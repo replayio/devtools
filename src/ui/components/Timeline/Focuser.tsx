@@ -10,18 +10,12 @@ type EditMode = {
   type: "move" | "move-auto" | "resize-end" | "resize-start";
 };
 
-type Props = { timelineRef: React.RefObject<HTMLDivElement> };
-
-// HACK: Limit the smallest focus region to be ~10% of the duration;
-// This avoids some known selection UI bugs.
-const MIN_FOCUS_WINDOW_PERCENTAGE = 0.1;
-
 function stopEvent(event: MouseEvent) {
   event.preventDefault();
   event.stopPropagation();
 }
 
-export default function ConditionalFocuser({ timelineRef }: Props) {
+export default function ConditionalFocuser() {
   const focusRegion = useSelector(selectors.getFocusRegion);
   const isFocusing = useSelector(selectors.getIsFocusing);
 
@@ -29,10 +23,10 @@ export default function ConditionalFocuser({ timelineRef }: Props) {
     return null;
   }
 
-  return <Focuser timelineRef={timelineRef} />;
+  return <Focuser />;
 }
 
-function Focuser({ timelineRef }: Props) {
+function Focuser() {
   const dispatch = useDispatch();
   const zoomRegion = useSelector(selectors.getZoomRegion);
   const focusRegion = useSelector(selectors.getFocusRegion);
@@ -49,10 +43,8 @@ function Focuser({ timelineRef }: Props) {
   const didDragRef = useRef<boolean>(false);
 
   useEffect(() => {
-    const div = containerRef.current;
-    const timeline = timelineRef.current;
-
-    if (!div || !focusRegion || !editMode || !timeline) {
+    const container = containerRef.current;
+    if (!container || !focusRegion || !editMode) {
       return;
     }
 
@@ -94,7 +86,14 @@ function Focuser({ timelineRef }: Props) {
         didDragRef.current = true;
 
         const relativeMouseX = pageX - (editMode.dragOffset || 0);
-        const mouseTime = getTimeFromPosition(relativeMouseX, div, zoomRegion);
+
+        const clampTime = editMode.type !== "move-auto";
+        const mouseTime = getTimeFromPosition(relativeMouseX, container, zoomRegion, clampTime);
+        if (mouseTime < 0 || mouseTime > zoomRegion.endTime) {
+          // Edge case for auto-track mode;
+          // When focus mode is entered, it's jarring if the focus region jumps towards the cursor before it mouses into the region.
+          return;
+        }
 
         switch (editMode.type) {
           case "move":
@@ -122,27 +121,19 @@ function Focuser({ timelineRef }: Props) {
             break;
           }
           case "resize-end": {
-            const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-            // TODO [bvaughn] Move minDuration checking into action dispatcher to be shared (and tested).
-            const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
-            const endTime = Math.max(mouseTime, focusRegion.startTime + minDuration);
             dispatch(
               setFocusRegion({
-                endTime,
-                startTime: focusRegion.startTime,
+                ...focusRegion,
+                endTime: mouseTime,
               })
             );
             break;
           }
           case "resize-start": {
-            const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-            // TODO [bvaughn] Move minDuration checking into action dispatcher to be shared (and tested).
-            const minDuration = zoomRegionDuration * MIN_FOCUS_WINDOW_PERCENTAGE;
-            const startTime = Math.min(mouseTime, focusRegion.endTime - minDuration);
             dispatch(
               setFocusRegion({
-                endTime: focusRegion.endTime,
-                startTime,
+                ...focusRegion,
+                startTime: mouseTime,
               })
             );
             break;
@@ -182,14 +173,14 @@ function Focuser({ timelineRef }: Props) {
       }
     };
 
-    timeline.addEventListener("click", onTimelineClick);
+    container.addEventListener("click", onTimelineClick);
     window.addEventListener("click", onWindowClick, true);
     window.addEventListener("mousemove", onWindowMouseMove, true);
     window.addEventListener("mouseleave", onWindowMouseLeave, true);
     window.addEventListener("mouseup", onWindowMouseUp, true);
 
     return () => {
-      timeline.removeEventListener("click", onTimelineClick);
+      container.removeEventListener("click", onTimelineClick);
       window.removeEventListener("click", onWindowClick, true);
       window.removeEventListener("mousemove", onWindowMouseMove, true);
       window.removeEventListener("mouseleave", onWindowMouseLeave, true);
@@ -201,15 +192,15 @@ function Focuser({ timelineRef }: Props) {
     return null;
   }
 
-  const setEditModeMove = (event: React.MouseEvent) => {
+  const setEditModeToMove = (event: React.MouseEvent) => {
     const draggableArea = draggableAreaRef.current!;
     const { left, width } = draggableArea.getBoundingClientRect();
     const relativeMouseX = event.pageX - left;
     const dragOffset = relativeMouseX - width / 2;
     setEditMode({ dragOffset, type: "move" });
   };
-  const setEditModeResizeEnd = () => setEditMode({ type: "resize-end" });
-  const setEditModeResizeStart = () => setEditMode({ type: "resize-start" });
+  const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
+  const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
 
   const left = getPositionFromTime(focusRegion.startTime, zoomRegion);
   const right = getPositionFromTime(focusRegion.endTime, zoomRegion);
@@ -225,17 +216,23 @@ function Focuser({ timelineRef }: Props) {
         }}
       >
         <div
-          className="h-full w-full rounded-sm bg-themeFocuserBgcolor opacity-50"
-          onMouseDown={setEditModeMove}
+          className="h-full w-full bg-themeFocuserBgcolor opacity-50"
+          onMouseDown={setEditModeToMove}
         />
+
         <div
-          className="absolute top-0 left-0 h-full w-2 transform cursor-ew-resize rounded-l-sm bg-themeFocuserBgcolor group-hover:w-2"
-          onMouseDown={setEditModeResizeStart}
-        />
+          className="absolute top-0 left-0 -ml-2 h-full w-2 transform cursor-ew-resize"
+          onMouseDown={setEditModeToResizeStart}
+        >
+          <div className="absolute right-0 h-full w-1 bg-themeFocuserBgcolor" />
+        </div>
+
         <div
-          className="absolute top-0 right-0 h-full w-2 transform cursor-ew-resize rounded-r-sm bg-themeFocuserBgcolor group-hover:w-2"
-          onMouseDown={setEditModeResizeEnd}
-        />
+          className="absolute top-0 right-0 -mr-2 h-full w-2 transform cursor-ew-resize"
+          onMouseDown={setEditModeToResizeEnd}
+        >
+          <div className="absolute left-0 h-full w-1 bg-themeFocuserBgcolor" />
+        </div>
       </div>
     </div>
   );

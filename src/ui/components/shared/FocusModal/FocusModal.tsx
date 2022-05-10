@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { hideModal as hideModalAction } from "ui/actions/app";
 import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
-import { getPrevFocusRegion } from "ui/reducers/timeline";
+import { getFocusRegion, getPrevFocusRegion } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../Button";
@@ -10,6 +10,7 @@ import MaterialIcon from "../MaterialIcon";
 
 export default function FocusingModal() {
   const dispatch = useDispatch();
+  const focusRegion = useSelector(getFocusRegion);
   const prevFocusRegion = useSelector(getPrevFocusRegion);
 
   const didExplicitlyDismiss = useRef<boolean>(false);
@@ -48,6 +49,13 @@ export default function FocusingModal() {
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
+  // Only show discard option if there are pending changes
+  const showDiscardButton =
+    focusRegion !== null &&
+    prevFocusRegion !== null &&
+    (prevFocusRegion.startTime !== focusRegion.startTime ||
+      prevFocusRegion.endTime !== focusRegion.endTime);
+
   return (
     <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
       <div
@@ -85,7 +93,7 @@ export default function FocusingModal() {
               <PrimaryButton color="blue" onClick={saveFocusRegion}>
                 Save
               </PrimaryButton>
-              {prevFocusRegion !== null && (
+              {showDiscardButton && (
                 <SecondaryButton color="pink" onClick={discardFocusRegion}>
                   Discard focus window
                 </SecondaryButton>

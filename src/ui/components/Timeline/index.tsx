@@ -26,7 +26,6 @@ export default function Timeline() {
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
 
-  const timelineRef = useRef<HTMLDivElement>(null);
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
@@ -86,7 +85,7 @@ export default function Timeline() {
   };
 
   return (
-    <div className="timeline" ref={timelineRef}>
+    <div className="timeline">
       <div className="commands">
         <PlayPauseButton />
       </div>
@@ -105,7 +104,7 @@ export default function Timeline() {
           <NonLoadingRegions />
           <UnfocusedRegion />
           <div className="progress-line-paused" style={{ left: `${percent}%` }} />
-          <Focuser timelineRef={timelineRef} />
+          <Focuser />
         </div>
 
         <Tooltip timelineWidth={timelineDimensions.width} />

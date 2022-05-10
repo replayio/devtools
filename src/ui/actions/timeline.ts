@@ -69,6 +69,13 @@ export type TimelineActions =
   | SetFocusRegionAction
   | SetPrevFocusRegionAction;
 
+const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
+const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
+
+// HACK: Limit the smallest focus region to be ~10% of the duration;
+// This avoids some known selection UI bugs.
+const MIN_FOCUS_WINDOW_PERCENTAGE = 0.1;
+
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
@@ -510,6 +517,40 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
     const currentTime = getCurrentTime(state);
 
     if (focusRegion !== null) {
+      const zoomRegion = getZoomRegion(state);
+
+      // Basic bounds check.
+      if (focusRegion.startTime < zoomRegion.startTime) {
+        focusRegion = {
+          ...focusRegion,
+          startTime: zoomRegion.startTime,
+        };
+      }
+      if (focusRegion.endTime > zoomRegion.endTime) {
+        focusRegion = {
+          ...focusRegion,
+          endTime: zoomRegion.endTime,
+        };
+      }
+
+      // Make sure our region is valid.
+      if (focusRegion.endTime < focusRegion.startTime) {
+        // If we need to adjust a dimension, it's the most intuitive to adjust the one that's being updated.
+        const prevFocusRegion = getFocusRegion(state);
+        if (prevFocusRegion?.endTime === focusRegion.endTime) {
+          focusRegion = {
+            ...focusRegion,
+            startTime: focusRegion.endTime,
+          };
+        } else {
+          focusRegion = {
+            ...focusRegion,
+            endTime: focusRegion.startTime,
+          };
+        }
+      }
+
+      // Make sure the current time stays within the bounds of our selected region.
       if (currentTime < focusRegion.startTime) {
         const minTime = focusRegion.startTime;
         dispatch(setTimelineToTime(minTime));
@@ -554,9 +595,6 @@ export function syncFocusedRegion(): UIThunkAction {
     );
   };
 }
-
-const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
-const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
 export function enterFocusMode(instructions?: string): UIThunkAction {
   return (dispatch, getState) => {

@@ -117,12 +117,19 @@ export function getNewZoomRegion({
 }
 
 // Format a time value to mm:ss
-export function getFormattedTime(time: number, showMs = false) {
+export function getFormattedTime(time: number, showMS: boolean = false) {
   const date = new Date(time);
   const seconds = date.getSeconds().toString().padStart(2, "0");
   const minutes = date.getMinutes();
+  const milliseconds = date.getMilliseconds().toString().padStart(3, "0");
 
-  return `${minutes}:${seconds}${showMs ? `.${date.getMilliseconds()}` : ""}`;
+  return `${minutes}:${seconds}${showMS ? `.${milliseconds}` : ""}`;
+}
+
+const TIME_REGEX = /^([0-9]+)(:[0-9]{0,2}){0,1}(\.[0-9]{0,3}){0,1}$/;
+
+export function isValidTimeString(formatted: string): boolean {
+  return TIME_REGEX.test(formatted) !== null;
 }
 
 // Parse milliseconds from a formatted time string (mm:ss or mm:ss:ss)
@@ -136,21 +143,29 @@ export function getSecondsFromFormattedTime(formatted: string) {
   let seconds = 0;
   let milliseconds = 0;
 
-  const pieces = formatted.split(":");
-  switch (pieces.length) {
+  const minutesAndSeconds = formatted.split(":");
+  switch (minutesAndSeconds.length) {
     case 1: {
-      seconds = parseInt(pieces[0]);
+      seconds = parseInt(minutesAndSeconds[0]);
       break;
     }
     case 2: {
-      minutes = parseInt(pieces[0]);
-      seconds = parseInt(pieces[1]);
-      break;
-    }
-    case 3: {
-      minutes = parseInt(pieces[0]);
-      seconds = parseInt(pieces[1]);
-      milliseconds = parseInt(pieces[2]);
+      minutes = parseInt(minutesAndSeconds[0]);
+      const secondsAndMilliseconds = minutesAndSeconds[1].split(".");
+      switch (secondsAndMilliseconds.length) {
+        case 1: {
+          seconds = parseInt(secondsAndMilliseconds[0]);
+          break;
+        }
+        case 2: {
+          seconds = parseInt(secondsAndMilliseconds[0]);
+          milliseconds = parseInt(secondsAndMilliseconds[1]);
+          break;
+        }
+        default: {
+          throw Error(`Unsupported time format "${formatted}"`);
+        }
+      }
       break;
     }
     default: {
@@ -212,11 +227,13 @@ export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
 export function getTimeFromPosition(
   pageX: number,
   target: HTMLElement,
-  zoomRegion: ZoomRegion
+  zoomRegion: ZoomRegion,
+  clampRange: boolean = true
 ): number {
   const rect = target.getBoundingClientRect();
   const x = pageX - rect.left;
   const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-  const time = zoomRegion.startTime + clamp(x / rect.width, 0, 100) * zoomRegionDuration;
+  const percentage = clampRange ? clamp(x / rect.width, 0, 100) : x / rect.width;
+  const time = zoomRegion.startTime + percentage * zoomRegionDuration;
   return time;
 }
