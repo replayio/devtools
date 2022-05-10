@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
@@ -8,8 +8,6 @@ import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import PortalDropdown from "../shared/PortalDropdown";
-import { Dropdown, DropdownItem } from "./LibraryDropdown";
 import LoadingScreen from "../shared/LoadingScreen";
 import Sidebar from "./Sidebar";
 import ViewerRouter from "./ViewerRouter";
@@ -25,6 +23,7 @@ import {
 } from "ui/utils/onboarding";
 import { useRouter } from "next/router";
 import { LibraryFiltersContext, useFilters } from "./Filter";
+import { FilterDropdown } from "./FilterDropdown";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -41,63 +40,35 @@ function isUnknownWorkspaceId(
   return !associatedWorkspaces.map(ws => ws.id).includes(id);
 }
 
-function FilterDropdown({
-  setSearchString,
-}: {
-  setSearchString: (str: string) => void;
-}) {
-  const [expanded, setExpanded] = useState(false);
-  
-  const setStringAndCollapseDropdown = (str: string) => {
-    setSearchString(str);
-    setExpanded(false);
-  }
-  const handleCreatedSince = (days: number) => {
-    const secondsAgo = 1000 * 60 * 60 * 24 * days;
-    const isoString = new Date(new Date().getTime() - secondsAgo).toISOString().substr(0, 10);
-    return setStringAndCollapseDropdown(`created:${isoString}`);
-  };
-
-  const button = (
-    <div className="text-sm flex border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor rounded-md space-x-2">
-      <div className="text-sm">Filter</div>
-      <div className="material-icons text-sm">expand_more</div>
-    </div>
-  );
-
-  return (
-    <PortalDropdown
-      buttonContent={button}
-      buttonStyle={`flex flex-grow flex-row items-center text-sm text-gray-500 ${styles.librarySearch}`}
-      setExpanded={setExpanded}
-      expanded={expanded}
-      position="top-right"
-      distance={0}
-    >
-      <Dropdown menuItemsClassName="z-50">
-        <DropdownItem onClick={() => setStringAndCollapseDropdown("")}>All Replays</DropdownItem>
-        <DropdownItem onClick={() => handleCreatedSince(7)}>Last 7 days</DropdownItem>
-        <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>Node replays</DropdownItem>
-      </Dropdown>
-    </PortalDropdown>
-  )
-}
-
 function FilterBar({
-  searchString,
-  setSearchString,
+  displayedString,
+  setAppliedString,
+  setDisplayedString,
+  applyDisplayedString,
 }: {
-  searchString: string;
-  setSearchString: (str: string) => void;
+  displayedString: string;
+  setAppliedString: (str: string) => void;
+  setDisplayedString: (str: string) => void;
+  applyDisplayedString: () => void;
 }) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchString(e.target.value);
+    setDisplayedString(e.target.value);
+  };
+  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      applyDisplayedString();
+    }
   };
 
   return (
     <>
-      <FilterDropdown setSearchString={setSearchString} />
-      <TextInput value={searchString} onChange={onChange} placeholder="Search" />
+      <FilterDropdown setSearchString={setAppliedString} />
+      <TextInput
+        value={displayedString}
+        onChange={onChange}
+        placeholder="Search"
+        onKeyDown={onKeyPress}
+      />
     </>
   );
 }
@@ -138,7 +109,8 @@ function Library({
   nags,
 }: LibraryProps) {
   const router = useRouter();
-  const { displayedSearchString, filters, setFilterString } = useFilters();
+  const { displayedString, setDisplayedString, applyDisplayedString, setAppliedString, filters } =
+    useFilters();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
@@ -187,7 +159,12 @@ function Library({
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-grow flex-col overflow-x-hidden">
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
-            <FilterBar searchString={displayedSearchString} setSearchString={setFilterString} />
+            <FilterBar
+              displayedString={displayedString}
+              setDisplayedString={setDisplayedString}
+              setAppliedString={setAppliedString}
+              applyDisplayedString={applyDisplayedString}
+            />
             <LaunchButton />
           </div>
           <ViewerRouter />

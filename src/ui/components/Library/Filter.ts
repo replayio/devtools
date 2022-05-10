@@ -27,11 +27,42 @@ function parseFilterString(str: string): LibraryFilters {
   return { qualifiers: { created, target }, searchString };
 }
 
-export function useFilters() {
-  const [displayedSearchString, setFilterString] = useState("");
-  const filters = parseFilterString(displayedSearchString);
+const useFilterString = (str: string) => {
+  const [appliedString, setAppliedString] = useState(str);
+  const [displayedString, setDisplayedString] = useState(str);
 
-  return { displayedSearchString, filters, setFilterString };
+  const applyDisplayedString = () => setAppliedString(displayedString);
+  const forceSetAppliedString = (newStr: string) => {
+    setAppliedString(newStr);
+    setDisplayedString(newStr);
+  };
+
+  return {
+    appliedString,
+    displayedString,
+    applyDisplayedString,
+    setDisplayedString,
+    setAppliedString: forceSetAppliedString,
+  };
+};
+
+export function useFilters(initialString: string = "") {
+  const {
+    appliedString,
+    displayedString,
+    applyDisplayedString,
+    setDisplayedString,
+    setAppliedString,
+  } = useFilterString(initialString);
+  const filters = parseFilterString(appliedString);
+
+  return {
+    displayedString,
+    applyDisplayedString,
+    setDisplayedString,
+    setAppliedString,
+    filters,
+  };
 }
 
 const subStringInString = (subString: string, string: string | null) => {
