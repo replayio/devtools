@@ -516,6 +516,12 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
     const state = getState();
     const currentTime = getCurrentTime(state);
 
+    // Stop playback (if we're playing) to avoid the currentTime from getting out of bounds.
+    const playback = getPlayback(state);
+    if (playback !== null) {
+      dispatch(stopPlayback());
+    }
+
     if (focusRegion !== null) {
       const zoomRegion = getZoomRegion(state);
 

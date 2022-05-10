@@ -6,7 +6,7 @@ import { ThunkExtraArgs } from "ui/utils/thunk";
 import * as actions from "../actions/timeline";
 
 import appReducer from "./app";
-import timelineReducer, { getCurrentTime, getFocusRegion } from "./timeline";
+import timelineReducer, { getCurrentTime, getFocusRegion, getPlayback } from "./timeline";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -149,6 +149,19 @@ describe("Redux timeline state", () => {
           "startTime": 60,
         }
       `);
+    });
+
+    it("should stop playback before resizing focusRegion", () => {
+      dispatch(actions.startPlayback());
+      expect(getPlayback(store.getState())).not.toBeNull();
+
+      dispatch(
+        actions.setFocusRegion({
+          startTime: 50,
+          endTime: 60,
+        })
+      );
+      expect(getPlayback(store.getState())).toBeNull();
     });
   });
 });
