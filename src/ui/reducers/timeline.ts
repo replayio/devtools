@@ -81,15 +81,3 @@ export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||
     state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);
-export const getIsAtFocusSoftLimit = (state: UIState) => {
-  const focusRegion = getFocusRegion(state);
-
-  if (!focusRegion) {
-    return false;
-  }
-
-  const focusDuration = Math.floor(focusRegion.endTime - focusRegion.startTime);
-  const duration = getZoomRegion(state).endTime;
-
-  return focusDuration <= duration * 0.1;
-};

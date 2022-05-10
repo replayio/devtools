@@ -504,19 +504,21 @@ export function setPrevFocusRegion(focusRegion: FocusRegion): SetPrevFocusRegion
   return { type: "set_prev_trim_region", focusRegion };
 }
 
-export function setFocusRegion(focusRegion: FocusRegion): UIThunkAction {
+export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
 
-    if (currentTime < focusRegion.startTime) {
-      const minTime = focusRegion.startTime;
-      dispatch(setTimelineToTime(minTime));
-      dispatch(setTimelineState({ currentTime: minTime }));
-    } else if (currentTime > focusRegion.endTime) {
-      const maxTime = focusRegion.endTime;
-      dispatch(setTimelineToTime(maxTime));
-      dispatch(setTimelineState({ currentTime: maxTime }));
+    if (focusRegion !== null) {
+      if (currentTime < focusRegion.startTime) {
+        const minTime = focusRegion.startTime;
+        dispatch(setTimelineToTime(minTime));
+        dispatch(setTimelineState({ currentTime: minTime }));
+      } else if (currentTime > focusRegion.endTime) {
+        const maxTime = focusRegion.endTime;
+        dispatch(setTimelineToTime(maxTime));
+        dispatch(setTimelineState({ currentTime: maxTime }));
+      }
     }
 
     dispatch({ type: "set_trim_region", focusRegion });
@@ -563,7 +565,9 @@ export function enterFocusMode(instructions?: string): UIThunkAction {
     const state = getState();
     const focusRegion = getFocusRegion(state);
 
-    dispatch(setPrevFocusRegion(focusRegion));
+    if (focusRegion !== null) {
+      dispatch(setPrevFocusRegion(focusRegion));
+    }
 
     if (!focusRegion) {
       const currentTime = getCurrentTime(state);

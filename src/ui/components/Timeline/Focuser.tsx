@@ -1,12 +1,9 @@
-import { react } from "@babel/types";
-import number from "devtools/packages/devtools-reps/reps/number";
 import clamp from "lodash/clamp";
 import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import { setFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { ZoomRegion } from "ui/state/timeline";
-import { trackEvent } from "ui/utils/telemetry";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 type EditMode = {
@@ -51,16 +48,6 @@ function Focuser({ timelineRef }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
   const didDragRef = useRef<boolean>(false);
-
-  useEffect(() => {
-    return () => {
-      // TODO The way this code was originally designed, the focus UI shows only when the "focusing" modal is active.
-      // When the "focusing" modal is closed, the currently selected focus region is applied.
-      // This coupling feels a bit awkward and we should revisit it.
-      dispatch(syncFocusedRegion());
-      trackEvent("timeline.save_focus");
-    };
-  });
 
   useEffect(() => {
     const div = containerRef.current;
