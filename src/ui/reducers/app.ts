@@ -80,7 +80,7 @@ const appSlice = createSlice({
       state.uploading = action.payload;
     },
     setAwaitingSourcemaps(state, action: PayloadAction<boolean>) {
-      state.awaitingSourcemaps = true;
+      state.awaitingSourcemaps = action.payload;
     },
     setLoadedRegions(state, action: PayloadAction<LoadedRegions>) {
       const recordingDuration = Math.max(

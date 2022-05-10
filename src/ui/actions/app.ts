@@ -1,30 +1,9 @@
 import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
-import {
-  SessionId,
-  unprocessedRegions,
-  PointDescription,
-  Location,
-  MouseEvent,
-  KeyboardEvent,
-  TimeStampedPointRange,
-} from "@recordreplay/protocol";
-import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
+import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
+import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
-import {
-  ModalType,
-  ModalOptionsType,
-  UploadInfo,
-  Canvas,
-  WorkspaceId,
-  SettingsTabTitle,
-  EventKind,
-  ReplayEvent,
-  ReplayNavigationEvent,
-  AppTheme,
-  AppMode,
-  LoadedRegions,
-} from "ui/state/app";
+import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
@@ -41,7 +20,6 @@ import {
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
@@ -63,10 +41,6 @@ import {
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
-
-export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
-  awaitingSourcemaps: boolean;
-};
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
