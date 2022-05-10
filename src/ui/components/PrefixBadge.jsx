@@ -51,13 +51,12 @@ function EmojiBadge({ emoji, onSelect, theme }) {
   );
 }
 
-function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
+function _PrefixBadge({ prefixBadge, style, theme }) {
   if (!prefixBadge) {
     return null;
   }
 
   if (isColorPrefix(prefixBadge)) {
-    console.log(prefixBadge);
     return (
       <div
         className={`${styles[prefixBadge]}`}
@@ -71,14 +70,7 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
     );
   }
 
-  return (
-    <div
-      className={`img ${prefixBadge}-${theme}`}
-      style={{
-        ...style,
-      }}
-    />
-  );
+  return <div className={`img ${prefixBadge}-${theme}`} style={style} />;
 }
 export const PrefixBadge = connect(
   state => ({
@@ -125,8 +117,6 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   if (!enableUnicornConsole) {
     return null;
   }
-
-  console.log({ showPrefixBadge });
 
   const prefixBadge = breakpoint.options.prefixBadge;
   const isColor = isColorPrefix(prefixBadge);
