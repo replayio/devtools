@@ -1,13 +1,8 @@
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
 import { LayoutAction } from "ui/actions/layout";
-import { trackEvent } from "ui/utils/telemetry";
-import { Recording } from "ui/types";
-import { getRecording } from "ui/hooks/recordings";
-import { getRecordingId } from "ui/utils/recording";
-import { getReplaySession } from "ui/setup/prefs";
 
-const syncInitialLayoutState: LayoutState = {
+export const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
@@ -17,62 +12,6 @@ const syncInitialLayoutState: LayoutState = {
   selectedPanel: "console",
   localNags: [],
 };
-
-const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => {
-  if (session) {
-    return session.selectedPrimaryPanel;
-  }
-
-  if (!recording) {
-    return syncInitialLayoutState.selectedPrimaryPanel;
-  }
-
-  return recording.comments.length ? "comments" : syncInitialLayoutState.selectedPrimaryPanel;
-};
-
-export async function getInitialLayoutState(): Promise<LayoutState> {
-  const recordingId = getRecordingId();
-
-  // If we're in the library, there are no preferences to fetch.
-  if (!recordingId) {
-    return syncInitialLayoutState;
-  }
-
-  let recording;
-  try {
-    recording = await getRecording(recordingId);
-  } catch (e) {
-    return syncInitialLayoutState;
-  }
-
-  const session = await getReplaySession(recordingId);
-
-  if (!session) {
-    return {
-      ...syncInitialLayoutState,
-      selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    };
-  }
-
-  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel, consoleFilterDrawerExpanded } =
-    syncInitialLayoutState;
-  const initialViewMode = session.viewMode || viewMode;
-  trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
-
-  return {
-    ...syncInitialLayoutState,
-    consoleFilterDrawerExpanded:
-      "consoleFilterDrawerExpanded" in session
-        ? session.consoleFilterDrawerExpanded
-        : consoleFilterDrawerExpanded,
-    viewMode: initialViewMode,
-    selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
-    selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
-    toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
-    localNags: "localNags" in session ? session.localNags : [],
-  };
-}
 
 export default function update(state = syncInitialLayoutState, action: LayoutAction): LayoutState {
   switch (action.type) {

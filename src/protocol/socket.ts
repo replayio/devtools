@@ -9,7 +9,7 @@ import {
   CommandResult,
 } from "@recordreplay/protocol";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { setUnexpectedError } from "ui/actions/session";
+import { setUnexpectedError } from "ui/actions/errors";
 import { UnexpectedError } from "ui/state/app";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 import { endMixpanelSession } from "ui/utils/mixpanel";

@@ -38,7 +38,6 @@ import {
   requestBodyData,
 } from "@recordreplay/protocol";
 import uniqueId from "lodash/uniqueId";
-import { repaint } from "protocol/graphics";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import { client, log, addEventListener, sendMessage } from "../socket";
@@ -715,6 +714,7 @@ class _ThreadFront {
     } else if (rv.exception) {
       rv.exception = new ValueFront(pause, rv.exception);
     }
+    const { repaint } = await import("protocol/graphics");
     repaint(true);
     return rv;
   }

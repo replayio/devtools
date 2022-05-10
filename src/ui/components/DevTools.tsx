@@ -134,7 +134,9 @@ function _DevTools({
 
   useEffect(() => {
     createSession(recordingId);
-    return () => clearTrialExpired();
+    return () => {
+      clearTrialExpired();
+    };
   }, [clearTrialExpired, createSession, recordingId]);
 
   useEffect(() => {

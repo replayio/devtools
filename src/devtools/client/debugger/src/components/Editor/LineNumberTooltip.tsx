@@ -1,12 +1,12 @@
 import { minBy } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setHoveredLineNumberLocation } from "ui/actions/app";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
+import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -160,12 +160,12 @@ export default function LineNumberTooltip({
   }, [analysisPointsCount]);
 
   if (
-  breakpoints.some(
-    b =>
-      !b.disabled &&
-      b.location.sourceId === source?.id &&
-      b.location.line === lastHoveredLineNumber.current
-  )
+    breakpoints.some(
+      b =>
+        !b.disabled &&
+        b.location.sourceId === source?.id &&
+        b.location.line === lastHoveredLineNumber.current
+    )
   ) {
     return null;
   }

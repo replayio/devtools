@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 const { toEditorLine } = require("devtools/client/debugger/src/utils/editor");
 
@@ -13,7 +13,6 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
   const [node, setNode] = useState<HTMLDivElement | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(() => {
     if (loading) {
       const _node = document.createElement("div");
@@ -26,13 +25,11 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
       insertAt,
     });
 
-    // We are clearing the widget here because without
+    // We are clearing the widget here because not
     // doing so causes breakpoints to show up on the
     // wrong line number when clicking in the gutter.
-    return () => {
-      _widget.clear();
-    };
-  }, [loading]); // eslint-disable-line react-hooks/exhaustive-deps
+    return () => _widget.clear();
+  }, [loading, node, editor.codeMirror, insertAt, location.line]);
 
   if (!node) {
     return null;

@@ -17,7 +17,6 @@ import { tabExists } from "../../reducers/tabs";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
-import { addTab } from "../tabs";
 import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines, setBreakpointHitCounts } from ".";
 
@@ -28,8 +27,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { paused } from "../pause/paused";
 
 import { ThreadFront } from "protocol/thread";
-
-import { prefs } from "devtools/shared/services";
 
 import {
   getSource,
@@ -123,6 +120,18 @@ export function deselectSource(): UIThunkAction {
   return (dispatch, getState) => {
     const cx = getThreadContext(getState());
     dispatch(clearSelectedLocation(cx));
+  };
+}
+
+export function addTab(source: Source) {
+  const { url, id: sourceId } = source;
+  const isOriginal = source.isOriginal;
+
+  return {
+    type: "ADD_TAB",
+    url,
+    isOriginal,
+    sourceId,
   };
 }
 

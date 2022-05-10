@@ -1,46 +1,56 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useMemo } from "react";
 import classnames from "classnames";
 
 import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const BreakpointTimelinePoint = require("./BreakpointTimelinePoint").default;
-const { prefs } = require("ui/utils/prefs");
 import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
-import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
+import { mostRecentPaintOrMouseEvent, precacheScreenshots } from "protocol/graphics";
 
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 import { AnalysisPayload } from "ui/state/app";
+import { PointDescription } from "@recordreplay/protocol";
+import { getExecutionPoint } from "../../../selectors";
 
 function Points({
   analysisPoints,
-  hoveredItem,
   breakpoint,
+  hoveredItem,
 }: {
-  breakpoint: any;
   analysisPoints: AnalysisPayload;
+  breakpoint: any;
   hoveredItem: HoveredItem | null;
 }) {
   const executionPoint = useSelector(getExecutionPoint);
-  let displayedPoints = [...analysisPoints.data];
-
-  // Even if we're over maxHitsDisplayed, we should still display a single paused
-  // point if the user happens to be paused on that this breakpoint.
-  if (analysisPoints.data.length > prefs.maxHitsDisplayed && executionPoint) {
-    displayedPoints = displayedPoints.filter(
-      point => BigInt(point.point) == BigInt(executionPoint)
-    );
-  }
+  const duration = useSelector(selectors.getRecordingDuration);
+  const displayedPoints = useMemo(() => {
+    if (!duration) {
+      // We haven't loaded yet, bailing early
+      return [];
+    }
+    let previousDisplayed: PointDescription;
+    return analysisPoints.data.filter(p => {
+      if (
+        !previousDisplayed ||
+        executionPoint === p.point ||
+        p.time - previousDisplayed.time > duration * 0.01
+      ) {
+        previousDisplayed = p;
+        return true;
+      }
+      return false;
+    });
+  }, [analysisPoints.data, executionPoint, duration]);
 
   return (
     <>
-      {displayedPoints.map((p, i) => (
+      {displayedPoints?.map((p, i) => (
         <BreakpointTimelinePoint
           breakpoint={breakpoint}
           point={p}
@@ -55,10 +65,6 @@ function Points({
 
 type BreakpointTimelineProps = PropsFromRedux & {
   breakpoint: any;
-};
-type Coordinates = {
-  x: number;
-  y: number;
 };
 
 function BreakpointTimeline({
@@ -90,9 +96,7 @@ function BreakpointTimeline({
     const time = Math.ceil(startTime + (endTime - startTime) * clickPosition);
     setHoveredTime(time);
   };
-  const onMouseLeave = (e: React.MouseEvent) => {
-    setHoveredTime(null);
-  };
+  const onMouseLeave = (e: React.MouseEvent) => setHoveredTime(null);
 
   const hoverPercent = `${getVisiblePosition({ time: hoveredTime, zoom: zoomRegion }) * 100}%`;
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
@@ -132,9 +136,9 @@ const connector = connect(
       breakpoint.location,
       breakpoint.options.condition
     ),
-    zoomRegion: selectors.getZoomRegion(state),
     currentTime: selectors.getCurrentTime(state),
     hoveredItem: selectors.getHoveredItem(state),
+    zoomRegion: selectors.getZoomRegion(state),
   }),
   {
     seek: UIActions.seek,

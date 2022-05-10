@@ -1,30 +1,9 @@
 import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
-import {
-  SessionId,
-  unprocessedRegions,
-  PointDescription,
-  Location,
-  MouseEvent,
-  KeyboardEvent,
-  TimeStampedPointRange,
-} from "@recordreplay/protocol";
-import { ThreadFront, RecordingTarget } from "protocol/thread/thread";
+import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
+import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
-import {
-  ModalType,
-  ModalOptionsType,
-  UploadInfo,
-  Canvas,
-  WorkspaceId,
-  SettingsTabTitle,
-  EventKind,
-  ReplayEvent,
-  ReplayNavigationEvent,
-  AppTheme,
-  AppMode,
-  LoadedRegions,
-} from "ui/state/app";
+import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
@@ -41,7 +20,6 @@ import {
 } from "./layout";
 import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
-import { PanelName } from "ui/state/layout";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
@@ -49,91 +27,20 @@ import { getShowVideoPanel } from "ui/reducers/layout";
 import { toggleFocusMode } from "./timeline";
 import { getTheme } from "ui/reducers/app";
 
-export type SetRecordingDurationAction = Action<"set_recording_duration"> & { duration: number };
-export type LoadingAction = Action<"loading"> & { loading: number };
-export type SetDisplayedLoadingProgressAction = Action<"set_displayed_loading_progress"> & {
-  progress: number | null;
-};
-export type SetLoadingFinishedAction = Action<"set_loading_finished"> & { finished: boolean };
-export type SetSessionIdAction = Action<"set_session_id"> & { sessionId: SessionId };
-export type UpdateThemeAction = Action<"update_theme"> & { theme: AppTheme };
-export type SetInitializedPanelsAction = Action<"set_initialized_panels"> & { panel: PanelName };
-export type SetUploadingAction = Action<"set_uploading"> & { uploading: UploadInfo | null };
-export type SetAwaitingSourcemapsAction = Action<"set_awaiting_sourcemaps"> & {
-  awaitingSourcemaps: boolean;
-};
-export type SetModalAction = Action<"set_modal"> & {
-  modal: ModalType | null;
-  options: ModalOptionsType;
-};
+export * from "../reducers/app";
 
-export type SetAnalysisPointsAction = Action<"set_analysis_points"> & {
-  analysisPoints: PointDescription[];
-  location: Location;
-  condition: string;
-};
-export type SetAnalysisErrorAction = Action<"set_analysis_error"> & {
-  location: Location;
-  condition: string;
-  errorKey?: number;
-};
-export type SetEventsForType = Action<"set_events"> & {
-  events: (MouseEvent | KeyboardEvent | ReplayNavigationEvent)[];
-  eventType: EventKind;
-};
-export type SetHoveredLineNumberLocation = Action<"set_hovered_line_number_location"> & {
-  location: Location | null;
-};
-export type SetIsNodePickerActive = Action<"set_is_node_picker_active"> & { active: boolean };
-export type SetIsNodePickerInitializing = Action<"set_is_node_picker_initializing"> & {
-  initializing: boolean;
-};
-export type SetCanvas = Action<"set_canvas"> & { canvas: Canvas };
-export type SetVideoUrl = Action<"set_video_url"> & { videoUrl: string };
-export type SetWorkspaceId = Action<"set_workspace_id"> & { workspaceId: WorkspaceId | null };
-export type SetDefaultSettingsTab = Action<"set_default_settings_tab"> & {
-  tabTitle: SettingsTabTitle;
-};
-export type SetRecordingTargetAction = Action<"set_recording_target"> & {
-  recordingTarget: RecordingTarget;
-};
-export type SetRecordingWorkspaceAction = Action<"set_recording_workspace"> & {
-  workspace: Workspace;
-};
-export type SetLoadedRegions = Action<"set_loaded_regions"> & {
-  parameters: LoadedRegions;
-};
-export type SetMouseTargetsLoading = Action<"mouse_targets_loading"> & {
-  loading: boolean;
-};
-export type SetAppModeAction = Action<"set_app_mode"> & { mode: AppMode };
-
-export type AppActions =
-  | SetRecordingDurationAction
-  | LoadingAction
-  | SetDisplayedLoadingProgressAction
-  | SetLoadingFinishedAction
-  | SetSessionIdAction
-  | UpdateThemeAction
-  | SetInitializedPanelsAction
-  | SetUploadingAction
-  | SetModalAction
-  | SetAnalysisPointsAction
-  | SetAnalysisErrorAction
-  | SetEventsForType
-  | SetHoveredLineNumberLocation
-  | SetIsNodePickerActive
-  | SetIsNodePickerInitializing
-  | SetCanvas
-  | SetMouseTargetsLoading
-  | SetVideoUrl
-  | SetWorkspaceId
-  | SetDefaultSettingsTab
-  | SetRecordingTargetAction
-  | SetRecordingWorkspaceAction
-  | SetLoadedRegions
-  | SetAwaitingSourcemapsAction
-  | SetAppModeAction;
+import {
+  setRecordingDuration,
+  setMouseTargetsLoading,
+  setLoadedRegions,
+  updateTheme,
+  setLoading,
+  setSessionId,
+  setModal,
+  setEventsForType,
+  setIsNodePickerActive,
+  setCanvas as setCanvasAction,
+} from "../reducers/app";
 
 export function setupApp(store: UIStore) {
   if (!isTest()) {
@@ -146,7 +53,7 @@ export function setupApp(store: UIStore) {
   }
 
   ThreadFront.waitForSession().then(sessionId => {
-    store.dispatch({ type: "set_session_id", sessionId });
+    store.dispatch(setSessionId(sessionId));
 
     client.Session.findKeyboardEvents({}, sessionId);
     client.Session.addKeyboardEventsListener(({ events }) => onKeyboardEvents(events, store));
@@ -164,7 +71,7 @@ export function setupApp(store: UIStore) {
   });
 
   ThreadFront.listenForLoadChanges(parameters => {
-    store.dispatch({ type: "set_loaded_regions", parameters });
+    store.dispatch(setLoadedRegions(parameters));
   });
 }
 
@@ -199,16 +106,16 @@ export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UI
 function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
   const groupedEvents = groupBy(events, event => event.kind);
 
-  Object.entries(groupedEvents).map(([eventKind, kindEvents]) => {
+  Object.entries(groupedEvents).map(([eventType, kindEvents]) => {
     const keyboardEvents = [
-      ...selectors.getEventsForType(store.getState(), eventKind),
+      ...selectors.getEventsForType(store.getState(), eventType),
       ...kindEvents,
     ];
     keyboardEvents.sort((a: ReplayEvent, b: ReplayEvent) =>
       compareBigInt(BigInt(a.point), BigInt(b.point))
     );
 
-    store.dispatch(setEventsForType(keyboardEvents, eventKind));
+    store.dispatch(setEventsForType({ events: keyboardEvents, eventType }));
   });
 }
 
@@ -220,29 +127,7 @@ function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   ];
   newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
 
-  store.dispatch(setEventsForType(newNavEvents, "navigation"));
-}
-
-function setRecordingDuration(duration: number): SetRecordingDurationAction {
-  return { type: "set_recording_duration", duration };
-}
-
-function setLoading(loading: number): LoadingAction {
-  return { type: "loading", loading };
-}
-
-export function setDisplayedLoadingProgress(
-  progress: number | null
-): SetDisplayedLoadingProgressAction {
-  return { type: "set_displayed_loading_progress", progress };
-}
-
-export function setLoadingFinished(finished: boolean): SetLoadingFinishedAction {
-  return { type: "set_loading_finished", finished };
-}
-
-export function updateTheme(theme: AppTheme): UpdateThemeAction {
-  return { type: "update_theme", theme };
+  store.dispatch(setEventsForType({ events: newNavEvents, eventType: "navigation" }));
 }
 
 export function toggleTheme(): UIThunkAction {
@@ -253,88 +138,8 @@ export function toggleTheme(): UIThunkAction {
   };
 }
 
-export function setInitializedPanels(panel: PanelName): SetInitializedPanelsAction {
-  return { type: "set_initialized_panels", panel };
-}
-
-export function setUploading(uploading: UploadInfo | null): SetUploadingAction {
-  return { type: "set_uploading", uploading };
-}
-
-export function setAwaitingSourcemaps(awaitingSourcemaps: boolean): SetAwaitingSourcemapsAction {
-  return { type: "set_awaiting_sourcemaps", awaitingSourcemaps };
-}
-
-export function setModal(modalType: ModalType, options: ModalOptionsType = null): SetModalAction {
-  return {
-    type: "set_modal",
-    modal: modalType,
-    options,
-  };
-}
-
-export function hideModal(): SetModalAction {
-  return {
-    type: "set_modal",
-    modal: null,
-    options: null,
-  };
-}
-
-export function setAnalysisPoints(
-  points: PointDescription[],
-  location: Location,
-  condition = ""
-): SetAnalysisPointsAction {
-  return {
-    type: "set_analysis_points",
-    analysisPoints: points,
-    location,
-    condition,
-  };
-}
-
-export function setAnalysisError(
-  location: Location,
-  condition = "",
-  errorKey?: number
-): SetAnalysisErrorAction {
-  return {
-    type: "set_analysis_error",
-    location,
-    condition,
-    errorKey,
-  };
-}
-
-export function setEventsForType(events: ReplayEvent[], eventType: EventKind): SetEventsForType {
-  return {
-    type: "set_events",
-    eventType,
-    events,
-  };
-}
-
-export function setHoveredLineNumberLocation(
-  location: Location | null
-): SetHoveredLineNumberLocation {
-  return { type: "set_hovered_line_number_location", location };
-}
-
-export function setIsNodePickerActive(active: boolean): SetIsNodePickerActive {
-  return { type: "set_is_node_picker_active", active };
-}
-
-export function setIsNodePickerInitializing(initializing: boolean): SetIsNodePickerInitializing {
-  return { type: "set_is_node_picker_initializing", initializing };
-}
-
-export function setVideoUrl(videoUrl: string): SetVideoUrl {
-  return { type: "set_video_url", videoUrl };
-}
-
-export function setCanvasAction(canvas: Canvas): SetCanvas {
-  return { type: "set_canvas", canvas };
+export function hideModal() {
+  return setModal(null, null);
 }
 
 export function setCanvas(canvas: Canvas): UIThunkAction {
@@ -347,26 +152,6 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
       dispatch(setCanvasAction(canvas));
     }
   };
-}
-
-export function setWorkspaceId(workspaceId: WorkspaceId | null): SetWorkspaceId {
-  return { type: "set_workspace_id", workspaceId };
-}
-
-export function setDefaultSettingsTab(tabTitle: SettingsTabTitle): SetDefaultSettingsTab {
-  return { type: "set_default_settings_tab", tabTitle };
-}
-
-export function setRecordingTarget(recordingTarget: RecordingTarget): SetRecordingTargetAction {
-  return { type: "set_recording_target", recordingTarget };
-}
-
-export function setRecordingWorkspace(workspace: Workspace): SetRecordingWorkspaceAction {
-  return { type: "set_recording_workspace", workspace };
-}
-
-export function setMouseTargetsLoading(loading: boolean): SetMouseTargetsLoading {
-  return { type: "mouse_targets_loading", loading };
 }
 
 export function loadMouseTargets(): UIThunkAction {
@@ -452,8 +237,4 @@ export function executeCommand(key: CommandKey): UIThunkAction {
 
     dispatch(hideCommandPalette());
   };
-}
-
-export function setAppMode(mode: AppMode): SetAppModeAction {
-  return { type: "set_app_mode", mode };
 }

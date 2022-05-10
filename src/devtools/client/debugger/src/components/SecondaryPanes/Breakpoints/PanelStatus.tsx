@@ -1,9 +1,19 @@
+import sortedLastIndex from "lodash/sortedLastIndex";
 import { useSelector } from "react-redux";
 import { isColorPrefix } from "ui/components/PrefixBadge";
 import { getIsIndexed, getTheme } from "ui/reducers/app";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
-import { getExecutionPoint } from "../../../selectors";
 import styles from "ui/components/PrefixBadge.module.css";
+
+const numberStatus = (current: number, total: number): string => {
+  return `${current}/${total}`;
+};
+
+const maxStatusLength = (total: number): number => {
+  const numberLength = numberStatus(total, total).length;
+  return Math.max("Loading".length, numberLength);
+};
 
 export function PanelStatus({
   analysisPoints,
@@ -12,27 +22,23 @@ export function PanelStatus({
   analysisPoints: AnalysisPayload;
   prefixBadge: string;
 }) {
-  const executionPoint = useSelector(getExecutionPoint);
   const isIndexed = useSelector(getIsIndexed);
   const theme = useSelector(getTheme);
+  const time = useSelector(getCurrentTime);
   let status = "";
-  let maxStatusLength = 0;
 
-  if (!isIndexed) {
-    status = "Indexing";
-  } else if (!analysisPoints || !executionPoint) {
+  if (!isIndexed || !analysisPoints) {
     status = "Loading";
   } else if (analysisPoints.error) {
     status = analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error";
   } else if (analysisPoints.data.length == 0) {
     status = "No hits";
   } else {
-    const points = analysisPoints
-      ? analysisPoints.data.filter(point => BigInt(point.point) <= BigInt(executionPoint))
-      : [];
-
-    status = `${points.length}/${analysisPoints.data.length}`;
-    maxStatusLength = `${analysisPoints.data.length}/${analysisPoints.data.length}`.length;
+    const previousTimeIndex = sortedLastIndex(
+      analysisPoints.data.map(p => p.time),
+      time
+    );
+    status = numberStatus(previousTimeIndex, analysisPoints.data.length);
   }
 
   return (
@@ -40,7 +46,10 @@ export function PanelStatus({
       <div
         className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus ${styles[prefixBadge]}`}
       >
-        <div className="text-center" style={{ minWidth: `${maxStatusLength}ch` }}></div>
+        <div
+          className="text-center"
+          style={{ width: `${maxStatusLength(analysisPoints?.data.length || 0)}ch` }}
+        ></div>
         {status}
       </div>
     </div>

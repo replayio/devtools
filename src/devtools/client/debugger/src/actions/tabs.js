@@ -27,18 +27,6 @@ export function updateTab(source, framework) {
   };
 }
 
-export function addTab(source) {
-  const { url, id: sourceId } = source;
-  const isOriginal = source.isOriginal;
-
-  return {
-    type: "ADD_TAB",
-    url,
-    isOriginal,
-    sourceId,
-  };
-}
-
 export function moveTab(url, tabIndex) {
   return {
     type: "MOVE_TAB",

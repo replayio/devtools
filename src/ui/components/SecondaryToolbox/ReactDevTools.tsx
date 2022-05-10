@@ -12,7 +12,7 @@ import {
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/actions/app";
+import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/reducers/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
