@@ -326,17 +326,25 @@ function ReactDevtoolsPanel({
     );
   }
 
+  const isReactDevToolsReady = reactDevToolsInlineModule !== null;
   const isReady =
-    reactDevToolsInlineModule !== null &&
+    isReactDevToolsReady &&
     reactInitPoint !== null &&
     currentPoint !== null &&
     compareNumericStrings(reactInitPoint, currentPoint) <= 0;
 
   if (!isReady) {
     return (
-      <div className="flex flex-col gap-4 p-4">
-        <div>React DevTools not yet loaded.</div>
-        <div>Try picking a different point on the timeline.</div>
+      <div className="flex flex-col items-center gap-4 p-4">
+        <img src="/images/react.svg" className="mt-2 w-8" />
+        {isReactDevToolsReady ? (
+          <>
+            <div>Mounting your React application...</div>
+            <div>Taking too long? Try picking a different point on the timeline.</div>
+          </>
+        ) : (
+          <div>Loading React Developer Tools...</div>
+        )}
       </div>
     );
   }
