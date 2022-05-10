@@ -72,10 +72,6 @@ export type TimelineActions =
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
-// HACK: Limit the smallest focus region to be ~10% of the duration;
-// This avoids some known selection UI bugs.
-const MIN_FOCUS_WINDOW_PERCENTAGE = 0.1;
-
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
