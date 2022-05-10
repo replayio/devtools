@@ -21,7 +21,7 @@ import {
   getFileSearchResults,
 } from "../selectors";
 
-import { closeActiveSearch, clearHighlightLineRange, setActiveSearch } from "./ui";
+import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
 import { isFulfilled } from "../utils/async-value";
 
 export function doSearch(cx, query, editor) {
@@ -137,6 +137,7 @@ export function traverseResults(cx, rev, editor) {
     const { matches } = getFileSearchResults(getState());
 
     if (query === "") {
+      const { setActiveSearch } = await import("./ui");
       dispatch(setActiveSearch("file"));
     }
 

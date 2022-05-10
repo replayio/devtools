@@ -48,6 +48,7 @@ import { resizeBreakpointGutter } from "../utils/ui";
 import { searchContents } from "./file-search";
 
 export {
+  closeActiveSearch,
   highlightLineRange,
   clearHighlightLineRange,
   toggleActiveSearch,
@@ -56,10 +57,6 @@ export {
   setFulltextQuery,
   focusFullTextInput,
 } from "../reducers/ui";
-
-export function closeActiveSearch() {
-  return toggleActiveSearch(null);
-}
 
 export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {
   return (dispatch, getState) => {

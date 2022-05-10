@@ -143,6 +143,10 @@ export const {
   toggleSources,
 } = uiSlice.actions;
 
+export function closeActiveSearch() {
+  return toggleActiveSearch(null);
+}
+
 export default uiSlice.reducer;
 
 export const getSelectedPrimaryPaneTab = (state: UIState) => state.ui.selectedPrimaryPaneTab;

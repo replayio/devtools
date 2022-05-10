@@ -16,7 +16,7 @@ import type { Location, Source } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import { setSymbols } from "./symbols";
-import { closeActiveSearch, updateActiveFileSearch } from "../ui";
+import { closeActiveSearch } from "../../reducers/ui";
 import { loadSourceText } from "./loadSourceText";
 import { setBreakableLines } from "./breakableLines";
 
@@ -200,6 +200,7 @@ export function selectLocation(
     // If a new source is selected update the file search results
     const newSource = getSelectedSource(getState());
     if (currentSource && currentSource !== newSource) {
+      const { updateActiveFileSearch } = await import("../ui");
       dispatch(updateActiveFileSearch(cx));
     }
   };
