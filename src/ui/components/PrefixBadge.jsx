@@ -57,6 +57,7 @@ function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
   }
 
   if (isColorPrefix(prefixBadge)) {
+    console.log(prefixBadge);
     return (
       <div
         className={`${styles[prefixBadge]}`}
