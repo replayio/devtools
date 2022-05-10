@@ -1,5 +1,6 @@
 import { createContext, useState } from "react";
 import { Recording } from "ui/types";
+import { getParams, updateUrlWithParams } from "ui/utils/environment";
 
 export type LibraryFilters = {
   searchString: string;
@@ -31,10 +32,14 @@ const useFilterString = (str: string) => {
   const [appliedString, setAppliedString] = useState(str);
   const [displayedString, setDisplayedString] = useState(str);
 
-  const applyDisplayedString = () => setAppliedString(displayedString);
+  const applyDisplayedString = () => {
+    setAppliedString(displayedString);
+    updateUrlWithParams({ q: displayedString });
+  };
   const forceSetAppliedString = (newStr: string) => {
     setAppliedString(newStr);
     setDisplayedString(newStr);
+    updateUrlWithParams({ q: newStr });
   };
 
   return {
@@ -46,7 +51,8 @@ const useFilterString = (str: string) => {
   };
 };
 
-export function useFilters(initialString: string = "") {
+export function useFilters() {
+  const initialString = getParams().q || "";
   const {
     appliedString,
     displayedString,

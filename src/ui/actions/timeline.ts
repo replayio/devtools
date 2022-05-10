@@ -26,7 +26,7 @@ import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/ti
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { getPausePointParams, getTest } from "ui/utils/environment";
+import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
@@ -164,7 +164,7 @@ function onWarp(store: UIStore) {
 
 function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
   return async dispatch => {
-    updateUrl({ point, time, hasFrames });
+    updatePausePointParams({ point, time, hasFrames });
     dispatch(setTimelineState({ currentTime: time, playback: null }));
   };
 }
@@ -221,7 +221,7 @@ export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
   return { type: "set_zoom", region };
 }
 
-function updateUrl({
+function updatePausePointParams({
   point,
   time,
   hasFrames,
@@ -230,11 +230,8 @@ function updateUrl({
   time: number;
   hasFrames: boolean;
 }) {
-  const url = new URL(window.location.toString());
-  url.searchParams.set("point", point);
-  url.searchParams.set("time", `${time}`);
-  url.searchParams.set("hasFrames", `${hasFrames}`);
-  window.history.replaceState({}, "", url.toString());
+  const params = { point, time: `${time}`, hasFrames: `${hasFrames}`};
+  updateUrlWithParams(params);
 }
 
 export function seek(
