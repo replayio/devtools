@@ -1,4 +1,4 @@
-import React, { ChangeEvent, KeyboardEvent, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
@@ -8,10 +8,12 @@ import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
+
 import LoadingScreen from "../shared/LoadingScreen";
+import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
+import { LibraryFiltersContext, useFilters } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
-import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "./Library.module.css";
@@ -22,8 +24,6 @@ import {
   singleInvitation,
 } from "ui/utils/onboarding";
 import { useRouter } from "next/router";
-import { LibraryFiltersContext, useFilters } from "./Filter";
-import { FilterDropdown } from "./FilterDropdown";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -38,39 +38,6 @@ function isUnknownWorkspaceId(
   }
 
   return !associatedWorkspaces.map(ws => ws.id).includes(id);
-}
-
-function FilterBar({
-  displayedString,
-  setAppliedString,
-  setDisplayedString,
-  applyDisplayedString,
-}: {
-  displayedString: string;
-  setAppliedString: (str: string) => void;
-  setDisplayedString: (str: string) => void;
-  applyDisplayedString: () => void;
-}) {
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDisplayedString(e.target.value);
-  };
-  const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      applyDisplayedString();
-    }
-  };
-
-  return (
-    <>
-      <FilterDropdown setSearchString={setAppliedString} />
-      <TextInput
-        value={displayedString}
-        onChange={onChange}
-        placeholder="Search"
-        onKeyDown={onKeyPress}
-      />
-    </>
-  );
 }
 
 function LibraryLoader(props: PropsFromRedux) {

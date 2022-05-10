@@ -1,20 +1,18 @@
 import { useState } from "react";
+
 import PortalDropdown from "../shared/PortalDropdown";
+
 import { Dropdown, DropdownItem } from "./LibraryDropdown";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
-export function FilterDropdown({
-  setSearchString,
-}: {
-  setSearchString: (str: string) => void;
-}) {
+export function FilterDropdown({ setSearchString }: { setSearchString: (str: string) => void }) {
   const [expanded, setExpanded] = useState(false);
-  
+
   const setStringAndCollapseDropdown = (str: string) => {
     setSearchString(str);
     setExpanded(false);
-  }
+  };
   const handleCreatedSince = (days: number) => {
     const secondsAgo = daysInSeconds(days);
     const isoString = new Date(new Date().getTime() - secondsAgo).toISOString().substr(0, 10);
@@ -32,7 +30,6 @@ export function FilterDropdown({
   return (
     <PortalDropdown
       buttonContent={button}
-      // buttonStyle="flex flex-grow flex-row items-center text-sm text-gray-500"
       setExpanded={setExpanded}
       expanded={expanded}
       position="top-right"
@@ -41,8 +38,10 @@ export function FilterDropdown({
       <Dropdown menuItemsClassName="z-50">
         <DropdownItem onClick={() => setStringAndCollapseDropdown("")}>All Replays</DropdownItem>
         <DropdownItem onClick={() => handleCreatedSince(7)}>Last 7 days</DropdownItem>
-        <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>Node replays</DropdownItem>
+        <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>
+          Node replays
+        </DropdownItem>
       </Dropdown>
     </PortalDropdown>
-  )
+  );
 }

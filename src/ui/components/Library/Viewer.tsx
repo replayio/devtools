@@ -1,17 +1,21 @@
-import React, { useState, useMemo, useContext } from "react";
-import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
+
 import BatchActionDropdown from "./BatchActionDropdown";
+
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
-import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
+
 import sortBy from "lodash/sortBy";
-import styles from "./Library.module.css";
+import React, { useState, useMemo, useContext } from "react";
 import { useSelector } from "react-redux";
 import { getWorkspaceId } from "ui/reducers/app";
+import { Recording } from "ui/types";
+
+import styles from "./Library.module.css";
+import RecordingRow from "./RecordingRow";
 import TeamTrialEnd from "./TeamTrialEnd";
-import { filterRecordings, LibraryFiltersContext } from "./Filter";
+import { filterRecordings, LibraryFiltersContext } from "./useFilters";
 
 function getErrorText() {
   if (isReplayBrowser()) {

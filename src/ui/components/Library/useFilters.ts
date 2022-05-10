@@ -28,6 +28,37 @@ function parseFilterString(str: string): LibraryFilters {
   return { qualifiers: { created, target }, searchString };
 }
 
+const subStringInString = (subString: string, string: string | null) => {
+  if (!string) {
+    return false;
+  }
+
+  return string.toLowerCase().includes(subString.toLowerCase());
+};
+
+export const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
+  const { searchString, qualifiers } = filters;
+  let filteredRecordings = recordings;
+
+  filteredRecordings = searchString
+    ? recordings.filter(
+        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
+      )
+    : recordings;
+  filteredRecordings =
+    qualifiers.target && qualifiers.target === "target:node"
+      ? filteredRecordings.filter(r => !r.user)
+      : filteredRecordings;
+  filteredRecordings =
+    qualifiers.created && new Date(qualifiers.created)
+      ? filteredRecordings.filter(
+          r => new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
+        )
+      : filteredRecordings;
+
+  return filteredRecordings;
+};
+
 const useFilterString = (str: string) => {
   const [appliedString, setAppliedString] = useState(str);
   const [displayedString, setDisplayedString] = useState(str);
@@ -70,34 +101,3 @@ export function useFilters() {
     filters,
   };
 }
-
-const subStringInString = (subString: string, string: string | null) => {
-  if (!string) {
-    return false;
-  }
-
-  return string.toLowerCase().includes(subString.toLowerCase());
-};
-
-export const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
-  const { searchString, qualifiers } = filters;
-  let filteredRecordings = recordings;
-
-  filteredRecordings = searchString
-    ? recordings.filter(
-        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
-      )
-    : recordings;
-  filteredRecordings =
-    qualifiers.target && qualifiers.target === "target:node"
-      ? filteredRecordings.filter(r => !r.user)
-      : filteredRecordings;
-  filteredRecordings =
-    qualifiers.created && new Date(qualifiers.created)
-      ? filteredRecordings.filter(
-          r => new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
-        )
-      : filteredRecordings;
-
-  return filteredRecordings;
-};
