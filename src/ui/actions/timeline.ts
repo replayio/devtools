@@ -21,20 +21,12 @@ import {
   getFocusRegion,
   getZoomRegion,
 } from "ui/reducers/timeline";
-<<<<<<< HEAD
 import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
-=======
-import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
->>>>>>> 259baabaf (Tidied up the file structure and lint fixes)
 
 import { UIStore, UIThunkAction } from ".";
 import { Action } from "redux";
 import { PauseEventArgs } from "protocol/thread/thread";
-<<<<<<< HEAD
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
-=======
-import { TimelineState, ZoomRegion, HoveredItem, FocusOperation } from "ui/state/timeline";
->>>>>>> 259baabaf (Tidied up the file structure and lint fixes)
 import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";

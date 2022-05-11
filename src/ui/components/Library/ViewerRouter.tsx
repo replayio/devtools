@@ -62,14 +62,10 @@ function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
 
   return (
     <Viewer
-      {...{
-        recordings,
-        workspaceName: workspace.logo ? (
-          <Base64Image src={workspace.logo} className="max-h-12" />
-        ) : (
-          workspace.name
-        ),
-      }}
+      recordings={recordings}
+      workspaceName={
+        workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : workspace.name
+      }
     />
   );
 }

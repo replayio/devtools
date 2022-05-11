@@ -6,27 +6,25 @@ import { FilterDropdown } from "./FilterDropdown";
 
 export function FilterBar({
   displayedString,
-  setAppliedString,
-  setDisplayedString,
-  applyDisplayedString,
+  setDisplayedText,
+  setAppliedText,
 }: {
   displayedString: string;
-  setAppliedString: (str: string) => void;
-  setDisplayedString: (str: string) => void;
-  applyDisplayedString: () => void;
+  setDisplayedText: (str: string) => void;
+  setAppliedText: (str: string) => void;
 }) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setDisplayedString(e.target.value);
+    setDisplayedText(e.target.value);
   };
   const onKeyPress = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      applyDisplayedString();
+      setAppliedText(e.currentTarget.value);
     }
   };
 
   return (
     <>
-      <FilterDropdown setSearchString={setAppliedString} />
+      <FilterDropdown setAppliedText={setAppliedText} />
       <TextInput
         value={displayedString}
         onChange={onChange}

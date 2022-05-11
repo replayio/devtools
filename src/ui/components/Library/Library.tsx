@@ -76,8 +76,7 @@ function Library({
   nags,
 }: LibraryProps) {
   const router = useRouter();
-  const { displayedString, setDisplayedString, applyDisplayedString, setAppliedString, filters } =
-    useFilters();
+  const { displayedString, setDisplayedText, setAppliedText, filters } = useFilters();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
@@ -128,9 +127,8 @@ function Library({
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
             <FilterBar
               displayedString={displayedString}
-              setDisplayedString={setDisplayedString}
-              setAppliedString={setAppliedString}
-              applyDisplayedString={applyDisplayedString}
+              setDisplayedText={setDisplayedText}
+              setAppliedText={setAppliedText}
             />
             <LaunchButton />
           </div>

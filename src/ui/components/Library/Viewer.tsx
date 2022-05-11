@@ -52,13 +52,16 @@ export default function Viewer({
   workspaceName: string | React.ReactNode;
 }) {
   const filters = useContext(LibraryFiltersContext);
-  const filteredRecordings = filterRecordings(recordings, filters);
+  const filteredRecordings = useMemo(
+    () => filterRecordings(recordings, filters),
+    [filters, recordings]
+  );
 
   return (
     <div
       className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
-      <ViewerContent {...{ workspaceName }} recordings={filteredRecordings} />
+      <ViewerContent workspaceName={workspaceName} recordings={filteredRecordings} />
     </div>
   );
 }
@@ -74,8 +77,6 @@ function ViewerContent({
   const [isEditing, setIsEditing] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [showMore, toggleShowMore] = useState(false);
-
-  console.log(recordings);
 
   const shownRecordings = useMemo(() => {
     const sortedRecordings = sortBy(recordings, recording => {

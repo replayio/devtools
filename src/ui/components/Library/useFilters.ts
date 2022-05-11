@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useMemo, useState } from "react";
 import { Recording } from "ui/types";
 import { getParams, updateUrlWithParams } from "ui/utils/environment";
 
@@ -28,46 +28,40 @@ function parseFilterString(str: string): LibraryFilters {
   return { qualifiers: { created, target }, searchString };
 }
 
-const subStringInString = (subString: string, string: string | null) => {
+const substringInString = (substring: string, string: string | null) => {
   if (!string) {
     return false;
   }
 
-  return string.toLowerCase().includes(subString.toLowerCase());
+  return string.toLowerCase().includes(substring.toLowerCase());
 };
 
 export const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
   const { searchString, qualifiers } = filters;
   let filteredRecordings = recordings;
 
-  filteredRecordings = searchString
-    ? recordings.filter(
-        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
-      )
-    : recordings;
-  filteredRecordings =
-    qualifiers.target && qualifiers.target === "target:node"
-      ? filteredRecordings.filter(r => !r.user)
-      : filteredRecordings;
-  filteredRecordings =
-    qualifiers.created && new Date(qualifiers.created)
-      ? filteredRecordings.filter(
-          r => new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
-        )
-      : filteredRecordings;
+  return filteredRecordings.filter(r => {
+    const matchesSearchString = searchString
+      ? substringInString(searchString, r.url) || substringInString(searchString, r.title)
+      : true;
+    const matchesTarget = qualifiers.target && qualifiers.target === "target:node" ? !r.user : true;
+    const matchesCreated =
+      qualifiers.created && new Date(qualifiers.created)
+        ? new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
+        : true;
 
-  return filteredRecordings;
+    return matchesSearchString && matchesTarget && matchesCreated;
+  });
 };
 
 const useFilterString = (str: string) => {
   const [appliedString, setAppliedString] = useState(str);
   const [displayedString, setDisplayedString] = useState(str);
 
-  const applyDisplayedString = () => {
-    setAppliedString(displayedString);
-    updateUrlWithParams({ q: displayedString });
+  const setDisplayedText = (newStr: string) => {
+    setDisplayedString(newStr);
   };
-  const forceSetAppliedString = (newStr: string) => {
+  const setAppliedText = (newStr: string) => {
     setAppliedString(newStr);
     setDisplayedString(newStr);
     updateUrlWithParams({ q: newStr });
@@ -76,28 +70,21 @@ const useFilterString = (str: string) => {
   return {
     appliedString,
     displayedString,
-    applyDisplayedString,
-    setDisplayedString,
-    setAppliedString: forceSetAppliedString,
+    setDisplayedText,
+    setAppliedText,
   };
 };
 
 export function useFilters() {
   const initialString = getParams().q || "";
-  const {
-    appliedString,
-    displayedString,
-    applyDisplayedString,
-    setDisplayedString,
-    setAppliedString,
-  } = useFilterString(initialString);
-  const filters = parseFilterString(appliedString);
+  const { appliedString, displayedString, setDisplayedText, setAppliedText } =
+    useFilterString(initialString);
+  const filters = useMemo(() => parseFilterString(appliedString), [appliedString]);
 
   return {
     displayedString,
-    applyDisplayedString,
-    setDisplayedString,
-    setAppliedString,
+    setDisplayedText,
+    setAppliedText,
     filters,
   };
 }
