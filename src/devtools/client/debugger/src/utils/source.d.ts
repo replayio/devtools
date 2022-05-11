@@ -11,11 +11,7 @@ export function getUniqueAlternateSourceId(sourceId: SourceId): {
   why?: "no-sourcemap" | "not-unique";
 };
 
-export function getTextAtPosition(
-  sourceId: string,
-  asyncContent: SourceContent,
-  location: Location
-): string;
+export function getTextAtPosition(asyncContent: SourceContent, location: Location): string;
 
 export function getPrettySourceURL(url: string): string;
 
@@ -27,8 +23,4 @@ export function isInlineScript(source: { introductionType?: string | null }): bo
 
 export function getFilename(source: Source, rawSourceURL?: string): string;
 
-export function getLineText<T>(
-  sourceId?: string,
-  asyncContent?: AsyncValue<T>,
-  line?: number
-): string;
+export function getLineText<T>(asyncContent?: T | AsyncValue<T>, line?: number): string;

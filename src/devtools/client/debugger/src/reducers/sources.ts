@@ -775,7 +775,7 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
     return null;
   }
   // @ts-ignore Ignore async value errors for now
-  const text = getTextAtPosition(id, content, { ...location, column: 0 });
+  const text = getTextAtPosition(content, { ...location, column: 0 });
 
   return text;
 }

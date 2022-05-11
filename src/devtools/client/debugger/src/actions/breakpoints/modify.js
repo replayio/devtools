@@ -105,10 +105,10 @@ export function addBreakpoint(
     const astLocation = getASTLocation(source, symbols, location);
 
     const originalContent = getSourceContent(getState(), source.id);
-    const originalText = getTextAtPosition(source.id, originalContent, location);
+    const originalText = getTextAtPosition(originalContent, location);
 
     const content = getSourceContent(getState(), source.id);
-    const text = getTextAtPosition(source.id, content, location);
+    const text = getTextAtPosition(content, location);
 
     const id = getLocationKey(location);
     const breakpoint = {

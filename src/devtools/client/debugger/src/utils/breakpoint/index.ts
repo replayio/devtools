@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { ThreadFront } from "protocol/thread";
-import { getBreakpoint } from "../../reducers/breakpoints";
 import { getSource, getSourceActorsForSource } from "../../reducers/sources";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -142,11 +141,6 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
 
     return breakpoint.location.column === column;
   });
-}
-
-export function breakpointExists(state: UIState, location: Location) {
-  const currentBp = getBreakpoint(state, location);
-  return currentBp && !currentBp.disabled;
 }
 
 function createPendingLocation(location: SourceLocation) {
