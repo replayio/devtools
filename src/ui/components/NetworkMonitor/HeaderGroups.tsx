@@ -21,6 +21,7 @@ export function HeaderGroups({
   const [menuLocation, setMenuLocation] = useState<MenuLocation>();
   return (
     <div
+      className="border-b border-splitter bg-toolbarBackground"
       onContextMenu={ev => {
         ev.preventDefault();
         setMenuLocation({ x: ev.pageX, y: ev.pageY });
