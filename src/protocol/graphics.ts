@@ -164,7 +164,7 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
     }
   });
 
-  store.dispatch(setEventsForType({ events: gMouseClickEvents, eventType: "mousedown" }));
+  store.dispatch(setEventsForType({ events: [...gMouseClickEvents], eventType: "mousedown" }));
 }
 
 class VideoPlayer {
