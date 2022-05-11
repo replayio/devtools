@@ -28,11 +28,14 @@
 }
 
 :root:global(.theme-dark) .unicorn {
-  background-color: red;
-  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
+  background-image: url(~devtools/client/debugger/images/sources/unicorn-consoleSize.svg) !important;
   background-size: auto 100%;
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
+  margin-top: 3px;
+  margin-left: 2px;
+  margin-right: 0;
+  border-radius: 0;
 }
 
 :root:global(.theme-light) .undefined {
