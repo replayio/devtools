@@ -9,25 +9,18 @@
  * @module actions/sources
  */
 
-import type { UIState } from "ui/state";
-import type { Context } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
-
-import { tabExists } from "../../reducers/tabs";
-import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import { setSymbols } from "./symbols";
-import { closeActiveSearch, updateActiveFileSearch } from "../ui";
-import { loadSourceText } from "./loadSourceText";
-import { setBreakableLines } from "./breakableLines";
-
-import { createLocation } from "../../utils/location";
-import { getToolboxLayout } from "ui/reducers/layout";
-import { setSelectedPanel } from "ui/actions/layout";
-import { trackEvent } from "ui/utils/telemetry";
-import { paused } from "../pause/paused";
-
 import { ThreadFront } from "protocol/thread";
+import { UIThunkAction } from "ui/actions";
+import { setSelectedPanel } from "ui/actions/layout";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { trackEvent } from "ui/utils/telemetry";
 
+import type { Context } from "../../reducers/pause";
+import { getFrames, getSelectedFrameId } from "../../reducers/pause";
+import type { Location, Source } from "../../reducers/sources";
+import { tabExists } from "../../reducers/tabs";
+import { closeActiveSearch } from "../../reducers/ui";
+import { setShownSource } from "../../reducers/ui";
 import {
   getSource,
   getSourceByURL,
@@ -37,7 +30,12 @@ import {
   getThreadContext,
   getContext,
 } from "../../selectors";
-import { UIThunkAction } from "ui/actions";
+import { createLocation } from "../../utils/location";
+import { paused } from "../pause/paused";
+
+import { setBreakableLines } from "./breakableLines";
+import { loadSourceText } from "./loadSourceText";
+import { setSymbols } from "./symbols";
 
 type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -184,8 +182,8 @@ export function selectLocation(
     await dispatch(setBreakableLines(cx, source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
-    dispatch({ type: "SHOW_SOURCE", source: null });
-    dispatch({ type: "SHOW_SOURCE", source });
+    dispatch(setShownSource(null));
+    dispatch(setShownSource(source));
 
     const loadedSource = getSource(getState(), source.id);
 
@@ -199,6 +197,7 @@ export function selectLocation(
     // If a new source is selected update the file search results
     const newSource = getSelectedSource(getState());
     if (currentSource && currentSource !== newSource) {
+      const { updateActiveFileSearch } = await import("../ui");
       dispatch(updateActiveFileSearch(cx));
     }
   };

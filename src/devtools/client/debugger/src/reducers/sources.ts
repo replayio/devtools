@@ -182,7 +182,7 @@ function update(state = initialSourcesState(), action: AnyAction) {
         selectedLocationHasScrolled: false,
       };
 
-    case "SET_VIEWPORT":
+    case "debuggerUI/setViewport":
       // Interacting with the viewport while the debugger is selected is
       // a scroll action. Ignore viewport events when the debugger is not
       // selected, as CodeMirror will not update properly.
