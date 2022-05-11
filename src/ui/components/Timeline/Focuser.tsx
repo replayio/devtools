@@ -45,7 +45,7 @@ function Focuser({ editMode, setEditMode }: Props) {
     }
 
     // Stop dragging on "click"
-    const onWindowClick = (event: MouseEvent) => {
+    const onDocumentClick = (event: MouseEvent) => {
       switch (editMode.type) {
         case "drag":
         case "resize-end":
@@ -67,7 +67,7 @@ function Focuser({ editMode, setEditMode }: Props) {
       }
     };
 
-    const onWindowMouseMove = (event: MouseEvent) => {
+    const onDocumentMouseMove = (event: MouseEvent) => {
       stopEvent(event);
 
       const { movementX, pageX } = event;
@@ -125,7 +125,17 @@ function Focuser({ editMode, setEditMode }: Props) {
     };
 
     // Stop all drag operations when the mouse leaves the window.
-    const onWindowMouseLeave = () => {
+    const onDocumentMouseLeave = (event: MouseEvent) => {
+      if (
+        event.clientY >= 0 &&
+        event.clientX >= 0 &&
+        event.clientX <= window.innerWidth &&
+        event.clientY <= window.innerHeight
+      ) {
+        // The mouse is still within the window.
+        return;
+      }
+
       switch (editMode.type) {
         case "drag":
         case "resize-end":
@@ -137,7 +147,7 @@ function Focuser({ editMode, setEditMode }: Props) {
     };
 
     // Block "mouseup" events for drag-in-progress
-    const onWindowMouseUp = (event: MouseEvent) => {
+    const onDocumentMouseUp = (event: MouseEvent) => {
       switch (editMode.type) {
         case "drag":
         case "resize-end":
@@ -155,16 +165,16 @@ function Focuser({ editMode, setEditMode }: Props) {
       }
     };
 
-    window.addEventListener("click", onWindowClick, true);
-    window.addEventListener("mousemove", onWindowMouseMove, true);
-    window.addEventListener("mouseleave", onWindowMouseLeave, true);
-    window.addEventListener("mouseup", onWindowMouseUp, true);
+    document.addEventListener("click", onDocumentClick, true);
+    document.addEventListener("mousemove", onDocumentMouseMove, true);
+    document.addEventListener("mouseleave", onDocumentMouseLeave, true);
+    document.addEventListener("mouseup", onDocumentMouseUp, true);
 
     return () => {
-      window.removeEventListener("click", onWindowClick, true);
-      window.removeEventListener("mousemove", onWindowMouseMove, true);
-      window.removeEventListener("mouseleave", onWindowMouseLeave, true);
-      window.removeEventListener("mouseup", onWindowMouseUp, true);
+      document.removeEventListener("click", onDocumentClick, true);
+      document.removeEventListener("mousemove", onDocumentMouseMove, true);
+      document.removeEventListener("mouseleave", onDocumentMouseLeave, true);
+      document.removeEventListener("mouseup", onDocumentMouseUp, true);
     };
   });
 
