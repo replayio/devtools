@@ -25,12 +25,17 @@ export default function FocusInputs() {
 
     const validateAndSaveStartTime = (pending: string) => {
       try {
-        const time = getSecondsFromFormattedTime(pending);
-        if (!isNaN(time)) {
+        const newStartTime = getSecondsFromFormattedTime(pending);
+        if (!isNaN(newStartTime)) {
+          // If the new end time is less than the current start time, the user is probably trying to move the whole range.
+          // We can simplify this operation by resetting both the start and end time to the same value.
+          const newEndTime =
+            newStartTime <= focusRegion!.endTime ? focusRegion!.endTime : newStartTime;
+
           dispatch(
             setFocusRegion({
-              endTime: focusRegion!.endTime,
-              startTime: time,
+              endTime: newEndTime,
+              startTime: newStartTime,
             })
           );
         }
@@ -40,12 +45,17 @@ export default function FocusInputs() {
     };
     const validateAndSaveEndTime = (pending: string) => {
       try {
-        const time = getSecondsFromFormattedTime(pending);
-        if (!isNaN(time)) {
+        const newEndTime = getSecondsFromFormattedTime(pending);
+        if (!isNaN(newEndTime)) {
+          // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
+          // We can simplify this operation by resetting both the start and end time to the same value.
+          const newStartTime =
+            newEndTime >= focusRegion!.startTime ? focusRegion!.startTime : newEndTime;
+
           dispatch(
             setFocusRegion({
-              endTime: time,
-              startTime: focusRegion!.startTime,
+              endTime: newEndTime,
+              startTime: newStartTime,
             })
           );
         }
