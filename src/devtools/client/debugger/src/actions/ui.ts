@@ -46,13 +46,21 @@ import { selectSource, selectLocation } from "./sources/select";
 
 export {
   closeActiveSearch,
-  highlightLineRange,
   clearHighlightLineRange,
+  closeProjectSearch,
+  focusFullTextInput,
+  highlightLineRange,
+  setCursorPosition,
+  setFullTextQuery,
+  setPrimaryPaneTab,
+  setShownSource,
+  setViewport,
+  sourcesDisplayed,
+  sourcesPanelExpanded,
   toggleActiveSearch,
   toggleFrameworkGrouping,
-  setPrimaryPaneTab,
-  setFulltextQuery,
-  focusFullTextInput,
+  toggleStartPanel,
+  toggleSources,
 } from "../reducers/ui";
 
 export function setActiveSearch(activeSearch: ActiveSearchType): UIThunkAction {

@@ -89,7 +89,7 @@ const uiSlice = createSlice({
     setPrimaryPaneTab(state, action: PayloadAction<SelectedPrimaryPaneTabType>) {
       state.selectedPrimaryPaneTab = action.payload;
     },
-    setFulltextQuery(state, action: PayloadAction<string>) {
+    setFullTextQuery(state, action: PayloadAction<string>) {
       state.fullTextSearchQuery = action.payload;
     },
     focusFullTextInput(state, action: PayloadAction<boolean>) {
@@ -131,7 +131,7 @@ export const {
   focusFullTextInput,
   highlightLineRange,
   setCursorPosition,
-  setFulltextQuery,
+  setFullTextQuery,
   setPrimaryPaneTab,
   setShownSource,
   setViewport,
