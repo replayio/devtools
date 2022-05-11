@@ -220,8 +220,8 @@ export class ValueItem implements IItem {
   }
 
   shouldUpdate(prevItem: Item) {
-    assert(this.type === prevItem.type, "OI items for the same path must have the same type");
     return (
+      this.type !== prevItem.type ||
       this.childrenLoaded !== prevItem.childrenLoaded ||
       this.isInCurrentPause !== prevItem.isInCurrentPause
     );
