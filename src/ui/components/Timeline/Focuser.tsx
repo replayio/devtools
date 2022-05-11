@@ -7,7 +7,7 @@ import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
 type EditMode = {
   dragOffset?: number;
-  type: "move" | "move-auto" | "resize-end" | "resize-start";
+  type: "drag" | "resize-end" | "resize-start";
 };
 
 function stopEvent(event: MouseEvent) {
@@ -30,14 +30,11 @@ function Focuser() {
   const dispatch = useDispatch();
   const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
-  const focusRegionBackup = useSelector(selectors.getFocusRegionBackup);
   const zoomRegion = useSelector(selectors.getZoomRegion);
 
   // The first time we place a focus mode, it should automatically move to track the cursor.
   // If we're editing an existing focus mode, it should not.
-  const [editMode, setEditMode] = useState<EditMode | null>(
-    focusRegionBackup === null ? { type: "move-auto" } : null
-  );
+  const [editMode, setEditMode] = useState<EditMode | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);
@@ -49,20 +46,10 @@ function Focuser() {
       return;
     }
 
-    // Stop auto-tracking on "click"
-    const onTimelineClick = (event: MouseEvent) => {
-      if (editMode.type === "move-auto") {
-        // This click shouldn't bubble; we're handling
-        stopEvent(event);
-
-        setEditMode(null);
-      }
-    };
-
     // Stop dragging on "click"
     const onWindowClick = (event: MouseEvent) => {
       switch (editMode.type) {
-        case "move":
+        case "drag":
         case "resize-end":
         case "resize-start": {
           // If this was a real click, we should allow this event to pass through to update the current time.
@@ -91,17 +78,10 @@ function Focuser() {
 
         const relativeMouseX = pageX - (editMode.dragOffset || 0);
 
-        const clampTime = editMode.type !== "move-auto";
-        const mouseTime = getTimeFromPosition(relativeMouseX, container, zoomRegion, clampTime);
-        if (mouseTime < 0 || mouseTime > zoomRegion.endTime) {
-          // Edge case for auto-track mode;
-          // When focus mode is entered, it's jarring if the focus region jumps towards the cursor before it mouses into the region.
-          return;
-        }
+        const mouseTime = getTimeFromPosition(relativeMouseX, container, zoomRegion);
 
         switch (editMode.type) {
-          case "move":
-          case "move-auto": {
+          case "drag": {
             // Re-center the focus region around the mouse cursor.
             const focusRegionDuration = focusRegion.endTime - focusRegion.startTime;
             let newEndTime = mouseTime + focusRegionDuration / 2;
@@ -147,9 +127,9 @@ function Focuser() {
     };
 
     // Stop all drag operations when the mouse leaves the window.
-    const onWindowMouseLeave = (event: MouseEvent) => {
+    const onWindowMouseLeave = () => {
       switch (editMode.type) {
-        case "move":
+        case "drag":
         case "resize-end":
         case "resize-start": {
           setEditMode(null);
@@ -161,7 +141,7 @@ function Focuser() {
     // Block "mouseup" events for drag-in-progress
     const onWindowMouseUp = (event: MouseEvent) => {
       switch (editMode.type) {
-        case "move":
+        case "drag":
         case "resize-end":
         case "resize-start": {
           // If this was a real mouseup, we should allow this event to pass through to update the current time.
@@ -177,14 +157,12 @@ function Focuser() {
       }
     };
 
-    container.addEventListener("click", onTimelineClick);
     window.addEventListener("click", onWindowClick, true);
     window.addEventListener("mousemove", onWindowMouseMove, true);
     window.addEventListener("mouseleave", onWindowMouseLeave, true);
     window.addEventListener("mouseup", onWindowMouseUp, true);
 
     return () => {
-      container.removeEventListener("click", onTimelineClick);
       window.removeEventListener("click", onWindowClick, true);
       window.removeEventListener("mousemove", onWindowMouseMove, true);
       window.removeEventListener("mouseleave", onWindowMouseLeave, true);
@@ -201,7 +179,7 @@ function Focuser() {
     const { left, width } = draggableArea.getBoundingClientRect();
     const relativeMouseX = event.pageX - left;
     const dragOffset = relativeMouseX - width / 2;
-    setEditMode({ dragOffset, type: "move" });
+    setEditMode({ dragOffset, type: "drag" });
   };
   const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
   const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
@@ -220,7 +198,10 @@ function Focuser() {
         }}
       >
         <div
-          className="h-full w-full bg-themeFocuserBgcolor opacity-50"
+          className={classNames("h-full w-full bg-themeFocuserBgcolor opacity-50", {
+            "cursor-grab": editMode === null,
+            "cursor-grabbing": editMode?.type === "drag",
+          })}
           onMouseDown={setEditModeToMove}
         />
 

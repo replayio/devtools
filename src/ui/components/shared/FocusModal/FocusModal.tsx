@@ -74,20 +74,10 @@ export default function FocusingModal() {
             </div>
             <div className="text-lg">Edit Focus Mode</div>
           </div>
-          {focusRegionBackup === null ? (
-            <>
-              <div>Click anywhere in the timeline to focus your replay.</div>
-              <div>
-                To reposition, <strong>click to drag</strong> or use the{" "}
-                <strong>left and right handlebars</strong>
-              </div>
-            </>
-          ) : (
-            <div>
-              To focus your replay, <strong>click to drag</strong> or use the{" "}
-              <strong>left and right handlebars</strong>.
-            </div>
-          )}
+          <div>
+            To focus your replay, <strong>click to drag</strong> or use the{" "}
+            <strong>left and right handlebars</strong>.
+          </div>
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <PrimaryButton color="blue" onClick={saveFocusRegion}>

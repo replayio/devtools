@@ -247,13 +247,12 @@ export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
 export function getTimeFromPosition(
   pageX: number,
   target: HTMLElement,
-  zoomRegion: ZoomRegion,
-  clampRange: boolean = true
+  zoomRegion: ZoomRegion
 ): number {
   const rect = target.getBoundingClientRect();
   const x = pageX - rect.left;
   const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-  const percentage = clampRange ? clamp(x / rect.width, 0, 100) : x / rect.width;
+  const percentage = clamp(x / rect.width, 0, 100);
   const time = zoomRegion.startTime + percentage * zoomRegionDuration;
   return time;
 }
