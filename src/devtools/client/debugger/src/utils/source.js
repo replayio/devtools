@@ -16,9 +16,9 @@ import { truncateMiddleText } from "../utils/text";
 import { parse as parseURL } from "../utils/url";
 import { memoizeLast } from "../utils/memoizeLast";
 export { isMinified } from "./isMinified";
-import { getURL, getFileExtension } from "./sources-tree";
+import { getURL } from "./sources-tree/getURL";
+import { getFileExtension } from "./sources-tree/utils";
 import sortBy from "lodash/sortBy";
-import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 
 import { isFulfilled } from "./async-value";
