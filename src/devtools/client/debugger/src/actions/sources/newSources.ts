@@ -30,7 +30,6 @@ import {
 import { ContextError } from "../../utils/context";
 import { getRawSourceURL, isInlineScript } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
-import { selectLocation } from "../sources/select";
 
 import { toggleBlackBox } from "./blackbox";
 import { setBreakableLines } from "./breakableLines";
@@ -78,6 +77,7 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
     const rawPendingUrl = getRawSourceURL(pendingUrl);
 
     if (rawPendingUrl === source.url) {
+      const { selectLocation } = await import("../sources");
       await dispatch(
         selectLocation(cx, {
           column: pendingLocation.column,

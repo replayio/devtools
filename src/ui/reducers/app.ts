@@ -1,6 +1,5 @@
 import { Location, PointDescription } from "@recordreplay/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
@@ -331,7 +330,7 @@ export const getNonLoadingTimeRanges = (state: UIState) => {
 };
 export const getIsInLoadedRegion = createSelector(
   getLoadedRegions,
-  getExecutionPoint,
+  (state: UIState) => state.pause.executionPoint,
   (regions, currentPausePoint) => {
     const loadedRegions = regions?.loaded;
 
