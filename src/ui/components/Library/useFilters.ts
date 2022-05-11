@@ -2,38 +2,70 @@ import { createContext, useMemo, useState } from "react";
 import { Recording } from "ui/types";
 import { getParams, updateUrlWithParams } from "ui/utils/environment";
 
+type QualifierKey = "created" | "target";
+type Qualifier = { key: QualifierKey; isValid: (str: string) => boolean; errorMessage: string };
+export type ParsedQualifier = { value: string; error?: string };
+export type ParsedQualifiers = Partial<Record<QualifierKey, ParsedQualifier>>;
+const QUALIFIERS: Qualifier[] = [
+  {
+    key: "created",
+    isValid: (str: string) => !!str.match(/created:\d\d\d\d-\d\d-\d\d/),
+    errorMessage: "Created date should be in the format YYYY-MM-DD",
+  },
+  {
+    key: "target",
+    isValid: (str: string) => !!str.match(/target:node/),
+    errorMessage: "Replay currently only supports filtering by target:node",
+  },
+];
+
 export type LibraryFilters = {
   searchString: string;
-  qualifiers: {
-    created?: string;
-    target?: string;
-  };
+  qualifiers: ParsedQualifiers;
 };
 
-export const LibraryFiltersContext = createContext({
+export const LibraryFiltersContext = createContext<LibraryFilters>({
   searchString: "",
   qualifiers: {},
 });
 
-function parseFilterString(str: string): LibraryFilters {
-  const words = str.split(" ");
+function getQualifierValue(key: string, string: string) {
+  const tokens = string.split(" ");
+  const expression = new RegExp(`^${key}:`);
 
   // If there are multiple matching entries for the same filter, use the last one.
-  // TODO: Add validation for created and target. It should return null if the user didn't comply with
-  // the expected format.
-  const created = words.filter(w => !!w.match(/^created:/)).pop();
-  const target = words.filter(w => !!w.match(/^target:/)).pop();
-  const searchString = words.filter(w => !w.match(/created:|target:/)).join(" ");
+  return tokens.filter(w => !!w.match(expression)).pop() || null;
+}
 
-  return { qualifiers: { created, target }, searchString };
+function getQualifiers(str: string) {
+  const qualifiers: ParsedQualifiers = {};
+
+  QUALIFIERS.forEach(qualifier => {
+    const value = getQualifierValue(qualifier.key, str);
+
+    if (value) {
+      qualifiers[qualifier.key] = {
+        value,
+        error: !qualifier.isValid(value) ? qualifier.errorMessage : undefined,
+      };
+    }
+  });
+
+  return qualifiers;
+}
+
+function getSearchString(str: string) {
+  const words = str.split(" ");
+  const expression = new RegExp(`^${QUALIFIERS.map(qualifier => qualifier.key).join(":|^")}:`);
+  return words.filter(w => !w.match(new RegExp(expression))).join(" ");
+}
+
+function parseFilterString(str: string): LibraryFilters {
+  return { qualifiers: getQualifiers(str), searchString: getSearchString(str) };
 }
 
 const substringInString = (substring: string, string: string | null) => {
-  if (!string) {
-    return false;
-  }
-
-  return string.toLowerCase().includes(substring.toLowerCase());
+  return string ? string.toLowerCase().includes(substring.toLowerCase()) : false;
 };
 
 export const filterRecordings = (recordings: Recording[], filters: LibraryFilters) => {
@@ -44,10 +76,13 @@ export const filterRecordings = (recordings: Recording[], filters: LibraryFilter
     const matchesSearchString = searchString
       ? substringInString(searchString, r.url) || substringInString(searchString, r.title)
       : true;
-    const matchesTarget = qualifiers.target && qualifiers.target === "target:node" ? !r.user : true;
+    const matchesTarget =
+      qualifiers.target && qualifiers.target.value === "target:node" && !qualifiers.target.error
+        ? !r.user
+        : true;
     const matchesCreated =
-      qualifiers.created && new Date(qualifiers.created)
-        ? new Date(r.date).getTime() > new Date(qualifiers.created!).getTime()
+      qualifiers.created && new Date(qualifiers.created.value) && !qualifiers.created.error
+        ? new Date(r.date).getTime() > new Date(qualifiers.created.value).getTime()
         : true;
 
     return matchesSearchString && matchesTarget && matchesCreated;

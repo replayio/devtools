@@ -12,7 +12,7 @@ import { Nag, useGetUserInfo } from "ui/hooks/users";
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
-import { LibraryFiltersContext, useFilters } from "./useFilters";
+import { LibraryFilters, LibraryFiltersContext, useFilters } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
