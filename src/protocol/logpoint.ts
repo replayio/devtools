@@ -226,7 +226,7 @@ export async function setLogpoint(
   condition: string,
   showInConsole: boolean = true
 ) {
-  await ThreadFront.ensureAllSources();
+  await Promise.all([ThreadFront.ensureAllSources(), ThreadFront.ensureProcessed("basic")]);
   const sourceIds = ThreadFront.getCorrespondingSourceIds(location.sourceId);
   const { line, column } = location;
   const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
