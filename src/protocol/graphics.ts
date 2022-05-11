@@ -106,7 +106,9 @@ export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
 // All paints that have occurred in the recording, in order. Include the
 // beginning point of the recording as well, which is not painted and has
 // a known point and time.
-const gPaintPoints: TimeStampedPointWithPaintHash[] = [{ point: "0", time: 0, paintHash: "" }];
+export const gPaintPoints: TimeStampedPointWithPaintHash[] = [
+  { point: "0", time: 0, paintHash: "" },
+];
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
