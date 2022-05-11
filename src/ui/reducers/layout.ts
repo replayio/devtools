@@ -1,8 +1,7 @@
+import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
+import { LayoutAction } from "ui/actions/layout";
 import { UIState } from "ui/state";
 import { LayoutState } from "ui/state/layout";
-import { LayoutAction } from "ui/actions/layout";
-
-import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
 
 export const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,

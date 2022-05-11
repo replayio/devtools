@@ -9,7 +9,6 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import type { UIThunkAction } from "ui/actions";
 
-import { selectSource, selectLocation } from "./sources/select";
 import { closeQuickOpen } from "../reducers/quick-open";
 import {
   clearHighlightLineRange,
@@ -22,14 +21,11 @@ import {
   sourcesPanelExpanded,
   toggleStartPanel,
   toggleSources,
-  SelectedPrimaryPaneTabType,
   ActiveSearchType,
   HighlightedRange,
 } from "../reducers/ui";
 import {
   getActiveSearch,
-  getPaneCollapse,
-  getSourcesCollapsed,
   getQuickOpenEnabled,
   getSource,
   getSourceContent,
@@ -46,6 +42,7 @@ import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
 
 import { searchContents } from "./file-search";
+import { selectSource, selectLocation } from "./sources/select";
 
 export {
   closeActiveSearch,

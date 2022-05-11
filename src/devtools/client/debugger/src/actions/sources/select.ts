@@ -9,26 +9,18 @@
  * @module actions/sources
  */
 
-import type { UIState } from "ui/state";
-import type { Context } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
-
-import { tabExists } from "../../reducers/tabs";
-import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import { setSymbols } from "./symbols";
-import { closeActiveSearch } from "../../reducers/ui";
-import { loadSourceText } from "./loadSourceText";
-import { setBreakableLines } from "./breakableLines";
-
-import { createLocation } from "../../utils/location";
-import { getToolboxLayout } from "ui/reducers/layout";
-import { setShownSource } from "../../reducers/ui";
-import { setSelectedPanel } from "ui/actions/layout";
-import { trackEvent } from "ui/utils/telemetry";
-import { paused } from "../pause/paused";
-
 import { ThreadFront } from "protocol/thread";
+import { UIThunkAction } from "ui/actions";
+import { setSelectedPanel } from "ui/actions/layout";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { trackEvent } from "ui/utils/telemetry";
 
+import type { Context } from "../../reducers/pause";
+import { getFrames, getSelectedFrameId } from "../../reducers/pause";
+import type { Location, Source } from "../../reducers/sources";
+import { tabExists } from "../../reducers/tabs";
+import { closeActiveSearch } from "../../reducers/ui";
+import { setShownSource } from "../../reducers/ui";
 import {
   getSource,
   getSourceByURL,
@@ -38,7 +30,12 @@ import {
   getThreadContext,
   getContext,
 } from "../../selectors";
-import { UIThunkAction } from "ui/actions";
+import { createLocation } from "../../utils/location";
+import { paused } from "../pause/paused";
+
+import { setBreakableLines } from "./breakableLines";
+import { loadSourceText } from "./loadSourceText";
+import { setSymbols } from "./symbols";
 
 type PartialLocation = Parameters<typeof createLocation>[0];
 

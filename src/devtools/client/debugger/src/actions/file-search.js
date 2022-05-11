@@ -4,6 +4,14 @@
 
 //
 
+import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
+import {
+  getSelectedSourceWithContent,
+  getFileSearchModifiers,
+  getFileSearchQuery,
+  getFileSearchResults,
+} from "../selectors";
+import { isFulfilled } from "../utils/async-value";
 import {
   clearSearch,
   find,
@@ -13,16 +21,6 @@ import {
   searchSourceForHighlight,
 } from "../utils/editor";
 import { getMatches } from "../workers/search";
-
-import {
-  getSelectedSourceWithContent,
-  getFileSearchModifiers,
-  getFileSearchQuery,
-  getFileSearchResults,
-} from "../selectors";
-
-import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
-import { isFulfilled } from "../utils/async-value";
 
 export function doSearch(cx, query, editor) {
   return (dispatch, getState) => {
