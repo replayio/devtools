@@ -1,19 +1,17 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { isValidTimeString } from "ui/utils/timeline";
-
-type Props = {
-  className?: string;
-  defaultValue: string;
-  size: number;
-  validateAndSave: (formatted: string) => void;
-};
 
 export default function EditableTimeInputWrapper({
   className,
   defaultValue,
   size,
   validateAndSave,
-}: Props) {
+}: {
+  className?: string;
+  defaultValue: string;
+  size: number;
+  validateAndSave: (formatted: string) => void;
+}) {
   // Ensures pseudo controlled inputs get recreated whenever values are saved;
   // this ensures the input fields stay in sync with Redux validation logic.
   //
@@ -22,7 +20,15 @@ export default function EditableTimeInputWrapper({
   // both will be capped to 20 seconds – so that part of the key won't change.
   const [key, setKey] = useState<number>(0);
 
-  const validateAndSaveWrapper = (pending: string) => {
+  // If the value is saved while the component is still focused (e.g. the "Enter" key)
+  // the input should remain focused from the user's POV.
+  // Behind the scenes we are recreating (unmounting and remounting) to update the derived state,
+  // but the user shouldn't notice this.
+  const autoFocusOnMountRef = useRef<boolean>(false);
+
+  const validateAndSaveWrapper = (pending: string, shouldRefocus: boolean) => {
+    autoFocusOnMountRef.current = shouldRefocus;
+
     setKey(key + 1);
     validateAndSave(pending);
   };
@@ -30,6 +36,7 @@ export default function EditableTimeInputWrapper({
   return (
     <EditableTimeInput
       key={`${defaultValue}-${key}`}
+      autoFocus={autoFocusOnMountRef.current}
       className={className}
       defaultValue={defaultValue}
       size={size}
@@ -38,14 +45,26 @@ export default function EditableTimeInputWrapper({
   );
 }
 
-function EditableTimeInput({ className, defaultValue, size, validateAndSave }: Props) {
+function EditableTimeInput({
+  autoFocus,
+  className,
+  defaultValue,
+  size,
+  validateAndSave,
+}: {
+  autoFocus: boolean;
+  className?: string;
+  defaultValue: string;
+  size: number;
+  validateAndSave: (formatted: string, shouldRefocus: boolean) => void;
+}) {
   const [pendingValue, setPendingValue] = useState<string>(defaultValue);
 
   const onBlur = (event: React.FocusEvent) => {
     if (pendingValue !== defaultValue) {
       // Don't save on blur unless the value has been modified.
       // This might cause milliseconds to be dropped unexepctedly.
-      validateAndSave(pendingValue);
+      validateAndSave(pendingValue, false);
     }
   };
 
@@ -64,13 +83,14 @@ function EditableTimeInput({ className, defaultValue, size, validateAndSave }: P
       case "Enter":
         // Always save on Enter, even if the value has not been modified.
         // Enter is a strong signal of intent.
-        validateAndSave(pendingValue);
+        validateAndSave(pendingValue, true);
         break;
     }
   };
 
   return (
     <input
+      autoFocus={autoFocus}
       className={`${className} focus:outline-none" border-0 bg-themeTextFieldBgcolor p-0 text-xs text-themeTextFieldColor`}
       onBlur={onBlur}
       onChange={onChange}
