@@ -235,7 +235,6 @@
 
 /* Icon on unindented row should be centered within the left gutter */
 .webconsole-app .message > .indent[data-indent="0"] + .icon {
-  width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
 }

@@ -7,24 +7,10 @@ import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
 import styles from "./PrefixBadge.module.css";
 
-export const PREFIX_COLORS = {
-  purple: "#A973CD",
-  empty: "#efefef",
-  green: "#73CC6D",
-  orange: "#EBA64D",
-  yellow: "#F0CF56",
-};
-
-export const DARK_PREFIX_COLORS = {
-  purple: "#CC81FF",
-  empty: "#a8a8a8",
-  green: "#69E261",
-  orange: "#FBAF4C",
-  yellow: "#FDEA3D",
-};
+export const PREFIX_COLORS = ["purple", "empty", "green", "orange", "yellow"];
 
 export function isColorPrefix(prefixBadge) {
-  return Object.keys(PREFIX_COLORS).includes(prefixBadge);
+  return PREFIX_COLORS.includes(prefixBadge);
 }
 
 function CircleBadge({ color, onSelect, theme }) {
@@ -56,21 +42,7 @@ function _PrefixBadge({ prefixBadge, style, theme }) {
     return null;
   }
 
-  if (isColorPrefix(prefixBadge)) {
-    return (
-      <div
-        className={`${styles[prefixBadge]}`}
-        style={{
-          borderRadius: "16px",
-          height: "16px",
-          width: "16px",
-          ...style,
-        }}
-      />
-    );
-  }
-
-  return <div className={`img ${prefixBadge}-${theme}`} style={style} />;
+  return <div className={`${styles[prefixBadge]} ${styles["consoleBadge"]}`} />;
 }
 export const PrefixBadge = connect(
   state => ({
@@ -120,7 +92,7 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
 
   const prefixBadge = breakpoint.options.prefixBadge;
   const isColor = isColorPrefix(prefixBadge);
-  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
+
   return (
     <button
       className={`h-5 w-5 p-px ${
