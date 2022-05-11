@@ -1,21 +1,23 @@
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { getPositionFromTime, getTimeFromPosition } from "ui/utils/timeline";
 
-type EditMode = {
-  dragOffset?: number;
-  type: "drag" | "resize-end" | "resize-start";
-};
+import { EditMode } from ".";
 
 function stopEvent(event: MouseEvent) {
   event.preventDefault();
   event.stopPropagation();
 }
 
-export default function ConditionalFocuser() {
+type Props = {
+  editMode: EditMode | null;
+  setEditMode: React.Dispatch<React.SetStateAction<EditMode | null>>;
+};
+
+export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
   const focusRegion = useSelector(selectors.getFocusRegion);
   const isFocusing = useSelector(selectors.getIsFocusing);
 
@@ -23,18 +25,14 @@ export default function ConditionalFocuser() {
     return null;
   }
 
-  return <Focuser />;
+  return <Focuser editMode={editMode} setEditMode={setEditMode} />;
 }
 
-function Focuser() {
+function Focuser({ editMode, setEditMode }: Props) {
   const dispatch = useDispatch();
   const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
   const zoomRegion = useSelector(selectors.getZoomRegion);
-
-  // The first time we place a focus mode, it should automatically move to track the cursor.
-  // If we're editing an existing focus mode, it should not.
-  const [editMode, setEditMode] = useState<EditMode | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);

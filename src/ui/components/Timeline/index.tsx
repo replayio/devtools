@@ -1,10 +1,11 @@
-import React, { useLayoutEffect, useRef } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { getTimeFromPosition, getVisiblePosition } from "ui/utils/timeline";
+import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import ProtocolTimeline from "../ProtocolTimeline";
 
 import { EditFocusButton } from "./EditFocusButton";
@@ -17,18 +18,21 @@ import ProgressBars from "./ProgressBars";
 import Tooltip from "./Tooltip";
 import UnfocusedRegion from "./UnfocusedRegion";
 
+export type EditMode = {
+  dragOffset?: number;
+  type: "drag" | "resize-end" | "resize-start";
+};
+
 export default function Timeline() {
   const dispatch = useDispatch();
-  const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
   const hoverTime = useSelector(selectors.getHoverTime);
-
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 
-  const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
+  const [editMode, setEditMode] = useState<EditMode | null>(null);
 
   useLayoutEffect(() => {
     const progressBar = progressBarRef.current;
@@ -103,8 +107,8 @@ export default function Timeline() {
           <Comments />
           <NonLoadingRegions />
           <UnfocusedRegion />
-          <div className="progress-line-paused" style={{ left: `${percent}%` }} />
-          <Focuser />
+          <CurrentTimeIndicator editMode={editMode} />
+          <Focuser editMode={editMode} setEditMode={setEditMode} />
         </div>
 
         <Tooltip timelineWidth={timelineDimensions.width} />
