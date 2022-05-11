@@ -60,7 +60,6 @@ function update(state = createUIState(), action: AnyAction) {
     }
 
     case "TOGGLE_FRAMEWORK_GROUPING": {
-      prefs.frameworkGroupingOn = action.value;
       return { ...state, frameworkGroupingOn: action.value };
     }
 
@@ -69,17 +68,14 @@ function update(state = createUIState(), action: AnyAction) {
     }
 
     case "TOGGLE_PANE": {
-      prefs.startPanelCollapsed = action.paneCollapsed;
       return { ...state, startPanelCollapsed: action.paneCollapsed };
     }
 
     case "set_selected_primary_panel": {
-      prefs.startPanelCollapsed = false;
       return { ...state, startPanelCollapsed: false };
     }
 
     case "TOGGLE_SOURCES": {
-      prefs.sourcesCollapsed = action.sourcesCollapsed;
       return { ...state, sourcesCollapsed: action.sourcesCollapsed };
     }
 

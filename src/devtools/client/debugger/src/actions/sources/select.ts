@@ -18,7 +18,7 @@ import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import { setSymbols } from "./symbols";
 import { closeActiveSearch, updateActiveFileSearch } from "../ui";
 import { loadSourceText } from "./loadSourceText";
-import { setBreakableLines, setBreakpointHitCounts } from ".";
+import { setBreakableLines } from "./breakableLines";
 
 import { createLocation } from "../../utils/location";
 import { getToolboxLayout } from "ui/reducers/layout";
