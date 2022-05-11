@@ -30,8 +30,6 @@ import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
-import { getSelectedPanel, getViewMode } from "./layout";
-
 export const initialAppState: AppState = {
   mode: "devtools",
   analysisPoints: {},
@@ -268,6 +266,10 @@ const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
     data: points.data.filter(p => isInTrimSpan(p.time, focusRegion)) || [],
   };
 };
+
+// Copied from ./layout to avoid circles
+const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
+const getViewMode = (state: UIState) => state.layout.viewMode;
 
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
