@@ -85,7 +85,7 @@ export default function FocusingModal() {
               </PrimaryButton>
               {showDiscardButton && (
                 <SecondaryButton color="pink" onClick={discardFocusRegion}>
-                  Discard focus window
+                  Discard changes
                 </SecondaryButton>
               )}
             </div>
