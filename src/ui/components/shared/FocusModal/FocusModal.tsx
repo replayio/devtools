@@ -1,43 +1,60 @@
-import React, { useState } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
-import { actions } from "ui/actions";
-import MaterialIcon from "../MaterialIcon";
-import {
-  getFocusRegion,
-  getCurrentTime,
-  getIsAtFocusSoftLimit,
-  getZoomRegion,
-} from "ui/reducers/timeline";
-import { DisabledButton, PrimaryButton } from "../Button";
-import { getFormattedTime } from "ui/utils/timeline";
+import React, { useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { hideModal as hideModalAction } from "ui/actions/app";
+import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import { getFocusRegion, getFocusRegionBackup } from "ui/reducers/timeline";
+import { trackEvent } from "ui/utils/telemetry";
 
-function FocusingModal({ hideModal }: PropsFromRedux) {
-  const currentTime = useSelector(getCurrentTime);
-  const modalOptions = useSelector(selectors.getModalOptions);
+import { PrimaryButton, SecondaryButton } from "../Button";
+import MaterialIcon from "../MaterialIcon";
+
+export default function FocusingModal() {
+  const dispatch = useDispatch();
+  const focusRegion = useSelector(getFocusRegion);
+  const focusRegionBackup = useSelector(getFocusRegionBackup);
+
+  const didExplicitlyDismiss = useRef<boolean>(false);
+
+  const hideModal = () => dispatch(hideModalAction());
+  const saveFocusRegion = () => {
+    didExplicitlyDismiss.current = true;
+
+    dispatch(syncFocusedRegion());
+    trackEvent("timeline.save_focus");
+
+    hideModal();
+  };
+  const discardFocusRegion = () => {
+    didExplicitlyDismiss.current = true;
+
+    dispatch(setFocusRegion(focusRegionBackup));
+    dispatch(syncFocusedRegion());
+    trackEvent("timeline.discard_focus_explicit");
+
+    hideModal();
+  };
+
+  useEffect(
+    () => () => {
+      if (!didExplicitlyDismiss.current) {
+        dispatch(setFocusRegion(focusRegionBackup));
+        dispatch(syncFocusedRegion());
+        trackEvent("timeline.discard_focus_implicit");
+      }
+    },
+    [dispatch, focusRegionBackup]
+  );
+
+  // TODO This is kind of a hack; can we use CSS for this?
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
-  const isAtFocusLimit = useSelector(getIsAtFocusSoftLimit);
 
-  let msg;
-
-  if (modalOptions?.instructions) {
-    msg = modalOptions.instructions;
-  } else if (isAtFocusLimit) {
-    msg = (
-      <p>{`Looks like you're making a precise selection at ${getFormattedTime(
-        currentTime,
-        true
-      )}.`}</p>
-    );
-  } else {
-    msg = (
-      <p>
-        Use the <strong>left and right handlebars</strong> in the timeline to focus your replay.
-      </p>
-    );
-  }
+  // Only show discard option if there are pending changes
+  const showDiscardButton =
+    focusRegion !== null &&
+    focusRegionBackup !== null &&
+    (focusRegionBackup.startTime !== focusRegion.startTime ||
+      focusRegionBackup.endTime !== focusRegion.endTime);
 
   return (
     <div className="pointer-events-none fixed z-50 grid h-full w-full items-center justify-center">
@@ -57,61 +74,24 @@ function FocusingModal({ hideModal }: PropsFromRedux) {
             </div>
             <div className="text-lg">Edit Focus Mode</div>
           </div>
-          <div>{msg}</div>
-          {isAtFocusLimit && <QuickActions />}
+          <div>
+            To focus your replay, <strong>click to drag</strong> or use the{" "}
+            <strong>left and right handlebars</strong>.
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <PrimaryButton color="blue" onClick={saveFocusRegion}>
+                Save
+              </PrimaryButton>
+              {showDiscardButton && (
+                <SecondaryButton color="pink" onClick={discardFocusRegion}>
+                  Discard changes
+                </SecondaryButton>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
-
-function QuickActions() {
-  const focusRegion = useSelector(getFocusRegion);
-  const zoomRegion = useSelector(getZoomRegion);
-  const currentTime = useSelector(getCurrentTime);
-  const dispatch = useDispatch();
-
-  const snapStart = () => {
-    dispatch(actions.setFocusRegion({ ...focusRegion!, startTime: Math.max(currentTime - 10, 0) }));
-  };
-  const snapEnd = () => {
-    dispatch(
-      actions.setFocusRegion({
-        ...focusRegion!,
-        endTime: Math.min(currentTime + 10, zoomRegion.endTime),
-      })
-    );
-  };
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        {currentTime !== focusRegion!.startTime ? (
-          <PrimaryButton color="blue" onClick={snapStart}>
-            Start at this point
-          </PrimaryButton>
-        ) : (
-          <DisabledButton>Start at this point</DisabledButton>
-        )}
-        {currentTime !== focusRegion!.endTime ? (
-          <PrimaryButton color="blue" onClick={snapEnd}>
-            End at this point
-          </PrimaryButton>
-        ) : (
-          <DisabledButton>End at this point</DisabledButton>
-        )}
-      </div>
-    </div>
-  );
-}
-
-const connector = connect(
-  (state: UIState) => ({
-    modalOptions: selectors.getModalOptions(state),
-  }),
-  {
-    hideModal: actions.hideModal,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(FocusingModal);

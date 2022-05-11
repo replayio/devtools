@@ -1,13 +1,12 @@
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { TimelineActions } from "ui/actions/timeline";
 import { UIState } from "ui/state";
 import { TimelineState } from "ui/state/timeline";
-import { isPointInRegions, overlap } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
     currentTime: 0,
     focusRegion: null,
+    focusRegionBackup: null,
     hoverTime: null,
     hoveredItem: null,
     playback: null,
@@ -47,7 +46,10 @@ export default function update(
     }
 
     case "set_trim_region": {
-      return { ...state, focusRegion: action.focusRegion };
+      return {
+        ...state,
+        focusRegion: action.focusRegion,
+      };
     }
 
     default: {
@@ -67,19 +69,8 @@ export const getTimelineDimensions = (state: UIState) => state.timeline.timeline
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
+export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
   (state.timeline.focusRegion.startTime !== 0 ||
     state.timeline.focusRegion.endTime !== state.timeline.zoomRegion.endTime);
-export const getIsAtFocusSoftLimit = (state: UIState) => {
-  const focusRegion = getFocusRegion(state);
-
-  if (!focusRegion) {
-    return false;
-  }
-
-  const focusDuration = Math.floor(focusRegion.endTime - focusRegion.startTime);
-  const duration = getZoomRegion(state).endTime;
-
-  return focusDuration <= duration * 0.1;
-};
