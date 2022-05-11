@@ -54,6 +54,7 @@ class AnalysisManager {
   }
 
   async runAnalysis<T>(params: AnalysisParams, handler: AnalysisHandler<T>) {
+    await ThreadFront.ensureAllSources();
     const { analysisId } = await sendMessage(
       "Analysis.createAnalysis",
       {
