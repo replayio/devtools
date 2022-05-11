@@ -49,8 +49,8 @@ function EditableTimeInput({ className, defaultValue, size, validateAndSave }: P
     }
   };
 
-  const onChange = (event: React.ChangeEvent) => {
-    const value = (event.currentTarget as HTMLInputElement).value;
+  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.currentTarget.value;
     if (isValidTimeString(value)) {
       setPendingValue(value);
     }
