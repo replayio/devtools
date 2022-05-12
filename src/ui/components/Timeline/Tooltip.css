@@ -7,7 +7,8 @@
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-1--timeline-tooltip);
-  background: var(--theme-toolbar-background);
+  background: var(--chrome);
+  padding: 1px;
   transform: translateX(-50%);
   user-select: none;
 }
