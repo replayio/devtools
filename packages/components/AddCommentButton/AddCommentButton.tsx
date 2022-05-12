@@ -15,14 +15,16 @@ interface AddCommentButtonProps {
   type?: "button" | "submit";
 }
 
-/** Initiate adding a comment from anywhere in the application. */
+/**
+ * Initiate adding a comment from a button.
+ */
 export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonProps>(
   function AddCommentButton({ type, isPausedOnHit = false, onClick }, ref) {
     const localRef = useRef<HTMLButtonElement>(null);
     const mergedRefs = mergeRefs([localRef, ref]);
     const [isFocused, setIsFocused] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
-    const isOpened = isFocused || isHovered;
+    const isOpened = isHovered;
 
     return (
       <StyledButton
@@ -45,6 +47,7 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
   }
 );
 
+/** TODO: replace with Figma packages/icons solution */
 const CommentPlusIcon = (props: ComponentProps<"svg">) => (
   <svg
     width="20"

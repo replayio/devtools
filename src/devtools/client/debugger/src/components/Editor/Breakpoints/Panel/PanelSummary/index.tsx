@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { AddCommentButton } from "components";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useRef, useEffect } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
@@ -90,6 +90,28 @@ function PanelSummary({
       );
     }
   };
+
+  /**
+   * Hacky solution that attaches a keyboard shortcut to "shift+c" for adding comments.
+   * TODO: move to a first-class keyboard shortcut hook that we can use to
+   * display a keyboard shortcut modal
+   *
+   */
+  const addCommentRef = useRef<any>(null);
+
+  addCommentRef.current = addComment;
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.shiftKey && event.key === "C") {
+        addCommentRef.current(event);
+      }
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
