@@ -8,7 +8,7 @@ import {
   LoadingItem,
   Item,
   KeyValueItem,
-} from "./object-inspector/utils";
+} from "./object-inspector/items";
 
 export type { Item };
 export {

@@ -1,5 +1,5 @@
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
-import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/utils";
+import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
 import { ThreadFront, ValueFront } from "protocol/thread";
 import { useCallback } from "react";
 import { useSelector } from "react-redux";
