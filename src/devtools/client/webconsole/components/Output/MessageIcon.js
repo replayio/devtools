@@ -55,7 +55,7 @@ export function MessageIcon(props) {
             width: 7,
             minWidth: 7,
           };
-    return <PrefixBadge prefixBadge={prefixBadge} style={style} />;
+    return <PrefixBadge prefixBadge={prefixBadge} />;
   }
 
   if (type) {

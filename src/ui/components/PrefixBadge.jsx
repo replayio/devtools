@@ -1,93 +1,30 @@
 import { connect } from "devtools/client/debugger/src/utils/connect";
-import { useState, useRef, useSelector } from "react";
+import { useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
+import { getTheme } from "ui/actions/app";
 import AppContainerPortal from "ui/components/shared/AppContainerPortal";
 import { useFeature } from "ui/hooks/settings";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
 
-export const PREFIX_COLORS = {
-  purple: "#A973CD",
-  empty: "#efefef",
-  green: "#73CC6D",
-  orange: "#EBA64D",
-  yellow: "#F0CF56",
-};
+import styles from "./PrefixBadge.module.css";
 
-export const DARK_PREFIX_COLORS = {
-  purple: "#CC81FF",
-  empty: "#a8a8a8",
-  green: "#69E261",
-  orange: "#FBAF4C",
-  yellow: "#FDEA3D",
-};
-
-export function isColorPrefix(prefixBadge) {
-  return Object.keys(PREFIX_COLORS).includes(prefixBadge);
-}
-
-function CircleBadge({ color, onSelect, theme }) {
+function CircleBadge({ color, onSelect }) {
   return (
     <div
       onClick={() => onSelect(color)}
-      className="h-5 w-5 cursor-pointer rounded-full"
-      style={{
-        backgroundColor: getBadgeColor(color, theme, true),
-      }}
+      className={`h-5 w-5 cursor-pointer rounded-full ${styles[color]}`}
     />
   );
 }
 
-function EmojiBadge({ emoji, onSelect, theme }) {
-  return (
-    <div
-      onClick={() => onSelect(emoji)}
-      className={`img ${emoji}-${theme}`}
-      style={{
-        borderRadius: "10px",
-        cursor: "pointer",
-        height: "20px",
-        width: "20px",
-      }}
-    />
-  );
-}
-
-export function getBadgeColor(prefixBadge, theme, showEmpty) {
-  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
-  if (!prefixBadge) {
-    return showEmpty ? colors.empty : "none";
-  }
-  return colors[prefixBadge];
-}
-
-function _PrefixBadge({ prefixBadge, style, theme, showEmpty = false }) {
+function _PrefixBadge({ prefixBadge }) {
   if (!prefixBadge) {
     return null;
   }
 
-  if (isColorPrefix(prefixBadge)) {
-    return (
-      <div
-        style={{
-          backgroundColor: getBadgeColor(prefixBadge, theme, showEmpty),
-          borderRadius: "16px",
-          height: "16px",
-          width: "16px",
-          ...style,
-        }}
-      />
-    );
-  }
-
-  return (
-    <div
-      className={`img ${prefixBadge}-${theme}`}
-      style={{
-        ...style,
-      }}
-    />
-  );
+  return <div className={`${styles[prefixBadge]} ${styles["consoleBadge"]}`} />;
 }
 export const PrefixBadge = connect(
   state => ({
@@ -115,52 +52,37 @@ function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
         className="absolute z-10 flex -translate-x-full transform space-x-1"
         ref={pickerRef}
       >
-        <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="orange" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="yellow" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="green" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="purple" />
-        <CircleBadge onSelect={onSelect} theme={theme} color={undefined} />
+        <CircleBadge onSelect={onSelect} color="unicorn" />
+        <CircleBadge onSelect={onSelect} color="orange" />
+        <CircleBadge onSelect={onSelect} color="yellow" />
+        <CircleBadge onSelect={onSelect} color="green" />
+        <CircleBadge onSelect={onSelect} color="purple" />
+        <CircleBadge onSelect={onSelect} color="empty" />
       </div>
     </AppContainerPortal>
   );
 }
 
-function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
+function PrefixBadgeButton({ breakpoint, setBreakpointPrefixBadge }) {
   const [showPrefixBadge, setShowPrefixBadge] = useState(false);
   const pickerNode = useRef();
   const { value: enableUnicornConsole } = useFeature("unicornConsole");
+  const theme = useSelector(getTheme);
+  const dispatch = useDispatch();
 
   if (!enableUnicornConsole) {
     return null;
   }
 
-  console.log({ showPrefixBadge });
-
   const prefixBadge = breakpoint.options.prefixBadge;
-  const isColor = isColorPrefix(prefixBadge);
-  const colors = theme == "dark" ? DARK_PREFIX_COLORS : PREFIX_COLORS;
+
   return (
     <button
-      className={`h-5 w-5 rounded-full p-px ${
-        prefixBadge == "unicorn"
-          ? `img unicorn-${theme}`
-          : !prefixBadge
-          ? `img picker-${theme}`
-          : ""
-      }`}
+      className={`${styles["pickerBadge"]} h-5 w-5 p-px ${
+        prefixBadge === "empty" || prefixBadge === undefined ? `img picker-${theme}` : ""
+      } 
+      ${prefixBadge === "unicorn" ? styles["pickerunicorn"] : styles[prefixBadge]}`}
       ref={pickerNode}
-      style={{
-        backgroundColor: isColor
-          ? colors[prefixBadge]
-          : !prefixBadge
-          ? "var(--theme-base-100)"
-          : "",
-        borderRadius: "100%",
-        position: "relative",
-        height: "20px",
-        width: "20px",
-      }}
       onClick={() => {
         setShowPrefixBadge(!showPrefixBadge);
       }}
@@ -172,18 +94,12 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
           onDismiss={() => setShowPrefixBadge(false)}
           onSelect={badge => {
             setShowPrefixBadge(false);
-            setBreakpointPrefixBadge(breakpoint, badge);
+            dispatch(actions.setBreakpointPrefixBadge(breakpoint, badge));
           }}
         />
       )}
     </button>
   );
 }
-export default connect(
-  state => ({
-    theme: selectors.getTheme(state),
-  }),
-  {
-    setBreakpointPrefixBadge: actions.setBreakpointPrefixBadge,
-  }
-)(PrefixBadgeButton);
+
+export default PrefixBadgeButton;

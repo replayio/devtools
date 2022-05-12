@@ -83,6 +83,12 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/warning.svg);
 }
 
+/* print statements */
+
+.icon.filter {
+  -webkit-mask-image: url(/icons/filter.svg);
+}
+
 /* focus mode */
 
 .icon.focus {
