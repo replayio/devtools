@@ -1,9 +1,9 @@
 import classNames from "classnames";
+import { AddCommentButton } from "components";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { PrefixBadge } from "ui/components/PrefixBadge";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -115,7 +115,7 @@ function PanelSummary({
           it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
         <div className="button-container flex items-center">
-          <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+          <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
         </div>
       </div>
     );
