@@ -144,6 +144,7 @@ function handleAuthError() {
   _handleAuthError?.();
 }
 
+
 // _ONLY_ set this flag if you want to disable the frontend entirely
 const maintenanceMode = false;
 
