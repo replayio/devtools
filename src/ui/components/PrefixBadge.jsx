@@ -7,12 +7,6 @@ import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
 import styles from "./PrefixBadge.module.css";
 
-export const PREFIX_COLORS = ["purple", "empty", "green", "orange", "yellow"];
-
-export function isColorPrefix(prefixBadge) {
-  return PREFIX_COLORS.includes(prefixBadge);
-}
-
 function CircleBadge({ color, onSelect, theme }) {
   return (
     <div
@@ -89,9 +83,6 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   if (!enableUnicornConsole) {
     return null;
   }
-
-  const prefixBadge = breakpoint.options.prefixBadge;
-  const isColor = isColorPrefix(prefixBadge);
 
   return (
     <button
