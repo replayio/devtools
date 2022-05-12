@@ -6,7 +6,7 @@ import { compareNumericStrings } from "protocol/utils";
 import React, { useEffect } from "react";
 import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
+import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
 
 import BreakpointTimeline from "./BreakpointTimeline";
@@ -51,17 +51,11 @@ function BreakpointNavigation({
     return (
       <div className="breakpoint-navigation justify-end space-x-1 p-1.5 py-2">
         <PrefixBadgeButton breakpoint={breakpoint} showEmpty={true} />
-        <button
-          className={classnames(
-            "h-5 w-5 rounded-full border p-px",
-            showCondition
-              ? "border-primaryAccent text-primaryAccent"
-              : "border-gray-500 text-gray-500"
-          )}
-          style={{ height: "1.25rem", borderRadius: "100%" }}
-          onClick={() => setShowCondition(!showCondition)}
-        >
-          <MaterialIcon>filter_list</MaterialIcon>
+        <button className="" onClick={() => setShowCondition(!showCondition)}>
+          <Icon
+            filename="filter"
+            className={classnames(showCondition ? "bg-primaryAccent" : "bg-gray-400")}
+          />
         </button>
       </div>
     );

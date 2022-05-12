@@ -91,7 +91,7 @@
 }
 
 .breakpoint-panel .panel-editor.conditional form .CodeMirror {
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--theme-text-field-bgcolor);
 }
 
 .breakpoint-panel form .form-row {
