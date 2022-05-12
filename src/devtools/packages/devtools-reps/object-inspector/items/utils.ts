@@ -1,11 +1,10 @@
-import { ValueItem } from "./value";
-import { KeyValueItem } from "./keyValue";
-import { MODE } from "../../reps/constants";
-import { LoadingItem } from "./loading";
-import { ContainerItem } from "./container";
-import { GetterItem } from "./getter";
 import { Pause, ValueFront } from "protocol/thread";
-import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
+
+import { MODE } from "../../reps/constants";
+
+import type { ValueItem } from "./index";
+import type { Item } from "./index";
+
 const {
   REPS: { Rep, Grip },
 } = require("../../reps/rep");
@@ -16,31 +15,6 @@ const {
  * levels we should walk down the prototype chain looking for getters.
  */
 export const GETTERS_FROM_PROTOTYPES = 1;
-
-export interface LabelAndValue {
-  label?: React.ReactNode;
-  value?: React.ReactNode;
-}
-
-export interface IItem {
-  readonly type: string;
-  name: string | undefined;
-  path: string;
-  isPrimitive(): boolean;
-  getLabelAndValue(props: ObjectInspectorItemProps): LabelAndValue;
-  getChildren(): Item[];
-  shouldUpdate(prevItem: Item): boolean;
-}
-
-// An Item represents one node in the ObjectInspector tree:
-// ValueItems represent nodes that correspond to a ValueFront (i.e. a javascript value in the debuggee)
-// KeyValueItems represent nodes for entries in a native javascript container (i.e. Map, WeakMap, Set and WeakSet)
-// ContainerItems represent nodes with an arbitrary list of child nodes
-// - this is used to represent Scopes and the <entries> node of a native javascript container, for example
-// GetterItems represent nodes for getters
-// LoadingItem represents the "Loading…" node shown while a node's children are being loaded
-export { ValueItem, KeyValueItem, ContainerItem, GetterItem, LoadingItem };
-export type Item = ValueItem | KeyValueItem | ContainerItem | GetterItem | LoadingItem;
 
 export function isValueLoaded(value: ValueFront): boolean {
   return value.isPrimitive() || !value.hasPreviewOverflow();
@@ -90,4 +64,48 @@ export function findPause(items: Item[]): Pause | null {
     }
   }
   return null;
+}
+
+export function getChildValues(parentValue: ValueFront): ValueFront[] {
+  const previewValues = parentValue.previewValueMap();
+  const rv = [...previewValues.values()];
+
+  const knownProperties = new Set(previewValues.keys());
+  parentValue.traversePrototypeChain(current => {
+    rv.push(current);
+    const getters = current.previewGetters();
+    for (const [name, getterFn] of getters.entries()) {
+      if (!knownProperties.has(name)) {
+        rv.push(getterFn);
+        knownProperties.add(name);
+      }
+    }
+  }, GETTERS_FROM_PROTOTYPES);
+
+  if (parentValue.className() === "Promise") {
+    const result = parentValue.previewPromiseState();
+    if (result) {
+      const { state, value } = result;
+      if (value) {
+        rv.push(value);
+      }
+      rv.push(state);
+    }
+  }
+
+  if (parentValue.className() === "Proxy") {
+    const result = parentValue.previewProxyState();
+    if (result) {
+      const { target, handler } = result;
+      rv.push(handler);
+      rv.push(target);
+    }
+  } else {
+    const prototypeValue = parentValue.previewPrototypeValue();
+    if (prototypeValue) {
+      rv.push(prototypeValue);
+    }
+  }
+
+  return rv;
 }
