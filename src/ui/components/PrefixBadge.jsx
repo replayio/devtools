@@ -1,5 +1,5 @@
 import { connect } from "devtools/client/debugger/src/utils/connect";
-import { useState, useRef, useSelector } from "react";
+import { useState, useRef } from "react";
 import { actions } from "ui/actions";
 import AppContainerPortal from "ui/components/shared/AppContainerPortal";
 import { useFeature } from "ui/hooks/settings";
@@ -7,7 +7,7 @@ import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { selectors } from "ui/reducers";
 import styles from "./PrefixBadge.module.css";
 
-function CircleBadge({ color, onSelect, theme }) {
+function CircleBadge({ color, onSelect }) {
   return (
     <div
       onClick={() => onSelect(color)}
@@ -16,22 +16,7 @@ function CircleBadge({ color, onSelect, theme }) {
   );
 }
 
-function EmojiBadge({ emoji, onSelect, theme }) {
-  return (
-    <div
-      onClick={() => onSelect(emoji)}
-      className={`img ${emoji}-${theme}`}
-      style={{
-        borderRadius: "10px",
-        cursor: "pointer",
-        height: "20px",
-        width: "20px",
-      }}
-    />
-  );
-}
-
-function _PrefixBadge({ prefixBadge, style, theme }) {
+function _PrefixBadge({ prefixBadge, style }) {
   if (!prefixBadge) {
     return null;
   }
@@ -64,12 +49,12 @@ function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
         className="absolute z-10 flex -translate-x-full transform space-x-1"
         ref={pickerRef}
       >
-        <CircleBadge onSelect={onSelect} theme={theme} color="unicorn" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="orange" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="yellow" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="green" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="purple" />
-        <CircleBadge onSelect={onSelect} theme={theme} color="empty" />
+        <CircleBadge onSelect={onSelect} color="unicorn" />
+        <CircleBadge onSelect={onSelect} color="orange" />
+        <CircleBadge onSelect={onSelect} color="yellow" />
+        <CircleBadge onSelect={onSelect} color="green" />
+        <CircleBadge onSelect={onSelect} color="purple" />
+        <CircleBadge onSelect={onSelect} color="empty" />
       </div>
     </AppContainerPortal>
   );
@@ -87,9 +72,9 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
   return (
     <button
       className={`${styles["pickerBadge"]} h-5 w-5 p-px ${
-        prefixBadge == "empty" ? `img picker-${theme}` : ""
+        PrefixBadge == "empty" ? `img picker-${theme}` : ""
       } 
-      ${prefixBadge == "unicorn" ? styles["pickerunicorn"] : styles[prefixBadge]}`}
+    ${PrefixBadge == "unicorn" ? styles["pickerunicorn"] : styles[PrefixBadge]}`}
       ref={pickerNode}
       onClick={() => {
         setShowPrefixBadge(!showPrefixBadge);
