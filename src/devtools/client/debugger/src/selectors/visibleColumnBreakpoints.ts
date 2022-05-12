@@ -3,28 +3,28 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
+import type { Location } from "@recordreplay/protocol";
 import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
+import type { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 
 import {
-  getViewport,
   getSource,
   getSelectedSource,
   getSelectedSourceWithContent,
   getBreakpointPositions,
   getBreakpointPositionsForSource,
-} from "../selectors";
-import { getVisibleBreakpoints, getVisibleRequestedBreakpoints } from "./visibleBreakpoints";
+} from "../reducers/sources";
+import type { Source } from "../reducers/sources";
+import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
+import { getViewport } from "../reducers/ui";
+import type { AsyncValue } from "../utils/async-value";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
-import { features } from "ui/utils/prefs";
 
-import type { Location } from "@recordreplay/protocol";
-import type { UIState } from "ui/state";
-import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
-import type { Source } from "../reducers/sources";
-import type { AsyncValue } from "../utils/async-value";
+import { getVisibleBreakpoints, getVisibleRequestedBreakpoints } from "./visibleBreakpoints";
 
 type BreakpointMap = Record<string, Record<string, Breakpoint[]>>;
 
@@ -37,7 +37,7 @@ function contains(location: Location, range: Range) {
   );
 }
 
-function groupBreakpoints(breakpoints: Breakpoint[], selectedSource: Source) {
+function groupBreakpoints(breakpoints: Breakpoint[]) {
   if (!breakpoints) {
     return {};
   }
@@ -76,18 +76,14 @@ function filterByLineCount(positions: Location[], selectedSource: Source) {
 }
 
 // filter out positions that are not being shown
-function filterVisible(positions: Location[], selectedSource: Source, viewport: Range) {
+function filterVisible(positions: Location[], viewport: Range) {
   return positions.filter(location => {
     return viewport && contains(location, viewport);
   });
 }
 
 // filter out positions that are not in the map
-function filterByBreakpoints(
-  positions: Location[],
-  selectedSource: Source,
-  breakpointMap: BreakpointMap
-) {
+function filterByBreakpoints(positions: Location[], breakpointMap: BreakpointMap) {
   return positions.filter(position => {
     return breakpointMap[position.line];
   });
@@ -96,21 +92,26 @@ function filterByBreakpoints(
 // Filters out breakpoints to the right of the line. (bug 1552039)
 function filterInLine(
   positions: Location[],
-  selectedSource: Source,
-  selectedContent: AsyncValue<string>
+  selectedContent:
+    | AsyncValue<{
+        contentType: string;
+        type: string;
+        value: string;
+      }>
+    | {
+        contentType: string;
+        type: string;
+        value: string;
+      }
 ) {
   return positions.filter(position => {
-    const lineText = getLineText(selectedSource.id, selectedContent, position.line);
+    const lineText = getLineText(selectedContent, position.line);
 
     return lineText.length >= (position.column || 0);
   });
 }
 
-function formatPositions(
-  positions: Location[],
-  selectedSource: Source,
-  breakpointMap: BreakpointMap
-) {
+function formatPositions(positions: Location[], breakpointMap: BreakpointMap) {
   return positions.map(location => {
     return {
       location,
@@ -172,13 +173,14 @@ export const visibleColumnBreakpoints = createSelector(
         ({ sourceId, line }) => `${sourceId}:${line}`
       );
     }
-    const breakpointMap = groupBreakpoints(allBreakpoints, selectedSource);
+    const breakpointMap = groupBreakpoints(allBreakpoints);
     // @ts-ignore columns undefined
-    positions = filterVisible(positions, selectedSource, viewport);
-    positions = filterInLine(positions, selectedSource, selectedSource.content);
-    positions = filterByBreakpoints(positions, selectedSource, breakpointMap);
+    positions = filterVisible(positions, viewport);
+    // @ts-ignore weird asyncvalue mismatch
+    positions = filterInLine(positions, selectedSource.content);
+    positions = filterByBreakpoints(positions, breakpointMap);
 
-    return formatPositions(positions, selectedSource, breakpointMap);
+    return formatPositions(positions, breakpointMap);
   }
 );
 

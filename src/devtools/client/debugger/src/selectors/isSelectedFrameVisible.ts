@@ -4,7 +4,9 @@
 
 import type { UIState } from "ui/state";
 
-import { getSelectedFrame, getSelectedLocation } from ".";
+import { getSelectedLocation } from "../reducers/sources";
+
+import { getSelectedFrame } from "./pause";
 
 /*
  * Checks to if the selected frame's source is currently

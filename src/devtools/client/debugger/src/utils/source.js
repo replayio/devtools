@@ -16,9 +16,9 @@ import { truncateMiddleText } from "../utils/text";
 import { parse as parseURL } from "../utils/url";
 import { memoizeLast } from "../utils/memoizeLast";
 export { isMinified } from "./isMinified";
-import { getURL, getFileExtension } from "./sources-tree";
+import { getURL } from "./sources-tree/getURL";
+import { getFileExtension } from "./sources-tree/utils";
 import sortBy from "lodash/sortBy";
-import { assert } from "protocol/utils";
 import { ThreadFront } from "protocol/thread";
 
 import { isFulfilled } from "./async-value";
@@ -331,7 +331,7 @@ export function isInlineScript(source) {
   return source.introductionType === "scriptElement";
 }
 
-export const getLineText = memoizeLast((sourceId, asyncContent, line) => {
+export const getLineText = memoizeLast((asyncContent, line) => {
   if (!asyncContent || !isFulfilled(asyncContent)) {
     return "";
   }
@@ -342,10 +342,10 @@ export const getLineText = memoizeLast((sourceId, asyncContent, line) => {
   return lineText || "";
 });
 
-export function getTextAtPosition(sourceId, asyncContent, location) {
+export function getTextAtPosition(asyncContent, location) {
   const { column, line = 0 } = location;
 
-  const lineText = getLineText(sourceId, asyncContent, line);
+  const lineText = getLineText(asyncContent, line);
   return lineText.slice(column, column + 100).trim();
 }
 

@@ -2,9 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import { getTokenLocation } from ".";
 import isEqual from "lodash/isEqual";
 
 function isValidToken(target) {
@@ -110,5 +107,18 @@ export function onTokenMouseOver(codeMirror) {
       });
       prevTokenPos = tokenPos;
     }
+  };
+}
+
+export function getTokenLocation(codeMirror, tokenEl) {
+  const { left, top, width, height } = tokenEl.getBoundingClientRect();
+  const { line, ch } = codeMirror.coordsChar({
+    left: left + width / 2,
+    top: top + height / 2,
+  });
+
+  return {
+    line: line + 1,
+    column: ch,
   };
 }

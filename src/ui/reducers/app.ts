@@ -1,6 +1,5 @@
 import { Location, PointDescription } from "@recordreplay/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
@@ -30,8 +29,6 @@ import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
-
-import { getSelectedPanel, getViewMode } from "./layout";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -270,6 +267,10 @@ const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
   };
 };
 
+// Copied from ./layout to avoid circles
+const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
+const getViewMode = (state: UIState) => state.layout.viewMode;
+
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
 export const getThemePreference = (state: UIState) => state.app.theme;
@@ -331,7 +332,7 @@ export const getNonLoadingTimeRanges = (state: UIState) => {
 };
 export const getIsInLoadedRegion = createSelector(
   getLoadedRegions,
-  getExecutionPoint,
+  (state: UIState) => state.pause.executionPoint,
   (regions, currentPausePoint) => {
     const loadedRegions = regions?.loaded;
 

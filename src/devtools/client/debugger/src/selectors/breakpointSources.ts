@@ -2,17 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { UIState } from "ui/state";
-import type { Breakpoint } from "../reducers/types";
-import type { Source } from "../reducers/sources";
-
 import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-import { getSources, getBreakpointsList, getSelectedSource, resourceAsSourceBase } from ".";
-import { getFilename } from "../utils/source";
-import { makeShallowQuery } from "../utils/resource";
+import type { UIState } from "ui/state";
+
+import type { Source } from "../reducers/sources";
+import { getSources, getSelectedSource, resourceAsSourceBase } from "../reducers/sources";
+import type { Breakpoint } from "../reducers/types";
 import { isBreakable, isLogpoint, sortSelectedBreakpoints } from "../utils/breakpoint";
+import { makeShallowQuery } from "../utils/resource";
+import { getFilename } from "../utils/source";
+
+import { getBreakpointsList } from "./breakpoints";
 
 function getBreakpointsForSource(
   source: Source,
