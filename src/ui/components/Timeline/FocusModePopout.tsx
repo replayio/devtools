@@ -8,14 +8,13 @@ import {
 } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { DisabledButton, PrimaryButton, SecondaryButton } from "../shared/Button";
+import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 
 export default function FocusModePopout() {
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   const dispatch = useDispatch();
-  const focusRegion = useSelector(getFocusRegion);
   const focusRegionBackup = useSelector(getFocusRegionBackup);
 
   const hideModal = () => dispatch(exitFocusMode());
@@ -60,11 +59,6 @@ export default function FocusModePopout() {
   const timelineNode = document.querySelector(".timeline");
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
-  const focusRegionHasUnsavedChanges =
-    focusRegionBackup?.startTime !== focusRegion?.startTime ||
-    focusRegionBackup?.endTime !== focusRegion?.endTime;
-  const DiscardButton = focusRegionHasUnsavedChanges ? SecondaryButton : DisabledButton;
-
   return (
     <div
       className="absolute top-0 left-0 right-0 z-10 flex flex-col"
@@ -95,9 +89,9 @@ export default function FocusModePopout() {
           </a>
         </div>
 
-        <DiscardButton color="pink" onClick={() => discardPendingChanges(false)}>
+        <SecondaryButton color="pink" onClick={() => discardPendingChanges(false)}>
           Discard
-        </DiscardButton>
+        </SecondaryButton>
         <PrimaryButton color="blue" onClick={savePendingChanges}>
           Save
         </PrimaryButton>

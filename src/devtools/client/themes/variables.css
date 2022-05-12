@@ -197,6 +197,7 @@
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toggle-color: var(--grey-70);
   --theme-toolbar-hover: #fff;
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --toolbox-bgcolor: var(--theme-base-100);
@@ -428,6 +429,7 @@
   --theme-console-input-bgcolor: var(--theme-base-95);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --theme-toggle-bgcolor: var(--theme-base-85);
+  --theme-toggle-color: white;
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
   --toolbox-bgcolor: var(--theme-base-100);
   --unloaded-region-img: url("/images/dotted-mask-dark.svg");

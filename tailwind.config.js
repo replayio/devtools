@@ -56,6 +56,7 @@ module.exports = {
         themeTextFieldBgcolor: "var(--theme-text-field-bgcolor)",
         themeTextFieldColor: "var(--theme-text-field-color)",
         themeToggleBgcolor: "var(--theme-toggle-bgcolor)",
+        themeToggleColor: "var(--theme-toggle-color)",
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
