@@ -182,7 +182,7 @@ function update(state = initialSourcesState(), action: AnyAction) {
         selectedLocationHasScrolled: false,
       };
 
-    case "SET_VIEWPORT":
+    case "debuggerUI/setViewport":
       // Interacting with the viewport while the debugger is selected is
       // a scroll action. Ignore viewport events when the debugger is not
       // selected, as CodeMirror will not update properly.
@@ -775,7 +775,7 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
     return null;
   }
   // @ts-ignore Ignore async value errors for now
-  const text = getTextAtPosition(id, content, { ...location, column: 0 });
+  const text = getTextAtPosition(content, { ...location, column: 0 });
 
   return text;
 }

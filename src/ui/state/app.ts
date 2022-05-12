@@ -34,7 +34,6 @@ export type ModalType =
   | "browser-launch"
   | "first-replay"
   | "download-replay"
-  | "focusing"
   | "privacy"
   | "loom"
   | "attachment"

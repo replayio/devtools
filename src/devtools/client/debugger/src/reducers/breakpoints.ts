@@ -14,7 +14,7 @@ import type { AnyAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
-import { getSelectedSource } from "../selectors";
+import { getSelectedSource } from "./sources";
 
 // eslint-disable-next-line max-len
 import { getBreakpointsList } from "../selectors/breakpoints";

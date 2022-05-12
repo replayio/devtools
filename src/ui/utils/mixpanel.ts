@@ -83,6 +83,8 @@ type MixpanelEvent =
   | ["team_change", { workspaceId: WorkspaceId | null }]
   | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
   | ["timeline.comment_select"]
+  | ["timeline.discard_focus_explicit"]
+  | ["timeline.discard_focus_implicit"]
   | ["timeline.marker_select"]
   | ["timeline.pause"]
   | ["timeline.play"]

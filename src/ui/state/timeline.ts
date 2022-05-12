@@ -13,21 +13,23 @@ export interface FocusRegion {
 
 export interface TimelineState {
   currentTime: number;
+  hoveredItem: HoveredItem | null;
+  hoverTime: number | null;
+  focusRegion: FocusRegion | null;
+  focusRegionBackup: FocusRegion | null;
   playback: {
     startTime: number;
     startDate: number;
     time: number;
   } | null;
-  stalled?: boolean;
   playbackPrecachedTime: number;
   recordingDuration: number | null;
-  zoomRegion: ZoomRegion;
-  timelineDimensions: { width: number; left: number; top: number };
-  hoverTime: number | null;
-  unprocessedRegions: TimeRange[];
   shouldAnimate: boolean;
-  hoveredItem: HoveredItem | null;
-  focusRegion: { startTime: number; endTime: number } | null;
+  showFocusModeControls: boolean;
+  stalled?: boolean;
+  timelineDimensions: { width: number; left: number; top: number };
+  unprocessedRegions: TimeRange[];
+  zoomRegion: ZoomRegion;
 }
 
 export interface HoveredItem {

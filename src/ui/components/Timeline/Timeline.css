@@ -206,21 +206,23 @@
   padding-right: 4px;
 }
 
-.timeline .progress-line-paused {
+.timeline .progress-line-paused-edit-mode-active,
+.timeline .progress-line-paused-edit-mode-inactive {
   height: 11px;
   width: 11px;
   border-radius: 50%;
-  background: var(--secondary-accent);
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
   cursor: grab;
 }
 
-.timeline .progress-line-paused:hover {
-  width: 15px;
-  height: 15px;
-  cursor: grab;
+.timeline .progress-line-paused-edit-mode-active {
+  background: var(--primary-accent);
+}
+
+.timeline .progress-line-paused-edit-mode-inactive {
+  background: var(--secondary-accent);
 }
 
 /* Timeline timestamp */

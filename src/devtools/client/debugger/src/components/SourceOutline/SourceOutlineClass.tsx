@@ -1,6 +1,6 @@
 import React from "react";
 import classnames from "classnames";
-import { isFunctionSymbol } from "./SourceOutline";
+import { isFunctionSymbol } from "./isFunctionSymbol";
 import { ClassSymbol, FunctionSymbol } from "devtools/client/debugger/src/types";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 

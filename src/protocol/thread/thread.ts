@@ -1055,7 +1055,10 @@ class _ThreadFront {
     const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
     const preferredLocation = locations.find(l => l.sourceId == sourceId);
     assert(preferredLocation, "no preferred location found");
-    this.updateLocation(preferredLocation);
+    assert(
+      preferredLocation.sourceId === this.getCorrespondingSourceIds(preferredLocation.sourceId)[0],
+      "location.sourceId should be updated to the first corresponding sourceId"
+    );
     return preferredLocation;
   }
 

@@ -117,7 +117,7 @@ async function selectInspector() {
   });
 }
 
-const selectReactDevTools = async () => clickElement("button.components-panel-button");
+const selectReactDevTools = async () => clickElement("button.react-components-panel-button");
 const getContext = () => dbgSelectors.getContext();
 const getThreadContext = () => dbgSelectors.getThreadContext();
 

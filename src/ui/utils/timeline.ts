@@ -1,4 +1,6 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
+import { format, isValid } from "date-fns";
+import { clamp } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
@@ -116,12 +118,82 @@ export function getNewZoomRegion({
 }
 
 // Format a time value to mm:ss
-export function getFormattedTime(time: number, showMs = false) {
+export function getFormattedTime(time: number, showMilliseconds: boolean = false) {
   const date = new Date(time);
-  const seconds = date.getSeconds().toString().padStart(2, "0");
-  const minutes = date.getMinutes();
+  let minutes = date.getMinutes();
+  let seconds = date.getSeconds();
+  const milliseconds = date.getMilliseconds();
 
-  return `${minutes}:${seconds}${showMs ? `.${date.getMilliseconds()}` : ""}`;
+  if (!showMilliseconds) {
+    if (milliseconds >= 500) {
+      seconds++;
+    }
+    if (seconds >= 60) {
+      seconds = 0;
+      minutes++;
+    }
+  }
+
+  if (showMilliseconds) {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}.${milliseconds
+      .toString()
+      .padStart(3, "0")}`;
+  } else {
+    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+}
+
+const TIME_REGEX = /^([0-9]+)(:[0-9]{0,2}){0,1}(\.[0-9]{0,3}){0,1}$/;
+
+export function isValidTimeString(formatted: string): boolean {
+  return TIME_REGEX.test(formatted);
+}
+
+// Parse milliseconds from a formatted time string containing any combination of minutes, seconds, and milliseconds.
+export function getSecondsFromFormattedTime(formatted: string) {
+  formatted = formatted.trim();
+  if (!formatted) {
+    return 0;
+  }
+
+  if (!isValidTimeString(formatted)) {
+    throw Error(`Invalid format "${formatted}"`);
+  }
+
+  let minutes = 0;
+  let seconds = 0;
+  let milliseconds = 0;
+
+  if (formatted.includes(".")) {
+    const index = formatted.indexOf(".");
+    const millisecondsString = formatted.substring(index + 1);
+    switch (millisecondsString.length) {
+      case 1: {
+        milliseconds = parseInt(millisecondsString) * 100;
+        break;
+      }
+      case 2: {
+        milliseconds = parseInt(millisecondsString) * 10;
+        break;
+      }
+      case 3: {
+        milliseconds = parseInt(millisecondsString);
+        break;
+      }
+    }
+
+    formatted = formatted.substring(0, index);
+  }
+
+  if (formatted.includes(":")) {
+    const index = formatted.indexOf(":");
+    minutes = parseInt(formatted.substring(0, index));
+    seconds = parseInt(formatted.substring(index + 1));
+  } else {
+    seconds = parseInt(formatted);
+  }
+
+  return minutes * 60 * 1000 + seconds * 1000 + milliseconds;
 }
 
 export function isSameTimeStampedPointRange(
@@ -165,3 +237,22 @@ export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) 
   });
   return overlapping;
 };
+
+export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
+  const position = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
+  const clampedPosition = clamp(position, 0, 100);
+  return clampedPosition;
+}
+
+export function getTimeFromPosition(
+  pageX: number,
+  target: HTMLElement,
+  zoomRegion: ZoomRegion
+): number {
+  const rect = target.getBoundingClientRect();
+  const x = pageX - rect.left;
+  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+  const percentage = clamp(x / rect.width, 0, 100);
+  const time = zoomRegion.startTime + percentage * zoomRegionDuration;
+  return time;
+}

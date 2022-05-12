@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSelector } from "react-redux";
-import { useSearch } from ".";
+import useSearch from "./useSearch";
 import { Message } from "../../reducers/messages";
 import { getMessages } from "../../selectors";
 

@@ -12,6 +12,7 @@ import {
   SessionId,
 } from "@recordreplay/protocol";
 import { sendMessage, addEventListener } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
 
 import { assert } from "./utils";
 
@@ -53,6 +54,7 @@ class AnalysisManager {
   }
 
   async runAnalysis<T>(params: AnalysisParams, handler: AnalysisHandler<T>) {
+    await ThreadFront.ensureAllSources();
     const { analysisId } = await sendMessage(
       "Analysis.createAnalysis",
       {
@@ -166,6 +168,7 @@ class AnalysisManager {
   private readonly onAnalysisPoints = ({ analysisId, points }: analysisPoints) => {
     const handler = this.handlers.get(analysisId);
     assert(handler, "no handler for given analysisId");
+    points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
     handler.onAnalysisPoints?.(points);
   };
 
