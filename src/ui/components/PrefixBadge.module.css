@@ -20,11 +20,6 @@
 :root:global(.theme-dark) .unicorn {
   background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-size: auto 100%;
-  width: 16px;
-  height: 16px;
-  margin-top: 3px;
-  margin-left: 2px;
-  margin-right: 0;
   border-radius: 0;
 }
 
@@ -48,6 +43,13 @@
 :root:global(.theme-light) .empty,
 :root:global(.theme-dark) .empty {
   background-color: transparent;
+}
+
+/* stay tuned for this */
+:root:global(.theme-light) .cancel,
+:root:global(.theme-dark) .cancel {
+  background-image: url(~devtools/client/debugger/images/sources/cancel.svg) !important;
+  background-size: auto 100%;
 }
 
 :root:global(.theme-light) .purple {
