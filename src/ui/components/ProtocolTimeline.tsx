@@ -35,7 +35,7 @@ const Spans = ({
   const { endTime } = useSelector(getZoomRegion)!;
 
   return (
-    <div className="relative z-50 h-1 w-full" title={title}>
+    <div className="relative z-10 h-1 w-full" title={title}>
       {regions.map((r, i) => (
         <Span regions={r} endTime={endTime} className={color} key={i} />
       ))}
