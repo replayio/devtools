@@ -1,5 +1,9 @@
 module.exports = {
-  stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.tsx"],
+  stories: [
+    "../src/**/*.stories.mdx",
+    "../src/**/*.stories.tsx",
+    "../packages/**/**/*.stories.tsx",
+  ],
   addons: [
     "@storybook/addon-links",
     "@storybook/addon-essentials",
@@ -19,6 +23,11 @@ module.exports = {
   },
 
   webpackFinal: async (config, { configType }) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      components: require("path").resolve(__dirname, "../packages/components/index.ts"),
+    };
+
     config.resolve.modules = [
       "src",
       "src/devtools/client/shared/vendor",
