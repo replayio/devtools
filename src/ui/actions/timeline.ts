@@ -20,6 +20,7 @@ import {
   getPlayback,
   getFocusRegion,
   getZoomRegion,
+  getShowFocusModeControls,
 } from "ui/reducers/timeline";
 import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
 
@@ -31,9 +32,10 @@ import { assert, waitForTime } from "protocol/utils";
 import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { getFirstComment } from "ui/hooks/comments/comments";
-import { hideModal, setModal } from "./app";
-import { getIsFocusing } from "ui/reducers/app";
+
 import { trackEvent } from "ui/utils/telemetry";
+
+import { hideModal } from "./app";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -596,21 +598,20 @@ export function syncFocusedRegion(): UIThunkAction {
   };
 }
 
-export function enterFocusMode(instructions?: string): UIThunkAction {
+export function enterFocusMode(): UIThunkAction {
   return (dispatch, getState) => {
-    dispatch(setModal("focusing", { instructions }));
+    trackEvent("timeline.start_focus_edit");
 
     const state = getState();
     const currentTime = getCurrentTime(state);
     const focusRegion = getFocusRegion(state);
 
-    if (focusRegion !== null) {
-      dispatch(
-        setTimelineState({
-          focusRegionBackup: focusRegion,
-        })
-      );
-    }
+    dispatch(
+      setTimelineState({
+        focusRegionBackup: focusRegion,
+        showFocusModeControls: true,
+      })
+    );
 
     if (!focusRegion) {
       const zoomRegion = getZoomRegion(state);
@@ -628,17 +629,25 @@ export function enterFocusMode(instructions?: string): UIThunkAction {
   };
 }
 
-export function toggleFocusMode(instructions?: string): UIThunkAction {
+export function exitFocusMode(): UIThunkAction {
+  return dispatch => {
+    trackEvent("timeline.exit_focus_edit");
+    dispatch(
+      setTimelineState({
+        showFocusModeControls: false,
+      })
+    );
+  };
+}
+
+export function toggleFocusMode(): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
-    const isFocusing = getIsFocusing(state);
-
-    if (isFocusing) {
-      trackEvent("timeline.exit_focus_edit");
-      dispatch(hideModal());
+    const showFocusModeControls = getShowFocusModeControls(state);
+    if (showFocusModeControls) {
+      dispatch(exitFocusMode());
     } else {
-      trackEvent("timeline.start_focus_edit");
-      dispatch(enterFocusMode(instructions));
+      dispatch(enterFocusMode());
     }
   };
 }

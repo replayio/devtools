@@ -10,7 +10,7 @@ export default function FocusInputs() {
   const dispatch = useDispatch();
   const currentTime = useSelector(selectors.getCurrentTime);
   const focusRegion = useSelector(selectors.getFocusRegion);
-  const isFocusing = useSelector(selectors.getIsFocusing);
+  const showFocusModeControls = useSelector(selectors.getShowFocusModeControls);
   const recordingDuration = useSelector(selectors.getRecordingDuration);
 
   const formattedDuration = getFormattedTime(recordingDuration || 0);
@@ -19,7 +19,7 @@ export default function FocusInputs() {
   // Avoid layout shift; keep input size consistent when focus mode toggles.
   const inputSize = formattedDuration.length;
 
-  if (isFocusing && focusRegion !== null) {
+  if (showFocusModeControls && focusRegion !== null) {
     const formattedEndTime = getFormattedTime(focusRegion.endTime);
     const formattedStartTime = getFormattedTime(focusRegion.startTime);
 
