@@ -1,4 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
+import clamp from "lodash/clamp";
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import { useSelector } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
@@ -17,7 +18,7 @@ const Span = ({
   const { begin, end } = regions;
   const style = {
     left: `${(begin.time / endTime) * 100}%`,
-    width: `${((end.time - begin.time) / endTime) * 100}%`,
+    width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
   };
 
   return <div className={`absolute h-full ${className}`} style={style} />;
@@ -64,7 +65,7 @@ export default function ProtocolTimeline() {
             ? [
                 {
                   begin: { point: firstPaint.point, time: firstPaint.time },
-                  end: { point: "", time: Infinity },
+                  end: { point: lastPaint.point, time: Infinity },
                 },
               ]
             : [
