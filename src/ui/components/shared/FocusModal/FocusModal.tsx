@@ -4,9 +4,9 @@ import { hideModal as hideModalAction } from "ui/actions/app";
 import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
 import { getFocusRegion, getFocusRegionBackup } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
-import Icon from "../Icon";
 
 import { PrimaryButton, SecondaryButton } from "../Button";
+import Icon from "../Icon";
 import MaterialIcon from "../MaterialIcon";
 
 export default function FocusingModal() {
