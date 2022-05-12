@@ -25,7 +25,7 @@ export const EditFocusButton = () => {
       onClick={onClick}
       title={isFocusing ? "Save current focus" : "Start focus edit mode"}
     >
-      <Icon filename="focus" className="mr-2" style={{ color: "white" }} />
+      <Icon filename="focus" className="bg-iconColor" />
     </button>
   );
 };

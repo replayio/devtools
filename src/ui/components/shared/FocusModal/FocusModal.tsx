@@ -4,6 +4,7 @@ import { hideModal as hideModalAction } from "ui/actions/app";
 import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
 import { getFocusRegion, getFocusRegionBackup } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+import Icon from "../Icon";
 
 import { PrimaryButton, SecondaryButton } from "../Button";
 import MaterialIcon from "../MaterialIcon";
@@ -69,9 +70,10 @@ export default function FocusingModal() {
       >
         <div className="space-y-4 p-8">
           <div className="flex flex-row items-center space-x-2">
-            <div className="h-6 w-6 rounded-full bg-primaryAccent p-1 text-white">
-              <MaterialIcon>center_focus_strong</MaterialIcon>
+            <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primaryAccent text-white">
+              <Icon filename="focus" className="bg-iconColor" />
             </div>
+
             <div className="text-lg">Edit Focus Mode</div>
           </div>
           <div>
