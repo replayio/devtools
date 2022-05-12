@@ -49,8 +49,12 @@ export function getTest() {
 
 // Return whether we are running one of the tests in our e2e test suite.
 // We will be connected to a live backend and testing debugging features.
+export function isE2ETest() {
+  return getTest() != null;
+}
+
 export function isTest() {
-  return isMock() || getTest() != null;
+  return isMock() || isE2ETest();
 }
 
 // Return whether we are running a mock test. The backend servers which we

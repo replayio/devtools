@@ -17,7 +17,7 @@ const RequestBody = ({ request }: { request: RequestSummary | undefined }) => {
       <div className="pl-6">
         <HttpBody
           bodyParts={requestBody}
-          contentType={findHeader(request.responseHeaders, "content-type") || "unknown"}
+          contentType={findHeader(request.requestHeaders, "content-type") || "unknown"}
           filename={request.name}
         />
       </div>

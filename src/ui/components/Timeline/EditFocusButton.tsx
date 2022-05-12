@@ -2,13 +2,13 @@ import classNames from "classnames";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleFocusMode } from "ui/actions/timeline";
-import { getIsFocusing } from "ui/reducers/app";
-import { getIsInFocusMode } from "ui/reducers/timeline";
-import MaterialIcon from "../shared/MaterialIcon";
+import { getIsInFocusMode, getShowFocusModeControls } from "ui/reducers/timeline";
+
+import Icon from "../shared/Icon";
 
 export const EditFocusButton = () => {
   const dispatch = useDispatch();
-  const isFocusing = useSelector(getIsFocusing);
+  const showFocusModeControls = useSelector(getShowFocusModeControls);
   const isInFocusMode = useSelector(getIsInFocusMode);
 
   const onClick = () => {
@@ -22,9 +22,9 @@ export const EditFocusButton = () => {
         isInFocusMode ? "bg-primaryAccent" : "bg-themeToggleBgcolor"
       )}
       onClick={onClick}
-      title={isFocusing ? "Save current focus" : "Start focus edit mode"}
+      title={showFocusModeControls ? "Save current focus" : "Start focus edit mode"}
     >
-      <MaterialIcon iconSize="lg">center_focus_strong</MaterialIcon>
+      <Icon filename="focus" className="bg-iconColor" />
     </button>
   );
 };

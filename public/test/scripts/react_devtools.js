@@ -34,15 +34,15 @@ Test.describe(`Test React DevTools.`, async () => {
   await Test.checkHighlighterVisible(true);
   await Test.checkHighlighterShape("M40,16 L140,16 L140,36 L40,36");
 
-  rootComponent.parentElement.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
-  await Test.waitUntil(() => getInspectedItem("State"), {
-    waitingFor: "State to be the inspectedItem",
+  rootComponent.click();
+  await Test.waitUntil(() => getInspectedItem("1State"), {
+    waitingFor: "State to be among the inspected items",
   });
 
-  getInspectedItem("State").parentElement.firstChild.click();
-  await Test.waitUntil(() => getInspectedItem("0"), { waitingFor: "0 to be the inspected item" });
+  getInspectedItem("1State").parentElement.firstChild.click();
+  await Test.waitUntil(() => getInspectedItem("0"), { waitingFor: "0 to be among the inspected items" });
   getInspectedItem("0").parentElement.firstChild.click();
   await Test.waitUntil(() => getInspectedItem("key") && getInspectedItem("text"), {
-    waitingFor: "key and text to be the inspected items",
+    waitingFor: "key and text to be among the inspected items",
   });
 });

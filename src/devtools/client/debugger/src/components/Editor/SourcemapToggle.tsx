@@ -78,7 +78,7 @@ export function SourcemapToggle({
   }
 
   const setEnabled = (v: React.SetStateAction<boolean>) => {
-    showAlternateSource(selectedSource.id, alternateSourceId);
+    showAlternateSource(selectedSource.id, alternateSourceId!);
   };
   const onErrorClick = () => {
     setModal("sourcemap-setup");

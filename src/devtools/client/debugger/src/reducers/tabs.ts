@@ -16,8 +16,6 @@ import { isSimilarTab } from "../utils/tabs";
 import { makeShallowQuery } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-import { getRecordingId } from "ui/utils/recording";
-import { getReplaySession } from "ui/setup/prefs";
 import type { Source } from "./sources";
 
 export interface Tab {
@@ -31,13 +29,7 @@ export interface TabsState {
   tabs: Tab[];
 }
 
-const EMPTY_TABS: Tab[] = [];
-
-export const getInitialTabsState = async () => {
-  const session = await getReplaySession(getRecordingId()!);
-
-  return { tabs: session?.tabs ?? EMPTY_TABS };
-};
+export const EMPTY_TABS: Tab[] = [];
 
 function initialTabState() {
   return { tabs: [] };

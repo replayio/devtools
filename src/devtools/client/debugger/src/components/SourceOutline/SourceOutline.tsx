@@ -16,10 +16,7 @@ import { UIState } from "ui/state";
 import Spinner from "ui/components/shared/Spinner";
 import { getHitCountsForSelectedSource } from "../../reducers/sources";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
-
-export function isFunctionSymbol(symbol: FunctionSymbol | ClassSymbol): symbol is FunctionSymbol {
-  return "parameterNames" in symbol;
-}
+import { isFunctionSymbol } from "./isFunctionSymbol";
 
 export function SourceOutline({
   cx,

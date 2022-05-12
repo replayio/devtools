@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useLayoutEffect, useRef } from "react";
+
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
 import { RequestSummary } from "./utils";
@@ -23,8 +24,21 @@ export const RequestRow = ({
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
 }) => {
+  const prevIsSelectedRef = useRef<boolean>(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Make sure newly selected Network requests have been scrolled into view.
+  useLayoutEffect(() => {
+    if (isSelected && !prevIsSelectedRef.current) {
+      ref.current!.scrollIntoView({ block: "nearest" });
+    }
+
+    prevIsSelectedRef.current = isSelected;
+  }, [isSelected]);
+
   return (
     <div
+      key={row.getRowProps().key}
       className={classNames(styles.row, {
         [styles.current]: isFirstInFuture,
         [styles.selected]: isSelected,
@@ -32,7 +46,7 @@ export const RequestRow = ({
         [styles.unloaded]: !isInLoadedRegion,
       })}
       onClick={() => onClick(row.original)}
-      key={row.getRowProps().key}
+      ref={ref}
     >
       <div {...row.getRowProps()}>
         {row.original.triggerPoint && row.original.triggerPoint.time !== currentTime && (
