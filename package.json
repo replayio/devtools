@@ -92,8 +92,7 @@
     "reselect": "^4.1.5",
     "resize-observer-polyfill": "^1.5.1",
     "slugify": "^1.6.5",
-    "styled-components": "^5.3.5",
-    "tsup-node": "^0.1.0"
+    "styled-components": "^5.3.5"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
