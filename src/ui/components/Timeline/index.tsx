@@ -1,6 +1,8 @@
+import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
+import { ThreadFront } from "protocol/thread/thread";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setTimelineState, setTimelineToTime } from "ui/actions/timeline";
+import { seek, setTimelineState, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
@@ -65,8 +67,15 @@ export default function Timeline() {
       return;
     }
 
-    dispatch(setTimelineToTime(mouseTime, true));
-    dispatch(setTimelineState({ currentTime: mouseTime }));
+    const paintOrMouseEvent = mostRecentPaintOrMouseEvent(mouseTime);
+    if (paintOrMouseEvent?.point) {
+      if (!dispatch(seek(paintOrMouseEvent.point, mouseTime, false))) {
+        // if seeking to the new point failed because it is in an unloaded region,
+        // we reset the timeline back to the current time
+        setTimelineToTime(ThreadFront.currentTime);
+        setTimelineState({ currentTime: ThreadFront.currentTime });
+      }
+    }
   };
 
   const onMouseMove = (event: React.MouseEvent) => {
