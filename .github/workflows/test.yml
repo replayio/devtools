@@ -48,7 +48,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Waiting for 200 from the Vercel Preview
-        uses: hbenl/wait-for-vercel-preview@v1.2.1
+        uses: hbenl/wait-for-vercel-preview@v1.2.2
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
