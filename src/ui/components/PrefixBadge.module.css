@@ -38,20 +38,13 @@
 
 :root:global(.theme-light) .empty,
 :root:global(.theme-light) .undefined {
-  background-color: #efefef;
+  background-color: var(--theme-base-90);
 }
 
 :root:global(.theme-dark) .empty,
 :root:global(.theme-dark) .undefined {
-  background-color: #a8a8a8;
-}
-
-:root:global(.theme-light) .undefined {
-  background-color: transparent;
-}
-
-:root:global(.theme-dark) .undefined {
-  background-color: transparent;
+  background-color: var(--theme-base-90);
+  color: var(--body-color);
 }
 
 :root:global(.theme-light) .purple {
