@@ -16,12 +16,6 @@
   background-size: auto 100%;
 }
 
-.img.unicornButt-light,
-.img.unicornButt-dark {
-  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
-  background-size: auto 100%;
-}
-
 .img.picker-light,
 .img.picker-dark {
   background-image: url(~devtools/client/debugger/images/sources/prefix-picker.svg) !important;

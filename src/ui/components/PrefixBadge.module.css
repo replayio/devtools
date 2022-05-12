@@ -36,15 +36,18 @@
   background-color: transparent;
 }
 
-:root:global(.theme-light) .empty,
 :root:global(.theme-light) .undefined {
   background-color: var(--theme-base-90);
 }
 
-:root:global(.theme-dark) .empty,
 :root:global(.theme-dark) .undefined {
   background-color: var(--theme-base-90);
   color: var(--body-color);
+}
+
+:root:global(.theme-light) .empty,
+:root:global(.theme-dark) .empty {
+  background-color: transparent;
 }
 
 :root:global(.theme-light) .purple {
