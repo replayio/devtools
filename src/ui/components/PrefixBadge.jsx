@@ -70,12 +70,12 @@ function PrefixBadgePicker({ onSelect, pickerNode, theme, onDismiss }) {
         className="absolute z-10 flex -translate-x-full transform space-x-1"
         ref={pickerRef}
       >
-        <EmojiBadge onSelect={onSelect} theme={theme} emoji="unicorn" />
+        <CircleBadge onSelect={onSelect} theme={theme} color="unicorn" />
         <CircleBadge onSelect={onSelect} theme={theme} color="orange" />
         <CircleBadge onSelect={onSelect} theme={theme} color="yellow" />
         <CircleBadge onSelect={onSelect} theme={theme} color="green" />
         <CircleBadge onSelect={onSelect} theme={theme} color="purple" />
-        <CircleBadge onSelect={onSelect} theme={theme} color={undefined} />
+        <CircleBadge onSelect={onSelect} theme={theme} color="empty" />
       </div>
     </AppContainerPortal>
   );
@@ -95,20 +95,11 @@ function PrefixBadgeButton({ breakpoint, theme, setBreakpointPrefixBadge }) {
 
   return (
     <button
-      className={`h-5 w-5 p-px ${
-        prefixBadge == "unicorn"
-          ? `img unicorn-${theme}`
-          : !prefixBadge
-          ? `img picker-${theme}`
-          : ""
-      } ${styles[prefixBadge]}`}
+      className={`${styles["pickerBadge"]} h-5 w-5 p-px ${
+        prefixBadge == "empty" ? `img picker-${theme}` : ""
+      } 
+      ${prefixBadge == "unicorn" ? styles["pickerunicorn"] : styles[prefixBadge]}`}
       ref={pickerNode}
-      style={{
-        borderRadius: "100%",
-        position: "relative",
-        height: "20px",
-        width: "20px",
-      }}
       onClick={() => {
         setShowPrefixBadge(!showPrefixBadge);
       }}
