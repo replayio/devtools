@@ -14,7 +14,6 @@ import { AnalysisPayload } from "ui/state/app";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-import CommentButton from "./CommentButton";
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
@@ -146,7 +145,7 @@ function PanelSummary({
         ) : null}
       </div>
       <div className="button-container flex items-center">
-        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
       </div>
     </div>
   );

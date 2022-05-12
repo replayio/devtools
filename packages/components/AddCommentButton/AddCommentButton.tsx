@@ -36,6 +36,7 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         onBlur={() => setIsFocused(false)}
         $isOpened={isOpened}
         $isPausedOnHit={isPausedOnHit}
+        className="focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
       >
         <CommentPlusIcon />
         <TextFade visible={isOpened}>Add Comment</TextFade>
@@ -46,8 +47,8 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
 
 const CommentPlusIcon = (props: ComponentProps<"svg">) => (
   <svg
-    width="14"
-    height="14"
+    width="20"
+    height="20"
     viewBox="0 0 20 20"
     fill="currentColor"
     xmlns="http://www.w3.org/2000/svg"
@@ -65,9 +66,9 @@ const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean
     lineHeight: "1rem",
     fontWeight: 700,
     fontSize: "0.625rem",
-    height: 20,
+    height: 26,
     paddingLeft: 3,
-    borderRadius: "2rem",
+    borderRadius: "3rem",
     color: "#fff",
     overflow: "hidden",
     transition: "width 180ms ease-out",
@@ -75,7 +76,7 @@ const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean
     svg: { flexShrink: 0 },
   },
   props => ({
-    width: props.$isOpened ? 100 : 20,
+    width: props.$isOpened ? 106 : 26,
     backgroundColor: props.$isPausedOnHit ? "var(--secondary-accent)" : "var(--primary-accent)",
   })
 );
