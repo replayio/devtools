@@ -1,5 +1,5 @@
 import { TimeStampedPointRange } from "@recordreplay/protocol";
-import { gPaintPoints } from "protocol/graphics";
+import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import { useSelector } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -59,12 +59,21 @@ export default function ProtocolTimeline() {
       <Spans regions={loadedRegions.loaded} color="bg-orange-500" title="Loaded" />
       <Spans regions={loadedRegions.indexed} color="bg-green-500" title="Indexed" />
       <Spans
-        regions={[
-          {
-            begin: { point: firstPaint.point, time: firstPaint.time },
-            end: { point: lastPaint.point, time: lastPaint.time },
-          },
-        ]}
+        regions={
+          hasAllPaintPoints
+            ? [
+                {
+                  begin: { point: firstPaint.point, time: firstPaint.time },
+                  end: { point: "", time: Infinity },
+                },
+              ]
+            : [
+                {
+                  begin: { point: firstPaint.point, time: firstPaint.time },
+                  end: { point: lastPaint.point, time: lastPaint.time },
+                },
+              ]
+        }
         color="bg-sky-500"
         title="Paints"
       />

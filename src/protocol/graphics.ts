@@ -234,7 +234,7 @@ class VideoPlayer {
 export const Video = new VideoPlayer();
 
 let onRefreshGraphics: (canvas: Canvas) => void;
-let hasAllPaintPoints = false;
+export let hasAllPaintPoints = false;
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
