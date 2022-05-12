@@ -13,6 +13,7 @@ import ProtocolTimeline from "../ProtocolTimeline";
 import { EditFocusButton } from "./EditFocusButton";
 import Focuser from "./Focuser";
 import FocusInputs from "./FocusInputs";
+import FocusModePopout from "./FocusModePopout";
 import NonLoadingRegions from "./NonLoadingRegions";
 import PlayPauseButton from "./PlaybackControls";
 import PreviewMarkers from "./PreviewMarkers";
@@ -98,33 +99,36 @@ export default function Timeline() {
   };
 
   return (
-    <div className="timeline">
-      <div className="commands">
-        <PlayPauseButton />
-      </div>
-
-      <div className="progress-bar-container">
-        <div
-          className="progress-bar"
-          ref={progressBarRef}
-          onClick={onClick}
-          onMouseMove={onMouseMove}
-        >
-          <ProtocolTimeline />
-          <ProgressBars />
-          <PreviewMarkers />
-          <Comments />
-          <NonLoadingRegions />
-          <UnfocusedRegion />
-          <CurrentTimeIndicator editMode={editMode} />
-          <Focuser editMode={editMode} setEditMode={setEditMode} />
+    <>
+      <FocusModePopout />
+      <div className="timeline">
+        <div className="commands">
+          <PlayPauseButton />
         </div>
 
-        <Tooltip timelineWidth={timelineDimensions.width} />
-      </div>
+        <div className="progress-bar-container">
+          <div
+            className="progress-bar"
+            ref={progressBarRef}
+            onClick={onClick}
+            onMouseMove={onMouseMove}
+          >
+            <ProtocolTimeline />
+            <ProgressBars />
+            <PreviewMarkers />
+            <Comments />
+            <NonLoadingRegions />
+            <UnfocusedRegion />
+            <CurrentTimeIndicator editMode={editMode} />
+            <Focuser editMode={editMode} setEditMode={setEditMode} />
+          </div>
 
-      <FocusInputs />
-      <EditFocusButton />
-    </div>
+          <Tooltip timelineWidth={timelineDimensions.width} />
+        </div>
+
+        <FocusInputs />
+        <EditFocusButton />
+      </div>
+    </>
   );
 }
