@@ -5,6 +5,7 @@ import { toggleFocusMode } from "ui/actions/timeline";
 import { getIsFocusing } from "ui/reducers/app";
 import { getIsInFocusMode } from "ui/reducers/timeline";
 import MaterialIcon from "../shared/MaterialIcon";
+import Icon from "../shared/Icon";
 
 export const EditFocusButton = () => {
   const dispatch = useDispatch();
@@ -24,7 +25,7 @@ export const EditFocusButton = () => {
       onClick={onClick}
       title={isFocusing ? "Save current focus" : "Start focus edit mode"}
     >
-      <MaterialIcon iconSize="lg">center_focus_strong</MaterialIcon>
+      <Icon filename="focus" className="mr-2" style={{ color: "white" }} />
     </button>
   );
 };
