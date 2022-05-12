@@ -10,18 +10,17 @@
  */
 
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
-
-import { endTruncateStr } from "./utils";
-import { truncateMiddleText } from "../utils/text";
-import { parse as parseURL } from "../utils/url";
-import { memoizeLast } from "../utils/memoizeLast";
-export { isMinified } from "./isMinified";
-import { getURL } from "./sources-tree/getURL";
-import { getFileExtension } from "./sources-tree/utils";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 
+import { memoizeLast } from "../utils/memoizeLast";
+import { truncateMiddleText } from "../utils/text";
+import { parse as parseURL } from "../utils/url";
+
 import { isFulfilled } from "./async-value";
+export { isMinified } from "./isMinified";
+import { getURL } from "./sources-tree/getURL";
+import { endTruncateStr } from "./utils";
 
 export const sourceTypes = {
   coffee: "coffeescript",
@@ -33,6 +32,8 @@ export const sourceTypes = {
 };
 
 const javascriptLikeExtensions = ["marko", "es6", "vue", "jsm"];
+
+const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
 function getPath(source) {
   const { path } = getURL(source);
@@ -108,6 +109,30 @@ export function getPrettySourceURL(url) {
     url = "";
   }
   return `${url}:formatted`;
+}
+
+export function getFileExtension(source) {
+  const { path } = getURL(source);
+  if (!path) {
+    return "";
+  }
+
+  const lastIndex = path.lastIndexOf(".");
+  return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
+}
+
+export function isNotJavaScript(source) {
+  return ["css", "svg", "png"].includes(getFileExtension(source));
+}
+
+export function isInvalidUrl(url, source) {
+  return (
+    !source.url ||
+    !url.group ||
+    isNotJavaScript(source) ||
+    IGNORED_URLS.includes(url) ||
+    isPretty(source)
+  );
 }
 
 export function getRawSourceURL(url) {
