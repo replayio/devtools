@@ -84,11 +84,11 @@ export default function FocusInputs() {
   } else {
     return (
       <div className="timeline-time text-right">
-        <span className="time-current" style={{ width: `${inputSize}ch` }}>
+        <span className="time-current inline-flex items-center" style={{ width: `${inputSize}ch` }}>
           {formattedCurrentTime}
         </span>
         <span className="time-divider">/</span>
-        <span className="time-total" style={{ width: `${inputSize}ch` }}>
+        <span className="time-total inline-flex items-center" style={{ width: `${inputSize}ch` }}>
           {formattedDuration}
         </span>
       </div>
