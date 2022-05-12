@@ -1,7 +1,8 @@
 import { ThreadFront } from "protocol/thread";
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
 import { addAnnotations } from "ui/actions/reactDevTools";
+import { useFeature } from "ui/hooks/settings";
 
 import { ReduxAnnotationsContext, processReduxAnnotations } from "./redux-annotations";
 import type { ReduxActionAnnotation } from "./redux-annotations";
@@ -14,11 +15,12 @@ export const ReduxAnnotationsProvider = ({ children }: RAPProps) => {
   const [annotations, setAnnotations] = useState<ReduxActionAnnotation[]>([]);
   const dispatch = useDispatch();
   const isStrictEffectsSecondRenderRef = useRef(false);
+  const { value: reduxDevtoolsEnabled } = useFeature("showRedux");
 
   useEffect(() => {
     // React will double-run effects in dev. Avoid trying to subscribe twice,
     // as `socket.ts` throws errors if you call `getAnnotations()` more than once.
-    if (isStrictEffectsSecondRenderRef.current) {
+    if (isStrictEffectsSecondRenderRef.current || !reduxDevtoolsEnabled) {
       return;
     }
 
@@ -57,7 +59,7 @@ export const ReduxAnnotationsProvider = ({ children }: RAPProps) => {
         )
       );
     });
-  }, [dispatch]);
+  }, [reduxDevtoolsEnabled, dispatch]);
 
   return (
     <ReduxAnnotationsContext.Provider value={annotations}>
