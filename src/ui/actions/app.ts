@@ -43,6 +43,16 @@ import {
   setCanvas as setCanvasAction,
 } from "../reducers/app";
 
+const supportsPerformanceNow =
+  typeof performance !== "undefined" && typeof performance.now === "function";
+
+function now(): number {
+  if (supportsPerformanceNow) {
+    return performance.now();
+  }
+  return Date.now();
+}
+
 export function setupApp(store: UIStore) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
@@ -81,7 +91,7 @@ export function setupApp(store: UIStore) {
   // If another update eventually comes in we will reset the slow/timed-out flag.
   const SLOW_THRESHOLD = 2500;
   const TIMED_OUT_THRESHOLD = 10000;
-  let lastLoadChangeUpdateTime = performance.now();
+  let lastLoadChangeUpdateTime = now();
 
   setInterval(function onLoadChangeInterval() {
     const isLoadingFinished = getIndexingProgress(store.getState()) === 100;
@@ -90,7 +100,7 @@ export function setupApp(store: UIStore) {
     }
 
     const loadingStatusWarning = getLoadingStatusWarning(store.getState());
-    const currentTime = performance.now();
+    const currentTime = now();
     const elapsedTime = currentTime - lastLoadChangeUpdateTime;
 
     if (elapsedTime > TIMED_OUT_THRESHOLD) {
@@ -109,7 +119,7 @@ export function setupApp(store: UIStore) {
   }, 1000);
 
   ThreadFront.listenForLoadChanges(parameters => {
-    lastLoadChangeUpdateTime = performance.now();
+    lastLoadChangeUpdateTime = now();
 
     store.dispatch(setLoadedRegions(parameters));
   });
