@@ -19,14 +19,15 @@ const pendingBreakpointsSlice = createSlice({
   initialState: {} as PendingBreakpointsState,
   reducers: {
     removePendingBreakpoint: {
-      reducer(state, action: PayloadAction<SourceLocation>) {
-        const locationId = makePendingLocationId(action.payload);
+      reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
+        const { location, recordingId } = action.payload;
+        const locationId = makePendingLocationId(location, recordingId);
         delete state[locationId];
       },
-      prepare(location: SourceLocation, cx?: Context) {
+      prepare(location: SourceLocation, recordingId: string, cx?: Context) {
         // Add cx to action.meta
         return {
-          payload: location,
+          payload: { location, recordingId },
           meta: { cx },
         };
       },
@@ -35,14 +36,15 @@ const pendingBreakpointsSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(setBreakpoint, (state, action) => {
-        const breakpoint = action.payload;
-        const locationId = makePendingLocationId(breakpoint.location);
+        const { breakpoint, recordingId } = action.payload;
+        const locationId = makePendingLocationId(breakpoint.location, recordingId);
         const pendingBreakpoint = createPendingBreakpoint(breakpoint);
         state[locationId] = pendingBreakpoint;
       })
       .addCase(removeBreakpoint, (state, action) => {
         // same as removePendingBreakpoint
-        const locationId = makePendingLocationId(action.payload);
+        const { location, recordingId } = action.payload;
+        const locationId = makePendingLocationId(location, recordingId);
         delete state[locationId];
       })
       .addCase(removeBreakpoints, () => {
