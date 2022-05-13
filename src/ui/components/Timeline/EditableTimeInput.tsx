@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import { isValidTimeString } from "ui/utils/timeline";
 
+import styles from "./EditableTimeInput.module.css";
+
 export default function EditableTimeInputWrapper({
   className,
   defaultValue,
@@ -91,7 +93,7 @@ function EditableTimeInput({
   return (
     <input
       autoFocus={autoFocus}
-      className={`${className} focus:outline-none" border-0 bg-themeTextFieldBgcolor p-0 text-xs text-themeTextFieldColor`}
+      className={`${className} ${styles.Input}`}
       onBlur={onBlur}
       onChange={onChange}
       onKeyDown={onKeyDown}

@@ -1,0 +1,69 @@
+.Capsule {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  column-gap: 1px;
+  height: 2rem;
+}
+
+.LeftSide,
+.LeftSideError {
+  width: 7rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom-left-radius: 2rem;
+  border-top-left-radius: 2rem;
+  padding: 0 0.5rem;
+}
+.LeftSide {
+  background-color: var(--theme-toggle-bgcolor);
+  color: var(--theme-icon-color);
+}
+.LeftSide:hover {
+  background-color: var(--theme-toggle-handle-bgcolor-hover);
+}
+.LeftSideError {
+  background-color: var(--secondary-accent);
+  color: white;
+}
+
+.LoadingState {
+  display: flex;
+  flex-grow: 1;
+}
+
+.LoadingStateIcon {
+  background-color: currentColor;
+}
+
+.ShowOnHover {
+  display: none;
+}
+.LeftSide:hover .ShowOnHover,
+.LeftSideError:hover .ShowOnHover {
+  display: unset;
+}
+.LeftSide:hover .HideOnHover,
+.LeftSideError:hover .HideOnHover {
+  display: none;
+}
+
+.LoadingText {
+  flex-grow: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RadialProgressContainer {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.CircularProgressbar {
+  width: 1.5rem;
+  height: 1.5rem;
+}

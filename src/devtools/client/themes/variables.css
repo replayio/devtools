@@ -194,6 +194,7 @@
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
   --theme-console-input-bgcolor: var(--body-bgcolor);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-handle-bgcolor-hover: #b5eaff;
   --theme-toggle-inner: var(--cool-gray-200);
   --theme-toggle-selected: white;
   --theme-toggle-bgcolor: var(--theme-base-85);
@@ -428,6 +429,7 @@
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
   --theme-console-input-bgcolor: var(--theme-base-95);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
+  --theme-toggle-handle-bgcolor-hover: #005f92;
   --theme-toggle-bgcolor: var(--theme-base-85);
   --theme-toggle-color: white;
   --toolbarbutton-focus-bgcolor: var(--theme-base-90);
