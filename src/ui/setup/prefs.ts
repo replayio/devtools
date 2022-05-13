@@ -1,4 +1,7 @@
-import { prefs as debuggerPrefs } from "devtools/client/debugger/src/utils/prefs";
+import {
+  prefs as debuggerPrefs,
+  asyncStore as debuggerAsyncPrefs,
+} from "devtools/client/debugger/src/utils/prefs";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
@@ -22,6 +25,7 @@ import { RecordingId } from "@recordreplay/protocol";
 import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
+import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -100,6 +104,11 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     );
 
     updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
+  }
+
+  if (state.pendingBreakpoints && oldState.pendingBreakpoints) {
+    // @ts-ignore `asyncStoreHelper` is untyped, so TS doesn't know keys here
+    updateDebuggerAsyncPrefs(state, oldState, "pendingBreakpoints", getPendingBreakpoints);
   }
   maybeUpdateReplaySessions(state);
 };
