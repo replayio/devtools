@@ -1,3 +1,5 @@
+// @TODO Disabled import/order rule until fix this https://github.com/RecordReplay/devtools/issues/6552
+/* eslint-disable import/order */
 import "../src/test-prep";
 
 import { useAuth0 } from "@auth0/auth0-react";
@@ -20,7 +22,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
-
+/* eslint-enable import/order */
 import "image/image.css";
 import "image/icon.css";
 import "tailwindcss/tailwind.css";
