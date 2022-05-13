@@ -2,8 +2,7 @@ import {
   getGlobalFunctions,
   isGlobalFunctionsLoading,
 } from "devtools/client/debugger/src/reducers/ast";
-// @ts-expect-error needs TS definition
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import type { UIThunkAction } from "ui/actions";
 
 import { getSources } from "../reducers/sources";

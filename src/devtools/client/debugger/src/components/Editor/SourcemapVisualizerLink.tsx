@@ -4,7 +4,7 @@ import { UIState } from "ui/state";
 import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
 import Icon from "ui/components/shared/Icon";
-import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/source";
+import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import { trackEvent } from "ui/utils/telemetry";
 
 function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromRedux) {

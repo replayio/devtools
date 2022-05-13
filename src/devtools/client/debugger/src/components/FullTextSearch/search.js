@@ -1,7 +1,7 @@
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import groupBy from "lodash/groupBy";
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 
 import { sliceCodePoints } from "ui/utils/codePointString";
 
