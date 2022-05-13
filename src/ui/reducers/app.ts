@@ -305,40 +305,41 @@ export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loade
   }
   return overlap(loadedRegions.indexed, loadedRegions.loaded);
 });
-export const getIndexingProgress = createSelector(
-  getLoadedRegions,
-  getIndexedAndLoadedRegions,
-  (regions, indexedAndLoaded) => {
-    if (!regions) {
-      return null;
-    }
 
-    const { loading } = regions;
-
-    const indexedProgress = indexedAndLoaded
-      .filter(region => {
-        // It's possible for the indexedProgress to not be a subset of
-        // loadingRegions. This acts as a guard if that should happen.
-        // Todo: Investigate this on the backend.
-        return loading.some(
-          loadingRegion =>
-            region.begin.time >= loadingRegion.begin.time &&
-            region.end.time <= loadingRegion.end.time
-        );
-      })
-      .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
-    const loadingProgress = loading.reduce(
-      (sum, region) => sum + (region.end.time - region.begin.time),
-      0
-    );
-
-    return (indexedProgress / loadingProgress) * 100 || 0;
+// Calculates the percentage of loading regions that have been loaded and indexed.
+//
+// For example:
+// If 80% of the regions have been indexed and 50% have been loaded, this method would return 0.65.
+// If 100% of the regions have been indexed and 50% have been loaded, this method would return 0.75.
+export const getLoadedAndIndexedProgress = createSelector(getLoadedRegions, regions => {
+  if (!regions) {
+    return 0;
   }
-);
-export const getIsIndexed = createSelector(
-  getIndexingProgress,
-  indexingProgress => indexingProgress === 100
-);
+
+  const { indexed, loaded, loading } = regions;
+  if (indexed == null || loaded == null || loading == null) {
+    return 0;
+  }
+
+  const totalLoadingTime = loading.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+
+  if (totalLoadingTime === 0) {
+    return 0;
+  }
+
+  const totalLoadedTime = loaded.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+  const totalIndexedTime = indexed.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+
+  return (totalLoadedTime + totalIndexedTime) / (totalLoadingTime * 2);
+});
+
+export const getIsIndexed = createSelector(getLoadedAndIndexedProgress, progress => progress === 1);
 
 export const getNonLoadingTimeRanges = (state: UIState) => {
   const loadingRegions = getLoadedRegions(state)?.loading || [];

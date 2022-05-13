@@ -28,7 +28,7 @@ import { getTheme } from "ui/reducers/app";
 export * from "../reducers/app";
 
 import {
-  getIndexingProgress,
+  getIsIndexed,
   getLoadingStatusWarning,
   setRecordingDuration,
   setMouseTargetsLoading,
@@ -94,7 +94,7 @@ export function setupApp(store: UIStore) {
   let lastLoadChangeUpdateTime = now();
 
   setInterval(function onLoadChangeInterval() {
-    const isLoadingFinished = getIndexingProgress(store.getState()) === 100;
+    const isLoadingFinished = getIsIndexed(store.getState());
     if (isLoadingFinished) {
       return;
     }

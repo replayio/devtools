@@ -1,7 +1,12 @@
 import classNames from "classnames";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useSelector } from "react-redux";
-import { getIndexingProgress, getLoadingStatusWarning, LoadingStatusWarning } from "ui/actions/app";
+import {
+  getLoadedAndIndexedProgress,
+  getLoadingStatusWarning,
+  LoadingStatusWarning,
+} from "ui/actions/app";
+import { getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
 
@@ -10,21 +15,23 @@ import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
 
 export default function Capsule() {
-  const indexingProgress = useSelector(getIndexingProgress) || 0;
+  const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
   const loadingStatusWarning = useSelector(getLoadingStatusWarning);
+  const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   return (
     <div className={styles.Capsule}>
       <div
-        className={loadingStatusWarning === "timed-out" ? styles.LeftSideError : styles.LeftSide}
+        className={
+          showFocusModeControls || loadingStatusWarning !== "timed-out"
+            ? styles.LeftSide
+            : styles.LeftSideError
+        }
       >
-        {indexingProgress < 100 ? (
-          <LoadingState
-            indexingProgress={indexingProgress}
-            loadingStatusWarning={loadingStatusWarning}
-          />
-        ) : (
+        {showFocusModeControls || progress === 100 ? (
           <FocusInputs />
+        ) : (
+          <LoadingState loadingStatusWarning={loadingStatusWarning} progress={progress} />
         )}
       </div>
       <EditFocusButton loadingStatusWarning={loadingStatusWarning} />
@@ -33,11 +40,11 @@ export default function Capsule() {
 }
 
 function LoadingState({
-  indexingProgress,
   loadingStatusWarning,
+  progress,
 }: {
-  indexingProgress: number;
   loadingStatusWarning: LoadingStatusWarning | null;
+  progress: number;
 }) {
   if (loadingStatusWarning === "timed-out") {
     return (
@@ -52,9 +59,9 @@ function LoadingState({
         {loadingStatusWarning === "slow" ? (
           <Icon className={styles.LoadingStateIcon} filename="turtle" size="extra-large" />
         ) : (
-          <RadialProgress progress={indexingProgress} />
+          <RadialProgress progress={progress} />
         )}
-        <div className={styles.LoadingText}>{Math.round(indexingProgress)}%</div>
+        <div className={styles.LoadingText}>{Math.round(progress)}%</div>
       </div>
     );
   }
