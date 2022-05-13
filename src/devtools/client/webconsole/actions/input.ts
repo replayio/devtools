@@ -5,14 +5,15 @@
 "use strict";
 
 import type { ThunkDispatch } from "redux-thunk";
-import { Pause } from "protocol/thread";
+import { Pause } from "protocol/thread/pause";
 import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
-const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { createPrimitiveValueFront } from "protocol/thread/value";
 const { assert } = require("protocol/utils");
 
 const messagesActions = require("devtools/client/webconsole/actions/messages");
@@ -33,7 +34,7 @@ type EvaluationResponse = {
 };
 type EvaluationResponseResult = any;
 
-async function getPause(toolbox: DevToolsToolbox) {
+async function getPause(toolbox: DevToolsToolbox, ThreadFront: typeof ThreadFrontType) {
   const { asyncIndex } = toolbox.getPanel("debugger")!.getFrameId();
   await ThreadFront.ensureAllSources();
   const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
@@ -66,9 +67,9 @@ async function dispatchExpression(
 }
 
 export function paywallExpression(expression: string, reason = "team-user"): UIThunkAction {
-  return async dispatch => {
-    const pause = await getPause(window.gToolbox);
-    const evalId = await dispatchExpression(dispatch, pause, expression);
+  return async (dispatch, getState, { ThreadFront }) => {
+    const pause = await getPause(window.gToolbox, ThreadFront);
+    const evalId = await dispatchExpression(dispatch, pause!, expression);
 
     dispatch(
       messagesActions.messagesAdd([
@@ -79,8 +80,8 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
           source: MESSAGE_SOURCE.CONSOLE_API,
           timeStamp: Date.now(),
           evalId,
-          executionPoint: pause.point,
-          executionPointTime: pause.time,
+          executionPoint: pause!.point,
+          executionPointTime: pause!.time,
         }),
       ])
     );
@@ -89,7 +90,7 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
 
 let nextEvalId = 1;
 export function evaluateExpression(expression: string): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const debuggerPanel = window.gToolbox.getPanel("debugger");
 
     if (!expression) {
@@ -100,8 +101,8 @@ export function evaluateExpression(expression: string): UIThunkAction {
     }
 
     const { asyncIndex, frameId } = debuggerPanel.getFrameId();
-    const pause = await getPause(window.gToolbox);
-    const evalId = await dispatchExpression(dispatch, pause, expression);
+    const pause = await getPause(window.gToolbox, ThreadFront);
+    const evalId = await dispatchExpression(dispatch, pause!, expression);
     dispatch(
       messagesActions.messagesAdd([
         {
@@ -113,7 +114,7 @@ export function evaluateExpression(expression: string): UIThunkAction {
     );
 
     try {
-      const response: EvaluationResponse = await evaluateJSAsync(expression, {
+      const response: EvaluationResponse = await evaluateJSAsync(expression, ThreadFront, {
         asyncIndex,
         frameId,
         forConsoleMessage: true,
@@ -139,7 +140,7 @@ export function evaluateExpression(expression: string): UIThunkAction {
 }
 
 export function eagerEvalExpression(expression: string): UIThunkAction {
-  return async () => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (!expression) {
       return null;
     }
@@ -147,8 +148,8 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
     const { asyncIndex, frameId } = window.gToolbox.getPanel("debugger")!.getFrameId();
 
     try {
-      const response = await evaluateJSAsync(expression, {
-        asyncIndex,
+      const response = await evaluateJSAsync(expression, ThreadFront, {
+        asyncIndex: asyncIndex!,
         frameId,
         pure: true,
       });
@@ -169,11 +170,15 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
  * @param {Object} options: Options for evaluation. See evaluateJSAsync method on
  *                          devtools/shared/fronts/webconsole.js
  */
-async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptions = {}) {
+async function evaluateJSAsync(
+  expression: string,
+  ThreadFront: typeof ThreadFrontType,
+  options: EvaluateJSAsyncOptions = {}
+) {
   const { asyncIndex, frameId, pure } = options;
   //reminder that there would be no results if the function were impure -logan
   const { returned, exception, failed } = await ThreadFront.evaluate({
-    asyncIndex,
+    asyncIndex: asyncIndex!,
     frameId,
     text: expression,
     pure,
@@ -183,7 +188,7 @@ async function evaluateJSAsync(expression: string, options: EvaluateJSAsyncOptio
   if (failed || !(returned || exception)) {
     v = createPrimitiveValueFront(
       "Error: Evaluation failed",
-      ThreadFront.pauseForAsyncIndex(asyncIndex)
+      ThreadFront.pauseForAsyncIndex(asyncIndex!)
     );
   } else if (returned) {
     v = returned;

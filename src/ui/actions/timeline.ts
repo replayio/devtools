@@ -1,5 +1,5 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
-import { Pause, ThreadFront } from "protocol/thread";
+import { Pause } from "protocol/thread/pause";
 import { client, log, sendMessage } from "protocol/socket";
 import {
   getGraphicsAtTime,
@@ -65,6 +65,8 @@ const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
 export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
+  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
+
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
 
@@ -89,7 +91,7 @@ export async function setupTimeline(store: UIStore) {
 }
 
 export function jumpToInitialPausePoint(): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     assert(ThreadFront.recordingId, "no recordingId");
 
     await ThreadFront.waitForSession();
@@ -242,7 +244,7 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
-  return (dispatch, getState) => {
+  return (dispatch, getState, { ThreadFront }) => {
     const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 

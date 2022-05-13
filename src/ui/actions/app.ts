@@ -1,6 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
-import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
@@ -62,6 +61,8 @@ export function setupApp(store: UIStore) {
     });
     tokenManager.getToken();
   }
+
+  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
 
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
@@ -205,7 +206,7 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
 }
 
 export function loadMouseTargets(): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     dispatch(setMouseTargetsLoading(true));
     const resp = await ThreadFront.loadMouseTargets();
     dispatch(setMouseTargetsLoading(false));

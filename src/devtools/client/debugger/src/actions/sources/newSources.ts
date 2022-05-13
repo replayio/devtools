@@ -9,7 +9,6 @@
  * @module actions/sources
  */
 
-import { ThreadFront } from "protocol/thread";
 import type { UIThunkAction } from "ui/actions";
 
 import { insertSourceActors } from "../../actions/source-actors";
@@ -91,7 +90,7 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
 }
 
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     // source may have been modified by selectLocation
     const source = getSource(getState(), sourceId);
     if (!source) {
@@ -214,7 +213,7 @@ export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promis
   };
 }
 export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const resultIds: string[] = [];
     const newSourcesObj: Record<string, Source> = {};
     const newSourceActors: SourceActor[] = [];

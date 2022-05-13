@@ -3,7 +3,7 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
 import { UIThunkAction } from ".";
-import { ThreadFront } from "protocol/thread";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import escapeHtml from "escape-html";
 import { waitForTime } from "protocol/utils";
 import { RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
@@ -99,9 +99,9 @@ export function createFrameComment(
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const sourceLocation =
-      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
+      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront));
     const options = {
       position,
       hasFrames: true,
@@ -111,7 +111,7 @@ export function createFrameComment(
   };
 }
 
-function getCurrentPauseSourceLocationWithTimeout() {
+function getCurrentPauseSourceLocationWithTimeout(ThreadFront: typeof ThreadFrontType) {
   return Promise.race([ThreadFront.getCurrentPauseSourceLocation(), waitForTime(1000)]);
 }
 
@@ -161,7 +161,7 @@ export function createLabels(sourceLocation: {
   sourceUrl: string;
   line: number;
 }): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const { sourceId, sourceUrl, line } = sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
     if (!sourceId) {
