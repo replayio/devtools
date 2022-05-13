@@ -1,4 +1,3 @@
-.ToggleError,
 .ToggleOn,
 .ToggleOff {
   display: flex;
@@ -18,11 +17,7 @@
 .ToggleOff:hover {
   background-color: var(--theme-toggle-handle-bgcolor-hover);
 }
-.ToggleError {
-  background-color: var(--secondary-accent);
-}
 
-.ToggleErrorIcon,
 .ToggleOffIcon,
 .ToggleOnIcon {
   mask-position: top;
@@ -33,7 +28,4 @@
 }
 .ToggleOffIcon {
   background-color: var(--theme-toggle-color);
-}
-.ToggleErrorIcon {
-  background-color: white;
 }

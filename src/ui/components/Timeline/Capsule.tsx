@@ -1,11 +1,12 @@
 import classNames from "classnames";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getLoadedAndIndexedProgress,
   getLoadingStatusWarning,
   LoadingStatusWarning,
 } from "ui/actions/app";
+import { setModal } from "ui/reducers/app";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
@@ -23,9 +24,11 @@ export default function Capsule() {
     <div className={styles.Capsule}>
       <div
         className={
-          showFocusModeControls || loadingStatusWarning !== "timed-out"
-            ? styles.LeftSide
-            : styles.LeftSideError
+          showFocusModeControls
+            ? styles.LeftSideFocusModeControls
+            : loadingStatusWarning === "really-slow"
+            ? styles.LeftSideReallySlow
+            : styles.LeftSide
         }
       >
         {showFocusModeControls || progress === 100 ? (
@@ -34,7 +37,7 @@ export default function Capsule() {
           <LoadingState loadingStatusWarning={loadingStatusWarning} progress={progress} />
         )}
       </div>
-      <EditFocusButton loadingStatusWarning={loadingStatusWarning} />
+      <EditFocusButton />
     </div>
   );
 }
@@ -46,25 +49,26 @@ function LoadingState({
   loadingStatusWarning: LoadingStatusWarning | null;
   progress: number;
 }) {
-  if (loadingStatusWarning === "timed-out") {
-    return (
-      <div className={styles.LoadingState}>
-        <Icon className={styles.LoadingStateIcon} filename="cloud" size="large" />
-        <div className={styles.LoadingText}>Error</div>
-      </div>
-    );
-  } else {
-    return (
-      <div className={styles.LoadingState}>
-        {loadingStatusWarning === "slow" ? (
-          <Icon className={styles.LoadingStateIcon} filename="turtle" size="extra-large" />
-        ) : (
-          <RadialProgress progress={progress} />
-        )}
-        <div className={styles.LoadingText}>{Math.round(progress)}%</div>
-      </div>
-    );
-  }
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    if (loadingStatusWarning === "really-slow") {
+      dispatch(setModal("timeline-slow"));
+    }
+  };
+
+  return (
+    <div className={styles.LoadingState} onClick={onClick}>
+      {loadingStatusWarning === "really-slow" ? (
+        <Icon className={styles.ReallySlowIcon} filename="cloud" size="large" />
+      ) : loadingStatusWarning === "slow" ? (
+        <Icon className={styles.SlowIcon} filename="turtle" size="extra-large" />
+      ) : (
+        <RadialProgress progress={progress} />
+      )}
+      <div className={styles.LoadingText}>{Math.round(progress)}%</div>
+    </div>
+  );
 }
 
 function RadialProgress({ className, progress }: { className?: string; progress: number }) {

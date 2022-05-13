@@ -104,8 +104,8 @@ export function setupApp(store: UIStore) {
     const elapsedTime = currentTime - lastLoadChangeUpdateTime;
 
     if (elapsedTime > TIMED_OUT_THRESHOLD) {
-      if (loadingStatusWarning !== "timed-out") {
-        store.dispatch(setLoadingStatusWarning("timed-out"));
+      if (loadingStatusWarning !== "really-slow") {
+        store.dispatch(setLoadingStatusWarning("really-slow"));
       }
     } else if (elapsedTime > SLOW_THRESHOLD) {
       if (loadingStatusWarning !== "slow") {

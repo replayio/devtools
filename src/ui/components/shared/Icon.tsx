@@ -1,6 +1,7 @@
 import React from "react";
 
 const SIZES = {
+  custom: {},
   small: { height: "1rem", width: "1rem" },
   medium: { height: "1.25rem", width: "1.25rem" },
   large: { height: "1.5rem", width: "1.5rem" },
@@ -12,7 +13,7 @@ export default function Icon({
   size = "medium",
   style = {},
 }: {
-  size?: "small" | "medium" | "large" | "extra-large";
+  size?: "small" | "medium" | "large" | "extra-large" | "custom";
   filename: string;
   className?: string;
   style?: object;

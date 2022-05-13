@@ -39,7 +39,8 @@ export type ModalType =
   | "loom"
   | "attachment"
   | "sourcemap-setup"
-  | "rename-replay";
+  | "rename-replay"
+  | "timeline-slow";
 export type WorkspaceId = string;
 export type WorkspaceUuid = string;
 export type SettingsTabTitle =

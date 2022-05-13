@@ -30,7 +30,7 @@ import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
-export type LoadingStatusWarning = "slow" | "timed-out";
+export type LoadingStatusWarning = "slow" | "really-slow";
 
 export const initialAppState: AppState = {
   mode: "devtools",
