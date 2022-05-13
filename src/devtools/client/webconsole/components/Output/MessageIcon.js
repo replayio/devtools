@@ -39,22 +39,6 @@ export function MessageIcon(props) {
   }
 
   if (prefixBadge) {
-    const style =
-      prefixBadge == "unicorn"
-        ? {
-            height: 16,
-            marginLeft: 4,
-            marginRight: 8,
-            marginTop: 2,
-          }
-        : {
-            height: 7,
-            marginLeft: 9,
-            marginRight: 12,
-            marginTop: 8,
-            width: 7,
-            minWidth: 7,
-          };
     return <PrefixBadge prefixBadge={prefixBadge} />;
   }
 
