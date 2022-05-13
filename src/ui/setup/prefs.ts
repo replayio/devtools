@@ -52,7 +52,8 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
     selector: (state: UIState) => T[typeof field]
   ) {
     const newValue = selector(newState);
-    if (newValue != selector(oldState)) {
+    const oldValue = selector(oldState);
+    if (newValue != oldValue) {
       prefObj[field] = newValue;
     }
   };
@@ -62,8 +63,9 @@ const updateStandardPrefs = createPrefsUpdater(prefs);
 const updateAsyncPrefs = createPrefsUpdater(asyncStore);
 const updateWebconsolePrefs = createPrefsUpdater(webconsolePrefs);
 const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
+const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
-const actualUpdatePrefs = (state: UIState, oldState: UIState) => {
+export const updatePrefs = (state: UIState, oldState: UIState) => {
   updateStandardPrefs(state, oldState, "viewMode", getViewMode);
   updateStandardPrefs(state, oldState, "theme", getTheme);
 
@@ -101,9 +103,6 @@ const actualUpdatePrefs = (state: UIState, oldState: UIState) => {
   }
   maybeUpdateReplaySessions(state);
 };
-
-// Avoid a small bit of overhead of checking prefs after _every_ dispatch
-export const updatePrefs = debounce(actualUpdatePrefs, 50);
 
 async function getReplaySessions() {
   return await asyncStore.replaySessions;
