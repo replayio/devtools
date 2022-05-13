@@ -2,56 +2,60 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIState } from "ui/state";
-
-import { PendingBreakpoint } from "./types";
-
-/**
- * Pending breakpoints reducer
- * @module reducers/pending-breakpoints
- */
 
 import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
 
+import { setBreakpoint, removeBreakpoint, removeBreakpoints } from "./breakpoints";
+import { PendingBreakpoint, SourceLocation } from "./types";
+
 export type PendingBreakpointsState = Record<string, PendingBreakpoint>;
 
-function update(state: PendingBreakpointsState = {}, action: AnyAction) {
-  switch (action.type) {
-    case "SET_BREAKPOINT":
-      return setBreakpoint(state, action);
+const pendingBreakpointsSlice = createSlice({
+  name: "pendingBreakpoints",
+  initialState: {} as PendingBreakpointsState,
+  reducers: {
+    removePendingBreakpoint: {
+      reducer(state, action: PayloadAction<SourceLocation>) {
+        const locationId = makePendingLocationId(action.payload);
+        delete state[locationId];
+      },
+      prepare(location: SourceLocation, cx?: Context) {
+        // Add cx to action.meta
+        return {
+          payload: location,
+          meta: { cx },
+        };
+      },
+    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(setBreakpoint, (state, action) => {
+        const breakpoint = action.payload;
+        const locationId = makePendingLocationId(breakpoint.location);
+        const pendingBreakpoint = createPendingBreakpoint(breakpoint);
+        state[locationId] = pendingBreakpoint;
+      })
+      .addCase(removeBreakpoint, (state, action) => {
+        // same as removePendingBreakpoint
+        const locationId = makePendingLocationId(action.payload);
+        delete state[locationId];
+      })
+      .addCase(removeBreakpoints, () => {
+        return {};
+      });
+  },
+});
 
-    case "REMOVE_BREAKPOINT":
-      return removeBreakpoint(state, action);
+export const { removePendingBreakpoint } = pendingBreakpointsSlice.actions;
 
-    case "REMOVE_PENDING_BREAKPOINT":
-      return removeBreakpoint(state, action);
-
-    case "REMOVE_BREAKPOINTS": {
-      return {};
-    }
-  }
-
-  return state;
-}
-
-function setBreakpoint(state: PendingBreakpointsState, { breakpoint }: AnyAction) {
-  const locationId = makePendingLocationId(breakpoint.location);
-  const pendingBreakpoint = createPendingBreakpoint(breakpoint);
-
-  return { ...state, [locationId]: pendingBreakpoint };
-}
-
-function removeBreakpoint(state: PendingBreakpointsState, { location }: AnyAction) {
-  const locationId = makePendingLocationId(location);
-
-  state = { ...state };
-  delete state[locationId];
-  return state;
-}
+export default pendingBreakpointsSlice.reducer;
 
 // Selectors
-// TODO: these functions should be moved out of the reducer
 
 export function getPendingBreakpoints(state: UIState) {
   return state.pendingBreakpoints;
@@ -72,5 +76,3 @@ export function getPendingBreakpointsForSource(
     return pendingBreakpoint.location.sourceUrl === source.url;
   });
 }
-
-export default update;
