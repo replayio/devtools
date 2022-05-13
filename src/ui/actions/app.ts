@@ -1,10 +1,8 @@
-import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
 import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
@@ -30,9 +28,12 @@ import { getTheme } from "ui/reducers/app";
 export * from "../reducers/app";
 
 import {
+  getIndexingProgress,
+  getLoadingStatusWarning,
   setRecordingDuration,
   setMouseTargetsLoading,
   setLoadedRegions,
+  setLoadingStatusWarning,
   updateTheme,
   setLoading,
   setSessionId,
@@ -70,7 +71,46 @@ export function setupApp(store: UIStore) {
     store.dispatch(setLoading(100));
   });
 
+  // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
+  // Practically speaking though, there are cases where updates take so long it feels like things are broken.
+  // In that case the UI should show an error state.
+  //
+  // We can rely on the fact that even when loading takes a long time, we should still be getting regular progress updates.
+  // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
+  //
+  // If another update eventually comes in we will reset the slow/timed-out flag.
+  const SLOW_THRESHOLD = 2500;
+  const TIMED_OUT_THRESHOLD = 10000;
+  let lastLoadChangeUpdateTime = performance.now();
+
+  setInterval(function onLoadChangeInterval() {
+    const isLoadingFinished = getIndexingProgress(store.getState()) === 100;
+    if (isLoadingFinished) {
+      return;
+    }
+
+    const loadingStatusWarning = getLoadingStatusWarning(store.getState());
+    const currentTime = performance.now();
+    const elapsedTime = currentTime - lastLoadChangeUpdateTime;
+
+    if (elapsedTime > TIMED_OUT_THRESHOLD) {
+      if (loadingStatusWarning !== "timed-out") {
+        store.dispatch(setLoadingStatusWarning("timed-out"));
+      }
+    } else if (elapsedTime > SLOW_THRESHOLD) {
+      if (loadingStatusWarning !== "slow") {
+        store.dispatch(setLoadingStatusWarning("slow"));
+      }
+    } else {
+      if (loadingStatusWarning !== null) {
+        store.dispatch(setLoadingStatusWarning(null));
+      }
+    }
+  }, 1000);
+
   ThreadFront.listenForLoadChanges(parameters => {
+    lastLoadChangeUpdateTime = performance.now();
+
     store.dispatch(setLoadedRegions(parameters));
   });
 }

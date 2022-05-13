@@ -30,6 +30,8 @@ import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
+export type LoadingStatusWarning = "slow" | "timed-out";
+
 export const initialAppState: AppState = {
   mode: "devtools",
   analysisPoints: {},
@@ -46,6 +48,7 @@ export const initialAppState: AppState = {
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
+  loadingStatusWarning: null,
   loadingPageTipIndex: 0,
   modal: null,
   modalOptions: null,
@@ -86,6 +89,10 @@ const appSlice = createSlice({
       );
       state.loadedRegions = action.payload;
       state.recordingDuration = recordingDuration;
+
+      // This is inferred by an interval that checks the amount of time since the last update.
+      // Whenever a new update comes in, this state should be reset.
+      state.loadingStatusWarning = null;
     },
     setExpectedError(state, action: PayloadAction<ExpectedError>) {
       state.expectedError = action.payload;
@@ -119,6 +126,13 @@ const appSlice = createSlice({
     },
     setLoadingFinished(state, action: PayloadAction<boolean>) {
       state.loadingFinished = action.payload;
+
+      // This is inferred by an interval that checks the amount of time since the last update.
+      // Whenever a new update comes in, this state should be reset.
+      state.loadingStatusWarning = null;
+    },
+    setLoadingStatusWarning(state, action: PayloadAction<LoadingStatusWarning | null>) {
+      state.loadingStatusWarning = action.payload;
     },
     setSessionId(state, action: PayloadAction<string>) {
       state.sessionId = action.payload;
@@ -239,6 +253,7 @@ export const {
   setLoadedRegions,
   setLoading,
   setLoadingFinished,
+  setLoadingStatusWarning,
   setModal,
   setRecordingDuration,
   setRecordingTarget,
@@ -282,6 +297,7 @@ export const getRecordingDuration = (state: UIState) => state.app.recordingDurat
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
+export const getLoadingStatusWarning = (state: UIState) => state.app.loadingStatusWarning;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
   if (!loadedRegions) {

@@ -2,13 +2,18 @@ import classNames from "classnames";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleFocusMode } from "ui/actions/timeline";
+import { LoadingStatusWarning } from "ui/reducers/app";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
 
 import styles from "./EditFocusButton.module.css";
 
-export const EditFocusButton = ({ didLoadingFail }: { didLoadingFail: boolean }) => {
+export const EditFocusButton = ({
+  loadingStatusWarning,
+}: {
+  loadingStatusWarning: LoadingStatusWarning | null;
+}) => {
   const dispatch = useDispatch();
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
@@ -21,7 +26,7 @@ export const EditFocusButton = ({ didLoadingFail }: { didLoadingFail: boolean })
       className={
         showFocusModeControls
           ? styles.ToggleOn
-          : didLoadingFail
+          : loadingStatusWarning === "timed-out"
           ? styles.ToggleError
           : styles.ToggleOff
       }
@@ -32,7 +37,7 @@ export const EditFocusButton = ({ didLoadingFail }: { didLoadingFail: boolean })
         className={
           showFocusModeControls
             ? styles.ToggleOnIcon
-            : didLoadingFail
+            : loadingStatusWarning === "timed-out"
             ? styles.ToggleErrorIcon
             : styles.ToggleOffIcon
         }

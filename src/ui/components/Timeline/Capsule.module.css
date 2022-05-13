@@ -37,18 +37,6 @@
   background-color: currentColor;
 }
 
-.ShowOnHover {
-  display: none;
-}
-.LeftSide:hover .ShowOnHover,
-.LeftSideError:hover .ShowOnHover {
-  display: unset;
-}
-.LeftSide:hover .HideOnHover,
-.LeftSideError:hover .HideOnHover {
-  display: none;
-}
-
 .LoadingText {
   flex-grow: 1;
   display: inline-flex;

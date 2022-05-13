@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useSelector } from "react-redux";
-import { getIndexingProgress } from "ui/actions/app";
+import { getIndexingProgress, getLoadingStatusWarning, LoadingStatusWarning } from "ui/actions/app";
 
 import Icon from "../shared/Icon";
 
@@ -11,33 +11,35 @@ import FocusInputs from "./FocusInputs";
 
 export default function Capsule() {
   const indexingProgress = useSelector(getIndexingProgress) || 0;
-
-  // TODO [bvaughn] Determine when things have errored and we should show the storm cloud icon.
-  // There is currently no explicit event for this case; should we add some sort of timeout?
-  const didLoadingFail = false;
+  const loadingStatusWarning = useSelector(getLoadingStatusWarning);
 
   return (
     <div className={styles.Capsule}>
-      <div className={didLoadingFail ? styles.LeftSideError : styles.LeftSide}>
+      <div
+        className={loadingStatusWarning === "timed-out" ? styles.LeftSideError : styles.LeftSide}
+      >
         {indexingProgress < 100 ? (
-          <LoadingState indexingProgress={indexingProgress} didLoadingFail={didLoadingFail} />
+          <LoadingState
+            indexingProgress={indexingProgress}
+            loadingStatusWarning={loadingStatusWarning}
+          />
         ) : (
           <FocusInputs />
         )}
       </div>
-      <EditFocusButton didLoadingFail={didLoadingFail} />
+      <EditFocusButton loadingStatusWarning={loadingStatusWarning} />
     </div>
   );
 }
 
 function LoadingState({
   indexingProgress,
-  didLoadingFail,
+  loadingStatusWarning,
 }: {
   indexingProgress: number;
-  didLoadingFail: boolean;
+  loadingStatusWarning: LoadingStatusWarning | null;
 }) {
-  if (didLoadingFail) {
+  if (loadingStatusWarning === "timed-out") {
     return (
       <div className={styles.LoadingState}>
         <Icon className={styles.LoadingStateIcon} filename="cloud" size="large" />
@@ -45,15 +47,13 @@ function LoadingState({
       </div>
     );
   } else {
-    // Note that we render both UI elements; CSS hover state determines visibility.
     return (
       <div className={styles.LoadingState}>
-        <Icon
-          className={classNames(styles.LoadingStateIcon, styles.ShowOnHover)}
-          filename="turtle"
-          size="extra-large"
-        />
-        <RadialProgress className={styles.HideOnHover} progress={indexingProgress} />
+        {loadingStatusWarning === "slow" ? (
+          <Icon className={styles.LoadingStateIcon} filename="turtle" size="extra-large" />
+        ) : (
+          <RadialProgress progress={indexingProgress} />
+        )}
         <div className={styles.LoadingText}>{Math.round(indexingProgress)}%</div>
       </div>
     );

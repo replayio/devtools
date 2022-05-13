@@ -11,6 +11,7 @@ import {
   TimeStampedPointRange,
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
+import { LoadingStatusWarning } from "ui/actions/app";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
 import { PanelName } from "./layout";
@@ -92,6 +93,7 @@ export interface AppState {
   loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
+  loadingStatusWarning: LoadingStatusWarning | null;
   loadingPageTipIndex: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;

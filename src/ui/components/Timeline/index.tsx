@@ -8,6 +8,7 @@ import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
+
 import ProtocolTimeline from "../ProtocolTimeline";
 
 import Capsule from "./Capsule";
