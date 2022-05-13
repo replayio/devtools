@@ -7,6 +7,7 @@ import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 
+import type { ThunkExtraArgs } from "ui/utils/thunk";
 import { extendStore, AppStore } from "../store";
 import app from "ui/reducers/app";
 import timeline from "ui/reducers/timeline";
@@ -128,8 +129,9 @@ export default async function DevTools(store: AppStore) {
 
   bootstrapWorkers();
 
-  const extraThunkArgs = {
+  const extraThunkArgs: ThunkExtraArgs = {
     client: clientCommands,
+    ThreadFront: ThreadFront,
   };
 
   extendStore(store, initialState, reducers, extraThunkArgs);
