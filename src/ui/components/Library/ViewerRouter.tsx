@@ -21,7 +21,7 @@ function ViewerLoader() {
   );
 }
 
-function MyLibrary({ searchString }: ViewerRouterProps) {
+function MyLibrary() {
   const { recordings, loading } = hooks.useGetPersonalRecordings();
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -29,7 +29,7 @@ function MyLibrary({ searchString }: ViewerRouterProps) {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY, searchString }} />;
+  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
@@ -50,7 +50,7 @@ function TeamLibrary(props: ViewerRouterProps) {
   }
 }
 
-function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRouterProps) {
+function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -62,22 +62,15 @@ function NonPendingTeamLibrary({ currentWorkspaceId, searchString }: ViewerRoute
 
   return (
     <Viewer
-      {...{
-        recordings,
-        workspaceName: workspace.logo ? (
-          <Base64Image src={workspace.logo} className="max-h-12" />
-        ) : (
-          workspace.name
-        ),
-        searchString,
-      }}
+      recordings={recordings}
+      workspaceName={
+        workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : workspace.name
+      }
     />
   );
 }
 
-type ViewerRouterProps = PropsFromRedux & {
-  searchString: string;
-};
+type ViewerRouterProps = PropsFromRedux;
 
 function ViewerRouter(props: ViewerRouterProps) {
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
@@ -122,7 +115,7 @@ function ViewerRouter(props: ViewerRouterProps) {
   }
 
   if (currentWorkspaceId === null && features.library) {
-    return <MyLibrary {...props} />;
+    return <MyLibrary />;
   } else if (currentWorkspaceId) {
     return <TeamLibrary {...props} />;
   }

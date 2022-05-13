@@ -1,7 +1,6 @@
 import React from "react";
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
-import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";
 import styles from "./Library.module.css";
 

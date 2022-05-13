@@ -1,4 +1,4 @@
-import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
@@ -8,19 +8,18 @@ import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
-import { removeUrlParameters } from "ui/utils/environment";
-import { setExpectedError } from "ui/actions/errors";
+
 import LoadingScreen from "../shared/LoadingScreen";
+import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
+import { LibraryFilters, LibraryFiltersContext, useFilters } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
-import { TextInput } from "../shared/Forms";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "./Library.module.css";
 import {
   downloadReplay,
   firstReplay,
-  hasTeamInvitationCode,
   isTeamLeaderInvite,
   singleInvitation,
 } from "ui/utils/onboarding";
@@ -39,27 +38,6 @@ function isUnknownWorkspaceId(
   }
 
   return !associatedWorkspaces.map(ws => ws.id).includes(id);
-}
-
-function FilterBar({
-  searchString,
-  setSearchString,
-}: {
-  searchString: string;
-  setSearchString: Dispatch<SetStateAction<string>>;
-}) {
-  const onChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchString(e.target.value);
-  };
-
-  return (
-    <div
-      className={`flex flex-grow flex-row items-center space-x-3 text-sm text-gray-500 ${styles.librarySearch}`}
-    >
-      <div className="material-icons">search</div>
-      <TextInput value={searchString} onChange={onChange} placeholder="Search" />
-    </div>
-  );
 }
 
 function LibraryLoader(props: PropsFromRedux) {
@@ -98,7 +76,7 @@ function Library({
   nags,
 }: LibraryProps) {
   const router = useRouter();
-  const [searchString, setSearchString] = useState("");
+  const { displayedString, setDisplayedText, setAppliedText, filters } = useFilters();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
@@ -142,16 +120,22 @@ function Library({
   }
 
   return (
-    <main className="flex h-full w-full flex-row">
-      <Sidebar nonPendingWorkspaces={workspaces} />
-      <div className="flex flex-grow flex-col overflow-x-hidden">
-        <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
-          <FilterBar searchString={searchString} setSearchString={setSearchString} />
-          <LaunchButton />
+    <LibraryFiltersContext.Provider value={filters}>
+      <main className="flex h-full w-full flex-row">
+        <Sidebar nonPendingWorkspaces={workspaces} />
+        <div className="flex flex-grow flex-col overflow-x-hidden">
+          <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
+            <FilterBar
+              displayedString={displayedString}
+              setDisplayedText={setDisplayedText}
+              setAppliedText={setAppliedText}
+            />
+            <LaunchButton />
+          </div>
+          <ViewerRouter />
         </div>
-        <ViewerRouter searchString={searchString} />
-      </div>
-    </main>
+      </main>
+    </LibraryFiltersContext.Provider>
   );
 }
 
@@ -162,7 +146,6 @@ const connector = connect(
   {
     setWorkspaceId: actions.setWorkspaceId,
     setModal: actions.setModal,
-    setExpectedError,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

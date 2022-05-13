@@ -1,4 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
+import { ExecutionPoint } from "@recordreplay/protocol";
 import { Editor } from "codemirror";
 import { usesWindow } from "../../ssr";
 
@@ -111,6 +112,20 @@ export function getPausePointParams() {
   }
 
   return null;
+}
+
+export function getParams() {
+  const url = new URL(window.location.toString());
+  return { q: url.searchParams.get("q") };
+}
+export function updateUrlWithParams(params: Record<string, string>) {
+  const url = new URL(window.location.toString());
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  window.history.replaceState({}, "", url.toString());
 }
 
 export function getLoginReferrerParam() {

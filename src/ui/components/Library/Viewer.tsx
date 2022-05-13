@@ -1,24 +1,21 @@
-import React, { useState, useMemo } from "react";
-import { Recording } from "ui/types";
 import { RecordingId } from "@recordreplay/protocol";
+
 import BatchActionDropdown from "./BatchActionDropdown";
+
 import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
-import RecordingRow from "./RecordingRow";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
+
 import sortBy from "lodash/sortBy";
-import styles from "./Library.module.css";
+import React, { useState, useMemo, useContext } from "react";
 import { useSelector } from "react-redux";
 import { getWorkspaceId } from "ui/reducers/app";
+import { Recording } from "ui/types";
+
+import styles from "./Library.module.css";
+import RecordingRow from "./RecordingRow";
 import TeamTrialEnd from "./TeamTrialEnd";
-
-const subStringInString = (subString: string, string: string | null) => {
-  if (!string) {
-    return false;
-  }
-
-  return string.toLowerCase().includes(subString.toLowerCase());
-};
+import { filterRecordings, LibraryFiltersContext } from "./useFilters";
 
 function getErrorText() {
   if (isReplayBrowser()) {
@@ -50,23 +47,21 @@ function DownloadLinks() {
 export default function Viewer({
   recordings,
   workspaceName,
-  searchString,
 }: {
   recordings: Recording[];
   workspaceName: string | React.ReactNode;
-  searchString: string;
 }) {
-  const filteredRecordings = searchString
-    ? recordings.filter(
-        r => subStringInString(searchString, r.url) || subStringInString(searchString, r.title)
-      )
-    : recordings;
+  const filters = useContext(LibraryFiltersContext);
+  const filteredRecordings = useMemo(
+    () => filterRecordings(recordings, filters),
+    [filters, recordings]
+  );
 
   return (
     <div
       className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
-      <ViewerContent {...{ workspaceName, searchString }} recordings={filteredRecordings} />
+      <ViewerContent workspaceName={workspaceName} recordings={filteredRecordings} />
     </div>
   );
 }
