@@ -4,11 +4,13 @@
 
 //
 
-import uniq from "lodash/uniq";
+import { getAvailableEventBreakpoints } from "devtools/server/actors/utils/event-breakpoints";
 import remove from "lodash/remove";
-import difference from "lodash/difference";
-import { ThreadFront } from "protocol/thread";
-const { getAvailableEventBreakpoints } = require("devtools/server/actors/utils/event-breakpoints");
+import uniq from "lodash/uniq";
+import type { UIThunkAction } from "ui/actions";
+import type { UIStore } from "ui/actions";
+import type { AppDispatch } from "ui/setup/store";
+
 import * as selectors from "../selectors";
 
 const INITIAL_EVENT_BREAKPOINTS = [
@@ -26,34 +28,38 @@ const INITIAL_EVENT_BREAKPOINTS = [
   "event.websocket.close",
 ];
 
-export async function setupEventListeners(store) {
+type $FixTypeLater = any;
+
+export async function setupEventListeners(store: UIStore) {
   store.dispatch(getEventListenerBreakpointTypes());
 
   const eventListeners = selectors.getActiveEventListeners(store.getState());
   await store.dispatch(setEventListeners(eventListeners));
 }
 
-function updateEventListeners(newEvents) {
+function updateEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
 
-function setEventListeners(newEvents) {
+function setEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
 
-async function updateExpanded(dispatch, newExpanded) {
+async function updateExpanded(dispatch: AppDispatch, newExpanded: $FixTypeLater[]) {
   dispatch({
     type: "UPDATE_EVENT_LISTENER_EXPANDED",
     expanded: newExpanded,
   });
 }
 
-export function addEventListenerBreakpoints(eventsToAdd) {
+export function addEventListenerBreakpoints(
+  eventsToAdd: $FixTypeLater[]
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     try {
       const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());
@@ -65,7 +71,9 @@ export function addEventListenerBreakpoints(eventsToAdd) {
   };
 }
 
-export function removeEventListenerBreakpoints(eventsToRemove) {
+export function removeEventListenerBreakpoints(
+  eventsToRemove: $FixTypeLater[]
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());
 
@@ -75,29 +83,34 @@ export function removeEventListenerBreakpoints(eventsToRemove) {
   };
 }
 
-export function addEventListenerExpanded(category) {
-  return async (dispatch, getState) => {
-    const expanded = await selectors.getEventListenerExpanded(getState());
+export function addEventListenerExpanded(category: string): UIThunkAction {
+  return (dispatch, getState) => {
+    const expanded = selectors.getEventListenerExpanded(getState());
 
     const newExpanded = uniq([...expanded, category]);
-
-    await updateExpanded(dispatch, newExpanded);
+    dispatch({
+      type: "UPDATE_EVENT_LISTENER_EXPANDED",
+      expanded: newExpanded,
+    });
   };
 }
 
-export function removeEventListenerExpanded(category) {
-  return async (dispatch, getState) => {
-    const expanded = await selectors.getEventListenerExpanded(getState());
+export function removeEventListenerExpanded(category: string): UIThunkAction {
+  return (dispatch, getState) => {
+    const expanded = selectors.getEventListenerExpanded(getState());
 
     const newExpanded = expanded.filter(expand => expand != category);
 
-    updateExpanded(dispatch, newExpanded);
+    dispatch({
+      type: "UPDATE_EVENT_LISTENER_EXPANDED",
+      expanded: newExpanded,
+    });
   };
 }
 
-export function getEventListenerBreakpointTypes() {
+export function getEventListenerBreakpointTypes(): UIThunkAction<Promise<void>> {
   return async (dispatch, _, { client }) => {
-    const categories = await getAvailableEventBreakpoints();
+    const categories = getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
     const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
@@ -106,8 +119,8 @@ export function getEventListenerBreakpointTypes() {
   };
 }
 
-export function loadAdditionalCounts() {
-  return async (dispatch, getState, { client }) => {
+export function loadAdditionalCounts(): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (!selectors.isLoadingAdditionalCounts(getState())) {
       return;
     }
@@ -116,7 +129,7 @@ export function loadAdditionalCounts() {
     const eventBreakpoints = selectors.getEventListenerBreakpointTypes(getState());
     const eventIds = eventBreakpoints.reduce(
       (acc, e) => [...acc, ...e.events.map(event => event.id)],
-      []
+      [] as $FixTypeLater[]
     );
 
     const eventTypeCounts = await ThreadFront.getEventHandlerCounts(eventIds);
