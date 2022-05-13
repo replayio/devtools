@@ -317,6 +317,7 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
     // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add_column");
 
+    // @ts-expect-error Breakpoint location field mismatches
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }

@@ -11,7 +11,10 @@ export function getUniqueAlternateSourceId(sourceId: SourceId): {
   why?: "no-sourcemap" | "not-unique";
 };
 
-export function getTextAtPosition(asyncContent: SourceContent, location: Location): string;
+export function getTextAtPosition(
+  asyncContent: SourceContent | AsyncValue<SourceContent>,
+  location: Location
+): string;
 
 export function getPrettySourceURL(url: string): string;
 
