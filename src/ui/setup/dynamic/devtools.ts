@@ -5,6 +5,7 @@ import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
+import { setupReactDevTools } from "ui/actions/reactDevTools";
 
 import { extendStore, AppStore } from "../store";
 import app from "ui/reducers/app";
@@ -169,6 +170,7 @@ export default async function DevTools(store: AppStore) {
   setupNetwork(store);
   setupLogpoints(store);
   setupExceptions(store);
+  setupReactDevTools(store);
 }
 
 function bindSelectors(obj: any) {

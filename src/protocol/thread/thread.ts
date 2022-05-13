@@ -28,7 +28,6 @@ import {
   TimeStamp,
   unprocessedRegions,
   loadedRegions,
-  annotations,
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
@@ -36,7 +35,9 @@ import {
   FunctionMatch,
   responseBodyData,
   requestBodyData,
+  findAnnotationsResult,
 } from "@recordreplay/protocol";
+import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
@@ -197,7 +198,8 @@ class _ThreadFront {
   breakpoints = new Map<BreakpointId, { location: Location }>();
 
   // Wait for all the annotations in the recording.
-  private annotationsWaiter: Promise<Annotation[]> | undefined;
+  private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
+  private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
 
   // Any callback to invoke to adjust the point which we zoom to.
   warpCallback:
@@ -233,6 +235,19 @@ class _ThreadFront {
         }
       }
     );
+    client.Session.addAnnotationsListener(({ annotations }: { annotations: Annotation[] }) => {
+      const byKind = groupBy(annotations, "kind");
+      Object.keys(byKind).forEach(kind => {
+        const callbacks = this.annotationCallbacks.get(kind);
+        if (callbacks) {
+          callbacks.forEach(c => c(byKind[kind]));
+        }
+        const forAll = this.annotationCallbacks.get("all");
+        if (forAll) {
+          forAll.forEach(c => c(byKind[kind]));
+        }
+      });
+    });
   }
 
   async setSessionId(sessionId: SessionId) {
@@ -310,22 +325,40 @@ class _ThreadFront {
     await client.Session.listenForLoadChanges({}, sessionId);
   }
 
-  async getAnnotations(onAnnotations: (annotations: annotations) => void) {
-    if (!this.annotationsWaiter) {
-      this.annotationsWaiter = new Promise(async (resolve, reject) => {
-        try {
-          const sessionId = await this.waitForSession();
-          const rv: Annotation[] = [];
-          client.Session.addAnnotationsListener(({ annotations }) => rv.push(...annotations));
-          await client.Session.findAnnotations({}, sessionId);
-          resolve(rv);
-        } catch (e) {
-          reject(e);
-        }
-      });
+  async getAnnotationKinds(): Promise<string[]> {
+    // @ts-ignore
+    const { kinds } = await sendMessage("Session.getAnnotationKinds", {}, this.sessionId!);
+    return kinds;
+  }
+
+  async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
+    const sessionId = await this.waitForSession();
+    if (!kind) {
+      kind = "all";
     }
-    const annotations = await this.annotationsWaiter;
-    onAnnotations({ annotations });
+
+    if (!this.annotationCallbacks.has(kind)) {
+      this.annotationCallbacks.set(kind, [onAnnotations]);
+    } else {
+      this.annotationCallbacks.get(kind)!.push(onAnnotations);
+    }
+    if (kind) {
+      if (!this.annotationWaiters.has(kind)) {
+        this.annotationWaiters.set(
+          kind,
+          new Promise(async (resolve, reject) => {
+            try {
+              const rv: Annotation[] = [];
+              await client.Session.findAnnotations(kind === "all" ? {} : { kind }, sessionId);
+              resolve(rv);
+            } catch (e) {
+              reject(e);
+            }
+          })
+        );
+      }
+      return this.annotationWaiters.get(kind)!;
+    }
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {
