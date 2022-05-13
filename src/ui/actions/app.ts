@@ -89,8 +89,8 @@ export function setupApp(store: UIStore) {
   // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
   //
   // If another update eventually comes in we will reset the slow/timed-out flag.
-  const SLOW_THRESHOLD = 2500;
-  const TIMED_OUT_THRESHOLD = 10000;
+  const SLOW_THRESHOLD = 7500;
+  const TIMED_OUT_THRESHOLD = 20000;
   let lastLoadChangeUpdateTime = now();
 
   setInterval(function onLoadChangeInterval() {
