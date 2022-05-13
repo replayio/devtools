@@ -27,10 +27,9 @@ fetchImages({
 
   prettier.resolveConfig;
 
-  fs.writeFileSync(
-    path.resolve("index.js"),
-    prettier.format(data, { parser: "babel", ...pretterOptions })
-  );
+  const formattedCodeString = prettier.format(data, { parser: "babel", ...pretterOptions });
+
+  fs.writeFileSync("index.js", formattedCodeString);
 
   console.log("Icons built ✨");
 });
