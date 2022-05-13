@@ -1,4 +1,4 @@
-export const Docs = () => (
+export const DocsIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="docs">
       <path
@@ -10,7 +10,7 @@ export const Docs = () => (
   </svg>
 );
 
-export const Lock = () => (
+export const LockIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="lock">
       <path
@@ -22,7 +22,7 @@ export const Lock = () => (
   </svg>
 );
 
-export const Drawer = () => (
+export const DrawerIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="drawer">
       <path
@@ -34,7 +34,7 @@ export const Drawer = () => (
   </svg>
 );
 
-export const Active = () => (
+export const ActiveIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="active">
       <path
@@ -46,7 +46,7 @@ export const Active = () => (
   </svg>
 );
 
-export const Warning = () => (
+export const WarningIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="warning">
       <path
@@ -58,7 +58,7 @@ export const Warning = () => (
   </svg>
 );
 
-export const Input = () => (
+export const InputIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="input">
       <path
@@ -70,7 +70,7 @@ export const Input = () => (
   </svg>
 );
 
-export const Return = () => (
+export const ReturnIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="return">
       <path
@@ -82,7 +82,7 @@ export const Return = () => (
   </svg>
 );
 
-export const Trash = () => (
+export const TrashIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="trash">
       <path
@@ -94,7 +94,7 @@ export const Trash = () => (
   </svg>
 );
 
-export const Resolved = () => (
+export const ResolvedIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="resolved">
       <path
@@ -106,7 +106,7 @@ export const Resolved = () => (
   </svg>
 );
 
-export const Help = () => (
+export const HelpIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="help">
       <path
@@ -118,7 +118,7 @@ export const Help = () => (
   </svg>
 );
 
-export const Globe = () => (
+export const GlobeIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="globe">
       <path
@@ -130,7 +130,7 @@ export const Globe = () => (
   </svg>
 );
 
-export const ReplayLogo = () => (
+export const ReplayLogoIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="replay-logo">
       <g id="Group 4">
@@ -154,7 +154,7 @@ export const ReplayLogo = () => (
   </svg>
 );
 
-export const Group = () => (
+export const GroupIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="group">
       <path
@@ -166,7 +166,7 @@ export const Group = () => (
   </svg>
 );
 
-export const Settings = () => (
+export const SettingsIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="settings">
       <path
@@ -178,7 +178,7 @@ export const Settings = () => (
   </svg>
 );
 
-export const ShieldCheck = () => (
+export const ShieldCheckIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="shield-check">
       <path
@@ -190,7 +190,7 @@ export const ShieldCheck = () => (
   </svg>
 );
 
-export const External = () => (
+export const ExternalIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="external">
       <path
@@ -207,7 +207,7 @@ export const External = () => (
   </svg>
 );
 
-export const Palette = () => (
+export const PaletteIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="palette">
       <path
@@ -219,7 +219,7 @@ export const Palette = () => (
   </svg>
 );
 
-export const Doc = () => (
+export const DocIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="doc">
       <path
@@ -231,7 +231,7 @@ export const Doc = () => (
   </svg>
 );
 
-export const Typography = () => (
+export const TypographyIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="typography">
       <path
@@ -243,7 +243,7 @@ export const Typography = () => (
   </svg>
 );
 
-export const Image = () => (
+export const ImageIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="image">
       <path
@@ -255,7 +255,7 @@ export const Image = () => (
   </svg>
 );
 
-export const Code = () => (
+export const CodeIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="code">
       <path
@@ -267,7 +267,7 @@ export const Code = () => (
   </svg>
 );
 
-export const Questionmark = () => (
+export const QuestionmarkIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="questionmark">
       <path
@@ -279,7 +279,7 @@ export const Questionmark = () => (
   </svg>
 );
 
-export const Tool = () => (
+export const ToolIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="tool">
       <path
@@ -291,7 +291,7 @@ export const Tool = () => (
   </svg>
 );
 
-export const Reload = () => (
+export const ReloadIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="reload">
       <path
@@ -303,7 +303,7 @@ export const Reload = () => (
   </svg>
 );
 
-export const List = () => (
+export const ListIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="list">
       <path
@@ -315,7 +315,7 @@ export const List = () => (
   </svg>
 );
 
-export const Other = () => (
+export const OtherIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="other">
       <path
@@ -327,7 +327,7 @@ export const Other = () => (
   </svg>
 );
 
-export const Unchecked = () => (
+export const UncheckedIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="unchecked">
       <path
@@ -339,7 +339,7 @@ export const Unchecked = () => (
   </svg>
 );
 
-export const Checked = () => (
+export const CheckedIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="checked">
       <path
@@ -351,7 +351,7 @@ export const Checked = () => (
   </svg>
 );
 
-export const JumpToDefinition = () => (
+export const JumpToDefinitionIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="jump-to-definition">
       <path
@@ -380,7 +380,7 @@ export const JumpToDefinition = () => (
   </svg>
 );
 
-export const CommentPlus = () => (
+export const CommentPlusIcon = () => (
   <svg height="20" width="20" fill="none" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
     <g id="comment-plus">
       <path

@@ -22,7 +22,7 @@ fetchImages({
 
   const jsx = await Promise.all(svgs.map(svg => svgtojsx(svg.buffer)));
   const data = svgs
-    .map((svg, index) => `export const ${pascalCase(svg.name)} = () => ${jsx[index]}\n`)
+    .map((svg, index) => `export const ${pascalCase(svg.name)}Icon = () => ${jsx[index]}\n`)
     .join("\n");
 
   prettier.resolveConfig;
