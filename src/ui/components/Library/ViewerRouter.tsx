@@ -36,6 +36,7 @@ function TeamLibrary(props: ViewerRouterProps) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
   const { currentWorkspaceId } = props;
 
+  console.log(currentWorkspaceId);
   if (loading) {
     return <ViewerLoader />;
   }
