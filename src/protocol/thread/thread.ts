@@ -239,6 +239,8 @@ class _ThreadFront {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
+    // This helps when trying to debug logRocket sessions and the like
+    console.debug({ sessionId });
 
     if (window.app.prefs.listenForMetrics) {
       window.sessionMetrics = [];
