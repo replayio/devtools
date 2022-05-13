@@ -4,13 +4,16 @@
 
 "use strict";
 
-import { ThreadFront } from "protocol/thread";
+import type { UIThunkAction } from "ui/actions";
+import type { ValueFront } from "protocol/thread/value";
 import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
 
-export function highlightDomElement(grip) {
-  return async () => {
+type $FixTypeLater = any;
+
+export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
+  return (dispatch, getState, { ThreadFront }) => {
     if (grip.getPause() !== ThreadFront.currentPause) {
       return;
     }
@@ -23,26 +26,27 @@ export function highlightDomElement(grip) {
   };
 }
 
-export function unHighlightDomElement(grip) {
+export function unHighlightDomElement(): UIThunkAction {
   return () => {
     const highlighter = window.gToolbox.getHighlighter();
     if (highlighter) {
-      highlighter.unhighlight(grip);
+      highlighter.unhighlight();
     }
   };
 }
 
-export function openNodeInInspector(valueFront) {
-  return async (dispatch, getState) => {
-    const pause = valueFront.getPause();
+export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const pause = valueFront.getPause()!;
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 
-    window.gToolbox.selectTool("inspector", "inspect_dom");
+    window.gToolbox.selectTool("inspector");
     dispatch(setSelectedPanel("inspector"));
 
-    const nodeFront = await pause.ensureDOMFrontAndParents(valueFront._object.objectId);
+    // @ts-expect-error private field usage?
+    const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
     await window.gToolbox.selection.setNodeFront(nodeFront, {
       reason: "console",
@@ -50,7 +54,10 @@ export function openNodeInInspector(valueFront) {
   };
 }
 
-export function onMessageHover(type, message) {
+export function onMessageHover(
+  type: "mouseenter" | "mouseleave",
+  message: $FixTypeLater
+): UIThunkAction {
   return dispatch => {
     if (type == "mouseenter") {
       const hoveredItem = {
@@ -59,6 +66,7 @@ export function onMessageHover(type, message) {
         time: message.executionPointTime,
         location: message.frame,
       };
+      // @ts-expect-error HoveredItem mismatch
       dispatch(setHoveredItem(hoveredItem));
     }
     if (type == "mouseleave") {
@@ -67,7 +75,10 @@ export function onMessageHover(type, message) {
   };
 }
 
-export function onViewSourceInDebugger(frame, openSourcesTab) {
+export function onViewSourceInDebugger(
+  frame: $FixTypeLater,
+  openSourcesTab: $FixTypeLater
+): UIThunkAction {
   return () => {
     window.gToolbox.viewSourceInDebugger(
       frame.url,
