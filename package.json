@@ -180,6 +180,7 @@
     "prettier": "^2.6.2",
     "prettier-plugin-tailwindcss": "^0.1.7",
     "raw-loader": "^4.0.2",
+    "react-merge-refs": "^1.1.0",
     "sharp": "^0.30.3",
     "storybook-addon-root-attribute": "^1.0.2",
     "storybook-css-modules-preset": "^1.1.1",
