@@ -19,7 +19,7 @@ export type LocalExperimentalUserSettings = {
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
-  tenMinuteReplays: boolean;
+  turboReplay: boolean;
   enableResolveRecording: boolean;
   unicornConsole: boolean;
   showRedux: boolean;

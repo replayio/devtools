@@ -24,7 +24,7 @@ pref("devtools.features.httpBodies", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.networkRequestComments", true);
-pref("devtools.features.tenMinuteReplays", false);
+pref("devtools.features.turboReplay", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
@@ -51,7 +51,7 @@ export const prefs = new PrefsHelper("devtools", {
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  tenMinuteReplays: ["Bool", "tenMinuteReplays"],
+  turboReplay: ["Bool", "turboReplay"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   httpBodies: ["Bool", "httpBodies"],
   videoPlayback: ["Bool", "videoPlayback"],
