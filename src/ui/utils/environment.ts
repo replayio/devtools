@@ -118,6 +118,7 @@ export function getParams() {
   const url = new URL(window.location.toString());
   return { q: url.searchParams.get("q") };
 }
+
 export function updateUrlWithParams(params: Record<string, string>) {
   const url = new URL(window.location.toString());
 

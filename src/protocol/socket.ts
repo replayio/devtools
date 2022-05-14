@@ -8,17 +8,13 @@ import {
   CommandParams,
   CommandResult,
 } from "@recordreplay/protocol";
-import { UIStore, UIThunkAction } from "ui/actions";
-import { setUnexpectedError } from "ui/actions/errors";
-import { UnexpectedError } from "ui/state/app";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
-import { endMixpanelSession } from "ui/utils/mixpanel";
 
 import { requiresWindow } from "../ssr";
 
 import { makeInfallible } from "./utils";
 
-interface Message {
+export interface Message {
   id: number;
   method: string;
   params: any;
@@ -32,7 +28,7 @@ let gSocketOpen = false;
 let gPendingMessages: Message[] = [];
 let gNextMessageId = 1;
 
-type CommandResponse =
+export type CommandResponse =
   | {
       id: number;
       result: unknown;
@@ -59,8 +55,9 @@ const gMessageWaiters = new Map<number, MessageWaiter>();
 const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
-let lastReceivedMessageTime = Date.now();
 
+// If the socket has errored, the connection will close. So let's set `willClose`
+// so that we show _this_ error message, and not the `onSocketClose` error message
 let willClose = false;
 requiresWindow(win => {
   win.addEventListener("beforeunload", () => {
@@ -68,7 +65,42 @@ requiresWindow(win => {
   });
 });
 
-export function initSocket(store: UIStore, address: string) {
+export type ExperimentalSettings = {
+  listenForMetrics: boolean;
+  disableCache?: boolean;
+  useMultipleControllers: boolean;
+  multipleControllerUseSnapshots: boolean;
+};
+
+type SessionCallbacks = {
+  onEvent: (message: MessageEvent) => void;
+  onRequest: (command: Message) => void;
+  onResponse: (command: CommandResponse) => void;
+  onResponseError: (command: Message) => void;
+  onSocketError: (error: Event, initial: boolean, lastReceivedMessageTime: Number) => void;
+  onSocketClose: (willClose: boolean) => void;
+};
+
+let gSessionCallbacks: SessionCallbacks | undefined;
+let lastReceivedMessageTime = Date.now();
+
+export async function createSession(
+  recordingId: string,
+  loadPoint: string | undefined,
+  experimentalSettings: ExperimentalSettings,
+  sessionCallbacks: SessionCallbacks
+) {
+  const { sessionId } = await sendMessage("Recording.createSession", {
+    recordingId,
+    loadPoint: loadPoint || undefined,
+    experimentalSettings,
+  });
+
+  gSessionCallbacks = sessionCallbacks;
+  return sessionId;
+}
+
+export function initSocket(address: string) {
   if (isMock()) {
     waitForMockEnvironment().then(env => {
       env!.setOnSocketMessage(onSocketMessage as any);
@@ -78,9 +110,20 @@ export function initSocket(store: UIStore, address: string) {
   }
 
   const onopen = makeInfallible(onSocketOpen);
-  const onclose = makeInfallible(() => store.dispatch(onSocketClose()));
-  const onerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt, false)));
-  const oninitialerror = makeInfallible((evt: Event) => store.dispatch(onSocketError(evt, true)));
+
+  const onclose = makeInfallible(() => {
+    gSocketOpen = false;
+    gSessionCallbacks?.onSocketClose(willClose);
+  });
+
+  const onerror = makeInfallible((evt: Event) =>
+    gSessionCallbacks?.onSocketError(evt, false, lastReceivedMessageTime)
+  );
+
+  const oninitialerror = makeInfallible((evt: Event) =>
+    gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime)
+  );
+
   const onmessage = makeInfallible(onSocketMessage);
 
   const handleOpen = () => {
@@ -98,6 +141,10 @@ export function initSocket(store: UIStore, address: string) {
 
   // First attempt at opening socket.
   socket = new WebSocket(address);
+
+  // @ts-ignore
+  window.app.socket = socket;
+
   socket.onopen = handleOpen;
   socket.onerror = handleOpenError;
 }
@@ -109,7 +156,7 @@ export function sendMessage<M extends CommandMethods>(
   pauseId?: PauseId
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
-  const msg = { id, method, params, pauseId, sessionId };
+  const msg: Message = { id, method, params, pauseId, sessionId };
 
   if (gSocketOpen) {
     doSend(msg);
@@ -120,6 +167,8 @@ export function sendMessage<M extends CommandMethods>(
   return new Promise<CommandResponse>(resolve => gMessageWaiters.set(id, { method, resolve })).then(
     response => {
       if (response.error) {
+        gSessionCallbacks?.onResponseError(msg);
+
         const { code, data, message } = response.error;
         console.warn("Message failed", method, { code, id, message }, data);
 
@@ -139,6 +188,7 @@ const doSend = makeInfallible(msg => {
   const str = JSON.stringify(msg);
   gSentBytes += str.length;
 
+  gSessionCallbacks?.onRequest(msg);
   if (isMock()) {
     mockEnvironment().sendSocketMessage(str);
   } else {
@@ -181,12 +231,16 @@ function onSocketMessage(evt: MessageEvent<any>) {
 
   if (msg.id) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;
+    gSessionCallbacks?.onResponse(msg);
+
     window.performance?.mark(`${method}_end`);
     window.performance?.measure(method, `${method}_start`, `${method}_end`);
 
     gMessageWaiters.delete(msg.id);
     resolve(msg);
   } else if (gEventListeners.has(msg.method)) {
+    gSessionCallbacks?.onEvent(msg);
+
     const handler = gEventListeners.get(msg.method)!;
     handler(msg.params);
   } else {
@@ -198,58 +252,6 @@ function onSocketMessage(evt: MessageEvent<any>) {
 export function triggerEvent(method: string, params: any) {
   const handler = gEventListeners.get(method)!;
   handler(params);
-}
-
-export function getDisconnectionError(): UnexpectedError {
-  endMixpanelSession("disconnected");
-  return {
-    action: "refresh",
-    content: "Replays disconnect after 5 minutes to reduce server load.",
-    message: "Ready when you are!",
-  };
-}
-
-function onSocketClose(): UIThunkAction {
-  return dispatch => {
-    log("Socket Closed");
-    gSocketOpen = false;
-
-    if (!willClose) {
-      dispatch(setUnexpectedError(getDisconnectionError(), true));
-    }
-  };
-}
-
-function onSocketError(evt: Event, initial: boolean): UIThunkAction {
-  console.error("Socket Error", evt);
-  // If the socket has errored, the connection will close. So let's set `willClose`
-  // so that we show _this_ error message, and not the `onSocketClose` error message
-  willClose = true;
-  return dispatch => {
-    log("Socket Error");
-    if (initial) {
-      dispatch(
-        setUnexpectedError({
-          action: "refresh",
-          content:
-            "A connection to our server could not be established. Please check your connection.",
-          message: "Unable to establish socket connection",
-          ...evt,
-        })
-      );
-    } else if (Date.now() - lastReceivedMessageTime < 300000) {
-      dispatch(
-        setUnexpectedError({
-          action: "refresh",
-          content: "The socket has closed due to an error. Please refresh the page.",
-          message: "Unexpected socket error",
-          ...evt,
-        })
-      );
-    } else {
-      dispatch(setUnexpectedError(getDisconnectionError(), true));
-    }
-  };
 }
 
 export function log(text: string) {

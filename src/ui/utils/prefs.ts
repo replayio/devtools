@@ -29,6 +29,7 @@ pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.protocolTimeline", false);
+pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.showRedux", false);
 
@@ -60,6 +61,7 @@ export const features = new PrefsHelper("devtools.features", {
   codeHeatMaps: ["Bool", "codeHeatMaps"],
   resolveRecording: ["Bool", "resolveRecording"],
   protocolTimeline: ["Bool", "protocolTimeline"],
+  logProtocol: ["Bool", "logProtocol"],
   unicornConsole: ["Bool", "unicornConsole"],
   showRedux: ["Bool", "showRedux"],
 });
