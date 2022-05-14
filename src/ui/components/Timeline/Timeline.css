@@ -33,6 +33,10 @@
   font-size: 29px;
 }
 
+.timeline.show-protocol-timeline {
+  padding-top:40px;
+}
+
 .timeline > *:not(:last-child) {
   margin-right: 8px;
 }
