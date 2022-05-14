@@ -15,7 +15,7 @@ export default function TimelineSlowModal() {
         <Icon filename="replay-logo" className="h-16 w-16 bg-secondaryAccent" size="custom" />
         <div className="text-xl font-bold">Loading</div>
         <div className="text-sm">
-          Loading is going slower than expected. Try using{" "}
+          Use{" "}
           <a
             href="https://docs.replay.io/docs/viewer-26591deb256c473a946d0f64abb67859#bf19baaa57004b0d9282cc0a02b281f5"
             rel="noreferrer noopener"
@@ -24,7 +24,7 @@ export default function TimelineSlowModal() {
           >
             Focus Mode
           </a>{" "}
-          to narrow down further, and please let us know on our{" "}
+          to narrow what's being loaded and visit our{" "}
           <a
             href="https://replay.io/discord"
             rel="noreferrer noopener"
@@ -33,7 +33,7 @@ export default function TimelineSlowModal() {
           >
             Discord
           </a>{" "}
-          if you think something is wrong.
+          if you'd like to report an issue.
         </div>
       </div>
     </Modal>
