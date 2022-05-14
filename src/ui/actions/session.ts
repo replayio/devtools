@@ -1,15 +1,18 @@
 import { ApolloError } from "@apollo/client";
-import { ExecutionPoint, uploadedData } from "@recordreplay/protocol";
+import { uploadedData } from "@recordreplay/protocol";
 import { findAutomatedTests } from "protocol/find-tests";
 import { videoReady } from "protocol/graphics";
-import { sendMessage } from "protocol/socket";
+import * as socket from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
 import { getSelectedPanel } from "ui/reducers/layout";
 import { Recording } from "ui/types";
+import { endMixpanelSession } from "ui/utils/mixpanel";
+import { features, prefs } from "ui/utils/prefs";
 import tokenManager from "ui/utils/tokenManager";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
@@ -19,8 +22,6 @@ import LogRocket from "ui/utils/logrocket";
 import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecording } from "ui/hooks/recordings";
-
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setUnexpectedError, setExpectedError } from "./errors";
@@ -89,6 +90,15 @@ function getRecordingNotAccessibleError(
   };
 }
 
+export function getDisconnectionError(): UnexpectedError {
+  endMixpanelSession("disconnected");
+  return {
+    action: "refresh",
+    content: "Replays disconnect after 5 minutes to reduce server load.",
+    message: "Ready when you are!",
+  };
+}
+
 // Create a session to use while debugging.
 export function createSession(recordingId: string): UIThunkAction {
   return async (dispatch, getState) => {
@@ -131,28 +141,68 @@ export function createSession(recordingId: string): UIThunkAction {
 
       ThreadFront.setTest(getTest() || undefined);
 
-      type ExperimentalSettings = {
-        listenForMetrics: boolean;
-        disableCache?: boolean;
-        useMultipleControllers: boolean;
-        multipleControllerUseSnapshots: boolean;
-      };
-
-      const experimentalSettings: ExperimentalSettings = {
-        listenForMetrics: !!window.app.prefs.listenForMetrics,
-        disableCache: !!window.app.prefs.disableCache,
-        useMultipleControllers: !!window.app.features.tenMinuteReplays,
-        multipleControllerUseSnapshots: !!window.app.features.tenMinuteReplays,
+      const experimentalSettings: socket.ExperimentalSettings = {
+        listenForMetrics: !!prefs.listenForMetrics,
+        disableCache: !!prefs.disableCache,
+        useMultipleControllers: !!features.tenMinuteReplays,
+        multipleControllerUseSnapshots: !!features.tenMinuteReplays,
       };
 
       dispatch(showLoadingProgress());
 
-      const loadPoint = new URL(window.location.href).searchParams.get("point");
+      const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
-      const { sessionId } = await sendMessage("Recording.createSession", {
-        recordingId,
-        loadPoint: loadPoint || undefined,
-        experimentalSettings,
+      const sessionId = await socket.createSession(recordingId, loadPoint, experimentalSettings, {
+        onEvent: (event: MessageEvent<any>) => {
+          if (features.logProtocol) {
+            console.log("event", event);
+          }
+        },
+        onRequest: (request: socket.Message) => {
+          if (features.logProtocol) {
+            console.log("request", request);
+          }
+        },
+        onResponse: (response: socket.CommandResponse) => {
+          if (features.logProtocol) {
+            console.log("response", response);
+          }
+        },
+        onResponseError: (error: socket.Message) => {
+          if (features.logProtocol) {
+            console.log("response error", error);
+          }
+        },
+        onSocketError: (evt: Event, initial: boolean, lastReceivedMessageTime: Number) => {
+          console.error("Socket Error", evt);
+          if (initial) {
+            dispatch(
+              setUnexpectedError({
+                action: "refresh",
+                content:
+                  "A connection to our server could not be established. Please check your connection.",
+                message: "Unable to establish socket connection",
+                ...evt,
+              })
+            );
+          } else if (Date.now() - +lastReceivedMessageTime < 300000) {
+            dispatch(
+              setUnexpectedError({
+                action: "refresh",
+                content: "The socket has closed due to an error. Please refresh the page.",
+                message: "Unexpected socket error",
+                ...evt,
+              })
+            );
+          } else {
+            dispatch(setUnexpectedError(getDisconnectionError(), true));
+          }
+        },
+        onSocketClose: (willClose: boolean) => {
+          if (!willClose) {
+            dispatch(setUnexpectedError(getDisconnectionError(), true));
+          }
+        },
       });
 
       window.sessionId = sessionId;

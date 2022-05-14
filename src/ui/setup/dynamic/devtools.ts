@@ -136,12 +136,12 @@ export default async function DevTools(store: AppStore) {
 
   dbgClient.bootstrap(store);
 
-  // Initialize the socket so we can communicate with the server
-  initSocket(store, dispatchUrl);
+  initSocket(dispatchUrl);
 
   addEventListener("Recording.uploadedData", (data: uploadedData) =>
     store.dispatch(actions.onUploadedData(data))
   );
+
   addEventListener("Recording.awaitingSourcemaps", () =>
     store.dispatch(actions.setAwaitingSourcemaps(true))
   );
