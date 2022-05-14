@@ -30,6 +30,7 @@ import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
+import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
@@ -54,6 +55,7 @@ export interface UIState {
   pause: PauseState;
   pendingBreakpoints: PendingBreakpointsState;
   preview: PreviewState;
+  protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;

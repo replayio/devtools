@@ -2,26 +2,38 @@ import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@recordreplay/protocol";
 import { findAutomatedTests } from "protocol/find-tests";
 import { videoReady } from "protocol/graphics";
-import * as socket from "protocol/socket";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import {
+  CommandRequest,
+  CommandResponse,
+  createSession,
+  ExperimentalSettings,
+} from "protocol/socket";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { UIThunkAction } from "ui/actions";
+import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
+import * as selectors from "ui/reducers/app";
 import { getSelectedPanel } from "ui/reducers/layout";
+import {
+  eventReceived,
+  requestSent,
+  errorReceived,
+  responseReceived,
+  ProtocolEvent,
+} from "ui/reducers/protocolMessages";
+import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
+import { extractGraphQLError } from "ui/utils/apolloClient";
 import { getTest, isTest, isMock } from "ui/utils/environment";
+import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
-import { UIThunkAction } from "ui/actions";
-import * as actions from "ui/actions/app";
-import * as selectors from "ui/reducers/app";
-import LogRocket from "ui/utils/logrocket";
-import { extractGraphQLError } from "ui/utils/apolloClient";
-import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setUnexpectedError, setExpectedError } from "./errors";
@@ -103,7 +115,7 @@ export function getDisconnectionError(): UnexpectedError {
 // NOTE: This thunk is dispatched _before_ the rest of the devtools logic
 // is initialized, so `extra.ThreadFront` isn't available yet.
 // We pass `ThreadFront` in as an arg here instead.
-export function createSession(
+export function createSocket(
   recordingId: string,
   ThreadFront: typeof ThreadFrontType
 ): UIThunkAction {
@@ -147,7 +159,7 @@ export function createSession(
 
       ThreadFront.setTest(getTest() || undefined);
 
-      const experimentalSettings: socket.ExperimentalSettings = {
+      const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache,
         useMultipleControllers: !!features.turboReplay,
@@ -158,25 +170,25 @@ export function createSession(
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
-      const sessionId = await socket.createSession(recordingId, loadPoint, experimentalSettings, {
-        onEvent: (event: MessageEvent<any>) => {
+      const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
+        onEvent: (event: ProtocolEvent) => {
           if (features.logProtocol) {
-            console.log("event", event);
+            dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
           }
         },
-        onRequest: (request: socket.Message) => {
+        onRequest: (request: CommandRequest) => {
           if (features.logProtocol) {
-            console.log("request", request);
+            dispatch(requestSent({ ...request, recordedAt: window.performance.now() }));
           }
         },
-        onResponse: (response: socket.CommandResponse) => {
+        onResponse: (response: CommandResponse) => {
           if (features.logProtocol) {
-            console.log("response", response);
+            dispatch(responseReceived({ ...response, recordedAt: window.performance.now() }));
           }
         },
-        onResponseError: (error: socket.Message) => {
+        onResponseError: (error: CommandResponse) => {
           if (features.logProtocol) {
-            console.log("response error", error);
+            dispatch(errorReceived({ ...error, recordedAt: window.performance.now() }));
           }
         },
         onSocketError: (evt: Event, initial: boolean, lastReceivedMessageTime: Number) => {

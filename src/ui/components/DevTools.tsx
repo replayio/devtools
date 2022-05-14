@@ -1,7 +1,7 @@
 import { ThreadFront } from "protocol/thread";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { clearTrialExpired, createSession } from "ui/actions/session";
+import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { UIState } from "ui/state";
 
@@ -94,12 +94,11 @@ function Body() {
 
 function _DevTools({
   clearTrialExpired,
-  createSession,
+  createSocket,
   loadingFinished,
   sessionId,
   showCommandPalette,
   uploadComplete,
-  viewMode,
 }: _DevToolsProps) {
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
@@ -136,11 +135,11 @@ function _DevTools({
   });
 
   useEffect(() => {
-    createSession(recordingId, ThreadFront);
+    createSocket(recordingId, ThreadFront);
     return () => {
       clearTrialExpired();
     };
-  }, [clearTrialExpired, createSession, recordingId]);
+  }, [clearTrialExpired, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
@@ -171,12 +170,11 @@ function _DevTools({
 const connector = connect(
   (state: UIState) => ({
     loadingFinished: selectors.getLoadingFinished(state),
-    viewMode: selectors.getViewMode(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
   }),
   {
-    createSession,
+    createSocket,
     clearTrialExpired,
   }
 );

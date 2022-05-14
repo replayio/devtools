@@ -21,7 +21,7 @@ import { setupLogpoints } from "protocol/logpoint";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { bindActionCreators, Store } from "redux";
+import { bindActionCreators } from "redux";
 import { actions } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
@@ -29,10 +29,10 @@ import app from "ui/reducers/app";
 import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
+import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
 import timeline from "ui/reducers/timeline";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
-import { asyncStore } from "ui/utils/prefs";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { extendStore, AppStore } from "../store";
@@ -107,8 +107,6 @@ export default async function DevTools(store: AppStore) {
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
 
-  const commandHistory = await asyncStore.commandHistory;
-
   const initialState = {
     ...initialDebuggerState,
     ...initialConsoleState,
@@ -121,6 +119,7 @@ export default async function DevTools(store: AppStore) {
     network,
     reactDevTools,
     timeline,
+    protocolMessages: protocolMessages,
     ...debuggerReducers,
     ...consoleReducers.reducers,
   };

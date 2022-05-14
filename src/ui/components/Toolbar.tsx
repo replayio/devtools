@@ -13,6 +13,7 @@ import classNames from "classnames";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useFeature } from "ui/hooks/settings";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
@@ -86,6 +87,7 @@ export default function Toolbar() {
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { comments, loading } = hooks.useGetComments(recordingId);
+  const logProtocol = useFeature("logProtocol");
 
   useEffect(() => {
     if (!loading && comments.length > 0) {
@@ -121,6 +123,7 @@ export default function Toolbar() {
             />
           </>
         ) : null}
+        {logProtocol ? <ToolbarButton icon="code" label="Protocol" name="protocol" /> : null}
       </div>
     </div>
   );

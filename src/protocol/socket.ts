@@ -14,18 +14,20 @@ import { requiresWindow } from "../ssr";
 
 import { makeInfallible } from "./utils";
 
-export interface Message {
+export interface Request<T extends CommandMethods> {
   id: number;
-  method: string;
-  params: any;
+  method: T;
+  params: CommandParams<T>;
   sessionId?: string;
   pauseId?: string;
 }
 
+export type CommandRequest = Request<CommandMethods>;
+
 let socket: WebSocket;
 let gSocketOpen = false;
 
-let gPendingMessages: Message[] = [];
+let gPendingMessages: Request<CommandMethods>[] = [];
 let gNextMessageId = 1;
 
 export type CommandResponse =
@@ -45,7 +47,7 @@ export type CommandResponse =
     };
 
 interface MessageWaiter {
-  method: string;
+  method: CommandMethods;
   resolve: (value: CommandResponse) => void;
 }
 
@@ -73,10 +75,10 @@ export type ExperimentalSettings = {
 };
 
 type SessionCallbacks = {
-  onEvent: (message: MessageEvent) => void;
-  onRequest: (command: Message) => void;
+  onEvent: (message: any) => void;
+  onRequest: (command: Request<CommandMethods>) => void;
   onResponse: (command: CommandResponse) => void;
-  onResponseError: (command: Message) => void;
+  onResponseError: (command: CommandResponse) => void;
   onSocketError: (error: Event, initial: boolean, lastReceivedMessageTime: Number) => void;
   onSocketClose: (willClose: boolean) => void;
 };
@@ -156,7 +158,7 @@ export function sendMessage<M extends CommandMethods>(
   pauseId?: PauseId
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
-  const msg: Message = { id, method, params, pauseId, sessionId };
+  const msg: CommandRequest = { id, method, params, pauseId, sessionId };
 
   if (gSocketOpen) {
     doSend(msg);
@@ -167,7 +169,7 @@ export function sendMessage<M extends CommandMethods>(
   return new Promise<CommandResponse>(resolve => gMessageWaiters.set(id, { method, resolve })).then(
     response => {
       if (response.error) {
-        gSessionCallbacks?.onResponseError(msg);
+        gSessionCallbacks?.onResponseError(response);
 
         const { code, data, message } = response.error;
         console.warn("Message failed", method, { code, id, message }, data);
