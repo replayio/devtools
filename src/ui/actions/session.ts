@@ -11,15 +11,15 @@ import { getUserId, getUserInfo } from "ui/hooks/users";
 import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
 import { getSelectedPanel } from "ui/reducers/layout";
 import { Recording } from "ui/types";
+import { getTest, isTest, isMock } from "ui/utils/environment";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
+import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
-import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
 import LogRocket from "ui/utils/logrocket";
-import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { subscriptionExpired } from "ui/utils/workspace";
@@ -144,8 +144,8 @@ export function createSession(recordingId: string): UIThunkAction {
       const experimentalSettings: socket.ExperimentalSettings = {
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache,
-        useMultipleControllers: !!features.tenMinuteReplays,
-        multipleControllerUseSnapshots: !!features.tenMinuteReplays,
+        useMultipleControllers: !!features.turboReplay,
+        multipleControllerUseSnapshots: !!features.turboReplay,
       };
 
       dispatch(showLoadingProgress());
