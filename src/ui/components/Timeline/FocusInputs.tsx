@@ -5,6 +5,7 @@ import { selectors } from "ui/reducers";
 import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";
+import styles from "./FocusInputs.module.css";
 
 export default function FocusInputs() {
   const dispatch = useDispatch();
@@ -65,16 +66,15 @@ export default function FocusInputs() {
     };
 
     return (
-      <div className="timeline-time text-right">
+      <div className={styles.Container}>
         <EditableTimeInput
-          className="time-current"
+          className="text-right"
           defaultValue={formattedStartTime}
           size={inputSize}
           validateAndSave={validateAndSaveStartTime}
         />
-        <span className="time-divider">/</span>
+        <span>/</span>
         <EditableTimeInput
-          className="time-total"
           defaultValue={formattedEndTime}
           size={inputSize}
           validateAndSave={validateAndSaveEndTime}
@@ -83,12 +83,12 @@ export default function FocusInputs() {
     );
   } else {
     return (
-      <div className="timeline-time text-right">
-        <span className="time-current inline-flex items-center" style={{ width: `${inputSize}ch` }}>
+      <div className={styles.Container}>
+        <span className={styles.CurrentTimeLabel} style={{ width: `${inputSize}ch` }}>
           {formattedCurrentTime}
         </span>
-        <span className="time-divider">/</span>
-        <span className="time-total inline-flex items-center" style={{ width: `${inputSize}ch` }}>
+        <span>/</span>
+        <span className={styles.DurationLabel} style={{ width: `${inputSize}ch` }}>
           {formattedDuration}
         </span>
       </div>

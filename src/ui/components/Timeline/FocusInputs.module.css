@@ -1,0 +1,21 @@
+.Container {
+  display: flex;
+  align-items: stretch;
+  column-gap: 0.25rem;
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+.CurrentTimeLabel,
+.DurationLabel {
+  height: 1rem;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1rem;
+}
+.CurrentTimeLabel {
+  justify-content: flex-end;
+}
+.DurationLabel {
+  color: var(--theme-comment);
+}

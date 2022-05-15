@@ -160,3 +160,13 @@ but without a background color so we can use hover effects
 .icon.video {
   -webkit-mask-image: url(/icons/video.svg);
 }
+
+/* global loader component */
+
+.icon.cloud {
+  -webkit-mask-image: url(/icons/cloud.svg);
+}
+
+.icon.turtle {
+  -webkit-mask-image: url(/icons/turtle.svg);
+}

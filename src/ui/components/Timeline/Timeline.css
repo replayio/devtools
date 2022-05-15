@@ -224,17 +224,3 @@
 .timeline .progress-line-paused-edit-mode-inactive {
   background: var(--secondary-accent);
 }
-
-/* Timeline timestamp */
-
-.timeline .timeline-time {
-  font-size: 12px;
-}
-
-.timeline .timeline-time > :not(:first-child) {
-  margin-left: 4px;
-}
-
-.timeline .timeline-time .time-total {
-  color: var(--theme-comment);
-}

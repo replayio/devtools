@@ -8,11 +8,11 @@ import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
+
 import ProtocolTimeline from "../ProtocolTimeline";
 
-import { EditFocusButton } from "./EditFocusButton";
+import Capsule from "./Capsule";
 import Focuser from "./Focuser";
-import FocusInputs from "./FocusInputs";
 import FocusModePopout from "./FocusModePopout";
 import NonLoadingRegions from "./NonLoadingRegions";
 import PlayPauseButton from "./PlaybackControls";
@@ -101,6 +101,7 @@ export default function Timeline() {
   return (
     <>
       <FocusModePopout />
+
       <div className="timeline">
         <div className="commands">
           <PlayPauseButton />
@@ -126,8 +127,7 @@ export default function Timeline() {
           <Tooltip timelineWidth={timelineDimensions.width} />
         </div>
 
-        <FocusInputs />
-        <EditFocusButton />
+        <Capsule />
       </div>
     </>
   );
