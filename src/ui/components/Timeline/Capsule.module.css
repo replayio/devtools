@@ -7,7 +7,7 @@
 }
 
 .LeftSide,
-.LeftSideFocusModeControls,
+.LeftSideLoaded,
 .LeftSideReallySlow {
   width: 7rem;
   display: flex;

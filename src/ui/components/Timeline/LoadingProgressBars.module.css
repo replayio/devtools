@@ -1,0 +1,5 @@
+.Region {
+  position: absolute;
+  background-color: var(--blue-80);
+  height: 5px;
+}

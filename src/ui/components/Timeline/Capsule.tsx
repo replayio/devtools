@@ -1,4 +1,5 @@
 import classNames from "classnames";
+import React from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -15,7 +16,11 @@ import styles from "./Capsule.module.css";
 import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
 
-export default function Capsule() {
+export default function Capsule({
+  setShowLoadingProgress,
+}: {
+  setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
   const loadingStatusWarning = useSelector(getLoadingStatusWarning);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
@@ -24,8 +29,8 @@ export default function Capsule() {
     <div className={styles.Capsule}>
       <div
         className={
-          showFocusModeControls
-            ? styles.LeftSideFocusModeControls
+          showFocusModeControls || progress === 100
+            ? styles.LeftSideLoaded
             : loadingStatusWarning === "really-slow"
             ? styles.LeftSideReallySlow
             : styles.LeftSide
@@ -34,7 +39,11 @@ export default function Capsule() {
         {showFocusModeControls || progress === 100 ? (
           <FocusInputs />
         ) : (
-          <LoadingState loadingStatusWarning={loadingStatusWarning} progress={progress} />
+          <LoadingState
+            loadingStatusWarning={loadingStatusWarning}
+            progress={progress}
+            setShowLoadingProgress={setShowLoadingProgress}
+          />
         )}
       </div>
       <EditFocusButton />
@@ -45,9 +54,11 @@ export default function Capsule() {
 function LoadingState({
   loadingStatusWarning,
   progress,
+  setShowLoadingProgress,
 }: {
   loadingStatusWarning: LoadingStatusWarning | null;
   progress: number;
+  setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const dispatch = useDispatch();
 
@@ -57,8 +68,16 @@ function LoadingState({
     }
   };
 
+  const onMouseEnter = () => setShowLoadingProgress(true);
+  const onMouseLeave = () => setShowLoadingProgress(false);
+
   return (
-    <div className={styles.LoadingState} onClick={onClick}>
+    <div
+      className={styles.LoadingState}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       {loadingStatusWarning === "really-slow" ? (
         <Icon className={styles.ReallySlowIcon} filename="cloud" size="large" />
       ) : loadingStatusWarning === "slow" ? (
