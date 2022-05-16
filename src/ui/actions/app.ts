@@ -29,11 +29,11 @@ export * from "../reducers/app";
 
 import {
   getIsIndexed,
-  getLoadingStatusWarning,
+  getLoadingStatusSlow,
   setRecordingDuration,
   setMouseTargetsLoading,
   setLoadedRegions,
-  setLoadingStatusWarning,
+  setLoadingStatusSlow,
   updateTheme,
   setLoading,
   setSessionId,
@@ -83,14 +83,13 @@ export function setupApp(store: UIStore) {
 
   // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
   // Practically speaking though, there are cases where updates take so long it feels like things are broken.
-  // In that case the UI should show an error state.
+  // In that case the UI should show a visual indicator that hte loading is slow.
   //
   // We can rely on the fact that even when loading takes a long time, we should still be getting regular progress updates.
   // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
   //
   // If another update eventually comes in we will reset the slow/timed-out flag.
-  const SLOW_THRESHOLD = 7500;
-  const TIMED_OUT_THRESHOLD = 20000;
+  const LOADING_STATUS_SLOW_THRESHOLD = 10000;
   let lastLoadChangeUpdateTime = now();
 
   setInterval(function onLoadChangeInterval() {
@@ -99,21 +98,17 @@ export function setupApp(store: UIStore) {
       return;
     }
 
-    const loadingStatusWarning = getLoadingStatusWarning(store.getState());
+    const loadingStatusSlow = getLoadingStatusSlow(store.getState());
     const currentTime = now();
     const elapsedTime = currentTime - lastLoadChangeUpdateTime;
 
-    if (elapsedTime > TIMED_OUT_THRESHOLD) {
-      if (loadingStatusWarning !== "really-slow") {
-        store.dispatch(setLoadingStatusWarning("really-slow"));
-      }
-    } else if (elapsedTime > SLOW_THRESHOLD) {
-      if (loadingStatusWarning !== "slow") {
-        store.dispatch(setLoadingStatusWarning("slow"));
+    if (elapsedTime > LOADING_STATUS_SLOW_THRESHOLD) {
+      if (!loadingStatusSlow) {
+        store.dispatch(setLoadingStatusSlow(true));
       }
     } else {
-      if (loadingStatusWarning !== null) {
-        store.dispatch(setLoadingStatusWarning(null));
+      if (loadingStatusSlow) {
+        store.dispatch(setLoadingStatusSlow(false));
       }
     }
   }, 1000);

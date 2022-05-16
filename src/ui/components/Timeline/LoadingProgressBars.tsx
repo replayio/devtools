@@ -1,5 +1,4 @@
 import { clamp } from "lodash";
-import { ReactElement } from "react";
 import { useSelector } from "react-redux";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";

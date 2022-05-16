@@ -2,11 +2,7 @@ import classNames from "classnames";
 import React from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  getLoadedAndIndexedProgress,
-  getLoadingStatusWarning,
-  LoadingStatusWarning,
-} from "ui/actions/app";
+import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import { setModal } from "ui/reducers/app";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
 
@@ -22,25 +18,21 @@ export default function Capsule({
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
-  const loadingStatusWarning = useSelector(getLoadingStatusWarning);
+  const loadingStatusSlow = useSelector(getLoadingStatusSlow);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   return (
     <div className={styles.Capsule}>
       <div
         className={
-          showFocusModeControls || progress === 100
-            ? styles.LeftSideLoaded
-            : loadingStatusWarning === "really-slow"
-            ? styles.LeftSideReallySlow
-            : styles.LeftSide
+          showFocusModeControls || progress === 100 ? styles.LeftSideLoaded : styles.LeftSide
         }
       >
         {showFocusModeControls || progress === 100 ? (
           <FocusInputs />
         ) : (
           <LoadingState
-            loadingStatusWarning={loadingStatusWarning}
+            loadingStatusSlow={loadingStatusSlow}
             progress={progress}
             setShowLoadingProgress={setShowLoadingProgress}
           />
@@ -52,35 +44,22 @@ export default function Capsule({
 }
 
 function LoadingState({
-  loadingStatusWarning,
+  loadingStatusSlow,
   progress,
   setShowLoadingProgress,
 }: {
-  loadingStatusWarning: LoadingStatusWarning | null;
+  loadingStatusSlow: boolean;
   progress: number;
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const dispatch = useDispatch();
 
-  const onClick = () => {
-    if (loadingStatusWarning === "really-slow") {
-      dispatch(setModal("timeline-slow"));
-    }
-  };
-
   const onMouseEnter = () => setShowLoadingProgress(true);
   const onMouseLeave = () => setShowLoadingProgress(false);
 
   return (
-    <div
-      className={styles.LoadingState}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    >
-      {loadingStatusWarning === "really-slow" ? (
-        <Icon className={styles.ReallySlowIcon} filename="cloud" size="large" />
-      ) : loadingStatusWarning === "slow" ? (
+    <div className={styles.LoadingState} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      {loadingStatusSlow ? (
         <Icon className={styles.SlowIcon} filename="turtle" size="extra-large" />
       ) : (
         <RadialProgress progress={progress} />
