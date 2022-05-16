@@ -144,8 +144,8 @@ function resolveFileURL(
   transformUrl = (initialUrl: string) => initialUrl,
   truncate = true
 ) {
-  url = getRawSourceURL(url || "")!;
-  const name = transformUrl(url);
+  const rawUrl = getRawSourceURL(url || "")!;
+  const name = transformUrl(rawUrl);
   if (!truncate) {
     return name;
   }
@@ -365,18 +365,38 @@ export function isInlineScript(source: SourceActor) {
   return source.introductionType === "scriptElement";
 }
 
-export const getLineText = memoizeLast(
-  (asyncContent: SourceWithContent["content"], line: number) => {
-    if (!asyncContent || !isFulfilled(asyncContent)) {
-      return "";
-    }
+type SourceContentObject = {
+  contentType: string;
+  type: string;
+  value: string;
+};
 
-    const content = asyncContent.value;
+// Cache line-split source file text
+const sourceContentToLines = new WeakMap<SourceContentObject, string[]>();
 
-    const lineText = content!.value!.split("\n")[line - 1];
-    return lineText || "";
+export const getLineText = (asyncContent: SourceWithContent["content"], line: number) => {
+  if (!asyncContent || !isFulfilled(asyncContent)) {
+    return "";
   }
-);
+
+  const content = asyncContent.value;
+
+  if (!content) {
+    return "";
+  }
+
+  let lines: string[] = [];
+
+  if (sourceContentToLines.has(content)) {
+    lines = sourceContentToLines.get(content)!;
+  } else {
+    lines = content.value.split("\n");
+    sourceContentToLines.set(content, lines);
+  }
+
+  const lineText = lines[line - 1];
+  return lineText || "";
+};
 
 export function getTextAtPosition(asyncContent: SourceWithContent["content"], location: Location) {
   const { column, line = 0 } = location;
