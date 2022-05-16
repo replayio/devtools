@@ -548,9 +548,12 @@ async function toggleScopeNode(text) {
   return toggleObjectInspectorNode(node);
 }
 
-function writeInConsole(value) {
+async function writeInConsole(value) {
   window.jsterm.setValue(value);
-  return waitUntil(() => window.jsterm.editor.getValue() === value);
+  await waitUntil(() => window.jsterm.editor.getValue() === value);
+  // workaround for #6774
+  // TODO [hbenl] remove this workaround once JSTerm is fixed (#6778)
+  await waitForTime(100);
 }
 
 async function executeInConsole(value) {
