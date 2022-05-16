@@ -1,5 +1,14 @@
-.Region {
+.LoadingRegion,
+.IndexedAndLoadedRegion {
   position: absolute;
-  background-color: var(--blue-80);
   height: 5px;
+}
+
+.LoadingRegion {
+  background-color: var(--focus-mode-loading-color);
+  width: 100%;
+}
+
+.IndexedAndLoadedRegion {
+  background-color: var(--focus-mode-loaded-indexed-color);
 }

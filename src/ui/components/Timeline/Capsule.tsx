@@ -1,9 +1,8 @@
 import classNames from "classnames";
 import React from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
-import { setModal } from "ui/reducers/app";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
@@ -52,8 +51,6 @@ function LoadingState({
   progress: number;
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const dispatch = useDispatch();
-
   const onMouseEnter = () => setShowLoadingProgress(true);
   const onMouseLeave = () => setShowLoadingProgress(false);
 
@@ -81,8 +78,8 @@ function RadialProgress({ className, progress }: { className?: string; progress:
         className={styles.CircularProgressbar}
         strokeWidth={25}
         styles={buildStyles({
-          pathColor: `var(--badge-color)`,
-          trailColor: `var(--badge-background-color)`,
+          pathColor: `var(--focus-mode-loaded-indexed-color)`,
+          trailColor: `var(--focus-mode-loading-color)`,
         })}
         value={progress}
       />

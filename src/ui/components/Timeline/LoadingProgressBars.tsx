@@ -10,17 +10,36 @@ export default function LoadingProgressBars() {
   const loadedRegions = useSelector(getLoadedRegions);
   const zoomRegion = useSelector(getZoomRegion);
 
-  const regions = loadedRegions ? overlap(loadedRegions.indexed, loadedRegions.loaded) : [];
+  const allRegions = loadedRegions ? loadedRegions.loading : [];
+  const completeRegions = loadedRegions ? overlap(loadedRegions.indexed, loadedRegions.loaded) : [];
   const endTime = zoomRegion ? zoomRegion.endTime : 0;
 
-  return regions.map(({ begin, end }, index) => (
-    <div
-      key={index}
-      className={styles.Region}
-      style={{
-        left: `${(begin.time / endTime) * 100}%`,
-        width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
-      }}
-    />
-  )) as any;
+  return (
+    <>
+      {
+        allRegions.map(({ begin, end }, index) => (
+          <div
+            key={`loading-${index}`}
+            className={styles.LoadingRegion}
+            style={{
+              left: `${(begin.time / endTime) * 100}%`,
+              width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
+            }}
+          />
+        )) as any
+      }
+      {
+        completeRegions.map(({ begin, end }, index) => (
+          <div
+            key={`loaded-${index}`}
+            className={styles.IndexedAndLoadedRegion}
+            style={{
+              left: `${(begin.time / endTime) * 100}%`,
+              width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
+            }}
+          />
+        )) as any
+      }
+    </>
+  );
 }

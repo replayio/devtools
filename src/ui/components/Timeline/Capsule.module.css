@@ -7,8 +7,7 @@
 }
 
 .LeftSide,
-.LeftSideLoaded,
-.LeftSideReallySlow {
+.LeftSideLoaded {
   width: 7rem;
   display: flex;
   flex-direction: row;
@@ -16,17 +15,11 @@
   border-bottom-left-radius: 2rem;
   border-top-left-radius: 2rem;
   padding: 0 0.5rem;
-  background-color: var(--theme-toggle-bgcolor);
+  background-color: var(--focus-mode-capsule-background-color);
   color: var(--theme-icon-color);
 }
-.LeftSideReallySlow {
-  cursor: pointer;
-}
 .LeftSide:hover {
-  background-color: var(--theme-toggle-handle-bgcolor-hover);
-}
-.LeftSideReallySlow:hover {
-  background-color: var(--console-error-border);
+  background-color: var(--focus-mode-capsule-background-color-hover);
 }
 
 .LoadingState {
@@ -36,9 +29,6 @@
 
 .SlowIcon {
   background-color: currentColor;
-}
-.ReallySlowIcon {
-  background-color: var(--secondary-accent);
 }
 
 .LoadingText {

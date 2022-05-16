@@ -31,11 +31,11 @@
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background-color: var(--theme-focus-mode-popout-icon-background-color);
+  background-color: var(--focus-mode-popout-icon-background-color);
 }
 
 .Icon {
-  background-color: var(--theme-focus-mode-popout-icon-color);
+  background-color: var(--focus-mode-popout-icon-color);
 }
 
 .Text {

@@ -3,7 +3,7 @@
   padding: 0px;
   font-size: 1rem;
   line-height: 1rem;
-  background-color: var(--theme-focus-mode-popout-text-input-background-color);
+  background-color: var(--focus-mode-popout-text-input-background-color);
   color: var(--theme-text-field-color);
 }
 .Input:focus {
