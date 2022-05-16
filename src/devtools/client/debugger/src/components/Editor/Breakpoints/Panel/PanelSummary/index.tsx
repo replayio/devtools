@@ -91,28 +91,6 @@ function PanelSummary({
     }
   };
 
-  /**
-   * Hacky solution that attaches a keyboard shortcut to "shift+c" for adding comments.
-   * TODO: move to a first-class keyboard shortcut hook that we can use to
-   * display a keyboard shortcut modal
-   *
-   */
-  const addCommentRef = useRef<any>(null);
-
-  addCommentRef.current = addComment;
-
-  useEffect(() => {
-    function handleKeyDown(event: KeyboardEvent) {
-      if (event.shiftKey && event.key === "C") {
-        addCommentRef.current(event);
-      }
-    }
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
     return (
