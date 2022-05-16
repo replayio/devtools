@@ -327,12 +327,14 @@ export function setBreakpointPrefixBadge(
   prefixBadge: Breakpoint["options"]["prefixBadge"]
 ): UIThunkAction {
   return (dispatch, getState, { ThreadFront }) => {
-    setBreakpoint(
-      {
-        ...breakpoint,
-        options: { ...breakpoint.options, prefixBadge },
-      },
-      ThreadFront.recordingId!
+    dispatch(
+      setBreakpoint(
+        {
+          ...breakpoint,
+          options: { ...breakpoint.options, prefixBadge },
+        },
+        ThreadFront.recordingId!
+      )
     );
   };
 }
