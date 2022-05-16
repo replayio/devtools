@@ -1,44 +1,43 @@
-import { bindActionCreators, Store } from "redux";
-
 import { sessionError, uploadedData } from "@recordreplay/protocol";
-import { initSocket, addEventListener } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
-import { setupGraphics } from "protocol/graphics";
-import { setupLogpoints } from "protocol/logpoint";
-import { setupReactDevTools } from "ui/actions/reactDevTools";
-
-import { extendStore, AppStore } from "../store";
-import app from "ui/reducers/app";
-import timeline from "ui/reducers/timeline";
-import comments from "ui/reducers/comments";
-import contextMenus from "ui/reducers/contextMenus";
-import reactDevTools from "ui/reducers/reactDevTools";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-const { setupApp, setupTimeline } = actions;
-
+// Side-effectful import, has to be imported before event-listeners
+// Ordering matters here
+import "devtools/client/inspector/prefs";
+import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
+import { setupExceptions } from "devtools/client/debugger/src/actions/logExceptions";
 import * as dbgClient from "devtools/client/debugger/src/client";
-import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { clientCommands } from "devtools/client/debugger/src/client/commands";
+import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
-import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
-const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
-
+import { setupMessages } from "devtools/client/webconsole/actions/messages";
+import { setupNetwork } from "devtools/client/webconsole/actions/network";
+import consoleReducers from "devtools/client/webconsole/reducers";
 import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
-import consoleReducers from "devtools/client/webconsole/reducers";
-const { setupMessages } = require("devtools/client/webconsole/actions/messages");
-const {
-  initOutputSyntaxHighlighting,
-} = require("devtools/client/webconsole/utils/syntax-highlighted");
-
+import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
+import { LocalizationHelper } from "devtools/shared/l10n";
+import { setupGraphics } from "protocol/graphics";
+import { setupLogpoints } from "protocol/logpoint";
+import { initSocket, addEventListener } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
+import { assert } from "protocol/utils";
+import { bindActionCreators, Store } from "redux";
+import { actions } from "ui/actions";
+import { setupReactDevTools } from "ui/actions/reactDevTools";
+import { selectors } from "ui/reducers";
+import app from "ui/reducers/app";
+import comments from "ui/reducers/comments";
+import contextMenus from "ui/reducers/contextMenus";
+import network from "ui/reducers/network";
+import reactDevTools from "ui/reducers/reactDevTools";
+import timeline from "ui/reducers/timeline";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { asyncStore } from "ui/utils/prefs";
-import { assert } from "protocol/utils";
-const { LocalizationHelper } = require("devtools/shared/l10n");
-import network from "ui/reducers/network";
-import { setupNetwork } from "devtools/client/webconsole/actions/network";
+import type { ThunkExtraArgs } from "ui/utils/thunk";
+
+import { extendStore, AppStore } from "../store";
+
+const { setupApp, setupTimeline } = actions;
 
 declare global {
   interface Window {
@@ -128,8 +127,9 @@ export default async function DevTools(store: AppStore) {
 
   bootstrapWorkers();
 
-  const extraThunkArgs = {
+  const extraThunkArgs: ThunkExtraArgs = {
     client: clientCommands,
+    ThreadFront: ThreadFront,
   };
 
   extendStore(store, initialState, reducers, extraThunkArgs);
@@ -161,13 +161,13 @@ export default async function DevTools(store: AppStore) {
     );
   });
 
-  setupApp(store);
-  setupTimeline(store);
+  setupApp(store, ThreadFront);
+  setupTimeline(store, ThreadFront);
   setupEventListeners(store);
   setupGraphics(store);
   initOutputSyntaxHighlighting();
-  setupMessages(store);
-  setupNetwork(store);
+  setupMessages(store, ThreadFront);
+  setupNetwork(store, ThreadFront);
   setupLogpoints(store);
   setupExceptions(store);
   setupReactDevTools(store);

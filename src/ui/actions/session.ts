@@ -3,7 +3,6 @@ import { uploadedData } from "@recordreplay/protocol";
 import { findAutomatedTests } from "protocol/find-tests";
 import { videoReady } from "protocol/graphics";
 import * as socket from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
@@ -101,7 +100,7 @@ export function getDisconnectionError(): UnexpectedError {
 
 // Create a session to use while debugging.
 export function createSession(recordingId: string): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     try {
       if (ThreadFront.recordingId) {
         assert(
@@ -262,7 +261,7 @@ export function showLoadingProgress(): UIThunkAction<Promise<void>> {
 }
 
 function onLoadingFinished(): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still

@@ -8,7 +8,6 @@ import {
   ExecutionPoint,
 } from "@recordreplay/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
-import { ThreadFront } from "protocol/thread";
 import { AppDispatch } from "ui/setup";
 import { isPointInRegions, isTimeInRegions } from "ui/utils/timeline";
 
@@ -85,7 +84,7 @@ export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
 });
 
 export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return (dispatch, getState) => {
+  return (dispatch, getState, { ThreadFront }) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -97,7 +96,7 @@ export function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): 
   };
 }
 export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return (dispatch, getState) => {
+  return (dispatch, getState, { ThreadFront }) => {
     const loadedRegions = getLoadedRegions(getState());
 
     // Bail if the selected request's point has not been loaded yet
@@ -110,7 +109,7 @@ export function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): U
 }
 
 export function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const pause = ThreadFront.ensurePause(tsPoint.point, tsPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
     const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));

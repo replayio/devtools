@@ -1,6 +1,5 @@
 import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
-import { ThreadFront } from "protocol/thread";
 import { NodeFront } from "protocol/thread/node";
 import Selection, { SelectionReason } from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
@@ -64,7 +63,7 @@ export function reset(): ResetAction {
  * Clears the tree and adds the new root node.
  */
 export function newRoot(): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const pause = ThreadFront.currentPause;
     assert(pause, "no current pause");
     const rootNodeFront = await ThreadFront.getRootDOMNode();
@@ -90,7 +89,7 @@ export function newRoot(): UIThunkAction {
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
 export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (!features.showWhitespaceNodes) {
       childFronts = childFronts.filter(
         node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
@@ -158,7 +157,7 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
  * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
 export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const tree = getState().markup.tree;
     const node = tree[nodeId];
     assert(node, "node not found in markup state");
@@ -241,7 +240,7 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
-  return () => {
+  return (dispatch, getState, { ThreadFront }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);

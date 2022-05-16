@@ -35,8 +35,8 @@ const breakpointsSlice = createSlice({
   initialState: initialBreakpointsState(),
   reducers: {
     setBreakpoint: {
-      reducer(state, action: PayloadAction<Breakpoint>) {
-        const breakpoint = action.payload;
+      reducer(state, action: PayloadAction<{ breakpoint: Breakpoint; recordingId: string }>) {
+        const { breakpoint } = action.payload;
         const location = breakpoint.location;
         const id = getLocationKey(location);
         state.breakpoints[id] = breakpoint;
@@ -47,23 +47,23 @@ const breakpointsSlice = createSlice({
           breakpointsSlice.actions.removeRequestedBreakpoint(location)
         );
       },
-      prepare(breakpoint: Breakpoint, cx?: Context) {
+      prepare(breakpoint: Breakpoint, recordingId: string, cx?: Context) {
         // Add cx to action.meta
         return {
-          payload: breakpoint,
+          payload: { breakpoint, recordingId },
           meta: { cx },
         };
       },
     },
     removeBreakpoint: {
-      reducer(state, action: PayloadAction<SourceLocation>) {
-        const id = getLocationKey(action.payload);
+      reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
+        const id = getLocationKey(action.payload.location);
         delete state.breakpoints[id];
       },
-      prepare(location: SourceLocation, cx?: Context) {
+      prepare(location: SourceLocation, recordingId: string, cx?: Context) {
         // Add cx to action.meta
         return {
-          payload: location,
+          payload: { location, recordingId },
           meta: { cx },
         };
       },

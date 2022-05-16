@@ -1,14 +1,15 @@
-import { ThreadFront } from "protocol/thread";
-import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/source";
-import { formatProjectFunctions } from "../utils/quick-open";
-import { getSources } from "../reducers/sources";
 import {
   getGlobalFunctions,
   isGlobalFunctionsLoading,
 } from "devtools/client/debugger/src/reducers/ast";
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
+import type { UIThunkAction } from "ui/actions";
 
-export function loadGlobalFunctions() {
-  return async (dispatch, getState) => {
+import { getSources } from "../reducers/sources";
+import { formatProjectFunctions } from "../utils/quick-open";
+
+export function loadGlobalFunctions(): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
     // Only load global functions once.
     if (getGlobalFunctions(getState()) !== null || isGlobalFunctionsLoading(getState())) {
       return;
@@ -25,7 +26,7 @@ export function loadGlobalFunctions() {
     const query = "";
     const sourceIds = getSourceIDsToSearch(sourceById);
 
-    const globalFns = [];
+    const globalFns: any[] = [];
 
     await ThreadFront.searchFunctions({ query, sourceIds }, matches => {
       globalFns.push(...formatProjectFunctions(matches, sourceById));

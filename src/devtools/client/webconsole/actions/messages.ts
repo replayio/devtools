@@ -11,7 +11,7 @@ import {
 } from "devtools/client/webconsole/utils/messages";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { LogpointHandlers } from "protocol/logpoint";
-import { Pause, ThreadFront, ValueFront } from "protocol/thread";
+import type { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
 import { WiredMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
@@ -30,7 +30,7 @@ const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
 let throttledDispatchPromise: Promise<void> | null = null;
 
-export function setupMessages(store: UIStore) {
+export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
@@ -44,7 +44,11 @@ export function setupMessages(store: UIStore) {
   ).then(() => store.dispatch(messagesLoaded()), Sentry.captureException);
 }
 
-function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
+function convertStack(
+  stack: string[],
+  { frames }: { frames?: Frame[] },
+  ThreadFront: typeof ThreadFrontType
+) {
   if (!stack) {
     return null;
   }
@@ -64,8 +68,8 @@ function convertStack(stack: string[], { frames }: { frames?: Frame[] }) {
 }
 
 function onConsoleMessage(msg: WiredMessage): UIThunkAction {
-  return async dispatch => {
-    const stacktrace = await convertStack(msg.stack!, msg.data);
+  return async (dispatch, getState, { ThreadFront }) => {
+    const stacktrace = await convertStack(msg.stack!, msg.data, ThreadFront);
     const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, sourceId: msgSourceId, line, column } = msg;
@@ -137,7 +141,7 @@ function onLogpointLoading(
   time: number,
   { sourceId, line, column }: { sourceId: string; line: number; column: number }
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const packet = {
       errorMessage: "Loading...",
       sourceName: await ThreadFront.getSourceURL(sourceId),
@@ -164,7 +168,7 @@ function onLogpointResult(
   pause?: Pause,
   values?: ValueFront[]
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (values) {
       await Promise.all(values.map(value => value.loadIfNecessary()));
     }

@@ -2,21 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import zip from "lodash/zip";
+import type { UIThunkAction } from "ui/actions";
 
 import { getSourceByActorId, getSelectedFrame } from "../../selectors";
-import zip from "lodash/zip";
 
-const { ThreadFront } = require("protocol/thread");
+type $FixTypeLater = any;
 
-export function setFramePositions() {
-  return async (dispatch, getState, { client }) => {
+export function setFramePositions(): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     const frame = getSelectedFrame(getState());
     if (!frame) {
       return;
     }
 
-    const positions = await client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
+    const positions: $FixTypeLater[] = await client.fetchAncestorFramePositions(
+      frame.asyncIndex,
+      frame.protocolId
+    );
     const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
       positions[0].frame
     );

@@ -6,7 +6,8 @@
 import { bindActionCreators } from "redux";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
-import { getRawSourceURL, getSourcemapVisualizerURL, shouldBlackbox } from "../../../utils/source";
+import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
+import { getSourcemapVisualizerURL } from "../../../utils/sourceVisualizations";
 
 // menu items
 

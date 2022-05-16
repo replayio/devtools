@@ -317,6 +317,7 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
     // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add_column");
 
+    // @ts-expect-error Breakpoint location field mismatches
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }
@@ -324,11 +325,16 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
 export function setBreakpointPrefixBadge(
   breakpoint: Breakpoint,
   prefixBadge: Breakpoint["options"]["prefixBadge"]
-) {
-  return setBreakpoint({
-    ...breakpoint,
-    options: { ...breakpoint.options, prefixBadge },
-  });
+): UIThunkAction {
+  return (dispatch, getState, { ThreadFront }) => {
+    setBreakpoint(
+      {
+        ...breakpoint,
+        options: { ...breakpoint.options, prefixBadge },
+      },
+      ThreadFront.recordingId!
+    );
+  };
 }
 
 function getLogValue(source: Source, state: UIState, location: Location) {

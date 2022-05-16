@@ -1,6 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
-import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
@@ -21,6 +20,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { toggleFocusMode } from "./timeline";
 import { getTheme } from "ui/reducers/app";
@@ -53,7 +53,7 @@ function now(): number {
   return Date.now();
 }
 
-export function setupApp(store: UIStore) {
+export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
@@ -205,7 +205,7 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
 }
 
 export function loadMouseTargets(): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     dispatch(setMouseTargetsLoading(true));
     const resp = await ThreadFront.loadMouseTargets();
     dispatch(setMouseTargetsLoading(false));

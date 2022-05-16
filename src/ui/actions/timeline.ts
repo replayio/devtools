@@ -1,6 +1,4 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
-import { Pause, ThreadFront } from "protocol/thread";
-import { client, log, sendMessage } from "protocol/socket";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -13,6 +11,13 @@ import {
   snapTimeForPlayback,
   Video,
 } from "protocol/graphics";
+import { client, log, sendMessage } from "protocol/socket";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { Pause } from "protocol/thread/pause";
+import { PauseEventArgs } from "protocol/thread/thread";
+import { assert, waitForTime } from "protocol/utils";
+import { Action } from "redux";
+import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
   getHoveredItem,
@@ -23,19 +28,12 @@ import {
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
 import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
-
-import { UIStore, UIThunkAction } from ".";
-import { Action } from "redux";
-import { PauseEventArgs } from "protocol/thread/thread";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
-import { assert, waitForTime } from "protocol/utils";
-import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
-import { getFirstComment } from "ui/hooks/comments/comments";
-
+import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { hideModal } from "./app";
+import type { UIStore, UIThunkAction } from "./index";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;
@@ -63,8 +61,9 @@ export type TimelineActions =
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
-export async function setupTimeline(store: UIStore) {
+export async function setupTimeline(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   const dispatch = store.dispatch;
+
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);
 
@@ -89,7 +88,7 @@ export async function setupTimeline(store: UIStore) {
 }
 
 export function jumpToInitialPausePoint(): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     assert(ThreadFront.recordingId, "no recordingId");
 
     await ThreadFront.waitForSession();
@@ -242,7 +241,7 @@ export function seek(
   hasFrames: boolean,
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
-  return (dispatch, getState) => {
+  return (dispatch, getState, { ThreadFront }) => {
     const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 

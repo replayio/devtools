@@ -2,10 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { ThreadFront } from "protocol/thread";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { UIThunkAction } from "ui/actions";
+import { selectors } from "ui/reducers";
+import { trackEvent } from "ui/utils/telemetry";
 
-import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
-
+import {
+  Breakpoint,
+  removeBreakpoint,
+  setBreakpoint,
+  setRequestedBreakpoint,
+} from "../../reducers/breakpoints";
+import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
+import type { Location, Source } from "../../reducers/sources";
 import {
   getBreakpoint,
   getBreakpointPositionsForLocation,
@@ -17,21 +26,13 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
-
-import { selectors } from "ui/reducers";
+import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
+import { comparePosition } from "../../utils/location";
+import { getTextAtPosition } from "../../utils/source";
 
 import { setBreakpointPositions } from "./breakpointPositions";
 
-import { comparePosition } from "../../utils/location";
-import { getTextAtPosition } from "../../utils/source";
-import { trackEvent } from "ui/utils/telemetry";
-
-import {
-  removeBreakpoint,
-  setBreakpoint,
-  setRequestedBreakpoint,
-} from "../../reducers/breakpoints";
-import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
+type $FixTypeLater = any;
 
 // This file has the primitive operations used to modify individual breakpoints
 // and keep them in sync with the breakpoints installed on server threads. These
@@ -57,27 +58,31 @@ import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
 // breakpoint will be added to the reducer, to restore the above invariant.
 // See syncBreakpoint.js for more.
 
-export function enableBreakpoint(cx, initialBreakpoint) {
-  return async (dispatch, getState, { client }) => {
+export function enableBreakpoint(
+  cx: Context,
+  initialBreakpoint: Breakpoint
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
+    // @ts-expect-error Breakpoint location field mismatch
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || !breakpoint.disabled) {
       return;
     }
 
-    dispatch(setBreakpoint({ ...breakpoint, disabled: false }, cx));
+    dispatch(setBreakpoint({ ...breakpoint, disabled: false }, ThreadFront.recordingId!, cx));
 
     await client.setBreakpoint(breakpoint.location, breakpoint.options);
   };
 }
 
 export function addBreakpoint(
-  cx,
-  initialLocation,
-  options = {},
+  cx: Context,
+  initialLocation: Location,
+  options: $FixTypeLater = {},
   disabled = false,
   shouldTrack = false,
   shouldCancel = () => false
-) {
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     const { sourceId, column, line } = initialLocation;
 
@@ -108,9 +113,11 @@ export function addBreakpoint(
     const astLocation = getASTLocation(source, symbols, location);
 
     const originalContent = getSourceContent(getState(), source.id);
+    // @ts-expect-error Async content mismatch
     const originalText = getTextAtPosition(originalContent, location);
 
     const content = getSourceContent(getState(), source.id);
+    // @ts-expect-error Async content mismatch
     const text = getTextAtPosition(content, location);
 
     const id = getLocationKey(location);
@@ -128,6 +135,7 @@ export function addBreakpoint(
       return;
     }
 
+    // @ts-expect-error Breakpoint structure mismatch
     dispatch(setBreakpoint(breakpoint, cx));
 
     if (disabled) {
@@ -140,7 +148,11 @@ export function addBreakpoint(
   };
 }
 
-export function runAnalysis(cx, initialLocation, options) {
+export function runAnalysis(
+  cx: Context,
+  initialLocation: Location,
+  options: $FixTypeLater
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
@@ -163,14 +175,18 @@ export function runAnalysis(cx, initialLocation, options) {
   };
 }
 
-export function _removeBreakpoint(cx, initialBreakpoint) {
-  return async (dispatch, getState, { client }) => {
+export function _removeBreakpoint(
+  cx: Context,
+  initialBreakpoint: Breakpoint
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
+    // @ts-expect-error Breakpoint location mismatch
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint) {
       return;
     }
 
-    dispatch(removeBreakpoint(breakpoint.location, cx));
+    dispatch(removeBreakpoint(breakpoint.location, ThreadFront.recordingId!, cx));
 
     // If the breakpoint is disabled then it is not installed in the server.
     if (!breakpoint.disabled) {
@@ -179,20 +195,24 @@ export function _removeBreakpoint(cx, initialBreakpoint) {
   };
 }
 
-export function removeBreakpointAtGeneratedLocation(cx, target) {
-  return async (dispatch, getState, { client }) => {
+export function removeBreakpointAtGeneratedLocation(
+  cx: Context,
+  target: Location
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     // Remove any breakpoints matching the generated location.
     const breakpoints = getBreakpointsList(getState());
     for (const { location } of breakpoints) {
       if (location.sourceId == target.sourceId && comparePosition(location, target)) {
-        dispatch(removeBreakpoint(location, cx));
+        dispatch(removeBreakpoint(location, ThreadFront.recordingId!, cx));
       }
     }
 
     // Remove any remaining pending breakpoints matching the generated location.
-    const pending = getPendingBreakpointList(getState(), ThreadFront.recordingId);
+    const pending = getPendingBreakpointList(getState(), ThreadFront.recordingId!);
     for (const { location } of pending) {
       if (location.sourceUrl == target.sourceUrl && comparePosition(location, target)) {
+        // @ts-expect-error Location type mismatch
         dispatch(removePendingBreakpoint(location, cx));
       }
     }
@@ -202,32 +222,45 @@ export function removeBreakpointAtGeneratedLocation(cx, target) {
   };
 }
 
-export function disableBreakpoint(cx, initialBreakpoint) {
-  return async (dispatch, getState, { client }) => {
+export function disableBreakpoint(
+  cx: Context,
+  initialBreakpoint: Breakpoint
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
+    // @ts-expect-error Breakpoint location mismatch
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || breakpoint.disabled) {
       return;
     }
 
-    dispatch(setBreakpoint({ ...breakpoint, disabled: true }, cx));
+    dispatch(setBreakpoint({ ...breakpoint, disabled: true }, ThreadFront.recordingId!, cx));
 
     await client.removeBreakpoint(breakpoint.location);
   };
 }
 
-export function removeBreakpointOption(cx, breakpoint, option) {
-  return async (dispatch, getState, { client }) => {
+export function removeBreakpointOption(
+  cx: Context,
+  breakpoint: Breakpoint,
+  option: keyof Breakpoint["options"]
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     const newOptions = { ...breakpoint.options };
     delete newOptions[option];
 
-    dispatch(setBreakpoint({ ...breakpoint, options: newOptions }, cx));
+    dispatch(setBreakpoint({ ...breakpoint, options: newOptions }, ThreadFront.recordingId!, cx));
 
     await client.setBreakpoint(breakpoint.location, newOptions);
   };
 }
 
-export function setBreakpointOptions(cx, location, options = {}) {
-  return async (dispatch, getState, { client }) => {
+export function setBreakpointOptions(
+  cx: Context,
+  location: Location,
+  options: Partial<Breakpoint["options"]> = {}
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { client, ThreadFront }) => {
+    // @ts-expect-error Location field mismatch
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));
@@ -237,7 +270,7 @@ export function setBreakpointOptions(cx, location, options = {}) {
     breakpoint = { ...breakpoint, disabled: false, options };
     trackEvent("breakpoint.edit");
 
-    dispatch(setBreakpoint(breakpoint, cx));
+    dispatch(setBreakpoint(breakpoint, ThreadFront.recordingId!, cx));
 
     await client.setBreakpoint(breakpoint.location, breakpoint.options);
   };
