@@ -30,17 +30,13 @@ const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
 let throttledDispatchPromise: Promise<void> | null = null;
 
-export function setupMessages(store: UIStore) {
+export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
   LogpointHandlers.onResult = (logGroupId, point, time, location, pause, values) =>
     store.dispatch(onLogpointResult(logGroupId, point, time, location, pause, values));
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
   TestMessageHandlers.onTestMessage = msg => store.dispatch(onConsoleMessage(msg));
-
-  // HACK inline a thunk to grab ThreadFront out of the `extra` arg.
-  // Stupid, but legal!
-  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
 
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),

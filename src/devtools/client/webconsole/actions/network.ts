@@ -1,4 +1,5 @@
 import { RequestInfo, RequestEventInfo, responseBodyData } from "@recordreplay/protocol";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { UIStore, UIThunkAction } from "ui/actions";
 import {
   newNetworkRequests,
@@ -9,9 +10,7 @@ import {
 
 let onResponseBodyPart: (responseBodyParts: responseBodyData) => void;
 
-export const setupNetwork = async (store: UIStore) => {
-  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
-
+export const setupNetwork = async (store: UIStore, ThreadFront: typeof ThreadFrontType) => {
   await ThreadFront.findNetworkRequests(
     async data => store.dispatch(onNetworkRequestsThunk(data)),
     async data => store.dispatch(newResponseBodyParts(data)),

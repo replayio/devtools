@@ -20,6 +20,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { toggleFocusMode } from "./timeline";
 import { getTheme } from "ui/reducers/app";
@@ -52,7 +53,7 @@ function now(): number {
   return Date.now();
 }
 
-export function setupApp(store: UIStore) {
+export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
@@ -61,8 +62,6 @@ export function setupApp(store: UIStore) {
     });
     tokenManager.getToken();
   }
-
-  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
 
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));

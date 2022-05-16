@@ -12,6 +12,7 @@ import {
   Video,
 } from "protocol/graphics";
 import { client, log, sendMessage } from "protocol/socket";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
@@ -60,9 +61,8 @@ export type TimelineActions =
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
-export async function setupTimeline(store: UIStore) {
+export async function setupTimeline(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   const dispatch = store.dispatch;
-  const ThreadFront = store.dispatch((dispatch, getState, { ThreadFront }) => ThreadFront);
 
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
   ThreadFront.warpCallback = onWarp(store);

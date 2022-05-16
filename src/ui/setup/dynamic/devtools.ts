@@ -3,15 +3,19 @@ import { sessionError, uploadedData } from "@recordreplay/protocol";
 // Ordering matters here
 import "devtools/client/inspector/prefs";
 import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
+import { setupExceptions } from "devtools/client/debugger/src/actions/logExceptions";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import { clientCommands } from "devtools/client/debugger/src/client/commands";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
+import { setupMessages } from "devtools/client/webconsole/actions/messages";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 import consoleReducers from "devtools/client/webconsole/reducers";
 import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
+import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
+import { LocalizationHelper } from "devtools/shared/l10n";
 import { setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "protocol/logpoint";
 import { initSocket, addEventListener } from "protocol/socket";
@@ -32,13 +36,6 @@ import { asyncStore } from "ui/utils/prefs";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 
 import { extendStore, AppStore } from "../store";
-
-const { setupExceptions } = require("devtools/client/debugger/src/actions/logExceptions");
-const { setupMessages } = require("devtools/client/webconsole/actions/messages");
-const {
-  initOutputSyntaxHighlighting,
-} = require("devtools/client/webconsole/utils/syntax-highlighted");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const { setupApp, setupTimeline } = actions;
 
@@ -164,13 +161,13 @@ export default async function DevTools(store: AppStore) {
     );
   });
 
-  setupApp(store);
-  setupTimeline(store);
+  setupApp(store, ThreadFront);
+  setupTimeline(store, ThreadFront);
   setupEventListeners(store);
   setupGraphics(store);
   initOutputSyntaxHighlighting();
-  setupMessages(store);
-  setupNetwork(store);
+  setupMessages(store, ThreadFront);
+  setupNetwork(store, ThreadFront);
   setupLogpoints(store);
   setupExceptions(store);
   setupReactDevTools(store);
