@@ -12,6 +12,11 @@ import {
   getBreakpointsForSource,
   getBreakpointsForSourceId,
 } from "../../reducers/breakpoints";
+import {
+  removeRequestedBreakpoint,
+  removeBreakpoints as removeBreakpointsAction,
+} from "../../reducers/breakpoints";
+import { setBreakpoint } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
 import {
   getBreakpointsList,
@@ -29,7 +34,6 @@ import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
-  removeRequestedBreakpoint,
   addBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
@@ -152,7 +156,7 @@ export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> 
 
     const breakpointList = getBreakpointsList(getState());
     await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
-    dispatch({ type: "REMOVE_BREAKPOINTS" });
+    dispatch(removeBreakpointsAction());
   };
 }
 
@@ -317,14 +321,14 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
   };
 }
 
-export function setBreakpointPrefixBadge(breakpoint: Breakpoint, prefixBadge: string) {
-  return {
-    breakpoint: {
-      ...breakpoint,
-      options: { ...breakpoint.options, prefixBadge },
-    },
-    type: "SET_BREAKPOINT",
-  };
+export function setBreakpointPrefixBadge(
+  breakpoint: Breakpoint,
+  prefixBadge: Breakpoint["options"]["prefixBadge"]
+) {
+  return setBreakpoint({
+    ...breakpoint,
+    options: { ...breakpoint.options, prefixBadge },
+  });
 }
 
 function getLogValue(source: Source, state: UIState, location: Location) {

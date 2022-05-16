@@ -195,9 +195,9 @@ export type BreakpointResult = {
 export type PendingBreakpoint = {
   readonly location: PendingLocation;
   readonly astLocation: ASTLocation;
-  readonly generatedLocation: PendingLocation;
+  readonly generatedLocation?: PendingLocation;
   readonly disabled: boolean;
-  readonly text: string;
+  readonly text?: string;
   readonly options: BreakpointOptions;
 };
 

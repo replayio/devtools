@@ -2,30 +2,23 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-/**
- * Breakpoints reducer
- * @module reducers/breakpoints
- */
-
 import { Location } from "@recordreplay/protocol";
-import type { AnyAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIState } from "ui/state";
 
-import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
-import { getSelectedSource } from "./sources";
-
-// eslint-disable-next-line max-len
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
+import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
-import type { Breakpoint } from "./types";
+import { getSelectedSource } from "./sources";
+import type { Breakpoint, SourceLocation } from "./types";
 export type { Breakpoint } from "./types";
 
+type LocationWithoutColumn = Omit<Location, "column">;
 export interface BreakpointsState {
   breakpoints: Record<string, Breakpoint>;
-  requestedBreakpoints: Record<string, Location>;
+  requestedBreakpoints: Record<string, LocationWithoutColumn>;
   breakpointsDisabled: boolean;
 }
 
@@ -37,62 +30,73 @@ export function initialBreakpointsState(): BreakpointsState {
   };
 }
 
-function update(state = initialBreakpointsState(), action: AnyAction) {
-  switch (action.type) {
-    case "SET_REQUESTED_BREAKPOINT": {
-      return setRequestedBreakpoint(state, action);
-    }
+const breakpointsSlice = createSlice({
+  name: "breakpoints",
+  initialState: initialBreakpointsState(),
+  reducers: {
+    setBreakpoint: {
+      reducer(state, action: PayloadAction<Breakpoint>) {
+        const breakpoint = action.payload;
+        const location = breakpoint.location;
+        const id = getLocationKey(location);
+        state.breakpoints[id] = breakpoint;
 
-    case "SET_BREAKPOINT": {
-      return setBreakpoint(state, action);
-    }
+        // Also remove any requested breakpoint that corresponds to this location
+        breakpointsSlice.caseReducers.removeRequestedBreakpoint(
+          state,
+          breakpointsSlice.actions.removeRequestedBreakpoint(location)
+        );
+      },
+      prepare(breakpoint: Breakpoint, cx?: Context) {
+        // Add cx to action.meta
+        return {
+          payload: breakpoint,
+          meta: { cx },
+        };
+      },
+    },
+    removeBreakpoint: {
+      reducer(state, action: PayloadAction<SourceLocation>) {
+        const id = getLocationKey(action.payload);
+        delete state.breakpoints[id];
+      },
+      prepare(location: SourceLocation, cx?: Context) {
+        // Add cx to action.meta
+        return {
+          payload: location,
+          meta: { cx },
+        };
+      },
+    },
+    setRequestedBreakpoint(state, action: PayloadAction<LocationWithoutColumn>) {
+      const location = action.payload;
+      // @ts-ignore intentional field check
+      assert(!location.column, "location should have no column");
+      const requestedId = getLocationKey(location);
+      state.requestedBreakpoints[requestedId] = location;
+    },
+    removeRequestedBreakpoint(state, action: PayloadAction<LocationWithoutColumn>) {
+      const requestedId = getLocationKey({ ...action.payload, column: undefined });
+      delete state.requestedBreakpoints[requestedId];
+    },
+    removeBreakpoints(state) {
+      state.breakpoints = {};
+      state.requestedBreakpoints = {};
+    },
+  },
+});
 
-    case "REMOVE_BREAKPOINT": {
-      return removeBreakpoint(state, action);
-    }
+export const {
+  removeBreakpoint,
+  removeBreakpoints,
+  removeRequestedBreakpoint,
+  setBreakpoint,
+  setRequestedBreakpoint,
+} = breakpointsSlice.actions;
 
-    case "REMOVE_REQUESTED_BREAKPOINT": {
-      return removeRequestedBreakpoint(state, action);
-    }
-
-    case "REMOVE_BREAKPOINTS": {
-      return { ...state, breakpoints: {}, requestedBreakpoints: {} };
-    }
-  }
-
-  return state;
-}
-
-function setRequestedBreakpoint(state: BreakpointsState, { location }: AnyAction) {
-  assert(!location.column, "location should have no column");
-  const requestedId = getLocationKey(location);
-  const requestedBreakpoints = { ...state.requestedBreakpoints, [requestedId]: location };
-  return { ...state, requestedBreakpoints };
-}
-
-function setBreakpoint(state: BreakpointsState, { breakpoint }: AnyAction) {
-  const location = breakpoint.location;
-  const id = getLocationKey(location);
-  const breakpoints = { ...state.breakpoints, [id]: breakpoint };
-  return { ...removeRequestedBreakpoint(state, { location } as any), breakpoints };
-}
-
-function removeRequestedBreakpoint(state: BreakpointsState, { location }: AnyAction) {
-  const requestedId = getLocationKey({ ...location, column: undefined });
-  const requestedBreakpoints = { ...state.requestedBreakpoints };
-  delete requestedBreakpoints[requestedId];
-  return { ...state, requestedBreakpoints };
-}
-
-function removeBreakpoint(state: BreakpointsState, { location }: AnyAction) {
-  const id = getLocationKey(location);
-  const breakpoints = { ...state.breakpoints };
-  delete breakpoints[id];
-  return { ...state, breakpoints };
-}
+export default breakpointsSlice.reducer;
 
 // Selectors
-// TODO: these functions should be moved out of the reducer
 
 export function getBreakpointsMap(state: UIState) {
   return state.breakpoints.breakpoints;
@@ -149,7 +153,6 @@ export function getBreakpointForLocation(state: UIState, location?: Location) {
 
   return getBreakpointsList(state).find(bp => {
     const loc = bp.location;
-    // @ts-ignore
     return isMatchingLocation(loc, location);
   });
 }
@@ -167,5 +170,3 @@ export function getLogpointsForSource(state: UIState, sourceId: string) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.filter(bp => bp.location.sourceId === sourceId).filter(bp => isLogpoint(bp));
 }
-
-export default update;

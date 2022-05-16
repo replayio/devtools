@@ -15,7 +15,6 @@ import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 import actions from "../actions";
 import * as selectors from "../selectors";
 
-import { updatePrefs } from "../utils/bootstrap";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 import { prepareSourcePayload } from "./create";
 
@@ -57,7 +56,6 @@ export function bootstrap(_store) {
   verifyPrefSchema();
   setupCommands();
   setupEvents({ actions: boundActions });
-  store.subscribe(() => updatePrefs(store.getState()));
 }
 
 export function onConnect() {

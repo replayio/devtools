@@ -14,6 +14,7 @@ import type { UIThunkAction } from "ui/actions";
 
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
+import { setRequestedBreakpoint } from "../../reducers/breakpoints";
 import type { Context } from "../../reducers/pause";
 import { SourceActor } from "../../reducers/source-actors";
 import type { Source } from "../../reducers/sources";
@@ -109,7 +110,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
 
     for (const bp of pendingBreakpoints) {
       const line = bp.location.line;
-      dispatch({ location: { line, sourceId }, type: "SET_REQUESTED_BREAKPOINT" });
+      dispatch(setRequestedBreakpoint({ line, sourceId }));
     }
 
     // load the source text if there is a pending breakpoint for it

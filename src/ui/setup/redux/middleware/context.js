@@ -4,35 +4,19 @@
 
 //
 
-import {
-  validateNavigateContext,
-  validateContext,
-} from "../../../../devtools/client/debugger/src/utils/context";
+import { validateContext } from "devtools/client/debugger/src/utils/context";
 
 const { log } = require("protocol/socket");
 
-function validateActionContext(getState, action) {
-  if (action.type == "COMMAND" && action.status == "done") {
-    // The thread will have resumed execution since the action was initiated,
-    // so just make sure we haven't navigated.
-    validateNavigateContext(getState(), action.cx);
-    return;
-  }
-
+function validateActionContext(getState, cx, action) {
   // Watch for other actions which are unaffected by thread changes.
-  switch (action.type) {
-    case "SET_BREAKPOINT":
-    case "SET_SYMBOLS":
-      validateNavigateContext(getState(), action.cx);
-      break;
-    default:
-      try {
-        // Validate using all available information in the context.
-        validateContext(getState(), action.cx);
-      } catch (e) {
-        console.log(`ActionContextFailure ${action.type}`);
-        throw e;
-      }
+
+  try {
+    // Validate using all available information in the context.
+    validateContext(getState(), cx);
+  } catch (e) {
+    console.log(`ActionContextFailure ${action.type}`);
+    throw e;
   }
 }
 
@@ -56,8 +40,9 @@ function logAction(action) {
 // them if the context is no longer valid.
 function context(storeApi) {
   return next => action => {
-    if ("cx" in action) {
-      validateActionContext(storeApi.getState, action);
+    const cx = action.cx ?? action.meta?.cx ?? null;
+    if (cx) {
+      validateActionContext(storeApi.getState, cx, action);
     }
 
     logAction(action);

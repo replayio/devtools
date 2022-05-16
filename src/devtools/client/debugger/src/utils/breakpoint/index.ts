@@ -148,7 +148,7 @@ function createPendingLocation(location: SourceLocation) {
   return { sourceUrl, line, column };
 }
 
-export function createPendingBreakpoint(bp: Breakpoint) {
+export function createPendingBreakpoint(bp: Breakpoint): PendingBreakpoint {
   const pendingLocation = createPendingLocation(bp.location);
 
   assertPendingLocation(pendingLocation);
@@ -157,7 +157,7 @@ export function createPendingBreakpoint(bp: Breakpoint) {
     options: bp.options,
     disabled: bp.disabled,
     location: pendingLocation,
-    astLocation: bp.astLocation,
+    astLocation: bp.astLocation!,
   };
 }
 
