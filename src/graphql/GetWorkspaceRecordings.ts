@@ -81,4 +81,5 @@ export interface GetWorkspaceRecordings {
 
 export interface GetWorkspaceRecordingsVariables {
   workspaceId: string;
+  filter: string;
 }

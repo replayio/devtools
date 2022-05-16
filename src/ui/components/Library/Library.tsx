@@ -12,7 +12,7 @@ import { Nag, useGetUserInfo } from "ui/hooks/users";
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
-import { LibraryFilters, LibraryFiltersContext, useFilters } from "./useFilters";
+import { LibraryFiltersContext, useFilters } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
@@ -76,7 +76,7 @@ function Library({
   nags,
 }: LibraryProps) {
   const router = useRouter();
-  const { displayedString, setDisplayedText, setAppliedText, filters } = useFilters();
+  const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
@@ -120,7 +120,7 @@ function Library({
   }
 
   return (
-    <LibraryFiltersContext.Provider value={filters}>
+    <LibraryFiltersContext.Provider value={{ filter }}>
       <main className="flex h-full w-full flex-row">
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-grow flex-col overflow-x-hidden">
