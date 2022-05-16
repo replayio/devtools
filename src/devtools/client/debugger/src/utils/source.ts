@@ -4,20 +4,19 @@
 
 //
 
-/**
- * Utils for working with Source URLs
- * @module utils/source
- */
-
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
-import { memoizeLast } from "../utils/memoizeLast";
-import { truncateMiddleText } from "../utils/text";
-import { parse as parseURL } from "../utils/url";
+import type { SymbolDeclarations } from "../reducers/ast";
+import type { SourceActor } from "../reducers/source-actors";
+import type { Source, SourceContent, Location, SourceWithContent } from "../reducers/sources";
 
+import type { AsyncValue } from "./async-value";
 import { isFulfilled } from "./async-value";
-export { isMinified } from "./isMinified";
+import { memoizeLast } from "./memoizeLast";
 import { getURL } from "./sources-tree/getURL";
+import { truncateMiddleText } from "./text";
+import { parse as parseURL } from "./url";
+export { isMinified } from "./isMinified";
 import { endTruncateStr } from "./utils";
 
 export const sourceTypes = {
@@ -29,11 +28,13 @@ export const sourceTypes = {
   vue: "vue",
 };
 
+type UrlResult = ReturnType<typeof getURL>;
+
 const javascriptLikeExtensions = ["marko", "es6", "vue", "jsm"];
 
 const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
-function getPath(source) {
+function getPath(source: Source) {
   const { path } = getURL(source);
   let lastIndex = path.lastIndexOf("/");
   let nextToLastIndex = path.lastIndexOf("/", lastIndex - 1);
@@ -50,7 +51,7 @@ function getPath(source) {
   return result;
 }
 
-export function shouldBlackbox(source) {
+export function shouldBlackbox(source: Source) {
   if (!source) {
     return false;
   }
@@ -67,24 +68,24 @@ export function shouldBlackbox(source) {
  * javascript files.
  *
  */
-export function isJavaScript(source, content) {
+export function isJavaScript(source: Source, content: SourceContent["value"]) {
   const extension = getFileExtension(source).toLowerCase();
-  const contentType = content.contentType;
+  const contentType = content?.contentType;
   return (
     javascriptLikeExtensions.includes(extension) ||
     !!(contentType && contentType.includes("javascript"))
   );
 }
 
-export function isPretty(source) {
+export function isPretty(source: Source) {
   return isPrettyURL(source.url);
 }
 
-export function isPrettyURL(url) {
+export function isPrettyURL(url?: string) {
   return url ? url.endsWith(":formatted") : false;
 }
 
-export function isBowerComponent(source) {
+export function isBowerComponent(source: Source) {
   if (!source?.url) {
     return false;
   }
@@ -93,7 +94,7 @@ export function isBowerComponent(source) {
   return url.includes("bower_components");
 }
 
-export function isNodeModule(source) {
+export function isNodeModule(source?: Source) {
   if (!source?.url) {
     return false;
   }
@@ -102,14 +103,14 @@ export function isNodeModule(source) {
   return url.includes("node_modules");
 }
 
-export function getPrettySourceURL(url) {
+export function getPrettySourceURL(url?: string) {
   if (!url) {
     url = "";
   }
   return `${url}:formatted`;
 }
 
-export function getFileExtension(source) {
+export function getFileExtension(source?: Source) {
   const { path } = getURL(source);
   if (!path) {
     return "";
@@ -119,26 +120,31 @@ export function getFileExtension(source) {
   return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
 }
 
-export function isNotJavaScript(source) {
+export function isNotJavaScript(source?: Source) {
   return ["css", "svg", "png"].includes(getFileExtension(source));
 }
 
-export function isInvalidUrl(url, source) {
+export function isInvalidUrl(url: UrlResult, source: Source) {
   return (
     !source.url ||
     !url.group ||
     isNotJavaScript(source) ||
+    // @ts-expect-error this seems like it always fails
     IGNORED_URLS.includes(url) ||
     isPretty(source)
   );
 }
 
-export function getRawSourceURL(url) {
+export function getRawSourceURL(url?: string) {
   return url && url.endsWith(":formatted") ? url.slice(0, -":formatted".length) : url;
 }
 
-function resolveFileURL(url, transformUrl = initialUrl => initialUrl, truncate = true) {
-  url = getRawSourceURL(url || "");
+function resolveFileURL(
+  url: string,
+  transformUrl = (initialUrl: string) => initialUrl,
+  truncate = true
+) {
+  url = getRawSourceURL(url || "")!;
   const name = transformUrl(url);
   if (!truncate) {
     return name;
@@ -146,7 +152,7 @@ function resolveFileURL(url, transformUrl = initialUrl => initialUrl, truncate =
   return endTruncateStr(name, 50);
 }
 
-export function getFormattedSourceId(id) {
+export function getFormattedSourceId(id: string) {
   return `SOURCE ${id}`;
 }
 
@@ -154,7 +160,7 @@ export function getFormattedSourceId(id) {
  * Gets a readable filename from a source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
  */
-export function getFilename(source, rawSourceURL = getRawSourceURL(source.url)) {
+export function getFilename(source: Source, rawSourceURL = getRawSourceURL(source.url)) {
   const { id } = source;
   if (!rawSourceURL) {
     return getFormattedSourceId(id);
@@ -167,14 +173,14 @@ export function getFilename(source, rawSourceURL = getRawSourceURL(source.url)) 
 /**
  * Provides a middle-trunated filename
  */
-export function getTruncatedFileName(source, querystring = "", length = 30) {
+export function getTruncatedFileName(source: Source, querystring = "", length = 30) {
   return truncateMiddleText(`${getFilename(source)}${querystring}`, length);
 }
 
 /* Gets path for files with same filename for editor tabs, breakpoints, etc.
  * Pass the source, and list of other sources
  */
-export function getDisplayPath(mySource, sources) {
+export function getDisplayPath(mySource: Source, sources: Source[]) {
   const rawSourceURL = getRawSourceURL(mySource.url);
   const filename = getFilename(mySource, rawSourceURL);
 
@@ -224,7 +230,7 @@ export function getDisplayPath(mySource, sources) {
  * Gets a readable source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
  */
-export function getFileURL(source, truncate = true) {
+export function getFileURL(source: Source, truncate = true) {
   const { url, id } = source;
   if (!url) {
     return getFormattedSourceId(id);
@@ -248,11 +254,12 @@ const contentTypeModeMap = {
   "text/html": { name: "htmlmixed" },
 };
 
-export function getSourcePath(url) {
+export function getSourcePath(url?: UrlResult): string {
   if (!url) {
     return "";
   }
 
+  // @ts-expect-error path field mismatch
   const { path, href } = parseURL(url);
   // for URLs like "about:home" the path is null so we pass the full href
   return path || href;
@@ -262,11 +269,11 @@ export function getSourcePath(url) {
  * Returns amount of lines in the source. If source is a WebAssembly binary,
  * the function returns amount of bytes.
  */
-export function getSourceLineCount(content) {
+export function getSourceLineCount(content: SourceContent["value"]) {
   let count = 0;
 
-  for (let i = 0; i < content.value.length; ++i) {
-    if (content.value[i] === "\n") {
+  for (let i = 0; i < content!.value.length; ++i) {
+    if (content!.value[i] === "\n") {
       ++count;
     }
   }
@@ -275,14 +282,18 @@ export function getSourceLineCount(content) {
 }
 
 // eslint-disable-next-line complexity
-export function getMode(source, content, symbols) {
+export function getMode(
+  source: Source,
+  content: SourceContent["value"],
+  symbols: SymbolDeclarations
+) {
   const extension = getFileExtension(source);
 
-  if (content.type !== "text") {
+  if (content!.type !== "text") {
     return { name: "text" };
   }
 
-  const { contentType, value: text } = content;
+  const { contentType, value: text } = content!;
 
   if (extension === "jsx" || (symbols && symbols.hasJsx)) {
     if (symbols && symbols.hasTypes) {
@@ -337,7 +348,7 @@ export function getMode(source, content, symbols) {
 
   if (/script|elm|jsx|clojure|html/.test(contentType)) {
     if (contentType in contentTypeModeMap) {
-      return contentTypeModeMap[contentType];
+      return contentTypeModeMap[contentType as keyof typeof contentTypeModeMap];
     }
 
     return contentTypeModeMap["text/javascript"];
@@ -350,29 +361,31 @@ export function getMode(source, content, symbols) {
   return { name: "text" };
 }
 
-export function isInlineScript(source) {
+export function isInlineScript(source: SourceActor) {
   return source.introductionType === "scriptElement";
 }
 
-export const getLineText = memoizeLast((asyncContent, line) => {
-  if (!asyncContent || !isFulfilled(asyncContent)) {
-    return "";
+export const getLineText = memoizeLast(
+  (asyncContent: SourceWithContent["content"], line: number) => {
+    if (!asyncContent || !isFulfilled(asyncContent)) {
+      return "";
+    }
+
+    const content = asyncContent.value;
+
+    const lineText = content!.value!.split("\n")[line - 1];
+    return lineText || "";
   }
+);
 
-  const content = asyncContent.value;
-
-  const lineText = content.value.split("\n")[line - 1];
-  return lineText || "";
-});
-
-export function getTextAtPosition(asyncContent, location) {
+export function getTextAtPosition(asyncContent: SourceWithContent["content"], location: Location) {
   const { column, line = 0 } = location;
 
   const lineText = getLineText(asyncContent, line);
-  return lineText.slice(column, column + 100).trim();
+  return lineText.slice(column, column! + 100).trim();
 }
 
-export function getSourceClassnames(source) {
+export function getSourceClassnames(source?: Source) {
   // Conditionals should be ordered by priority of icon!
   const defaultClassName = "file";
 
@@ -392,10 +405,10 @@ export function getSourceClassnames(source) {
     return "extension";
   }
 
-  return sourceTypes[getFileExtension(source)] || defaultClassName;
+  return sourceTypes[getFileExtension(source) as keyof typeof sourceTypes] || defaultClassName;
 }
 
-export function getRelativeUrl(source, root) {
+export function getRelativeUrl(source: Source, root: string) {
   const { group, path } = getURL(source);
   if (!root) {
     return path;
@@ -406,7 +419,7 @@ export function getRelativeUrl(source, root) {
   return url.slice(url.indexOf(root) + root.length + 1);
 }
 
-export function underRoot(source, root) {
+export function underRoot(source: Source, root: string) {
   if (source.url && source.url.includes("chrome://")) {
     const { group, path } = getURL(source);
     return (group + path).includes(root);
@@ -415,7 +428,7 @@ export function underRoot(source, root) {
   return source.url && source.url.includes(root);
 }
 
-export function getSourceQueryString(source) {
+export function getSourceQueryString(source?: Source) {
   if (!source) {
     return;
   }
@@ -423,11 +436,11 @@ export function getSourceQueryString(source) {
   return parseURL(getRawSourceURL(source.url)).search;
 }
 
-export function isUrlExtension(url) {
+export function isUrlExtension(url: string) {
   return url.includes("moz-extension:") || url.includes("chrome-extension");
 }
 
-export function isExtensionDirectoryPath(url) {
+export function isExtensionDirectoryPath(url: string) {
   if (isUrlExtension(url)) {
     const urlArr = url.replace(/\/+/g, "/").split("/");
     let extensionIndex = urlArr.indexOf("moz-extension:");
@@ -438,7 +451,7 @@ export function isExtensionDirectoryPath(url) {
   }
 }
 
-export function getPlainUrl(url) {
+export function getPlainUrl(url: string) {
   const queryStart = url.indexOf("?");
   return queryStart !== -1 ? url.slice(0, queryStart) : url;
 }
