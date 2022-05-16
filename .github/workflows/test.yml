@@ -53,7 +53,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           max_timeout: 960
-          check_interval: 10
+          check_interval: 60
           environment: ${{ fromJSON('["", "production"]')[github.ref == 'refs/heads/master'] }}
     outputs:
       url: ${{ steps.waitFor200.outputs.url }}
