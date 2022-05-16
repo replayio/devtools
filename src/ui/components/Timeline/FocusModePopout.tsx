@@ -11,6 +11,8 @@ import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import Icon from "../shared/Icon";
 
+import styles from "./FocusModePopout.module.css";
+
 export default function FocusModePopout() {
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
@@ -60,24 +62,14 @@ export default function FocusModePopout() {
   const timelineHeight = timelineNode!.getBoundingClientRect().height;
 
   return (
-    <div
-      className="absolute top-0 left-0 right-0 z-10 flex flex-col"
-      style={{ bottom: `${timelineHeight}px` }}
-    >
-      <div className="grow bg-black opacity-10" onClick={() => discardPendingChanges(true)} />
-      <div
-        className="flex flex-row items-center gap-2 p-2"
-        style={{
-          // TODO Move to CSS class?
-          backgroundColor: "var(--theme-popup-color)",
-          color: "var(--theme-popup-background)",
-        }}
-      >
-        <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primaryAccent text-white">
-          <Icon filename="focus" className="bg-iconColor" />
+    <div className={styles.Container} style={{ bottom: `${timelineHeight}px` }}>
+      <div className={styles.Mask} onClick={() => discardPendingChanges(true)} />
+      <div className={styles.Content}>
+        <div className={styles.IconContainer}>
+          <Icon filename="focus" className={styles.Icon} />
         </div>
 
-        <div className="grow text-sm">
+        <div className={styles.Text}>
           <strong>Focus mode</strong> lets you specify a region for your debugging.{" "}
           <a
             href="https://docs.replay.io/docs/viewer-26591deb256c473a946d0f64abb67859#bf19baaa57004b0d9282cc0a02b281f5"

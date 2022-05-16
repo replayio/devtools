@@ -323,6 +323,10 @@
   /* Loading screen */
   --loading-boxes: white;
   --loading-background: var(--chrome);
+
+  /* Focus mode editor */
+  --theme-focus-mode-popout-icon-background-color: white;
+  --theme-focus-mode-popout-icon-color: black;
 }
 
 /* browser specific tweaks */
@@ -555,6 +559,10 @@
   /* Loading screen */
   --loading-boxes: var(--chrome);
   --loading-background: var(--theme-base-100);
+
+  /* Focus mode editor */
+  --theme-focus-mode-popout-icon-background-color: var(--primary-accent);
+  --theme-focus-mode-popout-icon-color: white;
 }
 
 /* browser specific tweaks */

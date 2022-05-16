@@ -1,0 +1,45 @@
+.Container {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+}
+
+.Mask {
+  flex-grow: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+  opacity: 0.1;
+}
+
+.Content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  background-color: var(--theme-popup-color);
+  color: var(--theme-popup-background);
+}
+
+.IconContainer {
+  display: flex;
+  height: 1.5rem;
+  width: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background-color: var(--theme-focus-mode-popout-icon-background-color);
+}
+
+.Icon {
+  background-color: var(--theme-focus-mode-popout-icon-color);
+}
+
+.Text {
+  flex-grow: 1;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+}
