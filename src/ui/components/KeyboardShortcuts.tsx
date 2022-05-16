@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
@@ -11,8 +11,10 @@ import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/s
 import { trackEvent } from "ui/utils/telemetry";
 import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
-import { getSelectedSource } from "devtools/client/debugger/src/reducers/sources";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
+import useAuth0 from "ui/utils/useAuth0";
+import { useGetUserId } from "ui/hooks/users";
+import { useGetRecordingId } from "ui/hooks/recordings";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {
@@ -38,6 +40,10 @@ const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
 };
 
 function KeyboardShortcuts({
+  createFrameComment,
+  currentTime,
+  executionPoint,
+  pendingComment,
   showCommandPaletteInEditor,
   setSelectedPrimaryPanel,
   focusFullTextInput,
@@ -52,6 +58,9 @@ function KeyboardShortcuts({
   toggleQuickOpen,
   closeOpenModalsOnEscape,
 }: PropsFromRedux) {
+  const { user } = useAuth0();
+  const { userId } = useGetUserId();
+  const recordingId = useGetRecordingId();
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -113,6 +122,25 @@ function KeyboardShortcuts({
       toggleQuickOpen(query, project);
     };
 
+    /**
+     * Add a commment from anywhere in the application.
+     *
+     * @steps
+     * 1. Focus the comment pane
+     * 2. Start a new comment if not already in progress
+     */
+    const addComment = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        if (pendingComment?.comment.content !== "") {
+          throw new Error("Return focus to in-progress comment or cancel it");
+        }
+        if (executionPoint) {
+          createFrameComment(currentTime, executionPoint, null, { ...user, userId }, recordingId);
+        }
+      }
+    };
+
     const toggleTheme = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
@@ -126,6 +154,7 @@ function KeyboardShortcuts({
       "CmdOrCtrl+K": togglePalette,
 
       // Should be ignored when an editable element is focused
+      "Shift+C": addComment,
       "Shift+T": toggleTheme,
       "Shift+F": toggleEditFocusMode,
 
@@ -156,6 +185,13 @@ function KeyboardShortcuts({
     toggleThemeAction,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
+    createFrameComment,
+    currentTime,
+    executionPoint,
+    recordingId,
+    user,
+    userId,
+    pendingComment,
   ]);
 
   useEffect(() => {
@@ -175,12 +211,16 @@ function KeyboardShortcuts({
 
 const connector = connect(
   (state: UIState) => ({
+    currentTime: selectors.getCurrentTime(state),
+    executionPoint: selectors.getExecutionPoint(state),
+    pendingComment: selectors.getPendingComment(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-    selectedSource: getSelectedSource(state),
-    viewMode: selectors.getViewMode(state),
+    selectedSource: selectors.getSelectedSource(state),
     toolboxLayout: selectors.getToolboxLayout(state),
+    viewMode: selectors.getViewMode(state),
   }),
   {
+    createFrameComment: actions.createFrameComment,
     focusFullTextInput: dbgActions.focusFullTextInput,
     setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
     setViewMode: actions.setViewMode,
