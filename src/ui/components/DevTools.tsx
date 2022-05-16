@@ -1,9 +1,12 @@
+import { ThreadFront } from "protocol/thread";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { selectors } from "../reducers";
-import { UIState } from "ui/state";
 import { clearTrialExpired, createSession } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { UIState } from "ui/state";
+
+import { selectors } from "../reducers";
+
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
 import WaitForReduxSlice from "./WaitForReduxSlice";
@@ -133,7 +136,7 @@ function _DevTools({
   });
 
   useEffect(() => {
-    createSession(recordingId);
+    createSession(recordingId, ThreadFront);
     return () => {
       clearTrialExpired();
     };

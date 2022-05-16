@@ -3,6 +3,7 @@ import { uploadedData } from "@recordreplay/protocol";
 import { findAutomatedTests } from "protocol/find-tests";
 import { videoReady } from "protocol/graphics";
 import * as socket from "protocol/socket";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
 import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
@@ -99,8 +100,14 @@ export function getDisconnectionError(): UnexpectedError {
 }
 
 // Create a session to use while debugging.
-export function createSession(recordingId: string): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+// NOTE: This thunk is dispatched _before_ the rest of the devtools logic
+// is initialized, so `extra.ThreadFront` isn't available yet.
+// We pass `ThreadFront` in as an arg here instead.
+export function createSession(
+  recordingId: string,
+  ThreadFront: typeof ThreadFrontType
+): UIThunkAction {
+  return async (dispatch, getState) => {
     try {
       if (ThreadFront.recordingId) {
         assert(
