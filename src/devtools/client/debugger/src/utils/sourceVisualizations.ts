@@ -1,8 +1,8 @@
+import type { SourceId } from "@recordreplay/protocol";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 
-import type { SourceId } from "@recordreplay/protocol";
-import type { Source, SourceContent, Location } from "../reducers/sources";
+import type { Source } from "../reducers/sources";
 
 import { isNodeModule, isBowerComponent } from "./source";
 

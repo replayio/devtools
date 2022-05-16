@@ -4,8 +4,8 @@
 
 "use strict";
 
-import type { UIThunkAction } from "ui/actions";
 import type { ValueFront } from "protocol/thread/value";
+import type { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";

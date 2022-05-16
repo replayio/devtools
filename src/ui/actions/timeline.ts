@@ -1,6 +1,4 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
-import { Pause } from "protocol/thread/pause";
-import { client, log, sendMessage } from "protocol/socket";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -13,6 +11,12 @@ import {
   snapTimeForPlayback,
   Video,
 } from "protocol/graphics";
+import { client, log, sendMessage } from "protocol/socket";
+import { Pause } from "protocol/thread/pause";
+import { PauseEventArgs } from "protocol/thread/thread";
+import { assert, waitForTime } from "protocol/utils";
+import { Action } from "redux";
+import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
   getHoveredItem,
@@ -23,19 +27,12 @@ import {
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
 import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
-
-import { UIStore, UIThunkAction } from ".";
-import { Action } from "redux";
-import { PauseEventArgs } from "protocol/thread/thread";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
-import { assert, waitForTime } from "protocol/utils";
-import { features } from "ui/utils/prefs";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
-import { getFirstComment } from "ui/hooks/comments/comments";
-
+import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { hideModal } from "./app";
+import type { UIStore, UIThunkAction } from "./index";
 
 export type SetTimelineStateAction = Action<"set_timeline_state"> & {
   state: Partial<TimelineState>;

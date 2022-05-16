@@ -2,14 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { getSource, getSourceActorsForSource } from "../../reducers/sources";
-import assert from "../assert";
-import { features } from "../prefs";
-import sortBy from "lodash/sortBy";
-
 import type { Location } from "@recordreplay/protocol";
+import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
+
 import type { SourceActor } from "../../reducers/source-actors";
+import { getSource, getSourceActorsForSource } from "../../reducers/sources";
 import type {
   Breakpoint,
   PendingBreakpoint,
@@ -17,6 +15,8 @@ import type {
   SourceActorLocation,
   PendingLocation,
 } from "../../reducers/types";
+import assert from "../assert";
+import { features } from "../prefs";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";

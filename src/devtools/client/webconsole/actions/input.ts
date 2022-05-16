@@ -4,21 +4,20 @@
 
 "use strict";
 
-import type { ThunkDispatch } from "redux-thunk";
+import * as messagesActions from "devtools/client/webconsole/actions/messages";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
+import { createPrimitiveValueFront } from "protocol/thread/value";
+import type { ThunkDispatch } from "redux-thunk";
 import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { createPrimitiveValueFront } from "protocol/thread/value";
-const { assert } = require("protocol/utils");
-
-const messagesActions = require("devtools/client/webconsole/actions/messages");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
+const { assert } = require("protocol/utils");
 
 type EvaluateJSAsyncOptions = {
   asyncIndex?: number;
