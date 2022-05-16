@@ -13,7 +13,6 @@ import { deselectSource } from "devtools/client/debugger/src/actions/sources/sel
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import useAuth0 from "ui/utils/useAuth0";
-import { useGetUserId } from "ui/hooks/users";
 import { useGetRecordingId } from "ui/hooks/recordings";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
@@ -59,7 +58,6 @@ function KeyboardShortcuts({
   closeOpenModalsOnEscape,
 }: PropsFromRedux) {
   const { user } = useAuth0();
-  const { userId } = useGetUserId();
   const recordingId = useGetRecordingId();
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
@@ -122,13 +120,6 @@ function KeyboardShortcuts({
       toggleQuickOpen(query, project);
     };
 
-    /**
-     * Add a commment from anywhere in the application.
-     *
-     * @steps
-     * 1. Focus the comment pane
-     * 2. Start a new comment if not already in progress
-     */
     const addComment = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
@@ -136,7 +127,7 @@ function KeyboardShortcuts({
           throw new Error("Return focus to in-progress comment or cancel it");
         }
         if (executionPoint) {
-          createFrameComment(currentTime, executionPoint, null, { ...user, userId }, recordingId);
+          createFrameComment(currentTime, executionPoint, null, user, recordingId);
         }
       }
     };
@@ -190,7 +181,6 @@ function KeyboardShortcuts({
     executionPoint,
     recordingId,
     user,
-    userId,
     pendingComment,
   ]);
 
