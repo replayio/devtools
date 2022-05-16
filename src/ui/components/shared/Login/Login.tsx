@@ -1,7 +1,7 @@
 import { gql } from "@apollo/client";
+import Services from "devtools/shared/services";
 import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
-import Services from "devtools/shared/services";
 import { query } from "ui/utils/apolloClient";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getLoginReferrerParam } from "ui/utils/environment";
@@ -176,6 +176,10 @@ export function LoginLink({
 export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
   const { loginWithRedirect } = useAuth0();
   const [sso, setSSO] = useState(false);
+
+  if (returnToPath.startsWith("/login")) {
+    returnToPath = "/";
+  }
 
   const onLogin = () =>
     loginWithRedirect({
