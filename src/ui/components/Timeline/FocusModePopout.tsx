@@ -82,7 +82,7 @@ export default function FocusModePopout() {
         </div>
 
         <SecondaryButton color="pink" onClick={() => discardPendingChanges(false)}>
-          Discard
+          Cancel
         </SecondaryButton>
         <PrimaryButton color="blue" onClick={savePendingChanges}>
           Save
