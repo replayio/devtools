@@ -1,9 +1,9 @@
 .Input {
   border-width: 0px;
-  background-color: var(--theme-text-field-bgcolor);
   padding: 0px;
   font-size: 1rem;
   line-height: 1rem;
+  background-color: var(--theme-focus-mode-popout-text-input-background-color);
   color: var(--theme-text-field-color);
 }
 .Input:focus {

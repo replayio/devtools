@@ -327,6 +327,7 @@
   /* Focus mode editor */
   --theme-focus-mode-popout-icon-background-color: white;
   --theme-focus-mode-popout-icon-color: black;
+  --theme-focus-mode-popout-text-input-background-color: var(--theme-text-field-bgcolor);
 }
 
 /* browser specific tweaks */
@@ -563,6 +564,7 @@
   /* Focus mode editor */
   --theme-focus-mode-popout-icon-background-color: var(--primary-accent);
   --theme-focus-mode-popout-icon-color: white;
+  --theme-focus-mode-popout-text-input-background-color: #33373d;
 }
 
 /* browser specific tweaks */
