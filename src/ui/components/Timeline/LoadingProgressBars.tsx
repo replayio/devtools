@@ -11,6 +11,10 @@ export default function LoadingProgressBars() {
   const zoomRegion = useSelector(getZoomRegion);
 
   const endTime = zoomRegion ? zoomRegion.endTime : 0;
+  if (endTime === 0) {
+    return null;
+  }
+
   const completedRegions = loadedRegions
     ? overlap(loadedRegions.indexed, loadedRegions.loaded)
     : [];

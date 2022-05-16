@@ -83,7 +83,7 @@ export function setupApp(store: UIStore) {
 
   // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
   // Practically speaking though, there are cases where updates take so long it feels like things are broken.
-  // In that case the UI should show a visual indicator that hte loading is slow.
+  // In that case the UI should show a visual indicator that the loading is slow.
   //
   // We can rely on the fact that even when loading takes a long time, we should still be getting regular progress updates.
   // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
