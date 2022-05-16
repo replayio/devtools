@@ -21,7 +21,6 @@ import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
-import TimelineSlowModal from "./Timeline/TimelineSlowModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import { ConfirmRenderer } from "./shared/Confirm";
@@ -100,9 +99,6 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     }
     case "rename-replay": {
       return <RenameReplayModal />;
-    }
-    case "timeline-slow": {
-      return <TimelineSlowModal />;
     }
     default: {
       return null;

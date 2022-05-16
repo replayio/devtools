@@ -11,7 +11,6 @@ import {
   TimeStampedPointRange,
 } from "@recordreplay/protocol";
 import type { RecordingTarget } from "protocol/thread/thread";
-import { LoadingStatusWarning } from "ui/actions/app";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
 import { PanelName } from "./layout";
@@ -39,8 +38,7 @@ export type ModalType =
   | "loom"
   | "attachment"
   | "sourcemap-setup"
-  | "rename-replay"
-  | "timeline-slow";
+  | "rename-replay";
 export type WorkspaceId = string;
 export type WorkspaceUuid = string;
 export type SettingsTabTitle =
@@ -94,7 +92,7 @@ export interface AppState {
   loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
-  loadingStatusWarning: LoadingStatusWarning | null;
+  loadingStatusSlow: boolean;
   loadingPageTipIndex: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;

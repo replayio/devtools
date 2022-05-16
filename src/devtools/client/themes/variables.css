@@ -323,6 +323,15 @@
   /* Loading screen */
   --loading-boxes: white;
   --loading-background: var(--chrome);
+
+  /* Focus mode editor (light) */
+  --focus-mode-capsule-background-color: #e6e6e6;
+  --focus-mode-capsule-background-color-hover: #d8d8d8;
+  --focus-mode-loading-color: white;
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-popout-icon-background-color: white;
+  --focus-mode-popout-icon-color: black;
+  --focus-mode-popout-text-input-background-color: var(--theme-base-85);
 }
 
 /* browser specific tweaks */
@@ -555,6 +564,15 @@
   /* Loading screen */
   --loading-boxes: var(--chrome);
   --loading-background: var(--theme-base-100);
+
+  /* Focus mode editor (dark) */
+  --focus-mode-capsule-background-color: var(--theme-base-90);
+  --focus-mode-capsule-background-color-hover: #232938;
+  --focus-mode-loading-color: #00567f;
+  --focus-mode-loaded-indexed-color: var(--primary-accent);
+  --focus-mode-popout-icon-background-color: var(--primary-accent);
+  --focus-mode-popout-icon-color: white;
+  --focus-mode-popout-text-input-background-color: #33373d;
 }
 
 /* browser specific tweaks */

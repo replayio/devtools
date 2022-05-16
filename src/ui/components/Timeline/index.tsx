@@ -14,6 +14,7 @@ import ProtocolTimeline from "../ProtocolTimeline";
 import Capsule from "./Capsule";
 import Focuser from "./Focuser";
 import FocusModePopout from "./FocusModePopout";
+import LoadingProgressBars from "./LoadingProgressBars";
 import NonLoadingRegions from "./NonLoadingRegions";
 import PlayPauseButton from "./PlaybackControls";
 import PreviewMarkers from "./PreviewMarkers";
@@ -36,6 +37,7 @@ export default function Timeline() {
   const progressBarRef = useRef<HTMLDivElement>(null);
 
   const [editMode, setEditMode] = useState<EditMode | null>(null);
+  const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
 
   useLayoutEffect(() => {
     const progressBar = progressBarRef.current;
@@ -120,6 +122,7 @@ export default function Timeline() {
             <Comments />
             <NonLoadingRegions />
             <UnfocusedRegion />
+            {showLoadingProgress && <LoadingProgressBars />}
             <CurrentTimeIndicator editMode={editMode} />
             <Focuser editMode={editMode} setEditMode={setEditMode} />
           </div>
@@ -127,7 +130,7 @@ export default function Timeline() {
           <Tooltip timelineWidth={timelineDimensions.width} />
         </div>
 
-        <Capsule />
+        <Capsule setShowLoadingProgress={setShowLoadingProgress} />
       </div>
     </>
   );

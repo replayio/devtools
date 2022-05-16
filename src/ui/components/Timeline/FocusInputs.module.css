@@ -1,5 +1,6 @@
 .Container {
   display: flex;
+  align-items: center;
   align-items: stretch;
   column-gap: 0.25rem;
   font-size: 1rem;
