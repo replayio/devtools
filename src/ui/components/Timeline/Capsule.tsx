@@ -24,7 +24,7 @@ export default function Capsule({
     <div className={styles.Capsule}>
       <div
         className={
-          showFocusModeControls || progress === 100 ? styles.LeftSideLoaded : styles.LeftSide
+          showFocusModeControls || progress === 100 ? styles.LeftSideLoaded : styles.LeftSideLoading
         }
       >
         {showFocusModeControls || progress === 100 ? (

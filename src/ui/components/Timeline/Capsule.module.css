@@ -6,7 +6,7 @@
   height: 2rem;
 }
 
-.LeftSide,
+.LeftSideLoading,
 .LeftSideLoaded {
   width: 7rem;
   display: flex;
@@ -18,7 +18,7 @@
   background-color: var(--focus-mode-capsule-background-color);
   color: var(--theme-icon-color);
 }
-.LeftSide:hover {
+.LeftSideLoading:hover {
   background-color: var(--focus-mode-capsule-background-color-hover);
 }
 
