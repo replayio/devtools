@@ -16,30 +16,26 @@ export default function LoadingProgressBars() {
 
   return (
     <>
-      {
-        allRegions.map(({ begin, end }, index) => (
-          <div
-            key={`loading-${index}`}
-            className={styles.LoadingRegion}
-            style={{
-              left: `${(begin.time / endTime) * 100}%`,
-              width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
-            }}
-          />
-        )) as any
-      }
-      {
-        completeRegions.map(({ begin, end }, index) => (
-          <div
-            key={`loaded-${index}`}
-            className={styles.IndexedAndLoadedRegion}
-            style={{
-              left: `${(begin.time / endTime) * 100}%`,
-              width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
-            }}
-          />
-        )) as any
-      }
+      {allRegions.map(({ begin, end }, index) => (
+        <div
+          key={`loading-${index}`}
+          className={styles.LoadingRegion}
+          style={{
+            left: `${(begin.time / endTime) * 100}%`,
+            width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
+          }}
+        />
+      ))}
+      {completeRegions.map(({ begin, end }, index) => (
+        <div
+          key={`loaded-${index}`}
+          className={styles.IndexedAndLoadedRegion}
+          style={{
+            left: `${(begin.time / endTime) * 100}%`,
+            width: `${clamp(((end.time - begin.time) / endTime) * 100, 0, 100)}%`,
+          }}
+        />
+      ))}
     </>
   );
 }
