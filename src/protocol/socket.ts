@@ -193,6 +193,7 @@ const doSend = makeInfallible(msg => {
   const str = JSON.stringify(msg);
   gSentBytes += str.length;
 
+  console.log("ON REQUEST", { gSessionCallbacks });
   gSessionCallbacks?.onRequest(msg);
   if (isMock()) {
     mockEnvironment().sendSocketMessage(str);
@@ -236,6 +237,8 @@ function onSocketMessage(evt: MessageEvent<any>) {
 
   if (msg.id) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;
+
+    console.log("ON RESPONSE", { gSessionCallbacks });
     gSessionCallbacks?.onResponse(msg);
 
     window.performance?.mark(`${method}_end`);
@@ -244,6 +247,7 @@ function onSocketMessage(evt: MessageEvent<any>) {
     gMessageWaiters.delete(msg.id);
     resolve(msg);
   } else if (gEventListeners.has(msg.method)) {
+    console.log("ON EVENT", { gSessionCallbacks });
     gSessionCallbacks?.onEvent(msg);
 
     const handler = gEventListeners.get(msg.method)!;
