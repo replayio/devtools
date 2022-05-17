@@ -35,9 +35,11 @@ const protocolMessagesSlice = createSlice({
   name: "protocolMessages",
   reducers: {
     eventReceived(state, action: PayloadAction<ProtocolEvent & Recorded>) {
+      console.log("EVENT RECIEVED", { action });
       state.events.push(cloneDeep(action.payload));
     },
     responseReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
+      console.log("RESPONSE RECIEVED", { action });
       state.responses.push(cloneDeep(action.payload));
       const request = state.requests.find(r => r.id === action.payload.id);
       if (request) {
@@ -45,6 +47,7 @@ const protocolMessagesSlice = createSlice({
       }
     },
     errorReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
+      console.log("ERROR RECIEVED", { action });
       state.errors.push(action.payload);
       const request = state.requests.find(r => r.id === action.payload.id);
       if (request) {
@@ -53,6 +56,7 @@ const protocolMessagesSlice = createSlice({
       }
     },
     requestSent(state, action: PayloadAction<CommandRequest & Recorded>) {
+      console.log("REQUEST SENT", { action });
       const [requestClass, requestMethod] = action.payload.method.split(".");
       state.requests.push({
         ...action.payload,
