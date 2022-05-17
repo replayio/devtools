@@ -4,7 +4,7 @@ import cloneDeep from "lodash/cloneDeep";
 import { CommandRequest, CommandResponse } from "protocol/socket";
 import { UIState } from "ui/state";
 
-interface Recorded {
+export interface Recorded {
   recordedAt: number;
 }
 
@@ -73,3 +73,17 @@ export default protocolMessagesSlice.reducer;
 export const getProtocolEvents = (state: UIState) => state.protocolMessages.events;
 export const getProtocolRequests = (state: UIState) => state.protocolMessages.requests;
 export const getProtocolResponses = (state: UIState) => state.protocolMessages.responses;
+export const getProtocolRequest = (requestId: number | undefined) => (state: UIState) =>
+  requestId ? state.protocolMessages.requests.find(r => r.id === requestId) : undefined;
+export const getProtocolResponse = (requestId: number | undefined) => (state: UIState) =>
+  requestId ? state.protocolMessages.responses.find(r => r.id === requestId) : undefined;
+export const getProtocolError = (requestId: number | undefined) => (state: UIState) =>
+  requestId ? state.protocolMessages.errors.find(r => r.id === requestId) : undefined;
+export const getFullRequestDetails = (requestIds: number[]) => (state: UIState) =>
+  requestIds.map(id => {
+    return {
+      request: getProtocolRequest(id)(state),
+      response: getProtocolResponse(id)(state),
+      error: getProtocolError(id)(state),
+    };
+  });
