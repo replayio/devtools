@@ -1,20 +1,14 @@
 import { EnhancedStore, Reducer, ThunkDispatch } from "@reduxjs/toolkit";
 import { createTestStore } from "test/testUtils";
-import { UIAction } from "ui/actions";
-import { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
+import { UIStore } from "ui/actions";
 
 import * as actions from "../actions/timeline";
 
 import { getCurrentTime, getFocusRegion, getHoverTime, getPlayback } from "./timeline";
 
-type UIStateReducers = {
-  [key in keyof UIState]: Reducer<UIState[key]>;
-};
-
 describe("Redux timeline state", () => {
-  let dispatch = null as unknown as ThunkDispatch<UIState, ThunkExtraArgs, UIAction>;
-  let store = null as unknown as EnhancedStore;
+  let store = null as unknown as UIStore;
+  let dispatch = null as unknown as UIStore["dispatch"];
 
   beforeEach(async () => {
     store = await createTestStore();

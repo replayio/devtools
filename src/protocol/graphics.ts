@@ -7,8 +7,8 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/reducers/app";
+import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/reducers/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { Canvas } from "ui/state/app";
 
