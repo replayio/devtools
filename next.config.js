@@ -84,11 +84,26 @@ module.exports = {
     if (process.env.CHECK_CIRCULAR_IMPORTS) {
       const CircularDependencyPlugin = require("circular-dependency-plugin");
 
+      let numCyclesDetected = 0;
+
       config.plugins.push(
         new CircularDependencyPlugin({
           exclude: /node_modules/,
           failOnError: true,
           cwd: process.cwd(),
+          allowAsyncCycles: true,
+          onStart({ compilation }) {
+            numCyclesDetected = 0;
+          },
+          onDetected({ module: webpackModuleRecord, paths, compilation }) {
+            numCyclesDetected++;
+            compilation.warnings.push(new Error(paths.join(" -> ")));
+          },
+          onEnd({ compilation }) {
+            if (numCyclesDetected > 0) {
+              compilation.warnings.push(new Error(`Detected ${numCyclesDetected} cycles`));
+            }
+          },
         })
       );
     }
