@@ -208,7 +208,7 @@
   },
   "homepage": "https://github.com/RecordReplay/devtools#readme",
   "workspaces": [
-    "packages/accordion"
+    "packages/*"
   ],
   "overrides": {
     "graphql": "15.8.0",
