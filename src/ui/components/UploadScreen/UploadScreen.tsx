@@ -191,7 +191,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                   isPublic={isPublic}
                   setIsPublic={setIsPublic}
                 />
-                {isPublic ? (
+                {isPublic && recording.operations ? (
                   <ToggleShowPrivacyButton
                     showPrivacy={showPrivacy}
                     operations={recording.operations}
