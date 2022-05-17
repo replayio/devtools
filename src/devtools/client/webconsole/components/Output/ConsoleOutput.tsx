@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { PointDescription } from "@recordreplay/protocol";
 import { Dispatch } from "@reduxjs/toolkit";
 import type { AnyAction } from "@reduxjs/toolkit";
 import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
@@ -10,11 +9,9 @@ import { MessageContainer } from "devtools/client/webconsole/components/Output/M
 import { StateContext } from "devtools/client/webconsole/components/Search";
 import constants from "devtools/client/webconsole/constants";
 import { Frame, Message } from "devtools/client/webconsole/reducers/messages";
-import analysisManager from "protocol/analysisManager";
-import { ThreadFront } from "protocol/thread";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
 import { ContextMenu } from "ui/components/ContextMenu";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
@@ -22,6 +19,7 @@ import { selectors } from "ui/reducers";
 import { getFocusRegion } from "ui/reducers/timeline";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
+import { convertPointToTime } from "ui/utils/time";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
@@ -302,18 +300,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
-    // Let the focus action/reducer will handle cropping for us.
-    const startTime = focusRegion ? focusRegion.startTime : 0;
-    const endTime = time!;
-
-    dispatch(
-      setFocusRegion({
-        endTime,
-        startTime,
-      }) as unknown as AnyAction
-    );
-    dispatch(syncFocusedRegion() as unknown as AnyAction);
+    dispatch(setFocusRegionEndTime(time, true) as unknown as AnyAction);
   };
 
   setFocusStart = async () => {
@@ -328,18 +315,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
-    // Let the focus action/reducer will handle cropping for us.
-    const startTime = time!;
-    const endTime = focusRegion ? focusRegion.endTime : Number.POSITIVE_INFINITY;
-
-    dispatch(
-      setFocusRegion({
-        endTime,
-        startTime,
-      }) as unknown as AnyAction
-    );
-    dispatch(syncFocusedRegion() as unknown as AnyAction);
+    dispatch(setFocusRegionStartTime(time, true) as unknown as AnyAction);
   };
 }
 
@@ -375,7 +351,6 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export default connector(ConsoleOutput);
 
-// TODO Is there a more central location for this utility method?
 async function getTimeForMessage(message: Message): Promise<number> {
   const { executionPoint, executionPointTime, timeStamp } = message;
   if (timeStamp != null) {
@@ -383,26 +358,7 @@ async function getTimeForMessage(message: Message): Promise<number> {
   } else if (executionPointTime != null) {
     return executionPointTime;
   } else if (executionPoint != null) {
-    return new Promise(async resolve => {
-      await analysisManager.runAnalysis(
-        {
-          effectful: true,
-          mapper: "return [];",
-          points: [executionPoint],
-          sessionId: ThreadFront.sessionId!,
-        },
-        {
-          onAnalysisPoints: (points: PointDescription[]) => {
-            if (points.length > 0) {
-              const point = points[0];
-              resolve(point.time);
-            } else {
-              resolve(-1);
-            }
-          },
-        }
-      );
-    });
+    return await convertPointToTime(executionPoint);
   }
 
   return -1;

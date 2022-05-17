@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
+import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { isTimeInRegions } from "ui/utils/timeline";
@@ -61,20 +61,9 @@ const RequestTable = ({
     setContextMenuData(null);
 
     if (contextMenuData) {
-      const time = contextMenuData.row.original?.end;
-      if (time != null) {
-        // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
-        // Let the focus action/reducer will handle cropping for us.
-        const startTime = focusRegion ? focusRegion.startTime : 0;
-        const endTime = time;
-
-        dispatch(
-          setFocusRegion({
-            endTime,
-            startTime,
-          })
-        );
-        dispatch(syncFocusedRegion());
+      const endTime = contextMenuData.row.original?.end;
+      if (endTime != null) {
+        dispatch(setFocusRegionEndTime(endTime, true));
       }
     }
   };
@@ -83,20 +72,9 @@ const RequestTable = ({
     setContextMenuData(null);
 
     if (contextMenuData) {
-      const time = contextMenuData.row.original?.start;
-      if (time != null) {
-        // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
-        // Let the focus action/reducer will handle cropping for us.
-        const startTime = time!;
-        const endTime = focusRegion ? focusRegion.endTime : Number.POSITIVE_INFINITY;
-
-        dispatch(
-          setFocusRegion({
-            endTime,
-            startTime,
-          })
-        );
-        dispatch(syncFocusedRegion());
+      const startTime = contextMenuData.row.original?.start;
+      if (startTime != null) {
+        dispatch(setFocusRegionStartTime(startTime, true));
       }
     }
   };

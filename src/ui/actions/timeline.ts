@@ -564,6 +564,50 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
   };
 }
 
+export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAction {
+  return (dispatch, getState) => {
+    const state = getState();
+    const focusRegion = getFocusRegion(state);
+
+    // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
+    // Let the focus action/reducer will handle cropping for us.
+    const startTime = focusRegion ? focusRegion.startTime : 0;
+
+    dispatch(
+      setFocusRegion({
+        endTime,
+        startTime,
+      })
+    );
+
+    if (sync) {
+    dispatch(syncFocusedRegion());
+  }
+  };
+}
+
+export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThunkAction {
+  return (dispatch, getState) => {
+    const state = getState();
+    const focusRegion = getFocusRegion(state);
+
+    // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
+    // Let the focus action/reducer will handle cropping for us.
+    const endTime = focusRegion ? focusRegion.endTime : Number.POSITIVE_INFINITY;
+
+    dispatch(
+      setFocusRegion({
+        endTime,
+        startTime,
+      })
+    );
+
+    if (sync) {
+    dispatch(syncFocusedRegion());
+  }
+  };
+}
+
 export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
