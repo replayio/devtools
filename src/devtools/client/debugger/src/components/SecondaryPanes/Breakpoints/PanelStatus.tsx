@@ -44,7 +44,13 @@ export function PanelStatus({
     <div className="breakpoint-navigation-status-container">
       <div
         className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus 
-          ${prefixBadge === "unicorn" || prefixBadge === "empty" ? "" : styles[prefixBadge]}
+          ${
+            prefixBadge === "unicorn"
+              ? styles["bg-unicorn"]
+              : prefixBadge !== "empty"
+              ? styles[prefixBadge]
+              : ""
+          }
           `}
       >
         <div

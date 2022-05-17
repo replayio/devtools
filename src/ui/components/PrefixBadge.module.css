@@ -59,6 +59,16 @@
   background-size: auto 100%;
 }
 
+:root:global(.theme-light) .bg-unicorn {
+  background: #ff6ddf;
+  color: #fff;
+}
+
+:root:global(.theme-dark) .bg-unicorn {
+  background: #e110b3;
+  color: #fff;
+}
+
 :root:global(.theme-light) .purple {
   background-color: #a973cd;
   color: #fff;
