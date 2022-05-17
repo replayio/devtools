@@ -3,8 +3,7 @@ import { MutableRefObject, useEffect } from "react";
 export default function useModalDismissSignal(
   modalRef: MutableRefObject<HTMLDivElement>,
   dismissCallback: () => void,
-  dismissOnClickOutside: boolean = true,
-  dismissOnScroll: boolean
+  dismissOnClickOutside: boolean = true
 ) {
   useEffect(() => {
     if (modalRef.current === null) {
