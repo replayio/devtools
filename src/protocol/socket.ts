@@ -118,14 +118,15 @@ export function initSocket(address: string) {
     gSessionCallbacks?.onSocketClose(willClose);
   });
 
-  const onerror = makeInfallible((evt: Event) =>
-    gSessionCallbacks?.onSocketError(evt, false, lastReceivedMessageTime)
-  );
+  const onerror = makeInfallible((evt: Event) => {
+    console.log(gSessionCallbacks);
+    gSessionCallbacks?.onSocketError(evt, false, lastReceivedMessageTime);
+  });
 
-  const oninitialerror = makeInfallible((evt: Event) =>
-    gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime)
-  );
-
+  const oninitialerror = makeInfallible((evt: Event) => {
+    console.log(gSessionCallbacks);
+    gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime);
+  });
   const onmessage = makeInfallible(onSocketMessage);
 
   const handleOpen = () => {
@@ -139,6 +140,7 @@ export function initSocket(address: string) {
     socket = new WebSocket(address);
     socket.onopen = handleOpen;
     socket.onerror = oninitialerror;
+    console.log(gSessionCallbacks);
   };
 
   // First attempt at opening socket.
@@ -159,6 +161,7 @@ export function sendMessage<M extends CommandMethods>(
 ): Promise<CommandResult<M>> {
   const id = gNextMessageId++;
   const msg: CommandRequest = { id, method, params, pauseId, sessionId };
+  console.log(gSessionCallbacks);
 
   if (gSocketOpen) {
     doSend(msg);
