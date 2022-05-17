@@ -4,6 +4,7 @@ import React, { MouseEvent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
+
 import MaterialIcon from "../shared/MaterialIcon";
 
 const getTimestamp = (ms: number) => {
