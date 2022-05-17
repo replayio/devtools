@@ -1,13 +1,66 @@
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
 import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
 import useDebounceState from "./useDebounceState";
 
-const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+function sanitizeUrlList(input: string) {
+  return input
+    .split(",")
+    .map(s => s.trim())
+    .map(v => {
+      try {
+        return new URL(v).toString();
+      } catch {
+        return "";
+      }
+    })
+    .filter(Boolean);
+}
+
+function CSVInput({
+  disabled,
+  id,
+  value,
+  onChange,
+}: {
+  disabled: boolean;
+  id: string;
+  value?: string;
+  onChange: (value: string[]) => void;
+}) {
+  const [currentValue, setCurrentValue] = useDebounceState(value, v =>
+    onChange(sanitizeUrlList(v))
+  );
+
   return (
-    <div className={classNames(className, "w-5/12 flex-shrink-0")}>
+    <textarea
+      id={id}
+      className={classNames("h-20 w-full rounded-md text-sm", {
+        "bg-themeTextFieldBgcolor": disabled,
+        "border-textFieldBorder": disabled,
+      })}
+      disabled={disabled}
+      onChange={e => setCurrentValue(e.currentTarget.value)}
+      value={currentValue}
+    />
+  );
+}
+
+const Label = ({
+  className,
+  children,
+  help,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  help?: string;
+}) => {
+  return (
+    <div className={classNames(className, "w-5/12 flex-shrink-0 justify-between space-x-2")}>
       <label>{children}</label>
+      {help ? <QuestionMarkCircleIcon className="h-4 w-4" aria-label={help} /> : null}
     </div>
   );
 };
@@ -17,7 +70,7 @@ const Input = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Row = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex items-center">{children}</div>;
+  return <div className="flex items-center space-x-2">{children}</div>;
 };
 
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
@@ -32,14 +85,17 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
     })
   );
 
-  const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
-    updateWorkspaceSettings({
-      variables: {
-        workspaceId,
-        features,
-      },
-    });
-  };
+  const [features, updateFeature] = useDebounceState(
+    workspace?.settings?.features || {},
+    (features: PartialWorkspaceSettingsFeatures) => {
+      updateWorkspaceSettings({
+        variables: {
+          workspaceId,
+          features,
+        },
+      });
+    }
+  );
 
   if (!workspace) {
     return null;
@@ -82,34 +138,42 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
           </label>
         </Input>
       </Row>
-      {/* <Row>
-        <Label>Allow Recordings From</Label>
+
+      <Row>
+        <Label
+          className="flex flex-row self-start"
+          help="If set, any recorded URL must match at least one of these domains."
+        >
+          Allow Recordings From
+        </Label>
         <Input>
-          <input
-            className={classNames("rounded-md mr-2 w-full text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
-            })}
+          <label className="space-y-3" htmlFor="allow_list"></label>
+          <CSVInput
+            id="allow_list"
+            value={workspace.settings.features.recording.allowList?.join(", ")}
             disabled={disabled}
-            placeholder={`staging.${workspace?.domain}`}
-            type="text"
+            onChange={allowList => updateFeature({ recording: { allowList } })}
           />
         </Input>
       </Row>
       <Row>
-        <Label>Block Recordings From</Label>
+        <Label
+          className="flex flex-row self-start"
+          help="If set, any recorded URL must not match any of these domains."
+        >
+          Block Recordings From
+        </Label>
         <Input>
-          <input
-            disabled={disabled}
-            placeholder={`production.${workspace?.domain}`}
-            type="text"
-            className={classNames("rounded-md w-full mr-2 text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
-            })}
-          />
+          <label htmlFor="block_list">
+            <CSVInput
+              id="block_list"
+              value={workspace.settings.features.recording.blockList?.join(", ")}
+              disabled={disabled}
+              onChange={blockList => updateFeature({ recording: { blockList } })}
+            />
+          </label>
         </Input>
-      </Row> */}
+      </Row>
       <div className="text-xs font-semibold uppercase">Members</div>
       <Row>
         <Label>Disable My Library</Label>

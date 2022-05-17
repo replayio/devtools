@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 
-export default function useDebounceState(
-  original: string | undefined,
-  callback: (value: string) => void,
+export default function useDebounceState<T>(
+  original: T | undefined,
+  callback: (value: T) => void,
   timeout = 500
-): [string | undefined, (value: string) => void] {
+): [T | undefined, (value: T) => void] {
   const [value, updateValue] = useState(original); // nosemgrep typescript.react.best-practice.react-props-in-state.react-props-in-state
   const ref = useRef<NodeJS.Timeout | undefined>();
 
@@ -14,7 +14,7 @@ export default function useDebounceState(
     }
   }, [original]);
 
-  const setValue = (updated: string) => {
+  const setValue = (updated: T) => {
     updateValue(updated);
 
     if (ref.current) {
