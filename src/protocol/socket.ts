@@ -92,13 +92,13 @@ export async function createSession(
   experimentalSettings: ExperimentalSettings,
   sessionCallbacks: SessionCallbacks
 ) {
+  gSessionCallbacks = sessionCallbacks;
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
     loadPoint: loadPoint || undefined,
     experimentalSettings,
   });
 
-  gSessionCallbacks = sessionCallbacks;
   return sessionId;
 }
 
