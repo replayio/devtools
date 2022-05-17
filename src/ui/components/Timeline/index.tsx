@@ -21,6 +21,7 @@ import PreviewMarkers from "./PreviewMarkers";
 import ProgressBars from "./ProgressBars";
 import Tooltip from "./Tooltip";
 import UnfocusedRegion from "./UnfocusedRegion";
+import { useFeature } from "ui/hooks/settings";
 
 export type EditMode = {
   dragOffset?: number;
@@ -33,6 +34,7 @@ export default function Timeline() {
   const hoverTime = useSelector(selectors.getHoverTime);
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
+  const { value: showProtocolTimeline } = useFeature("protocolTimeline");
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 
@@ -103,8 +105,7 @@ export default function Timeline() {
   return (
     <>
       <FocusModePopout />
-
-      <div className="timeline">
+      <div className={`timeline ${showProtocolTimeline ? "show-protocol-timeline" : ""}`}>
         <div className="commands">
           <PlayPauseButton />
         </div>
