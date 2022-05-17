@@ -22,7 +22,7 @@ import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import NewCommentEditor from "./CommentEditor/NewCommentEditor";
 import CommentSource from "./CommentSource";
 import NetworkRequestPreview from "./NetworkRequestPreview";
-import { FocusContext } from "./types";
+import { FocusContext } from "./FocusContext";
 import { CommentData } from "./types";
 
 type PendingCommentProps = {

@@ -7,7 +7,7 @@ import hooks from "ui/hooks";
 import { Comment, Reply } from "ui/state/comments";
 import { User } from "ui/types";
 
-import { FocusContext } from "../types";
+import { FocusContext } from "../FocusContext";
 
 import TipTapEditor from "./TipTapEditor";
 

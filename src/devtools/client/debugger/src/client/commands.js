@@ -4,7 +4,7 @@
 
 //
 
-import { createFrame } from "./create";
+import { createFrame, makeSourceId } from "./create";
 import { clientEvents } from "./events";
 import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 

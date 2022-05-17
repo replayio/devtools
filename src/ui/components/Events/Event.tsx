@@ -5,7 +5,7 @@ import { getFormattedTime } from "ui/utils/timeline";
 
 import MaterialIcon from "../shared/MaterialIcon";
 
-import { getReplayEvent, getEventLabel } from "./eventKinds";
+import { getReplayEvent } from "./eventKinds";
 import Matches from "./Matches";
 
 type EventProps = {
@@ -14,6 +14,22 @@ type EventProps = {
   executionPoint: any;
   onSeek: (point: string, time: number) => void;
   showLink: boolean;
+};
+
+export const getEventLabel = (event: ReplayEvent) => {
+  const { kind } = event;
+  const { label } = getReplayEvent(kind);
+
+  if (kind === "navigation") {
+    const url = new URL(event.url);
+    return <span title={event.url}>{url.host}</span>;
+  }
+
+  if ("key" in event) {
+    return `${label} ${event.key}`;
+  }
+
+  return label;
 };
 
 export default function Event({

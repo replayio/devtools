@@ -19,18 +19,3 @@ export type EventKindKey =
   | "event.mouse.click";
 
 export const getReplayEvent = (kind: Kind) => EVENT_KINDS[kind];
-export const getEventLabel = (event: ReplayEvent) => {
-  const { kind } = event;
-  const { label } = getReplayEvent(kind);
-
-  if (kind === "navigation") {
-    const url = new URL(event.url);
-    return <span title={event.url}>{url.host}</span>;
-  }
-
-  if ("key" in event) {
-    return `${label} ${event.key}`;
-  }
-
-  return label;
-};
