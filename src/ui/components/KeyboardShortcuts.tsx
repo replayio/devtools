@@ -123,10 +123,21 @@ function KeyboardShortcuts({
     const addComment = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        if (pendingComment?.comment.content !== "") {
-          throw new Error("Return focus to in-progress comment or cancel it");
-        }
-        if (executionPoint) {
+        const commentContent: any = pendingComment?.comment.content;
+        const hasComment =
+          commentContent === ""
+            ? false
+            : Boolean(commentContent?.content && commentContent.content[0].content);
+
+        if (hasComment) {
+          /** TODO: look into better way to manage focus, should these be in a store/context that hooks communicate with? */
+          const commentNode: any = document.querySelector(
+            `.comment-input [contenteditable="true"]`
+          );
+          if (commentNode) {
+            commentNode.focus();
+          }
+        } else if (executionPoint) {
           createFrameComment(currentTime, executionPoint, null, user, recordingId);
         }
       }
