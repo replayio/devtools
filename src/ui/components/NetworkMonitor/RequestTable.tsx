@@ -1,7 +1,13 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
+import { getFocusRegion } from "ui/reducers/timeline";
 import { isTimeInRegions } from "ui/utils/timeline";
+
+import { ContextMenu } from "../ContextMenu";
+import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import Icon from "../shared/Icon";
 
 import styles from "./RequestTable.module.css";
 import classNames from "classnames";
@@ -10,6 +16,12 @@ import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
 import { Row, TableInstance } from "react-table";
 import { trackEvent } from "ui/utils/telemetry";
+
+interface ContextMenuData {
+  pageX: number;
+  pageY: number;
+  row: Row<RequestSummary>;
+}
 
 const RequestTable = ({
   className,
@@ -30,12 +42,63 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
+  const dispatch = useDispatch();
   const loadedRegions = useSelector(getLoadedRegions);
+  const focusRegion = useSelector(getFocusRegion);
+  const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
     onRowSelect(request);
+  };
+
+  const closeContextMenu = () => {
+    setContextMenuData(null);
+  };
+
+  const setFocusEnd = () => {
+    setContextMenuData(null);
+
+    if (contextMenuData) {
+      const time = contextMenuData.row.original?.end;
+      if (time != null) {
+        // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
+        // Let the focus action/reducer will handle cropping for us.
+        const startTime = focusRegion ? focusRegion.startTime : 0;
+        const endTime = time;
+
+        dispatch(
+          setFocusRegion({
+            endTime,
+            startTime,
+          })
+        );
+        dispatch(syncFocusedRegion());
+      }
+    }
+  };
+
+  const setFocusStart = () => {
+    setContextMenuData(null);
+
+    if (contextMenuData) {
+      const time = contextMenuData.row.original?.start;
+      if (time != null) {
+        // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
+        // Let the focus action/reducer will handle cropping for us.
+        const startTime = time!;
+        const endTime = focusRegion ? focusRegion.endTime : Number.POSITIVE_INFINITY;
+
+        dispatch(
+          setFocusRegion({
+            endTime,
+            startTime,
+          })
+        );
+        dispatch(syncFocusedRegion());
+      }
+    }
   };
 
   let inPast = true;
@@ -73,6 +136,7 @@ const RequestTable = ({
                 onClick={onRowSelect}
                 onSeek={onSeek}
                 row={row}
+                showContentMenuAt={setContextMenuData}
               />
             );
           })}
@@ -84,6 +148,25 @@ const RequestTable = ({
           />
         </div>
       </div>
+
+      {contextMenuData !== null && (
+        <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
+          <Dropdown>
+            <DropdownItem onClick={setFocusStart}>
+              <>
+                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" />
+                Set focus start
+              </>
+            </DropdownItem>
+            <DropdownItem onClick={setFocusEnd}>
+              <>
+                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" />
+                Set focus end
+              </>
+            </DropdownItem>
+          </Dropdown>
+        </ContextMenu>
+      )}
     </div>
   );
 };
