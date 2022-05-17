@@ -270,6 +270,7 @@ const resourceAsSourceWithContent = memoizeResourceShallow(({ content, ...source
   content: asSettled(content!),
 }));
 
+export type SourceWithContent = ReturnType<typeof resourceAsSourceWithContent>;
 /*
  * Add sources to the sources store
  * - Add the source to the sources store
@@ -774,7 +775,7 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
   if (!content) {
     return null;
   }
-  // @ts-ignore Ignore async value errors for now
+
   const text = getTextAtPosition(content, { ...location, column: 0 });
 
   return text;

@@ -113,11 +113,9 @@ export function addBreakpoint(
     const astLocation = getASTLocation(source, symbols, location);
 
     const originalContent = getSourceContent(getState(), source.id);
-    // @ts-expect-error Async content mismatch
     const originalText = getTextAtPosition(originalContent, location);
 
     const content = getSourceContent(getState(), source.id);
-    // @ts-expect-error Async content mismatch
     const text = getTextAtPosition(content, location);
 
     const id = getLocationKey(location);

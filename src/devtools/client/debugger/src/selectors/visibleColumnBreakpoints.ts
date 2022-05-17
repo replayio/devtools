@@ -17,7 +17,7 @@ import {
   getBreakpointPositions,
   getBreakpointPositionsForSource,
 } from "../reducers/sources";
-import type { Source } from "../reducers/sources";
+import type { Source, SourceWithContent } from "../reducers/sources";
 import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
 import { getViewport } from "../reducers/ui";
 import type { AsyncValue } from "../utils/async-value";
@@ -90,20 +90,7 @@ function filterByBreakpoints(positions: Location[], breakpointMap: BreakpointMap
 }
 
 // Filters out breakpoints to the right of the line. (bug 1552039)
-function filterInLine(
-  positions: Location[],
-  selectedContent:
-    | AsyncValue<{
-        contentType: string;
-        type: string;
-        value: string;
-      }>
-    | {
-        contentType: string;
-        type: string;
-        value: string;
-      }
-) {
+function filterInLine(positions: Location[], selectedContent: SourceWithContent["content"]) {
   return positions.filter(position => {
     const lineText = getLineText(selectedContent, position.line);
 
@@ -176,7 +163,6 @@ export const visibleColumnBreakpoints = createSelector(
     const breakpointMap = groupBreakpoints(allBreakpoints);
     // @ts-ignore columns undefined
     positions = filterVisible(positions, viewport);
-    // @ts-ignore weird asyncvalue mismatch
     positions = filterInLine(positions, selectedSource.content);
     positions = filterByBreakpoints(positions, breakpointMap);
 
