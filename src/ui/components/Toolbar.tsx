@@ -87,7 +87,7 @@ export default function Toolbar() {
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { comments, loading } = hooks.useGetComments(recordingId);
-  const logProtocol = useFeature("logProtocol");
+  const { value: logProtocol } = useFeature("logProtocol");
 
   useEffect(() => {
     if (!loading && comments.length > 0) {

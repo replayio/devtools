@@ -16,7 +16,6 @@ export default function SidePanel() {
   const { value: resolveRecording } = useFeature("resolveRecording");
   const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
 
-  let sidepanel;
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
 
