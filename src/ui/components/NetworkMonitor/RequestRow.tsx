@@ -1,7 +1,7 @@
+import classNames from "classnames";
 import React, { useLayoutEffect, useRef } from "react";
 
 import styles from "./RequestTable.module.css";
-import classNames from "classnames";
 import { RequestSummary } from "./utils";
 import { Row } from "react-table";
 
@@ -14,6 +14,7 @@ export const RequestRow = ({
   onClick,
   onSeek,
   row,
+  showContentMenuAt,
 }: {
   currentTime: number;
   isFirstInFuture: boolean;
@@ -23,6 +24,7 @@ export const RequestRow = ({
   onClick: (row: RequestSummary) => void;
   onSeek: (row: RequestSummary) => void;
   row: Row<RequestSummary>;
+  showContentMenuAt: (params: { pageX: number; pageY: number; row: Row<RequestSummary> }) => void;
 }) => {
   const prevIsSelectedRef = useRef<boolean>(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -36,6 +38,13 @@ export const RequestRow = ({
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
 
+  const onContextMenu = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
+
+    showContentMenuAt({ pageX: event.pageX, pageY: event.pageY, row });
+  };
+
   return (
     <div
       key={row.getRowProps().key}
@@ -46,6 +55,7 @@ export const RequestRow = ({
         [styles.unloaded]: !isInLoadedRegion,
       })}
       onClick={() => onClick(row.original)}
+      onContextMenu={onContextMenu}
       ref={ref}
     >
       <div {...row.getRowProps()}>
