@@ -285,7 +285,7 @@ class _ThreadFront {
   }
 
   async ensureProcessed(
-    level: "basic" | "executionIndexed",
+    level?: "basic",
     onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
     onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
   ) {
