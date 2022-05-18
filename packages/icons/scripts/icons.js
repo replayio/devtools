@@ -1,15 +1,12 @@
 const fs = require("fs");
-const path = require("path");
 
+const { transform } = require("@svgr/core");
 const { pascalCase } = require("case-anything");
 const dotenv = require("dotenv");
 const { fetchImages } = require("figma-tools");
 const prettier = require("prettier");
-const svgtojsx = require("svg-to-jsx");
 
 dotenv.config({ path: "../../.env" });
-
-const pretterOptions = JSON.parse(fs.readFileSync("../../.prettierrc", "utf-8"));
 
 console.log("Fetching icons...");
 
@@ -20,16 +17,41 @@ fetchImages({
 }).then(async svgs => {
   console.log("Building icons...");
 
-  const jsx = await Promise.all(svgs.map(svg => svgtojsx(svg.buffer)));
-  const data = svgs
-    .map((svg, index) => `export const ${pascalCase(svg.name)}Icon = () => ${jsx[index]}\n`)
+  const allIconExports = (
+    await Promise.all(
+      svgs.map(svg =>
+        transform(
+          svg.buffer.toString(),
+          {
+            icon: 20,
+            replaceAttrValues: {
+              black: "currentColor",
+              "#383838": "currentColor",
+              "#38383D": "currentColor",
+            },
+            typescript: true,
+          },
+          { componentName: pascalCase(svg.name) }
+        )
+      )
+    )
+  )
+    /**
+     * SVGR adds 'import * as React from "react"' and default exports for every
+     * component, so we trim the lines and add an explicit named export.
+     */
+    .map(component => `export ${component.split("\n").slice(2, -2).join("\n")}`)
     .join("\n");
 
-  prettier.resolveConfig;
+  console.log(allIconExports);
 
-  const formattedCodeString = prettier.format(data, { parser: "babel", ...pretterOptions });
+  const prettierConfig = await prettier.resolveConfig(process.cwd());
+  const formattedCodeString = prettier.format(allIconExports, {
+    parser: "typescript",
+    ...prettierConfig,
+  });
 
-  fs.writeFileSync("index.js", formattedCodeString);
+  fs.writeFileSync("index.tsx", `import { SVGProps } from "react"\n\n${formattedCodeString}`);
 
   console.log("Icons built ✨");
 });

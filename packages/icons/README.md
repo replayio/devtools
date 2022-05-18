@@ -10,7 +10,14 @@ Make sure you have a `.env` file at the root of the project that contains a <a h
 FIGMA_TOKEN=personal-token-here
 ```
 
-Once that is setup, you can run the following script to download and generate the icons:
+From the root of the project, move into the `icons` package and install the dependencies:
+
+```bash
+cd packages/icons
+npm install
+```
+
+Now you can run the script to download and generate the icons:
 
 ```bash
 npm run build
