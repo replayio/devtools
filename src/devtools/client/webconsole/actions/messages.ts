@@ -9,6 +9,7 @@ import {
   prepareMessage,
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
+import { loadValue } from "devtools/packages/devtools-reps/object-inspector/items/utils";
 import { TestMessageHandlers } from "ui/actions/find-tests";
 import { LogpointHandlers } from "ui/actions/logpoint";
 import { client } from "protocol/socket";
@@ -115,7 +116,7 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
     }
 
     if (msg.argumentValues) {
-      await Promise.all(msg.argumentValues.map(value => value.loadIfNecessary()));
+      await Promise.all(msg.argumentValues.map(loadValue));
     }
 
     const packet = {
@@ -178,7 +179,7 @@ function onLogpointResult(
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     if (values) {
-      await Promise.all(values.map(value => value.loadIfNecessary()));
+      await Promise.all(values.map(loadValue));
     }
     const packet = {
       errorMessage: "",

@@ -35,6 +35,7 @@ pref("devtools.features.enableLargeText", false);
 pref("devtools.features.softFocus", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.testSupport", false);
+pref("devtools.features.originalClassNames", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -68,6 +69,7 @@ export const features = new PrefsHelper("devtools.features", {
   softFocus: ["Bool", "softFocus"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   testSupport: ["Bool", "testSupport"],
+  originalClassNames: ["Bool", "originalClassNames"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
