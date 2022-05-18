@@ -209,7 +209,7 @@ class JestTestState {
 
         const { time, pauseId, location, exception, data } = result.value;
 
-        const pause = new Pause(ThreadFront.sessionId!);
+        const pause = new Pause(ThreadFront);
         pause.addData(data);
         pause.instantiate(pauseId, test.errorPoint.point, time, /* hasFrames */ true);
         const exceptionValue = new ValueFront(pause, exception);

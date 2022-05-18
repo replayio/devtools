@@ -1,29 +1,29 @@
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import classNames from "classnames";
-import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { AvatarImage } from "ui/components/Avatar";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
+import { useFeature } from "ui/hooks/settings";
+import { useGetUserId } from "ui/hooks/users";
+import { selectors } from "ui/reducers";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { UIState } from "ui/state";
+import { Comment, Reply } from "ui/state/comments";
 import { formatRelativeTime } from "ui/utils/comments";
+import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-import NewCommentEditor from "./CommentEditor/NewCommentEditor";
-import { Comment, Reply } from "ui/state/comments";
-import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
 import CommentActions from "./CommentActions";
+import ExistingCommentEditor from "./CommentEditor/ExistingCommentEditor";
+import NewCommentEditor from "./CommentEditor/NewCommentEditor";
 import CommentSource from "./CommentSource";
-
-import { AvatarImage } from "ui/components/Avatar";
-import { trackEvent } from "ui/utils/telemetry";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { features } from "ui/utils/prefs";
-import { getFocusRegion } from "ui/reducers/timeline";
 import NetworkRequestPreview from "./NetworkRequestPreview";
-import { useFeature } from "ui/hooks/settings";
+import { FocusContext } from "./FocusContext";
 import { CommentData } from "./types";
-import { useGetUserId } from "ui/hooks/users";
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
 
 type PendingCommentProps = {
   comment: Comment;
@@ -203,13 +203,6 @@ type PropsFromParent = {
 };
 type CommentCardProps = PropsFromRedux & PropsFromParent;
 
-export const FocusContext = React.createContext({
-  autofocus: false,
-  isFocused: false,
-  blur: () => {},
-  close: () => {},
-});
-
 function CommentCard({
   comment,
   comments,
@@ -248,8 +241,10 @@ function CommentCard({
 
     setIsUpdating(true);
     if (type == "new_reply") {
+      // @ts-ignore field mismatch?
       await addCommentReply({ ...comment, content: inputValue });
     } else if (type == "new_comment") {
+      // @ts-ignore field mismatch?
       await addComment({ ...comment, content: inputValue });
     } else if (type === "comment") {
       await updateComment(comment.id, inputValue, (comment as Comment).position);

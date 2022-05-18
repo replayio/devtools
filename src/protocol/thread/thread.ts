@@ -278,7 +278,7 @@ class _ThreadFront {
 
     if (this.testName) {
       await gToolbox.selectTool("debugger");
-      window.Test = require("test/harness");
+      window.Test = await import("test/harness");
       const script = document.createElement("script");
       script.src = `/test/scripts/${this.testName}`;
       document.head.appendChild(script);
@@ -666,7 +666,7 @@ class _ThreadFront {
     if (pause) {
       return pause;
     }
-    pause = new Pause(this.sessionId);
+    pause = new Pause(this);
     pause.create(point, time);
     this.allPauses.set(point, pause);
     return pause;
@@ -997,7 +997,7 @@ class _ThreadFront {
     });
     client.Console.addNewMessageListener(async ({ message }) => {
       await this.ensureAllSources();
-      const pause = new Pause(sessionId);
+      const pause = new Pause(this);
       pause.instantiate(
         message.pauseId,
         message.point.point,

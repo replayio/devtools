@@ -2,7 +2,8 @@ import classNames from "classnames";
 import React from "react";
 import { Workspace } from "ui/types";
 import { getOrganizationSettings } from "ui/utils/org";
-import { MY_LIBRARY, personalWorkspace } from "./Sharing";
+
+import { MY_LIBRARY, personalWorkspace } from "./libraryConstants";
 
 const getIconAndText = (
   isPublic: boolean,

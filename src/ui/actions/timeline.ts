@@ -33,30 +33,21 @@ import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
+import {
+  setHoveredItem as setHoveredItemAction,
+  setPlaybackStalled,
+  setTimelineState,
+  setTrimRegion,
+} from "../reducers/timeline";
+
+export {
+  setPlaybackPrecachedTime,
+  setPlaybackStalled,
+  setTrimRegion,
+  setTimelineState,
+} from "../reducers/timeline";
+
 import type { UIStore, UIThunkAction } from "./index";
-
-export type SetTimelineStateAction = Action<"set_timeline_state"> & {
-  state: Partial<TimelineState>;
-};
-export type SetPlaybackStalledAction = Action<"set_playback_stalled"> & { stalled: boolean };
-export type SetZoomRegionAction = Action<"set_zoom"> & { region: ZoomRegion };
-export type SetHoveredItemAction = Action<"set_hovered_item"> & {
-  hoveredItem: HoveredItem | null;
-};
-export type SetPlaybackPrecachedTimeAction = Action<"set_playback_precached_time"> & {
-  time: number;
-};
-export type SetFocusRegionAction = Action<"set_trim_region"> & {
-  focusRegion: FocusRegion;
-};
-
-export type TimelineActions =
-  | SetTimelineStateAction
-  | SetPlaybackStalledAction
-  | SetZoomRegionAction
-  | SetHoveredItemAction
-  | SetPlaybackPrecachedTimeAction
-  | SetFocusRegionAction;
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -184,10 +175,6 @@ function setRecordingDescription(duration: number): UIThunkAction {
   };
 }
 
-export function setTimelineState(state: Partial<TimelineState>): SetTimelineStateAction {
-  return { type: "set_timeline_state", state };
-}
-
 export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async (dispatch, getState) => {
     dispatch(setTimelineState({ hoverTime: time }));
@@ -212,14 +199,6 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
       Video.seek(currentTime);
     } catch {}
   };
-}
-
-export function setPlaybackStalled(stalled: boolean): SetPlaybackStalledAction {
-  return { type: "set_playback_stalled", stalled };
-}
-
-export function setZoomRegion(region: ZoomRegion): SetZoomRegionAction {
-  return { type: "set_zoom", region };
 }
 
 function updatePausePointParams({
@@ -469,7 +448,7 @@ export function setHoveredItem(hoveredItem: HoveredItem): UIThunkAction {
       return;
     }
 
-    dispatch({ type: "set_hovered_item", hoveredItem });
+    dispatch(setHoveredItemAction(hoveredItem));
 
     dispatch(setTimelineToTime(hoveredItem?.time || null));
   };
@@ -481,13 +460,9 @@ export function clearHoveredItem(): UIThunkAction {
     if (!hoveredItem) {
       return;
     }
-    dispatch({ type: "set_hovered_item", hoveredItem: null });
+    dispatch(setHoveredItemAction(null));
     dispatch(setTimelineToTime(null));
   };
-}
-
-export function setPlaybackPrecachedTime(time: number): SetPlaybackPrecachedTimeAction {
-  return { type: "set_playback_precached_time", time };
 }
 
 export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
@@ -551,15 +526,14 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
         }
       }
 
-      dispatch({
-        type: "set_trim_region",
-        focusRegion: {
+      dispatch(
+        setTrimRegion({
           endTime,
           startTime,
-        },
-      });
+        })
+      );
     } else {
-      dispatch({ type: "set_trim_region", focusRegion: null });
+      dispatch(setTrimRegion(null));
     }
   };
 }
