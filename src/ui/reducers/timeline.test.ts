@@ -204,5 +204,61 @@ describe("Redux timeline state", () => {
       );
       expect(getPlayback(store.getState())).toBeNull();
     });
+
+    describe("set start time", () => {
+      it("should focus from the start time to the end of the zoom region if no focus region has been set", () => {
+        dispatch(actions.setFocusRegionStartTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 100,
+            "startTime": 65,
+          }
+        `);
+      });
+
+      it("should only update the start time when a region is set", () => {
+        dispatch(
+          actions.setFocusRegion({
+            startTime: 50,
+            endTime: 70,
+          })
+        );
+        dispatch(actions.setFocusRegionStartTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 70,
+            "startTime": 65,
+          }
+        `);
+      });
+    });
+
+    describe("set end time", () => {
+      it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", () => {
+        dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 65,
+            "startTime": 50,
+          }
+        `);
+      });
+
+      it("should only update the end time when a region is set", () => {
+        dispatch(
+          actions.setFocusRegion({
+            startTime: 50,
+            endTime: 70,
+          })
+        );
+        dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 65,
+            "startTime": 50,
+          }
+        `);
+      });
+    });
   });
 });
