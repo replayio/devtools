@@ -235,13 +235,13 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
             <Dropdown>
               <DropdownItem onClick={this.setFocusStart}>
                 <>
-                  <Icon filename="set-focus-start" className="mr-4 bg-iconColor" />
+                  <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
                   Set focus start
                 </>
               </DropdownItem>
               <DropdownItem onClick={this.setFocusEnd}>
                 <>
-                  <Icon filename="set-focus-end" className="mr-4 bg-iconColor" />
+                  <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
                   Set focus end
                 </>
               </DropdownItem>

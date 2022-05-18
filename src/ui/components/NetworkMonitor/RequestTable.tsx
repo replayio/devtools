@@ -1,22 +1,21 @@
+import classNames from "classnames";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getFocusRegion } from "ui/reducers/timeline";
 import type { AppDispatch } from "ui/setup/store";
+import { trackEvent } from "ui/utils/telemetry";
 import { isTimeInRegions } from "ui/utils/timeline";
 
 import { ContextMenu } from "../ContextMenu";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 import Icon from "../shared/Icon";
 
-import styles from "./RequestTable.module.css";
-import classNames from "classnames";
-import { RequestSummary } from "./utils";
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
-import { Row, TableInstance } from "react-table";
-import { trackEvent } from "ui/utils/telemetry";
+import styles from "./RequestTable.module.css";
+import { RequestSummary } from "./utils";
 
 interface ContextMenuData {
   pageX: number;
@@ -45,7 +44,6 @@ const RequestTable = ({
 
   const dispatch = useDispatch() as AppDispatch;
   const loadedRegions = useSelector(getLoadedRegions);
-  const focusRegion = useSelector(getFocusRegion);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
 
   const onSeek = (request: RequestSummary) => {
@@ -133,13 +131,13 @@ const RequestTable = ({
           <Dropdown>
             <DropdownItem onClick={setFocusStart}>
               <>
-                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" />
+                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
                 Set focus start
               </>
             </DropdownItem>
             <DropdownItem onClick={setFocusEnd}>
               <>
-                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" />
+                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
                 Set focus end
               </>
             </DropdownItem>
