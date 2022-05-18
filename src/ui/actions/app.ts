@@ -55,13 +55,8 @@ function now(): number {
   return Date.now();
 }
 
-let thread: typeof ThreadFrontType | undefined;
 export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
-  return async (dispatch, getState) => {
-    if (!thread) {
-      return;
-    }
-
+  return async (dispatch, getState, { ThreadFront }) => {
     // Technically, we only need to do this in *some* circumstances.
     // I think the cases where we need to are:
     // - We are enlarging or moving the focus zone beyond what we have most recently loaded.
@@ -85,14 +80,14 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
     // without refetching*.
     // BTW - we don't have to figure out *all* of this right now :)
     dispatch(clearMessages());
-    const endpoint = (await sendMessage("Session.getEndpoint", {}, thread.sessionId!)).endpoint;
+    const endpoint = (await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!)).endpoint;
     const beginning = (
       await sendMessage(
         "Session.getPointNearTime",
         {
           time: focusRegion.startTime,
         },
-        thread.sessionId!
+        ThreadFront.sessionId!
       )
     ).point as TimeStampedPoint;
     // @ts-ignore
@@ -103,7 +98,7 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
             await sendMessage(
               "Session.getPointNearTime",
               { time: focusRegion.endTime },
-              thread.sessionId!
+              ThreadFront.sessionId!
             )
           ).point as TimeStampedPoint);
     // This is broken right now, see https://github.com/RecordReplay/backend/issues/5622
@@ -113,13 +108,12 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
     //   {
     //     range: { begin: beginning.point, end: end.point },
     //   },
-    //   thread.sessionId!
+    //   ThreadFront.sessionId!
     // ).then(() => dispatch(messagesLoaded()));
   };
 };
 
 export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
-  thread = ThreadFront;
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
