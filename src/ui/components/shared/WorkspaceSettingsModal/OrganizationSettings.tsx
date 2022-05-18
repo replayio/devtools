@@ -1,9 +1,23 @@
 import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import hooks from "ui/hooks";
-import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
+import { PartialWorkspaceSettingsFeatures } from "ui/types";
+
 import useDebounceState from "./useDebounceState";
+
+const extractUrlParts = new RegExp(
+  "^" +
+    // protocol
+    "([^:/?#.]+:)" +
+    "//" +
+    // domain - adapted from https://stackoverflow.com/questions/3117218/matching-url-with-wildcards
+    // full supported list https://www.icann.org/en/system/files/files/idna-protocol-2003-2008.txt
+    "([*\\w\\d\\-\\u0100-\\uffff.%]*)" +
+    // port
+    "(?::([*0-9]+))?",
+  "u"
+);
 
 function sanitizeUrlList(input: string) {
   return input
@@ -11,7 +25,13 @@ function sanitizeUrlList(input: string) {
     .map(s => s.trim())
     .map(v => {
       try {
-        return new URL(v).toString();
+        const [, protocol, hostname, port] = v.match(extractUrlParts) || [];
+
+        if (!protocol || !hostname) {
+          return "";
+        }
+
+        return `${protocol}//${hostname}${port ? ":" + port : ""}`;
       } catch {
         return "";
       }
@@ -60,7 +80,11 @@ const Label = ({
   return (
     <div className={classNames(className, "w-5/12 flex-shrink-0 justify-between space-x-2")}>
       <label>{children}</label>
-      {help ? <QuestionMarkCircleIcon className="h-4 w-4" aria-label={help} /> : null}
+      {help ? (
+        <span title={help}>
+          <QuestionMarkCircleIcon className="h-4 w-4" />
+        </span>
+      ) : null}
     </div>
   );
 };
@@ -74,19 +98,22 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 };
 
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
-  const { workspace } = hooks.useGetWorkspace(workspaceId);
+  const { workspace, loading } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [message, setMessage] = useDebounceState(workspace?.settings?.motd || undefined, motd =>
-    updateWorkspaceSettings({
-      variables: {
-        workspaceId,
-        motd,
-      },
-    })
+  const [message, setMessage, resetMessage] = useDebounceState(
+    workspace?.settings?.motd || undefined,
+    motd =>
+      updateWorkspaceSettings({
+        variables: {
+          workspaceId,
+          motd,
+        },
+      })
   );
 
-  const [features, updateFeature] = useDebounceState(
-    workspace?.settings?.features || {},
+  const features: PartialWorkspaceSettingsFeatures = workspace?.settings?.features || {};
+  const [, updateFeature, resetFeatures] = useDebounceState(
+    features,
     (features: PartialWorkspaceSettingsFeatures) => {
       updateWorkspaceSettings({
         variables: {
@@ -96,6 +123,13 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       });
     }
   );
+
+  useEffect(() => {
+    if (workspace) {
+      resetFeatures(workspace.settings.features);
+      resetMessage(workspace.settings.motd || "");
+    }
+  }, [workspace?.id, resetFeatures, resetMessage]);
 
   if (!workspace) {
     return null;
@@ -133,7 +167,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               id="disable_public_recordings"
               name="disable_public_recordings"
               onChange={e => updateFeature({ recording: { public: !e.currentTarget.checked } })}
-              checked={!workspace.settings.features.recording.public}
+              checked={!features?.recording?.public}
             />
           </label>
         </Input>
@@ -141,16 +175,15 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
 
       <Row>
         <Label
-          className="flex flex-row self-start"
+          className="flex flex-row items-center self-start"
           help="If set, any recorded URL must match at least one of these domains."
         >
           Allow Recordings From
         </Label>
         <Input>
-          <label className="space-y-3" htmlFor="allow_list"></label>
           <CSVInput
             id="allow_list"
-            value={workspace.settings.features.recording.allowList?.join(", ")}
+            value={features?.recording?.allowList?.join(", ")}
             disabled={disabled}
             onChange={allowList => updateFeature({ recording: { allowList } })}
           />
@@ -158,20 +191,18 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       </Row>
       <Row>
         <Label
-          className="flex flex-row self-start"
+          className="flex flex-row items-center self-start"
           help="If set, any recorded URL must not match any of these domains."
         >
           Block Recordings From
         </Label>
         <Input>
-          <label htmlFor="block_list">
-            <CSVInput
-              id="block_list"
-              value={workspace.settings.features.recording.blockList?.join(", ")}
-              disabled={disabled}
-              onChange={blockList => updateFeature({ recording: { blockList } })}
-            />
-          </label>
+          <CSVInput
+            id="block_list"
+            value={features?.recording?.blockList?.join(", ")}
+            disabled={disabled}
+            onChange={blockList => updateFeature({ recording: { blockList } })}
+          />
         </Input>
       </Row>
       <div className="text-xs font-semibold uppercase">Members</div>
@@ -188,7 +219,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               type="checkbox"
               id="restrict_users_to_domain"
               name="restrict_users_to_domain"
-              checked={!workspace.settings.features.user.library}
+              checked={!features?.user?.library}
               onChange={e => updateFeature({ user: { library: !e.currentTarget.checked } })}
             />
           </label>
@@ -206,7 +237,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               disabled={disabled}
               id="auto_add_users"
               name="auto_add_users"
-              value={workspace.settings.features.user.autoJoin || 0}
+              value={features?.user?.autoJoin || 0}
               onChange={e =>
                 updateFeature({
                   user: {
