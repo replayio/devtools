@@ -9,7 +9,13 @@ import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 
 export * from "./utils";
 
-import { GETTERS_FROM_PROTOTYPES, isValueLoaded, getChildValues, renderRep } from "./utils";
+import {
+  GETTERS_FROM_PROTOTYPES,
+  isValueLoaded,
+  getChildValues,
+  renderRep,
+  loadValue,
+} from "./utils";
 
 export interface LabelAndValue {
   label?: React.ReactNode;
@@ -63,9 +69,7 @@ export class ContainerItem implements IItem {
   }
 
   async loadChildren() {
-    await Promise.all(
-      this.contents.map(item => item.type === "value" && item.contents.loadIfNecessary())
-    );
+    await Promise.all(this.contents.map(item => item.type === "value" && loadValue(item.contents)));
   }
 
   shouldUpdate(prevItem: Item) {
@@ -246,7 +250,7 @@ export class KeyValueItem implements IItem {
   }
 
   async loadChildren() {
-    await Promise.all([this.key.loadIfNecessary(), this.value.loadIfNecessary()]);
+    await Promise.all([loadValue(this.key), loadValue(this.value)]);
   }
 
   shouldUpdate(prevItem: Item) {
@@ -472,7 +476,7 @@ export class ValueItem implements IItem {
       await current.loadIfNecessary();
     }, GETTERS_FROM_PROTOTYPES);
 
-    await Promise.all(getChildValues(this.contents).map(value => value.loadIfNecessary()));
+    await Promise.all(getChildValues(this.contents).map(loadValue));
   }
 
   recreate() {

@@ -23,6 +23,7 @@ export class ValueFront {
   private _object: WiredObject | null;
   private _uninitialized: boolean;
   private _unavailable: boolean;
+  originalClassName?: string;
 
   constructor(pause: Pause | null, protocolValue: any) {
     this._pause = pause;
@@ -344,6 +345,40 @@ export class ValueFront {
         assert(value.hasPreview(), "no object preview");
       }
     }
+  }
+
+  async mapClassName() {
+    if (this.originalClassName === undefined) {
+      this.originalClassName = (await this.getOriginalClassName()) || "";
+    }
+  }
+
+  private async getOriginalClassName() {
+    const generatedClassName = this.className();
+    if (!generatedClassName || generatedClassName === "Object") {
+      return;
+    }
+    await this.loadIfNecessary();
+    const proto = this.previewPrototypeValue();
+    if (!proto) {
+      return;
+    }
+    await proto.loadIfNecessary();
+    const constr = proto.previewValueMap().get("constructor");
+    if (!constr) {
+      return;
+    }
+    await constr.loadIfNecessary();
+    const locations = constr._object?.preview?.functionLocation;
+    if (!locations) {
+      return;
+    }
+    const generatedLocation = ThreadFront.getGeneratedLocation(locations);
+    if (!generatedLocation) {
+      return;
+    }
+    const scopeMap = await ThreadFront.getScopeMap(generatedLocation);
+    return scopeMap[generatedClassName];
   }
 
   /**
