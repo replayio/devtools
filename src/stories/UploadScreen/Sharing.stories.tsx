@@ -58,6 +58,8 @@ OrgLibraryDisabled.args = {
           },
           recording: {
             public: true,
+            allowList: [],
+            blockList: [],
           },
         },
         motd: null,
@@ -88,6 +90,8 @@ OrgPublicDisabled.args = {
           },
           recording: {
             public: false,
+            allowList: [],
+            blockList: [],
           },
         },
         motd: null,
@@ -118,6 +122,8 @@ OrgLibraryAndPublicDisabled.args = {
           },
           recording: {
             public: false,
+            allowList: [],
+            blockList: [],
           },
         },
         motd: null,
