@@ -50,7 +50,7 @@ export function updatePendingCommentContent(content: string): UpdatePendingComme
 export function createComment(
   time: number,
   point: string,
-  user: User,
+  user: User, // TODO: user is no longer required and should be removed
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
