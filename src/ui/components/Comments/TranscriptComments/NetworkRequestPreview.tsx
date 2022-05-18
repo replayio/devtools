@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setSelectedPanel } from "ui/actions/layout";
-import { showRequestDetails } from "ui/actions/network";
+import { selectAndFetchRequest } from "ui/actions/network";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getSummaryById } from "ui/reducers/network";
 import { UIState } from "ui/state";
@@ -15,7 +15,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
   const onClick = () => {
     trackEvent("comments.select_request");
     dispatch(setSelectedPanel("network"));
-    dispatch(showRequestDetails(networkRequestId));
+    dispatch(selectAndFetchRequest(networkRequestId));
   };
 
   if (!request) {
@@ -32,7 +32,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
       <div className="mono flex flex-col font-medium">
         <div className="flex w-full flex-row justify-between space-x-1">
           <div
-            className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs space-x-2"
+            className="cm-s-mozilla space-x-2 overflow-hidden whitespace-pre font-mono text-xs"
             style={{ fontSize: "11px" }}
           >
             <span className="font-bold">{`[${method}]`}</span>
