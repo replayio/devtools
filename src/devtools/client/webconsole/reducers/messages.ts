@@ -19,6 +19,7 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
+import { findMessagesResult } from "@recordreplay/protocol";
 
 type MessageId = string;
 type Command = string;
@@ -285,6 +286,11 @@ const messagesSlice = createSlice({
         state as MessageState
       );
     },
+    clearMessages(state) {
+      removeMessagesFromState(state as MessageState, state.messages.ids as string[]);
+      state.overflow = false;
+      state.messagesLoaded = false;
+    },
   },
   extraReducers: builder => {
     // Dispatched from `actions/paused.js`
@@ -305,6 +311,7 @@ const messagesSlice = createSlice({
 });
 
 export const {
+  clearMessages,
   consoleOverflowed,
   filterStateUpdated,
   logpointMessagesCleared,

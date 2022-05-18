@@ -1,5 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
+import { unprocessedRegions, KeyboardEvent, TimeStampedPoint } from "@recordreplay/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
@@ -42,6 +42,8 @@ import {
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
+import { FocusRegion } from "ui/state/timeline";
+import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -53,7 +55,71 @@ function now(): number {
   return Date.now();
 }
 
+let thread: typeof ThreadFrontType | undefined;
+export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
+  return async (dispatch, getState) => {
+    if (!thread) {
+      return;
+    }
+
+    // Technically, we only need to do this in *some* circumstances.
+    // I think the cases where we need to are:
+    // - We are enlarging or moving the focus zone beyond what we have most recently loaded.
+    // - We are shrinking the focus zone and have overflow currently.
+    // That first bullet might sounds like we will end up doing this basically
+    // all the time, but that is not so. Take, for instance, the case where the
+    // initial load of the recording did *not* set the overflow flag. In that
+    // case, we have all console messages, and we never need to fetch them
+    // again. However, in order to track this properly, I suspect we will need
+    // to add another piece of state to our messages slice: the boundaries that
+    // were most recently used to load messages. By default, this will be the
+    // entire recording, even if we start with only a small region focused.
+    // That's just the way that the Console.findMessages protocol command works.
+    // In that case (without overflow), like I said above, we never need to run
+    // any of this code. If we have overflow, and focus on, let's say the first
+    // 30 seconds of the recording, and we *don't* get overflow on the first
+    // thirty seconds, then we know that if the user were to change the window
+    // to the first 15 seconds, we don't need to refetch, and we also should not
+    // update the "most recently loaded" boundaries in the store, because that
+    // way the user could then focus on, for example, seconds 10 to 20 *also
+    // without refetching*.
+    // BTW - we don't have to figure out *all* of this right now :)
+    dispatch(clearMessages());
+    const endpoint = (await sendMessage("Session.getEndpoint", {}, thread.sessionId!)).endpoint;
+    const beginning = (
+      await sendMessage(
+        "Session.getPointNearTime",
+        {
+          time: focusRegion.startTime,
+        },
+        thread.sessionId!
+      )
+    ).point as TimeStampedPoint;
+    // @ts-ignore
+    const end =
+      endpoint.time === focusRegion.endTime
+        ? endpoint
+        : ((
+            await sendMessage(
+              "Session.getPointNearTime",
+              { time: focusRegion.endTime },
+              thread.sessionId!
+            )
+          ).point as TimeStampedPoint);
+    // This is broken right now, see https://github.com/RecordReplay/backend/issues/5622
+    // @ts-ignore
+    // sendMessage(
+    //   "Console.findMessagesInRange",
+    //   {
+    //     range: { begin: beginning.point, end: end.point },
+    //   },
+    //   thread.sessionId!
+    // ).then(() => dispatch(messagesLoaded()));
+  };
+};
+
 export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
+  thread = ThreadFront;
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
