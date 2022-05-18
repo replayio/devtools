@@ -3,7 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { Dispatch } from "@reduxjs/toolkit";
-import type { AnyAction } from "@reduxjs/toolkit";
 import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
 import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
 import { StateContext } from "devtools/client/webconsole/components/Search";
@@ -17,6 +16,7 @@ import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
 import { getFocusRegion } from "ui/reducers/timeline";
+import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
@@ -300,7 +300,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    dispatch(setFocusRegionEndTime(time, true) as unknown as AnyAction);
+    (dispatch as AppDispatch)(setFocusRegionEndTime(time, true));
   };
 
   setFocusStart = async () => {
@@ -315,7 +315,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    dispatch(setFocusRegionStartTime(time, true) as unknown as AnyAction);
+    (dispatch as AppDispatch)(setFocusRegionStartTime(time, true));
   };
 }
 

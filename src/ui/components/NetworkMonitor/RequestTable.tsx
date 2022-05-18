@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion } from "ui/reducers/timeline";
+import type { AppDispatch } from "ui/setup/store";
 import { isTimeInRegions } from "ui/utils/timeline";
 
 import { ContextMenu } from "../ContextMenu";
@@ -42,7 +43,7 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch() as AppDispatch;
   const loadedRegions = useSelector(getLoadedRegions);
   const focusRegion = useSelector(getFocusRegion);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);

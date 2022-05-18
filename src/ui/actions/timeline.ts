@@ -581,8 +581,8 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
     );
 
     if (sync) {
-    dispatch(syncFocusedRegion());
-  }
+      dispatch(syncFocusedRegion());
+    }
   };
 }
 
@@ -603,8 +603,8 @@ export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThu
     );
 
     if (sync) {
-    dispatch(syncFocusedRegion());
-  }
+      dispatch(syncFocusedRegion());
+    }
   };
 }
 
