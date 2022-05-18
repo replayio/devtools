@@ -1,4 +1,5 @@
 import { EnhancedStore, Reducer, ThunkDispatch } from "@reduxjs/toolkit";
+import { setHasAllPaintPoints } from "protocol/graphics";
 import { createTestStore } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
@@ -22,6 +23,9 @@ describe("Redux timeline state", () => {
         zoomRegion: { endTime: 100, scale: 1, startTime: 50 },
       })
     );
+
+    // Fake having loaded paint points.
+    setHasAllPaintPoints(true);
   });
 
   describe("focus region", () => {
