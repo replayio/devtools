@@ -162,18 +162,22 @@ async function evaluateExpressions(sources, options) {
 }
 
 async function evaluate(source, { asyncIndex, frameId } = {}) {
-  const { returned, exception, failed } = await ThreadFront.evaluate({
-    asyncIndex,
-    frameId,
-    text: source,
-  });
-  if (failed) {
+  try {
+    const { returned, exception, failed } = await ThreadFront.evaluate({
+      asyncIndex,
+      frameId,
+      text: source,
+    });
+    if (failed) {
+      return { exception: createPrimitiveValueFront("Evaluation failed") };
+    }
+    if (returned) {
+      return { result: returned };
+    }
+    return { exception };
+  } catch (e) {
     return { exception: createPrimitiveValueFront("Evaluation failed") };
   }
-  if (returned) {
-    return { result: returned };
-  }
-  return { exception };
 }
 
 async function autocomplete(input, cursor, frameId) {

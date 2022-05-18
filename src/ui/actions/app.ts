@@ -20,7 +20,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { toggleFocusMode } from "./timeline";
 import { getTheme } from "ui/reducers/app";
@@ -42,6 +42,8 @@ import {
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
+import { FocusRegion } from "ui/state/timeline";
+import { isInTrimSpan } from "ui/utils/timeline";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -52,6 +54,27 @@ function now(): number {
   }
   return Date.now();
 }
+
+export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
+  return async (dispatch, getState, { client, ThreadFront }) => {
+    const state = getState();
+    const breakpoints = state.breakpoints.breakpoints;
+
+    if (
+      ThreadFront.currentPause &&
+      !isInTrimSpan(Number(ThreadFront.currentPause.time), focusRegion)
+    ) {
+      // We are no longer at a place where the current pause should be
+      // considered valid
+      ThreadFront.currentPause = null;
+    }
+
+    for (const b of Object.values(breakpoints)) {
+      // Prod all breakpoints to refetch
+      client.setBreakpoint(b.location, b.options);
+    }
+  };
+};
 
 export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {

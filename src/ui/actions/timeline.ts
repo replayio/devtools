@@ -32,6 +32,7 @@ import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/envi
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { refetchDataForTimeRange } from "./app";
 
 import type { UIStore, UIThunkAction } from "./index";
 
@@ -591,6 +592,8 @@ export function syncFocusedRegion(): UIThunkAction {
       },
       window.sessionId
     );
+
+    dispatch(refetchDataForTimeRange(focusRegion));
   };
 }
 
