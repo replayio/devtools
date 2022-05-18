@@ -96,7 +96,7 @@ const libraryMap = [
   },
   {
     label: "Marko",
-    pattern: /marko/i,
+    pattern: /(?<!\.)marko/i,
   },
   {
     label: "NuxtJS",

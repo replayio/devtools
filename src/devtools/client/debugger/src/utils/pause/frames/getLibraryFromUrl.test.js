@@ -34,6 +34,14 @@ describe("getLibraryFromUrl", () => {
     ).toEqual(null);
   });
 
+  test("Marko component should not have the library label", () => {
+    expect(
+      getLibraryFromUrl({
+        source: { url: "https://www.foo.com/componnts/button.marko.js" },
+      })
+    ).toEqual(null);
+  });
+
   describe("When Preact is on the frame", () => {
     it("should return Preact and not React", () => {
       const frame = makeMockFrameWithURL(
