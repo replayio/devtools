@@ -1,11 +1,9 @@
 import {
   RequestInfo,
   RequestEventInfo,
-  TimeStampedPoint,
   responseBodyData,
   RequestId,
   requestBodyData,
-  ExecutionPoint,
 } from "@recordreplay/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -83,46 +81,14 @@ export const networkRequestsLoaded = (): NetworkRequestsLoadedAction => ({
   type: "NETWORK_REQUESTS_LOADED",
 });
 
-function fetchResponseBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return (dispatch, getState, { ThreadFront }) => {
-    const loadedRegions = getLoadedRegions(getState());
-
-    // Bail if the selected request's point has not been loaded yet
-    if (!loadedRegions || !isPointInRegions(loadedRegions.loaded, point)) {
-      return false;
-    }
-
-    ThreadFront.fetchResponseBody(requestId);
+export function hideRequestDetails() {
+  return {
+    type: "HIDE_REQUEST_DETAILS",
   };
 }
 
-function fetchRequestBody(requestId: RequestId, point: ExecutionPoint): UIThunkAction {
-  return (dispatch, getState, { ThreadFront }) => {
-    const loadedRegions = getLoadedRegions(getState());
-
-    // Bail if the selected request's point has not been loaded yet
-    if (!loadedRegions || !isPointInRegions(loadedRegions.loaded, point)) {
-      return;
-    }
-
-    ThreadFront.fetchRequestBody(requestId);
-  };
-}
-
-function fetchFrames(tsPoint: TimeStampedPoint): UIThunkAction {
+export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const pause = ThreadFront.ensurePause(tsPoint.point, tsPoint.time);
-    const frames = (await pause.getFrames())?.filter(Boolean) || [];
-    const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));
-    dispatch({
-      type: "SET_FRAMES",
-      payload: { frames: formattedFrames, point: tsPoint.point },
-    });
-  };
-}
-
-function showRequestDetails(requestId: RequestId): UIThunkAction {
-  return (dispatch, getState) => {
     const state = getState();
     const request = state.network.requests.find(request => request.id === requestId);
     const loadedRegions = getLoadedRegions(state);
@@ -132,38 +98,31 @@ function showRequestDetails(requestId: RequestId): UIThunkAction {
       return;
     }
 
-    dispatch({
-      requestId,
-      type: "SHOW_REQUEST_DETAILS",
-    });
-  };
-}
-
-export function hideRequestDetails() {
-  return {
-    type: "HIDE_REQUEST_DETAILS",
-  };
-}
-
-export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
     const requestSummary = getSummaryById(state, requestId);
-
     if (!requestSummary) {
       console.error(`Could not find summary for request "${requestId}"`);
       return;
     }
 
-    dispatch(fetchFrames(requestSummary.point));
+    const timeStampedPoint = requestSummary.point;
+    const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
+    const frames = (await pause.getFrames())?.filter(Boolean) || [];
+    const formattedFrames = await Promise.all(frames?.map((frame, i) => createFrame(frame, i)));
+    dispatch({
+      type: "SET_FRAMES",
+      payload: { frames: formattedFrames, point: timeStampedPoint.point },
+    });
 
     if (requestSummary.hasResponseBody) {
-      dispatch(fetchResponseBody(requestId, requestSummary.point.point));
+      ThreadFront.fetchResponseBody(requestId);
     }
     if (requestSummary.hasRequestBody) {
-      dispatch(fetchRequestBody(requestId, requestSummary.point.point));
+      ThreadFront.fetchRequestBody(requestId);
     }
 
-    dispatch(showRequestDetails(requestId));
+    dispatch({
+      requestId,
+      type: "SHOW_REQUEST_DETAILS",
+    });
   };
 }
