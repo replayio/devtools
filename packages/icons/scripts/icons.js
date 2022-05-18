@@ -15,7 +15,7 @@ fetchImages({
   fileId: "ASas6u2DMihEEzw8jPT1XC",
   format: "svg",
   onEvent: event => console.log(`${event.type}: ${event.status}`),
-  filter: component => component.pageName === "0.3 Icons",
+  filter: component => component.pageName.toLowerCase().includes("icons"),
 }).then(async svgs => {
   console.log("Building icons...");
 
@@ -34,7 +34,10 @@ fetchImages({
     )
   );
   const jsxSvgs = await Promise.all(optimizedSvgs.map(svg => svgToJsx(svg.data)));
-  const allIconExports = ['import { SVGProps } from "react"']
+  const allIconExports = [
+    'import { SVGProps } from "react"',
+    `export type IconNames = ${svgs.map(svg => `"${svg.name}"`).join(" | ")}`,
+  ]
     .concat(
       svgs.map((svg, index) => {
         const name = `${pascalCase(svg.name)}Icon`;
@@ -52,7 +55,7 @@ fetchImages({
     ...prettierConfig,
   });
 
-  fs.writeFileSync("index.tsx", formattedCodeString);
+  fs.writeFileSync("icons.tsx", formattedCodeString);
 
   console.log("Icons built ✨");
 });

@@ -40,6 +40,6 @@ export function BasicUsage() {
 ### Something not working?
 
 - Check the root `.env` file is correct and you have a valid token.
-- All icons to be exported must be components and should be located in the `Icons 03` page.
-- Check the icon page is named `Icons 03` and has not changed.
+- All icons to be exported must be components and should be located in the `Icons` page.
+- Check the icon page includes the word `Icons` and has not changed.
 - Check Figma's [status page](http://status.figma.com/) to make sure the API is up and running.

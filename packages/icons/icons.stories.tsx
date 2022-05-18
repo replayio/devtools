@@ -1,6 +1,7 @@
 import type { Meta } from "@storybook/react";
-import * as icons from "icons";
 import { useState } from "react";
+
+import * as icons from "./icons";
 
 export default {
   title: "Icons",
