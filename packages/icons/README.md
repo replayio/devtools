@@ -2,9 +2,11 @@
 
 This package contains the icons used in the application. The icons are built using our design system icons located [here](https://www.figma.com/file/ASas6u2DMihEEzw8jPT1XC/Replay-Component-Library?node-id=134%3A2898).
 
-## Development
+## Adding a new icon
 
-Make sure you have a `.env` file at the root of the project that contains a <a href="https://www.figma.com/developers/docs#auth-dev-token">personal access token</a>.
+First, visit the [icons page](https://www.figma.com/file/ASas6u2DMihEEzw8jPT1XC/Replay-Component-Library?node-id=134%3A2898) in Figma and add a new icon.
+
+Next, make sure you have a `.env` file at the root of this project that contains a <a href="https://www.figma.com/developers/docs#auth-dev-token">personal access token</a>.
 
 ```env
 FIGMA_TOKEN=personal-token-here
@@ -23,4 +25,21 @@ Now you can run the script to download and generate the icons:
 npm run build
 ```
 
-This will generate an `index.js` file that can be committed to the project.
+This will generate a `index.ts` file that can be committed to the project alongside any other changes.
+
+To access the generated icons, use the `icons` path:
+
+```tsx
+import { CheckedIcon } from "icons";
+
+export function BasicUsage() {
+  return <CheckedIcon />;
+}
+```
+
+### Something not working?
+
+- Check the root `.env` file is correct and you have a valid token.
+- All icons to be exported must be components and should be located in the `Icons 03` page.
+- Check the icon page is named `Icons 03` and has not changed.
+- Check Figma's [status page](http://status.figma.com/) to make sure the API is up and running.

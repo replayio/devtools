@@ -1,10 +1,11 @@
 const fs = require("fs");
 
-const { transform } = require("@svgr/core");
 const { pascalCase } = require("case-anything");
 const dotenv = require("dotenv");
 const { fetchImages } = require("figma-tools");
 const prettier = require("prettier");
+const svgToJsx = require("svg-to-jsx");
+const { optimize } = require("svgo");
 
 dotenv.config({ path: "../../.env" });
 
@@ -13,45 +14,45 @@ console.log("Fetching icons...");
 fetchImages({
   fileId: "ASas6u2DMihEEzw8jPT1XC",
   format: "svg",
+  onEvent: event => console.log(`${event.type}: ${event.status}`),
   filter: component => component.pageName === "0.3 Icons",
 }).then(async svgs => {
   console.log("Building icons...");
 
-  const allIconExports = (
-    await Promise.all(
-      svgs.map(svg =>
-        transform(
-          svg.buffer.toString(),
+  const optimizedSvgs = await Promise.all(
+    svgs.map(svg =>
+      optimize(svg.buffer.toString(), {
+        plugins: [
           {
-            icon: 20,
-            replaceAttrValues: {
-              black: "currentColor",
-              "#383838": "currentColor",
-              "#38383D": "currentColor",
+            name: "removeAttrs",
+            params: {
+              attrs: "(fill|stroke)",
             },
-            typescript: true,
           },
-          { componentName: pascalCase(svg.name) }
-        )
-      )
+        ],
+      })
     )
-  )
-    /**
-     * SVGR adds 'import * as React from "react"' and default exports for every
-     * component, so we trim the lines and add an explicit named export.
-     */
-    .map(component => `export ${component.split("\n").slice(2, -2).join("\n")}`)
+  );
+  const jsxSvgs = await Promise.all(optimizedSvgs.map(svg => svgToJsx(svg.data)));
+  const allIconExports = ['import { SVGProps } from "react"']
+    .concat(
+      svgs.map((svg, index) => {
+        const name = `${pascalCase(svg.name)}Icon`;
+        const jsx = jsxSvgs[index]
+          /** Spread props for controlling the svg element. */
+          .replace('">\n', '" {...props}>\n');
+
+        return `export const ${name} = (props: SVGProps<SVGSVGElement>) => ${jsx};`;
+      })
+    )
     .join("\n");
-
-  console.log(allIconExports);
-
   const prettierConfig = await prettier.resolveConfig(process.cwd());
   const formattedCodeString = prettier.format(allIconExports, {
     parser: "typescript",
     ...prettierConfig,
   });
 
-  fs.writeFileSync("index.tsx", `import { SVGProps } from "react"\n\n${formattedCodeString}`);
+  fs.writeFileSync("index.tsx", formattedCodeString);
 
   console.log("Icons built ✨");
 });

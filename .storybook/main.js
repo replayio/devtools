@@ -26,6 +26,7 @@ module.exports = {
     config.resolve.alias = {
       ...config.resolve.alias,
       components: require("path").resolve(__dirname, "../packages/components/index.ts"),
+      icons: require("path").resolve(__dirname, "../packages/icons/index.ts"),
     };
 
     config.resolve.modules = [
