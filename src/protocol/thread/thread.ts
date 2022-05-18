@@ -201,15 +201,6 @@ class _ThreadFront {
   private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
   private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
 
-  // Any callback to invoke to adjust the point which we zoom to.
-  warpCallback:
-    | ((
-        point: ExecutionPoint,
-        time: number,
-        hasFrames?: boolean
-      ) => { point: ExecutionPoint; time: number; hasFrames?: boolean } | null)
-    | null = null;
-
   testName: string | undefined;
 
   // added by EventEmitter.decorate(ThreadFront)
@@ -367,17 +358,6 @@ class _ThreadFront {
 
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
     log(`TimeWarp ${point}`);
-
-    // The warp callback is used to change the locations where the thread is
-    // warping to.
-    if (this.warpCallback && !force) {
-      const newTarget = this.warpCallback(point, time, hasFrames);
-      if (newTarget) {
-        point = newTarget.point;
-        time = newTarget.time;
-        hasFrames = newTarget.hasFrames;
-      }
-    }
 
     this.currentPoint = point;
     this.currentTime = time;

@@ -34,15 +34,12 @@ type RequestSummaryChunk = {
   startedAt: number;
 };
 
-type ChunkReducer = {
-  chunks: RequestSummaryChunk[];
-  current: RequestSummaryChunk;
-};
-
+// Group requests by common properties, if they are the same method, the same
+// status, and next to each other, then we push them into a `chunk` together
 const chunkedRequests = (requests: RequestSummary[]): RequestSummaryChunk[] => {
   return requests.reduce(
-    (acc: ChunkReducer, request: RequestSummary) => {
-      const { current } = acc;
+    (acc: RequestSummaryChunk[], request: RequestSummary) => {
+      const current = acc[acc.length - 1];
       if (
         current.method === fullMethod(request) &&
         current.pending === request.pending &&
@@ -51,21 +48,19 @@ const chunkedRequests = (requests: RequestSummary[]): RequestSummaryChunk[] => {
         current.count++;
         current.ids.push(request.id);
       } else {
-        acc.chunks.push(current);
-        acc.current = {
+        acc.push({
           count: 1,
           ids: [request.id],
           errored: request.errored,
           method: fullMethod(request),
           pending: request.pending,
           startedAt: request.recordedAt,
-        };
+        });
       }
       return acc;
     },
-    {
-      chunks: [],
-      current: {
+    [
+      {
         count: 0,
         ids: [],
         method: "",
@@ -73,8 +68,8 @@ const chunkedRequests = (requests: RequestSummary[]): RequestSummaryChunk[] => {
         errored: false,
         startedAt: 0,
       },
-    }
-  ).chunks;
+    ]
+  );
 };
 
 const JSONViewer = ({ src }: { src: object }) => {

@@ -10,6 +10,7 @@ import {
   precacheScreenshots,
   snapTimeForPlayback,
   Video,
+  timeIsBeyondKnownPaints,
 } from "protocol/graphics";
 import { client, log, sendMessage } from "protocol/socket";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -56,7 +57,6 @@ export async function setupTimeline(store: UIStore, ThreadFront: typeof ThreadFr
   const dispatch = store.dispatch;
 
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
-  ThreadFront.warpCallback = onWarp(store);
 
   const shortcuts = new KeyShortcuts({
     Left: ev => {
@@ -133,27 +133,6 @@ async function getInitialPausePoint(recordingId: string) {
   }
 }
 
-function onWarp(store: UIStore) {
-  return function (point: ExecutionPoint, time: number) {
-    const { startTime, endTime } = getZoomRegion(store.getState());
-    if (time < startTime) {
-      const startEvent = mostRecentPaintOrMouseEvent(startTime);
-      if (startEvent) {
-        return { point: startEvent.point, time: startTime };
-      }
-    }
-
-    if (time > endTime) {
-      const endEvent = mostRecentPaintOrMouseEvent(endTime);
-      if (endEvent) {
-        return { point: endEvent.point, time: endTime };
-      }
-    }
-
-    return null;
-  };
-}
-
 function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
   return async dispatch => {
     updatePausePointParams({ point, time, hasFrames });
@@ -178,11 +157,12 @@ function setRecordingDescription(duration: number): UIThunkAction {
 export function setTimelineToTime(time: number | null, updateGraphics = true): UIThunkAction {
   return async (dispatch, getState) => {
     dispatch(setTimelineState({ hoverTime: time }));
-    const stateBeforeScreenshot = getState();
 
     if (!updateGraphics) {
       return;
     }
+
+    const stateBeforeScreenshot = getState();
 
     try {
       const currentTime = getCurrentTime(stateBeforeScreenshot);
@@ -240,29 +220,35 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return dispatch => {
+  return async (dispatch, _getState, { ThreadFront }) => {
     if (targetTime == null) {
       return;
     }
 
-    const event = mostRecentPaintOrMouseEvent(targetTime);
+    const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
+    const pointNearTime =
+      // @ts-ignore
+      (await sendMessage("Session.getPointNearTime", { time: targetTime }, ThreadFront.sessionId!)) // @ts-ignore
+        .point;
 
-    if (event) {
-      // Seek to the exact time provided, even if it does not match up with a
-      // paint event. This can cause some slight UI weirdness: resumes done in
-      // the debugger will be relative to the point instead of the time,
-      // so e.g. running forward could land at a point before the time itself.
-      // This could be fixed but doesn't seem worth worrying about for now.
-      dispatch(seek(event.point, targetTime, false));
+    if (Math.abs(pointNearTime.time - targetTime) > Math.abs(nearestEvent.time - targetTime)) {
+      dispatch(seek(nearestEvent.point, targetTime, false));
+    } else {
+      // I would prefer that we also use pointNearTime.time here, for accuracy,
+      // but it would be super annoying when it is off. Maybe when we have a
+      // more exact method.
+      dispatch(seek(pointNearTime.point, targetTime, false));
     }
   };
 }
 
 export function togglePlayback(): UIThunkAction {
   return (dispatch, getState) => {
-    const playback = getPlayback(getState());
+    const state = getState();
+    const playback = getPlayback(state);
+    const currentTime = getCurrentTime(state);
 
-    if (playback) {
+    if (playback || timeIsBeyondKnownPaints(currentTime)) {
       dispatch(stopPlayback());
     } else {
       dispatch(startPlayback());
@@ -276,6 +262,11 @@ export function startPlayback(): UIThunkAction {
 
     const state = getState();
     const currentTime = getCurrentTime(state);
+
+    if (timeIsBeyondKnownPaints(currentTime)) {
+      return;
+    }
+
     const focusRegion = getFocusRegion(state);
     const { endTime } = focusRegion ? focusRegion : getZoomRegion(state);
 
