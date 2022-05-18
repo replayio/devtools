@@ -30,10 +30,10 @@ This will generate a `index.ts` file that can be committed to the project alongs
 To access the generated icons, use the `icons` path:
 
 ```tsx
-import { CheckedIcon } from "icons";
+import { Icon } from "components";
 
 export function BasicUsage() {
-  return <CheckedIcon />;
+  return <Icon name="checked" />;
 }
 ```
 

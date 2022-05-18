@@ -25,18 +25,18 @@ fetchImages({
         plugins: [
           {
             name: "removeAttrs",
-            params: {
-              attrs: "(fill|stroke)",
-            },
+            params: { attrs: "(fill|stroke)" },
           },
         ],
       })
     )
   );
   const jsxSvgs = await Promise.all(optimizedSvgs.map(svg => svgToJsx(svg.data)));
+  const iconMap = Object.fromEntries(svgs.map(svg => [svg.name, `${pascalCase(svg.name)}Icon`]));
   const allIconExports = [
     'import { SVGProps } from "react"',
-    `export type IconNames = ${svgs.map(svg => `"${svg.name}"`).join(" | ")}`,
+    `export const iconMap = ${JSON.stringify(iconMap)} as const`,
+    `export type IconNames = keyof typeof iconMap`,
   ]
     .concat(
       svgs.map((svg, index) => {
@@ -48,14 +48,14 @@ fetchImages({
         return `export const ${name} = (props: SVGProps<SVGSVGElement>) => ${jsx};`;
       })
     )
-    .join("\n");
+    .join("\n\n");
   const prettierConfig = await prettier.resolveConfig(process.cwd());
   const formattedCodeString = prettier.format(allIconExports, {
     parser: "typescript",
     ...prettierConfig,
   });
 
-  fs.writeFileSync("icons.tsx", formattedCodeString);
+  fs.writeFileSync("index.tsx", formattedCodeString);
 
   console.log("Icons built ✨");
 });

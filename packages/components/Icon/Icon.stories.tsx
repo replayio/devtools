@@ -1,10 +1,13 @@
 import type { Meta } from "@storybook/react";
+import { Icon } from "components";
+import type { IconNames } from "icons";
+import { iconMap } from "icons";
+import * as icons from "icons";
 import { useState } from "react";
-
-import * as icons from "./icons";
 
 export default {
   title: "Icons",
+  component: Icon,
 } as Meta;
 
 export function BasicUsage() {
@@ -23,17 +26,17 @@ export function BasicUsage() {
           gridTemplateColumns: "repeat(auto-fit, 10rem)",
         }}
       >
-        {Object.entries(icons)
-          .filter(([name]) => name.toLowerCase().includes(filterValue.toLowerCase()))
-          .map(([name, IconElement]) => (
-            <Icon key={name} name={name} icon={<IconElement />} />
+        {(Object.keys(iconMap) as IconNames[])
+          .filter(name => name.toLowerCase().includes(filterValue.toLowerCase()))
+          .map(name => (
+            <IconSpecimen key={name} name={name} />
           ))}
       </div>
     </div>
   );
 }
 
-function Icon({ name, icon }: { name: string; icon: React.ReactElement<any> }) {
+function IconSpecimen({ name }: { name: IconNames }) {
   const [copied, setCopied] = useState(false);
   return (
     <div
@@ -41,7 +44,7 @@ function Icon({ name, icon }: { name: string; icon: React.ReactElement<any> }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        padding: "2rem",
+        padding: "2rem 0",
         gap: "1rem",
         cursor: "pointer",
         userSelect: "none",
@@ -49,14 +52,14 @@ function Icon({ name, icon }: { name: string; icon: React.ReactElement<any> }) {
         transition: "background-color ease-out 120ms",
       }}
       onClick={() => {
-        navigator.clipboard.writeText(name).then(() => {});
+        navigator.clipboard.writeText(`<Icon name="${name}" />`).then(() => {});
         setCopied(true);
         setTimeout(() => {
           setCopied(false);
         }, 300);
       }}
     >
-      {icon}
+      <Icon name={name} />
       <span
         style={{ fontSize: "0.85rem", color: copied ? "black" : "var(--theme-text-color-alt)" }}
       >
