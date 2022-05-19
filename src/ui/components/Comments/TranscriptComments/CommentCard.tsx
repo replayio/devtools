@@ -273,8 +273,8 @@ function CommentCard({
   return (
     <div
       className={classNames(
-        `comment-card relative mx-auto w-full cursor-pointer border-b border-splitter transition`,
-        isOutsideFocusedRegion ? "opacity-30" : "bg-bodyBgcolor",
+        `comment-card relative mx-auto w-full border-b border-splitter transition`,
+        isOutsideFocusedRegion ? "opacity-30" : "cursor-pointer bg-bodyBgcolor",
         isUpdating ? "bg-themeBase-90" : ""
       )}
       onMouseDown={e => {
