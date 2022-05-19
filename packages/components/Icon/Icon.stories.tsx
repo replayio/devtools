@@ -2,7 +2,6 @@ import type { Meta } from "@storybook/react";
 import { Icon } from "components";
 import type { IconNames } from "icons";
 import { iconMap } from "icons";
-import * as icons from "icons";
 import { useState } from "react";
 
 export default {

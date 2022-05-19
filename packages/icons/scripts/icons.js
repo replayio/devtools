@@ -1,6 +1,7 @@
 const fs = require("fs");
+const path = require("path");
 
-const { pascalCase } = require("case-anything");
+const { kebabCase, pascalCase } = require("case-anything");
 const dotenv = require("dotenv");
 const { fetchImages } = require("figma-tools");
 const prettier = require("prettier");
@@ -9,19 +10,58 @@ const { optimize } = require("svgo");
 
 dotenv.config({ path: "../../.env" });
 
-console.log("Fetching icons...");
+async function fetch() {
+  console.log("Fetching icons...");
 
-fetchImages({
-  fileId: "ASas6u2DMihEEzw8jPT1XC",
-  format: "svg",
-  onEvent: event => console.log(`${event.type}: ${event.status}`),
-  filter: component => component.pageName.toLowerCase().includes("icons"),
-}).then(async svgs => {
-  console.log("Building icons...");
+  const svgs = await fetchImages({
+    fileId: "ASas6u2DMihEEzw8jPT1XC",
+    format: "svg",
+    onEvent: event => console.log(`${event.type}: ${event.status}`),
+    filter: component => component.pageName.toLowerCase().includes("icons"),
+  });
+
+  console.log("Saving svgs...");
+
+  if (!fs.existsSync("svgs")) {
+    fs.mkdirSync("svgs");
+  }
+
+  svgs.forEach(svg => {
+    fs.writeFileSync(path.resolve(`svgs/${kebabCase(svg.name)}.svg`), svg.buffer);
+  });
+
+  console.log("Icon svgs saved ✨");
+
+  return svgs.map(svg => ({
+    name: svg.name,
+    contents: svg.buffer.toString(),
+  }));
+}
+
+async function start() {
+  let svgs;
+
+  /**
+   * This flag is used in case the Figma API is down and we instead need to export
+   * from Figma directly into the svgs directory.
+   */
+  if (process.argv.slice(2).includes("--fetch")) {
+    svgs = await fetch();
+  } else {
+    const svgPaths = fs.readdirSync("svgs");
+    const svgContents = svgPaths.map(svgPath => fs.readFileSync(`svgs/${svgPath}`, "utf-8"));
+
+    svgs = svgPaths.map((svgPath, index) => ({
+      name: svgPath.replace(".svg", ""),
+      contents: svgContents[index],
+    }));
+  }
+
+  console.log("Building icon components...");
 
   const optimizedSvgs = await Promise.all(
     svgs.map(svg =>
-      optimize(svg.buffer.toString(), {
+      optimize(svg.contents, {
         plugins: [
           {
             name: "removeAttrs",
@@ -32,7 +72,9 @@ fetchImages({
     )
   );
   const jsxSvgs = await Promise.all(optimizedSvgs.map(svg => svgToJsx(svg.data)));
-  const iconMap = Object.fromEntries(svgs.map(svg => [svg.name, `${pascalCase(svg.name)}Icon`]));
+  const iconMap = Object.fromEntries(
+    svgs.map(svg => [kebabCase(svg.name), `${pascalCase(svg.name)}Icon`])
+  );
   const allIconExports = [
     'import { SVGProps } from "react"',
     `export const iconMap = ${JSON.stringify(iconMap)} as const`,
@@ -57,5 +99,7 @@ fetchImages({
 
   fs.writeFileSync("index.tsx", formattedCodeString);
 
-  console.log("Icons built ✨");
-});
+  console.log("Icon components built ✨");
+}
+
+start();
