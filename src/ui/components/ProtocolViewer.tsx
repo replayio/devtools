@@ -39,39 +39,30 @@ type RequestSummaryChunk = {
 // Group requests by common properties, if they are the same method, the same
 // status, and next to each other, then we push them into a `chunk` together
 const chunkedRequests = (requests: RequestSummary[]): RequestSummaryChunk[] => {
-  return requests.reduce(
-    (acc: RequestSummaryChunk[], request: RequestSummary) => {
-      const current = acc[acc.length - 1];
-      if (
-        current.method === fullMethod(request) &&
-        current.pending === request.pending &&
-        current.errored === request.errored
-      ) {
-        current.count++;
-        current.ids.push(request.id);
-      } else {
-        acc.push({
-          count: 1,
-          ids: [request.id],
-          errored: request.errored,
-          method: fullMethod(request),
-          pending: request.pending,
-          startedAt: request.recordedAt,
-        });
-      }
-      return acc;
-    },
-    [
-      {
-        count: 0,
-        ids: [],
-        method: "",
-        pending: false,
-        errored: false,
-        startedAt: 0,
-      },
-    ]
-  );
+  return requests.reduce((accumulated: RequestSummaryChunk[], request: RequestSummary) => {
+    const current = accumulated[accumulated.length - 1];
+
+    if (
+      current == null ||
+      current.method !== fullMethod(request) ||
+      current.pending !== request.pending ||
+      current.errored !== request.errored
+    ) {
+      accumulated.push({
+        count: 1,
+        ids: [request.id],
+        errored: request.errored,
+        method: fullMethod(request),
+        pending: request.pending,
+        startedAt: request.recordedAt,
+      });
+    } else {
+      current.count++;
+      current.ids.push(request.id);
+    }
+
+    return accumulated;
+  }, []);
 };
 
 const JSONViewer = ({ src }: { src: object }) => {
@@ -186,10 +177,6 @@ function ProtocolChunk({
 
     prevIsSelectedRef.current = isSelected;
   }, [isSelected]);
-
-  if (chunk.method === "") {
-    return null;
-  }
 
   let className = styles.Chunk;
   if (isSelected) {
