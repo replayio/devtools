@@ -43,7 +43,12 @@ import {
   setCanvas as setCanvasAction,
 } from "../reducers/app";
 import { FocusRegion } from "ui/state/timeline";
-import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
+import {
+  clearMessages,
+  messagesAdded,
+  messagesLoaded,
+} from "devtools/client/webconsole/reducers/messages";
+import { messagesAdd } from "devtools/client/webconsole/actions/messages";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -116,7 +121,9 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
       endPoint = pointNearEnd.point.point;
     }
 
-    await sendMessage(
+    // TODO [bvaughn] Store overflow somewhere too (for soft focus)
+    // @ts-ignore TypeScript doesn't (yet) know about this return value.
+    const { messages, overflow } = await sendMessage(
       "Console.findMessagesInRange",
       {
         range: { begin: beginPoint, end: endPoint },
@@ -124,6 +131,7 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
       ThreadFront.sessionId!
     );
 
+    dispatch(messagesAdd(messages));
     dispatch(messagesLoaded());
   };
 };
