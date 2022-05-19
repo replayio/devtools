@@ -56,6 +56,7 @@ import {
   endOperation,
   clearDocuments,
 } from "../../utils/editor";
+import { LineHitCounts } from "./LineHitCounts";
 
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
@@ -456,6 +457,7 @@ class Editor extends PureComponent {
           />
         }
         <ColumnBreakpoints editor={editor} />
+        <LineHitCounts cm={editor} />
       </div>
     );
   }
@@ -477,6 +479,7 @@ class Editor extends PureComponent {
       <div
         className={classnames("editor-wrapper", {
           blackboxed: selectedSource && selectedSource.isBlackBoxed,
+          showLineHits: true,
         })}
         ref={c => (this.$editorWrapper = c)}
       >

@@ -1,7 +1,7 @@
+import classNames from "classnames";
 import React from "react";
 import ReactDOM from "react-dom";
 import { useFeature } from "ui/hooks/settings";
-import classNames from "classnames";
 
 type StaticTooltipProps = {
   targetNode: HTMLElement;
@@ -15,7 +15,7 @@ export default function StaticTooltip({ targetNode, children }: StaticTooltipPro
   return ReactDOM.createPortal(
     <div
       className={classNames(
-        "absolute z-50 flex flex-row space-x-px transform -right-1 translate-x-full bottom-4 mb-0.5 pointer-events-none",
+        "pointer-events-none absolute -right-1 bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px",
         enableLargeText && "bottom-6"
       )}
     >
