@@ -42,6 +42,10 @@ export default function FocusModePopout() {
 
   // Keyboard shortcuts handler.
   useEffect(() => {
+    if (!showFocusModeControls) {
+      return;
+    }
+
     const onDocumentKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
         case "Enter": {
@@ -54,6 +58,7 @@ export default function FocusModePopout() {
         }
       }
     };
+
     document.addEventListener("keydown", onDocumentKeyDown);
     return () => {
       document.removeEventListener("keydown", onDocumentKeyDown);
