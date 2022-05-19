@@ -10,7 +10,45 @@
   font-size: 1rem;
   line-height: 1rem;
   flex: 0 0 auto;
+  padding: 1rem 1rem 0.5rem;
+}
+
+.SubHeader {
+  font-size: 1rem;
+  line-height: 1rem;
+  flex: 0 0 auto;
   padding: 1rem;
+}
+
+.HeaderControls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 1rem 0.5rem;
+  margin: 0 0 0.5rem;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.FilterInput {
+  background: var(--console-input-background);
+  padding: 0.25rem 0.5rem;
+  flex: 1 0 auto;
+}
+
+.ClearButton {
+  border-radius: 4px;
+  margin-left: 0.5rem;
+}
+.ClearButton:not(.ClearButton:disabled):hover {
+  background-color: var(--toolbarbutton-focus-bgcolor);
+}
+
+.ClearIcon {
+  background-color: var(--icon-color);
+}
+
+.ClearIconDisabled {
+  background-color: var(--theme-text-field-bgcolor);
 }
 
 .Panel {
