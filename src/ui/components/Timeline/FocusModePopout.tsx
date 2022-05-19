@@ -40,11 +40,18 @@ export default function FocusModePopout() {
     hideModal();
   };
 
-  // Dismiss modal if the "Escape" key is pressed.
+  // Keyboard shortcuts handler.
   useEffect(() => {
     const onDocumentKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        discardPendingChanges(true);
+      switch (event.key) {
+        case "Enter": {
+          savePendingChanges();
+          break;
+        }
+        case "Escape": {
+          discardPendingChanges(true);
+          break;
+        }
       }
     };
     document.addEventListener("keydown", onDocumentKeyDown);
