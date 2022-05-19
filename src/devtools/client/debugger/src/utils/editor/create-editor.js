@@ -29,7 +29,7 @@ export function getCodeMirror() {
 
 export function createEditor() {
   assert(SourceEditor, "CodeMirror must have been loaded");
-  const gutters = ["breakpoints", "hit-markers", "CodeMirror-linenumbers"];
+  const gutters = ["breakpoints", "CodeMirror-linenumbers", "hit-markers"];
 
   return new SourceEditor({
     mode: "javascript",

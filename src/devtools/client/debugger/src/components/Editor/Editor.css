@@ -222,3 +222,8 @@ separately stack the pause line visuals and the code. */
 .visible {
   visibility: visible;
 }
+
+.editor-wrapper.showLineHits .CodeMirror-gutters .hit-markers {
+  /*min-width: 30px;*/
+  width: 30px;
+}

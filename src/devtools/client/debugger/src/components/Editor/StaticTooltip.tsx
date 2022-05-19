@@ -9,7 +9,10 @@ type StaticTooltipProps = {
 
 export default function StaticTooltip({ targetNode, children }: StaticTooltipProps) {
   return ReactDOM.createPortal(
-    <div className="absolute z-50 flex flex-row space-x-px transform -right-1 translate-x-full bottom-4 mb-0.5 pointer-events-none">
+    <div
+      className="pointer-events-none absolute -right-1 bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px"
+      style={{ zIndex: 1500 }}
+    >
       {children}
     </div>,
     targetNode
