@@ -1,0 +1,51 @@
+.Container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+.Header {
+  font-size: 1rem;
+  line-height: 1rem;
+  flex: 0 0 auto;
+  padding: 1rem;
+}
+
+.Panel {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 0 1rem;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.Chunk,
+.ChunkSelected,
+.ChunkErrored,
+.ChunkPending {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.25rem;
+}
+.Chunk {
+  cursor: pointer;
+}
+.ChunkSelected {
+  background-color: var(--theme-selection-background);
+  color: var(--theme-selection-color);
+}
+.ChunkPending {
+  color: var(--light-grey);
+}
+.ChunkErrored {
+  cursor: pointer;
+  color: var(--console-error-color);
+}
+
+.Details {
+  height: 75%;
+  overflow: auto;
+  border-top: 1px solid var(--theme-border);
+}

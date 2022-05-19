@@ -12,6 +12,8 @@ import {
   RequestSummary,
 } from "ui/reducers/protocolMessages";
 
+import styles from "./ProtocolViewer.module.css";
+
 const ReactJson = dynamic(() => import("react-json-view"), {
   ssr: false,
 });
@@ -97,22 +99,28 @@ const ProtocolRequestDetail = ({
   error: (CommandResponse & Recorded) | undefined;
 }) => {
   return (
-    <div>
-      Request
-      <JSONViewer src={request} />
+    <>
+      <h3 className={styles.Header}>Request</h3>
+      <div className={styles.Panel}>
+        <JSONViewer src={request} />
+      </div>
       {response && (
         <>
-          Response
-          <JSONViewer src={response} />
+          <h3 className={styles.Header}>Response</h3>
+          <div className={styles.Panel}>
+            <JSONViewer src={response} />
+          </div>
         </>
       )}
       {error && (
         <>
-          Error
-          <JSONViewer src={error} />
+          <h3 className={styles.Header}>Error</h3>
+          <div className={styles.Panel}>
+            <JSONViewer src={error} />
+          </div>
         </>
       )}
-    </div>
+    </>
   );
 };
 
@@ -123,38 +131,54 @@ const ProtocolViewer = () => {
   const selectedRequestDetails = useSelector(getFullRequestDetails(selectedRequests));
 
   return (
-    <div className="max-h-full overflow-y-scroll p-4">
-      {selectedRequestDetails.map(({ request, response, error }) => {
-        return (
-          <ProtocolRequestDetail
-            key={request!.id}
-            request={request!}
-            response={response}
-            error={error}
-          />
-        );
-      })}
-      <h3 className="text-lg">Protocol Info</h3>
-      {chunks.map(chunk => {
-        return (
-          <div
-            key={`${chunk.method}:${chunk.startedAt}`}
-            className={classNames("flex justify-between p-1", {
-              "text-lightGrey": chunk.pending,
-              "text-errorColor": chunk.errored,
-            })}
-            onClick={() => {
-              setSelectedRequests(chunk.ids);
-            }}
-          >
-            <span>
-              {chunk.method}
-              {chunk.count > 1 ? `(${chunk.count})` : null}
-            </span>
-            <span>{msAsMinutes(chunk.startedAt)}</span>
-          </div>
-        );
-      })}
+    <div className={styles.Container}>
+      <h3 className={styles.Header}>Protocol Info</h3>
+      <div className={styles.Panel}>
+        {chunks.map(chunk => {
+          if (chunk.method === "") {
+            return null;
+          }
+
+          let className = styles.Chunk;
+          if (selectedRequests.join(",") === chunk.ids.join(",")) {
+            className = styles.ChunkSelected;
+          } else if (chunk.pending) {
+            className = styles.ChunkPending;
+          } else if (chunk.errored) {
+            className = styles.ChunkErrored;
+          }
+
+          return (
+            <div
+              key={`${chunk.method}:${chunk.startedAt}`}
+              className={className}
+              onClick={() => {
+                setSelectedRequests(chunk.ids);
+              }}
+            >
+              <span>
+                {chunk.method}
+                {chunk.count > 1 ? `(${chunk.count})` : null}
+              </span>
+              <span>{msAsMinutes(chunk.startedAt)}</span>
+            </div>
+          );
+        })}
+      </div>
+      {selectedRequestDetails.length > 0 && (
+        <div className={styles.Details}>
+          {selectedRequestDetails.map(({ request, response, error }) => {
+            return (
+              <ProtocolRequestDetail
+                key={request!.id}
+                request={request!}
+                response={response}
+                error={error}
+              />
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };
