@@ -36,7 +36,10 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
     return comments[index];
   }
 
-  onClick = () => {
+  onClick = (e: React.MouseEvent) => {
+    // This should not count as a click on the timeline, which would seek to a
+    // particular time.
+    e.stopPropagation();
     const { comment, seekToComment } = this.props;
     trackEvent("timeline.comment_select");
     seekToComment(comment);
