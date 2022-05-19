@@ -5,7 +5,7 @@ import { iconMap } from "icons";
 import { useState } from "react";
 
 export default {
-  title: "Icons",
+  title: "Components/Icon",
   component: Icon,
 } as Meta;
 
