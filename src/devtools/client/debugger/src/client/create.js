@@ -30,7 +30,12 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     };
   }
 
-  const displayName = frame.functionName || `(${frame.type})`;
+  let originalFunctionName;
+  const scopes = await ThreadFront.getScopes(asyncIndex, frame.frameId);
+  if (!scopes.originalScopesUnavailable) {
+    originalFunctionName = scopes.scopes.find(scope => scope.functionName)?.functionName;
+  }
+  const displayName = originalFunctionName || frame.functionName || `(${frame.type})`;
 
   return {
     id: `${asyncIndex}:${index}`,
