@@ -1,13 +1,21 @@
 import { filter, padStart } from "lodash";
 import dynamic from "next/dynamic";
 import { CommandResponse } from "protocol/socket";
-import React, { MutableRefObject, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, {
+  MutableRefObject,
+  useDeferredValue,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useSelector } from "react-redux";
 import Icon from "ui/components/shared/Icon";
 import { getTheme } from "ui/reducers/app";
 import {
   getFullRequestDetails,
-  getProtocolRequests,
+  getProtocolRequestsMap,
+  getProtocolResponseMap,
   Recorded,
   RequestSummary,
 } from "ui/reducers/protocolMessages";
@@ -36,35 +44,38 @@ type RequestSummaryChunk = {
   startedAt: number;
 };
 
-// Group requests by common properties, if they are the same method, the same
-// status, and next to each other, then we push them into a `chunk` together
-const chunkedRequests = (requests: RequestSummary[]): RequestSummaryChunk[] => {
-  return requests.reduce((accumulated: RequestSummaryChunk[], request: RequestSummary) => {
-    const current = accumulated[accumulated.length - 1];
+// Collapses consecutive requests with the same method name and shows the count.
+const flattenRequests = (
+  requestMap: { [key: number]: RequestSummary },
+  responseMap: { [key: number]: CommandResponse & Recorded }
+): RequestSummaryChunk[] => {
+  const flattened: RequestSummaryChunk[] = [];
+  let current: RequestSummaryChunk | null = null;
 
-    // TODO [bvaughn] Equality check is ID based not method.
-    // TODO [bvaughn] Store start and stop time on Mpa in iD.
-    if (
-      current == null ||
-      current.method !== fullMethod(request) ||
-      current.pending !== request.pending ||
-      current.errored !== request.errored
-    ) {
-      accumulated.push({
+  for (let id in requestMap) {
+    const request = requestMap[id];
+    const response = responseMap[id];
+
+    if (current == null || current.method !== fullMethod(request)) {
+      current = {
         count: 1,
         ids: [request.id],
         errored: request.errored,
         method: fullMethod(request),
         pending: request.pending,
         startedAt: request.recordedAt,
-      });
+      };
+
+      flattened.push(current);
     } else {
       current.count++;
+      current.errored ||= request.errored;
+      current.pending ||= request.pending;
       current.ids.push(request.id);
     }
+  }
 
-    return accumulated;
-  }, []);
+  return flattened;
 };
 
 const JSONViewer = ({ src }: { src: object }) => {
@@ -117,26 +128,38 @@ const ProtocolRequestDetail = ({
   );
 };
 
+interface RequestTimings {
+  startTime: number;
+  stopTime: number;
+}
+
 const ProtocolViewer = () => {
+  const requestIdToTimingMap: Map<number, RequestTimings> = useMemo(() => new Map(), []);
+
   const [clearBeforeIndex, setClearBeforeIndex] = useState(0);
   const [filterText, setFilterText] = useState("");
+  const deferredFilterText = useDeferredValue(filterText);
 
-  const requests = useSelector(getProtocolRequests);
+  const requestsMap = useSelector(getProtocolRequestsMap);
+  const responseMap = useSelector(getProtocolResponseMap);
 
-  const chunks = useMemo(() => chunkedRequests(requests), [requests]);
+  const chunks = useMemo(
+    () => flattenRequests(requestsMap, responseMap),
+    [requestsMap, responseMap]
+  );
   const filteredChunks = useMemo(
     () =>
       chunks.slice(clearBeforeIndex).filter(chunk => {
-        return chunk.method.includes(filterText);
+        return chunk.method.includes(deferredFilterText);
       }),
-    [chunks, clearBeforeIndex, filterText]
+    [chunks, clearBeforeIndex, deferredFilterText]
   );
 
   const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
   const selectedRequestDetails = useSelector(getFullRequestDetails(selectedChunk?.ids ?? []));
 
   const onFilterTextInputChange = (event: React.ChangeEvent) => {
-    setFilterText(event.currentTarget.value);
+    setFilterText((event.currentTarget as HTMLInputElement).value);
   };
 
   const onClearButtonClick = () => {
@@ -230,10 +253,10 @@ function ProtocolChunk({
   let className = styles.Chunk;
   if (isSelected) {
     className = styles.ChunkSelected;
-  } else if (chunk.pending) {
-    className = styles.ChunkPending;
   } else if (chunk.errored) {
     className = styles.ChunkErrored;
+  } else if (chunk.pending) {
+    className = styles.ChunkPending;
   }
 
   return (

@@ -10,21 +10,21 @@
   font-size: 1rem;
   line-height: 1rem;
   flex: 0 0 auto;
-  padding: 1rem 1rem 0.5rem;
+  padding: 0.5rem;
 }
 
 .SubHeader {
   font-size: 1rem;
   line-height: 1rem;
   flex: 0 0 auto;
-  padding: 1rem;
+  padding: 0.5rem;
 }
 
 .HeaderControls {
   display: flex;
   flex-direction: row;
   align-items: center;
-  padding: 0 1rem 0.5rem;
+  padding: 0 0.5rem 0.5rem;
   margin: 0 0 0.5rem;
   border-bottom: 1px solid var(--theme-border);
 }
@@ -54,7 +54,7 @@
 .Panel {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 0 1rem;
+  padding: 0 0.5rem;
   overflow-x: hidden;
   overflow-y: auto;
 }

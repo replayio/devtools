@@ -20,16 +20,16 @@ export type RequestSummary = Omit<CommandRequest, "method"> & {
 
 export interface ProtocolMessagesState {
   events: (ProtocolEvent & Recorded)[];
-  requests: RequestSummary[];
-  responses: (CommandResponse & Recorded)[];
+  idToResponseMap: {[key: number]: CommandResponse & Recorded};
+  idToRequestMap: {[key: number]: RequestSummary};
   errors: (CommandResponse & Recorded)[];
 }
 
 const protocolMessagesSlice = createSlice({
   initialState: {
     events: [],
-    requests: [],
-    responses: [],
+    idToResponseMap: {},
+    idToRequestMap: {},
     errors: [],
   } as ProtocolMessagesState,
   name: "protocolMessages",
@@ -38,15 +38,18 @@ const protocolMessagesSlice = createSlice({
       state.events.push(cloneDeep(action.payload));
     },
     responseReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
-      state.responses.push(cloneDeep(action.payload));
-      const request = state.requests.find(r => r.id === action.payload.id);
+      const clonedResponse = cloneDeep(action.payload);
+
+      state.idToResponseMap[clonedResponse.id] = clonedResponse;
+
+      const request = state.idToRequestMap[action.payload.id];
       if (request) {
         request.pending = false;
       }
     },
     errorReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
       state.errors.push(action.payload);
-      const request = state.requests.find(r => r.id === action.payload.id);
+      const request = state.idToRequestMap[action.payload.id];
       if (request) {
         request.pending = false;
         request.errored = true;
@@ -54,13 +57,16 @@ const protocolMessagesSlice = createSlice({
     },
     requestSent(state, action: PayloadAction<CommandRequest & Recorded>) {
       const [requestClass, requestMethod] = action.payload.method.split(".");
-      state.requests.push({
+
+      const clonedRequest = {
         ...action.payload,
         class: requestClass,
         method: requestMethod,
-        pending: !state.responses.some(r => r.id === action.payload.id),
+        pending: !state.idToResponseMap[action.payload.id],
         errored: state.errors.some(r => r.id === action.payload.id),
-      });
+      };
+
+      state.idToRequestMap[clonedRequest.id] = clonedRequest;
     },
   },
 });
@@ -71,12 +77,12 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 export default protocolMessagesSlice.reducer;
 
 export const getProtocolEvents = (state: UIState) => state.protocolMessages.events;
-export const getProtocolRequests = (state: UIState) => state.protocolMessages.requests;
-export const getProtocolResponses = (state: UIState) => state.protocolMessages.responses;
+export const getProtocolRequestsMap = (state: UIState) => state.protocolMessages.idToRequestMap;
+export const getProtocolResponseMap = (state: UIState) => state.protocolMessages.idToResponseMap;
 export const getProtocolRequest = (requestId: number | undefined) => (state: UIState) =>
-  requestId ? state.protocolMessages.requests.find(r => r.id === requestId) : undefined;
+  requestId ? state.protocolMessages.idToRequestMap[requestId] : undefined;
 export const getProtocolResponse = (requestId: number | undefined) => (state: UIState) =>
-  requestId ? state.protocolMessages.responses.find(r => r.id === requestId) : undefined;
+  requestId ? state.protocolMessages.idToResponseMap[requestId] : undefined;
 export const getProtocolError = (requestId: number | undefined) => (state: UIState) =>
   requestId ? state.protocolMessages.errors.find(r => r.id === requestId) : undefined;
 export const getFullRequestDetails = (requestIds: number[]) => (state: UIState) =>
