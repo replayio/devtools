@@ -4,8 +4,5 @@
   "private": true,
   "scripts": {
     "dev": "next dev"
-  },
-  "dependencies": {
-    "next": "^12.1.0"
   }
 }
