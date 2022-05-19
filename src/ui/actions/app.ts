@@ -57,6 +57,8 @@ function now(): number {
 
 export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
+    const { endTime, startTime } = focusRegion;
+
     // Technically, we only need to do this in *some* circumstances.
     // I think the cases where we need to are:
     // - We are enlarging or moving the focus zone beyond what we have most recently loaded.
@@ -80,36 +82,49 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
     // without refetching*.
     // BTW - we don't have to figure out *all* of this right now :)
     dispatch(clearMessages());
-    const endpoint = (await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!)).endpoint;
-    const beginning = (
-      await sendMessage(
+
+    // TODO [bvaughn] This value is probably pretty lightweight _but_ we could cache it for the whole session.
+    const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
+
+    let beginPoint: string | null = null;
+    let endPoint: string | null = null;
+
+    if (sessionEndpoint.endpoint.time === focusRegion.endTime) {
+      const pointNearBeginning = await sendMessage(
         "Session.getPointNearTime",
         {
-          time: focusRegion.startTime,
+          time: startTime,
         },
         ThreadFront.sessionId!
-      )
-    ).point as TimeStampedPoint;
-    // @ts-ignore
-    const end =
-      endpoint.time === focusRegion.endTime
-        ? endpoint
-        : ((
-            await sendMessage(
-              "Session.getPointNearTime",
-              { time: focusRegion.endTime },
-              ThreadFront.sessionId!
-            )
-          ).point as TimeStampedPoint);
-    // This is broken right now, see https://github.com/RecordReplay/backend/issues/5622
-    // @ts-ignore
-    // sendMessage(
-    //   "Console.findMessagesInRange",
-    //   {
-    //     range: { begin: beginning.point, end: end.point },
-    //   },
-    //   ThreadFront.sessionId!
-    // ).then(() => dispatch(messagesLoaded()));
+      );
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = sessionEndpoint.endpoint.point;
+    } else {
+      const [pointNearBeginning, pointNearEnd] = await Promise.all([
+        sendMessage(
+          "Session.getPointNearTime",
+          {
+            time: startTime,
+          },
+          ThreadFront.sessionId!
+        ),
+        sendMessage("Session.getPointNearTime", { time: endTime }, ThreadFront.sessionId!),
+      ]);
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = pointNearEnd.point.point;
+    }
+
+    await sendMessage(
+      "Console.findMessagesInRange",
+      {
+        range: { begin: beginPoint, end: endPoint },
+      },
+      ThreadFront.sessionId!
+    );
+
+    dispatch(messagesLoaded());
   };
 };
 
