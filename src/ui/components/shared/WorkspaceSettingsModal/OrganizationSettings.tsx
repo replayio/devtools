@@ -112,24 +112,25 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   );
 
   const features: PartialWorkspaceSettingsFeatures = workspace?.settings?.features || {};
-  const [, updateFeature, resetFeatures] = useDebounceState(
-    features,
-    (features: PartialWorkspaceSettingsFeatures) => {
-      updateWorkspaceSettings({
-        variables: {
-          workspaceId,
-          features,
-        },
-      });
-    }
-  );
+  const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
+    updateWorkspaceSettings({
+      variables: {
+        workspaceId,
+        features,
+      },
+    });
+  };
 
   useEffect(() => {
     if (workspace) {
-      resetFeatures(workspace.settings.features);
       resetMessage(workspace.settings.motd || "");
     }
-  }, [workspace?.id, resetFeatures, resetMessage]);
+    // workspace can referentially change from polling for changes without the
+    // workspace actually having changed so we're tying this hook invocation to
+    // the id change which will indicate when the workspace becomes loaded (or if
+    // a new workspace is somehow selected) eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspace?.id, resetMessage]);
 
   if (!workspace) {
     return null;
