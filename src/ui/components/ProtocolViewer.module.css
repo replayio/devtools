@@ -28,8 +28,6 @@
   display: flex;
   justify-content: space-between;
   padding: 0.25rem;
-}
-.Chunk {
   cursor: pointer;
 }
 .ChunkSelected {
@@ -40,12 +38,13 @@
   color: var(--light-grey);
 }
 .ChunkErrored {
-  cursor: pointer;
   color: var(--console-error-color);
 }
 
 .Details {
-  height: 75%;
+  height: 65%;
+  min-height: 65%;
+  max-height: 65%;
   overflow: auto;
   border-top: 1px solid var(--theme-border);
 }

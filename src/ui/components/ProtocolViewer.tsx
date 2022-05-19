@@ -2,7 +2,7 @@ import classNames from "classnames";
 import { padStart } from "lodash";
 import dynamic from "next/dynamic";
 import { CommandResponse } from "protocol/socket";
-import { useState } from "react";
+import { MutableRefObject, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { getTheme } from "ui/reducers/app";
 import {
@@ -126,44 +126,22 @@ const ProtocolRequestDetail = ({
 
 const ProtocolViewer = () => {
   const requests = useSelector(getProtocolRequests);
-  const chunks = chunkedRequests(requests);
-  const [selectedRequests, setSelectedRequests] = useState<number[]>([]);
-  const selectedRequestDetails = useSelector(getFullRequestDetails(selectedRequests));
+  const chunks = useMemo(() => chunkedRequests(requests), [requests]);
+  const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
+  const selectedRequestDetails = useSelector(getFullRequestDetails(selectedChunk?.ids ?? []));
 
   return (
     <div className={styles.Container}>
       <h3 className={styles.Header}>Protocol Info</h3>
       <div className={styles.Panel}>
-        {chunks.map(chunk => {
-          if (chunk.method === "") {
-            return null;
-          }
-
-          let className = styles.Chunk;
-          if (selectedRequests.join(",") === chunk.ids.join(",")) {
-            className = styles.ChunkSelected;
-          } else if (chunk.pending) {
-            className = styles.ChunkPending;
-          } else if (chunk.errored) {
-            className = styles.ChunkErrored;
-          }
-
-          return (
-            <div
-              key={`${chunk.method}:${chunk.startedAt}`}
-              className={className}
-              onClick={() => {
-                setSelectedRequests(chunk.ids);
-              }}
-            >
-              <span>
-                {chunk.method}
-                {chunk.count > 1 ? `(${chunk.count})` : null}
-              </span>
-              <span>{msAsMinutes(chunk.startedAt)}</span>
-            </div>
-          );
-        })}
+        {chunks.map(chunk => (
+          <ProtocolChunk
+            key={`${chunk.method}:${chunk.startedAt}`}
+            chunk={chunk}
+            selectedChunk={selectedChunk}
+            setSelectedChunk={setSelectedChunk}
+          />
+        ))}
       </div>
       {selectedRequestDetails.length > 0 && (
         <div className={styles.Details}>
@@ -182,5 +160,55 @@ const ProtocolViewer = () => {
     </div>
   );
 };
+
+function ProtocolChunk({
+  chunk,
+  selectedChunk,
+  setSelectedChunk,
+}: {
+  chunk: RequestSummaryChunk;
+  selectedChunk: RequestSummaryChunk | null;
+  setSelectedChunk: React.Dispatch<React.SetStateAction<RequestSummaryChunk | null>>;
+}) {
+  const isSelected = selectedChunk === chunk;
+  const prevIsSelectedRef = useRef<boolean>(false);
+
+  const ref = useRef<HTMLDivElement>() as MutableRefObject<HTMLDivElement>;
+
+  // Make sure the selected request is still visible after details panel opens.
+  useLayoutEffect(() => {
+    if (isSelected && prevIsSelectedRef.current !== isSelected) {
+      const div = ref.current;
+      if (div) {
+        div.scrollIntoView({ block: "nearest", behavior: "auto" });
+      }
+    }
+
+    prevIsSelectedRef.current = isSelected;
+  }, [isSelected]);
+
+  if (chunk.method === "") {
+    return null;
+  }
+
+  let className = styles.Chunk;
+  if (isSelected) {
+    className = styles.ChunkSelected;
+  } else if (chunk.pending) {
+    className = styles.ChunkPending;
+  } else if (chunk.errored) {
+    className = styles.ChunkErrored;
+  }
+
+  return (
+    <div ref={ref} className={className} onClick={() => setSelectedChunk(chunk)}>
+      <span>
+        {chunk.method}
+        {chunk.count > 1 ? `(${chunk.count})` : null}
+      </span>
+      <span>{msAsMinutes(chunk.startedAt)}</span>
+    </div>
+  );
+}
 
 export default ProtocolViewer;
