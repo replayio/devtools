@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client";
+import { ExclamationIcon } from "@heroicons/react/outline";
 import Services from "devtools/shared/services";
 import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
@@ -6,6 +7,7 @@ import { query } from "ui/utils/apolloClient";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getLoginReferrerParam } from "ui/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
+import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
 const isOSX = Services.appinfo.OS === "Darwin";
@@ -162,6 +164,35 @@ function ReplayBrowserLogin() {
   );
 }
 
+function AuthError({ error }: { error: any }) {
+  let message = error && "message" in error ? error.message : null;
+
+  if (!message) {
+    return null;
+  }
+
+  if (message === "Invalid state") {
+    message = "Your login session expired. Please try logging in again.";
+  } else {
+    sendTelemetryEvent("devtools-auth-error-login", {
+      errorMessage: message,
+    });
+
+    if (message === "Unable to authenticate user") {
+      message = "We're sorry but we had a problem authenticating you. We're looking into it now!";
+    }
+  }
+
+  return (
+    <OnboardingContentWrapper overlay noLogo>
+      <div className="flex flex-row items-center space-x-4">
+        <ExclamationIcon className="h-12 w-12 flex-shrink-0 text-red-500" />
+        <span className="align-left text-base font-bold">{message}</span>
+      </div>
+    </OnboardingContentWrapper>
+  );
+}
+
 export function LoginLink({
   children,
   referrer,
@@ -174,7 +205,7 @@ export function LoginLink({
 }
 
 export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
-  const { loginWithRedirect } = useAuth0();
+  const { loginWithRedirect, error } = useAuth0();
   const [sso, setSSO] = useState(false);
 
   if (returnToPath.startsWith("/login")) {
@@ -202,6 +233,7 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
           <SocialLogin onShowSSOLogin={() => setSSO(true)} onLogin={onLogin} />
         )}
       </OnboardingContentWrapper>
+      <AuthError error={error} />
     </OnboardingModalContainer>
   );
 }
