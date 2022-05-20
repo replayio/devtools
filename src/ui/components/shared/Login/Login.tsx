@@ -172,13 +172,18 @@ function AuthError({ error }: { error: any }) {
   }
 
   if (message === "Invalid state") {
+    // This is usually caused by waiting too long to go through the auth process
+    // and can be fixed by trying again.
     message = "Your login session expired. Please try logging in again.";
   } else {
+    // We want to capture any other error so we can investigate further.
     sendTelemetryEvent("devtools-auth-error-login", {
       errorMessage: message,
     });
 
     if (message === "Unable to authenticate user") {
+      // This usually occurs because our auth hook threw an error but the
+      // message itself isn't very useful so we show a more friendly message
       message = "We're sorry but we had a problem authenticating you. We're looking into it now!";
     }
   }
