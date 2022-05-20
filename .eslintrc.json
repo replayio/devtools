@@ -30,6 +30,8 @@
         }
       }
     ],
+    // turn on errors for missing imports
+    "import/no-unresolved": "error",
     "import/prefer-default-export": 0,
     "no-nested-ternary": 0,
     "no-param-reassign": 0,
@@ -52,8 +54,15 @@
     "sort-vars": "error"
   },
   "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/resolver": {
+      "alwaysTryTypes": true, // always try to resolve types under `<root>@types` directory even it doesn't contain any source code, like `@types/unist`
+      "project": "tsconfig.json"
+    },
     "react": {
-      "version": "16.8"
+      "version": "detect"
     }
   }
 }
