@@ -4,19 +4,16 @@
 
 //
 
+import { ThreadFront } from "protocol/thread";
 import { bindActionCreators } from "redux";
 
-const { ThreadFront } = require("protocol/thread");
-
-import { setupCommands, clientCommands } from "./commands";
-import { setupEvents } from "./events";
-
-import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 import actions from "../actions";
-import * as selectors from "../selectors";
-
 import { initialBreakpointsState } from "../reducers/breakpoints";
-import { prepareSourcePayload } from "./create";
+import * as selectors from "../selectors";
+import { asyncStore, verifyPrefSchema } from "../utils/prefs";
+
+import { setupCommands, clientCommands, prepareSourcePayload } from "./commands";
+import { setupEvents } from "./events";
 
 export async function loadInitialState() {
   const pendingBreakpoints = await asyncStore.pendingBreakpoints;

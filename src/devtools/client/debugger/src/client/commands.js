@@ -4,7 +4,7 @@
 
 //
 
-import { prepareSourcePayload, createFrame } from "./create";
+import { createFrame, makeSourceId } from "./create";
 import { clientEvents } from "./events";
 import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 
@@ -285,6 +285,11 @@ function pauseGrip(func) {
 
 function registerSourceActor(sourceActorId, sourceId, url) {
   sourceActors[sourceActorId] = sourceId;
+}
+
+export function prepareSourcePayload(source) {
+  clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
+  return { thread: ThreadFront.actor, source };
 }
 
 async function getSources(client) {

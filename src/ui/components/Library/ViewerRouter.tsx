@@ -7,7 +7,7 @@ import { UIState } from "ui/state";
 import hooks from "ui/hooks";
 import Spinner from "../shared/Spinner";
 import { PendingTeamScreen } from "./PendingTeamScreen";
-import { MY_LIBRARY } from "../UploadScreen/Sharing";
+import { MY_LIBRARY } from "../UploadScreen/libraryConstants";
 import { actions } from "ui/actions";
 import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";

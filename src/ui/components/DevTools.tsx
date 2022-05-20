@@ -31,6 +31,8 @@ import Video from "./Video";
 import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
+import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+
 const Viewer = React.lazy(() => import("./Viewer"));
 
 type _DevToolsProps = PropsFromRedux & DevToolsProps;
@@ -103,6 +105,10 @@ function _DevTools({
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const { trackLoadingIdleTime } = useTrackLoadingIdleTime(
+    uploadComplete ? "warm" : "cold",
+    recording
+  );
   const { userIsAuthor, loading } = useUserIsAuthor();
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
@@ -146,6 +152,11 @@ function _DevTools({
       endUploadWaitTracking(sessionId!);
     }
   }, [loadingFinished, uploadComplete, sessionId]);
+  useEffect(() => {
+    if (loadingFinished) {
+      trackLoadingIdleTime(sessionId!);
+    }
+  }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
   useEffect(() => {
     if (recording && document.title !== recording.title) {

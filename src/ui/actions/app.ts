@@ -122,10 +122,6 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return (dispatch, getState) => {
-    if (level === "executionIndexed") {
-      return;
-    }
-
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;

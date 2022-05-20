@@ -1,10 +1,10 @@
 import { MutableRefObject, useEffect } from "react";
 
+// Closes a modal dialog if the user clicks outside of it or types "Escape"
 export default function useModalDismissSignal(
   modalRef: MutableRefObject<HTMLDivElement>,
   dismissCallback: () => void,
-  dismissOnClickOutside: boolean = true,
-  dismissOnScroll: boolean
+  dismissOnClickOutside: boolean = true
 ) {
   useEffect(() => {
     if (modalRef.current === null) {

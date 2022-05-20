@@ -1,15 +1,27 @@
-import React from "react";
-import { useSelector } from "react-redux";
+import classNames from "classnames";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { Row, TableInstance } from "react-table";
+import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
+import type { AppDispatch } from "ui/setup/store";
+import { trackEvent } from "ui/utils/telemetry";
 import { isTimeInRegions } from "ui/utils/timeline";
 
-import styles from "./RequestTable.module.css";
-import classNames from "classnames";
-import { RequestSummary } from "./utils";
+import { ContextMenu } from "../ContextMenu";
+import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import Icon from "../shared/Icon";
+
 import { HeaderGroups } from "./HeaderGroups";
 import { RequestRow } from "./RequestRow";
-import { Row, TableInstance } from "react-table";
-import { trackEvent } from "ui/utils/telemetry";
+import styles from "./RequestTable.module.css";
+import { RequestSummary } from "./utils";
+
+interface ContextMenuData {
+  pageX: number;
+  pageY: number;
+  row: Row<RequestSummary>;
+}
 
 const RequestTable = ({
   className,
@@ -30,12 +42,40 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
+  const dispatch = useDispatch() as AppDispatch;
   const loadedRegions = useSelector(getLoadedRegions);
+  const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
     seek(request.point.point, request.point.time, true);
     onRowSelect(request);
+  };
+
+  const closeContextMenu = () => {
+    setContextMenuData(null);
+  };
+
+  const setFocusEnd = () => {
+    setContextMenuData(null);
+
+    if (contextMenuData) {
+      const endTime = contextMenuData.row.original?.end;
+      if (endTime != null) {
+        dispatch(setFocusRegionEndTime(endTime, true));
+      }
+    }
+  };
+
+  const setFocusStart = () => {
+    setContextMenuData(null);
+
+    if (contextMenuData) {
+      const startTime = contextMenuData.row.original?.start;
+      if (startTime != null) {
+        dispatch(setFocusRegionStartTime(startTime, true));
+      }
+    }
   };
 
   let inPast = true;
@@ -73,6 +113,7 @@ const RequestTable = ({
                 onClick={onRowSelect}
                 onSeek={onSeek}
                 row={row}
+                showContentMenuAt={setContextMenuData}
               />
             );
           })}
@@ -84,6 +125,25 @@ const RequestTable = ({
           />
         </div>
       </div>
+
+      {contextMenuData !== null && (
+        <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
+          <Dropdown>
+            <DropdownItem onClick={setFocusStart}>
+              <>
+                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
+                Set focus start
+              </>
+            </DropdownItem>
+            <DropdownItem onClick={setFocusEnd}>
+              <>
+                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
+                Set focus end
+              </>
+            </DropdownItem>
+          </Dropdown>
+        </ContextMenu>
+      )}
     </div>
   );
 };

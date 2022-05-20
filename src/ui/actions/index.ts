@@ -10,7 +10,6 @@ import * as layoutActions from "./layout";
 import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
-import type { TimelineActions } from "./timeline";
 import type { CommentsAction } from "./comments";
 import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
@@ -31,7 +30,6 @@ export type UIAction =
   | MarkupAction
   | NetworkAction
   | ReactDevToolsAction
-  | TimelineActions
   | QuickOpenActions;
 
 export type UIThunkAction<TReturn = void> = ThunkAction<

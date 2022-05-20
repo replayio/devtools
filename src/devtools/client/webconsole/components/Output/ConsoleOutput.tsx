@@ -5,16 +5,21 @@
 import { Dispatch } from "@reduxjs/toolkit";
 import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
 import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
+import { StateContext } from "devtools/client/webconsole/components/Search";
 import constants from "devtools/client/webconsole/constants";
+import { Frame, Message } from "devtools/client/webconsole/reducers/messages";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
+import { ContextMenu } from "ui/components/ContextMenu";
+import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
+import { getFocusRegion } from "ui/reducers/timeline";
+import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
-
-import { Frame, Message } from "../../reducers/messages";
-import { StateContext } from "../Search";
+import { convertPointToTime } from "ui/utils/time";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 
@@ -27,13 +32,25 @@ function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-class ConsoleOutput extends React.Component<PropsFromRedux> {
+interface State {
+  contextMenu: {
+    message: Message;
+    pageX: number;
+    pageY: number;
+  } | null;
+}
+
+class ConsoleOutput extends React.Component<PropsFromRedux, State> {
   outputNode = React.createRef<HTMLDivElement>();
 
   _scrollTimeoutID: number | null = null;
   _prevSearchResultMessage: Message | null = null;
 
   static contextType = StateContext;
+
+  state: State = {
+    contextMenu: null,
+  };
 
   componentDidMount() {
     if (this.props.visibleMessages.length > 0) {
@@ -159,7 +176,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
   }
 
   render() {
-    let {
+    const {
       breakpoints,
       closestMessage,
       dispatch,
@@ -170,6 +187,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
       timestampsVisible,
       visibleMessages,
     } = this.props;
+    const { contextMenu } = this.state;
 
     const messageNodes = visibleMessages.map((messageId, i) => {
       const message = messages.entities[messageId]!;
@@ -202,12 +220,103 @@ class ConsoleOutput extends React.Component<PropsFromRedux> {
     });
 
     return (
-      <div className="webconsole-output" ref={this.outputNode} role="main">
-        <ConsoleLoadingBar />
-        {messageNodes}
-      </div>
+      <>
+        <div
+          className="webconsole-output"
+          ref={this.outputNode}
+          role="main"
+          onContextMenu={this.onContextMenu}
+        >
+          <ConsoleLoadingBar />
+          {messageNodes}
+        </div>
+        {contextMenu !== null && (
+          <ContextMenu x={contextMenu.pageX} y={contextMenu.pageY} close={this.closeContextMenu}>
+            <Dropdown>
+              <DropdownItem onClick={this.setFocusStart}>
+                <>
+                  <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
+                  Set focus start
+                </>
+              </DropdownItem>
+              <DropdownItem onClick={this.setFocusEnd}>
+                <>
+                  <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
+                  Set focus end
+                </>
+              </DropdownItem>
+            </Dropdown>
+          </ContextMenu>
+        )}
+      </>
     );
   }
+
+  closeContextMenu = () => {
+    this.setState({ contextMenu: null });
+  };
+
+  onContextMenu = (event: React.MouseEvent) => {
+    // This method of mapping context-menu event to a message is a bit hacky.
+    // This section of the UI was written in a pretty imperative style though.
+    // Ideally we will revisit and refactor the console UI components at some point.
+    let message: Message | null = null;
+    let target: HTMLElement | null = event.target as HTMLElement;
+    while (target) {
+      if (target.hasAttribute("data-message-id")) {
+        const id = parseInt(target.getAttribute("data-message-id") as string);
+        message = this.props.messages.entities[id] || null;
+        break;
+      }
+
+      target = target.parentElement;
+    }
+
+    if (message == null) {
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.setState({
+      contextMenu: {
+        message,
+        pageX: event.pageX,
+        pageY: event.pageY,
+      },
+    });
+  };
+
+  setFocusEnd = async () => {
+    const { dispatch, focusRegion } = this.props;
+    const { message } = this.state.contextMenu!;
+
+    this.setState({ contextMenu: null });
+
+    const time = await getTimeForMessage(message);
+    if (time < 0) {
+      console.error("Could not calculate time for message", message);
+      return;
+    }
+
+    (dispatch as AppDispatch)(setFocusRegionEndTime(time, true));
+  };
+
+  setFocusStart = async () => {
+    const { dispatch, focusRegion } = this.props;
+    const { message } = this.state.contextMenu!;
+
+    this.setState({ contextMenu: null });
+
+    const time = await getTimeForMessage(message);
+    if (time < 0) {
+      console.error("Could not calculate time for message", message);
+      return;
+    }
+
+    (dispatch as AppDispatch)(setFocusRegionStartTime(time, true));
+  };
 }
 
 function scrollToBottom(node: HTMLElement) {
@@ -221,6 +330,7 @@ function mapStateToProps(state: UIState) {
     // @ts-ignore
     breakpoints: selectors.getBreakpointsList(state),
     closestMessage: selectors.getClosestMessage(state),
+    focusRegion: getFocusRegion(state),
     hoveredItem: selectors.getHoveredItem(state),
     lastMessageId: selectors.getLastMessageId(state),
     messages: selectors.getAllMessagesById(state),
@@ -232,11 +342,24 @@ function mapStateToProps(state: UIState) {
     visibleMessages: selectors.getVisibleMessages(state),
   };
 }
+
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   dispatch,
-  openLink: actions.openLink,
 });
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export default connector(ConsoleOutput);
+
+async function getTimeForMessage(message: Message): Promise<number> {
+  const { executionPoint, executionPointTime, timeStamp } = message;
+  if (timeStamp != null) {
+    return timeStamp;
+  } else if (executionPointTime != null) {
+    return executionPointTime;
+  } else if (executionPoint != null) {
+    return await convertPointToTime(executionPoint);
+  }
+
+  return -1;
+}

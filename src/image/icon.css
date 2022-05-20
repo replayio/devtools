@@ -170,3 +170,11 @@ but without a background color so we can use hover effects
 .icon.turtle {
   -webkit-mask-image: url(/icons/turtle.svg);
 }
+
+.icon.set-focus-end {
+  -webkit-mask-image: url(/icons/set-focus-end.svg);
+}
+
+.icon.set-focus-start {
+  -webkit-mask-image: url(/icons/set-focus-start.svg);
+}

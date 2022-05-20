@@ -59,7 +59,7 @@ export function memoizeableAction<Args, Value, Key>(
   }
 ) {
   const requests = new Map();
-  return (args: Args & { cx?: Context }): UIThunkAction =>
+  return (args: Args & { cx?: Context }): UIThunkAction<Promise<Value>> =>
     async (dispatch, getState: AppGetState, extraArgs) => {
       // TODO Consider rewriting usage sites to not need thunkArgs as an object
 

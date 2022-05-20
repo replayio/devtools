@@ -18,7 +18,9 @@ import setup from "ui/setup/dynamic/devtools";
 import { Recording as RecordingInfo } from "ui/types";
 import { isTest } from "ui/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
+import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";
+import { trackTiming } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
@@ -155,6 +157,10 @@ function RecordingPage({
     store,
     token.token,
   ]);
+  const onUpload = () => {
+    startUploadWaitTracking();
+    setUploadComplete(true);
+  };
 
   if (!recording || typeof window === "undefined") {
     return (
@@ -169,7 +175,7 @@ function RecordingPage({
   // We skip the upload step if there's no associated user ID, which
   // is the case for CI test recordings.
   if (!uploadComplete && recording.isInitialized === false && !isTest() && recording.userId) {
-    return <Upload onUpload={() => setUploadComplete(true)} />;
+    return <Upload onUpload={onUpload} />;
   } else {
     return (
       <>

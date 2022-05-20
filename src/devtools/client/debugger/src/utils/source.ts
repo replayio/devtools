@@ -398,7 +398,10 @@ export const getLineText = (asyncContent: SourceWithContent["content"], line: nu
   return lineText || "";
 };
 
-export function getTextAtPosition(asyncContent: SourceWithContent["content"], location: Location) {
+export function getTextAtPosition(
+  asyncContent: SourceWithContent["content"],
+  location: { column?: number; line?: number }
+) {
   const { column, line = 0 } = location;
 
   const lineText = getLineText(asyncContent, line);
