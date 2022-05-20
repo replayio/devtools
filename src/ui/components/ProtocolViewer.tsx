@@ -153,8 +153,8 @@ const ProtocolViewer = () => {
   const filteredChunks = useMemo(
     () =>
       chunks.slice(clearBeforeIndex).filter(chunk => {
-        const fullString = `${chunk.class}.${chunk.method}`;
-        return fullString.includes(deferredFilterText);
+        const fullString = `${chunk.class}.${chunk.method}`.toLowerCase();
+        return fullString.includes(deferredFilterText.toLowerCase());
       }),
     [chunks, clearBeforeIndex, deferredFilterText]
   );
