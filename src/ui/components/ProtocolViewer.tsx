@@ -149,6 +149,8 @@ const ProtocolViewer = () => {
   const requestMap = useSelector(getProtocolRequestMap);
   const responseMap = useSelector(getProtocolResponseMap);
 
+  const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
+
   const chunks = useMemo(() => flattenRequests(requestMap, responseMap), [requestMap, responseMap]);
   const filteredChunks = useMemo(
     () =>
@@ -158,8 +160,10 @@ const ProtocolViewer = () => {
       }),
     [chunks, clearBeforeIndex, deferredFilterText]
   );
-
-  const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
+  const doesFilteredChunksContainSelectedChunk = useMemo(
+    () => selectedChunk !== null && filteredChunks.includes(selectedChunk),
+    [filteredChunks, selectedChunk]
+  );
 
   const onFilterTextInputChange = (event: React.ChangeEvent) => {
     setFilterText((event.currentTarget as HTMLInputElement).value);
@@ -206,13 +210,15 @@ const ProtocolViewer = () => {
           />
         ))}
       </div>
-      <SelectedRequestDetails
-        key={selectedChunk ? selectedChunk.ids[0] : null}
-        errorMap={errorMap}
-        requestMap={requestMap}
-        responseMap={responseMap}
-        selectedChunk={selectedChunk}
-      />
+      {selectedChunk !== null && doesFilteredChunksContainSelectedChunk && (
+        <SelectedRequestDetails
+          key={selectedChunk.ids[0]}
+          errorMap={errorMap}
+          requestMap={requestMap}
+          responseMap={responseMap}
+          selectedChunk={selectedChunk}
+        />
+      )}
     </div>
   );
 };
