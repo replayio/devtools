@@ -29,14 +29,14 @@ function PrimaryPanes(props: PropsFromRedux) {
   const { value: outlineExpanded, update: updateOutlineExpanded } =
     useDebuggerPrefs("outline-expanded");
   const { value: sourcesCollapsed } = useDebuggerPrefs("sources-collapsed");
-  const { value: enableScaleFontSize } = useFeature("enableScaleFontSize");
+  const { value: enableLargeText } = useFeature("enableLargeText");
 
   return (
     <Accordion>
       <AccordionPane
         header="Sources"
-        // ExperimentFeature: ScaleFontSize Logic
-        className={clsx("sources-pane", enableScaleFontSize ? "text-base" : "text-xs")}
+        // ExperimentFeature: LargeText Logic
+        className={clsx("sources-pane", enableLargeText ? "text-base" : "text-xs")}
         expanded={!sourcesCollapsed}
         onToggle={() => props.toggleSourcesCollapse()}
         initialHeight={400}

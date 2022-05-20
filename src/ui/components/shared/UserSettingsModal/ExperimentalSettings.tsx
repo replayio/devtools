@@ -44,14 +44,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Code Heatmaps ",
+    label: "Code Heatmaps",
     description: "Calculate hit counts for editor files all at once",
     key: "codeHeatMaps",
   },
   {
-    label: "Scale Font Size",
-    description: "Scale font size of Editor",
-    key: "enableScaleFontSize",
+    label: "Large Text",
+    description: "Enable large text for Editor",
+    key: "enableLargeText",
   },
   {
     label: "Resolve recording",
@@ -116,8 +116,7 @@ export default function ExperimentalSettings({}) {
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: enableScaleFontSize, update: updateEnableScaleFontSize } =
-    useFeature("enableScaleFontSize");
+  const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -140,8 +139,8 @@ export default function ExperimentalSettings({}) {
       updateEnableUnicornConsole(!enableUnicornConsole);
     } else if (key === "showRedux") {
       updateEnableReduxDevtools(!enableReduxDevtools);
-    } else if (key === "enableScaleFontSize") {
-      updateEnableScaleFontSize(!enableScaleFontSize);
+    } else if (key === "enableLargeText") {
+      updateEnableLargeText(!enableLargeText);
     }
   };
 
@@ -154,7 +153,7 @@ export default function ExperimentalSettings({}) {
     turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
-    enableScaleFontSize,
+    enableLargeText,
   };
 
   const settings = { ...userSettings, ...localSettings };

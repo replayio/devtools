@@ -24,19 +24,19 @@ export const EditorPane = () => {
   const toolboxLayout = useSelector(getToolboxLayout);
   const selectedSource = useSelector(getSelectedSource);
   const panelEl = useRef(null);
-  const { value: enableScaleFontSize } = useFeature("enableScaleFontSize");
+  const { value: enableLargeText } = useFeature("enableLargeText");
 
   const nodeWidth = useWidthObserver(panelEl);
 
-  // ExperimentFeature: ScaleFontSize Logic
+  // ExperimentFeature: LargeText Logic
   useLayoutEffect(() => {
     const root = document.querySelector<HTMLElement>(":root")!;
-    if (enableScaleFontSize) {
+    if (enableLargeText) {
       root.style.setProperty("--theme-code-font-size", "14px");
     } else {
       root.style.setProperty("--theme-code-font-size", "11px");
     }
-  }, [enableScaleFontSize]);
+  }, [enableLargeText]);
   useEffect(() => {
     (async () => {
       try {

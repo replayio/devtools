@@ -12,7 +12,7 @@ export type ExperimentalUserSettings = {
   enableEventLink: boolean;
   enableTeams: boolean;
   showReact: boolean;
-  enableScaleFontSize: boolean;
+  enableLargeText: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
@@ -24,7 +24,7 @@ export type LocalExperimentalUserSettings = {
   enableResolveRecording: boolean;
   unicornConsole: boolean;
   showRedux: boolean;
-  enableScaleFontSize: boolean;
+  enableLargeText: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
