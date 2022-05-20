@@ -19,9 +19,11 @@ const OnboardingContext = React.createContext({ theme: "dark" });
 export function OnboardingContentWrapper({
   children,
   overlay,
+  noLogo,
 }: {
   children: React.ReactChild | (React.ReactChild | null)[];
   overlay?: boolean;
+  noLogo?: boolean;
 }) {
   const ctx = useContext(OnboardingContext);
 
@@ -35,7 +37,7 @@ export function OnboardingContentWrapper({
         }
       )}
     >
-      <ReplayLogo size={overlay ? "md" : "lg"} wide={overlay} />
+      {noLogo ? null : <ReplayLogo size={overlay ? "md" : "lg"} wide={overlay} />}
       {children}
     </div>
   );
@@ -137,7 +139,7 @@ export function OnboardingModalContainer({
   children,
   theme = "dark",
 }: {
-  children: React.ReactElement;
+  children: React.ReactNode;
   // For randomizing some background elements as controlled by progress
   // on the parent component, e.g. circles/bubbles that change on click
   randomNumber?: number;

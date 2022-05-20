@@ -6,6 +6,7 @@ import { isTest, isMock } from "./environment";
 import useToken from "./useToken";
 
 const TEST_AUTH = {
+  error: undefined,
   isLoading: false,
   isAuthenticated: true,
   user: {
@@ -42,6 +43,7 @@ export default function useAuth0() {
 
   if (external && token) {
     return {
+      error: undefined,
       isLoading: loading,
       isAuthenticated: true,
       user: loading
