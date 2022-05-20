@@ -16,15 +16,12 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
       return;
     }
 
-    const positions: $FixTypeLater[] = await client.fetchAncestorFramePositions(
-      frame.asyncIndex,
-      frame.protocolId
-    );
+    const positions = await client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
     if (positions.length === 0) {
       return;
     }
     const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
-      positions[0].frame
+      positions[0].frame!
     );
     const sourceId = getSourceByActorId(getState(), protocolSourceId)?.id;
 
@@ -34,12 +31,13 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
 
     const locations = await Promise.all(
       positions.map(async ({ frame }) => {
-        const { line, column } = await ThreadFront.getPreferredLocation(frame);
+        const { line, column } = await ThreadFront.getPreferredLocation(frame!);
         return { line, column, sourceId };
       })
     );
 
-    const combinedPositions = zip(positions, locations).map(([{ point, time }, location]) => {
+    const combinedPositions = zip(positions, locations).map(([position, location]) => {
+      const { point, time } = position!;
       return { point, time, location };
     });
 

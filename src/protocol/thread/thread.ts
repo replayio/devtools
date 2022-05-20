@@ -697,7 +697,7 @@ class _ThreadFront {
     return frames.slice(1);
   }
 
-  pauseForAsyncIndex(asyncIndex: number) {
+  pauseForAsyncIndex(asyncIndex?: number) {
     this.ensureCurrentPause();
     return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
   }
@@ -715,7 +715,7 @@ class _ThreadFront {
     frameId,
     pure = false,
   }: {
-    asyncIndex: number;
+    asyncIndex?: number;
     text: string;
     frameId?: FrameId;
     pure?: boolean;
@@ -921,14 +921,14 @@ class _ThreadFront {
     return this._findResumeTarget(point, client.Debugger.findResumeTarget);
   }
 
-  blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
+  blackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
       await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
     });
   }
 
-  unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
+  unblackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
       await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);

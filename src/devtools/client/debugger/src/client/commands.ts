@@ -3,165 +3,199 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-
-import { createFrame, makeSourceId } from "./create";
-import { clientEvents } from "./events";
-import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
-
-const { ThreadFront, createPrimitiveValueFront } = require("protocol/thread");
-const { fetchEventTypePoints } = require("protocol/logpoint");
-const {
+import {
+  ScopeType,
+  SourceLocation as ProtocolSourceLocation,
+  loadedRegions,
+} from "@recordreplay/protocol";
+import {
+  fetchEventTypePoints,
   setLogpoint,
   setLogpointByURL,
   newLogGroupId,
   setEventLogpoints,
   setExceptionLogpoint,
   removeLogpoint,
-} = require("protocol/logpoint");
+} from "protocol/logpoint";
+import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
+import { WiredNamedValue } from "protocol/thread/pause";
 
-let currentThreadFront;
-let currentTarget;
-let devToolsClient;
-let sourceActors;
-let breakpoints;
+import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
+import { SelectedFrame } from "../reducers/pause";
+import type { SourceActor } from "../reducers/source-actors";
+import type { BreakpointOptions, SourceLocation } from "../reducers/types";
+
+import { createFrame, makeSourceId } from "./create";
+
+export type InitialBreakpointOptions = Pick<
+  BreakpointOptions,
+  "condition" | "shouldPause" | "logValue"
+>;
+type FinalBreakpointOptions = Pick<
+  BreakpointOptions,
+  "condition" | "shouldPause" | "logValue" | "logGroupId"
+>;
+
+interface BreakpointDetails {
+  location: SourceLocation;
+  options: FinalBreakpointOptions;
+}
+
+let currentThreadFront: any;
+let currentTarget: any;
+let devToolsClient: any;
+let sourceActors: Record<string, string> = {};
+let breakpoints: Record<string, BreakpointDetails> = {};
 
 function setupCommands() {
   sourceActors = {};
   breakpoints = {};
 }
 
-function releaseActor(actor) {
+function releaseActor() {
   // Object fronts are always thread scoped in the replay viewer.
   return;
 }
 
-function resume(point, loadedRegions) {
+function resume(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.resume(point, loadedRegions);
 }
 
-function stepIn(point, loadedRegions) {
+function stepIn(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.stepIn(point, loadedRegions);
 }
 
-function stepOver(point, loadedRegions) {
+function stepOver(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.stepOver(point, loadedRegions);
 }
 
-function stepOut(point, loadedRegions) {
+function stepOut(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.stepOut(point, loadedRegions);
 }
 
-function rewind(point, loadedRegions) {
+function rewind(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.rewind(point, loadedRegions);
 }
 
-function reverseStepOver(point, loadedRegions) {
+function reverseStepOver(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.reverseStepOver(point, loadedRegions);
 }
 
-async function sourceContents({ actor }) {
+async function sourceContents({ actor }: { actor: string }) {
   const threadFront = ThreadFront;
   const { contents, contentType } = await threadFront.getSourceContents(actor);
   return { source: contents, contentType };
 }
 
-function setXHRBreakpoint(path, method) {
+function setXHRBreakpoint(path: any, method: any) {
   return currentThreadFront.setXHRBreakpoint(path, method);
 }
 
-function removeXHRBreakpoint(path, method) {
+function removeXHRBreakpoint(path: any, method: any) {
   return currentThreadFront.removeXHRBreakpoint(path, method);
 }
 
-function addWatchpoint(object, property, label, watchpointType) {}
+function addWatchpoint(object: any, property: any, label: any, watchpointType: any) {}
 
-async function removeWatchpoint(object, property) {}
+async function removeWatchpoint(object: any, property: any) {}
 
 // Get the string key to use for a breakpoint location.
 // See also duplicate code in breakpoint-actor-map.js :(
-function locationKey(location) {
+function locationKey(location: SourceLocation) {
   const { sourceUrl, line, column } = location;
   const sourceId = location.sourceId || "";
   // $FlowIgnore
   return `${sourceUrl}:${sourceId}:${line}:${column}`;
 }
 
-function maybeGenerateLogGroupId(options) {
+function maybeGenerateLogGroupId(options: InitialBreakpointOptions): FinalBreakpointOptions {
   if (options.logValue) {
     return { ...options, logGroupId: newLogGroupId() };
   }
   return options;
 }
 
-async function maybeClearLogpoint(location) {
+async function maybeClearLogpoint(location: SourceLocation) {
   const bp = breakpoints[locationKey(location)];
   if (bp && bp.options.logGroupId) {
     removeLogpoint(bp.options.logGroupId);
   }
 }
 
-function hasBreakpoint(location) {
+function hasBreakpoint(location: SourceLocation) {
   return !!breakpoints[locationKey(location)];
 }
 
-function setBreakpoint(location, options) {
+function setBreakpoint(location: SourceLocation, options: InitialBreakpointOptions) {
   maybeClearLogpoint(location);
-  options = maybeGenerateLogGroupId(options);
-  breakpoints[locationKey(location)] = { location, options };
+  const finalOptions = maybeGenerateLogGroupId(options);
+  breakpoints[locationKey(location)] = { location, options: finalOptions };
 
-  const { condition, logValue, logGroupId, shouldPause } = options;
+  const { condition, logValue, logGroupId, shouldPause } = finalOptions;
   const { line, column, sourceUrl, sourceId } = location;
   const promises = [];
 
   if (sourceId) {
     if (shouldPause) {
-      promises.push(ThreadFront.setBreakpoint(sourceId, line, column, condition));
+      promises.push(ThreadFront.setBreakpoint(sourceId, line, column!, condition!));
     }
     if (logValue) {
-      promises.push(setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition));
+      promises.push(
+        setLogpoint(logGroupId!, { sourceId, line, column: column! }, logValue, condition!)
+      );
     }
   } else {
     if (shouldPause) {
-      promises.push(ThreadFront.setBreakpointByURL(sourceUrl, line, column, condition));
+      promises.push(ThreadFront.setBreakpointByURL(sourceUrl!, line, column!, condition!));
     }
     if (logValue) {
-      promises.push(setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition));
+      promises.push(setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue, condition!));
     }
   }
 
   return Promise.all(promises);
 }
 
-// jvv
-function removeBreakpoint(location) {
+function removeBreakpoint(location: SourceLocation) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
 
   const { line, column, sourceUrl, sourceId } = location;
   if (sourceId) {
-    return ThreadFront.removeBreakpoint(sourceId, line, column);
+    return ThreadFront.removeBreakpoint(sourceId, line, column!);
   }
-  return ThreadFront.removeBreakpointByURL(sourceUrl, line, column);
+  return ThreadFront.removeBreakpointByURL(sourceUrl!, line, column!);
 }
 
-function runAnalysis(location, options) {
-  options = maybeGenerateLogGroupId(options);
-  const { condition, logValue, logGroupId } = options;
+function runAnalysis(location: SourceLocation, options: InitialBreakpointOptions) {
+  const finalOptions = maybeGenerateLogGroupId(options);
+  const { condition, logValue, logGroupId } = finalOptions;
   const { line, column, sourceUrl, sourceId } = location;
   const showInConsole = false;
 
   if (sourceId) {
-    setLogpoint(logGroupId, { sourceId, line, column }, logValue, condition, showInConsole);
+    setLogpoint(
+      logGroupId!,
+      { sourceId, line, column: column! },
+      logValue!,
+      condition!,
+      showInConsole
+    );
   } else {
-    setLogpointByURL(logGroupId, sourceUrl, line, column, logValue, condition, showInConsole);
+    setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue!, condition!, showInConsole);
   }
 }
 
-async function evaluateExpressions(sources, options) {
+export interface EvaluateOptions {
+  asyncIndex?: number;
+  frameId?: string;
+}
+
+async function evaluateExpressions(sources: string[], options: EvaluateOptions) {
   return Promise.all(sources.map(source => evaluate(source, options)));
 }
 
-async function evaluate(source, { asyncIndex, frameId } = {}) {
+async function evaluate(source: string, { asyncIndex, frameId }: EvaluateOptions = {}) {
   const { returned, exception, failed } = await ThreadFront.evaluate({
     asyncIndex,
     frameId,
@@ -176,7 +210,7 @@ async function evaluate(source, { asyncIndex, frameId } = {}) {
   return { exception };
 }
 
-async function autocomplete(input, cursor, frameId) {
+async function autocomplete(input: any, cursor: any, frameId: any) {
   if (!currentTarget || !input) {
     return {};
   }
@@ -186,11 +220,11 @@ async function autocomplete(input, cursor, frameId) {
   }
 
   return new Promise(resolve => {
-    consoleFront.autocomplete(input, cursor, result => resolve(result), frameId);
+    consoleFront.autocomplete(input, cursor, (result: any) => resolve(result), frameId);
   });
 }
 
-function navigate(url) {
+function navigate(url: string) {
   return currentTarget.navigateTo({ url });
 }
 
@@ -198,10 +232,11 @@ function reload() {
   return currentTarget.reload();
 }
 
-function getProperties(grip) {
+function getProperties(grip: any) {
+  // @ts-expect-error This function doesn't appear to exist
   const objClient = ThreadFront.pauseGrip(grip);
 
-  return objClient.getPrototypeAndProperties().then(resp => {
+  return objClient.getPrototypeAndProperties().then((resp: any) => {
     const { ownProperties, safeGetterValues } = resp;
     for (const name in safeGetterValues) {
       const { enumerable, writable, getterValue } = safeGetterValues[name];
@@ -212,16 +247,29 @@ function getProperties(grip) {
 }
 
 async function getFrames() {
-  const frames = await ThreadFront.getFrames();
+  const frames = (await ThreadFront.getFrames()) ?? [];
   return Promise.all(frames.map((frame, i) => createFrame(frame, i)));
 }
 
-async function loadAsyncParentFrames(asyncIndex) {
+async function loadAsyncParentFrames(asyncIndex?: number) {
   const frames = await ThreadFront.loadAsyncParentFrames();
   return Promise.all(frames.map((frame, i) => createFrame(frame, i, asyncIndex)));
 }
 
-function convertScope(protocolScope) {
+// Isn't this a lovely type lookup?
+type ProtocolScope = Awaited<ReturnType<typeof ThreadFront["getScopes"]>>["scopes"][number];
+
+interface ConvertedScope {
+  actor: string;
+  parent: ConvertedScope | null;
+  bindings: WiredNamedValue[] | undefined;
+  object: ValueFront | undefined;
+  functionName: string | undefined;
+  type: ScopeType;
+  scopeKind: string;
+}
+
+function convertScope(protocolScope: ProtocolScope): ConvertedScope {
   const { scopeId, type, functionLexical, object, functionName, bindings } = protocolScope;
 
   return {
@@ -235,7 +283,7 @@ function convertScope(protocolScope) {
   };
 }
 
-async function getFrameScopes(frame) {
+async function getFrameScopes(frame: SelectedFrame) {
   const { scopes, originalScopesUnavailable } = await ThreadFront.getScopes(
     frame.asyncIndex,
     frame.protocolId
@@ -247,7 +295,11 @@ async function getFrameScopes(frame) {
   return { scopes: converted[0], originalScopesUnavailable };
 }
 
-async function blackBox(sourceActor, isBlackBoxed, range) {
+async function blackBox(
+  sourceActor: SourceActor,
+  isBlackBoxed: boolean,
+  range?: { start?: ProtocolSourceLocation; end?: ProtocolSourceLocation }
+) {
   const begin = range ? range.start : undefined;
   const end = range ? range.end : undefined;
   if (isBlackBoxed) {
@@ -257,17 +309,17 @@ async function blackBox(sourceActor, isBlackBoxed, range) {
   }
 }
 
-function interrupt(thread) {
+function interrupt(thread: any) {
+  // @ts-expect-error this function doesn't appear to exist
   return ThreadFront.interrupt();
 }
-
-function setEventListenerBreakpoints(ids) {
+function setEventListenerBreakpoints(ids: string[]) {
   setEventLogpoints(ids);
 }
 
-let gExceptionLogpointGroupId;
+let gExceptionLogpointGroupId: string | null;
 
-function logExceptions(shouldLog) {
+function logExceptions(shouldLog: boolean) {
   if (gExceptionLogpointGroupId) {
     removeLogpoint(gExceptionLogpointGroupId);
   }
@@ -279,23 +331,27 @@ function logExceptions(shouldLog) {
   }
 }
 
-function pauseGrip(func) {
+function pauseGrip(func: Function) {
+  // @ts-expect-error this function doesn't appear to exist
   return ThreadFront.pauseGrip(func);
 }
-
-function registerSourceActor(sourceActorId, sourceId, url) {
+function registerSourceActor(sourceActorId: string, sourceId: string) {
   sourceActors[sourceActorId] = sourceId;
 }
 
-export function prepareSourcePayload(source) {
+export function prepareSourcePayload(source: {
+  actor: string;
+  url?: string;
+  sourceMapURL?: string;
+}) {
   clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
   return { thread: ThreadFront.actor, source };
 }
 
-async function getSources(client) {
+async function getSources(client: any) {
   const { sources } = await client.getSources();
 
-  return sources.map(source => prepareSourcePayload(source));
+  return sources.map((source: any) => prepareSourcePayload(source));
 }
 
 // Fetch the sources for all the targets
@@ -309,13 +365,15 @@ async function fetchSources() {
 // the debugger. If one is paused. Fake a `pause` RDP event
 // by directly calling the client event listener.
 async function checkIfAlreadyPaused() {
+  // @ts-expect-error this function has got to actually be dead
   const pausedPacket = ThreadFront.getLastPausePacket();
   if (pausedPacket) {
+    // @ts-expect-error ditto
     clientEvents.paused(ThreadFront, pausedPacket);
   }
 }
 
-function getSourceForActor(actor) {
+function getSourceForActor(actor: string) {
   if (!sourceActors[actor]) {
     throw new Error(`Unknown source actor: ${actor}`);
   }
@@ -325,20 +383,29 @@ function getSourceForActor(actor) {
 function getMainThread() {
   return currentThreadFront.actor;
 }
-
-async function getSourceActorBreakpointPositions({ actor }, range) {
+async function getSourceActorBreakpointPositions(
+  { actor }: { actor: string },
+  range?: {
+    start: ProtocolSourceLocation;
+    end: ProtocolSourceLocation;
+  }
+) {
   const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
-  const rv = {};
+  const rv: Record<number, number[]> = {};
   linePositions.forEach(({ line, columns }) => (rv[line] = columns));
   return rv;
 }
 
-async function getSourceActorBreakableLines({ actor }) {
+async function getSourceActorBreakableLines({ actor }: { actor: string }) {
   const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
   return positions.map(({ line }) => line);
 }
 
-async function getSourceActorBreakpointHitCounts({ id }, lineNumber, onFailure) {
+async function getSourceActorBreakpointHitCounts(
+  { id }: { id: string },
+  lineNumber: number,
+  onFailure?: (e: any) => void
+) {
   const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
   // See `source-actors` where MAX_LINE_HITS_TO_FETCH is defined for an
   // explanation of the bounds here.
@@ -355,15 +422,15 @@ async function getSourceActorBreakpointHitCounts({ id }, lineNumber, onFailure) 
   };
 }
 
-function getFrontByID(actorID) {
+function getFrontByID(actorID: string) {
   return devToolsClient.getFrontByID(actorID);
 }
 
-function fetchAncestorFramePositions(asyncIndex, frameId) {
+function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }
 
-function pickExecutionPoints(count, options) {
+function pickExecutionPoints(count: any, options: any) {
   return currentThreadFront.pickExecutionPoints(count, options);
 }
 

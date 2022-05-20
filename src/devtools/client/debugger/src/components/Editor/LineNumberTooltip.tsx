@@ -124,6 +124,8 @@ export default function LineNumberTooltip({
         if (lineNumber === lastHoveredLineNumber.current) {
           if (codeHeatMaps) {
             dispatch(
+              // TODO This is bad API design. Instead of passing in an `onFailure` callback,
+              // this action  should return a promise
               setBreakpointHitCounts(source!.id, lineNumber, () => {
                 setCodeHeatMaps(false);
                 dispatch(runAnalysisOnLine(lineNumber));
