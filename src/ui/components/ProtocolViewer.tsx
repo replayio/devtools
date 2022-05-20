@@ -111,13 +111,13 @@ const ProtocolRequestDetail = ({
   return (
     <>
       <h3 className={styles.SubHeader}>Request</h3>
-      <div className={styles.Panel}>
+      <div className={styles.SubPanel}>
         <JSONViewer src={request} />
       </div>
       {response && (
         <>
           <h3 className={styles.SubHeader}>Response</h3>
-          <div className={styles.Panel}>
+          <div className={styles.SubPanel}>
             <JSONViewer src={response} />
           </div>
         </>
@@ -125,7 +125,7 @@ const ProtocolRequestDetail = ({
       {error && (
         <>
           <h3 className={styles.SubHeader}>Error</h3>
-          <div className={styles.Panel}>
+          <div className={styles.SubPanel}>
             <JSONViewer src={error} />
           </div>
         </>
@@ -316,18 +316,12 @@ function ProtocolChunk({
   const durationTitle =
     chunk.ids.length > 1 ? `${averageDuration}ms average` : `${Math.round(durations)}ms`;
 
-  // TODO [bvaughn] Expand chunk when clicking on the collapsed count.
-
   return (
-    <div ref={ref} className={className}>
+    <div ref={ref} className={className} onClick={selectChunk}>
       <span className={styles.ChunkCount}>
         {chunk.count > 1 ? <span className={styles.ChunkCountBadge}>{chunk.count}</span> : null}
       </span>
-      <span
-        className={styles.ChunkMethod}
-        onClick={selectChunk}
-        title={`${chunk.class}.${chunk.method}`}
-      >
+      <span className={styles.ChunkMethod} title={`${chunk.class}.${chunk.method}`}>
         {chunk.method}
       </span>
       <span className={styles.ChunkStartTime}>{msAsMinutes(chunk.startedAt)}</span>

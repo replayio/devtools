@@ -51,12 +51,15 @@
   background-color: var(--theme-text-field-bgcolor);
 }
 
-.Panel {
+.Panel,
+.SubPanel {
   flex: 1 1 auto;
   overflow: auto;
-  padding: 0 0.5rem;
   overflow-x: hidden;
   overflow-y: auto;
+}
+.SubPanel {
+  padding: 0 0.5rem;
 }
 
 .Chunk,
@@ -65,7 +68,8 @@
 .ChunkPending {
   display: flex;
   align-items: center;
-  padding: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
 }
 .ChunkSelected {
   background-color: var(--theme-selection-background);
@@ -76,6 +80,10 @@
 }
 .ChunkErrored {
   color: var(--console-error-color);
+}
+
+.Chunk:not(.ChunkSelected):hover {
+  background-color: var(--badge-hover-background-color);
 }
 
 .ChunkCount {
@@ -99,7 +107,6 @@
   flex: 1 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: pointer;
 }
 .ChunkStartTime {
   flex: 0 0 4ch;
