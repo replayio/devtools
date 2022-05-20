@@ -1,5 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent, TimeStampedPoint } from "@recordreplay/protocol";
+import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
@@ -20,10 +20,13 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import { onConsoleMessage } from "devtools/client/webconsole/actions/messages";
+import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { getShowVideoPanel } from "ui/reducers/layout";
-import { toggleFocusMode } from "./timeline";
+import { WiredMessage } from "protocol/thread/thread";
 import { getTheme } from "ui/reducers/app";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { FocusRegion } from "ui/state/timeline";
 
 export * from "../reducers/app";
 
@@ -42,13 +45,8 @@ import {
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
-import { FocusRegion } from "ui/state/timeline";
-import {
-  clearMessages,
-  messagesAdded,
-  messagesLoaded,
-} from "devtools/client/webconsole/reducers/messages";
-import { messagesAdd } from "devtools/client/webconsole/actions/messages";
+
+import { toggleFocusMode } from "./timeline";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -131,7 +129,7 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
       ThreadFront.sessionId!
     );
 
-    dispatch(messagesAdd(messages));
+    messages.forEach(message => dispatch(onConsoleMessage(message as WiredMessage)));
     dispatch(messagesLoaded());
   };
 };

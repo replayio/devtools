@@ -33,7 +33,6 @@ import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/envi
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { refetchDataForTimeRange } from "./app";
 
 import {
   setHoveredItem as setHoveredItemAction,
@@ -41,6 +40,8 @@ import {
   setTimelineState,
   setTrimRegion,
 } from "../reducers/timeline";
+
+import { refetchDataForTimeRange } from "./app";
 
 export {
   setPlaybackPrecachedTime,
