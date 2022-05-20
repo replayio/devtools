@@ -16,12 +16,6 @@
   background-size: auto 100%;
 }
 
-.img.picker-light,
-.img.picker-dark {
-  background-image: url(~devtools/client/debugger/images/sources/prefix-picker.svg) !important;
-  background-color: transparent;
-}
-
 .img.angular {
   background-image: url(~devtools/client/debugger/images/sources/angular.svg) !important;
 }

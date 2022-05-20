@@ -335,7 +335,6 @@ class Message extends React.Component {
       messageId,
       notes,
       open,
-      prefixBadge,
       source,
       stacktrace,
       topLevelClasses,
