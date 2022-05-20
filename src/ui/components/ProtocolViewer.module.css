@@ -64,9 +64,8 @@
 .ChunkErrored,
 .ChunkPending {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   padding: 0.25rem;
-  cursor: pointer;
 }
 .ChunkSelected {
   background-color: var(--theme-selection-background);
@@ -79,10 +78,64 @@
   color: var(--console-error-color);
 }
 
+.ChunkCount {
+  flex: 0 0 1.25rem;
+  margin-right: 1ch;
+  display: flex;
+  align-items: center;
+}
+.ChunkCountBadge {
+  background: var(--badge-active-background-color);
+  color: var(--badge-active-border-color);
+  display: block;
+  border-radius: 0.25rem;
+  height: 1rem;
+  width: 1.25rem;
+  line-height: 1rem;
+  text-align: center;
+  font-size: 9px;
+}
+.ChunkMethod {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.ChunkStartTime {
+  flex: 0 0 4ch;
+}
+.ChunkDuration {
+  flex: 0 0 0.5rem;
+  margin-left: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+.ChunkDurationFast,
+.ChunkDurationMedium,
+.ChunkDurationSlow {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 0.5rem;
+}
+.ChunkDurationFast {
+  background-color: var(--green-60);
+}
+.ChunkDurationMedium {
+  background-color: var(--yellow-65);
+}
+.ChunkDurationSlow {
+  background-color: var(--red-50);
+}
+
 .Details {
   height: 65%;
   min-height: 65%;
   max-height: 65%;
   overflow: auto;
   border-top: 1px solid var(--theme-border);
+}
+
+.HiddenText {
+  flex: 0 0 auto;
+  padding: 0.5rem;
 }

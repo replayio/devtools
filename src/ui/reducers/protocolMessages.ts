@@ -20,9 +20,9 @@ export type RequestSummary = Omit<CommandRequest, "method"> & {
 
 export interface ProtocolMessagesState {
   events: (ProtocolEvent & Recorded)[];
-  idToResponseMap: {[key: number]: CommandResponse & Recorded};
-  idToRequestMap: {[key: number]: RequestSummary};
-  errors: (CommandResponse & Recorded)[];
+  idToResponseMap: { [id: number]: CommandResponse & Recorded };
+  idToRequestMap: { [id: number]: RequestSummary };
+  idToErrorMap: { [id: number]: CommandResponse & Recorded };
 }
 
 const protocolMessagesSlice = createSlice({
@@ -30,7 +30,7 @@ const protocolMessagesSlice = createSlice({
     events: [],
     idToResponseMap: {},
     idToRequestMap: {},
-    errors: [],
+    idToErrorMap: {},
   } as ProtocolMessagesState,
   name: "protocolMessages",
   reducers: {
@@ -48,7 +48,7 @@ const protocolMessagesSlice = createSlice({
       }
     },
     errorReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
-      state.errors.push(action.payload);
+      state.idToErrorMap[action.payload.id] = action.payload;
       const request = state.idToRequestMap[action.payload.id];
       if (request) {
         request.pending = false;
@@ -63,7 +63,7 @@ const protocolMessagesSlice = createSlice({
         class: requestClass,
         method: requestMethod,
         pending: !state.idToResponseMap[action.payload.id],
-        errored: state.errors.some(r => r.id === action.payload.id),
+        errored: !!state.idToErrorMap[action.payload.id],
       };
 
       state.idToRequestMap[clonedRequest.id] = clonedRequest;
@@ -77,14 +77,15 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 export default protocolMessagesSlice.reducer;
 
 export const getProtocolEvents = (state: UIState) => state.protocolMessages.events;
-export const getProtocolRequestsMap = (state: UIState) => state.protocolMessages.idToRequestMap;
+export const getProtocolErrorMap = (state: UIState) => state.protocolMessages.idToErrorMap;
+export const getProtocolRequestMap = (state: UIState) => state.protocolMessages.idToRequestMap;
 export const getProtocolResponseMap = (state: UIState) => state.protocolMessages.idToResponseMap;
 export const getProtocolRequest = (requestId: number | undefined) => (state: UIState) =>
   requestId ? state.protocolMessages.idToRequestMap[requestId] : undefined;
 export const getProtocolResponse = (requestId: number | undefined) => (state: UIState) =>
   requestId ? state.protocolMessages.idToResponseMap[requestId] : undefined;
 export const getProtocolError = (requestId: number | undefined) => (state: UIState) =>
-  requestId ? state.protocolMessages.errors.find(r => r.id === requestId) : undefined;
+  requestId ? state.protocolMessages.idToErrorMap[requestId] : undefined;
 export const getFullRequestDetails = (requestIds: number[]) => (state: UIState) =>
   requestIds.map(id => {
     return {
