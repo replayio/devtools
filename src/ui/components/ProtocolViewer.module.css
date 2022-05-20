@@ -142,7 +142,8 @@
   border-top: 1px solid var(--theme-border);
 }
 
-.HiddenText {
-  flex: 0 0 auto;
-  padding: 0.5rem;
+.LoadRemainingDetails {
+  display: flex;
+  justify-content: center;
+  margin: 0.5rem;
 }

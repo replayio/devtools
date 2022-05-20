@@ -21,6 +21,7 @@ import {
 } from "ui/reducers/protocolMessages";
 
 import styles from "./ProtocolViewer.module.css";
+import { PrimarySmButton } from "./shared/Button";
 
 const ReactJson = dynamic(() => import("react-json-view"), {
   ssr: false,
@@ -206,6 +207,7 @@ const ProtocolViewer = () => {
         ))}
       </div>
       <SelectedRequestDetails
+        key={selectedChunk ? selectedChunk.ids[0] : null}
         errorMap={errorMap}
         requestMap={requestMap}
         responseMap={responseMap}
@@ -226,15 +228,18 @@ function SelectedRequestDetails({
   responseMap: { [id: number]: CommandResponse & Recorded };
   selectedChunk: RequestSummaryChunk | null;
 }) {
+  const [loadAll, setLoadAll] = useState(false);
+
   if (selectedChunk === null) {
     return null;
   }
 
-  const hiddenCount = selectedChunk.ids.length - MAX_DETAILS_TO_RENDER;
+  const ids = loadAll ? selectedChunk.ids : selectedChunk.ids.slice(0, MAX_DETAILS_TO_RENDER);
+  const hiddenCount = loadAll ? 0 : Math.max(0, selectedChunk.ids.length - MAX_DETAILS_TO_RENDER);
 
   return (
     <div className={styles.Details}>
-      {selectedChunk.ids.slice(0, MAX_DETAILS_TO_RENDER).map(id => {
+      {ids.map(id => {
         const error = errorMap[id];
         const request = requestMap[id];
         const response = responseMap[id];
@@ -249,7 +254,11 @@ function SelectedRequestDetails({
         );
       })}
       {hiddenCount > 0 && (
-        <div className={styles.HiddenText}>{hiddenCount} additional requests were hidden...</div>
+        <div className={styles.LoadRemainingDetails}>
+          <PrimarySmButton color="blue" onClick={() => setLoadAll(true)}>
+            Load additional {hiddenCount} requests...
+          </PrimarySmButton>
+        </div>
       )}
     </div>
   );
