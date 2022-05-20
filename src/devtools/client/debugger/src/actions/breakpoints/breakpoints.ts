@@ -18,6 +18,7 @@ import {
 } from "../../reducers/breakpoints";
 import { setBreakpoint } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
+import { PrefixBadge } from "../../reducers/types";
 import {
   getBreakpointsList,
   getSelectedSource,
@@ -324,7 +325,7 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
 
 export function setBreakpointPrefixBadge(
   breakpoint: Breakpoint,
-  prefixBadge: Breakpoint["options"]["prefixBadge"]
+  prefixBadge?: PrefixBadge
 ): UIThunkAction {
   return (dispatch, getState, { ThreadFront }) => {
     dispatch(

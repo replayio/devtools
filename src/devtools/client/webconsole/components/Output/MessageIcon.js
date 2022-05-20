@@ -1,7 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { PrefixBadge } from "ui/components/PrefixBadge";
+
+import { MessagePrefixBadge } from "ui/components/PrefixBadge";
 
 const levels = {
   debug: "Debug",
@@ -39,7 +40,7 @@ export function MessageIcon(props) {
   }
 
   if (prefixBadge) {
-    return <PrefixBadge prefixBadge={prefixBadge} />;
+    return <MessagePrefixBadge prefixBadge={prefixBadge} />;
   }
 
   if (type) {

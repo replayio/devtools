@@ -1,20 +1,15 @@
 import { EnhancedStore, Reducer, ThunkDispatch } from "@reduxjs/toolkit";
+import { setHasAllPaintPoints } from "protocol/graphics";
 import { createTestStore } from "test/testUtils";
-import { UIAction } from "ui/actions";
-import { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
+import { UIStore } from "ui/actions";
 
 import * as actions from "../actions/timeline";
 
 import { getCurrentTime, getFocusRegion, getHoverTime, getPlayback } from "./timeline";
 
-type UIStateReducers = {
-  [key in keyof UIState]: Reducer<UIState[key]>;
-};
-
 describe("Redux timeline state", () => {
-  let dispatch = null as unknown as ThunkDispatch<UIState, ThunkExtraArgs, UIAction>;
-  let store = null as unknown as EnhancedStore;
+  let store = null as unknown as UIStore;
+  let dispatch = null as unknown as UIStore["dispatch"];
 
   beforeEach(async () => {
     store = await createTestStore();
@@ -28,6 +23,9 @@ describe("Redux timeline state", () => {
         zoomRegion: { endTime: 100, scale: 1, startTime: 50 },
       })
     );
+
+    // Fake having loaded paint points.
+    setHasAllPaintPoints(true);
   });
 
   describe("focus region", () => {
@@ -203,6 +201,62 @@ describe("Redux timeline state", () => {
         })
       );
       expect(getPlayback(store.getState())).toBeNull();
+    });
+
+    describe("set start time", () => {
+      it("should focus from the start time to the end of the zoom region if no focus region has been set", () => {
+        dispatch(actions.setFocusRegionStartTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 100,
+            "startTime": 65,
+          }
+        `);
+      });
+
+      it("should only update the start time when a region is set", () => {
+        dispatch(
+          actions.setFocusRegion({
+            startTime: 50,
+            endTime: 70,
+          })
+        );
+        dispatch(actions.setFocusRegionStartTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 70,
+            "startTime": 65,
+          }
+        `);
+      });
+    });
+
+    describe("set end time", () => {
+      it("should focus from the beginning of the zoom region to the specified end time if no focus region has been set", () => {
+        dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 65,
+            "startTime": 50,
+          }
+        `);
+      });
+
+      it("should only update the end time when a region is set", () => {
+        dispatch(
+          actions.setFocusRegion({
+            startTime: 50,
+            endTime: 70,
+          })
+        );
+        dispatch(actions.setFocusRegionEndTime(65, false));
+        expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
+          Object {
+            "endTime": 65,
+            "startTime": 50,
+          }
+        `);
+      });
     });
   });
 });

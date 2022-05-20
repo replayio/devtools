@@ -139,7 +139,7 @@ export interface Recording {
   collaborators?: string[];
   comments?: any;
   userRole?: RecordingRole;
-  operations: OperationsData;
+  operations?: OperationsData;
   resolution: { resolvedAt: string; resolvedBy: string };
   collaboratorRequests: CollaboratorRequest[];
 }

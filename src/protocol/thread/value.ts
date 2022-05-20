@@ -1,5 +1,5 @@
 import { assert, DisallowEverythingProxyHandler } from "../utils";
-import { EvaluationResult, Pause, WiredObject } from "./pause";
+import type { EvaluationResult, Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
 
 // like JSON, but including `undefined`

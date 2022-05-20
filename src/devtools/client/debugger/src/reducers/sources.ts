@@ -41,6 +41,7 @@ import {
   SourceActor,
 } from "./source-actors";
 import uniq from "lodash/uniq";
+import { SourceLocation } from "./types";
 
 export interface Location {
   url: string;
@@ -765,7 +766,7 @@ export function selectedLocationHasScrolled(state: UIState) {
   return state.sources.selectedLocationHasScrolled;
 }
 
-export function getTextAtLocation(state: UIState, id: string, location: Location) {
+export function getTextAtLocation(state: UIState, id: string, location: SourceLocation) {
   const source = getSource(state, id);
   if (!source) {
     return null;

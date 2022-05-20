@@ -1,6 +1,5 @@
 import { defer } from "./utils";
 import { Location, MappedLocation } from "@recordreplay/protocol";
-import { ThreadFront } from "./thread";
 
 export class MappedLocationCache {
   // Map locations encoded as strings to the corresponding MappedLocations
@@ -18,6 +17,8 @@ export class MappedLocationCache {
     if (this.runningRequests.has(cacheKey)) {
       return await this.runningRequests.get(cacheKey)!;
     }
+
+    const { ThreadFront } = await import("./thread");
 
     if (!ThreadFront.sessionId) {
       return [location];

@@ -5,19 +5,13 @@
 //
 // This module converts Firefox specific types to the generic types
 
-import { clientCommands } from "./commands";
-
-const { ThreadFront } = require("protocol/thread");
-
-export function prepareSourcePayload(source) {
-  clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
-  return { thread: ThreadFront.actor, source };
-}
-
 export async function createFrame(frame, index = 0, asyncIndex = 0) {
   if (!frame) {
     return null;
   }
+
+  const { clientCommands } = await import("./commands");
+  const { ThreadFront } = await import("protocol/thread");
 
   const { sourceId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
   const location = {

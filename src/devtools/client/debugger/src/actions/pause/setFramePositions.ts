@@ -20,6 +20,9 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
       frame.asyncIndex,
       frame.protocolId
     );
+    if (positions.length === 0) {
+      return;
+    }
     const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
       positions[0].frame
     );

@@ -1,7 +1,8 @@
+import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import sortedLastIndex from "lodash/sortedLastIndex";
 import { useSelector } from "react-redux";
-import styles from "ui/components/PrefixBadge.module.css";
-import { getIsIndexed, getTheme } from "ui/reducers/app";
+import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
+import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { AnalysisError, AnalysisPayload } from "ui/state/app";
 
@@ -19,10 +20,9 @@ export function PanelStatus({
   prefixBadge,
 }: {
   analysisPoints: AnalysisPayload;
-  prefixBadge: string;
+  prefixBadge: PrefixBadge;
 }) {
   const isIndexed = useSelector(getIsIndexed);
-  const theme = useSelector(getTheme);
   const time = useSelector(getCurrentTime);
   let status = "";
 
@@ -43,15 +43,9 @@ export function PanelStatus({
   return (
     <div className="breakpoint-navigation-status-container">
       <div
-        className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus 
-          ${
-            prefixBadge === "unicorn"
-              ? styles["bg-unicorn"]
-              : prefixBadge !== "empty"
-              ? styles[prefixBadge]
-              : ""
-          }
-          `}
+        className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus ${getPrefixBadgeBackgroundColorClassName(
+          prefixBadge
+        )}`}
       >
         <div
           className="text-center"

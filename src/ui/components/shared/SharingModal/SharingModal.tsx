@@ -143,7 +143,9 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
             <div className="flex flex-col space-y-1 overflow-hidden">
               <div className="font-bold">Privacy Settings</div>
               <PrivacyDropdown {...{ recording }} />
-              <SecurityWarnings operations={recording.operations} onClick={() => {}} />
+              {recording.operations ? (
+                <SecurityWarnings operations={recording.operations} onClick={() => {}} />
+              ) : null}
               {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
             </div>
           </div>

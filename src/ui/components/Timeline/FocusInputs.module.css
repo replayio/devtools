@@ -5,6 +5,9 @@
   column-gap: 0.25rem;
   font-size: 1rem;
   line-height: 1rem;
+
+  /* Don't show text selection cursor because it looks like an input cursor */
+  cursor: default;
 }
 
 .CurrentTimeLabel,
