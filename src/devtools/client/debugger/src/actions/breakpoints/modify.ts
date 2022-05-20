@@ -83,7 +83,7 @@ export function addBreakpoint(
   shouldTrack = false,
   shouldCancel = () => false
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     const { sourceId, column, line } = initialLocation;
 
     dispatch(setRequestedBreakpoint({ sourceId, line }));
@@ -134,7 +134,7 @@ export function addBreakpoint(
     }
 
     // @ts-expect-error Breakpoint structure mismatch
-    dispatch(setBreakpoint(breakpoint, cx));
+    dispatch(setBreakpoint(breakpoint, ThreadFront.recordingId!, cx));
 
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
