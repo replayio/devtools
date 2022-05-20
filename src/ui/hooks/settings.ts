@@ -37,6 +37,7 @@ const emptySettings: ExperimentalUserSettings = {
   enableEventLink: false,
   enableTeams: true,
   showReact: false,
+  enableScaleFontSize: false
 };
 
 const testSettings: ExperimentalUserSettings = {
@@ -46,6 +47,7 @@ const testSettings: ExperimentalUserSettings = {
   enableEventLink: false,
   enableTeams: true,
   showReact: true,
+  enableScaleFontSize: false
 };
 
 export async function getUserSettings(): Promise<ExperimentalUserSettings> {
@@ -118,6 +120,7 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
     showReact: settings.showReact,
+    enableScaleFontSize: settings.enableScaleFontSize
   };
 }
 
