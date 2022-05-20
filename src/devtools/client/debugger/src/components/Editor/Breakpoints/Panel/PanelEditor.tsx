@@ -4,7 +4,6 @@ const { connect } = require("devtools/client/debugger/src/utils/connect");
 const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";
-import { PrefixBadge } from "ui/components/PrefixBadge";
 import { UIState } from "ui/state";
 
 interface Props {
@@ -116,7 +115,7 @@ class PanelEditor extends PureComponent<Props, State> {
           setCondition={this.setCondition}
           setConditionSyntaxError={this.setConditionSyntaxError}
         />
-        <div className="button-container flex items-center ml-2">
+        <div className="button-container ml-2 flex items-center">
           <SubmitButton
             handleSetBreakpoint={this.handleSetBreakpoint}
             disabled={!!logSyntaxError || !!conditionSyntaxError}

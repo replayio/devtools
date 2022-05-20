@@ -146,6 +146,8 @@ export type Breakpoint = {
   readonly options: BreakpointOptions;
 };
 
+export type PrefixBadge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
+
 /**
  * Options for a breakpoint that can be modified by the user.
  */
@@ -155,7 +157,7 @@ export type BreakpointOptions = {
   logValue?: string | null;
   logGroupId?: string | null;
   shouldPause?: boolean;
-  prefixBadge?: "unicorn" | "blue" | "pink" | "yellow" | "green";
+  prefixBadge?: PrefixBadge;
 };
 export type BreakpointActor = {
   readonly actor: ActorId;
