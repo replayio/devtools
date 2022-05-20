@@ -32,6 +32,7 @@ pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.showRedux", false);
+pref("devtools.features.enableScaleFontSize", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -64,6 +65,7 @@ export const features = new PrefsHelper("devtools.features", {
   logProtocol: ["Bool", "logProtocol"],
   unicornConsole: ["Bool", "unicornConsole"],
   showRedux: ["Bool", "showRedux"],
+  enableScaleFontSize: ["Bool", "enableScaleFontSize"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

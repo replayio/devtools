@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Editor from "./index";
 import EditorTabs from "./Tabs";
@@ -8,11 +8,14 @@ import EditorFooter from "./Footer";
 import WelcomeBox from "../WelcomeBox";
 
 import { Redacted } from "ui/components/Redacted";
-import useWidthObserver from "ui/utils/useWidthObserver";
+
 import { waitForEditor } from "../../utils/editor/create-editor";
 import { setUnexpectedError } from "ui/actions/errors";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
+import { useFeature } from "ui/hooks/settings";
 import { getToolboxLayout } from "ui/reducers/layout";
+import useWidthObserver from "ui/utils/useWidthObserver";
+
 import { getSelectedSource } from "../../reducers/sources";
 
 export const EditorPane = () => {
@@ -21,9 +24,19 @@ export const EditorPane = () => {
   const toolboxLayout = useSelector(getToolboxLayout);
   const selectedSource = useSelector(getSelectedSource);
   const panelEl = useRef(null);
+  const { value: enableScaleFontSize } = useFeature("enableScaleFontSize");
 
   const nodeWidth = useWidthObserver(panelEl);
 
+  // ExperimentFeature: ScaleFontSize Logic
+  useLayoutEffect(() => {
+    const root = document.querySelector<HTMLElement>(":root")!;
+    if (enableScaleFontSize) {
+      root.style.setProperty("--theme-code-font-size", "14px");
+    } else {
+      root.style.setProperty("--theme-code-font-size", "11px");
+    }
+  }, [enableScaleFontSize]);
   useEffect(() => {
     (async () => {
       try {

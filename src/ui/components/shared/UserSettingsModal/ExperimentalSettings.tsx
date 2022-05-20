@@ -49,6 +49,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "codeHeatMaps",
   },
   {
+    label: "Scale Font Size",
+    description: "Scale font size of Editor",
+    key: "enableScaleFontSize",
+  },
+  {
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
@@ -111,6 +116,8 @@ export default function ExperimentalSettings({}) {
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
+  const { value: enableScaleFontSize, update: updateEnableScaleFontSize } =
+    useFeature("enableScaleFontSize");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -133,6 +140,8 @@ export default function ExperimentalSettings({}) {
       updateEnableUnicornConsole(!enableUnicornConsole);
     } else if (key === "showRedux") {
       updateEnableReduxDevtools(!enableReduxDevtools);
+    } else if (key === "enableScaleFontSize") {
+      updateEnableScaleFontSize(!enableScaleFontSize);
     }
   };
 
@@ -145,6 +154,7 @@ export default function ExperimentalSettings({}) {
     turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
+    enableScaleFontSize,
   };
 
   const settings = { ...userSettings, ...localSettings };

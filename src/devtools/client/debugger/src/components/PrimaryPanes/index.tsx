@@ -4,7 +4,10 @@
 
 //
 
+import clsx from "clsx";
 import React from "react";
+import { useFeature } from "ui/hooks/settings";
+import { UIState } from "ui/state";
 
 import actions from "../../actions";
 import {
@@ -17,7 +20,7 @@ import {
 import Outline from "../SourceOutline/SourceOutline";
 import SourcesTree from "./SourcesTree";
 import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
+
 import QuickOpenButton from "./QuickOpenButton";
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 import { useDebuggerPrefs } from "../../utils/prefs";
@@ -26,12 +29,14 @@ function PrimaryPanes(props: PropsFromRedux) {
   const { value: outlineExpanded, update: updateOutlineExpanded } =
     useDebuggerPrefs("outline-expanded");
   const { value: sourcesCollapsed } = useDebuggerPrefs("sources-collapsed");
+  const { value: enableScaleFontSize } = useFeature("enableScaleFontSize");
 
   return (
     <Accordion>
       <AccordionPane
         header="Sources"
-        className="sources-pane"
+        // ExperimentFeature: ScaleFontSize Logic
+        className={clsx("sources-pane", enableScaleFontSize ? "text-base" : "text-xs")}
         expanded={!sourcesCollapsed}
         onToggle={() => props.toggleSourcesCollapse()}
         initialHeight={400}
