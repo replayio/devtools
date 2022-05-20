@@ -1,8 +1,10 @@
-import { filter, padStart } from "lodash";
+import { padStart } from "lodash";
 import dynamic from "next/dynamic";
 import { CommandResponse } from "protocol/socket";
 import React, {
   MutableRefObject,
+  ReactElement,
+  ReactNode,
   useDeferredValue,
   useLayoutEffect,
   useMemo,
@@ -11,6 +13,7 @@ import React, {
 } from "react";
 import { useSelector } from "react-redux";
 import Icon from "ui/components/shared/Icon";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTheme } from "ui/reducers/app";
 import {
   getProtocolErrorMap,
@@ -34,10 +37,6 @@ const REQUEST_DURATION_SLOW_THRESHOLD_MS = 1000;
 const msAsMinutes = (ms: number) => {
   const seconds = Math.round(ms / 1000.0);
   return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
-};
-
-const fullMethod = (request: RequestSummary): string => {
-  return `${request.class}.${request.method}`;
 };
 
 type RequestSummaryChunk = {
@@ -85,7 +84,7 @@ const flattenRequests = (
   return flattened;
 };
 
-const JSONViewer = ({ src }: { src: object }) => {
+function JSONViewer({ src }: { src: object }) {
   const theme = useSelector(getTheme);
 
   return (
@@ -98,49 +97,74 @@ const JSONViewer = ({ src }: { src: object }) => {
       displayObjectSize={false}
     />
   );
-};
-
-const ProtocolRequestDetail = ({
-  request,
-  response,
-  error,
-}: {
-  request: RequestSummary;
-  response: (CommandResponse & Recorded) | undefined;
-  error: (CommandResponse & Recorded) | undefined;
-}) => {
-  return (
-    <>
-      <h3 className={styles.SubHeader}>Request</h3>
-      <div className={styles.SubPanel}>
-        <JSONViewer src={request} />
-      </div>
-      {response && (
-        <>
-          <h3 className={styles.SubHeader}>Response</h3>
-          <div className={styles.SubPanel}>
-            <JSONViewer src={response} />
-          </div>
-        </>
-      )}
-      {error && (
-        <>
-          <h3 className={styles.SubHeader}>Error</h3>
-          <div className={styles.SubPanel}>
-            <JSONViewer src={error} />
-          </div>
-        </>
-      )}
-    </>
-  );
-};
-
-interface RequestTimings {
-  startTime: number;
-  stopTime: number;
 }
 
-const ProtocolViewer = () => {
+function ProtocolRequestDetailPanel({
+  autoExpand,
+  children,
+  header,
+  subHeader,
+}: {
+  autoExpand: boolean;
+  children: ReactNode;
+  header: ReactNode;
+  subHeader: ReactNode;
+}) {
+  const [isExpanded, setIsExpanded] = useState(autoExpand);
+
+  return (
+    <>
+      <h3 className={styles.AccordionHeader} onClick={() => setIsExpanded(!isExpanded)}>
+        <MaterialIcon iconSize="2xl">{isExpanded ? "arrow_drop_down" : "arrow_right"}</MaterialIcon>
+        <span className={styles.AccordionHeaderPrimaryText}>{header}</span>{" "}
+        <small className={styles.AccordionHeaderSecondaryText}>{subHeader}</small>
+      </h3>
+      {isExpanded && children}
+    </>
+  );
+}
+
+function ProtocolRequestDetail({
+  error,
+  index,
+  request,
+  response,
+}: {
+  error: (CommandResponse & Recorded) | undefined;
+  index: number;
+  request: RequestSummary;
+  response: (CommandResponse & Recorded) | undefined;
+}) {
+  return (
+    <>
+      <ProtocolRequestDetailPanel
+        autoExpand={index === 0}
+        header={
+          <>
+            Request <small>#{index + 1}</small>
+          </>
+        }
+        subHeader={msAsMinutes(request.recordedAt)}
+      >
+        <JSONViewer src={request} />
+        {response && (
+          <>
+            <h3 className={styles.AccordionSubHeader}>Response</h3>
+            <JSONViewer src={response} />
+          </>
+        )}
+        {error && (
+          <>
+            <h3 className={styles.AccordionSubHeader}>Error</h3>
+            <JSONViewer src={error} />
+          </>
+        )}
+      </ProtocolRequestDetailPanel>
+    </>
+  );
+}
+
+export default function ProtocolViewer() {
   const [clearBeforeIndex, setClearBeforeIndex] = useState(0);
   const [filterText, setFilterText] = useState("");
   const deferredFilterText = useDeferredValue(filterText);
@@ -221,7 +245,7 @@ const ProtocolViewer = () => {
       )}
     </div>
   );
-};
+}
 
 function SelectedRequestDetails({
   errorMap,
@@ -245,7 +269,7 @@ function SelectedRequestDetails({
 
   return (
     <div className={styles.Details}>
-      {ids.map(id => {
+      {ids.map((id, index) => {
         const error = errorMap[id];
         const request = requestMap[id];
         const response = responseMap[id];
@@ -253,6 +277,7 @@ function SelectedRequestDetails({
         return (
           <ProtocolRequestDetail
             key={request!.id}
+            index={index}
             request={request!}
             response={response}
             error={error}
@@ -346,5 +371,3 @@ function ProtocolChunk({
     </div>
   );
 }
-
-export default ProtocolViewer;

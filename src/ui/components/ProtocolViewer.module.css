@@ -13,11 +13,33 @@
   padding: 0.5rem;
 }
 
-.SubHeader {
+.AccordionHeader {
   font-size: 1rem;
   line-height: 1rem;
   flex: 0 0 auto;
+  padding: 0.5rem 0;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  border-bottom: 1px solid var(--theme-border);
+  gap: 0.25rem;
+}
+.AccordionHeaderPrimaryText {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: pre;
+}
+.AccordionHeaderSecondaryText {
+  flex: 0 0 auto;
+}
+
+.AccordionSubHeader {
+  font-size: 0.9rem;
+  line-height: 0.9rem;
   padding: 0.5rem;
+  margin: 0.5rem 0;
+  background-color: var(--focus-mode-capsule-background-color-hover);
 }
 
 .HeaderControls {
@@ -107,6 +129,7 @@
   flex: 1 1 auto;
   overflow: hidden;
   text-overflow: ellipsis;
+  white-space: pre;
 }
 .ChunkStartTime {
   flex: 0 0 4ch;
@@ -146,4 +169,23 @@
   display: flex;
   justify-content: center;
   margin: 0.5rem;
+}
+
+.AccordionArrowCollapsed,
+.AccordionArrowExpanded {
+  mask-size: 10px;
+  vertical-align: -1px;
+  width: 10px;
+  height: 10px;
+  border: 0;
+  padding: 0;
+  margin-inline-end: 4px;
+  transform-origin: center center;
+  transition: transform 125ms var(--animation-curve);
+  background-color: var(--theme-icon-dimmed-color);
+}
+.AccordionArrowCollapsed {
+  transform: rotate(-90deg);
+}
+.AccordionArrowExpanded {
 }
