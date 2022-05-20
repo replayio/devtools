@@ -46,6 +46,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 0.5rem;
   padding: 0 0.5rem 0.5rem;
   margin: 0 0 0.5rem;
   border-bottom: 1px solid var(--theme-border);
@@ -59,7 +60,6 @@
 
 .ClearButton {
   border-radius: 4px;
-  margin-left: 0.5rem;
 }
 .ClearButton:not(.ClearButton:disabled):hover {
   background-color: var(--toolbarbutton-focus-bgcolor);
@@ -90,6 +90,7 @@
 .ChunkPending {
   display: flex;
   align-items: center;
+  gap: 1ch;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
 }
@@ -110,7 +111,6 @@
 
 .ChunkCount {
   flex: 0 0 1.25rem;
-  margin-right: 1ch;
   display: flex;
   align-items: center;
 }
@@ -135,17 +135,17 @@
   flex: 0 0 4ch;
 }
 .ChunkDuration {
-  flex: 0 0 0.5rem;
-  margin-left: 0.5rem;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
 }
 .ChunkDurationFast,
 .ChunkDurationMedium,
 .ChunkDurationSlow {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0.25rem;
+  font-size: 9px;
+  padding: 0 0.25rem;
+  color: var(--theme-selection-color);
 }
 .ChunkDurationFast {
   background-color: var(--green-60);
