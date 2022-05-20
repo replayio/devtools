@@ -1,5 +1,6 @@
 import { ExecutionPoint, PointDescription } from "@recordreplay/protocol";
 import { padStart } from "lodash";
+import prettyMilliseconds from "pretty-ms";
 import analysisManager from "protocol/analysisManager";
 import { ThreadFront } from "protocol/thread";
 
@@ -26,15 +27,11 @@ export async function convertPointToTime(executionPoint: ExecutionPoint): Promis
   });
 }
 
-export function msToMinutes(ms: number) {
-  const seconds = Math.round(ms / 1000.0);
-  return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
+export function formatDuration(ms: number) {
+  return prettyMilliseconds(ms, { millisecondsDecimalDigits: 1 });
 }
 
-export function msToSeconds(ms: number) {
-  if (ms < 1000) {
-    return `${Math.round(ms)}ms`;
-  } else {
-    return `${(ms / 1000).toPrecision(2)}s`;
-  }
+export function formatTimestamp(ms: number) {
+  const seconds = Math.round(ms / 1000.0);
+  return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
 }

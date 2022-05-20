@@ -20,7 +20,7 @@ import {
   Recorded,
   RequestSummary,
 } from "ui/reducers/protocolMessages";
-import { msToMinutes, msToSeconds } from "ui/utils/time";
+import { formatDuration, formatTimestamp } from "ui/utils/time";
 
 import styles from "./ProtocolViewer.module.css";
 import { PrimarySmButton } from "./shared/Button";
@@ -138,7 +138,7 @@ function ProtocolRequestDetail({
             Request <small>#{index + 1}</small>
           </>
         }
-        subHeader={msToMinutes(request.recordedAt)}
+        subHeader={formatTimestamp(request.recordedAt)}
       >
         <JSONViewer src={request} />
         {response && (
@@ -354,7 +354,7 @@ function ProtocolChunk({
 
   return (
     <div ref={ref} className={className} onClick={selectChunk}>
-      <div className={styles.ChunkStartTime}>{msToMinutes(chunk.startedAt)}</div>
+      <div className={styles.ChunkStartTime}>{formatTimestamp(chunk.startedAt)}</div>
       <div className={styles.ChunkCount}>
         {chunk.count > 1 ? <div className={styles.ChunkCountBadge}>{chunk.count}</div> : null}
       </div>
@@ -364,7 +364,7 @@ function ProtocolChunk({
       <div className={styles.ChunkDuration}>
         {durations > 0 && (
           <div className={durationName} title={durationTitle}>
-            {msToSeconds(averageDuration)}
+            {formatDuration(averageDuration)}
           </div>
         )}
       </div>
