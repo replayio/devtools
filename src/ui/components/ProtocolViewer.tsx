@@ -362,10 +362,12 @@ function ProtocolChunk({
         {chunk.method}
       </div>
       <div className={styles.ChunkDuration}>
-        {durations > 0 && (
+        {durations > 0 ? (
           <div className={durationName} title={durationTitle}>
             {formatDuration(averageDuration)}
           </div>
+        ) : (
+          <MaterialIcon>pending</MaterialIcon>
         )}
       </div>
     </div>
