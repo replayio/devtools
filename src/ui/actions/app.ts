@@ -86,7 +86,6 @@ export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction
     // BTW - we don't have to figure out *all* of this right now :)
     dispatch(clearMessages());
 
-    // TODO [bvaughn] This value is probably pretty lightweight _but_ we could cache it for the whole session.
     const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
 
     let beginPoint: string | null = null;
