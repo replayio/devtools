@@ -1,9 +1,7 @@
-import { padStart } from "lodash";
 import dynamic from "next/dynamic";
 import { CommandResponse } from "protocol/socket";
 import React, {
   MutableRefObject,
-  ReactElement,
   ReactNode,
   useDeferredValue,
   useLayoutEffect,
@@ -22,6 +20,7 @@ import {
   Recorded,
   RequestSummary,
 } from "ui/reducers/protocolMessages";
+import { msToMinutes, msToSeconds } from "ui/utils/time";
 
 import styles from "./ProtocolViewer.module.css";
 import { PrimarySmButton } from "./shared/Button";
@@ -33,11 +32,6 @@ const ReactJson = dynamic(() => import("react-json-view"), {
 const MAX_DETAILS_TO_RENDER = 10;
 const REQUEST_DURATION_MEDIUM_THRESHOLD_MS = 250;
 const REQUEST_DURATION_SLOW_THRESHOLD_MS = 1000;
-
-const msAsMinutes = (ms: number) => {
-  const seconds = Math.round(ms / 1000.0);
-  return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
-};
 
 type RequestSummaryChunk = {
   class: string;
@@ -144,7 +138,7 @@ function ProtocolRequestDetail({
             Request <small>#{index + 1}</small>
           </>
         }
-        subHeader={msAsMinutes(request.recordedAt)}
+        subHeader={msToMinutes(request.recordedAt)}
       >
         <JSONViewer src={request} />
         {response && (
@@ -334,6 +328,8 @@ function ProtocolChunk({
     className = styles.ChunkPending;
   }
 
+  const chunksLength = chunk.ids.length;
+
   const durations = chunk.ids.reduce((total, id) => {
     const request = requestMap[id];
     const response = responseMap[id];
@@ -342,7 +338,7 @@ function ProtocolChunk({
     }
     return total;
   }, 0);
-  const averageDuration = Math.round(durations / chunk.ids.length);
+  const averageDuration = Math.round(durations / chunksLength);
 
   const selectChunk = () => setSelectedChunk(chunk);
 
@@ -354,20 +350,24 @@ function ProtocolChunk({
   }
 
   const durationTitle =
-    chunk.ids.length > 1 ? `${averageDuration}ms average` : `${Math.round(durations)}ms`;
+    chunksLength > 1 ? `${averageDuration}ms average` : `${Math.round(durations)}ms`;
 
   return (
     <div ref={ref} className={className} onClick={selectChunk}>
-      <span className={styles.ChunkCount}>
-        {chunk.count > 1 ? <span className={styles.ChunkCountBadge}>{chunk.count}</span> : null}
-      </span>
-      <span className={styles.ChunkMethod} title={`${chunk.class}.${chunk.method}`}>
+      <div className={styles.ChunkStartTime}>{msToMinutes(chunk.startedAt)}</div>
+      <div className={styles.ChunkCount}>
+        {chunk.count > 1 ? <div className={styles.ChunkCountBadge}>{chunk.count}</div> : null}
+      </div>
+      <div className={styles.ChunkMethod} title={`${chunk.class}.${chunk.method}`}>
         {chunk.method}
-      </span>
-      <span className={styles.ChunkStartTime}>{msAsMinutes(chunk.startedAt)}</span>
-      <span className={styles.ChunkDuration}>
-        {durations > 0 && <div className={durationName} title={durationTitle} />}
-      </span>
+      </div>
+      <div className={styles.ChunkDuration}>
+        {durations > 0 && (
+          <div className={durationName} title={durationTitle}>
+            {msToSeconds(averageDuration)}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
