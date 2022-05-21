@@ -13,6 +13,7 @@ import React, {
 import { useSelector } from "react-redux";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { useGetUserInfo } from "ui/hooks/users";
 import { getTheme } from "ui/reducers/app";
 import {
   getProtocolErrorMap,
@@ -125,6 +126,8 @@ function ProtocolRequestDetail({
   request: RequestSummary;
   response: (CommandResponse & Recorded) | undefined;
 }) {
+  const { internal: isInternalUser } = useGetUserInfo();
+
   let className = "";
   if (error != null) {
     className = styles.ColorErrored;
@@ -134,12 +137,14 @@ function ProtocolRequestDetail({
 
   let reportBugLink = null;
   // If this command failed, or is hung, we might want to report it to the backend team.
-  if (error != null || response == null) {
-    const title = `${request.method} failure`;
-    const body = `Session ID: ${ThreadFront.sessionId}\nCommand ID: ${request.id}`;
-    reportBugLink = `${BACKEND_GITHUB_REPO_BASE_URL}/issues/new?body=${encodeURIComponent(
-      body
-    )}&title=${encodeURIComponent(title)}&labels=bug,bug-report`;
+  if (isInternalUser) {
+    if (error != null || response == null) {
+      const title = `${request.method} failure`;
+      const body = `Session ID: ${ThreadFront.sessionId}\nCommand ID: ${request.id}`;
+      reportBugLink = `${BACKEND_GITHUB_REPO_BASE_URL}/issues/new?body=${encodeURIComponent(
+        body
+      )}&title=${encodeURIComponent(title)}&labels=bug,bug-report`;
+    }
   }
 
   return (
@@ -226,13 +231,17 @@ export default function ProtocolViewer() {
     setClearBeforeIndex(chunks.length);
   };
 
-  let viewLogLink = null;
-  const sessionId = ThreadFront.sessionId;
-  const sessionIdPieces = sessionId?.split("/");
-  if (sessionIdPieces?.length === 2) {
-    const controllerId = sessionIdPieces[0];
+  const { internal: isInternalUser } = useGetUserInfo();
 
-    viewLogLink = `${ADMIN_APP_BASE_URL}/${controllerId}`;
+  let viewLogLink = null;
+  if (isInternalUser) {
+    const sessionId = ThreadFront.sessionId;
+    const sessionIdPieces = sessionId?.split("/");
+    if (sessionIdPieces?.length === 2) {
+      const controllerId = sessionIdPieces[0];
+
+      viewLogLink = `${ADMIN_APP_BASE_URL}/${controllerId}`;
+    }
   }
 
   return (
