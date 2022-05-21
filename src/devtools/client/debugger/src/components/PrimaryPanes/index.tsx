@@ -4,7 +4,7 @@
 
 //
 
-import clsx from "clsx";
+import classnames from "classnames";
 import React from "react";
 import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
@@ -36,7 +36,7 @@ function PrimaryPanes(props: PropsFromRedux) {
       <AccordionPane
         header="Sources"
         // ExperimentFeature: LargeText Logic
-        className={clsx("sources-pane", enableLargeText ? "text-base" : "text-xs")}
+        className={classnames("sources-pane", enableLargeText ? "text-base" : "text-xs")}
         expanded={!sourcesCollapsed}
         onToggle={() => props.toggleSourcesCollapse()}
         initialHeight={400}
