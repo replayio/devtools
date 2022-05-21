@@ -78,7 +78,7 @@ export function enableBreakpoint(
 export function addBreakpoint(
   cx: Context,
   initialLocation: Location,
-  options: $FixTypeLater = {},
+  options: Breakpoint["options"] = {},
   disabled = false,
   shouldTrack = false,
   shouldCancel = () => false
