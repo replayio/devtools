@@ -225,3 +225,14 @@
 .JSONViewerContainer {
   margin: 0.5rem 0;
 }
+
+.BugReportLink {
+  background-color: var(--red-50);
+  color: white;
+  border-radius: 0.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

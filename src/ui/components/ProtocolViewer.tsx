@@ -149,16 +149,17 @@ function ProtocolRequestDetail({
         <>
           <span className={styles.DetailPanelHeaderPrimary}>
             <span className={className}>{request.method}</span>
-          {reportBugLink != null && (
-            <a
-              href={reportBugLink}
-              rel="noreferrer noopener"
-              target="_blank"
-              title="Report protocol bug"
-            >
-              <MaterialIcon>bug_report</MaterialIcon>
-            </a>
-          )}
+            {reportBugLink != null && (
+              <a
+                className={styles.BugReportLink}
+                href={reportBugLink}
+                rel="noreferrer noopener"
+                target="_blank"
+                title="Report protocol bug"
+              >
+                <MaterialIcon>bug_report</MaterialIcon>
+              </a>
+            )}
           </span>
           <small className={styles.DetailPanelHeaderSecondary}>
             {formatTimestamp(request.recordedAt)}
