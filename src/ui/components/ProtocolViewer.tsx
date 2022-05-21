@@ -34,6 +34,7 @@ const MAX_DETAILS_TO_RENDER = 10;
 const REQUEST_DURATION_MEDIUM_THRESHOLD_MS = 250;
 const REQUEST_DURATION_SLOW_THRESHOLD_MS = 1000;
 const ADMIN_APP_BASE_URL = "http://admin.replay.prod/controllers";
+const BACKEND_GITHUB_REPO_BASE_URL = "https://github.com/recordReplay/backend/";
 
 type RequestSummaryChunk = {
   class: string;
@@ -131,6 +132,16 @@ function ProtocolRequestDetail({
     className = styles.ColorPending;
   }
 
+  let reportBugLink = null;
+  // If this command failed, or is hung, we might want to report it to the backend team.
+  if (error != null || response == null) {
+    const title = `${request.method} failure`;
+    const body = `Session ID: ${ThreadFront.sessionId}\nCommand ID: ${request.id}`;
+    reportBugLink = `${BACKEND_GITHUB_REPO_BASE_URL}/issues/new?body=${encodeURIComponent(
+      body
+    )}&title=${encodeURIComponent(title)}&labels=bug,bug-report`;
+  }
+
   return (
     <ProtocolRequestDetailPanel
       autoExpand={index === 0}
@@ -138,8 +149,17 @@ function ProtocolRequestDetail({
         <>
           <span className={styles.DetailPanelHeaderPrimary}>
             <span className={className}>{request.method}</span>
-            <small>#{index + 1}</small>
-          </span>{" "}
+          {reportBugLink != null && (
+            <a
+              href={reportBugLink}
+              rel="noreferrer noopener"
+              target="_blank"
+              title="Report protocol bug"
+            >
+              <MaterialIcon>bug_report</MaterialIcon>
+            </a>
+          )}
+          </span>
           <small className={styles.DetailPanelHeaderSecondary}>
             {formatTimestamp(request.recordedAt)}
           </small>
