@@ -1,9 +1,9 @@
 import classNames from "classnames";
 import React, { useLayoutEffect, useRef } from "react";
+import { Row } from "react-table";
 
 import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
-import { Row } from "react-table";
 
 export const RequestRow = ({
   currentTime,
@@ -91,6 +91,7 @@ export const RequestRow = ({
               )}
               {...cellProps}
               style={{ ...cell.getCellProps().style, display: "flex" }}
+              title={cell.value}
             >
               <div className={(cell.column as any).className}>{cell.render("Cell")}</div>
             </div>
