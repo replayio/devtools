@@ -11,6 +11,11 @@
   line-height: 1rem;
   flex: 0 0 auto;
   padding: 0.5rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
 }
 
 .AccordionHeader {
@@ -23,23 +28,7 @@
   cursor: pointer;
   border-bottom: 1px solid var(--theme-border);
   gap: 0.25rem;
-}
-.AccordionHeaderPrimaryText {
-  flex: 1 1 auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: pre;
-}
-.AccordionHeaderSecondaryText {
-  flex: 0 0 auto;
-}
-
-.AccordionSubHeader {
-  font-size: 0.9rem;
-  line-height: 0.9rem;
-  padding: 0.5rem;
-  margin: 0.5rem 0;
-  background-color: var(--focus-mode-capsule-background-color-hover);
+  user-select: none;
 }
 
 .HeaderControls {
@@ -53,9 +42,14 @@
 }
 
 .FilterInput {
-  background: var(--console-input-background);
   padding: 0.25rem 0.5rem;
   flex: 1 0 auto;
+}
+:root:global(.theme-dark) .FilterInput {
+  background: var(--console-input-background);
+}
+:root:global(.theme-light) .FilterInput {
+  background: var(--theme-base-85);
 }
 
 .ClearButton {
@@ -80,8 +74,18 @@
   overflow-x: hidden;
   overflow-y: auto;
 }
+.Panel {
+  user-select: none;
+}
 .SubPanel {
   padding: 0 0.5rem;
+}
+
+.ColorErrored {
+  color: var(--console-error-color);
+}
+.ColorPending {
+  color: var(--light-grey);
 }
 
 .Chunk,
@@ -188,4 +192,36 @@
   transform: rotate(-90deg);
 }
 .AccordionArrowExpanded {
+}
+
+.DetailPanel {
+  padding: 0 0.5rem;
+  border-bottom: 1px solid var(--theme-border);
+}
+:root:global(.theme-dark) .DetailPanel {
+  background-color: #232938;
+}
+:root:global(.theme-light) .DetailPanel {
+  background-color: var(--grey-20);
+}
+.DetailPanelHeaderPrimary {
+  flex: 1 1 auto;
+  text-overflow: ellipsis;
+  white-space: pre;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+}
+.DetailPanelHeaderSecondary {
+  flex: 0 0 auto;
+}
+.DetailPanelHeader {
+  font-size: 0.9rem;
+  line-height: 0.9rem;
+  padding: 0.5rem 0;
+}
+
+.JSONViewerContainer {
+  margin: 0.5rem 0;
 }

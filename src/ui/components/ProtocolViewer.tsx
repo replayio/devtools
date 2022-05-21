@@ -1,5 +1,6 @@
 import dynamic from "next/dynamic";
 import { CommandResponse } from "protocol/socket";
+import { ThreadFront } from "protocol/thread";
 import React, {
   MutableRefObject,
   ReactNode,
@@ -32,6 +33,7 @@ const ReactJson = dynamic(() => import("react-json-view"), {
 const MAX_DETAILS_TO_RENDER = 10;
 const REQUEST_DURATION_MEDIUM_THRESHOLD_MS = 250;
 const REQUEST_DURATION_SLOW_THRESHOLD_MS = 1000;
+const ADMIN_APP_BASE_URL = "http://admin.replay.prod/controllers";
 
 type RequestSummaryChunk = {
   class: string;
@@ -44,16 +46,12 @@ type RequestSummaryChunk = {
 };
 
 // Collapses consecutive requests with the same method name and shows the count.
-const flattenRequests = (
-  requestMap: { [key: number]: RequestSummary },
-  responseMap: { [key: number]: CommandResponse & Recorded }
-): RequestSummaryChunk[] => {
+const flattenRequests = (requestMap: { [key: number]: RequestSummary }): RequestSummaryChunk[] => {
   const flattened: RequestSummaryChunk[] = [];
   let current: RequestSummaryChunk | null = null;
 
   for (let id in requestMap) {
     const request = requestMap[id];
-    const response = responseMap[id];
 
     if (current == null || current.class !== request.class || current.method !== request.method) {
       current = {
@@ -83,12 +81,12 @@ function JSONViewer({ src }: { src: object }) {
 
   return (
     <ReactJson
-      style={{ backgroundColor: "none" }}
-      theme={theme == "light" ? "rjv-default" : "tube"}
-      src={src}
-      shouldCollapse={false}
       displayDataTypes={false}
       displayObjectSize={false}
+      shouldCollapse={false}
+      src={src}
+      style={{ backgroundColor: "transparent" }}
+      theme={theme == "light" ? "rjv-default" : "tube"}
     />
   );
 }
@@ -97,12 +95,10 @@ function ProtocolRequestDetailPanel({
   autoExpand,
   children,
   header,
-  subHeader,
 }: {
   autoExpand: boolean;
   children: ReactNode;
   header: ReactNode;
-  subHeader: ReactNode;
 }) {
   const [isExpanded, setIsExpanded] = useState(autoExpand);
 
@@ -110,8 +106,7 @@ function ProtocolRequestDetailPanel({
     <>
       <h3 className={styles.AccordionHeader} onClick={() => setIsExpanded(!isExpanded)}>
         <MaterialIcon iconSize="2xl">{isExpanded ? "arrow_drop_down" : "arrow_right"}</MaterialIcon>
-        <span className={styles.AccordionHeaderPrimaryText}>{header}</span>{" "}
-        <small className={styles.AccordionHeaderSecondaryText}>{subHeader}</small>
+        {header}
       </h3>
       {isExpanded && children}
     </>
@@ -129,32 +124,51 @@ function ProtocolRequestDetail({
   request: RequestSummary;
   response: (CommandResponse & Recorded) | undefined;
 }) {
+  let className = "";
+  if (error != null) {
+    className = styles.ColorErrored;
+  } else if (response == null) {
+    className = styles.ColorPending;
+  }
+
   return (
-    <>
-      <ProtocolRequestDetailPanel
-        autoExpand={index === 0}
-        header={
+    <ProtocolRequestDetailPanel
+      autoExpand={index === 0}
+      header={
+        <>
+          <span className={styles.DetailPanelHeaderPrimary}>
+            <span className={className}>{request.method}</span>
+            <small>#{index + 1}</small>
+          </span>{" "}
+          <small className={styles.DetailPanelHeaderSecondary}>
+            {formatTimestamp(request.recordedAt)}
+          </small>
+        </>
+      }
+    >
+      <div className={styles.DetailPanel}>
+        <h3 className={styles.DetailPanelHeader}>Request</h3>
+        <div className={styles.JSONViewerContainer}>
+          <JSONViewer src={request} />
+        </div>
+        {response != null && (
           <>
-            Request <small>#{index + 1}</small>
-          </>
-        }
-        subHeader={formatTimestamp(request.recordedAt)}
-      >
-        <JSONViewer src={request} />
-        {response && (
-          <>
-            <h3 className={styles.AccordionSubHeader}>Response</h3>
-            <JSONViewer src={response} />
+            <h3 className={styles.DetailPanelHeader}>Response</h3>
+            <div className={styles.JSONViewerContainer}>
+              <JSONViewer src={response} />
+            </div>
           </>
         )}
-        {error && (
+        {error != null && (
           <>
-            <h3 className={styles.AccordionSubHeader}>Error</h3>
-            <JSONViewer src={error} />
+            <h3 className={styles.DetailPanelHeader}>Error</h3>
+            <div className={styles.JSONViewerContainer}>
+              <JSONViewer src={error} />
+            </div>
           </>
         )}
-      </ProtocolRequestDetailPanel>
-    </>
+      </div>
+    </ProtocolRequestDetailPanel>
   );
 }
 
@@ -169,7 +183,7 @@ export default function ProtocolViewer() {
 
   const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
 
-  const chunks = useMemo(() => flattenRequests(requestMap, responseMap), [requestMap, responseMap]);
+  const chunks = useMemo(() => flattenRequests(requestMap), [requestMap]);
   const filteredChunks = useMemo(
     () =>
       chunks.slice(clearBeforeIndex).filter(chunk => {
@@ -191,9 +205,25 @@ export default function ProtocolViewer() {
     setClearBeforeIndex(chunks.length);
   };
 
+  let viewLogLink = null;
+  const sessionId = ThreadFront.sessionId;
+  const sessionIdPieces = sessionId?.split("/");
+  if (sessionIdPieces?.length === 2) {
+    const controllerId = sessionIdPieces[0];
+
+    viewLogLink = `${ADMIN_APP_BASE_URL}/${controllerId}`;
+  }
+
   return (
     <div className={styles.Container}>
-      <h3 className={styles.Header}>Protocol Info</h3>
+      <h3 className={styles.Header}>
+        Protocol Info
+        {viewLogLink != null && (
+          <a href={viewLogLink} rel="noreferrer noopener" target="_blank" title="View session logs">
+            <MaterialIcon>launch</MaterialIcon>
+          </a>
+        )}
+      </h3>
 
       <div className={styles.HeaderControls}>
         <input
