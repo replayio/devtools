@@ -150,7 +150,7 @@
     "apollo": "^2.33.10",
     "autoprefixer": "^10.4.4",
     "babel-jest": "^28.0.2",
-    "babel-loader": "^8.2.4",
+    "babel-loader": "^8.2.5",
     "babel-plugin-add-react-displayname": "^0.0.5",
     "babel-plugin-transform-import-meta": "^2.1.1",
     "bufferutil": "^4.0.6",
