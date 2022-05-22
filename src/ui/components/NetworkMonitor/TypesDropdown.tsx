@@ -1,8 +1,9 @@
+import classNames from "classnames";
 import React, { useState } from "react";
-
-import PortalDropdown from "ui/components/shared/PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
 export default function TypesDropdown({
@@ -43,7 +44,10 @@ export default function TypesDropdown({
       buttonContent={button}
       setExpanded={setExpanded}
       expanded={expanded}
-      buttonStyle={`${types.size > 0 ? "text-primaryAccent" : "text-gray-400"}`}
+      buttonStyle={classNames({
+        "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size > 0,
+        "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size === 0,
+      })}
       distance={0}
       position="bottom-right"
     >
