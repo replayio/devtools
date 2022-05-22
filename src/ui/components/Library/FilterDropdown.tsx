@@ -15,17 +15,18 @@ export function FilterDropdown({ setAppliedText }: { setAppliedText: (str: strin
   };
 
   const button = (
-    <div className="text-sm flex border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor rounded-md space-x-2">
+    <div className="flex">
       <div className="text-sm">Filter</div>
       <div className="material-icons text-sm">expand_more</div>
     </div>
   );
 
   return (
-
     <Dropdown
       trigger={button}
-      menuItemsClassName="z-50">
+      menuItemsClassName="z-50"
+      triggerClassname="text-sm border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor rounded-md space-x-2 hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+    >
       <DropdownItem onClick={() => setStringAndCollapseDropdown("")}>All Replays</DropdownItem>
       <DropdownItem onClick={() => handleCreatedSince(7)}>Last 7 days</DropdownItem>
       <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>

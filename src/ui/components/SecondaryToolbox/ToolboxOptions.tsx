@@ -43,7 +43,7 @@ export default function ToolboxOptions() {
       trigger={
         <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
       }
-      triggerClassname="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
+      triggerClassname="flex toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
     >
       <LayoutOption
         label="Dock to Bottom Right"

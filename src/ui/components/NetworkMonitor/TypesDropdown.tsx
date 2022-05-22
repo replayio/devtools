@@ -16,8 +16,8 @@ export default function TypesDropdown({
     <Dropdown
       placement="bottom-start"
       triggerClassname={classNames({
-        "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size > 0,
-        "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size === 0,
+        "flex text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover outline-none": types.size > 0,
+        "flex text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover outline-none": types.size === 0,
       })}
       trigger={
         <MaterialIcon className="mr-2" iconSize="lg" outlined={true}>
