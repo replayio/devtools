@@ -36,6 +36,7 @@
     "@auth0/auth0-react": "1.2.0",
     "@headlessui/react": "^1.4.3",
     "@heroicons/react": "^1.0.6",
+    "@popperjs/core": "^2.11.5",
     "@recordreplay/protocol": "^0.26.0",
     "@redux-devtools/app": "^2.1.4",
     "@redux-devtools/extension": "^3.2.2",
