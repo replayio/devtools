@@ -56,10 +56,19 @@ export const NetworkMonitor = ({
   );
 
   useEffect(() => {
-    if (container.current) {
-      resizeObserver.current.observe(container.current);
+    const observer = resizeObserver.current;
+    const splitBoxContainer = container.current;
+
+    if (splitBoxContainer) {
+      observer.observe(splitBoxContainer);
     }
-  });
+    
+    return () => {
+      if (splitBoxContainer) {
+        observer.unobserve(splitBoxContainer);
+      }
+    }
+  }, []);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
