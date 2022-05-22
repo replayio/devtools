@@ -95,7 +95,7 @@ export function DropdownItemContent({
 }: {
   children: string | React.ReactElement;
   icon: string;
-  selected: boolean;
+  selected?: boolean;
 }) {
   return (
     <div className="flex flex-row space-x-4">
