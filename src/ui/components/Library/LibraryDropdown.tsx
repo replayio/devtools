@@ -39,7 +39,7 @@ export function Dropdown({
   });
 
   return (
-    <Menu as="div" className="recording-options inline-block text-left shadow-lg">
+    <Menu as="div" className="recording-options inline-block text-left">
       <Menu.Button className={triggerClassname} disabled={disabled} ref={triggerRef}>
         {trigger}
       </Menu.Button>
