@@ -33,7 +33,7 @@ export function ContextMenu({
   return createPortal(
     <div className="portal-dropdown-container">
       <div className="absolute" ref={ref} style={{ left: x, top: y, zIndex: 1001 }}>
-        <Menu as="div" className="recording-options inline-block text-left shadow-lg">
+        <Menu as="div" className="recording-options inline-block text-left">
           {({ open }) => (
             <Menu.Items
               static
