@@ -1,15 +1,29 @@
-import React, { useState } from "react";
-import styles from "./RequestTable.module.css";
 import classNames from "classnames";
+import React, { useState } from "react";
 import { Column, HeaderGroup } from "react-table";
+import { ContextMenu, ContextMenuItem, ContextMenuItemContent } from "ui/components/Library/ContextMenu";
+
+import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
-import { ContextMenu } from "../ContextMenu";
-import ColumnsDropdown from "./ColumnsDropdown";
 
 interface MenuLocation {
   x: number;
   y: number;
 }
+
+const ColumnItem = ({ column }: { column: Column }) => {
+  const attrs = (column as any).getToggleHiddenProps();
+  return (
+    <ContextMenuItem onClick={() => attrs.onChange({ target: { checked: !attrs.checked } })}>
+      <ContextMenuItemContent
+        selected={attrs.checked}
+        icon={attrs.checked ? "checked" : "unchecked"}
+      >
+        <span className="capitalize">{String(column.id)}</span>
+      </ContextMenuItemContent>
+    </ContextMenuItem>
+  );
+};
 
 export function HeaderGroups({
   columns,
@@ -29,7 +43,9 @@ export function HeaderGroups({
     >
       {menuLocation ? (
         <ContextMenu x={menuLocation.x} y={menuLocation.y} close={() => setMenuLocation(undefined)}>
-          <ColumnsDropdown columns={columns} />
+          {columns.map(column => (
+            <ColumnItem key={column.id} column={column} />
+          ))}
         </ContextMenu>
       ) : (
         ""
