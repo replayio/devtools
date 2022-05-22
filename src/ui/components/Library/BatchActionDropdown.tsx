@@ -1,19 +1,20 @@
-import React, { useState } from "react";
-import hooks from "ui/hooks";
+import { RecordingId } from "@recordreplay/protocol";
+import classNames from "classnames";
+import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
-import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
-import { DisabledButton, getButtonClasses } from "../shared/Button";
-import MaterialIcon from "../shared/MaterialIcon";
-import classNames from "classnames";
-import PortalDropdown from "../shared/PortalDropdown";
-import MoveRecordingMenu from "./MoveRecordingMenu";
-import { useConfirm } from "../shared/Confirm";
 import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
+
+import { DisabledButton, getButtonClasses } from "../shared/Button";
+import { useConfirm } from "../shared/Confirm";
+import MaterialIcon from "../shared/MaterialIcon";
+
+import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
+import MoveRecordingMenu from "./MoveRecordingMenu";
 
 const getConfirmOptions = (count: number) => {
   if (count === 1) {
@@ -44,7 +45,6 @@ function BatchActionDropdown({
 }: BatchActionDropdownProps) {
   const { userId, loading: userIdLoading } = hooks.useGetUserId();
   const { workspaces, loading: workspacesLoading } = hooks.useGetNonPendingWorkspaces();
-  const [expanded, setExpanded] = useState(false);
   const isPublicEnabled = useIsPublicEnabled();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -63,7 +63,6 @@ function BatchActionDropdown({
       }
     });
     setSelectedIds([]);
-    setExpanded(false);
   };
 
   const deleteSelectedIds = () => {
@@ -72,7 +71,6 @@ function BatchActionDropdown({
         selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
         setSelectedIds([]);
       }
-      setExpanded(false);
     });
   };
 
@@ -81,7 +79,6 @@ function BatchActionDropdown({
       updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId)
     );
     setSelectedIds([]);
-    setExpanded(false);
   };
 
   if (!selectedIds.length) {
@@ -111,30 +108,21 @@ function BatchActionDropdown({
     .every(recording => userId === recording?.user?.id);
 
   return (
-    <PortalDropdown
-      buttonContent={button}
-      buttonStyle={buttonClasses}
-      setExpanded={setExpanded}
-      expanded={expanded}
-      distance={0}
-    >
-      <Dropdown menuItemsClassName="z-50">
-        {isPublicEnabled ? (
-          <>
-            <DropdownItem onClick={() => setSelectedIdsIsPrivate(true)}>Make private</DropdownItem>
-            <DropdownItem onClick={() => setSelectedIdsIsPrivate(false)}>Make public</DropdownItem>
-          </>
-        ) : null}
-        <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
-          selectedIds.length > 1 ? "s" : ""
+    <Dropdown trigger={button} triggerClassname={buttonClasses} menuItemsClassName="z-50">
+      {isPublicEnabled ? (
+        <>
+          <DropdownItem onClick={() => setSelectedIdsIsPrivate(true)}>Make private</DropdownItem>
+          <DropdownItem onClick={() => setSelectedIdsIsPrivate(false)}>Make public</DropdownItem>
+        </>
+      ) : null}
+      <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>
-        <MoveRecordingMenu
-          workspaces={workspaces}
-          onMoveRecording={updateRecordings}
-          disableLibrary={!enableLibrary}
-        />
-      </Dropdown>
-    </PortalDropdown>
+      <MoveRecordingMenu
+        workspaces={workspaces}
+        onMoveRecording={updateRecordings}
+        disableLibrary={!enableLibrary}
+      />
+    </Dropdown>
   );
 }
 
