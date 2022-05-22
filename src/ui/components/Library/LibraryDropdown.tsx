@@ -18,10 +18,10 @@ export function Dropdown({
   menuItemsClassName,
   widthClass = "w-56",
   fontSizeClass = "text-sm",
-  triggerClassname,
+  triggerClassname = "flex items-center px-1 py-2 text-sm outline-none",
   disabled = false,
   placement = "bottom-start",
-  offset = 5
+  offset = 0
 }: {
   children: React.ReactNode,
   trigger: React.ElementType | React.ReactNode,
@@ -41,7 +41,7 @@ export function Dropdown({
   return (
     <Menu as="div" className="recording-options inline-block text-left shadow-lg" >
       <Menu.Button
-        className={classNames(triggerClassname, "flex items-center px-1 py-2 text-sm outline-none")}
+        className={triggerClassname}
         disabled={disabled}
         ref={triggerRef}
       >
