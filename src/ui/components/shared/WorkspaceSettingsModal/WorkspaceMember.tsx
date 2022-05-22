@@ -181,10 +181,7 @@ export function NonRegisteredWorkspaceMember({
         {member.email}
       </div>
 
-      <Dropdown
-        trigger={<Status member={member} />}
-        triggerClassname="group"
-      >
+      <Dropdown trigger={<Status member={member} />} triggerClassname="group">
         <WorkspaceMemberRoles
           member={member}
           isAdmin={isAdmin}

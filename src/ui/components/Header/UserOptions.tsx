@@ -45,27 +45,19 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
   return (
     <div className="user-options">
-      <Dropdown trigger={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>} >
+      <Dropdown trigger={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}>
         <DropdownItem onClick={onDocsClick}>
-          <DropdownItemContent icon="docs" >
-            Docs
-          </DropdownItemContent>
+          <DropdownItemContent icon="docs">Docs</DropdownItemContent>
         </DropdownItem>
         <DropdownItem onClick={onChatClick}>
-          <DropdownItemContent icon="help" >
-            Chat with us
-          </DropdownItemContent>
+          <DropdownItemContent icon="help">Chat with us</DropdownItemContent>
         </DropdownItem>
         <DropdownItem onClick={onSettingsClick}>
-          <DropdownItemContent icon="settings" >
-            Settings
-          </DropdownItemContent>
+          <DropdownItemContent icon="settings">Settings</DropdownItemContent>
         </DropdownItem>
         {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
           <DropdownItem onClick={onLaunchClick}>
-            <DropdownItemContent icon="replay-logo" >
-              Launch Replay
-            </DropdownItemContent>
+            <DropdownItemContent icon="replay-logo">Launch Replay</DropdownItemContent>
           </DropdownItem>
         )}
         <LoginButton />

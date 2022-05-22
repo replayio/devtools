@@ -126,7 +126,7 @@ const RequestTable = ({
       </div>
 
       {contextMenuData !== null && (
-        <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu} >
+        <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
           <ContextMenuItem onClick={setFocusStart}>
             <>
               <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />

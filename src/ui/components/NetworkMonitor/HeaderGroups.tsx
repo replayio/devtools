@@ -1,7 +1,11 @@
 import classNames from "classnames";
 import React, { useState } from "react";
 import { Column, HeaderGroup } from "react-table";
-import { ContextMenu, ContextMenuItem, ContextMenuItemContent } from "ui/components/Library/ContextMenu";
+import {
+  ContextMenu,
+  ContextMenuItem,
+  ContextMenuItemContent,
+} from "ui/components/Library/ContextMenu";
 
 import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";

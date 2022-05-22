@@ -3,7 +3,6 @@ import { Dropdown, DropdownItem } from "./LibraryDropdown";
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
 export function FilterDropdown({ setAppliedText }: { setAppliedText: (str: string) => void }) {
-
   const setStringAndCollapseDropdown = (str: string) => {
     setAppliedText(str);
   };

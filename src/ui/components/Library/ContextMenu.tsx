@@ -1,7 +1,7 @@
 import { Menu } from "@headlessui/react";
 import classNames from "classnames";
-import React, { MutableRefObject, ReactNode, useRef } from "react";
-import {createPortal} from "react-dom";
+import React, { MutableRefObject, useRef } from "react";
+import { createPortal } from "react-dom";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 
 import Icon from "../shared/Icon";
@@ -22,7 +22,7 @@ export function ContextMenu({
   widthClass = "w-56",
   fontSizeClass = "text-sm",
   x,
-  y, 
+  y,
   close,
 }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null);

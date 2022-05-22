@@ -16,19 +16,12 @@ import MaterialIcon from "../shared/MaterialIcon";
 import { Dropdown, DropdownItem } from "./LibraryDropdown";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 
-
-
-function DeleteOption({
-  recording,
-}: {
-  recording: Recording;
-}) {
+function DeleteOption({ recording }: { recording: Recording }) {
   const currentWorkspaceId = useSelector(getWorkspaceId);
   const { confirmDestructive } = useConfirm();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
 
   const onDeleteRecording = (recordingId: RecordingId) => {
-
     confirmDestructive({
       message: "Delete replay?",
       description:
@@ -43,11 +36,7 @@ function DeleteOption({
 
   return <DropdownItem onClick={() => onDeleteRecording(recording.id)}>Delete</DropdownItem>;
 }
-function RenameOption({
-  recording,
-}: {
-  recording: Recording;
-}) {
+function RenameOption({ recording }: { recording: Recording }) {
   const dispatch = useDispatch();
   const isPublicEnabled = useIsPublicEnabled();
 
@@ -62,11 +51,7 @@ function RenameOption({
 
   return <DropdownItem onClick={() => onRename()}>Rename</DropdownItem>;
 }
-function TogglePrivacyOption({
-  recording,
-}: {
-  recording: Recording;
-}) {
+function TogglePrivacyOption({ recording }: { recording: Recording }) {
   const [isPrivate, setIsPrivate] = useState(recording.private);
   const isPublicEnabled = useIsPublicEnabled();
   const updateIsPrivate = hooks.useUpdateIsPrivate();
@@ -81,15 +66,12 @@ function TogglePrivacyOption({
   }
 
   return (
-    <DropdownItem onClick={toggleIsPrivate}>{`Make ${isPrivate ? "public" : "private"
-      }`}</DropdownItem>
+    <DropdownItem onClick={toggleIsPrivate}>{`Make ${
+      isPrivate ? "public" : "private"
+    }`}</DropdownItem>
   );
 }
-function ShareOption({
-  recording,
-}: {
-  recording: Recording;
-}) {
+function ShareOption({ recording }: { recording: Recording }) {
   const dispatch = useDispatch();
   const handleShareClick = () => {
     dispatch(setModal("sharing", { recordingId: recording.id }));
@@ -97,11 +79,7 @@ function ShareOption({
 
   return <DropdownItem onClick={handleShareClick}>Share</DropdownItem>;
 }
-function MoveRecordingOption({
-  recording,
-}: {
-  recording: Recording;
-}) {
+function MoveRecordingOption({ recording }: { recording: Recording }) {
   const { permissions } = useGetUserPermissions(recording);
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
@@ -132,22 +110,24 @@ export default function RecordingOptionsDropdown({ recording }: { recording: Rec
   }
 
   return (
-    <Dropdown trigger={({open}) => (
-      <MaterialIcon
-        outlined
-        className={classNames(
-          open ? "opacity-100" : "",
-          "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
-        )}
-      >
-        more_vert
-      </MaterialIcon>
-    )}>
+    <Dropdown
+      trigger={({ open }) => (
+        <MaterialIcon
+          outlined
+          className={classNames(
+            open ? "opacity-100" : "",
+            "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
+          )}
+        >
+          more_vert
+        </MaterialIcon>
+      )}
+    >
       {permissions.rename && <RenameOption recording={recording} />}
       {permissions.delete && <DeleteOption recording={recording} />}
-      {permissions.privacy && (<TogglePrivacyOption recording={recording} />)}
+      {permissions.privacy && <TogglePrivacyOption recording={recording} />}
       <ShareOption recording={recording} />
-      {permissions.move && (<MoveRecordingOption recording={recording} />)}
+      {permissions.move && <MoveRecordingOption recording={recording} />}
     </Dropdown>
   );
 }

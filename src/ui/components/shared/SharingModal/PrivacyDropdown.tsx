@@ -44,9 +44,7 @@ function DropdownButton({ disabled, children }: { disabled?: boolean; children: 
   );
 }
 
-function useGetPrivacyOptions(
-  recording: Recording,
-) {
+function useGetPrivacyOptions(recording: Recording) {
   const isPrivate = recording.private;
   const workspaceId = recording.workspace?.id || null;
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
@@ -156,7 +154,9 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
     <Dropdown
       trigger={<DropdownButton>{summary}</DropdownButton>}
       triggerClassname="overflow-hidden"
-      menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
+      menuItemsClassName="z-50 overflow-auto max-h-48"
+      widthClass="w-80"
+    >
       {privacyOptions}
     </Dropdown>
   );

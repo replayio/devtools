@@ -1,5 +1,5 @@
-import { Menu, } from "@headlessui/react";
-import { createPopper, Options, flip, preventOverflow } from '@popperjs/core'
+import { Menu } from "@headlessui/react";
+import { createPopper, Options, flip, preventOverflow } from "@popperjs/core";
 import classNames from "classnames";
 import React, { useEffect, useState, RefCallback, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
@@ -21,30 +21,26 @@ export function Dropdown({
   triggerClassname = "flex items-center px-1 py-2 text-sm outline-none",
   disabled = false,
   placement = "bottom-start",
-  offset = 0
+  offset = 0,
 }: {
-  children: React.ReactNode,
-  trigger: React.ElementType | React.ReactNode,
-  disabled?: boolean,
-  offset?: number,
+  children: React.ReactNode;
+  trigger: React.ElementType | React.ReactNode;
+  disabled?: boolean;
+  offset?: number;
   triggerClassname?: string;
   menuItemsClassName?: string;
   widthClass?: "w-56" | "w-64" | "w-80";
   fontSizeClass?: "text-sm" | "text-base";
-  placement?: Options['placement'];
+  placement?: Options["placement"];
 }) {
   let [triggerRef, containerRef] = usePopper({
     placement,
-    modifiers: [{ name: 'offset', options: { offset: [0, offset] } }, flip, preventOverflow],
-  })
+    modifiers: [{ name: "offset", options: { offset: [0, offset] } }, flip, preventOverflow],
+  });
 
   return (
-    <Menu as="div" className="recording-options inline-block text-left shadow-lg" >
-      <Menu.Button
-        className={triggerClassname}
-        disabled={disabled}
-        ref={triggerRef}
-      >
+    <Menu as="div" className="recording-options inline-block text-left shadow-lg">
+      <Menu.Button className={triggerClassname} disabled={disabled} ref={triggerRef}>
         {trigger}
       </Menu.Button>
       <Portal>
@@ -61,7 +57,7 @@ export function Dropdown({
         </Menu.Items>
       </Portal>
     </Menu>
-  )
+  );
 }
 
 export function DropdownItem({
@@ -118,43 +114,51 @@ export function DropdownDivider() {
 }
 
 function Portal(props: { children: React.ReactNode }) {
-  let { children } = props
-  let [mounted, setMounted] = useState(false)
+  let { children } = props;
+  let [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), [])
+  useEffect(() => setMounted(true), []);
 
-  if (!mounted) { return null }
-  return createPortal(children, document.body)
+  if (!mounted) {
+    return null;
+  }
+  return createPortal(children, document.body);
 }
 
 export function usePopper(
   options?: Partial<Options>
 ): [RefCallback<Element | null>, RefCallback<HTMLElement | null>] {
-  let reference = useRef<Element | null>(null)
-  let popper = useRef<HTMLElement | null>(null)
+  let reference = useRef<Element | null>(null);
+  let popper = useRef<HTMLElement | null>(null);
 
-  let cleanupCallback = useRef(() => { })
+  let cleanupCallback = useRef(() => {});
 
   let instantiatePopper = useCallback(() => {
-    if (!reference.current) { return }
-    if (!popper.current) { return }
+    if (!reference.current) {
+      return;
+    }
+    if (!popper.current) {
+      return;
+    }
 
-    if (cleanupCallback.current) { cleanupCallback.current() }
+    if (cleanupCallback.current) {
+      cleanupCallback.current();
+    }
 
-    cleanupCallback.current = createPopper(reference.current, popper.current, options).destroy
-  }, [reference, popper, cleanupCallback, options])
+    cleanupCallback.current = createPopper(reference.current, popper.current, options).destroy;
+  }, [reference, popper, cleanupCallback, options]);
 
   return useMemo(
     () => [
-      (referenceDomNode) => {
-        reference.current = referenceDomNode
-        instantiatePopper()
+      referenceDomNode => {
+        reference.current = referenceDomNode;
+        instantiatePopper();
       },
-      (popperDomNode) => {
-        popper.current = popperDomNode
-        instantiatePopper()
+      popperDomNode => {
+        popper.current = popperDomNode;
+        instantiatePopper();
       },
     ],
     [reference, popper, instantiatePopper]
-  )
+  );
 }
