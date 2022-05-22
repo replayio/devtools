@@ -91,7 +91,6 @@ function CommentActions({
     trackEvent("comments.start_edit");
   };
 
-
   return (
     <Dropdown
       trigger={({ open }) => (
@@ -104,8 +103,7 @@ function CommentActions({
         >
           more_vert
         </MaterialIcon>
-      )
-      }
+      )}
     >
       <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
       <DropdownItem onClick={handleDelete}>

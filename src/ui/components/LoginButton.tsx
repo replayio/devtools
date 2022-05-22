@@ -21,11 +21,7 @@ const LoginButton = () => {
     );
   }
 
-  return (
-    <DropdownItem onClick={() => loginAndReturn()}>
-      Sign In
-    </DropdownItem>
-  );
+  return <DropdownItem onClick={() => loginAndReturn()}>Sign In</DropdownItem>;
 };
 
 export default LoginButton;

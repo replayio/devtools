@@ -115,8 +115,9 @@ function BatchActionDropdown({
           <DropdownItem onClick={() => setSelectedIdsIsPrivate(false)}>Make public</DropdownItem>
         </>
       ) : null}
-      <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${selectedIds.length > 1 ? "s" : ""
-        }`}</DropdownItem>
+      <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
+        selectedIds.length > 1 ? "s" : ""
+      }`}</DropdownItem>
       <MoveRecordingMenu
         workspaces={workspaces}
         onMoveRecording={updateRecordings}

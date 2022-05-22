@@ -38,28 +38,13 @@ export default function ToolboxOptions() {
   const toolboxLayout = useSelector(getToolboxLayout);
 
   return (
-
     <Dropdown
-      trigger={
-        <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />
-      }
+      trigger={<Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />}
       triggerClassname="flex toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
     >
-      <LayoutOption
-        label="Dock to Bottom Right"
-        value="ide"
-        icon={LAYOUT_ICONS["ide"]}
-      />
-      <LayoutOption
-        label="Dock to Left"
-        value="left"
-        icon={LAYOUT_ICONS["left"]}
-      />
-      <LayoutOption
-        label="Dock to Bottom"
-        value="bottom"
-        icon={LAYOUT_ICONS["bottom"]}
-      />
+      <LayoutOption label="Dock to Bottom Right" value="ide" icon={LAYOUT_ICONS["ide"]} />
+      <LayoutOption label="Dock to Left" value="left" icon={LAYOUT_ICONS["left"]} />
+      <LayoutOption label="Dock to Bottom" value="bottom" icon={LAYOUT_ICONS["bottom"]} />
     </Dropdown>
   );
 }

@@ -41,7 +41,9 @@ export default function StatusDropdown() {
       <Dropdown
         trigger={<DropdownButton>{isResolved ? "Resolved" : "Active"}</DropdownButton>}
         triggerClassname="overflow-hidden"
-        menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-56">
+        menuItemsClassName="z-50 overflow-auto max-h-48"
+        widthClass="w-56"
+      >
         <DropdownItem
           onClick={e => {
             e.stopPropagation();
@@ -50,9 +52,7 @@ export default function StatusDropdown() {
           }}
         >
           <DropdownItemContent icon="active" selected={false}>
-            <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-              Active
-            </span>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">Active</span>
           </DropdownItemContent>
         </DropdownItem>
         <DropdownItem
