@@ -1,6 +1,6 @@
 import React, { CSSProperties, RefObject, useRef, useState, useCallback } from "react";
-
 import { createPortal } from "react-dom";
+
 import { DropdownProps } from "./Dropdown";
 
 interface PortalDropdownProps extends DropdownProps {
@@ -13,6 +13,11 @@ type Position = "top-right" | "bottom-right" | "top-left" | "bottom-left";
 
 type ViewportOverflows = Direction[];
 
+/**
+ * @deprecated
+ * @param props 
+ * @returns 
+ */
 export default function PortalDropdown(props: PortalDropdownProps) {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const [dropdownNode, setDropdownNode] = useState<HTMLDivElement | null>(null);
