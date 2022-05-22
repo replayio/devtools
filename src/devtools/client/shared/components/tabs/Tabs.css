@@ -77,15 +77,12 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   background: var(--tab-bgcolor);
 }
 
-.tabs .tabs-menu-item:hover {
-}
-
 .tabs .tabs-menu-item:hover:not(.is-active) {
   background-color: var(--tab-hover-bgcolor);
   color: var(--tab-hover-color);
 }
 
-.tabs .tabs-menu-item a {
+.tabs .tabs-menu-item :is(a, button) {
   display: flex;
   place-items: center;
   padding: 0 10px;
@@ -97,6 +94,12 @@ div[hidetabs="true"] .tabs .tabs-navigation {
   user-select: none;
   text-align: center;
   height: calc(2px + var(--theme-toolbar-height));
+}
+
+.tabs .tabs-menu-item :is(a, button):is(:focus-visible, :hover) {
+  outline: 0;
+  color: var(--tab-hover-color);
+  background-color: var(--tab-hover-bgcolor);
 }
 
 /* Remove the outline focusring from tabs-menu-item. */
