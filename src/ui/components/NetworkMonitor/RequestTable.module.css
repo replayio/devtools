@@ -76,10 +76,15 @@ table.requests {
 
 .seekBadge:is(:hover, :focus-visible) {
   outline: 0;
-  background: linear-gradient(0deg, var(--primary-accent-hover) 0, var(--primary-accent-hover) 100%);
+  background: linear-gradient(
+    0deg,
+    var(--primary-accent-hover) 0,
+    var(--primary-accent-hover) 100%
+  );
 }
 
-.row:is(:hover, :focus-visible) .seekBadge, .seekBadge:is(:hover, :focus-visible) {
+.row:is(:hover, :focus-visible) .seekBadge,
+.seekBadge:is(:hover, :focus-visible) {
   opacity: 1;
 }
 

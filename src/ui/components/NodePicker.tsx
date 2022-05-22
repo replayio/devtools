@@ -7,7 +7,6 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 
-
 export const nodePicker: any = {};
 
 interface Position {

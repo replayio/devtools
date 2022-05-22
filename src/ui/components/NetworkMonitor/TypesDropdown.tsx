@@ -45,8 +45,10 @@ export default function TypesDropdown({
       setExpanded={setExpanded}
       expanded={expanded}
       buttonStyle={classNames({
-        "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size > 0,
-        "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover": types.size === 0,
+        "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
+          types.size > 0,
+        "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover":
+          types.size === 0,
       })}
       distance={0}
       position="bottom-right"
