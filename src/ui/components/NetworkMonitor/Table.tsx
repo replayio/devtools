@@ -7,6 +7,7 @@ import {
   useTable,
   TableInstance,
 } from "react-table";
+
 import { CanonicalRequestType, partialRequestsToCompleteSummaries, RequestSummary } from "./utils";
 
 export default function Table({

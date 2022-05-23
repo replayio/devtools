@@ -36,9 +36,11 @@ import {
   responseBodyData,
   requestBodyData,
   findAnnotationsResult,
+  getHitCountsParameters,
 } from "@recordreplay/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
+import { FocusRegion } from "ui/state/timeline";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import { client, log, addEventListener } from "../socket";
@@ -513,9 +515,17 @@ class _ThreadFront {
     return { contents, contentType };
   }
 
-  async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
+  async getHitCounts(
+    sourceId: SourceId,
+    locations: SameLineSourceLocations[],
+    focusRegion: FocusRegion | null
+  ) {
     assert(this.sessionId, "no sessionId");
-    return client.Debugger.getHitCounts({ sourceId, locations, maxHits: 10000 }, this.sessionId);
+    let params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
+    if (focusRegion) {
+      params.range = { begin: focusRegion.start.point, end: focusRegion.end.point };
+    }
+    return client.Debugger.getHitCounts(params, this.sessionId);
   }
 
   async getEventHandlerCounts(eventTypes: string[]) {

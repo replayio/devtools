@@ -3,6 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 import {
   getSourceActor,
@@ -12,7 +14,6 @@ import {
   SourceActor,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
-import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 export function insertSourceActor(item: SourceActor) {
   return insertSourceActors([item]);
@@ -101,12 +102,14 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
     getValue: ({ id, lineNumber }, { getState }) =>
       getSourceActorBreakpointHitCounts(getState(), id, lineNumber),
     action: async ({ id, lineNumber, onFailure }, { dispatch, getState, client }) => {
+      const state = getState();
       await dispatch({
         type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
         id,
         [PROMISE]: client.getSourceActorBreakpointHitCounts(
-          getSourceActor(getState(), id),
+          getSourceActor(state, id),
           lineNumber,
+          getFocusRegion(state),
           onFailure
         ),
       });

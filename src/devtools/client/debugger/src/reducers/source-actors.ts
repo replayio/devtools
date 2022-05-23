@@ -4,6 +4,8 @@
 
 import type { AnyAction, Action } from "@reduxjs/toolkit";
 import sortBy from "lodash/sortBy";
+import { setLoadedRegions } from "ui/reducers/app";
+import { setFocusRegion } from "ui/reducers/timeline";
 import type { UIState } from "ui/state";
 
 import { asSettled, asyncActionAsValue, AsyncValue } from "../utils/async-value";
@@ -108,8 +110,12 @@ export default function update(state = initial, action: AnyAction) {
       state = updateBreakpointHitCounts(state, action as SetSourceActorBreakpointHitCountsAction);
       break;
 
-    case "app/setLoadedRegions":
-      state.values = clearBreakpointHitCounts(state);
+    case setLoadedRegions.type:
+      state = { ...state, values: clearBreakpointHitCounts(state) };
+      break;
+
+    case setFocusRegion.type:
+      state = { ...state, values: clearBreakpointHitCounts(state) };
       break;
 
     case "SET_SOURCE_ACTOR_BREAKABLE_LINES":

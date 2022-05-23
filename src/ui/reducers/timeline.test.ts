@@ -1,11 +1,16 @@
-import { EnhancedStore, Reducer, ThunkDispatch } from "@reduxjs/toolkit";
 import { setHasAllPaintPoints } from "protocol/graphics";
 import { createTestStore } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
 import * as actions from "../actions/timeline";
 
-import { getCurrentTime, getFocusRegion, getHoverTime, getPlayback } from "./timeline";
+import {
+  getCurrentTime,
+  getFocusRegion,
+  getHoverTime,
+  getPlayback,
+  setTimelineState,
+} from "./timeline";
 
 describe("Redux timeline state", () => {
   let store = null as unknown as UIStore;
@@ -18,7 +23,7 @@ describe("Redux timeline state", () => {
 
     // Fill dummy data in by default.
     dispatch(
-      actions.setTimelineState({
+      setTimelineState({
         currentTime: 75,
         zoomRegion: { endTime: 100, scale: 1, startTime: 50 },
       })
@@ -34,7 +39,15 @@ describe("Redux timeline state", () => {
       dispatch(actions.toggleFocusMode());
       expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
+          "end": Object {
+            "point": "",
+            "time": 80,
+          },
           "endTime": 80,
+          "start": Object {
+            "point": "",
+            "time": 70,
+          },
           "startTime": 70,
         }
       `);
@@ -130,7 +143,15 @@ describe("Redux timeline state", () => {
       );
       expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
+          "end": Object {
+            "point": "",
+            "time": 50,
+          },
           "endTime": 50,
+          "start": Object {
+            "point": "",
+            "time": 50,
+          },
           "startTime": 50,
         }
       `);
@@ -144,7 +165,15 @@ describe("Redux timeline state", () => {
       );
       expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
+          "end": Object {
+            "point": "",
+            "time": 110,
+          },
           "endTime": 110,
+          "start": Object {
+            "point": "",
+            "time": 110,
+          },
           "startTime": 110,
         }
       `);
@@ -164,7 +193,15 @@ describe("Redux timeline state", () => {
       );
       expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
+          "end": Object {
+            "point": "",
+            "time": 80,
+          },
           "endTime": 80,
+          "start": Object {
+            "point": "",
+            "time": 80,
+          },
           "startTime": 80,
         }
       `);
@@ -184,7 +221,15 @@ describe("Redux timeline state", () => {
       );
       expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
         Object {
+          "end": Object {
+            "point": "",
+            "time": 60,
+          },
           "endTime": 60,
+          "start": Object {
+            "point": "",
+            "time": 60,
+          },
           "startTime": 60,
         }
       `);
@@ -208,7 +253,15 @@ describe("Redux timeline state", () => {
         dispatch(actions.setFocusRegionStartTime(65, false));
         expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
+            "end": Object {
+              "point": "",
+              "time": 100,
+            },
             "endTime": 100,
+            "start": Object {
+              "point": "",
+              "time": 65,
+            },
             "startTime": 65,
           }
         `);
@@ -224,7 +277,15 @@ describe("Redux timeline state", () => {
         dispatch(actions.setFocusRegionStartTime(65, false));
         expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
+            "end": Object {
+              "point": "",
+              "time": 70,
+            },
             "endTime": 70,
+            "start": Object {
+              "point": "",
+              "time": 65,
+            },
             "startTime": 65,
           }
         `);
@@ -236,7 +297,15 @@ describe("Redux timeline state", () => {
         dispatch(actions.setFocusRegionEndTime(65, false));
         expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
+            "end": Object {
+              "point": "",
+              "time": 65,
+            },
             "endTime": 65,
+            "start": Object {
+              "point": "",
+              "time": 50,
+            },
             "startTime": 50,
           }
         `);
@@ -252,7 +321,15 @@ describe("Redux timeline state", () => {
         dispatch(actions.setFocusRegionEndTime(65, false));
         expect(getFocusRegion(store.getState())).toMatchInlineSnapshot(`
           Object {
+            "end": Object {
+              "point": "",
+              "time": 65,
+            },
             "endTime": 65,
+            "start": Object {
+              "point": "",
+              "time": 50,
+            },
             "startTime": 50,
           }
         `);

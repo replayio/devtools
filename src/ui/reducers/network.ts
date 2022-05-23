@@ -15,6 +15,7 @@ import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { getFocusRegion } from "./timeline";
 import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor/utils";
+import { filterToFocusRegion } from "ui/utils/timeline";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -115,9 +116,7 @@ export const getFocusedRequests = (state: UIState) => {
   const requests = getRequests(state);
   const focusRegion = getFocusRegion(state);
 
-  return requests.filter(
-    r => !focusRegion || (r.time > focusRegion.startTime && r.time <= focusRegion.endTime)
-  );
+  return filterToFocusRegion(requests, focusRegion);
 };
 
 export const getFormattedFrames = createSelector(getFrames, getSources, (frames, sources) => {

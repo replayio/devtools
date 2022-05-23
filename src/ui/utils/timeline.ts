@@ -1,6 +1,5 @@
-import { TimeStampedPointRange } from "@recordreplay/protocol";
-import { format, isValid } from "date-fns";
-import { clamp } from "lodash";
+import { TimeStamp, TimeStampedPoint, TimeStampedPointRange } from "@recordreplay/protocol";
+import { clamp, sortedIndexBy, sortedLastIndexBy } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
@@ -207,7 +206,7 @@ export function isSameTimeStampedPointRange(
   return sameBegin && sameEnd;
 }
 
-export function isInTrimSpan(time: number, focusRegion: FocusRegion) {
+export function isInFocusSpan(time: number, focusRegion: FocusRegion) {
   const { startTime, endTime } = focusRegion;
 
   return time >= startTime && time <= endTime;
@@ -274,4 +273,24 @@ export function isFocusRegionSubset(
       nextFocusRegion.endTime <= prevFocusRegion.endTime
     );
   }
+}
+
+export function filterToFocusRegion<T extends TimeStampedPoint>(
+  sortedPoints: T[],
+  focusRegion: FocusRegion | null
+): T[] {
+  if (!focusRegion) {
+    return sortedPoints;
+  }
+  const startIndex = sortedIndexBy(
+    sortedPoints,
+    { time: focusRegion.start.time, point: "" },
+    p => p.time
+  );
+  const endIndex = sortedLastIndexBy(
+    sortedPoints,
+    { time: focusRegion.end.time, point: "" },
+    p => p.time
+  );
+  return sortedPoints.slice(startIndex, endIndex);
 }

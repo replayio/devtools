@@ -19,6 +19,7 @@ import {
 } from "protocol/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 import { WiredNamedValue } from "protocol/thread/pause";
+import { FocusRegion } from "ui/state/timeline";
 
 import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 import { SelectedFrame } from "../reducers/pause";
@@ -404,6 +405,7 @@ async function getSourceActorBreakableLines({ actor }: { actor: string }) {
 async function getSourceActorBreakpointHitCounts(
   { id }: { id: string },
   lineNumber: number,
+  focusRegion: FocusRegion | null,
   onFailure?: (e: any) => void
 ) {
   const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
@@ -418,7 +420,7 @@ async function getSourceActorBreakpointHitCounts(
   return {
     max: upperBound,
     min: lowerBound,
-    ...(await ThreadFront.getHitCounts(id, locationsToFetch).catch(onFailure)),
+    ...(await ThreadFront.getHitCounts(id, locationsToFetch, focusRegion).catch(onFailure)),
   };
 }
 

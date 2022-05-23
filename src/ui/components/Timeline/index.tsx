@@ -1,8 +1,6 @@
-import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
-import { ThreadFront } from "protocol/thread/thread";
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { seek, seekToTime, setTimelineState, setTimelineToTime } from "ui/actions/timeline";
+import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { getTimeFromPosition } from "ui/utils/timeline";
 
@@ -22,6 +20,7 @@ import ProgressBars from "./ProgressBars";
 import Tooltip from "./Tooltip";
 import UnfocusedRegion from "./UnfocusedRegion";
 import { useFeature } from "ui/hooks/settings";
+import { setTimelineState } from "ui/reducers/timeline";
 
 export type EditMode = {
   dragOffset?: number;

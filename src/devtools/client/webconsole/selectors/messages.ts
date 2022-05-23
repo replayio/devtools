@@ -14,7 +14,7 @@ const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getCurrentTime, getFocusRegion } = require("ui/reducers/timeline");
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-const { isInTrimSpan } = require("ui/utils/timeline");
+const { isInFocusSpan } = require("ui/utils/timeline");
 
 export const getAllMessagesUiById = (state: UIState) => state.messages.messagesUiById;
 export const getCommandHistory = (state: UIState) => state.messages.commandHistory;
@@ -44,7 +44,7 @@ export const getVisibleMessages = createSelector(
 
       // Filter out messages that aren't within the focused region.
       if (focusRegion) {
-        if (!isInTrimSpan(executionPointTime, focusRegion)) {
+        if (!isInFocusSpan(executionPointTime, focusRegion)) {
           return false;
         }
       }

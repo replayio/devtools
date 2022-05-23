@@ -1,5 +1,6 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
+import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -13,7 +14,7 @@ import {
   Video,
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
-import { client, log, sendMessage } from "protocol/socket";
+import { client, log } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
@@ -28,23 +29,16 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
-import { HoveredItem, FocusRegion } from "ui/state/timeline";
+import { HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
 import {
+  setFocusRegion as newFocusRegion,
   setHoveredItem as setHoveredItemAction,
   setPlaybackStalled,
-  setTimelineState,
-  setTrimRegion,
-} from "../reducers/timeline";
-
-export {
-  setPlaybackPrecachedTime,
-  setPlaybackStalled,
-  setTrimRegion,
   setTimelineState,
 } from "../reducers/timeline";
 
@@ -226,10 +220,9 @@ export function seekToTime(targetTime: number): UIThunkAction {
     }
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
-    const pointNearTime =
-      // @ts-ignore
-      (await sendMessage("Session.getPointNearTime", { time: targetTime }, ThreadFront.sessionId!)) // @ts-ignore
-        .point;
+    const pointNearTime = (
+      await client.Session.getPointNearTime({ time: targetTime }, ThreadFront.sessionId!)
+    ).point;
 
     if (Math.abs(pointNearTime.time - targetTime) > Math.abs(nearestEvent.time - targetTime)) {
       dispatch(seek(nearestEvent.point, targetTime, false));
@@ -456,7 +449,9 @@ export function clearHoveredItem(): UIThunkAction {
   };
 }
 
-export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
+export function setFocusRegion(
+  focusRegion: { startTime: number; endTime: number } | null
+): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
@@ -517,14 +512,41 @@ export function setFocusRegion(focusRegion: FocusRegion | null): UIThunkAction {
         }
       }
 
+      // We now try and create a focus region with a time and a point, from just a
+      // time. In the future, it would be better if this were something like
+      // "setFocusRegionByTime" and we had another method which accepted
+      // TimeStampedPoints, because setting via context menu will often happen on
+      // resources where we already know the time *and* point. Also, we probably
+      // should *not* do this on every mouse movement in focus mode. This is
+      // actually foregoing most of the `getPointNearTime`, and instead relying on
+      // points that we mostly have already. I think often this will be OK, but
+      // probably we should also run "getPointNearTime", store that, and take the
+      // closest thing we can find of the points we have (assuming we don't have
+      // an exact match.)
+      const startIndex = sortedIndexBy(
+        state.timeline.points,
+        { time: startTime, point: "" },
+        p => p.time
+      );
+      const start =
+        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "", time: startTime };
+      const endIndex = sortedIndexBy(
+        state.timeline.points,
+        { time: endTime, point: "" },
+        p => p.time
+      );
+      const end = endIndex > 0 ? state.timeline.points[endIndex - 1] : { point: "", time: endTime };
+
       dispatch(
-        setTrimRegion({
-          endTime,
+        newFocusRegion({
+          start,
           startTime,
+          end,
+          endTime,
         })
       );
     } else {
-      dispatch(setTrimRegion(null));
+      dispatch(newFocusRegion(null));
     }
   };
 }
@@ -574,7 +596,7 @@ export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThu
 }
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
     const zoomRegion = getZoomRegion(state);
     const focusRegion = getFocusRegion(state);
@@ -583,22 +605,20 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    sendMessage(
-      "Session.unloadRegion",
-      { region: { begin: 0, end: focusRegion.startTime } },
-      window.sessionId
-    );
-    sendMessage(
-      "Session.unloadRegion",
-      { region: { begin: focusRegion.endTime, end: zoomRegion.endTime } },
-      window.sessionId
-    );
-    sendMessage(
-      "Session.loadRegion",
-      {
-        region: { begin: focusRegion.startTime, end: focusRegion.endTime },
-      },
-      window.sessionId
+    if (!features.softFocus) {
+      client.Session.unloadRegion(
+        { region: { begin: 0, end: focusRegion.startTime } },
+        ThreadFront.sessionId!
+      );
+      client.Session.unloadRegion(
+        { region: { begin: focusRegion.endTime, end: zoomRegion.endTime } },
+        ThreadFront.sessionId!
+      );
+    }
+
+    client.Session.loadRegion(
+      { region: { begin: focusRegion.startTime, end: focusRegion.endTime } },
+      ThreadFront.sessionId!
     );
 
     await dispatch(refetchMessages(focusRegion));

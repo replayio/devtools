@@ -1,4 +1,6 @@
+import { TimeStampedPoint } from "@recordreplay/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { sortBy, uniqBy } from "lodash";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState, ZoomRegion } from "ui/state/timeline";
 
@@ -11,6 +13,7 @@ function initialTimelineState(): TimelineState {
     hoveredItem: null,
     playback: null,
     playbackPrecachedTime: 0,
+    points: [],
     recordingDuration: null,
     shouldAnimate: true,
     showFocusModeControls: false,
@@ -39,8 +42,32 @@ const timelineSlice = createSlice({
     setPlaybackPrecachedTime(state, action: PayloadAction<number>) {
       state.playbackPrecachedTime = action.payload;
     },
-    setTrimRegion(state, action: PayloadAction<FocusRegion | null>) {
+    setFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.focusRegion = action.payload;
+    },
+    pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
+      let actionIndex = 0;
+      let stateIndex = 0;
+
+      while (actionIndex < action.payload.length) {
+        const actionPoint = action.payload[actionIndex];
+
+        let stateIndexPoint = state.points[stateIndex];
+
+        if (stateIndexPoint == null) {
+          state.points.push(actionPoint);
+          actionIndex++;
+        } else if (actionPoint.time === stateIndexPoint.time) {
+          // Don't add duplicates.
+          actionIndex++;
+        } else if (actionPoint.time < stateIndexPoint.time) {
+          state.points.splice(stateIndex, 0, actionPoint);
+          actionIndex++;
+          stateIndex++;
+        } else {
+          stateIndex++;
+        }
+      }
     },
   },
 });
@@ -49,8 +76,9 @@ export const {
   setHoveredItem,
   setPlaybackPrecachedTime,
   setPlaybackStalled,
-  setTrimRegion,
+  setFocusRegion,
   setTimelineState,
+  pointsReceived,
 } = timelineSlice.actions;
 
 export default timelineSlice.reducer;

@@ -6,7 +6,6 @@ import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AnalysisError,
-  AnalysisPayload,
   AppState,
   AppTheme,
   EventKind,
@@ -28,7 +27,7 @@ import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
-import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+import { filterToFocusRegion, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -267,19 +266,6 @@ export const {
 
 export default appSlice.reducer;
 
-const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
-  const focusRegion = getFocusRegion(state);
-
-  if (!focusRegion || points.error) {
-    return points;
-  }
-
-  return {
-    ...points,
-    data: points.data.filter(p => isInTrimSpan(p.time, focusRegion)) || [],
-  };
-};
-
 // Copied from ./layout to avoid circles
 const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
 const getViewMode = (state: UIState) => state.layout.viewMode;
@@ -374,10 +360,19 @@ export const getAnalysisPointsForLocation = (
   if (!location) {
     return undefined;
   }
-
   const key = getLocationAndConditionKey(location, condition);
   const points = state.app.analysisPoints[key];
-  return points ? getPointsInTrimSpan(state, points) : undefined;
+  const focusRegion = getFocusRegion(state);
+  if (!points) {
+    return undefined;
+  }
+  if (points.error || !focusRegion) {
+    return points;
+  }
+  return {
+    ...points,
+    data: filterToFocusRegion(points.data, focusRegion),
+  };
 };
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
@@ -405,7 +400,7 @@ export const getFlatEvents = (state: UIState) => {
 
   // Only show the events in the current focused region
   return focusRegion
-    ? filteredEvents.filter(e => e.time > focusRegion.startTime && e.time < focusRegion.endTime)
+    ? filteredEvents.filter(e => e.time > focusRegion.start.time && e.time < focusRegion.end.time)
     : filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;

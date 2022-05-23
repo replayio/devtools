@@ -9,16 +9,16 @@
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
+import { UIStore } from "ui/actions";
+import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
+import { pointsReceived } from "ui/reducers/timeline";
+import { ProtocolError } from "ui/state/app";
 
-import { assert, compareNumericStrings } from "./utils";
+import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
 import { PrimitiveValue } from "./thread/value";
-import { logpointGetFrameworkEventListeners } from "./event-listeners";
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-import { UIStore } from "ui/actions";
-import { setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
-import { getAnalysisPointsForLocation } from "ui/reducers/app";
-import { ProtocolError } from "ui/state/app";
+import { assert, compareNumericStrings } from "./utils";
 
 const { prefs } = require("ui/utils/prefs");
 
@@ -271,6 +271,7 @@ async function setMultiSourceLogpoint(
 
   handler.onAnalysisPoints = newPoints => {
     points.push(...newPoints);
+    store.dispatch(pointsReceived(points));
     if (showInConsole && !condition) {
       if (primitiveFronts) {
         showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);

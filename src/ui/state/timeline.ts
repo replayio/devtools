@@ -1,4 +1,4 @@
-import { TimeRange, Location } from "@recordreplay/protocol";
+import { TimeRange, Location, TimeStampedPoint } from "@recordreplay/protocol";
 
 export interface ZoomRegion {
   endTime: number;
@@ -7,7 +7,12 @@ export interface ZoomRegion {
 }
 
 export interface FocusRegion {
+  // We are moving towards using TimeStampedPoints for all ranges on the client,
+  // to that end, we should avoid using `endTime` and `startTime` from this
+  // object whenever possible
+  end: TimeStampedPoint;
   endTime: number;
+  start: TimeStampedPoint;
   startTime: number;
 }
 
@@ -23,6 +28,7 @@ export interface TimelineState {
     time: number;
   } | null;
   playbackPrecachedTime: number;
+  points: TimeStampedPoint[];
   recordingDuration: number | null;
   shouldAnimate: boolean;
   showFocusModeControls: boolean;
