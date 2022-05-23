@@ -4,15 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
-import { getLoadedRegions } from "ui/reducers/app";
-import {
-  getFormattedFrames,
-  getResponseBodies,
-  getRequestBodies,
-  getFocusedEvents,
-  getFocusedRequests,
-  getSelectedRequestId,
-} from "ui/reducers/network";
+import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
@@ -38,7 +30,6 @@ export const NetworkMonitor = ({
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
   const dispatch = useDispatch();
-  const loadedRegions = useSelector(getLoadedRegions);
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -61,10 +52,19 @@ export const NetworkMonitor = ({
   );
 
   useEffect(() => {
-    if (container.current) {
-      resizeObserver.current.observe(container.current);
+    const observer = resizeObserver.current;
+    const splitBoxContainer = container.current;
+
+    if (splitBoxContainer) {
+      observer.observe(splitBoxContainer);
     }
-  });
+
+    return () => {
+      if (splitBoxContainer) {
+        observer.unobserve(splitBoxContainer);
+      }
+    };
+  }, []);
 
   if (loading) {
     timeMixpanelEvent("net_monitor.open_network_monitor");
@@ -124,16 +124,11 @@ const connector = connect(
     currentTime: getCurrentTime(state),
     cx: getThreadContext(state),
     events: getFocusedEvents(state),
-    frames: getFormattedFrames(state),
-    loadedRegions: getLoadedRegions(state)?.loaded,
     loading: state.network.loading,
-    requestBodies: getRequestBodies(state),
     requests: getFocusedRequests(state),
-    responseBodies: getResponseBodies(state),
   }),
   {
     seek: actions.seek,
-    selectFrame: actions.selectFrame,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
