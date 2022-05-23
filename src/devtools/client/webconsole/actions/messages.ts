@@ -13,7 +13,7 @@ import { TestMessageHandlers } from "protocol/find-tests";
 import { LogpointHandlers } from "protocol/logpoint";
 import { sendMessage } from "protocol/socket";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
-import { WiredMessage } from "protocol/thread/thread";
+import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
 import { FocusRegion } from "ui/state/timeline";
@@ -315,31 +315,10 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     dispatch(setLastFetchedForFocusRegion(focusRegion));
     dispatch(setConsoleOverflowed(overflow === true));
 
-    // Copied from ThreadFront.findConsoleMessages():
-    // TODO [bvaughn] Would be nice if this shared code with ThreadFront.
     messages.forEach(message => {
-      const wiredMessage = message as WiredMessage;
+      wireUpMessage(message);
 
-      const pause = new Pause(ThreadFront);
-      pause.instantiate(
-        message.pauseId,
-        message.point.point,
-        message.point.time,
-        !!message.point.frame,
-        message.data
-      );
-
-      if (message.argumentValues) {
-        wiredMessage.argumentValues = message.argumentValues.map(
-          value => new ValueFront(pause, value)
-        );
-      }
-
-      if (message.sourceId) {
-        message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
-      }
-
-      dispatch(onConsoleMessage(wiredMessage));
+      dispatch(onConsoleMessage(message as WiredMessage));
     });
 
     dispatch(messagesLoaded());
