@@ -1,6 +1,7 @@
 import {
   getFormattedTime,
   getSecondsFromFormattedTime,
+  isFocusRegionSubset,
   isValidTimeString,
   overlap,
 } from "./timeline";
@@ -86,6 +87,44 @@ describe("getSecondsFromFormattedTime", () => {
   });
 });
 
+describe("isFocusRegionSubset", () => {
+  it("should always be true when previous focus region was null", () => {
+    expect(isFocusRegionSubset(null, null)).toBe(true);
+    expect(isFocusRegionSubset(null, { startTime: 0, endTime: 0 })).toBe(true);
+    expect(isFocusRegionSubset(null, { startTime: 0, endTime: 1000 })).toBe(true);
+    expect(isFocusRegionSubset(null, { startTime: 1000, endTime: 1000 })).toBe(true);
+  });
+
+  it("should never be true when new focus region was null (unless previous one was also)", () => {
+    expect(isFocusRegionSubset({ startTime: 0, endTime: 0 }, null)).toBe(false);
+    expect(isFocusRegionSubset({ startTime: 0, endTime: 1000 }, null)).toBe(false);
+    expect(isFocusRegionSubset({ startTime: 1000, endTime: 1000 }, null)).toBe(false);
+  });
+
+  it("should correctly differentiate between overlapping and non-overlapping focus regions", () => {
+    expect(isFocusRegionSubset({ startTime: 0, endTime: 0 }, { startTime: 0, endTime: 0 })).toBe(
+      true
+    );
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 0, endTime: 50 })
+    ).toBe(false);
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 50, endTime: 150 })
+    ).toBe(false);
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 100, endTime: 200 })
+    ).toBe(true);
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 125, endTime: 175 })
+    ).toBe(true);
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 150, endTime: 250 })
+    ).toBe(false);
+    expect(
+      isFocusRegionSubset({ startTime: 100, endTime: 200 }, { startTime: 200, endTime: 300 })
+    ).toBe(false);
+  });
+});
 describe("isValidTimeString", () => {
   it("should recognized valid time strings", () => {
     expect(isValidTimeString("0")).toBe(true);

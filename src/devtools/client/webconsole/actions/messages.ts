@@ -17,6 +17,7 @@ import { WiredMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
 import { FocusRegion } from "ui/state/timeline";
+import { isFocusRegionSubset } from "ui/utils/timeline";
 
 import {
   clearMessages,
@@ -240,26 +241,6 @@ export const messagesClearLogpoint = logpointMessagesCleared;
 export const messageOpen = messageOpened;
 export const messageClose = messageClosed;
 
-function isNewFocusRegionSubset(
-  prevFocusRegion: FocusRegion | null,
-  nextFocusRegion: FocusRegion | null
-): boolean {
-  if (prevFocusRegion === null) {
-    // Previously the entire timeline was selected.
-    // No matter what the new focus region is, it will be a subset.
-    return true;
-  } else if (nextFocusRegion === null) {
-    // The new selection includes the entire timeline.
-    // No matter what the previous focus region is, the new one is not a subset.
-    return false;
-  } else {
-    return (
-      nextFocusRegion.startTime >= prevFocusRegion.startTime &&
-      nextFocusRegion.endTime <= prevFocusRegion.endTime
-    );
-  }
-}
-
 export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
@@ -278,7 +259,7 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
     //    (unless our fetches have overflowed at some point).
     if (!didOverflow) {
-      if (isNewFocusRegionSubset(lastFetchedForFocusRegion, focusRegion)) {
+      if (isFocusRegionSubset(lastFetchedForFocusRegion, focusRegion)) {
         // We already have all of the console logs for the new region.
         // We can skip running a new analysis.
         return;
