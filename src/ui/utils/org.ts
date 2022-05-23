@@ -12,6 +12,8 @@ export function getDefaultOrganizationSettings(): WorkspaceSettings {
       },
       recording: {
         public: true,
+        allowList: [],
+        blockList: [],
       },
     },
     motd: null,

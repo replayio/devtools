@@ -67,7 +67,7 @@ export function MessagePrefixBadge({ prefixBadge }: { prefixBadge: PrefixBadge }
       ? `${styles.MessagePrefixBadgeUnicorn} ${styles.UnicornBadge}`
       : prefixBadge != null
       ? `${styles.MessagePrefixBadgeSolidColor} ${styles[prefixBadge]}`
-      : `${styles.MessagePrefixBadgeSolidColor} ${styles.Empty}`;
+      : styles.MessagePrefixBadgeSolidColor;
 
   return <div className={className} />;
 }
@@ -113,7 +113,7 @@ function PrefixBadgePickerItem({
       ? styles.UnicornBadge
       : prefixBadge != null
       ? `${styles.ColorBadge} ${styles[prefixBadge]}`
-      : `${styles.ColorBadge} ${styles.Empty}`;
+      : styles.ColorBadge;
 
   return <div onClick={onClick} className={`${styles.PickerItem} ${className}`} />;
 }
@@ -124,6 +124,6 @@ export function getPrefixBadgeBackgroundColorClassName(prefixBadge?: PrefixBadge
   return prefixBadge === "unicorn"
     ? styles.unicorn
     : prefixBadge == null
-    ? styles.Empty
+    ? ""
     : styles[prefixBadge];
 }

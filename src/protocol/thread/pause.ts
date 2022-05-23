@@ -352,7 +352,8 @@ export class Pause {
     method: (parameters: P, sessionId?: SessionId, pauseId?: PauseId) => R,
     params: P
   ) {
-    return method(params, this.sessionId, this.pauseId!);
+    assert(this.pauseId, "pauseId not set before sending a message");
+    return method(params, this.sessionId, this.pauseId);
   }
 
   async getObjectPreview(object: ObjectId) {

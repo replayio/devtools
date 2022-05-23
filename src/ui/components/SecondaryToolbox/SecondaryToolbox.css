@@ -50,11 +50,6 @@
   color: var(--tab-color);
 }
 
-.secondary-toolbox-header button:hover {
-  color: var(--tab-hover-color);
-  background-color: var(--tab-hover-bgcolor);
-}
-
 .secondary-toolbox-header button.layoutbutton:hover {
   background-color: var(--tab-bgcolor);
 }
@@ -67,6 +62,11 @@
   background: inherit;
   background: var(--tab-selected-bgcolor);
   color: var(--tab-selected-color);
+}
+
+.secondary-toolbox-header button:is(:hover, :focus-visible) {
+  color: var(--tab-hover-color);
+  background-color: var(--tab-hover-bgcolor);
 }
 
 .secondary-toolbox-header .action-buttons button {

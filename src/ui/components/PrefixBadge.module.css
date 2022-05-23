@@ -1,7 +1,6 @@
 .MessagePrefixBadgeUnicorn,
 .MessagePrefixBadgeSolidColor {
   flex-shrink: 0;
-  border-radius: 100%;
   align-self: center;
 }
 .MessagePrefixBadgeUnicorn {
@@ -12,6 +11,7 @@
   margin: 0 calc((18px - 1.25rem) / 2);
 }
 .MessagePrefixBadgeSolidColor {
+  border-radius: 100%;
   width: 0.5rem;
   height: 0.5rem;
 
@@ -58,19 +58,16 @@
 
 .ColorBadge,
 .UnicornBadge {
-  border-radius: 100%;
   width: 1.25rem;
   height: 1.25rem;
   flex: 0 0 1.25rem;
 }
-
+.ColorBadge {
+  border-radius: 100%;
+}
 .UnicornBadge {
   background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-size: auto 100%;
-}
-
-.Empty {
-  background-color: transparent;
 }
 
 /* Background fill colors */
