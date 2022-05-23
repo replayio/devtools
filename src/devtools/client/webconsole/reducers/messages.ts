@@ -283,9 +283,15 @@ const messagesSlice = createSlice({
       );
     },
     clearMessages(state) {
-      removeMessagesFromState(state as MessageState, state.messages.ids as string[]);
-      state.overflow = false;
+      // Note that we don't use removeMessagesFromState() in this case, because we're removing ALL messages.
+      // That method does extra work to handle the case where we are only removing SOME messages.
+      messagesAdapter.removeAll((state as MessageState).messages);
+
+      state.filteredMessagesCount = getDefaultFiltersCounter();
       state.messagesLoaded = false;
+      state.messagesUiById = [];
+      state.overflow = false;
+      state.visibleMessages = [];
     },
     setConsoleOverflowed(state, action: PayloadAction<boolean>) {
       state.overflow = action.payload;
