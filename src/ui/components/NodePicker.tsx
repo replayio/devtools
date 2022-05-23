@@ -1,12 +1,11 @@
+import classnames from "classnames";
+import Highlighter from "highlighter/highlighter";
+import { getDevicePixelRatio } from "protocol/graphics";
+import { ThreadFront } from "protocol/thread";
+import { EventEmitter } from "protocol/utils";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-
-import { EventEmitter } from "protocol/utils";
-import classnames from "classnames";
-import { ThreadFront } from "protocol/thread";
-import { getDevicePixelRatio } from "protocol/graphics";
-import Highlighter from "highlighter/highlighter";
 
 export const nodePicker: any = {};
 
@@ -137,14 +136,14 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     const { nodePickerActive } = this.state;
 
     return (
-      <div
+      <button
         id="command-button-pick"
         className={classnames("devtools-button toolbar-panel-button tab", {
           active: nodePickerActive,
         })}
         onClick={() => this.clickNodePickerButton()}
         title="Select an element in the video to inspect it"
-      ></div>
+      />
     );
   }
 }

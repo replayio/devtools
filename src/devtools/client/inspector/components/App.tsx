@@ -1,20 +1,21 @@
-import React, { FC, ReactNode, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import "ui/setup/dynamic/inspector";
+
 import classnames from "classnames";
-import { UIState } from "ui/state";
-import { setActiveTab } from "../actions";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { prefs } from "devtools/client/inspector/prefs";
-import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
-import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import ComputedApp from "devtools/client/inspector/computed/components/ComputedApp";
 import LayoutApp from "devtools/client/inspector/layout/components/LayoutApp";
-import { InspectorActiveTab } from "../state";
-
-import "ui/setup/dynamic/inspector";
-import { EventListenersApp } from "../event-listeners/EventListenersApp";
+import MarkupApp from "devtools/client/inspector/markup/components/MarkupApp";
+import { prefs } from "devtools/client/inspector/prefs";
+import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
+import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { assert } from "protocol/utils";
+import React, { FC, ReactNode, useMemo } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { UIState } from "ui/state";
+
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
+import { setActiveTab } from "../actions";
+import { EventListenersApp } from "../event-listeners/EventListenersApp";
+import { InspectorActiveTab } from "../state";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
   ruleview: "Rules",
@@ -117,18 +118,16 @@ const InspectorApp: FC = () => {
                                 className={classnames("tabs-menu-item", {
                                   "is-active": isPanelSelected,
                                 })}
-                                role="presentation"
                               >
                                 <span className="devtools-tab-line"></span>
-                                <a
+                                <button
                                   id={`${panelId}-tab`}
-                                  tabIndex={isPanelSelected ? 0 : -1}
                                   title={INSPECTOR_TAB_TITLES[panelId]}
                                   role="tab"
                                   onClick={() => dispatch(setActiveTab(panelId))}
                                 >
                                   {INSPECTOR_TAB_TITLES[panelId]}
-                                </a>
+                                </button>
                               </span>
                             );
                           })}

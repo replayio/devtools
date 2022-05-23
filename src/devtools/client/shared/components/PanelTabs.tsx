@@ -1,5 +1,5 @@
-import React from "react";
 import cx from "classnames";
+import React from "react";
 import { NetworkTab } from "ui/components/NetworkMonitor/RequestDetails";
 
 type Tab = {
@@ -31,7 +31,7 @@ export default function PanelTabs({
                   role="presentation"
                 >
                   <span className="devtools-tab-line"></span>
-                  <a
+                  <button
                     id={`${tab.id}-tab`}
                     onClick={() => setActiveTab(tab.id)}
                     role="tab"
@@ -39,7 +39,7 @@ export default function PanelTabs({
                     title={tab.title}
                   >
                     {tab.title}
-                  </a>
+                  </button>
                 </li>
               ))}
           </ul>

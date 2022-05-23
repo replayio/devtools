@@ -12,7 +12,8 @@ table.requests {
   cursor: pointer;
 }
 
-.row:hover {
+.row:is(:hover, :focus-visible) {
+  outline: 0;
   background-color: var(--theme-toolbar-background);
 }
 
@@ -62,7 +63,8 @@ table.requests {
   border-bottom-right-radius: 8px;
   border-top-right-radius: 8px;
   cursor: pointer;
-  display: none;
+  display: flex;
+  opacity: 0;
   font-weight: 700;
   height: 100%;
   padding-left: 6px;
@@ -72,8 +74,18 @@ table.requests {
   z-index: 1;
 }
 
-.row:hover .seekBadge {
-  display: flex;
+.seekBadge:is(:hover, :focus-visible) {
+  outline: 0;
+  background: linear-gradient(
+    0deg,
+    var(--primary-accent-hover) 0,
+    var(--primary-accent-hover) 100%
+  );
+}
+
+.row:is(:hover, :focus-visible) .seekBadge,
+.seekBadge:is(:hover, :focus-visible) {
+  opacity: 1;
 }
 
 .seekBadge .fastForward {
@@ -93,6 +105,6 @@ table.requests {
   display: none;
 }
 
-.seekBadge:hover .verbose {
+.seekBadge:is(:hover, :focus-visible) .verbose {
   display: block;
 }
