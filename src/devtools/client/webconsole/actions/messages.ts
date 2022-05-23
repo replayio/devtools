@@ -21,19 +21,17 @@ import { isFocusRegionSubset } from "ui/utils/timeline";
 
 import {
   clearMessages,
+  logpointMessagesCleared,
+  Message as InternalMessage,
+  messagesAdded,
+  messageClosed,
+  messageEvaluationsCleared,
+  messageOpened,
   setConsoleOverflowed,
   setLastFetchedForFocusRegion,
-  Message as InternalMessage,
+  setMessagesLoaded,
 } from "../reducers/messages";
-import {
-  messageEvaluationsCleared,
-  logpointMessagesCleared,
-  messagesAdded,
-  messageOpened,
-  messageClosed,
-  messagesLoaded,
-} from "../reducers/messages";
-import { getConsoleOverflow, getLastFetchedForFocusRegion } from "../selectors";
+import { getConsoleOverflow, getLastFetchedForFocusRegion, getMessagesLoaded } from "../selectors";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
@@ -50,7 +48,7 @@ export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontTyp
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
     () => store.dispatch(onConsoleOverflow())
-  ).then(() => store.dispatch(messagesLoaded()), Sentry.captureException);
+  ).then(() => store.dispatch(setMessagesLoaded(true)), Sentry.captureException);
 }
 
 function convertStack(
@@ -246,6 +244,7 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     const state = getState();
     const didOverflow = getConsoleOverflow(state);
     const lastFetchedForFocusRegion = getLastFetchedForFocusRegion(state);
+    const messagesLoaded = getMessagesLoaded(state);
 
     // Soft Focus: The frontend only needs to refetch data if:
     // 1. The most recent time it requested data "overflowed" (too many messages to send them all), or
@@ -258,12 +257,14 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
     //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
     //    (unless our fetches have overflowed at some point).
-    if (!didOverflow) {
-      if (isFocusRegionSubset(lastFetchedForFocusRegion, focusRegion)) {
-        // We already have all of the console logs for the new region.
-        // We can skip running a new analysis.
-        return;
-      }
+    if (
+      messagesLoaded &&
+      !didOverflow &&
+      isFocusRegionSubset(lastFetchedForFocusRegion, focusRegion)
+    ) {
+      // We already have all of the console logs for the new region.
+      // We can skip running a new analysis.
+      return;
     }
 
     dispatch(clearMessages());
@@ -321,6 +322,6 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
       dispatch(onConsoleMessage(message as WiredMessage));
     });
 
-    dispatch(messagesLoaded());
+    dispatch(setMessagesLoaded(true));
   };
 }

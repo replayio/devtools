@@ -216,9 +216,6 @@ const messagesSlice = createSlice({
   name: "messages",
   initialState: syncInitialMessageState,
   reducers: {
-    messagesLoaded(state) {
-      state.messagesLoaded = true;
-    },
     messagesAdded(state, action: PayloadAction<Message[]>) {
       const messages = action.payload;
       messages.forEach(message => {
@@ -290,11 +287,14 @@ const messagesSlice = createSlice({
       state.overflow = false;
       state.messagesLoaded = false;
     },
+    setConsoleOverflowed(state, action: PayloadAction<boolean>) {
+      state.overflow = action.payload;
+    },
     setLastFetchedForFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
       state.lastFetchedForFocusRegion = action.payload;
     },
-    setConsoleOverflowed(state, action: PayloadAction<boolean>) {
-      state.overflow = action.payload;
+    setMessagesLoaded(state, action: PayloadAction<boolean>) {
+      state.messagesLoaded = action.payload;
     },
   },
   extraReducers: builder => {
@@ -322,13 +322,13 @@ export const {
   messageEvaluationsCleared,
   messageOpened,
   messagesAdded,
-  messagesLoaded,
   filterTextUpdated,
   filterToggled,
   exceptionLogpointErrorCleared,
   exceptionLogpointErrorReceived,
   setConsoleOverflowed,
   setLastFetchedForFocusRegion,
+  setMessagesLoaded,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;
