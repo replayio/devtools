@@ -41,7 +41,7 @@ import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
-import { client, log, addEventListener, sendMessage } from "../socket";
+import { client, log, addEventListener } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 
 import { Pause } from "./pause";
@@ -318,7 +318,7 @@ class _ThreadFront {
 
   async getAnnotationKinds(): Promise<string[]> {
     // @ts-ignore
-    const { kinds } = await sendMessage("Session.getAnnotationKinds", {}, this.sessionId!);
+    const { kinds } = await client.Session.getAnnotationKinds();
     return kinds;
   }
 
@@ -514,13 +514,7 @@ class _ThreadFront {
   }
 
   async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
-    // @ts-ignore
-    return sendMessage(
-      // @ts-ignore
-      "Debugger.getHitCounts",
-      { sourceId, locations, maxHits: 10000 },
-      this.sessionId!
-    );
+    return client.Debugger.getHitCounts({ sourceId, locations, maxHits: 10000 });
   }
 
   async getEventHandlerCounts(eventTypes: string[]) {
@@ -536,11 +530,7 @@ class _ThreadFront {
 
   async getEventHandlerCount(eventType: string) {
     await this.waitForSession();
-    const { count } = await sendMessage(
-      "Debugger.getEventHandlerCount",
-      { eventType },
-      this.sessionId!
-    );
+    const { count } = await client.Debugger.getEventHandlerCount({ eventType });
     return count;
   }
 
