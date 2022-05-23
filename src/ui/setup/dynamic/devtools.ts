@@ -161,7 +161,7 @@ export default async function DevTools(store: AppStore) {
   });
 
   setupApp(store, ThreadFront);
-  setupTimeline(store, ThreadFront);
+  setupTimeline(store);
   setupEventListeners(store);
   setupGraphics(store);
   initOutputSyntaxHighlighting();

@@ -123,6 +123,10 @@ export function getMessage(state: UIState, id: string) {
   return getAllMessagesById(state).entities[id];
 }
 
+export function getLastFetchedForFocusRegion(state: UIState) {
+  return state.messages.lastFetchedForFocusRegion;
+}
+
 export function getConsoleOverflow(state: UIState) {
   return state.messages.overflow;
 }

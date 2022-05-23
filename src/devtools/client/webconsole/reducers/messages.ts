@@ -19,6 +19,7 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
+import { FocusRegion } from "ui/state/timeline";
 
 type MessageId = string;
 type Command = string;
@@ -150,10 +151,14 @@ export interface MessageState {
   /** Whether any messages with execution points have been seen. */
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
-  /** Flag that indicates if not all console messages will be displayed. */
-  overflow: boolean;
   messagesLoaded: boolean;
   exceptionLogpointError: string | null;
+  /** Flag that indicates if not all console messages will be displayed. */
+  overflow: boolean;
+  // The last time messages were fetched from the backend, they were constrained to this Focus Region.
+  // This value, along with the "overflow" flag, are used to implement an optimization known as "soft focus".
+  // Soft focus avoids unnecessarily re-fetching Console messages when the user changes the focus region.
+  lastFetchedForFocusRegion: FocusRegion | null;
 }
 
 const MAX_HISTORY_LENGTH = 1000;
@@ -193,6 +198,7 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
         lastMessageId: null,
         overflow: false,
         messagesLoaded: false,
+        lastFetchedForFocusRegion: null,
       },
       otherOverrides
     )
@@ -259,12 +265,6 @@ const messagesSlice = createSlice({
 
       return removeMessagesFromState(state as MessageState, removedIds);
     },
-    // This is only here to force recalculation after filters are updated
-    // TODO Find a way to rework `visibleMessages` as derived data and remove this
-    filterStateUpdated(state, action: PayloadAction<FiltersState>) {},
-    consoleOverflowed(state) {
-      state.overflow = true;
-    },
     exceptionLogpointErrorCleared(state) {
       state.exceptionLogpointError = null;
     },
@@ -290,6 +290,12 @@ const messagesSlice = createSlice({
       state.overflow = false;
       state.messagesLoaded = false;
     },
+    setLastFetchedForFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
+      state.lastFetchedForFocusRegion = action.payload;
+    },
+    setConsoleOverflowed(state, action: PayloadAction<boolean>) {
+      state.overflow = action.payload;
+    },
   },
   extraReducers: builder => {
     // Dispatched from `actions/paused.js`
@@ -311,8 +317,6 @@ const messagesSlice = createSlice({
 
 export const {
   clearMessages,
-  consoleOverflowed,
-  filterStateUpdated,
   logpointMessagesCleared,
   messageClosed,
   messageEvaluationsCleared,
@@ -323,6 +327,8 @@ export const {
   filterToggled,
   exceptionLogpointErrorCleared,
   exceptionLogpointErrorReceived,
+  setConsoleOverflowed,
+  setLastFetchedForFocusRegion,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;

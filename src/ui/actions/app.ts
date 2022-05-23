@@ -20,13 +20,9 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
-import { onConsoleMessage } from "devtools/client/webconsole/actions/messages";
-import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
-import { Pause, ThreadFront as ThreadFrontType, ValueFront } from "protocol/thread";
-import { WiredMessage } from "protocol/thread/thread";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
-import { FocusRegion } from "ui/state/timeline";
 
 export * from "../reducers/app";
 
@@ -57,98 +53,6 @@ function now(): number {
   }
   return Date.now();
 }
-
-export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
-  return async (dispatch, getState, { ThreadFront }) => {
-    const { endTime, startTime } = focusRegion;
-
-    // TODO [bvaughn] Add "soft focus" support
-    //
-    // The frontend only needs to refetch data if:
-    // 1. The most recent time it requested data "overflowed" (too many messages to send them all), or
-    // 2. The new focus region is outside of the most recent region we fetched messages for.
-    //
-    // There are two things to note about the second bullet point above:
-    // 1. When devtools is first opened, there is no focused region.
-    //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
-    // 2. We shouldn't compare the new focus region to the most recent focus region,
-    //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
-    //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
-    //    (unless our fetches have overflowed at some point).
-    dispatch(clearMessages());
-
-    const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
-
-    let beginPoint: string | null = null;
-    let endPoint: string | null = null;
-
-    if (sessionEndpoint.endpoint.time === focusRegion.endTime) {
-      const pointNearBeginning = await sendMessage(
-        "Session.getPointNearTime",
-        {
-          time: startTime,
-        },
-        ThreadFront.sessionId!
-      );
-
-      beginPoint = pointNearBeginning.point.point;
-      endPoint = sessionEndpoint.endpoint.point;
-    } else {
-      const [pointNearBeginning, pointNearEnd] = await Promise.all([
-        sendMessage(
-          "Session.getPointNearTime",
-          {
-            time: startTime,
-          },
-          ThreadFront.sessionId!
-        ),
-        sendMessage("Session.getPointNearTime", { time: endTime }, ThreadFront.sessionId!),
-      ]);
-
-      beginPoint = pointNearBeginning.point.point;
-      endPoint = pointNearEnd.point.point;
-    }
-
-    // TODO [bvaughn] Store overflow somewhere too (for "soft focus")
-    // @ts-ignore TypeScript doesn't (yet) know about this return value.
-    const { messages, overflow } = await sendMessage(
-      "Console.findMessagesInRange",
-      {
-        range: { begin: beginPoint, end: endPoint },
-      },
-      ThreadFront.sessionId!
-    );
-
-    // Copied from ThreadFront.findConsoleMessages():
-    // TODO [bvaughn] Would be nice if this shared code with ThreadFront.
-    messages.forEach(message => {
-      const wiredMessage = message as WiredMessage;
-
-      const pause = new Pause(ThreadFront);
-      pause.instantiate(
-        message.pauseId,
-        message.point.point,
-        message.point.time,
-        !!message.point.frame,
-        message.data
-      );
-
-      if (message.argumentValues) {
-        wiredMessage.argumentValues = message.argumentValues.map(
-          value => new ValueFront(pause, value)
-        );
-      }
-
-      if (message.sourceId) {
-        message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
-      }
-
-      dispatch(onConsoleMessage(wiredMessage));
-    });
-
-    dispatch(messagesLoaded());
-  };
-};
 
 export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {
