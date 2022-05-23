@@ -189,6 +189,8 @@ export interface WorkspaceSettings {
     };
     recording: {
       public: boolean;
+      allowList: string[] | null;
+      blockList: string[] | null;
     };
   };
   motd: string | null;

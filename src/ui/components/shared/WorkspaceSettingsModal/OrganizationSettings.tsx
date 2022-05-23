@@ -1,13 +1,58 @@
+import { QuestionMarkCircleIcon } from "@heroicons/react/outline";
 import classNames from "classnames";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect } from "react";
 import hooks from "ui/hooks";
-import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
-import useDebounceState from "./useDebounceState";
+import { PartialWorkspaceSettingsFeatures } from "ui/types";
 
-const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
+import useDebounceState from "./useDebounceState";
+import { sanitizeUrlList } from "./utils";
+
+function CSVInput({
+  disabled,
+  id,
+  value,
+  onChange,
+}: {
+  disabled: boolean;
+  id: string;
+  value?: string;
+  onChange: (value: string[]) => void;
+}) {
+  const [currentValue, setCurrentValue] = useDebounceState(value, v =>
+    onChange(sanitizeUrlList(v))
+  );
+
   return (
-    <div className={classNames(className, "w-5/12 flex-shrink-0")}>
+    <textarea
+      id={id}
+      className={classNames("h-20 w-full rounded-md text-sm", {
+        "bg-themeTextFieldBgcolor": disabled,
+        "border-textFieldBorder": disabled,
+      })}
+      disabled={disabled}
+      onChange={e => setCurrentValue(e.currentTarget.value)}
+      value={currentValue}
+    />
+  );
+}
+
+const Label = ({
+  className,
+  children,
+  help,
+}: {
+  className?: string;
+  children: React.ReactNode;
+  help?: string;
+}) => {
+  return (
+    <div className={classNames(className, "w-5/12 flex-shrink-0 justify-between space-x-2")}>
       <label>{children}</label>
+      {help ? (
+        <span title={help}>
+          <QuestionMarkCircleIcon className="h-4 w-4" />
+        </span>
+      ) : null}
     </div>
   );
 };
@@ -17,21 +62,24 @@ const Input = ({ children }: { children: React.ReactNode }) => {
 };
 
 const Row = ({ children }: { children: React.ReactNode }) => {
-  return <div className="flex items-center">{children}</div>;
+  return <div className="flex items-center space-x-2">{children}</div>;
 };
 
 const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
-  const { workspace } = hooks.useGetWorkspace(workspaceId);
+  const { workspace, loading } = hooks.useGetWorkspace(workspaceId);
   const updateWorkspaceSettings = hooks.useUpdateWorkspaceSettings();
-  const [message, setMessage] = useDebounceState(workspace?.settings?.motd || undefined, motd =>
-    updateWorkspaceSettings({
-      variables: {
-        workspaceId,
-        motd,
-      },
-    })
+  const [message, setMessage, resetMessage] = useDebounceState(
+    workspace?.settings?.motd || undefined,
+    motd =>
+      updateWorkspaceSettings({
+        variables: {
+          workspaceId,
+          motd,
+        },
+      })
   );
 
+  const features: PartialWorkspaceSettingsFeatures = workspace?.settings?.features || {};
   const updateFeature = (features: PartialWorkspaceSettingsFeatures) => {
     updateWorkspaceSettings({
       variables: {
@@ -40,6 +88,17 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
       },
     });
   };
+
+  useEffect(() => {
+    if (workspace) {
+      resetMessage(workspace.settings.motd || "");
+    }
+    // workspace can referentially change from polling for changes without the
+    // workspace actually having changed so we're tying this hook invocation to
+    // the id change which will indicate when the workspace becomes loaded (or if
+    // a new workspace is somehow selected) eslint-disable-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workspace?.id, resetMessage]);
 
   if (!workspace) {
     return null;
@@ -77,39 +136,44 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               id="disable_public_recordings"
               name="disable_public_recordings"
               onChange={e => updateFeature({ recording: { public: !e.currentTarget.checked } })}
-              checked={!workspace.settings.features.recording.public}
+              checked={!features?.recording?.public}
             />
           </label>
         </Input>
       </Row>
-      {/* <Row>
-        <Label>Allow Recordings From</Label>
+
+      <Row>
+        <Label
+          className="flex flex-row items-center self-start"
+          help="If set, any recorded URL must match at least one of these domains."
+        >
+          Allow Recordings From
+        </Label>
         <Input>
-          <input
-            className={classNames("rounded-md mr-2 w-full text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
-            })}
+          <CSVInput
+            id="allow_list"
+            value={features?.recording?.allowList?.join(", ")}
             disabled={disabled}
-            placeholder={`staging.${workspace?.domain}`}
-            type="text"
+            onChange={allowList => updateFeature({ recording: { allowList } })}
           />
         </Input>
       </Row>
       <Row>
-        <Label>Block Recordings From</Label>
+        <Label
+          className="flex flex-row items-center self-start"
+          help="If set, any recorded URL must not match any of these domains."
+        >
+          Block Recordings From
+        </Label>
         <Input>
-          <input
+          <CSVInput
+            id="block_list"
+            value={features?.recording?.blockList?.join(", ")}
             disabled={disabled}
-            placeholder={`production.${workspace?.domain}`}
-            type="text"
-            className={classNames("rounded-md w-full mr-2 text-sm", {
-              "bg-toolbarBackground": disabled,
-              "border-gray-300": disabled,
-            })}
+            onChange={blockList => updateFeature({ recording: { blockList } })}
           />
         </Input>
-      </Row> */}
+      </Row>
       <div className="text-xs font-semibold uppercase">Members</div>
       <Row>
         <Label>Disable My Library</Label>
@@ -124,7 +188,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               type="checkbox"
               id="restrict_users_to_domain"
               name="restrict_users_to_domain"
-              checked={!workspace.settings.features.user.library}
+              checked={!features?.user?.library}
               onChange={e => updateFeature({ user: { library: !e.currentTarget.checked } })}
             />
           </label>
@@ -142,7 +206,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
               disabled={disabled}
               id="auto_add_users"
               name="auto_add_users"
-              value={workspace.settings.features.user.autoJoin || 0}
+              value={features?.user?.autoJoin || 0}
               onChange={e =>
                 updateFeature({
                   user: {
