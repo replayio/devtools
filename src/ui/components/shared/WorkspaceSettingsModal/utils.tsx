@@ -137,3 +137,36 @@ export function formatPercentage(amount: number) {
   const formatter = new Intl.NumberFormat("en-us", { style: "percent" });
   return formatter.format(amount);
 }
+
+const extractUrlParts = new RegExp(
+  "^" +
+    // protocol
+    "([^:/?#.]+:)" +
+    "//" +
+    // domain - adapted from https://stackoverflow.com/questions/3117218/matching-url-with-wildcards
+    // full supported list https://www.icann.org/en/system/files/files/idna-protocol-2003-2008.txt
+    "([*\\w\\d\\-\\u0100-\\uffff.%]*)" +
+    // port
+    "(?::([*0-9]+))?",
+  "u"
+);
+
+export function sanitizeUrlList(input: string) {
+  return input
+    .split(",")
+    .map(s => s.trim())
+    .map(v => {
+      try {
+        const [, protocol, hostname, port] = v.match(extractUrlParts) || [];
+
+        if (!protocol || !hostname) {
+          return "";
+        }
+
+        return `${protocol}//${hostname}${port ? ":" + port : ""}`;
+      } catch {
+        return "";
+      }
+    })
+    .filter(Boolean);
+}
