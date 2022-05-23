@@ -4,7 +4,7 @@
   "description": "Web app with developer tools built on the Record Replay Protocol",
   "main": "postcss.config.js",
   "scripts": {
-    "dev": "next dev -p 8080 ",
+    "dev": "next dev -p 8080",
     "export": "next build && next export -o dist",
     "test": "jest",
     "test:watch": "jest --watch",
