@@ -4,11 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
-import {
-  getFocusedEvents,
-  getFocusedRequests,
-  getSelectedRequestId,
-} from "ui/reducers/network";
+import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import { timeMixpanelEvent } from "ui/utils/mixpanel";
@@ -62,12 +58,12 @@ export const NetworkMonitor = ({
     if (splitBoxContainer) {
       observer.observe(splitBoxContainer);
     }
-    
+
     return () => {
       if (splitBoxContainer) {
         observer.unobserve(splitBoxContainer);
       }
-    }
+    };
   }, []);
 
   if (loading) {
