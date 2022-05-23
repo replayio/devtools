@@ -1,5 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent, TimeStampedPoint } from "@recordreplay/protocol";
+import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
@@ -20,10 +20,13 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { getShowVideoPanel } from "ui/reducers/layout";
-import { toggleFocusMode } from "./timeline";
+import { onConsoleMessage } from "devtools/client/webconsole/actions/messages";
+import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
+import { Pause, ThreadFront as ThreadFrontType, ValueFront } from "protocol/thread";
+import { WiredMessage } from "protocol/thread/thread";
 import { getTheme } from "ui/reducers/app";
+import { getShowVideoPanel } from "ui/reducers/layout";
+import { FocusRegion } from "ui/state/timeline";
 
 export * from "../reducers/app";
 
@@ -42,8 +45,8 @@ import {
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
-import { FocusRegion } from "ui/state/timeline";
-import { clearMessages, messagesLoaded } from "devtools/client/webconsole/reducers/messages";
+
+import { toggleFocusMode } from "./timeline";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -57,59 +60,93 @@ function now(): number {
 
 export const refetchDataForTimeRange = (focusRegion: FocusRegion): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
-    // Technically, we only need to do this in *some* circumstances.
-    // I think the cases where we need to are:
-    // - We are enlarging or moving the focus zone beyond what we have most recently loaded.
-    // - We are shrinking the focus zone and have overflow currently.
-    // That first bullet might sounds like we will end up doing this basically
-    // all the time, but that is not so. Take, for instance, the case where the
-    // initial load of the recording did *not* set the overflow flag. In that
-    // case, we have all console messages, and we never need to fetch them
-    // again. However, in order to track this properly, I suspect we will need
-    // to add another piece of state to our messages slice: the boundaries that
-    // were most recently used to load messages. By default, this will be the
-    // entire recording, even if we start with only a small region focused.
-    // That's just the way that the Console.findMessages protocol command works.
-    // In that case (without overflow), like I said above, we never need to run
-    // any of this code. If we have overflow, and focus on, let's say the first
-    // 30 seconds of the recording, and we *don't* get overflow on the first
-    // thirty seconds, then we know that if the user were to change the window
-    // to the first 15 seconds, we don't need to refetch, and we also should not
-    // update the "most recently loaded" boundaries in the store, because that
-    // way the user could then focus on, for example, seconds 10 to 20 *also
-    // without refetching*.
-    // BTW - we don't have to figure out *all* of this right now :)
+    const { endTime, startTime } = focusRegion;
+
+    // TODO [bvaughn] Add "soft focus" support
+    //
+    // The frontend only needs to refetch data if:
+    // 1. The most recent time it requested data "overflowed" (too many messages to send them all), or
+    // 2. The new focus region is outside of the most recent region we fetched messages for.
+    //
+    // There are two things to note about the second bullet point above:
+    // 1. When devtools is first opened, there is no focused region.
+    //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
+    // 2. We shouldn't compare the new focus region to the most recent focus region,
+    //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
+    //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
+    //    (unless our fetches have overflowed at some point).
     dispatch(clearMessages());
-    const endpoint = (await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!)).endpoint;
-    const beginning = (
-      await sendMessage(
+
+    const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
+
+    let beginPoint: string | null = null;
+    let endPoint: string | null = null;
+
+    if (sessionEndpoint.endpoint.time === focusRegion.endTime) {
+      const pointNearBeginning = await sendMessage(
         "Session.getPointNearTime",
         {
-          time: focusRegion.startTime,
+          time: startTime,
         },
         ThreadFront.sessionId!
-      )
-    ).point as TimeStampedPoint;
-    // @ts-ignore
-    const end =
-      endpoint.time === focusRegion.endTime
-        ? endpoint
-        : ((
-            await sendMessage(
-              "Session.getPointNearTime",
-              { time: focusRegion.endTime },
-              ThreadFront.sessionId!
-            )
-          ).point as TimeStampedPoint);
-    // This is broken right now, see https://github.com/RecordReplay/backend/issues/5622
-    // @ts-ignore
-    // sendMessage(
-    //   "Console.findMessagesInRange",
-    //   {
-    //     range: { begin: beginning.point, end: end.point },
-    //   },
-    //   ThreadFront.sessionId!
-    // ).then(() => dispatch(messagesLoaded()));
+      );
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = sessionEndpoint.endpoint.point;
+    } else {
+      const [pointNearBeginning, pointNearEnd] = await Promise.all([
+        sendMessage(
+          "Session.getPointNearTime",
+          {
+            time: startTime,
+          },
+          ThreadFront.sessionId!
+        ),
+        sendMessage("Session.getPointNearTime", { time: endTime }, ThreadFront.sessionId!),
+      ]);
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = pointNearEnd.point.point;
+    }
+
+    // TODO [bvaughn] Store overflow somewhere too (for "soft focus")
+    // @ts-ignore TypeScript doesn't (yet) know about this return value.
+    const { messages, overflow } = await sendMessage(
+      "Console.findMessagesInRange",
+      {
+        range: { begin: beginPoint, end: endPoint },
+      },
+      ThreadFront.sessionId!
+    );
+
+    // Copied from ThreadFront.findConsoleMessages():
+    // TODO [bvaughn] Would be nice if this shared code with ThreadFront.
+    messages.forEach(message => {
+      const wiredMessage = message as WiredMessage;
+
+      const pause = new Pause(ThreadFront);
+      pause.instantiate(
+        message.pauseId,
+        message.point.point,
+        message.point.time,
+        !!message.point.frame,
+        message.data
+      );
+
+      if (message.argumentValues) {
+        wiredMessage.argumentValues = message.argumentValues.map(
+          value => new ValueFront(pause, value)
+        );
+      }
+
+      if (message.sourceId) {
+        message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
+      }
+
+      dispatch(onConsoleMessage(wiredMessage));
+    });
+
+    dispatch(messagesLoaded());
   };
 };
 

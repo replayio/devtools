@@ -19,7 +19,6 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
-import { findMessagesResult } from "@recordreplay/protocol";
 
 type MessageId = string;
 type Command = string;
@@ -260,7 +259,7 @@ const messagesSlice = createSlice({
 
       return removeMessagesFromState(state as MessageState, removedIds);
     },
-    //  This is only here to force recalculation after filters are updated
+    // This is only here to force recalculation after filters are updated
     // TODO Find a way to rework `visibleMessages` as derived data and remove this
     filterStateUpdated(state, action: PayloadAction<FiltersState>) {},
     consoleOverflowed(state) {

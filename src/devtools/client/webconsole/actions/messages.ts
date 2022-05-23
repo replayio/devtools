@@ -67,7 +67,7 @@ function convertStack(
   );
 }
 
-function onConsoleMessage(msg: WiredMessage): UIThunkAction {
+export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const stacktrace = await convertStack(msg.stack!, msg.data, ThreadFront);
     const sourceId = stacktrace?.[0]?.sourceId;
