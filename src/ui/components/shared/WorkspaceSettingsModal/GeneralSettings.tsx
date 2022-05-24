@@ -83,14 +83,21 @@ const GeneralSettings = ({ workspaceId }: { workspaceId: string }) => {
     <div className="space-y-4">
       <Row>
         <Label>Name</Label>
-        <Input>
-          <input
-            className="w-full rounded-md border-textFieldBorder bg-themeTextFieldBgcolor text-sm"
-            type="text"
-            value={name}
-            onChange={e => setName(e.currentTarget.value)}
-          />
-        </Input>
+        {/* Only enable workspace name edit if team is organization https://github.com/RecordReplay/devtools/issues/6799 */}
+        {workspace.isOrganization ? (
+          <Input>
+            <input
+              className="w-full rounded-md border-textFieldBorder bg-themeTextFieldBgcolor text-sm"
+              type="text"
+              value={name}
+              onChange={e => setName(e.currentTarget.value)}
+            />
+          </Input>
+        ) : (
+          <div className="w-8/12">
+            <div className="text-sm py-2">{name}</div>
+          </div>
+        )}
       </Row>
       <Row>
         <Label className="self-start">Logo</Label>
