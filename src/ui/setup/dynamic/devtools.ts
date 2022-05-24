@@ -72,7 +72,8 @@ enum SessionError {
 const SessionErrorMessages: Record<number, string> = {
   [SessionError.BackendDeploy]: "Please wait a few minutes and try again.",
   [SessionError.NodeTerminated]: "Our servers hiccuped but things should be back to normal soon.",
-  [SessionError.UnknownFatalError]: "There was an error. Please try recording again.",
+  [SessionError.UnknownFatalError]:
+    "Something went wrong. Refreshing the page should help. Please try recording again if the problem persists.",
   [SessionError.KnownFatalError]:
     "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
   [SessionError.OldBuild]:
