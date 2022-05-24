@@ -1,20 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useIntercom } from "react-use-intercom";
 import * as actions from "ui/actions/app";
-import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
+import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
+import Dropdown from "ui/components/shared/Dropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { trackEvent } from "ui/utils/telemetry";
+import Icon from "ui/components/shared/Icon";
 import useAuth0 from "ui/utils/useAuth0";
+import { features } from "ui/utils/prefs";
+import { trackEvent } from "ui/utils/telemetry";
+import { useIntercom } from "react-use-intercom";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
 }
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
+  const recordingId = hooks.useGetRecordingId();
+  const [expanded, setExpanded] = useState(false);
   const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
+
+  const isOwner = hooks.useIsOwner();
+  const isCollaborator =
+    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
+    isAuthenticated;
 
   if (!isAuthenticated) {
     return <LoginButton />;
@@ -30,35 +40,47 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
     window.open(docsUrl, "replaydocs");
   };
   const onLaunchClick: React.MouseEventHandler = event => {
+    setExpanded(false);
     trackEvent("user_options.launch_replay");
 
     setModal("browser-launch");
   };
   const onSettingsClick = () => {
+    setExpanded(false);
     trackEvent("user_options.select_settings");
 
     setModal("settings");
   };
   const onChatClick = () => {
+    setExpanded(false);
     show();
   };
 
   return (
-    <div className="user-options">
-      <Dropdown trigger={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}>
-        <DropdownItem onClick={onDocsClick}>
-          <DropdownItemContent icon="docs">Docs</DropdownItemContent>
-        </DropdownItem>
-        <DropdownItem onClick={onChatClick}>
-          <DropdownItemContent icon="help">Chat with us</DropdownItemContent>
-        </DropdownItem>
-        <DropdownItem onClick={onSettingsClick}>
-          <DropdownItemContent icon="settings">Settings</DropdownItemContent>
-        </DropdownItem>
+    <div className="user-options text-blue-400">
+      <Dropdown
+        buttonContent={<MaterialIcon iconSize="xl">more_horiz</MaterialIcon>}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        orientation="bottom"
+      >
+        <button className="row group" onClick={onDocsClick}>
+          <Icon filename="docs" className="bg-iconColor" />
+          <span>Docs</span>
+        </button>
+        <button className="row group" onClick={onChatClick}>
+          <Icon filename="help" className="bg-iconColor" />
+          <span>Chat with us</span>
+        </button>
+        <button className="row group" onClick={onSettingsClick}>
+          <Icon filename="settings" className="bg-iconColor" />
+          <span>Settings</span>
+        </button>
         {window.__IS_RECORD_REPLAY_RUNTIME__ || noBrowserItem ? null : (
-          <DropdownItem onClick={onLaunchClick}>
-            <DropdownItemContent icon="replay-logo">Launch Replay</DropdownItemContent>
-          </DropdownItem>
+          <button className="row group" onClick={onLaunchClick}>
+            <Icon filename="replay-logo" className="bg-iconColor" />
+            <span>Launch Replay</span>
+          </button>
         )}
         <LoginButton />
       </Dropdown>

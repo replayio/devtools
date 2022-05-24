@@ -1,7 +1,8 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useState } from "react";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
@@ -12,28 +13,56 @@ export default function TypesDropdown({
   types: Set<CanonicalRequestType>;
   toggleType: (type: CanonicalRequestType) => void;
 }) {
+  const [expanded, setExpanded] = useState(false);
+
+  const button = (
+    <MaterialIcon className="mr-2" iconSize="lg" outlined={true}>
+      filter_alt
+    </MaterialIcon>
+  );
+
+  const TypeItem = ({
+    icon,
+    label,
+    type,
+  }: {
+    icon: string;
+    type: CanonicalRequestType;
+    label: string;
+  }) => {
+    return (
+      <DropdownItem onClick={() => toggleType(type)}>
+        <DropdownItemContent selected={types.has(type)} icon={icon}>
+          {label}
+        </DropdownItemContent>
+      </DropdownItem>
+    );
+  };
+
   return (
-    <Dropdown
-      placement="bottom-start"
-      triggerClassname={classNames({
-        "flex text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover outline-none":
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle={classNames({
+        "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
           types.size > 0,
-        "flex text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover outline-none":
+        "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover":
           types.size === 0,
       })}
-      trigger={
-        <MaterialIcon className="mr-2" iconSize="lg" outlined={true}>
-          filter_alt
-        </MaterialIcon>
-      }
+      distance={0}
+      position="bottom-right"
     >
-      {RequestTypeOptions.map(({ type, label, icon }) => (
-        <DropdownItem key={type} onClick={() => toggleType(type)}>
-          <DropdownItemContent selected={types.has(type)} icon={icon}>
-            {label}
-          </DropdownItemContent>
-        </DropdownItem>
-      ))}
-    </Dropdown>
+      <Dropdown>
+        {RequestTypeOptions.map(canonicalType => (
+          <TypeItem
+            key={canonicalType.type}
+            label={canonicalType.label}
+            icon={canonicalType.icon}
+            type={canonicalType.type}
+          />
+        ))}
+      </Dropdown>
+    </PortalDropdown>
   );
 }
