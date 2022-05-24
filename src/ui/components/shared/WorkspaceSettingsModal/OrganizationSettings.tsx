@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useEffect, useRef, useState } from "react";
 import hooks from "ui/hooks";
-import { PartialWorkspaceSettingsFeatures, WorkspaceSettings } from "ui/types";
+import { PartialWorkspaceSettingsFeatures } from "ui/types";
 import useDebounceState from "./useDebounceState";
 
 const Label = ({ className, children }: { className?: string; children: React.ReactNode }) => {
