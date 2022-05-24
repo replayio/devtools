@@ -8,8 +8,7 @@ import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 import { isTimeInRegions } from "ui/utils/timeline";
 
-import { ContextMenu } from "../ContextMenu";
-import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import { ContextMenu, ContextMenuItem } from "../Library/ContextMenu";
 import Icon from "../shared/Icon";
 
 import { HeaderGroups } from "./HeaderGroups";
@@ -128,20 +127,18 @@ const RequestTable = ({
 
       {contextMenuData !== null && (
         <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
-          <Dropdown>
-            <DropdownItem onClick={setFocusStart}>
-              <>
-                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
-                Set focus start
-              </>
-            </DropdownItem>
-            <DropdownItem onClick={setFocusEnd}>
-              <>
-                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
-                Set focus end
-              </>
-            </DropdownItem>
-          </Dropdown>
+          <ContextMenuItem onClick={setFocusStart}>
+            <>
+              <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
+              Set focus start
+            </>
+          </ContextMenuItem>
+          <ContextMenuItem onClick={setFocusEnd}>
+            <>
+              <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
+              Set focus end
+            </>
+          </ContextMenuItem>
         </ContextMenu>
       )}
     </div>

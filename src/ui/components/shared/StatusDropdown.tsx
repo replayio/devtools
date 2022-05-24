@@ -1,13 +1,13 @@
 import React, { ReactNode, useState } from "react";
-import PortalDropdown from "./PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
-import MaterialIcon from "./MaterialIcon";
-import Confetti from "./Confetti";
 import {
   useGetRecording,
   useGetRecordingId,
   useUpdateRecordingResolution,
 } from "ui/hooks/recordings";
+
+import Confetti from "./Confetti";
+import MaterialIcon from "./MaterialIcon";
 
 function DropdownButton({ disabled, children }: { disabled?: boolean; children: ReactNode }) {
   return (
@@ -38,45 +38,39 @@ export default function StatusDropdown() {
   return (
     <div className="rounded-md px-2 py-1">
       {showConfetti ? <Confetti /> : null}
-      <PortalDropdown
-        buttonContent={<DropdownButton>{isResolved ? "Resolved" : "Active"}</DropdownButton>}
-        buttonStyle={"overflow-hidden"}
-        setExpanded={setExpanded}
-        expanded={expanded}
-        distance={0}
-        position="bottom-right"
+      <Dropdown
+        trigger={<DropdownButton>{isResolved ? "Resolved" : "Active"}</DropdownButton>}
+        triggerClassname="overflow-hidden"
+        menuItemsClassName="z-50 overflow-auto max-h-48"
+        widthClass="w-56"
       >
-        <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-56">
-          <DropdownItem
-            onClick={e => {
-              e.stopPropagation();
-              setExpanded(false);
-              setIsResolved(false);
-            }}
-          >
-            <DropdownItemContent icon="active" selected={false}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-                Active
-              </span>
-            </DropdownItemContent>
-          </DropdownItem>
-          <DropdownItem
-            onClick={e => {
-              e.stopPropagation();
-              setShowConfetti(true);
-              setExpanded(false);
-              setIsResolved(true);
-              setTimeout(() => setShowConfetti(false), 6000);
-            }}
-          >
-            <DropdownItemContent icon="resolved" selected={false}>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
-                Resolved
-              </span>
-            </DropdownItemContent>
-          </DropdownItem>
-        </Dropdown>
-      </PortalDropdown>
+        <DropdownItem
+          onClick={e => {
+            e.stopPropagation();
+            setExpanded(false);
+            setIsResolved(false);
+          }}
+        >
+          <DropdownItemContent icon="active" selected={false}>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">Active</span>
+          </DropdownItemContent>
+        </DropdownItem>
+        <DropdownItem
+          onClick={e => {
+            e.stopPropagation();
+            setShowConfetti(true);
+            setExpanded(false);
+            setIsResolved(true);
+            setTimeout(() => setShowConfetti(false), 6000);
+          }}
+        >
+          <DropdownItemContent icon="resolved" selected={false}>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
+              Resolved
+            </span>
+          </DropdownItemContent>
+        </DropdownItem>
+      </Dropdown>
     </div>
   );
 }

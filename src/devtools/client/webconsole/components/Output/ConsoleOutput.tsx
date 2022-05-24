@@ -11,8 +11,7 @@ import { Frame, Message } from "devtools/client/webconsole/reducers/messages";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
-import { ContextMenu } from "ui/components/ContextMenu";
-import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import { ContextMenu, ContextMenuItem } from "ui/components/Library/ContextMenu";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
 import { getFocusRegion } from "ui/reducers/timeline";
@@ -232,20 +231,18 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
         </div>
         {contextMenu !== null && (
           <ContextMenu x={contextMenu.pageX} y={contextMenu.pageY} close={this.closeContextMenu}>
-            <Dropdown>
-              <DropdownItem onClick={this.setFocusStart}>
-                <>
-                  <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
-                  Set focus start
-                </>
-              </DropdownItem>
-              <DropdownItem onClick={this.setFocusEnd}>
-                <>
-                  <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
-                  Set focus end
-                </>
-              </DropdownItem>
-            </Dropdown>
+            <ContextMenuItem onClick={this.setFocusStart}>
+              <>
+                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
+                Set focus start
+              </>
+            </ContextMenuItem>
+            <ContextMenuItem onClick={this.setFocusEnd}>
+              <>
+                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
+                Set focus end
+              </>
+            </ContextMenuItem>
           </ContextMenu>
         )}
       </>

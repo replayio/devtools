@@ -1,30 +1,27 @@
+import classNames from "classnames";
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import Avatar from "ui/components/Avatar";
+import { DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { handleIntercomLogout } from "ui/utils/intercom";
-import { useRouter } from "next/router";
+import useAuth0 from "ui/utils/useAuth0";
 
 const LoginButton = () => {
   const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();
 
   if (isAuthenticated) {
     return (
-      <button className="row logout" onClick={() => handleIntercomLogout(logout)}>
-        <Avatar player={user} isFirstPlayer={true} />
-        <span>Sign Out</span>
-      </button>
+      <DropdownItem onClick={() => handleIntercomLogout(logout)}>
+        <div className="flex flex-row space-x-4">
+          <div className={classNames("flex w-4 flex-row items-center")}>
+            <Avatar player={user} isFirstPlayer={true} />
+          </div>
+          <span className="overflow-hidden overflow-ellipsis whitespace-pre">Sign Out</span>
+        </div>
+      </DropdownItem>
     );
   }
 
-  return (
-    <button
-      className="inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 text-sm font-medium leading-4 text-white hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-      onClick={() => loginAndReturn()}
-      color="blue"
-    >
-      Sign In
-    </button>
-  );
+  return <DropdownItem onClick={() => loginAndReturn()}>Sign In</DropdownItem>;
 };
 
 export default LoginButton;

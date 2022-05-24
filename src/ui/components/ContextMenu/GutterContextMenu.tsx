@@ -1,17 +1,17 @@
-import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
-import { ContextMenu as ContextMenuType } from "ui/actions/contextMenus";
-import { ContextMenu } from "./index";
-import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
-import { UIState } from "ui/state";
-import { actions } from "ui/actions";
-import { assert } from "protocol/utils";
-import { connect, ConnectedProps } from "react-redux";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { selectors } from "ui/reducers";
-import { trackEvent } from "ui/utils/telemetry";
+import { assert } from "protocol/utils";
+import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { actions } from "ui/actions";
+import { ContextMenu as ContextMenuType } from "ui/actions/contextMenus";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
+import useAuth0 from "ui/utils/useAuth0";
+
+import { ContextMenu, ContextMenuItem } from "../Library/ContextMenu";
 
 export interface GutterContextMenuProps extends PropsFromRedux {
   close: () => void;
@@ -41,9 +41,7 @@ function GutterContextMenu({
 
   return (
     <ContextMenu close={close} x={contextMenu.x} y={contextMenu.y}>
-      <Dropdown>
-        <DropdownItem onClick={addComment}>Add comment</DropdownItem>
-      </Dropdown>
+      <ContextMenuItem onClick={addComment}>Add comment</ContextMenuItem>
     </ContextMenu>
   );
 }
