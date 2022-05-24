@@ -1,9 +1,10 @@
 import { SelectorIcon } from "@heroicons/react/solid";
-import React from "react";
+import React, { useState } from "react";
 import { useGetUserInfo } from "ui/hooks/users";
 import { Workspace } from "ui/types";
 
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import PortalDropdown from "../shared/PortalDropdown";
 
 import { personalWorkspace } from "./libraryConstants";
 
@@ -33,6 +34,7 @@ export default function TeamSelect({
   handleWorkspaceSelect: (id: string) => void;
 }) {
   const userInfo = useGetUserInfo();
+  const [expanded, setExpanded] = useState(false);
   let displayedWorkspaces: DisplayedWorkspace[] = [...workspaces].sort();
 
   if (userInfo.features.library) {
@@ -41,6 +43,7 @@ export default function TeamSelect({
 
   const handleSelect = (workspace: DisplayedWorkspace) => {
     handleWorkspaceSelect(workspace.id);
+    setExpanded(false);
   };
 
   const selectedWorkspace =
@@ -49,14 +52,23 @@ export default function TeamSelect({
   const button = <TeamSelectButton selectedWorkspaceName={selectedWorkspaceName} />;
 
   return (
-    <Dropdown trigger={button} widthClass="w-64" fontSizeClass="text-base">
-      <div className="max-h-48 overflow-auto">
-        {displayedWorkspaces.map(workspace => (
-          <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
-            {workspace.name}
-          </DropdownItem>
-        ))}
-      </div>
-    </Dropdown>
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle=""
+      distance={0}
+      position="bottom-right"
+    >
+      <Dropdown widthClass="w-64" fontSizeClass="text-base">
+        <div className="max-h-48 overflow-auto">
+          {displayedWorkspaces.map(workspace => (
+            <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
+              {workspace.name}
+            </DropdownItem>
+          ))}
+        </div>
+      </Dropdown>
+    </PortalDropdown>
   );
 }

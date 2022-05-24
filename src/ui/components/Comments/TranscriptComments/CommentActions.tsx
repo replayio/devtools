@@ -1,10 +1,11 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { useConfirm } from "ui/components/shared/Confirm";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
 import hooks from "ui/hooks";
 import { Comment, Reply } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
@@ -46,6 +47,7 @@ function CommentActions({
   const { userId } = hooks.useGetUserId();
   const deleteComment = hooks.useDeleteComment();
   const deleteCommentReply = hooks.useDeleteCommentReply();
+  const [expanded, setExpanded] = useState(false);
   const { confirmDestructive } = useConfirm();
 
   const isCommentAuthor = userId === comment.user.id;
@@ -56,6 +58,7 @@ function CommentActions({
 
   const handleDelete = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setExpanded(false);
 
     const replyCount = ("replies" in comment && comment.replies?.length) || 0;
     const message = getDeleteMessage(replyCount);
@@ -87,29 +90,39 @@ function CommentActions({
   };
   const editComment = (e: React.MouseEvent) => {
     e.stopPropagation();
+    setExpanded(false);
     setIsEditing(true);
     trackEvent("comments.start_edit");
   };
 
-  return (
-    <Dropdown
-      trigger={({ open }) => (
-        <MaterialIcon
-          outlined
-          className={classNames(
-            open ? "opacity-100" : "",
-            "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
-          )}
-        >
-          more_vert
-        </MaterialIcon>
+  const button = (
+    <MaterialIcon
+      outlined
+      className={classNames(
+        expanded ? "opacity-100" : "",
+        "h-4 w-4 text-gray-400 opacity-0 hover:text-primaryAccentHover group-hover:opacity-100"
       )}
     >
-      <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
-      <DropdownItem onClick={handleDelete}>
-        {isRoot ? "Delete comment and replies" : "Delete comment"}
-      </DropdownItem>
-    </Dropdown>
+      more_vert
+    </MaterialIcon>
+  );
+
+  return (
+    <PortalDropdown
+      buttonContent={button}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle=""
+      distance={0}
+      position="bottom-right"
+    >
+      <Dropdown>
+        <DropdownItem onClick={editComment}>Edit comment</DropdownItem>
+        <DropdownItem onClick={handleDelete}>
+          {isRoot ? "Delete comment and replies" : "Delete comment"}
+        </DropdownItem>
+      </Dropdown>
+    </PortalDropdown>
   );
 }
 

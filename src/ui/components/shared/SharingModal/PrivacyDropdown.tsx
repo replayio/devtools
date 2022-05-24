@@ -1,12 +1,12 @@
-import React, { ReactNode } from "react";
+import React, { Dispatch, ReactNode, SetStateAction, useState } from "react";
+import PortalDropdown from "../PortalDropdown";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
-import hooks from "ui/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { Recording, Workspace } from "ui/types";
-import { isPublicDisabled } from "ui/utils/org";
-import { trackEvent } from "ui/utils/telemetry";
-
+import hooks from "ui/hooks";
 import MaterialIcon from "../MaterialIcon";
+import { trackEvent } from "ui/utils/telemetry";
+import { isPublicDisabled } from "ui/utils/org";
 
 const WorkspacePrivacySummary = ({ workspace: { name } }: { workspace: Workspace }) => (
   <span>
@@ -44,7 +44,10 @@ function DropdownButton({ disabled, children }: { disabled?: boolean; children: 
   );
 }
 
-function useGetPrivacyOptions(recording: Recording) {
+function useGetPrivacyOptions(
+  recording: Recording,
+  setExpanded: Dispatch<SetStateAction<boolean>>
+) {
   const isPrivate = recording.private;
   const workspaceId = recording.workspace?.id || null;
   const { workspaces } = hooks.useGetNonPendingWorkspaces();
@@ -63,6 +66,7 @@ function useGetPrivacyOptions(recording: Recording) {
     if (isPrivate) {
       toggleIsPrivate();
     }
+    setExpanded(false);
   };
   const handleMoveToTeam = (targetWorkspaceId: WorkspaceId | null) => {
     if (targetWorkspaceId !== workspaceId) {
@@ -71,12 +75,14 @@ function useGetPrivacyOptions(recording: Recording) {
     }
 
     setPrivate();
+    setExpanded(false);
   };
   const setPrivate = () => {
     trackEvent("share_modal.set_private");
     if (!isPrivate) {
       toggleIsPrivate();
     }
+    setExpanded(false);
   };
 
   if (!isPublicDisabled(workspaces, workspaceId)) {
@@ -133,7 +139,8 @@ function useGetPrivacyOptions(recording: Recording) {
 
 export default function PrivacyDropdown({ recording }: { recording: Recording }) {
   const workspaceId = recording.workspace?.id || null;
-  const privacyOptions = useGetPrivacyOptions(recording);
+  const [expanded, setExpanded] = useState(false);
+  const privacyOptions = useGetPrivacyOptions(recording, setExpanded);
   const { summary } = getPrivacySummaryAndIcon(recording);
 
   if (privacyOptions.length <= 1) {
@@ -151,13 +158,19 @@ export default function PrivacyDropdown({ recording }: { recording: Recording })
   }
 
   return (
-    <Dropdown
-      trigger={<DropdownButton>{summary}</DropdownButton>}
-      triggerClassname="overflow-hidden"
-      menuItemsClassName="z-50 overflow-auto max-h-48"
-      widthClass="w-80"
-    >
-      {privacyOptions}
-    </Dropdown>
+    <>
+      <PortalDropdown
+        buttonContent={<DropdownButton>{summary}</DropdownButton>}
+        buttonStyle={"overflow-hidden"}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        distance={0}
+        position="bottom-right"
+      >
+        <Dropdown menuItemsClassName="z-50 overflow-auto max-h-48" widthClass="w-80">
+          {privacyOptions}
+        </Dropdown>
+      </PortalDropdown>
+    </>
   );
 }

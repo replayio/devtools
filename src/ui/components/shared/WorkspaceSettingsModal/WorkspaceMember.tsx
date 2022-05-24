@@ -1,14 +1,14 @@
 import classnames from "classnames";
 import React, { useState, useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import * as actions from "ui/actions/app";
-import { AvatarImage } from "ui/components/Avatar";
-import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import hooks from "ui/hooks";
 import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
-
-import { useConfirm } from "../Confirm";
+import PortalDropdown from "ui/components/shared/PortalDropdown";
+import { connect, ConnectedProps } from "react-redux";
+import * as actions from "ui/actions/app";
 import MaterialIcon from "../MaterialIcon";
+import { AvatarImage } from "ui/components/Avatar";
+import { useConfirm } from "../Confirm";
+import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -180,16 +180,23 @@ export function NonRegisteredWorkspaceMember({
       <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
         {member.email}
       </div>
-
-      <Dropdown trigger={<Status member={member} />} triggerClassname="group">
-        <WorkspaceMemberRoles
-          member={member}
-          isAdmin={isAdmin}
-          onClick={() => setExpanded(false)}
-        />
-        <DropdownDivider />
-        <DropdownItem onClick={handleDelete}>Remove</DropdownItem>
-      </Dropdown>
+      <PortalDropdown
+        buttonContent={<Status member={member} />}
+        setExpanded={setExpanded}
+        expanded={expanded}
+        buttonStyle="group"
+        position="bottom-right"
+      >
+        <Dropdown>
+          <WorkspaceMemberRoles
+            member={member}
+            isAdmin={isAdmin}
+            onClick={() => setExpanded(false)}
+          />
+          <DropdownDivider />
+          <DropdownItem onClick={handleDelete}>Remove</DropdownItem>
+        </Dropdown>
+      </PortalDropdown>
     </li>
   );
 }
@@ -245,21 +252,29 @@ function Role({
   }
 
   return (
-    <Dropdown trigger={<Status member={member} />} triggerClassname="group">
-      {localUserId !== userId ? (
-        <>
-          <WorkspaceMemberRoles
-            member={member}
-            isAdmin={isAdmin}
-            onClick={() => setExpanded(false)}
-          />
-          <DropdownDivider />
-        </>
-      ) : null}
-      <DropdownItem onClick={handleDelete}>
-        {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
-      </DropdownItem>
-    </Dropdown>
+    <PortalDropdown
+      buttonContent={<Status member={member} />}
+      setExpanded={setExpanded}
+      expanded={expanded}
+      buttonStyle="group"
+      position="bottom-right"
+    >
+      <Dropdown>
+        {localUserId !== userId ? (
+          <>
+            <WorkspaceMemberRoles
+              member={member}
+              isAdmin={isAdmin}
+              onClick={() => setExpanded(false)}
+            />
+            <DropdownDivider />
+          </>
+        ) : null}
+        <DropdownItem onClick={handleDelete}>
+          {member.pending ? "Cancel" : localUserId == userId ? "Leave" : "Remove"}
+        </DropdownItem>
+      </Dropdown>
+    </PortalDropdown>
   );
 }
 
