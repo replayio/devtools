@@ -76,7 +76,11 @@ function Focuser({ editMode, setEditMode }: Props) {
 
         const relativeMouseX = pageX - (editMode.dragOffset || 0);
 
-        const mouseTime = getTimeFromPosition(relativeMouseX, container, zoomRegion);
+        const mouseTime = getTimeFromPosition(
+          relativeMouseX,
+          container.getBoundingClientRect(),
+          zoomRegion
+        );
 
         switch (editMode.type) {
           case "drag": {

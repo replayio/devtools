@@ -246,13 +246,12 @@ export function getPositionFromTime(time: number, zoomRegion: ZoomRegion) {
 
 export function getTimeFromPosition(
   pageX: number,
-  target: HTMLElement,
+  targetRect: { left: number; width: number },
   zoomRegion: ZoomRegion
 ): number {
-  const rect = target.getBoundingClientRect();
-  const x = pageX - rect.left;
+  const x = pageX - targetRect.left;
   const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
-  const percentage = clamp(x / rect.width, 0, 100);
+  const percentage = clamp(x / targetRect.width, 0, 1);
   const time = zoomRegion.startTime + percentage * zoomRegionDuration;
   return time;
 }

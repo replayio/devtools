@@ -64,7 +64,11 @@ export default function Timeline() {
   }, [dispatch]);
 
   const onClick = (event: React.MouseEvent) => {
-    const mouseTime = getTimeFromPosition(event.pageX, progressBarRef.current!, zoomRegion);
+    const mouseTime = getTimeFromPosition(
+      event.pageX,
+      progressBarRef.current!.getBoundingClientRect(),
+      zoomRegion
+    );
     const isOutsideFocusRegion =
       focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
 
@@ -76,7 +80,11 @@ export default function Timeline() {
   };
 
   const onMouseMove = (event: React.MouseEvent) => {
-    const mouseTime = getTimeFromPosition(event.pageX, progressBarRef.current!, zoomRegion);
+    const mouseTime = getTimeFromPosition(
+      event.pageX,
+      progressBarRef.current!.getBoundingClientRect(),
+      zoomRegion
+    );
     const isDragging = event.buttons === 1;
     const isOutsideFocusRegion =
       focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);

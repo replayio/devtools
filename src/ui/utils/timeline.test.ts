@@ -1,6 +1,9 @@
+import { ZoomRegion } from "ui/state/timeline";
+
 import {
   getFormattedTime,
   getSecondsFromFormattedTime,
+  getTimeFromPosition,
   isFocusRegionSubset,
   isValidTimeString,
   overlap,
@@ -84,6 +87,34 @@ describe("getSecondsFromFormattedTime", () => {
     expect(() => getSecondsFromFormattedTime("?1:01.009-C")).toThrow(
       'Invalid format "?1:01.009-C"'
     );
+  });
+});
+
+describe("getTimeFromPosition", () => {
+  const RECT = {
+    left: 50,
+    width: 100,
+  };
+
+  const ZOOM_REGION: ZoomRegion = {
+    startTime: 0,
+    endTime: 1000,
+    scale: 1,
+  };
+
+  it("should calculate the right relative time", () => {
+    expect(getTimeFromPosition(50, RECT, ZOOM_REGION)).toBe(0);
+    expect(getTimeFromPosition(75, RECT, ZOOM_REGION)).toBe(250);
+    expect(getTimeFromPosition(100, RECT, ZOOM_REGION)).toBe(500);
+    expect(getTimeFromPosition(125, RECT, ZOOM_REGION)).toBe(750);
+    expect(getTimeFromPosition(150, RECT, ZOOM_REGION)).toBe(1000);
+  });
+
+  it("should properly clamp times", () => {
+    expect(getTimeFromPosition(0, RECT, ZOOM_REGION)).toBe(0);
+    expect(getTimeFromPosition(25, RECT, ZOOM_REGION)).toBe(0);
+    expect(getTimeFromPosition(175, RECT, ZOOM_REGION)).toBe(1000);
+    expect(getTimeFromPosition(200, RECT, ZOOM_REGION)).toBe(1000);
   });
 });
 
