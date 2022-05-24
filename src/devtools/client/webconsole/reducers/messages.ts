@@ -283,15 +283,17 @@ const messagesSlice = createSlice({
       );
     },
     clearMessages(state) {
-      // Note that we don't use removeMessagesFromState() in this case, because we're removing ALL messages.
-      // That method does extra work to handle the case where we are only removing SOME messages.
-      messagesAdapter.removeAll((state as MessageState).messages);
+      const removedIds = [];
+      for (const [id, maybeMessage] of Object.entries(state.messages.entities)) {
+        const message = maybeMessage!;
+        if (message.type !== "logPoint") {
+          removedIds.push(id);
+        }
+      }
+      removeMessagesFromState(state as MessageState, removedIds);
 
-      state.filteredMessagesCount = getDefaultFiltersCounter();
       state.messagesLoaded = false;
-      state.messagesUiById = [];
       state.overflow = false;
-      state.visibleMessages = [];
     },
     setConsoleOverflowed(state, action: PayloadAction<boolean>) {
       state.overflow = action.payload;
@@ -436,6 +438,13 @@ function setVisibleMessages(messagesState: MessageState, forceTimestampSort = fa
       filtered[message.level as FilterCountKeys] = filtered[message.level as FilterCountKeys] + 1;
     }
   }
+  console.groupCollapsed(
+    `%csetVisibleMessages() (hide ${filtered})`,
+    "color: red; font-weight: bold;"
+  );
+  console.log("all messages:", messagesState.messages.entities);
+  console.log("visible:", messagesToShow);
+  console.groupEnd();
 
   messagesState.visibleMessages = messagesToShow;
   messagesState.filteredMessagesCount = filtered;
