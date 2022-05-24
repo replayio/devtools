@@ -256,3 +256,23 @@ export function getTimeFromPosition(
   const time = zoomRegion.startTime + percentage * zoomRegionDuration;
   return time;
 }
+
+export function isFocusRegionSubset(
+  prevFocusRegion: FocusRegion | null,
+  nextFocusRegion: FocusRegion | null
+): boolean {
+  if (prevFocusRegion === null) {
+    // Previously the entire timeline was selected.
+    // No matter what the new focus region is, it will be a subset.
+    return true;
+  } else if (nextFocusRegion === null) {
+    // The new selection includes the entire timeline.
+    // No matter what the previous focus region is, the new one is not a subset.
+    return false;
+  } else {
+    return (
+      nextFocusRegion.startTime >= prevFocusRegion.startTime &&
+      nextFocusRegion.endTime <= prevFocusRegion.endTime
+    );
+  }
+}

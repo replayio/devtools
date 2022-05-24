@@ -11,20 +11,27 @@ import {
 } from "devtools/client/webconsole/utils/messages";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { LogpointHandlers } from "protocol/logpoint";
-import type { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
-import { WiredMessage } from "protocol/thread/thread";
+import { sendMessage } from "protocol/socket";
+import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
+import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
+import { FocusRegion } from "ui/state/timeline";
+import { isFocusRegionSubset } from "ui/utils/timeline";
 
-import type { Message as InternalMessage } from "../reducers/messages";
 import {
-  messageEvaluationsCleared,
+  clearMessages,
   logpointMessagesCleared,
+  Message as InternalMessage,
   messagesAdded,
-  messageOpened,
   messageClosed,
-  messagesLoaded,
+  messageEvaluationsCleared,
+  messageOpened,
+  setConsoleOverflowed,
+  setLastFetchedForFocusRegion,
+  setMessagesLoaded,
 } from "../reducers/messages";
+import { getConsoleOverflow, getLastFetchedForFocusRegion, getMessagesLoaded } from "../selectors";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
@@ -41,7 +48,7 @@ export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontTyp
   ThreadFront.findConsoleMessages(
     (_, msg) => store.dispatch(onConsoleMessage(msg)),
     () => store.dispatch(onConsoleOverflow())
-  ).then(() => store.dispatch(messagesLoaded()), Sentry.captureException);
+  ).then(() => store.dispatch(setMessagesLoaded(true)), Sentry.captureException);
 }
 
 function convertStack(
@@ -67,7 +74,7 @@ function convertStack(
   );
 }
 
-function onConsoleMessage(msg: WiredMessage): UIThunkAction {
+export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const stacktrace = await convertStack(msg.stack!, msg.data, ThreadFront);
     const sourceId = stacktrace?.[0]?.sourceId;
@@ -231,3 +238,90 @@ export const messagesClearEvaluations = messageEvaluationsCleared;
 export const messagesClearLogpoint = logpointMessagesCleared;
 export const messageOpen = messageOpened;
 export const messageClose = messageClosed;
+
+export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const state = getState();
+    const didOverflow = getConsoleOverflow(state);
+    const lastFetchedForFocusRegion = getLastFetchedForFocusRegion(state);
+    const messagesLoaded = getMessagesLoaded(state);
+
+    // Soft Focus: The frontend only needs to refetch data if:
+    // 1. The most recent time it requested data "overflowed" (too many messages to send them all), or
+    // 2. The new focus region is outside of the most recent region we fetched messages for.
+    //
+    // There are two things to note about the second bullet point above:
+    // 1. When devtools is first opened, there is no focused region.
+    //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
+    // 2. We shouldn't compare the new focus region to the most recent focus region,
+    //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
+    //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
+    //    (unless our fetches have overflowed at some point).
+    if (
+      messagesLoaded &&
+      !didOverflow &&
+      isFocusRegionSubset(lastFetchedForFocusRegion, focusRegion)
+    ) {
+      // We already have all of the console logs for the new region.
+      // We can skip running a new analysis.
+      return;
+    }
+
+    dispatch(clearMessages());
+
+    const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
+
+    const startTime = focusRegion ? focusRegion.startTime : 0;
+    const endTime = focusRegion ? focusRegion.endTime : sessionEndpoint.endpoint.time;
+
+    let beginPoint: string | null = null;
+    let endPoint: string | null = null;
+
+    if (sessionEndpoint.endpoint.time === endTime) {
+      const pointNearBeginning = await sendMessage(
+        "Session.getPointNearTime",
+        {
+          time: startTime,
+        },
+        ThreadFront.sessionId!
+      );
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = sessionEndpoint.endpoint.point;
+    } else {
+      const [pointNearBeginning, pointNearEnd] = await Promise.all([
+        sendMessage(
+          "Session.getPointNearTime",
+          {
+            time: startTime,
+          },
+          ThreadFront.sessionId!
+        ),
+        sendMessage("Session.getPointNearTime", { time: endTime }, ThreadFront.sessionId!),
+      ]);
+
+      beginPoint = pointNearBeginning.point.point;
+      endPoint = pointNearEnd.point.point;
+    }
+
+    const { messages, overflow } = await sendMessage(
+      "Console.findMessagesInRange",
+      {
+        range: { begin: beginPoint, end: endPoint },
+      },
+      ThreadFront.sessionId!
+    );
+
+    // Store the result of the new analysis window for "soft focus" comparison next time.
+    dispatch(setLastFetchedForFocusRegion(focusRegion));
+    dispatch(setConsoleOverflowed(overflow === true));
+
+    messages.forEach(message => {
+      wireUpMessage(message);
+
+      dispatch(onConsoleMessage(message as WiredMessage));
+    });
+
+    dispatch(setMessagesLoaded(true));
+  };
+}

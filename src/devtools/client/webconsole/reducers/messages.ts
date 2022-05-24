@@ -19,6 +19,7 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
+import { FocusRegion } from "ui/state/timeline";
 
 type MessageId = string;
 type Command = string;
@@ -150,10 +151,14 @@ export interface MessageState {
   /** Whether any messages with execution points have been seen. */
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
-  /** Flag that indicates if not all console messages will be displayed. */
-  overflow: boolean;
   messagesLoaded: boolean;
   exceptionLogpointError: string | null;
+  /** Flag that indicates if not all console messages will be displayed. */
+  overflow: boolean;
+  // The last time messages were fetched from the backend, they were constrained to this Focus Region.
+  // This value, along with the "overflow" flag, are used to implement an optimization known as "soft focus".
+  // Soft focus avoids unnecessarily re-fetching Console messages when the user changes the focus region.
+  lastFetchedForFocusRegion: FocusRegion | null;
 }
 
 const MAX_HISTORY_LENGTH = 1000;
@@ -193,6 +198,7 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
         lastMessageId: null,
         overflow: false,
         messagesLoaded: false,
+        lastFetchedForFocusRegion: null,
       },
       otherOverrides
     )
@@ -210,9 +216,6 @@ const messagesSlice = createSlice({
   name: "messages",
   initialState: syncInitialMessageState,
   reducers: {
-    messagesLoaded(state) {
-      state.messagesLoaded = true;
-    },
     messagesAdded(state, action: PayloadAction<Message[]>) {
       const messages = action.payload;
       messages.forEach(message => {
@@ -259,12 +262,6 @@ const messagesSlice = createSlice({
 
       return removeMessagesFromState(state as MessageState, removedIds);
     },
-    //  This is only here to force recalculation after filters are updated
-    // TODO Find a way to rework `visibleMessages` as derived data and remove this
-    filterStateUpdated(state, action: PayloadAction<FiltersState>) {},
-    consoleOverflowed(state) {
-      state.overflow = true;
-    },
     exceptionLogpointErrorCleared(state) {
       state.exceptionLogpointError = null;
     },
@@ -284,6 +281,28 @@ const messagesSlice = createSlice({
         // Doesn't like `WritableDraft<MessagesState>` due to `ValueFront`
         state as MessageState
       );
+    },
+    clearMessages(state) {
+      const removedIds = [];
+      for (const [id, maybeMessage] of Object.entries(state.messages.entities)) {
+        const message = maybeMessage!;
+        if (message.type !== "logPoint") {
+          removedIds.push(id);
+        }
+      }
+      removeMessagesFromState(state as MessageState, removedIds);
+
+      state.messagesLoaded = false;
+      state.overflow = false;
+    },
+    setConsoleOverflowed(state, action: PayloadAction<boolean>) {
+      state.overflow = action.payload;
+    },
+    setLastFetchedForFocusRegion(state, action: PayloadAction<FocusRegion | null>) {
+      state.lastFetchedForFocusRegion = action.payload;
+    },
+    setMessagesLoaded(state, action: PayloadAction<boolean>) {
+      state.messagesLoaded = action.payload;
     },
   },
   extraReducers: builder => {
@@ -305,18 +324,19 @@ const messagesSlice = createSlice({
 });
 
 export const {
-  consoleOverflowed,
-  filterStateUpdated,
+  clearMessages,
   logpointMessagesCleared,
   messageClosed,
   messageEvaluationsCleared,
   messageOpened,
   messagesAdded,
-  messagesLoaded,
   filterTextUpdated,
   filterToggled,
   exceptionLogpointErrorCleared,
   exceptionLogpointErrorReceived,
+  setConsoleOverflowed,
+  setLastFetchedForFocusRegion,
+  setMessagesLoaded,
 } = messagesSlice.actions;
 
 export const messages = messagesSlice.reducer;
@@ -418,6 +438,13 @@ function setVisibleMessages(messagesState: MessageState, forceTimestampSort = fa
       filtered[message.level as FilterCountKeys] = filtered[message.level as FilterCountKeys] + 1;
     }
   }
+  console.groupCollapsed(
+    `%csetVisibleMessages() (hide ${filtered})`,
+    "color: red; font-weight: bold;"
+  );
+  console.log("all messages:", messagesState.messages.entities);
+  console.log("visible:", messagesToShow);
+  console.groupEnd();
 
   messagesState.visibleMessages = messagesToShow;
   messagesState.filteredMessagesCount = filtered;

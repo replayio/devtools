@@ -1,4 +1,5 @@
 import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
+import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -13,11 +14,10 @@ import {
   timeIsBeyondKnownPaints,
 } from "protocol/graphics";
 import { client, log, sendMessage } from "protocol/socket";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { Action } from "redux";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
@@ -28,7 +28,7 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
-import { TimelineState, ZoomRegion, HoveredItem, FocusRegion } from "ui/state/timeline";
+import { HoveredItem, FocusRegion } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
@@ -53,7 +53,7 @@ import type { UIStore, UIThunkAction } from "./index";
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
 
-export async function setupTimeline(store: UIStore, ThreadFront: typeof ThreadFrontType) {
+export async function setupTimeline(store: UIStore) {
   const dispatch = store.dispatch;
 
   ThreadFront.on("paused", args => dispatch(onPaused(args)));
@@ -600,6 +600,8 @@ export function syncFocusedRegion(): UIThunkAction {
       },
       window.sessionId
     );
+
+    await dispatch(refetchMessages(focusRegion));
   };
 }
 

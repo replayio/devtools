@@ -1,11 +1,7 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { exitFocusMode, setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
-import {
-  getFocusRegion,
-  getFocusRegionBackup,
-  getShowFocusModeControls,
-} from "ui/reducers/timeline";
+import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../shared/Button";

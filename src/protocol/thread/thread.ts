@@ -969,23 +969,9 @@ class _ThreadFront {
     });
     client.Console.addNewMessageListener(async ({ message }) => {
       await this.ensureAllSources();
-      const pause = new Pause(this);
-      pause.instantiate(
-        message.pauseId,
-        message.point.point,
-        message.point.time,
-        !!message.point.frame,
-        message.data
-      );
-      if (message.argumentValues) {
-        (message as WiredMessage).argumentValues = message.argumentValues.map(
-          v => new ValueFront(pause, v)
-        );
-      }
-      this.updateMappedLocation(message.point.frame);
-      if (message.sourceId) {
-        message.sourceId = this.getCorrespondingSourceIds(message.sourceId)[0];
-      }
+
+      const pause = wireUpMessage(message);
+
       onConsoleMessage(pause, message as WiredMessage);
     });
 
@@ -1385,3 +1371,28 @@ class _ThreadFront {
 
 export const ThreadFront = new _ThreadFront();
 EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
+
+export function wireUpMessage(message: Message): Pause {
+  const wiredMessage = message as WiredMessage;
+
+  const pause = new Pause(ThreadFront);
+  pause.instantiate(
+    message.pauseId,
+    message.point.point,
+    message.point.time,
+    !!message.point.frame,
+    message.data
+  );
+
+  if (message.argumentValues) {
+    wiredMessage.argumentValues = message.argumentValues.map(value => new ValueFront(pause, value));
+  }
+
+  ThreadFront.updateMappedLocation(message.point.frame);
+
+  if (message.sourceId) {
+    message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
+  }
+
+  return pause;
+}
