@@ -38,6 +38,8 @@ export default function Timeline() {
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+
   const [editMode, setEditMode] = useState<EditMode | null>(null);
   const [showLoadingProgress, setShowLoadingProgress] = useState<boolean>(false);
 
@@ -110,7 +112,11 @@ export default function Timeline() {
           <PlayPauseButton />
         </div>
 
-        <div className="progress-bar-container">
+        <div
+          className="progress-bar-container"
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+        >
           <div
             className="progress-bar"
             ref={progressBarRef}
@@ -128,7 +134,7 @@ export default function Timeline() {
             <Focuser editMode={editMode} setEditMode={setEditMode} />
           </div>
 
-          <Tooltip timelineWidth={timelineDimensions.width} />
+          {isHovered && <Tooltip timelineWidth={timelineDimensions.width} />}
         </div>
 
         <Capsule setShowLoadingProgress={setShowLoadingProgress} />
