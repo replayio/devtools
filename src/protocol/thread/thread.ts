@@ -318,7 +318,7 @@ class _ThreadFront {
 
   async getAnnotationKinds(): Promise<string[]> {
     // @ts-ignore
-    const { kinds } = await client.Session.getAnnotationKinds();
+    const { kinds } = await client.Session.getAnnotationKinds({}, this.sessionId);
     return kinds;
   }
 
@@ -514,7 +514,8 @@ class _ThreadFront {
   }
 
   async getHitCounts(sourceId: SourceId, locations: SameLineSourceLocations[]) {
-    return client.Debugger.getHitCounts({ sourceId, locations, maxHits: 10000 });
+    assert(this.sessionId, "no sessionId");
+    return client.Debugger.getHitCounts({ sourceId, locations, maxHits: 10000 }, this.sessionId);
   }
 
   async getEventHandlerCounts(eventTypes: string[]) {
@@ -530,7 +531,8 @@ class _ThreadFront {
 
   async getEventHandlerCount(eventType: string) {
     await this.waitForSession();
-    const { count } = await client.Debugger.getEventHandlerCount({ eventType });
+    assert(this.sessionId, "no sessionId");
+    const { count } = await client.Debugger.getEventHandlerCount({ eventType }, this.sessionId);
     return count;
   }
 
