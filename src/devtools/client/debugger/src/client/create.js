@@ -30,7 +30,7 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     };
   }
 
-  const displayName = frame.functionName || `(${frame.type})`;
+  const displayName = frame.originalFunctionName || frame.functionName || `(${frame.type})`;
 
   return {
     id: `${asyncIndex}:${index}`,
