@@ -1,3 +1,8 @@
+import {
+  runAnalysisOnLine,
+  updateHoveredLineNumber,
+} from "devtools/client/debugger/src/actions/breakpoints/index";
+import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import { minBy } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +20,6 @@ import { shouldShowNag } from "ui/utils/user";
 import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
-
-const { runAnalysisOnLine } = require("devtools/client/debugger/src/actions/breakpoints/index");
-const {
-  updateHoveredLineNumber,
-} = require("devtools/client/debugger/src/actions/breakpoints/index");
-const { setBreakpointHitCounts } = require("devtools/client/debugger/src/actions/sources");
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
