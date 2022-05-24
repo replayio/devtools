@@ -31,7 +31,7 @@ pref("devtools.features.resolveRecording", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
-pref("devtools.features.showRedux", false);
+pref("devtools.features.showRedux", true);
 pref("devtools.features.enableLargeText", false);
 
 export const prefs = new PrefsHelper("devtools", {
