@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
+import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 import { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
@@ -59,6 +60,8 @@ function KeyboardShortcuts({
 }: PropsFromRedux) {
   const { user } = useAuth0();
   const recordingId = useGetRecordingId();
+  const { value: protocolTimeline, update: updateProtocolTimeline } =
+    useFeature("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
     const openFullTextSearch = (e: KeyboardEvent) => {
       e.preventDefault();
@@ -150,6 +153,13 @@ function KeyboardShortcuts({
       }
     };
 
+    const toggleProtocolTimeline = (e: KeyboardEvent) => {
+      if (!e.target || !isEditableElement(e.target)) {
+        e.preventDefault();
+        updateProtocolTimeline(!protocolTimeline);
+      }
+    };
+
     const shortcuts: Record<string, (e: KeyboardEvent) => void> = {
       "CmdOrCtrl+Shift+F": openFullTextSearch,
       "CmdOrCtrl+B": toggleLeftSidebar,
@@ -169,6 +179,8 @@ function KeyboardShortcuts({
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
       "CmdOrCtrl+G": toggleLineQuickOpenModal,
 
+      "~": toggleProtocolTimeline,
+
       Escape: closeOpenModalsOnEscape,
     };
 
@@ -177,12 +189,14 @@ function KeyboardShortcuts({
     showCommandPaletteInEditor,
     setSelectedPrimaryPanel,
     focusFullTextInput,
+    protocolTimeline,
     setViewMode,
     selectedSource,
     toolboxLayout,
     toggleCommandPalette,
     toggleFocusMode,
     togglePaneCollapse,
+    updateProtocolTimeline,
     viewMode,
     toggleThemeAction,
     toggleQuickOpen,
