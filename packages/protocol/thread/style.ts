@@ -1,13 +1,12 @@
 import { StyleDeclaration } from "@replayio/protocol";
+import { ELEMENT_STYLE } from "shared/constants";
 
 import { assert, DisallowEverythingProxyHandler } from "../utils";
 
 import { Pause, WiredObject } from "./pause";
 
-const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
-
-// Manages interaction with a CSSStyleDeclaration. StyleFront represents an inline
-// element style.
+// Manages interaction with a CSSStyleDeclaration.
+// StyleFront represents an inline element style.
 export class StyleFront {
   parentStyleSheet = null;
   mediaText = undefined;
