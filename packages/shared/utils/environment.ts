@@ -1,7 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { ExecutionPoint } from "@replayio/protocol";
 import { Editor } from "codemirror";
-import { usesWindow } from "../../ssr";
 
 export interface MockEnvironment {
   graphqlMocks: MockedResponse[];
@@ -22,13 +20,8 @@ declare global {
   }
 }
 
-export const url = usesWindow(win => {
-  if (!win) {
-    return new URL("https://app.replay.io");
-  }
-
-  return new URL(win.location.href);
-});
+export const url =
+  typeof window !== "undefined" ? new URL(window.location.href) : new URL("https://app.replay.io");
 
 export function isDevelopment() {
   return url.hostname == "localhost";
@@ -39,9 +32,7 @@ export function isFirefox() {
 }
 
 export function isReplayBrowser() {
-  return usesWindow(win => {
-    return win ? "__IS_RECORD_REPLAY_RUNTIME__" in win : false;
-  });
+  return typeof window !== "undefined" ? "__IS_RECORD_REPLAY_RUNTIME__" in window : false;
 }
 
 export function getTest() {
