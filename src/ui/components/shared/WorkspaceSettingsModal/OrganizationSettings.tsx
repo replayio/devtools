@@ -107,7 +107,11 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
   const disabled = !workspace.isOrganization;
 
   return (
-    <div className={classNames("space-y-4", { "text-gray-500": disabled })}>
+    <div
+      className={classNames("-mr-4 max-h-full space-y-4 overflow-y-auto pr-4", {
+        "text-gray-500": disabled,
+      })}
+    >
       {disabled ? (
         <p>
           These features are only available to teams on our Organization Plan. Want to upgrade?{" "}

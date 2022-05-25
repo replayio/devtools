@@ -148,7 +148,7 @@ const settings: Settings<
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-grow flex-col space-y-3 overflow-hidden">
+        <div className="flex flex-grow flex-col space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
           <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>

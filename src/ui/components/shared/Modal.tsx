@@ -12,7 +12,7 @@ function Modal({ hideModal, children, showClose = true }: ModalProps) {
   return (
     <div className="modal-container">
       <div className="modal-mask" onClick={hideModal} />
-      <div className="modal-content text-sm">
+      <div className="modal-content overflow-hidden text-sm">
         {showClose && (
           <button className="modal-close" onClick={hideModal}>
             <div className="img close" />

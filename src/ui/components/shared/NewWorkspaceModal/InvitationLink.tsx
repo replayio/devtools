@@ -67,8 +67,8 @@ function InvationDomainCheck({ workspace }: { workspace: Workspace }) {
   const emptyWorkspaceLink = "Give access with anyone with a replay.io email address";
   const workspaceLink = (
     <span>
-      Give access to anyone with a <span className="font-medium ">{workspace.domain}</span> email
-      address
+      Restrict this invite link to users with a{" "}
+      <span className="font-medium ">{workspace.domain}</span> email address
     </span>
   );
 
@@ -110,8 +110,9 @@ export default function InvitationLink({
     : `https://app.replay.io/team/invitation/${workspace.invitationCode}`;
 
   return (
-    <div className="flex w-full flex-col space-y-3">
-      {!hideHeader ? <div className="text-xs font-bold uppercase">{`Invite link`}</div> : null}
+    <div className="relative flex w-full flex-col space-y-3">
+      <div className="absolute -inset-8 top-0 bg-themeBase-60 opacity-10" />
+      {!hideHeader ? <div className="font-bold">{`Invite link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
     </div>
