@@ -1,9 +1,13 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useIntercom } from "react-use-intercom";
 import * as actions from "ui/actions/app";
 import Avatar from "ui/components/Avatar";
-import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownItemContent,
+  DropdownLinkItem,
+} from "ui/components/Library/LibraryDropdown";
 import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
@@ -14,7 +18,6 @@ interface UserOptionsProps extends PropsFromRedux {
 }
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
-  const { show } = useIntercom();
   const { isAuthenticated, user, logout } = useAuth0();
 
   if (!isAuthenticated) {
@@ -40,9 +43,6 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
     setModal("settings");
   };
-  const onChatClick = () => {
-    show();
-  };
 
   return (
     <div className="user-options">
@@ -50,9 +50,9 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
         <DropdownItem onClick={onDocsClick}>
           <DropdownItemContent icon="docs">Docs</DropdownItemContent>
         </DropdownItem>
-        <DropdownItem onClick={onChatClick}>
+        <DropdownLinkItem href="https://discord.gg/n2dTK6kcRX">
           <DropdownItemContent icon="help">Chat with us</DropdownItemContent>
-        </DropdownItem>
+        </DropdownLinkItem>
         <DropdownItem onClick={onSettingsClick}>
           <DropdownItemContent icon="settings">Settings</DropdownItemContent>
         </DropdownItem>

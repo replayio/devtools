@@ -3,6 +3,7 @@ import { createPopper, Options, flip, preventOverflow } from "@popperjs/core";
 import classNames from "classnames";
 import React, { useEffect, useState, RefCallback, useRef, useCallback, useMemo } from "react";
 import { createPortal } from "react-dom";
+import ExternalLink from "ui/components/shared/ExternalLink";
 
 import Icon from "../shared/Icon";
 
@@ -79,6 +80,30 @@ export function DropdownItem({
         >
           {children}
         </button>
+      )}
+    </Menu.Item>
+  );
+}
+
+export function DropdownLinkItem({
+  children,
+  href,
+}: {
+  children: string | React.ReactElement;
+  href: string;
+}) {
+  return (
+    <Menu.Item>
+      {({ active }: { active: boolean }) => (
+        <ExternalLink
+          className={classNames(
+            active ? "bg-menuHoverBgcolor text-menuHoverColor" : "text-menuColor",
+            "block px-4 py-2 w-full text-left"
+          )}
+          href={href}
+        >
+          {children}
+        </ExternalLink>
       )}
     </Menu.Item>
   );
