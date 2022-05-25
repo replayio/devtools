@@ -339,7 +339,14 @@ export class QuickOpenModal extends Component {
         tagOpen: '<mark class="highlight">',
       },
     };
-    const html = fuzzyAldrin.wrap(candidateString, query, options);
+
+    // There might be a match in the path but not the title.
+    // In this case just render the whole title, un-styled.
+    //
+    // Note that "fuzzaldrin-plus" returns an HTML string usually,
+    // but if either the input string or the query string are empty, it returns an array.
+    const html = query ? fuzzyAldrin.wrap(candidateString, query, options) : candidateString;
+
     return <div dangerouslySetInnerHTML={{ __html: html }} />;
   }
 
