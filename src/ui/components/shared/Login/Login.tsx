@@ -5,7 +5,7 @@ import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
 import { query } from "ui/utils/apolloClient";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
-import { getLoginReferrerParam } from "ui/utils/environment";
+import { getLoginReferrerParam } from "shared/utils/environment";
 import { isTeamMemberInvite } from "ui/utils/onboarding";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";

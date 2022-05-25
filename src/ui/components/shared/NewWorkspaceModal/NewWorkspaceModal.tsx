@@ -12,7 +12,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
-import { removeUrlParameters } from "ui/utils/environment";
+import { removeUrlParameters } from "shared/utils/environment";
 import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";

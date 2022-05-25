@@ -31,7 +31,7 @@ import {
 } from "ui/reducers/timeline";
 import { LoadedRegions } from "ui/state/app";
 import { HoveredItem } from "ui/state/timeline";
-import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
+import { getPausePointParams, getTest, updateUrlWithParams } from "shared/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";

@@ -12,7 +12,7 @@ import { connect } from "../../utils/connect";
 import classnames from "classnames";
 import debounce from "lodash/debounce";
 
-import { isFirefox } from "ui/utils/environment";
+import { isFirefox } from "shared/utils/environment";
 import { getIndentation } from "../../utils/indentation";
 
 import actions from "../../actions";

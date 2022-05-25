@@ -19,7 +19,7 @@ import {
 import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "./WorkspaceSettingsModal/WorkspaceSettingsModal";
 import { trackEvent } from "ui/utils/telemetry";
-import { removeUrlParameters } from "ui/utils/environment";
+import { removeUrlParameters } from "shared/utils/environment";
 import { DownloadPage } from "./Onboarding/DownloadPage";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { useRouter } from "next/router";

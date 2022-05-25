@@ -4,7 +4,7 @@ import { loadStripe } from "@stripe/stripe-js";
 
 import { assert } from "protocol/utils";
 import hooks from "ui/hooks";
-import { isDevelopment } from "ui/utils/environment";
+import { isDevelopment } from "shared/utils/environment";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
 import { SettingsHeader } from "../SettingsModal/SettingsBody";

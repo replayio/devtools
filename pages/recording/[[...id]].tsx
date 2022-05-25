@@ -16,7 +16,7 @@ import {
 } from "ui/hooks/recordings";
 import setup from "ui/setup/dynamic/devtools";
 import { Recording as RecordingInfo } from "ui/types";
-import { isTest } from "ui/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";

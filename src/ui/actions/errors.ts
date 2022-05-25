@@ -5,7 +5,7 @@ import {
 } from "ui/reducers/app";
 import type { UIState } from "ui/state";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { isDevelopment } from "ui/utils/environment";
+import { isDevelopment } from "shared/utils/environment";
 import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 

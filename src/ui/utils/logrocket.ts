@@ -1,7 +1,7 @@
 import LogRocket from "logrocket";
 import setupLogRocketReact from "logrocket-react";
 import * as Sentry from "@sentry/react";
-import { skipTelemetry } from "./environment";
+import { skipTelemetry } from "shared/utils/environment";
 import { Recording, ExperimentalUserSettings } from "ui/types";
 import { UserInfo } from "ui/hooks/users";
 

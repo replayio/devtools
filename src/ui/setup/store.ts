@@ -11,7 +11,7 @@ import { Immer, enableMapSet } from "immer";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { ThunkExtraArgs } from "ui/utils/thunk";
-import { isDevelopment, skipTelemetry } from "ui/utils/environment";
+import { isDevelopment, skipTelemetry } from "shared/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 import appReducer from "ui/reducers/app";

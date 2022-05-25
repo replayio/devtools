@@ -5,7 +5,7 @@ import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { isTest } from "ui/utils/environment";
+import { isTest } from "shared/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import {
   hideCommandPalette,

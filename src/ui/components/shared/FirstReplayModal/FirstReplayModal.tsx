@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { launchAndRecordUrl } from "ui/utils/environment";
+import { launchAndRecordUrl } from "shared/utils/environment";
 import { trackEvent } from "ui/utils/telemetry";
 import { PrimaryLgButton } from "../Button";
 import { TextInputCopy } from "../NewWorkspaceModal/InvitationLink";

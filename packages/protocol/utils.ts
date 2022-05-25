@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/browser";
-import { isDevelopment } from "ui/utils/environment";
+// TODO [bvaughn] protocol
+import { isDevelopment } from "shared/utils/environment";
 
 export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   return (...args: any[]) => {

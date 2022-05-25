@@ -2,7 +2,7 @@ import { RecordingId } from "@replayio/protocol";
 
 import BatchActionDropdown from "./BatchActionDropdown";
 
-import { isReplayBrowser } from "ui/utils/environment";
+import { isReplayBrowser } from "shared/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 

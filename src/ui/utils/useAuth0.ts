@@ -2,7 +2,7 @@ import { useAuth0 as useOrigAuth0, Auth0ContextInterface, LogoutOptions } from "
 import { useRouter } from "next/router";
 import { useGetUserInfo } from "ui/hooks/users";
 import { setAccessTokenInBrowserPrefs } from "./browser";
-import { isTest, isMock } from "./environment";
+import { isTest, isMock } from "shared/utils/environment";
 import useToken from "./useToken";
 
 const TEST_AUTH = {

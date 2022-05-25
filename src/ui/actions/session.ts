@@ -28,7 +28,7 @@ import {
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
-import { getTest, isTest, isMock } from "ui/utils/environment";
+import { getTest, isTest, isMock } from "shared/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";

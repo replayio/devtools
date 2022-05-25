@@ -1,7 +1,7 @@
 const Services = require("devtools/shared/services");
 import { gql, useQuery, useMutation, DocumentNode } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { isTest } from "ui/utils/environment";
+import { isTest } from "shared/utils/environment";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { ExperimentalUserSettings } from "../types";

@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { isDevelopment } from "ui/utils/environment";
+import { isDevelopment } from "shared/utils/environment";
 
 export default function assert(condition, message) {
   if (isDevelopment() && !condition) {

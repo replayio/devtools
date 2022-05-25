@@ -24,7 +24,7 @@ import {
 import { PanelName } from "ui/state/layout";
 import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
+import { getSystemColorSchemePreference } from "shared/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { filterToFocusRegion, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";

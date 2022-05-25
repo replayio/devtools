@@ -9,7 +9,7 @@ import { Redacted } from "../Redacted";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { getDisplayedUrl } from "ui/utils/environment";
+import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 import styles from "./Library.module.css";
 import { useGetUserPermissions } from "ui/hooks/users";
