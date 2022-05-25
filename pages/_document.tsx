@@ -20,7 +20,7 @@ const csp = (props: any) => {
       isDev ? "http://localhost:* http://*.replay.local ws://localhost:*" : "ws://localhost:8000"
     }`,
     `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com https://www.loom.com/`,
-    // unsafe-eval is required by some external services
+    // Required by some of our external services
     `script-src 'self' 'unsafe-eval' https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,
 
@@ -31,6 +31,9 @@ const csp = (props: any) => {
     // Required by LogRocket
     `child-src 'self' blob:`,
     `worker-src 'self' blob:`,
+
+    // Required by some of our external services
+    `style-src 'self' 'unsafe-inline'`,
 
     // Required to inline images from the database and from external avaters
     `img-src 'self' data: https:`,
