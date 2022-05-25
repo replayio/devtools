@@ -144,6 +144,7 @@ export interface Recording {
   operations?: OperationsData;
   resolution: { resolvedAt: string; resolvedBy: string };
   collaboratorRequests: CollaboratorRequest[];
+  metadata: any;
 }
 
 export interface RecordingOptions {
