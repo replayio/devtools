@@ -11,8 +11,8 @@
  */
 
 import type { Action } from "@reduxjs/toolkit";
-import type { Location, Scope } from "@replayio/protocol";
 import type { AnyAction } from "@reduxjs/toolkit";
+import type { Location, Scope } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 import type { Source } from "./sources";
 

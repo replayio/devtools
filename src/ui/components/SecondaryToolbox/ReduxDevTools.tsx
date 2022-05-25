@@ -1,7 +1,7 @@
-import { Annotation } from "@replayio/protocol";
 // import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Root } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
+import { Annotation } from "@replayio/protocol";
 import React, { useLayoutEffect, useRef, useState, useContext } from "react";
 import { useSelector, batch } from "react-redux";
 import type { UIState } from "ui/state";

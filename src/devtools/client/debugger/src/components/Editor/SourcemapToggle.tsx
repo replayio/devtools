@@ -1,3 +1,4 @@
+import { SourceId } from "@replayio/protocol";
 import React, { Dispatch, SetStateAction } from "react";
 import { UIState } from "ui/state";
 import { getAlternateSource } from "../../reducers/pause";
@@ -9,7 +10,6 @@ import { Switch } from "@headlessui/react";
 import classNames from "classnames";
 import { setModal } from "ui/actions/app";
 import { ThreadFront } from "protocol/thread";
-import { SourceId } from "@replayio/protocol";
 import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
 
 function SourcemapError({ onClick }: { onClick: () => void }) {

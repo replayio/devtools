@@ -1,4 +1,3 @@
-import { RecordingId } from "@replayio/protocol";
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { Recording } from "ui/types";
@@ -10,6 +9,7 @@ import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
 import { ColorSwatchIcon } from "@heroicons/react/solid";
+import { RecordingId } from "@replayio/protocol";
 import {
   SetRecordingIsPrivate,
   SetRecordingIsPrivateVariables,

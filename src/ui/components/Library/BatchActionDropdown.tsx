@@ -1,9 +1,9 @@
+import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import { RecordingId } from "@replayio/protocol";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
 import { DisabledButton, getButtonClasses } from "../shared/Button";

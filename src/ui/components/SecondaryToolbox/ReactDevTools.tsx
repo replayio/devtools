@@ -1,7 +1,7 @@
+import { ExecutionPoint, ObjectId } from "@replayio/protocol";
 import React from "react";
 import { useEffect, useState } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { ExecutionPoint, ObjectId } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UIState } from "ui/state";

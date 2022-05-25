@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import React, { MouseEvent } from "react";
 import { Recording } from "ui/types";
 import formatDate from "date-fns/format";
@@ -5,7 +6,6 @@ import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import LazyLoad from "react-lazyload";
 import hooks from "ui/hooks";
 import { Redacted } from "../Redacted";
-import { RecordingId } from "@replayio/protocol";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
