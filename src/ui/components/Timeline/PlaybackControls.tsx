@@ -4,6 +4,7 @@ import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline
 import { selectors } from "ui/reducers";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { endTimeForFocusRegion } from "ui/utils/timeline";
 
 export default function PlayPauseButton() {
   const dispatch = useDispatch();
@@ -15,7 +16,7 @@ export default function PlayPauseButton() {
 
   const disabled = !videoUrl && (features.videoPlayback as boolean);
   const isAtEnd = focusRegion
-    ? currentTime === focusRegion.endTime
+    ? currentTime === endTimeForFocusRegion(focusRegion)
     : currentTime == recordingDuration;
 
   let onClick;

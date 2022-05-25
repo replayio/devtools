@@ -3,7 +3,11 @@ import { FC } from "react";
 import { useSelector } from "react-redux";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
-import { getVisiblePosition } from "ui/utils/timeline";
+import {
+  endTimeForFocusRegion,
+  getVisiblePosition,
+  startTimeForFocusRegion,
+} from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useSelector(getLoadedRegions);
@@ -25,8 +29,8 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusRegion) {
-    beginTime = focusRegion.startTime;
-    endTime = focusRegion.endTime;
+    beginTime = startTimeForFocusRegion(focusRegion);
+    endTime = endTimeForFocusRegion(focusRegion);
   }
   const { endTime: recordingEndTime } = zoomRegion;
   const loadedRegionStart = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

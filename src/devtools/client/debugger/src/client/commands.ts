@@ -19,7 +19,7 @@ import {
 } from "protocol/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 import { WiredNamedValue } from "protocol/thread/pause";
-import { FocusRegion } from "ui/state/timeline";
+import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
 
 import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 import { SelectedFrame } from "../reducers/pause";
@@ -425,8 +425,8 @@ async function getSourceActorBreakpointHitCounts(
       locationsToFetch,
       focusRegion
         ? {
-            startPoint: focusRegion.start.point,
-            endPoint: focusRegion.end.point,
+            startPoint: (focusRegion as UnsafeFocusRegion).start.point,
+            endPoint: (focusRegion as UnsafeFocusRegion).end.point,
           }
         : null
     ).catch(onFailure)),

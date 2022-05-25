@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { exitFocusMode, setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
 import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
+import { UnsafeFocusRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
@@ -13,7 +14,7 @@ export default function FocusModePopout() {
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   const dispatch = useDispatch();
-  const focusRegionBackup = useSelector(getFocusRegionBackup);
+  const focusRegionBackup = useSelector(getFocusRegionBackup) as UnsafeFocusRegion;
 
   const hideModal = () => dispatch(exitFocusMode());
 

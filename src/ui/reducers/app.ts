@@ -27,7 +27,14 @@ import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
-import { filterToFocusRegion, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
+import {
+  endTimeForFocusRegion,
+  filterToFocusRegion,
+  isPointInRegions,
+  isTimeInRegions,
+  overlap,
+  startTimeForFocusRegion,
+} from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -400,7 +407,11 @@ export const getFlatEvents = (state: UIState) => {
 
   // Only show the events in the current focused region
   return focusRegion
-    ? filteredEvents.filter(e => e.time > focusRegion.start.time && e.time < focusRegion.end.time)
+    ? filteredEvents.filter(
+        e =>
+          e.time > startTimeForFocusRegion(focusRegion) &&
+          e.time < endTimeForFocusRegion(focusRegion)
+      )
     : filteredEvents;
 };
 export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerActive;

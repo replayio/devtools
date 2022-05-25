@@ -24,6 +24,7 @@ import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
 
 import type { UIThunkAction } from "./index";
+import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -201,7 +202,11 @@ export function seekToComment(item: Comment | Reply | PendingComment["comment"])
     dispatch(clearPendingComment());
     const focusRegion = getFocusRegion(getState());
 
-    if (focusRegion && (item.time < focusRegion.startTime || item.time > focusRegion.endTime)) {
+    if (
+      focusRegion &&
+      (item.time < startTimeForFocusRegion(focusRegion) ||
+        item.time > endTimeForFocusRegion(focusRegion))
+    ) {
       console.error("Cannot seek outside the current focused region", focusRegion, item);
       return;
     }

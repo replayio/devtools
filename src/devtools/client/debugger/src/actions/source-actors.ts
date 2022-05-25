@@ -5,6 +5,7 @@
 import type { UIThunkAction } from "ui/actions";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 
 import {
   getSourceActor,
@@ -94,8 +95,12 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
       const key = [
         id,
         Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH,
-        state.timeline.focusRegion?.startTime,
-        state.timeline.focusRegion?.endTime,
+        state.timeline.focusRegion
+          ? startTimeForFocusRegion(state.timeline.focusRegion)
+          : "no_focus_start",
+        state.timeline.focusRegion
+          ? endTimeForFocusRegion(state.timeline.focusRegion)
+          : "no_focus_end",
       ].join("-");
       return key;
     },

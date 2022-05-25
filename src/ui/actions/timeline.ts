@@ -1,6 +1,7 @@
-import { ExecutionPoint, loadedRegions, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
+import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 import {
   getGraphicsAtTime,
   paintGraphics,
@@ -19,7 +20,6 @@ import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
@@ -30,12 +30,12 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
-import { LoadedRegions } from "ui/state/app";
-import { HoveredItem } from "ui/state/timeline";
+import { FocusRegion, HoveredItem } from "ui/state/timeline";
+import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { isTimeInRegions } from "ui/utils/timeline";
+import { endTimeForFocusRegion, isTimeInRegions, startTimeForFocusRegion } from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -205,9 +205,13 @@ export function seek(
     const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
 
-    if (focusRegion && (time < focusRegion.startTime || time > focusRegion.endTime)) {
-      console.error("Cannot seek outside the current focused region");
-      return false;
+    if (focusRegion) {
+      const startTime = startTimeForFocusRegion(focusRegion);
+      const endTime = endTimeForFocusRegion(focusRegion);
+      if (time < startTime || time > endTime) {
+        console.error("Cannot seek outside the current focused region");
+        return false;
+      }
     }
 
     dispatch({ type: "CLEAR_FRAME_POSITIONS" });
@@ -268,11 +272,15 @@ export function startPlayback(): UIThunkAction {
     }
 
     const focusRegion = getFocusRegion(state);
-    const { endTime } = focusRegion ? focusRegion : getZoomRegion(state);
+    const endTime = focusRegion ? endTimeForFocusRegion(focusRegion) : getZoomRegion(state).endTime;
 
     const startDate = Date.now();
     const startTime =
-      currentTime >= endTime ? (focusRegion ? focusRegion.startTime : 0) : currentTime;
+      currentTime >= endTime
+        ? focusRegion
+          ? startTimeForFocusRegion(focusRegion)
+          : 0
+        : currentTime;
 
     dispatch(
       setTimelineState({
@@ -305,7 +313,7 @@ export function replayPlayback(): UIThunkAction {
     let startTime = 0;
 
     if (focusRegion) {
-      startTime = focusRegion.startTime;
+      startTime = startTimeForFocusRegion(focusRegion);
     }
 
     dispatch(seekToTime(startTime));
@@ -471,7 +479,13 @@ export function setFocusRegion(
 
     if (focusRegion !== null) {
       const zoomRegion = getZoomRegion(state);
-      const { endTime: prevEndTime, startTime: prevStartTime } = getFocusRegion(state) || {};
+      const previousFocusRegion = getFocusRegion(state);
+      const prevStartTime = previousFocusRegion
+        ? startTimeForFocusRegion(previousFocusRegion)
+        : undefined;
+      const prevEndTime = previousFocusRegion
+        ? endTimeForFocusRegion(previousFocusRegion)
+        : undefined;
 
       let { endTime, startTime } = focusRegion;
 
@@ -530,7 +544,7 @@ export function setFocusRegion(
       // probably we should also run "getPointNearTime", store that, and take the
       // closest thing we can find of the points we have (assuming we don't have
       // an exact match.)
-      const startIndex = sortedIndexBy(
+      const startIndex = sortedLastIndexBy(
         state.timeline.points,
         { time: startTime, point: "" },
         p => p.time
@@ -542,7 +556,10 @@ export function setFocusRegion(
         { time: endTime, point: "" },
         p => p.time
       );
-      const end = endIndex > 0 ? state.timeline.points[endIndex - 1] : { point: "", time: endTime };
+      const end =
+        endIndex > 0 && endIndex < state.timeline.points.length
+          ? state.timeline.points[endIndex]
+          : { point: "", time: endTime };
 
       dispatch(
         newFocusRegion({
@@ -565,7 +582,7 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
 
     // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const startTime = focusRegion ? focusRegion.startTime : 0;
+    const startTime = focusRegion ? startTimeForFocusRegion(focusRegion) : 0;
 
     dispatch(
       setFocusRegion({
@@ -587,7 +604,7 @@ export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThu
 
     // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const endTime = focusRegion ? focusRegion.endTime : Number.POSITIVE_INFINITY;
+    const endTime = focusRegion ? endTimeForFocusRegion(focusRegion) : Number.POSITIVE_INFINITY;
 
     dispatch(
       setFocusRegion({
@@ -606,7 +623,7 @@ export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
     const zoomRegion = getZoomRegion(state);
-    const focusRegion = getFocusRegion(state);
+    const focusRegion = getFocusRegion(state) as FocusRegion;
 
     if (!focusRegion) {
       return;
@@ -614,17 +631,22 @@ export function syncFocusedRegion(): UIThunkAction {
 
     if (!features.softFocus) {
       client.Session.unloadRegion(
-        { region: { begin: 0, end: focusRegion.startTime } },
+        { region: { begin: 0, end: startTimeForFocusRegion(focusRegion) } },
         ThreadFront.sessionId!
       );
       client.Session.unloadRegion(
-        { region: { begin: focusRegion.endTime, end: zoomRegion.endTime } },
+        { region: { begin: endTimeForFocusRegion(focusRegion), end: zoomRegion.endTime } },
         ThreadFront.sessionId!
       );
     }
 
     client.Session.loadRegion(
-      { region: { begin: focusRegion.startTime, end: focusRegion.endTime } },
+      {
+        region: {
+          begin: startTimeForFocusRegion(focusRegion),
+          end: endTimeForFocusRegion(focusRegion),
+        },
+      },
       ThreadFront.sessionId!
     );
 

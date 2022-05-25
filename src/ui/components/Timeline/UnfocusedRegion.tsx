@@ -2,7 +2,11 @@ import { clamp } from "lodash";
 import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
-import { getVisiblePosition } from "ui/utils/timeline";
+import {
+  endTimeForFocusRegion,
+  getVisiblePosition,
+  startTimeForFocusRegion,
+} from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
   const focusRegion = useSelector(selectors.getFocusRegion);
@@ -12,7 +16,8 @@ export default function UnfocusedRegion() {
     return null;
   }
 
-  const { startTime, endTime } = focusRegion;
+  const startTime = startTimeForFocusRegion(focusRegion);
+  const endTime = endTimeForFocusRegion(focusRegion);
   const duration = zoomRegion.endTime - zoomRegion.startTime;
 
   const start = getVisiblePosition({ time: startTime, zoom: zoomRegion }) * 100;

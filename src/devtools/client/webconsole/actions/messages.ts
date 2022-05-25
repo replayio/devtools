@@ -9,17 +9,15 @@ import {
   prepareMessage,
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
-import { sortedLastIndexBy } from "lodash";
-import sortedIndexBy from "lodash/sortedIndexBy";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { LogpointHandlers } from "protocol/logpoint";
-import { client, sendMessage } from "protocol/socket";
+import { client } from "protocol/socket";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
 import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
 import { pointsReceived } from "ui/reducers/timeline";
-import { FocusRegion } from "ui/state/timeline";
+import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
 import { isFocusRegionSubset } from "ui/utils/timeline";
 
 import {
@@ -280,8 +278,10 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     dispatch(clearMessages());
 
     const sessionEndpoint = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
-    const begin = focusRegion ? focusRegion.start.point : "0";
-    const end = focusRegion ? focusRegion.end.point : sessionEndpoint.endpoint.point;
+    const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).start.point : "0";
+    const end = focusRegion
+      ? (focusRegion as UnsafeFocusRegion).end.point
+      : sessionEndpoint.endpoint.point;
 
     const { messages, overflow } = await client.Console.findMessagesInRange(
       { range: { begin, end } },

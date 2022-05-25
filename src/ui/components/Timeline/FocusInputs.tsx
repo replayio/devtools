@@ -2,7 +2,12 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { getFormattedTime, getSecondsFromFormattedTime } from "ui/utils/timeline";
+import {
+  endTimeForFocusRegion,
+  getFormattedTime,
+  getSecondsFromFormattedTime,
+  startTimeForFocusRegion,
+} from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";
 import styles from "./FocusInputs.module.css";
@@ -21,8 +26,8 @@ export default function FocusInputs() {
   const inputSize = formattedDuration.length;
 
   if (showFocusModeControls && focusRegion !== null) {
-    const formattedEndTime = getFormattedTime(focusRegion.endTime);
-    const formattedStartTime = getFormattedTime(focusRegion.startTime);
+    const formattedEndTime = getFormattedTime(endTimeForFocusRegion(focusRegion));
+    const formattedStartTime = getFormattedTime(startTimeForFocusRegion(focusRegion));
 
     const validateAndSaveStartTime = (pending: string) => {
       try {
@@ -31,7 +36,9 @@ export default function FocusInputs() {
           // If the new end time is less than the current start time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newEndTime =
-            newStartTime <= focusRegion!.endTime ? focusRegion!.endTime : newStartTime;
+            newStartTime <= endTimeForFocusRegion(focusRegion!)
+              ? endTimeForFocusRegion(focusRegion!)
+              : newStartTime;
 
           dispatch(
             setFocusRegion({
@@ -51,7 +58,9 @@ export default function FocusInputs() {
           // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newStartTime =
-            newEndTime >= focusRegion!.startTime ? focusRegion!.startTime : newEndTime;
+            newEndTime >= startTimeForFocusRegion(focusRegion!)
+              ? startTimeForFocusRegion(focusRegion!)
+              : newEndTime;
 
           dispatch(
             setFocusRegion({

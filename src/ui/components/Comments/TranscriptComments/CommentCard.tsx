@@ -24,6 +24,7 @@ import CommentSource from "./CommentSource";
 import NetworkRequestPreview from "./NetworkRequestPreview";
 import { FocusContext } from "./FocusContext";
 import { CommentData } from "./types";
+import { isInFocusSpan, startTimeForFocusRegion } from "ui/utils/timeline";
 
 type PendingCommentProps = {
   comment: Comment;
@@ -215,8 +216,7 @@ function CommentCard({
 }: CommentCardProps) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
   const focusRegion = useSelector(getFocusRegion);
-  const isOutsideFocusedRegion =
-    focusRegion && (comment.time < focusRegion.startTime || comment.time > focusRegion.endTime);
+  const isOutsideFocusedRegion = focusRegion && !isInFocusSpan(comment.time, focusRegion);
 
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);

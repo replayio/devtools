@@ -9,6 +9,7 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 
 import { trackEvent } from "ui/utils/telemetry";
+import { isInFocusSpan } from "ui/utils/timeline";
 
 export default function NetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {
   const dispatch = useDispatch();
@@ -25,9 +26,7 @@ export default function NetworkRequestPreview({ networkRequestId }: { networkReq
     dispatch(selectAndFetchRequest(networkRequestId));
   };
 
-  const isSeekEnabled =
-    focusRegion == null ||
-    (request.point.time >= focusRegion.startTime && request.point.time <= focusRegion.endTime);
+  const isSeekEnabled = focusRegion == null || isInFocusSpan(request.point.time, focusRegion);
 
   const { method, name } = request;
 

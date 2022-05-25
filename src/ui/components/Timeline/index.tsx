@@ -1,16 +1,20 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import { useFeature } from "ui/hooks/settings";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
-import { getTimeFromPosition } from "ui/utils/timeline";
+import {
+  endTimeForFocusRegion,
+  getTimeFromPosition,
+  startTimeForFocusRegion,
+} from "ui/utils/timeline";
 
 import Comments from "../Comments";
-import CurrentTimeIndicator from "./CurrentTimeIndicator";
-
 import ProtocolTimeline from "../ProtocolTimeline";
 
 import Capsule from "./Capsule";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
 import Focuser from "./Focuser";
 import FocusModePopout from "./FocusModePopout";
 import LoadingProgressBars from "./LoadingProgressBars";
@@ -20,7 +24,6 @@ import PreviewMarkers from "./PreviewMarkers";
 import ProgressBars from "./ProgressBars";
 import Tooltip from "./Tooltip";
 import UnfocusedRegion from "./UnfocusedRegion";
-import { useFeature } from "ui/hooks/settings";
 
 export type EditMode = {
   dragOffset?: number;
@@ -71,7 +74,9 @@ export default function Timeline() {
       zoomRegion
     );
     const isOutsideFocusRegion =
-      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
+      focusRegion &&
+      (mouseTime < startTimeForFocusRegion(focusRegion) ||
+        mouseTime > endTimeForFocusRegion(focusRegion));
 
     if (isOutsideFocusRegion) {
       return;
@@ -88,7 +93,9 @@ export default function Timeline() {
     );
     const isDragging = event.buttons === 1;
     const isOutsideFocusRegion =
-      focusRegion && (mouseTime < focusRegion.startTime || mouseTime > focusRegion.endTime);
+      focusRegion &&
+      (mouseTime < startTimeForFocusRegion(focusRegion) ||
+        mouseTime > endTimeForFocusRegion(focusRegion));
 
     if (isOutsideFocusRegion) {
       return;
