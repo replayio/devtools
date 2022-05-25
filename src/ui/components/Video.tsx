@@ -1,7 +1,8 @@
-import React, { FC, useEffect, useRef } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { installObserver, refreshGraphics, Video as VideoPlayer } from "protocol/graphics";
 import { setVideoNode } from "protocol/videoNode";
+import React, { FC, useEffect, useRef } from "react";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
 import CommentTool from "ui/components/shared/CommentTool";

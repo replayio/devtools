@@ -5,13 +5,16 @@ import {
   Rect,
   Quads,
 } from "@recordreplay/protocol";
-import { client } from "../socket";
-import { Pause, WiredObject } from "./pause";
-import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
-import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
-import { ValueFront } from "./value";
-import { RuleFront } from "./rule";
 import uniqBy from "lodash/uniqBy";
+
+import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
+import { client } from "../socket";
+import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
+
+import { Pause, WiredObject } from "./pause";
+import { RuleFront } from "./rule";
+import { ValueFront } from "./value";
+
 const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 export interface WiredEventListener {

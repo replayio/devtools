@@ -1,6 +1,8 @@
 import { StyleSheet } from "@recordreplay/protocol";
-import { Pause, WiredObject } from "./pause";
+
 import { assert, DisallowEverythingProxyHandler } from "../utils";
+
+import { Pause, WiredObject } from "./pause";
 
 // Manages interaction with a StyleSheet.
 export class StyleSheetFront {

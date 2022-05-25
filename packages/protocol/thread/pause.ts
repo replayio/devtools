@@ -15,15 +15,17 @@ import {
   repaintGraphicsResult,
   getAllBoundingClientRectsResult,
 } from "@recordreplay/protocol";
+
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
-import { ValueFront } from "./value";
-import type { ThreadFront as ThreadFrontType } from "./thread";
+
+import { NodeBoundsFront } from "./bounds";
 import { NodeFront } from "./node";
 import { RuleFront } from "./rule";
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";
-import { NodeBoundsFront } from "./bounds";
+import type { ThreadFront as ThreadFrontType } from "./thread";
+import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
 
