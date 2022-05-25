@@ -1,5 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import React, { MouseEvent } from "react";
+import { getDisplayedUrl } from "shared/utils/environment";
 import { Recording } from "ui/types";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
@@ -9,7 +10,6 @@ import { Redacted } from "../Redacted";
 import RecordingOptionsDropdown from "./RecordingOptionsDropdown";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { getDisplayedUrl } from "shared/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 import styles from "./Library.module.css";
 import { useGetUserPermissions } from "ui/hooks/users";

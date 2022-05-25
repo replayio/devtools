@@ -19,6 +19,7 @@ import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { getPausePointParams, getTest, updateUrlWithParams } from "shared/utils/environment";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
@@ -31,7 +32,6 @@ import {
 } from "ui/reducers/timeline";
 import { LoadedRegions } from "ui/state/app";
 import { HoveredItem } from "ui/state/timeline";
-import { getPausePointParams, getTest, updateUrlWithParams } from "shared/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";

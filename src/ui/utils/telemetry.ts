@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { skipTelemetry } from "shared/utils/environment";
 import { Recording } from "ui/types";
+
 import { prefs } from "./prefs";
 import { initializeMixpanel, trackMixpanelEvent } from "./mixpanel";
 import { pingTelemetry } from "./replay-telemetry";

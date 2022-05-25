@@ -1,6 +1,7 @@
 import React from "react";
-import { PendingWorkspaceInvitation } from "ui/types";
 import { getDisplayedUrl } from "shared/utils/environment";
+import { PendingWorkspaceInvitation } from "ui/types";
+
 import PendingTeamPrompt from "./PendingTeamPrompt";
 import { getDurationString, getRelativeDate } from "./RecordingRow";
 

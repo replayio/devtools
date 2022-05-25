@@ -10,6 +10,7 @@ import {
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { getTest, isTest, isMock } from "shared/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";
@@ -28,7 +29,6 @@ import {
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
-import { getTest, isTest, isMock } from "shared/utils/environment";
 import LogRocket from "ui/utils/logrocket";
 import { endMixpanelSession } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";

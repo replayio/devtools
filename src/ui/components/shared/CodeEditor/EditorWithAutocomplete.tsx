@@ -1,7 +1,10 @@
-import React, { useRef } from "react";
 import { Editor } from "codemirror";
+import React, { useRef } from "react";
+
 import useAutocomplete from "./useAutocomplete";
+
 import { isTest } from "shared/utils/environment";
+
 import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";

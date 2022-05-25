@@ -5,7 +5,6 @@ import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import { isTest } from "shared/utils/environment";
 import tokenManager from "ui/utils/tokenManager";
 import {
   hideCommandPalette,
@@ -21,6 +20,7 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { isTest } from "shared/utils/environment";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
 

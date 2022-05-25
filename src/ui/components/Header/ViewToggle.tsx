@@ -1,8 +1,8 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
-import hooks from "ui/hooks";
 import { isTest } from "shared/utils/environment";
+import hooks from "ui/hooks";
 import { setViewMode } from "ui/actions/layout";
 import { ViewMode } from "ui/state/layout";
 import { getViewMode } from "ui/reducers/layout";
