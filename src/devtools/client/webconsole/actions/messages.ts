@@ -9,13 +9,16 @@ import {
   prepareMessage,
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
+import { sortedLastIndexBy } from "lodash";
+import sortedIndexBy from "lodash/sortedIndexBy";
 import { TestMessageHandlers } from "protocol/find-tests";
 import { LogpointHandlers } from "protocol/logpoint";
-import { sendMessage } from "protocol/socket";
+import { client, sendMessage } from "protocol/socket";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
 import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
+import { pointsReceived } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
 import { isFocusRegionSubset } from "ui/utils/timeline";
 
@@ -230,6 +233,13 @@ export function messagesAdd(
     }
     // TODO This really a good type here?
     const messages: InternalMessage[] = packets.map(packet => prepareMessage(packet, idGenerator));
+    dispatch(
+      pointsReceived(
+        messages
+          .filter(p => p.executionPoint && p.executionPointTime)
+          .map(p => ({ time: p.executionPointTime!, point: p.executionPoint! }))
+      )
+    );
     dispatch(messagesAdded(messages));
   };
 }
@@ -269,46 +279,12 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
 
     dispatch(clearMessages());
 
-    const sessionEndpoint = await sendMessage("Session.getEndpoint", {}, ThreadFront.sessionId!);
+    const sessionEndpoint = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    const begin = focusRegion ? focusRegion.start.point : "0";
+    const end = focusRegion ? focusRegion.end.point : sessionEndpoint.endpoint.point;
 
-    const startTime = focusRegion ? focusRegion.startTime : 0;
-    const endTime = focusRegion ? focusRegion.endTime : sessionEndpoint.endpoint.time;
-
-    let beginPoint: string | null = null;
-    let endPoint: string | null = null;
-
-    if (sessionEndpoint.endpoint.time === endTime) {
-      const pointNearBeginning = await sendMessage(
-        "Session.getPointNearTime",
-        {
-          time: startTime,
-        },
-        ThreadFront.sessionId!
-      );
-
-      beginPoint = pointNearBeginning.point.point;
-      endPoint = sessionEndpoint.endpoint.point;
-    } else {
-      const [pointNearBeginning, pointNearEnd] = await Promise.all([
-        sendMessage(
-          "Session.getPointNearTime",
-          {
-            time: startTime,
-          },
-          ThreadFront.sessionId!
-        ),
-        sendMessage("Session.getPointNearTime", { time: endTime }, ThreadFront.sessionId!),
-      ]);
-
-      beginPoint = pointNearBeginning.point.point;
-      endPoint = pointNearEnd.point.point;
-    }
-
-    const { messages, overflow } = await sendMessage(
-      "Console.findMessagesInRange",
-      {
-        range: { begin: beginPoint, end: endPoint },
-      },
+    const { messages, overflow } = await client.Console.findMessagesInRange(
+      { range: { begin, end } },
       ThreadFront.sessionId!
     );
 
