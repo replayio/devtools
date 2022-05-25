@@ -19,7 +19,7 @@ import { ELEMENT_STYLE } from "shared/constants";
 
 const Types = require("devtools/client/inspector/rules/types");
 
-class Selector extends PureComponent {
+export default class Selector extends PureComponent {
   static get propTypes() {
     return {
       id: PropTypes.string.isRequired,
@@ -136,5 +136,3 @@ class Selector extends PureComponent {
     );
   }
 }
-
-module.exports = Selector;
