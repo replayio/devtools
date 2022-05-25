@@ -24,6 +24,7 @@ the frontend requests that all regions that do not intersect with the selected t
 When a recording is opened, the frontend loads all javascript sources in that recording using [`Debugger.findSources`](https://static.replay.io/protocol/tot/Debugger/#method-findSources) and stores them in the [`ThreadFront`](../src/protocol/thread/thread.ts). Sourcemaps are handled in the backend, so the sources also include original sources from sourcemaps. Furthermore, the backend automatically adds pretty-printed versions of minified sources. The [`newSource`](https://static.replay.io/protocol/tot/Debugger/#event-newSource) events from the backend include the list of generated sources for every original source. This information is used to pick the sources that are shown to the user: Replay always tries to show an original source and may offer a generated source as an alternate that the user can switch to using the toggle at the bottom of the editor.
 
 This is what a typical source graph for one source file loaded by the browser may look like:
+
 ```
           ------
       --> | o1 |
@@ -35,7 +36,8 @@ This is what a typical source graph for one source file loaded by the browser ma
       --> | pp1 |
           -------
 ```
-The arrows in this graph point from generated to original sources. `1` is a source generated from the original source `o1` and since `1` is minified, the backend also created a pretty-printed version `pp1`. Note that Replay declares `pp1` as an *original* version of `1`, even though technically it was generated from `1` and not the other way around. That way we can assume that an "original" version of a source is always more readable than (and hence preferred over) a "generated" version.
+
+The arrows in this graph point from generated to original sources. `1` is a source generated from the original source `o1` and since `1` is minified, the backend also created a pretty-printed version `pp1`. Note that Replay declares `pp1` as an _original_ version of `1`, even though technically it was generated from `1` and not the other way around. That way we can assume that an "original" version of a source is always more readable than (and hence preferred over) a "generated" version.
 In this example, the Replay frontend would show `o1` by default (the "preferred" version) and allow the user to switch to `pp1` (the "alternate" version).
 
 These source graphs become more complex with bundles which have multiple original sources and minified original sources for which the backend will also create a pretty-printed version. Furthermore, if a source file was loaded multiple times by the browser (usually because the user navigated while recording), it will appear as multiple sources in the recording. The frontend tries to identify duplicates (called corresponding sources) of preferred and alternate sources in `ThreadFront.groupSourceIds()`. All locations received from the backend are updated to reference the first corresponding source of the one they originally referenced.

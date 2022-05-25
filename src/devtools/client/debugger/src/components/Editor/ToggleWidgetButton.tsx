@@ -103,7 +103,7 @@ function QuickActions({
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
   };
 
-  let prev: PointDescription | undefined, next: PointDescription | undefined;
+  let next: PointDescription | undefined, prev: PointDescription | undefined;
 
   if (analysisPoints && !analysisPoints.error && executionPoint) {
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
