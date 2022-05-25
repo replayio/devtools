@@ -2,6 +2,7 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useIntercom } from "react-use-intercom";
 import * as actions from "ui/actions/app";
+import Avatar from "ui/components/Avatar";
 import { Dropdown, DropdownItem, DropdownItemContent } from "ui/components/Library/LibraryDropdown";
 import LoginButton from "ui/components/LoginButton";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -14,7 +15,7 @@ interface UserOptionsProps extends PropsFromRedux {
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
   const { show } = useIntercom();
-  const { isAuthenticated } = useAuth0();
+  const { isAuthenticated, user, logout } = useAuth0();
 
   if (!isAuthenticated) {
     return <LoginButton />;
@@ -60,7 +61,14 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
             <DropdownItemContent icon="replay-logo">Launch Replay</DropdownItemContent>
           </DropdownItem>
         )}
-        <LoginButton />
+        <DropdownItem onClick={() => logout()}>
+          <div className="flex flex-row space-x-4">
+            <div className={"flex w-4 flex-row items-center"}>
+              <Avatar player={user} isFirstPlayer={true} />
+            </div>
+            <span className="overflow-hidden overflow-ellipsis whitespace-pre">Sign Out</span>
+          </div>
+        </DropdownItem>
       </Dropdown>
     </div>
   );
