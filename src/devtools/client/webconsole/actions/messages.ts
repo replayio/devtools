@@ -18,6 +18,7 @@ import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thre
 import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { onConsoleOverflow } from "ui/actions/session";
+import { pointsReceived } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
 import { isFocusRegionSubset } from "ui/utils/timeline";
 
@@ -232,6 +233,13 @@ export function messagesAdd(
     }
     // TODO This really a good type here?
     const messages: InternalMessage[] = packets.map(packet => prepareMessage(packet, idGenerator));
+    dispatch(
+      pointsReceived(
+        messages
+          .filter(p => p.executionPoint && p.executionPointTime)
+          .map(p => ({ time: p.executionPointTime!, point: p.executionPoint! }))
+      )
+    );
     dispatch(messagesAdded(messages));
   };
 }
