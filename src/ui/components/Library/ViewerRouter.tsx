@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
+
 import Viewer from "./Viewer";
 
 import { connect, ConnectedProps } from "react-redux";
@@ -13,6 +14,8 @@ import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
+import { LibraryFiltersContext } from "./useFilters";
+
 function ViewerLoader() {
   return (
     <div className="grid h-full w-full items-center justify-items-center bg-chrome">
@@ -22,8 +25,11 @@ function ViewerLoader() {
 }
 
 function MyLibrary() {
-  const { recordings, loading } = hooks.useGetPersonalRecordings();
+  const { filter } = useContext(LibraryFiltersContext);
+  const { recordings, loading } = hooks.useGetPersonalRecordings(filter);
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
+
+  console.log({ loading, recordings });
 
   if (loading || nonPendingLoading || recordings == null) {
     return <ViewerLoader />;
@@ -51,7 +57,8 @@ function TeamLibrary(props: ViewerRouterProps) {
 }
 
 function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
-  const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!);
+  const { filter } = useContext(LibraryFiltersContext);
+  const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!, filter);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
   if (loading || nonPendingLoading || recordings == null) {

@@ -49,11 +49,11 @@ function isTest() {
 }
 
 const GET_WORKSPACE_RECORDINGS = gql`
-  query GetWorkspaceRecordings($workspaceId: ID!) {
+  query GetWorkspaceRecordings($workspaceId: ID!, $filter: String) {
     node(id: $workspaceId) {
       ... on Workspace {
         id
-        recordings {
+        recordings(filter: $filter) {
           edges {
             node {
               uuid
@@ -97,9 +97,9 @@ const GET_WORKSPACE_RECORDINGS = gql`
 `;
 
 const GET_MY_RECORDINGS = gql`
-  query GetMyRecordings {
+  query GetMyRecordings($filter: String) {
     viewer {
-      recordings {
+      recordings(filter: $filter) {
         edges {
           node {
             uuid
@@ -421,11 +421,12 @@ export function useIsOwner() {
   return userId === recording.owner.id;
 }
 
-export function useGetPersonalRecordings():
-  | { recordings: null; loading: true }
-  | { recordings: Recording[]; loading: false } {
+export function useGetPersonalRecordings(
+  filter: string
+): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery<GetMyRecordings>(GET_MY_RECORDINGS, {
     pollInterval: 5000,
+    variables: { filter },
   });
 
   if (loading) {
@@ -444,13 +445,14 @@ export function useGetPersonalRecordings():
 }
 
 export function useGetWorkspaceRecordings(
-  currentWorkspaceId: WorkspaceId
+  currentWorkspaceId: WorkspaceId,
+  filter: string
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery<
     GetWorkspaceRecordings,
     GetWorkspaceRecordingsVariables
   >(GET_WORKSPACE_RECORDINGS, {
-    variables: { workspaceId: currentWorkspaceId },
+    variables: { workspaceId: currentWorkspaceId, filter },
     pollInterval: 5000,
   });
 
@@ -644,10 +646,6 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
       },
     });
   };
-}
-
-export function useGetMyRecordings() {
-  return useGetPersonalRecordings();
 }
 
 const DELETE_RECORDING = gql`

@@ -15,7 +15,6 @@ import { Recording } from "ui/types";
 import styles from "./Library.module.css";
 import RecordingRow from "./RecordingRow";
 import TeamTrialEnd from "./TeamTrialEnd";
-import { filterRecordings, LibraryFiltersContext } from "./useFilters";
 
 function getErrorText() {
   if (isReplayBrowser()) {
@@ -51,17 +50,11 @@ export default function Viewer({
   recordings: Recording[];
   workspaceName: string | React.ReactNode;
 }) {
-  const filters = useContext(LibraryFiltersContext);
-  const filteredRecordings = useMemo(
-    () => filterRecordings(recordings, filters),
-    [filters, recordings]
-  );
-
   return (
     <div
       className={`flex flex-grow flex-col space-y-5 overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
-      <ViewerContent workspaceName={workspaceName} recordings={filteredRecordings} />
+      <ViewerContent workspaceName={workspaceName} recordings={recordings} />
     </div>
   );
 }
