@@ -1,24 +1,22 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-
-import { AvatarImage } from "ui/components/Avatar";
-import { handleIntercomLogout } from "ui/utils/intercom";
-import useAuth0 from "ui/utils/useAuth0";
-import hooks from "ui/hooks";
 import * as actions from "ui/actions/app";
+import { AvatarImage } from "ui/components/Avatar";
+import hooks from "ui/hooks";
+import { useGetUserInfo } from "ui/hooks/users";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
-import { useGetUserInfo } from "ui/hooks/users";
+import useAuth0 from "ui/utils/useAuth0";
 
 import APIKeys from "../APIKeys";
 import ExternalLink from "../ExternalLink";
 import SettingsModal from "../SettingsModal";
-import { Settings } from "../SettingsModal/types";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
+import { Settings } from "../SettingsModal/types";
 
-import PreferencesSettings from "./PreferencesSettings";
 import ExperimentalSettings from "./ExperimentalSettings";
+import PreferencesSettings from "./PreferencesSettings";
 
 function Support() {
   return (
@@ -61,7 +59,7 @@ function Personal() {
       </div>
       <div>
         <button
-          onClick={() => handleIntercomLogout(logout)}
+          onClick={() => logout()}
           className="max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         >
           Log Out

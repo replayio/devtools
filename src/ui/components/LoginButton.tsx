@@ -1,15 +1,13 @@
 import React from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Avatar from "ui/components/Avatar";
-import { handleIntercomLogout } from "ui/utils/intercom";
-import { useRouter } from "next/router";
 
 const LoginButton = () => {
   const { loginAndReturn, isAuthenticated, logout, user } = useAuth0();
 
   if (isAuthenticated) {
     return (
-      <button className="row logout" onClick={() => handleIntercomLogout(logout)}>
+      <button className="row logout" onClick={() => logout()}>
         <Avatar player={user} isFirstPlayer={true} />
         <span>Sign Out</span>
       </button>

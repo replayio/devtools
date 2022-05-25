@@ -1,30 +1,22 @@
 import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
-import hooks from "ui/hooks";
 import LoginButton from "ui/components/LoginButton";
 import Dropdown from "ui/components/shared/Dropdown";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import Icon from "ui/components/shared/Icon";
-import useAuth0 from "ui/utils/useAuth0";
-import { features } from "ui/utils/prefs";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { trackEvent } from "ui/utils/telemetry";
-import { useIntercom } from "react-use-intercom";
+import useAuth0 from "ui/utils/useAuth0";
+
+import ExternalLink from "../shared/ExternalLink";
 
 interface UserOptionsProps extends PropsFromRedux {
   noBrowserItem?: boolean;
 }
 
 function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
-  const recordingId = hooks.useGetRecordingId();
   const [expanded, setExpanded] = useState(false);
-  const { show } = useIntercom();
   const { isAuthenticated } = useAuth0();
-
-  const isOwner = hooks.useIsOwner();
-  const isCollaborator =
-    hooks.useIsCollaborator(recordingId || "00000000-0000-0000-0000-000000000000") &&
-    isAuthenticated;
 
   if (!isAuthenticated) {
     return <LoginButton />;
@@ -51,10 +43,6 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
 
     setModal("settings");
   };
-  const onChatClick = () => {
-    setExpanded(false);
-    show();
-  };
 
   return (
     <div className="user-options text-blue-400">
@@ -68,10 +56,10 @@ function UserOptions({ setModal, noBrowserItem }: UserOptionsProps) {
           <Icon filename="docs" className="bg-iconColor" />
           <span>Docs</span>
         </button>
-        <button className="row group" onClick={onChatClick}>
+        <ExternalLink className="row group" href="https://discord.gg/n2dTK6kcRX">
           <Icon filename="help" className="bg-iconColor" />
           <span>Chat with us</span>
-        </button>
+        </ExternalLink>
         <button className="row group" onClick={onSettingsClick}>
           <Icon filename="settings" className="bg-iconColor" />
           <span>Settings</span>
