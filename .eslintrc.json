@@ -20,7 +20,7 @@
   "rules": {
     "curly": "error",
     "import/order": [
-      "warn",
+      "off",
       {
         "groups": ["builtin", "external", "internal", "parent", "sibling", "index", "object"],
         "newlines-between": "always",
