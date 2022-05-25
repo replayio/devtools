@@ -6,7 +6,6 @@ import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
 import React, { ReactNode, useEffect, useState } from "react";
-import { IntercomProvider } from "react-use-intercom";
 import { Provider } from "react-redux";
 import { Store } from "redux";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
@@ -172,9 +171,7 @@ function AppUtilities({ children }: { children: ReactNode }) {
 
   return (
     <ApolloWrapper onAuthError={handleAuthError}>
-      <IntercomProvider appId={"k7f741xx"} autoBoot>
-        <ConfirmProvider>{children}</ConfirmProvider>
-      </IntercomProvider>
+      <ConfirmProvider>{children}</ConfirmProvider>
     </ApolloWrapper>
   );
 }
