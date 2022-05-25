@@ -2,7 +2,7 @@ import React from "react";
 import hooks from "ui/hooks";
 import EmailForm from "./EmailForm";
 import CollaboratorsList from "./CollaboratorsList";
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 
 type CollaboratorsProps = {
   recordingId: RecordingId;

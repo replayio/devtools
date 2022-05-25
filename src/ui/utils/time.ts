@@ -1,4 +1,4 @@
-import { ExecutionPoint, PointDescription } from "@recordreplay/protocol";
+import { ExecutionPoint, PointDescription } from "@replayio/protocol";
 import { padStart } from "lodash";
 import prettyMilliseconds from "pretty-ms";
 import analysisManager from "protocol/analysisManager";

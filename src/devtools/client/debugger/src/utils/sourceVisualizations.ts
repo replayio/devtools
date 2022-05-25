@@ -1,4 +1,4 @@
-import type { SourceId } from "@recordreplay/protocol";
+import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 

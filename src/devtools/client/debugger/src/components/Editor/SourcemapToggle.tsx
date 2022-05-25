@@ -9,7 +9,7 @@ import { Switch } from "@headlessui/react";
 import classNames from "classnames";
 import { setModal } from "ui/actions/app";
 import { ThreadFront } from "protocol/thread";
-import { SourceId } from "@recordreplay/protocol";
+import { SourceId } from "@replayio/protocol";
 import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
 
 function SourcemapError({ onClick }: { onClick: () => void }) {

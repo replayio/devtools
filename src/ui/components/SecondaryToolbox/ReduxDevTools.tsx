@@ -1,4 +1,4 @@
-import { Annotation } from "@recordreplay/protocol";
+import { Annotation } from "@replayio/protocol";
 // import { Root, UPDATE_STATE } from "@redux-devtools/app";
 import type { Root } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";

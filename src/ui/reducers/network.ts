@@ -3,7 +3,7 @@ import {
   RequestEventInfo,
   RequestInfo,
   ResponseBodyData,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 
 import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";

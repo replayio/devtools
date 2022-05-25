@@ -1,5 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
+import { unprocessedRegions, KeyboardEvent } from "@replayio/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
 import { client, sendMessage } from "protocol/socket";

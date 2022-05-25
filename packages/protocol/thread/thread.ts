@@ -37,7 +37,7 @@ import {
   requestBodyData,
   findAnnotationsResult,
   getHitCountsParameters,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 import { FocusRegion } from "ui/state/timeline";

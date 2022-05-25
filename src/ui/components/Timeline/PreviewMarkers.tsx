@@ -1,4 +1,4 @@
-import type { PointDescription, Location } from "@recordreplay/protocol";
+import type { PointDescription, Location } from "@replayio/protocol";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";

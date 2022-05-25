@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 import { AddCollaborator, AddCollaboratorVariables } from "graphql/AddCollaborator";
 import { DeleteCollaborator, DeleteCollaboratorVariables } from "graphql/DeleteCollaborator";
 import { useGetRecording } from "./recordings";

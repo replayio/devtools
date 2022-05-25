@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId } from "@recordreplay/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import {

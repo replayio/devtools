@@ -1,10 +1,4 @@
-import {
-  Node as NodeDescription,
-  AppliedRule,
-  BoxModel,
-  Rect,
-  Quads,
-} from "@recordreplay/protocol";
+import { Node as NodeDescription, AppliedRule, BoxModel, Quads } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
 import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";

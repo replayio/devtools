@@ -1,4 +1,4 @@
-import { BodyData } from "@recordreplay/protocol";
+import { BodyData } from "@replayio/protocol";
 
 // These are the body types that we know how to display.
 // The functions in this file have two jobs:

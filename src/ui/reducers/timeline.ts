@@ -1,4 +1,4 @@
-import { TimeStampedPoint } from "@recordreplay/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { sortBy, uniqBy } from "lodash";
 import { UIState } from "ui/state";

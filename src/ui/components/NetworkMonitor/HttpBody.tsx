@@ -1,4 +1,4 @@
-import { BodyData } from "@recordreplay/protocol";
+import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
 import { useMemo, useState } from "react";
 import ReactJson from "react-json-view";

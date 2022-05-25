@@ -1,4 +1,4 @@
-import { sessionError, uploadedData } from "@recordreplay/protocol";
+import { sessionError, uploadedData } from "@replayio/protocol";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";

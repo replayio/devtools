@@ -1,4 +1,4 @@
-import { SourceId } from "@recordreplay/protocol";
+import { SourceId } from "@replayio/protocol";
 import { Source, SourceContent, Location } from "../reducers/sources";
 import { AsyncValue } from "./async-value";
 

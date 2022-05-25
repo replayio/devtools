@@ -1,6 +1,6 @@
 // Perform some analysis to find and describe automated tests that were recorded.
 
-import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
+import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@replayio/protocol";
 import { assert } from "protocol/utils";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";

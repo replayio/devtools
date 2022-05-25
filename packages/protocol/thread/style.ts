@@ -1,4 +1,4 @@
-import { StyleDeclaration } from "@recordreplay/protocol";
+import { StyleDeclaration } from "@replayio/protocol";
 
 import { assert, DisallowEverythingProxyHandler } from "../utils";
 

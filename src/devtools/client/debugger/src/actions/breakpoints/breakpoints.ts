@@ -1,4 +1,4 @@
-import { SourceId, Location } from "@recordreplay/protocol";
+import { SourceId, Location } from "@replayio/protocol";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";

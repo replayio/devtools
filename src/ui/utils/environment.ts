@@ -1,5 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
-import { ExecutionPoint } from "@recordreplay/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import { Editor } from "codemirror";
 import { usesWindow } from "../../ssr";
 

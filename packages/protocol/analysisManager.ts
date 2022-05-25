@@ -10,7 +10,7 @@ import {
   ExecutionPoint,
   PointDescription,
   SessionId,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import { sendMessage, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { Location } from "@recordreplay/protocol";
+import type { Location } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
 

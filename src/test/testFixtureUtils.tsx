@@ -19,7 +19,7 @@ import type {
   TimeStampedPoint,
   TimeStampedPointRange,
   Value,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { UIStore } from "ui/actions";
 import { convertRecording } from "ui/hooks/recordings";

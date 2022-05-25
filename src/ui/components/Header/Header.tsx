@@ -10,7 +10,7 @@ import hooks from "ui/hooks";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 

@@ -1,4 +1,4 @@
-import { RequestInfo, RequestEventInfo, responseBodyData } from "@recordreplay/protocol";
+import { RequestInfo, RequestEventInfo, responseBodyData } from "@replayio/protocol";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { UIStore, UIThunkAction } from "ui/actions";
 import {

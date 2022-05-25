@@ -60,7 +60,7 @@ An entire recording has way too many objects that go in and out of existence and
 
 A single `Pause` exists for each JS instruction. (TODO explain this and how it's related to debug stepping and `ExecutionPoint`s)
 
-(defined in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
+(defined in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`, client implementation in `src/protocol/thread/pause.ts`)
 
 # `Frame`
 
@@ -72,7 +72,7 @@ A single `Frame` can have multiple `Scope`s.
 
 A frame is not something that the user interacts with and is used to derive further information that the user can and wants to interacts with.
 
-(in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
+(in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`)
 
 TODO why "Frame" exists and how it's used, what sort of info is derived using it
 
@@ -88,7 +88,7 @@ Scope is simply a collection of (named) values which are more or less an `Object
 
 Scope is what the users want to often interact with and inspect, as it can tell them information such as "what's the value of a particular variable while some function was executing" and "if a variable was shadowed by some other".
 
-(in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
+(in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`)
 
 # `Object` and `ObjectPreview`
 
@@ -96,7 +96,7 @@ Scope is what the users want to often interact with and inspect, as it can tell 
 
 `ObjectPreview` is an actual description of some or all `Object`'s contents.
 
-(in `node_modules/@recordreplay/protocol/js/protocol/Pause.d.ts`)
+(in `node_modules/@replayio/protocol/js/protocol/Pause.d.ts`)
 
 # `Wired*` types
 

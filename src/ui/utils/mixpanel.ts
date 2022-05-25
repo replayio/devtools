@@ -1,4 +1,4 @@
-import { SessionId } from "@recordreplay/protocol";
+import { SessionId } from "@replayio/protocol";
 import mixpanel from "mixpanel-browser";
 import { getRecordingId } from "./recording";
 import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";

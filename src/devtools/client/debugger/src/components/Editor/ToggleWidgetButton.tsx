@@ -19,7 +19,7 @@ import find from "lodash/find";
 import { getPointsForHoveredLineNumber } from "ui/reducers/app";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
-import { PointDescription } from "@recordreplay/protocol";
+import { PointDescription } from "@replayio/protocol";
 import { seek } from "ui/actions/timeline";
 
 const QuickActionButton: FC<{
