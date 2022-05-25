@@ -111,7 +111,7 @@ export default function InvitationLink({
 
   return (
     <div className="relative flex w-full flex-col space-y-3">
-      <div className="absolute -inset-8 top-0 bg-gray-600 opacity-5" />
+      <div className="absolute -inset-8 top-0 bg-themeBase-60 opacity-10" />
       {!hideHeader ? <div className="font-bold">{`Invite link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}
