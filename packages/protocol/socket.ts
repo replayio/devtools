@@ -10,8 +10,6 @@ import {
 } from "@recordreplay/protocol";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 
-import { requiresWindow } from "../ssr";
-
 import { makeInfallible } from "./utils";
 
 export interface Request<T extends CommandMethods> {
@@ -61,11 +59,11 @@ let gReceivedBytes = 0;
 // If the socket has errored, the connection will close. So let's set `willClose`
 // so that we show _this_ error message, and not the `onSocketClose` error message
 let willClose = false;
-requiresWindow(win => {
-  win.addEventListener("beforeunload", () => {
+if (typeof window !== "undefined") {
+  window.addEventListener("beforeunload", () => {
     willClose = true;
   });
-});
+}
 
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
