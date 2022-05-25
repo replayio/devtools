@@ -1,6 +1,6 @@
-import { Annotation, TimeStampedPoint } from "@recordreplay/protocol";
 import type { UPDATE_STATE } from "@redux-devtools/app";
 import type { Action } from "@reduxjs/toolkit";
+import { Annotation, TimeStampedPoint } from "@replayio/protocol";
 import { createContext } from "react";
 
 import type {

@@ -1,4 +1,4 @@
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 import React, { Dispatch, SetStateAction, useState } from "react";
 import hooks from "ui/hooks";
 import Spinner from "../Spinner";

@@ -4,7 +4,7 @@ import {
   responseBodyData,
   RequestId,
   requestBodyData,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getSummaryById } from "ui/reducers/network";

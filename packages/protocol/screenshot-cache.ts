@@ -1,4 +1,4 @@
-import { ScreenShot } from "@recordreplay/protocol";
+import { ScreenShot } from "@replayio/protocol";
 
 import { ThreadFront } from "./thread";
 import { defer } from "./utils";

@@ -1,5 +1,5 @@
 import { Context } from "@apollo/client";
-import { Location } from "@recordreplay/protocol";
+import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { Breakpoint } from ".";
 

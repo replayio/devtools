@@ -1,4 +1,4 @@
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 
 import BatchActionDropdown from "./BatchActionDropdown";
 

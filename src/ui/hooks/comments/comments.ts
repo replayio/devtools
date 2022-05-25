@@ -1,4 +1,4 @@
-import { RecordingId } from "@recordreplay/protocol";
+import { RecordingId } from "@replayio/protocol";
 import { gql, useQuery, useMutation, ApolloError } from "@apollo/client";
 import { Comment, CommentPosition } from "ui/state/comments";
 import { query } from "ui/utils/apolloClient";

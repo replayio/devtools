@@ -1,4 +1,4 @@
-import { RequestEventInfo, RequestInfo } from "@recordreplay/protocol";
+import { RequestEventInfo, RequestInfo } from "@replayio/protocol";
 
 export type NetworkState = {
   events: RequestEventInfo[];

@@ -7,7 +7,7 @@ import {
   ScopeType,
   SourceLocation as ProtocolSourceLocation,
   loadedRegions,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import {
   fetchEventTypePoints,
   setLogpoint,

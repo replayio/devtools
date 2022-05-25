@@ -4,7 +4,7 @@ import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { actions } from "../../actions";
 import { HoveredItem, ZoomRegion } from "ui/state/timeline";
-import { Location, PauseId } from "@recordreplay/protocol";
+import { Location, PauseId } from "@replayio/protocol";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { timelineMarkerWidth as pointWidth } from "../../constants";
 import { trackEvent } from "ui/utils/telemetry";

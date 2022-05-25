@@ -14,7 +14,7 @@ import {
   PauseData,
   repaintGraphicsResult,
   getAllBoundingClientRectsResult,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";

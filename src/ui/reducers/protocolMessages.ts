@@ -1,4 +1,4 @@
-import { EventMethods, EventParams } from "@recordreplay/protocol";
+import { EventMethods, EventParams } from "@replayio/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cloneDeep from "lodash/cloneDeep";
 import { CommandRequest, CommandResponse } from "protocol/socket";

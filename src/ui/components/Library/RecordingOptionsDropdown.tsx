@@ -1,9 +1,9 @@
+import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Recording } from "ui/types";
 import MaterialIcon from "../shared/MaterialIcon";
 import hooks from "ui/hooks";
-import { RecordingId } from "@recordreplay/protocol";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownItem } from "./LibraryDropdown";
 import PortalDropdown from "../shared/PortalDropdown";

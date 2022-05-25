@@ -1,4 +1,4 @@
-import { ResponseBodyData } from "@recordreplay/protocol";
+import { ResponseBodyData } from "@replayio/protocol";
 import React from "react";
 import { useSelector } from "react-redux";
 import { getSelectedResponseBody } from "ui/reducers/network";

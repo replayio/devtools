@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import React, { useLayoutEffect, useRef, useState } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
@@ -10,7 +11,6 @@ import hooks from "ui/hooks";
 import ShareButton from "./ShareButton";
 import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
-import { RecordingId } from "@recordreplay/protocol";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
 

@@ -1,4 +1,4 @@
-import { Location, MappedLocation } from "@recordreplay/protocol";
+import { Location, MappedLocation } from "@replayio/protocol";
 
 import { defer } from "./utils";
 

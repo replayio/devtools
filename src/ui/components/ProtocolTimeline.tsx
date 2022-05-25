@@ -1,4 +1,4 @@
-import { TimeStampedPoint, TimeStampedPointRange } from "@recordreplay/protocol";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
 import { useSelector } from "react-redux";

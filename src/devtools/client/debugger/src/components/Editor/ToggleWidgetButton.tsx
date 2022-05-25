@@ -1,3 +1,4 @@
+import { PointDescription } from "@replayio/protocol";
 import ReactDOM from "react-dom";
 import React, { useState, useEffect, MouseEventHandler, FC, ReactNode } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
@@ -19,7 +20,6 @@ import find from "lodash/find";
 import { getPointsForHoveredLineNumber } from "ui/reducers/app";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
-import { PointDescription } from "@recordreplay/protocol";
 import { seek } from "ui/actions/timeline";
 
 const QuickActionButton: FC<{
@@ -103,7 +103,7 @@ function QuickActions({
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
   };
 
-  let prev: PointDescription | undefined, next: PointDescription | undefined;
+  let next: PointDescription | undefined, prev: PointDescription | undefined;
 
   if (analysisPoints && !analysisPoints.error && executionPoint) {
     prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);

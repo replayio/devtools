@@ -1,4 +1,4 @@
-import { TimeStamp, TimeStampedPoint, TimeStampedPointRange } from "@recordreplay/protocol";
+import { TimeStamp, TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import { clamp, sortedIndexBy, sortedLastIndexBy } from "lodash";
 import { FocusRegion, ZoomRegion } from "ui/state/timeline";
 

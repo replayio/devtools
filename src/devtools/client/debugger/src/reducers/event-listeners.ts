@@ -5,7 +5,7 @@
 //
 
 import type { AnyAction } from "@reduxjs/toolkit";
-import { TimeStampedPoint } from "@recordreplay/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 
 import type { UIState } from "ui/state";
 

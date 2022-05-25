@@ -15,7 +15,7 @@ import { connect, ConnectedProps, useSelector } from "react-redux";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 import { AnalysisPayload } from "ui/state/app";
-import { PointDescription } from "@recordreplay/protocol";
+import { PointDescription } from "@replayio/protocol";
 import { getExecutionPoint } from "../../../selectors";
 
 function Points({

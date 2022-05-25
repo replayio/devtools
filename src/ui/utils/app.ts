@@ -1,4 +1,4 @@
-import { TimeStampedPointRange } from "@recordreplay/protocol";
+import { TimeStampedPointRange } from "@replayio/protocol";
 export type TimeRange = {
   start: number;
   end: number;

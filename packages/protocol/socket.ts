@@ -7,7 +7,7 @@ import {
   PauseId,
   CommandParams,
   CommandResult,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 
 import { makeInfallible } from "./utils";

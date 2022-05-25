@@ -6,7 +6,7 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@recordreplay/protocol";
+import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@replayio/protocol";
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";

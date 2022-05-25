@@ -1,4 +1,4 @@
-import { ExecutionPoint } from "@recordreplay/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 
 export interface Annotation {
   point: ExecutionPoint;

@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
-import type { Location } from "@recordreplay/protocol";
+import type { Location } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";

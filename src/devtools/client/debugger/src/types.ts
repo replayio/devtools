@@ -1,4 +1,4 @@
-import { SourceLocation } from "@recordreplay/protocol";
+import { SourceLocation } from "@replayio/protocol";
 
 export type ClassSymbol = {
   name: string;

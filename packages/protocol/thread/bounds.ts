@@ -1,4 +1,4 @@
-import { ObjectId, Rect } from "@recordreplay/protocol";
+import { ObjectId, Rect } from "@replayio/protocol";
 
 import { DisallowEverythingProxyHandler } from "../utils";
 

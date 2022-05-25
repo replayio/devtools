@@ -8,7 +8,7 @@ import {
   RequestResponseBodyEvent,
   RequestResponseEvent,
   TimeStampedPoint,
-} from "@recordreplay/protocol";
+} from "@replayio/protocol";
 import keyBy from "lodash/keyBy";
 import { compareNumericStrings } from "protocol/utils";
 

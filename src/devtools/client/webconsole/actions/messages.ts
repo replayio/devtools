@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import type { ExecutionPoint, Frame } from "@recordreplay/protocol";
+import type { ExecutionPoint, Frame } from "@replayio/protocol";
 import * as Sentry from "@sentry/browser";
 import { IdGenerator } from "devtools/client/webconsole/utils/id-generator";
 import {

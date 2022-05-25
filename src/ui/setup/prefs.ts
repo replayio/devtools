@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import {
   prefs as debuggerPrefs,
   asyncStore as debuggerAsyncPrefs,
@@ -21,7 +22,6 @@ import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getPendingComment } from "ui/reducers/comments";
-import { RecordingId } from "@recordreplay/protocol";
 import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";

@@ -1,4 +1,4 @@
-import { Location, PointDescription } from "@recordreplay/protocol";
+import { Location, PointDescription } from "@replayio/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";

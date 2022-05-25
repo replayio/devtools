@@ -1,4 +1,4 @@
-import { Rule } from "@recordreplay/protocol";
+import { Rule } from "@replayio/protocol";
 
 import { assert, DisallowEverythingProxyHandler } from "../utils";
 
