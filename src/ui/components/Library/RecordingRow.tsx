@@ -145,6 +145,13 @@ function RecordingRow({
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
                   {getDisplayedUrl(recording.url)}
                 </div>
+                {
+                  recording.metadata?.test ? (
+                    <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
+                      {recording.metadata.test.file}
+                    </div>
+                  ) : null
+                }
               </div>
             </div>
           </div>
