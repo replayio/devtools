@@ -3,6 +3,7 @@
 
 module.exports = {
   collectCoverageFrom: [
+    "packages/protocol/**/*.{js,jsx,ts,tsx}",
     "src/**/*.{js,jsx,ts,tsx}",
     "!**/*.d.ts",
     "!**/node_modules/**",
@@ -12,7 +13,7 @@ module.exports = {
   moduleNameMapper: {
     "^devtools/(.*)": "<rootDir>/src/devtools/$1",
     "^highlighter/(.*)": "<rootDir>/src/highlighter/$1",
-    "^protocol/(.*)": "<rootDir>/src/protocol/$1",
+    "^protocol/(.*)": "<rootDir>/packages/protocol/$1",
     "^shims/(.*)": "<rootDir>/src/shims/$1",
     "^toolkit/(.*)": "<rootDir>/src/toolkit/$1",
     "^test/(.*)": "<rootDir>/src/test/$1",

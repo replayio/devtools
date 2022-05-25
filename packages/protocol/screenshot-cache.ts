@@ -1,6 +1,7 @@
+import { ScreenShot } from "@recordreplay/protocol";
+
 import { ThreadFront } from "./thread";
 import { defer } from "./utils";
-import { ScreenShot } from "@recordreplay/protocol";
 
 export class DownloadCancelledError extends Error {}
 

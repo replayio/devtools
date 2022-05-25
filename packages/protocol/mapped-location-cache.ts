@@ -1,5 +1,6 @@
-import { defer } from "./utils";
 import { Location, MappedLocation } from "@recordreplay/protocol";
+
+import { defer } from "./utils";
 
 export class MappedLocationCache {
   // Map locations encoded as strings to the corresponding MappedLocations

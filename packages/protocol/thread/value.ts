@@ -1,4 +1,5 @@
 import { assert, DisallowEverythingProxyHandler } from "../utils";
+
 import type { EvaluationResult, Pause, WiredObject } from "./pause";
 import { ThreadFront } from "./thread";
 
