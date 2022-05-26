@@ -61,7 +61,7 @@ export function installMockEnvironment(options: MockOptionsJSON) {
     emitEvent(method: string, params: any) {
       setImmediate(() => {
         const event = { method, params };
-        receiveMessageCallback({ data: JSON.stringify(event) });
+        receiveDataCallback(JSON.stringify(event));
       });
     },
     bindings: options.bindings,
@@ -77,12 +77,12 @@ export function installMockEnvironment(options: MockOptionsJSON) {
     eval(`messageHandlers["${name}"] = ${options.messageHandlers[name]};`); // nosemgrep
   }
 
-  let receiveMessageCallback: (arg: { data: string }) => unknown;
+  let receiveDataCallback: (data: string) => unknown;
 
   const mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
-    setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
-      receiveMessageCallback = callback;
+    setSocketDataHandler(callback: (data: string) => unknown) {
+      receiveDataCallback = callback;
     },
     sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
@@ -103,7 +103,7 @@ export function installMockEnvironment(options: MockOptionsJSON) {
       promise.then(
         result => {
           const response = { id: msg.id, result };
-          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+          setImmediate(() => receiveDataCallback(JSON.stringify(response)));
         },
         e => {
           let error;
@@ -114,7 +114,7 @@ export function installMockEnvironment(options: MockOptionsJSON) {
             error = helpers.Errors.InternalError;
           }
           const response = { id: msg.id, error };
-          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+          setImmediate(() => receiveDataCallback(JSON.stringify(response)));
         }
       );
     },
@@ -124,12 +124,12 @@ export function installMockEnvironment(options: MockOptionsJSON) {
   window.__mockEnvironmentForTesting = mockEnvironment;
 
   // Configure the protocol to use our mock WebSocket message method.
-  const { messageHandler, flushQueuedMessages } = setCustomSendMessageHandler(
+  const { flushQueuedMessages, responseDataHandler } = setCustomSendMessageHandler(
     mockEnvironment.sendSocketMessage
   );
 
   // Configure the protocol's default socket message handler to receive messages from the mocked WebSocket.
-  mockEnvironment.setOnSocketMessage(messageHandler);
+  mockEnvironment.setSocketDataHandler(responseDataHandler);
 
   // Now that the mock environment has been configured, flush any pending messages.
   flushQueuedMessages();

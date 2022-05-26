@@ -29,7 +29,7 @@ let gSocketOpen = false;
 
 type setCustomSendMessageHandlerResponse = {
   flushQueuedMessages: () => void;
-  messageHandler: (event: MessageEvent<any>) => void;
+  responseDataHandler: (data: string) => void;
 };
 
 // Enables test code to mock out the WebSocket used to send protocol messages.
@@ -40,7 +40,7 @@ export function setCustomSendMessageHandler(
 
   return {
     flushQueuedMessages,
-    messageHandler: handleWebSocketMessage,
+    responseDataHandler: socketDataHandler,
   };
 }
 
@@ -140,12 +140,12 @@ export function initSocket(address: string) {
     gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime)
   );
 
-  const onmessage = makeInfallible(handleWebSocketMessage);
+  const onmessage = makeInfallible(socketDataHandler);
 
   const handleOpen = () => {
     socket.onerror = onerror;
     socket.onclose = onclose;
-    socket.onmessage = onmessage;
+    socket.onmessage = event => onmessage(event.data);
     onopen();
   };
   const handleOpenError = () => {
@@ -241,10 +241,10 @@ export const client = new ProtocolClient({
   sendCommand: sendMessage,
 });
 
-function handleWebSocketMessage(evt: MessageEvent<any>) {
+function socketDataHandler(data: string) {
   lastReceivedMessageTime = Date.now();
-  gReceivedBytes += evt.data.length;
-  const msg = JSON.parse(evt.data);
+  gReceivedBytes += data.length;
+  const msg = JSON.parse(data);
 
   if (msg.id) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;

@@ -3,7 +3,7 @@ import { Editor } from "codemirror";
 
 export interface MockEnvironment {
   graphqlMocks?: MockedResponse[];
-  setOnSocketMessage(callback: (arg: { data: string }) => unknown): void;
+  setSocketDataHandler(callback: (data: string) => unknown): void;
   sendSocketMessage(str: string): void;
 }
 
