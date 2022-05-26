@@ -366,8 +366,6 @@ class _ThreadFront {
     this.currentPause = null;
     this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time });
-
-    this._precacheResumeTargets();
   }
 
   timeWarpToPause(pause: Pause) {
@@ -384,8 +382,6 @@ class _ThreadFront {
     this.currentPause = pause;
     this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time });
-
-    this._precacheResumeTargets();
   }
 
   async findSources(onSource: (source: newSource) => void) {
@@ -735,68 +731,6 @@ class _ThreadFront {
     return rv;
   }
 
-  // Preload step target information and pause data for nearby points.
-  private async _precacheResumeTargets() {
-    if (!this.currentPointHasFrames) {
-      return;
-    }
-
-    const point = this.currentPoint;
-    const epoch = this.resumeTargetEpoch;
-
-    // Each step command, and the transitive steps to queue up after that step is known.
-    const stepCommands = [
-      {
-        command: client.Debugger.findReverseStepOverTarget,
-        transitive: [client.Debugger.findReverseStepOverTarget, client.Debugger.findStepInTarget],
-      },
-      {
-        command: client.Debugger.findStepOverTarget,
-        transitive: [client.Debugger.findStepOverTarget, client.Debugger.findStepInTarget],
-      },
-      {
-        command: client.Debugger.findStepInTarget,
-        transitive: [client.Debugger.findStepOutTarget, client.Debugger.findStepInTarget],
-      },
-      {
-        command: client.Debugger.findStepOutTarget,
-        transitive: [
-          client.Debugger.findReverseStepOverTarget,
-          client.Debugger.findStepOverTarget,
-          client.Debugger.findStepInTarget,
-          client.Debugger.findStepOutTarget,
-        ],
-      },
-    ];
-
-    stepCommands.forEach(async ({ command, transitive }) => {
-      const target = await this._findResumeTarget(point, command);
-      if (epoch != this.resumeTargetEpoch || !target.frame) {
-        return;
-      }
-
-      // Precache pause data for the point.
-      this.ensurePause(target.point, target.time);
-
-      if (point != this.currentPoint) {
-        return;
-      }
-
-      // Look for transitive resume targets.
-      transitive.forEach(async command => {
-        const transitiveTarget = await this._findResumeTarget(target.point, command);
-        if (
-          epoch != this.resumeTargetEpoch ||
-          point != this.currentPoint ||
-          !transitiveTarget.frame
-        ) {
-          return;
-        }
-        this.ensurePause(transitiveTarget.point, transitiveTarget.time);
-      });
-    });
-  }
-
   // Perform an operation that will change our cached targets about where resume
   // operations will finish.
   private async _invalidateResumeTargets(callback: () => Promise<void>) {
@@ -810,7 +744,6 @@ class _ThreadFront {
       if (--this.numPendingInvalidateCommands == 0) {
         this.invalidateCommandWaiters.forEach(resolve => resolve());
         this.invalidateCommandWaiters.length = 0;
-        this._precacheResumeTargets();
       }
     }
   }
