@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
@@ -12,7 +12,7 @@ import { Nag, useGetUserInfo } from "ui/hooks/users";
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
-import { LibraryFiltersContext, useFilters } from "./useFilters";
+import { LibraryContext, useFilters, View } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
@@ -77,6 +77,8 @@ function Library({
 }: LibraryProps) {
   const router = useRouter();
   const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
+  const [view, setView] = useState<View>("recordings");
+  const [preview, setPreview] = useState<{ id: string | string[]; view: View } | null>(null);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
@@ -120,7 +122,7 @@ function Library({
   }
 
   return (
-    <LibraryFiltersContext.Provider value={{ filter }}>
+    <LibraryContext.Provider value={{ filter, view, preview, setPreview }}>
       <main className="flex h-full w-full flex-row">
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-grow flex-col overflow-x-hidden">
@@ -129,13 +131,14 @@ function Library({
               displayedString={displayedString}
               setDisplayedText={setDisplayedText}
               setAppliedText={setAppliedText}
+              setView={setView}
             />
             <LaunchButton />
           </div>
           <ViewerRouter />
         </div>
       </main>
-    </LibraryFiltersContext.Provider>
+    </LibraryContext.Provider>
   );
 }
 
