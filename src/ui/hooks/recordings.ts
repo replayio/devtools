@@ -64,6 +64,7 @@ const GET_WORKSPACE_RECORDINGS = gql`
               private
               isInitialized
               userRole
+              metadata
               comments {
                 user {
                   id
@@ -236,6 +237,7 @@ export function convertRecording(rec: any): Recording | undefined {
     userRole: rec.userRole,
     operations: rec.operations,
     resolution: rec.resolution,
+    metadata: rec.metadata,
   };
 }
 

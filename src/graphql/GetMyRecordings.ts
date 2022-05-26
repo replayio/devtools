@@ -84,3 +84,7 @@ export interface GetMyRecordings_viewer {
 export interface GetMyRecordings {
   viewer: GetMyRecordings_viewer | null;
 }
+
+export interface GetMyRecordingsVariables {
+  filter?: string | null;
+}

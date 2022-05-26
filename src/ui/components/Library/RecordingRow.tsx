@@ -13,6 +13,7 @@ import { getDisplayedUrl } from "ui/utils/environment";
 import { getRecordingURL } from "ui/utils/recording";
 import styles from "./Library.module.css";
 import { useGetUserPermissions } from "ui/hooks/users";
+import { TestResult } from "./TestResult";
 
 export function getDurationString(durationMs: number) {
   const seconds = Math.round(durationMs / 1000);
@@ -120,7 +121,12 @@ function RecordingRow({
             </div>
 
             <div className={`flex flex-col space-y-0.5 overflow-hidden ${styles.recordingTitle}`}>
-              <ReplayTitle title={recording.title} />
+              <div className="flex items-center space-x-1">
+                {recording.metadata?.test ? (
+                  <TestResult result={recording.metadata.test.result} />
+                ) : null}
+                <ReplayTitle title={recording.title} />
+              </div>
               <div className="flex flex-row space-x-4 font-light text-gray-400">
                 <div
                   className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
@@ -139,6 +145,11 @@ function RecordingRow({
                 <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
                   {getDisplayedUrl(recording.url)}
                 </div>
+                {recording.metadata?.test?.file ? (
+                  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
+                    {recording.metadata.test.file}
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>
