@@ -2,7 +2,7 @@ import { MockedResponse } from "@apollo/client/testing";
 import { Editor } from "codemirror";
 
 export interface MockEnvironment {
-  graphqlMocks: MockedResponse[];
+  graphqlMocks?: MockedResponse[];
   setOnSocketMessage(callback: (arg: { data: string }) => unknown): void;
   sendSocketMessage(str: string): void;
 }
@@ -10,7 +10,9 @@ export interface MockEnvironment {
 declare global {
   var __IS_RECORD_REPLAY_RUNTIME__: boolean;
   interface Window {
-    mockEnvironment?: MockEnvironment;
+    // Injected by test runner during e2e tests.
+    __mockEnvironmentForTesting?: MockEnvironment;
+
     jsterm: {
       editor: Editor;
       setValue: (newValue: string) => void;
@@ -56,22 +58,25 @@ export function isMock() {
   return !!url.searchParams.get("mock");
 }
 
-export async function waitForMockEnvironment() {
+// Helper method to retrieve the mock environment that was injected by a test runner.
+export async function getMockEnvironmentForTesting(): Promise<MockEnvironment> {
   if (!isMock()) {
-    return null;
+    throw Error("Not a mock/test environment");
   }
+
   // The mock test runner will install a "mockEnvironment" on the window.
-  while (!window.mockEnvironment) {
+  while (!window.__mockEnvironmentForTesting) {
     await new Promise(resolve => setTimeout(resolve, 50));
   }
-  return window.mockEnvironment;
+
+  return window.__mockEnvironmentForTesting!;
 }
 
-export function mockEnvironment() {
-  if (!window.mockEnvironment) {
-    throw new Error("Missing mock environment");
-  }
-  return window.mockEnvironment;
+// Helper method to retrieve GraphQL mock data that was injected by a test runner.
+export async function getGraphqlMocksForTesting(): Promise<MockedResponse[]> {
+  const mockEnvironment = await getMockEnvironmentForTesting();
+
+  return mockEnvironment.graphqlMocks!;
 }
 
 export function skipTelemetry() {

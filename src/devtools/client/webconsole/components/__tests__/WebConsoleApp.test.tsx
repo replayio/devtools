@@ -3,6 +3,7 @@ import WebConsoleApp from "devtools/client/webconsole/components/App";
 import { ThreadFront } from "protocol/thread";
 import React from "react";
 import { render, createTestStore, filterCommonTestWarnings } from "test/testUtils";
+import { getMockEnvironmentForTesting } from "ui/utils/environment";
 
 import { websocketMessages } from "./fixtures/messageSetupActions";
 
@@ -24,10 +25,12 @@ describe("Web Console UI", () => {
     // Actual session ID value _probably_ doesn't matter here
     await ThreadFront.setSessionId("1e3e916b-7725-4f7f-9f2e-07088f4a0b9d");
 
+    const mockEnvironment = await getMockEnvironmentForTesting();
+
     // Initialize state using exported websocket messages,
     // sent through the mock environment straight to socket parsing
     websocketMessages.forEach(message => {
-      window.mockEnvironment?.sendSocketMessage(message.data);
+      mockEnvironment.sendSocketMessage(message.data);
     });
 
     // Give everything time to settle

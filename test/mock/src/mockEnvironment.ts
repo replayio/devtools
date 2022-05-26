@@ -2,11 +2,12 @@
 
 import { MockedResponse } from "@apollo/client/testing";
 import { Page } from "@recordreplay/playwright";
+import { setCustomSendMessageHandler } from "protocol/socket";
 import type { MockEnvironment } from "ui/utils/environment";
 
 declare global {
   interface Window {
-    mockEnvironment?: MockEnvironment;
+    __mockEnvironmentForTesting?: MockEnvironment;
   }
 }
 
@@ -36,8 +37,9 @@ export interface Error {
   message: string;
 }
 
-// This script runs within the browser process.
-export function doInstall(options: MockOptionsJSON) {
+// During e2e tests, this script runs within the browser process alongside of the Replay devtools app.
+// It is also exported directly for unit test usage.
+export function installMockEnvironment(options: MockOptionsJSON) {
   function setImmediate(callback: () => void) {
     setTimeout(callback, 0);
   }
@@ -77,7 +79,7 @@ export function doInstall(options: MockOptionsJSON) {
 
   let receiveMessageCallback: (arg: { data: string }) => unknown;
 
-  window.mockEnvironment = {
+  const mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
     setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
       receiveMessageCallback = callback;
@@ -117,9 +119,24 @@ export function doInstall(options: MockOptionsJSON) {
       );
     },
   };
+
+  // Expose mock environment to Replay devtools app.
+  window.__mockEnvironmentForTesting = mockEnvironment;
+
+  // Configure the protocol to use our mock WebSocket message method.
+  const { messageHandler, flushQueuedMessages } = setCustomSendMessageHandler(
+    mockEnvironment.sendSocketMessage
+  );
+
+  // Configure the protocol's default socket message handler to receive messages from the mocked WebSocket.
+  mockEnvironment.setOnSocketMessage(messageHandler);
+
+  // Now that the mock environment has been configured, flush any pending messages.
+  flushQueuedMessages();
 }
 
-export async function installMockEnvironment(page: Page, options: MockOptions) {
+// Installs a mock environment for testing into the page running the Replay devtools UI.
+export async function installMockEnvironmentInPage(page: Page, options: MockOptions) {
   const optionsJSON: MockOptionsJSON = {
     graphqlMocks: options.graphqlMocks,
     messageHandlers: {},
@@ -129,7 +146,7 @@ export async function installMockEnvironment(page: Page, options: MockOptions) {
     optionsJSON.messageHandlers[name] = options.messageHandlers[name].toString();
   }
   try {
-    await page.evaluate<void, MockOptionsJSON>(doInstall, optionsJSON);
+    await page.evaluate<void, MockOptionsJSON>(installMockEnvironment, optionsJSON);
   } catch (e) {
     console.log("ERROR", e);
   }

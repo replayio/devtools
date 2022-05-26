@@ -6,6 +6,7 @@ import React from "react";
 import { isDevelopment } from "ui/utils/environment";
 
 if (!isDevelopment()) {
+  // Configure protocl to log errors to Sentry in production environments.
   setErrorHandler((error: Error) => {
     Sentry.captureException(error);
   });

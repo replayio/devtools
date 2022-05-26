@@ -1,7 +1,7 @@
 // Test that a failing GraphQL request during initialization shows an appropriate error.
 
 import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironment } from "../src/mockEnvironment";
+import { installMockEnvironmentInPage } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import { createGetUserMock, createUserSettingsMock } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
@@ -33,6 +33,6 @@ const bindings = basicBindings();
 
 runTest("invalidRecordingID", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
+  await installMockEnvironmentInPage(page, { graphqlMocks, messageHandlers, bindings });
   await page.textContent(`text=${errorMessage}`);
 });

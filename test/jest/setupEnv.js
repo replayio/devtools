@@ -2,7 +2,7 @@
 require("fake-indexeddb/auto");
 require("@testing-library/jest-dom");
 
-import { doInstall } from "../../test/mock/src/mockEnvironment";
+import { installMockEnvironment } from "../../test/mock/src/mockEnvironment";
 import { basicMessageHandlers, basicBindings } from "../../test/mock/src/handlers";
 
 // Code throws if there's no dispatchUrl set
@@ -18,7 +18,7 @@ delete window.location;
 window.location = new URL("http://localhost?mock=true");
 
 // Reuse additional environment handling from the E2E tests
-doInstall({
+installMockEnvironment({
   bindings: basicBindings(),
   messageHandlers: basicMessageHandlers(),
 });

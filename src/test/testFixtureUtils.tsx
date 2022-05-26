@@ -26,6 +26,7 @@ import { convertRecording } from "ui/hooks/recordings";
 import { Recording } from "ui/types";
 
 import { createTestStore } from "./testUtils";
+import { getMockEnvironmentForTesting } from "ui/utils/environment";
 
 export const DEFAULT_SOURCE_ID = "fake-source-id";
 export const DEFAULT_SOURCE_URL = "fake-source-url";
@@ -252,8 +253,9 @@ export async function loadFixtureData(
 
   // Initialize state using exported websocket messages,
   // sent through the mock environment straight to socket parsing.
+  const mockEnvironment = await getMockEnvironmentForTesting();
   replayFixtureData.forEach((message: any) => {
-    window.mockEnvironment?.sendSocketMessage(JSON.stringify(message));
+    mockEnvironment.sendSocketMessage(JSON.stringify(message));
   });
 
   // Give everything time to settle
@@ -264,11 +266,13 @@ export async function loadFixtureData(
 
 type Tuple = LoadedRegionsTuple | MessageTuple | SourceTuple;
 
-export function sendValuesToMockEnvironment(...values: Array<Tuple>): void {
+export async function sendValuesToMockEnvironment(...values: Array<Tuple>) {
+  const mockEnvironment = await getMockEnvironmentForTesting();
+
   values.forEach(([method, value]) => {
     switch (method) {
       case "Session.loadedRegions":
-        window.mockEnvironment?.sendSocketMessage(
+        mockEnvironment.sendSocketMessage(
           JSON.stringify({
             method,
             params: value,
@@ -277,7 +281,7 @@ export function sendValuesToMockEnvironment(...values: Array<Tuple>): void {
         );
         break;
       case "Console.newMessage":
-        window.mockEnvironment?.sendSocketMessage(
+        mockEnvironment.sendSocketMessage(
           JSON.stringify({
             method,
             params: { message: value },
@@ -286,7 +290,7 @@ export function sendValuesToMockEnvironment(...values: Array<Tuple>): void {
         );
         break;
       case "Debugger.newSource":
-        window.mockEnvironment?.sendSocketMessage(
+        mockEnvironment.sendSocketMessage(
           JSON.stringify({
             method,
             params: value,

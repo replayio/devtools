@@ -1,7 +1,7 @@
 // Test getting a session error on startup.
 
 import { runTest, devtoolsURL } from "../src/runTest";
-import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
+import { installMockEnvironmentInPage, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
   createRecordingOwnerUserIdMock,
@@ -40,6 +40,6 @@ const bindings = basicBindings();
 // Test that getting a session error while loading a replay shows an appropriate error.
 runTest("sessionError", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
+  await installMockEnvironmentInPage(page, { graphqlMocks, messageHandlers, bindings });
   await page.textContent("text=Something went wrong while replaying");
 });

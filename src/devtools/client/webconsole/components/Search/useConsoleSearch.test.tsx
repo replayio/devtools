@@ -48,7 +48,7 @@ describe("useConsoleSearch", () => {
     // This is necessary to unblock various event listeners and parsing.
     await ThreadFront.setSessionId(DEFAULT_SESSION_ID);
 
-    sendValuesToMockEnvironment(
+    await sendValuesToMockEnvironment(
       createSource({
         kind: "scriptSource",
       }),
