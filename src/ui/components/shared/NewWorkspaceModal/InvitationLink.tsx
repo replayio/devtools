@@ -92,11 +92,13 @@ export default function InvitationLink({
   showDomainCheck = true,
   isLarge = false,
   hideHeader = false,
+  overlay = false,
 }: {
   workspaceId: string;
   showDomainCheck?: boolean;
   isLarge?: boolean;
   hideHeader?: boolean;
+  overlay?: boolean;
 }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
 
@@ -111,7 +113,9 @@ export default function InvitationLink({
 
   return (
     <div className="relative flex w-full flex-col space-y-3">
-      <div className="absolute -inset-8 top-0 bg-themeBase-60 opacity-10" />
+      {overlay ? (
+        <div className="pointer-events-none absolute -inset-8 top-0 bg-themeBase-60 opacity-10" />
+      ) : null}
       {!hideHeader ? <div className="font-bold">{`Invite link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
       {showDomainCheck ? <InvationDomainCheck workspace={workspace} /> : null}

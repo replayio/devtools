@@ -152,14 +152,14 @@ const settings: Settings<
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
           <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
-          <div className="flex-grow overflow-auto">
+          <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
-              <div className="flex flex-col space-y-1.5">
+              <div className="flex h-0 flex-col space-y-1.5">
                 {members ? <WorkspaceMembers members={members} isAdmin={isAdmin} /> : null}
               </div>
             </div>
           </div>
-          <InvitationLink workspaceId={workspaceId} showDomainCheck={isAdmin} />
+          <InvitationLink workspaceId={workspaceId} showDomainCheck={isAdmin} overlay />
         </div>
       );
     },
