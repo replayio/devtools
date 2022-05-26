@@ -53,6 +53,10 @@ const GET_WORKSPACE_RECORDINGS = gql`
     node(id: $workspaceId) {
       ... on Workspace {
         id
+        tests {
+          path
+          count
+        }
         recordings(filter: $filter) {
           edges {
             node {
@@ -449,7 +453,7 @@ export function useGetPersonalRecordings(
 export function useGetWorkspaceRecordings(
   currentWorkspaceId: WorkspaceId,
   filter: string
-): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
+): { recordings: null; tests: null; loading: true } | { recordings: Recording[]; tests: any[]; loading: false } {
   const { data, error, loading } = useQuery<
     GetWorkspaceRecordings,
     GetWorkspaceRecordingsVariables
@@ -459,7 +463,7 @@ export function useGetWorkspaceRecordings(
   });
 
   if (loading) {
-    return { recordings: null, loading };
+    return { recordings: null, tests: null, loading };
   }
 
   if (error) {
@@ -473,7 +477,7 @@ export function useGetWorkspaceRecordings(
   if (recordingsData) {
     recordings = recordingsData.edges.map(({ node }: any) => convertRecording(node));
   }
-  return { recordings, loading };
+  return { recordings, tests: data?.node?.tests, loading };
 }
 
 export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {

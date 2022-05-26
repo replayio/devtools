@@ -58,7 +58,7 @@ function TeamLibrary(props: ViewerRouterProps) {
 
 function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
   const { filter } = useContext(LibraryFiltersContext);
-  const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!, filter);
+  const { recordings, tests, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!, filter);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
   if (loading || nonPendingLoading || recordings == null) {
@@ -70,6 +70,7 @@ function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
   return (
     <Viewer
       recordings={recordings}
+      tests={tests}
       workspaceName={
         workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : workspace.name
       }
