@@ -11,8 +11,8 @@ process.env.NEXT_PUBLIC_DISPATCH_URL = "wss://dummy.example.com";
 // Stub out Worker
 globalThis.Worker = function () {};
 
-// The socket logic determines if it's in a mocked environment based on a "mock"
-// query param existing. However, JSDOM doesn't allow manipulating query params.
+// The socket logic determines if it's in a mocked environment based on a "mock" query param existing.
+// However, JSDOM doesn't allow manipulating query params.
 // Replace `window.location` to fake this: https://stackoverflow.com/a/60697570/62937
 delete window.location;
 window.location = new URL("http://localhost?mock=true");

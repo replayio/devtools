@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { getParams, updateUrlWithParams } from "shared/utils/environment";
+import { getParams, updateUrlWithParams } from "ui/utils/environment";
 
 export type LibraryFilter = {
   filter: string;

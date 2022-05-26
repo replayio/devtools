@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import React, { MouseEvent } from "react";
-import { getDisplayedUrl } from "shared/utils/environment";
+import { getDisplayedUrl } from "ui/utils/environment";
 import { Recording } from "ui/types";
 import formatDate from "date-fns/format";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";

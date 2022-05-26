@@ -1,4 +1,4 @@
-import { isDevelopment } from "shared/utils/environment";
+import { isDevelopment } from "ui/utils/environment";
 import type { UIThunkAction } from "ui/actions";
 import {
   setExpectedError as setExpectedErrorAction,

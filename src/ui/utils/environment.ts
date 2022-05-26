@@ -49,9 +49,9 @@ export function isTest() {
   return isMock() || isE2ETest();
 }
 
-// Return whether we are running a mock test. The backend servers which we
-// connect to will be mocked, and we can test behaviors we can't easily
-// replicate when connected to a live backend.
+// Return whether we are running a mock test.
+// The backend servers which we connect to will be mocked,
+// and we can test behaviors we can't easily replicate when connected to a live backend.
 export function isMock() {
   return !!url.searchParams.get("mock");
 }

@@ -9,7 +9,7 @@ import React, {
   useState,
 } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { removeUrlParameters } from "shared/utils/environment";
+import { removeUrlParameters } from "ui/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";

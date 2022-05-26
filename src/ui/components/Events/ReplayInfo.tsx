@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { getDisplayedUrl } from "shared/utils/environment";
+import { getDisplayedUrl } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { OperationsData } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";

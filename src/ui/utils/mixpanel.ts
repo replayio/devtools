@@ -1,6 +1,6 @@
 import { SessionId } from "@replayio/protocol";
 import mixpanel from "mixpanel-browser";
-import { isReplayBrowser, skipTelemetry } from "shared/utils/environment";
+import { isReplayBrowser, skipTelemetry } from "ui/utils/environment";
 import { PrimaryPanelName, SecondaryPanelName, ViewMode } from "ui/state/layout";
 
 import { getRecordingId } from "./recording";

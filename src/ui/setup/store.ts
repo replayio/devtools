@@ -8,7 +8,7 @@ import {
   AnyAction,
 } from "@reduxjs/toolkit";
 import { Immer, enableMapSet } from "immer";
-import { isDevelopment, skipTelemetry } from "shared/utils/environment";
+import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { ThunkExtraArgs } from "ui/utils/thunk";

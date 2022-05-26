@@ -1,6 +1,6 @@
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { launchAndRecordUrl } from "shared/utils/environment";
+import { launchAndRecordUrl } from "ui/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";

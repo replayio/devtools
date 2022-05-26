@@ -3,7 +3,7 @@ import React, { useRef } from "react";
 
 import useAutocomplete from "./useAutocomplete";
 
-import { isTest } from "shared/utils/environment";
+import { isTest } from "ui/utils/environment";
 
 import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";

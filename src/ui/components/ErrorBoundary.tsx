@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { isDevelopment } from "shared/utils/environment";
+import { isDevelopment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
 import { setUnexpectedError } from "ui/actions/errors";

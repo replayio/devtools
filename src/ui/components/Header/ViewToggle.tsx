@@ -1,7 +1,7 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import classnames from "classnames";
-import { isTest } from "shared/utils/environment";
+import { isTest } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { setViewMode } from "ui/actions/layout";
 import { ViewMode } from "ui/state/layout";

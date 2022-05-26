@@ -8,7 +8,7 @@ import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 import sortBy from "lodash/sortBy";
 import React, { useState, useMemo, useContext } from "react";
 import { useSelector } from "react-redux";
-import { isReplayBrowser } from "shared/utils/environment";
+import { isReplayBrowser } from "ui/utils/environment";
 import { getWorkspaceId } from "ui/reducers/app";
 import { Recording } from "ui/types";
 

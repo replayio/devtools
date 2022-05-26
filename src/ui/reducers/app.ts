@@ -2,7 +2,7 @@ import { Location, PointDescription } from "@replayio/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
-import { getSystemColorSchemePreference } from "shared/utils/environment";
+import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {

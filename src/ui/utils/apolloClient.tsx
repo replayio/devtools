@@ -12,7 +12,7 @@ import {
 import { MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
-import { isE2ETest } from "shared/utils/environment";
+import { isE2ETest } from "ui/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 

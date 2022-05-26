@@ -19,7 +19,7 @@ import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { getPausePointParams, getTest, updateUrlWithParams } from "shared/utils/environment";
+import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,

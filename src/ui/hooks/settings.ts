@@ -28,7 +28,7 @@ import {
   UpdateUserSettingsReactVariables,
 } from "graphql/UpdateUserSettingsReact";
 import { GetUserSettings } from "graphql/GetUserSettings";
-import { isTest } from "shared/utils/environment";
+import { isTest } from "ui/utils/environment";
 
 const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],

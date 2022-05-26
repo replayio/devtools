@@ -20,7 +20,7 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { isTest } from "shared/utils/environment";
+import { isTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
 

@@ -1,6 +1,6 @@
 import React, { ReactNode, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { removeUrlParameters } from "shared/utils/environment";
+import { removeUrlParameters } from "ui/utils/environment";
 import { actions } from "ui/actions";
 import { Nag, useDismissNag } from "ui/hooks/users";
 import { trackEvent } from "ui/utils/telemetry";

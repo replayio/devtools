@@ -1,4 +1,4 @@
-import { isReplayBrowser, url } from "shared/utils/environment";
+import { isReplayBrowser, url } from "ui/utils/environment";
 import { Nag } from "ui/hooks/users";
 
 import { shouldShowNag } from "./user";

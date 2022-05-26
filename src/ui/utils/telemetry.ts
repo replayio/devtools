@@ -1,6 +1,6 @@
 import * as Sentry from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
-import { skipTelemetry } from "shared/utils/environment";
+import { skipTelemetry } from "ui/utils/environment";
 import { Recording } from "ui/types";
 
 import { prefs } from "./prefs";

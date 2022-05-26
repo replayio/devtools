@@ -1,6 +1,6 @@
 import * as LDClient from "launchdarkly-js-client-sdk";
 import { useEffect, useState } from "react";
-import { isDevelopment } from "shared/utils/environment";
+import { isDevelopment } from "ui/utils/environment";
 import { UserInfo } from "ui/hooks/users";
 
 const DEFAULT_FLAGS = {

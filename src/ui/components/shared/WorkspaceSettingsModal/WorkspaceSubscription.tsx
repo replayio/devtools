@@ -3,7 +3,7 @@ import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
 
 import { assert } from "protocol/utils";
-import { isDevelopment } from "shared/utils/environment";
+import { isDevelopment } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 

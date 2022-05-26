@@ -10,7 +10,7 @@ import {
 } from "protocol/socket";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
-import { getTest, isTest, isMock } from "shared/utils/environment";
+import { getTest, isTest, isMock } from "ui/utils/environment";
 import { UIThunkAction } from "ui/actions";
 import * as actions from "ui/actions/app";
 import { getRecording } from "ui/hooks/recordings";

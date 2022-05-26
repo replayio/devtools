@@ -3,7 +3,7 @@ import { ExclamationIcon } from "@heroicons/react/outline";
 import Services from "devtools/shared/services";
 import Link from "next/link";
 import React, { ReactNode, useEffect, useState } from "react";
-import { getLoginReferrerParam } from "shared/utils/environment";
+import { getLoginReferrerParam } from "ui/utils/environment";
 import { query } from "ui/utils/apolloClient";
 import { requestBrowserLogin, setUserInBrowserPrefs } from "ui/utils/browser";
 import { isTeamMemberInvite } from "ui/utils/onboarding";

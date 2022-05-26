@@ -1,5 +1,5 @@
 import React from "react";
-import { getDisplayedUrl } from "shared/utils/environment";
+import { getDisplayedUrl } from "ui/utils/environment";
 import { PendingWorkspaceInvitation } from "ui/types";
 
 import PendingTeamPrompt from "./PendingTeamPrompt";

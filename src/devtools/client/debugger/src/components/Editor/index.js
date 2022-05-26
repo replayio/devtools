@@ -9,7 +9,7 @@ import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
 import { bindActionCreators } from "redux";
-import { isFirefox } from "shared/utils/environment";
+import { isFirefox } from "ui/utils/environment";
 
 import { connect } from "../../utils/connect";
 import classnames from "classnames";

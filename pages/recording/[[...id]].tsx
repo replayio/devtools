@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
-import { isTest } from "shared/utils/environment";
+import { isTest } from "ui/utils/environment";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { getAccessibleRecording } from "ui/actions/session";
