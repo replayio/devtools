@@ -1,6 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { Editor } from "codemirror";
-import { setCustomSendMessageHandler } from "protocol/socket";
+import { injectCustomSocketSendMessageForTesting } from "protocol/socket";
 
 export interface MockEnvironment {
   graphqlMocks?: MockedResponse[];
@@ -176,7 +176,7 @@ export async function configureMockEnvironmentForTesting() {
   const mockEnvironment = await getMockEnvironmentForTesting();
 
   // Configure the protocol to use our mock WebSocket message method.
-  const { flushQueuedMessages, responseDataHandler } = setCustomSendMessageHandler(
+  const { flushQueuedMessages, responseDataHandler } = injectCustomSocketSendMessageForTesting(
     mockEnvironment.sendSocketMessage
   );
 
