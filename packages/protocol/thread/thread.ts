@@ -308,12 +308,7 @@ class _ThreadFront {
     // This is a placeholder which logs loading changes to the console.
     const sessionId = await this.waitForSession();
 
-    client.Session.addLoadedRegionsListener((parameters: loadedRegions) => {
-      // TODO Remove this once we have a better region loading indicator
-      // Log loaded regions to help with diagnostics.
-      console.debug("LoadedRegions", parameters);
-      listenerCallback(parameters);
-    });
+    client.Session.addLoadedRegionsListener(listenerCallback);
 
     await client.Session.listenForLoadChanges({}, sessionId);
   }

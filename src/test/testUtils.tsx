@@ -62,8 +62,6 @@ export const filterLoggingInTests = (
 };
 
 export const filterCommonTestWarnings = () => {
-  // Skip LoadedRegions debug messages
-  filterLoggingInTests(message => message === "LoadedRegions", "debug");
   // Skip websocket "Socket Open" message
   filterLoggingInTests(
     message =>
