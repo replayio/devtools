@@ -14,7 +14,7 @@ export function fetchScopes(cx) {
       return;
     }
 
-    const scopes = dispatch({
+    dispatch({
       type: "ADD_SCOPES",
       cx,
       thread: cx.thread,

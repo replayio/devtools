@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, loadedRegions, PauseId } from "@replayio/protocol";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import {
@@ -29,11 +29,13 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
 } from "ui/reducers/timeline";
+import { LoadedRegions } from "ui/state/app";
 import { HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
+import { isTimeInRegions } from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -41,6 +43,7 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
+import { getLoadedRegions } from "./app";
 
 import type { UIStore, UIThunkAction } from "./index";
 
@@ -83,7 +86,8 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
     let { point, time } = endpoint;
 
-    const zoomRegion = getZoomRegion(getState());
+    const state = getState();
+    const zoomRegion = getZoomRegion(state);
     const newZoomRegion = { ...zoomRegion, endTime: time };
     dispatch(
       setTimelineState({ currentTime: time, recordingDuration: time, zoomRegion: newZoomRegion })
@@ -91,7 +95,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
 
     let hasFrames = false;
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId);
-    if (initialPausePoint) {
+    if (initialPausePoint && isTimeInRegions(initialPausePoint.time, getLoadedRegions(state)!.loading)) {
       point = initialPausePoint.point;
       hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
