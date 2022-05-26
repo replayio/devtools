@@ -5,6 +5,7 @@ import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
+import { setRepaintAfterEvaluations } from "protocol/thread/thread";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { Store } from "redux";
@@ -20,6 +21,7 @@ import { pingTelemetry } from "ui/utils/replay-telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
 import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
+import { features } from "ui/utils/prefs";
 
 import "image/image.css";
 import "image/icon.css";
@@ -132,6 +134,11 @@ import "ui/utils/sourcemapVisualizer.css";
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
   configureMockEnvironmentForTesting();
+}
+
+// Expose app feature flags to the protocol through an app-agnostic API.
+if (features.repaintEvaluations) {
+  setRepaintAfterEvaluations(true);
 }
 
 interface AuthProps {
