@@ -8,6 +8,7 @@ import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { DebuggerPanel } from "devtools/client/debugger/panel";
 import { Inspector } from "devtools/client/inspector/inspector";
 import Selection from "devtools/client/framework/selection";
+import { getTest } from "./environment";
 
 export type StartablePanelName = "debugger" | "inspector" | "react-components" | "redux-devtools";
 
@@ -56,6 +57,18 @@ export class DevToolsToolbox {
 
   async init(selectedPanel: StartablePanelName) {
     await this.threadFront.initializeToolbox();
+
+    const testName = getTest();
+    if (testName) {
+      await gToolbox.selectTool("debugger");
+
+      window.Test = await import("test/harness");
+
+      const script = document.createElement("script");
+      script.src = `/test/scripts/${testName}`;
+
+      document.head.appendChild(script);
+    }
 
     // The debugger has to be started immediately on init so that when we click
     // on any of those messages, either on the console or the timeline, the debugger

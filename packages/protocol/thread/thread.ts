@@ -203,8 +203,6 @@ class _ThreadFront {
   private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
   private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
 
-  testName: string | undefined;
-
   // added by EventEmitter.decorate(ThreadFront)
   eventListeners!: Map<ThreadFrontEvent, ((value?: any) => void)[]>;
   on!: (name: ThreadFrontEvent, handler: (value?: any) => void) => void;
@@ -267,19 +265,8 @@ class _ThreadFront {
     await this.waitForSession();
     await this.initializedWaiter.promise;
     await this.ensureAllSources();
+
     this.ensureCurrentPause();
-
-    if (this.testName) {
-      await gToolbox.selectTool("debugger");
-      window.Test = await import("test/harness");
-      const script = document.createElement("script");
-      script.src = `/test/scripts/${this.testName}`;
-      document.head.appendChild(script);
-    }
-  }
-
-  setTest(test: string | undefined) {
-    this.testName = test;
   }
 
   waitForSession() {
