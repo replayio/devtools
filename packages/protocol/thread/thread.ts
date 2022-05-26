@@ -38,6 +38,7 @@ import {
   findAnnotationsResult,
   getHitCountsParameters,
 } from "@replayio/protocol";
+import { features } from "ui/utils/prefs";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
@@ -726,8 +727,12 @@ class _ThreadFront {
     } else if (rv.exception) {
       rv.exception = new ValueFront(pause, rv.exception);
     }
-    const { repaint } = await import("protocol/graphics");
-    repaint(true);
+
+    if (features.repaintEvaluations) {
+      const { repaint } = await import("protocol/graphics");
+      repaint(true);
+    }
+
     return rv;
   }
 
