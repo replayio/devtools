@@ -95,7 +95,10 @@ export function jumpToInitialPausePoint(): UIThunkAction {
 
     let hasFrames = false;
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId);
-    if (initialPausePoint && isTimeInRegions(initialPausePoint.time, getLoadedRegions(state)!.loading)) {
+    if (
+      initialPausePoint &&
+      isTimeInRegions(initialPausePoint.time, getLoadedRegions(state)!.loading)
+    ) {
       point = initialPausePoint.point;
       hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
