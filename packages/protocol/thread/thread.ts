@@ -517,13 +517,12 @@ class _ThreadFront {
   async getHitCounts(
     sourceId: SourceId,
     locations: SameLineSourceLocations[],
-    beginExecutionPoint?: ExecutionPoint,
-    endExecutionPoint?: ExecutionPoint
+    range: { startPoint: ExecutionPoint; endPoint: ExecutionPoint } | null
   ) {
     assert(this.sessionId, "no sessionId");
     let params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
-    if (beginExecutionPoint != null && endExecutionPoint != null) {
-      params.range = { begin: beginExecutionPoint, end: endExecutionPoint };
+    if (range !== null) {
+      params.range = { begin: range.startPoint, end: range.endPoint };
     }
     return client.Debugger.getHitCounts(params, this.sessionId);
   }
