@@ -7,6 +7,10 @@ import {
   PauseId,
   CommandParams,
   CommandResult,
+  analysisPoints,
+  analysisResult,
+  AnalysisEntry,
+  PointDescription,
 } from "@replayio/protocol";
 
 import { makeInfallible } from "./utils";
@@ -100,7 +104,14 @@ type SessionCallbacks = {
   onSocketClose: (willClose: boolean) => void;
 };
 
+type AnalysisCallbacks = {
+  onCreate: (command: CommandResult<"Analysis.createAnalysis">) => void;
+  onEvent: (points: PointDescription[]) => void;
+  onResults: (results: AnalysisEntry[]) => void;
+};
+
 let gSessionCallbacks: SessionCallbacks | undefined;
+export let gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
 let lastReceivedMessageTime = Date.now();
 
 export async function createSession(
@@ -224,6 +235,28 @@ export function addEventListener<M extends EventMethods>(
   event: M,
   handler: (params: EventParams<M>) => void
 ) {
+  if (event === "Analysis.analysisPoints") {
+    gEventListeners.set(event, ({ analysisId, points }: analysisPoints) => {
+      const callbacks = gAnalysisCallbacks.get(analysisId);
+      if (callbacks) {
+        callbacks.onEvent(points);
+      } else {
+        handler({ analysisId, points });
+      }
+    });
+    return;
+  }
+  if (event === "Analysis.analysisResult") {
+    gEventListeners.set(event, ({ analysisId, results }: analysisResult) => {
+      const callbacks = gAnalysisCallbacks.get(analysisId);
+      if (callbacks) {
+        callbacks.onResults(results);
+      } else {
+        handler({ analysisId, results });
+      }
+    });
+    return;
+  }
   if (gEventListeners.has(event)) {
     throw new Error("Duplicate event listener: " + event);
   }
