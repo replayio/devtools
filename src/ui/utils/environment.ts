@@ -1,5 +1,6 @@
 import { MockedResponse } from "@apollo/client/testing";
 import { Editor } from "codemirror";
+import { setCustomSendMessageHandler } from "protocol/socket";
 
 export interface MockEnvironment {
   graphqlMocks?: MockedResponse[];
@@ -22,11 +23,17 @@ declare global {
   }
 }
 
-export const url =
-  typeof window !== "undefined" ? new URL(window.location.href) : new URL("https://app.replay.io");
+function getURL(): URL {
+  // It's not safe to read the window.location.href during module initialization,
+  // because that relies on the order of modules being included,
+  // and the module that mocks the environment for tests may be loaded after this one.
+  return typeof window !== "undefined"
+    ? new URL(window.location.href)
+    : new URL("https://app.replay.io");
+}
 
 export function isDevelopment() {
-  return url.hostname == "localhost";
+  return getURL().hostname == "localhost";
 }
 
 export function isFirefox() {
@@ -38,7 +45,7 @@ export function isReplayBrowser() {
 }
 
 export function getTest() {
-  return url.searchParams.get("test");
+  return getURL().searchParams.get("test");
 }
 
 // Return whether we are running one of the tests in our e2e test suite.
@@ -55,12 +62,12 @@ export function isTest() {
 // The backend servers which we connect to will be mocked,
 // and we can test behaviors we can't easily replicate when connected to a live backend.
 export function isMock() {
-  return !!url.searchParams.get("mock");
+  return !!getURL().searchParams.get("mock");
 }
 
 // Helper method to retrieve the mock environment that was injected by a test runner.
 export async function getMockEnvironmentForTesting(): Promise<MockEnvironment> {
-  if (!isMock()) {
+  if (!isTest()) {
     throw Error("Not a mock/test environment");
   }
 
@@ -90,10 +97,12 @@ export function isDeployPreview() {
 // The loading param is currently used to wait for resources
 // such as sourcemaps to load
 export function hasLoadingParam() {
-  return url.searchParams.get("loading") != null;
+  return getURL().searchParams.get("loading") != null;
 }
 
 export function getPausePointParams() {
+  const url = getURL();
+
   const pointParam = url.searchParams.get("point");
   const point = `${pointParam}`;
 
@@ -126,6 +135,7 @@ export function updateUrlWithParams(params: Record<string, string>) {
 }
 
 export function getLoginReferrerParam() {
+  const url = getURL();
   const referrerParam = url.searchParams.get("login-referrer");
   return referrerParam === "first-browser-open" ? referrerParam : "default";
 }
@@ -160,4 +170,19 @@ export function getSystemColorSchemePreference() {
   const prefersDarkTheme = window.matchMedia("(prefers-color-scheme:dark)").matches;
 
   return prefersDarkTheme ? "dark" : "light";
+}
+
+export async function configureMockEnvironmentForTesting() {
+  const mockEnvironment = await getMockEnvironmentForTesting();
+
+  // Configure the protocol to use our mock WebSocket message method.
+  const { flushQueuedMessages, responseDataHandler } = setCustomSendMessageHandler(
+    mockEnvironment.sendSocketMessage
+  );
+
+  // Configure the protocol's default socket message handler to receive messages from the mocked WebSocket.
+  mockEnvironment.setSocketDataHandler(responseDataHandler);
+
+  // Now that the mock environment has been configured, flush any pending messages.
+  flushQueuedMessages();
 }

@@ -1,10 +1,10 @@
-import { isReplayBrowser, url } from "ui/utils/environment";
+import { isReplayBrowser } from "ui/utils/environment";
 import { Nag } from "ui/hooks/users";
 
 import { shouldShowNag } from "./user";
 
 function queryParams() {
-  return url.searchParams;
+  return new URL(window.location.href).searchParams;
 }
 
 export const isTeamMemberInvite = () => queryParams().get("teaminvite");

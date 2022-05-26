@@ -19,6 +19,7 @@ import { useLaunchDarkly } from "ui/utils/launchdarkly";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 import tokenManager from "ui/utils/tokenManager";
 import { ApolloWrapper } from "ui/components/ApolloWrapper";
+import { configureMockEnvironmentForTesting, isMock } from "ui/utils/environment";
 
 import "image/image.css";
 import "image/icon.css";
@@ -128,6 +129,11 @@ import "ui/components/Toolbox.css";
 import "ui/components/Transcript/Transcript.css";
 import "ui/utils/sourcemapVisualizer.css";
 
+if (isMock()) {
+  // If this is an end to end test, bootstrap the mock environment.
+  configureMockEnvironmentForTesting();
+}
+
 interface AuthProps {
   apiKey?: string;
 }
@@ -142,9 +148,6 @@ let _handleAuthError: () => Promise<void>;
 function handleAuthError() {
   _handleAuthError?.();
 }
-
-// _ONLY_ set this flag if you want to disable the frontend entirely
-const maintenanceMode = false;
 
 function AppUtilities({ children }: { children: ReactNode }) {
   const router = useRouter();
