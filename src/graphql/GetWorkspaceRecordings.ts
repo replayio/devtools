@@ -52,6 +52,7 @@ export interface GetWorkspaceRecordings_node_Workspace_recordings_edges_node {
   private: boolean;
   isInitialized: boolean;
   userRole: string;
+  metadata: any | null;
   comments: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_comments[];
   owner: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_owner | null;
   workspace: GetWorkspaceRecordings_node_Workspace_recordings_edges_node_workspace | null;
@@ -81,5 +82,5 @@ export interface GetWorkspaceRecordings {
 
 export interface GetWorkspaceRecordingsVariables {
   workspaceId: string;
-  filter: string;
+  filter?: string | null;
 }
