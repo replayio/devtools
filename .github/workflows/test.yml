@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   download-browser:
@@ -52,9 +52,9 @@ jobs:
         id: waitFor200
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          max_timeout: 480
+          max_timeout: 960
           check_interval: 60
-          environment: ${{ fromJSON('["", "production"]')[github.ref == 'refs/heads/master'] }}
+          environment: ${{ fromJSON('["", "production"]')[github.ref == 'refs/heads/main'] }}
     outputs:
       url: ${{ steps.waitFor200.outputs.url }}
   test0:

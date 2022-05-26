@@ -23,7 +23,6 @@ import LoadingScreen from "./shared/LoadingScreen";
 import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
 import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
-import FocusModal from "./shared/FocusModal/FocusModal";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
@@ -85,9 +84,6 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     }
     case "download-replay": {
       return <DownloadReplayPromptModal />;
-    }
-    case "focusing": {
-      return <FocusModal />;
     }
     case "privacy": {
       return <PrivacyModal />;

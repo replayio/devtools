@@ -6,7 +6,7 @@
 
 import React, { HTMLProps, PureComponent, ReactNode } from "react";
 import classnames from "classnames";
-import { Item, documentHasSelection } from "../utils";
+import { Item, documentHasSelection } from "../items";
 import { trackEvent } from "ui/utils/telemetry";
 import { DebuggerLocation } from "devtools/client/webconsole/actions";
 

@@ -5,7 +5,6 @@
 //
 
 export * from "./source-documents";
-export * from "./get-token-location";
 export * from "./source-search";
 export * from "../ui";
 export { onTokenMouseOver } from "./token-events";

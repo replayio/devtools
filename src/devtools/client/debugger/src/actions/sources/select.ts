@@ -9,7 +9,6 @@
  * @module actions/sources
  */
 
-import { ThreadFront } from "protocol/thread";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
@@ -226,7 +225,7 @@ export function showAlternateSource(
   oldSourceId: string,
   newSourceId: string
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (ThreadFront.isSourceMappedSource(oldSourceId)) {
       ThreadFront.preferSource(newSourceId, true);
     } else {

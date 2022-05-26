@@ -1,11 +1,12 @@
+import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
-import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSourceWithContent, Source } from "../../reducers/sources";
 import Icon from "ui/components/shared/Icon";
-import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/source";
+import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { getAlternateSource } from "../../reducers/pause";
+import { getSelectedSourceWithContent } from "../../reducers/sources";
 
 function SourcemapVisualizerLink({ selectedSource, alternateSource }: PropsFromRedux) {
   // @ts-ignore possible undefined mismatch

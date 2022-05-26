@@ -21,6 +21,12 @@ import { trackEvent } from "ui/utils/telemetry";
 import css from "./Header.module.css";
 const cx = classNames.bind(css);
 
+function pasteText(ev: React.ClipboardEvent) {
+  ev.preventDefault();
+  var text = ev.clipboardData.getData("text/plain");
+  document.execCommand("insertText", false, text);
+}
+
 function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
   const { users, loading, error } = useGetActiveSessions(
     recordingId || "00000000-0000-0000-0000-000000000000"
@@ -133,6 +139,7 @@ function HeaderTitle({
       onKeyPress={onKeyPress}
       onKeyDown={onKeyPress}
       onFocus={onFocus}
+      onPaste={pasteText}
       ref={inputNode}
     />
   );

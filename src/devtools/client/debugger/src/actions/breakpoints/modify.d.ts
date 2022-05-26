@@ -9,11 +9,6 @@ export function removeBreakpointOption(
   breakpoint: Breakpoint,
   option: "logValue" | "shouldPause"
 ): UIThunkAction;
-export function removeRequestedBreakpoint(
-  location: Omit<Location, "column">
-): Action<"REMOVE_REQUESTED_BREAKPOINT"> & {
-  location: Omit<Location, "column">;
-};
 export function addBreakpoint(
   cx: Context,
   initialLocation: Location,

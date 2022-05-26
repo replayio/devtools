@@ -1,26 +1,29 @@
-import { Action } from "redux";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
-import { UIThunkAction } from ".";
-import { ThreadFront } from "protocol/thread";
-import escapeHtml from "escape-html";
-import { waitForTime } from "protocol/utils";
 import { RecordingId, TimeStampedPoint } from "@recordreplay/protocol";
-import { User } from "ui/types";
-import { setSelectedPrimaryPanel } from "./layout";
-import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
+import { setSymbols } from "devtools/client/debugger/src/actions/sources/symbols";
+import { getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { RequestSummary } from "ui/components/NetworkMonitor/utils";
-const { getFilenameFromURL } = require("devtools/client/debugger/src/utils/sources-tree/getURL");
-const { getTextAtLocation } = require("devtools/client/debugger/src/reducers/sources");
-const { findClosestFunction } = require("devtools/client/debugger/src/utils/ast");
-const { getSymbols } = require("devtools/client/debugger/src/reducers/ast");
-const { setSymbols } = require("devtools/client/debugger/src/actions/sources/symbols");
-const {
+import { getTextAtLocation } from "devtools/client/debugger/src/reducers/sources";
+import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
+import {
   waitForEditor,
   getCodeMirror,
-} = require("devtools/client/debugger/src/utils/editor/create-editor");
+} from "devtools/client/debugger/src/utils/editor/create-editor";
+import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-tree/getURL";
+import escapeHtml from "escape-html";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
+import { waitForTime } from "protocol/utils";
+import { Action } from "redux";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { selectors } from "ui/reducers";
+import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
+import { User } from "ui/types";
+
+import { setSelectedPrimaryPanel } from "./layout";
+import { seek } from "./timeline";
+
+import type { UIThunkAction } from "./index";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -47,7 +50,7 @@ export function updatePendingCommentContent(content: string): UpdatePendingComme
 export function createComment(
   time: number,
   point: string,
-  user: User,
+  user: User, // TODO: user is no longer required and should be removed
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
@@ -99,9 +102,9 @@ export function createFrameComment(
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const sourceLocation =
-      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout());
+      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront));
     const options = {
       position,
       hasFrames: true,
@@ -111,7 +114,7 @@ export function createFrameComment(
   };
 }
 
-function getCurrentPauseSourceLocationWithTimeout() {
+function getCurrentPauseSourceLocationWithTimeout(ThreadFront: typeof ThreadFrontType) {
   return Promise.race([ThreadFront.getCurrentPauseSourceLocation(), waitForTime(1000)]);
 }
 
@@ -156,12 +159,10 @@ export function createNetworkRequestComment(
   };
 }
 
-export function createLabels(sourceLocation: {
-  sourceId: string;
-  sourceUrl: string;
-  line: number;
-}): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
-  return async (dispatch, getState) => {
+export function createLabels(
+  sourceLocation: SourceLocation
+): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
+  return async (dispatch, getState, { ThreadFront }) => {
     const { sourceId, sourceUrl, line } = sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
     if (!sourceId) {
@@ -206,11 +207,11 @@ export function seekToComment(item: Comment | Reply | PendingComment["comment"])
     }
 
     let cx = selectors.getThreadContext(getState());
-    dispatch(actions.seek(item.point, item.time, item.hasFrames));
-    dispatch(actions.setSelectedPrimaryPanel("comments"));
+    dispatch(seek(item.point, item.time, item.hasFrames));
+    dispatch(setSelectedPrimaryPanel("comments"));
     if (item.sourceLocation) {
       cx = selectors.getThreadContext(getState());
-      dispatch(actions.selectLocation(cx, item.sourceLocation));
+      dispatch(selectLocation(cx, item.sourceLocation));
     }
   };
 }

@@ -235,7 +235,6 @@
 
 /* Icon on unindented row should be centered within the left gutter */
 .webconsole-app .message > .indent[data-indent="0"] + .icon {
-  width: 24px;
   margin-inline-start: var(--console-icon-horizontal-offset);
   margin-inline-end: calc(4px - var(--console-icon-horizontal-offset));
 }
@@ -268,11 +267,6 @@
   flex: auto;
   min-width: 0px;
   margin: var(--console-output-vertical-padding) 0;
-}
-
-.webconsole-app .message.paused:not(.paused-before) > .message-body-wrapper {
-  margin: calc(var(--console-output-vertical-padding) - 1px) 0
-    var(--console-output-vertical-padding);
 }
 
 .webconsole-app .message-body-wrapper .table-widget-body {
@@ -894,19 +888,14 @@ a.learn-more-link.webconsole-learn-more-link {
   fill: currentColor;
 }
 
-.webconsole-app .message.paused.paused-before {
-  border-top: 1px solid var(--purple-50);
-  margin-top: 0px;
-}
-
-.webconsole-app .message.paused:not(.paused-before) {
-  /* always show the border, even for the last child */
-  border-top: 2px solid var(--paused-background-color);
-}
-
-.webconsole-app .message.paused.paused-before .message-body-wrapper,
-.webconsole-app .message.paused.paused-before > .icon {
-  margin-top: calc(var(--console-output-vertical-padding) - 1px);
+.webconsole-app .message.paused::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  top: -1px;
+  background-color: var(--paused-background-color);
 }
 
 .webconsole-output .paused ~ .message:last-of-type,
@@ -916,7 +905,7 @@ a.learn-more-link.webconsole-learn-more-link {
 
 .webconsole-app .message.paused {
   z-index: 3;
-  margin-bottom: 0px;
+  position: relative;
 }
 
 /** Utils **/

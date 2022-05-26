@@ -19,9 +19,9 @@ type Props = {
 
 export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
   const focusRegion = useSelector(selectors.getFocusRegion);
-  const isFocusing = useSelector(selectors.getIsFocusing);
+  const showFocusModeControls = useSelector(selectors.getShowFocusModeControls);
 
-  if (!focusRegion || !isFocusing) {
+  if (!focusRegion || !showFocusModeControls) {
     return null;
   }
 

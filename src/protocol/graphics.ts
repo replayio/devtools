@@ -7,8 +7,8 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { TimeStampedPoint, MouseEvent, paintPoints, ScreenShot } from "@recordreplay/protocol";
 import { decode } from "base64-arraybuffer";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/actions/timeline";
 import { setCanvas, setEventsForType, setVideoUrl } from "ui/reducers/app";
+import { setPlaybackPrecachedTime, setPlaybackStalled } from "ui/reducers/timeline";
 import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
 import { Canvas } from "ui/state/app";
 
@@ -234,7 +234,13 @@ class VideoPlayer {
 export const Video = new VideoPlayer();
 
 let onRefreshGraphics: (canvas: Canvas) => void;
-let hasAllPaintPoints = false;
+export let hasAllPaintPoints = false;
+
+export const setHasAllPaintPoints = (newValue: boolean) => {
+  hasAllPaintPoints = newValue;
+};
+export const timeIsBeyondKnownPaints = (time: number) =>
+  !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
 export function setupGraphics(store: UIStore) {
   onRefreshGraphics = (canvas: Canvas) => {
@@ -254,6 +260,12 @@ export function setupGraphics(store: UIStore) {
 
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
+
+    const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
+    if (recordingTarget === "node") {
+      // Make sure we never wait for any paints when trying to do things like playback
+      setHasAllPaintPoints(true);
+    }
 
     if (features.videoPlayback) {
       client.Graphics.getPlaybackVideo({}, sessionId);
@@ -293,6 +305,9 @@ export async function repaint(force = false) {
   if (recordingTarget === "node") {
     return;
   }
+  let graphicsFetched = false;
+  // Show a stalled message if the graphics have not fetched after half a second
+  setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
   const point = ThreadFront.currentPoint;
   await ThreadFront.ensureAllSources();
@@ -303,9 +318,6 @@ export async function repaint(force = false) {
   const pause = ThreadFront.currentPause;
   assert(pause, "no pause");
 
-  let graphicsFetched = false;
-  // Show a stalled message if the graphics have not fetched after half a second
-  setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
   const rv = await pause.repaintGraphics(force);
   graphicsFetched = true;
   store.dispatch(setPlaybackStalled(false));
@@ -394,7 +406,7 @@ export async function getGraphicsAtTime(
   forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
-  if (paintIndex === undefined) {
+  if (paintIndex === undefined || timeIsBeyondKnownPaints(time)) {
     // There are no graphics to paint here.
     return {};
   }

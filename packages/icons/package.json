@@ -1,0 +1,15 @@
+{
+  "name": "@replayio/icons",
+  "private": true,
+  "version": "0.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "node scripts/icons.js --fetch"
+  },
+  "dependencies": {
+    "case-anything": "^2.1.10",
+    "figma-tools": "^0.4.0",
+    "svg-to-jsx": "^1.0.4",
+    "svgo": "^2.8.0"
+  }
+}

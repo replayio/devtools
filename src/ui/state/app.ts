@@ -34,7 +34,6 @@ export type ModalType =
   | "browser-launch"
   | "first-replay"
   | "download-replay"
-  | "focusing"
   | "privacy"
   | "loom"
   | "attachment"
@@ -93,6 +92,7 @@ export interface AppState {
   loadedRegions: LoadedRegions | null;
   loading: number;
   loadingFinished: boolean;
+  loadingStatusSlow: boolean;
   loadingPageTipIndex: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;

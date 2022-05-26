@@ -18,7 +18,7 @@ import {
 import { client } from "../socket";
 import { defer, assert, Deferred } from "../utils";
 import { ValueFront } from "./value";
-import { ThreadFront } from "./thread";
+import type { ThreadFront as ThreadFrontType } from "./thread";
 import { NodeFront } from "./node";
 import { RuleFront } from "./rule";
 import { StyleFront } from "./style";
@@ -88,6 +88,7 @@ export interface EvaluationResult {
 
 // Information about a protocol pause.
 export class Pause {
+  ThreadFront: typeof ThreadFrontType;
   sessionId: SessionId;
   pauseId: PauseId | null;
   pauseIdWaiter: Deferred<PauseId>;
@@ -106,8 +107,9 @@ export class Pause {
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
-  constructor(sessionId: SessionId) {
-    this.sessionId = sessionId;
+  constructor(ThreadFront: typeof ThreadFrontType) {
+    this.ThreadFront = ThreadFront;
+    this.sessionId = ThreadFront.sessionId!;
     this.pauseId = null;
     this.pauseIdWaiter = defer();
     this.point = null;
@@ -201,8 +203,8 @@ export class Pause {
   private _updateDataFronts({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(frame => {
       (frame as WiredFrame).this = new ValueFront(this, frame.this);
-      ThreadFront.updateMappedLocation(frame.location);
-      ThreadFront.updateMappedLocation(frame.functionLocation);
+      this.ThreadFront.updateMappedLocation(frame.location);
+      this.ThreadFront.updateMappedLocation(frame.functionLocation);
     });
 
     (scopes || []).forEach(scope => {
@@ -282,7 +284,7 @@ export class Pause {
           prototypeId ? { object: prototypeId } : { value: null }
         );
 
-        ThreadFront.updateMappedLocation(object.preview.functionLocation);
+        this.ThreadFront.updateMappedLocation(object.preview.functionLocation);
       }
 
       this.objects.get(object.objectId)!.preview = object.preview as WiredObjectPreview;
@@ -330,7 +332,7 @@ export class Pause {
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
     let originalScopesUnavailable = false;
-    if (frame.originalScopeChain && !ThreadFront.hasPreferredGeneratedSource(frame.location)) {
+    if (frame.originalScopeChain && !this.ThreadFront.hasPreferredGeneratedSource(frame.location)) {
       const originalScopeChain = await this.ensureScopeChain(frame.originalScopeChain);
 
       // if all original variables are unavailable (usually due to sourcemap issues),
@@ -546,7 +548,7 @@ export class Pause {
         frameId,
       });
       for (const step of steps) {
-        ThreadFront.updateMappedLocation(step.frame);
+        this.ThreadFront.updateMappedLocation(step.frame);
       }
       this.frameSteps.set(frameId, steps);
     }

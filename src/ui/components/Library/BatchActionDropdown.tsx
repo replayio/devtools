@@ -13,7 +13,7 @@ import PortalDropdown from "../shared/PortalDropdown";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../shared/Confirm";
 import { Recording } from "ui/types";
-import { isPrivilegedUser } from "ui/hooks/users";
+import { useIsPublicEnabled } from "ui/utils/org";
 
 const getConfirmOptions = (count: number) => {
   if (count === 1) {
@@ -45,13 +45,26 @@ function BatchActionDropdown({
   const { userId, loading: userIdLoading } = hooks.useGetUserId();
   const { workspaces, loading: workspacesLoading } = hooks.useGetNonPendingWorkspaces();
   const [expanded, setExpanded] = useState(false);
+  const isPublicEnabled = useIsPublicEnabled();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
+  const updateIsPrivate = hooks.useUpdateIsPrivate();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
   const { confirmDestructive } = useConfirm();
 
   if (workspacesLoading || userIdLoading) {
     return null;
   }
+
+  const setSelectedIdsIsPrivate = (isPrivate: boolean) => {
+    selectedIds.forEach(recordingId => {
+      const recording = recordings.find(recording => recording.id === recordingId);
+      if (recording) {
+        updateIsPrivate(recording.id, isPrivate);
+      }
+    });
+    setSelectedIds([]);
+    setExpanded(false);
+  };
 
   const deleteSelectedIds = () => {
     confirmDestructive(getConfirmOptions(selectedIds.length)).then(confirmed => {
@@ -62,6 +75,7 @@ function BatchActionDropdown({
       setExpanded(false);
     });
   };
+
   const updateRecordings = (targetWorkspaceId: WorkspaceId | null) => {
     selectedIds.forEach(recordingId =>
       updateRecordingWorkspace(recordingId, currentWorkspaceId, targetWorkspaceId)
@@ -105,6 +119,12 @@ function BatchActionDropdown({
       distance={0}
     >
       <Dropdown menuItemsClassName="z-50">
+        {isPublicEnabled ? (
+          <>
+            <DropdownItem onClick={() => setSelectedIdsIsPrivate(true)}>Make private</DropdownItem>
+            <DropdownItem onClick={() => setSelectedIdsIsPrivate(false)}>Make public</DropdownItem>
+          </>
+        ) : null}
         <DropdownItem onClick={deleteSelectedIds}>{`Delete ${selectedIds.length} item${
           selectedIds.length > 1 ? "s" : ""
         }`}</DropdownItem>

@@ -16,16 +16,57 @@ import { ThreadFront } from "protocol/thread";
 
 import { assert } from "./utils";
 
+// For more information about these params, see:
+// https://static.replay.io/protocol/tot/Analysis
 export interface AnalysisParams {
+  // Whether effectful commands in the Pause domain might be sent by the mapper function.
+  // An analysis which does not use effectful commands will run more efficiently.
+  // See the Pause domain for which commands are effectful.
   effectful: boolean;
+
+  // Apply the analysis to the entry point of every handler for an each of these event types.
   eventHandlerEntryPoints?: EventHandlerEntryPoint[];
+
+  // Apply the analysis to every point where an exception is thrown.
   exceptionPoints?: boolean;
+
+  // Apply the analysis to every function entry point in a region of a source.
   functionEntryPoints?: FunctionEntryPoint[];
+
+  // Apply the analysis to every point where a these source locations execute.
   locations?: AnalysisLocation[];
+
+  // Body of the mapper function.
+  // The mapper function takes two arguments:
+  // 1. input is a MapInput object.
+  // 2. sendCommand is a function that can be passed a command name and parameters (in that order) and synchronously returns the command result.
+  //
+  // Only methods from the Pause domain may be used with sendCommand.
+  // The mapper function must return an array of AnalysisEntry objects.
+  //
+  // e.g. "return [{ key: input.point, value: input }];"
+  // e.g. "return [];"
   mapper: string;
+
+  // Apply the analysis to a random selection of points.
+  // This param specifies the number of random points to use.
+  numRandomPoints?: number;
+
+  // Apply the analysis to this specific set of points.
   points?: ExecutionPoint[];
-  randomPoints?: number;
+
+  // Body of the reducer function.
+  // The reducer function takes two arguments:
+  // 1. key is an AnalysisKey
+  // 2. values is an array of AnalysisValue
+  //
+  // All the values were associated with the key by an earlier call to mapper or reducer.
+  // The reducer function must return an AnalysisValue,
+  // which summarizes all the input values and will be associated with key for analysisResult events or further calls to the reducer.
+  // The reducer may be omitted if no reduction phase is needed.
   reducer?: string;
+
+  // The session this command is associated with, e.g. ThreadFront.sessionId.
   sessionId: SessionId;
 }
 
@@ -54,6 +95,7 @@ class AnalysisManager {
   }
 
   async runAnalysis<T>(params: AnalysisParams, handler: AnalysisHandler<T>) {
+    await ThreadFront.ensureAllSources();
     const { analysisId } = await sendMessage(
       "Analysis.createAnalysis",
       {
@@ -97,10 +139,10 @@ class AnalysisManager {
         await sendMessage("Analysis.addExceptionPoints", { analysisId }, params.sessionId);
       }
 
-      if (params.randomPoints) {
+      if (params.numRandomPoints) {
         await sendMessage(
           "Analysis.addRandomPoints",
-          { analysisId, numPoints: params.randomPoints },
+          { analysisId, numPoints: params.numRandomPoints },
           params.sessionId
         );
       }

@@ -33,6 +33,10 @@
   font-size: 29px;
 }
 
+.timeline.show-protocol-timeline {
+  padding-top:40px;
+}
+
 .timeline > *:not(:last-child) {
   margin-right: 8px;
 }
@@ -223,18 +227,4 @@
 
 .timeline .progress-line-paused-edit-mode-inactive {
   background: var(--secondary-accent);
-}
-
-/* Timeline timestamp */
-
-.timeline .timeline-time {
-  font-size: 12px;
-}
-
-.timeline .timeline-time > :not(:first-child) {
-  margin-left: 4px;
-}
-
-.timeline .timeline-time .time-total {
-  color: var(--theme-comment);
 }

@@ -1,26 +1,39 @@
 import { ApolloError } from "@apollo/client";
-import { ExecutionPoint, uploadedData } from "@recordreplay/protocol";
+import { uploadedData } from "@recordreplay/protocol";
 import { findAutomatedTests } from "protocol/find-tests";
 import { videoReady } from "protocol/graphics";
-import { sendMessage } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
+import {
+  CommandRequest,
+  CommandResponse,
+  createSession,
+  ExperimentalSettings,
+} from "protocol/socket";
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { assert, waitForTime } from "protocol/utils";
+import { UIThunkAction } from "ui/actions";
+import * as actions from "ui/actions/app";
+import { getRecording } from "ui/hooks/recordings";
 import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
-import { getSelectedPanel } from "ui/reducers/layout";
-import { Recording } from "ui/types";
-import tokenManager from "ui/utils/tokenManager";
-import { UIThunkAction } from "ui/actions";
-import * as actions from "ui/actions/app";
 import * as selectors from "ui/reducers/app";
-import { getTest, isDevelopment, isTest, isMock } from "ui/utils/environment";
-import LogRocket from "ui/utils/logrocket";
-import { registerRecording, sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
-import { extractGraphQLError } from "ui/utils/apolloClient";
+import { getSelectedPanel } from "ui/reducers/layout";
+import {
+  eventReceived,
+  requestSent,
+  errorReceived,
+  responseReceived,
+  ProtocolEvent,
+} from "ui/reducers/protocolMessages";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
-import { getRecording } from "ui/hooks/recordings";
-
+import { Recording } from "ui/types";
+import { extractGraphQLError } from "ui/utils/apolloClient";
+import { getTest, isTest, isMock } from "ui/utils/environment";
+import LogRocket from "ui/utils/logrocket";
+import { endMixpanelSession } from "ui/utils/mixpanel";
+import { features, prefs } from "ui/utils/prefs";
+import { registerRecording, trackEvent } from "ui/utils/telemetry";
+import tokenManager from "ui/utils/tokenManager";
 import { subscriptionExpired } from "ui/utils/workspace";
 
 import { setUnexpectedError, setExpectedError } from "./errors";
@@ -66,7 +79,7 @@ function getRecordingNotAccessibleError(
   userId?: string
 ): ExpectedError | undefined {
   const isAuthorized = !!((isTest() && !isMock()) || recording);
-  const isAuthenticated = !!(isTest() || isMock() || tokenManager.auth0Client?.isAuthenticated);
+  const isAuthenticated = !!(isTest() || isMock() || !!tokenManager.getState()?.token);
 
   if (isAuthorized) {
     return undefined;
@@ -89,8 +102,23 @@ function getRecordingNotAccessibleError(
   };
 }
 
+export function getDisconnectionError(): UnexpectedError {
+  endMixpanelSession("disconnected");
+  return {
+    action: "refresh",
+    content: "Replays disconnect after 5 minutes to reduce server load.",
+    message: "Ready when you are!",
+  };
+}
+
 // Create a session to use while debugging.
-export function createSession(recordingId: string): UIThunkAction {
+// NOTE: This thunk is dispatched _before_ the rest of the devtools logic
+// is initialized, so `extra.ThreadFront` isn't available yet.
+// We pass `ThreadFront` in as an arg here instead.
+export function createSocket(
+  recordingId: string,
+  ThreadFront: typeof ThreadFrontType
+): UIThunkAction {
   return async (dispatch, getState) => {
     try {
       if (ThreadFront.recordingId) {
@@ -131,28 +159,68 @@ export function createSession(recordingId: string): UIThunkAction {
 
       ThreadFront.setTest(getTest() || undefined);
 
-      type ExperimentalSettings = {
-        listenForMetrics: boolean;
-        disableCache?: boolean;
-        useMultipleControllers: boolean;
-        multipleControllerUseSnapshots: boolean;
-      };
-
       const experimentalSettings: ExperimentalSettings = {
-        listenForMetrics: !!window.app.prefs.listenForMetrics,
-        disableCache: !!window.app.prefs.disableCache,
-        useMultipleControllers: !!window.app.features.tenMinuteReplays,
-        multipleControllerUseSnapshots: !!window.app.features.tenMinuteReplays,
+        listenForMetrics: !!prefs.listenForMetrics,
+        disableCache: !!prefs.disableCache,
+        useMultipleControllers: !!features.turboReplay,
+        multipleControllerUseSnapshots: !!features.turboReplay,
       };
 
       dispatch(showLoadingProgress());
 
-      const loadPoint = new URL(window.location.href).searchParams.get("point");
+      const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
-      const { sessionId } = await sendMessage("Recording.createSession", {
-        recordingId,
-        loadPoint: loadPoint || undefined,
-        experimentalSettings,
+      const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
+        onEvent: (event: ProtocolEvent) => {
+          if (features.logProtocol) {
+            dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
+          }
+        },
+        onRequest: (request: CommandRequest) => {
+          if (features.logProtocol) {
+            dispatch(requestSent({ ...request, recordedAt: window.performance.now() }));
+          }
+        },
+        onResponse: (response: CommandResponse) => {
+          if (features.logProtocol) {
+            dispatch(responseReceived({ ...response, recordedAt: window.performance.now() }));
+          }
+        },
+        onResponseError: (error: CommandResponse) => {
+          if (features.logProtocol) {
+            dispatch(errorReceived({ ...error, recordedAt: window.performance.now() }));
+          }
+        },
+        onSocketError: (evt: Event, initial: boolean, lastReceivedMessageTime: Number) => {
+          console.error("Socket Error", evt);
+          if (initial) {
+            dispatch(
+              setUnexpectedError({
+                action: "refresh",
+                content:
+                  "A connection to our server could not be established. Please check your connection.",
+                message: "Unable to establish socket connection",
+                ...evt,
+              })
+            );
+          } else if (Date.now() - +lastReceivedMessageTime < 300000) {
+            dispatch(
+              setUnexpectedError({
+                action: "refresh",
+                content: "The socket has closed due to an error. Please refresh the page.",
+                message: "Unexpected socket error",
+                ...evt,
+              })
+            );
+          } else {
+            dispatch(setUnexpectedError(getDisconnectionError(), true));
+          }
+        },
+        onSocketClose: (willClose: boolean) => {
+          if (!willClose) {
+            dispatch(setUnexpectedError(getDisconnectionError(), true));
+          }
+        },
       });
 
       window.sessionId = sessionId;
@@ -212,7 +280,7 @@ export function showLoadingProgress(): UIThunkAction<Promise<void>> {
 }
 
 function onLoadingFinished(): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const selectedPanel = getSelectedPanel(getState());
     // This shouldn't hit when the selectedPanel is "comments"
     // as that's not dealt with in toolbox, however we still

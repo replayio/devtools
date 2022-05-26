@@ -12,7 +12,13 @@ import {
   getBreakpointsForSource,
   getBreakpointsForSourceId,
 } from "../../reducers/breakpoints";
+import {
+  removeRequestedBreakpoint,
+  removeBreakpoints as removeBreakpointsAction,
+} from "../../reducers/breakpoints";
+import { setBreakpoint } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
+import { PrefixBadge } from "../../reducers/types";
 import {
   getBreakpointsList,
   getSelectedSource,
@@ -29,7 +35,6 @@ import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
-  removeRequestedBreakpoint,
   addBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
@@ -152,7 +157,7 @@ export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> 
 
     const breakpointList = getBreakpointsList(getState());
     await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
-    dispatch({ type: "REMOVE_BREAKPOINTS" });
+    dispatch(removeBreakpointsAction());
   };
 }
 
@@ -313,17 +318,25 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
     // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add_column");
 
+    // @ts-expect-error Breakpoint location field mismatches
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }
 
-export function setBreakpointPrefixBadge(breakpoint: Breakpoint, prefixBadge: string) {
-  return {
-    breakpoint: {
-      ...breakpoint,
-      options: { ...breakpoint.options, prefixBadge },
-    },
-    type: "SET_BREAKPOINT",
+export function setBreakpointPrefixBadge(
+  breakpoint: Breakpoint,
+  prefixBadge?: PrefixBadge
+): UIThunkAction {
+  return (dispatch, getState, { ThreadFront }) => {
+    dispatch(
+      setBreakpoint(
+        {
+          ...breakpoint,
+          options: { ...breakpoint.options, prefixBadge },
+        },
+        ThreadFront.recordingId!
+      )
+    );
   };
 }
 

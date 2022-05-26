@@ -58,6 +58,12 @@ export const createDevtoolsAction = <S, A extends Action<unknown>>(
     action.request.instanceId = instanceId;
   }
 
+  // Crank up the max actions the RDT logic will process before compacting old ones
+  // This is usually 50 by default, but hey, let's be generous.  (We'll see if this
+  // ends up causing any memory issues or anything)
+  // @ts-ignore
+  request.maxAge = 500;
+
   // @ts-ignore
   if (request.libConfig) {
     // Try to mark RDT features as "disabled", since these aren't relevant in Replay

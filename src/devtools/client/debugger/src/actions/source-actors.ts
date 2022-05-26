@@ -84,7 +84,7 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
   "loadSourceActorBreakpointHitCounts",
   {
     createKey: (
-      { id, lineNumber }: { id: string; lineNumber: number; onFailure?: Function },
+      { id, lineNumber }: { id: string; lineNumber: number; onFailure?: (e: any) => void },
       { getState }
     ) => {
       const state = getState();

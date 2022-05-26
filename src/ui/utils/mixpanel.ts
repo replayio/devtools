@@ -13,6 +13,7 @@ import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoint
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]
+  | ["breakpoint.edit"]
   | ["breakpoint.minus_click"]
   | ["breakpoint.plus_click"]
   | ["breakpoint.preview_hits", { hitsCount: number | null }]

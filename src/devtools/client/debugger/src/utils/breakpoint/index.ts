@@ -2,15 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { ThreadFront } from "protocol/thread";
-import { getBreakpoint, getSource, getSourceActorsForSource } from "../../selectors";
-import assert from "../assert";
-import { features } from "../prefs";
-import sortBy from "lodash/sortBy";
-
 import type { Location } from "@recordreplay/protocol";
+import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
+
 import type { SourceActor } from "../../reducers/source-actors";
+import { getSource, getSourceActorsForSource } from "../../reducers/sources";
 import type {
   Breakpoint,
   PendingBreakpoint,
@@ -18,6 +15,8 @@ import type {
   SourceActorLocation,
   PendingLocation,
 } from "../../reducers/types";
+import assert from "../assert";
+import { features } from "../prefs";
 
 export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
@@ -53,13 +52,13 @@ export function getLocationWithoutColumn(location: Location) {
   return `${sourceId}:${line}`;
 }
 
-export function makePendingLocationId(location: SourceLocation) {
+export function makePendingLocationId(location: SourceLocation, recordingId: string) {
   assertPendingLocation(location);
   const { sourceUrl, line, column } = location;
   const sourceUrlString = sourceUrl || "";
   const columnString = column || "";
 
-  return `${ThreadFront.recordingId}:${sourceUrlString}:${line}:${columnString}`;
+  return `${recordingId}:${sourceUrlString}:${line}:${columnString}`;
 }
 
 export function makeBreakpointLocation(state: UIState, location: SourceLocation): SourceLocation {
@@ -69,7 +68,7 @@ export function makeBreakpointLocation(state: UIState, location: SourceLocation)
   }
 
   let sourceUrl;
-  let sourceId;
+  let sourceId: string;
 
   if (source.url) {
     sourceUrl = source.url;
@@ -81,7 +80,7 @@ export function makeBreakpointLocation(state: UIState, location: SourceLocation)
     line: location.line,
     column: location.column,
     sourceUrl,
-    sourceId,
+    sourceId: sourceId!,
   };
 }
 
@@ -143,17 +142,12 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
   });
 }
 
-export function breakpointExists(state: UIState, location: Location) {
-  const currentBp = getBreakpoint(state, location);
-  return currentBp && !currentBp.disabled;
-}
-
 function createPendingLocation(location: SourceLocation) {
   const { sourceUrl, line, column } = location;
   return { sourceUrl, line, column };
 }
 
-export function createPendingBreakpoint(bp: Breakpoint) {
+export function createPendingBreakpoint(bp: Breakpoint): PendingBreakpoint {
   const pendingLocation = createPendingLocation(bp.location);
 
   assertPendingLocation(pendingLocation);
@@ -162,7 +156,7 @@ export function createPendingBreakpoint(bp: Breakpoint) {
     options: bp.options,
     disabled: bp.disabled,
     location: pendingLocation,
-    astLocation: bp.astLocation,
+    astLocation: bp.astLocation!,
   };
 }
 

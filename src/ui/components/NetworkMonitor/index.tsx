@@ -1,7 +1,10 @@
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
+import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
+import { getLoadedRegions } from "ui/reducers/app";
 import {
   getFormattedFrames,
   getResponseBodies,
@@ -12,25 +15,16 @@ import {
 } from "ui/reducers/network";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
-import { isTimeInRegions } from "ui/utils/timeline";
+import { timeMixpanelEvent } from "ui/utils/mixpanel";
+import { trackEvent } from "ui/utils/telemetry";
 
+import LoadingProgressBar from "../shared/LoadingProgressBar";
+
+import FilterBar from "./FilterBar";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
-import { CanonicalRequestType, RequestSummary } from "./utils";
-import FilterBar from "./FilterBar";
 import Table from "./Table";
-import {
-  fetchResponseBody,
-  fetchRequestBody,
-  hideRequestDetails,
-  showRequestDetails,
-  fetchFrames,
-} from "ui/actions/network";
-import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import LoadingProgressBar from "../shared/LoadingProgressBar";
-import { trackEvent } from "ui/utils/telemetry";
-import { timeMixpanelEvent } from "ui/utils/mixpanel";
-import { getLoadedRegions } from "ui/reducers/app";
+import { CanonicalRequestType, RequestSummary } from "./utils";
 
 export const NetworkMonitor = ({
   currentTime,
@@ -106,16 +100,7 @@ export const NetworkMonitor = ({
                   currentTime={currentTime}
                   onRowSelect={row => {
                     trackEvent("net_monitor.select_request_row");
-                    dispatch(fetchFrames(row.point));
-
-                    if (row.hasResponseBody) {
-                      dispatch(fetchResponseBody(row.id, row.point.point));
-                    }
-                    if (row.hasRequestBody) {
-                      dispatch(fetchRequestBody(row.id, row.point.point));
-                    }
-
-                    dispatch(showRequestDetails(row.id));
+                    dispatch(selectAndFetchRequest(row.id));
                   }}
                   seek={seek}
                   selectedRequest={selectedRequest}

@@ -19,7 +19,6 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
-import { getLocalReplaySessionPrefs } from "ui/setup/prefs";
 
 type MessageId = string;
 type Command = string;
@@ -128,14 +127,6 @@ export interface FiltersState {
 
 export type FilterBooleanFields = Exclude<keyof FiltersState, "text">;
 
-const getInitialFiltersState = async () => {
-  const session = await getLocalReplaySessionPrefs();
-  // Already defined in `constants.js`, and don't want to duplicate for now
-  const defaultState = constants.DEFAULT_FILTERS_VALUES as FiltersState;
-
-  return session ? { ...defaultState, ...session.consoleFilters } : defaultState;
-};
-
 export interface MessageState {
   /** History of the user's entered commands */
   commandHistory: Command[];
@@ -166,6 +157,9 @@ export interface MessageState {
 }
 
 const MAX_HISTORY_LENGTH = 1000;
+
+// Already defined in `constants.js`, and don't want to duplicate for now
+export const defaultFiltersState = constants.DEFAULT_FILTERS_VALUES as FiltersState;
 
 export const appendToHistory = (command: Command, history: Command[]): Command[] => {
   return uniq([command, ...history].slice(0, MAX_HISTORY_LENGTH));
@@ -203,19 +197,6 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
       otherOverrides
     )
   );
-};
-
-export const initialMessageState = async (
-  overrides: Partial<MessageState> = {}
-): Promise<MessageState> => {
-  // Realistically, we only expect filters and commandHistory
-  // See ui/setup/dynamic/devtools.ts
-  const { filters = {}, ...otherOverrides } = overrides;
-
-  return syncInitialMessageState({
-    ...overrides,
-    filters: { ...(await getInitialFiltersState()), ...filters },
-  });
 };
 
 // Dispatched manually elsewhere in the codebase, so typed here for reference

@@ -4,10 +4,11 @@
 
 //
 
+import { isInvalidUrl } from "../source";
+
 import {
   nodeHasChildren,
   isPathDirectory,
-  isInvalidUrl,
   partIsFile,
   createSourceNode,
   createDirectoryNode,

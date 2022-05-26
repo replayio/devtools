@@ -1,6 +1,5 @@
 import { Location, PointDescription } from "@recordreplay/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
@@ -31,8 +30,6 @@ import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { isInTrimSpan, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";
 
-import { getSelectedPanel, getViewMode } from "./layout";
-
 export const initialAppState: AppState = {
   mode: "devtools",
   analysisPoints: {},
@@ -49,6 +46,7 @@ export const initialAppState: AppState = {
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
+  loadingStatusSlow: false,
   loadingPageTipIndex: 0,
   modal: null,
   modalOptions: null,
@@ -89,6 +87,10 @@ const appSlice = createSlice({
       );
       state.loadedRegions = action.payload;
       state.recordingDuration = recordingDuration;
+
+      // This is inferred by an interval that checks the amount of time since the last update.
+      // Whenever a new update comes in, this state should be reset.
+      state.loadingStatusSlow = false;
     },
     setExpectedError(state, action: PayloadAction<ExpectedError>) {
       state.expectedError = action.payload;
@@ -122,6 +124,13 @@ const appSlice = createSlice({
     },
     setLoadingFinished(state, action: PayloadAction<boolean>) {
       state.loadingFinished = action.payload;
+
+      // This is inferred by an interval that checks the amount of time since the last update.
+      // Whenever a new update comes in, this state should be reset.
+      state.loadingStatusSlow = false;
+    },
+    setLoadingStatusSlow(state, action: PayloadAction<boolean>) {
+      state.loadingStatusSlow = action.payload;
     },
     setSessionId(state, action: PayloadAction<string>) {
       state.sessionId = action.payload;
@@ -242,6 +251,7 @@ export const {
   setLoadedRegions,
   setLoading,
   setLoadingFinished,
+  setLoadingStatusSlow,
   setModal,
   setRecordingDuration,
   setRecordingTarget,
@@ -270,6 +280,10 @@ const getPointsInTrimSpan = (state: UIState, points: AnalysisPayload) => {
   };
 };
 
+// Copied from ./layout to avoid circles
+const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;
+const getViewMode = (state: UIState) => state.layout.viewMode;
+
 export const getTheme = (state: UIState) =>
   state.app.theme === "system" ? getSystemColorSchemePreference() : state.app.theme;
 export const getThemePreference = (state: UIState) => state.app.theme;
@@ -281,6 +295,7 @@ export const getRecordingDuration = (state: UIState) => state.app.recordingDurat
 export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
+export const getLoadingStatusSlow = (state: UIState) => state.app.loadingStatusSlow;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
   if (!loadedRegions) {
@@ -288,40 +303,41 @@ export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loade
   }
   return overlap(loadedRegions.indexed, loadedRegions.loaded);
 });
-export const getIndexingProgress = createSelector(
-  getLoadedRegions,
-  getIndexedAndLoadedRegions,
-  (regions, indexedAndLoaded) => {
-    if (!regions) {
-      return null;
-    }
 
-    const { loading } = regions;
-
-    const indexedProgress = indexedAndLoaded
-      .filter(region => {
-        // It's possible for the indexedProgress to not be a subset of
-        // loadingRegions. This acts as a guard if that should happen.
-        // Todo: Investigate this on the backend.
-        return loading.some(
-          loadingRegion =>
-            region.begin.time >= loadingRegion.begin.time &&
-            region.end.time <= loadingRegion.end.time
-        );
-      })
-      .reduce((sum, region) => sum + (region.end.time - region.begin.time), 0);
-    const loadingProgress = loading.reduce(
-      (sum, region) => sum + (region.end.time - region.begin.time),
-      0
-    );
-
-    return (indexedProgress / loadingProgress) * 100 || 0;
+// Calculates the percentage of loading regions that have been loaded and indexed.
+//
+// For example:
+// If 80% of the regions have been indexed and 50% have been loaded, this method would return 0.65.
+// If 100% of the regions have been indexed and 50% have been loaded, this method would return 0.75.
+export const getLoadedAndIndexedProgress = createSelector(getLoadedRegions, regions => {
+  if (!regions) {
+    return 0;
   }
-);
-export const getIsIndexed = createSelector(
-  getIndexingProgress,
-  indexingProgress => indexingProgress === 100
-);
+
+  const { indexed, loaded, loading } = regions;
+  if (indexed == null || loaded == null || loading == null) {
+    return 0;
+  }
+
+  const totalLoadingTime = loading.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+
+  if (totalLoadingTime === 0) {
+    return 0;
+  }
+
+  const totalLoadedTime = loaded.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+  const totalIndexedTime = indexed.reduce((totalTime, { begin, end }) => {
+    return totalTime + end.time - begin.time;
+  }, 0);
+
+  return (totalLoadedTime + totalIndexedTime) / (totalLoadingTime * 2);
+});
+
+export const getIsIndexed = createSelector(getLoadedAndIndexedProgress, progress => progress === 1);
 
 export const getNonLoadingTimeRanges = (state: UIState) => {
   const loadingRegions = getLoadedRegions(state)?.loading || [];
@@ -331,7 +347,7 @@ export const getNonLoadingTimeRanges = (state: UIState) => {
 };
 export const getIsInLoadedRegion = createSelector(
   getLoadedRegions,
-  getExecutionPoint,
+  (state: UIState) => state.pause.executionPoint,
   (regions, currentPausePoint) => {
     const loadedRegions = regions?.loaded;
 
@@ -402,6 +418,5 @@ export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
-export const getIsFocusing = (state: UIState) => getModal(state) === "focusing";
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;

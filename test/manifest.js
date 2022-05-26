@@ -312,9 +312,6 @@ module.exports = [
     targets: ["gecko", "chromium"],
   },
   {
-    // Disabled because we can't record the example in CI
-    // https://github.com/RecordReplay/gecko-dev/issues/726
-    disabled: true,
     example: "cra/dist/index.html",
     script: "react_devtools.js",
     targets: ["gecko", "chromium"],

@@ -50,7 +50,7 @@ type ImportDeclaration = {
   specifiers: string[];
 };
 
-type SymbolDeclarations = {
+export type SymbolDeclarations = {
   classes: ClassDeclaration[];
   functions: FunctionDeclaration[];
   memberExpressions: MemberDeclaration[];

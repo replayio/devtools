@@ -1,10 +1,7 @@
-import { Action } from "redux";
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@recordreplay/protocol";
-import { ThreadFront } from "protocol/thread/thread";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { Workspace } from "ui/types";
 import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
@@ -23,6 +20,7 @@ import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import { toggleFocusMode } from "./timeline";
 import { getTheme } from "ui/reducers/app";
@@ -30,9 +28,12 @@ import { getTheme } from "ui/reducers/app";
 export * from "../reducers/app";
 
 import {
+  getIsIndexed,
+  getLoadingStatusSlow,
   setRecordingDuration,
   setMouseTargetsLoading,
   setLoadedRegions,
+  setLoadingStatusSlow,
   updateTheme,
   setLoading,
   setSessionId,
@@ -42,7 +43,17 @@ import {
   setCanvas as setCanvasAction,
 } from "../reducers/app";
 
-export function setupApp(store: UIStore) {
+const supportsPerformanceNow =
+  typeof performance !== "undefined" && typeof performance.now === "function";
+
+function now(): number {
+  if (supportsPerformanceNow) {
+    return performance.now();
+  }
+  return Date.now();
+}
+
+export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
@@ -70,17 +81,47 @@ export function setupApp(store: UIStore) {
     store.dispatch(setLoading(100));
   });
 
+  // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
+  // Practically speaking though, there are cases where updates take so long it feels like things are broken.
+  // In that case the UI should show a visual indicator that the loading is slow.
+  //
+  // We can rely on the fact that even when loading takes a long time, we should still be getting regular progress updates.
+  // If too much time passes between these updates, we can infer that things are either slow, or we're in a stuck state (aka an "error" for all practical purposes).
+  //
+  // If another update eventually comes in we will reset the slow/timed-out flag.
+  const LOADING_STATUS_SLOW_THRESHOLD = 10000;
+  let lastLoadChangeUpdateTime = now();
+
+  setInterval(function onLoadChangeInterval() {
+    const isLoadingFinished = getIsIndexed(store.getState());
+    if (isLoadingFinished) {
+      return;
+    }
+
+    const loadingStatusSlow = getLoadingStatusSlow(store.getState());
+    const currentTime = now();
+    const elapsedTime = currentTime - lastLoadChangeUpdateTime;
+
+    if (elapsedTime > LOADING_STATUS_SLOW_THRESHOLD) {
+      if (!loadingStatusSlow) {
+        store.dispatch(setLoadingStatusSlow(true));
+      }
+    } else {
+      if (loadingStatusSlow) {
+        store.dispatch(setLoadingStatusSlow(false));
+      }
+    }
+  }, 1000);
+
   ThreadFront.listenForLoadChanges(parameters => {
+    lastLoadChangeUpdateTime = now();
+
     store.dispatch(setLoadedRegions(parameters));
   });
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return (dispatch, getState) => {
-    if (level === "executionIndexed") {
-      return;
-    }
-
     let endPoint = Math.max(...regions.map(r => r.end.time), 0);
     if (endPoint == 0) {
       return;
@@ -155,7 +196,7 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
 }
 
 export function loadMouseTargets(): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
     dispatch(setMouseTargetsLoading(true));
     const resp = await ThreadFront.loadMouseTargets();
     dispatch(setMouseTargetsLoading(false));

@@ -7,7 +7,10 @@
   align-items: center;
   justify-content: center;
   z-index: var(--z-index-1--timeline-tooltip);
-  background: var(--theme-toolbar-background);
+  background: var(--body-bgcolor);
+  padding: 3px 5px;
+  border-radius: 4px;
+  border: 1px solid var(--theme-toggle-bgcolor);
   transform: translateX(-50%);
   user-select: none;
 }

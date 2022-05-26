@@ -13,6 +13,8 @@ import { MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
 
+import { isE2ETest } from "./environment";
+
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
 export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
@@ -29,6 +31,9 @@ export async function mutate({
   mutation: DocumentNode;
   refetchQueries?: any;
 }) {
+  if (isE2ETest()) {
+    return;
+  }
   const apolloClient = await clientWaiter.promise;
   return await apolloClient.mutate({ variables, mutation, refetchQueries });
 }

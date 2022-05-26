@@ -10,7 +10,7 @@ import { isRegionLoaded } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
-import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../utils";
+import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../items";
 
 import ObjectInspectorItem from "./ObjectInspectorItem";
 

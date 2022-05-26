@@ -1,15 +1,15 @@
-import classNames from "classnames";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toggleFocusMode } from "ui/actions/timeline";
-import { getIsFocusing } from "ui/reducers/app";
-import { getIsInFocusMode } from "ui/reducers/timeline";
-import MaterialIcon from "../shared/MaterialIcon";
+import { getShowFocusModeControls } from "ui/reducers/timeline";
+
+import Icon from "../shared/Icon";
+
+import styles from "./EditFocusButton.module.css";
 
 export const EditFocusButton = () => {
   const dispatch = useDispatch();
-  const isFocusing = useSelector(getIsFocusing);
-  const isInFocusMode = useSelector(getIsInFocusMode);
+  const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   const onClick = () => {
     dispatch(toggleFocusMode());
@@ -17,14 +17,15 @@ export const EditFocusButton = () => {
 
   return (
     <button
-      className={classNames(
-        "flex h-6 w-6 items-center justify-center rounded-full text-white",
-        isInFocusMode ? "bg-primaryAccent" : "bg-themeToggleBgcolor"
-      )}
+      className={showFocusModeControls ? styles.ToggleOn : styles.ToggleOff}
       onClick={onClick}
-      title={isFocusing ? "Save current focus" : "Start focus edit mode"}
+      title={showFocusModeControls ? "Discard current focus" : "Start focus edit mode"}
     >
-      <MaterialIcon iconSize="lg">center_focus_strong</MaterialIcon>
+      <Icon
+        className={showFocusModeControls ? styles.ToggleOnIcon : styles.ToggleOffIcon}
+        filename="focus"
+        size="extra-large"
+      />
     </button>
   );
 };

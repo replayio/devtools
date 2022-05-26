@@ -5,9 +5,6 @@
 import * as search from "../workers/search";
 import { ParserDispatcher } from "../workers/parser";
 
-import * as selectors from "../selectors";
-import { asyncStore } from "./prefs";
-
 export let parser;
 
 export function bootstrapWorkers(panelWorkers) {
@@ -20,15 +17,4 @@ export function bootstrapWorkers(panelWorkers) {
 export function teardownWorkers() {
   parser.stop();
   search.stop();
-}
-
-let currentPendingBreakpoints;
-
-export function updatePrefs(state) {
-  const previousPendingBreakpoints = currentPendingBreakpoints;
-  currentPendingBreakpoints = selectors.getPendingBreakpoints(state);
-
-  if (previousPendingBreakpoints && currentPendingBreakpoints !== previousPendingBreakpoints) {
-    asyncStore.pendingBreakpoints = currentPendingBreakpoints;
-  }
 }

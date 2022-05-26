@@ -28,7 +28,6 @@ import {
   TimeStamp,
   unprocessedRegions,
   loadedRegions,
-  annotations,
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
@@ -36,7 +35,9 @@ import {
   FunctionMatch,
   responseBodyData,
   requestBodyData,
+  findAnnotationsResult,
 } from "@recordreplay/protocol";
+import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
@@ -197,16 +198,8 @@ class _ThreadFront {
   breakpoints = new Map<BreakpointId, { location: Location }>();
 
   // Wait for all the annotations in the recording.
-  private annotationsWaiter: Promise<Annotation[]> | undefined;
-
-  // Any callback to invoke to adjust the point which we zoom to.
-  warpCallback:
-    | ((
-        point: ExecutionPoint,
-        time: number,
-        hasFrames?: boolean
-      ) => { point: ExecutionPoint; time: number; hasFrames?: boolean } | null)
-    | null = null;
+  private annotationWaiters: Map<string, Promise<findAnnotationsResult>> = new Map();
+  private annotationCallbacks: Map<string, ((annotations: Annotation[]) => void)[]> = new Map();
 
   testName: string | undefined;
 
@@ -233,12 +226,27 @@ class _ThreadFront {
         }
       }
     );
+    client.Session.addAnnotationsListener(({ annotations }: { annotations: Annotation[] }) => {
+      const byKind = groupBy(annotations, "kind");
+      Object.keys(byKind).forEach(kind => {
+        const callbacks = this.annotationCallbacks.get(kind);
+        if (callbacks) {
+          callbacks.forEach(c => c(byKind[kind]));
+        }
+        const forAll = this.annotationCallbacks.get("all");
+        if (forAll) {
+          forAll.forEach(c => c(byKind[kind]));
+        }
+      });
+    });
   }
 
   async setSessionId(sessionId: SessionId) {
     this.sessionId = sessionId;
     assert(sessionId, "there should be a sessionId");
     this.sessionWaiter.resolve(sessionId);
+    // This helps when trying to debug logRocket sessions and the like
+    console.debug({ sessionId });
 
     if (window.app.prefs.listenForMetrics) {
       window.sessionMetrics = [];
@@ -261,7 +269,7 @@ class _ThreadFront {
 
     if (this.testName) {
       await gToolbox.selectTool("debugger");
-      window.Test = require("test/harness");
+      window.Test = await import("test/harness");
       const script = document.createElement("script");
       script.src = `/test/scripts/${this.testName}`;
       document.head.appendChild(script);
@@ -277,7 +285,7 @@ class _ThreadFront {
   }
 
   async ensureProcessed(
-    level: "basic" | "executionIndexed",
+    level?: "basic",
     onMissingRegions?: ((parameters: missingRegions) => void) | undefined,
     onUnprocessedRegions?: ((parameters: unprocessedRegions) => void) | undefined
   ) {
@@ -308,22 +316,40 @@ class _ThreadFront {
     await client.Session.listenForLoadChanges({}, sessionId);
   }
 
-  async getAnnotations(onAnnotations: (annotations: annotations) => void) {
-    if (!this.annotationsWaiter) {
-      this.annotationsWaiter = new Promise(async (resolve, reject) => {
-        try {
-          const sessionId = await this.waitForSession();
-          const rv: Annotation[] = [];
-          client.Session.addAnnotationsListener(({ annotations }) => rv.push(...annotations));
-          await client.Session.findAnnotations({}, sessionId);
-          resolve(rv);
-        } catch (e) {
-          reject(e);
-        }
-      });
+  async getAnnotationKinds(): Promise<string[]> {
+    // @ts-ignore
+    const { kinds } = await sendMessage("Session.getAnnotationKinds", {}, this.sessionId!);
+    return kinds;
+  }
+
+  async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
+    const sessionId = await this.waitForSession();
+    if (!kind) {
+      kind = "all";
     }
-    const annotations = await this.annotationsWaiter;
-    onAnnotations({ annotations });
+
+    if (!this.annotationCallbacks.has(kind)) {
+      this.annotationCallbacks.set(kind, [onAnnotations]);
+    } else {
+      this.annotationCallbacks.get(kind)!.push(onAnnotations);
+    }
+    if (kind) {
+      if (!this.annotationWaiters.has(kind)) {
+        this.annotationWaiters.set(
+          kind,
+          new Promise(async (resolve, reject) => {
+            try {
+              const rv: Annotation[] = [];
+              await client.Session.findAnnotations(kind === "all" ? {} : { kind }, sessionId);
+              resolve(rv);
+            } catch (e) {
+              reject(e);
+            }
+          })
+        );
+      }
+      return this.annotationWaiters.get(kind)!;
+    }
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {
@@ -332,17 +358,6 @@ class _ThreadFront {
 
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
     log(`TimeWarp ${point}`);
-
-    // The warp callback is used to change the locations where the thread is
-    // warping to.
-    if (this.warpCallback && !force) {
-      const newTarget = this.warpCallback(point, time, hasFrames);
-      if (newTarget) {
-        point = newTarget.point;
-        time = newTarget.time;
-        hasFrames = newTarget.hasFrames;
-      }
-    }
 
     this.currentPoint = point;
     this.currentTime = time;
@@ -631,7 +646,7 @@ class _ThreadFront {
     if (pause) {
       return pause;
     }
-    pause = new Pause(this.sessionId);
+    pause = new Pause(this);
     pause.create(point, time);
     this.allPauses.set(point, pause);
     return pause;
@@ -682,7 +697,7 @@ class _ThreadFront {
     return frames.slice(1);
   }
 
-  pauseForAsyncIndex(asyncIndex: number) {
+  pauseForAsyncIndex(asyncIndex?: number) {
     this.ensureCurrentPause();
     return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
   }
@@ -700,7 +715,7 @@ class _ThreadFront {
     frameId,
     pure = false,
   }: {
-    asyncIndex: number;
+    asyncIndex?: number;
     text: string;
     frameId?: FrameId;
     pure?: boolean;
@@ -906,14 +921,14 @@ class _ThreadFront {
     return this._findResumeTarget(point, client.Debugger.findResumeTarget);
   }
 
-  blackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
+  blackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
       await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
     });
   }
 
-  unblackbox(sourceId: SourceId, begin: SourceLocation, end: SourceLocation) {
+  unblackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
     return this._invalidateResumeTargets(async () => {
       assert(this.sessionId, "no sessionId");
       await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
@@ -962,7 +977,7 @@ class _ThreadFront {
     });
     client.Console.addNewMessageListener(async ({ message }) => {
       await this.ensureAllSources();
-      const pause = new Pause(sessionId);
+      const pause = new Pause(this);
       pause.instantiate(
         message.pauseId,
         message.point.point,

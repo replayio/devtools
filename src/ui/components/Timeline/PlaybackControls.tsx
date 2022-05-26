@@ -5,8 +5,6 @@ import { selectors } from "ui/reducers";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 
-import IndexingLoader from "../shared/IndexingLoader";
-
 export default function PlayPauseButton() {
   const dispatch = useDispatch();
   const currentTime = useSelector(selectors.getCurrentTime);
@@ -47,7 +45,6 @@ export default function PlayPauseButton() {
 
   return (
     <button className="relative" onClick={onClick} disabled={disabled}>
-      <IndexingLoader />
       <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
         <img className="m-auto h-6 w-6" src={icon} />
       </div>

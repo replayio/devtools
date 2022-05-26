@@ -1,0 +1,51 @@
+.Capsule {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  column-gap: 1px;
+  height: 2rem;
+}
+
+.LeftSideLoading,
+.LeftSideLoaded {
+  width: 7rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  border-bottom-left-radius: 2rem;
+  border-top-left-radius: 2rem;
+  padding: 0 0.5rem;
+  background-color: var(--focus-mode-capsule-background-color);
+  color: var(--theme-icon-color);
+}
+.LeftSideLoading:hover {
+  background-color: var(--focus-mode-capsule-background-color-hover);
+}
+
+.LoadingState {
+  display: flex;
+  flex-grow: 1;
+}
+
+.SlowIcon {
+  background-color: currentColor;
+}
+
+.LoadingText {
+  flex-grow: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.RadialProgressContainer {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+}
+
+.CircularProgressbar {
+  width: 1.5rem;
+  height: 1.5rem;
+}

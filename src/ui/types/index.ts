@@ -12,6 +12,7 @@ export type ExperimentalUserSettings = {
   enableEventLink: boolean;
   enableTeams: boolean;
   showReact: boolean;
+  enableLargeText: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
@@ -19,10 +20,11 @@ export type LocalExperimentalUserSettings = {
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
-  tenMinuteReplays: boolean;
+  turboReplay: boolean;
   enableResolveRecording: boolean;
   unicornConsole: boolean;
   showRedux: boolean;
+  enableLargeText: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
@@ -139,7 +141,7 @@ export interface Recording {
   collaborators?: string[];
   comments?: any;
   userRole?: RecordingRole;
-  operations: OperationsData;
+  operations?: OperationsData;
   resolution: { resolvedAt: string; resolvedBy: string };
   collaboratorRequests: CollaboratorRequest[];
 }

@@ -17,7 +17,7 @@ export default function Modal({
   actions?: React.ReactNode;
   onMaskClick?: () => void;
   blurMask?: boolean;
-  children: React.ReactElement | React.ReactElement[];
+  children: React.ReactNode;
   options?: {
     maskTransparency: "transparent" | "translucent";
   };

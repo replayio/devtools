@@ -1,9 +1,9 @@
 import classNames from "classnames";
-import React, { Dispatch, SetStateAction } from "react";
+import { AddCommentButton } from "components";
+import React, { Dispatch, SetStateAction, useRef, useEffect } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import { PrefixBadge } from "ui/components/PrefixBadge";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -14,7 +14,6 @@ import { AnalysisPayload } from "ui/state/app";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
-import CommentButton from "./CommentButton";
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
@@ -115,7 +114,7 @@ function PanelSummary({
           it was hit {prefs.maxHitsDisplayed}+ times
         </Popup>
         <div className="button-container flex items-center">
-          <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+          <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
         </div>
       </div>
     );
@@ -146,7 +145,7 @@ function PanelSummary({
         ) : null}
       </div>
       <div className="button-container flex items-center">
-        <CommentButton addComment={addComment} pausedOnHit={pausedOnHit} />
+        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
       </div>
     </div>
   );

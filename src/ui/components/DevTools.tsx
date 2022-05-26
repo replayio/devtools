@@ -1,9 +1,12 @@
+import { ThreadFront } from "protocol/thread";
 import React, { useEffect, useState, useRef, useMemo } from "react";
 import { connect, ConnectedProps, useSelector } from "react-redux";
-import { selectors } from "../reducers";
-import { UIState } from "ui/state";
-import { clearTrialExpired, createSession } from "ui/actions/session";
+import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import { UIState } from "ui/state";
+
+import { selectors } from "../reducers";
+
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
 import WaitForReduxSlice from "./WaitForReduxSlice";
@@ -28,6 +31,8 @@ import Video from "./Video";
 import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
+import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+
 const Viewer = React.lazy(() => import("./Viewer"));
 
 type _DevToolsProps = PropsFromRedux & DevToolsProps;
@@ -91,16 +96,19 @@ function Body() {
 
 function _DevTools({
   clearTrialExpired,
-  createSession,
+  createSocket,
   loadingFinished,
   sessionId,
   showCommandPalette,
   uploadComplete,
-  viewMode,
 }: _DevToolsProps) {
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
+  const { trackLoadingIdleTime } = useTrackLoadingIdleTime(
+    uploadComplete ? "warm" : "cold",
+    recording
+  );
   const { userIsAuthor, loading } = useUserIsAuthor();
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
@@ -133,17 +141,22 @@ function _DevTools({
   });
 
   useEffect(() => {
-    createSession(recordingId);
+    createSocket(recordingId, ThreadFront);
     return () => {
       clearTrialExpired();
     };
-  }, [clearTrialExpired, createSession, recordingId]);
+  }, [clearTrialExpired, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
       endUploadWaitTracking(sessionId!);
     }
   }, [loadingFinished, uploadComplete, sessionId]);
+  useEffect(() => {
+    if (loadingFinished) {
+      trackLoadingIdleTime(sessionId!);
+    }
+  }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
   useEffect(() => {
     if (recording && document.title !== recording.title) {
@@ -168,12 +181,11 @@ function _DevTools({
 const connector = connect(
   (state: UIState) => ({
     loadingFinished: selectors.getLoadingFinished(state),
-    viewMode: selectors.getViewMode(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
   }),
   {
-    createSession,
+    createSocket,
     clearTrialExpired,
   }
 );

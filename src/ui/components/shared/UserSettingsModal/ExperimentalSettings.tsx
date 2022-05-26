@@ -44,9 +44,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Code Heatmaps ",
+    label: "Code Heatmaps",
     description: "Calculate hit counts for editor files all at once",
     key: "codeHeatMaps",
+  },
+  {
+    label: "Large Text",
+    description: "Enable large text for Editor",
+    key: "enableLargeText",
   },
   {
     label: "Resolve recording",
@@ -58,15 +63,14 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "unicornConsole",
     label: "Unicorn console",
   },
-];
-
-const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "Ten Minute Replays",
-    description: "Supports replaying longer recordings",
-    key: "tenMinuteReplays",
+    label: "Turbo Replay",
+    description: "Replay recordings across multiple instances",
+    key: "turboReplay",
   },
 ];
+
+const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
 
 function Experiment({
   setting,
@@ -104,8 +108,7 @@ export default function ExperimentalSettings({}) {
     useFeature("columnBreakpoints");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
-  const { value: enableTenMinuteReplays, update: updateEnableTenMinuteReplays } =
-    useFeature("tenMinuteReplays");
+  const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
   const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
     useFeature("unicornConsole");
   const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
@@ -113,6 +116,7 @@ export default function ExperimentalSettings({}) {
   const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
+  const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -125,8 +129,8 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableNetworkRequestComments") {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
-    } else if (key == "tenMinuteReplays") {
-      updateEnableTenMinuteReplays(!enableTenMinuteReplays);
+    } else if (key == "turboReplay") {
+      updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "codeHeatMaps") {
       updateCodeHeatMaps(!codeHeatMaps);
     } else if (key == "enableResolveRecording") {
@@ -135,6 +139,8 @@ export default function ExperimentalSettings({}) {
       updateEnableUnicornConsole(!enableUnicornConsole);
     } else if (key === "showRedux") {
       updateEnableReduxDevtools(!enableReduxDevtools);
+    } else if (key === "enableLargeText") {
+      updateEnableLargeText(!enableLargeText);
     }
   };
 
@@ -144,9 +150,10 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     enableResolveRecording,
-    tenMinuteReplays: enableTenMinuteReplays,
+    turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
+    enableLargeText,
   };
 
   const settings = { ...userSettings, ...localSettings };
@@ -166,24 +173,26 @@ export default function ExperimentalSettings({}) {
             checked={!!settings[setting.key]}
           />
         ))}
-        <div>
-          <div className="my-4  flex items-center ">
-            <Icon
-              filename="warning"
-              className="mr-2"
-              style={{ backgroundColor: "var(--theme-toolbar-color)" }}
-            />
-            Increased chance of session errors and performance issues.
+        {RISKY_EXPERIMENTAL_SETTINGS.length > 0 && (
+          <div>
+            <div className="my-4  flex items-center ">
+              <Icon
+                filename="warning"
+                className="mr-2"
+                style={{ backgroundColor: "var(--theme-toolbar-color)" }}
+              />
+              Increased chance of session errors and performance issues.
+            </div>
+            {RISKY_EXPERIMENTAL_SETTINGS.map(setting => (
+              <Experiment
+                onChange={onChange}
+                key={setting.key}
+                setting={setting}
+                checked={!!settings[setting.key]}
+              />
+            ))}
           </div>
-          {RISKY_EXPERIMENTAL_SETTINGS.map(setting => (
-            <Experiment
-              onChange={onChange}
-              key={setting.key}
-              setting={setting}
-              checked={!!settings[setting.key]}
-            />
-          ))}
-        </div>
+        )}
       </div>
     </div>
   );

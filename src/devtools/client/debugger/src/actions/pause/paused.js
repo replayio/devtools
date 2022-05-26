@@ -5,7 +5,6 @@
 //
 import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
 
-import { selectLocation } from "../sources";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
@@ -66,6 +65,7 @@ export function paused({ executionPoint, time }) {
         currentLocation.line !== frame.location.line ||
         currentLocation.column !== frame.location.column
       ) {
+        const { selectLocation } = await import("../sources");
         dispatch(selectLocation(cx, frame.location, { remap: true }));
       }
 

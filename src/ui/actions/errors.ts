@@ -1,13 +1,15 @@
-import { UIThunkAction } from "ui/actions";
-import * as selectors from "ui/reducers/app";
+import type { UIThunkAction } from "ui/actions";
 import {
   setExpectedError as setExpectedErrorAction,
   setUnexpectedError as setUnexpectedErrorAction,
 } from "ui/reducers/app";
+import type { UIState } from "ui/state";
 import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { isDevelopment } from "ui/utils/environment";
 import { getRecordingId } from "ui/utils/recording";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
+
+const getSessionId = (state: UIState) => state.app.sessionId;
 
 export function setExpectedError(error: ExpectedError): UIThunkAction {
   return (dispatch, getState) => {
@@ -17,7 +19,7 @@ export function setExpectedError(error: ExpectedError): UIThunkAction {
       message: error.message,
       action: error.action,
       recordingId: getRecordingId(),
-      sessionId: selectors.getSessionId(state),
+      sessionId: getSessionId(state),
       environment: isDevelopment() ? "dev" : "prod",
     });
 
@@ -33,7 +35,7 @@ export function setUnexpectedError(error: UnexpectedError, skipTelemetry = false
       sendTelemetryEvent("DevtoolsUnexpectedError", {
         ...error,
         recordingId: getRecordingId(),
-        sessionId: selectors.getSessionId(state),
+        sessionId: getSessionId(state),
         environment: isDevelopment() ? "dev" : "prod",
       });
     }

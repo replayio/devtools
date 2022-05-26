@@ -8,6 +8,7 @@ import { setSymbols } from "../sources/symbols";
 import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
 
 import { getSource } from "../../selectors";
+import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
 import { addBreakpoint } from "./modify";
 
 async function findNewLocation(cx, { name, offset, index }, location, source, dispatch) {
@@ -42,7 +43,7 @@ export function syncBreakpoint(cx, sourceId, pendingBreakpoint) {
     const previousLocation = { ...location, sourceId };
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, dispatch);
 
-    dispatch({ type: "REMOVE_PENDING_BREAKPOINT", location });
+    dispatch(removePendingBreakpoint(location));
 
     return dispatch(
       addBreakpoint(cx, newLocation, pendingBreakpoint.options, pendingBreakpoint.disabled)

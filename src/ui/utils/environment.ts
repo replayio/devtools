@@ -1,4 +1,5 @@
 import { MockedResponse } from "@apollo/client/testing";
+import { ExecutionPoint } from "@recordreplay/protocol";
 import { Editor } from "codemirror";
 import { usesWindow } from "../../ssr";
 
@@ -49,8 +50,12 @@ export function getTest() {
 
 // Return whether we are running one of the tests in our e2e test suite.
 // We will be connected to a live backend and testing debugging features.
+export function isE2ETest() {
+  return getTest() != null;
+}
+
 export function isTest() {
-  return isMock() || getTest() != null;
+  return isMock() || isE2ETest();
 }
 
 // Return whether we are running a mock test. The backend servers which we
@@ -107,6 +112,21 @@ export function getPausePointParams() {
   }
 
   return null;
+}
+
+export function getParams() {
+  const url = new URL(window.location.toString());
+  return { q: url.searchParams.get("q") };
+}
+
+export function updateUrlWithParams(params: Record<string, string>) {
+  const url = new URL(window.location.toString());
+
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.set(key, value);
+  });
+
+  window.history.replaceState({}, "", url.toString());
 }
 
 export function getLoginReferrerParam() {

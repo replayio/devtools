@@ -24,13 +24,15 @@ pref("devtools.features.httpBodies", true);
 pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.networkRequestComments", true);
-pref("devtools.features.tenMinuteReplays", false);
+pref("devtools.features.turboReplay", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.codeHeatMaps", true);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.protocolTimeline", false);
+pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.showRedux", false);
+pref("devtools.features.enableLargeText", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -50,7 +52,7 @@ export const prefs = new PrefsHelper("devtools", {
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  tenMinuteReplays: ["Bool", "tenMinuteReplays"],
+  turboReplay: ["Bool", "turboReplay"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   httpBodies: ["Bool", "httpBodies"],
   videoPlayback: ["Bool", "videoPlayback"],
@@ -60,8 +62,10 @@ export const features = new PrefsHelper("devtools.features", {
   codeHeatMaps: ["Bool", "codeHeatMaps"],
   resolveRecording: ["Bool", "resolveRecording"],
   protocolTimeline: ["Bool", "protocolTimeline"],
+  logProtocol: ["Bool", "logProtocol"],
   unicornConsole: ["Bool", "unicornConsole"],
   showRedux: ["Bool", "showRedux"],
+  enableLargeText: ["Bool", "enableLargeText"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

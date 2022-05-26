@@ -3,21 +3,21 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component, createRef } from "react";
-import { connect } from "../../utils/connect";
-import actions from "../../actions";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
+import { trackEvent } from "ui/utils/telemetry";
 
-import { getEditor } from "../../utils/editor";
+import actions from "../../actions";
 import {
   getContext,
   getSources,
   getFullTextSearchQuery,
   getFullTextSearchFocus,
 } from "../../selectors";
+import { connect } from "../../utils/connect";
+import { getEditor } from "../../utils/editor";
 
-import { trackEvent } from "ui/utils/telemetry";
 import { FullTextFilter } from "./FullTextFilter";
 import { FullTextResults } from "./FullTextResults";
-import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { search } from "./search";
 
 function sanitizeQuery(query) {
@@ -118,7 +118,7 @@ export class FullTextSearch extends Component {
               focusFullTextInput={focusFullTextInput}
             />
           </div>
-          <label className="p-2 space-x-2 select-none" htmlFor="node-modules">
+          <label className="select-none space-x-2 p-2" htmlFor="node-modules">
             <Checkbox
               id="node-modules"
               value={includeNodeModules}

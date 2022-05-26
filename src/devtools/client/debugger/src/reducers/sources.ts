@@ -41,6 +41,7 @@ import {
   SourceActor,
 } from "./source-actors";
 import uniq from "lodash/uniq";
+import { SourceLocation } from "./types";
 
 export interface Location {
   url: string;
@@ -270,6 +271,7 @@ const resourceAsSourceWithContent = memoizeResourceShallow(({ content, ...source
   content: asSettled(content!),
 }));
 
+export type SourceWithContent = ReturnType<typeof resourceAsSourceWithContent>;
 /*
  * Add sources to the sources store
  * - Add the source to the sources store
@@ -764,7 +766,7 @@ export function selectedLocationHasScrolled(state: UIState) {
   return state.sources.selectedLocationHasScrolled;
 }
 
-export function getTextAtLocation(state: UIState, id: string, location: Location) {
+export function getTextAtLocation(state: UIState, id: string, location: SourceLocation) {
   const source = getSource(state, id);
   if (!source) {
     return null;
@@ -774,8 +776,8 @@ export function getTextAtLocation(state: UIState, id: string, location: Location
   if (!content) {
     return null;
   }
-  // @ts-ignore Ignore async value errors for now
-  const text = getTextAtPosition(id, content, { ...location, column: 0 });
+
+  const text = getTextAtPosition(content, { ...location, column: 0 });
 
   return text;
 }

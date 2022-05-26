@@ -1,7 +1,8 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
-import { PrefixBadge } from "ui/components/PrefixBadge";
+
+import { MessagePrefixBadge } from "ui/components/PrefixBadge";
 
 const levels = {
   debug: "Debug",
@@ -39,23 +40,7 @@ export function MessageIcon(props) {
   }
 
   if (prefixBadge) {
-    const style =
-      prefixBadge == "unicorn"
-        ? {
-            height: 16,
-            marginLeft: 4,
-            marginRight: 8,
-            marginTop: 2,
-          }
-        : {
-            height: 7,
-            marginLeft: 9,
-            marginRight: 12,
-            marginTop: 8,
-            width: 7,
-            minWidth: 7,
-          };
-    return <PrefixBadge prefixBadge={prefixBadge} style={style} />;
+    return <MessagePrefixBadge prefixBadge={prefixBadge} />;
   }
 
   if (type) {

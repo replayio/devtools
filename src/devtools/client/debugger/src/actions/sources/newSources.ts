@@ -9,11 +9,11 @@
  * @module actions/sources
  */
 
-import { ThreadFront } from "protocol/thread";
 import type { UIThunkAction } from "ui/actions";
 
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
+import { setRequestedBreakpoint } from "../../reducers/breakpoints";
 import type { Context } from "../../reducers/pause";
 import { SourceActor } from "../../reducers/source-actors";
 import type { Source } from "../../reducers/sources";
@@ -30,7 +30,6 @@ import {
 import { ContextError } from "../../utils/context";
 import { getRawSourceURL, isInlineScript } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
-import { selectLocation } from "../sources/select";
 
 import { toggleBlackBox } from "./blackbox";
 import { setBreakableLines } from "./breakableLines";
@@ -78,6 +77,7 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
     const rawPendingUrl = getRawSourceURL(pendingUrl);
 
     if (rawPendingUrl === source.url) {
+      const { selectLocation } = await import("../sources");
       await dispatch(
         selectLocation(cx, {
           column: pendingLocation.column,
@@ -90,7 +90,7 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
 }
 
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     // source may have been modified by selectLocation
     const source = getSource(getState(), sourceId);
     if (!source) {
@@ -109,7 +109,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
 
     for (const bp of pendingBreakpoints) {
       const line = bp.location.line;
-      dispatch({ location: { line, sourceId }, type: "SET_REQUESTED_BREAKPOINT" });
+      dispatch(setRequestedBreakpoint({ line, sourceId }));
     }
 
     // load the source text if there is a pending breakpoint for it
@@ -213,7 +213,7 @@ export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promis
   };
 }
 export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const resultIds: string[] = [];
     const newSourcesObj: Record<string, Source> = {};
     const newSourceActors: SourceActor[] = [];

@@ -1,16 +1,15 @@
 import React, { useState, useEffect, ReactNode, SetStateAction, Dispatch } from "react";
 import hooks from "ui/hooks";
 import ReplayTitle from "./ReplayTitle";
-import classNames from "classnames";
 import Modal from "ui/components/shared/NewModal";
 import { Recording, ExperimentalUserSettings } from "ui/types";
 import LoadingScreen from "../shared/LoadingScreen";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { trackEvent } from "ui/utils/telemetry";
-import Sharing, { MY_LIBRARY } from "./Sharing";
+import { MY_LIBRARY } from "./libraryConstants";
+import Sharing from "./Sharing";
 import { Privacy, ToggleShowPrivacyButton } from "./Privacy";
 import { UploadRecordingTrialEnd } from "./UploadRecordingTrialEnd";
-import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { BubbleViewportWrapper } from "../shared/Viewport";
 import { showDurationWarning } from "ui/utils/recording";
 import ReplayLogo from "../shared/ReplayLogo";
@@ -38,12 +37,12 @@ function DeletedScreen({ url }: { url: string }) {
     <div className="h-full w-full">
       <Modal>
         <div
-          className="relative flex flex-col justify-between space-y-4 overflow-y-auto rounded-md bg-modalBgcolor p-9 text-base shadow-lg items-center"
+          className="relative flex flex-col items-center justify-between space-y-4 overflow-y-auto rounded-md bg-modalBgcolor p-9 text-base shadow-lg"
           style={{ width: "400px" }}
         >
           <ReplayLogo size="sm" />
           <h2 className="text-2xl font-bold ">{`Replay discarded`}</h2>
-          <div className="space-y-2 text-md">
+          <div className="text-md space-y-2">
             <div>{`Hang tight while we load your library...`}</div>
           </div>
         </div>
@@ -142,7 +141,6 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     trackEvent("upload.create_replay", {
       workspaceUuid: decodeWorkspaceId(workspaceId),
     });
-    startUploadWaitTracking();
 
     await initializeRecording({
       variables: { recordingId, title: inputValue, workspaceId },
@@ -191,7 +189,7 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
                   isPublic={isPublic}
                   setIsPublic={setIsPublic}
                 />
-                {isPublic ? (
+                {isPublic && recording.operations ? (
                   <ToggleShowPrivacyButton
                     showPrivacy={showPrivacy}
                     operations={recording.operations}

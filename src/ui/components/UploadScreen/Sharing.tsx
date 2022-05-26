@@ -6,9 +6,7 @@ import { Toggle } from "../shared/Forms";
 import SettingsPreview from "./SettingsPreview";
 import classNames from "classnames";
 import { isPublicDisabled } from "ui/utils/org";
-
-export const MY_LIBRARY = "Your Library";
-export const personalWorkspace = { id: MY_LIBRARY, name: MY_LIBRARY };
+import { MY_LIBRARY } from "./libraryConstants";
 
 type SharingProps = {
   workspaces: Workspace[];

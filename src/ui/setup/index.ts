@@ -14,15 +14,22 @@ import { getUserSettings } from "ui/hooks/settings";
 import { initLaunchDarkly } from "ui/utils/launchdarkly";
 import { maybeSetMixpanelContext } from "ui/utils/mixpanel";
 import { syncInitialLayoutState } from "ui/reducers/layout";
-import { getInitialTabsState } from "devtools/client/debugger/src/reducers/tabs";
-import { getInitialCommentsState } from "ui/reducers/comments";
-import { initialMessageState } from "devtools/client/webconsole/reducers/messages";
+import {
+  FiltersState,
+  MessageState,
+  syncInitialMessageState,
+  defaultFiltersState,
+} from "devtools/client/webconsole/reducers/messages";
 import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
 import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
 import { getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
+import { getLocalReplaySessionPrefs } from "ui/setup/prefs";
+import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
+import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
+import { CommentsState } from "ui/state/comments";
 
 declare global {
   interface Window {
@@ -89,6 +96,49 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     localNags: "localNags" in session ? session.localNags : [],
   };
 }
+
+export const getInitialTabsState = async (): Promise<TabsState> => {
+  const session = await getReplaySession(getRecordingId()!);
+
+  return { tabs: session?.tabs ?? EMPTY_TABS };
+};
+
+export async function getInitialCommentsState(): Promise<CommentsState> {
+  const recordingId = getRecordingId()!;
+
+  if (!recordingId) {
+    return {
+      hoveredComment: null,
+      pendingComment: null,
+    };
+  }
+
+  const session = await getReplaySession(recordingId);
+
+  return {
+    hoveredComment: null,
+    pendingComment: session?.pendingComment || null,
+  };
+}
+
+const getInitialFiltersState = async () => {
+  const session = await getLocalReplaySessionPrefs();
+
+  return session ? { ...defaultFiltersState, ...session.consoleFilters } : defaultFiltersState;
+};
+
+export const initialMessageState = async (
+  overrides: Partial<MessageState> = {}
+): Promise<MessageState> => {
+  // Realistically, we only expect filters and commandHistory
+  // See ui/setup/dynamic/devtools.ts
+  const { filters = {}, ...otherOverrides } = overrides;
+
+  return syncInitialMessageState({
+    ...overrides,
+    filters: { ...(await getInitialFiltersState()), ...filters },
+  });
+};
 
 export async function bootstrapApp() {
   const initialState = {
