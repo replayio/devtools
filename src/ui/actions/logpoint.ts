@@ -14,11 +14,11 @@ import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } fro
 import { pointsReceived } from "ui/reducers/timeline";
 import { ProtocolError } from "ui/state/app";
 
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
+import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
-import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "./thread";
-import { PrimitiveValue } from "./thread/value";
-import { assert, compareNumericStrings } from "./utils";
+import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "protocol/thread";
+import { PrimitiveValue } from "protocol/thread/value";
+import { assert, compareNumericStrings } from "protocol/utils";
 
 const { prefs } = require("ui/utils/prefs");
 

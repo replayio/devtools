@@ -1,7 +1,7 @@
 // Routines for finding framework-specific event listeners within a pause.
 
-import { ValueFront } from "./thread";
-import { NodeFront } from "./thread/node";
+import { ValueFront } from "protocol/thread";
+import { NodeFront } from "protocol/thread/node";
 
 export interface FrameworkEventListener {
   handler: ValueFront;
@@ -10,7 +10,13 @@ export interface FrameworkEventListener {
   tags: string;
 }
 
+const frameworkListenersCache = new WeakMap<NodeFront, FrameworkEventListener[]>();
+
 export async function getFrameworkEventListeners(node: NodeFront) {
+  if (frameworkListenersCache.has(node)) {
+    return frameworkListenersCache.get(node)!;
+  }
+
   const obj = node.getObjectFront();
   await obj.loadProperties();
   const props = [...obj.previewValueMap().entries()];
@@ -21,13 +27,16 @@ export async function getFrameworkEventListeners(node: NodeFront) {
 
   await reactProp[1].loadProperties();
   const handlerProps = [...reactProp[1].previewValueMap().entries()];
-  return handlerProps
+  const resultListeners = handlerProps
     .filter(([, contents]) => {
       return contents.isObject() && contents.className() == "Function";
     })
     .map(([name, contents]) => {
       return { handler: contents, type: name, capture: false, tags: "React" };
     });
+
+  frameworkListenersCache.set(node, resultListeners);
+  return resultListeners;
 }
 
 export function logpointGetFrameworkEventListeners(frameId: string, frameworkListeners: string) {

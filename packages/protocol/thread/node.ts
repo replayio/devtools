@@ -1,7 +1,6 @@
 import { Node as NodeDescription, AppliedRule, BoxModel, Quads } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
-import { FrameworkEventListener, getFrameworkEventListeners } from "../event-listeners";
 import { client } from "../socket";
 import { defer, assert, DisallowEverythingProxyHandler, Deferred } from "../utils";
 
@@ -29,7 +28,6 @@ export class NodeFront {
   private _pause: Pause;
   private _object: WiredObject;
   private _node: NodeDescription;
-  private _frameworkListenersWaiter: Deferred<FrameworkEventListener[]> | null;
   private _quads: BoxModel | null;
 
   private _waiters: {
@@ -48,8 +46,6 @@ export class NodeFront {
     this._object = data;
     this._node = data.preview.node;
 
-    // Additional data that can be loaded for the node.
-    this._frameworkListenersWaiter = null;
     this._waiters = {
       computedStyle: null,
       rules: null,
@@ -256,16 +252,6 @@ export class NodeFront {
     }
 
     return this._waiters.listeners.promise;
-  }
-
-  async getFrameworkEventListeners() {
-    if (this._frameworkListenersWaiter) {
-      return this._frameworkListenersWaiter.promise;
-    }
-    this._frameworkListenersWaiter = defer<FrameworkEventListener[]>();
-    const listeners = await getFrameworkEventListeners(this);
-    this._frameworkListenersWaiter.resolve(listeners);
-    return listeners;
   }
 
   async getAppliedRules() {

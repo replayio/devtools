@@ -3,12 +3,12 @@
 import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@replayio/protocol";
 import { assert } from "protocol/utils";
 
-import analysisManager, { AnalysisHandler, AnalysisParams } from "./analysisManager";
-import { comparePoints, pointPrecedes } from "./execution-point-utils";
+import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
+import { comparePoints, pointPrecedes } from "protocol/execution-point-utils";
 import { Helpers } from "./logpoint";
-import { client } from "./socket";
-import { Pause, ThreadFront, ValueFront } from "./thread";
-import { WiredMessage } from "./thread/thread";
+import { client } from "protocol/socket";
+import { Pause, ThreadFront, ValueFront } from "protocol/thread";
+import { WiredMessage } from "protocol/thread/thread";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {

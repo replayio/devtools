@@ -9,8 +9,8 @@ import {
   prepareMessage,
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
-import { TestMessageHandlers } from "protocol/find-tests";
-import { LogpointHandlers } from "protocol/logpoint";
+import { TestMessageHandlers } from "ui/actions/find-tests";
+import { LogpointHandlers } from "ui/actions/logpoint";
 import { client } from "protocol/socket";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
 import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
