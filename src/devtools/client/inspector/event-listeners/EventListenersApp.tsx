@@ -1,4 +1,4 @@
-import { FrameworkEventListener } from "protocol/event-listeners";
+import { FrameworkEventListener, getFrameworkEventListeners } from "ui/actions/event-listeners";
 import { NodeFront, WiredEventListener } from "protocol/thread/node";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ExpandableItem } from "./ExpandableItem";
@@ -24,7 +24,7 @@ export const EventListenersApp: FC = () => {
       }
 
       const listeners = (await node.getEventListeners()) ?? [];
-      const fwListeners = await node.getFrameworkEventListeners();
+      const fwListeners = await getFrameworkEventListeners(node);
       setListeners([...listeners, ...fwListeners]);
     };
 

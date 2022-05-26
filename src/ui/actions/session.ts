@@ -1,6 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@replayio/protocol";
-import { findAutomatedTests } from "protocol/find-tests";
+import { findAutomatedTests } from "ui/actions/find-tests";
 import { videoReady } from "protocol/graphics";
 import {
   CommandRequest,

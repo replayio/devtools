@@ -16,7 +16,7 @@ import {
   setEventLogpoints,
   setExceptionLogpoint,
   removeLogpoint,
-} from "protocol/logpoint";
+} from "ui/actions/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 import { WiredNamedValue } from "protocol/thread/pause";
 import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";

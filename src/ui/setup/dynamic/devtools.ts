@@ -17,7 +17,7 @@ import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { LocalizationHelper } from "devtools/shared/l10n";
 import { setupGraphics } from "protocol/graphics";
-import { setupLogpoints } from "protocol/logpoint";
+import { setupLogpoints } from "ui/actions/logpoint";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
