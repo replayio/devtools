@@ -22,6 +22,8 @@ import { assert, compareNumericStrings } from "./utils";
 
 const { prefs } = require("ui/utils/prefs");
 
+// TODO [bvaughn] protocol – Remove external package imports
+
 // Hooks for adding messages to the console.
 export const LogpointHandlers: {
   onResult?: (

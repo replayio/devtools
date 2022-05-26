@@ -17,6 +17,8 @@ const MINIMUM_VIDEO_CONTENT = 5000;
 
 const { features } = require("ui/utils/prefs");
 
+// TODO [bvaughn] protocol – Remove external package imports
+
 declare global {
   interface Window {
     // we expose this for use in testing
