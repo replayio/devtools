@@ -1,6 +1,14 @@
-import * as Sentry from "@sentry/browser";
-// TODO [bvaughn] protocol
-import { isDevelopment } from "shared/utils/environment";
+type ErrorHandler = (error: Error) => void;
+
+let errorHandler: ErrorHandler = (error: Error) => {
+  throw error;
+};
+
+// By default, this package throw Errors.
+// You can override that behavior with this method (e.g. to log errors to Sentry).
+export function setErrorHandler(customErrorHandler: ErrorHandler) {
+  errorHandler = customErrorHandler;
+}
 
 export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   return (...args: any[]) => {
@@ -49,14 +57,10 @@ export function clamp(value: number, min: number, max: number) {
   return Math.max(min, Math.min(max, value));
 }
 
-export function assert(condition: any, msg = "Assertion failed!"): asserts condition {
+export function assert(condition: any, message = "Assertion failed!"): asserts condition {
   if (!condition) {
-    console.error(msg);
-    if (isDevelopment()) {
-      throw new Error(msg);
-    } else {
-      Sentry.captureException(new Error(msg));
-    }
+    console.error(message);
+    errorHandler(new Error(message));
   }
 }
 

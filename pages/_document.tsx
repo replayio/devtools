@@ -1,6 +1,15 @@
-import React from "react";
+import * as Sentry from "@sentry/browser";
 import crypto from "crypto";
 import Document, { Html, Head, Main, NextScript } from "next/document";
+import { setErrorHandler } from "protocol/utils";
+import React from "react";
+import { isDevelopment } from "ui/utils/environment";
+
+if (!isDevelopment()) {
+  setErrorHandler((error: Error) => {
+    Sentry.captureException(error);
+  });
+}
 
 const cspHashOf = (text: string) => {
   const hash = crypto.createHash("sha256");

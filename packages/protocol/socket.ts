@@ -8,7 +8,7 @@ import {
   CommandParams,
   CommandResult,
 } from "@replayio/protocol";
-import { isMock, mockEnvironment, waitForMockEnvironment } from "shared/utils/environment";
+import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 
 import { makeInfallible } from "./utils";
 
