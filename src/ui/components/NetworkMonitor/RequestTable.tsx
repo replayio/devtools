@@ -88,7 +88,7 @@ const RequestTable = ({
         {...getTableProps()}
       >
         <HeaderGroups columns={columns} headerGroups={headerGroups} />
-        <div className="w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
+        <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;
             if (inPast && row.original.point.time >= currentTime) {
