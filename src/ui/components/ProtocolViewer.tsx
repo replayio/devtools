@@ -167,6 +167,7 @@ function ProtocolRequestDetail({
             )}
           </span>
           <small className={styles.DetailPanelHeaderSecondary}>
+            {response ? `(${formatDuration(response.recordedAt - request.recordedAt)}) ` : ""}
             {formatTimestamp(request.recordedAt)}
           </small>
         </>
