@@ -8,7 +8,6 @@ import {
   CommandParams,
   CommandResult,
 } from "@replayio/protocol";
-import { isMock, mockEnvironment, waitForMockEnvironment } from "ui/utils/environment";
 
 import { makeInfallible } from "./utils";
 
@@ -22,8 +21,28 @@ export interface Request<T extends CommandMethods> {
 
 export type CommandRequest = Request<CommandMethods>;
 
+type SendMessageMethod = (message: string) => void;
+
+let customSocketSendMessageForTesting: SendMessageMethod | null = null;
 let socket: WebSocket;
 let gSocketOpen = false;
+
+type customSocketSendMessageForTestingResponse = {
+  flushQueuedMessages: () => void;
+  responseDataHandler: (data: string) => void;
+};
+
+// Enables test code to mock out the WebSocket used to send protocol messages.
+export function injectCustomSocketSendMessageForTesting(
+  sendMessage: SendMessageMethod
+): customSocketSendMessageForTestingResponse {
+  customSocketSendMessageForTesting = sendMessage;
+
+  return {
+    flushQueuedMessages,
+    responseDataHandler: socketDataHandler,
+  };
+}
 
 let gPendingMessages: Request<CommandMethods>[] = [];
 let gNextMessageId = 1;
@@ -101,15 +120,12 @@ export async function createSession(
 }
 
 export function initSocket(address: string) {
-  if (isMock()) {
-    waitForMockEnvironment().then(env => {
-      env!.setOnSocketMessage(onSocketMessage as any);
-      onSocketOpen();
-    });
+  if (customSocketSendMessageForTesting !== null) {
+    // Test environment; a custom WebSocket is being used.
     return;
   }
 
-  const onopen = makeInfallible(onSocketOpen);
+  const onopen = makeInfallible(flushQueuedMessages);
 
   const onclose = makeInfallible(() => {
     gSocketOpen = false;
@@ -120,23 +136,23 @@ export function initSocket(address: string) {
     gSessionCallbacks?.onSocketError(evt, false, lastReceivedMessageTime)
   );
 
-  const oninitialerror = makeInfallible((evt: Event) =>
+  const onInitialError = makeInfallible((evt: Event) =>
     gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime)
   );
 
-  const onmessage = makeInfallible(onSocketMessage);
+  const onmessage = makeInfallible(socketDataHandler);
 
   const handleOpen = () => {
     socket.onerror = onerror;
     socket.onclose = onclose;
-    socket.onmessage = onmessage;
+    socket.onmessage = event => onmessage(event.data);
     onopen();
   };
   const handleOpenError = () => {
     // If the first attempt fails, try one more time.
     socket = new WebSocket(address);
     socket.onopen = handleOpen;
-    socket.onerror = oninitialerror;
+    socket.onerror = onInitialError;
   };
 
   // First attempt at opening socket.
@@ -183,20 +199,21 @@ export function sendMessage<M extends CommandMethods>(
   );
 }
 
-const doSend = makeInfallible(msg => {
-  window.performance?.mark(`${msg.method}_start`);
-  const str = JSON.stringify(msg);
-  gSentBytes += str.length;
+const doSend = makeInfallible(message => {
+  window.performance?.mark(`${message.method}_start`);
+  const stringified = JSON.stringify(message);
+  gSentBytes += stringified.length;
 
-  gSessionCallbacks?.onRequest(msg);
-  if (isMock()) {
-    mockEnvironment().sendSocketMessage(str);
+  gSessionCallbacks?.onRequest(message);
+
+  if (customSocketSendMessageForTesting !== null) {
+    customSocketSendMessageForTesting(stringified);
   } else {
-    socket.send(str);
+    socket.send(stringified);
   }
 });
 
-function onSocketOpen() {
+function flushQueuedMessages() {
   gPendingMessages.forEach(msg => doSend(msg));
   gPendingMessages.length = 0;
   gSocketOpen = true;
@@ -224,10 +241,10 @@ export const client = new ProtocolClient({
   sendCommand: sendMessage,
 });
 
-function onSocketMessage(evt: MessageEvent<any>) {
+function socketDataHandler(data: string) {
   lastReceivedMessageTime = Date.now();
-  gReceivedBytes += evt.data.length;
-  const msg = JSON.parse(evt.data);
+  gReceivedBytes += data.length;
+  const msg = JSON.parse(data);
 
   if (msg.id) {
     const { method, resolve } = gMessageWaiters.get(msg.id)!;

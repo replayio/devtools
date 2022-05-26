@@ -1,7 +1,7 @@
 import React, { ReactNode, useState, useEffect } from "react";
 import { ApolloProvider, from } from "@apollo/client";
 import { MockedProvider, MockedResponse } from "@apollo/client/testing";
-import { isTest, isMock, waitForMockEnvironment } from "ui/utils/environment";
+import { getGraphqlMocksForTesting, isTest, isMock } from "ui/utils/environment";
 import useToken from "ui/utils/useToken";
 import { PopupBlockedError } from "ui/components/shared/Error";
 import {
@@ -25,12 +25,13 @@ export function ApolloWrapper({
   const [mocks, setMocks] = useState<MockedResponse<Record<string, any>>[]>();
 
   useEffect(() => {
-    async function waitForMocks() {
-      const mockEnvironment = await waitForMockEnvironment();
-      setMocks(mockEnvironment!.graphqlMocks);
+    async function waitForGraphqlMocks() {
+      const graphqlMocks = await getGraphqlMocksForTesting();
+      setMocks(graphqlMocks);
     }
+
     if (isMock()) {
-      waitForMocks();
+      waitForGraphqlMocks();
     }
   }, []);
 

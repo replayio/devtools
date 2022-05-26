@@ -1,7 +1,10 @@
-import React, { useRef } from "react";
 import { Editor } from "codemirror";
+import React, { useRef } from "react";
+
 import useAutocomplete from "./useAutocomplete";
+
 import { isTest } from "ui/utils/environment";
+
 import AutocompleteMatches, { AutocompleteMatchesOptions } from "./AutocompleteMatches";
 import ControlledCodeMirror, { ControlledCodeMirrorOptions } from "./ControlledCodeMirror";
 import { getCursorIndex, getRemainingCompletedTextAfterCursor } from "ui/utils/autocomplete";
@@ -121,7 +124,7 @@ export function EditorWithAutocomplete({
 
   if (disableAutocomplete) {
     return (
-      <div className="flex items-center relative w-full">
+      <div className="relative flex w-full items-center">
         <ControlledCodeMirror
           onKeyPress={onKeyPress}
           value={value}
@@ -134,7 +137,7 @@ export function EditorWithAutocomplete({
   }
 
   return (
-    <div className="flex items-center relative w-full" ref={containerNode}>
+    <div className="relative flex w-full items-center" ref={containerNode}>
       <ControlledCodeMirror
         onKeyPress={onKeyPress}
         value={value}

@@ -40,7 +40,6 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
-import { FocusRegion } from "ui/state/timeline";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import { client, log, addEventListener } from "../socket";
@@ -518,12 +517,12 @@ class _ThreadFront {
   async getHitCounts(
     sourceId: SourceId,
     locations: SameLineSourceLocations[],
-    focusRegion: FocusRegion | null
+    range: { startPoint: ExecutionPoint; endPoint: ExecutionPoint } | null
   ) {
     assert(this.sessionId, "no sessionId");
     let params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
-    if (focusRegion) {
-      params.range = { begin: focusRegion.start.point, end: focusRegion.end.point };
+    if (range !== null) {
+      params.range = { begin: range.startPoint, end: range.endPoint };
     }
     return client.Debugger.getHitCounts(params, this.sessionId);
   }

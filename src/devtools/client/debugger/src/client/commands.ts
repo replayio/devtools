@@ -420,7 +420,16 @@ async function getSourceActorBreakpointHitCounts(
   return {
     max: upperBound,
     min: lowerBound,
-    ...(await ThreadFront.getHitCounts(id, locationsToFetch, focusRegion).catch(onFailure)),
+    ...(await ThreadFront.getHitCounts(
+      id,
+      locationsToFetch,
+      focusRegion
+        ? {
+            startPoint: focusRegion.start.point,
+            endPoint: focusRegion.end.point,
+          }
+        : null
+    ).catch(onFailure)),
   };
 }
 

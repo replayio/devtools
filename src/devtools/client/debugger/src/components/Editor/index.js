@@ -4,15 +4,16 @@
 
 //
 
+import debounce from "lodash/debounce";
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
-import { bindActionCreators } from "redux";
 import ReactDOM from "react-dom";
+import { bindActionCreators } from "redux";
+import { isFirefox } from "ui/utils/environment";
+
 import { connect } from "../../utils/connect";
 import classnames from "classnames";
-import debounce from "lodash/debounce";
 
-import { isFirefox } from "ui/utils/environment";
 import { getIndentation } from "../../utils/indentation";
 
 import actions from "../../actions";

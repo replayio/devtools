@@ -1,9 +1,10 @@
-import React, { FC } from "react";
+import classNames from "classnames";
 import { Declarations } from "devtools/client/inspector/rules/components/Declarations";
-import { RuleState } from "../state/rules";
 import Selector from "devtools/client/inspector/rules/components/Selector";
 import { SourceLink } from "devtools/client/inspector/rules/components/SourceLink";
-import classNames from "classnames";
+import React, { FC } from "react";
+
+import { RuleState } from "../state/rules";
 
 type RuleProps = {
   showSelectorEditor: Function;

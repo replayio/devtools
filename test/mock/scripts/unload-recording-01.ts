@@ -2,7 +2,7 @@
 
 import { runTest, devtoolsURL } from "../src/runTest";
 import { waitUntil } from "../../../src/test/harness";
-import { installMockEnvironment, MockHandlerHelpers } from "../src/mockEnvironment";
+import { installMockEnvironmentInPage, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
   createRecordingOwnerUserIdMock,
@@ -62,7 +62,7 @@ const messageHandlers = {
 
 runTest("unloadRecording", async (page: Page) => {
   await page.goto(devtoolsURL({ id: recordingId }));
-  await installMockEnvironment(page, { graphqlMocks, messageHandlers, bindings });
+  await installMockEnvironmentInPage(page, { graphqlMocks, messageHandlers, bindings });
   await page.click("text=Devtools");
   await waitUntil(async () => {
     const bar = await page.$(".progress-bar");

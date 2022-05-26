@@ -1,8 +1,8 @@
 import React, { ReactNode, useEffect, createContext } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { isTest } from "ui/utils/environment";
 import { actions } from "ui/actions";
 import { ModalType } from "ui/state/app";
-import { isTest } from "ui/utils/environment";
 import useAuth0 from "ui/utils/useAuth0";
 
 import AppErrors from "./shared/Error";

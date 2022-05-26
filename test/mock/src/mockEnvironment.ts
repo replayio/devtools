@@ -2,11 +2,11 @@
 
 import { MockedResponse } from "@apollo/client/testing";
 import { Page } from "@recordreplay/playwright";
-import type { MockEnvironment } from "ui/utils/environment";
+import { configureMockEnvironmentForTesting, MockEnvironment } from "ui/utils/environment";
 
 declare global {
   interface Window {
-    mockEnvironment?: MockEnvironment;
+    __mockEnvironmentForTesting?: MockEnvironment;
   }
 }
 
@@ -36,8 +36,11 @@ export interface Error {
   message: string;
 }
 
-// This script runs within the browser process.
-export function doInstall(options: MockOptionsJSON) {
+// During e2e tests, this script runs within the browser process alongside of the Replay devtools app.
+//
+// WARNING: This function may be EVAL'ed.
+// It cannot reference any external modules because they may be undefined and throw.
+function installHelperUnsafeEval(options: MockOptionsJSON) {
   function setImmediate(callback: () => void) {
     setTimeout(callback, 0);
   }
@@ -59,7 +62,7 @@ export function doInstall(options: MockOptionsJSON) {
     emitEvent(method: string, params: any) {
       setImmediate(() => {
         const event = { method, params };
-        receiveMessageCallback({ data: JSON.stringify(event) });
+        receiveDataCallback(JSON.stringify(event));
       });
     },
     bindings: options.bindings,
@@ -75,12 +78,12 @@ export function doInstall(options: MockOptionsJSON) {
     eval(`messageHandlers["${name}"] = ${options.messageHandlers[name]};`); // nosemgrep
   }
 
-  let receiveMessageCallback: (arg: { data: string }) => unknown;
+  let receiveDataCallback: (data: string) => unknown;
 
-  window.mockEnvironment = {
+  const mockEnvironment = {
     graphqlMocks: options.graphqlMocks,
-    setOnSocketMessage(callback: (arg: { data: string }) => unknown) {
-      receiveMessageCallback = callback;
+    setSocketDataHandler(callback: (data: string) => unknown) {
+      receiveDataCallback = callback;
     },
     sendSocketMessage(str: string) {
       const msg = JSON.parse(str);
@@ -101,7 +104,7 @@ export function doInstall(options: MockOptionsJSON) {
       promise.then(
         result => {
           const response = { id: msg.id, result };
-          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+          setImmediate(() => receiveDataCallback(JSON.stringify(response)));
         },
         e => {
           let error;
@@ -112,14 +115,27 @@ export function doInstall(options: MockOptionsJSON) {
             error = helpers.Errors.InternalError;
           }
           const response = { id: msg.id, error };
-          setImmediate(() => receiveMessageCallback({ data: JSON.stringify(response) }));
+          setImmediate(() => receiveDataCallback(JSON.stringify(response)));
         }
       );
     },
   };
+
+  // Expose mock environment to Replay devtools app.
+  window.__mockEnvironmentForTesting = mockEnvironment;
 }
 
-export async function installMockEnvironment(page: Page, options: MockOptions) {
+// Install and configure the mock environment for unit tests.
+// This method installs the mock environment into the current browser/global.
+export function installMockEnvironment(options: MockOptionsJSON) {
+  installHelperUnsafeEval(options);
+  configureMockEnvironmentForTesting();
+}
+
+// Install the mock environment for end to end tests.
+// This method installs the mock environment in the browser page that's running the Replay devtools UI.
+// Application code running in the page is responsible for configuring the protocol Websocket.
+export async function installMockEnvironmentInPage(page: Page, options: MockOptions) {
   const optionsJSON: MockOptionsJSON = {
     graphqlMocks: options.graphqlMocks,
     messageHandlers: {},
@@ -129,7 +145,7 @@ export async function installMockEnvironment(page: Page, options: MockOptions) {
     optionsJSON.messageHandlers[name] = options.messageHandlers[name].toString();
   }
   try {
-    await page.evaluate<void, MockOptionsJSON>(doInstall, optionsJSON);
+    await page.evaluate<void, MockOptionsJSON>(installHelperUnsafeEval, optionsJSON);
   } catch (e) {
     console.log("ERROR", e);
   }

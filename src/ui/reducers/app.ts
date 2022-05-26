@@ -2,6 +2,7 @@ import { Location, PointDescription } from "@replayio/protocol";
 import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
+import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
@@ -24,7 +25,6 @@ import {
 import { PanelName } from "ui/state/layout";
 import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
-import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import { filterToFocusRegion, isPointInRegions, isTimeInRegions, overlap } from "ui/utils/timeline";

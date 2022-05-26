@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
 import React, { useEffect, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
+import { isTest } from "ui/utils/environment";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
 import { getAccessibleRecording } from "ui/actions/session";
@@ -16,7 +17,6 @@ import {
 } from "ui/hooks/recordings";
 import setup from "ui/setup/dynamic/devtools";
 import { Recording as RecordingInfo } from "ui/types";
-import { isTest } from "ui/utils/environment";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";

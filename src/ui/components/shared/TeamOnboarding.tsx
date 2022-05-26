@@ -1,5 +1,6 @@
 import React, { ChangeEvent, Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { removeUrlParameters } from "ui/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
@@ -19,7 +20,7 @@ import {
 import InvitationLink from "./NewWorkspaceModal/InvitationLink";
 import { WorkspaceMembers } from "./WorkspaceSettingsModal/WorkspaceSettingsModal";
 import { trackEvent } from "ui/utils/telemetry";
-import { removeUrlParameters } from "ui/utils/environment";
+
 import { DownloadPage } from "./Onboarding/DownloadPage";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { useRouter } from "next/router";

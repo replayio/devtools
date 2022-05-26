@@ -1,8 +1,9 @@
 import React, { ReactNode } from "react";
+import { getDisplayedUrl } from "ui/utils/environment";
 import hooks from "ui/hooks";
 import { OperationsData } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
-import { getDisplayedUrl } from "ui/utils/environment";
+
 import { AvatarImage } from "../Avatar";
 import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";

@@ -21,7 +21,7 @@ const {
   VIEW_NODE_FONT_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
 const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overlay");
-const { ELEMENT_STYLE } = require("devtools/client/inspector/rules/constants");
+import { ELEMENT_STYLE } from "shared/constants";
 
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 

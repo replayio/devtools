@@ -2,13 +2,13 @@ import { RecordingId } from "@replayio/protocol";
 
 import BatchActionDropdown from "./BatchActionDropdown";
 
-import { isReplayBrowser } from "ui/utils/environment";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
 import ViewerHeader, { ViewerHeaderLeft } from "./ViewerHeader";
 
 import sortBy from "lodash/sortBy";
 import React, { useState, useMemo, useContext } from "react";
 import { useSelector } from "react-redux";
+import { isReplayBrowser } from "ui/utils/environment";
 import { getWorkspaceId } from "ui/reducers/app";
 import { Recording } from "ui/types";
 

@@ -4,6 +4,7 @@
 module.exports = {
   collectCoverageFrom: [
     "packages/protocol/**/*.{js,jsx,ts,tsx}",
+    "packages/shared/**/*.{js,jsx,ts,tsx}",
     "src/**/*.{js,jsx,ts,tsx}",
     "!**/*.d.ts",
     "!**/node_modules/**",
@@ -14,6 +15,7 @@ module.exports = {
     "^devtools/(.*)": "<rootDir>/src/devtools/$1",
     "^highlighter/(.*)": "<rootDir>/src/highlighter/$1",
     "^protocol/(.*)": "<rootDir>/packages/protocol/$1",
+    "^shared/(.*)": "<rootDir>/packages/shared/$1",
     "^shims/(.*)": "<rootDir>/src/shims/$1",
     "^toolkit/(.*)": "<rootDir>/src/toolkit/$1",
     "^test/(.*)": "<rootDir>/src/test/$1",
