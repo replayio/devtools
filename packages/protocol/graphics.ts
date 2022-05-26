@@ -17,7 +17,11 @@ const MINIMUM_VIDEO_CONTENT = 5000;
 
 const { features } = require("ui/utils/prefs");
 
-// TODO [bvaughn] protocol – Remove external package imports
+// Temporary experimental feature flag
+let syncVideoPlaybackExperimentalFlag: boolean = false;
+export function setSyncVideoPlaybackExperimentalFlag(value: boolean): void {
+  syncVideoPlaybackExperimentalFlag = value;
+}
 
 declare global {
   interface Window {
@@ -213,7 +217,7 @@ class VideoPlayer {
       this.commands &&
       this.commands.then(async () => {
         const video = getVideoNode();
-        if (features.videoPlayback && video) {
+        if (syncVideoPlaybackExperimentalFlag && video) {
           video.pause();
           video.currentTime = timeMs / 1000;
         }
@@ -226,7 +230,7 @@ class VideoPlayer {
       this.commands.then(() => {
         const video = getVideoNode();
         const currentTime = this.store?.getState().timeline.currentTime;
-        if (features.videoPlayback && video) {
+        if (syncVideoPlaybackExperimentalFlag && video) {
           video.currentTime = (currentTime || 0) / 1000;
           return video.play();
         }
@@ -270,7 +274,7 @@ export function setupGraphics(store: UIStore) {
       setHasAllPaintPoints(true);
     }
 
-    if (features.videoPlayback) {
+    if (syncVideoPlaybackExperimentalFlag) {
       client.Graphics.getPlaybackVideo({}, sessionId);
       client.Graphics.addPlaybackVideoFragmentListener(param => Video.append(param.fragment));
     }
@@ -420,7 +424,7 @@ export async function getGraphicsAtTime(
   }
 
   const screenPromise = forPlayback
-    ? features.videoPlayback
+    ? syncVideoPlaybackExperimentalFlag
       ? Promise.resolve(undefined)
       : screenshotCache.getScreenshotForPlayback(point, paintHash)
     : screenshotCache.getScreenshotForPreview(point, paintHash);
@@ -470,7 +474,7 @@ export function paintGraphics(
   playing?: boolean
 ) {
   window.currentScreenshotHash = screenShot?.hash;
-  if (!screenShot || (playing && features.videoPlayback)) {
+  if (!screenShot || (playing && syncVideoPlaybackExperimentalFlag)) {
     clearGraphics();
   } else {
     assert(screenShot.data, "no screenshot data");

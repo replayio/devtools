@@ -5,7 +5,8 @@ import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
-import { setRepaintAfterEvaluations } from "protocol/thread/thread";
+import { setSyncVideoPlaybackExperimentalFlag } from "protocol/graphics";
+import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { Store } from "redux";
@@ -138,7 +139,10 @@ if (isMock()) {
 
 // Expose app feature flags to the protocol through an app-agnostic API.
 if (features.repaintEvaluations) {
-  setRepaintAfterEvaluations(true);
+  setRepaintAfterEvaluationsExperimentalFlag(true);
+}
+if (features.videoPlayback) {
+  setSyncVideoPlaybackExperimentalFlag(true);
 }
 
 interface AuthProps {
