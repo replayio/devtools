@@ -105,10 +105,7 @@ function _DevTools({
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const { trackLoadingIdleTime } = useTrackLoadingIdleTime(
-    uploadComplete ? "warm" : "cold",
-    recording
-  );
+  const { trackLoadingIdleTime } = useTrackLoadingIdleTime(uploadComplete, recording);
   const { userIsAuthor, loading } = useUserIsAuthor();
   const isExternalRecording = useMemo(
     () => recording?.user && !recording.user.internal,
