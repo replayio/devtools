@@ -88,11 +88,20 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.pause.frameScopes = OMITTED;
     }
 
+    if (draft.protocolMessages) {
+      draft.protocolMessages = OMITTED;
+    }
+
     if (draft.messages?.messages) {
       // This may contain nested `ValueFront` objects, which cause lots of
       // "Not Allowed" messages when serialized.
       // TODO Make this more precise later
       draft.messages.messages = OMITTED;
+    }
+
+    // Same problem :(
+    if (draft.analyses) {
+      draft.analyses = OMITTED;
     }
   });
 
@@ -100,7 +109,7 @@ const sanitizeStateForDevtools = <S>(state: S) => {
 };
 
 const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
-  // Actions may contain `ValueFront` objects
+  // Actions may contain `ValueFront` objectsaction);
   const sanitizedAction = customImmer.produce(action, draft => {
     return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
   });
@@ -155,6 +164,11 @@ export function bootstrapStore(initialState: Partial<UIState>) {
         : {
             stateSanitizer: sanitizeStateForDevtools,
             actionSanitizer: sanitizeActionForDevTools,
+            predicate: (state, action) => {
+              // There's a ton of these, and what we want to see
+              // is the Protocol Viewer UI, not these actions themselves
+              return !action.type.startsWith("protocolMessages");
+            },
           },
   });
 

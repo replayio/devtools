@@ -18,12 +18,20 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analy
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "protocol/thread";
 import { PrimitiveValue } from "protocol/thread/value";
+import { createAnalysis, Analysis, AnalysisError } from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
-
 import { prefs } from "ui/utils/prefs";
+import {
+  analysisCreated,
+  analysisErrored,
+  analysisPointsReceived,
+  analysisPointsRequested,
+  analysisResultsReceived,
+  analysisResultsRequested,
+} from "ui/reducers/analyses";
 
-// TODO Replace this with some kind of a typesafe event emitter
-// Hooks for adding messages to the console.
+// TODO Ideally this file shouldn't know about a Redux store at all.
+// Currently, it dispatches actions and reads state once.
 export const LogpointHandlers: {
   onResult?: (
     logGroupId: string,
@@ -233,6 +241,9 @@ export async function setLogpoint(
   setMultiSourceLogpoint(logGroupId, locations, text, condition);
 }
 
+// This should really be a thunk that creates a Breakpoint in the breakpoints
+// slice, and an accompanying analysis in the analysis slice, and those two can
+// watch *each other* to be informed of actions they might need to take.
 async function setMultiSourceLogpoint(
   logGroupId: string,
   locations: Location[],
@@ -264,6 +275,99 @@ async function setMultiSourceLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
+
+  let analysis: Analysis;
+  try {
+    analysis = await createAnalysis(params);
+    const { analysisId } = analysis;
+
+    store.dispatch(analysisCreated(analysisId));
+
+    await Promise.all(locations.map(location => analysis.addLocation(location)));
+
+    store.dispatch(analysisPointsRequested(analysisId));
+    const { points, error } = await analysis.findPoints();
+
+    let analysisResults: AnalysisEntry[] = [];
+
+    // The analysis points may have arrived in any order, so we have to sort
+    // them after they arrive.
+    points.sort((a, b) => compareNumericStrings(a.point, b.point));
+
+    if (error || points.length > 200) {
+      store.dispatch(
+        analysisErrored({
+          analysisId,
+          error: AnalysisError.TooManyPointsToFind,
+          points,
+        })
+      );
+
+      // TODO Remove this and change Redux logic to match
+      saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+
+      return;
+    }
+
+    store.dispatch(
+      analysisPointsReceived({
+        analysisId,
+        points,
+      })
+    );
+
+    if (!condition) {
+      if (primitiveFronts) {
+        showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+      } else {
+        showLogpointsLoading(logGroupId, points);
+      }
+    }
+
+    const shouldGetResults = condition || !primitives;
+
+    if (shouldGetResults) {
+      store.dispatch(analysisResultsRequested(analysisId));
+
+      const { results, error: runError } = await analysis.runAnalysis();
+
+      analysisResults = results;
+
+      if (runError) {
+        store.dispatch(
+          analysisErrored({
+            analysisId,
+            error: AnalysisError.TooManyPointsToRun,
+            results,
+          })
+        );
+
+        // TODO Remove this and change Redux logic to match
+        saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+        return;
+      }
+
+      store.dispatch(
+        analysisResultsReceived({
+          analysisId,
+          results,
+        })
+      );
+
+      showLogpointsResult(logGroupId, results);
+    }
+
+    // TODO Remove this and redo Redux logic
+    saveLogpointHits(points, analysisResults, locations, condition);
+
+    // MAYBE
+    // Rather than running *this* analysis, create a *new* analysis which only has
+    // the found points which fall *inside* of our current focusRegion, and run *that*.
+  } finally {
+    await analysis!.releaseAnalysis();
+  }
+
+  /*
   const points: PointDescription[] = [];
   const results: AnalysisEntry[] = [];
   const handler: AnalysisHandler<void> = {};
@@ -303,6 +407,7 @@ async function setMultiSourceLogpoint(
   points.sort((a, b) => compareNumericStrings(a.point, b.point));
 
   saveLogpointHits(points, results, locations, condition);
+  */
 }
 
 function primitiveValues(text: string) {
