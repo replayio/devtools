@@ -117,10 +117,10 @@ declare global {
   }
 }
 
-// Experimental feature
-let repaintAfterEvaluations: boolean = false;
-export function setRepaintAfterEvaluations(value: boolean): void {
-  repaintAfterEvaluations = value;
+// Temporary experimental feature flag
+let repaintAfterEvaluationsExperimentalFlag: boolean = false;
+export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void {
+  repaintAfterEvaluationsExperimentalFlag = value;
 }
 
 class _ThreadFront {
@@ -715,7 +715,7 @@ class _ThreadFront {
       rv.exception = new ValueFront(pause, rv.exception);
     }
 
-    if (repaintAfterEvaluations) {
+    if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
       repaint(true);
     }
