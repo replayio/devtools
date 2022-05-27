@@ -29,8 +29,6 @@ function MyLibrary() {
   const { recordings, loading } = hooks.useGetPersonalRecordings(filter);
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
-  console.log({ loading, recordings });
-
   if (loading || nonPendingLoading || recordings == null) {
     return <ViewerLoader />;
   }
