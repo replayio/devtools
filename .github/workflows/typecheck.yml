@@ -13,7 +13,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: "npm"
       - name: Install Deps
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
       - name: Run tsc
         run: npm run typecheck
   gql:
@@ -27,7 +27,7 @@ jobs:
           node-version-file: '.nvmrc'
           cache: "npm"
       - name: Install Deps
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
       - name: Fetch GraphQL schema
         run: npm run gql:schema
         env:

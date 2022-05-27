@@ -14,6 +14,6 @@ jobs:
           node-version-file: '.nvmrc'
           cache: "npm"
       - name: Install Deps
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1.0.1

@@ -13,6 +13,6 @@ jobs:
           node-version-file: '.nvmrc'
           cache: "npm"
       - name: Install Deps
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit
       - name: Build Storybook
         run: npm run build-storybook
