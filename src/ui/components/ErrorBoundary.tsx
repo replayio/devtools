@@ -22,7 +22,7 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
       return dispatch(setUnexpectedError(ReplayUpdatedError, true));
     }
 
-    if (isDevelopment()) {
+    if (error.name === "CommandError" || isDevelopment()) {
       return;
     }
 
