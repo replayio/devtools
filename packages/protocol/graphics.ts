@@ -2,11 +2,6 @@
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
 import { decode } from "base64-arraybuffer";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import { UIStore, UIThunkAction } from "ui/actions";
-import { setCanvas, setEventsForType, setVideoUrl } from "ui/reducers/app";
-import { pointsReceived, setPlaybackPrecachedTime, setPlaybackStalled } from "ui/reducers/timeline";
-import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
-import { Canvas } from "ui/state/app";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
@@ -14,8 +9,6 @@ import { assert, binarySearch, defer, Deferred } from "./utils";
 import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
-
-const { features } = require("ui/utils/prefs");
 
 // Temporary experimental feature flag
 let syncVideoPlaybackExperimentalFlag: boolean = false;
@@ -31,6 +24,7 @@ declare global {
 }
 
 export const screenshotCache = new ScreenshotCache();
+
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
 interface Timed {
@@ -39,7 +33,7 @@ interface Timed {
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
-function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
+export function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
   if (!array.length || time < array[0].time) {
     return undefined;
   }
@@ -130,8 +124,11 @@ export const videoReady: Deferred<void> = defer();
 
 const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
 
-function onPaints(paints: PaintPoint[], store: UIStore) {
-  store.dispatch(pointsReceived(paints));
+function onPaints(paints: PaintPoint[]) {
+  if (typeof onPointsReceived === "function") {
+    onPointsReceived(paints);
+  }
+
   paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
@@ -164,8 +161,11 @@ function onPaints(paints: PaintPoint[], store: UIStore) {
   });
 }
 
-function onMouseEvents(events: MouseEvent[], store: UIStore) {
-  store.dispatch(pointsReceived(events));
+function onMouseEvents(events: MouseEvent[]) {
+  if (typeof onPointsReceived === "function") {
+    onPointsReceived(events);
+  }
+
   events.forEach(entry => {
     insertEntrySorted(gMouseEvents, entry);
     if (entry.kind == "mousedown") {
@@ -173,34 +173,31 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
     }
   });
 
-  store.dispatch(setEventsForType({ events: [...gMouseClickEvents], eventType: "mousedown" }));
+  if (typeof onMouseDownEvents === "function") {
+    onMouseDownEvents(gMouseClickEvents);
+  }
 }
 
 class VideoPlayer {
-  store: UIStore | null = null;
   video: HTMLVideoElement | null = null;
   all = new Uint8Array();
   blob?: Blob;
   videoReadyCallback?: (video: HTMLVideoElement) => any;
   commands?: Promise<void>;
 
-  init(store: UIStore) {
-    this.store = store;
+  init() {
     this.commands = Promise.resolve();
-  }
-
-  createUrl() {
-    if (this.blob) {
-      const url = URL.createObjectURL(this.blob);
-      this.store?.dispatch(setVideoUrl(url));
-    }
   }
 
   async append(fragment: string) {
     if (!fragment) {
       if (this.all) {
         this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
-        this.createUrl();
+
+        if (typeof onVideoUrl === "function") {
+          const url = URL.createObjectURL(this.blob!);
+          onVideoUrl(url);
+        }
       }
     } else {
       const buffer = decode(fragment);
@@ -224,14 +221,13 @@ class VideoPlayer {
       });
   }
 
-  play() {
+  play(timeMs: number) {
     this.commands =
       this.commands &&
       this.commands.then(() => {
         const video = getVideoNode();
-        const currentTime = this.store?.getState().timeline.currentTime;
         if (syncVideoPlaybackExperimentalFlag && video) {
-          video.currentTime = (currentTime || 0) / 1000;
+          video.currentTime = (timeMs || 0) / 1000;
           return video.play();
         }
       });
@@ -240,7 +236,6 @@ class VideoPlayer {
 
 export const Video = new VideoPlayer();
 
-let onRefreshGraphics: (canvas: Canvas) => void;
 export let hasAllPaintPoints = false;
 
 export const setHasAllPaintPoints = (newValue: boolean) => {
@@ -249,12 +244,8 @@ export const setHasAllPaintPoints = (newValue: boolean) => {
 export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
-export function setupGraphics(store: UIStore) {
-  onRefreshGraphics = (canvas: Canvas) => {
-    store.dispatch(setCanvas(canvas));
-  };
-
-  Video.init(store);
+export function setupGraphics() {
+  Video.init();
 
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
     const { client } = await import("./socket");
@@ -263,10 +254,10 @@ export function setupGraphics(store: UIStore) {
       await Promise.all(gPaintPromises);
       videoReady.resolve();
     });
-    client.Graphics.addPaintPointsListener(({ paints }) => onPaints(paints, store));
+    client.Graphics.addPaintPointsListener(({ paints }) => onPaints(paints));
 
     client.Session.findMouseEvents({}, sessionId);
-    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
+    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
 
     const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
     if (recordingTarget === "node") {
@@ -301,7 +292,9 @@ export function setupGraphics(store: UIStore) {
       paintGraphics(screen, mouse);
     }
 
-    store.dispatch(precacheScreenshots(time));
+    if (typeof onPausedAtTime === "function") {
+      onPausedAtTime(time);
+    }
 
     await repaint();
   });
@@ -313,8 +306,18 @@ export async function repaint(force = false) {
     return;
   }
   let graphicsFetched = false;
-  // Show a stalled message if the graphics have not fetched after half a second
-  setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
+
+  let didStall = false;
+  setTimeout(() => {
+    if (!graphicsFetched) {
+      didStall = true;
+
+      if (typeof onPlaybackStatus === "function") {
+        onPlaybackStatus(true);
+      }
+    }
+  }, 500);
+
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
   const point = ThreadFront.currentPoint;
   await ThreadFront.ensureAllSources();
@@ -327,7 +330,13 @@ export async function repaint(force = false) {
 
   const rv = await pause.repaintGraphics(force);
   graphicsFetched = true;
-  store.dispatch(setPlaybackStalled(false));
+
+  if (didStall) {
+    if (typeof onPlaybackStatus === "function") {
+      onPlaybackStatus(false);
+    }
+  }
+
   if (!rv || pause !== ThreadFront.currentPause) {
     return;
   }
@@ -588,10 +597,12 @@ export function refreshGraphics() {
       cx.drawImage(image, 0, 0);
     }
 
-    onRefreshGraphics({
-      ...bounds,
-      gDevicePixelRatio,
-    });
+    if (typeof onRefreshGraphics === "function") {
+      onRefreshGraphics({
+        ...bounds,
+        gDevicePixelRatio,
+      });
+    }
 
     // Apply the same transforms to any displayed highlighter.
     const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
@@ -652,63 +663,48 @@ export async function getFirstMeaningfulPaint(limit: number = 10) {
   }
 }
 
-// precache this many milliseconds
-const precacheTime = 5000;
-// startTime of the currently running precacheScreenshots() call
-let precacheStartTime = -1;
+////////////////////////////////////////////////////////////////////////////////////////////////
+// The callbacks below allow external code to observe specific events.
+// This design pattern is a short term strategy to remove external imports from this package.
+//
+// TODO We should revisit this as part of a larger architectural redesign (#6932).
+////////////////////////////////////////////////////////////////////////////////////////////////
 
-export function precacheScreenshots(startTime: number): UIThunkAction {
-  return async (dispatch, getState) => {
-    const recordingDuration = getRecordingDuration(getState());
-    if (!recordingDuration) {
-      return;
-    }
-
-    startTime = snapTimeForPlayback(startTime);
-    if (startTime === precacheStartTime) {
-      return;
-    }
-    if (startTime < precacheStartTime) {
-      dispatch(setPlaybackPrecachedTime(startTime));
-    }
-    precacheStartTime = startTime;
-
-    const endTime = Math.min(startTime + precacheTime, recordingDuration);
-    for (let time = startTime; time < endTime; time += snapInterval) {
-      const index = mostRecentIndex(gPaintPoints, time);
-      if (index === undefined) {
-        return;
-      }
-
-      const paintHash = gPaintPoints[index].paintHash;
-      if (!screenshotCache.hasScreenshot(paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time, true);
-
-        const precachedTime = Math.max(time - snapInterval, startTime);
-        if (precachedTime > getPlaybackPrecachedTime(getState())) {
-          dispatch(setPlaybackPrecachedTime(precachedTime));
-        }
-
-        await graphicsPromise;
-
-        if (precacheStartTime !== startTime) {
-          return;
-        }
-      }
-    }
-
-    let precachedTime = endTime;
-    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
-      precachedTime = recordingDuration;
-    }
-    if (precachedTime > getPlaybackPrecachedTime(getState())) {
-      dispatch(setPlaybackPrecachedTime(precachedTime));
-    }
-  };
+export interface Canvas {
+  gDevicePixelRatio: number;
+  height: number;
+  left: number;
+  scale: number;
+  top: number;
+  width: number;
 }
 
-// Snap time to 50ms intervals, snapping up.
-const snapInterval = 50;
-export function snapTimeForPlayback(time: number) {
-  return time + snapInterval - (time % snapInterval);
+let onMouseDownEvents: (events: MouseEvent[]) => void;
+export function setMouseDownEventsCallback(callback: typeof onMouseDownEvents): void {
+  onMouseDownEvents = callback;
+}
+
+let onPausedAtTime: (time: number) => void;
+export function setPausedonPausedAtTimeCallback(callback: typeof onPausedAtTime): void {
+  onPausedAtTime = callback;
+}
+
+let onPlaybackStatus: (stalled: boolean) => void;
+export function setPlaybackStatusCallback(callback: typeof onPlaybackStatus): void {
+  onPlaybackStatus = callback;
+}
+
+let onPointsReceived: (points: TimeStampedPoint[]) => void;
+export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
+  onPointsReceived = callback;
+}
+
+let onRefreshGraphics: (canvas: Canvas) => void;
+export function setRefreshGraphicsCallback(callback: typeof onRefreshGraphics): void {
+  onRefreshGraphics = callback;
+}
+
+let onVideoUrl: (url: string) => void;
+export function setVideoUrlCallback(callback: typeof onVideoUrl): void {
+  onVideoUrl = callback;
 }

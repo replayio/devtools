@@ -7,7 +7,7 @@ import { timelineMarkerWidth as pointWidth } from "ui/constants";
 const BreakpointTimelinePoint = require("./BreakpointTimelinePoint").default;
 import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
-import { mostRecentPaintOrMouseEvent, precacheScreenshots } from "protocol/graphics";
+import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";

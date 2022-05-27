@@ -75,7 +75,7 @@ function Video({
     if (playback) {
       refreshGraphics();
       VideoPlayer.seek(currentTime);
-      VideoPlayer.play();
+      VideoPlayer.play(currentTime);
     }
 
     return () => {
