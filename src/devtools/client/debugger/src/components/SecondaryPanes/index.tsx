@@ -58,13 +58,7 @@ export default function SecondaryPanes() {
           expanded={callstackVisible}
           onToggle={() => updateCallstackVisible(!callstackVisible)}
         >
-          {hasFrames || framesLoading ? (
-            <Frames panel="debugger" />
-          ) : (
-            <div className="text-themeBodyColor mx-2 mt-2 mb-4 space-y-3 whitespace-normal rounded-lg bg-themeTextFieldBgcolor p-3 text-center text-xs">
-              Scopes are unavailable while not paused on a line of code
-            </div>
-          )}
+          <Frames panel="debugger" />
         </AccordionPane>
         <AccordionPane
           header="Scopes"
@@ -72,13 +66,7 @@ export default function SecondaryPanes() {
           expanded={scopesExpanded}
           onToggle={() => updateScopesExpanded(!scopesExpanded)}
         >
-          {hasFrames ? (
-            <Scopes />
-          ) : (
-            <div className="text-themeBodyColor mx-2 mt-2 mb-4 space-y-3 whitespace-normal rounded-lg bg-themeTextFieldBgcolor p-3 text-center text-xs">
-              Scopes are unavailable while not paused on a line of code
-            </div>
-          )}
+          <Scopes />
         </AccordionPane>
       </Accordion>
     </div>

@@ -19,12 +19,15 @@ import {
   getPauseReason,
   getThreadContext,
   getLastExpandedScopes,
+  getFramesLoading,
 } from "../../selectors";
 import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
 import { ObjectInspector } from "devtools/packages/devtools-reps";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { formatTimestamp } from "ui/utils/time";
 
 class Scopes extends PureComponent {
   constructor(props) {
@@ -123,7 +126,6 @@ class Scopes extends PureComponent {
   renderScopesList() {
     const {
       cx,
-      isLoading,
       openLink,
       openElementInInspector,
       highlightDomElement,
@@ -139,51 +141,63 @@ class Scopes extends PureComponent {
       return expandedScopes.some(path => path == getScopeItemPath(item));
     }
 
-    if (scopes && scopes.length > 0 && !isLoading) {
-      scopes.forEach((s, i) => {
-        s.path = `scope${selectedFrame?.id}.${i}`;
-      });
-      return (
-        <Redacted className="pane scopes-list">
-          {originalScopesUnavailable ? (
-            <div className="warning">The variables could not be mapped to their original names</div>
-          ) : null}
-          <ObjectInspector
-            roots={scopes}
-            autoExpandAll={false}
-            autoExpandDepth={1}
-            disableWrap={true}
-            dimTopLevelWindow={true}
-            openLink={openLink}
-            onDOMNodeClick={grip => openElementInInspector(grip)}
-            onInspectIconClick={grip => openElementInInspector(grip)}
-            onDOMNodeMouseOver={grip => highlightDomElement(grip)}
-            onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
-            onContextMenu={this.onContextMenu}
-            setExpanded={(path, expand) => {
-              trackEvent("scopes.set_expanded");
-              setExpandedScope(cx, path, expand);
-            }}
-            initiallyExpanded={initiallyExpanded}
-            renderItemActions={this.renderWatchpointButton}
-          />
-        </Redacted>
-      );
-    }
-
-    let stateText = "";
-    if (isLoading) {
-      stateText = "Loading\u2026";
-    }
-
+    scopes.forEach((s, i) => {
+      s.path = `scope${selectedFrame?.id}.${i}`;
+    });
     return (
-      <div className="pane scopes-list">
-        <div className="pane-info">{stateText}</div>
-      </div>
+      <Redacted className="pane scopes-list">
+        {originalScopesUnavailable ? (
+          <div className="warning">The variables could not be mapped to their original names</div>
+        ) : null}
+        <ObjectInspector
+          roots={scopes}
+          autoExpandAll={false}
+          autoExpandDepth={1}
+          disableWrap={true}
+          dimTopLevelWindow={true}
+          openLink={openLink}
+          onDOMNodeClick={grip => openElementInInspector(grip)}
+          onInspectIconClick={grip => openElementInInspector(grip)}
+          onDOMNodeMouseOver={grip => highlightDomElement(grip)}
+          onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
+          onContextMenu={this.onContextMenu}
+          setExpanded={(path, expand) => {
+            trackEvent("scopes.set_expanded");
+            setExpandedScope(cx, path, expand);
+          }}
+          initiallyExpanded={initiallyExpanded}
+          renderItemActions={this.renderWatchpointButton}
+        />
+      </Redacted>
     );
   }
 
   render() {
+    const { isErrored, isLoading } = this.props;
+    const { scopes } = this.state;
+
+    if (isErrored) {
+      return (
+        <div className="pane">
+          <div className="pane-info">Error trying to pause at {formatTimestamp(currentTime)}</div>
+        </div>
+      );
+    }
+    if (isLoading) {
+      return (
+        <div className="pane">
+          <div className="pane-info">Loading…</div>
+        </div>
+      );
+    }
+    if (!scopes || scopes.length === 0) {
+      return (
+        <div className="pane">
+          <div className="pane-info empty">Not paused at a point with any scopes</div>
+        </div>
+      );
+    }
+
     return <div className="scopes-content">{this.renderScopesList()}</div>;
   }
 }
@@ -192,16 +206,21 @@ const mapStateToProps = state => {
   const cx = getThreadContext(state);
   const selectedFrame = getSelectedFrame(state);
   const frameScope = getFrameScope(state, selectedFrame?.id);
+  const pauseErrored = state.pause.pauseErrored;
+  const pauseLoading = state.pause.pauseLoading;
   const { scope, pending, originalScopesUnavailable } = frameScope || {
     scope: null,
     pending: false,
     originalScopesUnavailable: false,
   };
+  const framesLoading = getFramesLoading(state);
 
   return {
     cx,
+    currentTime: getCurrentTime(state),
     selectedFrame,
-    isLoading: pending,
+    isLoading: pending || framesLoading || pauseLoading,
+    isErrored: pauseErrored,
     why: getPauseReason(state),
     frameScopes: scope,
     originalScopesUnavailable,

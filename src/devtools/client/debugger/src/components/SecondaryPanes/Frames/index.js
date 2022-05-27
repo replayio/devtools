@@ -7,6 +7,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { formatTimestamp } from "ui/utils/time";
 
 import FrameComponent from "./Frame";
 import Group from "./Group";
@@ -21,6 +23,7 @@ import {
   getCallStackFrames,
   getThreadContext,
   getFramesLoading,
+  getFramesErrored,
 } from "../../../selectors";
 
 const NUM_FRAMES_SHOWN = 7;
@@ -116,12 +119,36 @@ class Frames extends Component {
   }
 
   render() {
-    const { frames, framesLoading } = this.props;
+    const { currentTime, frames, framesErrored, framesLoading, pauseErrored, pauseLoading } =
+      this.props;
 
-    if (!frames) {
+    if (pauseErrored) {
       return (
         <div className="pane frames">
-          <div className="pane-info empty">{framesLoading ? "Loading..." : "Not paused"}</div>
+          <div className="pane-info empty">
+            Error trying to pause at {formatTimestamp(currentTime)}
+          </div>
+        </div>
+      );
+    }
+    if (framesErrored) {
+      return (
+        <div className="pane frames">
+          <div className="pane-info empty">Error loading frames</div>
+        </div>
+      );
+    }
+    if (framesLoading || pauseLoading) {
+      return (
+        <div className="pane frames">
+          <div className="pane-info empty">Loading...</div>
+        </div>
+      );
+    }
+    if (!frames || frames.length === 0) {
+      return (
+        <div className="pane frames">
+          <div className="pane-info empty">Not paused at a point with a call stack</div>
         </div>
       );
     }
@@ -134,9 +161,13 @@ Frames.contextTypes = { l10n: PropTypes.object };
 
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
+  currentTime: getCurrentTime(state),
   frames: getCallStackFrames(state),
   framesLoading: getFramesLoading(state),
+  framesErrored: getFramesErrored(state),
   frameworkGroupingOn: getFrameworkGroupingState(state),
+  pauseErrored: state.pause.pauseErrored,
+  pauseLoading: state.pause.pauseLoading,
   selectedFrame: getSelectedFrame(state),
   disableFrameTruncate: false,
   disableContextMenu: false,

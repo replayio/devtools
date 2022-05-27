@@ -116,7 +116,8 @@ export class ValueFront {
   }
 
   hasPreviewOverflow() {
-    return !this.hasPreview() || this._object!.preview!.overflow;
+    const preview = this.hasPreview();
+    return !preview || preview.overflow;
   }
 
   previewValueMap(): Map<string, ValueFront> {
