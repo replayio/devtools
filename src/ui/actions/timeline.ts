@@ -341,7 +341,9 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
 
-    Video.play(currentTime);
+    // Note: This matches the previous behavior of the VideoPlayer.
+    // Maybe we should be passing the currentTime instead?
+    Video.play(getCurrentTime(getState()));
 
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
