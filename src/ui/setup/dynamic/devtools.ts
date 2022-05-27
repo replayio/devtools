@@ -1,4 +1,4 @@
-import { sessionError, uploadedData } from "@replayio/protocol";
+import { MouseEvent, sessionError, TimeStampedPoint, uploadedData } from "@replayio/protocol";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
@@ -16,7 +16,7 @@ import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { LocalizationHelper } from "devtools/shared/l10n";
-import { setupGraphics } from "protocol/graphics";
+import { Canvas, setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "ui/actions/logpoint";
 import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -25,17 +25,27 @@ import { bindActionCreators } from "redux";
 import { actions } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
-import app from "ui/reducers/app";
+import app, { setEventsForType, setVideoUrl } from "ui/reducers/app";
 import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
-import timeline from "ui/reducers/timeline";
+import timeline, { pointsReceived, setPlaybackStalled } from "ui/reducers/timeline";
 import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
+import {
+  setMouseDownEventsCallback,
+  setPausedonPausedAtTimeCallback,
+  setPlaybackStatusCallback,
+  setPointsReceivedCallback,
+  setRefreshGraphicsCallback,
+  setVideoUrlCallback,
+} from "protocol/graphics";
 
 import { extendStore, AppStore } from "../store";
+import { setCanvas } from "ui/actions/app";
+import { precacheScreenshots } from "ui/actions/timeline";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -163,13 +173,35 @@ export default async function DevTools(store: AppStore) {
   setupApp(store, ThreadFront);
   setupTimeline(store);
   setupEventListeners(store);
-  setupGraphics(store);
+  setupGraphics();
   initOutputSyntaxHighlighting();
   setupMessages(store, ThreadFront);
   setupNetwork(store, ThreadFront);
   setupLogpoints(store);
   setupExceptions(store);
   setupReactDevTools(store);
+
+  // Add protocol event listeners for things that the Redux store needs to stay in sync with.
+  // TODO We should revisit this as part of a larger architectural redesign (#6932).
+
+  setMouseDownEventsCallback((events: MouseEvent[]) => {
+    store.dispatch(setEventsForType({ events: [...events], eventType: "mousedown" }));
+  });
+  setPausedonPausedAtTimeCallback((time: number) => {
+    store.dispatch(precacheScreenshots(time));
+  });
+  setPlaybackStatusCallback((stalled: boolean) => {
+    store.dispatch(setPlaybackStalled(stalled));
+  });
+  setPointsReceivedCallback((points: TimeStampedPoint[]) => {
+    store.dispatch(pointsReceived(points));
+  });
+  setRefreshGraphicsCallback((canvas: Canvas) => {
+    store.dispatch(setCanvas(canvas));
+  });
+  setVideoUrlCallback((url: string) => {
+    store.dispatch(setVideoUrl(url));
+  });
 }
 
 function bindSelectors(obj: any) {

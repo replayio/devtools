@@ -3,40 +3,6 @@ import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/
 import { decode } from "base64-arraybuffer";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 
-// TypeScript types only ///////////////////////////////////////////////////////////////////////////////////////
-
-import { UIStore } from "ui/actions";
-import { Canvas } from "ui/state/app";
-
-// Application events //////////////////////////////////////////////////////////////////////////////////////////
-
-// setupGraphics adds this to onRefreshGraphics() callback which gets called by refreshGraphics()
-// We could inject an external callback for this or emit an event.
-import { setCanvas } from "ui/reducers/app";
-
-// Gets called as part of client.Session.addMouseEventsListener() to notify of "mousedown" events
-// We could inject a "handleMouseDown" callback for this or emit a "mousedown" event.
-import { setEventsForType } from "ui/reducers/app";
-
-// Called by VideoPlayer.createUrl() in response to a new video fragment being appended.
-// We could inject a "handleUrl" callback for this or emit a "url" event.
-import { setVideoUrl } from "ui/reducers/app";
-
-// Called whenever new points are received.
-// Currently this means client.Graphics.addPaintPointsListener or client.Session.addMouseEventsListener
-// We could inject a "handlePoints" callback for this or emit a "points" event.
-import { pointsReceived } from "ui/reducers/timeline";
-
-// Called by the repaint() method to indicate playback stalled (timeout) or completed (after async code).
-// We could inject a "handlePlaybackStatus" callback for this or emit a "playback" event.
-import { setPlaybackStalled } from "ui/reducers/timeline";
-
-// Called by ThreadFront "paused" event handler (after some other things).
-// We could inject a "precacheScreenshots" callback for this or emit a "precacheScreenshots" event.
-import { precacheScreenshots } from "ui/actions/timeline";
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer, Deferred } from "./utils";
@@ -158,8 +124,11 @@ export const videoReady: Deferred<void> = defer();
 
 const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
 
-function onPaints(paints: PaintPoint[], store: UIStore) {
-  store.dispatch(pointsReceived(paints));
+function onPaints(paints: PaintPoint[]) {
+  if (typeof onPointsReceived === "function") {
+    onPointsReceived(paints);
+  }
+
   paints.forEach(async ({ point, time, screenShots }) => {
     const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
     insertEntrySorted(gPaintPoints, { point, time, paintHash });
@@ -192,8 +161,11 @@ function onPaints(paints: PaintPoint[], store: UIStore) {
   });
 }
 
-function onMouseEvents(events: MouseEvent[], store: UIStore) {
-  store.dispatch(pointsReceived(events));
+function onMouseEvents(events: MouseEvent[]) {
+  if (typeof onPointsReceived === "function") {
+    onPointsReceived(events);
+  }
+
   events.forEach(entry => {
     insertEntrySorted(gMouseEvents, entry);
     if (entry.kind == "mousedown") {
@@ -201,34 +173,31 @@ function onMouseEvents(events: MouseEvent[], store: UIStore) {
     }
   });
 
-  store.dispatch(setEventsForType({ events: [...gMouseClickEvents], eventType: "mousedown" }));
+  if (typeof onMouseDownEvents === "function") {
+    onMouseDownEvents(gMouseClickEvents);
+  }
 }
 
 class VideoPlayer {
-  store: UIStore | null = null;
   video: HTMLVideoElement | null = null;
   all = new Uint8Array();
   blob?: Blob;
   videoReadyCallback?: (video: HTMLVideoElement) => any;
   commands?: Promise<void>;
 
-  init(store: UIStore) {
-    this.store = store;
+  init() {
     this.commands = Promise.resolve();
-  }
-
-  createUrl() {
-    if (this.blob) {
-      const url = URL.createObjectURL(this.blob);
-      this.store?.dispatch(setVideoUrl(url));
-    }
   }
 
   async append(fragment: string) {
     if (!fragment) {
       if (this.all) {
         this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
-        this.createUrl();
+
+        if (typeof onVideoUrl === "function") {
+          const url = URL.createObjectURL(this.blob!);
+          onVideoUrl(url);
+        }
       }
     } else {
       const buffer = decode(fragment);
@@ -252,14 +221,13 @@ class VideoPlayer {
       });
   }
 
-  play() {
+  play(timeMs: number) {
     this.commands =
       this.commands &&
       this.commands.then(() => {
         const video = getVideoNode();
-        const currentTime = this.store?.getState().timeline.currentTime;
         if (syncVideoPlaybackExperimentalFlag && video) {
-          video.currentTime = (currentTime || 0) / 1000;
+          video.currentTime = (timeMs || 0) / 1000;
           return video.play();
         }
       });
@@ -268,7 +236,6 @@ class VideoPlayer {
 
 export const Video = new VideoPlayer();
 
-let onRefreshGraphics: (canvas: Canvas) => void;
 export let hasAllPaintPoints = false;
 
 export const setHasAllPaintPoints = (newValue: boolean) => {
@@ -277,12 +244,8 @@ export const setHasAllPaintPoints = (newValue: boolean) => {
 export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
-export function setupGraphics(store: UIStore) {
-  onRefreshGraphics = (canvas: Canvas) => {
-    store.dispatch(setCanvas(canvas));
-  };
-
-  Video.init(store);
+export function setupGraphics() {
+  Video.init();
 
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
     const { client } = await import("./socket");
@@ -291,10 +254,10 @@ export function setupGraphics(store: UIStore) {
       await Promise.all(gPaintPromises);
       videoReady.resolve();
     });
-    client.Graphics.addPaintPointsListener(({ paints }) => onPaints(paints, store));
+    client.Graphics.addPaintPointsListener(({ paints }) => onPaints(paints));
 
     client.Session.findMouseEvents({}, sessionId);
-    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events, store));
+    client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
 
     const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
     if (recordingTarget === "node") {
@@ -329,7 +292,9 @@ export function setupGraphics(store: UIStore) {
       paintGraphics(screen, mouse);
     }
 
-    store.dispatch(precacheScreenshots(time));
+    if (typeof onPausedAtTime === "function") {
+      onPausedAtTime(time);
+    }
 
     await repaint();
   });
@@ -341,8 +306,18 @@ export async function repaint(force = false) {
     return;
   }
   let graphicsFetched = false;
-  // Show a stalled message if the graphics have not fetched after half a second
-  setTimeout(() => !graphicsFetched && store.dispatch(setPlaybackStalled(true)), 500);
+
+  let didStall = false;
+  setTimeout(() => {
+    if (!graphicsFetched) {
+      didStall = true;
+
+      if (typeof onPlaybackStatus === "function") {
+        onPlaybackStatus(true);
+      }
+    }
+  }, 500);
+
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
   const point = ThreadFront.currentPoint;
   await ThreadFront.ensureAllSources();
@@ -355,7 +330,13 @@ export async function repaint(force = false) {
 
   const rv = await pause.repaintGraphics(force);
   graphicsFetched = true;
-  store.dispatch(setPlaybackStalled(false));
+
+  if (didStall) {
+    if (typeof onPlaybackStatus === "function") {
+      onPlaybackStatus(false);
+    }
+  }
+
   if (!rv || pause !== ThreadFront.currentPause) {
     return;
   }
@@ -616,10 +597,12 @@ export function refreshGraphics() {
       cx.drawImage(image, 0, 0);
     }
 
-    onRefreshGraphics({
-      ...bounds,
-      gDevicePixelRatio,
-    });
+    if (typeof onRefreshGraphics === "function") {
+      onRefreshGraphics({
+        ...bounds,
+        gDevicePixelRatio,
+      });
+    }
 
     // Apply the same transforms to any displayed highlighter.
     const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
@@ -678,4 +661,50 @@ export async function getFirstMeaningfulPaint(limit: number = 10) {
       return paintPoint;
     }
   }
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////
+// The callbacks below allow external code to observe specific events.
+// This design pattern is a short term strategy to remove external imports from this package.
+//
+// TODO We should revisit this as part of a larger architectural redesign (#6932).
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+export interface Canvas {
+  gDevicePixelRatio: number;
+  height: number;
+  left: number;
+  scale: number;
+  top: number;
+  width: number;
+}
+
+let onMouseDownEvents: (events: MouseEvent[]) => void;
+export function setMouseDownEventsCallback(callback: typeof onMouseDownEvents): void {
+  onMouseDownEvents = callback;
+}
+
+let onPausedAtTime: (time: number) => void;
+export function setPausedonPausedAtTimeCallback(callback: typeof onPausedAtTime): void {
+  onPausedAtTime = callback;
+}
+
+let onPlaybackStatus: (stalled: boolean) => void;
+export function setPlaybackStatusCallback(callback: typeof onPlaybackStatus): void {
+  onPlaybackStatus = callback;
+}
+
+let onPointsReceived: (points: TimeStampedPoint[]) => void;
+export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
+  onPointsReceived = callback;
+}
+
+let onRefreshGraphics: (canvas: Canvas) => void;
+export function setRefreshGraphicsCallback(callback: typeof onRefreshGraphics): void {
+  onRefreshGraphics = callback;
+}
+
+let onVideoUrl: (url: string) => void;
+export function setVideoUrlCallback(callback: typeof onVideoUrl): void {
+  onVideoUrl = callback;
 }

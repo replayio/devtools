@@ -341,7 +341,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
 
-    Video.play();
+    Video.play(currentTime);
 
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
