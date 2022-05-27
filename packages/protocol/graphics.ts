@@ -15,8 +15,6 @@ import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
-const { features } = require("ui/utils/prefs");
-
 // Temporary experimental feature flag
 let syncVideoPlaybackExperimentalFlag: boolean = false;
 export function setSyncVideoPlaybackExperimentalFlag(value: boolean): void {
