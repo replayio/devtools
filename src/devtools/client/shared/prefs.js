@@ -82,9 +82,11 @@ function get(cache, prefType, prefsRoot, prefName) {
  * @param string prefName
  * @param any value
  */
-function set(cache, prefType, prefsRoot, prefName, value) {
+function set(self, cache, prefType, prefsRoot, prefName, value) {
   Services.prefs["set" + prefType + "Pref"]([prefsRoot, prefName].join("."), value);
   cache.set(prefName, value);
+
+  self.emit(`${prefName}-changed`, value);
 }
 
 /**
@@ -130,7 +132,7 @@ function map(
 
   Object.defineProperty(self, accessorName, {
     get: () => serializer.in(get(cache, prefType, prefsRoot, prefName)),
-    set: e => set(cache, prefType, prefsRoot, prefName, serializer.out(e)),
+    set: e => set(self, cache, prefType, prefsRoot, prefName, serializer.out(e)),
   });
 }
 

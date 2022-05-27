@@ -145,6 +145,14 @@ if (features.videoPlayback) {
   setSyncVideoPlaybackExperimentalFlag(true);
 }
 
+// Listen for changes in the above preferences and pass them through to the protocol.
+features.on("repaintEvaluations-changed", (repaintEvaluations: boolean) => {
+  setRepaintAfterEvaluationsExperimentalFlag(repaintEvaluations);
+});
+features.on("videoPlayback-changed", (videoPlayback: boolean) => {
+  setSyncVideoPlaybackExperimentalFlag(videoPlayback);
+});
+
 interface AuthProps {
   apiKey?: string;
 }
