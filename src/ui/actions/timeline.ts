@@ -4,16 +4,17 @@ import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 import {
   getGraphicsAtTime,
+  gPaintPoints,
   paintGraphics,
+  mostRecentIndex,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
   nextPaintEvent,
   previousPaintEvent,
   getFirstMeaningfulPaint,
-  precacheScreenshots,
-  snapTimeForPlayback,
   Video,
   timeIsBeyondKnownPaints,
+  screenshotCache,
 } from "protocol/graphics";
 import { client, log } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -23,12 +24,15 @@ import { assert, waitForTime } from "protocol/utils";
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
+  getFocusRegion,
   getHoveredItem,
   getHoverTime,
   getPlayback,
-  getFocusRegion,
+  getPlaybackPrecachedTime,
+  getRecordingDuration,
   getZoomRegion,
   getShowFocusModeControls,
+  setPlaybackPrecachedTime,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
@@ -706,4 +710,65 @@ export function toggleFocusMode(): UIThunkAction {
       dispatch(enterFocusMode());
     }
   };
+}
+
+const PRECACHE_DURATION: number = 5000;
+
+let precacheStartTime: number = -1;
+
+export function precacheScreenshots(startTime: number): UIThunkAction {
+  return async (dispatch, getState) => {
+    const recordingDuration = getRecordingDuration(getState());
+    if (!recordingDuration) {
+      return;
+    }
+
+    startTime = snapTimeForPlayback(startTime);
+    if (startTime === precacheStartTime) {
+      return;
+    }
+    if (startTime < precacheStartTime) {
+      dispatch(setPlaybackPrecachedTime(startTime));
+    }
+    precacheStartTime = startTime;
+
+    const endTime = Math.min(startTime + PRECACHE_DURATION, recordingDuration);
+    for (let time = startTime; time < endTime; time += SNAP_TIME_INTERVAL) {
+      const index = mostRecentIndex(gPaintPoints, time);
+      if (index === undefined) {
+        return;
+      }
+
+      const paintHash = gPaintPoints[index].paintHash;
+      if (!screenshotCache.hasScreenshot(paintHash)) {
+        const graphicsPromise = getGraphicsAtTime(time, true);
+
+        const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, startTime);
+        if (precachedTime > getPlaybackPrecachedTime(getState())) {
+          dispatch(setPlaybackPrecachedTime(precachedTime));
+        }
+
+        await graphicsPromise;
+
+        if (precacheStartTime !== startTime) {
+          return;
+        }
+      }
+    }
+
+    let precachedTime = endTime;
+    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
+      precachedTime = recordingDuration;
+    }
+    if (precachedTime > getPlaybackPrecachedTime(getState())) {
+      dispatch(setPlaybackPrecachedTime(precachedTime));
+    }
+  };
+}
+
+const SNAP_TIME_INTERVAL = 50;
+
+// Snap time to 50ms intervals, snapping up.
+function snapTimeForPlayback(time: number) {
+  return time + SNAP_TIME_INTERVAL - (time % SNAP_TIME_INTERVAL);
 }

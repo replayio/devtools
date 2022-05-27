@@ -2,11 +2,40 @@
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
 import { decode } from "base64-arraybuffer";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
-import { UIStore, UIThunkAction } from "ui/actions";
-import { setCanvas, setEventsForType, setVideoUrl } from "ui/reducers/app";
-import { pointsReceived, setPlaybackPrecachedTime, setPlaybackStalled } from "ui/reducers/timeline";
-import { getPlaybackPrecachedTime, getRecordingDuration } from "ui/reducers/timeline";
+
+// TypeScript types only ///////////////////////////////////////////////////////////////////////////////////////
+
+import { UIStore } from "ui/actions";
 import { Canvas } from "ui/state/app";
+
+// Application events //////////////////////////////////////////////////////////////////////////////////////////
+
+// setupGraphics adds this to onRefreshGraphics() callback which gets called by refreshGraphics()
+// We could inject an external callback for this or emit an event.
+import { setCanvas } from "ui/reducers/app";
+
+// Gets called as part of client.Session.addMouseEventsListener() to notify of "mousedown" events
+// We could inject a "handleMouseDown" callback for this or emit a "mousedown" event.
+import { setEventsForType } from "ui/reducers/app";
+
+// Called by VideoPlayer.createUrl() in response to a new video fragment being appended.
+// We could inject a "handleUrl" callback for this or emit a "url" event.
+import { setVideoUrl } from "ui/reducers/app";
+
+// Called whenever new points are received.
+// Currently this means client.Graphics.addPaintPointsListener or client.Session.addMouseEventsListener
+// We could inject a "handlePoints" callback for this or emit a "points" event.
+import { pointsReceived } from "ui/reducers/timeline";
+
+// Called by the repaint() method to indicate playback stalled (timeout) or completed (after async code).
+// We could inject a "handlePlaybackStatus" callback for this or emit a "playback" event.
+import { setPlaybackStalled } from "ui/reducers/timeline";
+
+// Called by ThreadFront "paused" event handler (after some other things).
+// We could inject a "precacheScreenshots" callback for this or emit a "precacheScreenshots" event.
+import { precacheScreenshots } from "ui/actions/timeline";
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
@@ -29,6 +58,7 @@ declare global {
 }
 
 export const screenshotCache = new ScreenshotCache();
+
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
 interface Timed {
@@ -37,7 +67,7 @@ interface Timed {
 
 // Given a sorted array of items with "time" properties, find the index of
 // the most recent item at or preceding a given time.
-function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
+export function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
   if (!array.length || time < array[0].time) {
     return undefined;
   }
@@ -648,65 +678,4 @@ export async function getFirstMeaningfulPaint(limit: number = 10) {
       return paintPoint;
     }
   }
-}
-
-// precache this many milliseconds
-const precacheTime = 5000;
-// startTime of the currently running precacheScreenshots() call
-let precacheStartTime = -1;
-
-export function precacheScreenshots(startTime: number): UIThunkAction {
-  return async (dispatch, getState) => {
-    const recordingDuration = getRecordingDuration(getState());
-    if (!recordingDuration) {
-      return;
-    }
-
-    startTime = snapTimeForPlayback(startTime);
-    if (startTime === precacheStartTime) {
-      return;
-    }
-    if (startTime < precacheStartTime) {
-      dispatch(setPlaybackPrecachedTime(startTime));
-    }
-    precacheStartTime = startTime;
-
-    const endTime = Math.min(startTime + precacheTime, recordingDuration);
-    for (let time = startTime; time < endTime; time += snapInterval) {
-      const index = mostRecentIndex(gPaintPoints, time);
-      if (index === undefined) {
-        return;
-      }
-
-      const paintHash = gPaintPoints[index].paintHash;
-      if (!screenshotCache.hasScreenshot(paintHash)) {
-        const graphicsPromise = getGraphicsAtTime(time, true);
-
-        const precachedTime = Math.max(time - snapInterval, startTime);
-        if (precachedTime > getPlaybackPrecachedTime(getState())) {
-          dispatch(setPlaybackPrecachedTime(precachedTime));
-        }
-
-        await graphicsPromise;
-
-        if (precacheStartTime !== startTime) {
-          return;
-        }
-      }
-    }
-
-    let precachedTime = endTime;
-    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
-      precachedTime = recordingDuration;
-    }
-    if (precachedTime > getPlaybackPrecachedTime(getState())) {
-      dispatch(setPlaybackPrecachedTime(precachedTime));
-    }
-  };
-}
-
-// Snap time to 50ms intervals, snapping up.
-const snapInterval = 50;
-export function snapTimeForPlayback(time: number) {
-  return time + snapInterval - (time % snapInterval);
 }
