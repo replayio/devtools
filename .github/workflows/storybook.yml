@@ -7,7 +7,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: '.nvmrc'
+          cache: "npm"
       - name: Install Deps
-        run: npm install
+        run: npm ci
       - name: Build Storybook
         run: npm run build-storybook
