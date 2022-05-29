@@ -74,6 +74,7 @@ const gMessageWaiters = new Map<number, MessageWaiter>();
 const gStartTime = Date.now();
 let gSentBytes = 0;
 let gReceivedBytes = 0;
+let gSessionOptions: SessionOptions = { allowMultipleListeners: false };
 
 // If the socket has errored, the connection will close. So let's set `willClose`
 // so that we show _this_ error message, and not the `onSocketClose` error message
@@ -89,6 +90,10 @@ export type ExperimentalSettings = {
   disableCache?: boolean;
   useMultipleControllers: boolean;
   multipleControllerUseSnapshots: boolean;
+};
+
+export type SessionOptions = {
+  allowMultipleListeners: boolean;
 };
 
 type SessionCallbacks = {
@@ -107,8 +112,12 @@ export async function createSession(
   recordingId: string,
   loadPoint: string | undefined,
   experimentalSettings: ExperimentalSettings,
-  sessionCallbacks: SessionCallbacks
+  sessionCallbacks: SessionCallbacks,
+  options?: SessionOptions
 ) {
+  if (options) {
+    gSessionOptions = options;
+  }
   const { sessionId } = await sendMessage("Recording.createSession", {
     recordingId,
     loadPoint: loadPoint || undefined,
@@ -225,7 +234,7 @@ export function addEventListener<M extends EventMethods>(
   event: M,
   handler: (params: EventParams<M>) => void
 ) {
-  if (gEventListeners.has(event)) {
+  if (!gSessionOptions.allowMultipleListeners && gEventListeners.has(event)) {
     throw new Error("Duplicate event listener: " + event);
   }
   gEventListeners.set(event, handler);
