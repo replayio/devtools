@@ -19,7 +19,7 @@ import { setUnexpectedError } from "ui/actions/errors";
 import type { UnexpectedError } from "ui/state/app";
 import ProtocolViewer from "ui/components/ProtocolViewer";
 
-import { replayRecording } from "playground";
+import { replayRecording, Editor } from "playground";
 import {
   eventReceived,
   requestSent,
@@ -126,36 +126,37 @@ export default function Playground() {
 
   const recordingId: string | undefined = router.query.recordingId;
 
-  useEffect(() => {
-    if (recordingId) {
-      _createSession(recordingId, store).then(session => {
-        console.log(session);
-        setSession(session);
-      });
-    }
-  }, [recordingId, store, recordingId]);
+  // useEffect(() => {
+  //   if (recordingId) {
+  //     _createSession(recordingId, store).then(session => {
+  //       console.log(session);
+  //       setSession(session);
+  //     });
+  //   }
+  // }, [recordingId, store]);
 
-  useEffect(() => {
-    if (session?.sessionId) {
-      replayRecording(client, recordingId, session?.sessionId);
-    }
-  }, [session, recordingId]);
+  // useEffect(() => {
+  //   if (session?.sessionId) {
+  //     replayRecording(client, recordingId, session?.sessionId);
+  //   }
+  // }, [session, recordingId]);
 
-  if (!session) {
-    return <LoadingScreen />;
-  }
+  // if (!session) {
+  //   return <LoadingScreen />;
+  // }
 
-  if ("error" in session) {
-    const error: ExpectedError = {
-      message: "Error",
-      content: session.error,
-    };
-    return <ExpectedErrorScreen error={error} />;
-  }
+  // if ("error" in session) {
+  //   const error: ExpectedError = {
+  //     message: "Error",
+  //     content: session.error,
+  //   };
+  //   return <ExpectedErrorScreen error={error} />;
+  // }
 
   return (
     <div className=" h-full ">
       <div className="relative h-full w-80">
+        <Editor />
         <ProtocolViewer />
       </div>
     </div>

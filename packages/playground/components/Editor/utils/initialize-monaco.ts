@@ -3,8 +3,8 @@ import { wireTmGrammars } from "monaco-editor-textmate";
 import { Registry } from "monaco-textmate";
 import { loadWASM } from "onigasm";
 import type { AsyncReturnType } from "type-fest";
-import theme from "theme/code.json";
-import { allTypes } from ".data/types";
+import theme from "./theme/code.json";
+// import { allTypes } from ".data/types";
 
 import defineTheme from "./define-theme";
 
@@ -112,9 +112,9 @@ export async function initializeMonaco({
   /**
    * Load types for components and hooks
    */
-  allTypes.forEach(typeDef => {
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(typeDef.code, typeDef.path);
-  });
+  // allTypes.forEach(typeDef => {
+  //   monaco.languages.typescript.typescriptDefaults.addExtraLib(typeDef.code, typeDef.path);
+  // });
 
   /**
    * Convert VS Code theme to Monaco theme

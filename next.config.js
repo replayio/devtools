@@ -68,6 +68,16 @@ module.exports = {
 
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     const entry = config.entry;
+
+    // Disable NextJS normal WASM loading pipeline so onigasm can load properly
+    config.module.rules.push({
+      test: /\.wasm$/,
+      type: "asset/resource",
+      generator: {
+        filename: "static/wasm/[modulehash].wasm",
+      },
+    });
+
     config.entry = () => {
       return entry().then(e => ({
         ...e,
