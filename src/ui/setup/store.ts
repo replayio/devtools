@@ -47,6 +47,18 @@ let extraThunkArgs = {} as ThunkExtraArgs;
 // Create a custom Immer instance that does not autofreeze.
 const customImmer = new Immer({ autoFreeze: false });
 
+// Store state values that have had `ValueFront` entries stripped out,
+// so we don't keep recalculating them after each action.
+const sanitizedValuesCache = new WeakMap();
+const getSanitizedValue = (item: any, category: string) => {
+  let sanitizedValue: any = sanitizedValuesCache.get(item);
+  if (sanitizedValue === undefined) {
+    sanitizedValue = sanitize(item, "", category, false);
+    sanitizedValuesCache.set(item, sanitizedValue);
+  }
+  return sanitizedValue;
+};
+
 // This _should_ be our UIState type, but I'm getting "<S> is not assignable to UIState" TS errors
 const sanitizeStateForDevtools = <S>(state: S) => {
   const OMITTED = "<OMITTED>";
@@ -92,16 +104,18 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.protocolMessages = OMITTED;
     }
 
+    // These sections may contain nested `ValueFront` objects,
+    // which cause lots of "Not Allowed" messages when serialized.
     if (draft.messages?.messages) {
-      // This may contain nested `ValueFront` objects, which cause lots of
-      // "Not Allowed" messages when serialized.
-      // TODO Make this more precise later
-      draft.messages.messages = OMITTED;
+      draft.messages.messages = getSanitizedValue(draft.messages.messages, "messages");
     }
 
-    // Same problem :(
-    if (draft.analyses) {
-      draft.analyses = OMITTED;
+    if (draft?.analyses) {
+      draft.analyses = getSanitizedValue(draft.analyses, "breakpointAnalyses");
+    }
+
+    if (draft.preview?.preview) {
+      draft.preview.preview = OMITTED;
     }
   });
 
@@ -164,11 +178,15 @@ export function bootstrapStore(initialState: Partial<UIState>) {
         : {
             stateSanitizer: sanitizeStateForDevtools,
             actionSanitizer: sanitizeActionForDevTools,
-            predicate: (state, action) => {
-              // There's a ton of these, and what we want to see
-              // is the Protocol Viewer UI, not these actions themselves
-              return !action.type.startsWith("protocolMessages");
-            },
+            // @ts-ignore was renamed, but RTK types haven't caught up yet
+            actionsDenylist: [
+              "protocolMessages/eventReceived",
+              "protocolMessages/responseReceived",
+              "protocolMessages/errorReceived",
+              "protocolMessages/requestSent",
+              "app/setHoveredLineNumberLocation",
+              "timeline/setPlaybackPrecachedTime",
+            ],
           },
   });
 
