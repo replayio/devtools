@@ -3,6 +3,7 @@ import { uploadedData } from "@replayio/protocol";
 import { findAutomatedTests } from "ui/actions/find-tests";
 import { videoReady } from "protocol/graphics";
 import {
+  addEventListener,
   CommandRequest,
   CommandResponse,
   createSession,
@@ -45,6 +46,7 @@ export { setUnexpectedError, setExpectedError };
 declare global {
   interface Window {
     sessionId: string;
+    sessionMetrics: any[] | undefined;
   }
 }
 
@@ -220,6 +222,13 @@ export function createSocket(
           }
         },
       });
+
+      if (prefs.listenForMetrics) {
+        window.sessionMetrics = [];
+        addEventListener("Session.newMetric", ({ data }) => {
+          window.sessionMetrics?.push(data);
+        });
+      }
 
       window.sessionId = sessionId;
       ThreadFront.setSessionId(sessionId);
