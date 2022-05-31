@@ -35,7 +35,15 @@ async function loadSourceMap(
 
     const dispatchUrl =
       new URL(location.href).searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL!;
-    initSocket(dispatchUrl);
+
+    const socket = initSocket(dispatchUrl);
+    if (typeof window !== "undefined") {
+      if (window.app != null) {
+        // @ts-ignore
+        window.app.socket = socket;
+      }
+    }
+
     const token = await tokenManager.getToken();
     if (token.token) {
       await client.Authentication.setAccessToken({ accessToken: token.token });

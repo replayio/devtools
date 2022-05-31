@@ -119,10 +119,10 @@ export async function createSession(
   return sessionId;
 }
 
-export function initSocket(address: string) {
+export function initSocket(address: string): WebSocket | null {
   if (customSocketSendMessageForTesting !== null) {
     // Test environment; a custom WebSocket is being used.
-    return;
+    return null;
   }
 
   const onopen = makeInfallible(flushQueuedMessages);
@@ -158,11 +158,10 @@ export function initSocket(address: string) {
   // First attempt at opening socket.
   socket = new WebSocket(address);
 
-  // @ts-ignore
-  window.app.socket = socket;
-
   socket.onopen = handleOpen;
   socket.onerror = handleOpenError;
+
+  return socket;
 }
 
 export function sendMessage<M extends CommandMethods>(
