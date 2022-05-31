@@ -179,6 +179,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
       process.env.NODE_ENV === "production"
         ? false
         : {
+            maxAge: 100,
             stateSanitizer: sanitizeStateForDevtools,
             actionSanitizer: sanitizeActionForDevTools,
             // @ts-ignore was renamed, but RTK types haven't caught up yet
