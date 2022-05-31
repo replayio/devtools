@@ -41,13 +41,18 @@ export enum AnalysisStatus {
 export type AnalysisSummary = {
   error: AnalysisError | undefined;
   id: string;
-  location: Location | undefined;
+  location: Location;
   condition?: string;
   points: PointDescription[] | undefined;
-  // Do we want to store results here? I guess so? They can be a bit
-  // unweildy I think, but I expect they will be serializable.
   results: AnalysisEntry[] | undefined;
   status: AnalysisStatus;
+};
+
+export type BreakpointAnalysisMapping = {
+  locationId: string;
+  currentAnalysis: string | null;
+  lastSuccessfulAnalysis: string | null;
+  allAnalyses: string[];
 };
 
 export interface BreakpointsState {
@@ -64,15 +69,23 @@ export interface BreakpointsState {
    * Analysis entries associated with breakpoints, keyed by GUID.
    */
   analyses: EntityState<AnalysisSummary>;
+  /**
+   * Maps between a location string and analysis IDs for that location
+   */
+  analysisMappings: EntityState<BreakpointAnalysisMapping>;
 }
 
 const analysesAdapter = createEntityAdapter<AnalysisSummary>();
+const mappingsAdapter = createEntityAdapter<BreakpointAnalysisMapping>({
+  selectId: entry => entry.locationId,
+});
 
 export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
     requestedBreakpoints: {},
     analyses: analysesAdapter.getInitialState(),
+    analysisMappings: mappingsAdapter.getInitialState(),
   };
 }
 
@@ -86,6 +99,13 @@ const breakpointsSlice = createSlice({
         const location = breakpoint.location;
         const id = getLocationKey(location);
         state.breakpoints[id] = breakpoint;
+
+        mappingsAdapter.addOne(state.analysisMappings, {
+          locationId: id,
+          currentAnalysis: null,
+          lastSuccessfulAnalysis: null,
+          allAnalyses: [],
+        });
 
         // Also remove any requested breakpoint that corresponds to this location
         breakpointsSlice.caseReducers.removeRequestedBreakpoint(
@@ -105,6 +125,8 @@ const breakpointsSlice = createSlice({
       reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
         const id = getLocationKey(action.payload.location);
         delete state.breakpoints[id];
+
+        mappingsAdapter.removeOne(state.analysisMappings, id);
       },
       prepare(location: SourceLocation, recordingId: string, cx?: Context) {
         // Add cx to action.meta
@@ -125,38 +147,63 @@ const breakpointsSlice = createSlice({
       const requestedId = getLocationKey({ ...action.payload, column: undefined });
       delete state.requestedBreakpoints[requestedId];
     },
-    removeBreakpoints(state) {
-      state.breakpoints = {};
-      state.requestedBreakpoints = {};
+    removeBreakpoints() {
+      return initialBreakpointsState();
     },
 
-    analysisCreated(state, action: PayloadAction<string>) {
+    analysisCreated(
+      state,
+      action: PayloadAction<{ analysisId: string; location: Location; condition?: string }>
+    ) {
+      const { analysisId, location, condition } = action.payload;
+
       analysesAdapter.addOne(state.analyses, {
         error: undefined,
-        id: action.payload,
-        location: undefined,
-        condition: undefined,
+        id: analysisId,
+        location,
+        condition,
         points: undefined,
         results: undefined,
         status: AnalysisStatus.Created,
       });
+
+      const locationKey = getLocationKey(location);
+      const mapping = state.analysisMappings.entities[locationKey];
+      if (mapping) {
+        mapping.allAnalyses.push(analysisId);
+        mapping.currentAnalysis = analysisId;
+      }
     },
     analysisPointsRequested(state, action: PayloadAction<string>) {
-      analysesAdapter.updateOne(state.analyses, {
-        id: action.payload,
-        changes: { status: AnalysisStatus.LoadingPoints },
+      const analysisId = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+      analysis.status = AnalysisStatus.LoadingPoints;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { currentAnalysis: analysisId },
       });
     },
     analysisPointsReceived(
       state,
       action: PayloadAction<{ analysisId: string; points: PointDescription[] }>
     ) {
-      analysesAdapter.updateOne(state.analyses, {
-        id: action.payload.analysisId,
-        changes: {
-          points: action.payload.points,
-          status: AnalysisStatus.PointsRetrieved,
-        },
+      const { analysisId, points } = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+      analysis.points = points;
+      analysis.status = AnalysisStatus.PointsRetrieved;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { lastSuccessfulAnalysis: analysisId },
       });
     },
     analysisResultsRequested(state, action: PayloadAction<string>) {
@@ -170,14 +217,22 @@ const breakpointsSlice = createSlice({
       action: PayloadAction<{ analysisId: string; results: AnalysisEntry[] }>
     ) {
       const { analysisId, results } = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
 
       // Preemptively freeze the `results` array to keep Immer from recursively freezing,
       // because we have mutable class instances nested inside (EW!)
       Object.freeze(results);
 
-      analysesAdapter.updateOne(state.analyses, {
-        id: analysisId,
-        changes: { status: AnalysisStatus.Completed, results },
+      analysis.results = results;
+      analysis.status = AnalysisStatus.Completed;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { lastSuccessfulAnalysis: analysisId },
       });
     },
     analysisErrored(
@@ -192,7 +247,11 @@ const breakpointsSlice = createSlice({
       const { analysisId, error, points, results } = action.payload;
 
       const analysis = state.analyses.entities[analysisId];
-      const currentStatus = analysis?.status;
+      if (!analysis) {
+        return;
+      }
+
+      const currentStatus = analysis.status;
       const isLoadingPoints = currentStatus === AnalysisStatus.LoadingPoints;
       const isLoadingResults = currentStatus === AnalysisStatus.LoadingResults;
       if (!isLoadingPoints && !isLoadingResults) {
@@ -213,8 +272,8 @@ const breakpointsSlice = createSlice({
           status: isLoadingPoints
             ? AnalysisStatus.ErroredGettingPoints
             : AnalysisStatus.ErroredRunning,
-          points: isLoadingPoints ? points : analysis?.points,
-          results: isLoadingResults ? results : analysis?.results,
+          points: isLoadingPoints ? points : analysis.points,
+          results: isLoadingResults ? results : analysis.results,
           error,
         },
       });

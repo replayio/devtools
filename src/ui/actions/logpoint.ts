@@ -282,7 +282,7 @@ async function setMultiSourceLogpoint(
     analysis = await createAnalysis(params);
     const { analysisId } = analysis;
 
-    store.dispatch(analysisCreated(analysisId));
+    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition }));
 
     await Promise.all(locations.map(location => analysis.addLocation(location)));
 
