@@ -100,11 +100,7 @@ export default function ViewerHeader({
   );
 }
 
-export function ViewerHeaderLeft({
-  children,
-}: {
-  children: React.ReactChild | (React.ReactChild | null)[];
-}) {
+export function ViewerHeaderLeft({ children }: { children: React.ReactNode }) {
   return (
     <div
       className={`flex flex-row items-center space-x-2 text-2xl font-semibold ${styles.libraryHeaderText}`}

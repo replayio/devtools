@@ -65,14 +65,14 @@ function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
 
   const workspace = workspaces.find(ws => ws.id === currentWorkspaceId)!;
 
-  const workspaceName = (
-    <div className="flex flex-row space-x-2">
-      {workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : null}
-      <div>{workspace.name}</div>
-    </div>
+  return (
+    <Viewer
+      recordings={recordings}
+      workspaceName={
+        workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : workspace.name
+      }
+    />
   );
-
-  return <Viewer recordings={recordings} workspaceName={workspaceName} />;
 }
 
 type ViewerRouterProps = PropsFromRedux;
