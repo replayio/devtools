@@ -28,7 +28,7 @@ import {
   analysisPointsRequested,
   analysisResultsReceived,
   analysisResultsRequested,
-} from "ui/reducers/analyses";
+} from "devtools/client/debugger/src/reducers/breakpoints";
 
 // TODO Ideally this file shouldn't know about a Redux store at all.
 // Currently, it dispatches actions and reads state once.
@@ -254,6 +254,7 @@ async function setMultiSourceLogpoint(
   const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
   if (primitiveFronts) {
+    // TODO We're getting an _array_ of locations, but only using the first one?
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
       if (!points.error) {

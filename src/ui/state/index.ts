@@ -1,5 +1,4 @@
 import { TimelineState } from "./timeline";
-import type { AnalysesState } from "ui/reducers/analyses";
 import { AppState } from "./app";
 import { ASTState } from "devtools/client/debugger/src/reducers/ast";
 import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/async-requests";
@@ -35,7 +34,6 @@ import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
-  analyses: AnalysesState;
   app: AppState;
   ast: ASTState;
   asyncRequests: AsyncRequestsState;

@@ -110,8 +110,11 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.messages.messages = getSanitizedValue(draft.messages.messages, "messages");
     }
 
-    if (draft?.analyses) {
-      draft.analyses = getSanitizedValue(draft.analyses, "breakpointAnalyses");
+    if (draft.breakpoints?.analyses) {
+      draft.breakpoints.analyses = getSanitizedValue(
+        draft.breakpoints.analyses,
+        "breakpointAnalyses"
+      );
     }
 
     if (draft.preview?.preview) {

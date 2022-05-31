@@ -26,7 +26,6 @@ import { actions } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
 import app, { setEventsForType, setVideoUrl } from "ui/reducers/app";
-import analyses from "ui/reducers/analyses";
 import comments from "ui/reducers/comments";
 import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
@@ -124,7 +123,6 @@ export default async function DevTools(store: AppStore) {
   };
 
   const reducers = {
-    analyses,
     app,
     comments,
     contextMenus,
