@@ -10,11 +10,6 @@ import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
-// TODO With a large recording (e.g. recordingId=244fac49-fc9c-4558-8819-25693e04292b)
-// toggling focus off and back on again causes two sequential, visible render+suspend+resolve chunks.
-// We should bail out on the first one once the second one comes in.
-// React doesn't even try to render the second one while the first one is suspending though.
-
 let inFlightWakeable: Wakeable | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
