@@ -104,8 +104,11 @@ export function createFrameComment(
   breakpoint?: any
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const sourceLocation =
-      breakpoint?.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront));
+    // Only try to generate a sourceLocation if there's a corresponding breakpoint for this
+    // frame comment.
+    const sourceLocation = breakpoint
+      ? breakpoint.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront))
+      : null;
     const options = {
       position,
       hasFrames: true,
