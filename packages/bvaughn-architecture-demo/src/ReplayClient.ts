@@ -7,6 +7,7 @@ import {
 } from "@replayio/protocol";
 import { client, initSocket } from "protocol/socket";
 import type { ThreadFront } from "protocol/thread";
+import { compareNumericStrings } from "protocol/utils";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -68,16 +69,43 @@ export class ReplayClient implements ReplayClient {
         sessionId
       );
 
+      // Messages aren't guaranteed to arrive sorted, but unsorted messages aren't that useful to work with.
+      // So sort them before returning.
+      const sortedMessages = response.messages.sort((messageA: Message, messageB: Message) => {
+        const pointA = messageA.point.point;
+        const pointB = messageB.point.point;
+        return compareNumericStrings(pointA, pointB);
+      });
+
       return {
-        messages: response.messages,
+        messages: sortedMessages,
         overflow: response.overflow == true,
       };
     } else {
-      const messages: Message[] = [];
+      const sortedMessages: Message[] = [];
 
       // TOOD This won't work if there are every overlapping requests.
+      // Do we need to implement some kind of locking mechanism to ensure only one read is going at a time?
       client.Console.addNewMessageListener(({ message }) => {
-        messages.push(message);
+        const newMessagePoint = message.point.point;
+
+        // Messages may arrive out of order so let's sort them as we get them.
+        let lowIndex = 0;
+        let highIndex = sortedMessages.length;
+        while (lowIndex < highIndex) {
+          let middleIndex = (lowIndex + highIndex) >>> 1;
+          const message = sortedMessages[middleIndex];
+
+          if (compareNumericStrings(message.point.point, newMessagePoint)) {
+            lowIndex = middleIndex + 1;
+          } else {
+            highIndex = middleIndex;
+          }
+        }
+
+        const insertAtIndex = lowIndex;
+
+        sortedMessages.splice(insertAtIndex, 0, message);
       });
 
       const response = await client.Console.findMessages({}, sessionId);
@@ -85,7 +113,7 @@ export class ReplayClient implements ReplayClient {
       client.Console.removeNewMessageListener();
 
       return {
-        messages,
+        messages: sortedMessages,
         overflow: response.overflow == true,
       };
     }

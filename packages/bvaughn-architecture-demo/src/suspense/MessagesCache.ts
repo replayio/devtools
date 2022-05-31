@@ -149,20 +149,9 @@ async function fetchMessages(
     if (inFlightWakeable === wakeable) {
       inFlightWakeable = null;
 
-      // Messages aren't guaranteed to arrive sorted.
-      // Presorting this unfiltered list now saves us from having to sort filtered lists later.
-      //
-      // TODO Is this only required for Console.findMessages()?
-      // Can we skip it for Console.findMessagesInRange()?
-      const sortedMessages = messages.sort((messageA: Message, messageB: Message) => {
-        const pointA = messageA.point.point;
-        const pointB = messageB.point.point;
-        return compareNumericStrings(pointA, pointB);
-      });
-
       lastFetchDidOverflow = overflow;
       lastFetchedFocusRange = focusRange;
-      lastFetchedMessages = sortedMessages;
+      lastFetchedMessages = messages;
     }
 
     wakeable.resolve();
