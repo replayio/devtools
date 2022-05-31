@@ -14,7 +14,7 @@ import { BlankViewportWrapper } from "../shared/Viewport";
 import Base64Image from "../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
-import { LibraryFiltersContext } from "./useFilters";
+import { LibraryContext } from "./useFilters";
 
 function ViewerLoader() {
   return (
@@ -25,7 +25,7 @@ function ViewerLoader() {
 }
 
 function MyLibrary() {
-  const { filter } = useContext(LibraryFiltersContext);
+  const { filter } = useContext(LibraryContext);
   const { recordings, loading } = hooks.useGetPersonalRecordings(filter);
   const { loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 
@@ -55,7 +55,7 @@ function TeamLibrary(props: ViewerRouterProps) {
 }
 
 function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
-  const { filter } = useContext(LibraryFiltersContext);
+  const { filter } = useContext(LibraryContext);
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(currentWorkspaceId!, filter);
   const { workspaces, loading: nonPendingLoading } = hooks.useGetNonPendingWorkspaces();
 

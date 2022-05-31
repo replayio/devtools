@@ -147,13 +147,37 @@ export interface Recording {
   metadata: RecordingMetadata;
 }
 
-interface RecordingMetadata {
-  test?: TestData;
+export interface RecordingMetadata {
+  test?: TestMetadata;
+  source?: SourceMetadata;
 }
 
-type TestData = {
-  result: "passed" | "failed";
+// https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
+type TestMetadata = {
+  result: "passed" | "failed" | "timedOut";
+  title: string;
+  version: number;
+  run?: { id: string; title?: string };
+  path?: string[];
   file?: string;
+};
+
+// https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
+type SourceMetadata = {
+  result: "passed" | "failed";
+  branch?: string;
+  commit: {
+    id: string;
+    title?: string;
+    url?: string;
+  };
+  merge?: {
+    id: string;
+    title: string;
+    url?: string;
+  };
+  provider?: string;
+  repository?: string;
 };
 
 export interface RecordingOptions {

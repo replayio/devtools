@@ -35,6 +35,7 @@ pref("devtools.features.showRedux", true);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.softFocus", false);
 pref("devtools.features.repaintEvaluations", false);
+pref("devtools.features.testSupport", false);
 
 export const prefs = new PrefsHelper("devtools", {
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -70,6 +71,7 @@ export const features = new PrefsHelper("devtools.features", {
   enableLargeText: ["Bool", "enableLargeText"],
   softFocus: ["Bool", "softFocus"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
+  testSupport: ["Bool", "testSupport"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
