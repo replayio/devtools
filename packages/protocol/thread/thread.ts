@@ -493,7 +493,7 @@ class _ThreadFront {
   ) {
     assert(this.sessionId, "no sessionId");
     let params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
-    if (range !== null) {
+    if (range !== null && range.startPoint !== "" && range.endPoint !== "") {
       params.range = { begin: range.startPoint, end: range.endPoint };
     }
     return client.Debugger.getHitCounts(params, this.sessionId);
