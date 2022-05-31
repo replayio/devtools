@@ -42,17 +42,12 @@ import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
-import { client, log, addEventListener } from "../socket";
+import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 
 import { Pause } from "./pause";
 import { ValueFront } from "./value";
 
-declare global {
-  interface Window {
-    sessionMetrics: any[] | undefined;
-  }
-}
 export interface RecordingDescription {
   duration: TimeStamp;
   length?: number;
@@ -252,13 +247,6 @@ class _ThreadFront {
     this.sessionWaiter.resolve(sessionId);
     // This helps when trying to debug logRocket sessions and the like
     console.debug({ sessionId });
-
-    if (window.app.prefs.listenForMetrics) {
-      window.sessionMetrics = [];
-      addEventListener("Session.newMetric", ({ data }) => {
-        window.sessionMetrics?.push(data);
-      });
-    }
 
     log(`GotSessionId ${sessionId}`);
 
