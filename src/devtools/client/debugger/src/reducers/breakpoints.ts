@@ -16,16 +16,22 @@ import type { Breakpoint, SourceLocation } from "./types";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
+
 export interface BreakpointsState {
+  /**
+   * Actual breakpoint entries, keyed by a location string
+   */
   breakpoints: Record<string, Breakpoint>;
+  /**
+   * Indicates which breakpoints have been optimistically added and
+   * are still being processed by the Replay backend server
+   */
   requestedBreakpoints: Record<string, LocationWithoutColumn>;
-  breakpointsDisabled: boolean;
 }
 
 export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
-    breakpointsDisabled: false,
     requestedBreakpoints: {},
   };
 }

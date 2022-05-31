@@ -12,6 +12,9 @@ import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpo
 import { setBreakpoint, removeBreakpoint, removeBreakpoints } from "./breakpoints";
 import { PendingBreakpoint, SourceLocation } from "./types";
 
+/**
+ * A set of known breakpoints for all recordings, persisted to `indexedDB`
+ */
 export type PendingBreakpointsState = Record<string, PendingBreakpoint>;
 
 const pendingBreakpointsSlice = createSlice({
