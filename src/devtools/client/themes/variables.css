@@ -177,8 +177,8 @@
   --cm-string: #0842a4;
   --cm-number: #18181a;
   --caret-color: #18181a;
-  --debug-line-border: #037aff;
-  --debug-line-background: #e9f3ff;
+  --debug-line-border: var(--primary-accent);
+  --debug-line-background: #e8f5fb;
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
