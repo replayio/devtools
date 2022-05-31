@@ -24,7 +24,11 @@ export default function Transcript() {
       clonedComments.push(pendingComment.comment);
     }
 
-    const sortedComments = sortBy(clonedComments, [c => BigInt(c.point), "createdAt"]);
+    const sortedComments = sortBy(clonedComments, [
+      c => c.time,
+      c => BigInt(c.point || 0),
+      "createdAt",
+    ]);
     return sortedComments;
   }, [comments, pendingComment]);
 

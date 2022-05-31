@@ -1,4 +1,4 @@
-import { RecordingId, TimeStampedPoint } from "@replayio/protocol";
+import { RecordingId } from "@replayio/protocol";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { setSymbols } from "devtools/client/debugger/src/actions/sources/symbols";
 import { getSymbols } from "devtools/client/debugger/src/reducers/ast";
