@@ -1,10 +1,10 @@
-import { Message, SessionId, TimeStampedPointRange } from "@replayio/protocol";
-import { client } from "protocol/socket";
+import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
+import ReplayClient from "../ReplayClient";
+import { Wakeable } from "../types";
 import { compareNumericStrings } from "../utils/string";
 import { createWakeable } from "../utils/suspense";
 import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
-import { Wakeable } from "../types";
 
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,
@@ -39,7 +39,7 @@ type getMessagesResponse = {
 //
 // This method is Suspense friend; it is meant to be called from a React component during render.
 export function getMessages(
-  sessionId: SessionId,
+  client: ReplayClient,
   focusRange: TimeStampedPointRange | null
 ): getMessagesResponse {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
@@ -89,7 +89,7 @@ export function getMessages(
 
     const wakeable = (inFlightWakeable = createWakeable());
 
-    fetchMessages(sessionId, focusRange, wakeable);
+    fetchMessages(client, focusRange, wakeable);
 
     throw inFlightWakeable;
   }
@@ -137,40 +137,12 @@ export function getMessages(
 }
 
 async function fetchMessages(
-  sessionId: SessionId,
+  client: ReplayClient,
   focusRange: TimeStampedPointRange | null,
   wakeable: Wakeable
 ) {
   try {
-    // TODO Replace these client references with ReplayClient instance.
-    // Maybe that instance should have some of the "soft focus" and filtering logic baked into it.
-    // This could simplify the React-specific APIs and how we mock/stub for testing.
-
-    let messages: Message[] = null as unknown as Message[];
-    let overflow: boolean = false;
-
-    if (focusRange !== null) {
-      const response = await client.Console.findMessagesInRange(
-        { range: { begin: focusRange.begin.point, end: focusRange.end.point } },
-        sessionId
-      );
-
-      messages = response.messages;
-      overflow = response.overflow == true;
-    } else {
-      messages = [];
-
-      // TOOD This won't work if there are every overlapping requests.
-      client.Console.addNewMessageListener(({ message }) => {
-        messages.push(message);
-      });
-
-      const response = await client.Console.findMessages({}, sessionId);
-
-      client.Console.removeNewMessageListener();
-
-      overflow = response.overflow === true;
-    }
+    const { messages, overflow } = await client.findMessages(focusRange);
 
     // Only update cached values if this request hasn't been superceded by a newer one.
     //
@@ -187,7 +159,7 @@ async function fetchMessages(
       //
       // TODO Is this only required for Console.findMessages()?
       // Can we skip it for Console.findMessagesInRange()?
-      messages = messages.sort((messageA: Message, messageB: Message) => {
+      const sortedMessages = messages.sort((messageA: Message, messageB: Message) => {
         const pointA = messageA.point.point;
         const pointB = messageB.point.point;
         return compareNumericStrings(pointA, pointB);
@@ -195,7 +167,7 @@ async function fetchMessages(
 
       lastFetchDidOverflow = overflow;
       lastFetchedFocusRange = focusRange;
-      lastFetchedMessages = messages;
+      lastFetchedMessages = sortedMessages;
     }
 
     wakeable.resolve();

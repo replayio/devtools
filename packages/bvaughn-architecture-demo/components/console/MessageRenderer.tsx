@@ -16,6 +16,7 @@ function MessageRenderer({ message }: { message: Message }) {
 
   // TODO This logic should be moved out of the view.
   // It should probably be backed by its own Suspense cache which can just-in-time load ValueFronts, e.g. loadIfNecessary()
+  // Do messages have some sort of stable ID that we could use for a Suspense cache key? Maybe pauseId?
   const valueFronts = useMemo<ValueFront[]>(() => {
     if (message.argumentValues == null) {
       return [];

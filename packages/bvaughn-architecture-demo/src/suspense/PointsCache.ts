@@ -1,6 +1,6 @@
 import { ExecutionPoint, SessionId } from "@replayio/protocol";
-import { client } from "protocol/socket";
 import { unstable_getCacheForType as getCacheForType } from "react";
+import ReplayClient from "../ReplayClient";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "../types";
 import { createWakeable } from "../utils/suspense";
@@ -18,7 +18,7 @@ function getRecordMap(): TimeToRecordMap {
   return getCacheForType(createMap);
 }
 
-export function getClosestPointForTime(time: number, sessionId: SessionId): ExecutionPoint {
+export function getClosestPointForTime(client: ReplayClient, time: number): ExecutionPoint {
   const map = getRecordMap();
   let record = map.get(time);
   if (record == null) {
@@ -31,7 +31,7 @@ export function getClosestPointForTime(time: number, sessionId: SessionId): Exec
 
     map.set(time, record);
 
-    fetchPoint(time, sessionId, record, wakeable);
+    fetchPoint(client, time, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -42,17 +42,16 @@ export function getClosestPointForTime(time: number, sessionId: SessionId): Exec
 }
 
 async function fetchPoint(
+  client: ReplayClient,
   time: number,
-  sessionId: SessionId,
   record: Record<ExecutionPoint>,
   wakeable: Wakeable
 ) {
   try {
-    // TODO Replace these client references with ReplayClient instance.
-    const timeStampedPoint = await client.Session.getPointNearTime({ time: time }, sessionId);
+    const point = await client.getPointNearTime(time);
 
     record.status = STATUS_RESOLVED;
-    record.value = timeStampedPoint.point.point;
+    record.value = point.point;
 
     wakeable.resolve();
   } catch (error) {

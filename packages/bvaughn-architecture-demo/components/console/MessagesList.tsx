@@ -1,7 +1,7 @@
 import { Message } from "@replayio/protocol";
 import { useContext } from "react";
 
-import { ConsoleFiltersContext, FocusContext, SessionContext } from "../../src/contexts";
+import { ConsoleFiltersContext, FocusContext, ReplayClientContext } from "../../src/contexts";
 import useFilteredMessages from "../../src/hooks/useFilteredMessages";
 import { getMessages } from "../../src/suspense/MessagesCache";
 import { getClosestPointForTime } from "../../src/suspense/PointsCache";
@@ -17,7 +17,7 @@ import styles from "./MessagesList.module.css";
 // Note that the props passed from the parent component would more likely be exposed through Context in a real app.
 // We're passing them as props in this case since the parent and child are right beside each other in the tree.
 export default function MessagesList() {
-  const { sessionId } = useContext(SessionContext);
+  const replayClient = useContext(ReplayClientContext);
 
   const { filterByText, levelFlags } = useContext(ConsoleFiltersContext);
   const { range, isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
@@ -26,8 +26,8 @@ export default function MessagesList() {
   if (range !== null) {
     const [startTime, endTime] = range;
 
-    const startPoint = getClosestPointForTime(startTime, sessionId);
-    const endPoint = getClosestPointForTime(endTime, sessionId);
+    const startPoint = getClosestPointForTime(replayClient, startTime);
+    const endPoint = getClosestPointForTime(replayClient, endTime);
 
     focusMode = {
       begin: {
@@ -41,7 +41,7 @@ export default function MessagesList() {
     };
   }
 
-  const { countAfter, countBefore, didOverflow, messages } = getMessages(sessionId, focusMode);
+  const { countAfter, countBefore, didOverflow, messages } = getMessages(replayClient, focusMode);
 
   // Memoized selector that joins log points and messages and filters by criteria (e.g. type)
   // Note that we are intentionally not storing derived values like this in state.

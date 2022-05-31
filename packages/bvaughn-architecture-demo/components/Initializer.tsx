@@ -1,13 +1,9 @@
 // This file is not really part of the architectural demo.
 // It's just a bootstrap for things like auth that I didn't want to spend time actually implementing.
 
-import { client, initSocket } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { SessionContext } from "../src/contexts";
-
-const DISPATCH_URL = "wss://dispatch.replay.io";
+import { ReplayClientContext, SessionContext } from "../src/contexts";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.
@@ -20,6 +16,7 @@ if (typeof window !== "undefined") {
 type ContextType = { duration: number; endPoint: string; recordingId: string; sessionId: string };
 
 export default function Initializer({ children }: { children: ReactNode }) {
+  const client = useContext(ReplayClientContext);
   const [context, setContext] = useState<ContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
 
@@ -28,8 +25,6 @@ export default function Initializer({ children }: { children: ReactNode }) {
     // We only need to initialize them once.
     if (!didInitializeRef.current) {
       const asyncInitialize = async () => {
-        initSocket(DISPATCH_URL);
-
         // Read some of the hard-coded values from query params.
         // (This is just a prototype; no sense building a full authentication flow.)
         const url = new URL(window.location.href);
@@ -39,21 +34,11 @@ export default function Initializer({ children }: { children: ReactNode }) {
           throw Error(`Must specify "recordingId" parameter.`);
         }
 
-        // Authenticate
-        if (accessToken) {
-          await client.Authentication.setAccessToken({ accessToken });
-        }
+        const sessionId = await client.initialize(recordingId, accessToken);
+        const endpoint = await client.getSessionEndpoint(sessionId);
 
-        // Create session
-        const { sessionId } = await client.Recording.createSession({ recordingId });
-        const { endpoint } = await client.Session.getEndpoint({}, sessionId);
-
-        // Pre-load sources for ValueFront usage later.
-        ThreadFront.setSessionId(sessionId);
-        // @ts-expect-error `sourceMapURL` doesn't exist?
-        await ThreadFront.findSources(({ sourceId, url, sourceMapURL }) => {
-          // Ignore
-        });
+        // The demo doesn't use these directly, but the client throws if they aren't loaded.
+        await client.findSources();
 
         setContext({
           duration: endpoint.time,
@@ -67,7 +52,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
     }
 
     didInitializeRef.current = true;
-  }, []);
+  }, [client]);
 
   if (context === null) {
     return null;
