@@ -1,0 +1,66 @@
+.FocusRegionRowOff,
+.FocusRegionRowOn {
+  padding: 1ch;
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+  gap: 1ch;
+  align-items: center;
+}
+.FocusRegionRowOn {
+  background-color: var(--color-blue);
+}
+
+.FocusToggleButton {
+  width: 10ch;
+  cursor: pointer;
+  border-radius: 0.25rem;
+  border: none;
+  padding: 0.25rem;
+}
+
+.RangeSlider {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.RangeTrackFocused {
+  background-color: rgba(0, 0, 0, 0.25);
+  height: 4px;
+}
+.RangeTrackUnfocused {
+  height: 2px;
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+.FocusedRange {
+  background-color: red;
+}
+
+.RangeStartThumb,
+.RangeEndThumb {
+  position: absolute;
+  cursor: grab;
+  width: 1px;
+  height: 20px;
+  width: 6px;
+}
+.RangeStartThumb {
+  background-color: var(--color-gray-3);
+  border-radius: 4px 0px 0px 4px;
+}
+.RangeEndThumb {
+  background-color: var(--color-gray-3);
+  border-radius: 0px 4px 4px 0px;
+}
+
+.FocusTimeStamps {
+  white-space: nowrap;
+  font-size: 12px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 4px;
+  padding: 2px 4px;
+}

@@ -1,0 +1,6 @@
+.Error {
+  background-color: var(--color-red-light);
+  color: var(--color-red-dark);
+  padding: 1rem;
+  margin: 0;
+}

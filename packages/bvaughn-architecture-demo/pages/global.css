@@ -1,0 +1,23 @@
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: sans-serif;
+  font-size: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:root {
+  --color-blue: #0a84ff;
+  --color-gray-1: #d0d5dc;
+  --color-gray-2: #9ca3af;
+  --color-gray-3: #234;
+  --color-red-dark: #ff0000;
+  --color-red-light: #ffd3d3;
+  --color-yellow-dark: #6c5914;
+  --color-yellow-light: #fffac8;
+  --color-white: #fff;
+}

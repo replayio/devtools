@@ -1,0 +1,24 @@
+.Container,
+.ContainerPending {
+  position: relative;
+  overflow: auto;
+  height: 100%;
+}
+.ContainerPending {
+  opacity: 0.5;
+}
+
+.CountRow,
+.NoMessagesRow,
+.OverflowRow {
+  padding: 0.25rem;
+}
+
+.OverflowRow {
+  background-color: var(--color-red-dark);
+  color: var(--color-white);
+}
+
+.CountRow {
+  background-color: var(--color-gray-1);
+}
