@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Location } from "@replayio/protocol";
+import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
+import { Location, PointDescription, AnalysisEntry } from "@replayio/protocol";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import string from "devtools/packages/devtools-reps/reps/string";
+import { AnalysisError } from "protocol/thread/analysis";
 import type { UIState } from "ui/state";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
@@ -16,23 +18,80 @@ import type { Breakpoint, SourceLocation } from "./types";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
-export interface BreakpointsState {
-  breakpoints: Record<string, Breakpoint>;
-  requestedBreakpoints: Record<string, LocationWithoutColumn>;
-  breakpointsDisabled: boolean;
+
+export enum AnalysisStatus {
+  // Happy path
+  Created = "Created",
+  LoadingPoints = "LoadingPoints",
+  PointsRetrieved = "PointsRetrieved",
+  LoadingResults = "LoadingResults",
+  Completed = "Completed",
+
+  // We don't have this yet, but we *should*, it's important. For instance, when
+  // a user changes their focus region and we're going to rerun this anyways?
+  // Cancel it!
+  Cancelled = "Cancelled",
+
+  // These errors mean very different things! The max hits for getting points is
+  // 10,000, while the max hits for running an analysis is 200!
+  ErroredGettingPoints = "ErroredGettingPoints",
+  ErroredRunning = "ErroredRunning",
 }
+
+export type AnalysisSummary = {
+  error: AnalysisError | undefined;
+  id: string;
+  location: Location;
+  condition?: string;
+  points: PointDescription[] | undefined;
+  results: AnalysisEntry[] | undefined;
+  status: AnalysisStatus;
+};
+
+export type BreakpointAnalysisMapping = {
+  locationId: string;
+  currentAnalysis: string | null;
+  lastSuccessfulAnalysis: string | null;
+  allAnalyses: string[];
+};
+
+export interface BreakpointsState {
+  /**
+   * Actual breakpoint entries, keyed by a location string
+   */
+  breakpoints: Record<string, Breakpoint>;
+  /**
+   * Indicates which breakpoints have been optimistically added and
+   * are still being processed by the Replay backend server
+   */
+  requestedBreakpoints: Record<string, LocationWithoutColumn>;
+  /**
+   * Analysis entries associated with breakpoints, keyed by GUID.
+   */
+  analyses: EntityState<AnalysisSummary>;
+  /**
+   * Maps between a location string and analysis IDs for that location
+   */
+  analysisMappings: EntityState<BreakpointAnalysisMapping>;
+}
+
+const analysesAdapter = createEntityAdapter<AnalysisSummary>();
+const mappingsAdapter = createEntityAdapter<BreakpointAnalysisMapping>({
+  selectId: entry => entry.locationId,
+});
 
 export function initialBreakpointsState(): BreakpointsState {
   return {
     breakpoints: {},
-    breakpointsDisabled: false,
     requestedBreakpoints: {},
+    analyses: analysesAdapter.getInitialState(),
+    analysisMappings: mappingsAdapter.getInitialState(),
   };
 }
 
 const breakpointsSlice = createSlice({
   name: "breakpoints",
-  initialState: initialBreakpointsState(),
+  initialState: initialBreakpointsState,
   reducers: {
     setBreakpoint: {
       reducer(state, action: PayloadAction<{ breakpoint: Breakpoint; recordingId: string }>) {
@@ -40,6 +99,13 @@ const breakpointsSlice = createSlice({
         const location = breakpoint.location;
         const id = getLocationKey(location);
         state.breakpoints[id] = breakpoint;
+
+        mappingsAdapter.addOne(state.analysisMappings, {
+          locationId: id,
+          currentAnalysis: null,
+          lastSuccessfulAnalysis: null,
+          allAnalyses: [],
+        });
 
         // Also remove any requested breakpoint that corresponds to this location
         breakpointsSlice.caseReducers.removeRequestedBreakpoint(
@@ -59,6 +125,8 @@ const breakpointsSlice = createSlice({
       reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
         const id = getLocationKey(action.payload.location);
         delete state.breakpoints[id];
+
+        mappingsAdapter.removeOne(state.analysisMappings, id);
       },
       prepare(location: SourceLocation, recordingId: string, cx?: Context) {
         // Add cx to action.meta
@@ -79,14 +147,147 @@ const breakpointsSlice = createSlice({
       const requestedId = getLocationKey({ ...action.payload, column: undefined });
       delete state.requestedBreakpoints[requestedId];
     },
-    removeBreakpoints(state) {
-      state.breakpoints = {};
-      state.requestedBreakpoints = {};
+    removeBreakpoints() {
+      return initialBreakpointsState();
+    },
+
+    analysisCreated(
+      state,
+      action: PayloadAction<{ analysisId: string; location: Location; condition?: string }>
+    ) {
+      const { analysisId, location, condition } = action.payload;
+
+      analysesAdapter.addOne(state.analyses, {
+        error: undefined,
+        id: analysisId,
+        location,
+        condition,
+        points: undefined,
+        results: undefined,
+        status: AnalysisStatus.Created,
+      });
+
+      const locationKey = getLocationKey(location);
+      const mapping = state.analysisMappings.entities[locationKey];
+      if (mapping) {
+        mapping.allAnalyses.push(analysisId);
+        mapping.currentAnalysis = analysisId;
+      }
+    },
+    analysisPointsRequested(state, action: PayloadAction<string>) {
+      const analysisId = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+      analysis.status = AnalysisStatus.LoadingPoints;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { currentAnalysis: analysisId },
+      });
+    },
+    analysisPointsReceived(
+      state,
+      action: PayloadAction<{ analysisId: string; points: PointDescription[] }>
+    ) {
+      const { analysisId, points } = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+      analysis.points = points;
+      analysis.status = AnalysisStatus.PointsRetrieved;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { lastSuccessfulAnalysis: analysisId },
+      });
+    },
+    analysisResultsRequested(state, action: PayloadAction<string>) {
+      analysesAdapter.updateOne(state.analyses, {
+        id: action.payload,
+        changes: { status: AnalysisStatus.LoadingResults },
+      });
+    },
+    analysisResultsReceived(
+      state,
+      action: PayloadAction<{ analysisId: string; results: AnalysisEntry[] }>
+    ) {
+      const { analysisId, results } = action.payload;
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+
+      // Preemptively freeze the `results` array to keep Immer from recursively freezing,
+      // because we have mutable class instances nested inside (EW!)
+      Object.freeze(results);
+
+      analysis.results = results;
+      analysis.status = AnalysisStatus.Completed;
+
+      const locationKey = getLocationKey(analysis.location);
+      mappingsAdapter.updateOne(state.analysisMappings, {
+        id: locationKey,
+        changes: { lastSuccessfulAnalysis: analysisId },
+      });
+    },
+    analysisErrored(
+      state,
+      action: PayloadAction<{
+        analysisId: string;
+        error: AnalysisError;
+        points?: PointDescription[];
+        results?: AnalysisEntry[];
+      }>
+    ) {
+      const { analysisId, error, points, results } = action.payload;
+
+      const analysis = state.analyses.entities[analysisId];
+      if (!analysis) {
+        return;
+      }
+
+      const currentStatus = analysis.status;
+      const isLoadingPoints = currentStatus === AnalysisStatus.LoadingPoints;
+      const isLoadingResults = currentStatus === AnalysisStatus.LoadingResults;
+      if (!isLoadingPoints && !isLoadingResults) {
+        throw "Invalid state update";
+      }
+
+      if (points) {
+        Object.freeze(points);
+      }
+
+      if (results) {
+        Object.freeze(results);
+      }
+
+      analysesAdapter.updateOne(state.analyses, {
+        id: analysisId,
+        changes: {
+          status: isLoadingPoints
+            ? AnalysisStatus.ErroredGettingPoints
+            : AnalysisStatus.ErroredRunning,
+          points: isLoadingPoints ? points : analysis.points,
+          results: isLoadingResults ? results : analysis.results,
+          error,
+        },
+      });
     },
   },
 });
 
 export const {
+  analysisCreated,
+  analysisErrored,
+  analysisPointsReceived,
+  analysisPointsRequested,
+  analysisResultsReceived,
+  analysisResultsRequested,
   removeBreakpoint,
   removeBreakpoints,
   removeRequestedBreakpoint,

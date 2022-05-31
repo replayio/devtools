@@ -172,18 +172,11 @@ function runAnalysis(location: SourceLocation, options: InitialBreakpointOptions
   const finalOptions = maybeGenerateLogGroupId(options);
   const { condition, logValue, logGroupId } = finalOptions;
   const { line, column, sourceUrl, sourceId } = location;
-  const showInConsole = false;
 
   if (sourceId) {
-    setLogpoint(
-      logGroupId!,
-      { sourceId, line, column: column! },
-      logValue!,
-      condition!,
-      showInConsole
-    );
+    setLogpoint(logGroupId!, { sourceId, line, column: column! }, logValue!, condition!);
   } else {
-    setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue!, condition!, showInConsole);
+    setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue!, condition!);
   }
 }
 

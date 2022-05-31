@@ -28,6 +28,12 @@ type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
 };
 
+// TODO This isn't exported from RTK. Mark should fix that.
+type ReduxDevToolsOptions = Exclude<
+  Parameters<typeof configureStore>[0]["devTools"],
+  boolean | undefined
+>;
+
 // HACK We know that other slices are being lazy-loaded later.
 // This should probably be rewritten at some point.
 // In the meantime, type the `reducers` object to represent the other
@@ -46,6 +52,18 @@ let extraThunkArgs = {} as ThunkExtraArgs;
 // apparently currently mutating state in ManagedTree.js, so that throws an error if frozen.
 // Create a custom Immer instance that does not autofreeze.
 const customImmer = new Immer({ autoFreeze: false });
+
+// Store state values that have had `ValueFront` entries stripped out,
+// so we don't keep recalculating them after each action.
+const sanitizedValuesCache = new WeakMap();
+const getSanitizedValue = (item: any, category: string) => {
+  let sanitizedValue: any = sanitizedValuesCache.get(item);
+  if (sanitizedValue === undefined) {
+    sanitizedValue = sanitize(item, "", category, false);
+    sanitizedValuesCache.set(item, sanitizedValue);
+  }
+  return sanitizedValue;
+};
 
 // This _should_ be our UIState type, but I'm getting "<S> is not assignable to UIState" TS errors
 const sanitizeStateForDevtools = <S>(state: S) => {
@@ -88,11 +106,25 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.pause.frameScopes = OMITTED;
     }
 
+    if (draft.protocolMessages) {
+      draft.protocolMessages = OMITTED;
+    }
+
+    // These sections may contain nested `ValueFront` objects,
+    // which cause lots of "Not Allowed" messages when serialized.
     if (draft.messages?.messages) {
-      // This may contain nested `ValueFront` objects, which cause lots of
-      // "Not Allowed" messages when serialized.
-      // TODO Make this more precise later
-      draft.messages.messages = OMITTED;
+      draft.messages.messages = getSanitizedValue(draft.messages.messages, "messages");
+    }
+
+    if (draft.breakpoints?.analyses) {
+      draft.breakpoints.analyses = getSanitizedValue(
+        draft.breakpoints.analyses,
+        "breakpointAnalyses"
+      );
+    }
+
+    if (draft.preview?.preview) {
+      draft.preview.preview = OMITTED;
     }
   });
 
@@ -106,6 +138,21 @@ const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
   });
 
   return sanitizedAction;
+};
+
+const reduxDevToolsOptions: ReduxDevToolsOptions = {
+  maxAge: 100,
+  stateSanitizer: sanitizeStateForDevtools,
+  actionSanitizer: sanitizeActionForDevTools,
+  // @ts-ignore This field has been renamed, but RTK types haven't caught up yet
+  actionsDenylist: [
+    "protocolMessages/eventReceived",
+    "protocolMessages/responseReceived",
+    "protocolMessages/errorReceived",
+    "protocolMessages/requestSent",
+    "app/setHoveredLineNumberLocation",
+    "timeline/setPlaybackPrecachedTime",
+  ],
 };
 
 export function bootstrapStore(initialState: Partial<UIState>) {
@@ -149,13 +196,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
 
       return updatedMiddlewareArray as typeof originalMiddlewareArray;
     },
-    devTools:
-      process.env.NODE_ENV === "production"
-        ? false
-        : {
-            stateSanitizer: sanitizeStateForDevtools,
-            actionSanitizer: sanitizeActionForDevTools,
-          },
+    devTools: process.env.NODE_ENV === "production" ? false : reduxDevToolsOptions,
   });
 
   return store;
