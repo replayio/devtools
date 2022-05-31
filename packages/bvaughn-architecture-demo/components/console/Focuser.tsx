@@ -29,17 +29,25 @@ export default function Focuser() {
       <button className={styles.FocusToggleButton} onClick={toggleFocus}>
         Focus {range === null ? "off" : "on"}
       </button>
-      <RangeSlider enabled={focus !== null} end={end} onChange={onSliderChange} start={start} />
+      <RangeSlider
+        duration={duration}
+        enabled={focus !== null}
+        end={end}
+        onChange={onSliderChange}
+        start={start}
+      />
     </div>
   );
 }
 
 function RangeSlider({
+  duration,
   enabled,
   end,
   onChange,
   start,
 }: {
+  duration: number;
   enabled: boolean;
   end: number;
   onChange: (start: number, end: number) => void;
@@ -94,7 +102,7 @@ function RangeSlider({
         />
       </div>
       <div className={styles.FocusTimeStamps}>
-        {formatTimestamp(start)} – {formatTimestamp(end)}
+        {formatTimestamp(start * duration)} – {formatTimestamp(end * duration)}
       </div>
     </>
   );

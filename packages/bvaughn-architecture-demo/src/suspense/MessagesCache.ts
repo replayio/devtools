@@ -1,6 +1,6 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
-import ReplayClient from "../ReplayClient";
+import { ReplayClientInterface } from "../ReplayClient";
 import { Wakeable } from "../types";
 import { compareNumericStrings } from "../utils/string";
 import { createWakeable } from "../utils/suspense";
@@ -39,7 +39,7 @@ type getMessagesResponse = {
 //
 // This method is Suspense friend; it is meant to be called from a React component during render.
 export function getMessages(
-  client: ReplayClient,
+  client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null
 ): getMessagesResponse {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
@@ -137,7 +137,7 @@ export function getMessages(
 }
 
 async function fetchMessages(
-  client: ReplayClient,
+  client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
   wakeable: Wakeable
 ) {

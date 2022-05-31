@@ -22,14 +22,14 @@ export default function MessagesList() {
   const { filterByText, levelFlags } = useContext(ConsoleFiltersContext);
   const { range, isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
 
-  let focusMode = null;
+  let focusRange = null;
   if (range !== null) {
     const [startTime, endTime] = range;
 
     const startPoint = getClosestPointForTime(replayClient, startTime);
     const endPoint = getClosestPointForTime(replayClient, endTime);
 
-    focusMode = {
+    focusRange = {
       begin: {
         point: startPoint,
         time: startTime,
@@ -41,7 +41,7 @@ export default function MessagesList() {
     };
   }
 
-  const { countAfter, countBefore, didOverflow, messages } = getMessages(replayClient, focusMode);
+  const { countAfter, countBefore, didOverflow, messages } = getMessages(replayClient, focusRange);
 
   // Memoized selector that joins log points and messages and filters by criteria (e.g. type)
   // Note that we are intentionally not storing derived values like this in state.

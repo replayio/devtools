@@ -12,7 +12,18 @@ import type { ThreadFront } from "protocol/thread";
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
 
-export default class ReplayClient {
+export interface ReplayClientInterface {
+  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  findMessages(focusRange: TimeStampedPointRange | null): Promise<{
+    messages: Message[];
+    overflow: boolean;
+  }>;
+  findSources(): Promise<void>;
+  getPointNearTime(time: number): Promise<TimeStampedPoint>;
+  getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
+}
+
+export class ReplayClient implements ReplayClient {
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
 
@@ -24,7 +35,7 @@ export default class ReplayClient {
     }
   }
 
-  getSessionIdThrows(): SessionId {
+  private getSessionIdThrows(): SessionId {
     const sessionId = this._sessionId;
     if (sessionId === null) {
       throw Error("Invalid session");
@@ -80,7 +91,7 @@ export default class ReplayClient {
     }
   }
 
-  async findSources() {
+  async findSources(): Promise<void> {
     await this._threadFront.findSources(() => {
       // The demo doesn't use these directly, but the client throws if they aren't loaded.
     });

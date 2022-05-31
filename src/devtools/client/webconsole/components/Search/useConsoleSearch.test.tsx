@@ -2,13 +2,12 @@ import { ThreadFront, ValueFront } from "protocol/thread";
 import React from "react";
 import { act } from "react-dom/test-utils";
 import {
-  DEFAULT_SESSION_ID,
   createConsoleMessage,
   createLoadedRegions,
   createSource,
   createValue,
-  sendValuesToMockEnvironment,
-} from "test/testFixtureUtils";
+} from "shared/utils/testing";
+import { DEFAULT_SESSION_ID, sendValuesToMockEnvironment } from "test/testFixtureUtils";
 import {
   createTestStore,
   filterCommonTestWarnings,

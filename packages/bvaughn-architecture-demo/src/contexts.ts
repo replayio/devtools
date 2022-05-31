@@ -1,7 +1,7 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { createContext } from "react";
-import ReplayClient from "./ReplayClient";
+import { ReplayClient, ReplayClientInterface } from "./ReplayClient";
 
 import { Range } from "./types";
 
@@ -49,7 +49,7 @@ export type SessionContextType = {
 };
 export const SessionContext = createContext<SessionContextType>(null as any);
 
-export type ReplayClientContextType = ReplayClient;
+export type ReplayClientContextType = ReplayClientInterface;
 
 // By default, this context wires the app up to use real Replay backend APIs.
 // We can leverage this when writing tests (or UI demos) by injecting a stub client.
