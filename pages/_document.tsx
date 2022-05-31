@@ -31,7 +31,7 @@ const csp = (props: any) => {
         ? "http://*.pre-prod.replay.prod/ http://localhost:* http://*.replay.local ws://localhost:*"
         : "ws://localhost:8000"
     }`,
-    `frame-src https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com https://www.loom.com/`,
+    `frame-src replay: https://js.stripe.com https://hooks.stripe.com https://webreplay.us.auth0.com https://www.loom.com/`,
     // Required by some of our external services
     `script-src 'self' 'unsafe-eval' https://cdn.logrocket.io https://cdn.lr-ingest.io https://cdn.lr-in.com https://js.stripe.com ${hash}`,
     `form-action https://webreplay.us.auth0.com`,
