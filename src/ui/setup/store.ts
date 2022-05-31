@@ -28,6 +28,12 @@ type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
 };
 
+// TODO This isn't exported from RTK. Mark should fix that.
+type ReduxDevToolsOptions = Exclude<
+  Parameters<typeof configureStore>[0]["devTools"],
+  boolean | undefined
+>;
+
 // HACK We know that other slices are being lazy-loaded later.
 // This should probably be rewritten at some point.
 // In the meantime, type the `reducers` object to represent the other
@@ -126,12 +132,27 @@ const sanitizeStateForDevtools = <S>(state: S) => {
 };
 
 const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
-  // Actions may contain `ValueFront` objectsaction);
+  // Actions may contain `ValueFront` objects
   const sanitizedAction = customImmer.produce(action, draft => {
     return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
   });
 
   return sanitizedAction;
+};
+
+const reduxDevToolsOptions: ReduxDevToolsOptions = {
+  maxAge: 100,
+  stateSanitizer: sanitizeStateForDevtools,
+  actionSanitizer: sanitizeActionForDevTools,
+  // @ts-ignore This field has been renamed, but RTK types haven't caught up yet
+  actionsDenylist: [
+    "protocolMessages/eventReceived",
+    "protocolMessages/responseReceived",
+    "protocolMessages/errorReceived",
+    "protocolMessages/requestSent",
+    "app/setHoveredLineNumberLocation",
+    "timeline/setPlaybackPrecachedTime",
+  ],
 };
 
 export function bootstrapStore(initialState: Partial<UIState>) {
@@ -175,23 +196,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
 
       return updatedMiddlewareArray as typeof originalMiddlewareArray;
     },
-    devTools:
-      process.env.NODE_ENV === "production"
-        ? false
-        : {
-            maxAge: 100,
-            stateSanitizer: sanitizeStateForDevtools,
-            actionSanitizer: sanitizeActionForDevTools,
-            // @ts-ignore was renamed, but RTK types haven't caught up yet
-            actionsDenylist: [
-              "protocolMessages/eventReceived",
-              "protocolMessages/responseReceived",
-              "protocolMessages/errorReceived",
-              "protocolMessages/requestSent",
-              "app/setHoveredLineNumberLocation",
-              "timeline/setPlaybackPrecachedTime",
-            ],
-          },
+    devTools: process.env.NODE_ENV === "production" ? false : reduxDevToolsOptions,
   });
 
   return store;
