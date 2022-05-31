@@ -13,7 +13,7 @@ export interface Analysis {
 export enum AnalysisError {
   TooManyPointsToFind,
   TooManyPointsToRun,
-  Unknown
+  Unknown,
 }
 
 interface FindAnalysisPointsResult {

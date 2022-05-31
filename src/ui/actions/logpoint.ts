@@ -367,48 +367,6 @@ async function setMultiSourceLogpoint(
   } finally {
     await analysis!.releaseAnalysis();
   }
-
-  /*
-  const points: PointDescription[] = [];
-  const results: AnalysisEntry[] = [];
-  const handler: AnalysisHandler<void> = {};
-
-  handler.onAnalysisPoints = newPoints => {
-    points.push(...newPoints);
-    store.dispatch(pointsReceived(points));
-    if (!condition) {
-      if (primitiveFronts) {
-        showPrimitiveLogpoints(logGroupId, newPoints, primitiveFronts);
-      } else {
-        showLogpointsLoading(logGroupId, newPoints);
-      }
-    }
-  };
-
-  const shouldGetResults = condition || !primitives;
-  if (shouldGetResults) {
-    handler.onAnalysisResult = result => {
-      results.push(...result);
-      if (condition || !primitives) {
-        showLogpointsResult(logGroupId, result);
-      }
-    };
-  }
-
-  try {
-    await analysisManager.runAnalysis(params, handler);
-  } catch (e: any) {
-    console.error("Cannot get analysis points", e);
-    saveAnalysisError(locations, condition, e?.code);
-    return;
-  }
-
-  // The analysis points may have arrived in any order, so we have to sort
-  // them after they arrive.
-  points.sort((a, b) => compareNumericStrings(a.point, b.point));
-
-  saveLogpointHits(points, results, locations, condition);
-  */
 }
 
 function primitiveValues(text: string) {
