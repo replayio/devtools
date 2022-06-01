@@ -5,6 +5,7 @@ import { ConsoleFiltersContext, FocusContext, ReplayClientContext } from "../../
 import useFilteredMessages from "../../src/hooks/useFilteredMessages";
 import { getMessages } from "../../src/suspense/MessagesCache";
 import { getClosestPointForTime } from "../../src/suspense/PointsCache";
+import { suspendInParallel } from "../../src/utils/suspense";
 
 import MessageRenderer from "./MessageRenderer";
 import styles from "./MessagesList.module.css";
@@ -26,8 +27,12 @@ export default function MessagesList() {
   if (range !== null) {
     const [startTime, endTime] = range;
 
-    const startPoint = getClosestPointForTime(replayClient, startTime);
-    const endPoint = getClosestPointForTime(replayClient, endTime);
+    // Small performance optimization:
+    // Suspend in parallel when fetching points to reduce the overall wait time.
+    const [startPoint, endPoint] = suspendInParallel(
+      () => getClosestPointForTime(replayClient, startTime),
+      () => getClosestPointForTime(replayClient, endTime)
+    );
 
     focusRange = {
       begin: {
