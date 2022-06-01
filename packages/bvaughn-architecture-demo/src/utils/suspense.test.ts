@@ -67,8 +67,8 @@ describe("Suspense util", () => {
     });
 
     it("should return all values if none of the callbacks suspend", () => {
-      const callbackA = jest.fn().mockImplementation(() => 123);
-      const callbackB = jest.fn().mockImplementation(() => "abc");
+      const callbackA = () => 123;
+      const callbackB = () => "abc";
 
       const [a, b] = suspendInParallel(callbackA, callbackB);
 
