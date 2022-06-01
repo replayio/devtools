@@ -1,20 +1,12 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
-/**
- * Sources reducer
- * @module reducers/sources
- */
-
 import type { AnyAction, Action } from "@reduxjs/toolkit";
+import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-
+import { UIThunkAction } from "ui/actions";
 import type { UIState } from "ui/state";
 
-import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/source";
+import { pending, fulfilled, rejected, asSettled, isFulfilled } from "../utils/async-value";
+import { findPosition } from "../utils/breakpoint/breakpointPositions";
+import { prefs } from "../utils/prefs";
 import {
   createInitial,
   insertResources,
@@ -26,11 +18,7 @@ import {
   makeReduceAllQuery,
 } from "../utils/resource";
 import type { ResourceState, ResourceId } from "../utils/resource/core";
-
-import { findPosition } from "../utils/breakpoint/breakpointPositions";
-import { pending, fulfilled, rejected, asSettled, isFulfilled } from "../utils/async-value";
-
-import { prefs } from "../utils/prefs";
+import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/source";
 
 import {
   hasSourceActor,
@@ -40,7 +28,6 @@ import {
   getSourceActorBreakpointHitCounts,
   SourceActor,
 } from "./source-actors";
-import uniq from "lodash/uniq";
 import { SourceLocation } from "./types";
 
 export interface Location {
@@ -78,9 +65,15 @@ export interface Source {
 
 export type SourceResources = ResourceState<Source>;
 
+type ScrollPosition = {
+  left: number;
+  top: number;
+};
+
 // Several types TBD here
 export interface SourcesState {
   sources: SourceResources;
+  sourceScrollPositions: Record<string, ScrollPosition>;
   urls: Record<string, ResourceId[]>;
   plainUrls: Record<string, string[]>;
   content: Record<string, unknown>;
@@ -105,6 +98,7 @@ export interface HitCount {
 export function initialSourcesState(): SourcesState {
   return {
     sources: createInitial(),
+    sourceScrollPositions: {},
     urls: {},
     plainUrls: {},
     content: {},
@@ -256,9 +250,29 @@ function update(state = initialSourcesState(), action: AnyAction) {
 
     case "SOURCES_LOADED":
       return { ...state, sourcesLoading: false };
+
+    case "SET_SELECTED_SOURCE_SCROLL_POSITION":
+      return {
+        ...state,
+        sourceScrollPositions: {
+          ...state.sourceScrollPositions,
+          [action.sourceId]: action.scrollPosition,
+        },
+      };
   }
 
   return state;
+}
+
+export function setSelectedSourceScrollPosition(
+  scrollPosition: ScrollPosition | null
+): UIThunkAction<void> {
+  return (dispatch, getState) => {
+    const state = getState();
+    const sourceId = getSelectedSourceId(state);
+
+    dispatch({ type: "SET_SELECTED_SOURCE_SCROLL_POSITION", sourceId, scrollPosition });
+  };
 }
 
 export const resourceAsSourceBase = memoizeResourceShallow(
@@ -652,6 +666,15 @@ export function getSourceContent(state: UIState, id: string) {
   const { content } = getResource(state.sources.sources, id);
   // @ts-ignore Ignore async value errors for now
   return asSettled(content);
+}
+
+export function getSelectedSourceScrollPosition(state: UIState): ScrollPosition | null {
+  const sourceId = getSelectedSourceId(state);
+  if (sourceId) {
+    return state.sources.sourceScrollPositions[sourceId] || null;
+  } else {
+    return null;
+  }
 }
 
 export function getSelectedSourceId(state: UIState) {
