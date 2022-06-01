@@ -4,7 +4,9 @@
 
 //
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 import actions from "../../../actions";
 import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
 import { getHasSiblingOfSameName, getContext } from "../../../selectors";
@@ -12,9 +14,31 @@ import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
+import type { Breakpoint, Source } from "../../../reducers/types";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
-class BreakpointHeading extends PureComponent {
-  onContextMenu = e => {
+type BHExtraProps = {
+  source: Source;
+  breakpoint: Breakpoint;
+  onRemoveBreakpoints: (cx: Context, source: Source) => void;
+};
+
+const mapStateToProps = (state: UIState, { source }: BHExtraProps) => ({
+  cx: getContext(state),
+  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+  executionPoint: getExecutionPoint(state),
+});
+
+const connector = connect(mapStateToProps, {
+  selectSource: actions.selectSource,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type BreakpointsProps = PropsFromRedux & BHExtraProps;
+
+class BreakpointHeading extends PureComponent<BreakpointsProps> {
+  onContextMenu = () => {
     return;
   };
 
@@ -31,7 +55,7 @@ class BreakpointHeading extends PureComponent {
     return `${fileName}${location}`;
   }
 
-  removeBreakpoint = event => {
+  removeBreakpoint = (event: React.MouseEvent) => {
     const { cx, source, onRemoveBreakpoints } = this.props;
     event.stopPropagation();
 
@@ -60,7 +84,8 @@ class BreakpointHeading extends PureComponent {
         <Redacted className="breakpoint-heading-label">{fileName}</Redacted>
         <div className="breakpoint-heading-actions">
           <CloseButton
-            handleClick={e => this.removeBreakpoint(e)}
+            buttonClass={null}
+            handleClick={this.removeBreakpoint}
             tooltip={"Remove all breakpoint from this source"}
           />
         </div>
@@ -69,12 +94,4 @@ class BreakpointHeading extends PureComponent {
   }
 }
 
-const mapStateToProps = (state, { source, breakpoint }) => ({
-  cx: getContext(state),
-  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-  executionPoint: getExecutionPoint(state),
-});
-
-export default connect(mapStateToProps, {
-  selectSource: actions.selectSource,
-})(BreakpointHeading);
+export default connector(BreakpointHeading);
