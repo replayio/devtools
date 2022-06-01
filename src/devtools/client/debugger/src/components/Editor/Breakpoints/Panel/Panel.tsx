@@ -147,7 +147,7 @@ function Panel({
             />
           )}
           <BreakpointNavigation
-            breakpoint={breakpoint}
+            breakpoint={breakpoint!}
             editing={editing}
             showCondition={showCondition}
             setShowCondition={setShowCondition}
