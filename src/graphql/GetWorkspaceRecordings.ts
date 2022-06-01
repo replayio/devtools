@@ -72,7 +72,6 @@ export interface GetWorkspaceRecordings_node_Workspace {
   __typename: "Workspace";
   id: string;
   recordings: GetWorkspaceRecordings_node_Workspace_recordings | null;
-  tests: any[] | null;
 }
 
 export type GetWorkspaceRecordings_node = GetWorkspaceRecordings_node_Recording | GetWorkspaceRecordings_node_Workspace;
