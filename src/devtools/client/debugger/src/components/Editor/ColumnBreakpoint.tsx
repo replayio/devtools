@@ -12,7 +12,7 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import actions from "../../actions";
 
 import { getDocument } from "../../utils/editor";
-import Panel from "./Breakpoints/Panel/index";
+import Panel from "./Breakpoints/Panel/Panel";
 import { features } from "ui/utils/prefs";
 import { isLogpoint } from "../../utils/breakpoint";
 import { Breakpoint } from "../../reducers/types";
@@ -149,7 +149,7 @@ class ColumnBreakpoint extends Component<CBProps> {
       return null;
     }
 
-    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} insertAt={insertAt} />;
+    return <Panel breakpoint={columnBreakpoint.breakpoint!} editor={editor} insertAt={insertAt} />;
   }
 }
 

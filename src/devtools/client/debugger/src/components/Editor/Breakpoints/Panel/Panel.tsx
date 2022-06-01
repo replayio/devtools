@@ -7,11 +7,13 @@ import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import type { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
+import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
@@ -19,13 +21,39 @@ import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
 import { AnalysisError } from "protocol/thread/analysis";
 
-function getPanelWidth({ editor }) {
+function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
   // to the panel's left edge, which is approximately ~60.
   const panelIndent = 60;
 
   return editor.getScrollInfo().clientWidth - panelIndent;
 }
+
+const connector = connect(
+  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
+    analysisPoints: selectors.getAnalysisPointsForLocation(
+      state,
+      // @ts-expect-error Location vs SourceLocation
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
+    currentTime: selectors.getCurrentTime(state),
+    executionPoint: getExecutionPoint(state),
+  }),
+  {
+    setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
+  }
+);
+
+type $FixTypeLater = any;
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type PanelProps = PropsFromRedux & {
+  breakpoint?: Breakpoint;
+  editor: $FixTypeLater;
+  insertAt: number;
+};
 
 function Panel({
   analysisPoints,
@@ -36,11 +64,11 @@ function Panel({
   insertAt,
   setHoveredItem,
   clearHoveredItem,
-}) {
+}: PanelProps) {
   const [editing, setEditing] = useState(false);
-  const [showCondition, setShowCondition] = useState(Boolean(breakpoint.options.condition)); // nosemgrep
+  const [showCondition, setShowCondition] = useState(Boolean(breakpoint!.options.condition)); // nosemgrep
   const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
-  const [inputToFocus, setInputToFocus] = useState("logValue");
+  const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
   const dismissNag = hooks.useDismissNag();
   const points = analysisPoints?.data;
   const error = analysisPoints?.error;
@@ -75,21 +103,22 @@ function Panel({
 
   const onMouseEnter = () => {
     const hoveredItem = {
-      location: breakpoint.location,
+      location: breakpoint!.location,
       target: "widget",
     };
 
+    // @ts-expect-error hovered item mismatch
     setHoveredItem(hoveredItem);
   };
 
-  const onMouseLeave = e => {
+  const onMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!inBreakpointPanel(e)) {
       clearHoveredItem();
     }
   };
 
   return (
-    <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
+    <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
       <div
         className="breakpoint-panel-wrapper mx-3 my-2"
         style={{ width: `${width}px` }}
@@ -105,7 +134,6 @@ function Panel({
               inputToFocus={inputToFocus}
               showCondition={showCondition}
               setShowCondition={setShowCondition}
-              dismissNag={dismissNag}
             />
           ) : (
             <PanelSummary
@@ -130,18 +158,4 @@ function Panel({
   );
 }
 
-export default connect(
-  (state, { breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
-    currentTime: selectors.getCurrentTime(state),
-    executionPoint: getExecutionPoint(state),
-  }),
-  {
-    setHoveredItem: actions.setHoveredItem,
-    clearHoveredItem: actions.clearHoveredItem,
-  }
-)(Panel);
+export default connector(Panel);
