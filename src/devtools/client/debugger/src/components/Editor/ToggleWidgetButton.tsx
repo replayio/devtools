@@ -123,11 +123,11 @@ function QuickActions({
 
   let button;
 
-  if (isMetaActive && isShiftActive) {
+  if (analysisPoints && isMetaActive && isShiftActive) {
     button = (
       <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />
     );
-  } else if (isMetaActive) {
+  } else if (analysisPoints && isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
