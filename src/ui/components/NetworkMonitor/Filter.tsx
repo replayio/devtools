@@ -45,7 +45,7 @@ export function Filter({
 
       <div className="flex min-h-0 flex-1">
         {filterOpen ? (
-          <div className="flex basis-32 flex-col overflow-auto bg-toolbarBackground px-0.5">
+          <div className="flex basis-32 flex-col overflow-auto bg-toolbarBackground px-0.5 py-1.5">
             {RequestTypeOptions.map(canonicalType => (
               <button
                 key={canonicalType.label}
