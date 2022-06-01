@@ -1,7 +1,9 @@
 import { Message } from "@replayio/protocol";
 import { useContext } from "react";
 
-import { ConsoleFiltersContext, FocusContext, ReplayClientContext } from "../../src/contexts";
+import { ConsoleFiltersContext } from "../../src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "../../src/contexts/FocusContext";
+import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import useFilteredMessages from "../../src/hooks/useFilteredMessages";
 import { getMessages } from "../../src/suspense/MessagesCache";
 import { getClosestPointForTime } from "../../src/suspense/PointsCache";
