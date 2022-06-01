@@ -5,7 +5,7 @@
 //
 import React, { PureComponent } from "react";
 import { showMenu } from "devtools/shared/contextmenu";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import actions from "../../actions";
 import {
   highlightDomElement,

@@ -1,5 +1,5 @@
 import React from "react";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";

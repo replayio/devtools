@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect } from "react-redux";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";

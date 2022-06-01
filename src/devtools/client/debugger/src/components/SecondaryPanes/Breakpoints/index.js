@@ -5,7 +5,7 @@
 //
 
 import React, { Component } from "react";
-import { connect } from "../../../utils/connect";
+import { connect } from "react-redux";
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";

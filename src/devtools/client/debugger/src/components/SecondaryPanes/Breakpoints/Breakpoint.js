@@ -5,7 +5,7 @@
 //
 
 import React, { PureComponent } from "react";
-import { connect } from "../../../utils/connect";
+import { connect } from "react-redux";
 import { createSelector } from "reselect";
 import classnames from "classnames";
 

@@ -1,7 +1,7 @@
 import React from "react";
 import actions from "../../../actions";
 import { getContext } from "../../../selectors";
-import { connect } from "../../../utils/connect";
+import { connect } from "react-redux";
 import memoize from "lodash/memoize";
 import { RedactedSpan } from "ui/components/Redacted";
 

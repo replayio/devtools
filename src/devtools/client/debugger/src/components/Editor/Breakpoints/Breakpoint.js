@@ -7,7 +7,7 @@
 import { PureComponent } from "react";
 import classnames from "classnames";
 import { actions } from "ui/actions";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect } from "react-redux";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";

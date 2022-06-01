@@ -14,7 +14,7 @@ import {
 } from "../../utils/editor";
 import { isException } from "../../utils/pause";
 import { getIndentation } from "../../utils/indentation";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { getPauseReason, getDebugLineLocation } from "../../selectors";
 
 export class DebugLine extends PureComponent {

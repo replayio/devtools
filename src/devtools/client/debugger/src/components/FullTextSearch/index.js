@@ -13,7 +13,7 @@ import {
   getFullTextSearchQuery,
   getFullTextSearchFocus,
 } from "../../selectors";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { getEditor } from "../../utils/editor";
 
 import { FullTextFilter } from "./FullTextFilter";

@@ -8,7 +8,7 @@ import React, { Component } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { getLocationKey } from "../../utils/breakpoint";
 
 // eslint-disable-next-line max-len

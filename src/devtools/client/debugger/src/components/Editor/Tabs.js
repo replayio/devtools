@@ -4,7 +4,7 @@
 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 
 import Tab from "./Tab";
 

@@ -11,7 +11,7 @@ import {
   getFirstVisibleBreakpoints,
 } from "devtools/client/debugger/src/selectors";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect } from "react-redux";
 
 class Breakpoints extends Component {
   render() {

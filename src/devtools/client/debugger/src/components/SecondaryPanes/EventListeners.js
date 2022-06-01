@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
