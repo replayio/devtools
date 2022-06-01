@@ -59,7 +59,7 @@ function PanelSummary({
     if (isEditable) {
       trackEvent("breakpoint.start_edit", {
         input,
-        hitsCount: analysisPoints?.data.length || null,
+        hitsCount: analysisPoints?.data?.length || null,
       });
       toggleEditingOn();
       setInputToFocus(input);

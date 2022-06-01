@@ -1,10 +1,11 @@
 import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import sortedLastIndex from "lodash/sortedLastIndex";
+import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
 import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { AnalysisError, AnalysisPayload } from "ui/state/app";
+import { AnalysisPayload } from "ui/state/app";
 
 const numberStatus = (current: number, total: number): string => {
   return `${current}/${total}`;
@@ -29,15 +30,19 @@ export function PanelStatus({
   if (!isIndexed || !analysisPoints) {
     status = "Loading";
   } else if (analysisPoints.error) {
-    status = analysisPoints.error === AnalysisError.TooManyPoints ? "10k+ hits" : "Error";
-  } else if (analysisPoints.data.length == 0) {
+    status =
+      (analysisPoints.error as AnalysisError) === AnalysisError.TooManyPointsToFind ||
+      analysisPoints.error === AnalysisError.Unknown
+        ? "10k+ hits"
+        : "Error";
+  } else if (analysisPoints.data?.length == 0) {
     status = "No hits";
   } else {
     const previousTimeIndex = sortedLastIndex(
-      analysisPoints.data.map(p => p.time),
+      analysisPoints.data?.map(p => p.time),
       time
     );
-    status = numberStatus(previousTimeIndex, analysisPoints.data.length);
+    status = numberStatus(previousTimeIndex, analysisPoints.data?.length || 0);
   }
 
   return (
@@ -49,7 +54,7 @@ export function PanelStatus({
       >
         <div
           className="text-center"
-          style={{ width: `${maxStatusLength(analysisPoints?.data.length || 0)}ch` }}
+          style={{ width: `${maxStatusLength(analysisPoints?.data?.length || 0)}ch` }}
         ></div>
         {status}
       </div>

@@ -11,7 +11,6 @@ import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reduc
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
 import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
-import { pointsReceived } from "ui/reducers/timeline";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -132,9 +131,9 @@ function saveLogpointHits(
   }
 }
 
-function saveAnalysisError(locations: Location[], condition: string, errorKey?: number) {
+export function saveAnalysisError(locations: Location[], condition: string, error: AnalysisError) {
   for (const location of locations) {
-    store.dispatch(setAnalysisError({ location, condition, errorKey }));
+    store.dispatch(setAnalysisError({ location, condition, error }));
   }
 }
 
@@ -258,7 +257,7 @@ async function setMultiSourceLogpoint(
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
       if (!points.error) {
-        showPrimitiveLogpoints(logGroupId, points.data, primitiveFronts);
+        showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
       return;
     }
@@ -295,7 +294,7 @@ async function setMultiSourceLogpoint(
     // them after they arrive.
     points.sort((a, b) => compareNumericStrings(a.point, b.point));
 
-    if (error || points.length > 200) {
+    if (error) {
       store.dispatch(
         analysisErrored({
           analysisId,
@@ -305,7 +304,7 @@ async function setMultiSourceLogpoint(
       );
 
       // TODO Remove this and change Redux logic to match
-      saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+      saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToFind);
 
       return;
     }
@@ -327,7 +326,7 @@ async function setMultiSourceLogpoint(
 
     const shouldGetResults = condition || !primitives;
 
-    if (shouldGetResults) {
+    if (shouldGetResults && points.length <= 200) {
       store.dispatch(analysisResultsRequested(analysisId));
 
       const { results, error: runError } = await analysis.runAnalysis();
@@ -344,7 +343,9 @@ async function setMultiSourceLogpoint(
         );
 
         // TODO Remove this and change Redux logic to match
-        saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+        // This is not right I think. The error could also be Unknown, we need
+        // to check to know for sure.
+        saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToRun);
         return;
       }
 
@@ -412,8 +413,7 @@ export function setLogpointByURL(
   line: number,
   column: number,
   text: string,
-  condition: string,
-  showInConsole: boolean = true
+  condition: string
 ) {
   const sourceIds = ThreadFront.getChosenSourceIdsForUrl(url).map(({ sourceId }) => sourceId);
   if (sourceIds.length === 0) {

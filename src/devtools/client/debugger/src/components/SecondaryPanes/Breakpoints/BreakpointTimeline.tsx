@@ -35,7 +35,7 @@ function Points({
       return [];
     }
     let previousDisplayed: PointDescription;
-    return analysisPoints.data.filter(p => {
+    return analysisPoints.data?.filter(p => {
       if (
         !previousDisplayed ||
         executionPoint === p.point ||

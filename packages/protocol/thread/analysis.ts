@@ -26,7 +26,9 @@ interface RunAnalysisResult {
   error: AnalysisError.TooManyPointsToRun | undefined;
 }
 
-export const createAnalysis = async (params: AnalysisParams): Promise<Analysis> => {
+export const createAnalysis = async (
+  params: Omit<AnalysisParams, "locations">
+): Promise<Analysis> => {
   // Call to the client and say hey please make an analysis and after that
   // create an Analysis with that result
   const { analysisId } = await sendMessage(

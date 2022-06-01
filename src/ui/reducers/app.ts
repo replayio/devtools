@@ -6,11 +6,9 @@ import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
-  AnalysisError,
   AppState,
   AppTheme,
   EventKind,
-  ProtocolError,
   ReplayEvent,
   UploadInfo,
   LoadedRegions,
@@ -35,6 +33,7 @@ import {
   overlap,
   startTimeForFocusRegion,
 } from "ui/utils/timeline";
+import { AnalysisError } from "protocol/thread/analysis";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -168,7 +167,7 @@ const appSlice = createSlice({
 
       state.analysisPoints[id] = {
         data: analysisPoints,
-        error: null,
+        error: undefined,
       };
     },
     setAnalysisError(
@@ -176,19 +175,16 @@ const appSlice = createSlice({
       action: PayloadAction<{
         location: Location;
         condition?: string;
-        errorKey?: number;
+        error: AnalysisError;
       }>
     ) {
-      const { location, condition = "", errorKey } = action.payload;
+      const { location, condition = "", error } = action.payload;
 
       const id = getLocationAndConditionKey(location, condition);
 
       state.analysisPoints[id] = {
-        data: [],
-        error:
-          errorKey === ProtocolError.TooManyPoints
-            ? AnalysisError.TooManyPoints
-            : AnalysisError.Default,
+        data: undefined,
+        error: error,
       };
     },
     setEventsForType(
@@ -378,7 +374,7 @@ export const getAnalysisPointsForLocation = (
   }
   return {
     ...points,
-    data: filterToFocusRegion(points.data, focusRegion),
+    data: filterToFocusRegion(points.data || [], focusRegion),
   };
 };
 
