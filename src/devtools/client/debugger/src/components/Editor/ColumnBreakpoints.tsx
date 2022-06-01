@@ -8,12 +8,27 @@ import React, { Component } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import type { UIState } from "ui/state";
 import { getLocationKey } from "../../utils/breakpoint";
 
 // eslint-disable-next-line max-len
 
-class ColumnBreakpoints extends Component {
+const mapStateToProps = (state: UIState) => ({
+  cx: getContext(state),
+  selectedSource: getSelectedSource(state),
+  columnBreakpoints: visibleColumnBreakpoints(state),
+});
+
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type $FixTypeLater = any;
+interface CBProps {
+  editor: $FixTypeLater;
+}
+
+class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
   render() {
     const { cx, editor, columnBreakpoints, selectedSource } = this.props;
 
@@ -22,6 +37,7 @@ class ColumnBreakpoints extends Component {
     }
 
     let breakpoints;
+    // TODO Is this a safe thing to do while rendering?
     editor.codeMirror.operation(() => {
       breakpoints = columnBreakpoints.map((breakpoint, i) => (
         <ColumnBreakpoint
@@ -38,10 +54,4 @@ class ColumnBreakpoints extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  cx: getContext(state),
-  selectedSource: getSelectedSource(state),
-  columnBreakpoints: visibleColumnBreakpoints(state),
-});
-
-export default connect(mapStateToProps)(ColumnBreakpoints);
+export default connector(ColumnBreakpoints);
