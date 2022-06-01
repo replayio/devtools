@@ -1,12 +1,8 @@
 import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { selectSource } from "../../actions/sources";
+import { useSelector } from "react-redux";
+import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
-import {
-  getSelectedSourceScrollPosition,
-  getSelectedSourceWithContent,
-  setSelectedSourceScrollPosition,
-} from "../../selectors";
+import { getSelectedSourceWithContent } from "../../selectors";
 
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
@@ -16,8 +12,15 @@ type CursorPosition = {
   readonly line: number;
 };
 
+type ScrollPosition = {
+  sourceId: string;
+  left: number;
+  top: number;
+};
+
+const LOCAL_STORAGE_KEY = "SourceFooter.scrollPosition";
+
 function SourceFooter() {
-  const dispatch = useDispatch();
   const selectedSource = useSelector(getSelectedSourceWithContent);
   const [cursorPosition, setCursorPosition] = useState<CursorPosition>({
     line: 0,
@@ -25,20 +28,30 @@ function SourceFooter() {
   });
 
   // On mount, restore the scroll position for the source we have selected.
+  // Only do this if it's the same source though.
   //
-  // // HACK:
+  // HACK:
   // Note that we only do this for the most recently selected source.
   // Trying to track and restore scroll positions for multiple sources was finicky;
   // CodeMirror seems to have small scroll position discrepancies that were noticeable.
-  const scrollPositionOnMountRef = useRef(useSelector(getSelectedSourceScrollPosition));
+  const selectedSourceOnMountRef = useRef(selectedSource);
   useLayoutEffect(() => {
+    const selectedSourceOnMount = selectedSourceOnMountRef.current;
+    if (!selectedSourceOnMount) {
+      return;
+    }
+
     const eventDoc = document.querySelector(".editor-mount .CodeMirror");
     const codeMirror = (eventDoc as any)?.CodeMirror;
-    if (codeMirror) {
-      let timeoutId: NodeJS.Timeout | null = null;
+    if (!codeMirror) {
+      return;
+    }
 
-      const scrollPosition = scrollPositionOnMountRef.current;
-      if (scrollPosition != null) {
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    try {
+      const scrollPosition = JSON.parse(localStorageGetItem(LOCAL_STORAGE_KEY));
+      if (scrollPosition != null && scrollPosition.sourceId === selectedSourceOnMount.id) {
         // HACK:
         // 1. CodeMirror's own CodeMirror.scrollIntoView() method should handle this but it doesn't work.
         //    That method only scrolls up (not down) due to what looks like a logic bug in the internal implementation.
@@ -52,17 +65,39 @@ function SourceFooter() {
         }, 1);
       }
 
-      // Before unmounting, save scroll position info for this source so that it can be restored later.
       return () => {
         if (timeoutId !== null) {
           clearTimeout(timeoutId);
         }
-
-        const scrollInfo = codeMirror.getScrollInfo();
-        dispatch(setSelectedSourceScrollPosition(scrollInfo || null));
       };
+    } catch (error) {}
+  }, []);
+
+  // Before unmounting, save scroll position info for this source so that it can be restored later.
+  useLayoutEffect(() => {
+    if (!selectedSource) {
+      return;
     }
-  }, [dispatch]);
+
+    const eventDoc = document.querySelector(".editor-mount .CodeMirror");
+    const codeMirror = (eventDoc as any)?.CodeMirror;
+    if (!codeMirror) {
+      return;
+    }
+
+    return () => {
+      const scrollInfo = codeMirror.getScrollInfo();
+      if (scrollInfo) {
+        const newScrollPosition: ScrollPosition = {
+          sourceId: selectedSource.id,
+          left: scrollInfo.left,
+          top: scrollInfo.top,
+        };
+
+        localStorageSetItem(LOCAL_STORAGE_KEY, JSON.stringify(newScrollPosition));
+      }
+    };
+  });
 
   useEffect(() => {
     const eventDoc = document.querySelector(".editor-mount .CodeMirror");

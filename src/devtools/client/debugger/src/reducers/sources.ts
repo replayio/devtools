@@ -65,15 +65,9 @@ export interface Source {
 
 export type SourceResources = ResourceState<Source>;
 
-type ScrollPosition = {
-  left: number;
-  top: number;
-};
-
 // Several types TBD here
 export interface SourcesState {
   sources: SourceResources;
-  sourceScrollPositions: Record<string, ScrollPosition>;
   urls: Record<string, ResourceId[]>;
   plainUrls: Record<string, string[]>;
   content: Record<string, unknown>;
@@ -98,7 +92,6 @@ export interface HitCount {
 export function initialSourcesState(): SourcesState {
   return {
     sources: createInitial(),
-    sourceScrollPositions: {},
     urls: {},
     plainUrls: {},
     content: {},
@@ -250,29 +243,9 @@ function update(state = initialSourcesState(), action: AnyAction) {
 
     case "SOURCES_LOADED":
       return { ...state, sourcesLoading: false };
-
-    case "SET_SELECTED_SOURCE_SCROLL_POSITION":
-      return {
-        ...state,
-        sourceScrollPositions: {
-          ...state.sourceScrollPositions,
-          [action.sourceId]: action.scrollPosition,
-        },
-      };
   }
 
   return state;
-}
-
-export function setSelectedSourceScrollPosition(
-  scrollPosition: ScrollPosition | null
-): UIThunkAction<void> {
-  return (dispatch, getState) => {
-    const state = getState();
-    const sourceId = getSelectedSourceId(state);
-
-    dispatch({ type: "SET_SELECTED_SOURCE_SCROLL_POSITION", sourceId, scrollPosition });
-  };
 }
 
 export const resourceAsSourceBase = memoizeResourceShallow(
@@ -666,15 +639,6 @@ export function getSourceContent(state: UIState, id: string) {
   const { content } = getResource(state.sources.sources, id);
   // @ts-ignore Ignore async value errors for now
   return asSettled(content);
-}
-
-export function getSelectedSourceScrollPosition(state: UIState): ScrollPosition | null {
-  const sourceId = getSelectedSourceId(state);
-  if (sourceId) {
-    return state.sources.sourceScrollPositions[sourceId] || null;
-  } else {
-    return null;
-  }
 }
 
 export function getSelectedSourceId(state: UIState) {
