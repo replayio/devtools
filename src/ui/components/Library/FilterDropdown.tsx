@@ -21,8 +21,8 @@ export function FilterDropdown({ setAppliedText }: { setAppliedText: (str: strin
   };
 
   const button = (
-    <div className="text-sm flex border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-themeTextFieldColor rounded-md space-x-2">
-      <div className="text-sm">Filter</div>
+    <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
+      <div className="text-sm">Filters</div>
       <div className="material-icons text-sm">expand_more</div>
     </div>
   );
