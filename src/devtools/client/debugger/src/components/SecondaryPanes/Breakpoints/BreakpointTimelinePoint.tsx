@@ -1,30 +1,73 @@
 import React from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
-const { getAnalysisPointsForLocation } = selectors;
+import type { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { Breakpoint } from "../../../reducers/types";
+import { PointDescription } from "@replayio/protocol";
+import { HoveredItem } from "ui/state/timeline";
 
-function toBigInt(num) {
+const { getAnalysisPointsForLocation } = selectors;
+
+function toBigInt(num?: string | null) {
   return num ? BigInt(num) : undefined;
 }
 
-function hasPrimaryHighlight({ hoveredItem, point }) {
+function hasPrimaryHighlight({
+  hoveredItem,
+  point,
+}: {
+  hoveredItem: HoveredItem | null;
+  point?: PointDescription;
+}) {
   return hoveredItem?.point === point?.point;
 }
 
-function hasSecondaryHighlighted({ hoveredItem, breakpoint }) {
+function hasSecondaryHighlighted({
+  hoveredItem,
+  breakpoint,
+}: {
+  hoveredItem: HoveredItem | null;
+  breakpoint: Breakpoint;
+}) {
   if (!breakpoint.id || !hoveredItem?.location) {
     return false;
   }
 
   return breakpoint.id == getLocationKey(hoveredItem.location);
 }
+
+const connector = connect(
+  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
+    analysisPoints: getAnalysisPointsForLocation(
+      state,
+      // @ts-expect-error Location mismatch
+      breakpoint.location,
+      breakpoint.options.condition
+    ),
+    executionPoint: getExecutionPoint(state),
+    zoomRegion: selectors.getZoomRegion(state),
+  }),
+  {
+    seek: actions.seek,
+    setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
+  }
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type BTPProps = PropsFromRedux & {
+  breakpoint: Breakpoint;
+  point: PointDescription;
+  index: number;
+  hoveredItem: HoveredItem | null;
+};
 
 function BreakpointTimelinePoint({
   breakpoint,
@@ -37,21 +80,22 @@ function BreakpointTimelinePoint({
   hoveredItem,
   setHoveredItem,
   clearHoveredItem,
-}) {
+}: BTPProps) {
   const onMouseEnter = () =>
     setHoveredItem({
       target: "widget",
       point: point.point,
       time: point.time,
+      // @ts-expect-error Location mismatch
       location: breakpoint.location,
     });
 
-  const onMouseLeave = e => {
+  const onMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!inBreakpointPanel(e)) {
       clearHoveredItem();
     }
   };
-  const onClick = e => {
+  const onClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     seek(point.point, point.time, true);
   };
@@ -59,12 +103,15 @@ function BreakpointTimelinePoint({
   const { startTime, endTime } = zoomRegion;
   const leftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
 
+  const pointInt = toBigInt(point.point)!;
+  const executionInt = toBigInt(executionPoint)!;
+
   return (
     <div
       className={classnames("breakpoint-navigation-timeline-point", {
-        past: toBigInt(point.point) < toBigInt(executionPoint),
-        future: toBigInt(point.point) > toBigInt(executionPoint),
-        pause: toBigInt(point.point) == toBigInt(executionPoint),
+        past: pointInt < executionInt,
+        future: pointInt > executionInt,
+        pause: pointInt == executionInt,
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
         "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
@@ -82,11 +129,11 @@ function BreakpointTimelinePoint({
 const MemoizedBreakpointTimelinePoint = React.memo(
   BreakpointTimelinePoint,
   (prevProps, nextProps) => {
-    function selectorChanged(selector) {
+    function selectorChanged(selector: (props: BTPProps) => any) {
       return selector(nextProps) !== selector(prevProps);
     }
 
-    function hasChanged(key) {
+    function hasChanged(key: keyof BTPProps) {
       return nextProps[key] !== prevProps[key];
     }
 
@@ -104,19 +151,4 @@ const MemoizedBreakpointTimelinePoint = React.memo(
   }
 );
 
-export default connect(
-  (state, { breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
-    executionPoint: getExecutionPoint(state),
-    zoomRegion: selectors.getZoomRegion(state),
-  }),
-  {
-    seek: actions.seek,
-    setHoveredItem: actions.setHoveredItem,
-    clearHoveredItem: actions.clearHoveredItem,
-  }
-)(MemoizedBreakpointTimelinePoint);
+export default connector(MemoizedBreakpointTimelinePoint);
