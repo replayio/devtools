@@ -78,7 +78,7 @@ const GET_TEST = gql`
   }
 `;
 const GET_TEST_RUN = gql`
-  query GetTest($id: String!) {
+  query GetTestRun($id: String!) {
     testRun(id: $id) {
       id
       recordings {
