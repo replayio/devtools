@@ -27,7 +27,6 @@ export function Filter({
           className={classNames("mr-1 flex items-center", {
             "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
               types.size > 0,
-            "text-gray-400 hover:text-primaryAccentHover focus:text-primaryAccentHover": false,
           })}
         >
           <MaterialIcon iconSize="lg" outlined={true}>
@@ -46,11 +45,11 @@ export function Filter({
 
       <div className="flex min-h-0 flex-1">
         {filterOpen ? (
-          <div className="flex basis-32 flex-col items-start overflow-auto bg-toolbarBackground px-0.5 py-3">
+          <div className="flex basis-32 flex-col overflow-auto bg-toolbarBackground px-0.5">
             {RequestTypeOptions.map(canonicalType => (
               <button
                 key={canonicalType.label}
-                className="flex items-center gap-2 px-1 py-1.5"
+                className="group flex items-center gap-2 px-1 py-1.5"
                 onClick={() => toggleType(canonicalType.type)}
               >
                 <Icon
