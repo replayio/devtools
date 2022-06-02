@@ -151,7 +151,7 @@ function onLogpointLoading(
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const packet = {
-      errorMessage: "Loading...",
+      errorMessage: "Loading…",
       sourceName: await ThreadFront.getSourceURL(sourceId),
       sourceId: sourceId,
       lineNumber: line,

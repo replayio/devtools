@@ -109,7 +109,7 @@ function Video({
           )}
         </CommentsOverlay>
       ) : null}
-      {isNodePickerInitializing ? <Tooltip label="Loading..." targetID="video" /> : null}
+      {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
       <div id="highlighter-root"></div>
       {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>

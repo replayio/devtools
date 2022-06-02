@@ -60,7 +60,7 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
         </div>
         <div className="flex flex-row space-x-2 text-base">
           {loading ? (
-            "Loading..."
+            "Loading…"
           ) : (
             <>
               <PrimaryButton color="blue" onClick={handleAccept}>

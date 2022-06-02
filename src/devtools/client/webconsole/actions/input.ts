@@ -106,7 +106,7 @@ export function evaluateExpression(expression: string): UIThunkAction {
       messagesActions.messagesAdd([
         {
           type: "evaluationResult",
-          result: createPrimitiveValueFront("Loading...", pause),
+          result: createPrimitiveValueFront("Loading…", pause),
           evalId,
         },
       ])
