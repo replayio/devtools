@@ -7,7 +7,7 @@
 // Dependencies
 import React, { Component } from "react";
 
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 
 // Selectors
 import {

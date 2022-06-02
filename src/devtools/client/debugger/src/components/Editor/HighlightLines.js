@@ -6,7 +6,7 @@
 import { Component } from "react";
 import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { getHighlightedLineRange } from "../../selectors";
 
 class HighlightLines extends Component {

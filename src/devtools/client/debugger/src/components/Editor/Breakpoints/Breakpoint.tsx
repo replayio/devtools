@@ -7,22 +7,40 @@
 import { PureComponent } from "react";
 import classnames from "classnames";
 import { actions } from "ui/actions";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { Context } from "../../../reducers/pause";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
+import type { Breakpoint as BreakpointType } from "../../../reducers/types";
+import type { SelectedSource } from "../../../selectors";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
   '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';
 
-class Breakpoint extends PureComponent {
+const connector = connect(null, {
+  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
+});
+
+type $FixTypeLater = any;
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type BreakpointProps = PropsFromRedux & {
+  breakpoint: BreakpointType;
+  editor: $FixTypeLater;
+  cx: Context;
+  selectedSource: SelectedSource;
+};
+
+class Breakpoint extends PureComponent<BreakpointProps> {
   componentDidMount() {
     this.addBreakpoint(this.props);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: BreakpointProps) {
     this.removeBreakpoint(prevProps);
     this.addBreakpoint(this.props);
   }
@@ -32,23 +50,19 @@ class Breakpoint extends PureComponent {
   }
 
   makeMarker() {
-    const bp = breakpointSvg.cloneNode(true);
+    const bp = breakpointSvg.cloneNode(true) as HTMLDivElement;
 
     bp.className = classnames("editor new-breakpoint", {
       "folding-enabled": features.codeFolding,
     });
 
     bp.onmousedown = this.onClick;
-    bp.onmouseenter = this.onMouseEnter;
-    bp.onmouseleave = this.onMouseLeave;
-
-    // NOTE: flow does not know about oncontextmenu
     bp.oncontextmenu = this.onContextMenu;
 
     return bp;
   }
 
-  onClick = event => {
+  onClick = (event: any) => {
     const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
 
     // ignore right clicks
@@ -64,14 +78,14 @@ class Breakpoint extends PureComponent {
     return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
   };
 
-  onContextMenu = event => {
+  onContextMenu = (event: any) => {
     event.stopPropagation();
     event.preventDefault();
 
     return;
   };
 
-  addBreakpoint(props) {
+  addBreakpoint(props: BreakpointProps) {
     const { breakpoint, editor, selectedSource } = props;
     const selectedLocation = breakpoint.location;
 
@@ -94,7 +108,7 @@ class Breakpoint extends PureComponent {
     }
   }
 
-  removeBreakpoint(props) {
+  removeBreakpoint(props: BreakpointProps) {
     const { selectedSource, breakpoint } = props;
     if (!selectedSource) {
       return;
@@ -120,6 +134,4 @@ class Breakpoint extends PureComponent {
   }
 }
 
-export default connect(null, {
-  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
-})(Breakpoint);
+export default connector(Breakpoint);

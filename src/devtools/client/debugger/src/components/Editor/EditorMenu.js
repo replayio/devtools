@@ -5,7 +5,7 @@
 //
 
 import { Component } from "react";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { showMenu } from "devtools/shared/contextmenu";
 
 import { getSourceLocationFromMouseEvent } from "../../utils/editor";

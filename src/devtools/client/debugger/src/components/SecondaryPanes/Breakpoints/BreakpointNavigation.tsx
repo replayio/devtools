@@ -1,5 +1,6 @@
 import classnames from "classnames";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { PointDescription } from "@replayio/protocol";
+import { connect, ConnectedProps } from "react-redux";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
@@ -8,11 +9,34 @@ import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
+import type { UIState } from "ui/state";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
 
-const { trackEvent } = require("ui/utils/telemetry");
+import { trackEvent } from "ui/utils/telemetry";
+import { Breakpoint } from "../../../reducers/types";
+const mapStateToProps = (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
+  analysisPoints: selectors.getAnalysisPointsForLocation(
+    state,
+    // @ts-ignore Location / SourceLocation mismatch
+    breakpoint.location,
+    breakpoint.options.condition
+  ),
+  executionPoint: selectors.getExecutionPoint(state),
+});
+
+const connector = connect(mapStateToProps, {
+  seek: actions.seek,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type BNProps = PropsFromRedux & {
+  breakpoint: Breakpoint;
+  editing: boolean;
+  showCondition: boolean;
+  setShowCondition: (showCondition: boolean) => void;
+};
 
 function BreakpointNavigation({
   analysisPoints,
@@ -21,10 +45,9 @@ function BreakpointNavigation({
   executionPoint,
   seek,
   setShowCondition,
-  setZoomedBreakpoint = () => {},
   showCondition,
-}) {
-  const navigateToPoint = point => {
+}: BNProps) {
+  const navigateToPoint = (point?: PointDescription) => {
     trackEvent("breakpoint.navigate");
     if (point) {
       seek(point.point, point.time, true);
@@ -52,7 +75,7 @@ function BreakpointNavigation({
   if (editing) {
     return (
       <div className="breakpoint-navigation justify-end space-x-1 p-1.5 py-2">
-        <PrefixBadgeButton breakpoint={breakpoint} showEmpty={true} />
+        <PrefixBadgeButton breakpoint={breakpoint} />
         <button className="" onClick={() => setShowCondition(!showCondition)}>
           <Icon
             filename="filter"
@@ -69,18 +92,27 @@ function BreakpointNavigation({
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
       {analysisPoints && !analysisPoints.error ? (
-        <BreakpointTimeline breakpoint={breakpoint} setZoomedBreakpoint={setZoomedBreakpoint} />
+        <BreakpointTimeline breakpoint={breakpoint} />
       ) : (
         <div className="flex-grow" />
       )}
       <div className="text-center">
-        <PanelStatus prefixBadge={breakpoint.options.prefixBadge} analysisPoints={analysisPoints} />
+        <PanelStatus
+          prefixBadge={breakpoint.options.prefixBadge!}
+          analysisPoints={analysisPoints!}
+        />
       </div>
     </div>
   );
 }
 
-function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
+interface BNCProps {
+  prev?: PointDescription;
+  next?: PointDescription;
+  navigateToPoint: (point?: PointDescription) => void;
+}
+
+function BreakpointNavigationCommands({ prev, next, navigateToPoint }: BNCProps) {
   const prevDisabled = !prev;
   const nextDisabled = !next;
   return (
@@ -105,15 +137,4 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }) {
   );
 }
 
-const mapStateToProps = (state, { breakpoint }) => ({
-  analysisPoints: selectors.getAnalysisPointsForLocation(
-    state,
-    breakpoint.location,
-    breakpoint.options.condition
-  ),
-  executionPoint: selectors.getExecutionPoint(state),
-});
-
-export default connect(mapStateToProps, {
-  seek: actions.seek,
-})(BreakpointNavigation);
+export default connector(BreakpointNavigation);

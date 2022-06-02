@@ -5,20 +5,28 @@
 //
 import React, { Component } from "react";
 import classnames from "classnames";
-import { connect } from "../../utils/connect";
+import { connect, ConnectedProps } from "react-redux";
+import type { Location } from "@replayio/protocol";
+
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import actions from "../../actions";
 
 import { getDocument } from "../../utils/editor";
-import Panel from "./Breakpoints/Panel/index";
+import Panel from "./Breakpoints/Panel/Panel";
 import { features } from "ui/utils/prefs";
 import { isLogpoint } from "../../utils/breakpoint";
+import { Breakpoint } from "../../reducers/types";
+import type { SelectedSource } from "../../selectors";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
   '<svg viewBox="0 0 11 13" width="11" height="13"><path d="M5.07.5H1.5c-.54 0-1 .46-1 1v10c0 .54.46 1 1 1h3.57c.58 0 1.15-.26 1.53-.7l3.7-5.3-3.7-5.3C6.22.76 5.65.5 5.07.5z"/></svg>';
 
-function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
-  const bp = breakpointButton.cloneNode(true);
+function makeBookmark(
+  { breakpoint }: ColumnBreakpointType,
+  { onClick, onContextMenu }: { onClick: (e: any) => void; onContextMenu: (e: any) => void }
+) {
+  const bp = breakpointButton.cloneNode(true) as HTMLButtonElement;
 
   const isActive = breakpoint && !breakpoint.disabled;
   const isDisabled = breakpoint && breakpoint.disabled;
@@ -39,18 +47,39 @@ function makeBookmark({ breakpoint }, { onClick, onContextMenu }) {
   return bp;
 }
 
-class ColumnBreakpoint extends Component {
-  addColumnBreakpoint;
-  bookmark;
+const connector = connect(null, {
+  addBreakpointAtColumn: actions.addBreakpointAtColumn,
+  removeBreakpoint: actions._removeBreakpoint,
+});
 
-  addColumnBreakpoint = nextProps => {
+type $FixTypeLater = any;
+
+interface ColumnBreakpointType {
+  location: Location;
+  breakpoint?: Breakpoint;
+}
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type CBProps = PropsFromRedux & {
+  cx: Context;
+  columnBreakpoint: ColumnBreakpointType;
+  editor: $FixTypeLater;
+  source: SelectedSource;
+  insertAt: number;
+};
+
+class ColumnBreakpoint extends Component<CBProps> {
+  bookmark: any;
+
+  addColumnBreakpoint = (nextProps?: CBProps) => {
     const { columnBreakpoint, source } = nextProps || this.props;
 
     if (!features.columnBreakpoints) {
       return null;
     }
 
-    const sourceId = source.id;
+    const sourceId = source!.id;
     const doc = getDocument(sourceId);
     if (!doc) {
       return;
@@ -76,7 +105,7 @@ class ColumnBreakpoint extends Component {
     }
   };
 
-  onClick = event => {
+  onClick = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
     const { cx, columnBreakpoint, addBreakpointAtColumn, removeBreakpoint } = this.props;
@@ -88,7 +117,7 @@ class ColumnBreakpoint extends Component {
     }
   };
 
-  onContextMenu = event => {
+  onContextMenu = (event: React.MouseEvent) => {
     event.stopPropagation();
     event.preventDefault();
 
@@ -108,7 +137,7 @@ class ColumnBreakpoint extends Component {
     this.addColumnBreakpoint();
   }
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps: CBProps) {
     return this.props.columnBreakpoint.breakpoint != nextProps.columnBreakpoint.breakpoint;
   }
 
@@ -120,11 +149,8 @@ class ColumnBreakpoint extends Component {
       return null;
     }
 
-    return <Panel breakpoint={columnBreakpoint.breakpoint} editor={editor} insertAt={insertAt} />;
+    return <Panel breakpoint={columnBreakpoint.breakpoint!} editor={editor} insertAt={insertAt} />;
   }
 }
 
-export default connect(null, {
-  addBreakpointAtColumn: actions.addBreakpointAtColumn,
-  removeBreakpoint: actions._removeBreakpoint,
-})(ColumnBreakpoint);
+export default connector(ColumnBreakpoint);

@@ -5,7 +5,7 @@
 //
 
 import React, { Component } from "react";
-import { connect } from "../../../utils/connect";
+import { connect } from "react-redux";
 import PropTypes from "prop-types";
 
 import FrameComponent from "./Frame";

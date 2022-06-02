@@ -4,6 +4,9 @@
 
 //
 import React, { Component } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import type { UIState } from "ui/state";
+import type { Context } from "../../../reducers/pause";
 import Breakpoint from "./Breakpoint";
 
 import {
@@ -11,9 +14,23 @@ import {
   getFirstVisibleBreakpoints,
 } from "devtools/client/debugger/src/selectors";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { connect } from "devtools/client/debugger/src/utils/connect";
 
-class Breakpoints extends Component {
+const connector = connect((state: UIState) => ({
+  // Retrieves only the first breakpoint per line so that the
+  // breakpoint marker represents only the first breakpoint
+  breakpoints: getFirstVisibleBreakpoints(state),
+  selectedSource: getSelectedSource(state),
+}));
+
+type $FixTypeLater = any;
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type BreakpointsProps = PropsFromRedux & {
+  editor: $FixTypeLater;
+  cx: Context;
+};
+
+class Breakpoints extends Component<BreakpointsProps> {
   render() {
     const { cx, breakpoints, selectedSource, editor } = this.props;
 
@@ -39,9 +56,4 @@ class Breakpoints extends Component {
   }
 }
 
-export default connect(state => ({
-  // Retrieves only the first breakpoint per line so that the
-  // breakpoint marker represents only the first breakpoint
-  breakpoints: getFirstVisibleBreakpoints(state),
-  selectedSource: getSelectedSource(state),
-}))(Breakpoints);
+export default connector(Breakpoints);

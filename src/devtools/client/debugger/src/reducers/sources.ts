@@ -612,6 +612,8 @@ export const getSelectedLocation = createSelector(
   sources => sources.selectedLocation
 );
 
+export type SelectedSource = ReturnType<typeof getSelectedSource>;
+
 export const getSelectedSource = createSelector(
   getSelectedLocation,
   getSources,

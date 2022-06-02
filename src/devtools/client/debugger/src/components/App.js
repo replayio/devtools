@@ -5,7 +5,7 @@
 import React, { Component, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
-import { connect } from "../utils/connect";
+import { connect } from "react-redux";
 import { features } from "../utils/prefs";
 import { prefs } from "../../../../../ui/utils/prefs";
 import actions from "../actions";
