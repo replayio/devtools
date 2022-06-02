@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
-import { endTimeForFocusRegion, isTimeInRegions, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -14,7 +14,6 @@ const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getCurrentTime, getFocusRegion } = require("ui/reducers/timeline");
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-const { isInFocusSpan } = require("ui/utils/timeline");
 
 export const getAllMessagesUiById = (state: UIState) => state.messages.messagesUiById;
 export const getCommandHistory = (state: UIState) => state.messages.commandHistory;
@@ -58,7 +57,6 @@ export const getVisibleMessageData = createSelector(
 
     let countAfter = 0;
     let countBefore = 0;
-    let countInUnloadedRegions = 0;
 
     const focusRegionStartTime = focusRegion ? startTimeForFocusRegion(focusRegion) : null;
     const focusRegionEndTime = focusRegion ? endTimeForFocusRegion(focusRegion) : null;
@@ -78,25 +76,12 @@ export const getVisibleMessageData = createSelector(
         }
       }
 
-      // Filter out messages that haven't yet been loaded.
-      if (!isTimeInRegions(messageTime, loadedRegions!.loaded)) {
-        // This is an edge case.
-        // We have fetched console messages for the entire recording,
-        // but after the user focused, the backend unloaded some regions.
-        // We can easily track the number of messages BUT they aren't being filtered out before or after the focus window,
-        // so it's not clear where this number should be shown, with one exception:
-        // when all console logs are filtered out, we can show a single total (before, after, and unloaded regions).
-        countInUnloadedRegions++;
-        return;
-      }
-
       filteredMessageIDs.push(messageID);
     });
 
     return {
       countAfter: canShowCount ? countAfter : -1,
       countBefore: canShowCount ? countBefore : -1,
-      countInUnloadedRegions: canShowCount ? countInUnloadedRegions : -1,
       messageIDs: filteredMessageIDs,
     };
   }

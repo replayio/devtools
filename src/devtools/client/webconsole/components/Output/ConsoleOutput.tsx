@@ -24,7 +24,6 @@ import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
-import { getLastFetchedForFocusRegion } from "../../selectors";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
@@ -376,9 +375,7 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
   const dispatch = useDispatch();
   const focusRegion = useSelector(getFocusRegion);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
-  const { countAfter, countBefore, countInUnloadedRegions, messageIDs } = useSelector(
-    selectors.getVisibleMessageData
-  );
+  const { countAfter, countBefore, messageIDs } = useSelector(selectors.getVisibleMessageData);
 
   // If the user has no focus region, there's nothing for this component to show.
   if (focusRegion === null) {
@@ -393,15 +390,14 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
   // (like the architecture proof of concept does with the MessagesCache).
   // I'd prefer to wait and address this as part of the architectural overhaul though.
   // See https://github.com/replayio/devtools/discussions/6932
-  const canShowFilteredMessageCounts =
-    countAfter >= 0 && countBefore >= 0 && countInUnloadedRegions >= 0;
+  const canShowFilteredMessageCounts = countAfter >= 0 && countBefore >= 0;
 
   // If there are no visible messages after filtering, show a single row for both before and after counts.
   let count = position === "before" ? countBefore : countAfter;
   let label: string = position;
   if (messageIDs.length === 0) {
     if (position === "before") {
-      count = countBefore + countAfter + countInUnloadedRegions;
+      count = countBefore + countAfter;
       label = "outside of";
     } else {
       return null;
