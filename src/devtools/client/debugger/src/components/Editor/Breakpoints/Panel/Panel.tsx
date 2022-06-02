@@ -72,7 +72,7 @@ function Panel({
   const dismissNag = hooks.useDismissNag();
   const points = analysisPoints?.data;
   const error = analysisPoints?.error;
-  const pausedOnHit = points?.some(
+  const pausedOnHit = !!points?.some(
     ({ point, time }) => point == executionPoint && time == currentTime
   );
   const isHot =
