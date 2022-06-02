@@ -22,9 +22,13 @@
   outline: none;
 }
 
-.PrefixBadge:focus-visible {
+/*
+  TODO: look into why focus-visible shows when programmatically moving focus
+  https://github.com/w3c/csswg-drafts/issues/5885
+*/
+/* .PrefixBadge:focus-visible {
   box-shadow: 0 0 0 0.125rem rgba(0, 123, 255, 0.25);
-}
+} */
 
 .ColorBadge,
 .UnicornBadge {

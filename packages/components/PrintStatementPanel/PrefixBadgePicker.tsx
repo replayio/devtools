@@ -34,7 +34,14 @@ export function PrefixBadgePicker() {
           setState("opening");
         }
       }}
-      onMouseUp={() => {
+      onMouseUp={event => {
+        event.preventDefault();
+        const button = (event.target as HTMLElement).closest("button");
+
+        if (button) {
+          button.focus();
+        }
+
         setState("opened");
       }}
       onBlur={event => {
