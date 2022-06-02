@@ -6,16 +6,16 @@ import Icon from "../shared/Icon";
 
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
 
-export function Filter({
-  children,
-  types,
-  toggleType,
+export function FilterLayout({
+  setFilterValue,
   table,
+  toggleType,
+  types,
 }: {
-  children: React.ReactNode;
-  types: Set<CanonicalRequestType>;
+  setFilterValue: (value: string) => void;
+  table: React.ReactNode;
   toggleType: (type: CanonicalRequestType) => void;
-  table: any;
+  types: Set<CanonicalRequestType>;
 }) {
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -38,7 +38,7 @@ export function Filter({
 
         <input
           placeholder="Filter requests"
-          onChange={e => table.setGlobalFilter(e.target.value)}
+          onChange={event => setFilterValue(event.target.value)}
           className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
         />
       </div>
@@ -60,13 +60,14 @@ export function Filter({
                     types.has(canonicalType.type) ? "bg-primaryAccent" : "bg-gray-400"
                   )}
                 />
+
                 {canonicalType.label}
               </button>
             ))}
           </div>
         ) : null}
 
-        {children}
+        {table}
       </div>
     </>
   );
