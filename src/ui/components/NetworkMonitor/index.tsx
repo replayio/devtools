@@ -12,7 +12,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 
-import { FilterLayout } from "./Filter";
+import { FilterLayout } from "./FilterLayout";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import Table from "./Table";
