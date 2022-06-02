@@ -9,19 +9,25 @@ import { StateContext } from "devtools/client/webconsole/components/Search";
 import constants from "devtools/client/webconsole/constants";
 import { Frame, Message } from "devtools/client/webconsole/reducers/messages";
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
+import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import {
+  enterFocusMode,
+  setFocusRegionEndTime,
+  setFocusRegionStartTime,
+} from "ui/actions/timeline";
 import { ContextMenu } from "ui/components/ContextMenu";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
-import { getFocusRegion } from "ui/reducers/timeline";
+import { getFocusRegion, getShowFocusModeControls } from "ui/reducers/timeline";
 import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
+import { getLastFetchedForFocusRegion } from "../../selectors";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
+import styles from "./ConsoleOutput.module.css";
 
 function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
   if (!locA) {
@@ -53,7 +59,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
   };
 
   componentDidMount() {
-    if (this.props.visibleMessages.length > 0) {
+    if (this.props.visibleMessageIDs.length > 0) {
       scrollToBottom(this.outputNode.current!);
     }
     this.scrollCurrentSearchResultIntoView();
@@ -158,15 +164,15 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
     (previous || resultNode).scrollIntoView();
   }
 
-  getIsFirstMessageForPoint(index: number, visibleMessages: PropsFromRedux["visibleMessages"]) {
+  getIsFirstMessageForPoint(index: number, visibleMessageIDs: PropsFromRedux["visibleMessageIDs"]) {
     const { messages } = this.props;
 
     if (index == 0) {
       return true;
     }
 
-    let previousMessage = messages.entities[visibleMessages[index - 1]];
-    let currentMessage = messages.entities[visibleMessages[index]];
+    let previousMessage = messages.entities[visibleMessageIDs[index - 1]];
+    let currentMessage = messages.entities[visibleMessageIDs[index]];
 
     if (!previousMessage || !currentMessage) {
       return false;
@@ -185,11 +191,11 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       messagesUi,
       pausedExecutionPoint,
       timestampsVisible,
-      visibleMessages,
+      visibleMessageIDs,
     } = this.props;
     const { contextMenu } = this.state;
 
-    const messageNodes = visibleMessages.map((messageId, i) => {
+    const messageNodes = visibleMessageIDs.map((messageId, i) => {
       const message = messages.entities[messageId]!;
       // @ts-ignore ExecutionPoint/string mismatch
       const isPrimaryHighlighted = hoveredItem?.point === message.executionPoint;
@@ -204,7 +210,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return React.createElement(MessageContainer, {
         // TODO Reconsider this when we rebuild message grouping
         dispatch,
-        isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessages),
+        isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessageIDs),
         isPaused: closestMessage?.id == messageId,
         isPrimaryHighlighted,
         key: messageId,
@@ -228,7 +234,9 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
           onContextMenu={this.onContextMenu}
         >
           <ConsoleLoadingBar />
+          <TrimmedMessageCountRow position="before" />
           {messageNodes}
+          <TrimmedMessageCountRow position="after" />
         </div>
         {contextMenu !== null && (
           <ContextMenu x={contextMenu.pageX} y={contextMenu.pageY} close={this.closeContextMenu}>
@@ -339,7 +347,7 @@ function mapStateToProps(state: UIState) {
     pausedExecutionPoint: selectors.getExecutionPoint(state),
     playback: selectors.getPlayback(state),
     timestampsVisible: state.consoleUI.timestampsVisible,
-    visibleMessages: selectors.getVisibleMessages(state),
+    visibleMessageIDs: selectors.getVisibleMessageData(state).messageIDs,
   };
 }
 
@@ -362,4 +370,74 @@ async function getTimeForMessage(message: Message): Promise<number> {
   }
 
   return -1;
+}
+
+function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) {
+  const dispatch = useDispatch();
+  const focusRegion = useSelector(getFocusRegion);
+  const showFocusModeControls = useSelector(getShowFocusModeControls);
+  const { countAfter, countBefore, countInUnloadedRegions, messageIDs } = useSelector(
+    selectors.getVisibleMessageData
+  );
+
+  // If the user has no focus region, there's nothing for this component to show.
+  if (focusRegion === null) {
+    return null;
+  }
+
+  // We can only calculate the number of messages before and after a focus region
+  // if we fetched all messages for the recording and did the filtering locally.
+  // Otherwise the best we can do is show a generic, "maybe" message.
+  //
+  // This is a bit of a HACK and should probably be modeled by the messages/focus state itself,
+  // (like the architecture proof of concept does with the MessagesCache).
+  // I'd prefer to wait and address this as part of the architectural overhaul though.
+  // See https://github.com/replayio/devtools/discussions/6932
+  const canShowFilteredMessageCounts =
+    countAfter >= 0 && countBefore >= 0 && countInUnloadedRegions >= 0;
+
+  // If there are no visible messages after filtering, show a single row for both before and after counts.
+  let count = position === "before" ? countBefore : countAfter;
+  let label: string = position;
+  if (messageIDs.length === 0) {
+    if (position === "before") {
+      count = countBefore + countAfter + countInUnloadedRegions;
+      label = "outside of";
+    } else {
+      return null;
+    }
+  }
+
+  // If we're confident there are no filtered messages, there's nothing for this component to show.
+  if (canShowFilteredMessageCounts && count === 0) {
+    return null;
+  }
+
+  const showFocusEditor = () => {
+    if (!showFocusModeControls) {
+      dispatch(enterFocusMode());
+    }
+  };
+
+  if (canShowFilteredMessageCounts) {
+    return (
+      <div className={styles.TrimmedMessageCountRow}>
+        There are {count} logs {label}{" "}
+        <span className={styles.TrimmedMessageLink} onClick={showFocusEditor}>
+          your debugging window
+        </span>
+        .
+      </div>
+    );
+  } else {
+    return (
+      <div className={styles.TrimmedMessageCountRow}>
+        There may be some logs {label}{" "}
+        <span className={styles.TrimmedMessageLink} onClick={showFocusEditor}>
+          your debugging window
+        </span>
+        .
+      </div>
+    );
+  }
 }
