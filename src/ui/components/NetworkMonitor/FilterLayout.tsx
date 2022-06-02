@@ -2,11 +2,11 @@ import classNames from "classnames";
 import { useState } from "react";
 
 import MaterialIcon from "../shared/MaterialIcon";
-import Icon from "../shared/Icon";
 
 import { CanonicalRequestType, RequestTypeOptions } from "./utils";
+import Checkbox from "../shared/Forms/Checkbox";
 
-export function FilterLayout({
+export const FilterLayout = ({
   setFilterValue,
   table,
   toggleType,
@@ -16,7 +16,7 @@ export function FilterLayout({
   table: React.ReactNode;
   toggleType: (type: CanonicalRequestType) => void;
   types: Set<CanonicalRequestType>;
-}) {
+}) => {
   const [filterOpen, setFilterOpen] = useState(false);
 
   return (
@@ -47,24 +47,18 @@ export function FilterLayout({
 
       <div className="flex min-h-0 flex-1">
         {filterOpen ? (
-          <div className="flex basis-32 flex-col overflow-auto border-r border-splitter bg-bodyBgcolor px-0.5">
+          <div
+            className="flex basis-32 flex-col overflow-auto border-r border-splitter bg-bodyBgcolor px-2 py-0.5"
+            style={{ paddingLeft: "0.55rem" }}
+          >
             {RequestTypeOptions.map(canonicalType => (
-              <button
+              <ToggleRow
                 key={canonicalType.label}
-                className="group flex items-center gap-2 p-1.5"
+                selected={types.has(canonicalType.type)}
                 onClick={() => toggleType(canonicalType.type)}
               >
-                <Icon
-                  size="small"
-                  filename={canonicalType.icon}
-                  className={classNames(
-                    "group-hover:bg-primaryAccent",
-                    types.has(canonicalType.type) ? "bg-primaryAccent" : "bg-gray-400"
-                  )}
-                />
-
                 {canonicalType.label}
-              </button>
+              </ToggleRow>
             ))}
           </div>
         ) : null}
@@ -73,4 +67,25 @@ export function FilterLayout({
       </div>
     </>
   );
-}
+};
+
+const ToggleRow = ({
+  children,
+  selected,
+  onClick,
+}: {
+  children: React.ReactNode;
+  selected: boolean;
+  onClick: () => void;
+}) => {
+  return (
+    <label className="flex select-none items-center py-1">
+      <div className="flex flex-grow flex-row items-center space-x-2">
+        <Checkbox checked={selected} className="m-0" onChange={onClick} />
+        <span className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
+          {children}
+        </span>
+      </div>
+    </label>
+  );
+};
