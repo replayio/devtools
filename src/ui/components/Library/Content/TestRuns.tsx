@@ -5,6 +5,7 @@ import { getWorkspaceId } from "ui/reducers/app";
 import { LibraryContext } from "../useFilters";
 import styles from "../Library.module.css";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+import { getRelativeDate } from "../RecordingRow";
 
 export function TestRuns() {
   const workspaceId = useSelector(getWorkspaceId);
@@ -33,13 +34,13 @@ export function TestRuns() {
 }
 
 function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
-  const { id, recordings } = testRun;
+  const { recordings, event, commit, branch } = testRun;
   const results = testRun.recordings.map(r => r.metadata?.test?.result);
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className="flex flex-row items-center justify-between cursor-pointer border-b border-themeBorder flex-grow overflow-hidden py-3 px-4 space-x-r"
+      className="flex flex-row items-center justify-between flex-grow px-4 py-3 overflow-hidden border-b cursor-pointer border-themeBorder space-x-r"
       onClick={onClick}
     >
       <div className="flex flex-row space-x-2">
@@ -50,23 +51,37 @@ function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => voi
           {results.every(r => r === "passed") ? "check_circle" : "error"}
         </MaterialIcon>
         <div className="flex flex-col space-y-0.5">
-          <div>Deploy PR ({id})</div>
-          <div className="flex flex-row space-x-4 items-center text-gray-400 font-light">
-            <div className="flex flex-row space-x-1 items-center">
-              <MaterialIcon>merge</MaterialIcon>
-              <div>{recordings[0].metadata.source?.commit.id.slice(0, 7)}</div>
+          <div>{commit?.title || "Unknown"} </div>
+          <div className="flex flex-row items-center space-x-4 font-light text-gray-400">
+            <div>{event}</div>
+            <div>{getRelativeDate(recordings[0].date)}</div>
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>fork_right</MaterialIcon>
+              <div>{commit.id}</div>
             </div>
-            <div>{new Date(recordings[0].date).toDateString()}</div>
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>fork_right</MaterialIcon>
+              <div>{branch}</div>
+            </div>
+            {recordings[0].metadata.source?.merge ? (
+              <div
+                className="flex flex-row items-center space-x-1"
+                title={recordings[0].metadata.source.merge.title}
+              >
+                <MaterialIcon>tag</MaterialIcon>
+                <div>{recordings[0].metadata.source.merge.id}</div>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
       <div className="flex flex-row space-x-2">
-        <div className="bg-green-100 text-green-500 px-4 py-2 rounded-3xl flex space-x-2 items-center">
+        <div className="flex items-center px-4 py-2 space-x-2 text-green-500 bg-green-100 rounded-3xl">
           <MaterialIcon iconSize="2xl">check_circle</MaterialIcon>
           <div>{`${results.filter(r => r === "passed").length} pass`}</div>
         </div>
         {results.filter(r => r === "failed").length === 0 ? null : (
-          <div className="bg-red-100 text-red-500 px-4 py-2 rounded-3xl flex space-x-2 items-center">
+          <div className="flex items-center px-4 py-2 space-x-2 text-red-500 bg-red-100 rounded-3xl">
             <MaterialIcon iconSize="2xl">error</MaterialIcon>
             <div>{`${results.filter(r => r === "failed").length} fail`}</div>
           </div>

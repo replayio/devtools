@@ -6,22 +6,12 @@ import { getFormattedTime } from "ui/utils/timeline";
 import { getRelativeDate } from "../RecordingRow";
 import { LibraryContext } from "../useFilters";
 
-export function ReplayRows({ recordings }: { recordings: Recording[] }) {
+export function TestRunReplayRows({ recordings }: { recordings: Recording[] }) {
   return (
     <div className="flex flex-col space-y-1">
       {orderBy(recordings, "date", "desc").map((r, i) => (
         <ReplayRow recording={r} key={i} />
       ))}
-    </div>
-  );
-}
-
-function PullRequestDetails({ id, title }: { id: string; title: string }) {
-  return (
-    <div className="flex space-x-1 items-center text-gray-500">
-      <MaterialIcon>merge</MaterialIcon>
-      <span>{title}</span>
-      <span>#{id}</span>
     </div>
   );
 }
@@ -33,7 +23,7 @@ function CommitDetails({ source }: { source?: SourceMetadata }) {
   return (
     <div className="flex space-x-1">
       <span className="font-medium">{title}</span>
-      <span className="overflow-hidden overflow-ellipsis whitespace-pre">({id})</span>
+      <span className="overflow-hidden whitespace-pre overflow-ellipsis">({id})</span>
     </div>
   );
 }
@@ -42,33 +32,33 @@ function ReplayRow({ recording }: { recording: Recording }) {
   const { setView, setAppliedText } = useContext(LibraryContext);
   const { metadata, date, duration } = recording;
 
-  const onViewTestRun = (e: MouseEvent) => {
+  const onViewTest = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
 
     setView("recordings");
-    setAppliedText(`test-run:${metadata.test!.run!.id}`);
+    setAppliedText(`test-path:${encodeURIComponent(JSON.stringify(metadata.test!.path))}`);
   };
 
+  console.log({ metadata });
   return (
     <a href={`/recording/${recording.id}`} target="_blank" rel="noreferrer noopener">
-      <div className="flex flex-row items-center space-x-2 hover:bg-gray-100 px-3 p-2 rounded-md flex-grow">
+      <div className="flex flex-row items-center flex-grow p-2 px-3 space-x-2 rounded-md hover:bg-gray-100">
         <ResultIcon result={metadata.test?.result} />
         <div className="flex flex-col flex-grow">
-          <CommitDetails source={metadata.source} />
-          {metadata.source?.merge ? (
-            <PullRequestDetails id={metadata.source.merge.id} title={metadata.source.merge.title} />
-          ) : null}
-          <div className="flex space-x-3 items-center text-gray-500">
-            <div className="flex space-x-1 items-center">
-              <MaterialIcon>fork_right</MaterialIcon>
-              <span>{metadata.source?.branch || "Unknown branch"}</span>
+          <div className="flex space-x-1">
+            <span className="font-medium">{metadata.test?.title}</span>
+          </div>
+          <div className="flex items-center space-x-3 text-gray-500">
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>web_asset</MaterialIcon>
+              <div>{metadata.test?.path?.[1]}</div>
             </div>
-            <div className="flex space-x-1 items-center">
-              <MaterialIcon>schedule</MaterialIcon>
-              <span>{getRelativeDate(date)}</span>
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>description</MaterialIcon>
+              <div>{metadata.test?.file}</div>
             </div>
-            <div className="flex space-x-1 items-center">
+            <div className="flex items-center space-x-1">
               <MaterialIcon>timer</MaterialIcon>
               <span>{getFormattedTime(duration)}</span>
             </div>
@@ -77,8 +67,8 @@ function ReplayRow({ recording }: { recording: Recording }) {
             <span className="hover:underline">Open Replay</span>
             <span>|</span>
             {metadata.test?.run?.id ? (
-              <button onClick={onViewTestRun} className="hover:underline">
-                View Test Run ({metadata.test.run.id.slice(0, 7)})
+              <button onClick={onViewTest} className="hover:underline">
+                View Test
               </button>
             ) : null}
           </div>

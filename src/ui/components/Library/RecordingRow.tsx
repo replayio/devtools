@@ -184,8 +184,9 @@ function RecordingRow({
   );
 }
 
-function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
+export function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
+  console.log({screenData});
   return (
     <Redacted>
       <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>

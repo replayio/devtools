@@ -121,8 +121,16 @@ function Library({
     return <LoadingScreen />;
   }
 
+  const handleSetView = (view: View) => {
+    setView(view);
+    setPreview(null);
+    setAppliedText("");
+  };
+
   return (
-    <LibraryContext.Provider value={{ filter, view, preview, setPreview, setAppliedText }}>
+    <LibraryContext.Provider
+      value={{ filter, view, preview, setPreview, setView: handleSetView, setAppliedText }}
+    >
       <main className="flex flex-row w-full h-full">
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-col flex-grow overflow-x-hidden">
@@ -131,7 +139,7 @@ function Library({
               displayedString={displayedString}
               setDisplayedText={setDisplayedText}
               setAppliedText={setAppliedText}
-              setView={setView}
+              setView={handleSetView}
             />
             <LaunchButton />
           </div>

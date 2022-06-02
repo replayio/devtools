@@ -163,14 +163,10 @@ type TestMetadata = {
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
-type SourceMetadata = {
+export type SourceMetadata = {
   result: "passed" | "failed";
   branch?: string;
-  commit: {
-    id: string;
-    title?: string;
-    url?: string;
-  };
+  commit: SourceCommit;
   merge?: {
     id: string;
     title: string;
@@ -179,6 +175,12 @@ type SourceMetadata = {
   provider?: string;
   repository?: string;
 };
+
+export type SourceCommit = {
+  id: string;
+  title?: string;
+  url?: string;
+}
 
 export interface RecordingOptions {
   resolvedAt: string | null;

@@ -79,6 +79,7 @@ export default function ViewerHeader({
           {recordings.length != 0 ? <>({recordings.length})</> : <></>}
         </span>
       ) : null}
+      <div>/ {view}</div>
     </ViewerHeaderLeft>
   );
 

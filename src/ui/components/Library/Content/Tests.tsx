@@ -1,10 +1,33 @@
-import { useContext } from "react";
+import { createContext, ReactNode, useContext, useState } from "react";
 import { useSelector } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Test, useGetTestsForWorkspace } from "ui/hooks/tests";
 import { getWorkspaceId } from "ui/reducers/app";
 import { LibraryContext } from "../useFilters";
 import styles from "../Library.module.css";
+import { getRelativeDate } from "../RecordingRow";
+import { Recording } from "ui/types";
+
+type TestsContextType = {
+  hoveredRunId: string | null;
+  setHoveredRunId: (runId: string | null) => void;
+};
+
+export const TestsContext = createContext<TestsContextType>({
+  hoveredRunId: null,
+  setHoveredRunId: () => {},
+});
+
+function TestsContextWrapper({ children }: { children: ReactNode }) {
+  const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
+
+  console.log({ hoveredRunId });
+  return (
+    <TestsContext.Provider value={{ hoveredRunId, setHoveredRunId }}>
+      {children}
+    </TestsContext.Provider>
+  );
+}
 
 export function Tests() {
   const workspaceId = useSelector(getWorkspaceId);
@@ -16,7 +39,7 @@ export function Tests() {
   }
 
   return (
-    <>
+    <TestsContextWrapper>
       <div
         className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
       >
@@ -24,42 +47,81 @@ export function Tests() {
           <TestRow test={t} key={i} onClick={() => setPreview({ id: t.path, view: "tests" })} />
         ))}
       </div>
-    </>
+    </TestsContextWrapper>
   );
 }
 
 function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
-  const { path, recordings } = test;
+  const { path, recordings, date } = test;
 
-  const results = test.recordings.map(r => r.metadata?.test?.result);
+  const displayedRecordings = test.recordings.filter(r => r.metadata?.test?.result);
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className="flex flex-row cursor-pointer border-b border-themeBorder flex-grow overflow-hidden py-3 px-4 items-center space-x-4 justify-between"
+      className="flex flex-row items-center justify-between flex-grow px-4 py-3 space-x-4 overflow-hidden border-b cursor-pointer border-themeBorder"
       onClick={onClick}
     >
-      <div className="flex space-x-4 items-center">
+      <div className="flex items-center space-x-4">
         <div className="flex flex-col space-y-0.5">
           <div>
-            {path[path.length - 2]} ({recordings.length})
+            {path[path.length - 1]} ({recordings.length})
           </div>
-          <div className="font-light text-gray-400 flex items-center space-x-1">
-            <MaterialIcon>description</MaterialIcon>
-            <div>{path.slice(1).join(" > ")}</div>
+          <div className="flex items-center space-x-3 text-gray-500">
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>web_asset</MaterialIcon>
+              <div>{path?.[1]}</div>
+            </div>
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>description</MaterialIcon>
+              <div>{path?.[path.length - 2]}</div>
+            </div>
+            <div className="flex flex-row items-center space-x-1">
+              <MaterialIcon>schedule</MaterialIcon>
+              <div>Last run {getRelativeDate(date)}</div>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex flex-row space-x-1 h-5">
-        {results.length < 10
-          ? new Array(10 - results.length)
+      <div className="flex flex-row h-5 space-x-1">
+        {/* {displayedRecordings.length < 10
+          ? new Array(10 - displayedRecordings.length)
               .fill("")
               .map((_, i) => <div key={i} className={`h-full w-2 bg-gray-300`} />)
-          : null}
-        {results.map((r, i) => (
-          <div key={i} className={`h-full w-2 ${r === "passed" ? "bg-green-500" : "bg-red-500"}`} />
+          : null} */}
+        {displayedRecordings.map((r, i) => (
+          <Result recording={r} key={i} />
         ))}
       </div>
     </div>
+  );
+}
+
+function Result({ recording }: { recording: Recording }) {
+  const { hoveredRunId, setHoveredRunId } = useContext(TestsContext);
+  const testRunId = recording.metadata?.test?.run?.id || null;
+
+  const onMouseEnter = () => {
+    const runId = recording.metadata.test?.run?.id;
+
+    if (runId) {
+      setHoveredRunId(runId);
+    }
+  };
+  const onMouseLeave = () => setHoveredRunId(null);
+  const shouldFade = hoveredRunId && testRunId !== hoveredRunId;
+
+  return (
+    <div
+      className={`h-full w-2 ${
+        shouldFade
+          ? "bg-gray-300"
+          : recording.metadata.test!.result === "passed"
+          ? "bg-green-500"
+          : "bg-red-500"
+      }`}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    />
   );
 }
