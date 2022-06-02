@@ -15,7 +15,7 @@ export function BasicUsage() {
         gap: "0.75rem",
         width: 200,
         padding: "1rem",
-        backgroundColor: "#f9f9f9",
+        backgroundColor: "#fff",
       }}
     >
       <PrintStatementPanel />
