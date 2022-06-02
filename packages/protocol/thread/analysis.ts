@@ -11,9 +11,9 @@ export interface Analysis {
 }
 
 export enum AnalysisError {
-  TooManyPointsToFind,
-  TooManyPointsToRun,
-  Unknown,
+  TooManyPointsToFind = "too-many-points-to-find",
+  TooManyPointsToRun = "too-many-points-to-run",
+  Unknown = "unknown",
 }
 
 interface FindAnalysisPointsResult {
