@@ -3,13 +3,9 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import {
-  LocationAnalysisPoints,
-  AnalysisStatus,
-} from "devtools/client/debugger/src/reducers/breakpoints";
+import { LocationAnalysisPoints } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { AnalysisPayload } from "ui/state/app";
 
 const numberStatus = (current: number, total: number): string => {
   return `${current}/${total}`;
@@ -31,7 +27,7 @@ export function PanelStatus({
   const time = useSelector(getCurrentTime);
   let status = "";
 
-  const points = analysisPoints?.data;
+  const points = analysisPoints?.data || [];
   const error = analysisPoints?.error;
 
   if (!isIndexed || !analysisPoints) {
@@ -42,14 +38,14 @@ export function PanelStatus({
     } else if (error === AnalysisError.Unknown) {
       status = "Error";
     }
-  } else if (points?.length == 0) {
+  } else if (points.length == 0) {
     status = "No hits";
   } else {
     const previousTimeIndex = sortedLastIndex(
-      points?.map(p => p.time),
+      points.map(p => p.time),
       time
     );
-    status = numberStatus(previousTimeIndex, points?.length || 0);
+    status = numberStatus(previousTimeIndex, points.length);
   }
 
   return (
@@ -59,10 +55,7 @@ export function PanelStatus({
           prefixBadge
         )}`}
       >
-        <div
-          className="text-center"
-          style={{ width: `${maxStatusLength(points?.length || 0)}ch` }}
-        ></div>
+        <div className="text-center" style={{ width: `${maxStatusLength(points.length)}ch` }}></div>
         {status}
       </div>
     </div>
