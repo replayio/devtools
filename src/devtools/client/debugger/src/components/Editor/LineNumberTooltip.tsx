@@ -25,7 +25,6 @@ import {
   analysisPointsReceived,
   analysisPointsRequested,
   getFirstBreakpointPosition,
-  getThreadContext,
 } from "../../selectors";
 
 import StaticTooltip from "./StaticTooltip";

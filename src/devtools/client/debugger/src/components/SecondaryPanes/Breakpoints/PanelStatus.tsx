@@ -27,22 +27,21 @@ export function PanelStatus({
   const time = useSelector(getCurrentTime);
   let status = "";
 
+  const points = analysisPoints?.data;
+  const error = analysisPoints?.error;
+
   if (!isIndexed || !analysisPoints) {
     status = "Loading";
-  } else if (analysisPoints.error) {
-    status =
-      (analysisPoints.error as AnalysisError) === AnalysisError.TooManyPointsToFind ||
-      analysisPoints.error === AnalysisError.Unknown
-        ? "10k+ hits"
-        : "Error";
-  } else if (analysisPoints.data?.length == 0) {
+  } else if (error) {
+    status = (error as AnalysisError) === AnalysisError.TooManyPointsToFind ? "10k+ hits" : "Error";
+  } else if (points?.length == 0) {
     status = "No hits";
   } else {
     const previousTimeIndex = sortedLastIndex(
-      analysisPoints.data?.map(p => p.time),
+      points?.map(p => p.time),
       time
     );
-    status = numberStatus(previousTimeIndex, analysisPoints.data?.length || 0);
+    status = numberStatus(previousTimeIndex, points?.length || 0);
   }
 
   return (
@@ -54,7 +53,7 @@ export function PanelStatus({
       >
         <div
           className="text-center"
-          style={{ width: `${maxStatusLength(analysisPoints?.data?.length || 0)}ch` }}
+          style={{ width: `${maxStatusLength(points?.length || 0)}ch` }}
         ></div>
         {status}
       </div>

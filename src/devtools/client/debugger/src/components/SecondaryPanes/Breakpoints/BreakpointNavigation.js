@@ -30,22 +30,24 @@ function BreakpointNavigation({
       seek(point.point, point.time, true);
     }
   };
-  const isEmpty = analysisPoints && (analysisPoints.error || analysisPoints.data.length == 0);
+  const points = analysisPoints?.data || [];
+  const error = analysisPoints?.error;
+  const isEmpty = error || points.length === 0;
 
   let next, prev;
 
-  if (executionPoint && !analysisPoints?.error && analysisPoints?.data.length > 0) {
-    prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = find(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) > 0);
+  if (executionPoint && !error && points.length > 0) {
+    prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
+    next = find(points, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   useEffect(() => {
     if (analysisPoints) {
-      trackEvent(analysisPoints.data.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: analysisPoints.data.length,
+      trackEvent(points.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: points.length,
       });
     }
-  }, [analysisPoints]);
+  }, [analysisPoints, points.length]);
 
   if (editing) {
     return (

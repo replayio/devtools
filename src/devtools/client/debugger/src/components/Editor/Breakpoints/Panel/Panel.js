@@ -42,16 +42,13 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState("logValue");
   const dismissNag = hooks.useDismissNag();
-  const pausedOnHit =
-    analysisPoints &&
-    !analysisPoints.error &&
-    !!analysisPoints?.data.find(
-      ({ point, time }) => point == executionPoint && time == currentTime
-    );
+  const points = analysisPoints?.data;
+  const error = analysisPoints?.error;
+  const pausedOnHit = points?.some(
+    ({ point, time }) => point == executionPoint && time == currentTime
+  );
   const isHot =
-    analysisPoints &&
-    (analysisPoints.error === AnalysisError.TooManyPointsToFind ||
-      (analysisPoints.data.length || 0) > prefs.maxHitsDisplayed);
+    error === AnalysisError.TooManyPointsToFind || (points?.length || 0) > prefs.maxHitsDisplayed;
 
   useEffect(() => {
     const updateWidth = () => setWidth(getPanelWidth(editor));

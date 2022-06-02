@@ -105,9 +105,12 @@ function QuickActions({
 
   let next: PointDescription | undefined, prev: PointDescription | undefined;
 
-  if (analysisPoints && !analysisPoints.error && executionPoint) {
-    prev = findLast(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = find(analysisPoints.data, p => compareNumericStrings(p.point, executionPoint) > 0);
+  let points = analysisPoints?.data;
+  let error = analysisPoints?.error;
+
+  if (points && !error && executionPoint) {
+    prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
+    next = find(points, p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   const onContinueToNext = () => {
@@ -123,11 +126,11 @@ function QuickActions({
 
   let button;
 
-  if (analysisPoints && isMetaActive && isShiftActive) {
+  if (points && isMetaActive && isShiftActive) {
     button = (
       <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />
     );
-  } else if (analysisPoints && isMetaActive) {
+  } else if (points && isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
