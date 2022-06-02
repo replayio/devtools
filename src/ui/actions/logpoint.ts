@@ -358,6 +358,7 @@ async function setMultiSourceLogpoint(
         // This is not right I think. The error could also be Unknown, we need
         // to check to know for sure.
         saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToRun);
+        removeLogpoint(logGroupId);
         return;
       }
 
@@ -369,6 +370,8 @@ async function setMultiSourceLogpoint(
       );
 
       showLogpointsResult(logGroupId, results);
+    } else {
+      removeLogpoint(logGroupId);
     }
 
     // TODO Remove this and redo Redux logic
