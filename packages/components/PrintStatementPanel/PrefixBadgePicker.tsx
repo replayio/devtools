@@ -8,7 +8,7 @@ export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as cons
 
 export type PrefixBadges = typeof badges[number];
 
-const openedWidth = 140;
+const openedWidth = 124;
 const closedWidth = 28;
 const duration = 0.14;
 const shadowInitial = "0px 1px 2px 0px rgba(0, 0, 0, 0)";

@@ -5,6 +5,10 @@
   align-self: start;
 }
 
+.PrefixBadgePicker > .PrefixBadge + .PrefixBadge {
+  margin-left: -0.25rem;
+}
+
 .PrefixBadgePickerFill {
   position: absolute;
   height: 100%;
