@@ -10,7 +10,8 @@ import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@repl
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
-import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
+import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
+import { setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";

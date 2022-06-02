@@ -2,12 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createEntityAdapter,
+  createSelector,
+  PayloadAction,
+  EntityState,
+} from "@reduxjs/toolkit";
 import { Location, PointDescription, AnalysisEntry } from "@replayio/protocol";
+import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import string from "devtools/packages/devtools-reps/reps/string";
 import { AnalysisError } from "protocol/thread/analysis";
+import { compareNumericStrings } from "protocol/utils";
 import type { UIState } from "ui/state";
+import { filterToFocusRegion } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
@@ -371,3 +380,102 @@ export function getLogpointsForSource(state: UIState, sourceId: string) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.filter(bp => bp.location.sourceId === sourceId).filter(bp => isLogpoint(bp));
 }
+
+export type LocationAnalysisPoints = {
+  data: PointDescription[];
+  error: AnalysisError | undefined;
+};
+
+export const getAnalysisPointsForLocation = createSelector(
+  [
+    (state: UIState) => state.breakpoints.analysisMappings,
+    (state: UIState) => state.breakpoints.analyses,
+    (state: UIState) => state.timeline.focusRegion,
+    (state: UIState, location: Location | null) => location,
+    (state: UIState, location: Location | null, condition: string | null = "") => condition,
+  ],
+  (
+    analysisMappings,
+    analyses,
+    focusRegion,
+    location,
+    condition
+  ): LocationAnalysisPoints | undefined => {
+    // First, verify that we have a real location, and a breakpoint mapping for that location
+    if (!location) {
+      return undefined;
+    }
+
+    const locationKey = getLocationKey(location);
+    const mappingEntry = analysisMappings.entities[locationKey];
+
+    if (!mappingEntry) {
+      return undefined;
+    }
+
+    const matchingEntries: AnalysisSummary[] = [];
+
+    // Next, filter down all analysis runs for this location, based on matching
+    // against the `condition` the user supplied, as well as whether we
+    // actually legitimately found points
+    mappingEntry.allAnalyses.forEach(analysisId => {
+      const analysisEntry = analyses.entities[analysisId];
+      // TODO Double-check undefined vs empty string conditions here
+      if (!analysisEntry || (analysisEntry.condition ?? "") !== condition) {
+        return;
+      }
+
+      // TODO Are we sure about the error statuses here?
+      const hasPoints = [
+        // Successful queries
+        AnalysisStatus.PointsRetrieved,
+        AnalysisStatus.Completed,
+        // Presumably got points first
+        AnalysisStatus.LoadingResults,
+        // Should have at least come back with _some_ points
+        AnalysisStatus.ErroredGettingPoints,
+        AnalysisStatus.ErroredRunning,
+      ].includes(analysisEntry.status);
+
+      if (hasPoints) {
+        matchingEntries.push(analysisEntry);
+      }
+    });
+
+    if (matchingEntries.length === 0) {
+      // We have no hits available
+      return undefined;
+    }
+
+    const allPoints = matchingEntries.map(entry => entry.points!).flat();
+    const uniquePoints = uniqBy(allPoints, item => item.point);
+    uniquePoints.sort((a, b) => compareNumericStrings(a.point, b.point));
+
+    const finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
+
+    // Meanwhile, we're going to use the _latest_ analysis run's status
+    // for display purposes.
+    const latestAnalysisEntry = analyses.entities[mappingEntry.currentAnalysis!];
+
+    // TODO What's a good default here?
+    let error: AnalysisError | undefined = latestAnalysisEntry?.error;
+
+    return {
+      data: finalPoints,
+      error,
+    };
+  },
+  {
+    memoizeOptions: {
+      // Arbitrary number for cache size
+      maxSize: 50,
+    },
+  }
+);
+
+const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
+
+export const getPointsForHoveredLineNumber = (state: UIState) => {
+  const location = getHoveredLineNumberLocation(state);
+  return getAnalysisPointsForLocation(state, location);
+};

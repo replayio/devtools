@@ -79,7 +79,7 @@ export interface LoadedRegions {
 
 export interface AppState {
   mode: AppMode;
-  analysisPoints: AnalysisPoints;
+  // analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
   defaultSettingsTab: SettingsTabTitle;

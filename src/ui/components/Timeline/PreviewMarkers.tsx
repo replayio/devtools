@@ -2,6 +2,7 @@ import type { PointDescription, Location } from "@replayio/protocol";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
+import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { HoveredItem } from "ui/state/timeline";
 import { prefs } from "ui/utils/prefs";
 
@@ -10,7 +11,7 @@ import Marker from "./Marker";
 export default function PreviewMarkers() {
   const currentTime = useSelector(selectors.getCurrentTime);
   const hoveredItem = useSelector(selectors.getHoveredItem);
-  const pointsForHoveredLineNumber = useSelector(selectors.getPointsForHoveredLineNumber);
+  const pointsForHoveredLineNumber = useSelector(getPointsForHoveredLineNumber);
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
 

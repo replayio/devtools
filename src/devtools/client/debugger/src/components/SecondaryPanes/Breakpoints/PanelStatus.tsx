@@ -3,6 +3,10 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
+import {
+  LocationAnalysisPoints,
+  AnalysisStatus,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { AnalysisPayload } from "ui/state/app";
@@ -20,7 +24,7 @@ export function PanelStatus({
   analysisPoints,
   prefixBadge,
 }: {
-  analysisPoints: AnalysisPayload;
+  analysisPoints?: LocationAnalysisPoints;
   prefixBadge: PrefixBadge;
 }) {
   const isIndexed = useSelector(getIsIndexed);
@@ -33,7 +37,14 @@ export function PanelStatus({
   if (!isIndexed || !analysisPoints) {
     status = "Loading";
   } else if (error) {
-    status = (error as AnalysisError) === AnalysisError.TooManyPointsToFind ? "10k+ hits" : "Error";
+    if (error === AnalysisError.TooManyPointsToFind) {
+      status = "10k+ hits";
+    } else if (error === AnalysisError.TooManyPointsToRun) {
+      // TODO Text length?
+      status = "200+ results";
+    } else {
+      status = "Error";
+    }
   } else if (points?.length == 0) {
     status = "No hits";
   } else {

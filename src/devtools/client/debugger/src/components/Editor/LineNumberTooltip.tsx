@@ -1,5 +1,11 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
+import {
+  AnalysisStatus,
+  getAnalysisPointsForLocation,
+  getPointsForHoveredLineNumber,
+  LocationAnalysisPoints,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { minBy } from "lodash";
 import { AnalysisParams } from "protocol/analysisManager";
 import { Analysis, AnalysisError, createAnalysis } from "protocol/thread/analysis";
@@ -32,14 +38,22 @@ import StaticTooltip from "./StaticTooltip";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
-function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount?: number) {
-  if (analysisPoints?.error) {
+function getTextAndWarning(analysisPoints?: LocationAnalysisPoints, analysisPointsCount?: number) {
+  const error = analysisPoints?.error;
+  if (error) {
+    // TODO Duplicate with PanelStatus logic
+    let status = "";
+    if (error === AnalysisError.TooManyPointsToFind) {
+      status = "10k+ hits";
+    } else if (error === AnalysisError.TooManyPointsToRun) {
+      // TODO Text length?
+      status = "200+ results";
+    } else {
+      status = "Error";
+    }
     return {
       showWarning: false,
-      text:
-        (analysisPoints.error as AnalysisError) === AnalysisError.TooManyPointsToFind
-          ? "10k+ hits"
-          : "Error",
+      text: status,
     };
   }
 
@@ -111,7 +125,7 @@ function runAnalysisOnLine(line: number): UIThunkAction {
       return;
     }
 
-    const analysisPoints = selectors.getAnalysisPointsForLocation(getState(), location, undefined);
+    const analysisPoints = getAnalysisPointsForLocation(getState(), location, undefined);
     if (analysisPoints) {
       return;
     }
@@ -192,7 +206,7 @@ export default function LineNumberTooltip({
   const indexed = useSelector(selectors.getIsIndexed);
   const hitCounts = useSelector(getHitCountsForSelectedSource);
   const source = useSelector(getSelectedSource);
-  const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
+  const analysisPoints = useSelector(getPointsForHoveredLineNumber);
   const breakpoints = useSelector(selectors.getBreakpointsList);
 
   let analysisPointsCount: number | undefined;

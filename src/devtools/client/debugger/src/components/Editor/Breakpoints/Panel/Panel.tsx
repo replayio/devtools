@@ -12,6 +12,10 @@ import type { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import {
+  getAnalysisPointsForLocation,
+  AnalysisStatus,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
@@ -31,7 +35,7 @@ function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
 
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
+    analysisPoints: getAnalysisPointsForLocation(
       state,
       // @ts-expect-error Location vs SourceLocation
       breakpoint.location,

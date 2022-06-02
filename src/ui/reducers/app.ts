@@ -38,7 +38,7 @@ import { uniqBy } from "lodash";
 
 export const initialAppState: AppState = {
   mode: "devtools",
-  analysisPoints: {},
+  // analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
   defaultSettingsTab: "Preferences",
@@ -163,6 +163,7 @@ const appSlice = createSlice({
         condition?: string;
       }>
     ) {
+      /*
       const { analysisPoints, location, condition = "" } = action.payload;
       const id = getLocationAndConditionKey(location, condition);
 
@@ -170,6 +171,7 @@ const appSlice = createSlice({
         data: uniqBy([...(state.analysisPoints[id]?.data || []), ...analysisPoints], p => p.point),
         error: undefined,
       };
+      */
     },
     setAnalysisError(
       state,
@@ -179,6 +181,7 @@ const appSlice = createSlice({
         error: AnalysisError;
       }>
     ) {
+      /*
       const { location, condition = "", error } = action.payload;
 
       const id = getLocationAndConditionKey(location, condition);
@@ -187,6 +190,7 @@ const appSlice = createSlice({
         data: undefined,
         error: error,
       };
+      */
     },
     setEventsForType(
       state,
@@ -356,6 +360,8 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
+
+/*
 export const getAnalysisPointsForLocation = (
   state: UIState,
   location: Location | null,
@@ -378,12 +384,15 @@ export const getAnalysisPointsForLocation = (
     data: filterToFocusRegion(points.data || [], focusRegion),
   };
 };
+*/
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
+/*
 export const getPointsForHoveredLineNumber = (state: UIState) => {
   const location = getHoveredLineNumberLocation(state);
   return getAnalysisPointsForLocation(state, location);
 };
+*/
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
