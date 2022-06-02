@@ -31,13 +31,17 @@ export const createAnalysis = async (
 ): Promise<Analysis> => {
   // Call to the client and say hey please make an analysis and after that
   // create an Analysis with that result
+  const protocolParams: Omit<AnalysisParams, "sessionId"> = {
+    mapper: params.mapper,
+    reducer: params.reducer,
+    effectful: params.effectful,
+  };
+  if (params.range) {
+    protocolParams.range = params.range;
+  }
   const { analysisId } = await sendMessage(
     "Analysis.createAnalysis",
-    {
-      mapper: params.mapper,
-      reducer: params.reducer,
-      effectful: params.effectful,
-    },
+    protocolParams,
     params.sessionId
   );
   const points: PointDescription[] = [];

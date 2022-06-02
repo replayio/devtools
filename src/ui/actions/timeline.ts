@@ -1,4 +1,6 @@
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
+import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
@@ -656,6 +658,12 @@ export function syncFocusedRegion(): UIThunkAction {
       ThreadFront.sessionId!
     );
 
+    const breakpoints = state.breakpoints.breakpoints;
+    const cx = getThreadContext(state);
+    for (const b of Object.values(breakpoints)) {
+      // Prod all breakpoints to refetch
+      dispatch(setBreakpointOptions(cx, b.location as any, b.options));
+    }
     await dispatch(refetchMessages(focusRegion));
   };
 }

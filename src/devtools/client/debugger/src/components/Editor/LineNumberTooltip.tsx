@@ -14,6 +14,7 @@ import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { setAnalysisPoints, setHoveredLineNumberLocation } from "ui/reducers/app";
 import { AnalysisPayload } from "ui/state/app";
+import { UnsafeFocusRegion } from "ui/state/timeline";
 import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
@@ -115,12 +116,19 @@ function runAnalysisOnLine(line: number): UIThunkAction {
       return;
     }
 
+    const focusRegion = selectors.getFocusRegion(getState());
     const sessionId = await ThreadFront.waitForSession();
     const params: AnalysisParams = {
       sessionId,
       mapper: "",
       effectful: true,
     };
+    if (focusRegion) {
+      params.range = {
+        begin: (focusRegion as UnsafeFocusRegion).start.point,
+        end: (focusRegion as UnsafeFocusRegion).end.point,
+      };
+    }
 
     let analysis: Analysis | undefined = undefined;
 

@@ -34,6 +34,7 @@ import {
   startTimeForFocusRegion,
 } from "ui/utils/timeline";
 import { AnalysisError } from "protocol/thread/analysis";
+import { uniqBy } from "lodash";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -166,7 +167,7 @@ const appSlice = createSlice({
       const id = getLocationAndConditionKey(location, condition);
 
       state.analysisPoints[id] = {
-        data: analysisPoints,
+        data: uniqBy([...(state.analysisPoints[id]?.data || []), ...analysisPoints], p => p.point),
         error: undefined,
       };
     },

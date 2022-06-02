@@ -28,6 +28,8 @@ import {
   analysisResultsReceived,
   analysisResultsRequested,
 } from "devtools/client/debugger/src/reducers/breakpoints";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { UnsafeFocusRegion } from "ui/state/timeline";
 
 // TODO Ideally this file shouldn't know about a Redux store at all.
 // Currently, it dispatches actions and reads state once.
@@ -267,6 +269,7 @@ async function setMultiSourceLogpoint(
     locations.map(({ sourceId }) => ThreadFront.getBreakpointPositionsCompressed(sourceId))
   );
 
+  const focusRegion = getFocusRegion(store.getState());
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -275,6 +278,13 @@ async function setMultiSourceLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
+
+  if (focusRegion) {
+    params.range = {
+      begin: (focusRegion as UnsafeFocusRegion).start.point,
+      end: (focusRegion as UnsafeFocusRegion).end.point,
+    };
+  }
 
   let analysis: Analysis;
   try {
