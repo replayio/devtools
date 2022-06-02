@@ -39,10 +39,7 @@ export function PanelStatus({
   } else if (error) {
     if (error === AnalysisError.TooManyPointsToFind) {
       status = "10k+ hits";
-    } else if (error === AnalysisError.TooManyPointsToRun) {
-      // TODO Text length?
-      status = "200+ results";
-    } else {
+    } else if (error === AnalysisError.Unknown) {
       status = "Error";
     }
   } else if (points?.length == 0) {

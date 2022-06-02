@@ -1,7 +1,6 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import {
-  AnalysisStatus,
   getAnalysisPointsForLocation,
   getPointsForHoveredLineNumber,
   LocationAnalysisPoints,
@@ -37,31 +36,6 @@ import {
 import StaticTooltip from "./StaticTooltip";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
-
-function getTextAndWarning(analysisPoints?: LocationAnalysisPoints, analysisPointsCount?: number) {
-  const error = analysisPoints?.error;
-  if (error) {
-    // TODO Duplicate with PanelStatus logic
-    let status = "";
-    if (error === AnalysisError.TooManyPointsToFind) {
-      status = "10k+ hits";
-    } else if (error === AnalysisError.TooManyPointsToRun) {
-      // TODO Text length?
-      status = "200+ results";
-    } else {
-      status = "Error";
-    }
-    return {
-      showWarning: false,
-      text: status,
-    };
-  }
-
-  const points = analysisPointsCount || 0;
-  const text = `${points} hit${points == 1 ? "" : "s"}`;
-  const showWarning = points > 200;
-  return { showWarning, text };
-}
 
 function Wrapper({
   children,
@@ -210,6 +184,7 @@ export default function LineNumberTooltip({
   const breakpoints = useSelector(selectors.getBreakpointsList);
 
   let analysisPointsCount: number | undefined;
+  let error = analysisPoints?.error;
 
   if (codeHeatMaps) {
     if (lastHoveredLineNumber.current && hitCounts) {
@@ -294,18 +269,33 @@ export default function LineNumberTooltip({
     return null;
   }
 
+  if (error) {
+    if (error === AnalysisError.TooManyPointsToFind) {
+      <StaticTooltip targetNode={targetNode}>
+        <Wrapper showWarning>10k+ hits</Wrapper>
+      </StaticTooltip>;
+    } else if (error === AnalysisError.Unknown) {
+      <StaticTooltip targetNode={targetNode}>
+        <Wrapper showWarning>Error</Wrapper>
+      </StaticTooltip>;
+    }
+  }
+
   if (!indexed || analysisPointsCount === undefined) {
     return (
       <StaticTooltip targetNode={targetNode}>
-        <Wrapper loading>{!indexed ? "Indexing…" : "Loading…"}</Wrapper>
+        <Wrapper loading>Loading…</Wrapper>
       </StaticTooltip>
     );
   }
 
-  const { text, showWarning } = getTextAndWarning(analysisPoints, analysisPointsCount);
+  const count = analysisPointsCount || 0;
+
   return (
     <StaticTooltip targetNode={targetNode}>
-      <Wrapper showWarning={showWarning}>{text}</Wrapper>
+      <Wrapper showWarning={count > 200}>
+        {count} hit{count == 1 ? "" : "s"}
+      </Wrapper>
     </StaticTooltip>
   );
 }
