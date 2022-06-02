@@ -21,35 +21,37 @@ export function FilterLayout({
 
   return (
     <>
-      <div className="flex items-center bg-themeTextFieldBgcolor p-1">
-        <button
-          onClick={() => setFilterOpen(!filterOpen)}
-          className={classNames("mr-1 flex items-center", {
-            "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
-              types.size > 0,
-          })}
-        >
-          <MaterialIcon iconSize="lg" outlined={true}>
-            filter_alt
-          </MaterialIcon>
-        </button>
+      <div className="bg-bodyBgcolor p-1">
+        <div className="flex items-center rounded-md bg-themeTextFieldBgcolor p-1">
+          <button
+            onClick={() => setFilterOpen(!filterOpen)}
+            className={classNames("mr-1 flex items-center", {
+              "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
+                types.size > 0,
+            })}
+          >
+            <MaterialIcon iconSize="lg" outlined={true}>
+              filter_alt
+            </MaterialIcon>
+          </button>
 
-        <MaterialIcon iconSize="lg">search</MaterialIcon>
+          <MaterialIcon iconSize="lg">search</MaterialIcon>
 
-        <input
-          placeholder="Filter requests"
-          onChange={event => setFilterValue(event.target.value)}
-          className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
-        />
+          <input
+            placeholder="Filter requests"
+            onChange={event => setFilterValue(event.target.value)}
+            className="w-full bg-transparent px-1 text-themeTextFieldColor focus:outline-none"
+          />
+        </div>
       </div>
 
       <div className="flex min-h-0 flex-1">
         {filterOpen ? (
-          <div className="flex basis-32 flex-col overflow-auto bg-toolbarBackground px-0.5 py-1.5">
+          <div className="flex basis-32 flex-col overflow-auto border-r border-splitter bg-bodyBgcolor px-0.5">
             {RequestTypeOptions.map(canonicalType => (
               <button
                 key={canonicalType.label}
-                className="group flex items-center gap-2 px-1 py-1.5"
+                className="group flex items-center gap-2 p-1.5"
                 onClick={() => toggleType(canonicalType.type)}
               >
                 <Icon
