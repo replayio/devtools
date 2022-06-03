@@ -19,7 +19,6 @@ import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "proto
 import { PrimitiveValue } from "protocol/thread/value";
 import { createAnalysis, Analysis, AnalysisError } from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
-import { prefs } from "ui/utils/prefs";
 import {
   analysisCreated,
   analysisErrored,
@@ -30,6 +29,8 @@ import {
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
+
+const TOO_MANY_HITS_TO_SHOW = 1000;
 
 // TODO Ideally this file shouldn't know about a Redux store at all.
 // Currently, it dispatches actions and reads state once.
@@ -104,7 +105,7 @@ async function showPrimitiveLogpoints(
   pointDescriptions: PointDescription[],
   values: ValueFront[]
 ) {
-  if (!LogpointHandlers.onResult || pointDescriptions.length >= 200) {
+  if (!LogpointHandlers.onResult || pointDescriptions.length >= TOO_MANY_HITS_TO_SHOW) {
     return;
   }
 
