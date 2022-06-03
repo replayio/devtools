@@ -297,7 +297,7 @@ class EventListeners extends Component {
       return null;
     }
 
-    const isHot = count > prefs.maxHitsEditable || count > maxAnalysisPoints;
+    const isHot = count > maxAnalysisPoints;
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (

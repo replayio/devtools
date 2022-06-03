@@ -45,7 +45,7 @@ function getTextAndWarning(analysisPoints?: AnalysisPayload, analysisPointsCount
 
   const points = analysisPointsCount || 0;
   const text = `${points} hit${points == 1 ? "" : "s"}`;
-  const showWarning = points > prefs.maxHitsDisplayed;
+  const showWarning = points > 200;
   return { showWarning, text };
 }
 

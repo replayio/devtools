@@ -17,7 +17,7 @@ export default function PreviewMarkers() {
   if (
     !pointsForHoveredLineNumber ||
     pointsForHoveredLineNumber.error ||
-    (pointsForHoveredLineNumber.data?.length || 0) > prefs.maxHitsDisplayed
+    (pointsForHoveredLineNumber.data?.length || 0) > 200
   ) {
     return null;
   }

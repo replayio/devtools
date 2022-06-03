@@ -75,8 +75,7 @@ function Panel({
   const pausedOnHit = !!points?.some(
     ({ point, time }) => point == executionPoint && time == currentTime
   );
-  const isHot =
-    error === AnalysisError.TooManyPointsToFind || (points?.length || 0) > prefs.maxHitsDisplayed;
+  const isHot = error === AnalysisError.TooManyPointsToFind || (points?.length || 0) > 200;
 
   useEffect(() => {
     const updateWidth = () => setWidth(getPanelWidth(editor));

@@ -111,7 +111,7 @@ function PanelSummary({
           }
         >
           This log cannot be edited because <br />
-          it was hit {prefs.maxHitsDisplayed}+ times
+          it was hit 200+ times
         </Popup>
         <div className="button-container flex items-center">
           <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
