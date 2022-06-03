@@ -16,16 +16,14 @@ import { waitForTime } from "protocol/utils";
 import { Action } from "redux";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { selectors } from "ui/reducers";
-import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
 import { User } from "ui/types";
 
+import { getLoadedRegions } from "./app";
+import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-
-import type { UIThunkAction } from "./index";
-import { endTimeForFocusRegion, isTimeInRegions, startTimeForFocusRegion } from "ui/utils/timeline";
-import { getLoadedRegions } from "./app";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -210,12 +208,8 @@ export function seekToComment(item: Comment | Reply | PendingComment["comment"])
     dispatch(setSelectedPrimaryPanel("comments"));
 
     if (item.sourceLocation) {
-      const regions = getLoadedRegions(getState());
-      const isTimeInLoadedRegion = regions !== null && isTimeInRegions(item.time, regions.loaded);
-      if (isTimeInLoadedRegion) {
-        context = selectors.getThreadContext(getState());
-        dispatch(selectLocation(context, item.sourceLocation));
-      }
+      context = selectors.getThreadContext(getState());
+      dispatch(selectLocation(context, item.sourceLocation));
     }
   };
 }
