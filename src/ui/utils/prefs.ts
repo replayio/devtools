@@ -19,7 +19,6 @@ pref("devtools.theme", "system");
 // app features
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.httpBodies", true);
-pref("devtools.features.videoPlayback", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.networkRequestComments", true);
 pref("devtools.features.turboReplay", false);
@@ -54,7 +53,6 @@ export const features = new PrefsHelper("devtools.features", {
   turboReplay: ["Bool", "turboReplay"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   httpBodies: ["Bool", "httpBodies"],
-  videoPlayback: ["Bool", "videoPlayback"],
   commentAttachments: ["Bool", "commentAttachments"],
   networkRequestComments: ["Bool", "networkRequestComments"],
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],

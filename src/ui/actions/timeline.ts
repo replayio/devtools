@@ -1,4 +1,4 @@
-import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
@@ -14,7 +14,6 @@ import {
   nextPaintEvent,
   previousPaintEvent,
   getFirstMeaningfulPaint,
-  Video,
   timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
@@ -185,7 +184,6 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 
       const playing = !!getPlayback(stateAfterScreenshot);
       paintGraphics(screen, mouse, playing);
-      Video.seek(currentTime);
     } catch {}
   };
 }
@@ -344,10 +342,6 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     };
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
-
-    // Note: This matches the previous behavior of the VideoPlayer.
-    // Maybe we should be passing the currentTime instead?
-    Video.play(getCurrentTime(getState()));
 
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
