@@ -59,36 +59,29 @@ function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className="flex flex-row items-center justify-between flex-grow px-4 py-3 space-x-4 overflow-hidden border-b cursor-pointer border-themeBorder"
+      className="flex flex-col px-4 py-3 space-y-2 border-b cursor-pointer border-themeBorder"
       onClick={onClick}
     >
-      <div className="flex items-center space-x-4">
-        <div className="flex flex-col space-y-0.5">
-          <div>
-            {path[path.length - 1]} ({recordings.length})
+      <div className="flex flex-col space-y-0.5">
+        <div>
+          {path[path.length - 1]} ({recordings.length})
+        </div>
+        <div className="flex items-center space-x-3 text-xs text-gray-500">
+          <div className="flex flex-row items-center space-x-1">
+            <MaterialIcon>web_asset</MaterialIcon>
+            <div>{path?.[1]}</div>
           </div>
-          <div className="flex items-center space-x-3 text-gray-500">
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>web_asset</MaterialIcon>
-              <div>{path?.[1]}</div>
-            </div>
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>description</MaterialIcon>
-              <div>{path?.[path.length - 2]}</div>
-            </div>
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>schedule</MaterialIcon>
-              <div>Last run {getRelativeDate(date)}</div>
-            </div>
+          <div className="flex flex-row items-center space-x-1">
+            <MaterialIcon>description</MaterialIcon>
+            <div>{path?.[path.length - 2]}</div>
+          </div>
+          <div className="flex flex-row items-center space-x-1">
+            <MaterialIcon>schedule</MaterialIcon>
+            <div>Last run {getRelativeDate(date)}</div>
           </div>
         </div>
       </div>
-      <div className="flex flex-row h-5 space-x-1">
-        {/* {displayedRecordings.length < 10
-          ? new Array(10 - displayedRecordings.length)
-              .fill("")
-              .map((_, i) => <div key={i} className={`h-full w-2 bg-gray-300`} />)
-          : null} */}
+      <div className="flex flex-row h-4 space-x-0.5">
         {displayedRecordings.map((r, i) => (
           <Result recording={r} key={i} />
         ))}
@@ -113,7 +106,7 @@ function Result({ recording }: { recording: Recording }) {
 
   return (
     <div
-      className={`h-full w-2 ${
+      className={`h-full w-1.5 ${
         shouldFade
           ? "bg-gray-300"
           : recording.metadata.test!.result === "passed"
