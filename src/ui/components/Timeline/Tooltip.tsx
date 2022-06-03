@@ -26,13 +26,15 @@ export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
   let offset = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * timelineWidth;
 
   const isHoveredOnNonLoadingRegion = nonLoadingRegion.some(
-    r => r.start <= hoverTime && r.end >= hoverTime
+    ({ start, end }) => start <= hoverTime && end >= hoverTime
   );
-  const msg = isHoveredOnNonLoadingRegion ? "Unloaded" : getTimestamp(hoverTime);
+
+  const timestamp = getTimestamp(hoverTime);
+  const message = isHoveredOnNonLoadingRegion ? `${timestamp} (Unloaded)` : timestamp;
 
   return (
     <div className="timeline-tooltip" style={{ left: offset }}>
-      {msg}
+      {message}
     </div>
   );
 }
