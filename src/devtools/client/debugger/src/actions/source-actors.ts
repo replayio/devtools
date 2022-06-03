@@ -85,10 +85,7 @@ export const MAX_LINE_HITS_TO_FETCH = 1000;
 export const loadSourceActorBreakpointHitCounts = memoizeableAction(
   "loadSourceActorBreakpointHitCounts",
   {
-    createKey: (
-      { id, lineNumber }: { id: string; lineNumber: number; onFailure?: (e: any) => void },
-      { getState }
-    ) => {
+    createKey: ({ id, lineNumber }: { id: string; lineNumber: number }, { getState }) => {
       const state = getState();
       // We need to refetch if: we are beyond the maximum number of line hits fetchable
       // Or the focusRegion has changed
@@ -106,7 +103,7 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
     },
     getValue: ({ id, lineNumber }, { getState }) =>
       getSourceActorBreakpointHitCounts(getState(), id, lineNumber),
-    action: async ({ id, lineNumber, onFailure }, { dispatch, getState, client }) => {
+    action: async ({ id, lineNumber }, { dispatch, getState, client }) => {
       const state = getState();
       await dispatch({
         type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
@@ -114,8 +111,7 @@ export const loadSourceActorBreakpointHitCounts = memoizeableAction(
         [PROMISE]: client.getSourceActorBreakpointHitCounts(
           getSourceActor(state, id),
           lineNumber,
-          getFocusRegion(state),
-          onFailure
+          getFocusRegion(state)
         ),
       });
     },

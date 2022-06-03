@@ -19,7 +19,6 @@ import { UIState } from "ui/state";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
-import { AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
 import type { Breakpoint } from "../../../reducers/types";
 
