@@ -1,14 +1,15 @@
-import { MutableRefObject, useEffect } from "react";
+import { MutableRefObject, RefObject, useEffect } from "react";
 
 // Closes a modal dialog if the user clicks outside of it or types "Escape"
 export default function useModalDismissSignal(
-  modalRef: MutableRefObject<HTMLDivElement>,
+  modalRef: MutableRefObject<HTMLDivElement> | RefObject<HTMLDivElement>,
   dismissCallback: () => void,
   dismissOnClickOutside: boolean = true
 ) {
   useEffect(() => {
-    if (modalRef.current === null) {
-      return () => {};
+    const element = modalRef.current;
+    if (element === null) {
+      return;
     }
 
     const handleDocumentKeyDown = (event: KeyboardEvent) => {
@@ -18,7 +19,7 @@ export default function useModalDismissSignal(
     };
 
     const handleDocumentClick = (event: MouseEvent) => {
-      if (modalRef.current !== null && !modalRef.current.contains(event.target as Node)) {
+      if (!element.contains(event.target as Node)) {
         event.stopPropagation();
         event.preventDefault();
 
@@ -36,7 +37,7 @@ export default function useModalDismissSignal(
 
       // It's important to listen to the ownerDocument to support browser extensions.
       // The root document might belong to a different window.
-      ownerDocument = modalRef.current.ownerDocument;
+      ownerDocument = element.ownerDocument;
       ownerDocument.addEventListener("keydown", handleDocumentKeyDown);
       if (dismissOnClickOutside) {
         ownerDocument.addEventListener("click", handleDocumentClick, true);
