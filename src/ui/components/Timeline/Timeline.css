@@ -33,10 +33,6 @@
   font-size: 29px;
 }
 
-.timeline.show-protocol-timeline {
-  padding-top: 40px;
-}
-
 .timeline > *:not(:last-child) {
   margin-right: 8px;
 }
@@ -46,13 +42,19 @@
   background: inherit;
 }
 
-.timeline .progress-bar-container {
+.progress-bar-container {
   display: flex;
   position: relative;
   flex-grow: 1;
 }
 
-.timeline .progress-bar {
+.progress-bar-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.progress-bar {
   align-items: center;
   cursor: pointer;
   display: flex;

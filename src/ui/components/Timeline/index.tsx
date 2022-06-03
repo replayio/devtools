@@ -113,7 +113,7 @@ export default function Timeline() {
   return (
     <>
       <FocusModePopout />
-      <div className={`timeline ${showProtocolTimeline ? "show-protocol-timeline" : ""}`}>
+      <div className="timeline">
         <div className="commands">
           <PlayPauseButton />
         </div>
@@ -123,21 +123,23 @@ export default function Timeline() {
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
         >
-          <div
-            className="progress-bar"
-            ref={progressBarRef}
-            onClick={onClick}
-            onMouseMove={onMouseMove}
-          >
+          <div className="progress-bar-stack">
             <ProtocolTimeline />
-            <ProgressBars />
-            <PreviewMarkers />
-            <Comments />
-            <NonLoadingRegions />
-            <UnfocusedRegion />
-            {showLoadingProgress && <LoadingProgressBars />}
-            <CurrentTimeIndicator editMode={editMode} />
-            <Focuser editMode={editMode} setEditMode={setEditMode} />
+            <div
+              className="progress-bar"
+              ref={progressBarRef}
+              onClick={onClick}
+              onMouseMove={onMouseMove}
+            >
+              <ProgressBars />
+              <PreviewMarkers />
+              <Comments />
+              <NonLoadingRegions />
+              <UnfocusedRegion />
+              {showLoadingProgress && <LoadingProgressBars />}
+              <CurrentTimeIndicator editMode={editMode} />
+              <Focuser editMode={editMode} setEditMode={setEditMode} />
+            </div>
           </div>
 
           {isHovered && <Tooltip timelineWidth={timelineDimensions.width} />}
