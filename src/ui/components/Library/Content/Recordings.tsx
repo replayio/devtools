@@ -1,36 +1,38 @@
 import { RecordingId } from "@replayio/protocol";
 import { sortBy } from "lodash";
-import { useMemo, useState } from "react";
-import { SecondaryButton } from "ui/components/shared/Button";
+import { ReactNode, useContext, useMemo, useState } from "react";
+import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { Recording } from "ui/types";
 import { isReplayBrowser } from "ui/utils/environment";
 import RecordingRow from "../RecordingRow";
 import styles from "../Library.module.css";
+import { LibraryContext } from "../useFilters";
 
-function getErrorText() {
-  if (isReplayBrowser()) {
-    return "Please open a new tab and press the blue record button to record a Replay";
-  }
+function RecordingsError() {
+  const { filter, setAppliedText } = useContext(LibraryContext);
+  let msg: string | ReactNode;
 
-  return <DownloadLinks />;
-}
-
-function DownloadLinks() {
-  const [clicked, setClicked] = useState(false);
-
-  if (clicked) {
-    return (
-      <div className="flex flex-col space-y-6" style={{ maxWidth: "24rem" }}>
-        <div>Download started.</div>
-        <div>{`Once the download is finished, open the Replay Browser installer to install Replay`}</div>
-      </div>
+  if (filter) {
+    msg = (
+      <>
+        <div>No recordings found</div>
+        <PrimaryButton color="blue" onClick={() => setAppliedText("")}>
+          Clear filters
+        </PrimaryButton>
+      </>
     );
+  } else if (isReplayBrowser()) {
+    msg = "Please open a new tab and press the blue record button to record a Replay";
+  } else {
+    msg = "👋 This is where your replays will go!";
   }
 
   return (
-    <div className="flex flex-col space-y-6 text-sm" style={{ maxWidth: "24rem" }}>
-      <div className="text-lg">{`👋 This is where your replays will go!`}</div>
-    </div>
+    <section
+      className={`flex flex-col flex-grow space-y-2 items-center justify-center text-lg ${styles.recordingsBackground}`}
+    >
+      {msg}
+    </section>
   );
 }
 
@@ -61,40 +63,28 @@ export function Recordings({
     setSelectedIds(selectedIds.filter(id => id !== recordingId));
 
   if (!recordings.length) {
-    const errorText = getErrorText();
-
-    return (
-      <>
-        <section
-          className={`grid flex-grow items-center justify-center text-sm ${styles.recordingsBackground}`}
-        >
-          <span>{errorText}</span>
-        </section>
-      </>
-    );
+    return <RecordingsError />;
   }
 
   return (
-    <>
-      <div
-        className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
-      >
-        {shownRecordings.map((r, i) => (
-          <RecordingRow
-            key={i}
-            recording={r}
-            selected={selectedIds.includes(r.id)}
-            {...{ addSelectedId, removeSelectedId, isEditing }}
-          />
-        ))}
-        {!showMore && recordings.length > 100 && (
-          <div className="flex justify-center p-4">
-            <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>
-              Show More
-            </SecondaryButton>
-          </div>
-        )}
-      </div>
-    </>
+    <div
+      className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+    >
+      {shownRecordings.map((r, i) => (
+        <RecordingRow
+          key={i}
+          recording={r}
+          selected={selectedIds.includes(r.id)}
+          {...{ addSelectedId, removeSelectedId, isEditing }}
+        />
+      ))}
+      {!showMore && recordings.length > 100 && (
+        <div className="flex justify-center p-4">
+          <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>
+            Show More
+          </SecondaryButton>
+        </div>
+      )}
+    </div>
   );
 }

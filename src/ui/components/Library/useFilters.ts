@@ -5,6 +5,7 @@ type LibraryContextType = {
   filter: string;
   view: View;
   setPreview: (preview: Preview) => void;
+  setAppliedText: (str: string) => void;
   preview: Preview | null;
 };
 type Preview = {
@@ -17,6 +18,7 @@ export const LibraryContext = createContext<LibraryContextType>({
   filter: "",
   view: "recordings",
   setPreview: () => {},
+  setAppliedText: () => {},
   preview: null,
 });
 

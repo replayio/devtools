@@ -122,10 +122,10 @@ function Library({
   }
 
   return (
-    <LibraryContext.Provider value={{ filter, view, preview, setPreview }}>
-      <main className="flex h-full w-full flex-row">
+    <LibraryContext.Provider value={{ filter, view, preview, setPreview, setAppliedText }}>
+      <main className="flex flex-row w-full h-full">
         <Sidebar nonPendingWorkspaces={workspaces} />
-        <div className="flex flex-grow flex-col overflow-x-hidden">
+        <div className="flex flex-col flex-grow overflow-x-hidden">
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
             <FilterBar
               displayedString={displayedString}
