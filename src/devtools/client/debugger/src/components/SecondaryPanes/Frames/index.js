@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import React, { Component } from "react";
-import { connect } from "react-redux";
 import PropTypes from "prop-types";
+import React, { PureComponent } from "react";
+import { connect } from "react-redux";
+import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { formatTimestamp } from "ui/utils/time";
 
@@ -26,18 +26,7 @@ import {
   getFramesErrored,
 } from "../../../selectors";
 
-const NUM_FRAMES_SHOWN = 7;
-
-class Frames extends Component {
-  shouldComponentUpdate(nextProps, nextState) {
-    const { frames, selectedFrame, frameworkGroupingOn } = this.props;
-    return (
-      frames !== nextProps.frames ||
-      selectedFrame !== nextProps.selectedFrame ||
-      frameworkGroupingOn !== nextProps.frameworkGroupingOn
-    );
-  }
-
+class Frames extends PureComponent {
   copyStackTrace = () => {
     const { frames } = this.props;
     const { l10n } = this.context;
@@ -119,8 +108,30 @@ class Frames extends Component {
   }
 
   render() {
-    const { currentTime, frames, framesErrored, framesLoading, pauseErrored, pauseLoading } =
-      this.props;
+    const {
+      currentTime,
+      enterFocusMode,
+      frames,
+      framesErrored,
+      framesLoading,
+      isCurrentTimeInLoadedRegion,
+      pauseErrored,
+      pauseLoading,
+    } = this.props;
+
+    if (!isCurrentTimeInLoadedRegion) {
+      return (
+        <div className="pane frames">
+          <div className="pane-info empty">
+            The call stack is unavailable because it is outside{" "}
+            <span className="cursor-pointer underline" onClick={enterFocusMode}>
+              your debugging window
+            </span>
+            .
+          </div>
+        </div>
+      );
+    }
 
     if (pauseErrored) {
       return (
@@ -162,19 +173,21 @@ Frames.contextTypes = { l10n: PropTypes.object };
 const mapStateToProps = state => ({
   cx: getThreadContext(state),
   currentTime: getCurrentTime(state),
+  disableContextMenu: false,
+  disableFrameTruncate: false,
+  displayFullUrl: false,
   frames: getCallStackFrames(state),
-  framesLoading: getFramesLoading(state),
   framesErrored: getFramesErrored(state),
+  framesLoading: getFramesLoading(state),
   frameworkGroupingOn: getFrameworkGroupingState(state),
+  isCurrentTimeInLoadedRegion: isCurrentTimeInLoadedRegion(state),
   pauseErrored: state.pause.pauseErrored,
   pauseLoading: state.pause.pauseLoading,
   selectedFrame: getSelectedFrame(state),
-  disableFrameTruncate: false,
-  disableContextMenu: false,
-  displayFullUrl: false,
 });
 
 export default connect(mapStateToProps, {
+  enterFocusMode: enterFocusModeAction,
   selectFrame: actions.selectFrame,
   toggleBlackBox: actions.toggleBlackBox,
   toggleFrameworkGrouping: actions.toggleFrameworkGrouping,

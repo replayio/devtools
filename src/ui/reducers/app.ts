@@ -1,9 +1,9 @@
 import { Location, PointDescription } from "@replayio/protocol";
-import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AppState,
@@ -423,3 +423,14 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
   typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
+
+export const isCurrentTimeInLoadedRegion = createSelector(
+  getCurrentTime,
+  getLoadedRegions,
+  (currentTime: number, regions: LoadedRegions | null) => {
+    return (
+      regions !== null &&
+      regions.loaded.some(({ begin, end }) => currentTime >= begin.time && currentTime <= end.time)
+    );
+  }
+);

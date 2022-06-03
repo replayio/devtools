@@ -182,9 +182,10 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
         return;
       }
 
-      const playing = !!getPlayback(stateAfterScreenshot);
-      paintGraphics(screen, mouse, playing);
-    } catch {}
+      paintGraphics(screen, mouse);
+    } catch (error) {
+      console.error(error);
+    }
   };
 }
 
@@ -209,12 +210,20 @@ export function seek(
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
-
     dispatch({ type: "CLEAR_FRAME_POSITIONS" });
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {
-      ThreadFront.timeWarp(point, time, hasFrames, false);
+      const regions = getLoadedRegions(getState());
+      const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
+      if (isTimeInLoadedRegion) {
+        ThreadFront.timeWarp(point, time, hasFrames, false);
+      } else {
+        // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
+        // In this case the best we can do is update the current time and the "video" frame.
+        dispatch(setTimelineState({ currentTime: time }));
+        dispatch(setTimelineToTime(time, true));
+      }
     }
     return true;
   };
@@ -374,7 +383,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
             );
           }
 
-          paintGraphics(screen, mouse, true);
+          paintGraphics(screen, mouse);
         } catch (e) {}
 
         prepareNextGraphics();

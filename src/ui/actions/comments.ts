@@ -24,7 +24,8 @@ import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
 
 import type { UIThunkAction } from "./index";
-import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, isTimeInRegions, startTimeForFocusRegion } from "ui/utils/timeline";
+import { getLoadedRegions } from "./app";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -203,23 +204,18 @@ export function createLabels(
 export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
   return (dispatch, getState) => {
     dispatch(clearPendingComment());
-    const focusRegion = getFocusRegion(getState());
 
-    if (
-      focusRegion &&
-      (item.time < startTimeForFocusRegion(focusRegion) ||
-        item.time > endTimeForFocusRegion(focusRegion))
-    ) {
-      console.error("Cannot seek outside the current focused region", focusRegion, item);
-      return;
-    }
-
-    let cx = selectors.getThreadContext(getState());
+    let context = selectors.getThreadContext(getState());
     dispatch(seek(item.point, item.time, item.hasFrames));
     dispatch(setSelectedPrimaryPanel("comments"));
+
     if (item.sourceLocation) {
-      cx = selectors.getThreadContext(getState());
-      dispatch(selectLocation(cx, item.sourceLocation));
+      const regions = getLoadedRegions(getState());
+      const isTimeInLoadedRegion = regions !== null && isTimeInRegions(item.time, regions.loaded);
+      if (isTimeInLoadedRegion) {
+        context = selectors.getThreadContext(getState());
+        dispatch(selectLocation(context, item.sourceLocation));
+      }
     }
   };
 }
