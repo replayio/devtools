@@ -12,7 +12,6 @@ import Popup from "./Popup";
 import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
-import { isCurrentTimeInLoadedRegion as isCurrentTimeInLoadedRegionSelector } from "ui/reducers/app";
 
 class Preview extends PureComponent {
   target = null;
@@ -45,9 +44,9 @@ class Preview extends PureComponent {
   }
 
   onTokenEnter = ({ target, tokenPos }) => {
-    const { cx, editor, isCurrentTimeInLoadedRegion, updatePreview } = this.props;
+    const { cx, editor, updatePreview } = this.props;
 
-    if (isCurrentTimeInLoadedRegion && cx.isPaused && !this.state.selecting) {
+    if (cx.isPaused && !this.state.selecting) {
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
   };
@@ -93,7 +92,6 @@ class Preview extends PureComponent {
 const mapStateToProps = state => {
   return {
     cx: getThreadContext(state),
-    isCurrentTimeInLoadedRegion: isCurrentTimeInLoadedRegionSelector(state),
     preview: getPreview(state),
   };
 };
