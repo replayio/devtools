@@ -1,0 +1,13 @@
+.TrimmedMessageCountRow {
+  display: block;
+  padding: 0.25rem 0 0.25rem 1.5rem;
+  min-height: 1.5rem;
+  font-family: var(--monospace-font-family);
+  font-size: var(--theme-code-font-size);
+  border-left: 0.25rem solid var(--primary-accent);
+}
+
+.TrimmedMessageLink {
+  cursor: pointer;
+  text-decoration-line: underline;
+}

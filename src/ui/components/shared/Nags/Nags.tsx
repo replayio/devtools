@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { getVisibleMessages } from "devtools/client/webconsole/selectors";
+import { getVisibleMessageData } from "devtools/client/webconsole/selectors";
 import React from "react";
 import { useSelector } from "react-redux";
 import hooks from "ui/hooks";
@@ -61,11 +61,11 @@ export function EditorNag() {
 }
 
 export function ConsoleNag() {
-  const visibleMessages = useSelector(getVisibleMessages);
+  const { messageIDs } = useSelector(getVisibleMessageData);
 
   // Don't show the console nag that directs the user to click on one of the console messages
   // if there aren't any console messages to begin with.
-  if (!visibleMessages.length) {
+  if (!messageIDs.length) {
     return null;
   }
 
