@@ -527,7 +527,7 @@ export function setFocusRegion(
       );
       const start =
         startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "0", time: 0 };
-      console.log({ startIndex, startTime, start });
+
       const endIndex = sortedIndexBy(
         state.timeline.points,
         { time: endTime, point: "" },
