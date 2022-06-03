@@ -20,6 +20,7 @@ import { filterToFocusRegion } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
+import { shallowEqual } from "../utils/resource/compare";
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
 import { getSelectedSource } from "./sources";
@@ -386,29 +387,43 @@ export type LocationAnalysisPoints = {
   error: AnalysisError | undefined;
 };
 
+const customAnalysisResultComparator = (
+  a: LocationAnalysisPoints | undefined,
+  b: LocationAnalysisPoints | undefined
+) => {
+  const d1 = a?.data ?? [];
+  const d2 = b?.data ?? [];
+
+  let dataEqual =
+    d1.length === d2.length &&
+    d1.every((item, i) => {
+      const otherItem = d2[i];
+      const pointEqual = item.point === otherItem.point;
+      const timeEqual = item.time === otherItem.time;
+      return pointEqual && timeEqual;
+    });
+  const errorEqual = a?.error === b?.error;
+  const result = dataEqual && errorEqual;
+
+  return result;
+};
+
 export const getAnalysisPointsForLocation = createSelector(
   [
-    (state: UIState) => state.breakpoints.analysisMappings,
+    (state: UIState, location: Location | null) => {
+      if (!location) {
+        return undefined;
+      }
+      const locationKey = getLocationKey(location);
+      return state.breakpoints.analysisMappings.entities[locationKey];
+    },
     (state: UIState) => state.breakpoints.analyses,
     (state: UIState) => state.timeline.focusRegion,
-    (state: UIState, location: Location | null) => location,
+
     (state: UIState, location: Location | null, condition: string | null = "") => condition,
   ],
-  (
-    analysisMappings,
-    analyses,
-    focusRegion,
-    location,
-    condition
-  ): LocationAnalysisPoints | undefined => {
-    // First, verify that we have a real location, and a breakpoint mapping for that location
-    if (!location) {
-      return undefined;
-    }
-
-    const locationKey = getLocationKey(location);
-    const mappingEntry = analysisMappings.entities[locationKey];
-
+  (mappingEntry, analyses, focusRegion, condition): LocationAnalysisPoints | undefined => {
+    // First, verify that we have a real location and a breakpoint mapping for that location
     if (!mappingEntry) {
       return undefined;
     }
@@ -467,8 +482,12 @@ export const getAnalysisPointsForLocation = createSelector(
   },
   {
     memoizeOptions: {
+      // Comparison for each individual input argument / extracted value
+      equalityCheck: shallowEqual,
       // Arbitrary number for cache size
-      maxSize: 50,
+      maxSize: 100,
+      // Reuse old result if contents are the same
+      resultEqualityCheck: customAnalysisResultComparator,
     },
   }
 );
