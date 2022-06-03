@@ -6,7 +6,6 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer, Deferred } from "./utils";
-import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
@@ -172,56 +171,6 @@ function onMouseEvents(events: MouseEvent[]) {
   }
 }
 
-class VideoPlayer {
-  video: HTMLVideoElement | null = null;
-  all = new Uint8Array();
-  blob?: Blob;
-  videoReadyCallback?: (video: HTMLVideoElement) => any;
-  commands?: Promise<void>;
-
-  init() {
-    this.commands = Promise.resolve();
-  }
-
-  async append(fragment: string) {
-    if (!fragment) {
-      if (this.all) {
-        this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
-
-        if (typeof onVideoUrl === "function") {
-          const url = URL.createObjectURL(this.blob!);
-          onVideoUrl(url);
-        }
-      }
-    } else {
-      const buffer = decode(fragment);
-
-      var tmp = new Uint8Array(this.all.byteLength + buffer.byteLength);
-      tmp.set(new Uint8Array(this.all), 0);
-      tmp.set(new Uint8Array(buffer), this.all.byteLength);
-      this.all = tmp;
-    }
-  }
-
-  seek(timeMs: number) {
-    this.commands =
-      this.commands &&
-      this.commands.then(async () => {
-        const video = getVideoNode();
-      });
-  }
-
-  play(timeMs: number) {
-    this.commands =
-      this.commands &&
-      this.commands.then(() => {
-        const video = getVideoNode();
-      });
-  }
-}
-
-export const Video = new VideoPlayer();
-
 export let hasAllPaintPoints = false;
 
 export const setHasAllPaintPoints = (newValue: boolean) => {
@@ -231,8 +180,6 @@ export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
 export function setupGraphics() {
-  Video.init();
-
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {

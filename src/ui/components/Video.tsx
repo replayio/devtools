@@ -1,5 +1,4 @@
-import { installObserver, refreshGraphics, Video as VideoPlayer } from "protocol/graphics";
-import { setVideoNode } from "protocol/videoNode";
+import { installObserver, refreshGraphics } from "protocol/graphics";
 import React, { FC, useEffect, useRef } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 
@@ -74,8 +73,6 @@ function Video({
 
     if (playback) {
       refreshGraphics();
-      VideoPlayer.seek(currentTime);
-      VideoPlayer.play(currentTime);
     }
 
     return () => {
@@ -100,7 +97,7 @@ function Video({
         <ReplayLogo size="sm" color="gray" />
       </div>
 
-      <video id="graphicsVideo" src={videoUrl || undefined} ref={setVideoNode} />
+      <video id="graphicsVideo" src={videoUrl || undefined} />
       <canvas id="graphics" onMouseDown={onMouseDown} />
       {showCommentTool ? (
         <CommentsOverlay>
