@@ -21,7 +21,6 @@ export const TestsContext = createContext<TestsContextType>({
 function TestsContextWrapper({ children }: { children: ReactNode }) {
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
 
-  console.log({ hoveredRunId });
   return (
     <TestsContext.Provider value={{ hoveredRunId, setHoveredRunId }}>
       {children}
@@ -38,13 +37,17 @@ export function Tests() {
     return <div>Loading…</div>;
   }
 
+  const onClick = (test: Test) => {
+    setPreview({ id: test.path, view: "tests" });
+  };
+
   return (
     <TestsContextWrapper>
       <div
         className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
       >
         {tests?.map((t, i) => (
-          <TestRow test={t} key={i} onClick={() => setPreview({ id: t.path, view: "tests" })} />
+          <TestRow test={t} key={i} onClick={() => onClick(t)} />
         ))}
       </div>
     </TestsContextWrapper>
@@ -52,14 +55,20 @@ export function Tests() {
 }
 
 function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
+  const { preview } = useContext(LibraryContext);
   const { path, recordings, date } = test;
 
   const displayedRecordings = test.recordings.filter(r => r.metadata?.test?.result);
+  const longestDuration = Math.max(...test.recordings.map(r => r.duration));
+
+  const isSelected = preview?.id.toString() === path.toString();
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className="flex flex-col px-4 py-3 space-y-2 border-b cursor-pointer border-themeBorder"
+      className={`flex flex-col px-4 py-3 space-y-2 border-b cursor-pointer border-themeBorder ${
+        isSelected ? "bg-blue-100" : ""
+      }`}
       onClick={onClick}
     >
       <div className="flex flex-col space-y-0.5">
@@ -81,16 +90,16 @@ function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
           </div>
         </div>
       </div>
-      <div className="flex flex-row h-4 space-x-0.5">
+      <div className="flex flex-row h-4 space-x-0.5 items-end">
         {displayedRecordings.map((r, i) => (
-          <Result recording={r} key={i} />
+          <Result recording={r} key={i} maxDuration={longestDuration} />
         ))}
       </div>
     </div>
   );
 }
 
-function Result({ recording }: { recording: Recording }) {
+function Result({ recording, maxDuration }: { recording: Recording; maxDuration: number }) {
   const { hoveredRunId, setHoveredRunId } = useContext(TestsContext);
   const testRunId = recording.metadata?.test?.run?.id || null;
 
@@ -104,9 +113,12 @@ function Result({ recording }: { recording: Recording }) {
   const onMouseLeave = () => setHoveredRunId(null);
   const shouldFade = hoveredRunId && testRunId !== hoveredRunId;
 
+  const height = `${maxDuration ? recording.duration / maxDuration : 100}%`;
+
   return (
     <div
-      className={`h-full w-1.5 ${
+      style={{ height }}
+      className={`w-1.5 ${
         shouldFade
           ? "bg-gray-300"
           : recording.metadata.test!.result === "passed"
