@@ -21,11 +21,12 @@ export const FilterLayout = ({
 
   return (
     <>
-      <div className="bg-bodyBgcolor p-1">
-        <div className="flex items-center rounded-md bg-themeTextFieldBgcolor p-1">
+      <div className="flex items-center bg-bodyBgcolor p-1 pl-0">
+        <div className={classNames("pl-1", filterOpen && "basis-32")}>
           <button
             onClick={() => setFilterOpen(!filterOpen)}
-            className={classNames("mr-1 flex items-center", {
+            className={classNames("flex items-center", {
+              "mr-1": !filterOpen,
               "text-primaryAccent hover:text-primaryAccentHover focus:text-primaryAccentHover":
                 types.size > 0,
             })}
@@ -34,7 +35,8 @@ export const FilterLayout = ({
               filter_alt
             </MaterialIcon>
           </button>
-
+        </div>
+        <div className="flex flex-1 items-center rounded-md bg-themeTextFieldBgcolor p-1">
           <MaterialIcon iconSize="lg">search</MaterialIcon>
 
           <input
@@ -47,10 +49,7 @@ export const FilterLayout = ({
 
       <div className="flex min-h-0 flex-1">
         {filterOpen ? (
-          <div
-            className="flex basis-32 flex-col overflow-auto border-r border-splitter bg-bodyBgcolor px-2 py-0.5"
-            style={{ paddingLeft: "0.55rem" }}
-          >
+          <div className="flex basis-32 flex-col overflow-auto border-r border-splitter bg-bodyBgcolor px-1.5 py-0.5">
             {RequestTypeOptions.map(canonicalType => (
               <ToggleRow
                 key={canonicalType.label}
