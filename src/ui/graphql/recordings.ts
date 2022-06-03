@@ -25,6 +25,7 @@ export const GET_RECORDING = gql`
       userRole
       operations
       resolution
+      metadata
       comments {
         id
       }

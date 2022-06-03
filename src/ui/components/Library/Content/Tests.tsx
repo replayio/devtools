@@ -1,28 +1,39 @@
-import { createContext, ReactNode, useContext, useState } from "react";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Test, useGetTestsForWorkspace } from "ui/hooks/tests";
+import {
+  Test,
+  useGetTestsForWorkspace,
+} from "ui/hooks/tests";
 import { getWorkspaceId } from "ui/reducers/app";
 import { LibraryContext } from "../useFilters";
 import styles from "../Library.module.css";
 import { getRelativeDate } from "../RecordingRow";
 import { Recording } from "ui/types";
+import { TestTooltip } from "./TestTooltip";
 
 type TestsContextType = {
   hoveredRunId: string | null;
   setHoveredRunId: (runId: string | null) => void;
+  hoveredRecordingId: string | null;
+  setHoveredRecordingId: (runId: string | null) => void;
 };
 
 export const TestsContext = createContext<TestsContextType>({
   hoveredRunId: null,
   setHoveredRunId: () => {},
+  hoveredRecordingId: null,
+  setHoveredRecordingId: () => {},
 });
 
 function TestsContextWrapper({ children }: { children: ReactNode }) {
   const [hoveredRunId, setHoveredRunId] = useState<string | null>(null);
+  const [hoveredRecordingId, setHoveredRecordingId] = useState<string | null>(null);
 
   return (
-    <TestsContext.Provider value={{ hoveredRunId, setHoveredRunId }}>
+    <TestsContext.Provider
+      value={{ hoveredRunId, setHoveredRunId, hoveredRecordingId, setHoveredRecordingId }}
+    >
       {children}
     </TestsContext.Provider>
   );
@@ -30,8 +41,17 @@ function TestsContextWrapper({ children }: { children: ReactNode }) {
 
 export function Tests() {
   const workspaceId = useSelector(getWorkspaceId);
-  const { setPreview } = useContext(LibraryContext);
+  const [initialized, setInitialized] = useState(false);
+  const { preview, setPreview } = useContext(LibraryContext);
   const { tests, loading } = useGetTestsForWorkspace(workspaceId!);
+
+  useEffect(() => {
+    if (!loading && tests && !initialized) {
+      console.log(">:", tests[0].path);
+      setPreview({ view: "tests", id: tests[0].path });
+      setInitialized(true);
+    }
+  }, [tests, loading, initialized, setPreview]);
 
   if (loading) {
     return <div>Loading…</div>;
@@ -100,12 +120,16 @@ function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
 }
 
 function Result({ recording, maxDuration }: { recording: Recording; maxDuration: number }) {
-  const { hoveredRunId, setHoveredRunId } = useContext(TestsContext);
+  const { setPreview } = useContext(LibraryContext);
+  const { hoveredRunId, setHoveredRunId, hoveredRecordingId, setHoveredRecordingId } =
+    useContext(TestsContext);
   const testRunId = recording.metadata?.test?.run?.id || null;
 
   const onMouseEnter = () => {
     const runId = recording.metadata.test?.run?.id;
+    const recordingId = recording.id;
 
+    setHoveredRecordingId(recordingId);
     if (runId) {
       setHoveredRunId(runId);
     }
@@ -115,18 +139,27 @@ function Result({ recording, maxDuration }: { recording: Recording; maxDuration:
 
   const height = `${maxDuration ? recording.duration / maxDuration : 100}%`;
 
+  const onClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    setPreview({ view: "tests", id: recording.metadata.test!.path!, recordingId: recording.id });
+  };
+
   return (
-    <div
-      style={{ height }}
-      className={`w-1.5 ${
-        shouldFade
-          ? "bg-gray-300"
-          : recording.metadata.test!.result === "passed"
-          ? "bg-green-500"
-          : "bg-red-500"
-      }`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-    />
+    <div style={{ height }} className="relative">
+      <div
+        className={`h-full w-1.5 ${
+          shouldFade
+            ? "bg-gray-300"
+            : recording.metadata.test!.result === "passed"
+            ? "bg-green-500"
+            : "bg-red-500"
+        }`}
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        onClick={onClick}
+      />
+      {hoveredRecordingId === recording.id ? <TestTooltip /> : null}
+    </div>
   );
 }

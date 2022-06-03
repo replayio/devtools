@@ -172,6 +172,11 @@ export type SourceMetadata = {
     title: string;
     url?: string;
   };
+  trigger?: {
+    name: string;
+    user?: string;
+    workflow?: string
+  }
   provider?: string;
   repository?: string;
 };
