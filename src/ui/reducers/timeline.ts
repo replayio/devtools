@@ -13,7 +13,7 @@ function initialTimelineState(): TimelineState {
     hoveredItem: null,
     playback: null,
     playbackPrecachedTime: 0,
-    points: [],
+    points: [{ time: 0, point: "0" }],
     recordingDuration: null,
     shouldAnimate: true,
     showFocusModeControls: false,

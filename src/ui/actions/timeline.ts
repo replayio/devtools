@@ -35,6 +35,7 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
   setPlaybackPrecachedTime,
+  pointsReceived,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
@@ -90,6 +91,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     dispatch(setRecordingDescription(duration));
 
     const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
     const state = getState();
@@ -558,7 +560,8 @@ export function setFocusRegion(
         p => p.time
       );
       const start =
-        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "", time: startTime };
+        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "0", time: 0 };
+      console.log({ startIndex, startTime, start });
       const endIndex = sortedIndexBy(
         state.timeline.points,
         { time: endTime, point: "" },

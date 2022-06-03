@@ -45,8 +45,8 @@ describe("Redux timeline state", () => {
           },
           "endTime": 80,
           "start": Object {
-            "point": "",
-            "time": 70,
+            "point": "0",
+            "time": 0,
           },
           "startTime": 70,
         }
@@ -149,8 +149,8 @@ describe("Redux timeline state", () => {
           },
           "endTime": 50,
           "start": Object {
-            "point": "",
-            "time": 50,
+            "point": "0",
+            "time": 0,
           },
           "startTime": 50,
         }
@@ -171,8 +171,8 @@ describe("Redux timeline state", () => {
           },
           "endTime": 110,
           "start": Object {
-            "point": "",
-            "time": 110,
+            "point": "0",
+            "time": 0,
           },
           "startTime": 110,
         }
@@ -199,8 +199,8 @@ describe("Redux timeline state", () => {
           },
           "endTime": 80,
           "start": Object {
-            "point": "",
-            "time": 80,
+            "point": "0",
+            "time": 0,
           },
           "startTime": 80,
         }
@@ -227,8 +227,8 @@ describe("Redux timeline state", () => {
           },
           "endTime": 60,
           "start": Object {
-            "point": "",
-            "time": 60,
+            "point": "0",
+            "time": 0,
           },
           "startTime": 60,
         }
@@ -259,8 +259,8 @@ describe("Redux timeline state", () => {
             },
             "endTime": 100,
             "start": Object {
-              "point": "",
-              "time": 65,
+              "point": "0",
+              "time": 0,
             },
             "startTime": 65,
           }
@@ -283,8 +283,8 @@ describe("Redux timeline state", () => {
             },
             "endTime": 70,
             "start": Object {
-              "point": "",
-              "time": 65,
+              "point": "0",
+              "time": 0,
             },
             "startTime": 65,
           }
@@ -303,8 +303,8 @@ describe("Redux timeline state", () => {
             },
             "endTime": 65,
             "start": Object {
-              "point": "",
-              "time": 50,
+              "point": "0",
+              "time": 0,
             },
             "startTime": 50,
           }
@@ -327,8 +327,8 @@ describe("Redux timeline state", () => {
             },
             "endTime": 65,
             "start": Object {
-              "point": "",
-              "time": 50,
+              "point": "0",
+              "time": 0,
             },
             "startTime": 50,
           }
