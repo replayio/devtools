@@ -1,13 +1,12 @@
-import { RecordingId } from "@replayio/protocol";
 import {
   prefs as debuggerPrefs,
   asyncStore as debuggerAsyncPrefs,
 } from "devtools/client/debugger/src/utils/prefs";
+import { RecordingId } from "@replayio/protocol";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
-import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
-import { prefs, asyncStore } from "ui/utils/prefs";
+import { prefs, asyncStore, updateAsyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
   getConsoleFilterDrawerExpanded,
@@ -191,5 +190,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
     consoleFilters: getAllFilters(state),
   };
 
-  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
+  const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };
+  await updateAsyncStore(newState);
 }
