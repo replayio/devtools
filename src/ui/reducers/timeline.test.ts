@@ -53,22 +53,14 @@ describe("Redux timeline state", () => {
       `);
     });
 
-    it("should keep the currentTime within the focusRegion as it moves around", () => {
+    it("should not force the currentTime to be within the focusRegion as it moves around", () => {
       dispatch(
         actions.setFocusRegion({
           startTime: 50,
           endTime: 60,
         })
       );
-      expect(getCurrentTime(store.getState())).toBe(60);
-
-      dispatch(
-        actions.setFocusRegion({
-          startTime: 65,
-          endTime: 60,
-        })
-      );
-      expect(getCurrentTime(store.getState())).toBe(60);
+      expect(getCurrentTime(store.getState())).toBe(75);
 
       dispatch(
         actions.setFocusRegion({
@@ -80,8 +72,8 @@ describe("Redux timeline state", () => {
 
       dispatch(
         actions.setFocusRegion({
-          startTime: 75,
-          endTime: 80,
+          startTime: 25,
+          endTime: 30,
         })
       );
       expect(getCurrentTime(store.getState())).toBe(75);

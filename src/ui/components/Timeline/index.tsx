@@ -4,11 +4,7 @@ import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import { useFeature } from "ui/hooks/settings";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
-import {
-  endTimeForFocusRegion,
-  getTimeFromPosition,
-  startTimeForFocusRegion,
-} from "ui/utils/timeline";
+import { getTimeFromPosition } from "ui/utils/timeline";
 
 import Comments from "../Comments";
 import ProtocolTimeline from "../ProtocolTimeline";
@@ -32,7 +28,6 @@ export type EditMode = {
 
 export default function Timeline() {
   const dispatch = useDispatch();
-  const focusRegion = useSelector(selectors.getFocusRegion);
   const hoverTime = useSelector(selectors.getHoverTime);
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
@@ -73,14 +68,6 @@ export default function Timeline() {
       progressBarRef.current!.getBoundingClientRect(),
       zoomRegion
     );
-    const isOutsideFocusRegion =
-      focusRegion &&
-      (mouseTime < startTimeForFocusRegion(focusRegion) ||
-        mouseTime > endTimeForFocusRegion(focusRegion));
-
-    if (isOutsideFocusRegion) {
-      return;
-    }
 
     dispatch(seekToTime(mouseTime));
   };
@@ -92,14 +79,6 @@ export default function Timeline() {
       zoomRegion
     );
     const isDragging = event.buttons === 1;
-    const isOutsideFocusRegion =
-      focusRegion &&
-      (mouseTime < startTimeForFocusRegion(focusRegion) ||
-        mouseTime > endTimeForFocusRegion(focusRegion));
-
-    if (isOutsideFocusRegion) {
-      return;
-    }
 
     if (hoverTime != mouseTime) {
       dispatch(setTimelineToTime(mouseTime, isDragging));

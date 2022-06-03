@@ -49,8 +49,8 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
-import { getLoadedRegions } from "./app";
 
+import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
@@ -111,7 +111,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       time = initialPausePoint.time;
     }
 
-    ThreadFront.timeWarp(point, time, hasFrames, /* force */ true);
+    ThreadFront.timeWarp(point, time, hasFrames, /* force */ false);
     ThreadFront.initializedWaiter.resolve();
   };
 }
@@ -208,23 +208,13 @@ export function seek(
   pauseId?: PauseId
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
-    const focusRegion = getFocusRegion(getState());
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
-
-    if (focusRegion) {
-      const startTime = startTimeForFocusRegion(focusRegion);
-      const endTime = endTimeForFocusRegion(focusRegion);
-      if (time < startTime || time > endTime) {
-        console.error("Cannot seek outside the current focused region");
-        return false;
-      }
-    }
 
     dispatch({ type: "CLEAR_FRAME_POSITIONS" });
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {
-      ThreadFront.timeWarp(point, time, hasFrames);
+      ThreadFront.timeWarp(point, time, hasFrames, false);
     }
     return true;
   };
@@ -277,16 +267,10 @@ export function startPlayback(): UIThunkAction {
       return;
     }
 
-    const focusRegion = getFocusRegion(state);
-    const endTime = focusRegion ? endTimeForFocusRegion(focusRegion) : getZoomRegion(state).endTime;
+    const endTime = getZoomRegion(state).endTime;
 
     const startDate = Date.now();
-    const startTime =
-      currentTime >= endTime
-        ? focusRegion
-          ? startTimeForFocusRegion(focusRegion)
-          : 0
-        : currentTime;
+    const startTime = currentTime >= endTime ? 0 : currentTime;
 
     dispatch(
       setTimelineState({
@@ -315,12 +299,7 @@ export function stopPlayback(): UIThunkAction {
 
 export function replayPlayback(): UIThunkAction {
   return (dispatch, getState) => {
-    const focusRegion = getFocusRegion(getState());
-    let startTime = 0;
-
-    if (focusRegion) {
-      startTime = startTimeForFocusRegion(focusRegion);
-    }
+    const startTime = 0;
 
     dispatch(seekToTime(startTime));
     dispatch(startPlayback());
@@ -509,13 +488,6 @@ export function setFocusRegion(
         } else {
           endTime = startTime;
         }
-      }
-
-      // Make sure the current time stays within the bounds of our selected region.
-      if (currentTime < startTime) {
-        dispatch(setTimelineState({ currentTime: startTime }));
-      } else if (currentTime > endTime) {
-        dispatch(setTimelineState({ currentTime: endTime }));
       }
 
       // Update the previous to match the handle that's being dragged.
