@@ -10,12 +10,6 @@ import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
-// Temporary experimental feature flag
-let syncVideoPlaybackExperimentalFlag: boolean = false;
-export function setSyncVideoPlaybackExperimentalFlag(value: boolean): void {
-  syncVideoPlaybackExperimentalFlag = value;
-}
-
 declare global {
   interface Window {
     // we expose this for use in testing
@@ -214,10 +208,6 @@ class VideoPlayer {
       this.commands &&
       this.commands.then(async () => {
         const video = getVideoNode();
-        if (syncVideoPlaybackExperimentalFlag && video) {
-          video.pause();
-          video.currentTime = timeMs / 1000;
-        }
       });
   }
 
@@ -226,10 +216,6 @@ class VideoPlayer {
       this.commands &&
       this.commands.then(() => {
         const video = getVideoNode();
-        if (syncVideoPlaybackExperimentalFlag && video) {
-          video.currentTime = (timeMs || 0) / 1000;
-          return video.play();
-        }
       });
   }
 }
@@ -263,11 +249,6 @@ export function setupGraphics() {
     if (recordingTarget === "node") {
       // Make sure we never wait for any paints when trying to do things like playback
       setHasAllPaintPoints(true);
-    }
-
-    if (syncVideoPlaybackExperimentalFlag) {
-      client.Graphics.getPlaybackVideo({}, sessionId);
-      client.Graphics.addPlaybackVideoFragmentListener(param => Video.append(param.fragment));
     }
   });
 
@@ -433,9 +414,7 @@ export async function getGraphicsAtTime(
   }
 
   const screenPromise = forPlayback
-    ? syncVideoPlaybackExperimentalFlag
-      ? Promise.resolve(undefined)
-      : screenshotCache.getScreenshotForPlayback(point, paintHash)
+    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
     : screenshotCache.getScreenshotForPreview(point, paintHash);
 
   const screen = await screenPromise;
@@ -483,7 +462,7 @@ export function paintGraphics(
   playing?: boolean
 ) {
   window.currentScreenshotHash = screenShot?.hash;
-  if (!screenShot || (playing && syncVideoPlaybackExperimentalFlag)) {
+  if (!screenShot) {
     clearGraphics();
   } else {
     assert(screenShot.data, "no screenshot data");
