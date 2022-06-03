@@ -16,39 +16,47 @@ const shadowActive = "0px 1px 2px 0px rgba(0, 0, 0, 0.25)";
 
 type States = "opening" | "opened" | "closed";
 
-export function PrefixBadgePicker() {
+export function PrefixBadgePicker({ initialState = "closed" }: { initialState?: States }) {
+  const id = (React as any).useId();
   const [activeBadge, setActiveBadge] = React.useState<PrefixBadges>("unicorn");
-  const [state, setState] = React.useState<States>("closed");
-  const onSelect = (prefixBadgeName: PrefixBadges) => {
+  const [state, setState] = React.useState<States>(initialState);
+  const isOpen = state === "opening" || state === "opened";
+
+  const handleSelect = (prefixBadgeName: PrefixBadges) => {
     setState("closed");
     setActiveBadge(prefixBadgeName);
   };
-  const isOpen = state === "opening" || state === "opened";
+
+  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (state === "closed") {
+      setState("opening");
+    }
+  };
+
+  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const button = (event.target as HTMLElement).closest("button");
+
+    if (button) {
+      button.focus();
+    }
+
+    setState("opened");
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
+    if (event.relatedTarget === null) {
+      setState("closed");
+    }
+  };
 
   return (
     <motion.div
       className={styles.PrefixBadgePicker}
-      onMouseDown={event => {
-        event.preventDefault();
-        if (state === "closed") {
-          setState("opening");
-        }
-      }}
-      onMouseUp={event => {
-        event.preventDefault();
-        const button = (event.target as HTMLElement).closest("button");
-
-        if (button) {
-          button.focus();
-        }
-
-        setState("opened");
-      }}
-      onBlur={event => {
-        if (event.relatedTarget === null) {
-          setState("closed");
-        }
-      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+      onBlur={handleBlur}
       whileHover="parentHover"
     >
       <AnimatePresence>
@@ -70,18 +78,23 @@ export function PrefixBadgePicker() {
           }}
           className={styles.PrefixBadgePickerFill}
         />
-        {badges.map((badge, index) =>
-          isOpen ? (
+        {badges.map((badge, index) => {
+          const sharedProps = {
+            key: badge,
+            layoutId: id + badge,
+            name: badge,
+          };
+
+          return isOpen ? (
             <PrefixBadge
-              key={badge}
-              name={badge}
-              onSelect={state === "opening" && index === 0 ? undefined : onSelect}
-              onSpaceKeyDown={() => onSelect(badge)}
+              {...sharedProps}
+              onSelect={state === "opening" && index === 0 ? undefined : handleSelect}
+              onSpaceKeyDown={() => handleSelect(badge)}
             />
           ) : badge === activeBadge ? (
-            <PrefixBadge key={badge} name={badge} onSpaceKeyDown={() => setState("opened")} />
-          ) : null
-        )}
+            <PrefixBadge {...sharedProps} onSpaceKeyDown={() => setState("opened")} />
+          ) : null;
+        })}
       </AnimatePresence>
     </motion.div>
   );
@@ -89,13 +102,23 @@ export function PrefixBadgePicker() {
 
 export function PrefixBadge({
   name,
+  layoutId,
   onSpaceKeyDown,
   onSelect,
 }: {
   name: PrefixBadges;
+  layoutId: string;
   onSpaceKeyDown: () => void;
   onSelect?: (prefixBadgeName: PrefixBadges) => void;
 }) {
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === " ") {
+      onSpaceKeyDown();
+    }
+    if (event.key === "Enter") {
+      handleSelect(event);
+    }
+  };
   const handleSelect = (event: React.MouseEvent | React.KeyboardEvent) => {
     if (onSelect) {
       event.stopPropagation();
@@ -106,20 +129,13 @@ export function PrefixBadge({
 
   return (
     <motion.button
-      layoutId={name}
+      layoutId={layoutId}
       className={styles.PrefixBadge}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration, layout: { duration: duration / 2 } }}
-      onKeyDown={(event: React.KeyboardEvent) => {
-        if (event.key === " ") {
-          onSpaceKeyDown();
-        }
-        if (event.key === "Enter") {
-          handleSelect(event);
-        }
-      }}
+      onKeyDown={handleKeyDown}
       onMouseUp={handleSelect}
     >
       <div

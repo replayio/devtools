@@ -1,9 +1,9 @@
 import { Meta } from "@storybook/react";
-import { PrintStatementPanel } from "components";
+import { PrefixBadgePicker } from "components";
 
 export default {
-  title: "Components/PrintStatementPanel",
-  component: PrintStatementPanel,
+  title: "Components/PrefixBadgePicker",
+  component: PrefixBadgePicker,
 } as Meta;
 
 export function BasicUsage() {
@@ -16,7 +16,9 @@ export function BasicUsage() {
         padding: "1rem",
       }}
     >
-      <PrintStatementPanel />
+      <PrefixBadgePicker initialState="closed" />
+
+      <PrefixBadgePicker initialState="opened" />
     </div>
   );
 }

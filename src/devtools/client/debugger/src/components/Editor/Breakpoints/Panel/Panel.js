@@ -99,7 +99,7 @@ function Panel({
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
-        <FirstEditNag editing={editing} />
+        <FirstEditNag editing={true} />
         <div className={classnames("breakpoint-panel", { editing })}>
           {editing ? (
             <PanelEditor

@@ -1,6 +1,5 @@
 .PrefixBadgePicker {
-  display: grid;
-  grid-auto-flow: column;
+  display: flex;
   position: relative;
   align-self: start;
 }
