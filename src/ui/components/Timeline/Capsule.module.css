@@ -4,6 +4,7 @@
   align-items: stretch;
   column-gap: 1px;
   height: 2rem;
+  position: relative;
 }
 
 .LeftSideLoading,
@@ -48,4 +49,22 @@
 .CircularProgressbar {
   width: 1.5rem;
   height: 1.5rem;
+}
+
+.SlowLoadingPopout {
+  position: absolute;
+  bottom: calc(100% + 0.25rem);
+  left: 0;
+  background: var(--modal-bgcolor);
+  border: 1px solid var(--modal-border);
+  color: var(--theme-text-color-strong);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: var(--theme-body-font-size);
+  text-align: center;
+}
+
+.SlowLoadingLink {
+  text-decoration: underline;
+  color: var(--source-link-color);
 }

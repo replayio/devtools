@@ -1,8 +1,10 @@
 import classNames from "classnames";
-import React from "react";
+import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { useSelector } from "react-redux";
 import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
+import ExternalLink from "ui/components/shared/ExternalLink";
+import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
 import { getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
@@ -11,13 +13,15 @@ import styles from "./Capsule.module.css";
 import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
 
+const SHOW_SLOW_LOADING_POPOUT_AFTER_DELAY = 1000;
+
 export default function Capsule({
   setShowLoadingProgress,
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
-  const loadingStatusSlow = useSelector(getLoadingStatusSlow);
+  let progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
+  let loadingStatusSlow = useSelector(getLoadingStatusSlow);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   return (
@@ -55,13 +59,82 @@ function LoadingState({
   const onMouseLeave = () => setShowLoadingProgress(false);
 
   return (
-    <div className={styles.LoadingState} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      {loadingStatusSlow ? (
+    <>
+      <div className={styles.LoadingState} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+        {loadingStatusSlow ? <SlowLoadingIcon /> : <RadialProgress progress={progress} />}
+        <div className={styles.LoadingText}>{Math.round(progress)}%</div>
+      </div>
+    </>
+  );
+}
+
+function SlowLoadingIcon() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [showSlowLoadingPopout, setShowSlowLoadingPopout] = useState<boolean>(false);
+
+  useEffect(() => {
+    const div = ref.current;
+    if (!div) {
+      return;
+    }
+
+    let timeoutID: NodeJS.Timeout | null = null;
+
+    const showAfterTimeout = () => {
+      timeoutID = setTimeout(() => {
+        timeoutID = null;
+
+        setShowSlowLoadingPopout(true);
+      }, SHOW_SLOW_LOADING_POPOUT_AFTER_DELAY);
+    };
+
+    const clearPendingTimeout = () => {
+      if (timeoutID !== null) {
+        clearTimeout(timeoutID);
+      }
+    };
+
+    div.addEventListener("click", clearPendingTimeout);
+    div.addEventListener("mouseenter", showAfterTimeout);
+    div.addEventListener("mouseleave", clearPendingTimeout);
+
+    return () => {
+      clearPendingTimeout();
+
+      div.removeEventListener("click", clearPendingTimeout);
+      div.removeEventListener("mouseenter", showAfterTimeout);
+      div.removeEventListener("mouseleave", clearPendingTimeout);
+    };
+  }, []);
+
+  return (
+    <>
+      <div ref={ref} onClick={() => setShowSlowLoadingPopout(true)}>
         <Icon className={styles.SlowIcon} filename="turtle" size="extra-large" />
-      ) : (
-        <RadialProgress progress={progress} />
+      </div>
+      {showSlowLoadingPopout && (
+        <SlowLoadingPopOut dismiss={() => setShowSlowLoadingPopout(false)} />
       )}
-      <div className={styles.LoadingText}>{Math.round(progress)}%</div>
+    </>
+  );
+}
+
+function SlowLoadingPopOut({ dismiss }: { dismiss: () => void }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useModalDismissSignal(ref, dismiss);
+
+  return (
+    <div ref={ref} className={styles.SlowLoadingPopout}>
+      Please{" "}
+      <ExternalLink
+        className={styles.SlowLoadingLink}
+        href="https://discord.gg/n2dTK6kcRX"
+        onClick={dismiss}
+      >
+        let us know
+      </ExternalLink>{" "}
+      if there is a problem.
     </div>
   );
 }
