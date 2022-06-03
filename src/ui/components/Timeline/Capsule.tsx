@@ -13,15 +13,15 @@ import styles from "./Capsule.module.css";
 import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
 
-const SHOW_SLOW_LOADING_POPOUT_AFTER_DELAY = 1000;
+const SHOW_SLOW_LOADING_POP_OUT_AFTER_DELAY = 1000;
 
 export default function Capsule({
   setShowLoadingProgress,
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  let progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
-  let loadingStatusSlow = useSelector(getLoadingStatusSlow);
+  const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
+  const loadingStatusSlow = useSelector(getLoadingStatusSlow);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
 
   return (
@@ -70,7 +70,7 @@ function LoadingState({
 
 function SlowLoadingIcon() {
   const ref = useRef<HTMLDivElement>(null);
-  const [showSlowLoadingPopout, setShowSlowLoadingPopout] = useState<boolean>(false);
+  const [showSlowLoadingPopOut, setShowSlowLoadingPopOut] = useState<boolean>(false);
 
   useEffect(() => {
     const div = ref.current;
@@ -84,8 +84,8 @@ function SlowLoadingIcon() {
       timeoutID = setTimeout(() => {
         timeoutID = null;
 
-        setShowSlowLoadingPopout(true);
-      }, SHOW_SLOW_LOADING_POPOUT_AFTER_DELAY);
+        setShowSlowLoadingPopOut(true);
+      }, SHOW_SLOW_LOADING_POP_OUT_AFTER_DELAY);
     };
 
     const clearPendingTimeout = () => {
@@ -109,11 +109,11 @@ function SlowLoadingIcon() {
 
   return (
     <>
-      <div ref={ref} onClick={() => setShowSlowLoadingPopout(true)}>
+      <div ref={ref} onClick={() => setShowSlowLoadingPopOut(true)}>
         <Icon className={styles.SlowIcon} filename="turtle" size="extra-large" />
       </div>
-      {showSlowLoadingPopout && (
-        <SlowLoadingPopOut dismiss={() => setShowSlowLoadingPopout(false)} />
+      {showSlowLoadingPopOut && (
+        <SlowLoadingPopOut dismiss={() => setShowSlowLoadingPopOut(false)} />
       )}
     </>
   );
@@ -125,7 +125,7 @@ function SlowLoadingPopOut({ dismiss }: { dismiss: () => void }) {
   useModalDismissSignal(ref, dismiss);
 
   return (
-    <div ref={ref} className={styles.SlowLoadingPopout}>
+    <div ref={ref} className={styles.SlowLoadingPopOut}>
       Please{" "}
       <ExternalLink
         className={styles.SlowLoadingLink}
