@@ -29,11 +29,11 @@ export function asyncStoreHelper(root, mappings) {
   Object.keys(mappings).map(key =>
     Object.defineProperty(store, key, {
       async get() {
-        const value = await asyncStorage.getItem(`${root}.${getMappingKey(key)}`);
+        const value = await asyncStorage.getItem(root, getMappingKey(key));
         return value || getMappingDefaultValue(key);
       },
       set(value) {
-        return asyncStorage.setItem(`${root}.${getMappingKey(key)}`, value);
+        return asyncStorage.setItem(root, getMappingKey(key), value);
       },
     })
   );

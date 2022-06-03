@@ -4,7 +4,6 @@ import {
   asyncStore as debuggerAsyncPrefs,
 } from "devtools/client/debugger/src/utils/prefs";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
-import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
@@ -26,6 +25,7 @@ import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
 import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
+import { getItem, setItem } from "devtools/shared/async-storage";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -113,12 +113,12 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
   maybeUpdateReplaySessions(state);
 };
 
-async function getReplaySessions() {
-  return await asyncStore.replaySessions;
-}
+export const recordingKeyForStorage = (recordingId: string) => {
+  return `replay-sessions-${recordingId}`;
+};
 
 export async function getReplaySession(recordingId: RecordingId) {
-  return (await asyncStore.replaySessions)[recordingId];
+  return await getItem(recordingKeyForStorage(recordingId), "session");
 }
 
 export const getLocalReplaySessionPrefs = async () => {
@@ -155,8 +155,7 @@ export async function isLocalNagDismissed(nag: LocalNag) {
     return;
   }
 
-  const replaySessions = await getReplaySessions();
-  const replaySession = replaySessions[recordingId];
+  const replaySession = await getReplaySession(recordingId);
 
   // If for some reason we don't have this replay session, return
   // true so that our default state is to behave as if we wanted to hide
@@ -176,8 +175,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
     return;
   }
 
-  const previousReplaySessions = await getReplaySessions();
-
   const currentReplaySession = {
     viewMode: getViewMode(state),
     consoleFilterDrawerExpanded: getConsoleFilterDrawerExpanded(state),
@@ -191,5 +188,5 @@ async function maybeUpdateReplaySessions(state: UIState) {
     consoleFilters: getAllFilters(state),
   };
 
-  asyncStore.replaySessions = { ...previousReplaySessions, [recordingId]: currentReplaySession };
+  setItem(recordingKeyForStorage(recordingId), "session", currentReplaySession);
 }

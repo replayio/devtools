@@ -20,11 +20,9 @@ import {
 } from "devtools/client/webconsole/reducers/messages";
 import { trackEvent } from "ui/utils/telemetry";
 import { Recording } from "ui/types";
-import { getRecording } from "ui/hooks/recordings";
 import { getRecordingId } from "ui/utils/recording";
 import { getReplaySession } from "ui/setup/prefs";
 import type { LayoutState } from "ui/state/layout";
-import { getLocalReplaySessionPrefs } from "ui/setup/prefs";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { CommentsState } from "ui/state/comments";
@@ -51,67 +49,48 @@ const getDefaultSelectedPrimaryPanel = (session: any, recording?: Recording) => 
   return recording.comments.length ? "comments" : syncInitialLayoutState.selectedPrimaryPanel;
 };
 
-export async function getInitialLayoutState(): Promise<LayoutState> {
-  const recordingId = getRecordingId();
-
-  // If we're in the library, there are no preferences to fetch.
-  if (!recordingId) {
-    return syncInitialLayoutState;
-  }
-
-  let recording;
-  try {
-    recording = await getRecording(recordingId);
-  } catch (e) {
-    return syncInitialLayoutState;
-  }
-
-  const session = await getReplaySession(recordingId);
-
+export function getInitialLayoutState(session: any): LayoutState {
   if (!session) {
-    return {
-      ...syncInitialLayoutState,
-      selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    };
+    return syncInitialLayoutState;
   }
 
-  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel, consoleFilterDrawerExpanded } =
-    syncInitialLayoutState;
-  const initialViewMode = session.viewMode || viewMode;
-  trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
+  const getSessionPrefWithFallback = (pref: keyof LayoutState) => {
+    if (pref in session) {
+      return session[pref];
+    } else {
+      return syncInitialLayoutState[pref];
+    }
+  };
+
+  trackEvent(
+    getSessionPrefWithFallback("viewMode") == "dev"
+      ? "layout.default_devtools"
+      : "layout.default_viewer"
+  );
 
   return {
     ...syncInitialLayoutState,
-    consoleFilterDrawerExpanded:
-      "consoleFilterDrawerExpanded" in session
-        ? session.consoleFilterDrawerExpanded
-        : consoleFilterDrawerExpanded,
-    viewMode: initialViewMode,
-    selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
-    selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
-    showVideoPanel: "showVideoPanel" in session ? session.showVideoPanel : showVideoPanel,
-    toolboxLayout: "toolboxLayout" in session ? session.toolboxLayout : toolboxLayout,
-    localNags: "localNags" in session ? session.localNags : [],
+    consoleFilterDrawerExpanded: getSessionPrefWithFallback("consoleFilterDrawerExpanded"),
+    viewMode: getSessionPrefWithFallback("viewMode"),
+    selectedPanel: getSessionPrefWithFallback("selectedPanel"),
+    selectedPrimaryPanel: getSessionPrefWithFallback("selectedPrimaryPanel"),
+    showVideoPanel: getSessionPrefWithFallback("showVideoPanel"),
+    toolboxLayout: getSessionPrefWithFallback("toolboxLayout"),
+    localNags: getSessionPrefWithFallback("localNags"),
   };
 }
 
-export const getInitialTabsState = async (): Promise<TabsState> => {
-  const session = await getReplaySession(getRecordingId()!);
-
+export const getInitialTabsState = (session: any): TabsState => {
   return { tabs: session?.tabs ?? EMPTY_TABS };
 };
 
-export async function getInitialCommentsState(): Promise<CommentsState> {
-  const recordingId = getRecordingId()!;
-
-  if (!recordingId) {
+export function getInitialCommentsState(session: any): CommentsState {
+  if (!session) {
     return {
       hoveredComment: null,
       pendingComment: null,
     };
   }
-
-  const session = await getReplaySession(recordingId);
 
   return {
     hoveredComment: null,
@@ -119,32 +98,34 @@ export async function getInitialCommentsState(): Promise<CommentsState> {
   };
 }
 
-const getInitialFiltersState = async () => {
-  const session = await getLocalReplaySessionPrefs();
-
+const getInitialFiltersState = (session: any) => {
   return session ? { ...defaultFiltersState, ...session.consoleFilters } : defaultFiltersState;
 };
 
-export const initialMessageState = async (
+export const initialMessageState = (
+  session: any,
   overrides: Partial<MessageState> = {}
-): Promise<MessageState> => {
+): MessageState => {
   // Realistically, we only expect filters and commandHistory
   // See ui/setup/dynamic/devtools.ts
-  const { filters = {}, ...otherOverrides } = overrides;
+  const { filters = {} } = overrides;
 
   return syncInitialMessageState({
     ...overrides,
-    filters: { ...(await getInitialFiltersState()), ...filters },
+    filters: { ...getInitialFiltersState(session), ...filters },
   });
 };
 
 export async function bootstrapApp() {
+  const recordingId = getRecordingId();
+  const session = recordingId ? await getReplaySession(recordingId) : null;
+
   const initialState = {
     app: initialAppState,
-    comments: await getInitialCommentsState(),
-    layout: await getInitialLayoutState(),
-    messages: await initialMessageState(),
-    tabs: await getInitialTabsState(),
+    comments: getInitialCommentsState(session),
+    layout: getInitialLayoutState(session),
+    messages: initialMessageState(session),
+    tabs: getInitialTabsState(session),
   };
 
   const store = bootstrapStore(initialState);

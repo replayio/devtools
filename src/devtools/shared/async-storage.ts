@@ -44,16 +44,16 @@
  *
  */
 
-const DBNAME = "devtools-async-storage";
 const DBVERSION = 1;
 const STORENAME = "keyvaluepairs";
 
 const withStore = (
+  dbName: string,
   type: IDBTransactionMode,
   onsuccess: (store: IDBObjectStore, db: IDBDatabase) => void,
   onerror: () => void
 ) => {
-  const dbConn = indexedDB.open(DBNAME, DBVERSION);
+  const dbConn = indexedDB.open(dbName, DBVERSION);
 
   dbConn.onerror = () => {
     onerror();
@@ -72,9 +72,10 @@ const withStore = (
   };
 };
 
-export const getItem = (itemKey: string): Promise<any> => {
+export const getItem = (dbName: string, itemKey: string): Promise<any> => {
   return new Promise((resolve, reject) => {
     withStore(
+      dbName,
       "readonly",
       (store, db) => {
         store.transaction.oncomplete = () => {
@@ -96,9 +97,10 @@ export const getItem = (itemKey: string): Promise<any> => {
   });
 };
 
-export const setItem = (itemKey: string, value: any): Promise<void> => {
+export const setItem = (dbName: string, itemKey: string, value: any): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
+      dbName,
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
@@ -116,9 +118,10 @@ export const setItem = (itemKey: string, value: any): Promise<void> => {
   });
 };
 
-export const clear = (): Promise<void> => {
+export const clear = (dbName: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
+      dbName,
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
@@ -136,9 +139,10 @@ export const clear = (): Promise<void> => {
   });
 };
 
-export const removeItem = (itemKey: string): Promise<void> => {
+export const removeItem = (dbName: string, itemKey: string): Promise<void> => {
   return new Promise((resolve, reject) => {
     withStore(
+      dbName,
       "readwrite",
       (store, db) => {
         store.transaction.oncomplete = () => {
@@ -156,9 +160,10 @@ export const removeItem = (itemKey: string): Promise<void> => {
   });
 };
 
-export const length = (): Promise<number> => {
+export const length = (dbName: string): Promise<number> => {
   return new Promise((resolve, reject) => {
     withStore(
+      dbName,
       "readonly",
       (store, db) => {
         const req = store.count();
@@ -176,7 +181,7 @@ export const length = (): Promise<number> => {
   });
 };
 
-export const key = (n: number): Promise<any> => {
+export const key = (dbName: string, n: number): Promise<any> => {
   return new Promise((resolve, reject) => {
     if (n < 0) {
       resolve(null);
@@ -184,6 +189,7 @@ export const key = (n: number): Promise<any> => {
     }
 
     withStore(
+      dbName,
       "readonly",
       (store, db) => {
         const req = store.openCursor();

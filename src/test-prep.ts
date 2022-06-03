@@ -12,6 +12,7 @@ requiresWindow(win => {
   // local storage in that case.
   if (test && !url.searchParams.get("navigated")) {
     localStorage.clear();
-    clearAsyncStorage();
+    clearAsyncStorage("debugger");
+    clearAsyncStorage("devtools");
   }
 });
