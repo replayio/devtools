@@ -6,7 +6,7 @@
 
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { CloseButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
 import actions from "../../actions";

@@ -5,7 +5,6 @@ import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
 import NextApp from "next/app";
-import { setSyncVideoPlaybackExperimentalFlag } from "protocol/graphics";
 import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
@@ -141,10 +140,6 @@ if (isMock()) {
 if (features.repaintEvaluations) {
   setRepaintAfterEvaluationsExperimentalFlag(true);
 }
-if (features.videoPlayback) {
-  setSyncVideoPlaybackExperimentalFlag(true);
-}
-
 interface AuthProps {
   apiKey?: string;
 }

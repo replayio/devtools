@@ -93,16 +93,14 @@ function LoginMessaging() {
   // Custom screen for when the user is seeing the login screen and this is the first
   // time that they have opened the browser.
   if (referrer === LoginReferrer.firstBrowserOpen) {
-    <div className="space-y-6">
-      <div className="space-y-4 self-start text-base">
-        <div className="text-center">
-          <p>Replay captures everything you need for the perfect bug report, all in one link</p>
-          <a href="https://replay.io" className="pointer-hand underline">
-            Learn more
-          </a>
-        </div>
+    return (
+      <div className="text-base text-center">
+        <p>Replay captures everything you need for the perfect bug report, all in one link</p>
+        <a href="https://replay.io" className="pointer-hand underline">
+          Learn more
+        </a>
       </div>
-    </div>;
+    );
   }
 
   return (

@@ -1,4 +1,6 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
@@ -12,7 +14,6 @@ import {
   nextPaintEvent,
   previousPaintEvent,
   getFirstMeaningfulPaint,
-  Video,
   timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
@@ -33,6 +34,7 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
   setPlaybackPrecachedTime,
+  pointsReceived,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
 import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
@@ -88,6 +90,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     dispatch(setRecordingDescription(duration));
 
     const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
     const state = getState();
@@ -181,7 +184,6 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 
       const playing = !!getPlayback(stateAfterScreenshot);
       paintGraphics(screen, mouse, playing);
-      Video.seek(currentTime);
     } catch {}
   };
 }
@@ -340,10 +342,6 @@ function playback(startTime: number, endTime: number): UIThunkAction {
     };
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
-
-    // Note: This matches the previous behavior of the VideoPlayer.
-    // Maybe we should be passing the currentTime instead?
-    Video.play(getCurrentTime(getState()));
 
     while (shouldContinuePlayback()) {
       await new Promise(resolve => requestAnimationFrame(resolve));
@@ -556,7 +554,8 @@ export function setFocusRegion(
         p => p.time
       );
       const start =
-        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "", time: startTime };
+        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "0", time: 0 };
+      console.log({ startIndex, startTime, start });
       const endIndex = sortedIndexBy(
         state.timeline.points,
         { time: endTime, point: "" },
@@ -656,6 +655,12 @@ export function syncFocusedRegion(): UIThunkAction {
       ThreadFront.sessionId!
     );
 
+    const breakpoints = state.breakpoints.breakpoints;
+    const cx = getThreadContext(state);
+    for (const b of Object.values(breakpoints)) {
+      // Prod all breakpoints to refetch
+      dispatch(setBreakpointOptions(cx, b.location as any, b.options));
+    }
     await dispatch(refetchMessages(focusRegion));
   };
 }

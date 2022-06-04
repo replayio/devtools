@@ -141,7 +141,7 @@ export function selectLocation(
   location: PartialLocation,
   openSourcesTab = true
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
     // @ts-ignore MixpanelEvent mismatch
     trackEvent("sources.select_location");
@@ -152,7 +152,18 @@ export function selectLocation(
       return;
     }
 
-    const source = getSource(getState(), location.sourceId);
+    let source = getSource(getState(), location.sourceId);
+    // The location may contain a sourceId from another session (e.g. when the user clicks
+    // on a comment that has a source location), but a sourceId is not guaranteed
+    // to be stable across sessions (although most of the time it is).
+    // We try to work around this by comparing source URLs and, if they don't match,
+    // use the preferred source for the location's URL.
+    if (location.sourceUrl && location.sourceUrl !== source?.url) {
+      let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
+      sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+      source = getSource(getState(), sourceId);
+      location = { ...location, sourceId };
+    }
     if (!source) {
       // If there is no source we deselect the current selected source
       return dispatch(clearSelectedLocation(cx));

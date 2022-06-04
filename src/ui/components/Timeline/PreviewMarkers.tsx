@@ -17,14 +17,14 @@ export default function PreviewMarkers() {
   if (
     !pointsForHoveredLineNumber ||
     pointsForHoveredLineNumber.error ||
-    pointsForHoveredLineNumber.data.length > prefs.maxHitsDisplayed
+    (pointsForHoveredLineNumber.data?.length || 0) > 200
   ) {
     return null;
   }
 
   return (
     <div className="preview-markers-container">
-      {pointsForHoveredLineNumber.data.map((point: PointDescription, index: number) => {
+      {pointsForHoveredLineNumber.data?.map((point: PointDescription, index: number) => {
         const isPrimaryHighlighted = hoveredItem?.point === point.point;
         const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 

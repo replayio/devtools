@@ -5,20 +5,50 @@
 //
 
 import React, { Component } from "react";
-import { connect } from "../../../utils/connect";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
+
 import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
 import { getSelectedSource } from "../../../selectors";
 import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { actions } from "ui/actions";
+import type { Breakpoint as BreakpointType, Source } from "../../../reducers/types";
 
-class Breakpoints extends Component {
+import type { BreakpointOrLogpointSources } from "../../../selectors/breakpointSources";
+
+const connector = connect(
+  (state: UIState) => ({
+    selectedSource: getSelectedSource(state),
+  }),
+  {
+    seek: actions.removeBreakpoint,
+  }
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type BreakpointsProps = PropsFromRedux & {
+  type: "print-statement" | "breakpoint";
+  emptyContent: React.ReactNode;
+  breakpointSources: BreakpointOrLogpointSources[];
+  onRemoveBreakpoint: (cx: Context, breakpoint: BreakpointType) => void;
+  onRemoveBreakpoints: (cx: Context, source: Source) => void;
+};
+
+interface BreakpointsState {
+  editorLoaded: boolean;
+}
+
+class Breakpoints extends Component<BreakpointsProps, BreakpointsState> {
   state = {
     editorLoaded: false,
   };
-  headlessEditor;
+  headlessEditor: any;
 
   componentDidMount() {
     (async () => {
@@ -64,15 +94,13 @@ class Breakpoints extends Component {
     return (
       <div className="pane breakpoints-list">
         {editorLoaded &&
-          breakpointSources.map(({ source, breakpoints, i }) => {
+          breakpointSources.map(({ source, breakpoints }) => {
             const sortedBreakpoints = sortSelectedBreakpoints(breakpoints);
             const renderedBreakpoints = sortedBreakpoints.map(breakpoint => {
               return (
                 <Breakpoint
                   type={type}
                   breakpoint={breakpoint}
-                  source={source}
-                  sources={sources}
                   editor={this.getEditor()}
                   key={getLocationKey(breakpoint.location)}
                   onRemoveBreakpoint={onRemoveBreakpoint}
@@ -83,6 +111,7 @@ class Breakpoints extends Component {
             return (
               <div className="breakpoints-list-source" key={source.id}>
                 <BreakpointHeading
+                  // @ts-expect-error Source field mismatch
                   source={source}
                   key="header"
                   onRemoveBreakpoints={onRemoveBreakpoints}
@@ -100,11 +129,4 @@ class Breakpoints extends Component {
   }
 }
 
-export default connect(
-  state => ({
-    selectedSource: getSelectedSource(state),
-  }),
-  {
-    seek: actions.removeBreakpoint,
-  }
-)(Breakpoints);
+export default connector(Breakpoints);

@@ -6,15 +6,8 @@ import ResizeObserverPolyfill from "resize-observer-polyfill";
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
 import { assert, binarySearch, defer, Deferred } from "./utils";
-import { getVideoNode } from "./videoNode";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
-
-// Temporary experimental feature flag
-let syncVideoPlaybackExperimentalFlag: boolean = false;
-export function setSyncVideoPlaybackExperimentalFlag(value: boolean): void {
-  syncVideoPlaybackExperimentalFlag = value;
-}
 
 declare global {
   interface Window {
@@ -178,64 +171,6 @@ function onMouseEvents(events: MouseEvent[]) {
   }
 }
 
-class VideoPlayer {
-  video: HTMLVideoElement | null = null;
-  all = new Uint8Array();
-  blob?: Blob;
-  videoReadyCallback?: (video: HTMLVideoElement) => any;
-  commands?: Promise<void>;
-
-  init() {
-    this.commands = Promise.resolve();
-  }
-
-  async append(fragment: string) {
-    if (!fragment) {
-      if (this.all) {
-        this.blob = new Blob([this.all], { type: 'video/webm; codecs="vp9"' });
-
-        if (typeof onVideoUrl === "function") {
-          const url = URL.createObjectURL(this.blob!);
-          onVideoUrl(url);
-        }
-      }
-    } else {
-      const buffer = decode(fragment);
-
-      var tmp = new Uint8Array(this.all.byteLength + buffer.byteLength);
-      tmp.set(new Uint8Array(this.all), 0);
-      tmp.set(new Uint8Array(buffer), this.all.byteLength);
-      this.all = tmp;
-    }
-  }
-
-  seek(timeMs: number) {
-    this.commands =
-      this.commands &&
-      this.commands.then(async () => {
-        const video = getVideoNode();
-        if (syncVideoPlaybackExperimentalFlag && video) {
-          video.pause();
-          video.currentTime = timeMs / 1000;
-        }
-      });
-  }
-
-  play(timeMs: number) {
-    this.commands =
-      this.commands &&
-      this.commands.then(() => {
-        const video = getVideoNode();
-        if (syncVideoPlaybackExperimentalFlag && video) {
-          video.currentTime = (timeMs || 0) / 1000;
-          return video.play();
-        }
-      });
-  }
-}
-
-export const Video = new VideoPlayer();
-
 export let hasAllPaintPoints = false;
 
 export const setHasAllPaintPoints = (newValue: boolean) => {
@@ -245,8 +180,6 @@ export const timeIsBeyondKnownPaints = (time: number) =>
   !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
 
 export function setupGraphics() {
-  Video.init();
-
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
@@ -263,11 +196,6 @@ export function setupGraphics() {
     if (recordingTarget === "node") {
       // Make sure we never wait for any paints when trying to do things like playback
       setHasAllPaintPoints(true);
-    }
-
-    if (syncVideoPlaybackExperimentalFlag) {
-      client.Graphics.getPlaybackVideo({}, sessionId);
-      client.Graphics.addPlaybackVideoFragmentListener(param => Video.append(param.fragment));
     }
   });
 
@@ -433,9 +361,7 @@ export async function getGraphicsAtTime(
   }
 
   const screenPromise = forPlayback
-    ? syncVideoPlaybackExperimentalFlag
-      ? Promise.resolve(undefined)
-      : screenshotCache.getScreenshotForPlayback(point, paintHash)
+    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
     : screenshotCache.getScreenshotForPreview(point, paintHash);
 
   const screen = await screenPromise;
@@ -483,7 +409,7 @@ export function paintGraphics(
   playing?: boolean
 ) {
   window.currentScreenshotHash = screenShot?.hash;
-  if (!screenShot || (playing && syncVideoPlaybackExperimentalFlag)) {
+  if (!screenShot) {
     clearGraphics();
   } else {
     assert(screenShot.data, "no screenshot data");

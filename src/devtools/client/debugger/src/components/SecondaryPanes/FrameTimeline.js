@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 

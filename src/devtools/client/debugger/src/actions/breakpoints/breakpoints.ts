@@ -201,29 +201,6 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
   };
 }
 
-export function runAnalysisOnLine(line: number): UIThunkAction {
-  return (dispatch, getState) => {
-    const state = getState();
-    const cx = getThreadContext(state);
-    const source = getSelectedSource(state);
-
-    if (!source) {
-      return;
-    }
-
-    const options = { logValue: "dummyValue" };
-    const location = {
-      sourceId: source.id,
-      sourceUrl: source.url,
-      column: undefined,
-      line,
-    };
-
-    // @ts-ignore location field mismatches
-    return dispatch(runAnalysis(cx, location, options));
-  };
-}
-
 export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const state = getState();

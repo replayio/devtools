@@ -56,10 +56,14 @@ interface ScopeDetails {
 
 export interface PauseState {
   cx: { navigateCounter: number };
+  id: string | undefined;
   threadcx: Context;
+  pauseErrored: boolean;
+  pauseLoading: boolean;
   pausePreviewLocation: Location | null;
   frames: SelectedFrame[] | null;
   framesLoading: boolean;
+  framesErrored: boolean;
   frameScopes: Record<string, ScopeDetails>;
   selectedFrameId: string | null;
   executionPoint: string | null;
@@ -76,6 +80,8 @@ export interface PauseState {
 
 function createPauseState(): PauseState {
   return {
+    pauseErrored: false,
+    pauseLoading: false,
     cx: {
       navigateCounter: 0,
     },
@@ -84,6 +90,7 @@ function createPauseState(): PauseState {
       isPaused: false,
       pauseCounter: 0,
     },
+    id: undefined,
     pausePreviewLocation: null,
     ...resumedPauseState,
     isWaitingOnBreak: false,
@@ -99,6 +106,7 @@ function createPauseState(): PauseState {
 const resumedPauseState = {
   frames: null,
   framesLoading: false,
+  framesErrored: false,
   frameScopes: {},
   selectedFrameId: null,
   executionPoint: null,
@@ -114,23 +122,30 @@ function update(state = createPauseState(), action: AnyAction) {
     return state;
   }
   switch (action.type) {
-    case "PAUSED": {
-      const { frame, why, executionPoint } = action;
-
-      state = {
+    case "PAUSE_REQUESTED_AT": {
+      return {
         ...state,
+        pauseErrored: false,
+        pauseLoading: true,
+        framesLoading: true,
+        framesErrored: false,
         threadcx: {
           ...state.threadcx,
           pauseCounter: state.threadcx.pauseCounter + 1,
           isPaused: true,
         },
       };
+    }
+    case "PAUSED": {
+      const { id, frame, why, executionPoint } = action;
       return {
         ...state,
+        pauseErrored: false,
+        pauseLoading: false,
+        id,
         isWaitingOnBreak: false,
         selectedFrameId: frame ? frame.id : undefined,
         frames: frame ? [frame] : undefined,
-        framesLoading: true,
         frameScopes: { ...resumedPauseState.frameScopes },
         why,
         executionPoint,
@@ -145,6 +160,37 @@ function update(state = createPauseState(), action: AnyAction) {
         frames,
         selectedFrameId,
         framesLoading: false,
+        framesErrored: false,
+      };
+    }
+
+    case "FAILED_TO_FETCH_FRAMES": {
+      return {
+        ...state,
+        frames: null,
+        selectedFrameId: null,
+        framesLoading: false,
+        framesErrored: true,
+      };
+    }
+
+    case "FAILED_TO_CREATE_PAUSE": {
+      const { executionPoint } = action;
+      return {
+        ...state,
+        pauseErrored: true,
+        pauseLoading: false,
+        id: undefined,
+        isWaitingOnBreak: false,
+        selectedFrameId: undefined,
+        frames: undefined,
+        frameScopes: {},
+        executionPoint,
+        threadcx: {
+          ...state.threadcx,
+          pauseCounter: state.threadcx.pauseCounter + 1,
+          isPaused: false,
+        },
       };
     }
 
@@ -210,36 +256,30 @@ function update(state = createPauseState(), action: AnyAction) {
 
     case "COMMAND":
       if (action.status === "start") {
-        state = {
-          ...state,
-          threadcx: {
-            ...state.threadcx,
-            pauseCounter: state.threadcx.pauseCounter + 1,
-            isPaused: false,
-          },
-        };
         return {
           ...state,
           ...resumedPauseState,
           command: action.command,
           lastCommand: action.command,
+          threadcx: {
+            ...state.threadcx,
+            pauseCounter: state.threadcx.pauseCounter + 1,
+            isPaused: false,
+          },
           previousLocation: getPauseLocation(state, action as CommandAction),
         };
       }
       return { ...state, command: null };
 
     case "RESUME": {
-      state = {
+      return {
         ...state,
+        ...resumedPauseState,
         threadcx: {
           ...state.threadcx,
           pauseCounter: state.threadcx.pauseCounter + 1,
           isPaused: false,
         },
-      };
-      return {
-        ...state,
-        ...resumedPauseState,
         expandedScopes: new Set(),
         lastExpandedScopes: [state.expandedScopes],
       };
@@ -335,8 +375,11 @@ export function getFrames(state: UIState) {
 }
 
 export function getFramesLoading(state: UIState) {
-  const { frames, framesLoading } = state.pause;
-  return frames && framesLoading;
+  return state.pause.framesLoading;
+}
+
+export function getFramesErrored(state: UIState) {
+  return state.pause.framesErrored;
 }
 
 export function getFrameScope(state: UIState, frameId: string) {

@@ -12,13 +12,24 @@ import { trackEvent } from "ui/utils/telemetry";
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
 
-export function fetchFrames(cx) {
+function failedToFetchFrames(cx, pauseId) {
+  return { type: "FAILED_TO_FETCH_FRAMES", pauseId, cx };
+}
+
+function failedToCreatePause(executionPoint, pauseId) {
+  return { type: "FAILED_TO_CREATE_PAUSE", executionPoint, pauseId };
+}
+
+export function fetchFrames(cx, pause) {
   return async function (dispatch, getState, { client }) {
     let frames;
     try {
       frames = await client.getFrames();
-    } catch (e) {}
-    dispatch({ type: "FETCHED_FRAMES", frames, cx });
+      dispatch({ type: "FETCHED_FRAMES", frames, pauseId: pause.id });
+    } catch (e) {
+      console.error(e);
+      dispatch(failedToFetchFrames(cx, pause.id));
+    }
   };
 }
 
@@ -39,6 +50,10 @@ function fetchAsyncFrames(cx) {
   };
 }
 
+function pauseRequestedAt(executionPoint) {
+  return { type: "PAUSE_REQUESTED_AT", executionPoint };
+}
+
 /**
  * Debugger has just paused
  *
@@ -47,14 +62,27 @@ function fetchAsyncFrames(cx) {
  * @static
  */
 export function paused({ executionPoint, time }) {
-  return async function (dispatch, getState) {
-    dispatch({ type: "PAUSED", executionPoint, time });
+  return async function (dispatch, getState, { ThreadFront }) {
     trackEvent("paused");
 
-    // Get a context capturing the newly paused and selected thread.
+    await dispatch(pauseRequestedAt(executionPoint, time));
+
+    const pause = ThreadFront.ensurePause(executionPoint, time);
+
+    dispatch({ type: "PAUSED", executionPoint, time, id: pause.id });
+
     const cx = getThreadContext(getState());
 
-    await dispatch(fetchFrames(cx));
+    try {
+      await pause.createWaiter;
+    } catch (e) {
+      console.error(e);
+      dispatch(failedToCreatePause(pause.id));
+      dispatch(failedToFetchFrames(pause.id));
+      return;
+    }
+
+    await dispatch(fetchFrames(cx, pause));
 
     const frame = getSelectedFrame(getState());
     if (frame) {

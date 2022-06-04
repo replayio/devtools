@@ -6,11 +6,9 @@ import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
-  AnalysisError,
   AppState,
   AppTheme,
   EventKind,
-  ProtocolError,
   ReplayEvent,
   UploadInfo,
   LoadedRegions,
@@ -35,6 +33,8 @@ import {
   overlap,
   startTimeForFocusRegion,
 } from "ui/utils/timeline";
+import { AnalysisError } from "protocol/thread/analysis";
+import { uniqBy } from "lodash";
 
 export const initialAppState: AppState = {
   mode: "devtools",
@@ -167,8 +167,8 @@ const appSlice = createSlice({
       const id = getLocationAndConditionKey(location, condition);
 
       state.analysisPoints[id] = {
-        data: analysisPoints,
-        error: null,
+        data: uniqBy([...(state.analysisPoints[id]?.data || []), ...analysisPoints], p => p.point),
+        error: undefined,
       };
     },
     setAnalysisError(
@@ -176,19 +176,16 @@ const appSlice = createSlice({
       action: PayloadAction<{
         location: Location;
         condition?: string;
-        errorKey?: number;
+        error: AnalysisError;
       }>
     ) {
-      const { location, condition = "", errorKey } = action.payload;
+      const { location, condition = "", error } = action.payload;
 
       const id = getLocationAndConditionKey(location, condition);
 
       state.analysisPoints[id] = {
-        data: [],
-        error:
-          errorKey === ProtocolError.TooManyPoints
-            ? AnalysisError.TooManyPoints
-            : AnalysisError.Default,
+        data: undefined,
+        error: error,
       };
     },
     setEventsForType(
@@ -378,7 +375,7 @@ export const getAnalysisPointsForLocation = (
   }
   return {
     ...points,
-    data: filterToFocusRegion(points.data, focusRegion),
+    data: filterToFocusRegion(points.data || [], focusRegion),
   };
 };
 

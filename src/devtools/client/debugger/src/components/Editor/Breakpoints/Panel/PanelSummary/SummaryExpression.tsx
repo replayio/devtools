@@ -50,7 +50,7 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
         {isTeamDeveloper ? (
           <>
             This log cannot be edited because <br />
-            it was hit {prefs.maxHitsDisplayed}+ times
+            it was hit 200+ times
           </>
         ) : (
           "Editing logpoints is available for Developers in the Team plan"

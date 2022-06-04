@@ -11,9 +11,9 @@ export interface Analysis {
 }
 
 export enum AnalysisError {
-  TooManyPointsToFind,
-  TooManyPointsToRun,
-  Unknown,
+  TooManyPointsToFind = "too-many-points-to-find",
+  TooManyPointsToRun = "too-many-points-to-run",
+  Unknown = "unknown",
 }
 
 interface FindAnalysisPointsResult {
@@ -26,16 +26,22 @@ interface RunAnalysisResult {
   error: AnalysisError.TooManyPointsToRun | undefined;
 }
 
-export const createAnalysis = async (params: AnalysisParams): Promise<Analysis> => {
+export const createAnalysis = async (
+  params: Omit<AnalysisParams, "locations">
+): Promise<Analysis> => {
   // Call to the client and say hey please make an analysis and after that
   // create an Analysis with that result
+  const protocolParams: Omit<AnalysisParams, "sessionId"> = {
+    mapper: params.mapper,
+    reducer: params.reducer,
+    effectful: params.effectful,
+  };
+  if (params.range) {
+    protocolParams.range = params.range;
+  }
   const { analysisId } = await sendMessage(
     "Analysis.createAnalysis",
-    {
-      mapper: params.mapper,
-      reducer: params.reducer,
-      effectful: params.effectful,
-    },
+    protocolParams,
     params.sessionId
   );
   const points: PointDescription[] = [];

@@ -4,7 +4,7 @@
 
 //
 import React, { Component } from "react";
-import { connect } from "../utils/connect";
+import { connect } from "react-redux";
 import fuzzyAldrin from "fuzzaldrin-plus";
 import { basename } from "../utils/path";
 import debounce from "lodash/debounce";

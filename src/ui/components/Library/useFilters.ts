@@ -1,12 +1,25 @@
 import { createContext, useState } from "react";
 import { getParams, updateUrlWithParams } from "ui/utils/environment";
 
-export type LibraryFilter = {
+type LibraryContextType = {
   filter: string;
+  view: View;
+  setPreview: (preview: Preview) => void;
+  setAppliedText: (str: string) => void;
+  preview: Preview | null;
 };
+type Preview = {
+  view: View;
+  id: string | string[];
+};
+export type View = "recordings" | "tests" | "test-runs";
 
-export const LibraryFiltersContext = createContext<LibraryFilter>({
+export const LibraryContext = createContext<LibraryContextType>({
   filter: "",
+  view: "recordings",
+  setPreview: () => {},
+  setAppliedText: () => {},
+  preview: null,
 });
 
 const useFilterString = (str: string) => {

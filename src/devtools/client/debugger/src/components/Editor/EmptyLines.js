@@ -4,7 +4,7 @@
 
 //
 
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { Component } from "react";
 import { getSelectedBreakableLines } from "../../selectors";
 import { fromEditorLine } from "../../utils/editor";

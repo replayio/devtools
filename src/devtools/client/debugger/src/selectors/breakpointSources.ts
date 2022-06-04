@@ -59,6 +59,8 @@ export const getBreakpointSources = createSelector(
   }
 );
 
+export type BreakpointOrLogpointSources = ReturnType<typeof getLogpointSources>[0];
+
 export const getLogpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,

@@ -78,7 +78,7 @@ export default function ProtocolTimeline() {
   }
 
   return (
-    <div className="absolute -top-6 flex w-full flex-col space-y-1">
+    <div className="flex w-full flex-col space-y-1">
       {/* This is pretty silly, but these are the classnames that get generated
       dynamically by this component. And if they are not statically in the
       build, then tailwind will not include the rules for them, which makes them

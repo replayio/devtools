@@ -1,6 +1,6 @@
 import React, { PureComponent } from "react";
 import classnames from "classnames";
-const { connect } = require("devtools/client/debugger/src/utils/connect");
+import { connect } from "react-redux";
 const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";

@@ -1,10 +1,11 @@
 import React, { useState, useRef, useMemo } from "react";
 import classnames from "classnames";
+import { PointDescription } from "@replayio/protocol";
 
 import { actions as UIActions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
-const BreakpointTimelinePoint = require("./BreakpointTimelinePoint").default;
+import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
 import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
@@ -15,8 +16,8 @@ import { connect, ConnectedProps, useSelector } from "react-redux";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 import { AnalysisPayload } from "ui/state/app";
-import { PointDescription } from "@replayio/protocol";
 import { getExecutionPoint } from "../../../selectors";
+import type { Breakpoint } from "../../../reducers/types";
 
 function Points({
   analysisPoints,
@@ -35,7 +36,7 @@ function Points({
       return [];
     }
     let previousDisplayed: PointDescription;
-    return analysisPoints.data.filter(p => {
+    return analysisPoints.data?.filter(p => {
       if (
         !previousDisplayed ||
         executionPoint === p.point ||
@@ -130,9 +131,10 @@ function BreakpointTimeline({
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: any }) => ({
+  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
     analysisPoints: selectors.getAnalysisPointsForLocation(
       state,
+      // @ts-expect-error Location/SourceLocation
       breakpoint.location,
       breakpoint.options.condition
     ),

@@ -166,7 +166,7 @@ class Message extends React.Component {
       executionPointTime,
       executionPointHasFrames,
       dispatch,
-      pausedExecutionPoint = Number.POSITIVE_INFINITY,
+      pausedExecutionPoint = "0",
       type,
       frame,
       message,

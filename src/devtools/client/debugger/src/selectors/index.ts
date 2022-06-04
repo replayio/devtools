@@ -6,6 +6,7 @@
 import type { UIState } from "ui/state";
 import type { UrlLocation } from "../reducers/pause";
 export type { UrlLocation } from "../reducers/pause";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 export * from "../reducers/sources";
 export * from "../reducers/tabs";
@@ -43,7 +44,7 @@ export * from "./debugLine";
 export declare function getThreadContext(state: UIState): any;
 
 export declare function getActiveSearch(state: UIState): string;
-export declare function getContext(state: UIState): any;
+export declare function getContext(state: UIState): Context;
 export declare function getCursorPosition(state: UIState): any;
 export declare function getDebugLineLocation(state: UIState): UrlLocation | undefined;
 export declare function getPaneCollapse(state: UIState): boolean;

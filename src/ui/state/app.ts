@@ -10,6 +10,7 @@ import {
   ExecutionPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import { AnalysisError } from "protocol/thread/analysis";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
@@ -112,13 +113,10 @@ export interface AppState {
 
 export type AnalysisPoints = Record<string, AnalysisPayload>;
 export type AnalysisPayload = {
-  data: PointDescription[];
-  error: AnalysisError | null;
+  data: PointDescription[] | undefined;
+  error: AnalysisError | undefined;
 };
-export enum AnalysisError {
-  TooManyPoints = "too-many-points",
-  Default = "default",
-}
+
 export type AppMode = "devtools" | "sourcemap-visualizer";
 
 interface Events {

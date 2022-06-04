@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component } from "react";
-import { connect } from "devtools/client/debugger/src/utils/connect";
+import { connect } from "react-redux";
 import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
 import actions from "devtools/client/debugger/src/actions";
 import {

@@ -5,7 +5,7 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 
-import { connect } from "../../utils/connect";
+import { connect } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
@@ -297,7 +297,7 @@ class EventListeners extends Component {
       return null;
     }
 
-    const isHot = count > prefs.maxHitsEditable || count > maxAnalysisPoints;
+    const isHot = count > maxAnalysisPoints;
     const title = isHot ? `Cannot view ${event.name} events` : `View ${event.name} events`;
 
     return (

@@ -1,9 +1,7 @@
 import React from "react";
-import actions from "../../../actions";
-import { getContext } from "../../../selectors";
-import { connect } from "../../../utils/connect";
 import memoize from "lodash/memoize";
 import { RedactedSpan } from "ui/components/Redacted";
+import type { Breakpoint as BreakpointType } from "../../../reducers/types";
 
 const highlightText = memoize(
   (text = "", editor) => {
@@ -14,18 +12,26 @@ const highlightText = memoize(
   text => text
 );
 
-function Highlighted({ expression, editor }) {
+function Highlighted({ expression, editor }: { expression: string; editor: $FixTypeLater }) {
   return <RedactedSpan dangerouslySetInnerHTML={highlightText(expression, editor)} />;
 }
 
-function BreakpointOptions({ breakpoint, editor, type }) {
+type $FixTypeLater = any;
+
+type BreakpointProps = {
+  type: "print-statement" | "breakpoint";
+  breakpoint: BreakpointType;
+  editor: $FixTypeLater;
+};
+
+function BreakpointOptions({ breakpoint, editor, type }: BreakpointProps) {
   const { logValue, condition } = breakpoint.options;
 
   if (!condition) {
     return (
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
         <Highlighted
-          expression={type === "print-statement" ? logValue : breakpoint.text}
+          expression={type === "print-statement" ? logValue! : breakpoint.text}
           editor={editor}
         />
       </span>
@@ -41,16 +47,10 @@ function BreakpointOptions({ breakpoint, editor, type }) {
 
       <span className="breakpoint-label cm-s-mozilla devtools-monospace">
         log(
-        <Highlighted expression={logValue} editor={editor} />)
+        <Highlighted expression={logValue!} editor={editor} />)
       </span>
     </div>
   );
 }
 
-const mapStateToProps = state => ({
-  cx: getContext(state),
-});
-
-export default connect(mapStateToProps, {
-  selectSpecificLocation: actions.selectSpecificLocation,
-})(BreakpointOptions);
+export default BreakpointOptions;

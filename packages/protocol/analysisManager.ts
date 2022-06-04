@@ -9,6 +9,7 @@ import {
   analysisResult,
   ExecutionPoint,
   PointDescription,
+  PointRange,
   SessionId,
 } from "@replayio/protocol";
 import { sendMessage, addEventListener } from "protocol/socket";
@@ -54,6 +55,8 @@ export interface AnalysisParams {
 
   // Apply the analysis to this specific set of points.
   points?: ExecutionPoint[];
+
+  range?: PointRange;
 
   // Body of the reducer function.
   // The reducer function takes two arguments:

@@ -11,7 +11,6 @@ import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reduc
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
 import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
-import { pointsReceived } from "ui/reducers/timeline";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -20,7 +19,6 @@ import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "proto
 import { PrimitiveValue } from "protocol/thread/value";
 import { createAnalysis, Analysis, AnalysisError } from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
-import { prefs } from "ui/utils/prefs";
 import {
   analysisCreated,
   analysisErrored,
@@ -29,6 +27,10 @@ import {
   analysisResultsReceived,
   analysisResultsRequested,
 } from "devtools/client/debugger/src/reducers/breakpoints";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { UnsafeFocusRegion } from "ui/state/timeline";
+
+const TOO_MANY_HITS_TO_SHOW = 1000;
 
 // TODO Ideally this file shouldn't know about a Redux store at all.
 // Currently, it dispatches actions and reads state once.
@@ -57,7 +59,7 @@ export function setupLogpoints(_store: UIStore) {
 }
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (!LogpointHandlers.onPointLoading || points.length >= prefs.maxHitsDisplayed) {
+  if (!LogpointHandlers.onPointLoading || points.length >= 200) {
     return;
   }
 
@@ -72,7 +74,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (!LogpointHandlers.onResult || result.length >= prefs.maxHitsDisplayed) {
+  if (!LogpointHandlers.onResult || result.length >= 200) {
     return;
   }
 
@@ -103,7 +105,7 @@ async function showPrimitiveLogpoints(
   pointDescriptions: PointDescription[],
   values: ValueFront[]
 ) {
-  if (!LogpointHandlers.onResult || pointDescriptions.length >= prefs.maxHitsDisplayed) {
+  if (!LogpointHandlers.onResult || pointDescriptions.length >= TOO_MANY_HITS_TO_SHOW) {
     return;
   }
 
@@ -132,9 +134,9 @@ function saveLogpointHits(
   }
 }
 
-function saveAnalysisError(locations: Location[], condition: string, errorKey?: number) {
+export function saveAnalysisError(locations: Location[], condition: string, error: AnalysisError) {
   for (const location of locations) {
-    store.dispatch(setAnalysisError({ location, condition, errorKey }));
+    store.dispatch(setAnalysisError({ location, condition, error }));
   }
 }
 
@@ -258,7 +260,7 @@ async function setMultiSourceLogpoint(
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
       if (!points.error) {
-        showPrimitiveLogpoints(logGroupId, points.data, primitiveFronts);
+        showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
       return;
     }
@@ -268,6 +270,7 @@ async function setMultiSourceLogpoint(
     locations.map(({ sourceId }) => ThreadFront.getBreakpointPositionsCompressed(sourceId))
   );
 
+  const focusRegion = getFocusRegion(store.getState());
   const mapper = formatLogpoint({ text, condition });
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
@@ -276,6 +279,13 @@ async function setMultiSourceLogpoint(
     effectful: true,
     locations: locations.map(location => ({ location })),
   };
+
+  if (focusRegion) {
+    params.range = {
+      begin: (focusRegion as UnsafeFocusRegion).start.point,
+      end: (focusRegion as UnsafeFocusRegion).end.point,
+    };
+  }
 
   let analysis: Analysis;
   try {
@@ -295,7 +305,7 @@ async function setMultiSourceLogpoint(
     // them after they arrive.
     points.sort((a, b) => compareNumericStrings(a.point, b.point));
 
-    if (error || points.length > 200) {
+    if (error) {
       store.dispatch(
         analysisErrored({
           analysisId,
@@ -305,7 +315,7 @@ async function setMultiSourceLogpoint(
       );
 
       // TODO Remove this and change Redux logic to match
-      saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+      saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToFind);
 
       return;
     }
@@ -327,7 +337,7 @@ async function setMultiSourceLogpoint(
 
     const shouldGetResults = condition || !primitives;
 
-    if (shouldGetResults) {
+    if (shouldGetResults && points.length <= 200) {
       store.dispatch(analysisResultsRequested(analysisId));
 
       const { results, error: runError } = await analysis.runAnalysis();
@@ -344,7 +354,9 @@ async function setMultiSourceLogpoint(
         );
 
         // TODO Remove this and change Redux logic to match
-        saveAnalysisError(locations, condition, ProtocolError.TooManyPoints);
+        // This is not right I think. The error could also be Unknown, we need
+        // to check to know for sure.
+        saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToRun);
         return;
       }
 
@@ -412,8 +424,7 @@ export function setLogpointByURL(
   line: number,
   column: number,
   text: string,
-  condition: string,
-  showInConsole: boolean = true
+  condition: string
 ) {
   const sourceIds = ThreadFront.getChosenSourceIdsForUrl(url).map(({ sourceId }) => sourceId);
   if (sourceIds.length === 0) {

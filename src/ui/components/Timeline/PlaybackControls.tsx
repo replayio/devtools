@@ -2,7 +2,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { clearPendingComment } from "ui/actions/comments";
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
-import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { endTimeForFocusRegion } from "ui/utils/timeline";
 
@@ -12,9 +11,7 @@ export default function PlayPauseButton() {
   const focusRegion = useSelector(selectors.getFocusRegion);
   const playback = useSelector(selectors.getPlayback);
   const recordingDuration = useSelector(selectors.getRecordingDuration);
-  const videoUrl = useSelector(selectors.getVideoUrl);
 
-  const disabled = !videoUrl && (features.videoPlayback as boolean);
   const isAtEnd = focusRegion
     ? currentTime === endTimeForFocusRegion(focusRegion)
     : currentTime == recordingDuration;
@@ -45,7 +42,7 @@ export default function PlayPauseButton() {
   }
 
   return (
-    <button className="relative" onClick={onClick} disabled={disabled}>
+    <button className="relative" onClick={onClick}>
       <div className="flex flex-row" style={{ width: "32px", height: "32px" }}>
         <img className="m-auto h-6 w-6" src={icon} />
       </div>

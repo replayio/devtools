@@ -473,6 +473,7 @@ export function useGetWorkspaceRecordings(
   if (recordingsData) {
     recordings = recordingsData.edges.map(({ node }: any) => convertRecording(node));
   }
+
   return { recordings, loading };
 }
 

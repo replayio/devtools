@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
-import { isTimeInRegions } from "ui/utils/timeline";
+import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -14,7 +14,6 @@ const { pointPrecedes } = require("protocol/execution-point-utils");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { getCurrentTime, getFocusRegion } = require("ui/reducers/timeline");
 const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-const { isInFocusSpan } = require("ui/utils/timeline");
 
 export const getAllMessagesUiById = (state: UIState) => state.messages.messagesUiById;
 export const getCommandHistory = (state: UIState) => state.messages.commandHistory;
@@ -32,39 +31,67 @@ export const { selectTotal: getTotalMessagesCount } = messagesAdapter.getSelecto
   (state: UIState) => state.messages.messages
 );
 
-export const getVisibleMessages = createSelector(
+export const getVisibleMessageData = createSelector(
   getAllMessagesById,
   (state: UIState) => state.messages.visibleMessages,
   getFocusRegion,
+  getLastFetchedForFocusRegion,
+  getConsoleOverflow,
   (state: UIState) => state.app.loadedRegions,
-  (messages, visibleMessages, focusRegion, loadedRegions) => {
-    const msgs = visibleMessages.filter(messageId => {
-      const message = messages.entities[messageId]!;
-      const executionPointTime = message.executionPointTime!;
+  (
+    messages,
+    visibleMessages,
+    focusRegion,
+    lastFetchedFocusRange,
+    lastFetchDidOverflow,
+    loadedRegions
+  ) => {
+    const filteredMessageIDs: string[] = [];
+
+    // We can only reliably show counts for the number of messages filtered (before/after) if:
+    // 1) We're doing in-memory filtering for the entire recording (aka no focus mode) and
+    // 2) Our request to fetch all messages didn't overflow (so we're filtering the entire set of them).
+    //
+    // Otherwise the best thing we can show is a "maybe".
+    const canShowCount = lastFetchedFocusRange === null && !lastFetchDidOverflow;
+
+    let countAfter = 0;
+    let countBefore = 0;
+
+    const focusRegionStartTime = focusRegion ? startTimeForFocusRegion(focusRegion) : null;
+    const focusRegionEndTime = focusRegion ? endTimeForFocusRegion(focusRegion) : null;
+
+    visibleMessages.forEach(messageID => {
+      const message = messages.entities[messageID]!;
+      const messageTime = message.executionPointTime!;
 
       // Filter out messages that aren't within the focused region.
       if (focusRegion) {
-        if (!isInFocusSpan(executionPointTime, focusRegion)) {
-          return false;
+        if (messageTime < (focusRegionStartTime as number)) {
+          countBefore++;
+          return;
+        } else if (messageTime > (focusRegionEndTime as number)) {
+          countAfter++;
+          return;
         }
       }
 
-      // Filter out messages that haven't yet been loaded.
-      if (!isTimeInRegions(executionPointTime, loadedRegions!.loaded)) {
-        return false;
-      }
-
-      return true;
+      filteredMessageIDs.push(messageID);
     });
 
-    return msgs;
+    return {
+      countAfter: canShowCount ? countAfter : -1,
+      countBefore: canShowCount ? countBefore : -1,
+      messageIDs: filteredMessageIDs,
+    };
   }
 );
 
 export const getMessages = createSelector(
   getAllMessagesById,
-  getVisibleMessages,
-  (messagesById, visibleMessages) => visibleMessages.map(id => messagesById.entities[id]!)
+  getVisibleMessageData,
+  (messagesById, visibleMessages) =>
+    visibleMessages.messageIDs.map(id => messagesById.entities[id]!)
 );
 
 export const getMessagesForTimeline = createSelector(getMessages, messages =>
@@ -77,21 +104,22 @@ function messageExecutionPoint(msg: Message) {
 }
 
 export const getClosestMessage = createSelector(
-  getVisibleMessages,
+  getVisibleMessageData,
   getAllMessagesById,
   getExecutionPoint,
   getCurrentTime,
   (visibleMessages, messages, executionPoint, currentTime) => {
-    if ((!executionPoint && !currentTime) || !visibleMessages || !visibleMessages.length) {
+    const messageIDs = visibleMessages?.messageIDs;
+    if ((!executionPoint && !currentTime) || !messageIDs || !messageIDs.length) {
       return null;
     }
 
     // If the pause location is before the first message, the first message is
     // marked as the paused one. This allows later messages to be grayed out but
     // isn't consistent with behavior for those other messages.
-    let last = messages.entities[visibleMessages[0]]!;
+    let last = messages.entities[messageIDs[0]]!;
 
-    for (const id of visibleMessages) {
+    for (const id of messageIDs) {
       const msg = messages.entities[id]!;
 
       // Skip evaluations, which will always occur at the same evaluation point as
