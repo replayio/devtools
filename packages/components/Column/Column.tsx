@@ -1,21 +1,25 @@
+import classNames from "classnames";
 import type { ComponentPropsWithoutRef, ElementType, ReactNode } from "react";
+
+import { SpacingProps } from "../types";
+import { getSpacingClassNamesFromProps } from "../utils";
 
 type ColumnProps<T extends ElementType> = {
   as?: T;
   children: ReactNode;
-  gap?: number;
-};
+} & SpacingProps;
 
+/** Position children in a vertical layout. */
 export function Column<T extends ElementType = "div">({
   as,
   children,
-  gap,
-  style,
   ...props
 }: ColumnProps<T> & ComponentPropsWithoutRef<T>) {
   const Element = as || "div";
+  const parsedProps = getSpacingClassNamesFromProps(props);
+
   return (
-    <Element className="flex flex-col" style={{ gap: `${gap}rem`, ...style }} {...props}>
+    <Element {...parsedProps} className={classNames("flex flex-col", parsedProps.className)}>
       {children}
     </Element>
   );
