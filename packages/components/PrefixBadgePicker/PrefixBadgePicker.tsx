@@ -108,7 +108,7 @@ export function PrefixBadge({
   onSpaceKeyDown,
   onSelect,
 }: {
-  active: boolean;
+  active?: boolean;
   name: PrefixBadges;
   layoutId: string;
   onSpaceKeyDown: () => void;
