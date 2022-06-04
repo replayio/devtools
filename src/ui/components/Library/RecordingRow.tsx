@@ -101,20 +101,20 @@ function RecordingRow({
       <div
         className={`group flex cursor-pointer flex-row border-b border-themeBorder ${styles.libraryRow}`}
       >
-        <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre py-3 px-4">
+        <div className="flex flex-row items-center flex-shrink-0 w-12 px-4 py-3 overflow-hidden whitespace-pre overflow-ellipsis">
           {allowSelecting ? (
             <input
               type="checkbox"
               onClick={e => e.stopPropagation()}
               onChange={toggleChecked}
               checked={selected}
-              className="focus:primaryAccentHover h-4 w-4 rounded border-themeBorder text-primaryAccent"
+              className="w-4 h-4 rounded focus:primaryAccentHover border-themeBorder text-primaryAccent"
             />
           ) : null}
         </div>
-        <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre py-3 px-1">
+        <div className="flex-grow px-1 py-3 overflow-hidden whitespace-pre overflow-ellipsis">
           <div className="flex flex-row items-center space-x-4 overflow-hidden">
-            <div className="h-9 w-16 flex-shrink-0 overflow-hidden rounded-sm bg-chrome">
+            <div className="flex-shrink-0 w-16 overflow-hidden rounded-sm h-9 bg-chrome">
               <LazyLoad height={36} scrollContainer=".recording-list" once>
                 <ItemScreenshot recordingId={recording.id} />
               </LazyLoad>
@@ -129,24 +129,24 @@ function RecordingRow({
               </div>
               <div className="flex flex-row space-x-4 font-light text-gray-400">
                 <div
-                  className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
+                  className="flex flex-row items-center space-x-1 overflow-hidden whitespace-pre overflow-ellipsis"
                   style={{ minWidth: "5rem" }}
                 >
                   <img src="/images/timer.svg" className="w-3" />
                   <span>{getDurationString(recording.duration)}</span>
                 </div>
                 <div
-                  className="flex flex-row items-center space-x-1 overflow-hidden overflow-ellipsis whitespace-pre"
+                  className="flex flex-row items-center space-x-1 overflow-hidden whitespace-pre overflow-ellipsis"
                   style={{ minWidth: "6rem" }}
                 >
                   <img src="/images/today.svg" className="w-3" />
                   <span>{getRelativeDate(recording.date)}</span>
                 </div>
-                <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
+                <div className="overflow-hidden font-light text-gray-400 whitespace-pre overflow-ellipsis">
                   {getDisplayedUrl(recording.url)}
                 </div>
                 {recording.metadata?.test?.file ? (
-                  <div className="overflow-hidden overflow-ellipsis whitespace-pre font-light text-gray-400">
+                  <div className="overflow-hidden font-light text-gray-400 whitespace-pre overflow-ellipsis">
                     {recording.metadata.test.file}
                   </div>
                 ) : null}
@@ -155,13 +155,13 @@ function RecordingRow({
           </div>
         </div>
 
-        <div className="my-auto w-20 min-w-min flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap py-3 px-3 text-right">
+        <div className="flex-shrink-0 w-20 px-3 py-3 my-auto overflow-hidden text-right min-w-min overflow-ellipsis whitespace-nowrap">
           {recording.private ? "Private" : "Public"}
         </div>
-        <div className="my-auto w-36 min-w-0 flex-shrink-0 overflow-hidden overflow-ellipsis whitespace-nowrap py-3 px-3">
+        <div className="flex-shrink-0 min-w-0 px-3 py-3 my-auto overflow-hidden w-36 overflow-ellipsis whitespace-nowrap">
           {recording.user ? recording.user.name : "Unknown"}
         </div>
-        <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden whitespace-pre py-3 px-3">
+        <div className="flex flex-row items-center flex-shrink-0 w-12 px-3 py-3 overflow-hidden whitespace-pre">
           {recording.comments.length ? (
             <div className="inline-block">
               <div className="flex flex-row space-x-1">
@@ -170,11 +170,11 @@ function RecordingRow({
               </div>
             </div>
           ) : (
-            <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-nowrap py-3 px-3" />
+            <div className="flex flex-row items-center flex-shrink-0 w-12 px-3 py-3 overflow-hidden overflow-ellipsis whitespace-nowrap" />
           )}
         </div>
         <div
-          className="relative flex w-6 flex-shrink-0 flex-row items-center justify-center py-3 pr-4"
+          className="relative flex flex-row items-center justify-center flex-shrink-0 w-6 py-3 pr-4"
           onClick={e => e.stopPropagation()}
         >
           {!isEditing ? <RecordingOptionsDropdown {...{ recording }} /> : null}
@@ -186,10 +186,9 @@ function RecordingRow({
 
 export function ItemScreenshot({ recordingId }: { recordingId: RecordingId }) {
   const { screenData } = hooks.useGetRecordingPhoto(recordingId);
-  console.log({screenData});
   return (
     <Redacted>
-      <div>{screenData && <img className="h-9 w-full object-contain" src={screenData} />}</div>
+      <div>{screenData && <img className="object-contain w-full h-9" src={screenData} />}</div>
     </Redacted>
   );
 }

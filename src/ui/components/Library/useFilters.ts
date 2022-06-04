@@ -10,8 +10,11 @@ type LibraryContextType = {
   preview: Preview | null;
 };
 type Preview = {
-  view: View;
+  view: "test-runs";
   id: string | string[];
+} | {
+  view: "tests";
+  id: string[];
   recordingId: string | null;
 };
 export type View = "recordings" | "tests" | "test-runs";

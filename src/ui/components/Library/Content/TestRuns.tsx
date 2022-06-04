@@ -33,8 +33,39 @@ export function TestRuns() {
   );
 }
 
+function PrimaryInfo({ testRun }: { testRun: TestRun }) {
+  return <div>{testRun.commit?.title || "Unknown"} </div>;
+}
+
+function SecondaryInfo({ testRun }: { testRun: TestRun }) {
+  const { recordings, event, commit, branch, date } = testRun;
+
+  return (
+    <div className="flex flex-row items-center space-x-4 font-light text-gray-400">
+      <div>{event}</div>
+      <div>{getRelativeDate(date)}</div>
+      <div className="flex flex-row items-center space-x-1">
+        <MaterialIcon>fork_right</MaterialIcon>
+        <div>{commit.id}</div>
+      </div>
+      <div className="flex flex-row items-center space-x-1">
+        <MaterialIcon>fork_right</MaterialIcon>
+        <div>{branch}</div>
+      </div>
+      {recordings[0].metadata.source?.merge ? (
+        <div
+          className="flex flex-row items-center space-x-1"
+          title={recordings[0].metadata.source.merge.title}
+        >
+          <MaterialIcon>tag</MaterialIcon>
+          <div>{recordings[0].metadata.source.merge.id}</div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
-  const { recordings, event, commit, branch } = testRun;
   const results = testRun.recordings.map(r => r.metadata?.test?.result);
 
   // Todo: Have a separate treatment for the "timedOut" result.
@@ -51,28 +82,8 @@ function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => voi
           {results.every(r => r === "passed") ? "check_circle" : "error"}
         </MaterialIcon>
         <div className="flex flex-col space-y-0.5">
-          <div>{commit?.title || "Unknown"} </div>
-          <div className="flex flex-row items-center space-x-4 font-light text-gray-400">
-            <div>{event}</div>
-            <div>{getRelativeDate(recordings[0].date)}</div>
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>fork_right</MaterialIcon>
-              <div>{commit.id}</div>
-            </div>
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>fork_right</MaterialIcon>
-              <div>{branch}</div>
-            </div>
-            {recordings[0].metadata.source?.merge ? (
-              <div
-                className="flex flex-row items-center space-x-1"
-                title={recordings[0].metadata.source.merge.title}
-              >
-                <MaterialIcon>tag</MaterialIcon>
-                <div>{recordings[0].metadata.source.merge.id}</div>
-              </div>
-            ) : null}
-          </div>
+          <PrimaryInfo testRun={testRun} />
+          <SecondaryInfo testRun={testRun} />
         </div>
       </div>
       <div className="flex flex-row space-x-2">

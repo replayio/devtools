@@ -1,13 +1,10 @@
-import { useContext } from "react";
 import { useGetRecording } from "ui/hooks/recordings";
 import { useGetTestRunForWorkspace } from "ui/hooks/tests";
-import { getRelativeDate } from "../RecordingRow";
-import { TestsContext } from "./Tests";
+import { getRelativeDate } from "../../RecordingRow";
 
-export function TestTooltip() {
-  const { hoveredRecordingId, hoveredRunId } = useContext(TestsContext);
-  const { recording, loading: recordingLoading } = useGetRecording(hoveredRecordingId);
-  const { testRun, loading: testRunLoading } = useGetTestRunForWorkspace(hoveredRunId!);
+export function TestTooltip({ recordingId, runId }: { recordingId: string; runId: string }) {
+  const { recording, loading: recordingLoading } = useGetRecording(recordingId);
+  const { testRun, loading: testRunLoading } = useGetTestRunForWorkspace(runId);
 
   if (recordingLoading || testRunLoading || !recording || !testRun) {
     return null;

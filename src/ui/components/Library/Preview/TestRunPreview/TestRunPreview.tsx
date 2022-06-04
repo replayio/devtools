@@ -1,9 +1,9 @@
 import { useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetTestRunForWorkspace } from "ui/hooks/tests";
-import { getRelativeDate } from "../RecordingRow";
-import { LibraryContext } from "../useFilters";
-import { TestRunReplayRows } from "./TestRunReplayRows";
+import { getRelativeDate } from "../../RecordingRow";
+import { LibraryContext } from "../../useFilters";
+import { ReplayList } from "./ReplayList";
 
 export function TestRunPreview() {
   const { preview } = useContext(LibraryContext);
@@ -46,7 +46,7 @@ export function TestRunPreview() {
           ) : null}
         </div>
       </div>
-      <TestRunReplayRows recordings={testRun.recordings} />
+      <ReplayList recordings={testRun.recordings} />
     </>
   );
 }

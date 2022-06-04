@@ -15,6 +15,7 @@ export interface TestRun {
   id: string;
   recordings: Recording[];
   date: string;
+  branch: string;
   commit: SourceCommit;
   event: "pull-request" | "push" | "unknown";
 }
@@ -225,9 +226,9 @@ function convertTestRun(testRun: any) {
       id: source?.commit?.id.slice(0, 7) || "Unknown ID",
       title: source?.commit?.title || "Unknown Commit",
     },
-    event: source ? (source.merge ? "pull-request" : "push") : "unknown",
     date: firstRecording.date,
     branch: source?.branch || "Unknown Branch",
+    event: source?.trigger?.name || "Unknown",
     recordings,
   };
 }

@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import { useGetTestForWorkspace } from "ui/hooks/tests";
-import { LibraryContext } from "../useFilters";
-import { ReplayRow, ReplayRows } from "./ReplayRows";
+import { LibraryContext } from "../../useFilters";
+import { ReplayRow, ReplayList } from "./ReplayList";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 
@@ -34,7 +34,7 @@ export function TestPreview() {
       </div>
       <div className="space-y-2 overflow-auto">
         {mostRecentFailure ? <MostRecentFailure recording={mostRecentFailure} /> : null}
-        <ReplayRows recordings={test.recordings} />
+        <ReplayList recordings={test.recordings} />
       </div>
     </>
   );
