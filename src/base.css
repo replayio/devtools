@@ -28,6 +28,28 @@ body {
   font-family: "Inter", sans-serif;
 }
 
+.theme-light {
+  --badge-picker-background: #fff;
+  --badge-unicorn: #ff6ddf;
+  --badge-purple: #a973cd;
+  --badge-green: #73cc6d;
+  --badge-green-foreground: #fff;
+  --badge-orange: #da7c04;
+  --badge-yellow: #e4cd00;
+  --badge-yellow-foreground: #634f05;
+}
+
+.theme-dark {
+  --badge-picker-background: #474c52;
+  --badge-unicorn: #e110b3;
+  --badge-purple: #cc81ff;
+  --badge-green: #69e261;
+  --badge-green-foreground: #050;
+  --badge-orange: #ff9a19;
+  --badge-yellow: #fee608;
+  --badge-yellow-foreground: #634f05;
+}
+
 #__next,
 #app-container {
   align-items: stretch;

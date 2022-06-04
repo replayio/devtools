@@ -18,6 +18,7 @@ type States = "opening" | "opened" | "closed";
 
 /**
  * Allows picking a prefix badge for identifying console messages more easily.
+ * Used in PanelEditor, when a log point is being added.
  */
 export function PrefixBadgePicker({
   initialState = "closed",
