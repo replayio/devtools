@@ -6,7 +6,7 @@ import styles from "./PrefixBadgePicker.module.css";
 
 export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as const;
 
-export type PrefixBadges = typeof badges[number];
+export type PrefixBadge = typeof badges[number];
 
 const openedWidth = 124;
 const closedWidth = 28;
@@ -16,15 +16,28 @@ const shadowActive = "0px 1px 2px 0px rgba(0, 0, 0, 0.25)";
 
 type States = "opening" | "opened" | "closed";
 
-export function PrefixBadgePicker({ initialState = "closed" }: { initialState?: States }) {
+/**
+ * Allows picking a prefix badge for identifying console messages more easily.
+ */
+export function PrefixBadgePicker({
+  initialState = "closed",
+  onSelect,
+}: {
+  /** Callback when a badge has been selected. */
+  onSelect?: (prefixBadge?: PrefixBadge) => void;
+
+  /** Control the opened or closed state. Useful for testing. */
+  initialState?: States;
+}) {
   const id = (React as any).useId();
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadges>("unicorn");
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge>("unicorn");
   const [state, setState] = React.useState<States>(initialState);
   const isOpen = state === "opening" || state === "opened";
 
-  const handleSelect = (prefixBadgeName: PrefixBadges) => {
+  const handleSelect = (prefixBadgeName: PrefixBadge) => {
     setState("closed");
     setActiveBadge(prefixBadgeName);
+    onSelect?.(prefixBadgeName);
   };
 
   const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -109,10 +122,10 @@ export function PrefixBadge({
   onSelect,
 }: {
   active?: boolean;
-  name: PrefixBadges;
+  name: PrefixBadge;
   layoutId: string;
   onSpaceKeyDown: () => void;
-  onSelect?: (prefixBadgeName: PrefixBadges) => void;
+  onSelect?: (prefixBadgeName: PrefixBadge) => void;
 }) {
   const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
     if (event.key === " ") {
