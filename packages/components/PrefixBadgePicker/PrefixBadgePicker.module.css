@@ -70,7 +70,8 @@
   background-color: transparent;
 }
 
-.ColorBadge::before,
+.PrefixBadge:hover .ColorBadge::before,
+.active .ColorBadge::before,
 .ColorBadge::after {
   grid-area: 1 / 1 / 1 / 1;
   content: "";

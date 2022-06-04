@@ -1,5 +1,5 @@
 import * as React from "react";
-import classnames from "classnames";
+import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
 
 import styles from "./PrefixBadgePicker.module.css";
@@ -88,6 +88,7 @@ export function PrefixBadgePicker({ initialState = "closed" }: { initialState?: 
           return isOpen ? (
             <PrefixBadge
               {...sharedProps}
+              active={badge === activeBadge}
               onSelect={state === "opening" && index === 0 ? undefined : handleSelect}
               onSpaceKeyDown={() => handleSelect(badge)}
             />
@@ -101,11 +102,13 @@ export function PrefixBadgePicker({ initialState = "closed" }: { initialState?: 
 }
 
 export function PrefixBadge({
+  active,
   name,
   layoutId,
   onSpaceKeyDown,
   onSelect,
 }: {
+  active: boolean;
   name: PrefixBadges;
   layoutId: string;
   onSpaceKeyDown: () => void;
@@ -130,7 +133,7 @@ export function PrefixBadge({
   return (
     <motion.button
       layoutId={layoutId}
-      className={styles.PrefixBadge}
+      className={classNames(styles.PrefixBadge, { [styles.active]: active })}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
@@ -140,7 +143,7 @@ export function PrefixBadge({
     >
       <div
         className={
-          name === "unicorn" ? styles.UnicornBadge : classnames(styles.ColorBadge, styles[name])
+          name === "unicorn" ? styles.UnicornBadge : classNames(styles.ColorBadge, styles[name])
         }
       />
     </motion.button>
