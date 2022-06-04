@@ -6,7 +6,7 @@ import styles from "./Library.module.css";
 import { LibraryContext } from "./useFilters";
 import { Preview } from "./Preview/Preview";
 import { TestRuns } from "./Content/TestRuns";
-import { Tests } from "./Content/Tests";
+import { Tests } from "./Content/Tests/Tests";
 import { Recordings } from "./Content/Recordings";
 
 export default function Viewer({
@@ -28,8 +28,8 @@ export default function Viewer({
     <div
       className={`flex flex-grow flex-col overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
-      <div className="flex space-x-4 overflow-y-auto h-full">
-        <div className="flex flex-col flex-grow space-y-5 w-full">
+      <div className="flex h-full space-x-4 overflow-y-auto">
+        <div className="flex flex-col flex-grow w-full space-y-5">
           <ViewerHeader
             recordings={recordings}
             selectedIds={selectedIds}
