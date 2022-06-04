@@ -15,6 +15,7 @@ export interface GetTestsForWorkspace_node_Workspace_tests_recordings_edges_node
   __typename: "Recording";
   uuid: any;
   duration: number | null;
+  createdAt: any;
   metadata: any | null;
 }
 

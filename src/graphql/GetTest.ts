@@ -7,7 +7,11 @@
 // GraphQL query operation: GetTest
 // ====================================================
 
-export interface GetTest_test_recordings_edges_node {
+export interface GetTest_node_Recording {
+  __typename: "Recording";
+}
+
+export interface GetTest_node_Workspace_tests_recordings_edges_node {
   __typename: "Recording";
   uuid: any;
   duration: number | null;
@@ -15,27 +19,36 @@ export interface GetTest_test_recordings_edges_node {
   metadata: any | null;
 }
 
-export interface GetTest_test_recordings_edges {
+export interface GetTest_node_Workspace_tests_recordings_edges {
   __typename: "TestRecordingEdge";
-  node: GetTest_test_recordings_edges_node;
+  node: GetTest_node_Workspace_tests_recordings_edges_node;
 }
 
-export interface GetTest_test_recordings {
+export interface GetTest_node_Workspace_tests_recordings {
   __typename: "TestRecordingConnection";
-  edges: GetTest_test_recordings_edges[];
+  edges: GetTest_node_Workspace_tests_recordings_edges[];
 }
 
-export interface GetTest_test {
+export interface GetTest_node_Workspace_tests {
   __typename: "Test";
   title: string | null;
   path: string[] | null;
-  recordings: GetTest_test_recordings | null;
+  recordings: GetTest_node_Workspace_tests_recordings | null;
 }
 
+export interface GetTest_node_Workspace {
+  __typename: "Workspace";
+  id: string;
+  tests: GetTest_node_Workspace_tests[] | null;
+}
+
+export type GetTest_node = GetTest_node_Recording | GetTest_node_Workspace;
+
 export interface GetTest {
-  test: GetTest_test | null;
+  node: GetTest_node | null;
 }
 
 export interface GetTestVariables {
+  workspaceId: string;
   path: string;
 }
