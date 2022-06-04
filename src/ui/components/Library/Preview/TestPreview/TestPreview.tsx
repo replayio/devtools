@@ -1,9 +1,10 @@
 import { useContext, useState } from "react";
 import { useGetTestForWorkspace } from "ui/hooks/tests";
 import { LibraryContext } from "../../useFilters";
-import { ReplayRow, ReplayList } from "./ReplayList";
+import { ReplayList } from "./ReplayList";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
+import { ReplayRow } from "./ReplayRow";
 
 export function TestPreview() {
   const { preview } = useContext(LibraryContext);

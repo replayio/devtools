@@ -175,8 +175,8 @@ export type SourceMetadata = {
   trigger?: {
     name: string;
     user?: string;
-    workflow?: string
-  }
+    workflow?: string;
+  };
   provider?: string;
   repository?: string;
 };
@@ -185,7 +185,7 @@ export type SourceCommit = {
   id: string;
   title?: string;
   url?: string;
-}
+};
 
 export interface RecordingOptions {
   resolvedAt: string | null;

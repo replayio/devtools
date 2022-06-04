@@ -12,7 +12,7 @@ import { Nag, useGetUserInfo } from "ui/hooks/users";
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
-import { LibraryContext, useFilters, View } from "./useFilters";
+import { LibraryContext, Preview, useFilters, View } from "./useFilters";
 import ViewerRouter from "./ViewerRouter";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
@@ -78,7 +78,7 @@ function Library({
   const router = useRouter();
   const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
   const [view, setView] = useState<View>("recordings");
-  const [preview, setPreview] = useState<{ id: string | string[]; view: View } | null>(null);
+  const [preview, setPreview] = useState<Preview | null>(null);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const dismissNag = hooks.useDismissNag();
 
