@@ -141,7 +141,7 @@ class Frames extends Component {
     if (framesLoading || pauseLoading) {
       return (
         <div className="pane frames">
-          <div className="pane-info empty">Loading...</div>
+          <div className="pane-info empty">Loading…</div>
         </div>
       );
     }

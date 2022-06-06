@@ -27,7 +27,7 @@ Test.describe(
       logValue: `"Part2Logpoint Number " + number`,
     });
 
-    // Wait until we see "Loading..." messages.
+    // Wait until we see "Loading…" messages.
     await Test.waitUntil(() => Test.findMessages("Loading").length > 0);
 
     // Then wait until they all go away.

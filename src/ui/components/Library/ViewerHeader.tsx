@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { useSelector } from "react-redux";
+import { useFeature } from "ui/hooks/settings";
 import { getWorkspaceId } from "ui/reducers/app";
 import { Recording } from "ui/types";
 import { PrimaryButton, SecondaryButton } from "../shared/Button";
@@ -68,6 +69,7 @@ export default function ViewerHeader({
   isEditing: boolean;
   setIsEditing: (value: boolean) => void;
 }) {
+  const { value: testSupport } = useFeature("testSupport");
   const { view } = useContext(LibraryContext);
   const currentWorkspaceId = useSelector(getWorkspaceId);
 
@@ -79,6 +81,7 @@ export default function ViewerHeader({
           {recordings.length != 0 ? <>({recordings.length})</> : <></>}
         </span>
       ) : null}
+      {testSupport ? <div>/ {view}</div> : null}
     </ViewerHeaderLeft>
   );
 

@@ -5,19 +5,27 @@ type LibraryContextType = {
   filter: string;
   view: View;
   setPreview: (preview: Preview) => void;
+  setView: (view: View) => void;
   setAppliedText: (str: string) => void;
   preview: Preview | null;
 };
-type Preview = {
-  view: View;
-  id: string | string[];
-};
+export type Preview =
+  | {
+      view: "test-runs";
+      id: string | string[];
+    }
+  | {
+      view: "tests";
+      id: string[];
+      recordingId: string | null;
+    };
 export type View = "recordings" | "tests" | "test-runs";
 
 export const LibraryContext = createContext<LibraryContextType>({
   filter: "",
   view: "recordings",
   setPreview: () => {},
+  setView: () => {},
   setAppliedText: () => {},
   preview: null,
 });

@@ -12,7 +12,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import LoadingProgressBar from "../shared/LoadingProgressBar";
 
-import FilterBar from "./FilterBar";
+import { FilterLayout } from "./FilterLayout";
 import RequestDetails from "./RequestDetails";
 import RequestTable from "./RequestTable";
 import Table from "./Table";
@@ -87,30 +87,36 @@ export const NetworkMonitor = ({
 
         return (
           <div className="flex h-full min-h-0 flex-col" ref={container}>
-            <FilterBar types={types} toggleType={toggleType} table={table} />
-            <SplitBox
-              className="min-h-0 border-t border-splitter"
-              initialSize="350px"
-              minSize={selectedRequest ? "30%" : "100%"}
-              maxSize={selectedRequest ? "70%" : "100%"}
-              startPanel={
-                <RequestTable
-                  table={table}
-                  data={data}
-                  currentTime={currentTime}
-                  onRowSelect={row => {
-                    trackEvent("net_monitor.select_request_row");
-                    dispatch(selectAndFetchRequest(row.id));
-                  }}
-                  seek={seek}
-                  selectedRequest={selectedRequest}
+            <FilterLayout
+              setFilterValue={table.setGlobalFilter}
+              toggleType={toggleType}
+              types={types}
+              table={
+                <SplitBox
+                  className="min-h-0 border-t border-splitter"
+                  initialSize="350px"
+                  minSize={selectedRequest ? "30%" : "100%"}
+                  maxSize={selectedRequest ? "70%" : "100%"}
+                  startPanel={
+                    <RequestTable
+                      table={table}
+                      data={data}
+                      currentTime={currentTime}
+                      onRowSelect={row => {
+                        trackEvent("net_monitor.select_request_row");
+                        dispatch(selectAndFetchRequest(row.id));
+                      }}
+                      seek={seek}
+                      selectedRequest={selectedRequest}
+                    />
+                  }
+                  endPanel={
+                    selectedRequest ? <RequestDetails cx={cx} request={selectedRequest} /> : null
+                  }
+                  splitterSize={2}
+                  vert={vert}
                 />
               }
-              endPanel={
-                selectedRequest ? <RequestDetails cx={cx} request={selectedRequest} /> : null
-              }
-              splitterSize={2}
-              vert={vert}
             />
           </div>
         );

@@ -91,6 +91,7 @@ export function createGetRecordingMock(opts: {
     userRole: RecordingRole.None,
     uuid: opts.recordingId || "mock-recording-id",
     workspace: null as any, // TypeScript fail
+    metadata: null,
 
     ...opts.recording,
   };

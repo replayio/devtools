@@ -97,6 +97,7 @@ export interface GetRecording_recording {
   userRole: string;
   operations: any | null;
   resolution: any | null;
+  metadata: any | null;
   comments: GetRecording_recording_comments[];
   owner: GetRecording_recording_owner | null;
   workspace: GetRecording_recording_workspace | null;
