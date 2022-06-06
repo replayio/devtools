@@ -9,7 +9,7 @@ export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as cons
 
 const openedWidth = 126;
 const closedWidth = 24;
-const duration = 0.14;
+const duration = 0.08;
 const shadowInitial = "0px 1px 2px 0px rgba(0, 0, 0, 0)";
 const shadowActive = "0px 1px 2px 0px rgba(0, 0, 0, 0.25)";
 
@@ -25,7 +25,7 @@ export function PrefixBadgePicker({
   onSelect,
 }: {
   /** The current selected badge. */
-  initialValue: PrefixBadge | undefined;
+  initialValue?: PrefixBadge | undefined;
 
   /** Callback when a badge has been selected. */
   onSelect?: (prefixBadge?: PrefixBadge) => void;
@@ -44,47 +44,21 @@ export function PrefixBadgePicker({
     onSelect?.(prefixBadgeName);
   };
 
-  const handleMouseDown = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    if (state === "closed") {
-      setState("opening");
-    }
-  };
-
-  const handleMouseUp = (event: React.MouseEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const button = (event.target as HTMLElement).closest("button");
-
-    if (button) {
-      button.focus();
-    }
-
-    setState("opened");
-  };
-
-  const handleBlur = (event: React.FocusEvent<HTMLDivElement>) => {
-    if (event.relatedTarget === null) {
-      setState("closed");
-    }
-  };
-
   return (
     <motion.div
       className={classNames(styles.PrefixBadgePicker, { [styles.isOpen]: isOpen })}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      onBlur={handleBlur}
       whileHover="parentHover"
     >
       <AnimatePresence>
         <motion.div
+          key="fill"
           initial={false}
           animate={{
             width: isOpen ? openedWidth : closedWidth,
             boxShadow: isOpen ? shadowActive : shadowInitial,
           }}
           transition={{
-            delay: isOpen ? 0 : duration,
+            delay: isOpen ? 0 : duration * 3,
             duration,
             boxShadow: { duration: 0.2 },
           }}
@@ -98,15 +72,22 @@ export function PrefixBadgePicker({
 
         {(activeBadge === undefined || isOpen) && (
           <motion.button
+            key="trigger"
+            type="button"
             initial={false}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className={styles.PrefixBadge}
-            onMouseUp={event => {
+            onMouseDown={() => {
+              if (state === "closed") {
+                setState("opening");
+              }
+            }}
+            onMouseUp={() => {
               if (state === "opened") {
-                event.stopPropagation();
-                event.preventDefault();
                 handleSelect();
+              } else {
+                setState("opened");
               }
             }}
           >
@@ -121,22 +102,30 @@ export function PrefixBadgePicker({
           </motion.button>
         )}
 
-        {badges.map((badge, index) => {
+        {badges.map(badge => {
           const sharedProps = {
             key: badge,
             layoutId: id + badge,
             name: badge,
+            onMouseDown: () => {
+              if (state === "closed") {
+                setState("opening");
+              }
+            },
+            onMouseUp: () => {
+              if (isOpen) {
+                handleSelect(badge);
+              } else {
+                setState("opened");
+              }
+            },
           };
+          const isActive = badge === activeBadge;
 
           return isOpen ? (
-            <PrefixBadgeItem
-              {...sharedProps}
-              active={badge === activeBadge}
-              onSelect={state === "opening" && index === 0 ? undefined : handleSelect}
-              onSpaceKeyDown={() => handleSelect(badge)}
-            />
-          ) : badge === activeBadge ? (
-            <PrefixBadgeItem {...sharedProps} onSpaceKeyDown={() => setState("opened")} />
+            <PrefixBadgeItem {...sharedProps} isActive={isActive} />
+          ) : isActive ? (
+            <PrefixBadgeItem {...sharedProps} />
           ) : null;
         })}
       </AnimatePresence>
@@ -145,45 +134,25 @@ export function PrefixBadgePicker({
 }
 
 function PrefixBadgeItem({
-  active,
+  isActive,
   name,
   layoutId,
-  onSpaceKeyDown,
-  onSelect,
+  ...props
 }: {
-  active?: boolean;
+  isActive?: boolean;
   name: PrefixBadge;
   layoutId: string;
-  onSpaceKeyDown: () => void;
-  onSelect?: (prefixBadgeName: PrefixBadge) => void;
-}) {
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
-    if (event.key === " ") {
-      onSpaceKeyDown();
-    }
-    if (event.key === "Enter") {
-      handleSelect(event);
-    }
-  };
-  const handleSelect = (event: React.MouseEvent | React.KeyboardEvent) => {
-    if (onSelect) {
-      event.stopPropagation();
-      event.preventDefault();
-      onSelect(name);
-    }
-  };
-
+} & Omit<React.ComponentProps<typeof motion.button>, "onSelect">) {
   return (
     <motion.button
+      type="button"
       layoutId={layoutId}
-      className={classNames(styles.PrefixBadge, { [styles.active]: active })}
+      className={classNames(styles.PrefixBadge, { [styles.active]: isActive })}
       initial={{ opacity: 0, scale: 0.9 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9 }}
-      transition={{ duration, layout: { duration: duration / 2 } }}
-      onKeyDown={handleKeyDown}
-      onClick={handleSelect}
-      onMouseUp={handleSelect}
+      transition={{ duration }}
+      {...props}
     >
       <div
         className={
