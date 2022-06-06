@@ -38,21 +38,25 @@
   border-radius: 0.3rem;
 }
 
+.ColorBadge,
 .UnicornBadge {
   width: 1rem;
   height: 1rem;
-  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
-  background-size: auto 100%;
 }
 
 .ColorBadge {
   display: grid;
   place-items: center;
   position: relative;
-  width: 0.8rem;
-  height: 0.8rem;
   border-radius: 100%;
   background-color: transparent;
+}
+
+.UnicornBadge {
+  width: 1rem;
+  height: 1rem;
+  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
+  background-size: auto 100%;
 }
 
 .active.PrefixBadge:hover .ColorBadge::before,
