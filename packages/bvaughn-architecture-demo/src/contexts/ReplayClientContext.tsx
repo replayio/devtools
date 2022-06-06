@@ -1,6 +1,6 @@
 import { ThreadFront } from "protocol/thread";
 import { createContext } from "react";
-import { ReplayClient, ReplayClientInterface } from "../ReplayClient";
+import { ReplayClient, ReplayClientInterface } from "../client/ReplayClient";
 
 export type ReplayClientContextType = ReplayClientInterface;
 

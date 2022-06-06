@@ -1,6 +1,6 @@
 import { ExecutionPoint, SessionId } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
-import { ReplayClientInterface } from "../ReplayClient";
+import { ReplayClientInterface } from "../client/ReplayClient";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "../types";
 import { createWakeable } from "../utils/suspense";
@@ -25,7 +25,7 @@ export function getClosestPointForTime(
   const map = getRecordMap();
   let record = map.get(time);
   if (record == null) {
-    const wakeable = createWakeable();
+    const wakeable = createWakeable<ExecutionPoint>();
 
     record = {
       status: STATUS_PENDING,
@@ -48,15 +48,15 @@ async function fetchPoint(
   client: ReplayClientInterface,
   time: number,
   record: Record<ExecutionPoint>,
-  wakeable: Wakeable
+  wakeable: Wakeable<ExecutionPoint>
 ) {
   try {
-    const point = await client.getPointNearTime(time);
+    const { point } = await client.getPointNearTime(time);
 
     record.status = STATUS_RESOLVED;
-    record.value = point.point;
+    record.value = point;
 
-    wakeable.resolve();
+    wakeable.resolve(point);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;
