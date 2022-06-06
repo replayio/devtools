@@ -57,6 +57,8 @@ export default function useFilteredMessages(
               });
             }
           }
+
+          return false;
         }
 
         return true;
