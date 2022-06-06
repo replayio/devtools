@@ -78,6 +78,15 @@ export function PrefixBadgePicker({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className={styles.PrefixBadge}
+            onKeyDown={(event: React.KeyboardEvent) => {
+              if (event.key === "Enter") {
+                if (state === "closed") {
+                  setState("opening");
+                } else {
+                  handleSelect();
+                }
+              }
+            }}
             onMouseDown={() => {
               if (state === "closed") {
                 setState("opening");
@@ -107,6 +116,15 @@ export function PrefixBadgePicker({
             key: badge,
             layoutId: id + badge,
             name: badge,
+            onKeyDown: (event: React.KeyboardEvent) => {
+              if (event.key === "Enter") {
+                if (state === "closed") {
+                  setState("opening");
+                } else {
+                  handleSelect(badge);
+                }
+              }
+            },
             onMouseDown: () => {
               if (state === "closed") {
                 setState("opening");
