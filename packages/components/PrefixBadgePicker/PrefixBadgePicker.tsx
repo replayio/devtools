@@ -1,3 +1,4 @@
+import type { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import * as React from "react";
 import classNames from "classnames";
 import { AnimatePresence, motion } from "framer-motion";
@@ -5,8 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import styles from "./PrefixBadgePicker.module.css";
 
 export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as const;
-
-export type PrefixBadge = typeof badges[number];
 
 const openedWidth = 126;
 const closedWidth = 24;
@@ -22,8 +21,12 @@ type States = "opening" | "opened" | "closed";
  */
 export function PrefixBadgePicker({
   initialState = "closed",
+  initialValue,
   onSelect,
 }: {
+  /** The current selected badge. */
+  initialValue: PrefixBadge | undefined;
+
   /** Callback when a badge has been selected. */
   onSelect?: (prefixBadge?: PrefixBadge) => void;
 
@@ -31,7 +34,7 @@ export function PrefixBadgePicker({
   initialState?: States;
 }) {
   const id = (React as any).useId();
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge>();
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | undefined>(initialValue);
   const [state, setState] = React.useState<States>(initialState);
   const isOpen = state === "opening" || state === "opened";
 
@@ -126,14 +129,14 @@ export function PrefixBadgePicker({
           };
 
           return isOpen ? (
-            <PrefixBadge
+            <PrefixBadgeItem
               {...sharedProps}
               active={badge === activeBadge}
               onSelect={state === "opening" && index === 0 ? undefined : handleSelect}
               onSpaceKeyDown={() => handleSelect(badge)}
             />
           ) : badge === activeBadge ? (
-            <PrefixBadge {...sharedProps} onSpaceKeyDown={() => setState("opened")} />
+            <PrefixBadgeItem {...sharedProps} onSpaceKeyDown={() => setState("opened")} />
           ) : null;
         })}
       </AnimatePresence>
@@ -141,7 +144,7 @@ export function PrefixBadgePicker({
   );
 }
 
-export function PrefixBadge({
+function PrefixBadgeItem({
   active,
   name,
   layoutId,
