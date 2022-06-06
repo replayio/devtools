@@ -114,12 +114,12 @@ class Frames extends PureComponent {
       frames,
       framesErrored,
       framesLoading,
-      isCurrentTimeInLoadedRegion,
       pauseErrored,
       pauseLoading,
+      showUnloadedRegionError,
     } = this.props;
 
-    if (!isCurrentTimeInLoadedRegion) {
+    if (showUnloadedRegionError) {
       return (
         <div className="pane frames">
           <div className="pane-info empty">
@@ -180,10 +180,10 @@ const mapStateToProps = state => ({
   framesErrored: getFramesErrored(state),
   framesLoading: getFramesLoading(state),
   frameworkGroupingOn: getFrameworkGroupingState(state),
-  isCurrentTimeInLoadedRegion: isCurrentTimeInLoadedRegion(state),
   pauseErrored: state.pause.pauseErrored,
   pauseLoading: state.pause.pauseLoading,
   selectedFrame: getSelectedFrame(state),
+  showUnloadedRegionError: !isCurrentTimeInLoadedRegion(state),
 });
 
 export default connect(mapStateToProps, {

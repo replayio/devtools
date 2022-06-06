@@ -136,6 +136,7 @@ class SmartTrace extends React.Component {
       frameworkGroupingOn: true,
       displayFullUrl: mapSources && (!this.state || !this.state.isSourceMapped),
       panel: "webconsole",
+      showUnloadedRegionError: false,
     });
   }
 }
