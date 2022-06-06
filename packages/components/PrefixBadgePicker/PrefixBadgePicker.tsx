@@ -49,106 +49,104 @@ export function PrefixBadgePicker({
       className={classNames(styles.PrefixBadgePicker, { [styles.isOpen]: isOpen })}
       whileHover="parentHover"
     >
-      <AnimateSharedLayout>
-        <AnimatePresence>
-          <motion.div
-            key="fill"
+      <AnimatePresence>
+        <motion.div
+          key="fill"
+          initial={false}
+          animate={{
+            width: isOpen ? openedWidth : closedWidth,
+            boxShadow: isOpen ? shadowActive : shadowInitial,
+          }}
+          transition={{
+            duration,
+            delay: isOpen ? 0 : duration * 3,
+            boxShadow: { duration: 0.2, delay: 0 },
+          }}
+          variants={{
+            parentHover: {
+              boxShadow: shadowActive,
+            },
+          }}
+          className={styles.PrefixBadgePickerFill}
+        />
+
+        {(activeBadge === undefined || isOpen) && (
+          <motion.button
+            key="trigger"
+            type="button"
             initial={false}
-            animate={{
-              width: isOpen ? openedWidth : closedWidth,
-              boxShadow: isOpen ? shadowActive : shadowInitial,
-            }}
-            transition={{
-              duration,
-              delay: isOpen ? 0 : duration * 3,
-              boxShadow: { duration: 0.2, delay: 0 },
-            }}
-            variants={{
-              parentHover: {
-                boxShadow: shadowActive,
-              },
-            }}
-            className={styles.PrefixBadgePickerFill}
-          />
-
-          {(activeBadge === undefined || isOpen) && (
-            <motion.button
-              key="trigger"
-              type="button"
-              initial={false}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className={styles.PrefixBadge}
-              onKeyDown={(event: React.KeyboardEvent) => {
-                if (event.key === "Enter") {
-                  if (state === "closed") {
-                    setState("opening");
-                  } else {
-                    handleSelect();
-                  }
-                }
-              }}
-              onMouseDown={() => {
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className={styles.PrefixBadge}
+            onKeyDown={(event: React.KeyboardEvent) => {
+              if (event.key === "Enter") {
                 if (state === "closed") {
                   setState("opening");
-                }
-              }}
-              onMouseUp={() => {
-                if (state === "opened") {
+                } else {
                   handleSelect();
-                } else {
-                  setState("opened");
                 }
+              }
+            }}
+            onMouseDown={() => {
+              if (state === "closed") {
+                setState("opening");
+              }
+            }}
+            onMouseUp={() => {
+              if (state === "opened") {
+                handleSelect();
+              } else {
+                setState("opened");
+              }
+            }}
+          >
+            <motion.span
+              animate={{
+                width: isOpen ? "0.5rem" : "0.3rem",
+                height: isOpen ? "0.1rem" : "0.3rem",
               }}
-            >
-              <motion.span
-                animate={{
-                  width: isOpen ? "0.5rem" : "0.3rem",
-                  height: isOpen ? "0.1rem" : "0.3rem",
-                }}
-                transition={{ type: "tween", duration: 0.16 }}
-                className={styles.DefaultBadge}
-              />
-            </motion.button>
-          )}
+              transition={{ type: "tween", duration: 0.16 }}
+              className={styles.DefaultBadge}
+            />
+          </motion.button>
+        )}
 
-          {badges.map(badge => {
-            const sharedProps = {
-              key: badge,
-              layoutId: id + badge,
-              name: badge,
-              onKeyDown: (event: React.KeyboardEvent) => {
-                if (event.key === "Enter") {
-                  if (state === "closed") {
-                    setState("opening");
-                  } else {
-                    handleSelect(badge);
-                  }
-                }
-              },
-              onMouseDown: () => {
+        {badges.map(badge => {
+          const sharedProps = {
+            key: badge,
+            layoutId: id + badge,
+            name: badge,
+            onKeyDown: (event: React.KeyboardEvent) => {
+              if (event.key === "Enter") {
                 if (state === "closed") {
                   setState("opening");
-                }
-              },
-              onMouseUp: () => {
-                if (isOpen) {
-                  handleSelect(badge);
                 } else {
-                  setState("opened");
+                  handleSelect(badge);
                 }
-              },
-            };
-            const isActive = badge === activeBadge;
+              }
+            },
+            onMouseDown: () => {
+              if (state === "closed") {
+                setState("opening");
+              }
+            },
+            onMouseUp: () => {
+              if (isOpen) {
+                handleSelect(badge);
+              } else {
+                setState("opened");
+              }
+            },
+          };
+          const isActive = badge === activeBadge;
 
-            return isOpen ? (
-              <PrefixBadgeItem {...sharedProps} isActive={isActive} />
-            ) : isActive ? (
-              <PrefixBadgeItem {...sharedProps} />
-            ) : null;
-          })}
-        </AnimatePresence>
-      </AnimateSharedLayout>
+          return isOpen ? (
+            <PrefixBadgeItem {...sharedProps} isActive={isActive} />
+          ) : isActive ? (
+            <PrefixBadgeItem {...sharedProps} />
+          ) : null;
+        })}
+      </AnimatePresence>
     </motion.div>
   );
 }
