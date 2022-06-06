@@ -1,8 +1,8 @@
-import { ExecutionPoint, SessionId } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
 import { ReplayClientInterface } from "../client/ReplayClient";
 
-import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "../types";
+import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 import { createWakeable } from "../utils/suspense";
 
 // TODO We could add some way for external code (in the client adapter) to pre-populate this cache with known points.

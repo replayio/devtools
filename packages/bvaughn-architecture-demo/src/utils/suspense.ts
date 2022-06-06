@@ -1,4 +1,4 @@
-import { Wakeable } from "../types";
+import { Wakeable } from "../suspense/types";
 
 // A "thennable" is a subset of the Promise API.
 // We could use a Promise as thennable, but Promises have a downside: they use the microtask queue.
