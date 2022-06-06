@@ -1,7 +1,23 @@
 .Container {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  width: 100vw;
   height: 100vh;
+}
+
+.CommentsContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 20%;
+  height: 100%;
+  max-width: 300px;
+}
+
+.ConsoleContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100%;
 }
 
 .ContentArea {

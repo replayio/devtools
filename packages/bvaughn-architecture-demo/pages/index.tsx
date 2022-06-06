@@ -20,23 +20,27 @@ export default function HomePage() {
 
   return (
     <FocusContextRoot>
-      <ConsoleFiltersContextRoot>
-        <div className={styles.Container}>
-          <div className={styles.Row}>
-            <ConsoleFilters />
+      <div className={styles.Container}>
+        <div className={styles.CommentsContainer}></div>
+
+        <ConsoleFiltersContextRoot>
+          <div className={styles.ConsoleContainer}>
+            <div className={styles.Row}>
+              <ConsoleFilters />
+            </div>
+            <div className={styles.ContentArea}>
+              <ErrorBoundary>
+                <Suspense fallback={<Loader />}>
+                  <ConsoleMessages />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+            <div className={styles.Row}>
+              <Focuser />
+            </div>
           </div>
-          <div className={styles.ContentArea}>
-            <ErrorBoundary>
-              <Suspense fallback={<Loader />}>
-                <ConsoleMessages />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-          <div className={styles.Row}>
-            <Focuser />
-          </div>
-        </div>
-      </ConsoleFiltersContextRoot>
+        </ConsoleFiltersContextRoot>
+      </div>
     </FocusContextRoot>
   );
 }
