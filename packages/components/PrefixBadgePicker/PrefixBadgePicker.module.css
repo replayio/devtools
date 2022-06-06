@@ -11,6 +11,7 @@
   left: -2px;
   height: 100%;
   border-radius: 1rem;
+  background-color: var(--breakpoint-editfield-hover);
   transition: background-color 0.18s ease-out;
 }
 
@@ -22,16 +23,7 @@
   width: 1.25rem;
   height: 1.25rem;
   flex: 0 0 1.25rem;
-  outline: none;
 }
-
-/*
-  TODO: look into why focus-visible shows when programmatically moving focus
-  https://github.com/w3c/csswg-drafts/issues/5885
-*/
-/* .PrefixBadge:focus-visible {
-  box-shadow: 0 0 0 0.125rem rgba(0, 123, 255, 0.25);
-} */
 
 .DefaultBadge {
   background-color: var(--light-grey);
@@ -81,14 +73,6 @@
 }
 
 /* Background fill colors */
-
-:global(.theme-light) .PrefixBadgePickerFill {
-  background: #fff;
-}
-
-:global(.theme-dark) .PrefixBadgePickerFill {
-  background: transparent;
-}
 
 :global(.theme-dark) .PrefixBadgePicker:hover .PrefixBadgePickerFill,
 :global(.theme-dark) .isOpen .PrefixBadgePickerFill {
