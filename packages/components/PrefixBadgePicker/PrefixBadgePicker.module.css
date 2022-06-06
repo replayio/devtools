@@ -1,0 +1,125 @@
+.PrefixBadgePicker {
+  display: flex;
+  align-items: center;
+  position: relative;
+  align-self: start;
+  height: 1.5rem;
+}
+
+.PrefixBadgePickerFill {
+  position: absolute;
+  left: -2px;
+  height: 100%;
+  border-radius: 1rem;
+  background-color: var(--breakpoint-editfield-hover);
+  transition: background-color 0.18s ease-out;
+}
+
+.PrefixBadge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 1.25rem;
+}
+
+.DefaultBadge {
+  background-color: var(--light-grey);
+  border-radius: 0.3rem;
+}
+
+.ColorBadge,
+.UnicornBadge {
+  width: 1rem;
+  height: 1rem;
+}
+
+.ColorBadge {
+  display: grid;
+  place-items: center;
+  position: relative;
+  border-radius: 100%;
+  background-color: transparent;
+}
+
+.UnicornBadge {
+  width: 1rem;
+  height: 1rem;
+  background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
+  background-size: auto 100%;
+}
+
+.active.PrefixBadge:hover .ColorBadge::before,
+.active .ColorBadge::before,
+.ColorBadge::after {
+  grid-area: 1 / 1 / 1 / 1;
+  content: "";
+  display: block;
+  border-radius: 100%;
+  background-color: var(--primary-color);
+}
+
+.ColorBadge::before {
+  width: 100%;
+  height: 100%;
+  opacity: 0.2;
+}
+
+.ColorBadge::after {
+  width: 50%;
+  height: 50%;
+}
+
+/* Background fill colors */
+
+:global(.theme-dark) .PrefixBadgePicker:hover .PrefixBadgePickerFill,
+:global(.theme-dark) .isOpen .PrefixBadgePickerFill {
+  background: #474c52;
+}
+
+:root:global(.theme-light) .unicorn {
+  --primary-color: #ff6ddf;
+  color: #fff;
+}
+:root:global(.theme-dark) .unicorn {
+  --primary-color: #e110b3;
+  color: #fff;
+}
+
+:root:global(.theme-light) .purple {
+  --primary-color: #a973cd;
+  color: #fff;
+}
+:root:global(.theme-dark) .purple {
+  --primary-color: #cc81ff;
+  color: #fff;
+}
+
+:root:global(.theme-light) .green {
+  --primary-color: #73cc6d;
+  color: #fff;
+}
+:root:global(.theme-dark) .green {
+  --primary-color: #69e261;
+  color: #050;
+}
+
+:root:global(.theme-light) .orange {
+  --primary-color: #da7c04;
+  color: #fff;
+}
+:root:global(.theme-dark) .orange {
+  --primary-color: #ff9a19;
+  color: #fff;
+}
+
+:root:global(.theme-light) .yellow {
+  --primary-color: #e4cd00;
+  color: rgb(99, 79, 5);
+}
+:root:global(.theme-dark) .yellow {
+  --primary-color: #fee608;
+  color: rgb(99, 79, 5);
+}

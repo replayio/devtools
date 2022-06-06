@@ -14,6 +14,7 @@ module.exports = {
   moduleNameMapper: {
     "^devtools/(.*)": "<rootDir>/src/devtools/$1",
     "^highlighter/(.*)": "<rootDir>/src/highlighter/$1",
+    "^components/(.*)": "<rootDir>/packages/components/$1",
     "^protocol/(.*)": "<rootDir>/packages/protocol/$1",
     "^shared/(.*)": "<rootDir>/packages/shared/$1",
     "^shims/(.*)": "<rootDir>/src/shims/$1",

@@ -1,19 +1,16 @@
 import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
 import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import { Breakpoint } from "devtools/client/debugger/src/selectors";
-import React, { useState, useRef, MutableRefObject } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
-import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
+import { PrefixBadgePicker } from "../../../packages/components";
 
 import styles from "./PrefixBadge.module.css";
-
-type SelectBadge = (prefixBadge?: PrefixBadge) => void;
 
 // Rendered in log point PanelEditor, when a log point is being edited.
 // Clicking this item will show the PrefixBadgePicker.
 export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoint }) {
-  const [showPrefixBadge, setShowPrefixBadge] = useState<boolean>(false);
   const { value: enableUnicornConsole } = useFeature("unicornConsole");
   const dispatch = useDispatch();
 
@@ -21,32 +18,12 @@ export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoi
     return null;
   }
 
-  const prefixBadge = breakpoint.options.prefixBadge;
-  const className =
-    prefixBadge === "unicorn"
-      ? `${styles.ColorBadgeButton} ${styles.UnicornBadge}`
-      : prefixBadge != null
-      ? `${styles.ColorBadgeButton} ${styles[prefixBadge]}`
-      : `${styles.ColorBadgeButton} ${styles.ColorBadgeButtonEmpty}`;
-
   return (
-    <div className={styles.PrefixBadgeButton}>
-      <button
-        className={className}
-        onClick={() => {
-          setShowPrefixBadge(!showPrefixBadge);
-        }}
+    <div className="relative z-10" style={{ width: 28, marginLeft: 7 }}>
+      <PrefixBadgePicker
+        initialValue={breakpoint.options.prefixBadge}
+        onSelect={newPrefixBadge => dispatch(setBreakpointPrefixBadge(breakpoint, newPrefixBadge))}
       />
-      {showPrefixBadge && (
-        <PrefixBadgePicker
-          onDismiss={() => setShowPrefixBadge(false)}
-          onSelect={newPrefixBadge => {
-            console.log("onSelect() newPrefixBadge:", newPrefixBadge);
-            setShowPrefixBadge(false);
-            dispatch(setBreakpointPrefixBadge(breakpoint, newPrefixBadge));
-          }}
-        />
-      )}
     </div>
   );
 }
@@ -70,52 +47,6 @@ export function MessagePrefixBadge({ prefixBadge }: { prefixBadge: PrefixBadge }
       : styles.MessagePrefixBadgeSolidColor;
 
   return <div className={className} />;
-}
-
-function PrefixBadgePicker({
-  onDismiss,
-  onSelect,
-}: {
-  onDismiss: () => void;
-  onSelect: SelectBadge;
-}) {
-  const ref = useRef() as MutableRefObject<HTMLDivElement>;
-  useModalDismissSignal(ref, onDismiss);
-
-  return (
-    <div className={styles.PopOutContainer} ref={ref}>
-      <PrefixBadgePickerItem onSelect={onSelect} prefixBadge="unicorn" />
-      <PrefixBadgePickerItem onSelect={onSelect} prefixBadge="orange" />
-      <PrefixBadgePickerItem onSelect={onSelect} prefixBadge="yellow" />
-      <PrefixBadgePickerItem onSelect={onSelect} prefixBadge="green" />
-      <PrefixBadgePickerItem onSelect={onSelect} prefixBadge="purple" />
-      <PrefixBadgePickerItem onSelect={onSelect} />
-    </div>
-  );
-}
-
-function PrefixBadgePickerItem({
-  prefixBadge,
-  onSelect,
-}: {
-  prefixBadge?: PrefixBadge;
-  onSelect: SelectBadge;
-}) {
-  const onClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-
-    onSelect(prefixBadge);
-  };
-
-  const className =
-    prefixBadge === "unicorn"
-      ? styles.UnicornBadge
-      : prefixBadge != null
-      ? `${styles.ColorBadge} ${styles[prefixBadge]}`
-      : styles.ColorBadge;
-
-  return <div onClick={onClick} className={`${styles.PickerItem} ${className}`} />;
 }
 
 // Helper method used by the log point PanelEditor, when a log point is being viewed.

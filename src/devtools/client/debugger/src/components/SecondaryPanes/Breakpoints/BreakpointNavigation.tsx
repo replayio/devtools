@@ -75,7 +75,6 @@ function BreakpointNavigation({
   if (editing) {
     return (
       <div className="breakpoint-navigation justify-end space-x-1 p-1.5 py-2">
-        <PrefixBadgeButton breakpoint={breakpoint} />
         <button className="" onClick={() => setShowCondition(!showCondition)}>
           <Icon
             filename="filter"

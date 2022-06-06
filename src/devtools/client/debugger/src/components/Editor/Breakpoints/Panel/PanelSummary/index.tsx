@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { AddCommentButton } from "components";
-import React, { Dispatch, SetStateAction, useRef, useEffect } from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
@@ -17,8 +17,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
-
-const { prefs } = require("ui/utils/prefs");
+import PrefixBadgeButton from "ui/components/PrefixBadge";
 
 export type Input = "condition" | "logValue";
 
@@ -122,6 +121,7 @@ function PanelSummary({
 
   return (
     <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
+      <PrefixBadgeButton breakpoint={breakpoint} />
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
