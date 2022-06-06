@@ -23,9 +23,15 @@ export function TestPreview() {
           <div>{test.title}</div>
         </div>
         <div className="flex flex-row space-x-2">
-          <div className="flex flex-row items-center space-x-1">
+          {/* <div className="flex flex-row items-center space-x-1">
             <MaterialIcon>web_asset</MaterialIcon>
             <div>{test.path[1]}</div>
+          </div> */}
+          <div className="flex flex-row items-center space-x-1" title={test.path[1]}>
+            <img
+              className="w-4 h-4"
+              src="/images/browser-firefox.svg"
+            />
           </div>
           <div className="flex flex-row items-center space-x-1">
             <MaterialIcon>description</MaterialIcon>

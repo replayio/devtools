@@ -22,26 +22,28 @@ export function TestRow({ test, onClick }: { test: Test; onClick: () => void }) 
       }`}
       onClick={onClick}
     >
-      <div className="flex flex-col space-y-0.5">
+      <div className="flex flex-row justify-between">
         <div>
           {path[path.length - 1]} ({recordings.length})
         </div>
         <div className="flex items-center space-x-3 text-xs text-gray-500">
-          <div className="flex flex-row items-center space-x-1">
+          {/* <div className="flex flex-row items-center space-x-1">
             <MaterialIcon>web_asset</MaterialIcon>
-            <div>{path?.[1]}</div>
-          </div>
+          </div> */}
           <div className="flex flex-row items-center space-x-1">
             <MaterialIcon>description</MaterialIcon>
             <div>{path?.[path.length - 2]}</div>
           </div>
-          <div className="flex flex-row items-center space-x-1">
+          <div className="flex flex-row items-center space-x-1" title={new Date(date).toString()}>
             <MaterialIcon>schedule</MaterialIcon>
-            <div>Last run {getRelativeDate(date)}</div>
+            <div>{getRelativeDate(date)}</div>
+          </div>
+          <div className="flex flex-row items-center space-x-1" title={path[1]}>
+            <img className="w-4 h-4" src="/images/browser-firefox.svg" />
           </div>
         </div>
       </div>
-      <div className="flex flex-row h-4 space-x-0.5 items-end">
+      <div className="flex flex-row h-4 space-x-0.5 items-end overflow-hidden">
         {displayedRecordings.map((r, i) => (
           <ResultBar recording={r} key={i} maxDuration={longestDuration} />
         ))}
