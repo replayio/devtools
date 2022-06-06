@@ -4,7 +4,7 @@ import { Breakpoint } from "devtools/client/debugger/src/selectors";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
-import { PrefixBadgePicker } from "components";
+import { PrefixBadgePicker } from "../../../packages/components";
 
 import styles from "./PrefixBadge.module.css";
 
