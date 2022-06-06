@@ -176,6 +176,7 @@ export type SourceMetadata = {
     name: string;
     user?: string;
     workflow?: string;
+    url?: string;
   };
   provider?: string;
   repository?: string;

@@ -1,45 +1,23 @@
 import { MouseEvent, useContext } from "react";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Recording, RecordingMetadata } from "ui/types";
-import { getFormattedTime } from "ui/utils/timeline";
+import { Recording } from "ui/types";
 import { LibraryContext } from "../../useFilters";
-import { ResultIcon } from "../shared/ResultIcon";
+import { MainRow } from "../shared/MainRow";
+import { MainContextMenu } from "./Menu";
 
 export function ReplayRow({ recording }: { recording: Recording }) {
-  const { metadata, duration } = recording;
-
-  return (
-    <a href={`/recording/${recording.id}`} target="_blank" rel="noreferrer noopener">
-      <div className="flex flex-row items-center flex-grow p-2 px-3 space-x-2 rounded-md hover:bg-gray-100">
-        <ResultIcon result={metadata.test?.result} />
-        <div className="flex flex-col flex-grow">
-          <div className="flex space-x-1">
-            <span className="font-medium">{metadata.test?.title}</span>
-          </div>
-          <div className="flex items-center space-x-3 text-gray-500">
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>web_asset</MaterialIcon>
-              <div>{metadata.test?.path?.[1]}</div>
-            </div>
-            <div className="flex flex-row items-center space-x-1">
-              <MaterialIcon>description</MaterialIcon>
-              <div>{metadata.test?.file}</div>
-            </div>
-            <div className="flex items-center space-x-1">
-              <MaterialIcon>timer</MaterialIcon>
-              <span>{getFormattedTime(duration)}</span>
-            </div>
-          </div>
-          <Actions metadata={metadata} />
-        </div>
-      </div>
-    </a>
-  );
-}
-
-function Actions({ metadata }: { metadata: RecordingMetadata }) {
+  const { preview, setPreview } = useContext(LibraryContext);
   const { setView, setAppliedText } = useContext(LibraryContext);
+  const { metadata } = recording;
+  const isFocused = preview?.view === "test-runs" && recording.id === preview.recordingId;
+  const runUrl = recording.metadata?.source?.trigger?.url;
 
+  const onClick = (e: React.MouseEvent) => {
+    setPreview({
+      view: "test-runs",
+      id: recording.metadata.test!.run!.id!,
+      recordingId: recording.id,
+    });
+  };
   const onViewTest = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -49,14 +27,28 @@ function Actions({ metadata }: { metadata: RecordingMetadata }) {
   };
 
   return (
-    <div className="flex pt-1 space-x-1">
-      <span className="hover:underline">Open Replay</span>
-      <span>|</span>
-      {metadata.test?.run?.id ? (
-        <button onClick={onViewTest} className="hover:underline">
-          View Test
-        </button>
-      ) : null}
-    </div>
+    <MainRow
+      onClick={onClick}
+      isFocused={isFocused}
+      passed={metadata.test?.result === "passed"}
+      recordingId={recording.id}
+    >
+      <div className="flex flex-row items-center flex-grow overflow-hidden">
+        <div className="flex flex-col flex-grow py-2 overflow-hidden">
+          <button
+            className="overflow-hidden text-left whitespace-pre hover:underline overflow-ellipsis"
+            onClick={onViewTest}
+          >
+            <span>{metadata.test?.title}</span>
+          </button>
+          <div className="flex space-x-2 text-xs text-gray-500">
+            <button className="flex flex-row space-x-1 hover:underline">
+              {metadata.test?.file}
+            </button>
+          </div>
+        </div>
+        {runUrl ? <MainContextMenu runUrl={runUrl} /> : null}
+      </div>
+    </MainRow>
   );
 }

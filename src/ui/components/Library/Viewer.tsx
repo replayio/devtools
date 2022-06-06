@@ -5,7 +5,7 @@ import { Recording } from "ui/types";
 import styles from "./Library.module.css";
 import { LibraryContext } from "./useFilters";
 import { Preview } from "./Preview/Preview";
-import { TestRuns } from "./Content/TestRuns";
+import { TestRuns } from "./Content/TestRuns/TestRuns";
 import { Tests } from "./Content/Tests/Tests";
 import { Recordings } from "./Content/Recordings";
 
