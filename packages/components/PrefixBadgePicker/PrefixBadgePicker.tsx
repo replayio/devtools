@@ -58,9 +58,9 @@ export function PrefixBadgePicker({
             boxShadow: isOpen ? shadowActive : shadowInitial,
           }}
           transition={{
-            delay: isOpen ? 0 : duration * 3,
             duration,
-            boxShadow: { duration: 0.2 },
+            delay: isOpen ? 0 : duration * 3,
+            boxShadow: { duration: 0.2, delay: 0 },
           }}
           variants={{
             parentHover: {
