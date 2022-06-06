@@ -32,7 +32,7 @@ pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.showRedux", true);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.softFocus", false);
+pref("devtools.features.softFocus", true);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.testSupport", false);
 
