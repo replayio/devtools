@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { AddCommentButton, Row } from "components";
+import { AddCommentButton } from "components";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
@@ -121,6 +121,7 @@ function PanelSummary({
 
   return (
     <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
+      <PrefixBadgeButton breakpoint={breakpoint} />
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
@@ -129,15 +130,12 @@ function PanelSummary({
             value={conditionValue}
           />
         )}
-        <Row>
-          <PrefixBadgeButton breakpoint={breakpoint} />
-          <Log
-            hasCondition={!!conditionValue}
-            isEditable={isEditable}
-            onClick={() => focusInput("logValue")}
-            value={logValue}
-          />
-        </Row>
+        <Log
+          hasCondition={!!conditionValue}
+          isEditable={isEditable}
+          onClick={() => focusInput("logValue")}
+          value={logValue}
+        />
         {!isTeamDeveloper ? (
           <Popup
             trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}

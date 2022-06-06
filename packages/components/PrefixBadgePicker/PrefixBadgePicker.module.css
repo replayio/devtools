@@ -1,17 +1,17 @@
 .PrefixBadgePicker {
   display: flex;
+  align-items: center;
   position: relative;
   align-self: start;
-}
-
-.PrefixBadgePicker > .PrefixBadge + .PrefixBadge {
-  margin-left: -0.25rem;
+  height: 1.5rem;
 }
 
 .PrefixBadgePickerFill {
   position: absolute;
+  left: -2px;
   height: 100%;
   border-radius: 1rem;
+  transition: background-color 0.18s ease-out;
 }
 
 .PrefixBadge {
@@ -19,9 +19,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  flex: 0 0 1.75rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 1.25rem;
   outline: none;
 }
 
@@ -35,18 +35,12 @@
 
 .DefaultBadge {
   background-color: var(--light-grey);
-  width: 0.2rem;
-  height: 0.2rem;
-  border-radius: 0.1rem;
-}
-
-.UnicornBadge,
-.ColorBadge {
-  width: 1.25rem;
-  height: 1.25rem;
+  border-radius: 0.3rem;
 }
 
 .UnicornBadge {
+  width: 1rem;
+  height: 1rem;
   background-image: url(~devtools/client/debugger/images/sources/unicorn-pixel.svg) !important;
   background-size: auto 100%;
 }
@@ -55,6 +49,8 @@
   display: grid;
   place-items: center;
   position: relative;
+  width: 0.8rem;
+  height: 0.8rem;
   border-radius: 100%;
   background-color: transparent;
 }
@@ -87,6 +83,11 @@
 }
 
 :global(.theme-dark) .PrefixBadgePickerFill {
+  background: transparent;
+}
+
+:global(.theme-dark) .PrefixBadgePicker:hover .PrefixBadgePickerFill,
+:global(.theme-dark) .isOpen .PrefixBadgePickerFill {
   background: #474c52;
 }
 

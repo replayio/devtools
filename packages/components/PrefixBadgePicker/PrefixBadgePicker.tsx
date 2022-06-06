@@ -8,8 +8,8 @@ export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as cons
 
 export type PrefixBadge = typeof badges[number];
 
-const openedWidth = 152;
-const closedWidth = 28;
+const openedWidth = 126;
+const closedWidth = 24;
 const duration = 0.14;
 const shadowInitial = "0px 1px 2px 0px rgba(0, 0, 0, 0)";
 const shadowActive = "0px 1px 2px 0px rgba(0, 0, 0, 0.25)";
@@ -25,17 +25,17 @@ export function PrefixBadgePicker({
   onSelect,
 }: {
   /** Callback when a badge has been selected. */
-  onSelect?: (prefixBadge?: PrefixBadge | null) => void;
+  onSelect?: (prefixBadge?: PrefixBadge) => void;
 
   /** Control the opened or closed state. Useful for testing. */
   initialState?: States;
 }) {
   const id = (React as any).useId();
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | null>(null);
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge>();
   const [state, setState] = React.useState<States>(initialState);
   const isOpen = state === "opening" || state === "opened";
 
-  const handleSelect = (prefixBadgeName: PrefixBadge | null) => {
+  const handleSelect = (prefixBadgeName?: PrefixBadge) => {
     setState("closed");
     setActiveBadge(prefixBadgeName);
     onSelect?.(prefixBadgeName);
@@ -67,7 +67,7 @@ export function PrefixBadgePicker({
 
   return (
     <motion.div
-      className={styles.PrefixBadgePicker}
+      className={classNames(styles.PrefixBadgePicker, { [styles.isOpen]: isOpen })}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
       onBlur={handleBlur}
@@ -93,9 +93,9 @@ export function PrefixBadgePicker({
           className={styles.PrefixBadgePickerFill}
         />
 
-        {(activeBadge === null || isOpen) && (
+        {(activeBadge === undefined || isOpen) && (
           <motion.button
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={false}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className={styles.PrefixBadge}
@@ -103,14 +103,16 @@ export function PrefixBadgePicker({
               if (state === "opened") {
                 event.stopPropagation();
                 event.preventDefault();
-                handleSelect(null);
+                handleSelect();
               }
             }}
           >
             <motion.span
               animate={{
-                width: isOpen ? "0.6rem" : "0.2rem",
+                width: isOpen ? "0.5rem" : "0.3rem",
+                height: isOpen ? "0.1rem" : "0.3rem",
               }}
+              transition={{ type: "tween", duration: 0.16 }}
               className={styles.DefaultBadge}
             />
           </motion.button>
