@@ -11,13 +11,17 @@
 .PrefixBadgePickerFill {
   position: absolute;
   height: 100%;
-  background-color: white;
   border-radius: 1rem;
 }
 
 .PrefixBadge {
   position: relative;
-  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 1.75rem;
   outline: none;
 }
 
@@ -29,11 +33,17 @@
   box-shadow: 0 0 0 0.125rem rgba(0, 123, 255, 0.25);
 } */
 
+.DefaultBadge {
+  background-color: var(--light-grey);
+  width: 0.2rem;
+  height: 0.2rem;
+  border-radius: 0.1rem;
+}
+
 .UnicornBadge,
 .ColorBadge {
   width: 1.25rem;
   height: 1.25rem;
-  flex: 0 0 1.25rem;
 }
 
 .UnicornBadge {
@@ -70,27 +80,57 @@
   height: 50%;
 }
 
-.unicorn {
-  --primary-color: var(--badge-unicorn);
+/* Background fill colors */
+
+:global(.theme-light) .PrefixBadgePickerFill {
+  background: #fff;
+}
+
+:global(.theme-dark) .PrefixBadgePickerFill {
+  background: #474c52;
+}
+
+:root:global(.theme-light) .unicorn {
+  --primary-color: #ff6ddf;
+  color: #fff;
+}
+:root:global(.theme-dark) .unicorn {
+  --primary-color: #e110b3;
   color: #fff;
 }
 
-.purple {
-  --primary-color: var(--badge-purple);
+:root:global(.theme-light) .purple {
+  --primary-color: #a973cd;
+  color: #fff;
+}
+:root:global(.theme-dark) .purple {
+  --primary-color: #cc81ff;
   color: #fff;
 }
 
-.green {
-  --primary-color: var(--badge-green);
-  color: var(--badge-green-foreground);
+:root:global(.theme-light) .green {
+  --primary-color: #73cc6d;
+  color: #fff;
+}
+:root:global(.theme-dark) .green {
+  --primary-color: #69e261;
+  color: #050;
 }
 
-.orange {
-  --primary-color: var(--badge-orange);
+:root:global(.theme-light) .orange {
+  --primary-color: #da7c04;
+  color: #fff;
+}
+:root:global(.theme-dark) .orange {
+  --primary-color: #ff9a19;
   color: #fff;
 }
 
-.yellow {
-  --primary-color: var(--badge-yellow);
-  color: var(--badge-yellow-foreground);
+:root:global(.theme-light) .yellow {
+  --primary-color: #e4cd00;
+  color: rgb(99, 79, 5);
+}
+:root:global(.theme-dark) .yellow {
+  --primary-color: #fee608;
+  color: rgb(99, 79, 5);
 }

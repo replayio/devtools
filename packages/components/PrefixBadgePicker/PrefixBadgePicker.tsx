@@ -8,7 +8,7 @@ export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as cons
 
 export type PrefixBadge = typeof badges[number];
 
-const openedWidth = 124;
+const openedWidth = 152;
 const closedWidth = 28;
 const duration = 0.14;
 const shadowInitial = "0px 1px 2px 0px rgba(0, 0, 0, 0)";
@@ -25,17 +25,17 @@ export function PrefixBadgePicker({
   onSelect,
 }: {
   /** Callback when a badge has been selected. */
-  onSelect?: (prefixBadge?: PrefixBadge) => void;
+  onSelect?: (prefixBadge?: PrefixBadge | null) => void;
 
   /** Control the opened or closed state. Useful for testing. */
   initialState?: States;
 }) {
   const id = (React as any).useId();
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge>("unicorn");
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | null>(null);
   const [state, setState] = React.useState<States>(initialState);
   const isOpen = state === "opening" || state === "opened";
 
-  const handleSelect = (prefixBadgeName: PrefixBadge) => {
+  const handleSelect = (prefixBadgeName: PrefixBadge | null) => {
     setState("closed");
     setActiveBadge(prefixBadgeName);
     onSelect?.(prefixBadgeName);
@@ -92,6 +92,30 @@ export function PrefixBadgePicker({
           }}
           className={styles.PrefixBadgePickerFill}
         />
+
+        {(activeBadge === null || isOpen) && (
+          <motion.button
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.9 }}
+            className={styles.PrefixBadge}
+            onMouseUp={event => {
+              if (state === "opened") {
+                event.stopPropagation();
+                event.preventDefault();
+                handleSelect(null);
+              }
+            }}
+          >
+            <motion.span
+              animate={{
+                width: isOpen ? "0.6rem" : "0.2rem",
+              }}
+              className={styles.DefaultBadge}
+            />
+          </motion.button>
+        )}
+
         {badges.map((badge, index) => {
           const sharedProps = {
             key: badge,
@@ -153,6 +177,7 @@ export function PrefixBadge({
       exit={{ opacity: 0, scale: 0.9 }}
       transition={{ duration, layout: { duration: duration / 2 } }}
       onKeyDown={handleKeyDown}
+      onClick={handleSelect}
       onMouseUp={handleSelect}
     >
       <div
