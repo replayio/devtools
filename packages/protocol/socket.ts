@@ -100,7 +100,7 @@ type SessionCallbacks = {
   onRequest: (command: Request<CommandMethods>) => void;
   onResponse: (command: CommandResponse) => void;
   onResponseError: (command: CommandResponse) => void;
-  onSocketError: (error: Event, initial: boolean, lastReceivedMessageTime: Number) => void;
+  onSocketError: (error: Event, initial: boolean) => void;
   onSocketClose: (willClose: boolean) => void;
 };
 
@@ -112,7 +112,6 @@ type AnalysisCallbacks = {
 
 let gSessionCallbacks: SessionCallbacks | undefined;
 export let gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
-let lastReceivedMessageTime = Date.now();
 
 export async function createSession(
   recordingId: string,
@@ -143,12 +142,10 @@ export function initSocket(address: string): WebSocket | null {
     gSessionCallbacks?.onSocketClose(willClose);
   });
 
-  const onerror = makeInfallible((evt: Event) =>
-    gSessionCallbacks?.onSocketError(evt, false, lastReceivedMessageTime)
-  );
+  const onerror = makeInfallible((evt: Event) => gSessionCallbacks?.onSocketError(evt, false));
 
   const onInitialError = makeInfallible((evt: Event) =>
-    gSessionCallbacks?.onSocketError(evt, true, lastReceivedMessageTime)
+    gSessionCallbacks?.onSocketError(evt, true)
   );
 
   const onmessage = makeInfallible(socketDataHandler);
@@ -196,6 +193,12 @@ export function sendMessage<M extends CommandMethods>(
         gSessionCallbacks?.onResponseError(response);
 
         const { code, data, message } = response.error;
+
+        if (method === "Session.listenForLoadChanges" && code === 66) {
+          // We are being disconnected after a timeout, no need to raise
+          return;
+        }
+
         console.warn("Message failed", method, { code, id, message }, data);
 
         const err = new Error(message) as any;
@@ -274,7 +277,6 @@ export const client = new ProtocolClient({
 });
 
 function socketDataHandler(data: string) {
-  lastReceivedMessageTime = Date.now();
   gReceivedBytes += data.length;
   const msg = JSON.parse(data);
 

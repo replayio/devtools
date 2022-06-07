@@ -191,7 +191,7 @@ export function createSocket(
             dispatch(errorReceived({ ...error, recordedAt: window.performance.now() }));
           }
         },
-        onSocketError: (evt: Event, initial: boolean, lastReceivedMessageTime: Number) => {
+        onSocketError: (evt: Event, initial: boolean) => {
           console.error("Socket Error", evt);
           if (initial) {
             dispatch(
@@ -203,7 +203,7 @@ export function createSocket(
                 ...evt,
               })
             );
-          } else if (Date.now() - +lastReceivedMessageTime < 300000) {
+          } else {
             dispatch(
               setUnexpectedError({
                 action: "refresh",
@@ -212,8 +212,6 @@ export function createSocket(
                 ...evt,
               })
             );
-          } else {
-            dispatch(setUnexpectedError(getDisconnectionError(), true));
           }
         },
         onSocketClose: (willClose: boolean) => {

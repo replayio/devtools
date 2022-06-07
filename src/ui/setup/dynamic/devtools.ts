@@ -46,6 +46,7 @@ import {
 import { extendStore, AppStore } from "../store";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
+import { UnexpectedError } from "ui/state/app";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -76,19 +77,41 @@ enum SessionError {
   UnknownFatalError = 5,
   OldBuild = 6,
   LongRecording = 7,
+  InactivityTimeout = 10,
 }
 
+const defaultMessaging: UnexpectedError = {
+  action: "refresh",
+  content: "Something went wrong while replaying, we'll look into it as soon as possible.",
+  message: "Our apologies!",
+};
+
 // Reported reasons why a session can be destroyed.
-const SessionErrorMessages: Record<number, string> = {
-  [SessionError.BackendDeploy]: "Please wait a few minutes and try again.",
-  [SessionError.NodeTerminated]: "Our servers hiccuped but things should be back to normal soon.",
-  [SessionError.UnknownFatalError]: "Refreshing should help.\nIf not, please try recording again.",
-  [SessionError.KnownFatalError]:
-    "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
-  [SessionError.OldBuild]:
-    "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
-  [SessionError.LongRecording]:
-    "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
+const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
+  [SessionError.BackendDeploy]: {
+    content: "Please wait a few minutes and try again.",
+  },
+  [SessionError.NodeTerminated]: {
+    content: "Our servers hiccuped but things should be back to normal soon.",
+  },
+  [SessionError.UnknownFatalError]: {
+    content: "Refreshing should help.\nIf not, please try recording again.",
+  },
+  [SessionError.KnownFatalError]: {
+    content:
+      "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+  },
+  [SessionError.OldBuild]: {
+    content:
+      "This error has been fixed in an updated version of Replay. Please try upgrading Replay and trying a new recording.",
+  },
+  [SessionError.LongRecording]: {
+    content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
+  },
+  [SessionError.InactivityTimeout]: {
+    content: "Replays disconnect after 5 minutes to reduce server load.",
+    message: "Ready when you are!",
+  },
 };
 
 export default async function DevTools(store: AppStore) {
@@ -162,16 +185,11 @@ export default async function DevTools(store: AppStore) {
   );
 
   addEventListener("Recording.sessionError", (error: sessionError) => {
-    const content: string =
-      SessionErrorMessages[error.code] ||
-      "Something went wrong while replaying, we'll look into it as soon as possible.";
-
     store.dispatch(
       actions.setUnexpectedError({
         ...error,
-        message: "Our apologies!",
-        content,
-        action: "refresh",
+        ...defaultMessaging,
+        ...SessionErrorMessages[error.code],
       })
     );
   });
