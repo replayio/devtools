@@ -10,7 +10,10 @@ import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@repl
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
+import {
+  AnalysisStatus,
+  getAnalysisPointsForLocation,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -240,7 +243,13 @@ async function setMultiSourceLogpoint(
       if (!points.error) {
         showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
-      return;
+      // If we're only displaying only primitives, we can bail out if there's no condition or the condition request is done
+      if (
+        !condition ||
+        (points.status === AnalysisStatus.Completed && points.condition === condition)
+      ) {
+        return;
+      }
     }
   }
 
@@ -341,8 +350,6 @@ async function setMultiSourceLogpoint(
       );
 
       showLogpointsResult(logGroupId, results);
-    } else {
-      removeLogpoint(logGroupId);
     }
 
     // MAYBE

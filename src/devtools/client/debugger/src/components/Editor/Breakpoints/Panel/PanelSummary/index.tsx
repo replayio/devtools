@@ -4,7 +4,7 @@ import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
 
-import { LocationAnalysisPoints } from "devtools/client/debugger/src/reducers/breakpoints";
+import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/breakpoints";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -24,7 +24,7 @@ import { prefs } from "ui/utils/prefs";
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
-  analysisPoints?: LocationAnalysisPoints;
+  analysisPoints?: LocationAnalysisSummary;
   breakpoint: any;
   executionPoint: any;
   isHot: boolean;

@@ -12,7 +12,7 @@ import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
 import {
   getAnalysisPointsForLocation,
-  LocationAnalysisPoints,
+  LocationAnalysisSummary,
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
@@ -27,7 +27,7 @@ function Points({
   breakpoint,
   hoveredItem,
 }: {
-  analysisPoints: LocationAnalysisPoints;
+  analysisPoints: LocationAnalysisSummary;
   breakpoint: any;
   hoveredItem: HoveredItem | null;
 }) {

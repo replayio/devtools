@@ -3,7 +3,7 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import { LocationAnalysisPoints } from "devtools/client/debugger/src/reducers/breakpoints";
+import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 
@@ -20,7 +20,7 @@ export function PanelStatus({
   analysisPoints,
   prefixBadge,
 }: {
-  analysisPoints?: LocationAnalysisPoints;
+  analysisPoints?: LocationAnalysisSummary;
   prefixBadge: PrefixBadge;
 }) {
   const isIndexed = useSelector(getIsIndexed);
