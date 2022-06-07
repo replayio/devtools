@@ -28,8 +28,7 @@ export function TestPreview() {
           </div>
         </div>
       </div>
-        <ReplayList recordings={test.recordings} />
+      <ReplayList recordings={test.recordings} />
     </>
   );
 }
-

@@ -51,13 +51,7 @@ function SecondaryInfo({ testRun }: { testRun: TestRun }) {
   );
 }
 
-export function TestRunRow({
-  testRun,
-  onClick,
-}: {
-  testRun: TestRun;
-  onClick: () => void;
-}) {
+export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { preview, setPreview } = useContext(LibraryContext);
   const results = testRun.recordings.map(r => r.metadata?.test?.result);
 

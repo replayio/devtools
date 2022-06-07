@@ -41,7 +41,11 @@ export function TestRuns() {
 
   useEffect(() => {
     if (!loading && testRuns && !initialized) {
-      setPreview({ view: "test-runs", id: testRuns[0].id, recordingId: testRuns[0].recordings[0].id! });
+      setPreview({
+        view: "test-runs",
+        id: testRuns[0].id,
+        recordingId: testRuns[0].recordings[0].id!,
+      });
       setInitialized(true);
     }
   }, [testRuns, loading, initialized, setPreview]);
