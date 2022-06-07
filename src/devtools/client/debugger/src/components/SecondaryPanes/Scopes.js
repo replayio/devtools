@@ -2,17 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-import React, { PureComponent } from "react";
-import { showMenu } from "devtools/shared/contextmenu";
-import { connect } from "react-redux";
-import actions from "../../actions";
 import {
   highlightDomElement,
   unHighlightDomElement,
 } from "devtools/client/webconsole/actions/toolbox";
-import { features } from "../../utils/prefs";
+import { ObjectInspector } from "devtools/packages/devtools-reps";
+import { showMenu } from "devtools/shared/contextmenu";
+import React, { PureComponent } from "react";
+import { connect } from "react-redux";
+import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
+import { Redacted } from "ui/components/Redacted";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { trackEvent } from "ui/utils/telemetry";
+import { formatTimestamp } from "ui/utils/time";
 
+import actions from "../../actions";
 import {
   getSelectedFrame,
   getFrameScope,
@@ -23,11 +28,7 @@ import {
 } from "../../selectors";
 import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
-import { trackEvent } from "ui/utils/telemetry";
-import { Redacted } from "ui/components/Redacted";
-import { ObjectInspector } from "devtools/packages/devtools-reps";
-import { getCurrentTime } from "ui/reducers/timeline";
-import { formatTimestamp } from "ui/utils/time";
+import { features } from "../../utils/prefs";
 
 class Scopes extends PureComponent {
   constructor(props) {
@@ -173,8 +174,23 @@ class Scopes extends PureComponent {
   }
 
   render() {
-    const { isErrored, isLoading } = this.props;
+    const { currentTime, enterFocusMode, isCurrentTimeInLoadedRegion, isErrored, isLoading } =
+      this.props;
     const { scopes } = this.state;
+
+    if (!isCurrentTimeInLoadedRegion) {
+      return (
+        <div className="pane">
+          <div className="pane-info empty">
+            Scope is unavailable because it is outside{" "}
+            <span className="cursor-pointer underline" onClick={enterFocusMode}>
+              your debugging window
+            </span>
+            .
+          </div>
+        </div>
+      );
+    }
 
     if (isErrored) {
       return (
@@ -216,19 +232,21 @@ const mapStateToProps = state => {
   const framesLoading = getFramesLoading(state);
 
   return {
-    cx,
     currentTime: getCurrentTime(state),
-    selectedFrame,
-    isLoading: pending || framesLoading || pauseLoading,
-    isErrored: pauseErrored,
-    why: getPauseReason(state),
-    frameScopes: scope,
-    originalScopesUnavailable,
+    cx,
     expandedScopes: getLastExpandedScopes(state),
+    isCurrentTimeInLoadedRegion: isCurrentTimeInLoadedRegion(state),
+    frameScopes: scope,
+    isErrored: pauseErrored,
+    isLoading: pending || framesLoading || pauseLoading,
+    originalScopesUnavailable,
+    selectedFrame,
+    why: getPauseReason(state),
   };
 };
 
 export default connect(mapStateToProps, {
+  enterFocusMode: enterFocusModeAction,
   openLink: actions.openLink,
   openElementInInspector: actions.openElementInInspectorCommand,
   highlightDomElement,

@@ -8,6 +8,7 @@ import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../s
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
@@ -63,6 +64,10 @@ function pauseRequestedAt(executionPoint) {
  */
 export function paused({ executionPoint, time }) {
   return async function (dispatch, getState, { ThreadFront }) {
+    if (!isCurrentTimeInLoadedRegion(getState())) {
+      return;
+    }
+
     trackEvent("paused");
 
     await dispatch(pauseRequestedAt(executionPoint, time));

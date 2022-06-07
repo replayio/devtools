@@ -16,15 +16,14 @@ import { waitForTime } from "protocol/utils";
 import { Action } from "redux";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { selectors } from "ui/reducers";
-import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime } from "ui/reducers/timeline";
 import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
 import { User } from "ui/types";
 
+import { getLoadedRegions } from "./app";
+import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-
-import type { UIThunkAction } from "./index";
-import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 
 type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
@@ -203,23 +202,14 @@ export function createLabels(
 export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
   return (dispatch, getState) => {
     dispatch(clearPendingComment());
-    const focusRegion = getFocusRegion(getState());
 
-    if (
-      focusRegion &&
-      (item.time < startTimeForFocusRegion(focusRegion) ||
-        item.time > endTimeForFocusRegion(focusRegion))
-    ) {
-      console.error("Cannot seek outside the current focused region", focusRegion, item);
-      return;
-    }
-
-    let cx = selectors.getThreadContext(getState());
+    let context = selectors.getThreadContext(getState());
     dispatch(seek(item.point, item.time, item.hasFrames));
     dispatch(setSelectedPrimaryPanel("comments"));
+
     if (item.sourceLocation) {
-      cx = selectors.getThreadContext(getState());
-      dispatch(selectLocation(cx, item.sourceLocation));
+      context = selectors.getThreadContext(getState());
+      dispatch(selectLocation(context, item.sourceLocation));
     }
   };
 }

@@ -438,13 +438,6 @@ function setVisibleMessages(messagesState: MessageState, forceTimestampSort = fa
       filtered[message.level as FilterCountKeys] = filtered[message.level as FilterCountKeys] + 1;
     }
   }
-  console.groupCollapsed(
-    `%csetVisibleMessages() (hide ${filtered})`,
-    "color: red; font-weight: bold;"
-  );
-  console.log("all messages:", messagesState.messages.entities);
-  console.log("visible:", messagesToShow);
-  console.groupEnd();
 
   messagesState.visibleMessages = messagesToShow;
   messagesState.filteredMessagesCount = filtered;

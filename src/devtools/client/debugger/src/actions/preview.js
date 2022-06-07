@@ -2,11 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { isConsole } from "../utils/preview";
-import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { createPrimitiveValueFront } from "protocol/thread";
 import { ValueItem } from "devtools/packages/devtools-reps";
+import { createPrimitiveValueFront } from "protocol/thread";
+import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 
+import { getExpressionFromCoords } from "../utils/editor/get-expression";
+import { isConsole } from "../utils/preview";
 import {
   getPreview,
   isSelectedFrameVisible,
@@ -18,7 +19,8 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
   return (dispatch, getState) => {
     const cursorPos = target.getBoundingClientRect();
 
-    if (!isSelectedFrameVisible(getState())) {
+    const state = getState();
+    if (!isCurrentTimeInLoadedRegion(state) || !isSelectedFrameVisible(state)) {
       return;
     }
 

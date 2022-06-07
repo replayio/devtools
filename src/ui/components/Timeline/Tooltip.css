@@ -13,4 +13,5 @@
   border: 1px solid var(--theme-toggle-bgcolor);
   transform: translateX(-50%);
   user-select: none;
+  white-space: nowrap;
 }
