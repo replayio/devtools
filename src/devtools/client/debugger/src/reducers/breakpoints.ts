@@ -482,28 +482,30 @@ export const getAnalysisPointsForLocation = createSelector(
 
     let finalPoints: PointDescription[] = [];
 
-    if (matchingEntries.length > 0) {
-      const pointsPerEntry = matchingEntries.map(entry => {
-        const { points = [], results = [] } = entry;
-        if (condition && entry.status === AnalysisStatus.Completed) {
-          // Currently the backend does not filter returned points by condition, only analysis results.
-          // If there _is_ a condition, _and_ we have results back, we should filter the total points
-          // based on the analysis results.
-          const resultPointsSet = new Set<string>(results.map(result => result.key));
-          const filteredConditionPoints = points.filter(point => resultPointsSet.has(point.point));
-          return filteredConditionPoints;
-        }
-
-        return points;
-      });
-
-      const flattenedPoints = pointsPerEntry.flat();
-      const uniquePoints = uniqBy(flattenedPoints, item => item.point);
-      uniquePoints.sort((a, b) => compareNumericStrings(a.point, b.point));
-
-      // TODO `filterToFocusRegion` wants a pre-sorted array, but maybe a bit cheaper to filter first _then_ sort?
-      finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
+    if (matchingEntries.length === 0) {
+      return undefined;
     }
+
+    const pointsPerEntry = matchingEntries.map(entry => {
+      const { points = [], results = [] } = entry;
+      if (condition && entry.status === AnalysisStatus.Completed) {
+        // Currently the backend does not filter returned points by condition, only analysis results.
+        // If there _is_ a condition, _and_ we have results back, we should filter the total points
+        // based on the analysis results.
+        const resultPointsSet = new Set<string>(results.map(result => result.key));
+        const filteredConditionPoints = points.filter(point => resultPointsSet.has(point.point));
+        return filteredConditionPoints;
+      }
+
+      return points;
+    });
+
+    const flattenedPoints = pointsPerEntry.flat();
+    const uniquePoints = uniqBy(flattenedPoints, item => item.point);
+    uniquePoints.sort((a, b) => compareNumericStrings(a.point, b.point));
+
+    // TODO `filterToFocusRegion` wants a pre-sorted array, but maybe a bit cheaper to filter first _then_ sort?
+    finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
 
     return {
       data: finalPoints,

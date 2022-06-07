@@ -244,10 +244,7 @@ async function setMultiSourceLogpoint(
         showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
       // If we're only displaying only primitives, we can bail out if there's no condition or the condition request is done
-      if (
-        !condition ||
-        (points.status === AnalysisStatus.Completed && points.condition === condition)
-      ) {
+      if (!condition) {
         return;
       }
     }

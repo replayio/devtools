@@ -3,7 +3,10 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/breakpoints";
+import {
+  AnalysisStatus,
+  LocationAnalysisSummary,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 
@@ -23,14 +26,17 @@ export function PanelStatus({
   analysisPoints?: LocationAnalysisSummary;
   prefixBadge: PrefixBadge;
 }) {
-  const isIndexed = useSelector(getIsIndexed);
   const time = useSelector(getCurrentTime);
   let status = "";
 
-  const points = analysisPoints?.data || [];
+  const points = analysisPoints?.data;
   const error = analysisPoints?.error;
+  const runningStatus = analysisPoints?.status;
 
-  if (!isIndexed || !analysisPoints) {
+  if (
+    !points ||
+    [AnalysisStatus.LoadingPoints, AnalysisStatus.LoadingResults].includes(runningStatus!)
+  ) {
     status = "Loading";
   } else if (error) {
     if (error === AnalysisError.TooManyPointsToFind) {
@@ -55,7 +61,10 @@ export function PanelStatus({
           prefixBadge
         )}`}
       >
-        <div className="text-center" style={{ width: `${maxStatusLength(points.length)}ch` }}></div>
+        <div
+          className="text-center"
+          style={{ width: `${maxStatusLength(points?.length ?? 0)}ch` }}
+        ></div>
         {status}
       </div>
     </div>
