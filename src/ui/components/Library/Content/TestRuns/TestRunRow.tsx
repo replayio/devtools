@@ -51,10 +51,15 @@ function SecondaryInfo({ testRun }: { testRun: TestRun }) {
   );
 }
 
-export function TestRunRow({ testRun }: { testRun: TestRun }) {
+export function TestRunRow({
+  testRun,
+  onClick,
+}: {
+  testRun: TestRun;
+  onClick: () => void;
+}) {
   const { preview, setPreview } = useContext(LibraryContext);
   const results = testRun.recordings.map(r => r.metadata?.test?.result);
-  const onClick = () => setPreview({ id: testRun.id, view: "test-runs" });
 
   const displayedRecordings = testRun.recordings.filter(r => r.metadata?.test?.result);
   const longestDuration = Math.max(...testRun.recordings.map(r => r.duration));
