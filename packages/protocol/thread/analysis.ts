@@ -1,4 +1,5 @@
 import { AnalysisEntry, Location, PointDescription } from "@replayio/protocol";
+import { ThreadFront } from "protocol/thread";
 import { AnalysisParams } from "../analysisManager";
 import { gAnalysisCallbacks, sendMessage } from "../socket";
 
@@ -60,6 +61,8 @@ export const createAnalysis = async (
     async findPoints() {
       try {
         await sendMessage("Analysis.findAnalysisPoints", { analysisId }, params.sessionId);
+        await ThreadFront.ensureAllSources();
+        points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
         return {
           points,
           error: undefined,
