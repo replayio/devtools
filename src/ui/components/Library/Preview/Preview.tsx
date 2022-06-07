@@ -7,7 +7,7 @@ export function Preview() {
   const { preview } = useContext(LibraryContext);
   return (
     <div
-      className="flex flex-col p-4 space-y-4 overflow-auto text-sm bg-white rounded-md shadow-md"
+      className="flex flex-col overflow-auto text-sm bg-white rounded-md shadow-md"
       style={{ width: "50rem" }}
     >
       {preview?.view === "tests" ? <TestPreview /> : <TestRunPreview />}

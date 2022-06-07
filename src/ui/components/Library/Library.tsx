@@ -122,6 +122,7 @@ function Library({
   }
 
   const handleSetView = (view: View) => {
+    console.log("test");
     setView(view);
     setPreview(null);
     setAppliedText("");

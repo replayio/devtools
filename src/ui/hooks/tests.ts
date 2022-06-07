@@ -220,6 +220,8 @@ function convertTestRun(testRun: any) {
   const firstRecording = sortedRecordings[0];
   const { source } = firstRecording.metadata;
 
+  console.log({source});
+
   return {
     ...testRun,
     commit: {
