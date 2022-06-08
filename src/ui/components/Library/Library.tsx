@@ -7,7 +7,7 @@ import * as actions from "ui/actions/app";
 import { Workspace } from "ui/types";
 import { UIState } from "ui/state";
 import * as selectors from "ui/reducers/app";
-import { Nag, useGetUserInfo } from "ui/hooks/users";
+import { useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
@@ -41,56 +41,20 @@ function isUnknownWorkspaceId(
 }
 
 function LibraryLoader(props: PropsFromRedux) {
+  const { setModal } = props;
   const auth = useAuth0();
   const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
   const userInfo = hooks.useGetUserInfo();
   const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
+  const dismissNag = hooks.useDismissNag();
 
   useEffect(() => {
     if (!userInfo.loading && !userSettingsLoading) {
       LogRocket.createSession({ userInfo, auth0User: auth.user, userSettings });
     }
   }, [auth, userInfo, userSettings, userSettingsLoading]);
-
-  if (loading1 || loading2 || loading3) {
-    return <LoadingScreen />;
-  }
-
-  return <Library {...{ ...props, workspaces, pendingWorkspaces, nags }} />;
-}
-
-type LibraryProps = PropsFromRedux & {
-  workspaces: Workspace[];
-  pendingWorkspaces?: Workspace[];
-  nags: Nag[];
-};
-
-function Library({
-  setWorkspaceId,
-  setModal,
-  currentWorkspaceId,
-  workspaces,
-  pendingWorkspaces,
-  nags,
-}: LibraryProps) {
-  const router = useRouter();
-  const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
-  const [view, setView] = useState<View>("recordings");
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
-  const dismissNag = hooks.useDismissNag();
-
-  // TODO [jaril] Fix react-hooks/exhaustive-deps
-  useEffect(function handleDeletedTeam() {
-    // After rendering null, update the workspaceId to display the user's library
-    // instead of the non-existent team.
-    if (![{ id: null }, ...workspaces].some(ws => ws.id === currentWorkspaceId)) {
-      setWorkspaceId(null);
-      updateDefaultWorkspace({ variables: { workspaceId: null } });
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // TODO [jaril] Fix react-hooks/exhaustive-deps
   useEffect(function handleOnboardingModals() {
@@ -103,6 +67,40 @@ function Library({
     } else if (firstReplay(nags)) {
       trackEvent("onboarding.demo_replay_prompt");
       setModal("first-replay");
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (loading1 || loading2 || loading3) {
+    return <LoadingScreen />;
+  }
+
+  return <Library {...{ ...props, workspaces, pendingWorkspaces }} />;
+}
+
+type LibraryProps = PropsFromRedux & {
+  workspaces: Workspace[];
+  pendingWorkspaces?: Workspace[];
+};
+
+function Library({
+  setWorkspaceId,
+  currentWorkspaceId,
+  workspaces,
+  pendingWorkspaces,
+}: LibraryProps) {
+  const router = useRouter();
+  const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
+  const [view, setView] = useState<View>("recordings");
+  const [preview, setPreview] = useState<Preview | null>(null);
+  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+
+  // TODO [jaril] Fix react-hooks/exhaustive-deps
+  useEffect(function handleDeletedTeam() {
+    // After rendering null, update the workspaceId to display the user's library
+    // instead of the non-existent team.
+    if (![{ id: null }, ...workspaces].some(ws => ws.id === currentWorkspaceId)) {
+      setWorkspaceId(null);
+      updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -131,9 +129,9 @@ function Library({
     <LibraryContext.Provider
       value={{ filter, view, preview, setPreview, setView: handleSetView, setAppliedText }}
     >
-      <main className="flex flex-row w-full h-full">
+      <main className="flex h-full w-full flex-row">
         <Sidebar nonPendingWorkspaces={workspaces} />
-        <div className="flex flex-col flex-grow overflow-x-hidden">
+        <div className="flex flex-grow flex-col overflow-x-hidden">
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
             <FilterBar
               displayedString={displayedString}
