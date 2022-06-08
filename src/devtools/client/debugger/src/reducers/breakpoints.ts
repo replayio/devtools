@@ -428,6 +428,14 @@ const customAnalysisResultComparator = (
   return result;
 };
 
+export const getAnalysisMappingForLocation = (state: UIState, location: Location | null) => {
+  if (!location) {
+    return undefined;
+  }
+  const locationKey = getLocationKey(location);
+  return state.breakpoints.analysisMappings.entities[locationKey];
+};
+
 /**
  * Retrieves a unique sorted set of hit points for a given location based on analysis runs.
  * If there is no breakpoint active for the location or no analysis run, returns `undefined`.
@@ -436,13 +444,7 @@ const customAnalysisResultComparator = (
  */
 export const getAnalysisPointsForLocation = createSelector(
   [
-    (state: UIState, location: Location | null) => {
-      if (!location) {
-        return undefined;
-      }
-      const locationKey = getLocationKey(location);
-      return state.breakpoints.analysisMappings.entities[locationKey];
-    },
+    getAnalysisMappingForLocation,
     (state: UIState) => state.breakpoints.analyses,
     (state: UIState) => state.timeline.focusRegion,
     (state: UIState, location: Location | null, condition: string | null = "") => condition,
