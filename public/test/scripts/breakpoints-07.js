@@ -50,6 +50,12 @@
     Test.app.actions.setViewMode("dev");
 
     await Test.waitUntil(
+      () => document.querySelector(".toolbox-toolbar-container .debugger button"),
+      { waitingFor: "toolbox debugger button" }
+    );
+    document.querySelector(".toolbox-toolbar-container .debugger button").click();
+
+    await Test.waitUntil(
       () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 2,
       { waitingFor: "a breakpoint and a logpoint to be present" }
     );
