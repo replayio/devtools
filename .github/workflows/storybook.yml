@@ -7,7 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Deps
-        run: npm install
+      - uses: bahmutov/npm-install@v1
       - name: Build Storybook
         run: npm run build-storybook

@@ -3,8 +3,7 @@ description: "Run end-to-end tests. Note that this action assumes that Node and 
 runs:
   using: "composite"
   steps:
-    - name: Install dependencies
-      run: npm install
+    - uses: bahmutov/npm-install@v1
       shell: bash
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash

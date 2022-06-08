@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Deps
-        run: npm install
+      - uses: bahmutov/npm-install@v1
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1.0.1
