@@ -19,11 +19,12 @@ import { ContextMenu } from "ui/components/ContextMenu";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
-import { getFocusRegion, getShowFocusModeControls } from "ui/reducers/timeline";
+import { getFocusRegion, getShowFocusModeControls, getZoomRegion } from "ui/reducers/timeline";
 import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
+import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
@@ -311,7 +312,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
   };
 
   setFocusStart = async () => {
-    const { dispatch, focusRegion } = this.props;
+    const { dispatch } = this.props;
     const { message } = this.state.contextMenu!;
 
     this.setState({ contextMenu: null });
@@ -374,6 +375,7 @@ async function getTimeForMessage(message: Message): Promise<number> {
 function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) {
   const dispatch = useDispatch();
   const focusRegion = useSelector(getFocusRegion);
+  const zoomRegion = useSelector(getZoomRegion);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
   const { countAfter, countBefore, messageIDs } = useSelector(selectors.getVisibleMessageData);
 
@@ -401,6 +403,19 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
       label = "outside of";
     } else {
       return null;
+    }
+  } else {
+    // Edge case handling here:
+    // Don't show a nonsensical message about filtered logs before or after the focus window
+    // if the focus window is at the very start or end of the recording.
+    if (position === "before") {
+      if (startTimeForFocusRegion(focusRegion) === 0) {
+        return null;
+      }
+    } else {
+      if (endTimeForFocusRegion(focusRegion) === zoomRegion.endTime) {
+        return null;
+      }
     }
   }
 
