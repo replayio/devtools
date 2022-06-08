@@ -422,6 +422,8 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
       // If we're confident there are no filtered messages, there's nothing for this component to show.
       return null;
     } else {
+      // Even though no messages were filtered out on the client, there may be messages outside of the focus region on the server.
+      // The best we can do in this case is say "maybe".
       return (
         <div className={styles.TrimmedMessageCountRow}>
           There may be some logs {label}{" "}
