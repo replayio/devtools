@@ -37,15 +37,7 @@ export const getVisibleMessageData = createSelector(
   getFocusRegion,
   getLastFetchedForFocusRegion,
   getConsoleOverflow,
-  (state: UIState) => state.app.loadedRegions,
-  (
-    messages,
-    visibleMessages,
-    focusRegion,
-    lastFetchedFocusRange,
-    lastFetchDidOverflow,
-    loadedRegions
-  ) => {
+  (messages, visibleMessages, focusRegion, lastFetchedFocusRange, lastFetchDidOverflow) => {
     const filteredMessageIDs: string[] = [];
 
     // We can only reliably show counts for the number of messages filtered (before/after) if:
@@ -53,7 +45,7 @@ export const getVisibleMessageData = createSelector(
     // 2) Our request to fetch all messages didn't overflow (so we're filtering the entire set of them).
     //
     // Otherwise the best thing we can show is a "maybe".
-    const canShowCount = lastFetchedFocusRange === null && !lastFetchDidOverflow;
+    const isFilteredCountExact = lastFetchedFocusRange === null && !lastFetchDidOverflow;
 
     let countAfter = 0;
     let countBefore = 0;
@@ -80,8 +72,9 @@ export const getVisibleMessageData = createSelector(
     });
 
     return {
-      countAfter: canShowCount ? countAfter : -1,
-      countBefore: canShowCount ? countBefore : -1,
+      countAfter,
+      countBefore,
+      isFilteredCountExact,
       messageIDs: filteredMessageIDs,
     };
   }
