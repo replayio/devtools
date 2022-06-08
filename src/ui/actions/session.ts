@@ -108,7 +108,7 @@ export function getDisconnectionError(): UnexpectedError {
   endMixpanelSession("disconnected");
   return {
     action: "refresh",
-    content: "Replays disconnect after 5 minutes to reduce server load.",
+    content: "Replays disconnect after 15 minutes to reduce server load.",
     message: "Ready when you are!",
   };
 }

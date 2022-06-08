@@ -109,7 +109,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
     content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
   },
   [SessionError.InactivityTimeout]: {
-    content: "Replays disconnect after 5 minutes to reduce server load.",
+    content: "Replays disconnect after 15 minutes to reduce server load.",
     message: "Ready when you are!",
   },
 };
@@ -187,8 +187,8 @@ export default async function DevTools(store: AppStore) {
   addEventListener("Recording.sessionError", (error: sessionError) => {
     store.dispatch(
       actions.setUnexpectedError({
-        ...error,
         ...defaultMessaging,
+        ...error,
         ...SessionErrorMessages[error.code],
       })
     );
