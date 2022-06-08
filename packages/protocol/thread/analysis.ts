@@ -3,6 +3,8 @@ import { ThreadFront } from "protocol/thread";
 import { AnalysisParams } from "../analysisManager";
 import { client, gAnalysisCallbacks } from "../socket";
 
+export const MAX_POINTS_FOR_FULL_ANALYSIS = 200;
+
 export interface Analysis {
   analysisId: string;
   addLocation: (location: Location) => Promise<void>;

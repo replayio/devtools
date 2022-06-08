@@ -19,7 +19,7 @@ import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
-import { prefs } from "ui/utils/prefs";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 
 export type Input = "condition" | "logValue";
 
@@ -112,7 +112,7 @@ function PanelSummary({
           }
         >
           This log cannot be edited because <br />
-          it was hit 200+ times
+          it was hit {MAX_POINTS_FOR_FULL_ANALYSIS}+ times
         </Popup>
         <div className="button-container flex items-center">
           <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />

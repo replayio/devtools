@@ -17,7 +17,12 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analy
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "protocol/thread";
 import { PrimitiveValue } from "protocol/thread/value";
-import { createAnalysis, Analysis, AnalysisError } from "protocol/thread/analysis";
+import {
+  createAnalysis,
+  Analysis,
+  AnalysisError,
+  MAX_POINTS_FOR_FULL_ANALYSIS,
+} from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
 import {
   analysisCreated,
@@ -59,7 +64,7 @@ export function setupLogpoints(_store: UIStore) {
 }
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (!LogpointHandlers.onPointLoading || points.length >= 200) {
+  if (!LogpointHandlers.onPointLoading || points.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return;
   }
 
@@ -74,7 +79,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (!LogpointHandlers.onResult || result.length >= 200) {
+  if (!LogpointHandlers.onResult || result.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return;
   }
 
@@ -313,7 +318,7 @@ async function setMultiSourceLogpoint(
 
     const shouldGetResults = condition || !primitives;
 
-    if (shouldGetResults && points.length <= 200) {
+    if (shouldGetResults && points.length <= MAX_POINTS_FOR_FULL_ANALYSIS) {
       store.dispatch(analysisResultsRequested(analysisId));
 
       const { results, error: runError } = await analysis.runAnalysis();

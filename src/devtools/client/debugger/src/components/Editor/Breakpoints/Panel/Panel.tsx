@@ -23,7 +23,7 @@ import FirstEditNag from "./FirstEditNag";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
-import { AnalysisError } from "protocol/thread/analysis";
+import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -79,7 +79,9 @@ function Panel({
   const pausedOnHit = !!points?.some(
     ({ point, time }) => point == executionPoint && time == currentTime
   );
-  const isHot = error === AnalysisError.TooManyPointsToFind || (points?.length || 0) > 200;
+  const isHot =
+    error === AnalysisError.TooManyPointsToFind ||
+    (points?.length || 0) > MAX_POINTS_FOR_FULL_ANALYSIS;
 
   useEffect(() => {
     const updateWidth = () => setWidth(getPanelWidth(editor));
