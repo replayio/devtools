@@ -25,6 +25,7 @@ import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpo
 
 import { getSelectedSource } from "./sources";
 import type { Breakpoint, SourceLocation } from "./types";
+import { FocusRegion } from "ui/state/timeline";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
@@ -53,6 +54,7 @@ export type AnalysisRequest = {
   id: string;
   location: Location;
   condition?: string;
+  focusRegion: FocusRegion | null;
   points: PointDescription[] | undefined;
   results: AnalysisEntry[] | undefined;
   status: AnalysisStatus;
@@ -170,15 +172,21 @@ const breakpointsSlice = createSlice({
 
     analysisCreated(
       state,
-      action: PayloadAction<{ analysisId: string; location: Location; condition?: string }>
+      action: PayloadAction<{
+        analysisId: string;
+        location: Location;
+        condition?: string;
+        focusRegion: FocusRegion | null;
+      }>
     ) {
-      const { analysisId, location, condition } = action.payload;
+      const { analysisId, location, condition, focusRegion } = action.payload;
 
       analysesAdapter.addOne(state.analyses, {
         error: undefined,
         id: analysisId,
         location,
         condition,
+        focusRegion,
         points: undefined,
         results: undefined,
         status: AnalysisStatus.Created,
