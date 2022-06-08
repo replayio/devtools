@@ -5,8 +5,7 @@ import sortBy from "lodash/sortBy";
 import { WiredFrame } from "protocol/thread/pause";
 import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { actions } from "ui/actions";
-import { hideRequestDetails } from "ui/actions/network";
+import { hideRequestDetails, seekToRequestFrame } from "ui/actions/network";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFormattedFrames } from "ui/reducers/network";
@@ -144,15 +143,24 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
   );
 };
 
-const StackTrace = ({ cx, frames }: { cx: any; frames: WiredFrame[] }) => {
+const StackTrace = ({
+  cx,
+  frames,
+  request,
+}: {
+  cx: any;
+  frames: WiredFrame[];
+  request: RequestSummary;
+}) => {
   const dispatch = useDispatch();
-  const selectFrame = (cx: any, frame: WiredFrame) => dispatch(actions.selectFrame(cx, frame));
-
+  const selectFrame = async (cx: any, frame: any) => {
+    dispatch(seekToRequestFrame(request, frame, cx));
+  };
   return (
     <div>
       <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
       <div className="px-2">
-        <Frames cx={cx} framesLoading={true} frames={frames} selectFrame={selectFrame} />
+        <Frames cx={cx} frames={frames} selectFrame={selectFrame} />
       </div>
     </div>
   );
@@ -327,7 +335,7 @@ const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) =
           {activeTab === "cookies" && <Cookies request={request} />}
           {activeTab === "response" && <ResponseBody request={request} />}
           {activeTab === "request" && <RequestBody request={request} />}
-          {activeTab === "stackTrace" && <StackTrace cx={cx} frames={frames} />}
+          {activeTab === "stackTrace" && <StackTrace cx={cx} frames={frames} request={request} />}
           {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>

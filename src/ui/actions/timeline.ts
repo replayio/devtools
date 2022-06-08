@@ -111,7 +111,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       time = initialPausePoint.time;
     }
 
-    ThreadFront.timeWarp(point, time, hasFrames, /* force */ false);
+    ThreadFront.timeWarp(point, time, hasFrames);
     ThreadFront.initializedWaiter.resolve();
   };
 }
@@ -217,7 +217,7 @@ export function seek(
       const regions = getLoadedRegions(getState());
       const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
       if (isTimeInLoadedRegion) {
-        ThreadFront.timeWarp(point, time, hasFrames, false);
+        ThreadFront.timeWarp(point, time, hasFrames);
       } else {
         // We can't time-wrap in this case because trying to pause outside of a loaded region will throw.
         // In this case the best we can do is update the current time and the "video" frame.

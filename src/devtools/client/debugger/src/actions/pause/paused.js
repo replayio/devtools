@@ -62,11 +62,13 @@ function pauseRequestedAt(executionPoint) {
  * @memberof actions/pause
  * @static
  */
-export function paused({ executionPoint, time }) {
+export function paused({ executionPoint, frame, time }) {
   return async function (dispatch, getState, { ThreadFront }) {
     if (!isCurrentTimeInLoadedRegion(getState())) {
       return;
     }
+
+    console.log("PAUSED", { frame, executionPoint, time });
 
     trackEvent("paused");
 
@@ -74,7 +76,7 @@ export function paused({ executionPoint, time }) {
 
     const pause = ThreadFront.ensurePause(executionPoint, time);
 
-    dispatch({ type: "PAUSED", executionPoint, time, id: pause.id });
+    dispatch({ type: "PAUSED", executionPoint, time, id: pause.id, frame });
 
     const cx = getThreadContext(getState());
 
@@ -89,17 +91,17 @@ export function paused({ executionPoint, time }) {
 
     await dispatch(fetchFrames(cx, pause));
 
-    const frame = getSelectedFrame(getState());
-    if (frame) {
+    const selectedFrame = frame || getSelectedFrame(getState());
+    if (selectedFrame) {
       const currentLocation = getSelectedLocation(getState());
       if (
         !currentLocation ||
-        currentLocation.sourceId !== frame.location.sourceId ||
-        currentLocation.line !== frame.location.line ||
-        currentLocation.column !== frame.location.column
+        currentLocation.sourceId !== selectedFrame.location.sourceId ||
+        currentLocation.line !== selectedFrame.location.line ||
+        currentLocation.column !== selectedFrame.location.column
       ) {
         const { selectLocation } = await import("../sources");
-        dispatch(selectLocation(cx, frame.location, { remap: true }));
+        dispatch(selectLocation(cx, selectedFrame.location, { remap: true }));
       }
 
       await Promise.all([

@@ -37,6 +37,7 @@ import {
   requestBodyData,
   findAnnotationsResult,
   getHitCountsParameters,
+  Frame,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
@@ -336,7 +337,7 @@ class _ThreadFront {
     return this.recordingTargetWaiter.promise;
   }
 
-  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
+  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, frame?: Frame) {
     log(`TimeWarp ${point}`);
 
     this.currentPoint = point;
@@ -344,7 +345,7 @@ class _ThreadFront {
     this.currentPointHasFrames = !!hasFrames;
     this.currentPause = null;
     this.asyncPauses.length = 0;
-    this.emit("paused", { point, hasFrames, time });
+    this.emit("paused", { point, hasFrames, time, frame });
   }
 
   timeWarpToPause(pause: Pause) {
