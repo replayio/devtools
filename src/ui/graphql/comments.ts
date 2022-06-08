@@ -6,6 +6,7 @@ export const GET_COMMENTS = gql`
       uuid
       comments {
         id
+        isPublished
         content
         primaryLabel
         secondaryLabel
@@ -19,11 +20,13 @@ export const GET_COMMENTS = gql`
         networkRequestId
         user {
           id
+          internal
           name
           picture
         }
         replies {
           id
+          isPublished
           content
           createdAt
           updatedAt

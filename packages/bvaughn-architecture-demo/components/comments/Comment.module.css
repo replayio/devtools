@@ -1,0 +1,108 @@
+.PublishedComment,
+.UnpublishedComment {
+  border-bottom: 2px solid var(--color-gray-2);
+  background-color: var(--color-white);
+  font-size: 1rem;
+}
+.UnpublishedComment {
+  border-left: 0.25rem solid var(--color-red-dark);
+  background-color: var(--color-red-light);
+}
+
+.HeaderRow {
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
+  padding: 0.25rem;
+  user-select: none;
+}
+
+.UserName {
+  font-weight: bold;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.Time {
+}
+
+.Avatar {
+  height: 1.5rem;
+  width: 1.5rem;
+  border-radius: 1.5rem;
+}
+
+.Content {
+  padding: 0.25rem;
+}
+
+.PublishedReply,
+.UnpublishedReply {
+  padding-left: 0.5rem;
+  padding-right: 0.25rem;
+}
+.UnpublishedReply {
+  border-left: 0.25rem solid var(--color-red-dark);
+  background-color: var(--color-red-light);
+}
+
+.Button {
+  padding: 0;
+  outline: none;
+  background: var(--color-gray-1);
+  border: 2px solid var(--color-gray-2);
+  padding: 0.25rem;
+  display: flex;
+  border-radius: 0.25rem;
+  cursor: pointer;
+}
+.Button:hover {
+  border: 2px solid var(--color-gray-3);
+}
+.Button:focus {
+  border: 2px solid var(--color-blue);
+}
+
+.Icon {
+  width: 1rem;
+  height: 1rem;
+  fill: currentColor;
+}
+
+.ReplyButton {
+  cursor: pointer;
+  user-select: none;
+  color: var(--color-blue);
+  outline: none;
+  border: none;
+  padding: 0.25rem;
+  background-color: var(--color-white);
+  border: 2px solid var(--color-gray-1);
+  border-radius: 0.25rem;
+  margin: 0.25rem;
+}
+.ReplyButton:focus {
+  border: 2px solid var(--color-blue);
+}
+
+.ReplyInput {
+  width: 100%;
+  outline: none;
+  border: none;
+  padding: 0.25rem;
+  background-color: var(--color-gray-1);
+  border: 2px solid var(--color-gray-2);
+  border-radius: 0.25rem;
+  font-family: sans-serif;
+}
+.ReplyInput:focus {
+  border: 2px solid var(--color-blue);
+}
+
+.ConfirmDeleteButton {
+  background-color: var(--color-red-dark);
+  color: var(--color-white);
+  border-color: var(--color-red-dark);
+}

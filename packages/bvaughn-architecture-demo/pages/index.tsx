@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 
+import CommentList from "../components/comments/CommentList";
 import ErrorBoundary from "../components/ErrorBoundary";
 import ConsoleFilters from "../components/console/Filters";
 import Focuser from "../components/console/Focuser";
@@ -21,7 +22,13 @@ export default function HomePage() {
   return (
     <FocusContextRoot>
       <div className={styles.Container}>
-        <div className={styles.CommentsContainer}></div>
+        <div className={styles.CommentsContainer}>
+          <ErrorBoundary>
+            <Suspense fallback={<Loader />}>
+              <CommentList />
+            </Suspense>
+          </ErrorBoundary>
+        </div>
 
         <ConsoleFiltersContextRoot>
           <div className={styles.ConsoleContainer}>

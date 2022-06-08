@@ -28,6 +28,8 @@ export async function render(
   };
 
   const sessionContext: SessionContextType = {
+    accessToken: null,
+    currentUserInfo: null,
     duration: 1000,
     endPoint: "1000",
     recordingId: "fakeRecordingId",
