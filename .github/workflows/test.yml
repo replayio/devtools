@@ -141,7 +141,7 @@ jobs:
           node-version: "16"
           cache: "npm"
       - name: Install dependencies
-        run: npm install
+        run: npm ci
         shell: bash
       - name: Run tests
         run: npm test

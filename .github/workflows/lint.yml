@@ -9,6 +9,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Deps
-        run: npm install
+        run: npm ci
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1.0.1
