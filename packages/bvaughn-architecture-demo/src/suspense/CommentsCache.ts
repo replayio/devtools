@@ -1,8 +1,9 @@
 import { RecordingId } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
 
-import { getComments as getCommentsAPI } from "../graphql/Comments";
+import { getComments as getCommentsGraphQL } from "../graphql/Comments";
 import { createWakeable } from "../utils/suspense";
+import { GraphQLClientInterface } from "../graphql/GraphQLClient";
 import { Comment } from "../graphql/types";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
@@ -17,7 +18,11 @@ function createCommentRecord(): CommentRecord {
   };
 }
 
-export function getCommentList(recordingId: RecordingId, accessToken: string | null): Comment[] {
+export function getCommentList(
+  graphQLClient: GraphQLClientInterface,
+  recordingId: RecordingId,
+  accessToken: string | null
+): Comment[] {
   const commentRecord = getCacheForType(createCommentRecord);
   if (commentRecord.record === null) {
     const wakeable = createWakeable<Comment[]>();
@@ -27,7 +32,7 @@ export function getCommentList(recordingId: RecordingId, accessToken: string | n
       value: wakeable,
     };
 
-    fetchCommentList(recordingId, accessToken, commentRecord.record, wakeable);
+    fetchCommentList(graphQLClient, recordingId, accessToken, commentRecord.record, wakeable);
   }
 
   if (commentRecord.record.status === STATUS_RESOLVED) {
@@ -38,13 +43,14 @@ export function getCommentList(recordingId: RecordingId, accessToken: string | n
 }
 
 async function fetchCommentList(
+  graphQLClient: GraphQLClientInterface,
   recordingId: RecordingId,
   accessToken: string | null,
   record: Record<Comment[]>,
   wakeable: Wakeable<Comment[]>
 ) {
   try {
-    const commentList = await getCommentsAPI(recordingId, accessToken);
+    const commentList = await getCommentsGraphQL(graphQLClient, recordingId, accessToken);
 
     record.status = STATUS_RESOLVED;
     record.value = commentList;

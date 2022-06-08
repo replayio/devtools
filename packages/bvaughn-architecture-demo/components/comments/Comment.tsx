@@ -8,6 +8,7 @@ import React, {
 } from "react";
 
 import Icon from "../../components/Icon";
+import { GraphQLClientContext } from "../../src/contexts/GraphQLClientContext";
 import { SessionContext } from "../../src/contexts/SessionContext";
 import {
   addCommentReply as addCommentReplyGraphQL,
@@ -22,25 +23,33 @@ import { formatRelativeTime } from "../../src/utils/time";
 import styles from "./Comment.module.css";
 
 export default function CommentRenderer({ comment }: { comment: Comment }) {
-  const { accessToken, currentUserInfo } = useContext(SessionContext);
+  const { accessToken } = useContext(SessionContext);
+  const graphQLClient = useContext(GraphQLClientContext);
 
   const invalidateCache = useCacheRefresh();
   const [isPending, startTransition] = useTransition();
 
   const addReplyTransition = () => {
     startTransition(async () => {
-      await addCommentReplyGraphQL(accessToken, comment.id, "", false);
+      await addCommentReplyGraphQL(graphQLClient, accessToken!, comment.id, "", false);
 
       invalidateCache();
     });
   };
 
   const deleteCommentCallback = async () => {
-    await deleteCommentGraphQL(accessToken as string, comment.id);
+    await deleteCommentGraphQL(graphQLClient, accessToken as string, comment.id);
   };
 
   const editCommentCallback = async (content: string, isPublished: boolean) => {
-    await updateCommentGraphQL(accessToken!, comment.id, content, isPublished, comment.position);
+    await updateCommentGraphQL(
+      graphQLClient,
+      accessToken!,
+      comment.id,
+      content,
+      isPublished,
+      comment.position
+    );
   };
 
   return (
@@ -56,11 +65,17 @@ export default function CommentRenderer({ comment }: { comment: Comment }) {
     >
       {comment.replies.map(reply => {
         const deleteCommentReplyCallback = async () => {
-          await deleteCommentReplyGraphQL(accessToken as string, reply.id);
+          await deleteCommentReplyGraphQL(graphQLClient, accessToken as string, reply.id);
         };
 
         const editCommentReplyCallback = async (content: string, isPublished: boolean) => {
-          await updateCommentReplyGraphQL(accessToken!, reply.id, content, isPublished);
+          await updateCommentReplyGraphQL(
+            graphQLClient,
+            accessToken!,
+            reply.id,
+            content,
+            isPublished
+          );
         };
 
         return (

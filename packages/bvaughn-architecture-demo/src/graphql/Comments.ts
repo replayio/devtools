@@ -1,35 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
+
 import { GetComments } from "./generated/GetComments";
-
+import { GraphQLClientInterface } from "./GraphQLClient";
 import { Comment, CommentPosition } from "./types";
-
-const DEFAULT_GRAPHQL_URL = "https://api.replay.io/v1/graphql";
-
-// TODO Pass this client via Context
-async function sendGraphQLMessage<T>(body: Object, accessToken: string | null): Promise<T> {
-  let graphqlUrl = DEFAULT_GRAPHQL_URL;
-  if (typeof window !== "undefined") {
-    const url = new URL(window.location.href);
-    if (url.searchParams.has("graphql")) {
-      graphqlUrl = url.searchParams.get("graphql") as string;
-    }
-  }
-
-  const response = await fetch(graphqlUrl, {
-    method: "POST",
-    headers: {
-      ...(accessToken && {
-        Authorization: `Bearer ${accessToken}`,
-      }),
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  const json = await response.json();
-
-  return json.data as T;
-}
 
 const AddCommentReplyMutation = `
   mutation AddCommentReply($input: AddCommentReplyInput!) {
@@ -121,12 +94,13 @@ const UpdateCommentReplyMutation = `
 `;
 
 export async function addCommentReply(
+  graphQLClient: GraphQLClientInterface,
   accessToken: string,
   parentId: string,
   content: string,
   isPublished: boolean
 ) {
-  await sendGraphQLMessage(
+  await graphQLClient.send(
     {
       operationName: "AddCommentReply",
       query: AddCommentReplyMutation,
@@ -142,8 +116,12 @@ export async function addCommentReply(
   );
 }
 
-export async function deleteComment(accessToken: string, commentId: string) {
-  await sendGraphQLMessage(
+export async function deleteComment(
+  graphQLClient: GraphQLClientInterface,
+  accessToken: string,
+  commentId: string
+) {
+  await graphQLClient.send(
     {
       operationName: "DeleteComment",
       query: DeleteCommentMutation,
@@ -153,8 +131,12 @@ export async function deleteComment(accessToken: string, commentId: string) {
   );
 }
 
-export async function deleteCommentReply(accessToken: string, replyId: string) {
-  await sendGraphQLMessage(
+export async function deleteCommentReply(
+  graphQLClient: GraphQLClientInterface,
+  accessToken: string,
+  replyId: string
+) {
+  await graphQLClient.send(
     {
       operationName: "DeleteCommentReply",
       query: DeleteCommentReplyMutation,
@@ -165,10 +147,11 @@ export async function deleteCommentReply(accessToken: string, replyId: string) {
 }
 
 export async function getComments(
+  graphQLClient: GraphQLClientInterface,
   recordingId: RecordingId,
   accessToken: string | null
 ): Promise<Comment[]> {
-  const response = await sendGraphQLMessage<GetComments>(
+  const response = await graphQLClient.send<GetComments>(
     {
       operationName: "GetComments",
       query: GetCommentsQuery,
@@ -202,13 +185,14 @@ export async function getComments(
 }
 
 export async function updateComment(
+  graphQLClient: GraphQLClientInterface,
   accessToken: string,
   commentId: string,
   newContent: string,
   newIsPublished: boolean,
   newPosition: CommentPosition | null
 ) {
-  await sendGraphQLMessage<GetComments>(
+  await graphQLClient.send<GetComments>(
     {
       operationName: "UpdateCommentContent",
       query: UpdateCommentMutation,
@@ -219,12 +203,13 @@ export async function updateComment(
 }
 
 export async function updateCommentReply(
+  graphQLClient: GraphQLClientInterface,
   accessToken: string,
   replyId: string,
   newContent: string,
   newIsPublished: boolean
 ) {
-  await sendGraphQLMessage<GetComments>(
+  await graphQLClient.send<GetComments>(
     {
       operationName: "UpdateCommentReplyContent",
       query: UpdateCommentReplyMutation,

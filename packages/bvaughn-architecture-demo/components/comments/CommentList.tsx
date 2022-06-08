@@ -1,6 +1,7 @@
 import { useContext } from "react";
 
 import { getCommentList } from "../../src/suspense/CommentsCache";
+import { GraphQLClientContext } from "../../src/contexts/GraphQLClientContext";
 import { SessionContext } from "../../src/contexts/SessionContext";
 
 import Comment from "./Comment";
@@ -9,8 +10,9 @@ import styles from "./CommentList.module.css";
 // TODO Dim comments that are outside of the focus window
 
 export default function CommentList() {
+  const graphQLClient = useContext(GraphQLClientContext);
   const { accessToken, currentUserInfo, recordingId } = useContext(SessionContext);
-  const commentList = getCommentList(recordingId, accessToken);
+  const commentList = getCommentList(graphQLClient, recordingId, accessToken);
 
   return (
     <div className={styles.List}>
