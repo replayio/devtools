@@ -3,15 +3,17 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useSelector } from "react-redux";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import { getIsIndexed } from "ui/reducers/app";
+import {
+  AnalysisStatus,
+  LocationAnalysisSummary,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { AnalysisPayload } from "ui/state/app";
 
-const numberStatus = (current: number, total: number): string => {
-  return `${current}/${total}`;
+const numberStatus = (current: number | undefined, total: number | undefined): string => {
+  return `${current ?? "?"}/${total ?? "?"}`;
 };
 
-const maxStatusLength = (total: number): number => {
+const maxStatusLength = (total: number | undefined): number => {
   const numberLength = numberStatus(total, total).length;
   return Math.max("Loading".length, numberLength);
 };
@@ -20,28 +22,35 @@ export function PanelStatus({
   analysisPoints,
   prefixBadge,
 }: {
-  analysisPoints: AnalysisPayload;
+  analysisPoints?: LocationAnalysisSummary;
   prefixBadge: PrefixBadge;
 }) {
-  const isIndexed = useSelector(getIsIndexed);
   const time = useSelector(getCurrentTime);
   let status = "";
 
   const points = analysisPoints?.data;
   const error = analysisPoints?.error;
+  const runningStatus = analysisPoints?.status;
 
-  if (!isIndexed || !analysisPoints) {
+  if (
+    !points ||
+    [AnalysisStatus.LoadingPoints, AnalysisStatus.LoadingResults].includes(runningStatus!)
+  ) {
     status = "Loading";
   } else if (error) {
-    status = (error as AnalysisError) === AnalysisError.TooManyPointsToFind ? "10k+ hits" : "Error";
-  } else if (points?.length == 0) {
+    if (error === AnalysisError.TooManyPointsToFind) {
+      status = "10k+ hits";
+    } else if (error === AnalysisError.Unknown) {
+      status = "Error";
+    }
+  } else if (points.length == 0) {
     status = "No hits";
   } else {
     const previousTimeIndex = sortedLastIndex(
-      points?.map(p => p.time),
+      points.map(p => p.time),
       time
     );
-    status = numberStatus(previousTimeIndex, points?.length || 0);
+    status = numberStatus(previousTimeIndex, points.length);
   }
 
   return (
@@ -53,7 +62,7 @@ export function PanelStatus({
       >
         <div
           className="text-center"
-          style={{ width: `${maxStatusLength(points?.length || 0)}ch` }}
+          style={{ width: `${maxStatusLength(points?.length)}ch` }}
         ></div>
         {status}
       </div>

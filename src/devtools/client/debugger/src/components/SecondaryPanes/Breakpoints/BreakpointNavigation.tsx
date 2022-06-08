@@ -5,6 +5,8 @@ import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import React, { useEffect } from "react";
+
+import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { actions } from "ui/actions";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import Icon from "ui/components/shared/Icon";
@@ -16,15 +18,19 @@ import { PanelStatus } from "./PanelStatus";
 
 import { trackEvent } from "ui/utils/telemetry";
 import { Breakpoint } from "../../../reducers/types";
-const mapStateToProps = (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-  analysisPoints: selectors.getAnalysisPointsForLocation(
+
+const mapStateToProps = (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => {
+  const analysisPoints = getAnalysisPointsForLocation(
     state,
     // @ts-ignore Location / SourceLocation mismatch
     breakpoint.location,
     breakpoint.options.condition
-  ),
-  executionPoint: selectors.getExecutionPoint(state),
-});
+  );
+  return {
+    analysisPoints,
+    executionPoint: selectors.getExecutionPoint(state),
+  };
+};
 
 const connector = connect(mapStateToProps, {
   seek: actions.seek,

@@ -10,7 +10,10 @@ import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@repl
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
-import { getAnalysisPointsForLocation, setAnalysisError, setAnalysisPoints } from "ui/reducers/app";
+import {
+  AnalysisStatus,
+  getAnalysisPointsForLocation,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -115,28 +118,6 @@ async function showPrimitiveLogpoints(
     const location = await ThreadFront.getPreferredLocation(frame);
     assert(location, "preferred location not found");
     LogpointHandlers.onResult(logGroupId, point, time, location, undefined, values);
-  }
-}
-
-function saveLogpointHits(
-  points: PointDescription[],
-  results: AnalysisEntry[],
-  locations: Location[],
-  condition: string
-) {
-  if (condition) {
-    points = points.filter(point =>
-      results.some(result => result.key === point.point && result.value.time === point.time)
-    );
-  }
-  for (const location of locations) {
-    store.dispatch(setAnalysisPoints({ analysisPoints: points, location, condition }));
-  }
-}
-
-export function saveAnalysisError(locations: Location[], condition: string, error: AnalysisError) {
-  for (const location of locations) {
-    store.dispatch(setAnalysisError({ location, condition, error }));
   }
 }
 
@@ -262,7 +243,10 @@ async function setMultiSourceLogpoint(
       if (!points.error) {
         showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
-      return;
+      // If we're only displaying only primitives, we can bail out if there's no condition or the condition request is done
+      if (!condition) {
+        return;
+      }
     }
   }
 
@@ -314,9 +298,6 @@ async function setMultiSourceLogpoint(
         })
       );
 
-      // TODO Remove this and change Redux logic to match
-      saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToFind);
-
       return;
     }
 
@@ -345,6 +326,7 @@ async function setMultiSourceLogpoint(
       analysisResults = results;
 
       if (runError) {
+        // TODO Should we be doing this for _all_ locations?
         store.dispatch(
           analysisErrored({
             analysisId,
@@ -353,10 +335,7 @@ async function setMultiSourceLogpoint(
           })
         );
 
-        // TODO Remove this and change Redux logic to match
-        // This is not right I think. The error could also be Unknown, we need
-        // to check to know for sure.
-        saveAnalysisError(locations, condition, AnalysisError.TooManyPointsToRun);
+        removeLogpoint(logGroupId);
         return;
       }
 
@@ -369,9 +348,6 @@ async function setMultiSourceLogpoint(
 
       showLogpointsResult(logGroupId, results);
     }
-
-    // TODO Remove this and redo Redux logic
-    saveLogpointHits(points, analysisResults, locations, condition);
 
     // MAYBE
     // Rather than running *this* analysis, create a *new* analysis which only has

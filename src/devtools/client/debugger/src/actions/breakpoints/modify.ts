@@ -26,6 +26,7 @@ import {
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
 } from "../../selectors";
+import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
@@ -149,7 +150,7 @@ export function addBreakpoint(
 export function runAnalysis(
   cx: Context,
   initialLocation: Location,
-  options: $FixTypeLater
+  options: Breakpoint["options"]
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     const location = getFirstBreakpointPosition(getState(), initialLocation);
@@ -160,11 +161,7 @@ export function runAnalysis(
 
     // Don't run the analysis if we already have the analysis points for that
     // location.
-    const analysisPoints = selectors.getAnalysisPointsForLocation(
-      getState(),
-      location,
-      options.condition
-    );
+    const analysisPoints = getAnalysisPointsForLocation(getState(), location, options.condition);
     if (analysisPoints) {
       return;
     }

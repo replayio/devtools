@@ -2,15 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createEntityAdapter,
+  createSelector,
+  PayloadAction,
+  EntityState,
+} from "@reduxjs/toolkit";
 import { Location, PointDescription, AnalysisEntry } from "@replayio/protocol";
+import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import string from "devtools/packages/devtools-reps/reps/string";
 import { AnalysisError } from "protocol/thread/analysis";
+import { compareNumericStrings } from "protocol/utils";
 import type { UIState } from "ui/state";
+import { filterToFocusRegion } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
+import { shallowEqual } from "../utils/resource/compare";
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
 import { getSelectedSource } from "./sources";
@@ -38,7 +48,7 @@ export enum AnalysisStatus {
   ErroredRunning = "ErroredRunning",
 }
 
-export type AnalysisSummary = {
+export type AnalysisRequest = {
   error: AnalysisError | undefined;
   id: string;
   location: Location;
@@ -55,6 +65,13 @@ export type BreakpointAnalysisMapping = {
   allAnalyses: string[];
 };
 
+export type LocationAnalysisSummary = {
+  data: PointDescription[];
+  error: AnalysisError | undefined;
+  status: AnalysisStatus;
+  condition?: string;
+};
+
 export interface BreakpointsState {
   /**
    * Actual breakpoint entries, keyed by a location string
@@ -68,14 +85,14 @@ export interface BreakpointsState {
   /**
    * Analysis entries associated with breakpoints, keyed by GUID.
    */
-  analyses: EntityState<AnalysisSummary>;
+  analyses: EntityState<AnalysisRequest>;
   /**
    * Maps between a location string and analysis IDs for that location
    */
   analysisMappings: EntityState<BreakpointAnalysisMapping>;
 }
 
-const analysesAdapter = createEntityAdapter<AnalysisSummary>();
+const analysesAdapter = createEntityAdapter<AnalysisRequest>();
 const mappingsAdapter = createEntityAdapter<BreakpointAnalysisMapping>({
   selectId: entry => entry.locationId,
 });
@@ -371,3 +388,145 @@ export function getLogpointsForSource(state: UIState, sourceId: string) {
   const breakpoints = getBreakpointsList(state);
   return breakpoints.filter(bp => bp.location.sourceId === sourceId).filter(bp => isLogpoint(bp));
 }
+
+const customAnalysisResultComparator = (
+  a: LocationAnalysisSummary | undefined,
+  b: LocationAnalysisSummary | undefined
+) => {
+  if (!a && !b) {
+    // Both undefined is the same
+    return true;
+  } else if (!a || !b) {
+    // Only one undefined is different
+    return false;
+  }
+  const d1 = a.data;
+  const d2 = b.data;
+
+  // Verify that all point entries have identical sorted point/time values
+  let dataEqual =
+    d1.length === d2.length &&
+    d1.every((item, i) => {
+      const otherItem = d2[i];
+      const pointEqual = item.point === otherItem.point;
+      const timeEqual = item.time === otherItem.time;
+      return pointEqual && timeEqual;
+    });
+
+  const errorEqual = a.error === b.error;
+  const statusEqual = a.status === b.status;
+  const result = dataEqual && errorEqual && statusEqual;
+
+  return result;
+};
+
+/**
+ * Retrieves a unique sorted set of hit points for a given location based on analysis runs.
+ * If there is no breakpoint active for the location or no analysis run, returns `undefined`.
+ * Otherwise, returns the array of hit points, plus the `status/condition/error` from
+ * the latest analysis run.
+ */
+export const getAnalysisPointsForLocation = createSelector(
+  [
+    (state: UIState, location: Location | null) => {
+      if (!location) {
+        return undefined;
+      }
+      const locationKey = getLocationKey(location);
+      return state.breakpoints.analysisMappings.entities[locationKey];
+    },
+    (state: UIState) => state.breakpoints.analyses,
+    (state: UIState) => state.timeline.focusRegion,
+    (state: UIState, location: Location | null, condition: string | null = "") => condition,
+  ],
+  (mappingEntry, analyses, focusRegion, condition): LocationAnalysisSummary | undefined => {
+    // First, verify that we have a real location and a breakpoint mapping for that location
+    if (!mappingEntry) {
+      return undefined;
+    }
+
+    // We're going to use the _latest_ analysis run's status for display purposes.
+    const latestAnalysisEntry = analyses.entities[mappingEntry.currentAnalysis!];
+
+    if (!latestAnalysisEntry) {
+      return undefined;
+    }
+
+    const matchingEntries: AnalysisRequest[] = [];
+
+    // Next, filter down all analysis runs for this location, based on matching
+    // against the `condition` the user supplied, as well as whether we
+    // actually legitimately found points
+    mappingEntry.allAnalyses.forEach(analysisId => {
+      const analysisEntry = analyses.entities[analysisId];
+      // TODO Double-check undefined vs empty string conditions here
+      if (!analysisEntry || (analysisEntry.condition ?? "") !== condition) {
+        return;
+      }
+
+      const hasPoints = [
+        // Successful queries
+        AnalysisStatus.PointsRetrieved,
+        AnalysisStatus.Completed,
+        // Presumably got points first
+        AnalysisStatus.LoadingResults,
+        // Should have at least come back with _some_ points
+        AnalysisStatus.ErroredGettingPoints,
+        AnalysisStatus.ErroredRunning,
+      ].includes(analysisEntry.status);
+
+      if (hasPoints) {
+        matchingEntries.push(analysisEntry);
+      }
+    });
+
+    let finalPoints: PointDescription[] = [];
+
+    if (matchingEntries.length === 0) {
+      return undefined;
+    }
+
+    const pointsPerEntry = matchingEntries.map(entry => {
+      const { points = [], results = [] } = entry;
+      if (condition && entry.status === AnalysisStatus.Completed) {
+        // Currently the backend does not filter returned points by condition, only analysis results.
+        // If there _is_ a condition, _and_ we have results back, we should filter the total points
+        // based on the analysis results.
+        const resultPointsSet = new Set<string>(results.map(result => result.key));
+        const filteredConditionPoints = points.filter(point => resultPointsSet.has(point.point));
+        return filteredConditionPoints;
+      }
+
+      return points;
+    });
+
+    const flattenedPoints = pointsPerEntry.flat();
+    const uniquePoints = uniqBy(flattenedPoints, item => item.point);
+    uniquePoints.sort((a, b) => compareNumericStrings(a.point, b.point));
+
+    // TODO `filterToFocusRegion` wants a pre-sorted array, but maybe a bit cheaper to filter first _then_ sort?
+    finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
+
+    return {
+      data: finalPoints,
+      error: latestAnalysisEntry.error,
+      status: latestAnalysisEntry.status,
+      condition: latestAnalysisEntry.condition,
+    };
+  },
+  {
+    memoizeOptions: {
+      // Arbitrary number for cache size
+      maxSize: 100,
+      // Reuse old result if contents are the same
+      resultEqualityCheck: customAnalysisResultComparator,
+    },
+  }
+);
+
+const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
+
+export const getPointsForHoveredLineNumber = (state: UIState) => {
+  const location = getHoveredLineNumberLocation(state);
+  return getAnalysisPointsForLocation(state, location);
+};

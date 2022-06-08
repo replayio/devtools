@@ -3,6 +3,8 @@ import { AddCommentButton } from "components";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
 import { connect, ConnectedProps } from "react-redux";
+
+import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/breakpoints";
 import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -10,7 +12,6 @@ import { useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { AnalysisPayload } from "ui/state/app";
 import { trackEvent } from "ui/utils/telemetry";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -18,11 +19,12 @@ import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
+import { prefs } from "ui/utils/prefs";
 
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = PropsFromRedux & {
-  analysisPoints?: AnalysisPayload;
+  analysisPoints?: LocationAnalysisSummary;
   breakpoint: any;
   executionPoint: any;
   isHot: boolean;

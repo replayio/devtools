@@ -79,7 +79,6 @@ export interface LoadedRegions {
 
 export interface AppState {
   mode: AppMode;
-  analysisPoints: AnalysisPoints;
   awaitingSourcemaps: boolean;
   canvas: Canvas | null;
   defaultSettingsTab: SettingsTabTitle;
@@ -110,12 +109,6 @@ export interface AppState {
   mouseTargetsLoading: boolean;
   currentPoint: ExecutionPoint | null;
 }
-
-export type AnalysisPoints = Record<string, AnalysisPayload>;
-export type AnalysisPayload = {
-  data: PointDescription[] | undefined;
-  error: AnalysisError | undefined;
-};
 
 export type AppMode = "devtools" | "sourcemap-visualizer";
 

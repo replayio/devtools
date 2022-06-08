@@ -10,12 +10,15 @@ import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
+import {
+  getAnalysisPointsForLocation,
+  LocationAnalysisSummary,
+} from "devtools/client/debugger/src/reducers/breakpoints";
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { HoveredItem } from "ui/state/timeline";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
-import { AnalysisPayload } from "ui/state/app";
 import { getExecutionPoint } from "../../../selectors";
 import type { Breakpoint } from "../../../reducers/types";
 
@@ -24,7 +27,7 @@ function Points({
   breakpoint,
   hoveredItem,
 }: {
-  analysisPoints: AnalysisPayload;
+  analysisPoints: LocationAnalysisSummary;
   breakpoint: any;
   hoveredItem: HoveredItem | null;
 }) {
@@ -132,7 +135,7 @@ function BreakpointTimeline({
 
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: selectors.getAnalysisPointsForLocation(
+    analysisPoints: getAnalysisPointsForLocation(
       state,
       // @ts-expect-error Location/SourceLocation
       breakpoint.location,
