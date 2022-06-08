@@ -1,19 +1,14 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { minBy } from "lodash";
-import { AnalysisParams } from "protocol/analysisManager";
-import { Analysis, AnalysisError, createAnalysis } from "protocol/thread/analysis";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { UIThunkAction } from "ui/actions";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
-import { prefs, features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
@@ -69,7 +64,6 @@ export default function LineNumberTooltip({
   const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
 
-  const indexed = useSelector(selectors.getIsIndexed);
   const hitCounts = useSelector(getHitCountsForSelectedSource);
   const source = useSelector(getSelectedSource);
   const breakpoints = useSelector(selectors.getBreakpointsList);
@@ -92,18 +86,10 @@ export default function LineNumberTooltip({
       lineNumber: number;
       lineNumberNode: HTMLElement;
     }) => {
-      // The gutter re-renders when we click the line number to add
-      // a breakpoint. That triggers a second gutterLineEnter event
-      // for the same line number. In that case, we shouldn't run
-      // the analysis again.
       if (lineNumber !== lastHoveredLineNumber.current) {
         lastHoveredLineNumber.current = lineNumber;
       }
-      setTimeout(() => {
-        if (lineNumber === lastHoveredLineNumber.current) {
-          dispatch(setBreakpointHitCounts(source!.id, lineNumber));
-        }
-      }, 200);
+      dispatch(setBreakpointHitCounts(source!.id, lineNumber));
       dispatch(updateHoveredLineNumber(lineNumber));
       setTargetNode(lineNumberNode);
     };
@@ -142,7 +128,7 @@ export default function LineNumberTooltip({
     return null;
   }
 
-  if (!indexed || hits === undefined) {
+  if (!hits) {
     return (
       <StaticTooltip targetNode={targetNode}>
         <Wrapper loading>Loading…</Wrapper>

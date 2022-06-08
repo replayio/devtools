@@ -7,14 +7,13 @@ import {
   AnalysisStatus,
   LocationAnalysisSummary,
 } from "devtools/client/debugger/src/reducers/breakpoints";
-import { getIsIndexed } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 
-const numberStatus = (current: number, total: number): string => {
-  return `${current}/${total}`;
+const numberStatus = (current: number | undefined, total: number | undefined): string => {
+  return `${current ?? "?"}/${total ?? "?"}`;
 };
 
-const maxStatusLength = (total: number): number => {
+const maxStatusLength = (total: number | undefined): number => {
   const numberLength = numberStatus(total, total).length;
   return Math.max("Loading".length, numberLength);
 };
@@ -63,7 +62,7 @@ export function PanelStatus({
       >
         <div
           className="text-center"
-          style={{ width: `${maxStatusLength(points?.length ?? 0)}ch` }}
+          style={{ width: `${maxStatusLength(points?.length)}ch` }}
         ></div>
         {status}
       </div>
