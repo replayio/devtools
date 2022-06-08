@@ -8,6 +8,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Deps
-        run: npm ci
+        run: npm ci -f
       - name: Build Storybook
         run: npm run build-storybook
