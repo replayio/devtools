@@ -8,5 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: bahmutov/npm-install@v1
+        with:
+          install-command: npm ci -f
       - name: Build Storybook
         run: npm run build-storybook
