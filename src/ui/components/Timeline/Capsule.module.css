@@ -51,7 +51,7 @@
   height: 1.5rem;
 }
 
-.SlowLoadingPopout {
+.SlowLoadingPopOut {
   position: absolute;
   bottom: calc(100% + 0.25rem);
   left: 0;
