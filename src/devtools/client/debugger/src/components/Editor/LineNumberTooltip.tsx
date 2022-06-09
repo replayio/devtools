@@ -128,7 +128,7 @@ export default function LineNumberTooltip({
     return null;
   }
 
-  if (!hits) {
+  if (hits === undefined) {
     return (
       <StaticTooltip targetNode={targetNode}>
         <Wrapper loading>Loading…</Wrapper>
