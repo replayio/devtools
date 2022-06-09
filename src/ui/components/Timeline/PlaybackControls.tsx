@@ -3,7 +3,7 @@ import { clearPendingComment } from "ui/actions/comments";
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
-import { endTimeForFocusRegion } from "ui/utils/timeline";
+import { displayedEndForFocusRegion } from "ui/utils/timeline";
 
 export default function PlayPauseButton() {
   const dispatch = useDispatch();
@@ -13,7 +13,7 @@ export default function PlayPauseButton() {
   const recordingDuration = useSelector(selectors.getRecordingDuration);
 
   const isAtEnd = focusRegion
-    ? currentTime === endTimeForFocusRegion(focusRegion)
+    ? currentTime === displayedEndForFocusRegion(focusRegion)
     : currentTime == recordingDuration;
 
   let onClick;

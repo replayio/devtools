@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
-import { endTimeForFocusRegion, beginTimeForFocusRegion } from "ui/utils/timeline";
+import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -50,8 +50,8 @@ export const getVisibleMessageData = createSelector(
     let countAfter = 0;
     let countBefore = 0;
 
-    const focusRegionBeginTime = focusRegion ? beginTimeForFocusRegion(focusRegion) : null;
-    const focusRegionEndTime = focusRegion ? endTimeForFocusRegion(focusRegion) : null;
+    const focusRegionBeginTime = focusRegion ? displayedBeginForFocusRegion(focusRegion) : null;
+    const focusRegionEndTime = focusRegion ? displayedEndForFocusRegion(focusRegion) : null;
 
     visibleMessages.forEach(messageID => {
       const message = messages.entities[messageID]!;

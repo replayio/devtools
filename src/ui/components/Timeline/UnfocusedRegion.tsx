@@ -3,9 +3,9 @@ import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
 import {
-  endTimeForFocusRegion,
   getVisiblePosition,
-  beginTimeForFocusRegion,
+  displayedEndForFocusRegion,
+  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
@@ -16,8 +16,8 @@ export default function UnfocusedRegion() {
     return null;
   }
 
-  const beginTime = beginTimeForFocusRegion(focusRegion);
-  const endTime = endTimeForFocusRegion(focusRegion);
+  const beginTime = displayedBeginForFocusRegion(focusRegion);
+  const endTime = displayedEndForFocusRegion(focusRegion);
   const duration = zoomRegion.endTime - zoomRegion.beginTime;
 
   const start = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

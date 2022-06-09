@@ -24,7 +24,7 @@ import CommentSource from "./CommentSource";
 import NetworkRequestPreview from "./NetworkRequestPreview";
 import { FocusContext } from "./FocusContext";
 import { CommentData } from "./types";
-import { isInFocusSpan, beginTimeForFocusRegion } from "ui/utils/timeline";
+import { isInFocusSpan, displayedBeginForFocusRegion } from "ui/utils/timeline";
 
 type PendingCommentProps = {
   comment: Comment;

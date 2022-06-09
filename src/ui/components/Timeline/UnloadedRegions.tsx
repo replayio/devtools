@@ -4,11 +4,11 @@ import { useSelector } from "react-redux";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import {
-  endTimeForFocusRegion,
+  displayedEndForFocusRegion,
   getVisiblePosition,
   overlap,
   rangeForFocusRegion,
-  beginTimeForFocusRegion,
+  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {

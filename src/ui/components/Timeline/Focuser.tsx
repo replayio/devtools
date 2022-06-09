@@ -5,10 +5,10 @@ import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import {
-  endTimeForFocusRegion,
   getPositionFromTime,
   getTimeFromPosition,
-  beginTimeForFocusRegion,
+  displayedEndForFocusRegion,
+  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 import { EditMode } from ".";
@@ -92,7 +92,8 @@ function Focuser({ editMode, setEditMode }: Props) {
         // the points we end up going to. Otherwise, because the window always
         // grows when the point is not exact, we end up with an ever-expanding
         // window while dragging it around the timeline.
-        const { beginTime, endTime } = focusRegion as UnsafeFocusRegion;
+        const beginTime = displayedBeginForFocusRegion(focusRegion);
+        const endTime = displayedEndForFocusRegion(focusRegion);
 
         switch (editMode.type) {
           case "drag": {
@@ -208,8 +209,8 @@ function Focuser({ editMode, setEditMode }: Props) {
   const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
   const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
 
-  const left = getPositionFromTime(beginTimeForFocusRegion(focusRegion), zoomRegion);
-  const right = getPositionFromTime(endTimeForFocusRegion(focusRegion), zoomRegion);
+  const left = getPositionFromTime(displayedBeginForFocusRegion(focusRegion), zoomRegion);
+  const right = getPositionFromTime(displayedEndForFocusRegion(focusRegion), zoomRegion);
 
   return (
     <div className="relative top-0 left-0 h-full w-full" ref={containerRef}>

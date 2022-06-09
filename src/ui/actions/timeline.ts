@@ -41,9 +41,15 @@ import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/envi
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { endTimeForFocusRegion, isTimeInRegions, beginTimeForFocusRegion } from "ui/utils/timeline";
-import { getAnalysisMappingForLocation } from "devtools/client/debugger/src/selectors";
-import { getStatusFlagsForAnalysisEntry } from "devtools/client/debugger/src/selectors";
+import {
+  getAnalysisMappingForLocation,
+  getStatusFlagsForAnalysisEntry,
+} from "devtools/client/debugger/src/selectors";
+import {
+  displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
+  isTimeInRegions,
+} from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -476,10 +482,10 @@ export function setFocusRegion(
       const zoomRegion = getZoomRegion(state);
       const previousFocusRegion = getFocusRegion(state);
       const prevBeginTime = previousFocusRegion
-        ? beginTimeForFocusRegion(previousFocusRegion)
+        ? displayedBeginForFocusRegion(previousFocusRegion)
         : undefined;
       const prevEndTime = previousFocusRegion
-        ? endTimeForFocusRegion(previousFocusRegion)
+        ? displayedEndForFocusRegion(previousFocusRegion)
         : undefined;
 
       let { endTime, beginTime } = focusRegion;
@@ -571,7 +577,7 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
 
     // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const beginTime = focusRegion ? beginTimeForFocusRegion(focusRegion) : 0;
+    const beginTime = focusRegion ? displayedBeginForFocusRegion(focusRegion) : 0;
 
     dispatch(
       setFocusRegion({
@@ -593,7 +599,9 @@ export function setFocusRegionBeginTime(beginTime: number, sync: boolean): UIThu
 
     // If this is the first time the user is focusing, extend to the end of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const endTime = focusRegion ? endTimeForFocusRegion(focusRegion) : Number.POSITIVE_INFINITY;
+    const endTime = focusRegion
+      ? displayedEndForFocusRegion(focusRegion)
+      : Number.POSITIVE_INFINITY;
 
     dispatch(
       setFocusRegion({
@@ -661,22 +669,11 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    if (!features.softFocus) {
-      client.Session.unloadRegion(
-        { region: { begin: 0, end: beginTimeForFocusRegion(focusRegion) } },
-        ThreadFront.sessionId!
-      );
-      client.Session.unloadRegion(
-        { region: { begin: endTimeForFocusRegion(focusRegion), end: zoomRegion.endTime } },
-        ThreadFront.sessionId!
-      );
-    }
-
     client.Session.loadRegion(
       {
         region: {
-          begin: beginTimeForFocusRegion(focusRegion),
-          end: endTimeForFocusRegion(focusRegion),
+          begin: displayedBeginForFocusRegion(focusRegion),
+          end: displayedEndForFocusRegion(focusRegion),
         },
       },
       ThreadFront.sessionId!

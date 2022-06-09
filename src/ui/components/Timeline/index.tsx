@@ -1,7 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
-import { useFeature } from "ui/hooks/settings";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
 import { getTimeFromPosition } from "ui/utils/timeline";
@@ -31,7 +30,6 @@ export default function Timeline() {
   const hoverTime = useSelector(selectors.getHoverTime);
   const timelineDimensions = useSelector(selectors.getTimelineDimensions);
   const zoomRegion = useSelector(selectors.getZoomRegion);
-  const { value: showProtocolTimeline } = useFeature("protocolTimeline");
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 

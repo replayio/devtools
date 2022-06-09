@@ -1,7 +1,6 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import { clamp, sortedIndexBy, sortedLastIndexBy } from "lodash";
 import { FocusRegion, UnsafeFocusRegion, ZoomRegion } from "ui/state/timeline";
-import { features } from "ui/utils/prefs";
 
 import { timelineMarkerWidth } from "../constants";
 
@@ -23,16 +22,14 @@ export function getPixelDistance({
   return Math.abs((toPos - fromPos) * overlayWidth);
 }
 
-export function beginTimeForFocusRegion(focusRegion: FocusRegion) {
-  return features.softFocus
-    ? (focusRegion as UnsafeFocusRegion).begin.time
-    : (focusRegion as UnsafeFocusRegion).beginTime;
+export function displayedBeginForFocusRegion(focusRegion: FocusRegion) {
+  const unsafe = focusRegion as UnsafeFocusRegion;
+  return unsafe.beginTime;
 }
 
-export function endTimeForFocusRegion(focusRegion: FocusRegion) {
-  return features.softFocus
-    ? (focusRegion as UnsafeFocusRegion).end.time
-    : (focusRegion as UnsafeFocusRegion).endTime;
+export function displayedEndForFocusRegion(focusRegion: FocusRegion) {
+  const unsafe = focusRegion as UnsafeFocusRegion;
+  return unsafe.endTime;
 }
 
 // Get the position of a time on the visible part of the timeline,
@@ -220,8 +217,8 @@ export function isSameTimeStampedPointRange(
 }
 
 export function isInFocusSpan(time: number, focusRegion: FocusRegion) {
-  const beginTime = beginTimeForFocusRegion(focusRegion);
-  const endTime = endTimeForFocusRegion(focusRegion);
+  const beginTime = displayedBeginForFocusRegion(focusRegion);
+  const endTime = displayedEndForFocusRegion(focusRegion);
 
   return time >= beginTime && time <= endTime;
 }
@@ -288,8 +285,9 @@ export function isFocusRegionSubset(
     return false;
   } else {
     return (
-      beginTimeForFocusRegion(nextFocusRegion) >= beginTimeForFocusRegion(prevFocusRegion) &&
-      endTimeForFocusRegion(nextFocusRegion) <= endTimeForFocusRegion(prevFocusRegion)
+      displayedBeginForFocusRegion(nextFocusRegion) >=
+        displayedBeginForFocusRegion(prevFocusRegion) &&
+      displayedEndForFocusRegion(nextFocusRegion) <= displayedEndForFocusRegion(prevFocusRegion)
     );
   }
 }
@@ -302,8 +300,8 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
     return sortedPoints;
   }
 
-  const beginTime = beginTimeForFocusRegion(focusRegion);
-  const endTime = endTimeForFocusRegion(focusRegion);
+  const beginTime = displayedBeginForFocusRegion(focusRegion);
+  const endTime = displayedEndForFocusRegion(focusRegion);
 
   const beginIndex = sortedIndexBy(sortedPoints, { time: beginTime, point: "" }, p => p.time);
   const endIndex = sortedLastIndexBy(sortedPoints, { time: endTime, point: "" }, p => p.time);

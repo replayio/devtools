@@ -31,7 +31,6 @@ pref("devtools.features.logProtocol", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.showRedux", true);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.softFocus", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.testSupport", false);
 pref("devtools.features.originalClassNames", false);
@@ -66,7 +65,6 @@ export const features = new PrefsHelper("devtools.features", {
   unicornConsole: ["Bool", "unicornConsole"],
   showRedux: ["Bool", "showRedux"],
   enableLargeText: ["Bool", "enableLargeText"],
-  softFocus: ["Bool", "softFocus"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   testSupport: ["Bool", "testSupport"],
   originalClassNames: ["Bool", "originalClassNames"],

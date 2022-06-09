@@ -29,7 +29,7 @@ import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
-import { endTimeForFocusRegion, beginTimeForFocusRegion } from "ui/utils/timeline";
+import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/utils/timeline";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
@@ -409,11 +409,11 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
     // Don't show a nonsensical message about filtered logs before or after the focus window
     // if the focus window is at the very start or end of the recording.
     if (position === "before") {
-      if (beginTimeForFocusRegion(focusRegion) === 0) {
+      if (displayedBeginForFocusRegion(focusRegion) === 0) {
         return null;
       }
     } else {
-      if (endTimeForFocusRegion(focusRegion) === zoomRegion.endTime) {
+      if (displayedEndForFocusRegion(focusRegion) === zoomRegion.endTime) {
         return null;
       }
     }

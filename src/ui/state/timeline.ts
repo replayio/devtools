@@ -9,8 +9,8 @@ export interface ZoomRegion {
 export interface FocusRegion {
   // We are moving towards using TimeStampedPoints for all ranges on the client,
   // to that end, we should avoid using fields directly from this object, and
-  // instead use the getters `beginTimeForFocusRegion` and
-  // `endTimeForFocusRegion`. If you must access the fields directly, you can
+  // instead use the getters `displayedBeginForFocusRegion` and
+  // `displayedEndForFocusRegion`. If you must access the fields directly, you can
   // cast instead to an `UnsafeFocusRegion`
 }
 

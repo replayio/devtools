@@ -25,11 +25,11 @@ import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import {
-  endTimeForFocusRegion,
+  displayedEndForFocusRegion,
   isPointInRegions,
   isTimeInRegions,
   overlap,
-  beginTimeForFocusRegion,
+  displayedBeginForFocusRegion,
 } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
@@ -342,8 +342,8 @@ export const getFlatEvents = (state: UIState) => {
   return focusRegion
     ? filteredEvents.filter(
         e =>
-          e.time > beginTimeForFocusRegion(focusRegion) &&
-          e.time < endTimeForFocusRegion(focusRegion)
+          e.time > displayedBeginForFocusRegion(focusRegion) &&
+          e.time < displayedEndForFocusRegion(focusRegion)
       )
     : filteredEvents;
 };
