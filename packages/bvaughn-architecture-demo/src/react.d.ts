@@ -1,12 +1,17 @@
 import "react";
 
 declare module "react" {
-  type Callback = () => void;
+  type TransitionCallback = () => void;
 
   // The following hooks are only available in the experimental react release.
+  export function startTransition(TransitionCallback): void;
   export function useDeferredValue(value: T): T;
-  export function useTransition(): [isPending: boolean, startTransition: (Callback) => void];
+  export function useTransition(): [
+    isPending: boolean,
+    startTransition: (TransitionCallback) => void
+  ];
 
   // Unstable Suspense cache API
   export function unstable_getCacheForType<T>(resourceType: () => T): T;
+  export function unstable_useCacheRefresh(): () => void;
 }

@@ -7,7 +7,7 @@ import {
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { ReplayClientContext } from "../contexts/ReplayClientContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { ReplayClientInterface } from "../ReplayClient";
+import { ReplayClientInterface } from "../client/ReplayClient";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).
@@ -28,6 +28,8 @@ export async function render(
   };
 
   const sessionContext: SessionContextType = {
+    accessToken: null,
+    currentUserInfo: null,
     duration: 1000,
     endPoint: "1000",
     recordingId: "fakeRecordingId",
