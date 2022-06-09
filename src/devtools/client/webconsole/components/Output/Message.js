@@ -162,6 +162,7 @@ class Message extends React.Component {
 
   renderOverlayButton() {
     const {
+      currentTime,
       executionPoint,
       executionPointTime,
       executionPointHasFrames,
@@ -173,7 +174,7 @@ class Message extends React.Component {
       isFirstMessageForPoint,
     } = this.props;
 
-    if (!pausedExecutionPoint || !executionPoint || !frame) {
+    if (!executionPoint || !frame) {
       return undefined;
     }
 
@@ -207,7 +208,17 @@ class Message extends React.Component {
       );
     };
 
-    if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
+    if (!pausedExecutionPoint) {
+      // The user is outside of a loaded region; there's no Pause in this case.
+      // In this case we fall back to comparing the Message's timeStamp to the currentTime.
+      if (executionPointTime > currentTime) {
+        overlayType = "fast-forward";
+        label = "Fast-forward";
+      } else {
+        overlayType = "rewind";
+        label = "Rewind";
+      }
+    } else if (BigInt(executionPoint) > BigInt(pausedExecutionPoint)) {
       overlayType = "fast-forward";
       label = "Fast-forward";
     } else if (BigInt(executionPoint) < BigInt(pausedExecutionPoint)) {

@@ -32,6 +32,7 @@ ConsoleApiCall.defaultProps = {
 
 export default function ConsoleApiCall(props) {
   const {
+    currentTime,
     dispatch,
     isFirstMessageForPoint,
     isPaused,
@@ -140,6 +141,7 @@ export default function ConsoleApiCall(props) {
     attachment,
     collapseTitle,
     collapsible,
+    currentTime,
     dispatch,
     executionPoint,
     executionPointHasFrames,
