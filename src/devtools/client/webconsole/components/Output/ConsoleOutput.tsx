@@ -377,22 +377,14 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
   const focusRegion = useSelector(getFocusRegion);
   const zoomRegion = useSelector(getZoomRegion);
   const showFocusModeControls = useSelector(getShowFocusModeControls);
-  const { countAfter, countBefore, messageIDs } = useSelector(selectors.getVisibleMessageData);
+  const { countAfter, countBefore, isFilteredCountExact, messageIDs } = useSelector(
+    selectors.getVisibleMessageData
+  );
 
   // If the user has no focus region, there's nothing for this component to show.
   if (focusRegion === null) {
     return null;
   }
-
-  // We can only calculate the number of messages before and after a focus region
-  // if we fetched all messages for the recording and did the filtering locally.
-  // Otherwise the best we can do is show a generic, "maybe" message.
-  //
-  // This is a bit of a HACK and should probably be modeled by the messages/focus state itself,
-  // (like the architecture proof of concept does with the MessagesCache).
-  // I'd prefer to wait and address this as part of the architectural overhaul though.
-  // See https://github.com/replayio/devtools/discussions/6932
-  const canShowFilteredMessageCounts = countAfter >= 0 && countBefore >= 0;
 
   // If there are no visible messages after filtering, show a single row for both before and after counts.
   let count = position === "before" ? countBefore : countAfter;
@@ -419,31 +411,40 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
     }
   }
 
-  // If we're confident there are no filtered messages, there's nothing for this component to show.
-  if (canShowFilteredMessageCounts && count === 0) {
-    return null;
-  }
-
   const showFocusEditor = () => {
     if (!showFocusModeControls) {
       dispatch(enterFocusMode());
     }
   };
 
-  if (canShowFilteredMessageCounts) {
-    return (
-      <div className={styles.TrimmedMessageCountRow}>
-        There are {count} logs {label}{" "}
-        <span className={styles.TrimmedMessageLink} onClick={showFocusEditor}>
-          your debugging window
-        </span>
-        .
-      </div>
-    );
+  if (count === 0) {
+    if (isFilteredCountExact) {
+      // If we're confident there are no filtered messages, there's nothing for this component to show.
+      return null;
+    } else {
+      // Even though no messages were filtered out on the client, there may be messages outside of the focus region on the server.
+      // The best we can do in this case is say "maybe".
+      return (
+        <div className={styles.TrimmedMessageCountRow}>
+          There may be some logs {label}{" "}
+          <span className={styles.TrimmedMessageLink} onClick={showFocusEditor}>
+            your debugging window
+          </span>
+          .
+        </div>
+      );
+    }
   } else {
+    let description;
+    if (count === 1) {
+      description = `There is ${isFilteredCountExact ? "" : "at least"} ${count} log ${label}`;
+    } else {
+      description = `There are ${isFilteredCountExact ? "" : "at least"} ${count} logs ${label}`;
+    }
+
     return (
       <div className={styles.TrimmedMessageCountRow}>
-        There may be some logs {label}{" "}
+        {description}{" "}
         <span className={styles.TrimmedMessageLink} onClick={showFocusEditor}>
           your debugging window
         </span>
