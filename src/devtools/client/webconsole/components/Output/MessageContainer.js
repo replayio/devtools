@@ -23,6 +23,7 @@ export class MessageContainer extends React.Component {
   static get propTypes() {
     return {
       badge: PropTypes.number,
+      currentTime: PropTypes.number,
       indent: PropTypes.number,
       isPaused: PropTypes.bool.isRequired,
       isPrimaryHighlighted: PropTypes.bool.isRequired,

@@ -19,7 +19,12 @@ import { ContextMenu } from "ui/components/ContextMenu";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
-import { getFocusRegion, getShowFocusModeControls, getZoomRegion } from "ui/reducers/timeline";
+import {
+  getCurrentTime,
+  getFocusRegion,
+  getShowFocusModeControls,
+  getZoomRegion,
+} from "ui/reducers/timeline";
 import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
@@ -185,6 +190,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
     const {
       breakpoints,
       closestMessage,
+      currentTime,
       dispatch,
       hoveredItem,
       messages,
@@ -208,6 +214,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       const prefixBadge = matchingBreakpoint?.options.prefixBadge;
 
       return React.createElement(MessageContainer, {
+        currentTime,
         // TODO Reconsider this when we rebuild message grouping
         dispatch,
         isFirstMessageForPoint: this.getIsFirstMessageForPoint(i, visibleMessageIDs),
@@ -338,6 +345,7 @@ function mapStateToProps(state: UIState) {
     // @ts-ignore
     breakpoints: selectors.getBreakpointsList(state),
     closestMessage: selectors.getClosestMessage(state),
+    currentTime: getCurrentTime(state),
     focusRegion: getFocusRegion(state),
     hoveredItem: selectors.getHoveredItem(state),
     lastMessageId: selectors.getLastMessageId(state),
