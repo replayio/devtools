@@ -5,7 +5,7 @@ runs:
   steps:
     - uses: bahmutov/npm-install@v1
       with:
-        install-command: npm ci -f
+        install-command: npm ci --legacy-peer-deps
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
     - run: tar xf ./macOS-replay-playwright.tar.xz

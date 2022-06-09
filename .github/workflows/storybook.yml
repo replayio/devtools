@@ -9,6 +9,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: bahmutov/npm-install@v1
         with:
-          install-command: npm ci -f
+          install-command: npm ci --legacy-peer-deps
       - name: Build Storybook
         run: npm run build-storybook
