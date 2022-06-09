@@ -1,4 +1,4 @@
-import { spawnSync } from "child_process";
+import { execSync, spawnSync } from "child_process";
 import fs from "fs";
 
 import config from "./config";
@@ -22,19 +22,22 @@ function getRecordingId(file: string) {
 }
 
 export async function recordNodeExample(scriptPath: string) {
-  if (!config.nodePath) {
-    console.log(`Skipping test: RECORD_REPLAY_NODE not set`);
+  const nodePath = config.nodePath || execSync("which replay-node").toString().trim();
+  if (!nodePath) {
+    console.warn("\x1b[1m\x1b[31m" + "Node e2e tests require @replayio/node" + "\x1b[0m");
+    console.log("\x1b[32m" + "npm i -g @replayio/node" + "\x1b[0m");
     return;
   }
 
   const recordingIdFile = tmpFile();
 
-  spawnSync(config.nodePath, [scriptPath], {
+  spawnSync(nodePath, [scriptPath], {
     env: {
       ...process.env,
       RECORD_REPLAY_API_KEY: config.replayApiKey,
       RECORD_REPLAY_DISPATCH: config.backendUrl,
       RECORD_REPLAY_DRIVER: config.driverPath,
+      RECORD_REPLAY_NODE: nodePath,
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
     },
     stdio: "inherit",
