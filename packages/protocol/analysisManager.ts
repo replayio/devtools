@@ -16,7 +16,6 @@ import { ThreadFront } from "protocol/thread";
 import { client } from "./socket";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";
 
-
 import { assert } from "./utils";
 
 // For more information about these params, see:

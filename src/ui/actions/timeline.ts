@@ -1,11 +1,6 @@
-import { ExecutionPoint, PauseId, Location } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
-import {
-  analysisResultsReceived,
-  AnalysisStatus,
-  Breakpoint,
-  getThreadContext,
-} from "devtools/client/debugger/src/selectors";
+import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
@@ -46,13 +41,9 @@ import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/envi
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import {
-  endTimeForFocusRegion,
-  isFocusRegionSubset,
-  isTimeInRegions,
-  beginTimeForFocusRegion,
-} from "ui/utils/timeline";
+import { endTimeForFocusRegion, isTimeInRegions, beginTimeForFocusRegion } from "ui/utils/timeline";
 import { getAnalysisMappingForLocation } from "devtools/client/debugger/src/selectors";
+import { getStatusFlagsForAnalysisEntry } from "devtools/client/debugger/src/selectors";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -64,7 +55,6 @@ import {
 import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 import { UIState } from "ui/state";
-import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -650,23 +640,13 @@ const shouldRerunAnalysisForBreakpoint = (
     return true;
   }
 
-  const { error, timeRange: analysisFocusRegion, status, points = [] } = latestAnalysisEntry;
-
-  const analysisErrored = [
-    AnalysisError.TooManyPointsToFind,
-    AnalysisError.TooManyPointsToRun,
-  ].includes(error!);
-
-  const analysisOverflowed =
-    status === AnalysisStatus.PointsRetrieved && points.length > MAX_POINTS_FOR_FULL_ANALYSIS;
-
-  const analysisLoaded = [AnalysisStatus.PointsRetrieved, AnalysisStatus.Completed].includes(
-    status
-  );
-  const isFocusSubset = isFocusRegionSubset(analysisFocusRegion, focusRegion);
-
-  const hasAllDataForFocusRegion =
-    analysisLoaded && !analysisErrored && !analysisOverflowed && isFocusSubset;
+  const {
+    analysisLoaded,
+    analysisErrored,
+    isFocusSubset,
+    analysisOverflowed,
+    hasAllDataForFocusRegion,
+  } = getStatusFlagsForAnalysisEntry(latestAnalysisEntry, focusRegion);
 
   return !hasAllDataForFocusRegion;
 };
