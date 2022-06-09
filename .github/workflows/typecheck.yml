@@ -7,8 +7,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Deps
-        run: npm ci -f
+      - uses: bahmutov/npm-install@v1
+        with:
+          install-command: npm ci -f
       - name: Run tsc
         run: npm run typecheck
   gql:
@@ -16,8 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: Install Deps
-        run: npm ci -f
+      - uses: bahmutov/npm-install@v1
+        with:
+          install-command: npm ci -f
       - name: Fetch GraphQL schema
         run: npm run gql:schema
         env:
