@@ -110,7 +110,6 @@ class JestTestState {
 
   async loadTests() {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
       mapper: JestTestMapper,
       effectful: true,
       locations: this.invokeCallbackLocations.map(location => ({ location })),
@@ -181,7 +180,6 @@ class JestTestState {
     }
 
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
       mapper: JestExceptionMapper,
       effectful: true,
       points: failureExceptionPoints.map(p => p.point),
@@ -228,7 +226,6 @@ class JestTestState {
   // Get the points where test failures occurred.
   private async getFailurePoints(): Promise<PointDescription[]> {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
       mapper: "",
       effectful: true,
       locations: [{ location: this.catchBlockLocation }],
@@ -246,7 +243,6 @@ class JestTestState {
   // Get a sorted array of the points where exceptions were thrown.
   private async getExceptionPoints(): Promise<PointDescription[]> {
     const params: AnalysisParams = {
-      sessionId: this.sessionId,
       mapper: "",
       effectful: true,
       exceptionPoints: true,

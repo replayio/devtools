@@ -1,6 +1,3 @@
-/* eslint-disable sort-keys */
-/* eslint-disable sort-keys-fix/sort-keys-fix */
-
 module.exports = {
   collectCoverageFrom: [
     "packages/protocol/**/*.{js,jsx,ts,tsx}",

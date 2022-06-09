@@ -10,10 +10,7 @@ import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@repl
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
-import {
-  AnalysisStatus,
-  getAnalysisPointsForLocation,
-} from "devtools/client/debugger/src/reducers/breakpoints";
+import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -256,9 +253,7 @@ async function setMultiSourceLogpoint(
 
   const focusRegion = getFocusRegion(store.getState());
   const mapper = formatLogpoint({ text, condition });
-  const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
     mapper,
     effectful: true,
     locations: locations.map(location => ({ location })),
@@ -414,14 +409,11 @@ const eventTypePoints: Record<string, PointDescription[]> = {};
 const eventTypeLogGroupId: Record<string, string> = {};
 
 export async function fetchEventTypePoints(eventTypes: EventId[]) {
-  const sessionId = await ThreadFront.waitForSession();
-
   await Promise.all(
     eventTypes.map(async eventType => {
       const collectedPoints: PointDescription[] = [];
       await analysisManager.runAnalysis(
         {
-          sessionId,
           mapper: `return [{ key: input.point, value: input }];`,
           effectful: false,
           eventHandlerEntryPoints: [{ eventType }],
@@ -505,7 +497,6 @@ export async function setEventLogpoint(
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
   const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
     mapper,
     effectful: true,
     eventHandlerEntryPoints: eventTypes.map(eventType => ({ eventType })),
@@ -540,9 +531,7 @@ async function findFrameworkListeners(
   }
 
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ false);
-  const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
     mapper,
     effectful: true,
     locations: locations.map(location => ({ location, onStackFrame: point })),
@@ -569,9 +558,7 @@ export async function setExceptionLogpoint(logGroupId: string) {
     }];
   `;
 
-  const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
-    sessionId,
     mapper,
     effectful: true,
     exceptionPoints: true,

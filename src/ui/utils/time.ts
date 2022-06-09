@@ -2,7 +2,6 @@ import { ExecutionPoint, PointDescription } from "@replayio/protocol";
 import { padStart } from "lodash";
 import prettyMilliseconds from "pretty-ms";
 import analysisManager from "protocol/analysisManager";
-import { ThreadFront } from "protocol/thread";
 
 export async function convertPointToTime(executionPoint: ExecutionPoint): Promise<number> {
   return new Promise(async resolve => {
@@ -11,7 +10,6 @@ export async function convertPointToTime(executionPoint: ExecutionPoint): Promis
         effectful: false,
         mapper: "return [];",
         points: [executionPoint],
-        sessionId: ThreadFront.sessionId!,
       },
       {
         onAnalysisPoints: (points: PointDescription[]) => {

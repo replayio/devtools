@@ -1,7 +1,7 @@
 import { AnalysisEntry, Location, PointDescription } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { AnalysisParams } from "../analysisManager";
-import { gAnalysisCallbacks, sendMessage } from "../socket";
+import { client, gAnalysisCallbacks } from "../socket";
 
 export interface Analysis {
   analysisId: string;
@@ -32,6 +32,7 @@ export const createAnalysis = async (
 ): Promise<Analysis> => {
   // Call to the client and say hey please make an analysis and after that
   // create an Analysis with that result
+  const sessionId = await ThreadFront.waitForSession();
   const protocolParams: Omit<AnalysisParams, "sessionId"> = {
     mapper: params.mapper,
     reducer: params.reducer,
@@ -40,11 +41,7 @@ export const createAnalysis = async (
   if (params.range) {
     protocolParams.range = params.range;
   }
-  const { analysisId } = await sendMessage(
-    "Analysis.createAnalysis",
-    protocolParams,
-    params.sessionId
-  );
+  const { analysisId } = await client.Analysis.createAnalysis(protocolParams, sessionId);
   const points: PointDescription[] = [];
   const results: AnalysisEntry[] = [];
   gAnalysisCallbacks.set(analysisId, {
@@ -60,7 +57,7 @@ export const createAnalysis = async (
     analysisId,
     async findPoints() {
       try {
-        await sendMessage("Analysis.findAnalysisPoints", { analysisId }, params.sessionId);
+        await client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
         await ThreadFront.ensureAllSources();
         points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
         return {
@@ -75,12 +72,12 @@ export const createAnalysis = async (
       }
     },
     async addLocation(location: Location) {
-      await sendMessage("Analysis.addLocation", { analysisId, location }, params.sessionId);
+      await client.Analysis.addLocation({ analysisId, location }, sessionId);
       return;
     },
     async runAnalysis() {
       try {
-        await sendMessage("Analysis.runAnalysis", { analysisId }, params.sessionId);
+        await client.Analysis.runAnalysis({ analysisId }, sessionId);
         return {
           results,
           error: undefined,
@@ -93,7 +90,7 @@ export const createAnalysis = async (
       }
     },
     async releaseAnalysis() {
-      await sendMessage("Analysis.releaseAnalysis", { analysisId }, params.sessionId);
+      await client.Analysis.releaseAnalysis({ analysisId }, sessionId);
       gAnalysisCallbacks.delete(analysisId);
       return;
     },

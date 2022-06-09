@@ -371,7 +371,7 @@ CssComputedView.prototype = {
       return null;
     }
 
-    let value, type;
+    let type, value;
 
     // Get the property and value for a node that's a property name or value
     const isHref = classes.contains("theme-link") && !classes.contains("computed-link");

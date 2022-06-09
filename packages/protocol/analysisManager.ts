@@ -10,10 +10,10 @@ import {
   ExecutionPoint,
   PointDescription,
   PointRange,
-  SessionId,
 } from "@replayio/protocol";
-import { sendMessage, addEventListener } from "protocol/socket";
+import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+import { client } from "./socket";
 
 import { assert } from "./utils";
 
@@ -68,12 +68,9 @@ export interface AnalysisParams {
   // which summarizes all the input values and will be associated with key for analysisResult events or further calls to the reducer.
   // The reducer may be omitted if no reduction phase is needed.
   reducer?: string;
-
-  // The session this command is associated with, e.g. ThreadFront.sessionId.
-  sessionId: SessionId;
 }
 
-type OmitParams = "analysisId" | "sessionId";
+type OmitParams = "analysisId";
 export type AnalysisLocation = Omit<addLocationParameters, OmitParams>;
 export type FunctionEntryPoint = Omit<addFunctionEntryPointsParameters, OmitParams>;
 export type EventHandlerEntryPoint = Omit<addEventHandlerEntryPointsParameters, OmitParams>;
@@ -99,21 +96,21 @@ class AnalysisManager {
 
   async runAnalysis<T>(params: AnalysisParams, handler: AnalysisHandler<T>) {
     await ThreadFront.ensureAllSources();
-    const { analysisId } = await sendMessage(
-      "Analysis.createAnalysis",
+    const sessionId = await ThreadFront.waitForSession();
+    const { analysisId } = await client.Analysis.createAnalysis(
       {
         mapper: params.mapper,
         reducer: params.reducer,
         effectful: params.effectful,
       },
-      params.sessionId
+      sessionId
     );
 
     try {
       if (params.locations) {
         await Promise.all(
           params.locations.map(loc =>
-            sendMessage("Analysis.addLocation", { analysisId, ...loc }, params.sessionId)
+            client.Analysis.addLocation({ analysisId, ...loc }, sessionId)
           )
         );
       }
@@ -121,7 +118,7 @@ class AnalysisManager {
       if (params.functionEntryPoints) {
         await Promise.all(
           params.functionEntryPoints.map(fep =>
-            sendMessage("Analysis.addFunctionEntryPoints", { analysisId, ...fep }, params.sessionId)
+            client.Analysis.addFunctionEntryPoints({ analysisId, ...fep }, sessionId)
           )
         );
       }
@@ -129,45 +126,34 @@ class AnalysisManager {
       if (params.eventHandlerEntryPoints) {
         await Promise.all(
           params.eventHandlerEntryPoints.map(ehep =>
-            sendMessage(
-              "Analysis.addEventHandlerEntryPoints",
-              { analysisId, ...ehep },
-              params.sessionId
-            )
+            client.Analysis.addEventHandlerEntryPoints({ analysisId, ...ehep }, sessionId)
           )
         );
       }
 
       if (params.exceptionPoints) {
-        await sendMessage("Analysis.addExceptionPoints", { analysisId }, params.sessionId);
+        await client.Analysis.addExceptionPoints({ analysisId }, sessionId);
       }
 
       if (params.numRandomPoints) {
-        await sendMessage(
-          "Analysis.addRandomPoints",
+        await client.Analysis.addRandomPoints(
           { analysisId, numPoints: params.numRandomPoints },
-          params.sessionId
+          sessionId
         );
       }
 
       if (params.points) {
-        await sendMessage(
-          "Analysis.addPoints",
-          { analysisId, points: params.points },
-          params.sessionId
-        );
+        await client.Analysis.addPoints({ analysisId, points: params.points }, sessionId);
       }
 
       this.handlers.set(analysisId, handler);
       await Promise.all([
-        !handler.onAnalysisResult ||
-          sendMessage("Analysis.runAnalysis", { analysisId }, params.sessionId),
-        !handler.onAnalysisPoints ||
-          sendMessage("Analysis.findAnalysisPoints", { analysisId }, params.sessionId),
+        !handler.onAnalysisResult || client.Analysis.runAnalysis({ analysisId }, sessionId),
+        !handler.onAnalysisPoints || client.Analysis.findAnalysisPoints({ analysisId }, sessionId),
       ]);
     } finally {
       this.handlers.delete(analysisId);
-      await sendMessage("Analysis.releaseAnalysis", { analysisId }, params.sessionId);
+      await client.Analysis.releaseAnalysis({ analysisId }, sessionId);
     }
 
     return handler.onFinished?.();
@@ -193,7 +179,6 @@ class AnalysisManager {
       const batchPoints = allPoints.slice(i, i + MaxPointsPerBatch);
 
       const batchParams: AnalysisParams = {
-        sessionId: params.sessionId,
         mapper: params.mapper,
         effectful: true,
         points: batchPoints.map(p => p.point),
