@@ -6,6 +6,8 @@ import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import {
   endTimeForFocusRegion,
   getVisiblePosition,
+  overlap,
+  rangeForFocusRegion,
   startTimeForFocusRegion,
 } from "ui/utils/timeline";
 
@@ -29,8 +31,9 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusRegion) {
-    beginTime = startTimeForFocusRegion(focusRegion);
-    endTime = endTimeForFocusRegion(focusRegion);
+    const focusedAndLoaded = overlap([rangeForFocusRegion(focusRegion)], loadedRegions.loading)[0];
+    beginTime = focusedAndLoaded.begin.time;
+    endTime = focusedAndLoaded.end.time;
   }
   const { endTime: recordingEndTime } = zoomRegion;
   const loadedRegionStart = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;

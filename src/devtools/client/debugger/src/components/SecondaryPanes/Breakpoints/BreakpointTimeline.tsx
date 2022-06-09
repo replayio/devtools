@@ -18,9 +18,11 @@ import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/
 import { UIState } from "ui/state";
 import { connect, ConnectedProps, useSelector } from "react-redux";
 import { HoveredItem } from "ui/state/timeline";
-import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 import { getExecutionPoint } from "../../../selectors";
 import type { Breakpoint } from "../../../reducers/types";
+import UnfocusedRegion from "ui/components/Timeline/UnfocusedRegion";
+import NonLoadingRegions from "ui/components/Timeline/NonLoadingRegions";
+import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
 
 function Points({
   analysisPoints,

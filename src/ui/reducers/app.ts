@@ -1,6 +1,5 @@
-import { Location, PointDescription } from "@replayio/protocol";
+import { Location } from "@replayio/protocol";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
 import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
@@ -27,14 +26,11 @@ import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
 import {
   endTimeForFocusRegion,
-  filterToFocusRegion,
   isPointInRegions,
   isTimeInRegions,
   overlap,
   startTimeForFocusRegion,
 } from "ui/utils/timeline";
-import { AnalysisError } from "protocol/thread/analysis";
-import { uniqBy } from "lodash";
 
 export const initialAppState: AppState = {
   mode: "devtools",

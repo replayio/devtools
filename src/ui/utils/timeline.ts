@@ -236,6 +236,11 @@ export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[])
   return !!regions?.some(region => time >= region.begin.time && time <= region.end.time);
 }
 
+export function rangeForFocusRegion(focusRegion: FocusRegion): TimeStampedPointRange {
+  const unsafe = focusRegion as UnsafeFocusRegion;
+  return { begin: unsafe.start, end: unsafe.end };
+}
+
 export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {
   const overlapping: TimeStampedPointRange[] = [];
   a.forEach(aRegion => {
