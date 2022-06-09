@@ -650,7 +650,7 @@ const shouldRerunAnalysisForBreakpoint = (
     return true;
   }
 
-  const { error, focusRegion: analysisFocusRegion, status, points = [] } = latestAnalysisEntry;
+  const { error, timeRange: analysisFocusRegion, status, points = [] } = latestAnalysisEntry;
 
   const analysisErrored = [
     AnalysisError.TooManyPointsToFind,

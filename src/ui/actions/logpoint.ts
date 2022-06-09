@@ -6,7 +6,13 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@replayio/protocol";
+import {
+  AnalysisEntry,
+  ExecutionPoint,
+  Location,
+  PointDescription,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
@@ -34,6 +40,8 @@ import {
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
+import { getLoadedRegions } from "./app";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 
 const TOO_MANY_HITS_TO_SHOW = 1000;
 
@@ -264,11 +272,20 @@ async function setMultiSourceLogpoint(
     locations: locations.map(location => ({ location })),
   };
 
+  let timeRange: TimeStampedPointRange | null = null;
+
   if (focusRegion) {
+    const ufr = focusRegion as UnsafeFocusRegion;
     params.range = {
-      begin: (focusRegion as UnsafeFocusRegion).begin.point,
-      end: (focusRegion as UnsafeFocusRegion).end.point,
+      begin: ufr.begin.point,
+      end: ufr.end.point,
     };
+
+    timeRange = rangeForFocusRegion(focusRegion);
+  } else {
+    const loadedRegions = getLoadedRegions(store.getState());
+    // Per discussion, `loading` is always a 0 or 1-item array
+    timeRange = loadedRegions?.loading[0] ?? null;
   }
 
   let analysis: Analysis;
@@ -276,7 +293,7 @@ async function setMultiSourceLogpoint(
     analysis = await createAnalysis(params);
     const { analysisId } = analysis;
 
-    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition, focusRegion }));
+    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition, timeRange }));
 
     await Promise.all(locations.map(location => analysis.addLocation(location)));
 

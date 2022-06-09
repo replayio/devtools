@@ -9,7 +9,12 @@ import {
   PayloadAction,
   EntityState,
 } from "@reduxjs/toolkit";
-import { Location, PointDescription, AnalysisEntry } from "@replayio/protocol";
+import {
+  Location,
+  PointDescription,
+  AnalysisEntry,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import string from "devtools/packages/devtools-reps/reps/string";
@@ -54,7 +59,7 @@ export type AnalysisRequest = {
   id: string;
   location: Location;
   condition?: string;
-  focusRegion: FocusRegion | null;
+  timeRange: TimeStampedPointRange | null;
   points: PointDescription[] | undefined;
   results: AnalysisEntry[] | undefined;
   status: AnalysisStatus;
@@ -176,17 +181,17 @@ const breakpointsSlice = createSlice({
         analysisId: string;
         location: Location;
         condition?: string;
-        focusRegion: FocusRegion | null;
+        timeRange: TimeStampedPointRange | null;
       }>
     ) {
-      const { analysisId, location, condition, focusRegion } = action.payload;
+      const { analysisId, location, condition, timeRange } = action.payload;
 
       analysesAdapter.addOne(state.analyses, {
         error: undefined,
         id: analysisId,
         location,
         condition,
-        focusRegion,
+        timeRange,
         points: undefined,
         results: undefined,
         status: AnalysisStatus.Created,
