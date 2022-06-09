@@ -1,23 +1,54 @@
-## E2E Test Runner
+# End to End tests
 
 The End To End test runner is responsible for running tests for our forks of Node, Gecko, and Chromium on Mac OSX, Linux, and Windows.
 
-### Tests
+## Tests configuration
 
 Tests are defined in the `manifest.js` file.
 
-```json
+```js
+// Example browser based e2e tests
 {
   "example": "doc_rr_basic.html",
   "script": "breakpoints-01.js",
   "targets": ["gecko", "chromium"]
-}
+},
+
+// Example Node e2e tests
+{
+  "example": "node/control_flow.js",
+  "script": "node_control_flow.js",
+  "targets": ["node"],
+},
+
+// ...
 ```
 
-### How to run
+## Installation
 
-It's possible to run a single test with the `--pattern` parameter.
+To run the e2e tests, you'll need to install the Replay Browser (download it [here](https://static.replay.io/downloads/replay.dmg)) and the Replay fork of Node:
 
-`node test/run.js --pattern breakpoints-02 `
+```sh
+npm i -g @replayio/node
+```
 
-Other params are available in `-h` or simply look at `src/state.js`.
+To ensure you have the latest versions installed, run:
+
+```sh
+replay update-browsers
+replay-node --update
+```
+
+## Running tests
+
+Tests can be run using:
+
+```sh
+npm run test-e2e
+```
+
+To run a subset of tests, pass a naming pattern:
+
+```sh
+npm run test-e2e breakpoints
+```
