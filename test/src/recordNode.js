@@ -1,6 +1,7 @@
+const { execSync, spawnSync } = require("child_process");
 const fs = require("fs");
+
 const { tmpFile } = require("./utils");
-const { spawnSync } = require("child_process");
 
 function getRecordingId(file) {
   try {
@@ -20,10 +21,14 @@ function getRecordingId(file) {
 }
 
 async function recordNode(state, scriptPath) {
-  if (!process.env.RECORD_REPLAY_NODE) {
-    console.log(`Skipping test: RECORD_REPLAY_NODE not set`);
+  const nodePath =
+    process.env.RECORD_REPLAY_NODE || execSync("which replay-node").toString().trim();
+  if (!nodePath) {
+    console.warn("\x1b[1m\x1b[31m" + "Node e2e tests require @replayio/node" + "\x1b[0m");
+    console.log("\x1b[32m" + "npm i -g @replayio/node" + "\x1b[0m");
     return;
   }
+
   if (!state.driverPath) {
     console.log(`Skipping test: RECORD_REPLAY_DRIVER not set and no --driverPath flag was passed`);
     return;
@@ -31,12 +36,13 @@ async function recordNode(state, scriptPath) {
 
   const recordingIdFile = tmpFile();
 
-  spawnSync(process.env.RECORD_REPLAY_NODE, [scriptPath], {
+  spawnSync(nodePath, [scriptPath], {
     env: {
       ...process.env,
       RECORD_REPLAY_API_KEY: state.replayApiKey,
       RECORD_REPLAY_DISPATCH: state.dispatchServer,
       RECORD_REPLAY_DRIVER: state.driverPath,
+      RECORD_REPLAY_NODE: nodePath,
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
     },
     stdio: "inherit",

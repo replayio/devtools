@@ -4,10 +4,13 @@ import {
   responseBodyData,
   RequestId,
   requestBodyData,
+  Frame,
 } from "@replayio/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
+import { Context } from "devtools/client/debugger/src/reducers/pause";
+import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getSummaryById } from "ui/reducers/network";
+import { getRequestById, getSummaryById } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
 
 import { UIThunkAction } from ".";
@@ -90,7 +93,7 @@ export function hideRequestDetails() {
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
-    const request = state.network.requests.find(request => request.id === requestId);
+    const request = getRequestById(state, requestId);
     const loadedRegions = getLoadedRegions(state);
 
     // Don't select a request that's not within a loaded region.
@@ -124,5 +127,24 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
       requestId,
       type: "SHOW_REQUEST_DETAILS",
     });
+  };
+}
+
+export function seekToRequestFrame(
+  request: RequestSummary,
+  frame: Frame,
+  cx: Context
+): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const state = getState();
+    const loadedRegions = getLoadedRegions(state);
+    const point = request.point;
+
+    // Don't select a request that's not within a loaded region.
+    if (!request || !loadedRegions || !isPointInRegions(loadedRegions.loaded, point.point)) {
+      return;
+    }
+
+    ThreadFront.timeWarp(point.point, point.time, true, frame);
   };
 }

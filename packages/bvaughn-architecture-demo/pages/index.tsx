@@ -1,5 +1,6 @@
 import React, { Suspense } from "react";
 
+import CommentList from "../components/comments/CommentList";
 import ErrorBoundary from "../components/ErrorBoundary";
 import ConsoleFilters from "../components/console/Filters";
 import Focuser from "../components/console/Focuser";
@@ -20,23 +21,33 @@ export default function HomePage() {
 
   return (
     <FocusContextRoot>
-      <ConsoleFiltersContextRoot>
-        <div className={styles.Container}>
-          <div className={styles.Row}>
-            <ConsoleFilters />
-          </div>
-          <div className={styles.ContentArea}>
-            <ErrorBoundary>
-              <Suspense fallback={<Loader />}>
-                <ConsoleMessages />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-          <div className={styles.Row}>
-            <Focuser />
-          </div>
+      <div className={styles.Container}>
+        <div className={styles.CommentsContainer}>
+          <ErrorBoundary>
+            <Suspense fallback={<Loader />}>
+              <CommentList />
+            </Suspense>
+          </ErrorBoundary>
         </div>
-      </ConsoleFiltersContextRoot>
+
+        <ConsoleFiltersContextRoot>
+          <div className={styles.ConsoleContainer}>
+            <div className={styles.Row}>
+              <ConsoleFilters />
+            </div>
+            <div className={styles.ContentArea}>
+              <ErrorBoundary>
+                <Suspense fallback={<Loader />}>
+                  <ConsoleMessages />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+            <div className={styles.Row}>
+              <Focuser />
+            </div>
+          </div>
+        </ConsoleFiltersContextRoot>
+      </div>
     </FocusContextRoot>
   );
 }

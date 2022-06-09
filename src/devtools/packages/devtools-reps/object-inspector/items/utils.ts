@@ -1,4 +1,5 @@
 import { Pause, ValueFront } from "protocol/thread";
+import { features } from "ui/utils/prefs";
 
 import { MODE } from "../../reps/constants";
 
@@ -18,6 +19,16 @@ export const GETTERS_FROM_PROTOTYPES = 1;
 
 export function isValueLoaded(value: ValueFront): boolean {
   return value.isPrimitive() || !value.hasPreviewOverflow();
+}
+
+/**
+ * Ensure the ValueFront is ready to be displayed in the ObjectInspector
+ */
+export async function loadValue(value: ValueFront) {
+  await value.loadIfNecessary();
+  if (features.originalClassNames) {
+    await value.mapClassName();
+  }
 }
 
 export function shouldRenderRootsInReps(roots: Item[]): boolean {

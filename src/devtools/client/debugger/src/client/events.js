@@ -17,9 +17,9 @@ function setupEvents(dependencies) {
   });
 }
 
-async function paused(_, { point, time }) {
+async function paused(_, { point, time, frame }) {
   log("ThreadFront.paused");
-  actions.paused({ thread: ThreadFront.actor, executionPoint: point, time });
+  actions.paused({ thread: ThreadFront.actor, executionPoint: point, time, frame });
 }
 
 function resumed() {

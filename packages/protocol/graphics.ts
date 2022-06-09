@@ -403,11 +403,7 @@ let gLastBounds: {
 // Mouse information to draw.
 let gDrawMouse: MouseAndClickPosition | null = null;
 
-export function paintGraphics(
-  screenShot?: ScreenShot,
-  mouse?: MouseAndClickPosition,
-  playing?: boolean
-) {
+export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosition) {
   window.currentScreenshotHash = screenShot?.hash;
   if (!screenShot) {
     clearGraphics();

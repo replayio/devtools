@@ -37,11 +37,13 @@ import {
   requestBodyData,
   findAnnotationsResult,
   getHitCountsParameters,
+  Frame,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
+import ScopeMapCache from "../scope-map-cache";
 import { client, log } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 
@@ -180,6 +182,8 @@ class _ThreadFront {
   onSource: ((source: newSource) => void) | undefined;
 
   mappedLocations = new MappedLocationCache();
+
+  scopeMaps = new ScopeMapCache();
 
   // Points which will be reached when stepping in various directions from a point.
   resumeTargets = new Map<string, PauseDescription>();
@@ -333,7 +337,7 @@ class _ThreadFront {
     return this.recordingTargetWaiter.promise;
   }
 
-  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, force?: boolean) {
+  timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, frame?: Frame) {
     log(`TimeWarp ${point}`);
 
     this.currentPoint = point;
@@ -341,7 +345,7 @@ class _ThreadFront {
     this.currentPointHasFrames = !!hasFrames;
     this.currentPause = null;
     this.asyncPauses.length = 0;
-    this.emit("paused", { point, hasFrames, time });
+    this.emit("paused", { point, hasFrames, time, frame });
   }
 
   timeWarpToPause(pause: Pause) {
@@ -682,6 +686,10 @@ class _ThreadFront {
     return await pause.getScopes(frameId);
   }
 
+  getScopeMap(location: Location): Promise<Record<string, string>> {
+    return this.scopeMaps.getScopeMap(location);
+  }
+
   async evaluate({
     asyncIndex,
     text,
@@ -1019,6 +1027,18 @@ class _ThreadFront {
       return locations.find(l => l.sourceId == alternateId);
     }
     return null;
+  }
+
+  getGeneratedLocation(locations: MappedLocation) {
+    const sourceIds = new Set<SourceId>(locations.map(location => location.sourceId));
+    return locations.find(location => {
+      const generated = this.getGeneratedSourceIds(location.sourceId);
+      if (!generated) {
+        return true;
+      }
+      // Don't return a location if it is an original version of another one of the given locations.
+      return !generated.some(generatedId => sourceIds.has(generatedId));
+    });
   }
 
   // Get the source which should be used in the devtools from an array of

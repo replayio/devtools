@@ -1,8 +1,7 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
-import { ReplayClientInterface } from "../ReplayClient";
-import { Wakeable } from "../types";
-import { compareNumericStrings } from "../utils/string";
+import { ReplayClientInterface } from "../client/ReplayClient";
+import { Wakeable } from "./types";
 import { createWakeable } from "../utils/suspense";
 import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
 
@@ -10,7 +9,7 @@ import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
-let inFlightWakeable: Wakeable | null = null;
+let inFlightWakeable: Wakeable<Message[]> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
@@ -134,7 +133,7 @@ export function getMessages(
 async function fetchMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
-  wakeable: Wakeable
+  wakeable: Wakeable<Message[]>
 ) {
   try {
     const { messages, overflow } = await client.findMessages(focusRange);
@@ -154,7 +153,7 @@ async function fetchMessages(
       lastFetchedMessages = messages;
     }
 
-    wakeable.resolve();
+    wakeable.resolve(messages);
   } catch (error) {
     inFlightFocusRange = null;
     inFlightWakeable = null;

@@ -22,11 +22,11 @@ function Routing({ Component, pageProps }: AppProps) {
         <title>Replay</title>
       </Head>
       <ErrorBoundary>
-        <Initializer>
-          <React.Suspense fallback={<Loader />}>
+        <React.Suspense fallback={<Loader />}>
+          <Initializer>
             <Component {...pageProps} />
-          </React.Suspense>
-        </Initializer>
+          </Initializer>
+        </React.Suspense>
       </ErrorBoundary>
     </>
   );

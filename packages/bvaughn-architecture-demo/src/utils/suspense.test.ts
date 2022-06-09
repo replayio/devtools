@@ -40,10 +40,10 @@ describe("Suspense util", () => {
       expect(onRejectA).not.toHaveBeenCalled();
       expect(onRejectB).not.toHaveBeenCalled();
 
-      wakeable.resolve();
+      wakeable.resolve(123);
 
-      expect(onFulfillA).toHaveBeenCalled();
-      expect(onFulfillB).toHaveBeenCalled();
+      expect(onFulfillA).toHaveBeenCalledWith(123);
+      expect(onFulfillB).toHaveBeenCalledWith(123);
       expect(onRejectA).not.toHaveBeenCalled();
       expect(onRejectB).not.toHaveBeenCalled();
     });

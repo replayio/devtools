@@ -144,6 +144,8 @@ export const getSummaryById = (state: UIState, id: string) => {
   );
   return summaries.find(s => s.id === id);
 };
+export const getRequestById = (state: UIState, id: string) =>
+  state.network.requests.find(request => request.id === id);
 
 export const getSelectedResponseBody = (state: UIState) => {
   const requestId = getSelectedRequestId(state);

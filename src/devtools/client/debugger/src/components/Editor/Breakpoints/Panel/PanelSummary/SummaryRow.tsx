@@ -10,7 +10,7 @@ export default function SummaryRow({
   onClick: () => void;
 }) {
   return (
-    <div onClick={onClick} className="statement flex flex-grow">
+    <div onClick={onClick} className="statement flex flex-grow" style={{ paddingLeft: 0 }}>
       {label ? <div className="w-6">{label}</div> : null}
       {children}
     </div>

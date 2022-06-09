@@ -1,16 +1,16 @@
-import { Wakeable } from "../types";
+import { Wakeable } from "../suspense/types";
 
 // A "thennable" is a subset of the Promise API.
 // We could use a Promise as thennable, but Promises have a downside: they use the microtask queue.
 // An advantage to creating a custom thennable is synchronous resolution (or rejection).
 //
 // A "wakeable" is a "thennable" that has convenience resolve/reject methods.
-export function createWakeable(): Wakeable {
-  const resolveCallbacks: Set<() => void> = new Set();
+export function createWakeable<T>(): Wakeable<T> {
+  const resolveCallbacks: Set<(value: T) => void> = new Set();
   const rejectCallbacks: Set<(error: Error) => void> = new Set();
 
-  const wakeable: Wakeable = {
-    then(resolveCallback: () => void, rejectCallback: (error: Error) => void) {
+  const wakeable: Wakeable<T> = {
+    then(resolveCallback: (value: T) => void, rejectCallback: (error: Error) => void) {
       resolveCallbacks.add(resolveCallback);
       rejectCallbacks.add(rejectCallback);
     },
@@ -29,12 +29,12 @@ export function createWakeable(): Wakeable {
         }
       });
     },
-    resolve() {
+    resolve(value: T) {
       resolveCallbacks.forEach(resolveCallback => {
         let thrownValue = null;
 
         try {
-          resolveCallback();
+          resolveCallback(value);
         } catch (error) {
           thrownValue = error;
         }

@@ -4,7 +4,9 @@
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
 import { ReplayClientContext } from "../src/contexts/ReplayClientContext";
-import { SessionContext } from "../src/contexts/SessionContext";
+import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
+import { UserInfo } from "../src/graphql/types";
+import { getCurrentUserInfo } from "../src/graphql/User";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.
@@ -14,11 +16,9 @@ if (typeof window !== "undefined") {
   };
 }
 
-type ContextType = { duration: number; endPoint: string; recordingId: string; sessionId: string };
-
 export default function Initializer({ children }: { children: ReactNode }) {
   const client = useContext(ReplayClientContext);
-  const [context, setContext] = useState<ContextType | null>(null);
+  const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
 
   useEffect(() => {
@@ -41,7 +41,14 @@ export default function Initializer({ children }: { children: ReactNode }) {
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
         await client.findSources();
 
+        let currentUserInfo: UserInfo | null = null;
+        if (accessToken) {
+          currentUserInfo = await getCurrentUserInfo(accessToken);
+        }
+
         setContext({
+          accessToken: accessToken || null,
+          currentUserInfo,
           duration: endpoint.time,
           endPoint: endpoint.point,
           recordingId,

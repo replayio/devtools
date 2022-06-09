@@ -1,10 +1,9 @@
 import type { AnyAction, Action } from "@reduxjs/toolkit";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-import { UIThunkAction } from "ui/actions";
 import type { UIState } from "ui/state";
 
-import { pending, fulfilled, rejected, asSettled, isFulfilled } from "../utils/async-value";
+import { pending, fulfilled, rejected, asSettled } from "../utils/async-value";
 import { findPosition } from "../utils/breakpoint/breakpointPositions";
 import { prefs } from "../utils/prefs";
 import {

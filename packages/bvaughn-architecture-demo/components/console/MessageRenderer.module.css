@@ -7,7 +7,7 @@
   padding: 0.25rem;
   font-family: monospace;
   font-size: 10px;
-  border-bottom: 1px solid var(--color-gray-1);
+  border-bottom: 1px solid var(--color-gray-2);
 }
 .MessageRow {
   background-color: var(--color-white);

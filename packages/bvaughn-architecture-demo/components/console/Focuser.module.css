@@ -49,11 +49,11 @@
   width: 6px;
 }
 .RangeStartThumb {
-  background-color: var(--color-gray-3);
+  background-color: var(--color-gray-4);
   border-radius: 4px 0px 0px 4px;
 }
 .RangeEndThumb {
-  background-color: var(--color-gray-3);
+  background-color: var(--color-gray-4);
   border-radius: 0px 4px 4px 0px;
 }
 

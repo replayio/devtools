@@ -17,10 +17,11 @@ import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
 import find from "lodash/find";
-import { getPointsForHoveredLineNumber } from "ui/reducers/app";
+import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
+import { useFeature } from "ui/hooks/settings";
 
 const QuickActionButton: FC<{
   showNag: boolean;
@@ -98,6 +99,7 @@ function QuickActions({
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { height } = targetNode.getBoundingClientRect();
+  const { value: enableLargeText } = useFeature("enableLargeText");
 
   const onAddLogpoint = () => {
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
@@ -138,7 +140,10 @@ function QuickActions({
 
   return (
     <div
-      className="line-action-button absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px"
+      className={classNames(
+        "line-action-button absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px",
+        enableLargeText && "bottom-0.5"
+      )}
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
       style={{ top: `-${(1 / 2) * (18 - height)}px` }}

@@ -1,9 +1,9 @@
 import { Location, PointDescription } from "@replayio/protocol";
-import { createSlice, createSelector, PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { getLocationAndConditionKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
-import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import { UIState } from "ui/state";
 import {
   AppState,
@@ -38,7 +38,7 @@ import { uniqBy } from "lodash";
 
 export const initialAppState: AppState = {
   mode: "devtools",
-  analysisPoints: {},
+  // analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
   defaultSettingsTab: "Preferences",
@@ -155,39 +155,6 @@ const appSlice = createSlice({
         };
       },
     },
-    setAnalysisPoints(
-      state,
-      action: PayloadAction<{
-        analysisPoints: PointDescription[];
-        location: Location;
-        condition?: string;
-      }>
-    ) {
-      const { analysisPoints, location, condition = "" } = action.payload;
-      const id = getLocationAndConditionKey(location, condition);
-
-      state.analysisPoints[id] = {
-        data: uniqBy([...(state.analysisPoints[id]?.data || []), ...analysisPoints], p => p.point),
-        error: undefined,
-      };
-    },
-    setAnalysisError(
-      state,
-      action: PayloadAction<{
-        location: Location;
-        condition?: string;
-        error: AnalysisError;
-      }>
-    ) {
-      const { location, condition = "", error } = action.payload;
-
-      const id = getLocationAndConditionKey(location, condition);
-
-      state.analysisPoints[id] = {
-        data: undefined,
-        error: error,
-      };
-    },
     setEventsForType(
       state,
       action: PayloadAction<{
@@ -237,8 +204,6 @@ const appSlice = createSlice({
 export const {
   clearExpectedError,
   setMouseTargetsLoading,
-  setAnalysisError,
-  setAnalysisPoints,
   setAppMode,
   setAwaitingSourcemaps,
   setCanvas,
@@ -356,34 +321,9 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
-export const getAnalysisPointsForLocation = (
-  state: UIState,
-  location: Location | null,
-  condition = ""
-) => {
-  if (!location) {
-    return undefined;
-  }
-  const key = getLocationAndConditionKey(location, condition);
-  const points = state.app.analysisPoints[key];
-  const focusRegion = getFocusRegion(state);
-  if (!points) {
-    return undefined;
-  }
-  if (points.error || !focusRegion) {
-    return points;
-  }
-  return {
-    ...points,
-    data: filterToFocusRegion(points.data || [], focusRegion),
-  };
-};
 
 export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
-export const getPointsForHoveredLineNumber = (state: UIState) => {
-  const location = getHoveredLineNumberLocation(state);
-  return getAnalysisPointsForLocation(state, location);
-};
+
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>
   state.app.events[type] || NO_EVENTS;
@@ -423,3 +363,14 @@ export const isRegionLoaded = (state: UIState, time: number | null | undefined) 
   typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
 export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
+
+export const isCurrentTimeInLoadedRegion = createSelector(
+  getCurrentTime,
+  getLoadedRegions,
+  (currentTime: number, regions: LoadedRegions | null) => {
+    return (
+      regions !== null &&
+      regions.loaded.some(({ begin, end }) => currentTime >= begin.time && currentTime <= end.time)
+    );
+  }
+);

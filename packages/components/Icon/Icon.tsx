@@ -1,6 +1,6 @@
-import type { IconNames } from "icons";
-import { iconMap } from "icons";
-import * as icons from "icons";
+import type { IconNames } from "../../icons";
+import { iconMap } from "../../icons";
+import * as icons from "../../icons";
 import type { SVGProps } from "react";
 
 export type IconProps = { name: IconNames } & SVGProps<SVGSVGElement>;

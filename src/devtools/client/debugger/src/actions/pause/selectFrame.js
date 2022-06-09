@@ -7,7 +7,6 @@
 import { selectLocation } from "../sources";
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
-import assert from "../../utils/assert";
 
 /**
  * @memberof actions/pause
@@ -15,8 +14,6 @@ import assert from "../../utils/assert";
  */
 export function selectFrame(cx, frame) {
   return async (dispatch, getState, { client }) => {
-    assert(cx.thread == frame.thread, "Thread mismatch");
-
     // Frames that aren't on-stack do not support evalling and may not
     // have live inspectable scopes, so we do not allow selecting them.
     if (frame.state !== "on-stack") {
@@ -26,7 +23,6 @@ export function selectFrame(cx, frame) {
     dispatch({
       type: "SELECT_FRAME",
       cx,
-      thread: cx.thread,
       frame,
     });
 
