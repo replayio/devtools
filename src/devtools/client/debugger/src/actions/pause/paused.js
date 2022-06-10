@@ -68,8 +68,6 @@ export function paused({ executionPoint, frame, time }) {
       return;
     }
 
-    console.log("PAUSED", { frame, executionPoint, time });
-
     trackEvent("paused");
 
     await dispatch(pauseRequestedAt(executionPoint, time));
