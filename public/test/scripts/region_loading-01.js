@@ -15,7 +15,7 @@ Test.describe(
     });
 
     await Test.selectConsole();
-    let messages = await Test.waitForMessageCount("Part1Logpoint", totalMessageCount);
+    let messages = await Test.waitForMessageCount("Part1Logpoint", totalMessageCount, 2);
     assert(!Test.findMessages("Loading").length, "No loading messages should be left.");
     assert(messages.length == totalMessageCount, "Should have gotten all expected logpoing messages.");
     await Test.removeAllBreakpoints();
@@ -45,6 +45,6 @@ Test.describe(
     await Test.addBreakpoint("doc_rr_region_loading.html", 20, undefined, {
       logValue: `"Part3Logpoint Number " + number`,
     });
-    messages = await Test.waitForMessageCount("Part3Logpoint", totalMessageCount);
+    messages = await Test.waitForMessageCount("Part3Logpoint", totalMessageCount, 2);
   }
 );
