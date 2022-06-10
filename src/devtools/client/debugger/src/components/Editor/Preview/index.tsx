@@ -38,6 +38,7 @@ class Preview extends PureComponent {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
     codeMirror.on("tokenenter", this.onTokenEnter);
+    codeMirror.on("tokenleave", this.onTokenLeave);
     codeMirror.on("scroll", this.onScroll);
     codeMirrorWrapper.addEventListener("mouseup", this.onMouseUp);
     codeMirrorWrapper.addEventListener("mousedown", this.onMouseDown);
@@ -49,6 +50,10 @@ class Preview extends PureComponent {
     if (cx.isPaused && !this.state.selecting) {
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
+  };
+
+  onTokenLeave = e => {
+    console.log("Token leave: ", e);
   };
 
   onMouseUp = () => {
