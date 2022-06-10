@@ -270,6 +270,58 @@ function CommentCard({
     );
   }
 
+  let replyUI = null;
+  if (isAuthenticated) {
+    replyUI = isEditorOpen ? (
+      <FocusContext.Provider
+        value={{
+          autofocus: isFocused,
+          isFocused,
+          blur: () => setIsFocused(false),
+          close: () => setIsEditorOpen(false),
+        }}
+      >
+        <NewCommentEditor
+          data={{
+            type: "new_reply",
+            comment: {
+              ...comment,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+              content: "",
+              isUnpublished: true,
+              parentId: comment.id,
+            },
+          }}
+          editable={!isUpdating}
+          isUpdating={isUpdating}
+          onSubmit={onSubmit}
+        />
+      </FocusContext.Provider>
+    ) : (
+      <div className="flex justify-between border border-transparent pl-1">
+        <button
+          className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:text-primaryAccent focus:outline-none"
+          disabled={isUpdating}
+          onClick={() => {
+            setIsEditorOpen(true);
+            setIsFocused(true);
+          }}
+        >
+          Reply
+        </button>
+
+        <div className="comment-actions mr-2 select-none opacity-0">
+          {features.commentAttachments && (
+            <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
+              attachment
+            </MaterialIcon>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className={classNames(
@@ -311,54 +363,7 @@ function CommentCard({
             />
           </div>
         ))}
-        {isEditorOpen ? (
-          <FocusContext.Provider
-            value={{
-              autofocus: isFocused,
-              isFocused,
-              blur: () => setIsFocused(false),
-              close: () => setIsEditorOpen(false),
-            }}
-          >
-            <NewCommentEditor
-              data={{
-                type: "new_reply",
-                comment: {
-                  ...comment,
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
-                  content: "",
-                  isUnpublished: true,
-                  parentId: comment.id,
-                },
-              }}
-              editable={!isUpdating}
-              isUpdating={isUpdating}
-              onSubmit={onSubmit}
-            />
-          </FocusContext.Provider>
-        ) : (
-          <div className="flex justify-between border border-transparent pl-1">
-            <button
-              className="w-1/2 text-left text-gray-400 hover:text-primaryAccent focus:text-primaryAccent focus:outline-none"
-              disabled={isUpdating}
-              onClick={() => {
-                setIsEditorOpen(true);
-                setIsFocused(true);
-              }}
-            >
-              Reply
-            </button>
-
-            <div className="comment-actions mr-2 select-none opacity-0">
-              {features.commentAttachments && (
-                <MaterialIcon className="text-gray-400" onClick={onAttachmentClick}>
-                  attachment
-                </MaterialIcon>
-              )}
-            </div>
-          </div>
-        )}
+        {replyUI}
       </div>
     </div>
   );
