@@ -349,8 +349,21 @@ async function checkEvaluateInTopFrame(text, expected) {
     { waitingFor: `message with text "${expected}"` }
   );
 
-  await clickElement(".devtools-clear-icon");
+  await clearConsoleEvaluations();
   selectDebugger();
+}
+
+async function clearConsoleEvaluations() {
+  const clearButton = await waitUntil(
+    () => {
+      const btn = document.querySelector(".devtools-clear-icon");
+      if (btn && !btn.disabled) {
+        return btn;
+      }
+    },
+    { waitingFor: "clear console evaluations button to be enabled" }
+  );
+  clearButton.click();
 }
 
 async function waitForScopeValue(name, value) {
@@ -439,13 +452,16 @@ function checkPausedMessage(text) {
   return waitForMessage(text, ".paused");
 }
 
-function waitForMessageCount(text, count) {
+function waitForMessageCount(text, count, timeoutFactor = 1) {
   return waitUntil(
     () => {
       const messages = findMessages(text);
       return messages.length == count ? messages : null;
     },
-    { waitingFor: `${count} messages with text: "${text}"` }
+    {
+      waitingFor: `${count} messages with text: "${text}"`,
+      timeout: defaultWaitTimeout() * timeoutFactor,
+    }
   );
 }
 
