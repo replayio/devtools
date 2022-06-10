@@ -1,9 +1,7 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { pref } from "devtools/shared/services";
-import debounce from "lodash/debounce";
 
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
-const asyncStorage = require("devtools/shared/async-storage");
 
 // app prefs.
 pref("devtools.event-listeners-breakpoints", true);
@@ -79,5 +77,3 @@ export const asyncStore = asyncStoreHelper("devtools", {
   replaySessions: ["replay-sessions", {}],
   commandHistory: ["command-history", []],
 });
-
-export const updateAsyncStore = debounce(value => asyncStorage.setItem("devtools", value), 1_000);

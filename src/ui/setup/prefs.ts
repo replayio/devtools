@@ -4,9 +4,10 @@ import {
 } from "devtools/client/debugger/src/utils/prefs";
 import { RecordingId } from "@replayio/protocol";
 import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
+import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
-import { prefs, asyncStore, updateAsyncStore } from "ui/utils/prefs";
+import { prefs, asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
   getConsoleFilterDrawerExpanded,
@@ -167,6 +168,8 @@ export async function isLocalNagDismissed(nag: LocalNag) {
   return replaySession.localNags.includes(nag);
 }
 
+const updateReplaySessions = debounce(value => (asyncStore.replaySessions = value), 1_000);
+
 async function maybeUpdateReplaySessions(state: UIState) {
   const recordingId = getRecordingId();
 
@@ -191,5 +194,5 @@ async function maybeUpdateReplaySessions(state: UIState) {
   };
 
   const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };
-  await updateAsyncStore(newState);
+  await updateReplaySessions(newState);
 }
