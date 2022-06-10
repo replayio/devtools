@@ -140,8 +140,8 @@ jobs:
         with:
           node-version: "16"
           cache: "npm"
-      - name: Install dependencies
-        run: npm ci -f
-        shell: bash
+      - uses: bahmutov/npm-install@v1
+        with:
+          install-command: npm ci --legacy-peer-deps
       - name: Run tests
         run: npm test
