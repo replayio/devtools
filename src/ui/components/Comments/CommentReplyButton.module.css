@@ -1,0 +1,8 @@
+.Button {
+  margin: 0.5rem 0.5rem 0;
+  color: var(--theme-icon-dimmed-color);
+  text-align: left;
+}
+.Button:hover {
+  color: var(--primary-accent);
+}

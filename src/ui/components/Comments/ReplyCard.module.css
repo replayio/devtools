@@ -1,0 +1,6 @@
+.ReplyCard {
+  width: 100%;
+  flex-grow: 1;
+  margin-top: 0.5rem;
+  cursor: pointer;
+}

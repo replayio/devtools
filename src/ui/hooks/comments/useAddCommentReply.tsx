@@ -19,13 +19,22 @@ export default function useAddCommentReply() {
     }
   );
 
-  return async (reply: Reply) => {
+  return async ({
+    commentId,
+    content,
+    isPublished,
+  }: {
+    commentId: string;
+    content: string;
+    isPublished: boolean;
+  }) => {
     return addCommentReply({
       awaitRefetchQueries: true,
       variables: {
         input: {
-          commentId: reply.parentId,
-          content: reply.content,
+          commentId,
+          content,
+          isPublished,
         },
       },
     });

@@ -1,0 +1,62 @@
+.Sidebar {
+  background: var(--tab-bgcolor-alt-subtle);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+.Toolbar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--theme-splitter-color);
+  margin-bottom: 0;
+}
+
+.ToolbarHeader {
+  font-size: 15px;
+  line-height: 19px;
+  font-weight: 400;
+  color: var(--body-color);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding: 8px;
+}
+
+.List {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  flex-grow: 1;
+  font-size: .75rem;
+  line-height: 1rem;
+  background-color: var(--body-bgcolor);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.NoComments {
+  text-align: center;
+  font-size: 15px;
+  padding: 20px;
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity));
+  font-size: 1rem;
+  line-height: 1.5rem;
+  padding: 0.75rem;
+  align-self: stretch;
+}
+
+.NoCommentsIcon {
+  font-size: 44px;
+  color: #c9c9c9;
+}
+
+.NoCommentsArrow {
+  margin: 0 auto;
+}

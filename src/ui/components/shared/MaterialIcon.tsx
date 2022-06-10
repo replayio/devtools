@@ -17,25 +17,28 @@ type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   // tailwind text color style, e.g. text-white, text-blue-200
   color?: string;
   iconSize?: keyof typeof SIZE_STYLES;
+  title?: string;
 };
 
 export default function MaterialIcon({
   children,
   className,
-  outlined,
   color,
   iconSize = "base",
+  outlined,
+  title,
   ...rest
 }: MaterialIconProps) {
   return (
     <div
       {...rest}
       className={classnames(
-        "select-none leading-none flex-shrink-0",
+        "flex-shrink-0 select-none leading-none",
         className,
         outlined ? "material-icons-outlined" : "material-icons",
         SIZE_STYLES[iconSize]
       )}
+      title={title}
     >
       {children}
     </div>

@@ -28,7 +28,7 @@ export default function useAddComment() {
       awaitRefetchQueries: true,
       variables: {
         input: {
-          ...omit(comment, ["id", "createdAt", "updatedAt", "isPublished", "replies", "user"]),
+          ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),
           recordingId: comment.recordingId,
         },
       },

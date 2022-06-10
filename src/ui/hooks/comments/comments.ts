@@ -41,8 +41,8 @@ export function useGetComments(recordingId: RecordingId): {
 export function useUpdateComment() {
   const [updateCommentContent] = useMutation<UpdateCommentContent, UpdateCommentContentVariables>(
     gql`
-      mutation UpdateCommentContent($newContent: String!, $commentId: ID!, $position: JSONObject) {
-        updateComment(input: { id: $commentId, content: $newContent, position: $position }) {
+      mutation UpdateCommentContent($newContent: String!, $newIsPublished: Boolean!, $commentId: ID!, $newPosition: JSONObject) {
+        updateComment(input: { id: $commentId, content: $newContent, isPublished: $newIsPublished, position: $newPosition }) {
           success
         }
       }
@@ -52,9 +52,10 @@ export function useUpdateComment() {
     }
   );
 
-  return async (commentId: string, newContent: string, position: CommentPosition | null) =>
+  return async (commentId: string, newContent: string, newIsPublished: boolean, position: CommentPosition | null) =>
     updateCommentContent({
-      variables: { commentId, newContent, position },
+      // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
+      variables: { commentId, newIsPublished, newContent, position },
     });
 }
 
@@ -64,8 +65,8 @@ export function useUpdateCommentReply() {
     UpdateCommentReplyContentVariables
   >(
     gql`
-      mutation UpdateCommentReplyContent($newContent: String!, $commentId: ID!) {
-        updateCommentReply(input: { id: $commentId, content: $newContent }) {
+      mutation UpdateCommentReplyContent($id: ID!, $newContent: String!, $newIsPublished: Boolean!) {
+        updateCommentReply(input: { id: $id, content: $newContent, isPublished: $newIsPublished }) {
           success
         }
       }
@@ -75,9 +76,10 @@ export function useUpdateCommentReply() {
     }
   );
 
-  return async (commentId: string, newContent: string) =>
+  return async (replyId: string, newContent: string, newIsPublished: boolean) =>
     updateCommentReplyContent({
-      variables: { commentId, newContent },
+      // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
+      variables: { newContent, newIsPublished, replyId },
     });
 }
 
