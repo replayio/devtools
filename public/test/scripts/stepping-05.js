@@ -15,10 +15,10 @@ Test.describe(`Test stepping in pretty-printed code.`, async () => {
   await Test.warpToMessage("click");
   await Test.selectDebugger();
 
-  await Test.stepInToLine(1);
-  await Test.stepOutToLine(10);
-  await Test.stepInToLine(6);
-  await Test.stepOutToLine(10);
   await Test.stepInToLine(2);
-  await Test.stepOutToLine(10);
+  await Test.stepOutToLine(15);
+  await Test.stepInToLine(10);
+  await Test.stepOutToLine(15);
+  await Test.stepInToLine(5);
+  await Test.stepOutToLine(15);
 });
