@@ -3,6 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { MessagePrefixBadge } from "ui/components/PrefixBadge";
+import type { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
+import React from "react";
 
 const levels = {
   debug: "Debug",
@@ -10,16 +12,17 @@ const levels = {
   info: "Info",
   log: "Log",
   warn: "Warn",
-};
+} as const;
 
 // Store common icons so they can be used without recreating the element
 // during render.
 const CONSTANT_ICONS = Object.entries(levels).reduce((acc, [key, l10nLabel]) => {
+  // @ts-expect-error key/value mismatch
   acc[key] = getIconElement(l10nLabel);
   return acc;
-}, {});
+}, {} as Record<string, React.ReactNode>);
 
-function getIconElement(level, onRewindClick, type) {
+function getIconElement(level: keyof typeof levels, type?: string) {
   let title = levels[level] || level;
   const classnames = ["icon"];
 
@@ -32,19 +35,21 @@ function getIconElement(level, onRewindClick, type) {
   }
 }
 
-export function MessageIcon(props) {
-  const { level, onRewindClick, type, prefixBadge } = props;
+interface MessageIconProps {
+  level: keyof typeof levels;
+  type: string;
+  prefixBadge?: PrefixBadge;
+}
 
-  if (onRewindClick) {
-    return getIconElement(level, onRewindClick, type);
-  }
+export function MessageIcon(props: MessageIconProps) {
+  const { level, type, prefixBadge } = props;
 
   if (prefixBadge) {
     return <MessagePrefixBadge prefixBadge={prefixBadge} />;
   }
 
   if (type) {
-    return getIconElement(level, null, type);
+    return getIconElement(level, type);
   }
 
   return CONSTANT_ICONS[level] || getIconElement(level);

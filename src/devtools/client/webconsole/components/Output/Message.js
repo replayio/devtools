@@ -257,7 +257,7 @@ class Message extends React.Component {
   renderIcon() {
     const { level, type, prefixBadge } = this.props;
 
-    return MessageIcon({ level, prefixBadge, type });
+    return <MessageIcon level={level} prefixBadge={prefixBadge} type={type} />;
   }
 
   renderTimestamp() {
