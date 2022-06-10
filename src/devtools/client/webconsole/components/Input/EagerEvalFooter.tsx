@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState, useCallback } from "react";
+import debounce from "lodash/debounce";
 import { ValueFront } from "protocol/thread";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
 import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
@@ -17,9 +18,12 @@ function useEagerEvalPreview(expression: string) {
       const isUndefined = rv?.isPrimitive && !rv.primitive;
 
       if (expressionRef.current === expression && !isUndefined) {
-        setValue(rv);
+        setValue(rv!);
       }
     })();
+    return () => {
+      eagerEvaluateExpression.cancel();
+    };
   }, [expression, eagerEvaluateExpression]);
 
   return value;
