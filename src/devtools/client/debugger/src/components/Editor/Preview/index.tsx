@@ -5,20 +5,41 @@
 //
 
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { UIState } from "ui/state";
 
 import Popup from "./Popup";
 
 import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
+import { SourceLocation } from "@replayio/protocol";
 
-class Preview extends PureComponent {
-  target = null;
-  constructor(props) {
-    super(props);
-    this.state = { selecting: false };
-  }
+const mapStateToProps = (state: UIState) => {
+  return {
+    cx: getThreadContext(state),
+    preview: getPreview(state),
+  };
+};
+
+const connector = connect(mapStateToProps, {
+  clearPreview: actions.clearPreview,
+  updatePreview: actions.updatePreview,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type PreviewProps = PropsFromRedux & {
+  editor: any;
+  editorRef: any;
+};
+
+type PreviewState = { selecting: boolean };
+
+class Preview extends PureComponent<PreviewProps, PreviewState> {
+
+  state = { selecting: false };
 
   componentDidMount() {
     this.updateListeners();
@@ -34,7 +55,7 @@ class Preview extends PureComponent {
     codeMirrorWrapper.removeEventListener("mousedown", this.onMouseDown);
   }
 
-  updateListeners(prevProps) {
+  updateListeners() {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
     codeMirror.on("tokenenter", this.onTokenEnter);
@@ -44,7 +65,7 @@ class Preview extends PureComponent {
     codeMirrorWrapper.addEventListener("mousedown", this.onMouseDown);
   }
 
-  onTokenEnter = ({ target, tokenPos }) => {
+  onTokenEnter = ({ target, tokenPos }: { target: HTMLElement; tokenPos: SourceLocation }) => {
     const { cx, editor, updatePreview } = this.props;
 
     if (cx.isPaused && !this.state.selecting) {
@@ -57,14 +78,14 @@ class Preview extends PureComponent {
   };
 
   onMouseUp = () => {
-    if (this.props.cx.isPaused) {
+    if (this.props.cx?.isPaused) {
       this.setState({ selecting: false });
       return true;
     }
   };
 
   onMouseDown = () => {
-    if (this.props.cx.isPaused) {
+    if (this.props.cx?.isPaused) {
       this.setState({ selecting: true });
       return true;
     }
@@ -72,7 +93,7 @@ class Preview extends PureComponent {
 
   onScroll = () => {
     const { clearPreview, cx, preview } = this.props;
-    if (cx.isPaused && preview) {
+    if (cx?.isPaused && preview) {
       clearPreview(cx, preview.previewId);
     }
   };
@@ -94,14 +115,4 @@ class Preview extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    cx: getThreadContext(state),
-    preview: getPreview(state),
-  };
-};
-
-export default connect(mapStateToProps, {
-  clearPreview: actions.clearPreview,
-  updatePreview: actions.updatePreview,
-})(Preview);
+export default connector(Preview);

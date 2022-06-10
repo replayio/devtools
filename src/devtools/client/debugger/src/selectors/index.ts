@@ -41,7 +41,6 @@ export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./
 export * from "./debugLine";
 
 // TODO These declarations are still masking some usages
-export declare function getThreadContext(state: UIState): any;
 
 export declare function getActiveSearch(state: UIState): string;
 export declare function getContext(state: UIState): Context;
@@ -55,5 +54,4 @@ export declare function getSourceActorsForSource(state: UIState, sourceId: strin
 export declare function getSourceWithContent(state: UIState, sourceId: string): any;
 export declare function getSourcesCollapsed(state: UIState): any;
 export declare function getSymbols(state: UIState, source: any): any;
-export declare function getThreadContext(state: UIState): any;
 export declare function hasFrames(state: UIState): boolean;

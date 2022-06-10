@@ -8,8 +8,13 @@ import type { UIState } from "ui/state";
 
 import type { Preview } from "./types";
 
+// TODO Are we really putting more DOM nodes in state?
+type $FixTypeLater = any;
+
 export interface PreviewState {
-  preview: (Preview & { previewId: string }) | null;
+  preview:
+    | (Preview & { previewId: string; expression: string; target: $FixTypeLater; resultGrip: any })
+    | null;
 }
 
 export function initialPreviewState(): PreviewState {
