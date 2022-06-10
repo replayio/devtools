@@ -2,12 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
+import type { SourceLocation } from "@replayio/protocol";
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import debounce from "lodash/debounce";
 
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIState } from "ui/state";
 
 import Popup from "./Popup";
@@ -15,7 +14,6 @@ import Popup from "./Popup";
 import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
-import { SourceLocation } from "@replayio/protocol";
 
 const mapStateToProps = (state: UIState) => {
   return {
@@ -38,7 +36,6 @@ type PreviewProps = PropsFromRedux & {
 type PreviewState = { selecting: boolean };
 
 class Preview extends PureComponent<PreviewProps, PreviewState> {
-
   state = { selecting: false };
 
   componentDidMount() {
@@ -66,15 +63,24 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   }
 
   onTokenEnter = ({ target, tokenPos }: { target: HTMLElement; tokenPos: SourceLocation }) => {
-    const { cx, editor, updatePreview } = this.props;
+    const { cx } = this.props;
 
-    if (cx.isPaused && !this.state.selecting) {
-      updatePreview(cx, target, tokenPos, editor.codeMirror);
+    if (cx?.isPaused && !this.state.selecting) {
+      this.startPreview(target, tokenPos);
     }
   };
 
-  onTokenLeave = e => {
-    console.log("Token leave: ", e);
+  startPreview = debounce((target: HTMLElement, tokenPos: SourceLocation) => {
+    const { cx, editor, updatePreview } = this.props;
+
+    // Double-check status after timer runs
+    if (cx?.isPaused && !this.state.selecting) {
+      updatePreview(cx, target, tokenPos, editor.codeMirror);
+    }
+  }, 300);
+
+  onTokenLeave = () => {
+    this.startPreview.cancel();
   };
 
   onMouseUp = () => {
