@@ -17,6 +17,7 @@ pref("devtools.listenForMetrics", false);
 pref("devtools.disableCache", false);
 pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
+pref("devtools.showPanelAbove", false);
 
 // app features
 pref("devtools.features.columnBreakpoints", false);
@@ -50,6 +51,7 @@ export const prefs = new PrefsHelper("devtools", {
   disableCache: ["Bool", "disableCache"],
   theme: ["String", "theme"],
   colorScheme: ["String", "colorScheme"],
+  showPanelAbove: ["Bool", "showPanelAbove"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
