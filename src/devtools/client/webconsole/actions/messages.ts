@@ -279,7 +279,7 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
     dispatch(clearMessages());
 
     const sessionEndpoint = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
-    const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).start.point : "0";
+    const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).begin.point : "0";
     const end = focusRegion
       ? (focusRegion as UnsafeFocusRegion).end.point
       : sessionEndpoint.endpoint.point;

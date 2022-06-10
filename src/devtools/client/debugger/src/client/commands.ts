@@ -417,7 +417,7 @@ async function getSourceActorBreakpointHitCounts(
       locationsToFetch,
       focusRegion
         ? {
-            startPoint: (focusRegion as UnsafeFocusRegion).start.point,
+            beginPoint: (focusRegion as UnsafeFocusRegion).begin.point,
             endPoint: (focusRegion as UnsafeFocusRegion).end.point,
           }
         : null

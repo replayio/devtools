@@ -23,10 +23,10 @@ export function getPixelDistance({
   return Math.abs((toPos - fromPos) * overlayWidth);
 }
 
-export function startTimeForFocusRegion(focusRegion: FocusRegion) {
+export function beginTimeForFocusRegion(focusRegion: FocusRegion) {
   return features.softFocus
-    ? (focusRegion as UnsafeFocusRegion).start.time
-    : (focusRegion as UnsafeFocusRegion).startTime;
+    ? (focusRegion as UnsafeFocusRegion).begin.time
+    : (focusRegion as UnsafeFocusRegion).beginTime;
 }
 
 export function endTimeForFocusRegion(focusRegion: FocusRegion) {
@@ -42,7 +42,7 @@ export function getVisiblePosition({ time, zoom }: { time: number | null; zoom: 
     return 0;
   }
 
-  return (time - zoom.startTime) / (zoom.endTime - zoom.startTime);
+  return (time - zoom.beginTime) / (zoom.endTime - zoom.beginTime);
 }
 
 interface GetOffsetParams {
@@ -110,23 +110,23 @@ export function getNewZoomRegion({
   recordingDuration: number;
 }) {
   let scale = zoomRegion.scale;
-  let length = zoomRegion.endTime - zoomRegion.startTime;
-  let leftToHover = hoverTime - zoomRegion.startTime;
+  let length = zoomRegion.endTime - zoomRegion.beginTime;
+  let leftToHover = hoverTime - zoomRegion.beginTime;
   let rightToHover = zoomRegion.endTime - hoverTime;
 
   let newLength = recordingDuration / newScale;
-  let newStart = zoomRegion.startTime - (newLength - length) * (leftToHover / length);
+  let newBegin = zoomRegion.beginTime - (newLength - length) * (leftToHover / length);
   let newEnd = zoomRegion.endTime + (newLength - length) * (rightToHover / length);
 
-  if (newStart < 0) {
-    newStart = 0;
+  if (newBegin < 0) {
+    newBegin = 0;
     newEnd = newLength;
   } else if (newEnd > recordingDuration) {
     newEnd = recordingDuration;
-    newStart = recordingDuration - newLength;
+    newBegin = recordingDuration - newLength;
   }
 
-  return { start: newStart, end: newEnd };
+  return { begin: newBegin, end: newEnd };
 }
 
 // Format a time value to mm:ss
@@ -220,10 +220,10 @@ export function isSameTimeStampedPointRange(
 }
 
 export function isInFocusSpan(time: number, focusRegion: FocusRegion) {
-  const startTime = startTimeForFocusRegion(focusRegion);
+  const beginTime = beginTimeForFocusRegion(focusRegion);
   const endTime = endTimeForFocusRegion(focusRegion);
 
-  return time >= startTime && time <= endTime;
+  return time >= beginTime && time <= endTime;
 }
 
 export function isPointInRegions(regions: TimeStampedPointRange[], point: string) {
@@ -238,7 +238,7 @@ export function isTimeInRegions(time: number, regions?: TimeStampedPointRange[])
 
 export function rangeForFocusRegion(focusRegion: FocusRegion): TimeStampedPointRange {
   const unsafe = focusRegion as UnsafeFocusRegion;
-  return { begin: unsafe.start, end: unsafe.end };
+  return { begin: unsafe.begin || { time: 0, point: "0" }, end: unsafe.end };
 }
 
 export const overlap = (a: TimeStampedPointRange[], b: TimeStampedPointRange[]) => {
@@ -268,9 +268,9 @@ export function getTimeFromPosition(
   zoomRegion: ZoomRegion
 ): number {
   const x = pageX - targetRect.left;
-  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.startTime;
+  const zoomRegionDuration = zoomRegion.endTime - zoomRegion.beginTime;
   const percentage = clamp(x / targetRect.width, 0, 1);
-  const time = zoomRegion.startTime + percentage * zoomRegionDuration;
+  const time = zoomRegion.beginTime + percentage * zoomRegionDuration;
   return time;
 }
 
@@ -288,7 +288,7 @@ export function isFocusRegionSubset(
     return false;
   } else {
     return (
-      startTimeForFocusRegion(nextFocusRegion) >= startTimeForFocusRegion(prevFocusRegion) &&
+      beginTimeForFocusRegion(nextFocusRegion) >= beginTimeForFocusRegion(prevFocusRegion) &&
       endTimeForFocusRegion(nextFocusRegion) <= endTimeForFocusRegion(prevFocusRegion)
     );
   }
@@ -302,11 +302,11 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
     return sortedPoints;
   }
 
-  const startTime = startTimeForFocusRegion(focusRegion);
+  const beginTime = beginTimeForFocusRegion(focusRegion);
   const endTime = endTimeForFocusRegion(focusRegion);
 
-  const startIndex = sortedIndexBy(sortedPoints, { time: startTime, point: "" }, p => p.time);
+  const beginIndex = sortedIndexBy(sortedPoints, { time: beginTime, point: "" }, p => p.time);
   const endIndex = sortedLastIndexBy(sortedPoints, { time: endTime, point: "" }, p => p.time);
 
-  return sortedPoints.slice(startIndex, endIndex);
+  return sortedPoints.slice(beginIndex, endIndex);
 }

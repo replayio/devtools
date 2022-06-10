@@ -2,14 +2,14 @@ import { TimeRange, Location, TimeStampedPoint } from "@replayio/protocol";
 
 export interface ZoomRegion {
   endTime: number;
-  startTime: number;
+  beginTime: number;
   scale: number;
 }
 
 export interface FocusRegion {
   // We are moving towards using TimeStampedPoints for all ranges on the client,
   // to that end, we should avoid using fields directly from this object, and
-  // instead use the getters `startTimeForFocusRegion` and
+  // instead use the getters `beginTimeForFocusRegion` and
   // `endTimeForFocusRegion`. If you must access the fields directly, you can
   // cast instead to an `UnsafeFocusRegion`
 }
@@ -17,8 +17,8 @@ export interface FocusRegion {
 export interface UnsafeFocusRegion {
   end: TimeStampedPoint;
   endTime: number;
-  start: TimeStampedPoint;
-  startTime: number;
+  begin: TimeStampedPoint;
+  beginTime: number;
 }
 
 export interface TimelineState {
@@ -28,8 +28,8 @@ export interface TimelineState {
   focusRegion: FocusRegion | null;
   focusRegionBackup: FocusRegion | null;
   playback: {
-    startTime: number;
-    startDate: number;
+    beginTime: number;
+    beginDate: number;
     time: number;
   } | null;
   playbackPrecachedTime: number;

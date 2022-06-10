@@ -27,19 +27,19 @@ export default function MessagesList() {
 
   let focusRange = null;
   if (range !== null) {
-    const [startTime, endTime] = range;
+    const [beginTime, endTime] = range;
 
     // Small performance optimization:
     // Suspend in parallel when fetching points to reduce the overall wait time.
-    const [startPoint, endPoint] = suspendInParallel(
-      () => getClosestPointForTime(replayClient, startTime),
+    const [beginPoint, endPoint] = suspendInParallel(
+      () => getClosestPointForTime(replayClient, beginTime),
       () => getClosestPointForTime(replayClient, endTime)
     );
 
     focusRange = {
       begin: {
-        point: startPoint,
-        time: startTime,
+        point: beginPoint,
+        time: beginTime,
       },
       end: {
         point: endPoint,

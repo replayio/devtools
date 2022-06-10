@@ -94,12 +94,12 @@ function BreakpointTimeline({
     }
   };
   const onMouseMove = (e: React.MouseEvent) => {
-    const { startTime, endTime } = zoomRegion;
+    const { beginTime, endTime } = zoomRegion;
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const clickLeft = e.clientX;
 
     const clickPosition = Math.max((clickLeft - left) / width, 0);
-    const time = Math.ceil(startTime + (endTime - startTime) * clickPosition);
+    const time = Math.ceil(beginTime + (endTime - beginTime) * clickPosition);
     setHoveredTime(time);
   };
   const onMouseLeave = (e: React.MouseEvent) => setHoveredTime(null);

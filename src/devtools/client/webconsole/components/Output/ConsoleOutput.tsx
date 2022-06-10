@@ -13,7 +13,7 @@ import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import {
   enterFocusMode,
   setFocusRegionEndTime,
-  setFocusRegionStartTime,
+  setFocusRegionBeginTime,
 } from "ui/actions/timeline";
 import { ContextMenu } from "ui/components/ContextMenu";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
@@ -29,7 +29,7 @@ import type { AppDispatch } from "ui/setup/store";
 import type { UIState } from "ui/state";
 import { isVisible } from "ui/utils/dom";
 import { convertPointToTime } from "ui/utils/time";
-import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, beginTimeForFocusRegion } from "ui/utils/timeline";
 
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
@@ -330,7 +330,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    (dispatch as AppDispatch)(setFocusRegionStartTime(time, true));
+    (dispatch as AppDispatch)(setFocusRegionBeginTime(time, true));
   };
 }
 
@@ -409,7 +409,7 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
     // Don't show a nonsensical message about filtered logs before or after the focus window
     // if the focus window is at the very start or end of the recording.
     if (position === "before") {
-      if (startTimeForFocusRegion(focusRegion) === 0) {
+      if (beginTimeForFocusRegion(focusRegion) === 0) {
         return null;
       }
     } else {

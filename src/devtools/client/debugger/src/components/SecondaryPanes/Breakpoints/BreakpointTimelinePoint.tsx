@@ -100,8 +100,8 @@ function BreakpointTimelinePoint({
     seek(point.point, point.time, true);
   };
 
-  const { startTime, endTime } = zoomRegion;
-  const leftPercentOffset = ((point.time - startTime) / (endTime - startTime)) * 100;
+  const { beginTime, endTime } = zoomRegion;
+  const leftPercentOffset = ((point.time - beginTime) / (endTime - beginTime)) * 100;
 
   const pointInt = toBigInt(point.point)!;
   const executionInt = toBigInt(executionPoint)!;

@@ -12,8 +12,8 @@ import {
 
 const point = (time: number) => ({ time, point: "" });
 const focusRegion = (from: number, to: number): FocusRegion => ({
-  start: point(from),
-  startTime: from,
+  begin: point(from),
+  beginTime: from,
   end: point(to),
   endTime: to,
 });
@@ -106,7 +106,7 @@ describe("getTimeFromPosition", () => {
   };
 
   const ZOOM_REGION: ZoomRegion = {
-    startTime: 0,
+    beginTime: 0,
     endTime: 1000,
     scale: 1,
   };

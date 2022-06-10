@@ -2,7 +2,7 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState, ZoomRegion } from "ui/state/timeline";
-import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, beginTimeForFocusRegion } from "ui/utils/timeline";
 
 function initialTimelineState(): TimelineState {
   return {
@@ -21,7 +21,7 @@ function initialTimelineState(): TimelineState {
     timelineDimensions: { left: 1, top: 1, width: 1 },
     unprocessedRegions: [],
     /** @deprecated This appears to be obsolete for now? */
-    zoomRegion: { startTime: 0, endTime: 0, scale: 1 },
+    zoomRegion: { beginTime: 0, endTime: 0, scale: 1 },
   };
 }
 
@@ -98,5 +98,5 @@ export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
 export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;
 export const getIsInFocusMode = (state: UIState) =>
   state.timeline.focusRegion &&
-  (startTimeForFocusRegion(state.timeline.focusRegion) !== 0 ||
+  (beginTimeForFocusRegion(state.timeline.focusRegion) !== 0 ||
     endTimeForFocusRegion(state.timeline.focusRegion) !== state.timeline.zoomRegion.endTime);

@@ -5,7 +5,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import {
   endTimeForFocusRegion,
   getVisiblePosition,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
@@ -16,11 +16,11 @@ export default function UnfocusedRegion() {
     return null;
   }
 
-  const startTime = startTimeForFocusRegion(focusRegion);
+  const beginTime = beginTimeForFocusRegion(focusRegion);
   const endTime = endTimeForFocusRegion(focusRegion);
-  const duration = zoomRegion.endTime - zoomRegion.startTime;
+  const duration = zoomRegion.endTime - zoomRegion.beginTime;
 
-  const start = getVisiblePosition({ time: startTime, zoom: zoomRegion }) * 100;
+  const start = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;
   const end = getVisiblePosition({ time: duration - endTime, zoom: zoomRegion }) * 100;
 
   return (

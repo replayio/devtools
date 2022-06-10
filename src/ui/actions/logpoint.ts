@@ -261,7 +261,7 @@ async function setMultiSourceLogpoint(
 
   if (focusRegion) {
     params.range = {
-      begin: (focusRegion as UnsafeFocusRegion).start.point,
+      begin: (focusRegion as UnsafeFocusRegion).begin.point,
       end: (focusRegion as UnsafeFocusRegion).end.point,
     };
   }

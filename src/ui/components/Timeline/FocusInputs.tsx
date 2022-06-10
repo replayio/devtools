@@ -6,7 +6,7 @@ import {
   endTimeForFocusRegion,
   getFormattedTime,
   getSecondsFromFormattedTime,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 import EditableTimeInput from "./EditableTimeInput";
@@ -27,23 +27,23 @@ export default function FocusInputs() {
 
   if (showFocusModeControls && focusRegion !== null) {
     const formattedEndTime = getFormattedTime(endTimeForFocusRegion(focusRegion));
-    const formattedStartTime = getFormattedTime(startTimeForFocusRegion(focusRegion));
+    const formattedBeginTime = getFormattedTime(beginTimeForFocusRegion(focusRegion));
 
-    const validateAndSaveStartTime = (pending: string) => {
+    const validateAndSaveBeginTime = (pending: string) => {
       try {
-        const newStartTime = getSecondsFromFormattedTime(pending);
-        if (!isNaN(newStartTime)) {
+        const newBeginTime = getSecondsFromFormattedTime(pending);
+        if (!isNaN(newBeginTime)) {
           // If the new end time is less than the current start time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
           const newEndTime =
-            newStartTime <= endTimeForFocusRegion(focusRegion!)
+            newBeginTime <= endTimeForFocusRegion(focusRegion!)
               ? endTimeForFocusRegion(focusRegion!)
-              : newStartTime;
+              : newBeginTime;
 
           dispatch(
             setFocusRegion({
               endTime: newEndTime,
-              startTime: newStartTime,
+              beginTime: newBeginTime,
             })
           );
         }
@@ -57,15 +57,15 @@ export default function FocusInputs() {
         if (!isNaN(newEndTime)) {
           // If the new start time is greater than the current end time, the user is probably trying to move the whole range.
           // We can simplify this operation by resetting both the start and end time to the same value.
-          const newStartTime =
-            newEndTime >= startTimeForFocusRegion(focusRegion!)
-              ? startTimeForFocusRegion(focusRegion!)
+          const newBeginTime =
+            newEndTime >= beginTimeForFocusRegion(focusRegion!)
+              ? beginTimeForFocusRegion(focusRegion!)
               : newEndTime;
 
           dispatch(
             setFocusRegion({
+              beginTime: newBeginTime,
               endTime: newEndTime,
-              startTime: newStartTime,
             })
           );
         }
@@ -78,9 +78,9 @@ export default function FocusInputs() {
       <div className={styles.Container}>
         <EditableTimeInput
           className="text-right"
-          defaultValue={formattedStartTime}
+          defaultValue={formattedBeginTime}
           size={inputSize}
-          validateAndSave={validateAndSaveStartTime}
+          validateAndSave={validateAndSaveBeginTime}
         />
         <span>/</span>
         <EditableTimeInput

@@ -18,7 +18,7 @@ import { partialRequestsToCompleteSummaries } from "ui/components/NetworkMonitor
 import {
   endTimeForFocusRegion,
   filterToFocusRegion,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 export type NetworkState = {
@@ -115,9 +115,9 @@ export const getFocusedEvents = (state: UIState) => {
   if (!focusRegion) {
     return events;
   }
-  const startTime = startTimeForFocusRegion(focusRegion);
+  const beginTime = beginTimeForFocusRegion(focusRegion);
   const endTime = endTimeForFocusRegion(focusRegion);
-  return events.filter(e => e.time > startTime && e.time <= endTime);
+  return events.filter(e => e.time > beginTime && e.time <= endTime);
 };
 export const getFocusedRequests = (state: UIState) => {
   const requests = getRequests(state);

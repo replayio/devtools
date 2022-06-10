@@ -29,7 +29,7 @@ import {
   isPointInRegions,
   isTimeInRegions,
   overlap,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
@@ -342,7 +342,7 @@ export const getFlatEvents = (state: UIState) => {
   return focusRegion
     ? filteredEvents.filter(
         e =>
-          e.time > startTimeForFocusRegion(focusRegion) &&
+          e.time > beginTimeForFocusRegion(focusRegion) &&
           e.time < endTimeForFocusRegion(focusRegion)
       )
     : filteredEvents;

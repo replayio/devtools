@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Row, TableInstance } from "react-table";
-import { setFocusRegionEndTime, setFocusRegionStartTime } from "ui/actions/timeline";
+import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
@@ -71,9 +71,9 @@ const RequestTable = ({
     setContextMenuData(null);
 
     if (contextMenuData) {
-      const startTime = contextMenuData.row.original?.start;
-      if (startTime != null) {
-        dispatch(setFocusRegionStartTime(startTime, true));
+      const beginTime = contextMenuData.row.original?.start;
+      if (beginTime != null) {
+        dispatch(setFocusRegionBeginTime(beginTime, true));
       }
     }
   };

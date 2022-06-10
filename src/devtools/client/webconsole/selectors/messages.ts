@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 
 import type { UIState } from "ui/state";
-import { endTimeForFocusRegion, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, beginTimeForFocusRegion } from "ui/utils/timeline";
 import type { Message } from "../reducers/messages";
 import { messagesAdapter } from "../reducers/messages";
 
@@ -50,7 +50,7 @@ export const getVisibleMessageData = createSelector(
     let countAfter = 0;
     let countBefore = 0;
 
-    const focusRegionStartTime = focusRegion ? startTimeForFocusRegion(focusRegion) : null;
+    const focusRegionBeginTime = focusRegion ? beginTimeForFocusRegion(focusRegion) : null;
     const focusRegionEndTime = focusRegion ? endTimeForFocusRegion(focusRegion) : null;
 
     visibleMessages.forEach(messageID => {
@@ -59,7 +59,7 @@ export const getVisibleMessageData = createSelector(
 
       // Filter out messages that aren't within the focused region.
       if (focusRegion) {
-        if (messageTime < (focusRegionStartTime as number)) {
+        if (messageTime < (focusRegionBeginTime as number)) {
           countBefore++;
           return;
         } else if (messageTime > (focusRegionEndTime as number)) {

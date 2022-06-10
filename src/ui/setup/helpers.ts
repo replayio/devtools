@@ -33,10 +33,10 @@ function dumpBasicProcessing() {
     return;
   }
 
-  const firstStartTime = processing[0]?.params.timings.creationTimestamp;
+  const firstBeginTime = processing[0]?.params.timings.creationTimestamp;
   const stats = processing.map((region: any) => ({
     id: region.params.regionIdx,
-    startTime: region.params.timings.creationTimestamp - firstStartTime,
+    beginTime: region.params.timings.creationTimestamp - firstBeginTime,
     duration: region.params.timings.processingDuration,
   }));
   console.table(stats);

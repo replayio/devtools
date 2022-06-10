@@ -8,7 +8,7 @@ import {
   getVisiblePosition,
   overlap,
   rangeForFocusRegion,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {

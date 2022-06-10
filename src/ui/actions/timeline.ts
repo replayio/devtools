@@ -41,7 +41,7 @@ import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/envi
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
-import { endTimeForFocusRegion, isTimeInRegions, startTimeForFocusRegion } from "ui/utils/timeline";
+import { endTimeForFocusRegion, isTimeInRegions, beginTimeForFocusRegion } from "ui/utils/timeline";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -278,17 +278,17 @@ export function startPlayback(): UIThunkAction {
 
     const endTime = getZoomRegion(state).endTime;
 
-    const startDate = Date.now();
-    const startTime = currentTime >= endTime ? 0 : currentTime;
+    const beginDate = Date.now();
+    const beginTime = currentTime >= endTime ? 0 : currentTime;
 
     dispatch(
       setTimelineState({
-        playback: { startTime, startDate, time: startTime },
-        currentTime: startTime,
+        playback: { beginTime, beginDate, time: beginTime },
+        currentTime: beginTime,
       })
     );
 
-    dispatch(playback(startTime, endTime));
+    dispatch(playback(beginTime, endTime));
   };
 }
 
@@ -308,18 +308,18 @@ export function stopPlayback(): UIThunkAction {
 
 export function replayPlayback(): UIThunkAction {
   return (dispatch, getState) => {
-    const startTime = 0;
+    const beginTime = 0;
 
-    dispatch(seekToTime(startTime));
+    dispatch(seekToTime(beginTime));
     dispatch(startPlayback());
   };
 }
 
-function playback(startTime: number, endTime: number): UIThunkAction {
+function playback(beginTime: number, endTime: number): UIThunkAction {
   return async (dispatch, getState) => {
-    let startDate = Date.now();
-    let currentDate = startDate;
-    let currentTime = startTime;
+    let beginDate = Date.now();
+    let currentDate = beginDate;
+    let currentTime = beginTime;
     let nextGraphicsTime!: number;
     let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
 
@@ -338,7 +338,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       }
 
       currentDate = Date.now();
-      currentTime = startTime + (currentDate - startDate);
+      currentTime = beginTime + (currentDate - beginDate);
 
       if (currentTime > endTime) {
         log(`FinishPlayback`);
@@ -350,7 +350,7 @@ function playback(startTime: number, endTime: number): UIThunkAction {
       dispatch(
         setTimelineState({
           currentTime,
-          playback: { startTime, startDate, time: currentTime },
+          playback: { beginTime, beginDate, time: currentTime },
         })
       );
 
@@ -370,15 +370,15 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 
           // Playback may have stalled waiting for `nextGraphicsPromise` and would jump
           // in the next iteration in order to catch up. To avoid jumps of more than
-          // 100 milliseconds, we reset `startTime` and `startDate` as if playback had
-          // been started right now.
+          // 100 milliseconds, we reset `beginTime` and `beginDate` as if playback had
+          // begun right now.
           if (Date.now() - currentDate > 100) {
-            startTime = currentTime;
-            startDate = Date.now();
+            beginTime = currentTime;
+            beginDate = Date.now();
             dispatch(
               setTimelineState({
                 currentTime,
-                playback: { startTime, startDate, time: currentTime },
+                playback: { beginTime, beginDate, time: currentTime },
               })
             );
           }
@@ -395,9 +395,9 @@ function playback(startTime: number, endTime: number): UIThunkAction {
 export function goToPrevPaint(): UIThunkAction {
   return (dispatch, getState) => {
     const currentTime = getCurrentTime(getState());
-    const { startTime } = getZoomRegion(getState());
+    const { beginTime: beginTime } = getZoomRegion(getState());
 
-    if (currentTime == startTime) {
+    if (currentTime == beginTime) {
       return;
     }
 
@@ -407,7 +407,7 @@ export function goToPrevPaint(): UIThunkAction {
       return;
     }
 
-    dispatch(seekToTime(Math.max(previous.time, startTime)));
+    dispatch(seekToTime(Math.max(previous.time, beginTime)));
   };
 }
 
@@ -457,7 +457,7 @@ export function clearHoveredItem(): UIThunkAction {
 }
 
 export function setFocusRegion(
-  focusRegion: { startTime: number; endTime: number } | null
+  focusRegion: { beginTime: number; endTime: number } | null
 ): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
@@ -472,44 +472,44 @@ export function setFocusRegion(
     if (focusRegion !== null) {
       const zoomRegion = getZoomRegion(state);
       const previousFocusRegion = getFocusRegion(state);
-      const prevStartTime = previousFocusRegion
-        ? startTimeForFocusRegion(previousFocusRegion)
+      const prevBeginTime = previousFocusRegion
+        ? beginTimeForFocusRegion(previousFocusRegion)
         : undefined;
       const prevEndTime = previousFocusRegion
         ? endTimeForFocusRegion(previousFocusRegion)
         : undefined;
 
-      let { endTime, startTime } = focusRegion;
+      let { endTime, beginTime } = focusRegion;
 
       // Basic bounds check.
-      if (startTime < zoomRegion.startTime) {
-        startTime = zoomRegion.startTime;
+      if (beginTime < zoomRegion.beginTime) {
+        beginTime = zoomRegion.beginTime;
       }
       if (endTime > zoomRegion.endTime) {
         endTime = zoomRegion.endTime;
       }
 
       // Make sure our region is valid.
-      if (endTime < startTime) {
+      if (endTime < beginTime) {
         // If we need to adjust a dimension, it's the most intuitive to adjust the one that's being updated.
         if (prevEndTime === endTime) {
-          startTime = endTime;
+          beginTime = endTime;
         } else {
-          endTime = startTime;
+          endTime = beginTime;
         }
       }
 
       // Update the previous to match the handle that's being dragged.
-      if (startTime !== prevStartTime && endTime === prevEndTime) {
-        dispatch(setTimelineToTime(startTime));
-      } else if (startTime === prevStartTime && endTime !== prevEndTime) {
+      if (beginTime !== prevBeginTime && endTime === prevEndTime) {
+        dispatch(setTimelineToTime(beginTime));
+      } else if (beginTime === prevBeginTime && endTime !== prevEndTime) {
         dispatch(setTimelineToTime(endTime));
       } else {
         // Else just make sure the preview time stays within the moving window.
         const hoverTime = getHoverTime(state);
         if (hoverTime !== null) {
-          if (hoverTime < startTime) {
-            dispatch(setTimelineToTime(startTime));
+          if (hoverTime < beginTime) {
+            dispatch(setTimelineToTime(beginTime));
           } else if (hoverTime > endTime) {
             dispatch(setTimelineToTime(endTime));
           }
@@ -529,13 +529,13 @@ export function setFocusRegion(
       // probably we should also run "getPointNearTime", store that, and take the
       // closest thing we can find of the points we have (assuming we don't have
       // an exact match.)
-      const startIndex = sortedLastIndexBy(
+      const beginIndex = sortedLastIndexBy(
         state.timeline.points,
-        { time: startTime, point: "" },
+        { time: beginTime, point: "" },
         p => p.time
       );
-      const start =
-        startIndex > 0 ? state.timeline.points[startIndex - 1] : { point: "0", time: 0 };
+      const begin =
+        beginIndex > 0 ? state.timeline.points[beginIndex - 1] : { point: "0", time: 0 };
 
       const endIndex = sortedIndexBy(
         state.timeline.points,
@@ -549,8 +549,8 @@ export function setFocusRegion(
 
       dispatch(
         newFocusRegion({
-          start,
-          startTime,
+          begin,
+          beginTime,
           end,
           endTime,
         })
@@ -566,14 +566,14 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
     const state = getState();
     const focusRegion = getFocusRegion(state);
 
-    // If this is the first time the user is focusing, start at the beginning of the recording (or zoom region).
+    // If this is the first time the user is focusing, begin at the beginning of the recording (or zoom region).
     // Let the focus action/reducer will handle cropping for us.
-    const startTime = focusRegion ? startTimeForFocusRegion(focusRegion) : 0;
+    const beginTime = focusRegion ? beginTimeForFocusRegion(focusRegion) : 0;
 
     dispatch(
       setFocusRegion({
         endTime,
-        startTime,
+        beginTime,
       })
     );
 
@@ -583,7 +583,7 @@ export function setFocusRegionEndTime(endTime: number, sync: boolean): UIThunkAc
   };
 }
 
-export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThunkAction {
+export function setFocusRegionBeginTime(beginTime: number, sync: boolean): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const focusRegion = getFocusRegion(state);
@@ -595,7 +595,7 @@ export function setFocusRegionStartTime(startTime: number, sync: boolean): UIThu
     dispatch(
       setFocusRegion({
         endTime,
-        startTime,
+        beginTime,
       })
     );
 
@@ -617,7 +617,7 @@ export function syncFocusedRegion(): UIThunkAction {
 
     if (!features.softFocus) {
       client.Session.unloadRegion(
-        { region: { begin: 0, end: startTimeForFocusRegion(focusRegion) } },
+        { region: { begin: 0, end: beginTimeForFocusRegion(focusRegion) } },
         ThreadFront.sessionId!
       );
       client.Session.unloadRegion(
@@ -629,7 +629,7 @@ export function syncFocusedRegion(): UIThunkAction {
     client.Session.loadRegion(
       {
         region: {
-          begin: startTimeForFocusRegion(focusRegion),
+          begin: beginTimeForFocusRegion(focusRegion),
           end: endTimeForFocusRegion(focusRegion),
         },
       },
@@ -665,14 +665,14 @@ export function enterFocusMode(): UIThunkAction {
       const zoomRegion = getZoomRegion(state);
 
       const focusWindowSize = Math.min(
-        (zoomRegion.endTime - zoomRegion.startTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
+        (zoomRegion.endTime - zoomRegion.beginTime) * DEFAULT_FOCUS_WINDOW_PERCENTAGE,
         DEFAULT_FOCUS_WINDOW_MAX_LENGTH
       );
 
-      const startTime = Math.max(zoomRegion.startTime, currentTime - focusWindowSize / 2);
+      const beginTime = Math.max(zoomRegion.beginTime, currentTime - focusWindowSize / 2);
       const endTime = Math.min(zoomRegion.endTime, currentTime + focusWindowSize / 2);
 
-      dispatch(setFocusRegion({ endTime, startTime }));
+      dispatch(setFocusRegion({ endTime, beginTime }));
     }
   };
 }
@@ -702,26 +702,26 @@ export function toggleFocusMode(): UIThunkAction {
 
 const PRECACHE_DURATION: number = 5000;
 
-let precacheStartTime: number = -1;
+let precacheBeginTime: number = -1;
 
-export function precacheScreenshots(startTime: number): UIThunkAction {
+export function precacheScreenshots(beginTime: number): UIThunkAction {
   return async (dispatch, getState) => {
     const recordingDuration = getRecordingDuration(getState());
     if (!recordingDuration) {
       return;
     }
 
-    startTime = snapTimeForPlayback(startTime);
-    if (startTime === precacheStartTime) {
+    beginTime = snapTimeForPlayback(beginTime);
+    if (beginTime === precacheBeginTime) {
       return;
     }
-    if (startTime < precacheStartTime) {
-      dispatch(setPlaybackPrecachedTime(startTime));
+    if (beginTime < precacheBeginTime) {
+      dispatch(setPlaybackPrecachedTime(beginTime));
     }
-    precacheStartTime = startTime;
+    precacheBeginTime = beginTime;
 
-    const endTime = Math.min(startTime + PRECACHE_DURATION, recordingDuration);
-    for (let time = startTime; time < endTime; time += SNAP_TIME_INTERVAL) {
+    const endTime = Math.min(beginTime + PRECACHE_DURATION, recordingDuration);
+    for (let time = beginTime; time < endTime; time += SNAP_TIME_INTERVAL) {
       const index = mostRecentIndex(gPaintPoints, time);
       if (index === undefined) {
         return;
@@ -731,14 +731,14 @@ export function precacheScreenshots(startTime: number): UIThunkAction {
       if (!screenshotCache.hasScreenshot(paintHash)) {
         const graphicsPromise = getGraphicsAtTime(time, true);
 
-        const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, startTime);
+        const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
         if (precachedTime > getPlaybackPrecachedTime(getState())) {
           dispatch(setPlaybackPrecachedTime(precachedTime));
         }
 
         await graphicsPromise;
 
-        if (precacheStartTime !== startTime) {
+        if (precacheBeginTime !== beginTime) {
           return;
         }
       }

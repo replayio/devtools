@@ -8,7 +8,7 @@ import {
   endTimeForFocusRegion,
   getPositionFromTime,
   getTimeFromPosition,
-  startTimeForFocusRegion,
+  beginTimeForFocusRegion,
 } from "ui/utils/timeline";
 
 import { EditMode } from ".";
@@ -92,28 +92,28 @@ function Focuser({ editMode, setEditMode }: Props) {
         // the points we end up going to. Otherwise, because the window always
         // grows when the point is not exact, we end up with an ever-expanding
         // window while dragging it around the timeline.
-        const { endTime, startTime } = focusRegion as UnsafeFocusRegion;
+        const { beginTime, endTime } = focusRegion as UnsafeFocusRegion;
 
         switch (editMode.type) {
           case "drag": {
             // Re-center the focus region around the mouse cursor.
-            const focusRegionDuration = endTime - startTime;
+            const focusRegionDuration = endTime - beginTime;
             let newEndTime = mouseTime + focusRegionDuration / 2;
-            let newStartTime = mouseTime - focusRegionDuration / 2;
+            let newBeginTime = mouseTime - focusRegionDuration / 2;
 
             // Make sure the new focus region is still within our zoom bounds.
-            if (newStartTime < zoomRegion.startTime) {
-              newEndTime += zoomRegion.startTime - newStartTime;
-              newStartTime = zoomRegion.startTime;
+            if (newBeginTime < zoomRegion.beginTime) {
+              newEndTime += zoomRegion.beginTime - newBeginTime;
+              newBeginTime = zoomRegion.beginTime;
             } else if (newEndTime > zoomRegion.endTime) {
-              newStartTime -= newEndTime - zoomRegion.endTime;
+              newBeginTime -= newEndTime - zoomRegion.endTime;
               newEndTime = zoomRegion.endTime;
             }
 
             dispatch(
               setFocusRegion({
+                beginTime: newBeginTime,
                 endTime: newEndTime,
-                startTime: newStartTime,
               })
             );
             break;
@@ -121,7 +121,7 @@ function Focuser({ editMode, setEditMode }: Props) {
           case "resize-end": {
             dispatch(
               setFocusRegion({
-                startTime,
+                beginTime: beginTime,
                 endTime: mouseTime,
               })
             );
@@ -130,8 +130,8 @@ function Focuser({ editMode, setEditMode }: Props) {
           case "resize-start": {
             dispatch(
               setFocusRegion({
+                beginTime: mouseTime,
                 endTime,
-                startTime: mouseTime,
               })
             );
             break;
@@ -208,7 +208,7 @@ function Focuser({ editMode, setEditMode }: Props) {
   const setEditModeToResizeEnd = () => setEditMode({ type: "resize-end" });
   const setEditModeToResizeStart = () => setEditMode({ type: "resize-start" });
 
-  const left = getPositionFromTime(startTimeForFocusRegion(focusRegion), zoomRegion);
+  const left = getPositionFromTime(beginTimeForFocusRegion(focusRegion), zoomRegion);
   const right = getPositionFromTime(endTimeForFocusRegion(focusRegion), zoomRegion);
 
   return (
