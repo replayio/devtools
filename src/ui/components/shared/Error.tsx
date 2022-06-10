@@ -118,7 +118,15 @@ function RequestRecordingAccessButton() {
   );
 }
 
-function ActionButton({ action }: { action: ErrorActions }) {
+function TryAgainButton({ onAction }: { onAction: () => void }) {
+  return (
+    <PrimaryButton color="blue" onClick={onAction}>
+      Try Again
+    </PrimaryButton>
+  );
+}
+
+function ActionButton({ action, onAction }: { action: ErrorActions; onAction?: () => void }) {
   if (action === "refresh") {
     return <RefreshButton />;
   } else if (action === "sign-in") {
@@ -129,6 +137,8 @@ function ActionButton({ action }: { action: ErrorActions }) {
     return <TeamBillingButton />;
   } else if (action === "request-access") {
     return <RequestRecordingAccessButton />;
+  } else if (action === "try-again" && onAction) {
+    return <TryAgainButton onAction={onAction} />;
   }
 
   return null;
@@ -148,7 +158,10 @@ function Error({ error }: ErrorProps) {
       {content && <DialogDescription>{content}</DialogDescription>}
       {action ? (
         <DialogActions>
-          <ActionButton action={action} />
+          <ActionButton
+            action={action}
+            onAction={"onAction" in error ? error.onAction : undefined}
+          />
         </DialogActions>
       ) : null}
     </Dialog>

@@ -51,11 +51,18 @@ export type SettingsTabTitle =
   | "API Keys"
   | "Preferences";
 
-export type ErrorActions = "sign-in" | "refresh" | "library" | "request-access" | "team-billing";
+export type ErrorActions =
+  | "sign-in"
+  | "refresh"
+  | "library"
+  | "request-access"
+  | "team-billing"
+  | "try-again";
 export interface ExpectedError {
   message: string;
   content: string;
   action?: ErrorActions;
+  onAction?: () => void;
 }
 
 export type UnexpectedError = {
