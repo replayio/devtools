@@ -5,6 +5,7 @@
 import type { AnyAction, PayloadAction, EntityState } from "@reduxjs/toolkit";
 import { createSlice, createEntityAdapter } from "@reduxjs/toolkit";
 import uniq from "lodash/uniq";
+import groupBy from "lodash/groupBy";
 
 import constants from "devtools/client/webconsole/constants";
 const { DEFAULT_FILTERS, FILTERS, MESSAGE_TYPE, MESSAGE_SOURCE } = constants;
@@ -70,8 +71,11 @@ export interface Message {
   evalId?: number;
   frame?: Frame;
   groupId: string | null;
+  groupTotal: number;
   id: MessageId;
   indent: number;
+  /** 1-based */
+  groupIndex: number;
   innerWindowID: string | null;
   level: string;
   logpointId?: string;
@@ -218,13 +222,39 @@ const messagesSlice = createSlice({
   reducers: {
     messagesAdded(state, action: PayloadAction<Message[]>) {
       const messages = action.payload;
+
+      const logpointIds = new Set<string>();
+
       messages.forEach(message => {
         addMessage(message, state as MessageState);
 
         if (message.type === "command") {
           state.commandHistory = appendToHistory(message.messageText, state.commandHistory);
+        } else if (message.type === "logPoint") {
+          logpointIds.add(message.logpointId!);
         }
       });
+
+      const messagesInUpdatedGroups = Object.values(state.messages.entities).filter(message =>
+        logpointIds.has(message!.logpointId!)
+      );
+
+      const messagesByLogpointGroup = groupBy(
+        messagesInUpdatedGroups,
+        message => message!.logpointId!
+      );
+
+      for (let messagesInGroup of Object.values(messagesByLogpointGroup)) {
+        messagesInGroup.sort((m1, m2) =>
+          compareNumericStrings(m1!.executionPoint!, m2!.executionPoint!)
+        );
+
+        messagesInGroup.forEach((message, i) => {
+          console.log(message);
+          message!.groupIndex = i + 1;
+          message!.groupTotal = messagesInGroup.length;
+        });
+      }
     },
     messageOpened(state, action: PayloadAction<MessageId>) {
       state.messagesUiById.push(action.payload);
@@ -384,11 +414,11 @@ function addMessage(newMessage: Message, state: MessageState): MessageState {
     logpointMessagesAdapter.upsertOne(state.logpointMessages, { key, messageId: newMessage.id });
   }
 
-  // Immer will freeze anyway, but this might help skipping the `ValueFront` fields
-  const addedMessage = Object.freeze(newMessage);
-  messagesAdapter.upsertOne(state.messages, addedMessage);
+  // Freeze nested field that may contain `ValueFront`s, to avoid Immer issues
+  Object.freeze(newMessage.parameters);
+  messagesAdapter.upsertOne(state.messages, newMessage);
 
-  const { visible, cause } = getMessageVisibility(addedMessage, state.filters);
+  const { visible, cause } = getMessageVisibility(newMessage, state.filters);
 
   if (visible) {
     state.visibleMessages.push(newMessage.id);
@@ -397,8 +427,8 @@ function addMessage(newMessage: Message, state: MessageState): MessageState {
     state.filteredMessagesCount.global++;
   }
   // Don't count replay logpoints (including exceptions!).
-  if (addedMessage.level && addedMessage.type !== "logPoint") {
-    state.filteredMessagesCount[addedMessage.level as FilterCountKeys]++;
+  if (newMessage.level && newMessage.type !== "logPoint") {
+    state.filteredMessagesCount[newMessage.level as FilterCountKeys]++;
   }
 
   return removeMessagesFromState(state, removedIds);
