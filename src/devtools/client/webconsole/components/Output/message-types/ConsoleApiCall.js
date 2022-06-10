@@ -64,6 +64,8 @@ export default function ConsoleApiCall(props) {
     messageText,
     prefix,
     userProvidedStyles,
+    groupIndex,
+    groupTotal,
   } = message;
 
   let messageBody;
@@ -147,6 +149,8 @@ export default function ConsoleApiCall(props) {
     executionPointHasFrames,
     executionPointTime,
     frame,
+    groupIndex,
+    groupTotal,
     indent,
     isFirstMessageForPoint,
     isPaused,

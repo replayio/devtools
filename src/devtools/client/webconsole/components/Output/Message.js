@@ -255,9 +255,17 @@ class Message extends React.Component {
   }
 
   renderIcon() {
-    const { level, type, prefixBadge } = this.props;
+    const { level, type, prefixBadge, groupIndex, groupTotal } = this.props;
 
-    return <MessageIcon level={level} prefixBadge={prefixBadge} type={type} />;
+    return (
+      <MessageIcon
+        level={level}
+        prefixBadge={prefixBadge}
+        type={type}
+        showGroupIndex={type === "logPoint"}
+        groupIndex={`${groupIndex}/${groupTotal}`}
+      />
+    );
   }
 
   renderTimestamp() {

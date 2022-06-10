@@ -39,13 +39,19 @@ interface MessageIconProps {
   level: keyof typeof levels;
   type: string;
   prefixBadge?: PrefixBadge;
+  showGroupIndex: boolean;
+  groupIndex?: string;
 }
 
 export function MessageIcon(props: MessageIconProps) {
-  const { level, type, prefixBadge } = props;
+  const { level, type, prefixBadge, showGroupIndex, groupIndex } = props;
 
   if (prefixBadge) {
     return <MessagePrefixBadge prefixBadge={prefixBadge} />;
+  }
+
+  if (showGroupIndex) {
+    return <span className="rounded bg-themeMenuHighlight px-2 text-bodyColor">{groupIndex}</span>;
   }
 
   if (type) {
