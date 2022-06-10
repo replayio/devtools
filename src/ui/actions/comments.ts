@@ -74,7 +74,7 @@ export function createComment(
         createdAt: new Date().toISOString(),
         hasFrames,
         id,
-        isUnpublished: true,
+        isPublished: false,
         networkRequestId: networkRequestId || null,
         point,
         position,

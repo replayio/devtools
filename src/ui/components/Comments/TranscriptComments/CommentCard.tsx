@@ -256,7 +256,7 @@ function CommentCard({
     clearPendingComment();
   };
 
-  if (comment.isUnpublished) {
+  if (!comment.isPublished) {
     return (
       <PendingCommentCard
         comment={comment}
@@ -289,7 +289,7 @@ function CommentCard({
               createdAt: new Date().toISOString(),
               updatedAt: new Date().toISOString(),
               content: "",
-              isUnpublished: true,
+              isPublished: false,
               parentId: comment.id,
             },
           }}

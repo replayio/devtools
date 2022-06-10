@@ -30,6 +30,9 @@ export interface Remark {
   createdAt: string;
   hasFrames: boolean;
   id: string;
+  // Unpublished remarks are only visible to their author.
+  // Published comments are visible to everyone (who can view the recording).
+  isPublished: boolean;
   point: string;
   recordingId: RecordingId;
   sourceLocation: SourceLocation | null;
@@ -38,32 +41,16 @@ export interface Remark {
   user: User;
 }
 
-// Unpublished comments are (currently) stored in-memory, in Redux;
-// Apollo isn't aware of the "isUnpublished" field;
-//
-// TODO: Store pending comments in Apollo and rename "isUnpublished" to "isPublished".
-// This attribute is currently named "isUnpublished" so that Redux and Apollo both have predictable truthy/falsy values.
 export interface Comment extends Remark {
   position: CommentPosition | null;
   networkRequestId: string | null;
   primaryLabel?: string;
   replies: Reply[];
   secondaryLabel?: string;
-
-  // TODO Currently a local-only attribute
-  isUnpublished?: boolean;
 }
 
-// Unpublished replies are (currently) stored in-memory, in Redux;
-// Apollo isn't aware of the "isUnpublished" field;
-//
-// TODO: Store pending replies in Apollo and rename "isUnpublished" to "isPublished".
-// This attribute is currently named "isUnpublished" so that Redux and Apollo both have predictable truthy/falsy values.
 export interface Reply extends Remark {
   parentId: string;
-
-  // TODO Currently a local-only attribute
-  isUnpublished?: boolean;
 }
 
 export type PendingComment =
