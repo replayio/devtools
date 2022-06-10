@@ -41,6 +41,10 @@
     await checkBreakpointPanel(1);
     await checkDebugLine();
 
+    // wait to ensure that the currently selected panel is saved to asyncStorage
+    // so that it is selected again after reloading
+    await Test.waitForTime(1000);
+
     // reload the recording
     url.searchParams.append("navigated", "true");
     document.location.href = url.href;
