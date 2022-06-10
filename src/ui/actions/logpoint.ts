@@ -6,7 +6,13 @@
 // Each logpoint has an associated log group ID, used to manipulate all the
 // messages associated with the logpoint atomically.
 
-import { AnalysisEntry, ExecutionPoint, Location, PointDescription } from "@replayio/protocol";
+import {
+  AnalysisEntry,
+  ExecutionPoint,
+  Location,
+  PointDescription,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
@@ -17,7 +23,12 @@ import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analy
 import { logpointGetFrameworkEventListeners } from "./event-listeners";
 import { ThreadFront, ValueFront, Pause, createPrimitiveValueFront } from "protocol/thread";
 import { PrimitiveValue } from "protocol/thread/value";
-import { createAnalysis, Analysis, AnalysisError } from "protocol/thread/analysis";
+import {
+  createAnalysis,
+  Analysis,
+  AnalysisError,
+  MAX_POINTS_FOR_FULL_ANALYSIS,
+} from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
 import {
   analysisCreated,
@@ -29,6 +40,8 @@ import {
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
+import { getLoadedRegions } from "./app";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 
 const TOO_MANY_HITS_TO_SHOW = 1000;
 
@@ -59,7 +72,7 @@ export function setupLogpoints(_store: UIStore) {
 }
 
 function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
-  if (!LogpointHandlers.onPointLoading || points.length >= 200) {
+  if (!LogpointHandlers.onPointLoading || points.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return;
   }
 
@@ -74,7 +87,7 @@ function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
 }
 
 function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
-  if (!LogpointHandlers.onResult || result.length >= 200) {
+  if (!LogpointHandlers.onResult || result.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return;
   }
 
@@ -241,7 +254,7 @@ async function setMultiSourceLogpoint(
         showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
       }
       // If we're only displaying only primitives, we can bail out if there's no condition or the condition request is done
-      if (!condition) {
+      if (!condition && points.isCompleted) {
         return;
       }
     }
@@ -259,11 +272,20 @@ async function setMultiSourceLogpoint(
     locations: locations.map(location => ({ location })),
   };
 
+  let timeRange: TimeStampedPointRange | null = null;
+
   if (focusRegion) {
+    const ufr = focusRegion as UnsafeFocusRegion;
     params.range = {
-      begin: (focusRegion as UnsafeFocusRegion).begin.point,
-      end: (focusRegion as UnsafeFocusRegion).end.point,
+      begin: ufr.begin.point,
+      end: ufr.end.point,
     };
+
+    timeRange = rangeForFocusRegion(focusRegion);
+  } else {
+    const loadedRegions = getLoadedRegions(store.getState());
+    // Per discussion, `loading` is always a 0 or 1-item array
+    timeRange = loadedRegions?.loading[0] ?? null;
   }
 
   let analysis: Analysis;
@@ -271,7 +293,7 @@ async function setMultiSourceLogpoint(
     analysis = await createAnalysis(params);
     const { analysisId } = analysis;
 
-    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition }));
+    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition, timeRange }));
 
     await Promise.all(locations.map(location => analysis.addLocation(location)));
 
@@ -313,7 +335,7 @@ async function setMultiSourceLogpoint(
 
     const shouldGetResults = condition || !primitives;
 
-    if (shouldGetResults && points.length <= 200) {
+    if (shouldGetResults && points.length <= MAX_POINTS_FOR_FULL_ANALYSIS) {
       store.dispatch(analysisResultsRequested(analysisId));
 
       const { results, error: runError } = await analysis.runAnalysis();

@@ -5,7 +5,7 @@ import escapeHtml from "escape-html";
 import Popup from "./Popup";
 import hooks from "ui/hooks";
 const { getCodeMirror } = require("devtools/client/debugger/src/utils/editor/create-editor");
-const { prefs } = require("ui/utils/prefs");
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 
 export interface SummaryExpressionProps {
   value: string;
@@ -50,7 +50,7 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
         {isTeamDeveloper ? (
           <>
             This log cannot be edited because <br />
-            it was hit 200+ times
+            it was hit {MAX_POINTS_FOR_FULL_ANALYSIS}+ times
           </>
         ) : (
           "Editing logpoints is available for Developers in the Team plan"

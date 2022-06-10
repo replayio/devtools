@@ -14,6 +14,7 @@ import {
 import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { client } from "./socket";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "./thread/analysis";
 
 import { assert } from "./utils";
 
@@ -83,7 +84,7 @@ export interface AnalysisHandler<T> {
 }
 
 // When running analyses in batches, limit on the points to use in each batch.
-const MaxPointsPerBatch = 200;
+const MaxPointsPerBatch = MAX_POINTS_FOR_FULL_ANALYSIS;
 
 class AnalysisManager {
   private handlers = new Map<AnalysisId, AnalysisHandler<any>>();

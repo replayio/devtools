@@ -9,14 +9,19 @@ import {
   PayloadAction,
   EntityState,
 } from "@reduxjs/toolkit";
-import { Location, PointDescription, AnalysisEntry } from "@replayio/protocol";
+import {
+  Location,
+  PointDescription,
+  AnalysisEntry,
+  TimeStampedPointRange,
+} from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import string from "devtools/packages/devtools-reps/reps/string";
-import { AnalysisError } from "protocol/thread/analysis";
+import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { compareNumericStrings } from "protocol/utils";
 import type { UIState } from "ui/state";
-import { filterToFocusRegion } from "ui/utils/timeline";
+import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
@@ -25,6 +30,7 @@ import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpo
 
 import { getSelectedSource } from "./sources";
 import type { Breakpoint, SourceLocation } from "./types";
+import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
@@ -53,6 +59,7 @@ export type AnalysisRequest = {
   id: string;
   location: Location;
   condition?: string;
+  timeRange: TimeStampedPointRange | null;
   points: PointDescription[] | undefined;
   results: AnalysisEntry[] | undefined;
   status: AnalysisStatus;
@@ -70,6 +77,7 @@ export type LocationAnalysisSummary = {
   error: AnalysisError | undefined;
   status: AnalysisStatus;
   condition?: string;
+  isCompleted: boolean;
 };
 
 export interface BreakpointsState {
@@ -170,15 +178,21 @@ const breakpointsSlice = createSlice({
 
     analysisCreated(
       state,
-      action: PayloadAction<{ analysisId: string; location: Location; condition?: string }>
+      action: PayloadAction<{
+        analysisId: string;
+        location: Location;
+        condition?: string;
+        timeRange: TimeStampedPointRange | null;
+      }>
     ) {
-      const { analysisId, location, condition } = action.payload;
+      const { analysisId, location, condition, timeRange } = action.payload;
 
       analysesAdapter.addOne(state.analyses, {
         error: undefined,
         id: analysisId,
         location,
         condition,
+        timeRange,
         points: undefined,
         results: undefined,
         status: AnalysisStatus.Created,
@@ -420,6 +434,46 @@ const customAnalysisResultComparator = (
   return result;
 };
 
+export const getAnalysisMappingForLocation = (state: UIState, location: Location | null) => {
+  if (!location) {
+    return undefined;
+  }
+  const locationKey = getLocationKey(location);
+  return state.breakpoints.analysisMappings.entities[locationKey];
+};
+
+export const getStatusFlagsForAnalysisEntry = (
+  analysisEntry: AnalysisRequest,
+  focusRegion: FocusRegion | null
+) => {
+  const { error, timeRange, status, points = [] } = analysisEntry;
+
+  const analysisErrored = [
+    AnalysisError.TooManyPointsToFind,
+    AnalysisError.TooManyPointsToRun,
+  ].includes(error!);
+
+  const analysisOverflowed =
+    status === AnalysisStatus.PointsRetrieved && points.length > MAX_POINTS_FOR_FULL_ANALYSIS;
+
+  const analysisLoaded = [AnalysisStatus.PointsRetrieved, AnalysisStatus.Completed].includes(
+    status
+  );
+
+  const isFocusSubset = isFocusRegionSubset(timeRange, focusRegion);
+
+  const hasAllDataForFocusRegion =
+    analysisLoaded && !analysisErrored && !analysisOverflowed && isFocusSubset;
+
+  return {
+    analysisLoaded,
+    analysisOverflowed,
+    analysisErrored,
+    isFocusSubset,
+    hasAllDataForFocusRegion,
+  };
+};
+
 /**
  * Retrieves a unique sorted set of hit points for a given location based on analysis runs.
  * If there is no breakpoint active for the location or no analysis run, returns `undefined`.
@@ -428,13 +482,7 @@ const customAnalysisResultComparator = (
  */
 export const getAnalysisPointsForLocation = createSelector(
   [
-    (state: UIState, location: Location | null) => {
-      if (!location) {
-        return undefined;
-      }
-      const locationKey = getLocationKey(location);
-      return state.breakpoints.analysisMappings.entities[locationKey];
-    },
+    getAnalysisMappingForLocation,
     (state: UIState) => state.breakpoints.analyses,
     (state: UIState) => state.timeline.focusRegion,
     (state: UIState, location: Location | null, condition: string | null = "") => condition,
@@ -507,11 +555,20 @@ export const getAnalysisPointsForLocation = createSelector(
     // TODO `filterToFocusRegion` wants a pre-sorted array, but maybe a bit cheaper to filter first _then_ sort?
     finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
 
+    const {
+      analysisLoaded,
+      analysisErrored,
+      isFocusSubset,
+      analysisOverflowed,
+      hasAllDataForFocusRegion,
+    } = getStatusFlagsForAnalysisEntry(latestAnalysisEntry, focusRegion);
+
     return {
       data: finalPoints,
       error: latestAnalysisEntry.error,
       status: latestAnalysisEntry.status,
       condition: latestAnalysisEntry.condition,
+      isCompleted: hasAllDataForFocusRegion,
     };
   },
   {

@@ -1,6 +1,6 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
-import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
@@ -42,6 +42,8 @@ import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { endTimeForFocusRegion, isTimeInRegions, beginTimeForFocusRegion } from "ui/utils/timeline";
+import { getAnalysisMappingForLocation } from "devtools/client/debugger/src/selectors";
+import { getStatusFlagsForAnalysisEntry } from "devtools/client/debugger/src/selectors";
 
 import {
   setFocusRegion as newFocusRegion,
@@ -52,6 +54,7 @@ import {
 
 import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
+import { UIState } from "ui/state";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -605,6 +608,49 @@ export function setFocusRegionBeginTime(beginTime: number, sync: boolean): UIThu
   };
 }
 
+const shouldRerunAnalysisForBreakpoint = (
+  state: UIState,
+  bp: Breakpoint,
+  focusRegion: FocusRegion
+): boolean => {
+  // Copy-pasted-tweaked comment from actions/messages.ts:
+  // Soft Focus: The frontend only needs to refetch data if:
+  // 1. The most recent time it requested data "overflowed" (too many hits to send them all), or
+  // 2. The new focus region is outside of the most recent region we ran breakpoint analysis for.
+  //
+  // There are two things to note about the second bullet point above:
+  // 1. When devtools is first opened, there is no focused region.
+  //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
+  // 2. We shouldn't compare the new focus region to the most recent focus region,
+  //    but rather to the most recent focus region that we ran breakpoint analysis for (the entire timeline in many cases).
+  //    If we don't need to re-run analysis after zooming in, then we won't need to refetch after zooming back out either,
+  //    (unless our fetches have overflowed at some point).
+
+  // @ts-expect-error Location type mismatches
+  const mappingEntry = getAnalysisMappingForLocation(state, bp.location);
+  if (!mappingEntry) {
+    return true;
+  }
+
+  const { analyses } = state.breakpoints;
+
+  const latestAnalysisEntry = analyses.entities[mappingEntry.currentAnalysis!];
+
+  if (!latestAnalysisEntry) {
+    return true;
+  }
+
+  const {
+    analysisLoaded,
+    analysisErrored,
+    isFocusSubset,
+    analysisOverflowed,
+    hasAllDataForFocusRegion,
+  } = getStatusFlagsForAnalysisEntry(latestAnalysisEntry, focusRegion);
+
+  return !hasAllDataForFocusRegion;
+};
+
 export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
@@ -636,11 +682,19 @@ export function syncFocusedRegion(): UIThunkAction {
       ThreadFront.sessionId!
     );
 
-    const breakpoints = state.breakpoints.breakpoints;
+    const { breakpoints } = state.breakpoints;
     const cx = getThreadContext(state);
     for (const b of Object.values(breakpoints)) {
-      // Prod all breakpoints to refetch
-      dispatch(setBreakpointOptions(cx, b.location as any, b.options));
+      const rerunAnalysisForBreakpoint = shouldRerunAnalysisForBreakpoint(state, b, focusRegion);
+
+      if (rerunAnalysisForBreakpoint) {
+        // Prod this breakpoint to refetch, circuitously:
+        // - Setting the breakpoint options calls `client.setBreakpoint`
+        // - That calls `setLogpoint` in `actions/logpoint`
+        // - Which finally runs `setMultiSourceLogpoint` with analysis
+        // @ts-expect-error Location type mismatches
+        dispatch(setBreakpointOptions(cx, b.location, b.options));
+      }
     }
     await dispatch(refetchMessages(focusRegion));
   };
