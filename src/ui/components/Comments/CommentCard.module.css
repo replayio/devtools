@@ -3,13 +3,21 @@
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  padding: 0.5rem 0;
-  border-left: 4px solid transparent;
-  margin-right: 4px;
-  border-bottom: 1px solid var(--theme-splitter-color);
   cursor: pointer;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--theme-splitter-color);
+  position: relative;
 }
 
-.Paused {
-  border-left-color: var(--secondary-accent);
+.Unpublished {
+  background: var(--diff-source-background);
+}
+
+.PausedOverlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 2px;
+  background-color: var(--secondary-accent);
 }

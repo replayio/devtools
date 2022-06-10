@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin: 0 0.5rem 0.5rem;
+  margin: 0 0.75rem 0.5rem;
 }
 
 .Avatar {
@@ -49,7 +49,7 @@
 
 .PublishedContent,
 .UnpublishedContent {
-  margin: 0 0.5rem;
+  margin: 0 0.75rem;
 }
 .UnpublishedContent {
   color: var(--theme-comment);

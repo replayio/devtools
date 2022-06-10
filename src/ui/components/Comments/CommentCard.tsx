@@ -16,7 +16,9 @@ export default function CommentCard({ comment }: { comment: Comment }) {
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
   return (
-    <div className={classNames(styles.CommentCard, isPaused && styles.Paused)}>
+    <div className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}>
+      {isPaused && <div className={styles.PausedOverlay} />}
+
       <CommentPreview comment={comment} />
 
       <EditableRemark remark={comment} type="comment" />
