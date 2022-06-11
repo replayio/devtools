@@ -5,7 +5,6 @@ const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";
 import { UIState } from "ui/state";
-import PrefixBadgeButton from "ui/components/PrefixBadge";
 
 interface Props {
   showCondition: boolean;
@@ -100,7 +99,6 @@ class PanelEditor extends PureComponent<Props, State> {
           }
         )}
       >
-        <PrefixBadgeButton breakpoint={breakpoint} />
         <PanelForm
           {...{
             logSyntaxError,

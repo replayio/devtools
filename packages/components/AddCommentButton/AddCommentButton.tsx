@@ -1,4 +1,4 @@
-import type { ComponentProps, MouseEventHandler } from "react";
+import type { MouseEventHandler } from "react";
 import { forwardRef, useRef, useState } from "react";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
@@ -26,6 +26,14 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
     const mergedRefs = mergeRefs([localRef, ref]);
     const [isHovered, setIsHovered] = useState(false);
     const isOpened = isHovered;
+    const hoverRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const maybeHover = () => {
+      hoverRef.current = setTimeout(() => setIsHovered(true), 300);
+    };
+    const clearHover = () => {
+      hoverRef.current && clearTimeout(hoverRef.current);
+      setIsHovered(false);
+    };
 
     return (
       <StyledButton
@@ -33,8 +41,8 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         type={type}
         aria-label="Add comment"
         onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={maybeHover}
+        onMouseLeave={clearHover}
         $isOpened={isOpened}
         $isPausedOnHit={isPausedOnHit}
         className="focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
