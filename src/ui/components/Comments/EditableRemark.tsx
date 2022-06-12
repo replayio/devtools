@@ -8,6 +8,7 @@ import type { Comment, Remark } from "ui/state/comments";
 import { User } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 
+import { AvatarImage } from "../Avatar";
 import MaterialIcon from "../shared/MaterialIcon";
 
 import TipTapEditor from "./CommentEditor/TipTapEditor";
@@ -130,7 +131,7 @@ export default function EditableRemark({
   return (
     <>
       <div className={styles.HeaderRow}>
-        <img className={styles.Avatar} src={remark.user.picture} />
+        <AvatarImage className={styles.Avatar} src={remark.user.picture} />
         <div className={styles.UserName} title={remark.user.name}>
           {remark.user.name}
         </div>
