@@ -1,10 +1,8 @@
 import sortBy from "lodash/sortBy";
 import React, { useMemo } from "react";
-import { useSelector } from "react-redux";
 import CommentCard from "ui/components/Comments/CommentCard";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
 import { Comment } from "ui/state/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -16,15 +14,10 @@ export default function CommentCardsList() {
   const recording = hooks.useGetRecording(recordingId);
   const auth = useAuth0();
 
-  const pendingComment = useSelector(selectors.getPendingComment);
   const { isAuthenticated } = useAuth0();
 
   const displayedComments = useMemo(() => {
     const clonedComments: Comment[] = [...comments];
-
-    if (pendingComment?.type == "new_comment") {
-      clonedComments.push(pendingComment.comment);
-    }
 
     const sortedComments = sortBy(clonedComments, [
       c => c.time,
@@ -32,7 +25,7 @@ export default function CommentCardsList() {
       "createdAt",
     ]);
     return sortedComments;
-  }, [comments, pendingComment]);
+  }, [comments]);
 
   if (loading || auth.isLoading || recording.loading) {
     return null;

@@ -17,40 +17,37 @@ import { Action } from "redux";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { PendingComment, Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
-import { User } from "ui/types";
+import { Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
+import { trackEvent } from "ui/utils/telemetry";
+import { mutate } from "ui/utils/apolloClient";
 
-import { getLoadedRegions } from "./app";
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
+import { gql } from "@apollo/client";
 
-type SetPendingComment = Action<"set_pending_comment"> & { comment: PendingComment | null };
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
-type UpdatePendingCommentContent = Action<"update_pending_comment_content"> & { content: string };
 
-export type CommentsAction = SetPendingComment | SetHoveredComment | UpdatePendingCommentContent;
-
-export function setPendingComment(comment: PendingComment): SetPendingComment {
-  return { type: "set_pending_comment", comment };
-}
+export type CommentsAction = SetHoveredComment;
 
 export function setHoveredComment(comment: any): SetHoveredComment {
   return { type: "set_hovered_comment", comment };
 }
 
-export function clearPendingComment(): SetPendingComment {
-  return { type: "set_pending_comment", comment: null };
-}
-
-export function updatePendingCommentContent(content: string): UpdatePendingCommentContent {
-  return { type: "update_pending_comment_content", content };
-}
+const ADD_COMMENT_MUTATION = gql`
+  mutation AddComment($input: AddCommentInput!) {
+    addComment(input: $input) {
+      success
+      comment {
+        id
+      }
+    }
+  }
+`;
 
 export function createComment(
   time: number,
   point: string,
-  user: User, // TODO: user is no longer required and should be removed
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
@@ -60,37 +57,30 @@ export function createComment(
     const primaryLabel = labels?.primary;
     const secondaryLabel = labels?.secondary;
 
-    // If a comment is saved to Apollo, it will be assigned a persisted ID.
-    // Local, pending comments just need stable+unique IDs.
-    // Avoid using createdAt or updatedAt in these IDs though as these values are not stable.
-    const id = sourceLocation
-      ? `${point}-${sourceLocation.sourceId}-${sourceLocation.line}`
-      : `${point}`;
+    trackEvent("comments.create");
 
-    const pendingComment: PendingComment = {
-      type: "new_comment",
-      comment: {
-        content: "",
-        createdAt: new Date().toISOString(),
-        hasFrames,
-        id,
-        isPublished: false,
-        networkRequestId: networkRequestId || null,
-        point,
-        position,
-        primaryLabel,
-        recordingId,
-        replies: [],
-        secondaryLabel,
-        sourceLocation,
-        time,
-        updatedAt: new Date().toISOString(),
-        user,
+    const response = await mutate({
+      mutation: ADD_COMMENT_MUTATION,
+      refetchQueries: ["GetComments"],
+      variables: {
+        input: {
+          content: "",
+          hasFrames,
+          isPublished: false,
+          networkRequestId: networkRequestId || null,
+          point,
+          position,
+          primaryLabel,
+          recordingId,
+          secondaryLabel,
+          sourceLocation,
+          time,
+        }
       },
-    };
+    });
+    const id = response?.data?.addComment?.comment?.id;
 
     dispatch(setSelectedPrimaryPanel("comments"));
-    dispatch(setPendingComment(pendingComment));
   };
 }
 
@@ -98,7 +88,6 @@ export function createFrameComment(
   time: number,
   point: string,
   position: { x: number; y: number } | null,
-  user: User,
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
@@ -113,7 +102,7 @@ export function createFrameComment(
       hasFrames: true,
       sourceLocation: sourceLocation || null,
     };
-    dispatch(createComment(time, point, user, recordingId, options));
+    dispatch(createComment(time, point, recordingId, options));
   };
 }
 
@@ -124,7 +113,6 @@ function getCurrentPauseSourceLocationWithTimeout(ThreadFront: typeof ThreadFron
 export function createFloatingCodeComment(
   time: number,
   point: string,
-  user: User,
   recordingId: RecordingId,
   breakpoint: any
 ): UIThunkAction {
@@ -135,13 +123,12 @@ export function createFloatingCodeComment(
       hasFrames: false,
       sourceLocation: sourceLocation || null,
     };
-    dispatch(createComment(time, point, user, recordingId, options));
+    dispatch(createComment(time, point, recordingId, options));
   };
 }
 
 export function createNetworkRequestComment(
   request: RequestSummary,
-  user: User,
   recordingId: RecordingId
 ): UIThunkAction {
   return async (dispatch, getState) => {
@@ -158,7 +145,7 @@ export function createNetworkRequestComment(
       sourceLocation: null,
       networkRequestId: request.id,
     };
-    dispatch(createComment(time, point, user, recordingId, options));
+    dispatch(createComment(time, point, recordingId, options));
   };
 }
 
@@ -199,10 +186,8 @@ export function createLabels(
   };
 }
 
-export function seekToComment(item: Comment | Reply | PendingComment["comment"]): UIThunkAction {
+export function seekToComment(item: Comment | Reply): UIThunkAction {
   return (dispatch, getState) => {
-    dispatch(clearPendingComment());
-
     let context = selectors.getThreadContext(getState());
     dispatch(seek(item.point, item.time, item.hasFrames));
     dispatch(setSelectedPrimaryPanel("comments"));

@@ -1,5 +1,4 @@
 import React from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import { ContextMenu as ContextMenuType } from "ui/actions/contextMenus";
 import { ContextMenu } from "./index";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
@@ -11,7 +10,6 @@ import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { useGetUserId } from "ui/hooks/users";
 
 export interface GutterContextMenuProps extends PropsFromRedux {
   close: () => void;
@@ -25,15 +23,13 @@ function GutterContextMenu({
   currentTime,
   executionPoint,
 }: GutterContextMenuProps) {
-  const { user } = useAuth0();
-  const { userId } = useGetUserId();
   const recordingId = useGetRecordingId();
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
     trackEvent("gutter.add_comment");
     assert(executionPoint, "no executionPoint");
-    createFloatingCodeComment(currentTime, executionPoint, { ...user, id: userId }, recordingId, {
+    createFloatingCodeComment(currentTime, executionPoint, recordingId, {
       location: contextMenu.contextMenuItem.location,
     });
     close();

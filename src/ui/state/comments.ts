@@ -2,7 +2,6 @@ import { RecordingId } from "@replayio/protocol";
 import { User } from "ui/types";
 
 export interface CommentsState {
-  pendingComment: PendingComment | null;
   hoveredComment: any;
 }
 
@@ -52,23 +51,3 @@ export interface Comment extends Remark {
 export interface Reply extends Remark {
   parentId: string;
 }
-
-export type PendingComment =
-  | {
-      comment: Comment;
-      type: "new_comment";
-    }
-  | {
-      comment: Reply;
-      type: "new_reply";
-    }
-  | {
-      comment: Comment;
-      type: "edit_comment";
-    }
-  | {
-      comment: Reply;
-      type: "edit_reply";
-    };
-
-export type PendingCommentAction = "edit_reply" | "edit_comment" | "new_reply" | "new_comment";

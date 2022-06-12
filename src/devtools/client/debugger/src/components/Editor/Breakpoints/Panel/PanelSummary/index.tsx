@@ -9,11 +9,9 @@ import { actions } from "ui/actions";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { useGetUserId } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
-import useAuth0 from "ui/utils/useAuth0";
 
 import Condition from "./Condition";
 import Log from "./Log";
@@ -47,8 +45,6 @@ function PanelSummary({
   toggleEditingOn,
 }: PanelSummaryProps) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
-  const { user } = useAuth0();
-  const { userId } = useGetUserId();
   const recordingId = useGetRecordingId();
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
@@ -73,22 +69,9 @@ function PanelSummary({
     trackEvent("breakpoint.add_comment");
 
     if (pausedOnHit) {
-      createFrameComment(
-        currentTime,
-        executionPoint,
-        null,
-        { ...user, userId },
-        recordingId,
-        breakpoint
-      );
+      createFrameComment(currentTime, executionPoint, null, recordingId, breakpoint);
     } else {
-      createFloatingCodeComment(
-        currentTime,
-        executionPoint,
-        { ...user, id: userId },
-        recordingId,
-        breakpoint
-      );
+      createFloatingCodeComment(currentTime, executionPoint, recordingId, breakpoint);
     }
   };
 

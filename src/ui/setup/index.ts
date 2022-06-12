@@ -107,7 +107,6 @@ export async function getInitialCommentsState(): Promise<CommentsState> {
   if (!recordingId) {
     return {
       hoveredComment: null,
-      pendingComment: null,
     };
   }
 
@@ -115,7 +114,6 @@ export async function getInitialCommentsState(): Promise<CommentsState> {
 
   return {
     hoveredComment: null,
-    pendingComment: session?.pendingComment || null,
   };
 }
 

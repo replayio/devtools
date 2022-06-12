@@ -13,7 +13,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
-import useAuth0 from "ui/utils/useAuth0";
 import { useGetRecordingId } from "ui/hooks/recordings";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
@@ -43,7 +42,6 @@ function KeyboardShortcuts({
   createFrameComment,
   currentTime,
   executionPoint,
-  pendingComment,
   showCommandPaletteInEditor,
   setSelectedPrimaryPanel,
   focusFullTextInput,
@@ -58,7 +56,6 @@ function KeyboardShortcuts({
   toggleQuickOpen,
   closeOpenModalsOnEscape,
 }: PropsFromRedux) {
-  const { user } = useAuth0();
   const recordingId = useGetRecordingId();
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
@@ -126,22 +123,8 @@ function KeyboardShortcuts({
     const addComment = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        const commentContent: any = pendingComment?.comment.content;
-        const hasComment =
-          commentContent === ""
-            ? false
-            : Boolean(commentContent?.content && commentContent.content[0].content);
-
-        if (hasComment) {
-          /** TODO: look into better way to manage focus, should these be in a store/context that hooks communicate with? */
-          const commentNode: any = document.querySelector(
-            `.comment-input [contenteditable="true"]`
-          );
-          if (commentNode) {
-            commentNode.focus();
-          }
-        } else if (executionPoint) {
-          createFrameComment(currentTime, executionPoint, null, user, recordingId);
+        if (executionPoint) {
+          createFrameComment(currentTime, executionPoint, null, recordingId);
         }
       }
     };
@@ -205,8 +188,6 @@ function KeyboardShortcuts({
     currentTime,
     executionPoint,
     recordingId,
-    user,
-    pendingComment,
   ]);
 
   useEffect(() => {
@@ -228,7 +209,6 @@ const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     executionPoint: selectors.getExecutionPoint(state),
-    pendingComment: selectors.getPendingComment(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedSource: selectors.getSelectedSource(state),
     toolboxLayout: selectors.getToolboxLayout(state),

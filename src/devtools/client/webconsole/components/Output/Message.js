@@ -7,8 +7,6 @@
 const { MessageIcon } = require("devtools/client/webconsole/components/Output/MessageIcon");
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const { getUserId } = require("ui/hooks/users");
-const { withAuth0 } = require("@auth0/auth0-react");
 const { withRouter } = require("next/router");
 const React = require("react");
 const dom = require("react-dom-factories");
@@ -190,7 +188,6 @@ class Message extends React.Component {
     };
     let handleAddComment = async () => {
       trackEvent("console.add_comment");
-      let userId = await getUserId();
       const opts = {
         hasFrames: true,
         position: null,
@@ -201,7 +198,6 @@ class Message extends React.Component {
         actions.createComment(
           executionPointTime,
           executionPoint,
-          { ...this.props.auth0.user, id: userId },
           getRecordingId(this.props.router.query.id),
           opts
         )
@@ -498,4 +494,4 @@ class Message extends React.Component {
   }
 }
 
-module.exports = withAuth0(withRouter(Message));
+module.exports = withRouter(Message);
