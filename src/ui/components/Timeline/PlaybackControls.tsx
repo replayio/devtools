@@ -1,5 +1,4 @@
 import { useDispatch, useSelector } from "react-redux";
-import { clearPendingComment } from "ui/actions/comments";
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
@@ -22,21 +21,18 @@ export default function PlayPauseButton() {
     icon = "/images/playback-refresh.svg";
     onClick = () => {
       trackEvent("timeline.replay");
-      dispatch(clearPendingComment());
       dispatch(replayPlayback());
     };
   } else if (playback) {
     icon = "/images/playback-pause.svg";
     onClick = () => {
       trackEvent("timeline.pause");
-      dispatch(clearPendingComment());
       dispatch(stopPlayback());
     };
   } else {
     icon = "/images/playback-play.svg";
     onClick = () => {
       trackEvent("timeline.play");
-      dispatch(clearPendingComment());
       dispatch(startPlayback());
     };
   }

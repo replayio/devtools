@@ -21,7 +21,6 @@ import {
 import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
-import { getPendingComment } from "ui/reducers/comments";
 import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
@@ -188,7 +187,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPanel: getSelectedPanel(state),
     localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
-    pendingComment: getPendingComment(state),
     consoleFilters: getAllFilters(state),
   };
 

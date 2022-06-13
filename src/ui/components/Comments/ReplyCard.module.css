@@ -1,0 +1,10 @@
+.ReplyCard {
+  width: 100%;
+  flex-grow: 1;
+  cursor: pointer;
+  padding: 0.25rem 0;
+}
+
+.Unpublished {
+  background-color: var(--theme-base-90);
+}

@@ -1,0 +1,52 @@
+.HeaderRow {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 0 0.75rem 0.5rem;
+}
+
+.Avatar {
+  height: 1.25rem;
+  width: 1.25rem;
+  max-width: 100%;
+  border-radius: 50%;
+  background-color: var(--light-grey);
+  border-radius: 9999px;
+}
+
+.UserName {
+  font-weight: 500;
+  white-space: pre;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin: 0 0.5ch;
+}
+
+.Time {
+  margin-right: calc(0.5rem * var(--tw-space-x-reverse));
+  margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
+  color: var(--theme-icon-dimmed-color);
+  white-space: pre;
+  flex: 1 0 auto;
+}
+
+.ReplyInput {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+  padding: 0.25rem;
+  background-color: var(--body-bgcolor);
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
+  border-width: 1px;
+  border-radius: 0.375rem;
+  cursor: text;
+  width: 100%;
+}
+
+.PublishedContent,
+.UnpublishedContent {
+  margin: 0 0.75rem;
+}
+.UnpublishedContent {
+  color: var(--theme-comment);
+}

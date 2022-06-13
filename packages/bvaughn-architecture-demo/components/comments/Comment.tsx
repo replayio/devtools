@@ -159,9 +159,13 @@ function EditableRemark({
     });
   };
 
-  const onBlur = (event: React.ChangeEvent) => {
+  const onBlur = () => {
     if (saveOnBlurRef.current) {
-      save(pendingContent);
+      if (pendingContent.trim() === "") {
+        deleteTransition();
+      } else {
+        save(pendingContent);
+      }
     }
   };
 
@@ -180,6 +184,11 @@ function EditableRemark({
       case "Escape": {
         event.preventDefault();
         saveOnBlurRef.current = false;
+
+        if (content.trim() === "") {
+          deleteTransition();
+        }
+
         setPendingContent("");
         setIsEditing(false);
         break;

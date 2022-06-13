@@ -357,7 +357,7 @@ export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
-export const areMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
+export const getAreMouseTargetsLoading = (state: UIState) => state.app.mouseTargetsLoading;
 export const getCurrentPoint = (state: UIState) => state.app.currentPoint;
 
 export const isCurrentTimeInLoadedRegion = createSelector(

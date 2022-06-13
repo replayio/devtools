@@ -1,16 +1,12 @@
-import { connect, ConnectedProps } from "react-redux";
-import React, { useState, useEffect, useRef } from "react";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-import { Comment, Reply } from "ui/state/comments";
 import classNames from "classnames";
-import { Canvas } from "ui/state/app";
+import React, { useState, useEffect, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
+import { createFrameComment } from "ui/actions/comments";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import useAuth0 from "ui/utils/useAuth0";
-import { useGetUserId } from "ui/hooks/users";
-import { getCommentEditorDOMId } from "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor";
+import { Canvas } from "ui/state/app";
+import { Comment, Reply } from "ui/state/comments";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -57,78 +53,32 @@ const getStyles = (
   return { parentStyle, childStyle };
 };
 
-type CommentToolProps = PropsFromRedux & {
-  comments: (Comment | Reply)[];
-};
-
 type Coordinates = {
   x: number;
   y: number;
 };
 
-function CommentTool({
-  pendingComment,
-  currentTime,
-  executionPoint,
-  comments,
-  areMouseTargetsLoading,
-  canvas,
-  createFrameComment,
-  setPendingComment,
-  setSelectedPrimaryPanel,
-}: CommentToolProps) {
+export default function CommentTool({ comments }: { comments: (Comment | Reply)[] }) {
+  const canvas = useSelector(getCanvas);
+  const areMouseTargetsLoading = useSelector(getAreMouseTargetsLoading);
+
+  const dispatch = useDispatch();
+
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();
-  const { user } = useAuth0();
-  const { userId } = useGetUserId();
   const captionNode = useRef<HTMLDivElement | null>(null);
 
   // Re-register the listener on every update to prevent the props used by the handler functions from being stale.
   useEffect(() => {
     const videoNode = document.getElementById("graphics");
     if (videoNode) {
-      const onMouseDown = (evt: MouseEvent) => {
-        if (!pendingComment || !document.activeElement) {
-          return;
-        }
-
-        const pendingCommentEditorId = getCommentEditorDOMId(pendingComment.comment);
-        // this uses `[id="..."]` because comment ids can have "="s in them!
-        const isEditorFocused = !!document.activeElement.closest(
-          `[id="${pendingCommentEditorId}"]`
-        );
-
-        // If the pending comment's editor is focused, comment tool clicks should not take focus from it.
-        if (isEditorFocused) {
-          evt.preventDefault();
-        }
-      };
       const onClickInCanvas = async (e: MouseEvent) => {
         if (e.target !== document.querySelector("canvas#graphics")) {
           return;
         }
 
-        // If there's no pending comment at that point and time, create one
-        // with the mouse click as its position.
-        if (!pendingComment) {
-          createFrameComment(
-            currentTime,
-            executionPoint,
-            mouseEventCanvasPosition(e),
-            { ...user, id: userId },
-            recordingId
-          );
-          return;
-        }
-
-        // If there's a pending comment (not a reply), change its position.
-        if (pendingComment.type == "new_comment" || pendingComment.type == "edit_comment") {
-          const newComment = { ...pendingComment };
-          newComment.comment.position = mouseEventCanvasPosition(e);
-
-          setPendingComment(newComment);
-          setSelectedPrimaryPanel("comments");
-        }
+        dispatch(createFrameComment(mouseEventCanvasPosition(e), recordingId));
+        dispatch(setSelectedPrimaryPanel("comments"));
       };
 
       const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -138,7 +88,6 @@ function CommentTool({
 
       videoNode.classList.add("location-marker");
 
-      videoNode.addEventListener("mousedown", onMouseDown);
       videoNode.addEventListener("mouseup", onClickInCanvas);
       videoNode.addEventListener("mousemove", onMouseMove);
       videoNode.addEventListener("mouseleave", onMouseLeave);
@@ -146,40 +95,19 @@ function CommentTool({
       return () => {
         videoNode.classList.remove("location-marker");
 
-        videoNode.removeEventListener("mousedown", onMouseDown);
         videoNode.removeEventListener("mouseup", onClickInCanvas);
         videoNode.removeEventListener("mousemove", onMouseMove);
         videoNode.removeEventListener("mouseleave", onMouseLeave);
       };
     }
-  }, [
-    comments,
-    createFrameComment,
-    currentTime,
-    executionPoint,
-    pendingComment,
-    recordingId,
-    setPendingComment,
-    setSelectedPrimaryPanel,
-    user,
-    userId,
-  ]);
+  }, [comments, dispatch, recordingId]);
 
-  if (
-    !mousePosition ||
-    pendingComment?.type === "edit_reply" ||
-    pendingComment?.type === "new_reply"
-  ) {
+  if (!mousePosition) {
     return null;
   }
 
   const { parentStyle, childStyle } = getStyles(mousePosition, canvas!, captionNode.current);
-  let label = "Add comment";
-  if (areMouseTargetsLoading) {
-    label = "Targets loading...";
-  } else if (pendingComment?.type === "new_comment" || pendingComment?.type === "edit_comment") {
-    label = "Move the marker";
-  }
+  const label = areMouseTargetsLoading ? "Targets loading..." : "Add comment";
 
   return (
     <div style={parentStyle} className="absolute">
@@ -196,22 +124,3 @@ function CommentTool({
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    recordingTarget: selectors.getRecordingTarget(state),
-    pendingComment: selectors.getPendingComment(state),
-    executionPoint: getExecutionPoint(state),
-    currentTime: selectors.getCurrentTime(state),
-    canvas: selectors.getCanvas(state),
-    areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
-  }),
-  {
-    setPendingComment: actions.setPendingComment,
-    createFrameComment: actions.createFrameComment,
-    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(CommentTool);

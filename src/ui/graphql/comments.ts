@@ -6,6 +6,7 @@ export const GET_COMMENTS = gql`
       uuid
       comments {
         id
+        isPublished
         content
         primaryLabel
         secondaryLabel
@@ -24,6 +25,7 @@ export const GET_COMMENTS = gql`
         }
         replies {
           id
+          isPublished
           content
           createdAt
           updatedAt

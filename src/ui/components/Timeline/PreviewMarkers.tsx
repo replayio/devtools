@@ -4,7 +4,6 @@ import { useSelector } from "react-redux";
 import { selectors } from "ui/reducers";
 import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { HoveredItem } from "ui/state/timeline";
-import { prefs } from "ui/utils/prefs";
 
 import Marker from "./Marker";
 

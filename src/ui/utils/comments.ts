@@ -4,9 +4,6 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
 import { Comment, Reply } from "ui/state/comments";
-import compact from "lodash/compact";
-import range from "lodash/range";
-import sortBy from "lodash/sortBy";
 
 export function formatRelativeTime(date: Date) {
   const minutes = differenceInMinutes(Date.now(), date);
@@ -34,4 +31,34 @@ export function formatRelativeTime(date: Date) {
     return `${minutes}m`;
   }
   return "Now";
+}
+
+export function isCommentContentEmpty(content: string | object): boolean {
+  if (typeof content === "string") {
+    return content.trim() === "";
+  } else {
+    return !(content as any)?.content?.find((paragraph: any) =>
+      paragraph.content.find((block: any) => {
+        return block.text.trim() !== "";
+      })
+    );
+  }
+}
+
+export function parseCommentContent(content: string | object): Object {
+  if (typeof content === "object") {
+    return content;
+  }
+
+  try {
+    return JSON.parse(content);
+  } catch {
+    // Our comments were not always JSON; they used to be stored as markdown.
+    // In that case, we just render the raw markdown.
+    const textContent = content ? [{ type: "text", text: content }] : [];
+    return {
+      type: "doc",
+      content: [{ type: "paragraph", content: textContent }],
+    };
+  }
 }

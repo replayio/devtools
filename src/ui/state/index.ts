@@ -5,7 +5,6 @@ import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/a
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
-import { CommentsState } from "./comments";
 import type { EventListenersState } from "devtools/client/debugger/src/selectors";
 import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { ContextMenusState } from "../reducers/contextMenus";
@@ -41,7 +40,6 @@ export interface UIState {
   breakpoints: BreakpointsState;
   changes: ChangesState;
   classList: ClassListState;
-  comments: CommentsState;
   computed: ComputedState;
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;

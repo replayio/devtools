@@ -1,6 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
 import { AddCommentReply, AddCommentReplyVariables } from "graphql/AddCommentReply";
-import { Reply } from "ui/state/comments";
 
 export default function useAddCommentReply() {
   const [addCommentReply] = useMutation<AddCommentReply, AddCommentReplyVariables>(
@@ -19,13 +18,22 @@ export default function useAddCommentReply() {
     }
   );
 
-  return async (reply: Reply) => {
+  return async ({
+    commentId,
+    content,
+    isPublished,
+  }: {
+    commentId: string;
+    content: string;
+    isPublished: boolean;
+  }) => {
     return addCommentReply({
       awaitRefetchQueries: true,
       variables: {
         input: {
-          commentId: reply.parentId,
-          content: reply.content,
+          commentId,
+          content,
+          isPublished,
         },
       },
     });

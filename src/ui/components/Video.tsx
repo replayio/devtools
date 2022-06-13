@@ -43,11 +43,9 @@ function CommentLoader({ recordingId }: { recordingId: string }) {
 }
 
 function Video({
-  currentTime,
   playback,
   isNodePickerActive,
   isNodePickerInitializing,
-  pendingComment,
   recordingTarget,
   stalled,
   mouseTargetsLoading,
@@ -84,7 +82,7 @@ function Video({
   // first. This updates the isNodePickerActive value and makes it look like the node picker is
   // inactive when we check it here.
   const onMouseDown = () => {
-    if (isNodePickerActive || isNodePickerInitializing || pendingComment) {
+    if (isNodePickerActive || isNodePickerInitializing) {
       return;
     }
   };
@@ -117,7 +115,6 @@ function Video({
 }
 
 const connector = connect((state: UIState) => ({
-  pendingComment: selectors.getPendingComment(state),
   isNodePickerActive: selectors.getIsNodePickerActive(state),
   isNodePickerInitializing: selectors.getIsNodePickerInitializing(state),
   currentTime: selectors.getCurrentTime(state),
@@ -125,7 +122,7 @@ const connector = connect((state: UIState) => ({
   recordingTarget: selectors.getRecordingTarget(state),
   videoUrl: selectors.getVideoUrl(state),
   stalled: selectors.isPlaybackStalled(state),
-  mouseTargetsLoading: selectors.areMouseTargetsLoading(state),
+  mouseTargetsLoading: selectors.getAreMouseTargetsLoading(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

@@ -24,6 +24,7 @@ export interface GetComments_recording_comments_replies_user {
 export interface GetComments_recording_comments_replies {
   __typename: "CommentReply";
   id: string;
+  isPublished: boolean | null;
   content: string;
   createdAt: any;
   updatedAt: any;
@@ -33,6 +34,7 @@ export interface GetComments_recording_comments_replies {
 export interface GetComments_recording_comments {
   __typename: "Comment";
   id: string;
+  isPublished: boolean | null;
   content: string;
   primaryLabel: string | null;
   secondaryLabel: string | null;

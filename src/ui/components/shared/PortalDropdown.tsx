@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import { DropdownProps } from "./Dropdown";
 
 interface PortalDropdownProps extends DropdownProps {
+  disabled?: boolean;
   distance?: number;
   style?: CSSProperties;
 }
@@ -46,6 +47,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
       <button
         type="button"
         className={`expand-dropdown flex w-full ${buttonStyle}`}
+        disabled={props.disabled}
         onMouseDown={expand}
         ref={buttonRef}
       >

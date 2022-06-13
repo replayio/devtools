@@ -1,19 +1,18 @@
+import classnames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getMarkerLeftOffset } from "ui/utils/timeline";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { Comment, PendingComment } from "ui/state/comments";
+import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
+import { getMarkerLeftOffset } from "ui/utils/timeline";
 
 const markerWidth = 19;
 
 interface CommentMarkerProps extends PropsFromRedux {
-  comment: Comment | PendingComment["comment"];
-  comments: (Comment | PendingComment["comment"])[];
+  comment: Comment;
+  comments: Comment[];
   isPrimaryHighlighted: boolean;
 }
 
@@ -37,8 +36,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
   }
 
   onClick = (e: React.MouseEvent) => {
-    // This should not count as a click on the timeline, which would seek to a
-    // particular time.
+    // This should not count as a click on the timeline, which would seek to a particular time.
     e.stopPropagation();
     const { comment, seekToComment } = this.props;
     trackEvent("timeline.comment_select");
@@ -46,20 +44,14 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
   };
 
   render() {
-    const { comment, currentTime, zoomRegion, setHoveredComment, isPrimaryHighlighted } =
-      this.props;
-
-    // We don't want to show the replies on the timeline
-    // just the parent comment.
-    if ("parentId" in comment && comment.parentId) {
-      return null;
-    }
-
-    if (!comment.time || comment.time > zoomRegion.endTime) {
-      return null;
-    }
+    const { comment, currentTime, zoomRegion, isPrimaryHighlighted } = this.props;
 
     const { time } = comment;
+
+    if (!time || time > zoomRegion.endTime) {
+      return null;
+    }
+
     const pausedAtComment = currentTime == time;
 
     return (
@@ -68,8 +60,6 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
           paused: pausedAtComment,
           "primary-highlight": isPrimaryHighlighted,
         })}
-        onMouseEnter={() => setHoveredComment((comment as any).id)}
-        onMouseLeave={() => setHoveredComment(null)}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
@@ -87,7 +77,6 @@ const connector = connect(
   }),
   {
     seekToComment: actions.seekToComment,
-    setHoveredComment: actions.setHoveredComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

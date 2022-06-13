@@ -30,7 +30,11 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
   const onSubmit = () => {
     if (loom && modalOptions?.comment) {
       const reply = { ...modalOptions.comment, content: addLoomComment(url) };
-      addCommentReply(reply);
+      addCommentReply({
+        commentId: reply.parentId,
+        content: reply.content,
+        isPublished: true,
+      });
       hideModal();
     }
   };

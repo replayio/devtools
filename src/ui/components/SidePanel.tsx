@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Transcript from "ui/components/Transcript";
 import Events from "ui/components/Events";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
@@ -8,6 +7,7 @@ import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useSelector } from "react-redux";
 import ProtocolViewer from "./ProtocolViewer";
+import CommentCardsList from "./Comments/CommentCardsList";
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
@@ -23,7 +23,7 @@ export default function SidePanel() {
     <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
-      {selectedPrimaryPanel === "comments" && <Transcript />}
+      {selectedPrimaryPanel === "comments" && <CommentCardsList />}
       {selectedPrimaryPanel === "search" && <FullTextSearch />}
       {selectedPrimaryPanel === "events" && (
         <Accordion

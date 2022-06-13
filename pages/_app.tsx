@@ -100,8 +100,6 @@ import "devtools/client/webconsole/components/FilterBar/Events.css";
 import "devtools/server/actors/highlighters.css";
 import "ui/components/App.css";
 import "ui/components/Comments/Comments.css";
-import "ui/components/Comments/TranscriptComments/CommentActions.css";
-import "ui/components/Comments/TranscriptComments/CommentEditor/CommentEditor.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
@@ -128,7 +126,6 @@ import "ui/components/Timeline/MessageMarker.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
-import "ui/components/Transcript/Transcript.css";
 import "ui/utils/sourcemapVisualizer.css";
 
 if (isMock()) {

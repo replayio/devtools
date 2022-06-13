@@ -1,6 +1,5 @@
 import app, * as appSelectors from "./app";
 import timeline, * as timelineSelectors from "./timeline";
-import comments, * as commentsSelectors from "./comments";
 import network, * as networkSelectors from "./network";
 import layout, * as layoutSelectors from "./layout";
 import contextMenus from "./contextMenus";
@@ -16,7 +15,6 @@ import protocolMessages from "./protocolMessages";
 export const reducers = {
   app,
   timeline,
-  comments,
   contextMenus,
   network,
   protocolMessages: protocolMessages,
@@ -29,7 +27,6 @@ export const reducers = {
 
 export const selectors = {
   ...appSelectors,
-  ...commentsSelectors,
   ...consoleSelectors,
   ...debuggerSelectors,
   ...eventListenerBreakpointsSelectors,
