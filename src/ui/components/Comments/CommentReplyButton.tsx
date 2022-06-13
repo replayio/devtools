@@ -1,12 +1,18 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { Comment } from "ui/state/comments";
+import { features } from "ui/utils/prefs";
 import useAuth0 from "ui/utils/useAuth0";
+
+import MaterialIcon from "../shared/MaterialIcon";
 
 import styles from "./CommentReplyButton.module.css";
 
 export default function CommentReplyButton({ comment }: { comment: Comment }) {
   const { isAuthenticated } = useAuth0();
+  const dispatch = useDispatch();
 
   const addCommentReply = useAddCommentReply();
 
@@ -30,11 +36,25 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
     setIsPending(false);
   };
 
+  const addAttachment = () => {
+    dispatch(
+      setModal("attachment", {
+        comment: { ...comment, content: "", parentId: comment.id },
+      })
+    );
+  };
+
   return (
-    <div>
+    <div className={styles.Row}>
       <button className={styles.Button} disabled={isPending} onClick={addReply}>
         Reply
       </button>
+
+      {features.commentAttachments && (
+        <MaterialIcon className={styles.AttachmentIcon} onClick={addAttachment}>
+          attachment
+        </MaterialIcon>
+      )}
     </div>
   );
 }
