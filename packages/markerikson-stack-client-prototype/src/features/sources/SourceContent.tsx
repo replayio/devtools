@@ -20,21 +20,21 @@ export const SourceContent = () => {
   > | null>(null);
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
 
-  const { data: sourceText } = useGetSourceTextQuery(selectedSourceId ?? skipToken);
-  const { data: sourceHits } = useGetSourceHitCountsQuery(selectedSourceId ?? skipToken);
+  const { currentData: sourceText } = useGetSourceTextQuery(selectedSourceId ?? skipToken);
+  const { currentData: sourceHits } = useGetSourceHitCountsQuery(selectedSourceId ?? skipToken);
 
   let closestHitPoint: HitCount | null = null;
   if (sourceHits && selectedLocation) {
-    const lineHits = sourceHits[selectedLocation.line] ?? [];
-    closestHitPoint = lineHits.reduceRight((prevValue, hit) => {
+    const lineHits = sourceHits[selectedLocation.line];
+    closestHitPoint = lineHits?.reduceRight((prevValue, hit) => {
       if (hit.location.column < selectedLocation.column) {
         return hit;
       }
       return prevValue;
-    });
+    }, null);
   }
 
-  const { data: locationHitPoints } = useGetLineHitPointsQuery(
+  const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
     closestHitPoint?.location ?? skipToken
   );
 
@@ -58,15 +58,25 @@ export const SourceContent = () => {
 
   return (
     <div>
-      <div>Selected location: {JSON.stringify(selectedLocation)}</div>
-      <div>Closest point: {JSON.stringify(selectedLocation)}</div>
-      <div>Point hits: {JSON.stringify(locationHitPoints)}</div>
-      <CodeMirror
-        value={sourceText}
-        editable={false}
-        style={{ maxHeight: 600, overflowY: "auto", minWidth: 800, maxWidth: 1000 }}
-        extensions={[domHandler, javascript({ jsx: true })]}
-      />
+      <div style={{ display: "flex" }}>
+        <CodeMirror
+          value={sourceText}
+          editable={false}
+          style={{ maxHeight: 600, overflowY: "auto", minWidth: 600, maxWidth: 600 }}
+          extensions={[domHandler, javascript({ jsx: true })]}
+        />
+        <div style={{ marginLeft: 10 }}>
+          <h3 style={{ marginTop: 0 }}>Selection Details</h3>
+          <div>Selected location: {JSON.stringify(selectedLocation)}</div>
+          <div>Closest point: {JSON.stringify(selectedLocation)}</div>
+          <h4>Location Hits</h4>
+          <ul>
+            {locationHitPoints?.map(point => {
+              return <li key={point.point}>{point.time}</li>;
+            }) ?? null}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
