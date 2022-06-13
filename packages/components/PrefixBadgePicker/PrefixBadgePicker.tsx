@@ -13,30 +13,28 @@ export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as cons
  * Used in PanelEditor when a log point is being added.
  */
 export function PrefixBadgePicker({
-  initialValue = null,
+  initialValue,
   onSelect,
 }: {
   /** The current selected badge. */
-  initialValue?: PrefixBadge | null;
+  initialValue?: PrefixBadge | undefined;
 
   /** Callback when a badge has been selected. */
-  onSelect?: (prefixBadge?: PrefixBadge | null) => void;
+  onSelect?: (prefixBadge?: PrefixBadge) => void;
 }) {
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | null>(initialValue);
-  const isOpen = activeBadge === null;
-  const handleSelect = (prefixBadgeName: PrefixBadge | null) => {
-    setActiveBadge(prefixBadgeName || null);
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | undefined>(initialValue);
+  const handleSelect = (prefixBadgeName: PrefixBadge | undefined) => {
+    setActiveBadge(prefixBadgeName);
     onSelect?.(prefixBadgeName);
   };
 
   return (
     <div className="flex" style={{ width: 26, height: 26 }}>
-      <Picker<PrefixBadge>
+      <Picker<PrefixBadge | undefined>
         value={activeBadge}
         onChange={handleSelect}
         radius={24}
         className={styles.PrefixBadgePicker}
-        title={isOpen ? undefined : "Select a prefix badge"}
       >
         <ToggleButton id="toggle" />
         {badges.map(badge => (
