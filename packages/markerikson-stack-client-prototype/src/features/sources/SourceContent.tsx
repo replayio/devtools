@@ -1,12 +1,16 @@
 import { useMemo, useState } from "react";
-import type { Location } from "@replayio/protocol";
+import type { HitCount, Location, PointDescription } from "@replayio/protocol";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
 import { countColumn } from "@codemirror/state";
 
-import { useGetSourceTextQuery, useGetSourceHitCountsQuery } from "../../app/api";
+import {
+  useGetSourceTextQuery,
+  useGetSourceHitCountsQuery,
+  useGetLineHitPointsQuery,
+} from "../../app/api";
 import { useAppSelector } from "../../app/hooks";
 
 export const SourceContent = () => {
@@ -18,6 +22,21 @@ export const SourceContent = () => {
 
   const { data: sourceText } = useGetSourceTextQuery(selectedSourceId ?? skipToken);
   const { data: sourceHits } = useGetSourceHitCountsQuery(selectedSourceId ?? skipToken);
+
+  let closestHitPoint: HitCount | null = null;
+  if (sourceHits && selectedLocation) {
+    const lineHits = sourceHits[selectedLocation.line] ?? [];
+    closestHitPoint = lineHits.reduceRight((prevValue, hit) => {
+      if (hit.location.column < selectedLocation.column) {
+        return hit;
+      }
+      return prevValue;
+    });
+  }
+
+  const { data: locationHitPoints } = useGetLineHitPointsQuery(
+    closestHitPoint?.location ?? skipToken
+  );
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({
@@ -40,6 +59,8 @@ export const SourceContent = () => {
   return (
     <div>
       <div>Selected location: {JSON.stringify(selectedLocation)}</div>
+      <div>Closest point: {JSON.stringify(selectedLocation)}</div>
+      <div>Point hits: {JSON.stringify(locationHitPoints)}</div>
       <CodeMirror
         value={sourceText}
         editable={false}

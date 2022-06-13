@@ -95,7 +95,36 @@ export const api = createApi({
       },
       keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),
+    getLineHitPoints: build.query<PointDescription[], Location>({
+      queryFn: async location => {
+        const sessionId = replayClient.getSessionIdThrows();
+
+        const data = await new Promise<PointDescription[]>(async resolve => {
+          const { analysisId } = await client.Analysis.createAnalysis(
+            {
+              mapper: "",
+              effectful: false,
+            },
+            sessionId
+          );
+
+          client.Analysis.addLocation({ analysisId, location }, sessionId);
+          client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+          client.Analysis.addAnalysisPointsListener(({ points }) => {
+            resolve(points);
+            client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+          });
+        });
+
+        return { data };
+      },
+    }),
   }),
 });
 
-export const { useGetSourcesQuery, useGetSourceTextQuery, useGetSourceHitCountsQuery } = api;
+export const {
+  useGetSourcesQuery,
+  useGetSourceTextQuery,
+  useGetSourceHitCountsQuery,
+  useGetLineHitPointsQuery,
+} = api;
