@@ -120,6 +120,10 @@ const TipTapEditor = ({
       content: tryToParse(content),
       editable,
       autofocus,
+
+      // TipTap requires these callbacks; it does not check if they are undefined.
+      onCreate: () => {},
+      onUpdate: () => {},
     };
   }, [
     autofocus,
