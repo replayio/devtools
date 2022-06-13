@@ -5,6 +5,7 @@ import type {
   Location,
   PointDescription,
   HitCount,
+  createPauseResult,
 } from "@replayio/protocol";
 import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
@@ -119,6 +120,21 @@ export const api = createApi({
         return { data };
       },
     }),
+    getPause: build.query<createPauseResult, PointDescription>({
+      queryFn: async point => {
+        const sessionId = replayClient.getSessionIdThrows();
+        const pause = await client.Session.createPause({ point: point.point }, sessionId);
+        return { data: pause };
+      },
+      onCacheEntryAdded: async (arg, api) => {
+        const { data: pauseEntry } = await api.cacheDataLoaded;
+        await api.cacheEntryRemoved;
+        const sessionId = replayClient.getSessionIdThrows();
+
+        // TODO Can confirm we get here, but the backend actually returned a "Method not yet implemented" error???
+        // await client.Session.releasePause({ pauseId: pauseEntry.pauseId }, sessionId);
+      },
+    }),
   }),
 });
 
@@ -127,4 +143,5 @@ export const {
   useGetSourceTextQuery,
   useGetSourceHitCountsQuery,
   useGetLineHitPointsQuery,
+  useGetPauseQuery,
 } = api;

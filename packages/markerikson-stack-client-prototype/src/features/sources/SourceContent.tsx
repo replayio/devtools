@@ -4,12 +4,12 @@ import { skipToken } from "@reduxjs/toolkit/dist/query";
 import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
-import { countColumn } from "@codemirror/state";
 
 import {
   useGetSourceTextQuery,
   useGetSourceHitCountsQuery,
   useGetLineHitPointsQuery,
+  useGetPauseQuery,
 } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { pointSelected } from "./sourcesSlice";
@@ -40,6 +40,8 @@ export const SourceContent = () => {
   const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
     closestHitPoint?.location ?? skipToken
   );
+
+  const { currentData: pause } = useGetPauseQuery(selectedPoint ?? skipToken);
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({
@@ -88,6 +90,19 @@ export const SourceContent = () => {
                 </li>
               );
             }) ?? null}
+          </ul>
+        </div>
+
+        <div style={{ marginLeft: 10 }}>
+          <h3 style={{ marginTop: 0 }}>Current Pause Frames</h3>
+          <ul>
+            {pause?.data.frames?.map(frame => {
+              return (
+                <li key={frame.frameId}>
+                  {frame.functionName} / {JSON.stringify(frame.functionLocation)}
+                </li>
+              );
+            })}
           </ul>
         </div>
       </div>
