@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 import { Children, cloneElement, isValidElement, useRef, useState } from "react";
 import classNames from "classnames";
 import { AnimateSharedLayout, motion } from "framer-motion";
@@ -29,13 +29,14 @@ export function Picker<Values extends any>({
   const isOpen = value === null;
   const isActive = isOpen || isHover;
   const transition = {
-    duration: isOpen ? 0.18 : 0.36,
-    opacity: { duration: 0.1 },
+    duration: isOpen ? 0.16 : 0.2,
+    opacity: { duration: isOpen ? 0.1 : 0.04 },
   };
 
   return (
     <motion.div
       {...parsedProps}
+      data-open={isOpen}
       className={classNames("relative inline-grid items-center", parsedProps.className)}
       initial={isOpen ? "opened" : "closed"}
       animate={isOpen ? "opened" : "closed"}
@@ -43,6 +44,11 @@ export function Picker<Values extends any>({
       onMouseLeave={() => setIsHover(false)}
       variants={{
         opened: {
+          transition: {
+            staggerChildren: 0.02,
+          },
+        },
+        closed: {
           transition: {
             staggerChildren: 0.02,
           },
@@ -78,16 +84,17 @@ export function Picker<Values extends any>({
           const childVariants = child.props.variants || {};
 
           return cloneElement(child, {
+            disabled: !isOpen && !isChildActive,
             layout: true,
-            initial: false,
             variants: {
               opened: {
                 ...childVariants.opened,
                 opacity: 1,
               },
               closed: {
-                opacity: isChildActive ? 1 : 0,
                 ...childVariants.closed,
+                scale: isChildActive ? 1 : childVariants.closed?.scale,
+                opacity: isChildActive ? 1 : 0,
               },
             },
             transition: {
@@ -95,9 +102,9 @@ export function Picker<Values extends any>({
               ...child.props.transition,
             },
             style: {
+              zIndex: isChildActive || wasChildActive ? 10 : 1,
               gridColumn: isOpen ? (isChildActive ? 1 : undefined) : 1,
               gridRow: 1,
-              zIndex: isChildActive || wasChildActive ? 10 : 1,
               ...child.props.style,
             },
             onClick: () => {
@@ -105,7 +112,9 @@ export function Picker<Values extends any>({
               previousId.current = isChildActive ? child.props.id : null;
               onChange(nextActiveId);
             },
-          });
+            "data-is-active": isChildActive,
+            "data-was-active": wasChildActive,
+          } as ComponentProps<typeof motion.button>);
         })}
       </AnimateSharedLayout>
     </motion.div>

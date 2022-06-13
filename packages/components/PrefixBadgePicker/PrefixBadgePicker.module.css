@@ -1,4 +1,5 @@
 .PrefixBadgePicker {
+  padding: 0 3px;
 }
 
 .PrefixBadgePickerFill {
@@ -16,8 +17,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.125rem;
-  height: 1.125rem;
+  width: 20px;
+  height: 26px;
 }
 
 .DefaultBadge {
@@ -46,8 +47,7 @@
   background-size: auto 100%;
 }
 
-.active.PrefixBadge:hover .ColorBadge::before,
-.active .ColorBadge::before,
+.ColorBadge::before,
 .ColorBadge::after {
   grid-area: 1 / 1 / 1 / 1;
   content: "";
@@ -59,6 +59,12 @@
 .ColorBadge::before {
   width: 100%;
   height: 100%;
+  opacity: 0;
+  transition: opacity 0.18s ease-out;
+}
+
+[data-was-active="true"] .ColorBadge::before,
+[data-open="true"] .PrefixBadge:hover .ColorBadge::before {
   opacity: 0.2;
 }
 
