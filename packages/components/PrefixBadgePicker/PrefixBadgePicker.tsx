@@ -29,7 +29,7 @@ export function PrefixBadgePicker({
   };
 
   return (
-    <div className="flex" style={{ width: 26, height: 26 }}>
+    <div className="z-10 flex" style={{ width: 26, height: 26 }}>
       <Picker<PrefixBadge | undefined>
         value={activeBadge}
         onChange={handleSelect}

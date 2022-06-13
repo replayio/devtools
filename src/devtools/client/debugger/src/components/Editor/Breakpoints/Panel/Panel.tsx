@@ -20,11 +20,11 @@ import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
+import PrefixBadgeButton from "ui/components/PrefixBadge";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
-import BreakpointPanel from "./BreakpointPanel";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -133,27 +133,35 @@ function Panel({
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
-          <BreakpointPanel breakpoint={breakpoint!} editing={editing}>
-            {editing ? (
-              <PanelEditor
-                breakpoint={breakpoint}
-                toggleEditingOff={toggleEditingOff}
-                inputToFocus={inputToFocus}
-                showCondition={showCondition}
-                setShowCondition={setShowCondition}
-              />
-            ) : (
-              <PanelSummary
-                analysisPoints={analysisPoints}
-                breakpoint={breakpoint}
-                executionPoint={executionPoint}
-                isHot={isHot}
-                pausedOnHit={pausedOnHit}
-                setInputToFocus={setInputToFocus}
-                toggleEditingOn={toggleEditingOn}
-              />
-            )}
-          </BreakpointPanel>
+          <div
+            className="flex items-center py-2 pl-1 pr-2"
+            style={{
+              backgroundColor: "var(--breakpoint-editfield-active)",
+            }}
+          >
+            <PrefixBadgeButton breakpoint={breakpoint!} />
+            <div className="flex-1">
+              {editing ? (
+                <PanelEditor
+                  breakpoint={breakpoint}
+                  toggleEditingOff={toggleEditingOff}
+                  inputToFocus={inputToFocus}
+                  showCondition={showCondition}
+                  setShowCondition={setShowCondition}
+                />
+              ) : (
+                <PanelSummary
+                  analysisPoints={analysisPoints}
+                  breakpoint={breakpoint}
+                  executionPoint={executionPoint}
+                  isHot={isHot}
+                  pausedOnHit={pausedOnHit}
+                  setInputToFocus={setInputToFocus}
+                  toggleEditingOn={toggleEditingOn}
+                />
+              )}
+            </div>
+          </div>
           <BreakpointNavigation
             breakpoint={breakpoint!}
             editing={editing}
