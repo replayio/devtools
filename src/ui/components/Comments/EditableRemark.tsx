@@ -1,3 +1,4 @@
+import { Editor } from "@tiptap/react";
 import { useMemo, useRef, useState } from "react";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
@@ -39,17 +40,10 @@ export default function EditableRemark({
 
   // New comments should default to showing edit mode.
   const [isEditing, setIsEditing] = useState(canEdit && remark.content === "");
-  const [pendingContent, setPendingContent] = useState(remark.content);
-
-  // Both the Enter key and "blur" trigger saving behavior.
-  // This ref ensures that only the first event to occur gets handled.
-  const saveOnBlurRef = useRef(true);
 
   const showOptionsMenu = !isEditing && !isPending && canEdit;
 
   const startEditing = () => {
-    saveOnBlurRef.current = true;
-    setPendingContent(remark.content);
     setIsEditing(true);
   };
 
@@ -61,47 +55,25 @@ export default function EditableRemark({
     }
   };
 
-  const discardPendingContent = () => {
-    saveOnBlurRef.current = false;
+  const publishRemark = () => {
+    saveChanges(remark.content);
+  };
 
-    if (remark.content.trim() === "") {
-      deleteRemark();
-    }
-
-    setPendingContent("");
+  const discardPendingChanges = () => {
     setIsEditing(false);
   };
 
-  const publishRemark = () => {
-    saveRemark(remark.content, true);
-  };
-
-  const saveRemark = async (newContent: string, newIsPublished: boolean = remark.isPublished) => {
+  const saveChanges = async (newContent: string) => {
     setIsPending(true);
-    setPendingContent("");
     setIsEditing(false);
 
     if (type === "comment") {
-      await updateComment(remark.id, newContent, newIsPublished, (remark as Comment).position);
+      await updateComment(remark.id, newContent, true, (remark as Comment).position);
     } else {
-      await updateCommentReply(remark.id, newContent, newIsPublished);
+      await updateCommentReply(remark.id, newContent, true);
     }
 
     setIsPending(false);
-  };
-
-  const onBlur = () => {
-    if (saveOnBlurRef.current) {
-      if (pendingContent.trim() === "") {
-        deleteRemark();
-      } else {
-        saveRemark(pendingContent);
-      }
-    }
-  };
-
-  const onChange = (event: React.ChangeEvent) => {
-    setPendingContent((event.currentTarget as HTMLTextAreaElement).value);
   };
 
   const onDoubleClick = () => {
@@ -109,24 +81,6 @@ export default function EditableRemark({
       startEditing();
     }
   };
-
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    switch (event.key) {
-      case "Enter": {
-        event.preventDefault();
-        saveOnBlurRef.current = false;
-        saveRemark(pendingContent, true);
-        break;
-      }
-      case "Escape": {
-        event.preventDefault();
-        discardPendingContent();
-        break;
-      }
-    }
-  };
-
-  // TODO Double click starts edit
 
   return (
     <>
@@ -162,25 +116,17 @@ export default function EditableRemark({
         <FocusContext.Consumer>
           {({ autofocus, blur, close, isFocused }) => (
             <TipTapEditor
-              key={remark.id}
               autofocus={autofocus}
               blur={blur}
               close={close}
-              content={pendingContent}
+              content={remark.content}
               editable={isEditing && !isPending}
-              handleCancel={discardPendingContent}
-              handleSubmit={saveRemark}
+              handleCancel={discardPendingChanges}
+              handleDelete={deleteRemark}
+              handleSubmit={saveChanges}
               possibleMentions={users || []}
-              placeholder={
-                remark.content == ""
-                  ? type === "reply"
-                    ? "Write a reply..."
-                    : "Type a comment"
-                  : ""
-              }
+              placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
               takeFocus={isFocused}
-              onCreate={noop}
-              onUpdate={noop}
             />
           )}
         </FocusContext.Consumer>
@@ -203,5 +149,3 @@ function useCollaborators() {
 
   return users;
 }
-
-function noop() {}

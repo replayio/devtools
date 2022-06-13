@@ -76,10 +76,10 @@ export function useUpdateCommentReply() {
     }
   );
 
-  return async (replyId: string, newContent: string, newIsPublished: boolean) =>
+  return async (id: string, newContent: string, newIsPublished: boolean) =>
     updateCommentReplyContent({
       // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
-      variables: { newContent, newIsPublished, replyId },
+      variables: { id, newContent, newIsPublished },
     });
 }
 

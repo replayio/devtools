@@ -1,27 +1,31 @@
-import React, { useEffect, useMemo } from "react";
-import { useEditor, EditorContent, Extension, Editor } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import { User } from "ui/types";
-import Placeholder from "@tiptap/extension-placeholder";
 import classNames from "classnames";
-import { GitHubLink } from "./githubLink";
-import { ReplayLink } from "./replayLink";
+import Placeholder from "@tiptap/extension-placeholder";
+import { useEditor, EditorContent, Extension } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
+import React, { useEffect, useMemo, useRef } from "react";
+import { User } from "ui/types";
 import useAuth0 from "ui/utils/useAuth0";
 
+import { GitHubLink } from "./githubLink";
+import { ReplayLink } from "./replayLink";
+import styles from "./TipTapEditor.module.css";
 interface TipTapEditorProps {
+  // TipTap core props
   autofocus: boolean;
-  blur: () => void;
-  close: () => void;
   content: string | object;
   editable: boolean;
-  handleSubmit: (text: string) => void;
-  handleCancel: () => void;
   placeholder: string;
-  // Not actually implementing this now, but leaving it in the API for later
   possibleMentions: User[];
+
+  // FocusContext pass-thru props
+  blur: () => void;
+  close: () => void;
   takeFocus: boolean;
-  onCreate: (editor: { editor: Pick<Editor, "commands"> }) => void;
-  onUpdate: (editor: { editor: Pick<Editor, "getJSON"> }) => void;
+
+  // Remark persistence props
+  handleCancel: () => void;
+  handleDelete: () => void;
+  handleSubmit: (text: string) => void;
 }
 
 const tryToParse = (content: string | object): any => {
@@ -47,19 +51,32 @@ const TipTapEditor = ({
   close,
   content,
   editable,
-  handleSubmit,
   handleCancel,
+  handleDelete,
+  handleSubmit,
   placeholder,
   takeFocus,
-  onCreate,
-  onUpdate,
 }: TipTapEditorProps) => {
   const { isAuthenticated } = useAuth0();
 
+  // TipTap extensions seem to have stale closure problems.
+  // Even if we re-render and pass a new editor config,
+  // the keyboard event handler closes over the initial content value.
+  // This breaks the Escape (to cancel) functionality.
+  const contentRef = useRef(content);
+  useEffect(() => {
+    contentRef.current = content;
+  });
+
   // Memoize the Editor config prevents unnecessary re-renders of the "@tiptap/react" editor components.
   const editorConfig = useMemo(() => {
-    const onSubmit = (newContent: string) => {
-      handleSubmit(newContent);
+    const onSubmit = (newPlainText: string, newContent: string) => {
+      if (newPlainText.trim() === "") {
+        handleDelete();
+      } else {
+        handleSubmit(newContent);
+      }
+
       blur();
       close();
     };
@@ -70,23 +87,28 @@ const TipTapEditor = ({
         GitHubLink,
         ReplayLink,
         // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
-        Placeholder.configure({ placeholder }),
+        Placeholder.configure({
+          emptyNodeClass: styles.Placeholder,
+          placeholder,
+        }),
         Extension.create({
           name: "submitOnEnter",
           addKeyboardShortcuts() {
             return {
               "Cmd-Enter": ({ editor }) => {
-                onSubmit(JSON.stringify(editor.getJSON()));
+                onSubmit(editor.getText(), JSON.stringify(editor.getJSON()));
                 return true;
               },
-
               Enter: ({ editor }) => {
-                onSubmit(JSON.stringify(editor.getJSON()));
+                onSubmit(editor.getText(), JSON.stringify(editor.getJSON()));
                 return true;
               },
               Escape: ({ editor }) => {
                 editor.commands.blur();
-                editor.commands.setContent(tryToParse(content));
+
+                const mostRecentlySavedContent = contentRef.current;
+                editor.commands.setContent(tryToParse(mostRecentlySavedContent));
+
                 handleCancel();
                 return true;
               },
@@ -96,8 +118,6 @@ const TipTapEditor = ({
       ],
       editorProps: { attributes: { class: "focus:outline-none" } },
       content: tryToParse(content),
-      onCreate,
-      onUpdate,
       editable,
       autofocus,
     };
@@ -108,9 +128,8 @@ const TipTapEditor = ({
     content,
     editable,
     handleCancel,
+    handleDelete,
     handleSubmit,
-    onCreate,
-    onUpdate,
     placeholder,
   ]);
   const editor = useEditor(editorConfig, [isAuthenticated]);
@@ -138,7 +157,7 @@ const TipTapEditor = ({
       }}
     >
       <EditorContent
-        className={classNames("w-full rounded-md border outline-none transition", {
+        className={classNames("w-full rounded-md border p-1 outline-none transition", {
           "bg-bodyBgcolor": editable,
           "border-gray-400": editable,
           "border-transparent": !editable,
@@ -146,10 +165,14 @@ const TipTapEditor = ({
         })}
         editor={editor}
         onBlur={() => {
-          blur();
-          if ((editor?.getCharacterCount() || 0) === 0) {
-            close();
+          if (editor?.getText().trim() === "") {
+            handleDelete();
+          } else {
+            handleSubmit(JSON.stringify(editor?.getJSON()));
           }
+
+          blur();
+          close();
         }}
       />
     </div>
