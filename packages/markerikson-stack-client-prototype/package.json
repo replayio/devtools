@@ -8,7 +8,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "protocol": "file:../protocol"
-  },
-  "devDependencies": {}
+    "protocol": "file:../protocol",
+    "react": "^0.0.0-experimental-e7d0053e6-20220325",
+    "react-dom": "^0.0.0-experimental-e7d0053e6-20220325"
+  }
 }
