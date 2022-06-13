@@ -1,5 +1,14 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
-import type { newSource, ProtocolClient, Location, PointDescription } from "@replayio/protocol";
+import type {
+  newSource,
+  ProtocolClient,
+  Location,
+  PointDescription,
+  HitCount,
+} from "@replayio/protocol";
+import { Dictionary } from "lodash";
+import groupBy from "lodash/groupBy";
+
 import { client, initSocket } from "protocol/socket";
 import { replayClient } from "../client/ReplayClient";
 
@@ -10,6 +19,8 @@ interface SourceGroups {
 }
 
 const reIsJsSourceFile = /(js|ts)x?$/;
+
+const CACHE_DATA_PERMANENTLY = 10 * 365 * 24 * 60 * 60;
 
 export const api = createApi({
   baseQuery: fakeBaseQuery(),
@@ -46,8 +57,45 @@ export const api = createApi({
 
         return { data: sourceGroups };
       },
+      keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
+    }),
+    getSourceText: build.query<string, string>({
+      queryFn: async sourceId => {
+        const demoSourceText = await client.Debugger.getSourceContents(
+          {
+            sourceId,
+          },
+          replayClient.getSessionIdThrows()
+        );
+        return { data: demoSourceText.contents };
+      },
+      keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
+    }),
+    getSourceHitCounts: build.query<Dictionary<HitCount[]>, string>({
+      queryFn: async sourceId => {
+        const sessionId = replayClient.getSessionIdThrows();
+        const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
+          {
+            sourceId,
+          },
+          sessionId
+        );
+
+        const hitCounts = await client.Debugger.getHitCounts(
+          {
+            sourceId,
+            locations: lineLocations,
+            maxHits: 250,
+          },
+          sessionId
+        );
+
+        const hitsByLine = groupBy(hitCounts.hits, entry => entry.location.line);
+        return { data: hitsByLine };
+      },
+      keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),
   }),
 });
 
-export const { useGetSourcesQuery } = api;
+export const { useGetSourcesQuery, useGetSourceTextQuery, useGetSourceHitCountsQuery } = api;

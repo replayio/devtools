@@ -5,6 +5,7 @@ import { SessionContext } from "../contexts/SessionContext";
 import { useContext } from "react";
 
 import { SourcesList } from "../features/sources/SourcesList";
+import { SourceContent } from "../features/sources/SourceContent";
 
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);
@@ -19,8 +20,16 @@ const IndexPage: NextPage = () => {
       <div style={{ display: "flex", alignItems: "center" }}>
         User: {currentUserInfo.name} <img src={currentUserInfo.picture} height={24} />
       </div>
-      <h2>Sources Entries</h2>
-      <SourcesList />
+      <div style={{ display: "flex" }}>
+        <div style={{ minWidth: 500 }}>
+          <h2>Sources Entries</h2>
+          <SourcesList />
+        </div>
+        <div style={{ marginLeft: 10 }}>
+          <h2>Source Contents</h2>
+          <SourceContent />
+        </div>
+      </div>
     </div>
   );
 };
