@@ -14,7 +14,7 @@ export default function BreakpointPanel({
 }) {
   return (
     <Column>
-      <Row
+      {/* <Row
         paddingHorizontal={2}
         paddingVertical={1}
         gap={1}
@@ -27,7 +27,7 @@ export default function BreakpointPanel({
         <ConditionalIcon />
         <div style={{ flex: 1 }}>Conditional</div>
         <CloseIcon />
-      </Row>
+      </Row> */}
       <Row
         paddingLeft={1}
         paddingRight={2}
@@ -39,7 +39,6 @@ export default function BreakpointPanel({
       >
         <PrefixBadgeButton breakpoint={breakpoint} />
         <div style={{ flex: 1 }}>{children}</div>
-        <AddCommentButton />
       </Row>
     </Column>
   );

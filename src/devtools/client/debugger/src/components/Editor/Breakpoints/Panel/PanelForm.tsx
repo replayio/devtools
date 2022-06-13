@@ -20,7 +20,7 @@ export function SubmitButton({
       onClick={handleSetBreakpoint}
       title={disabled ? "Syntax error" : "Save expression"}
       className={classnames(
-        "inline-flex flex-shrink-0 items-center rounded-md border border-transparent p-1 font-sans text-xs font-medium leading-4 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
+        "inline-flex flex-shrink-0 items-center rounded-full border border-transparent p-1 px-2 font-sans text-xs font-medium leading-4 text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2",
         disabled ? "cursor-default bg-gray-400" : "bg-primaryAccent hover:bg-primaryAccentHover"
       )}
     >

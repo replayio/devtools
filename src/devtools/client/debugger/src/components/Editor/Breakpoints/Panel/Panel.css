@@ -45,7 +45,6 @@
 }
 
 .breakpoint-panel .summary {
-  border-bottom: 1px solid var(--theme-splitter-color);
   display: flex;
   justify-content: space-between;
 }
@@ -71,10 +70,6 @@
 
 .breakpoint-panel .statement:last-child {
   padding-bottom: 8px;
-}
-
-.breakpoint-panel .panel-editor {
-  border-bottom: 1px solid var(--theme-splitter-color);
 }
 
 .breakpoint-panel .panel-editor form .CodeMirror {

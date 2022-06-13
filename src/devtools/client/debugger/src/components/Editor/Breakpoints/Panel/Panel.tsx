@@ -24,6 +24,7 @@ import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { prefs } from "ui/utils/prefs";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import BreakpointPanel from "./BreakpointPanel";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -132,25 +133,27 @@ function Panel({
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
-          {editing ? (
-            <PanelEditor
-              breakpoint={breakpoint}
-              toggleEditingOff={toggleEditingOff}
-              inputToFocus={inputToFocus}
-              showCondition={showCondition}
-              setShowCondition={setShowCondition}
-            />
-          ) : (
-            <PanelSummary
-              analysisPoints={analysisPoints}
-              breakpoint={breakpoint}
-              executionPoint={executionPoint}
-              isHot={isHot}
-              pausedOnHit={pausedOnHit}
-              setInputToFocus={setInputToFocus}
-              toggleEditingOn={toggleEditingOn}
-            />
-          )}
+          <BreakpointPanel breakpoint={breakpoint!} editing={editing}>
+            {editing ? (
+              <PanelEditor
+                breakpoint={breakpoint}
+                toggleEditingOff={toggleEditingOff}
+                inputToFocus={inputToFocus}
+                showCondition={showCondition}
+                setShowCondition={setShowCondition}
+              />
+            ) : (
+              <PanelSummary
+                analysisPoints={analysisPoints}
+                breakpoint={breakpoint}
+                executionPoint={executionPoint}
+                isHot={isHot}
+                pausedOnHit={pausedOnHit}
+                setInputToFocus={setInputToFocus}
+                toggleEditingOn={toggleEditingOn}
+              />
+            )}
+          </BreakpointPanel>
           <BreakpointNavigation
             breakpoint={breakpoint!}
             editing={editing}

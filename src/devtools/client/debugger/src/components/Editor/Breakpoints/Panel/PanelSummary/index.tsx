@@ -114,16 +114,15 @@ function PanelSummary({
           This log cannot be edited because <br />
           it was hit {MAX_POINTS_FOR_FULL_ANALYSIS}+ times
         </Popup>
-        <div className="button-container flex items-center">
-          <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
-        </div>
+        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
       </div>
     );
   }
 
   return (
-    <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
-      <PrefixBadgeButton breakpoint={breakpoint} />
+    <div
+      className={classNames("summary flex items-center gap-1 text-gray-500", { enabled: isLoaded })}
+    >
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
@@ -146,9 +145,7 @@ function PanelSummary({
           </Popup>
         ) : null}
       </div>
-      <div className="button-container flex items-center">
-        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
-      </div>
+      <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
     </div>
   );
 }

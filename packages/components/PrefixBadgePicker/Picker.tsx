@@ -41,8 +41,8 @@ export function Picker<Values extends any>({
       title={isOpen ? undefined : "Select a prefix badge"}
       initial={isOpen ? "opened" : "closed"}
       animate={isOpen ? "opened" : "closed"}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      //   onMouseEnter={() => setIsHover(true)}
+      //   onMouseLeave={() => setIsHover(false)}
       variants={{
         opened: {
           transition: {
