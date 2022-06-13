@@ -1,7 +1,8 @@
+import debounce from "lodash/debounce";
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
 import { ThreadFront, ValueFront } from "protocol/thread";
-import { useCallback } from "react";
+import { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { getPropertiesForObject } from "ui/utils/autocomplete";
 
@@ -64,9 +65,13 @@ async function eagerEvaluateExpression(
 
 export function useEagerEvaluateExpression() {
   const frame = useSelector(getSelectedFrame);
-  const callback = useCallback(
-    (expression: string) =>
-      frame ? eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId) : null,
+  const callback = useMemo(
+    () => (expression: string) => {
+      if (!frame) {
+        return null;
+      }
+      return eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId);
+    },
     [frame]
   );
 
