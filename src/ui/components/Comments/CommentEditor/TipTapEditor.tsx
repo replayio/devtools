@@ -7,7 +7,6 @@ import { User } from "ui/types";
 import { parseCommentContent } from "ui/utils/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
-import { GitHubLink } from "./githubLink";
 import { ReplayLink } from "./replayLink";
 import styles from "./TipTapEditor.module.css";
 interface TipTapEditorProps {
@@ -68,7 +67,6 @@ const TipTapEditor = ({
     return {
       extensions: [
         StarterKit,
-        GitHubLink,
         ReplayLink,
         // Mention.configure({ suggestion: suggestion(possibleMentions.map(u => u.name)) }),
         Placeholder.configure({
