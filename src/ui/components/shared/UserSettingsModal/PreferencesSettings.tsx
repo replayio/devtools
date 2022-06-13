@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import hooks from "ui/hooks";
+import { useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
-import { getTheme, getThemePreference } from "ui/reducers/app";
+import { getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
 import { AppTheme } from "ui/state/app";
 
@@ -110,6 +111,7 @@ function PrivacyPreferences() {
 function UiPreferences() {
   const dispatch = useDispatch();
   const theme = useSelector(getThemePreference);
+  const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -129,6 +131,17 @@ function UiPreferences() {
             ]}
             selected={theme}
             setSelected={str => setSelected(str as AppTheme)}
+          />
+        </div>
+        <div>Default Mode</div>
+        <div className="w-1/2">
+          <SelectMenu
+            options={[
+              { name: "Viewer", id: "non-dev" },
+              { name: "DevTools", id: "dev" },
+            ]}
+            selected={defaultMode}
+            setSelected={str => str && updateDefaultMode(str)}
           />
         </div>
       </div>

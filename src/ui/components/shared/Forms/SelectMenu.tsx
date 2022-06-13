@@ -63,7 +63,7 @@ export default function SelectMenu({
       {({ open }) => (
         <>
           {label ? <Listbox.Label className="block font-medium">label</Listbox.Label> : null}
-          <div className={`relative z-10 ${className || ""}`}>
+          <div className={`relative ${className || ""}`}>
             <Listbox.Button className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-chrome py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
               <span className="block truncate">{selectedName}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
@@ -79,7 +79,7 @@ export default function SelectMenu({
             >
               <Listbox.Options
                 static
-                className="absolute mt-1 max-h-48 w-full overflow-auto rounded-md bg-chrome py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md bg-chrome py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
               >
                 {options.map(({ name, id }) => (
                   <Option name={name} id={id} key={id} />

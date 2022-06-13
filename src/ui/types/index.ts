@@ -16,7 +16,6 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
-  defaultToDevTools: boolean;
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
