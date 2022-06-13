@@ -1,4 +1,3 @@
-import { RecordingId } from "@replayio/protocol";
 import { Action } from "redux";
 import {
   getLocalNags,
@@ -6,7 +5,7 @@ import {
   getSelectedPrimaryPanel,
   getShowCommandPalette,
 } from "ui/reducers/layout";
-import { getReplaySession, LocalNag } from "ui/setup/prefs";
+import { LocalNag } from "ui/setup/prefs";
 import {
   ViewMode,
   PrimaryPanelName,
@@ -14,7 +13,6 @@ import {
   VIEWER_PANELS,
   ToolboxLayout,
 } from "ui/state/layout";
-import { asyncStore } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
 
@@ -115,19 +113,4 @@ export function setConsoleFilterDrawerExpanded(
   expanded: boolean
 ): SetConsoleFilterDrawerExpandedAction {
   return { type: "set_console_filter_drawer_expanded", expanded };
-}
-
-export function loadReplayPrefs(recordingId: RecordingId): UIThunkAction {
-  return async dispatch => {
-    const session = await getReplaySession(recordingId);
-
-    if (recordingId && session) {
-      const { viewMode, showVideoPanel, toolboxLayout, selectedPrimaryPanel } = session;
-
-      dispatch(setViewMode(viewMode));
-      dispatch(setToolboxLayout(toolboxLayout));
-      dispatch(setShowVideoPanel(showVideoPanel));
-      dispatch(setSelectedPrimaryPanel(selectedPrimaryPanel));
-    }
-  };
 }

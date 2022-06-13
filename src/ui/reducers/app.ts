@@ -33,10 +33,10 @@ import {
 } from "ui/utils/timeline";
 
 export const initialAppState: AppState = {
-  mode: "devtools",
   // analysisPoints: {},
   awaitingSourcemaps: false,
   canvas: null,
+  currentPoint: null,
   defaultSettingsTab: "Preferences",
   displayedLoadingProgress: null,
   events: {},
@@ -48,10 +48,11 @@ export const initialAppState: AppState = {
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
-  loadingStatusSlow: false,
   loadingPageTipIndex: 0,
+  loadingStatusSlow: false,
   modal: null,
   modalOptions: null,
+  mode: "devtools",
   mouseTargetsLoading: false,
   recordingDuration: 0,
   recordingTarget: null,
@@ -63,7 +64,6 @@ export const initialAppState: AppState = {
   uploading: null,
   videoUrl: null,
   workspaceId: null,
-  currentPoint: null,
 };
 
 const appSlice = createSlice({

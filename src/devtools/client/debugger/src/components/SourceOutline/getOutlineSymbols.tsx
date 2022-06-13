@@ -23,7 +23,7 @@ function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCoun
       return hitCount.location.line === end.line && hitCount.location.column! >= start.column;
     });
 
-    return { ...functionSymbol, hits: features.codeHeatMaps ? hitCount?.hits : undefined };
+    return { ...functionSymbol, hits: hitCount?.hits };
   });
 }
 

@@ -70,7 +70,6 @@ const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
 const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
 export const updatePrefs = (state: UIState, oldState: UIState) => {
-  updateStandardPrefs(state, oldState, "viewMode", getViewMode);
   updateStandardPrefs(state, oldState, "theme", getTheme);
 
   updateAsyncPrefs(

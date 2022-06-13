@@ -4,74 +4,72 @@ import { pref } from "devtools/shared/services";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
 // app prefs.
-pref("devtools.event-listeners-breakpoints", true);
-pref("devtools.toolbox-size", "50%");
-pref("devtools.view-mode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
-pref("devtools.logTelemetryEvent", false);
-pref("devtools.showRedactions", false);
-pref("devtools.disableLogRocket", false);
-pref("devtools.listenForMetrics", false);
 pref("devtools.disableCache", false);
+pref("devtools.disableLogRocket", false);
+pref("devtools.event-listeners-breakpoints", true);
+pref("devtools.listenForMetrics", false);
+pref("devtools.logTelemetryEvent", false);
+pref("devtools.showPanelAbove", false);
+pref("devtools.showRedactions", false);
 pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
-pref("devtools.showPanelAbove", false);
+pref("devtools.toolbox-size", "50%");
 
 // app features
-pref("devtools.features.columnBreakpoints", false);
-pref("devtools.features.httpBodies", true);
-pref("devtools.features.commentAttachments", false);
-pref("devtools.features.networkRequestComments", true);
-pref("devtools.features.turboReplay", false);
 pref("devtools.features.breakpointPanelAutocomplete", true);
-pref("devtools.features.codeHeatMaps", true);
-pref("devtools.features.resolveRecording", false);
-pref("devtools.features.protocolTimeline", false);
-pref("devtools.features.logProtocol", false);
-pref("devtools.features.unicornConsole", true);
-pref("devtools.features.showRedux", true);
+pref("devtools.features.columnBreakpoints", false);
+pref("devtools.features.commentAttachments", false);
+pref("devtools.features.defaultToDevTools", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.repaintEvaluations", false);
-pref("devtools.features.testSupport", false);
+pref("devtools.features.httpBodies", true);
+pref("devtools.features.logProtocol", false);
+pref("devtools.features.networkRequestComments", true);
 pref("devtools.features.originalClassNames", false);
+pref("devtools.features.protocolTimeline", false);
+pref("devtools.features.repaintEvaluations", false);
+pref("devtools.features.resolveRecording", false);
+pref("devtools.features.showRedux", true);
+pref("devtools.features.testSupport", false);
+pref("devtools.features.turboReplay", false);
+pref("devtools.features.unicornConsole", true);
 
 export const prefs = new PrefsHelper("devtools", {
-  eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
-  toolboxSize: ["String", "toolbox-size"],
-  viewMode: ["String", "view-mode"],
-  secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
-  logTelemetryEvent: ["Bool", "logTelemetryEvent"],
-  showRedactions: ["Bool", "showRedactions"],
-  disableLogRocket: ["Bool", "disableLogRocket"],
-  sidePanelSize: ["String", "sidePanelSize"],
-  listenForMetrics: ["Bool", "listenForMetrics"],
-  disableCache: ["Bool", "disableCache"],
-  theme: ["String", "theme"],
   colorScheme: ["String", "colorScheme"],
+  disableCache: ["Bool", "disableCache"],
+  disableLogRocket: ["Bool", "disableLogRocket"],
+  eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
+  listenForMetrics: ["Bool", "listenForMetrics"],
+  logTelemetryEvent: ["Bool", "logTelemetryEvent"],
+  secondaryPanelHeight: ["String", "dev-secondary-panel-height"],
   showPanelAbove: ["Bool", "showPanelAbove"],
+  showRedactions: ["Bool", "showRedactions"],
+  sidePanelSize: ["String", "sidePanelSize"],
+  theme: ["String", "theme"],
+  toolboxSize: ["String", "toolbox-size"],
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  turboReplay: ["Bool", "turboReplay"],
-  columnBreakpoints: ["Bool", "columnBreakpoints"],
-  httpBodies: ["Bool", "httpBodies"],
-  commentAttachments: ["Bool", "commentAttachments"],
-  networkRequestComments: ["Bool", "networkRequestComments"],
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
-  codeHeatMaps: ["Bool", "codeHeatMaps"],
-  resolveRecording: ["Bool", "resolveRecording"],
-  protocolTimeline: ["Bool", "protocolTimeline"],
-  logProtocol: ["Bool", "logProtocol"],
-  unicornConsole: ["Bool", "unicornConsole"],
-  showRedux: ["Bool", "showRedux"],
+  columnBreakpoints: ["Bool", "columnBreakpoints"],
+  commentAttachments: ["Bool", "commentAttachments"],
+  defaultToDevTools: ["Bool", "defaultToDevTools"],
   enableLargeText: ["Bool", "enableLargeText"],
-  repaintEvaluations: ["Bool", "repaintEvaluations"],
-  testSupport: ["Bool", "testSupport"],
+  httpBodies: ["Bool", "httpBodies"],
+  logProtocol: ["Bool", "logProtocol"],
+  networkRequestComments: ["Bool", "networkRequestComments"],
   originalClassNames: ["Bool", "originalClassNames"],
+  protocolTimeline: ["Bool", "protocolTimeline"],
+  repaintEvaluations: ["Bool", "repaintEvaluations"],
+  resolveRecording: ["Bool", "resolveRecording"],
+  showRedux: ["Bool", "showRedux"],
+  testSupport: ["Bool", "testSupport"],
+  turboReplay: ["Bool", "turboReplay"],
+  unicornConsole: ["Bool", "unicornConsole"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
+  commandHistory: ["command-history", []],
   eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
   replaySessions: ["replay-sessions", {}],
-  commandHistory: ["command-history", []],
 });

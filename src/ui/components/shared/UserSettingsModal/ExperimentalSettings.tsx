@@ -44,9 +44,9 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Code Heatmaps",
-    description: "Calculate hit counts for editor files all at once",
-    key: "codeHeatMaps",
+    label: "Default to Dev Tools",
+    description: "Open DevTools by default instead of the Viewer",
+    key: "defaultToDevTools",
   },
   {
     label: "Large Text",
@@ -106,6 +106,8 @@ export default function ExperimentalSettings({}) {
   } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
+  const { value: defaultToDevTools, update: updateDefaultToDevTools } =
+    useFeature("defaultToDevTools");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
@@ -113,7 +115,6 @@ export default function ExperimentalSettings({}) {
     useFeature("unicornConsole");
   const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
 
-  const { value: codeHeatMaps, update: updateCodeHeatMaps } = useFeature("codeHeatMaps");
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
@@ -131,8 +132,8 @@ export default function ExperimentalSettings({}) {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
     } else if (key == "turboReplay") {
       updateEnableTurboReplay(!enableTurboReplay);
-    } else if (key == "codeHeatMaps") {
-      updateCodeHeatMaps(!codeHeatMaps);
+    } else if (key == "defaultToDevTools") {
+      updateDefaultToDevTools(!defaultToDevTools);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key == "unicornConsole") {
@@ -145,7 +146,7 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
-    codeHeatMaps,
+    defaultToDevTools,
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
