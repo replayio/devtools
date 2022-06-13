@@ -20,7 +20,7 @@ const IndexPage: NextPage = () => {
       </div>
       <h2>Sources Entries</h2>
       <ul>
-        {data?.map(entry => {
+        {data?.src.map(entry => {
           return <li key={entry.sourceId}>{entry.url}</li>;
         })}
       </ul>
