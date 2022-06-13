@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { seekToComment } from "ui/actions/comments";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { Comment } from "ui/state/comments";
 
@@ -15,8 +16,17 @@ export default function CommentCard({ comment }: { comment: Comment }) {
   const executionPoint = useSelector(getExecutionPoint);
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
+  const dispatch = useDispatch();
+
+  const onClick = () => {
+    dispatch(seekToComment(comment));
+  };
+
   return (
-    <div className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}>
+    <div
+      className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}
+      onClick={onClick}
+    >
       {isPaused && <div className={styles.PausedOverlay} />}
 
       <CommentPreview comment={comment} />

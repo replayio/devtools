@@ -31,8 +31,10 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
   };
 
   return (
-    <button className={styles.Button} disabled={isPending} onClick={addReply}>
-      Reply
-    </button>
+    <div>
+      <button className={styles.Button} disabled={isPending} onClick={addReply}>
+        Reply
+      </button>
+    </div>
   );
 }
