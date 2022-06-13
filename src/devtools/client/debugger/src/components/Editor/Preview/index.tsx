@@ -2,10 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
+import type { SourceLocation } from "@replayio/protocol";
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import debounce from "lodash/debounce";
+
+import type { UIState } from "ui/state";
 
 import Popup from "./Popup";
 
@@ -13,12 +15,28 @@ import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
 
-class Preview extends PureComponent {
-  target = null;
-  constructor(props) {
-    super(props);
-    this.state = { selecting: false };
-  }
+const mapStateToProps = (state: UIState) => {
+  return {
+    cx: getThreadContext(state),
+    preview: getPreview(state),
+  };
+};
+
+const connector = connect(mapStateToProps, {
+  clearPreview: actions.clearPreview,
+  updatePreview: actions.updatePreview,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type PreviewProps = PropsFromRedux & {
+  editor: any;
+  editorRef: any;
+};
+
+type PreviewState = { selecting: boolean };
+
+class Preview extends PureComponent<PreviewProps, PreviewState> {
+  state = { selecting: false };
 
   componentDidMount() {
     this.updateListeners();
@@ -34,32 +52,46 @@ class Preview extends PureComponent {
     codeMirrorWrapper.removeEventListener("mousedown", this.onMouseDown);
   }
 
-  updateListeners(prevProps) {
+  updateListeners() {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
     codeMirror.on("tokenenter", this.onTokenEnter);
+    codeMirror.on("tokenleave", this.onTokenLeave);
     codeMirror.on("scroll", this.onScroll);
     codeMirrorWrapper.addEventListener("mouseup", this.onMouseUp);
     codeMirrorWrapper.addEventListener("mousedown", this.onMouseDown);
   }
 
-  onTokenEnter = ({ target, tokenPos }) => {
-    const { cx, editor, updatePreview } = this.props;
+  onTokenEnter = ({ target, tokenPos }: { target: HTMLElement; tokenPos: SourceLocation }) => {
+    const { cx } = this.props;
 
-    if (cx.isPaused && !this.state.selecting) {
-      updatePreview(cx, target, tokenPos, editor.codeMirror);
+    if (cx?.isPaused && !this.state.selecting) {
+      this.startPreview(target, tokenPos);
     }
   };
 
+  startPreview = debounce((target: HTMLElement, tokenPos: SourceLocation) => {
+    const { cx, editor, updatePreview } = this.props;
+
+    // Double-check status after timer runs
+    if (cx?.isPaused && !this.state.selecting) {
+      updatePreview(cx, target, tokenPos, editor.codeMirror);
+    }
+  }, 100);
+
+  onTokenLeave = () => {
+    this.startPreview.cancel();
+  };
+
   onMouseUp = () => {
-    if (this.props.cx.isPaused) {
+    if (this.props.cx?.isPaused) {
       this.setState({ selecting: false });
       return true;
     }
   };
 
   onMouseDown = () => {
-    if (this.props.cx.isPaused) {
+    if (this.props.cx?.isPaused) {
       this.setState({ selecting: true });
       return true;
     }
@@ -67,7 +99,7 @@ class Preview extends PureComponent {
 
   onScroll = () => {
     const { clearPreview, cx, preview } = this.props;
-    if (cx.isPaused && preview) {
+    if (cx?.isPaused && preview) {
       clearPreview(cx, preview.previewId);
     }
   };
@@ -89,14 +121,4 @@ class Preview extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    cx: getThreadContext(state),
-    preview: getPreview(state),
-  };
-};
-
-export default connect(mapStateToProps, {
-  clearPreview: actions.clearPreview,
-  updatePreview: actions.updatePreview,
-})(Preview);
+export default connector(Preview);

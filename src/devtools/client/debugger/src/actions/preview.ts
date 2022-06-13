@@ -2,9 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { SourceLocation } from "@replayio/protocol";
 import { ValueItem } from "devtools/packages/devtools-reps";
 import { createPrimitiveValueFront } from "protocol/thread";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
+import type { UIThunkAction } from "ui/actions";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { isConsole } from "../utils/preview";
@@ -15,7 +18,14 @@ import {
   getSelectedFrame,
 } from "../selectors";
 
-export function updatePreview(cx, target, tokenPos, codeMirror) {
+type $FixTypeLater = any;
+
+export function updatePreview(
+  cx: Context,
+  target: HTMLElement,
+  tokenPos: SourceLocation,
+  codeMirror: $FixTypeLater
+): UIThunkAction {
   return (dispatch, getState) => {
     const cursorPos = target.getBoundingClientRect();
 
@@ -39,7 +49,14 @@ export function updatePreview(cx, target, tokenPos, codeMirror) {
   };
 }
 
-export function setPreview(cx, expression, location, tokenPos, cursorPos, target) {
+export function setPreview(
+  cx: Context,
+  expression: string,
+  location: { start: SourceLocation; end: SourceLocation },
+  tokenPos: SourceLocation,
+  cursorPos: DOMRect,
+  target: HTMLElement
+): UIThunkAction {
   return async (dispatch, getState, { client }) => {
     dispatch({
       type: "START_PREVIEW",
@@ -52,7 +69,7 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
       },
     });
 
-    const { previewId } = getPreview(getState());
+    const { previewId } = getPreview(getState())!;
 
     const source = getSelectedSource(getState());
     if (!source) {
@@ -104,12 +121,10 @@ export function setPreview(cx, expression, location, tokenPos, cursorPos, target
   };
 }
 
-export function clearPreview(cx, previewId) {
-  return (dispatch, getState) => {
-    return dispatch({
-      type: "CLEAR_PREVIEW",
-      cx,
-      previewId,
-    });
+export function clearPreview(cx: Context, previewId: string) {
+  return {
+    type: "CLEAR_PREVIEW",
+    cx,
+    previewId,
   };
 }

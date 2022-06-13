@@ -1,4 +1,5 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import debounce from "lodash/debounce";
 import { ValueFront } from "protocol/thread";
 import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
 import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
@@ -8,19 +9,30 @@ function useEagerEvalPreview(expression: string) {
   const expressionRef = useRef(expression);
   const eagerEvaluateExpression = useEagerEvaluateExpression();
 
+  const debouncedUpdateValue = useMemo(
+    () =>
+      // Debounce the function called from the effect to cut down the number
+      // of protocol requests made (only request when the user stops typing)
+      debounce(async function updateValue(expression: string) {
+        setValue(null);
+        const rv = await eagerEvaluateExpression(expression);
+        const isUndefined = rv?.isPrimitive && !rv.primitive;
+
+        if (expressionRef.current === expression && !isUndefined) {
+          setValue(rv!);
+        }
+      }, 300),
+    [eagerEvaluateExpression]
+  );
+
   useEffect(() => {
     expressionRef.current = expression;
+    debouncedUpdateValue(expression);
 
-    (async function updateValue() {
-      setValue(null);
-      const rv = await eagerEvaluateExpression(expression);
-      const isUndefined = rv?.isPrimitive && !rv.primitive;
-
-      if (expressionRef.current === expression && !isUndefined) {
-        setValue(rv);
-      }
-    })();
-  }, [expression, eagerEvaluateExpression]);
+    return () => {
+      debouncedUpdateValue.cancel();
+    };
+  }, [expression, eagerEvaluateExpression, debouncedUpdateValue]);
 
   return value;
 }
