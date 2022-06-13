@@ -23,6 +23,9 @@ interface State {
   conditionSyntaxError: string | null;
 }
 
+const stripTrailingSemiColon = (expr: string) =>
+  expr.match(/.*;$/) ? expr.slice(0, expr.length - 1) : expr;
+
 class PanelEditor extends PureComponent<Props, State> {
   constructor(props: Props) {
     super(props);
@@ -48,7 +51,9 @@ class PanelEditor extends PureComponent<Props, State> {
       setShowCondition,
     } = this.props;
     const { logValue, condition } = this.state;
-    const newOptions: { logValue: string; condition?: string; prefixBadge?: string } = { logValue };
+    const newOptions: { logValue: string; condition?: string; prefixBadge?: string } = {
+      logValue: stripTrailingSemiColon(logValue),
+    };
 
     // Bail if there is an error.
     if (this.hasError()) {
