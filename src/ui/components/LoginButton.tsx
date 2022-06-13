@@ -7,7 +7,10 @@ const LoginButton = () => {
 
   if (isAuthenticated) {
     return (
-      <button className="row logout" onClick={() => logout()}>
+      <button
+        className="row logout"
+        onClick={() => logout({ returnTo: window.location.origin + "/login" })}
+      >
         <Avatar player={user} isFirstPlayer={true} />
         <span>Sign Out</span>
       </button>

@@ -12,5 +12,5 @@ export default function LoginPage() {
     dispatch(clearExpectedError());
   }, [dispatch]);
 
-  return <Login returnToPath={"" + router.query.returnTo} />;
+  return <Login returnToPath={"" + (router.query.returnTo || "/")} />;
 }

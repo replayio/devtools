@@ -59,7 +59,7 @@ function Personal() {
       </div>
       <div>
         <button
-          onClick={() => logout()}
+          onClick={() => logout({ returnTo: window.location.origin + "/login" })}
           className="max-w-max items-center rounded-md border border-transparent bg-primaryAccent px-3 py-1.5 font-medium text-white shadow-sm hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         >
           Log Out
