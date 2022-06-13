@@ -13,6 +13,7 @@ jobs:
       - name: Run tsc
         run: npm run typecheck
   gql:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.pull_request.head.repo.full_name, 'replayio/')
     name: GraphQL schema types
     runs-on: ubuntu-latest
     steps:
