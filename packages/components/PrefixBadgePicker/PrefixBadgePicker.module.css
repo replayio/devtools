@@ -1,17 +1,3 @@
-.PrefixBadgePicker {
-  padding: 0 3px;
-}
-
-.PrefixBadgePickerFill {
-  --badge-background: var(--breakpoint-editfield-active);
-  position: absolute;
-  left: -1px;
-  height: 100%;
-  border-radius: 1rem;
-  background-color: var(--badge-background);
-  transition: background-color 0.18s ease-out;
-}
-
 .PrefixBadge {
   position: relative;
   display: flex;
@@ -77,13 +63,11 @@
 
 :global(.theme-light) .PrefixBadgePicker {
   --badge-foreground: #dcdcdc;
-  --badge-foreground--active: #b9b9b9;
   --badge-background--active: #f8f8f8;
 }
 
 :global(.theme-dark) .PrefixBadgePicker {
-  --badge-foreground: #666a6e;
-  --badge-foreground--active: #697076;
+  --badge-foreground: #898f95;
   --badge-background--active: #474c52;
 }
 

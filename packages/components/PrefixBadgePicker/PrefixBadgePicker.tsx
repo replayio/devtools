@@ -33,7 +33,6 @@ export function PrefixBadgePicker({
       <Picker<PrefixBadge | undefined>
         value={activeBadge}
         onChange={handleSelect}
-        radius={24}
         className={styles.PrefixBadgePicker}
       >
         <ToggleButton id="toggle" />

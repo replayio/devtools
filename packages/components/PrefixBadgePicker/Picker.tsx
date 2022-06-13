@@ -6,28 +6,28 @@ import { motion } from "framer-motion";
 import { getSpacingClassNamesFromProps } from "../utils";
 import { SpacingProps } from "../types";
 
+import styles from "./Picker.module.css";
+
 export function Picker<Values extends any>({
   value,
   onChange,
   children,
   backgroundColor,
-  radius,
   ...props
 }: {
   value: Values;
   onChange: (value: Values) => void;
   children: ReactNode;
   backgroundColor?: string;
-  radius?: number;
   className?: string;
   style?: React.CSSProperties;
   title?: string;
 } & SpacingProps) {
   const parsedProps = getSpacingClassNamesFromProps(props);
   const previousId = useRef(null);
-  const [isHover, setIsHover] = useState(false);
+  const transitioning = useRef(false);
+  const [isActive, setIsActive] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const isActive = isOpen || isHover;
   const transition = {
     duration: isOpen ? 0.16 : 0.2,
     opacity: { duration: isOpen ? 0.1 : 0.04 },
@@ -37,12 +37,12 @@ export function Picker<Values extends any>({
     <motion.div
       {...parsedProps}
       data-open={isOpen}
-      className={classNames("relative inline-grid items-center", parsedProps.className)}
+      className={classNames(styles.Picker, parsedProps.className)}
       title={isOpen ? undefined : "Select a prefix badge"}
       initial={isOpen ? "opened" : "closed"}
       animate={isOpen ? "opened" : "closed"}
-      onMouseEnter={() => setIsHover(true)}
-      onMouseLeave={() => setIsHover(false)}
+      onMouseEnter={() => setIsActive(true)}
+      onMouseLeave={() => !isOpen && !transitioning.current && setIsActive(false)}
       variants={{
         opened: {
           transition: {
@@ -59,11 +59,9 @@ export function Picker<Values extends any>({
       <motion.div
         layout
         transition={transition}
+        className={styles.PickerFill}
         style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: radius,
-          transition: "background-color 180ms ease-out",
+          borderRadius: 32,
           backgroundColor: isActive ? "var(--badge-background--active)" : "var(--badge-background)",
         }}
       />
@@ -82,6 +80,28 @@ export function Picker<Values extends any>({
         const isChildActive = value === child.props.id || showToggle;
         const wasChildActive = previousId.current === child.props.id;
         const childVariants = child.props.variants || {};
+        const onSelect = () => {
+          const nextIsOpen = !isOpen;
+
+          setIsOpen(nextIsOpen);
+
+          if (nextIsOpen) {
+            setIsActive(true);
+          } else {
+            setTimeout(() => {
+              setIsActive(false);
+              transitioning.current = false;
+            }, transition.duration * 1000);
+
+            transitioning.current = true;
+          }
+
+          const nextActiveId = isToggle ? undefined : isChildActive ? undefined : child.props.id;
+
+          previousId.current = isChildActive ? child.props.id : undefined;
+
+          onChange(nextActiveId);
+        };
 
         return cloneElement(child, {
           disabled: !isOpen && !isChildActive,
@@ -107,12 +127,7 @@ export function Picker<Values extends any>({
             gridRow: 1,
             ...child.props.style,
           },
-          onClick: () => {
-            setIsOpen(!isOpen);
-            const nextActiveId = isToggle ? undefined : isChildActive ? undefined : child.props.id;
-            previousId.current = isChildActive ? child.props.id : undefined;
-            onChange(nextActiveId);
-          },
+          onClick: onSelect,
           "data-is-active": isChildActive,
           "data-was-active": wasChildActive,
         } as ComponentProps<typeof motion.button>);
