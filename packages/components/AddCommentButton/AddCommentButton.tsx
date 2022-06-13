@@ -70,7 +70,7 @@ const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean
     svg: { flexShrink: 0 },
   },
   props => ({
-    width: props.$isOpened ? 124 : 26,
+    width: props.$isOpened ? 122 : 26,
     backgroundColor: props.$isPausedOnHit ? "var(--secondary-accent)" : "var(--primary-accent)",
   })
 );
