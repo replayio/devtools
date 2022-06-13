@@ -28,8 +28,6 @@ import { seek } from "./timeline";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
-export type CommentsAction = SetHoveredComment;
-
 export function setHoveredComment(comment: any): SetHoveredComment {
   return { type: "set_hovered_comment", comment };
 }

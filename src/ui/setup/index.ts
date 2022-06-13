@@ -27,7 +27,6 @@ import type { LayoutState } from "ui/state/layout";
 import { getLocalReplaySessionPrefs } from "ui/setup/prefs";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
-import { CommentsState } from "ui/state/comments";
 
 declare global {
   interface Window {
@@ -101,22 +100,6 @@ export const getInitialTabsState = async (): Promise<TabsState> => {
   return { tabs: session?.tabs ?? EMPTY_TABS };
 };
 
-export async function getInitialCommentsState(): Promise<CommentsState> {
-  const recordingId = getRecordingId()!;
-
-  if (!recordingId) {
-    return {
-      hoveredComment: null,
-    };
-  }
-
-  const session = await getReplaySession(recordingId);
-
-  return {
-    hoveredComment: null,
-  };
-}
-
 const getInitialFiltersState = async () => {
   const session = await getLocalReplaySessionPrefs();
 
@@ -139,7 +122,6 @@ export const initialMessageState = async (
 export async function bootstrapApp() {
   const initialState = {
     app: initialAppState,
-    comments: await getInitialCommentsState(),
     layout: await getInitialLayoutState(),
     messages: await initialMessageState(),
     tabs: await getInitialTabsState(),

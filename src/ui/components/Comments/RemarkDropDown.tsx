@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { setHoveredComment } from "ui/actions/comments";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -61,8 +60,6 @@ export default function RemarkDropDown({
 
       setIsPending(false);
     });
-
-    dispatch(setHoveredComment(null));
   };
 
   return (

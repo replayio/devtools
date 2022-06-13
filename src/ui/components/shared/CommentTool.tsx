@@ -1,10 +1,10 @@
 import classNames from "classnames";
-import { connect, ConnectedProps } from "react-redux";
 import React, { useState, useEffect, useRef } from "react";
-import { actions } from "ui/actions";
+import { useDispatch, useSelector } from "react-redux";
+import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
+import { createFrameComment } from "ui/actions/comments";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import { Canvas } from "ui/state/app";
 import { Comment, Reply } from "ui/state/comments";
 
@@ -53,22 +53,17 @@ const getStyles = (
   return { parentStyle, childStyle };
 };
 
-type CommentToolProps = PropsFromRedux & {
-  comments: (Comment | Reply)[];
-};
-
 type Coordinates = {
   x: number;
   y: number;
 };
 
-function CommentTool({
-  comments,
-  areMouseTargetsLoading,
-  canvas,
-  createFrameComment,
-  setSelectedPrimaryPanel,
-}: CommentToolProps) {
+export default function CommentTool({ comments }: { comments: (Comment | Reply)[] }) {
+  const canvas = useSelector(getCanvas);
+  const areMouseTargetsLoading = useSelector(getAreMouseTargetsLoading);
+
+  const dispatch = useDispatch();
+
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();
   const captionNode = useRef<HTMLDivElement | null>(null);
@@ -82,9 +77,8 @@ function CommentTool({
           return;
         }
 
-        createFrameComment(mouseEventCanvasPosition(e), recordingId);
-
-        setSelectedPrimaryPanel("comments");
+        dispatch(createFrameComment(mouseEventCanvasPosition(e), recordingId));
+        dispatch(setSelectedPrimaryPanel("comments"));
       };
 
       const onMouseMove = (e: MouseEvent) => setMousePosition(mouseEventCanvasPosition(e));
@@ -106,7 +100,7 @@ function CommentTool({
         videoNode.removeEventListener("mouseleave", onMouseLeave);
       };
     }
-  }, [comments, createFrameComment, recordingId, setSelectedPrimaryPanel]);
+  }, [comments, dispatch, recordingId]);
 
   if (!mousePosition) {
     return null;
@@ -130,18 +124,3 @@ function CommentTool({
     </div>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    recordingTarget: selectors.getRecordingTarget(state),
-    canvas: selectors.getCanvas(state),
-    areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
-  }),
-  {
-    createFrameComment: actions.createFrameComment,
-    setSelectedPrimaryPanel: actions.setSelectedPrimaryPanel,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(CommentTool);

@@ -1,10 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import { User } from "ui/types";
 
-export interface CommentsState {
-  hoveredComment: any;
-}
-
 export interface SourceLocation {
   sourceUrl: string;
   line: number;

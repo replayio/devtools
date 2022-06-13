@@ -1,13 +1,12 @@
+import classnames from "classnames";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-
-import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getMarkerLeftOffset } from "ui/utils/timeline";
+import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import { Comment } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
+import { getMarkerLeftOffset } from "ui/utils/timeline";
 
 const markerWidth = 19;
 
@@ -45,8 +44,7 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
   };
 
   render() {
-    const { comment, currentTime, zoomRegion, setHoveredComment, isPrimaryHighlighted } =
-      this.props;
+    const { comment, currentTime, zoomRegion, isPrimaryHighlighted } = this.props;
 
     const { time } = comment;
 
@@ -62,8 +60,6 @@ class CommentMarker extends React.Component<CommentMarkerProps> {
           paused: pausedAtComment,
           "primary-highlight": isPrimaryHighlighted,
         })}
-        onMouseEnter={() => setHoveredComment((comment as any).id)}
-        onMouseLeave={() => setHoveredComment(null)}
         style={{
           left: `${this.calculateLeftOffset(time)}%`,
         }}
@@ -81,7 +77,6 @@ const connector = connect(
   }),
   {
     seekToComment: actions.seekToComment,
-    setHoveredComment: actions.setHoveredComment,
   }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;

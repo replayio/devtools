@@ -10,7 +10,6 @@ import * as layoutActions from "./layout";
 import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
-import type { CommentsAction } from "./comments";
 import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
@@ -24,7 +23,6 @@ import { LayoutAction } from "./layout";
 type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 
 export type UIAction =
-  | CommentsAction
   | DebuggerAction
   | LayoutAction
   | MarkupAction

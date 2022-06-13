@@ -122,7 +122,7 @@ const connector = connect((state: UIState) => ({
   recordingTarget: selectors.getRecordingTarget(state),
   videoUrl: selectors.getVideoUrl(state),
   stalled: selectors.isPlaybackStalled(state),
-  mouseTargetsLoading: selectors.areMouseTargetsLoading(state),
+  mouseTargetsLoading: selectors.getAreMouseTargetsLoading(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
