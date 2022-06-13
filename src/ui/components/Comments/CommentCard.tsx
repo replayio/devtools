@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { seekToComment } from "ui/actions/comments";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { Comment } from "ui/state/comments";
+import { isCommentContentEmpty } from "ui/utils/comments";
 
 import styles from "./CommentCard.module.css";
 import CommentPreview from "./CommentPreview";
@@ -25,6 +26,8 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
   const loomUrl = comment.content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
 
+  const showReplyButton = !isCommentContentEmpty(comment.content);
+
   return (
     <div
       className={classNames(styles.CommentCard, !comment.isPublished && styles.Unpublished)}
@@ -44,7 +47,7 @@ export default function CommentCard({ comment }: { comment: Comment }) {
         <ReplyCard key={reply.id} reply={reply} />
       ))}
 
-      <CommentReplyButton comment={comment} />
+      {showReplyButton && <CommentReplyButton comment={comment} />}
     </div>
   );
 }

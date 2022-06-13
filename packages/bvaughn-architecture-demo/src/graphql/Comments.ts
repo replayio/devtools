@@ -167,11 +167,11 @@ export async function getComments(
   return comments.map(comment => {
     return {
       ...comment,
-      content: tryToParse(comment.content),
+      content: contentToString(comment.content),
       replies: comment.replies.map(reply => {
         return {
           ...reply,
-          content: tryToParse(reply.content),
+          content: contentToString(reply.content),
           hasFrames: comment.hasFrames,
           sourceLocation: comment.sourceLocation,
           time: comment.time,
@@ -219,9 +219,9 @@ export async function updateCommentReply(
   );
 }
 
-// HACK: This is the inverse of tryToParse() in <TipTapEditor>
+// HACK: This is the inverse of parseCommentContent() in utils/comments
 // For the purposes of this demo, comment contents are plain text.
-function tryToParse(content: string): string {
+function contentToString(content: string): string {
   try {
     content = JSON.parse(content)
       .content.map((paragraph: any) => paragraph.content.map((block: any) => block.text).join(""))

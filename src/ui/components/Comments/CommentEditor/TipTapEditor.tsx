@@ -4,6 +4,7 @@ import { useEditor, EditorContent, Extension } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import React, { useEffect, useMemo, useRef } from "react";
 import { User } from "ui/types";
+import { parseCommentContent } from "ui/utils/comments";
 import useAuth0 from "ui/utils/useAuth0";
 
 import { GitHubLink } from "./githubLink";
@@ -27,23 +28,6 @@ interface TipTapEditorProps {
   handleDelete: () => void;
   handleSubmit: (text: string) => void;
 }
-
-const tryToParse = (content: string | object): any => {
-  if (typeof content === "object") {
-    return content;
-  }
-  try {
-    return JSON.parse(content);
-  } catch {
-    // Our comments were not always JSON, they used to be stored as markdown
-    // In that case, we just render the raw markdown.
-    const textContent = content ? [{ type: "text", text: content }] : [];
-    return {
-      type: "doc",
-      content: [{ type: "paragraph", content: textContent }],
-    };
-  }
-};
 
 const TipTapEditor = ({
   autofocus,
@@ -107,7 +91,7 @@ const TipTapEditor = ({
                 editor.commands.blur();
 
                 const mostRecentlySavedContent = contentRef.current;
-                editor.commands.setContent(tryToParse(mostRecentlySavedContent));
+                editor.commands.setContent(parseCommentContent(mostRecentlySavedContent));
 
                 handleCancel();
                 return true;
@@ -117,7 +101,7 @@ const TipTapEditor = ({
         }),
       ],
       editorProps: { attributes: { class: "focus:outline-none" } },
-      content: tryToParse(content),
+      content: parseCommentContent(content),
       editable,
       autofocus,
 
