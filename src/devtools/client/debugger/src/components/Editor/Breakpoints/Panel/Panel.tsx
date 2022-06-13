@@ -134,7 +134,7 @@ function Panel({
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           <div
-            className="flex items-center py-2 pl-1 pr-2"
+            className="flex py-2 pl-1 pr-2"
             style={{
               backgroundColor: "var(--breakpoint-editfield-active)",
             }}
