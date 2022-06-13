@@ -1,5 +1,4 @@
-import { Editor } from "@tiptap/react";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
@@ -10,7 +9,6 @@ import { User } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
 
 import { AvatarImage } from "../Avatar";
-import MaterialIcon from "../shared/MaterialIcon";
 
 import TipTapEditor from "./CommentEditor/TipTapEditor";
 import styles from "./EditableRemark.module.css";
@@ -90,14 +88,6 @@ export default function EditableRemark({
           {remark.user.name}
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
-        {!remark.isPublished && (
-          <MaterialIcon
-            className={styles.UnpublishedIcon}
-            title="This comment has not been published"
-          >
-            lock
-          </MaterialIcon>
-        )}
         {showOptionsMenu && (
           <RemarkDropDown
             deleteRemark={deleteRemark}

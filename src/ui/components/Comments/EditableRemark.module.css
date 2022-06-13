@@ -43,10 +43,6 @@
   width: 100%;
 }
 
-.UnpublishedIcon {
-  color: var(--theme-graphs-yellow);
-}
-
 .PublishedContent,
 .UnpublishedContent {
   margin: 0 0.75rem;

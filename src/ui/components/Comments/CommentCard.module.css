@@ -9,7 +9,7 @@
 }
 
 .Unpublished {
-  background: var(--diff-source-background);
+  background-color: var(--theme-base-90);
 }
 
 .PausedOverlay {
