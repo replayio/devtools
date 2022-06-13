@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "protocol": "file:../protocol"
+  },
+  "devDependencies": {}
+}
