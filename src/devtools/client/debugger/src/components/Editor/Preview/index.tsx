@@ -77,7 +77,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
     if (cx?.isPaused && !this.state.selecting) {
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
-  }, 300);
+  }, 100);
 
   onTokenLeave = () => {
     this.startPreview.cancel();
