@@ -107,6 +107,11 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
       return;
     }
 
+    dispatch({
+      requestId,
+      type: "SHOW_REQUEST_DETAILS",
+    });
+
     const timeStampedPoint = requestSummary.point;
     const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
@@ -122,11 +127,6 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     if (requestSummary.hasRequestBody) {
       ThreadFront.fetchRequestBody(requestId);
     }
-
-    dispatch({
-      requestId,
-      type: "SHOW_REQUEST_DETAILS",
-    });
   };
 }
 

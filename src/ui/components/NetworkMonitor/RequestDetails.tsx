@@ -5,7 +5,7 @@ import sortBy from "lodash/sortBy";
 import { WiredFrame } from "protocol/thread/pause";
 import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { hideRequestDetails, seekToRequestFrame } from "ui/actions/network";
+import { hideRequestDetails, seekToRequestFrame, selectAndFetchRequest } from "ui/actions/network";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFormattedFrames } from "ui/reducers/network";
@@ -285,11 +285,44 @@ const DEFAULT_TAB = "headers";
 
 export type NetworkTab = "headers" | "cookies" | "response" | "request" | "stackTrace" | "timings";
 
-const RequestDetails = ({ cx, request }: { cx: any; request: RequestSummary }) => {
+const RequestDetails = ({
+  cx,
+  request,
+  previousRequestId,
+  nextRequestId,
+}: {
+  cx: any;
+  request: RequestSummary;
+  previousRequestId: string | null;
+  nextRequestId: string | null;
+}) => {
   const dispatch = useDispatch();
   const frames = useSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
   const loadedRegions = useSelector(getLoadedRegions)?.loaded;
+
+  // Keyboard shortcuts handler.
+  useEffect(() => {
+    const onDocumentKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "ArrowUp": {
+          event.preventDefault();
+          previousRequestId !== null && dispatch(selectAndFetchRequest(previousRequestId));
+          break;
+        }
+        case "ArrowDown": {
+          event.preventDefault();
+          nextRequestId !== null && dispatch(selectAndFetchRequest(nextRequestId));
+          break;
+        }
+      }
+    };
+
+    document.addEventListener("keydown", onDocumentKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onDocumentKeyDown);
+    };
+  }, [previousRequestId, nextRequestId, dispatch]);
 
   const { value: httpBodies } = useFeature("httpBodies");
 

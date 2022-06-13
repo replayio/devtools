@@ -1,5 +1,6 @@
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
+import { findIndex } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
 import { actions } from "ui/actions";
@@ -27,9 +28,9 @@ export const NetworkMonitor = ({
   seek,
 }: PropsFromRedux) => {
   const selectedRequestId = useSelector(getSelectedRequestId);
+  const dispatch = useDispatch();
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
-  const dispatch = useDispatch();
 
   const container = useRef<HTMLDivElement>(null);
 
@@ -81,8 +82,16 @@ export const NetworkMonitor = ({
     <Table events={events} requests={requests} types={types}>
       {({ table, data }: { table: any; data: RequestSummary[] }) => {
         let selectedRequest;
+        let previousRequestId = null;
+        let nextRequestId = null;
         if (selectedRequestId) {
-          selectedRequest = data.find(request => request.id === selectedRequestId);
+          selectedRequest = data.find((request, i) => {
+            if (request.id === selectedRequestId) {
+              previousRequestId = i > 0 ? data[i - 1].id : null;
+              nextRequestId = i + 1 < data.length ? data[i + 1].id : null;
+              return true;
+            }
+          });
         }
 
         return (
@@ -111,7 +120,18 @@ export const NetworkMonitor = ({
                     />
                   }
                   endPanel={
-                    selectedRequest ? <RequestDetails cx={cx} request={selectedRequest} /> : null
+                    selectedRequestId ? (
+                      selectedRequest ? (
+                        <RequestDetails
+                          cx={cx}
+                          request={selectedRequest}
+                          previousRequestId={previousRequestId}
+                          nextRequestId={nextRequestId}
+                        />
+                      ) : (
+                        <div>Loading…</div>
+                      )
+                    ) : null
                   }
                   splitterSize={2}
                   vert={vert}
