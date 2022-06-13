@@ -1,13 +1,12 @@
+import classNames from "classnames";
 import { connect, ConnectedProps } from "react-redux";
 import React, { useState, useEffect, useRef } from "react";
 import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import { selectors } from "ui/reducers";
-const { getExecutionPoint } = require("devtools/client/debugger/src/reducers/pause");
-import { Comment, Reply } from "ui/state/comments";
-import classNames from "classnames";
-import { Canvas } from "ui/state/app";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { selectors } from "ui/reducers";
+import { UIState } from "ui/state";
+import { Canvas } from "ui/state/app";
+import { Comment, Reply } from "ui/state/comments";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -64,8 +63,6 @@ type Coordinates = {
 };
 
 function CommentTool({
-  currentTime,
-  executionPoint,
   comments,
   areMouseTargetsLoading,
   canvas,
@@ -85,7 +82,7 @@ function CommentTool({
           return;
         }
 
-        createFrameComment(currentTime, executionPoint, mouseEventCanvasPosition(e), recordingId);
+        createFrameComment(mouseEventCanvasPosition(e), recordingId);
 
         setSelectedPrimaryPanel("comments");
       };
@@ -109,14 +106,7 @@ function CommentTool({
         videoNode.removeEventListener("mouseleave", onMouseLeave);
       };
     }
-  }, [
-    comments,
-    createFrameComment,
-    currentTime,
-    executionPoint,
-    recordingId,
-    setSelectedPrimaryPanel,
-  ]);
+  }, [comments, createFrameComment, recordingId, setSelectedPrimaryPanel]);
 
   if (!mousePosition) {
     return null;
@@ -144,8 +134,6 @@ function CommentTool({
 const connector = connect(
   (state: UIState) => ({
     recordingTarget: selectors.getRecordingTarget(state),
-    executionPoint: getExecutionPoint(state),
-    currentTime: selectors.getCurrentTime(state),
     canvas: selectors.getCanvas(state),
     areMouseTargetsLoading: selectors.areMouseTargetsLoading(state),
   }),

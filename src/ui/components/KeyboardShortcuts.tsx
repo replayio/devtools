@@ -40,8 +40,6 @@ const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
 
 function KeyboardShortcuts({
   createFrameComment,
-  currentTime,
-  executionPoint,
   showCommandPaletteInEditor,
   setSelectedPrimaryPanel,
   focusFullTextInput,
@@ -123,9 +121,7 @@ function KeyboardShortcuts({
     const addComment = (e: KeyboardEvent) => {
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
-        if (executionPoint) {
-          createFrameComment(currentTime, executionPoint, null, recordingId);
-        }
+        createFrameComment(null, recordingId);
       }
     };
 
@@ -185,8 +181,6 @@ function KeyboardShortcuts({
     toggleQuickOpen,
     closeOpenModalsOnEscape,
     createFrameComment,
-    currentTime,
-    executionPoint,
     recordingId,
   ]);
 
@@ -207,8 +201,6 @@ function KeyboardShortcuts({
 
 const connector = connect(
   (state: UIState) => ({
-    currentTime: selectors.getCurrentTime(state),
-    executionPoint: selectors.getExecutionPoint(state),
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
     selectedSource: selectors.getSelectedSource(state),
     toolboxLayout: selectors.getToolboxLayout(state),

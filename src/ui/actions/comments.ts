@@ -74,24 +74,30 @@ export function createComment(
 }
 
 export function createFrameComment(
-  time: number,
-  point: string,
   position: { x: number; y: number } | null,
   recordingId: RecordingId,
   breakpoint?: any
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    // Only try to generate a sourceLocation if there's a corresponding breakpoint for this
-    // frame comment.
+    const state = getState();
+    const currentTime = getCurrentTime(state);
+    const executionPoint = getExecutionPoint(state);
+    if (executionPoint == null) {
+      return;
+    }
+
+    // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
     const sourceLocation = breakpoint
       ? breakpoint.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront))
       : null;
-    const options = {
-      position,
-      hasFrames: true,
-      sourceLocation: sourceLocation || null,
-    };
-    dispatch(createComment(time, point, recordingId, options));
+
+    dispatch(
+      createComment(currentTime, executionPoint, recordingId, {
+        position,
+        hasFrames: true,
+        sourceLocation: sourceLocation || null,
+      })
+    );
   };
 }
 
@@ -100,19 +106,24 @@ function getCurrentPauseSourceLocationWithTimeout(ThreadFront: typeof ThreadFron
 }
 
 export function createFloatingCodeComment(
-  time: number,
-  point: string,
   recordingId: RecordingId,
   breakpoint: any
 ): UIThunkAction {
-  return async dispatch => {
-    const { location: sourceLocation } = breakpoint;
-    const options = {
-      position: null,
-      hasFrames: false,
-      sourceLocation: sourceLocation || null,
-    };
-    dispatch(createComment(time, point, recordingId, options));
+  return async (dispatch, getState) => {
+    const state = getState();
+    const currentTime = getCurrentTime(state);
+    const executionPoint = getExecutionPoint(state);
+    if (executionPoint == null) {
+      return;
+    }
+
+    dispatch(
+      createComment(currentTime, executionPoint, recordingId, {
+        position: null,
+        hasFrames: false,
+        sourceLocation: breakpoint.location || null,
+      })
+    );
   };
 }
 
@@ -122,19 +133,20 @@ export function createNetworkRequestComment(
 ): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
-    const currentTime = getCurrentTime(state);
-    const executionPoint = getExecutionPoint(state);
+    const time = request.triggerPoint?.time ?? getCurrentTime(state);
+    const executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
+    if (executionPoint == null) {
+      return;
+    }
 
-    const time = request.triggerPoint?.time ?? currentTime;
-    const point = request.triggerPoint?.point || executionPoint!;
-
-    const options = {
-      position: null,
-      hasFrames: false,
-      sourceLocation: null,
-      networkRequestId: request.id,
-    };
-    dispatch(createComment(time, point, recordingId, options));
+    dispatch(
+      createComment(time, executionPoint, recordingId, {
+        position: null,
+        hasFrames: false,
+        sourceLocation: null,
+        networkRequestId: request.id,
+      })
+    );
   };
 }
 

@@ -17,7 +17,7 @@ export default function CommentPreview({ comment }: { comment: Comment }) {
   } else if (comment.networkRequestId && networkRequestComments) {
     return (
       <div className={styles.Preview}>
-        <NetworkRequestPreview networkRequestId={comment.networkRequestId} />;
+        <NetworkRequestPreview networkRequestId={comment.networkRequestId} />
       </div>
     );
   } else {
