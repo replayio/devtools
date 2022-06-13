@@ -1,6 +1,4 @@
-const {
-  inputRegex,
-} = require("ui/components/Comments/TranscriptComments/CommentEditor/githubLink");
+const { inputRegex } = require("ui/components/Comments/CommentEditor/githubLink");
 
 describe("GitHubLink", () => {
   test("when there are no github links it does not match", () => {
