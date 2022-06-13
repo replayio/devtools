@@ -6,7 +6,6 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import { client, initSocket } from "protocol/socket";
-import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { UserInfo } from "../graphql/types";
 import { getCurrentUserInfo } from "../graphql/User";
@@ -21,24 +20,23 @@ export interface ReplayClientInterface {
     messages: Message[];
     overflow: boolean;
   }>;
-  findSources(): Promise<void>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
 }
 
 export class ReplayClient implements ReplayClient {
   private _sessionId: SessionId | null = null;
-  private _threadFront: typeof ThreadFront;
+  // private _threadFront: typeof ThreadFront;
 
-  constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
-    this._threadFront = threadFront;
+  constructor(dispatchURL: string) {
+    // this._threadFront = threadFront;
 
     if (typeof window !== "undefined") {
       initSocket(dispatchURL);
     }
   }
 
-  private getSessionIdThrows(): SessionId {
+  public getSessionIdThrows(): SessionId {
     const sessionId = this._sessionId;
     if (sessionId === null) {
       throw Error("Invalid session");
@@ -54,7 +52,7 @@ export class ReplayClient implements ReplayClient {
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
     this._sessionId = sessionId;
-    this._threadFront.setSessionId(sessionId);
+    //8this._threadFront.setSessionId(sessionId);
 
     return sessionId;
   }
@@ -121,12 +119,13 @@ export class ReplayClient implements ReplayClient {
     }
   }
 
+  /*
   async findSources(): Promise<void> {
     await this._threadFront.findSources(() => {
       // The demo doesn't use these directly, but the client throws if they aren't loaded.
     });
   }
-
+*/
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
     const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
@@ -151,7 +150,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-export const replayClient = new ReplayClient(DISPATCH_URL, ThreadFront);
+export const replayClient = new ReplayClient(DISPATCH_URL);
 
 export const asyncInitializeClient = async () => {
   // Read some of the hard-coded values from query params.
@@ -169,7 +168,7 @@ export const asyncInitializeClient = async () => {
   console.log("Loaded session: ", sessionId);
 
   // The demo doesn't use these directly, but the client throws if they aren't loaded.
-  await replayClient.findSources();
+  // await replayClient.findSources();
 
   let currentUserInfo: UserInfo | null = null;
   if (accessToken) {
