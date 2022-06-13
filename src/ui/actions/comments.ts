@@ -15,6 +15,7 @@ import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
 import { Action } from "redux";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
+import { ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
@@ -24,7 +25,6 @@ import { mutate } from "ui/utils/apolloClient";
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
-import { gql } from "@apollo/client";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
@@ -33,17 +33,6 @@ export type CommentsAction = SetHoveredComment;
 export function setHoveredComment(comment: any): SetHoveredComment {
   return { type: "set_hovered_comment", comment };
 }
-
-const ADD_COMMENT_MUTATION = gql`
-  mutation AddComment($input: AddCommentInput!) {
-    addComment(input: $input) {
-      success
-      comment {
-        id
-      }
-    }
-  }
-`;
 
 export function createComment(
   time: number,
@@ -75,7 +64,7 @@ export function createComment(
           secondaryLabel,
           sourceLocation,
           time,
-        }
+        },
       },
     });
     const id = response?.data?.addComment?.comment?.id;

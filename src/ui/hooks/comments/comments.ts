@@ -41,8 +41,20 @@ export function useGetComments(recordingId: RecordingId): {
 export function useUpdateComment() {
   const [updateCommentContent] = useMutation<UpdateCommentContent, UpdateCommentContentVariables>(
     gql`
-      mutation UpdateCommentContent($newContent: String!, $newIsPublished: Boolean!, $commentId: ID!, $newPosition: JSONObject) {
-        updateComment(input: { id: $commentId, content: $newContent, isPublished: $newIsPublished, position: $newPosition }) {
+      mutation UpdateCommentContent(
+        $newContent: String!
+        $newIsPublished: Boolean!
+        $commentId: ID!
+        $newPosition: JSONObject
+      ) {
+        updateComment(
+          input: {
+            id: $commentId
+            content: $newContent
+            isPublished: $newIsPublished
+            position: $newPosition
+          }
+        ) {
           success
         }
       }
@@ -52,7 +64,12 @@ export function useUpdateComment() {
     }
   );
 
-  return async (commentId: string, newContent: string, newIsPublished: boolean, position: CommentPosition | null) =>
+  return async (
+    commentId: string,
+    newContent: string,
+    newIsPublished: boolean,
+    position: CommentPosition | null
+  ) =>
     updateCommentContent({
       // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
       variables: { commentId, newIsPublished, newContent, position },
@@ -65,7 +82,11 @@ export function useUpdateCommentReply() {
     UpdateCommentReplyContentVariables
   >(
     gql`
-      mutation UpdateCommentReplyContent($id: ID!, $newContent: String!, $newIsPublished: Boolean!) {
+      mutation UpdateCommentReplyContent(
+        $id: ID!
+        $newContent: String!
+        $newIsPublished: Boolean!
+      ) {
         updateCommentReply(input: { id: $id, content: $newContent, isPublished: $newIsPublished }) {
           success
         }

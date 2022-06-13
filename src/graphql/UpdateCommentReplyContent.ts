@@ -17,6 +17,7 @@ export interface UpdateCommentReplyContent {
 }
 
 export interface UpdateCommentReplyContentVariables {
+  id: string;
   newContent: string;
-  commentId: string;
+  newIsPublished: boolean;
 }

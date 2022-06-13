@@ -6,22 +6,21 @@ import { trackEvent } from "ui/utils/telemetry";
 
 export type AddCommentMutation = (comment: Comment) => Promise<FetchResult<AddComment>>;
 
-export default function useAddComment(): AddCommentMutation {
-  const [addComment] = useMutation<AddComment, AddCommentVariables>(
-    gql`
-      mutation AddComment($input: AddCommentInput!) {
-        addComment(input: $input) {
-          success
-          comment {
-            id
-          }
-        }
+export const ADD_COMMENT_MUTATION = gql`
+  mutation AddComment($input: AddCommentInput!) {
+    addComment(input: $input) {
+      success
+      comment {
+        id
       }
-    `,
-    {
-      refetchQueries: ["GetComments"],
     }
-  );
+  }
+`;
+
+export default function useAddComment(): AddCommentMutation {
+  const [addComment] = useMutation<AddComment, AddCommentVariables>(ADD_COMMENT_MUTATION, {
+    refetchQueries: ["GetComments"],
+  });
 
   return async (comment: Comment) => {
     trackEvent("comments.create");

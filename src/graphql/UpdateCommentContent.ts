@@ -18,6 +18,7 @@ export interface UpdateCommentContent {
 
 export interface UpdateCommentContentVariables {
   newContent: string;
+  newIsPublished: boolean;
   commentId: string;
-  position?: any | null;
+  newPosition?: any | null;
 }

@@ -36,7 +36,7 @@
   padding: 0.25rem;
   background-color: var(--body-bgcolor);
   --tw-border-opacity: 1;
-  border-color: rgb(156 163 175/var(--tw-border-opacity));
+  border-color: rgb(156 163 175 / var(--tw-border-opacity));
   border-width: 1px;
   border-radius: 0.375rem;
   cursor: text;

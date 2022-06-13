@@ -33,7 +33,7 @@
   align-items: center;
   flex-direction: column;
   flex-grow: 1;
-  font-size: .75rem;
+  font-size: 0.75rem;
   line-height: 1rem;
   background-color: var(--body-bgcolor);
   overflow-x: hidden;
