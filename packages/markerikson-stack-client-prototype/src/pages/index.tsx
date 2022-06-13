@@ -8,13 +8,16 @@ import { SourcesList } from "../features/sources/SourcesList";
 
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);
+  const { currentUserInfo } = sessionData;
 
   return (
     <div className={styles.container}>
-      <h1>Current user</h1>
-
-      <div style={{ whiteSpace: "pre", fontFamily: "monospace", textAlign: "left" }}>
-        {JSON.stringify(sessionData?.currentUserInfo, null, 2)}
+      <h2>Session</h2>
+      <div>
+        Session ID: <span title={sessionData.sessionId}>{sessionData.sessionId.slice(0, 8)}</span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center" }}>
+        User: {currentUserInfo.name} <img src={currentUserInfo.picture} height={24} />
       </div>
       <h2>Sources Entries</h2>
       <SourcesList />
