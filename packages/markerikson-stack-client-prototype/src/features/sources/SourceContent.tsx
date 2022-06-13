@@ -11,14 +11,17 @@ import {
   useGetSourceHitCountsQuery,
   useGetLineHitPointsQuery,
 } from "../../app/api";
-import { useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { pointSelected } from "./sourcesSlice";
 
 export const SourceContent = () => {
   const [selectedLocation, setSelectedLocation] = useState<Pick<
     Location,
     "line" | "column"
   > | null>(null);
+  const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
+  const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
 
   const { currentData: sourceText } = useGetSourceTextQuery(selectedSourceId ?? skipToken);
   const { currentData: sourceHits } = useGetSourceHitCountsQuery(selectedSourceId ?? skipToken);
@@ -72,7 +75,18 @@ export const SourceContent = () => {
           <h4>Location Hits</h4>
           <ul>
             {locationHitPoints?.map(point => {
-              return <li key={point.point}>{point.time}</li>;
+              const isSelected = point === selectedPoint;
+              let entryText: React.ReactNode = point.time;
+              if (isSelected) {
+                entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
+              }
+
+              const onPointClicked = () => dispatch(pointSelected(point));
+              return (
+                <li key={point.point} onClick={onPointClicked}>
+                  {entryText}
+                </li>
+              );
             }) ?? null}
           </ul>
         </div>

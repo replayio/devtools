@@ -21,7 +21,7 @@ const IndexPage: NextPage = () => {
         User: {currentUserInfo.name} <img src={currentUserInfo.picture} height={24} />
       </div>
       <div style={{ display: "flex" }}>
-        <div style={{ minWidth: 500 }}>
+        <div style={{ minWidth: 300 }}>
           <h2>Sources Entries</h2>
           <SourcesList />
         </div>

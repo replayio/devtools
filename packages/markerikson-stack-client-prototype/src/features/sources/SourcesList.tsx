@@ -12,7 +12,7 @@ export const SourcesList = () => {
     <ul>
       {data?.src.map(entry => {
         const isSelected = selectedSourceId === entry.sourceId;
-        let entryText: React.ReactNode = entry.url;
+        let entryText: React.ReactNode = new URL(entry.url).pathname;
         if (isSelected) {
           entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
         }
