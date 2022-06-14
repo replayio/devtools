@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import useSearch from "./useSearch";
 import { Message } from "../../reducers/messages";
 import { getMessages } from "../../selectors";
@@ -42,7 +42,7 @@ export type State = SearchState<Message> & {
 };
 
 export default function useConsoleSearch(): [State, Actions] {
-  const messages = useSelector(getMessages);
+  const messages = useAppSelector(getMessages);
   const [state, dispatch] = useSearch<Message>(messages, search);
 
   const [visible, setVisible] = useState<boolean>(false);

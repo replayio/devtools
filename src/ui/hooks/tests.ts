@@ -1,6 +1,6 @@
 import { gql, useQuery } from "@apollo/client";
 import { orderBy } from "lodash";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getWorkspaceId } from "ui/reducers/app";
 import { WorkspaceId } from "ui/state/app";
 import { Recording, SourceCommit } from "ui/types";
@@ -124,7 +124,7 @@ function unwrapRecordingsData(recordings: any): Recording[] {
 
 export function useGetTestForWorkspace(path: string[]): { test: Test | null; loading: boolean } {
   const serializedPath = encodeURIComponent(JSON.stringify(path));
-  const workspaceId = useSelector(getWorkspaceId);
+  const workspaceId = useAppSelector(getWorkspaceId);
   const { data, loading } = useQuery(GET_TEST, {
     variables: { path: serializedPath, workspaceId },
   });
@@ -143,7 +143,7 @@ export function useGetTestRunForWorkspace(id: string): {
   testRun: TestRun | null;
   loading: boolean;
 } {
-  const workspaceId = useSelector(getWorkspaceId);
+  const workspaceId = useAppSelector(getWorkspaceId);
   const { data, loading } = useQuery(GET_TEST_RUN, {
     variables: { id, workspaceId },
   });
