@@ -35,7 +35,7 @@ export function Dropdown({
 }: {
   children: React.ReactNode;
   menuItemsClassName?: string;
-  widthClass?: "w-56" | "w-64" | "w-80";
+  widthClass?: "" | "w-56" | "w-64" | "w-80";
   fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
