@@ -34,7 +34,7 @@ export function MainRow({
 
   return (
     <div
-      className={`flex flex-row items-center flex-grow border-b transition duration-150 group pr-2 ${
+      className={`group flex flex-grow flex-row items-center border-b pr-2 transition duration-150 ${
         isFocused ? "bg-blue-100" : "hover:bg-gray-100"
       }`}
       ref={rowNode}
@@ -55,7 +55,7 @@ function ViewReplayButton({ isFocused, recordingId }: { isFocused: boolean; reco
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <button className="flex items-center justify-center p-2 transition text-primaryAccent hover:text-primaryAccentHover">
+      <button className="flex items-center justify-center p-2 text-primaryAccent transition hover:text-primaryAccentHover">
         <MaterialIcon iconSize="2xl" outlined={!isFocused}>
           play_circle
         </MaterialIcon>
