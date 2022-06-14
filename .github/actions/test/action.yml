@@ -35,7 +35,9 @@ runs:
         RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
-    - run: npx -y @replayio/replay ls
+        DEBUG: "pw:browsers"
+    - name: List Replays
+      run: npx -y @replayio/replay ls
       shell: sh
     - uses: replayio/action-upload@main
       if: always()
