@@ -58,6 +58,20 @@ function SignInButton() {
   );
 }
 
+function SignOutButton() {
+  const { logout } = useAuth0();
+
+  const onClick = () => {
+    logout({ returnTo: window.location.origin + "/login" });
+  };
+
+  return (
+    <PrimaryButton color="blue" onClick={onClick}>
+      Sign out of Replay
+    </PrimaryButton>
+  );
+}
+
 function LibraryButton() {
   const onClick = () => {
     window.location.href = window.location.origin;
@@ -131,6 +145,8 @@ function ActionButton({ action, onAction }: { action: ErrorActions; onAction?: (
     return <RefreshButton />;
   } else if (action === "sign-in") {
     return <SignInButton />;
+  } else if (action === "sign-out") {
+    return <SignOutButton />;
   } else if (action === "library") {
     return <LibraryButton />;
   } else if (action === "team-billing") {
