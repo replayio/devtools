@@ -34,7 +34,7 @@ export const SourceContent = () => {
         return hit;
       }
       return prevValue;
-    }, null);
+    }, null as HitCount | null);
   }
 
   const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
@@ -47,7 +47,7 @@ export const SourceContent = () => {
     return EditorView.domEventHandlers({
       click(e, editorView) {
         const pos = editorView.posAtCoords({ x: e.clientX, y: e.clientY });
-        const line = editorView.state.doc.lineAt(pos);
+        const line = editorView.state.doc.lineAt(pos!);
         const selectionRange = editorView.state.selection.ranges[0];
         const columnNumber = selectionRange.head - line.from;
         setSelectedLocation({ line: line.number, column: columnNumber });
