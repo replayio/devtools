@@ -4,6 +4,7 @@ import { pref } from "devtools/shared/services";
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
 // app prefs.
+pref("devtools.defaultMode", "non-dev");
 pref("devtools.dev-secondary-panel-height", "375px");
 pref("devtools.disableCache", false);
 pref("devtools.disableLogRocket", false);
@@ -20,7 +21,6 @@ pref("devtools.toolbox-size", "50%");
 pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
-pref("devtools.features.defaultToDevTools", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.httpBodies", true);
 pref("devtools.features.logProtocol", false);
@@ -36,6 +36,7 @@ pref("devtools.features.unicornConsole", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
+  defaultMode: ["String", "defaultMode"],
   disableCache: ["Bool", "disableCache"],
   disableLogRocket: ["Bool", "disableLogRocket"],
   eventListenersBreakpoints: ["Bool", "event-listeners-breakpoints"],
@@ -53,7 +54,6 @@ export const features = new PrefsHelper("devtools.features", {
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
-  defaultToDevTools: ["Bool", "defaultToDevTools"],
   enableLargeText: ["Bool", "enableLargeText"],
   httpBodies: ["Bool", "httpBodies"],
   logProtocol: ["Bool", "logProtocol"],

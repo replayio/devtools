@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { ChangeEvent, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { hideModal } from "ui/actions/app";
 import { useUpdateRecordingTitle } from "ui/hooks/recordings";
 import { getModalOptions } from "ui/reducers/app";
@@ -17,7 +17,7 @@ function RenameReplayModal({
   initialTitle: string;
 }) {
   const [title, setTitle] = useState(initialTitle);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const updateRecordingTitle = useUpdateRecordingTitle();
 
   const dismissModal = () => dispatch(hideModal());
@@ -44,8 +44,8 @@ function RenameReplayModal({
 }
 
 export default function RenameReplayModalWrapper() {
-  const options = useSelector(getModalOptions);
-  const dispatch = useDispatch();
+  const options = useAppSelector(getModalOptions);
+  const dispatch = useAppDispatch();
   const dismissModal = () => dispatch(hideModal());
 
   if (!options || !options.recordingId) {

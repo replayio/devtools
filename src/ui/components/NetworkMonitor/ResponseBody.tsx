@@ -1,6 +1,6 @@
 import { ResponseBodyData } from "@replayio/protocol";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedResponseBody } from "ui/reducers/network";
 import HttpBody from "./HttpBody";
 import { findHeader, RequestSummary } from "./utils";
@@ -28,7 +28,7 @@ export function _ResponseBody({
 }
 
 const ResponseBody = ({ request }: { request?: RequestSummary }) => {
-  const responseBodyParts = useSelector(getSelectedResponseBody);
+  const responseBodyParts = useAppSelector(getSelectedResponseBody);
 
   if (!request || !responseBodyParts) {
     return null;

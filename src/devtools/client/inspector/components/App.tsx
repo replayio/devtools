@@ -9,7 +9,7 @@ import { RulesApp } from "devtools/client/inspector/rules/components/RulesApp";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { assert } from "protocol/utils";
 import React, { FC, ReactNode, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
@@ -32,8 +32,8 @@ const availableTabs: readonly InspectorActiveTab[] = [
 ] as const;
 
 const InspectorApp: FC = () => {
-  const dispatch = useDispatch();
-  const { initializedPanels, activeTab } = useSelector((state: UIState) => ({
+  const dispatch = useAppDispatch();
+  const { initializedPanels, activeTab } = useAppSelector((state: UIState) => ({
     initializedPanels: state.app.initializedPanels,
     activeTab: state.inspector.activeTab,
   }));

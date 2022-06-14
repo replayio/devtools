@@ -1,5 +1,6 @@
 import React from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import Modal from "ui/components/shared/NewModal";
 import { CopyButton } from "./ReplayLink";
 import hooks from "ui/hooks";
@@ -123,7 +124,7 @@ function EnvironmentVariablesRow() {
 }
 
 function SharingModal({ recording, hideModal }: SharingModalProps) {
-  const recordingTarget = useSelector(getRecordingTarget);
+  const recordingTarget = useAppSelector(getRecordingTarget);
   const showEnvironmentVariables = recordingTarget == "node";
 
   return (

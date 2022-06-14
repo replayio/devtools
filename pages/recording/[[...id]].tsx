@@ -2,7 +2,8 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
 import React, { useEffect, useState } from "react";
-import { connect, ConnectedProps, useDispatch, useStore } from "react-redux";
+import { connect, ConnectedProps, useStore } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isTest } from "ui/utils/environment";
 import { setModal } from "ui/actions/app";
 import { setExpectedError } from "ui/actions/errors";
@@ -24,6 +25,7 @@ import { trackTiming } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
+import { UIStore } from "ui/actions";
 
 interface MetadataProps {
   metadata?: {
@@ -118,9 +120,9 @@ function RecordingPage({
   head,
 }: PropsFromRedux & { head?: React.ReactNode }) {
   const token = useToken();
-  const store = useStore();
+  const store: UIStore = useStore();
   const { query } = useRouter();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
   const rawRecordingId = useGetRawRecordingIdWithSlug();
   useRecordingSlug(recordingId);

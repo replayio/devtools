@@ -44,11 +44,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Default to Dev Tools",
-    description: "Open DevTools by default instead of the Viewer",
-    key: "defaultToDevTools",
-  },
-  {
     label: "Large Text",
     description: "Enable large text for Editor",
     key: "enableLargeText",
@@ -106,8 +101,6 @@ export default function ExperimentalSettings({}) {
   } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: defaultToDevTools, update: updateDefaultToDevTools } =
-    useFeature("defaultToDevTools");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
@@ -132,8 +125,6 @@ export default function ExperimentalSettings({}) {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
     } else if (key == "turboReplay") {
       updateEnableTurboReplay(!enableTurboReplay);
-    } else if (key == "defaultToDevTools") {
-      updateDefaultToDevTools(!defaultToDevTools);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key == "unicornConsole") {
@@ -146,7 +137,6 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
-    defaultToDevTools,
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { exitFocusMode, setFocusRegion, syncFocusedRegion } from "ui/actions/timeline";
 import { getFocusRegionBackup, getShowFocusModeControls } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
@@ -11,10 +11,10 @@ import Icon from "../shared/Icon";
 import styles from "./FocusModePopout.module.css";
 
 export default function FocusModePopout() {
-  const showFocusModeControls = useSelector(getShowFocusModeControls);
+  const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
-  const dispatch = useDispatch();
-  const focusRegionBackup = useSelector(getFocusRegionBackup) as UnsafeFocusRegion;
+  const dispatch = useAppDispatch();
+  const focusRegionBackup = useAppSelector(getFocusRegionBackup) as UnsafeFocusRegion;
 
   const hideModal = () => dispatch(exitFocusMode());
 

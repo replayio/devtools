@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { createFloatingCodeComment } from "ui/actions/comments";
 import { ContextMenu as ContextMenuType } from "ui/actions/contextMenus";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -18,7 +18,7 @@ export default function GutterContextMenu({
 }) {
   const recordingId = useGetRecordingId();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();

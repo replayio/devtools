@@ -1,94 +1,23 @@
 import { MouseEvent, useContext, useEffect, useRef } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Recording, RecordingMetadata, SourceMetadata } from "ui/types";
-import { getFormattedTime } from "ui/utils/timeline";
-import { getRelativeDate } from "../../RecordingRow";
+import { Recording } from "ui/types";
+import { getTruncatedRelativeDate } from "../../RecordingRow";
 import { LibraryContext } from "../../useFilters";
-import { ResultIcon } from "../shared/ResultIcon";
+import { MainRow } from "../shared/MainRow";
 
 function PullRequestDetails({ id, title }: { id: string; title: string }) {
   return (
-    <div className="flex items-center space-x-1 text-gray-500">
-      <MaterialIcon>merge</MaterialIcon>
-      <span>{title}</span>
-      <span>#{id}</span>
+    <div className="flex flex-row items-center space-x-1 text-xs" title={title}>
+      <div className="font-bold">PR</div>
+      <div>{id}</div>
     </div>
   );
 }
 
-function CommitDetails({ source }: { source?: SourceMetadata }) {
-  const title = source?.commit.title || "Unknown commit message";
-  const id = source?.commit.id ? source.commit.id.substring(0, 7) : "Unknown ID";
-
-  return (
-    <div className="flex space-x-1">
-      <span className="font-medium">{title}</span>
-      <span className="overflow-hidden whitespace-pre overflow-ellipsis">({id})</span>
-    </div>
-  );
-}
-
-function ReplayDetails({ recording }: { recording: Recording }) {
-  const { metadata, date, duration } = recording;
-
-  return (
-    <div className="flex items-center space-x-3 text-gray-500">
-      <div className="flex items-center space-x-1">
-        <MaterialIcon>fork_right</MaterialIcon>
-        <span>{metadata.source?.branch || "Unknown branch"}</span>
-      </div>
-      <div className="flex items-center space-x-1">
-        <MaterialIcon>schedule</MaterialIcon>
-        <span>{getRelativeDate(date)}</span>
-      </div>
-      <div className="flex items-center space-x-1">
-        <MaterialIcon>timer</MaterialIcon>
-        <span>{getFormattedTime(duration)}</span>
-      </div>
-    </div>
-  );
-}
-
-export function ReplayRow({ recording }: { recording: Recording }) {
-  const { preview, setPreview } = useContext(LibraryContext);
-  const rowNode = useRef<HTMLDivElement>(null);
+function CommitDetails({ recording }: { recording: Recording }) {
   const { metadata } = recording;
-  const isFocused = preview?.view === "tests" && recording.id === preview.recordingId;
-
-  const onClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    setPreview({ view: "tests", id: recording.metadata.test!.path!, recordingId: recording.id });
-  };
-
-  useEffect(() => {
-    if (isFocused) {
-      rowNode.current!.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [isFocused]);
-
-  return (
-    <div
-      className={`flex flex-row items-center flex-grow p-2 px-3 space-x-2 rounded-md ${
-        isFocused ? "bg-blue-100" : "hover:bg-gray-100"
-      }`}
-      onClick={onClick}
-      ref={rowNode}
-    >
-      <ResultIcon result={metadata.test?.result} />
-      <div className="flex flex-col flex-grow">
-        <CommitDetails source={metadata.source} />
-        {metadata.source?.merge ? (
-          <PullRequestDetails id={metadata.source.merge.id} title={metadata.source.merge.title} />
-        ) : null}
-        <ReplayDetails recording={recording} />
-        {isFocused ? <Actions recordingId={recording.id} metadata={metadata} /> : null}
-      </div>
-    </div>
-  );
-}
-
-function Actions({ recordingId, metadata }: { recordingId: string; metadata: RecordingMetadata }) {
+  const title = metadata.source?.commit.title || "Unknown commit message";
+  const id = metadata.source?.commit.id ? metadata.source.commit.id.substring(0, 7) : "Unknown ID";
   const { setView, setAppliedText } = useContext(LibraryContext);
 
   const onViewTestRun = (e: MouseEvent) => {
@@ -100,21 +29,60 @@ function Actions({ recordingId, metadata }: { recordingId: string; metadata: Rec
   };
 
   return (
-    <div className="flex pt-1 space-x-1">
-      <a
-        href={`/recording/${recordingId}`}
-        target="_blank"
-        rel="noreferrer noopener"
-        className="underline"
-      >
-        Open Replay
-      </a>
-      <span>|</span>
-      {metadata.test?.run?.id ? (
-        <button onClick={onViewTestRun} className="underline">
-          View Test Run ({metadata.test.run.id.slice(0, 7)})
-        </button>
+    <button
+      className="overflow-hidden text-left whitespace-pre overflow-ellipsis hover:underline"
+      onClick={onViewTestRun}
+    >
+      <span>
+        {title} ({id})
+      </span>
+    </button>
+  );
+}
+
+function ReplayDetails({ recording }: { recording: Recording }) {
+  const { metadata } = recording;
+  const user = metadata.source?.trigger?.user;
+
+  return (
+    <div className="flex items-center space-x-3 text-xs text-gray-500">
+      <div className="flex items-center space-x-1">
+        <MaterialIcon>fork_right</MaterialIcon>
+        <span>{metadata.source?.branch || "Unknown branch"}</span>
+      </div>
+      {metadata.source?.merge ? (
+        <PullRequestDetails id={metadata.source.merge.id} title={metadata.source.merge.title} />
       ) : null}
+      {!!user && <div>{user}</div>}
     </div>
+  );
+}
+
+export function ReplayRow({ recording }: { recording: Recording }) {
+  const { preview, setPreview } = useContext(LibraryContext);
+  const { metadata, date } = recording;
+  const isFocused = preview?.view === "tests" && recording.id === preview.recordingId;
+
+  const onClick = (e: React.MouseEvent) => {
+    setPreview({ view: "tests", id: recording.metadata.test!.path!, recordingId: recording.id });
+  };
+
+  return (
+    <MainRow
+      onClick={onClick}
+      isFocused={isFocused}
+      passed={metadata.test?.result === "passed"}
+      recordingId={recording.id}
+    >
+      <div className="flex flex-row items-center flex-grow py-2 space-x-2 overflow-hidden">
+        <div className="flex flex-col flex-grow overflow-hidden">
+          <CommitDetails recording={recording} />
+          <ReplayDetails recording={recording} />
+        </div>
+        <div className="flex flex-shrink-0 text-gray-500">
+          <span>{getTruncatedRelativeDate(date)}</span>
+        </div>
+      </div>
+    </MainRow>
   );
 }

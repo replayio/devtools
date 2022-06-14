@@ -4,11 +4,13 @@ import { ReplayRow } from "./ReplayRow";
 
 export function ReplayList({ recordings }: { recordings: Recording[] }) {
   return (
-    <div className="flex flex-col space-y-1 font-medium">
-      <div>Most Recent Runs</div>
-      {orderBy(recordings, "date", "desc").map((r, i) => (
-        <ReplayRow recording={r} key={i} />
-      ))}
+    <div className="flex flex-col overflow-hidden">
+      <div className="p-4 py-2 border-b">Recent Runs</div>
+      <div className="flex flex-col overflow-y-auto">
+        {orderBy(recordings, "date", "desc").map((r, i) => (
+          <ReplayRow recording={r} key={i} />
+        ))}
+      </div>
     </div>
   );
 }

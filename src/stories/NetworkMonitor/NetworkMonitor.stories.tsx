@@ -22,6 +22,7 @@ const requests = [
 export const Basic = Template.bind({});
 
 Basic.args = {
+  // @ts-expect-error time field mismatch
   currentTime: 3,
   events: requests.flatMap(r => r.events),
   requests: requests.map(r => r.info),

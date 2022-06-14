@@ -1,6 +1,6 @@
 import clamp from "lodash/clamp";
 import { FC } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
 import {
@@ -12,9 +12,9 @@ import {
 } from "ui/utils/timeline";
 
 export const UnloadedRegions: FC = () => {
-  const loadedRegions = useSelector(getLoadedRegions);
-  const zoomRegion = useSelector(getZoomRegion);
-  const focusRegion = useSelector(getFocusRegion);
+  const loadedRegions = useAppSelector(getLoadedRegions);
+  const zoomRegion = useAppSelector(getZoomRegion);
+  const focusRegion = useAppSelector(getFocusRegion);
 
   // Check loadedRegions to keep typescript happy.
   if (!loadedRegions) {

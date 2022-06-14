@@ -134,8 +134,7 @@
 .breakpoint-navigation-timeline .progress-line {
   width: 0%;
   height: 4px;
-  /* border-top: 3px dashed var(--primary-accent); */
-  border-top: 5px solid var(--primary-accent);
+  background-color: var(--primary-accent);
   position: absolute;
   pointer-events: none;
   margin-top: auto;
@@ -152,16 +151,16 @@
 .timeline .progress-line.full,
 .breakpoint-navigation-timeline .progress-line.full {
   width: 100%;
-  border-top-color: var(--progressbar-background);
+  background-color: var(--progressbar-background);
 }
 
 .timeline .progress-line.preview-min,
 .breakpoint-navigation-timeline .progress-line.preview-min {
-  border-top-color: var(--progressbar-preview-min);
+  background-color: var(--progressbar-preview-min);
 }
 
 .timeline .progress-line.preview-max {
-  border-top-color: #a6d4fa;
+  background-color: #a6d4fa;
 }
 
 .timeline .unloaded-regions,

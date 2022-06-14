@@ -1,5 +1,5 @@
 import React, { FC, useContext } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
 import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
@@ -41,11 +41,12 @@ interface PanelButtonsProps {
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
+  children?: React.ReactNode;
 }
 
-const PanelButton: FC<PanelButtonProps> = ({ panel, children }) => {
-  const selectedPanel = useSelector(selectors.getSelectedPanel);
-  const dispatch = useDispatch();
+const PanelButton = ({ panel, children }: PanelButtonProps) => {
+  const selectedPanel = useAppSelector(selectors.getSelectedPanel);
+  const dispatch = useAppDispatch();
 
   const onClick = (panel: SecondaryPanelName) => {
     dispatch(setSelectedPanel(panel));
@@ -132,12 +133,12 @@ function PanelButtonsScrollOverflowGradient() {
 }
 
 export default function SecondaryToolbox() {
-  const selectedPanel = useSelector(getSelectedPanel);
-  const recordingTarget = useSelector(getRecordingTarget);
-  const hasReactComponents = useSelector(selectors.hasReactComponents);
-  const toolboxLayout = useSelector(getToolboxLayout);
+  const selectedPanel = useAppSelector(getSelectedPanel);
+  const recordingTarget = useAppSelector(getRecordingTarget);
+  const hasReactComponents = useAppSelector(selectors.hasReactComponents);
+  const toolboxLayout = useAppSelector(getToolboxLayout);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 

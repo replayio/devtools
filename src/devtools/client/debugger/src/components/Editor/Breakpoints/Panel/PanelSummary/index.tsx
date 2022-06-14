@@ -4,7 +4,7 @@ import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/b
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { createFloatingCodeComment, createFrameComment } from "ui/actions/comments";
 import { enterFocusMode } from "ui/actions/timeline";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
@@ -42,7 +42,7 @@ export default function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const isLoaded = Boolean(analysisPoints && !isHot);
   const isEditable = isLoaded && isTeamDeveloper;
@@ -90,16 +90,15 @@ export default function PanelSummary({
           This log cannot be edited because <br />
           it was hit {MAX_POINTS_FOR_FULL_ANALYSIS}+ times
         </Popup>
-        <div className="button-container flex items-center">
-          <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
-        </div>
+        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
       </div>
     );
   }
 
   return (
-    <div className={classNames("summary flex items-center text-gray-500", { enabled: isLoaded })}>
-      <PrefixBadgeButton breakpoint={breakpoint} />
+    <div
+      className={classNames("summary flex items-center gap-1 text-gray-500", { enabled: isLoaded })}
+    >
       <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
@@ -122,9 +121,7 @@ export default function PanelSummary({
           </Popup>
         ) : null}
       </div>
-      <div className="button-container flex items-center">
-        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
-      </div>
+      <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
     </div>
   );
 }

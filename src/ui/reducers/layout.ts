@@ -1,14 +1,14 @@
 import { sourcesDisplayed } from "devtools/client/debugger/src/reducers/ui";
 import { LayoutAction } from "ui/actions/layout";
 import { UIState } from "ui/state";
-import { LayoutState } from "ui/state/layout";
+import { LayoutState, ViewMode } from "ui/state/layout";
 import { features, prefs } from "ui/utils/prefs";
 
 export const syncInitialLayoutState: LayoutState = {
   consoleFilterDrawerExpanded: true,
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
-  viewMode: features.defaultToDevTools ? "dev" : "non-dev",
+  viewMode: prefs.defaultMode as ViewMode,
   showVideoPanel: true,
   toolboxLayout: "ide",
   selectedPanel: "console",

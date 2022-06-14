@@ -9,17 +9,13 @@ export default {
 export function BasicUsage() {
   return (
     <>
-      <Column gap={2} style={{ padding: "1rem" }}>
-        <PrefixBadgePicker initialState="closed" />
-        <PrefixBadgePicker initialState="opened" />
+      <Column gap={2} className="theme-light items-start p-1">
+        <PrefixBadgePicker />
+        <PrefixBadgePicker initialValue="unicorn" />
       </Column>
-      <Column
-        gap={2}
-        className="theme-dark"
-        style={{ padding: "1rem", backgroundColor: "#192230" }}
-      >
-        <PrefixBadgePicker initialState="closed" />
-        <PrefixBadgePicker initialState="opened" />
+      <Column gap={2} className="theme-dark items-start p-1" style={{ backgroundColor: "#192230" }}>
+        <PrefixBadgePicker />
+        <PrefixBadgePicker initialValue="unicorn" />
       </Column>
     </>
   );

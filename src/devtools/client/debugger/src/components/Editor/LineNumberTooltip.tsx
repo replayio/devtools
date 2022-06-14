@@ -2,7 +2,7 @@ import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/br
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import { minBy } from "lodash";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -59,14 +59,14 @@ export default function LineNumberTooltip({
   editor: any;
   keyModifiers: KeyModifiers;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
 
-  const hitCounts = useSelector(getHitCountsForSelectedSource);
-  const source = useSelector(getSelectedSource);
-  const breakpoints = useSelector(selectors.getBreakpointsList);
+  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const source = useAppSelector(getSelectedSource);
+  const breakpoints = useAppSelector(selectors.getBreakpointsList);
 
   let hits: number | undefined;
 

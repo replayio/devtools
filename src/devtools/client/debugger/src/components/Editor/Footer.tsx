@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
 import { getSelectedSourceWithContent } from "../../selectors";
@@ -21,7 +21,7 @@ type ScrollPosition = {
 const LOCAL_STORAGE_KEY = "SourceFooter.scrollPosition";
 
 function SourceFooter() {
-  const selectedSource = useSelector(getSelectedSourceWithContent);
+  const selectedSource = useAppSelector(getSelectedSourceWithContent);
   const [cursorPosition, setCursorPosition] = useState<CursorPosition>({
     line: 0,
     column: 0,

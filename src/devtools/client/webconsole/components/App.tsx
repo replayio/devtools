@@ -7,7 +7,7 @@ import { ConsoleNag } from "ui/components/shared/Nags/Nags";
 import { FilterDrawer } from "./FilterDrawer";
 import Warning from "ui/components/shared/Warning";
 import { MouseEventHandler } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import JSTerm from "./Input/JSTerm";
 import { ConsoleSearch, ActionsContext, StateContext, useConsoleSearch } from "./Search/";
 
@@ -18,9 +18,9 @@ const App = (): JSX.Element => {
   const [state, actions] = useConsoleSearch();
 
   // @ts-ignore
-  const consoleOverflow = useSelector(state => state.messages.overflow);
+  const consoleOverflow = useAppSelector(state => state.messages.overflow);
   // @ts-ignore
-  const filterBarDisplayMode = useSelector(state => state.consoleUI.filterBarDisplayMode);
+  const filterBarDisplayMode = useAppSelector(state => state.consoleUI.filterBarDisplayMode);
 
   const onClick: MouseEventHandler<HTMLDivElement> = event => {
     // @ts-ignore

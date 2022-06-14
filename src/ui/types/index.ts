@@ -16,7 +16,6 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
-  defaultToDevTools: boolean;
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
@@ -176,6 +175,7 @@ export type SourceMetadata = {
     name: string;
     user?: string;
     workflow?: string;
+    url?: string;
   };
   provider?: string;
   repository?: string;

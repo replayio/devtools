@@ -1,13 +1,13 @@
 import classNames from "classnames";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
 import { getVisiblePosition } from "ui/utils/timeline";
 
 import { EditMode } from ".";
 
 export default function CurrentTimeIndicator({ editMode }: { editMode: EditMode | null }) {
-  const currentTime = useSelector(selectors.getCurrentTime);
-  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
 

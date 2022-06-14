@@ -1,10 +1,10 @@
 import React from "react";
 import { actions } from "ui/actions";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import CommandPalette from ".";
 
 export function CommandPaletteModal() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onMaskClick = () => {
     dispatch(actions.hideCommandPalette());
