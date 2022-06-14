@@ -36,6 +36,7 @@ runs:
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
     - uses: replayio/action-upload@main
+      if: always()
       with:
         apiKey: ${{ inputs.api-key }}
         public: true
