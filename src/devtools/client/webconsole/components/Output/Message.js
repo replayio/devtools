@@ -8,6 +8,7 @@ const { MessageIcon } = require("devtools/client/webconsole/components/Output/Me
 const { MessageIndent } = require("devtools/client/webconsole/components/Output/MessageIndent");
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
 const { withRouter } = require("next/router");
+const classNames = require("classnames");
 const React = require("react");
 const dom = require("react-dom-factories");
 const { l10n } = require("devtools/client/webconsole/utils/messages");
@@ -470,7 +471,9 @@ class Message extends React.Component {
         { className: "message-body-wrapper" },
         dom.span(
           {
-            className: "message-flex-body",
+            className: classNames("message-flex-body", {
+              "message-flex-body--collapsible": collapsible,
+            }),
             onClick: collapsible ? this.toggleMessage : undefined,
           },
           // Add whitespaces for formatting when copying to the clipboard.
