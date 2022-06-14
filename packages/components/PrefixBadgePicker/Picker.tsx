@@ -97,7 +97,7 @@ export function Picker<Values extends any>({
             transitioning.current = true;
           }
 
-          const nextActiveId = isToggle ? undefined : isChildActive ? undefined : child.props.id;
+          const nextActiveId = isToggle ? undefined : child.props.id;
 
           previousId.current = isChildActive ? child.props.id : undefined;
 
