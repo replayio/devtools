@@ -1,0 +1,16 @@
+.HitsBadge,
+.NoHitsBadge {
+  width: 30px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.HitsBadge {
+  background-color: var(--gutter-hit-count-background);
+  color: var(--gutter-hit-count-foreground);
+}
+
+.NoHitsBadge {
+  background-color: var(--gutter-hit-count-no-hits);
+}

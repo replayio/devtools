@@ -11,12 +11,14 @@ type StaticTooltipProps = {
 
 export default function StaticTooltip({ targetNode, children }: StaticTooltipProps) {
   const { value: enableLargeText } = useFeature("enableLargeText");
+  const { value: inlineHitCounts } = useFeature("inlineHitCounts");
 
   return ReactDOM.createPortal(
     <div
       className={classNames(
-        "pointer-events-none absolute -right-1 bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px",
-        enableLargeText && "bottom-6"
+        "pointer-events-none absolute bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px",
+        enableLargeText && "bottom-6",
+        inlineHitCounts ? "-right-9" : "-right-1"
       )}
     >
       {children}

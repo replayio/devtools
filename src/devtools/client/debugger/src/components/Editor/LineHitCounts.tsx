@@ -1,38 +1,24 @@
-import { classMethod } from "@babel/types";
-import minBy from "lodash/minBy";
-import React, { useState, useMemo, useLayoutEffect } from "react";
-import { useSelector } from "react-redux";
-import { selectors } from "ui/reducers";
-import { prefs, features } from "ui/utils/prefs";
+import { useMemo, useLayoutEffect } from "react";
+import { useFeature } from "ui/hooks/settings";
+import { useAppSelector } from "ui/setup/hooks";
 
-import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
+import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
 
-interface LHCProps {
-  // make this better!
-  cm: any;
+import styles from "./LineHitCounts.module.css";
+
+type Props = { cm: any };
+
+export default function LineHitCountsWrapper(props: Props) {
+  const { value } = useFeature("inlineHitCounts");
+  return value ? <LineHitCounts {...props} /> : null;
 }
 
-export const LineHitCounts = ({ cm }: LHCProps) => {
-  const [codeHeatMaps, setCodeHeatMaps] = useState(features.codeHeatMaps);
-  const indexed = useSelector(selectors.getIsIndexed);
-  const hitCounts = useSelector(getHitCountsForSelectedSource);
-  const source = useSelector(getSelectedSource);
-  const analysisPoints = useSelector(selectors.getPointsForHoveredLineNumber);
-  const breakpoints = useSelector(selectors.getBreakpointsList);
-
-  /*
-  let analysisPointsCount = useMemo(() => {
-    if (hitCounts) {
-      const lineHitCounts = minBy(
-        hitCounts.filter(hitCount => hitCount.location.line === lastHoveredLineNumber.current),
-        b => b.location.column
-      );
-      return lineHitCounts?.hits;
-    } else {
-      return analysisPoints?.data.length;
-    }
-  }, [hitCounts, analysisPoints]);
-  */
+function LineHitCounts({ cm }: Props) {
+  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const hitCountMap = useMemo(
+    () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
+    [hitCounts]
+  );
 
   useLayoutEffect(() => {
     if (!cm) {
@@ -42,11 +28,19 @@ export const LineHitCounts = ({ cm }: LHCProps) => {
     const doc = cm.editor.getDoc();
     const drawLines = () => {
       cm.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers", "hit-markers"]);
+
+      let lineNumber = 0;
+
       doc.eachLine((lineHandle: any) => {
+        lineNumber++;
+        const hitCount = hitCountMap?.get(lineNumber) || 0;
+        const className = hitCount > 0 ? styles.HitsBadge : styles.NoHitsBadge;
+        const innerHTML = hitCount > 0 ? `${hitCount}x` : "&nbsp;";
+
         const markerNode = document.createElement("div");
-        markerNode.innerHTML = "25x";
-        markerNode.style.zIndex = "0";
-        markerNode.style.backgroundColor = "green";
+        markerNode.className = className;
+        markerNode.innerHTML = innerHTML;
+
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
     };
@@ -58,11 +52,21 @@ export const LineHitCounts = ({ cm }: LHCProps) => {
 
     return () => {
       cm.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [cm]);
+  }, [cm, hitCountMap]);
 
   // We're just here for the hooks!
   return null;
-};
+}
+
+function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {
+  const hitCountMap: Map<number, number> = new Map();
+  hitCounts.forEach(hitCount => {
+    const line = hitCount.location.line;
+    hitCountMap.set(line, (hitCountMap.get(line) || 0) + hitCount.hits);
+  });
+  return hitCountMap;
+}

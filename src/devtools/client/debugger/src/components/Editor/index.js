@@ -56,7 +56,7 @@ import {
   endOperation,
   clearDocuments,
 } from "../../utils/editor";
-import { LineHitCounts } from "./LineHitCounts";
+import LineHitCounts from "./LineHitCounts";
 
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
