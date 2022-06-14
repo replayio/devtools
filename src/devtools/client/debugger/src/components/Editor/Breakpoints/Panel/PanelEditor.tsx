@@ -5,7 +5,6 @@ const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
 import actions from "devtools/client/debugger/src/actions";
 import { UIState } from "ui/state";
-import PrefixBadgeButton from "ui/components/PrefixBadge";
 
 interface Props {
   showCondition: boolean;
@@ -99,13 +98,12 @@ class PanelEditor extends PureComponent<Props, State> {
     return (
       <div
         className={classnames(
-          "panel-editor items-top flex flex-row items-center rounded-sm bg-breakpointEditfieldActive",
+          "panel-editor items-top flex flex-row items-start gap-1 rounded-sm bg-breakpointEditfieldActive",
           {
             conditional: showCondition,
           }
         )}
       >
-        <PrefixBadgeButton breakpoint={breakpoint} />
         <PanelForm
           {...{
             logSyntaxError,
@@ -122,12 +120,10 @@ class PanelEditor extends PureComponent<Props, State> {
           setCondition={this.setCondition}
           setConditionSyntaxError={this.setConditionSyntaxError}
         />
-        <div className="button-container ml-2 flex items-center">
-          <SubmitButton
-            handleSetBreakpoint={this.handleSetBreakpoint}
-            disabled={!!logSyntaxError || !!conditionSyntaxError}
-          />
-        </div>
+        <SubmitButton
+          handleSetBreakpoint={this.handleSetBreakpoint}
+          disabled={!!logSyntaxError || !!conditionSyntaxError}
+        />
       </div>
     );
   }

@@ -19,12 +19,10 @@ export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoi
   }
 
   return (
-    <div className="relative z-10" style={{ width: 28, marginLeft: 7 }}>
-      <PrefixBadgePicker
-        initialValue={breakpoint.options.prefixBadge}
-        onSelect={newPrefixBadge => dispatch(setBreakpointPrefixBadge(breakpoint, newPrefixBadge))}
-      />
-    </div>
+    <PrefixBadgePicker
+      initialValue={breakpoint.options.prefixBadge}
+      onSelect={newPrefixBadge => dispatch(setBreakpointPrefixBadge(breakpoint, newPrefixBadge))}
+    />
   );
 }
 
