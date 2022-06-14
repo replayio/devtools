@@ -30,13 +30,3 @@ export async function recordPlaywright(
     await browser.close();
   }
 }
-
-export async function uploadLastRecording(id?: string) {
-  if (id) {
-    return await uploadRecording(id as any, {
-      verbose: true,
-      apiKey: config.replayApiKey,
-      server: config.backendUrl,
-    });
-  }
-}

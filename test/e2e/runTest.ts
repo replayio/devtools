@@ -41,7 +41,7 @@ function appendTestMetadata(testId: string, file: string, success: boolean) {
       );
     });
   } else {
-    console.error("Failed to find any recordings for test", script);
+    console.error("Failed to find any recordings for test", file);
   }
 }
 
