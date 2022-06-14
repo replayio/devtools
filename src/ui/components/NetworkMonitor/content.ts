@@ -59,6 +59,11 @@ export const shouldTryAndTurnIntoText = (contentType: string): boolean => {
   if (contentType.startsWith("text")) {
     return true;
   }
+
+  if (contentType == "unknown") {
+    return true;
+  }
+
   if (TEXTISH_CONTENT_TYPES.includes(withoutCharset(contentType))) {
     return true;
   }
