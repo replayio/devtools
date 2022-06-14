@@ -102,3 +102,6 @@ More information on using trunk can be found [here](https://docs.trunk.io/gettin
 #### Generating GraphQL types for Typescript
 
 See [/src/graphql/README.md](./src/graphql/README.md) for details.
+
+### Deploying
+Every commit to the main branch is automatically deployed to production.
