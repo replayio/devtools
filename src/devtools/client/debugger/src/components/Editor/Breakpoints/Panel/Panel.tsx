@@ -140,7 +140,7 @@ function Panel({
             }}
           >
             <PrefixBadgeButton breakpoint={breakpoint!} />
-            <div className="flex-1">
+            <div className="min-w-0 flex-1">
               {editing ? (
                 <PanelEditor
                   breakpoint={breakpoint}
