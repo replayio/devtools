@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setFocusRegion } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import {
@@ -13,11 +13,11 @@ import EditableTimeInput from "./EditableTimeInput";
 import styles from "./FocusInputs.module.css";
 
 export default function FocusInputs() {
-  const dispatch = useDispatch();
-  const currentTime = useSelector(selectors.getCurrentTime);
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const showFocusModeControls = useSelector(selectors.getShowFocusModeControls);
-  const recordingDuration = useSelector(selectors.getRecordingDuration);
+  const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
+  const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
   const formattedDuration = getFormattedTime(recordingDuration || 0);
   const formattedCurrentTime = getFormattedTime(currentTime);

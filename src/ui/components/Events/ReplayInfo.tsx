@@ -9,7 +9,8 @@ import MaterialIcon from "../shared/MaterialIcon";
 import Icon from "../shared/Icon";
 import { getPrivacySummaryAndIcon } from "../shared/SharingModal/PrivacyDropdown";
 import { getUniqueDomains } from "../UploadScreen/Privacy";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import { getRecordingTarget } from "ui/reducers/app";
@@ -34,7 +35,7 @@ const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void 
 function ReplayInfo({ setModal }: PropsFromRedux) {
   const { recording } = hooks.useGetRecording(getRecordingId()!);
   const { isAuthenticated } = useAuth0();
-  const recordingTarget = useSelector(getRecordingTarget);
+  const recordingTarget = useAppSelector(getRecordingTarget);
   const showEnvironmentVariables = recordingTarget == "node";
 
   if (!recording) {

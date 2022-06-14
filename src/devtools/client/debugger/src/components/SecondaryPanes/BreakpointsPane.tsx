@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { removeBreakpoint, removeBreakpointsInSource } from "../../actions/breakpoints/breakpoints";
 import { Source } from "../../reducers/types";
 import { Breakpoint, Context } from "../../selectors";
@@ -7,8 +7,8 @@ import { getBreakpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 
 export default function BreakpointsPane() {
-  const breakpointSources = useSelector(getBreakpointSources);
-  const dispatch = useDispatch();
+  const breakpointSources = useAppSelector(getBreakpointSources);
+  const dispatch = useAppDispatch();
   const emptyContent = "Click on a line number in the editor to add a breakpoint";
 
   return (

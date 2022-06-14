@@ -1,5 +1,5 @@
 import { clamp } from "lodash";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
 import {
@@ -9,8 +9,8 @@ import {
 } from "ui/utils/timeline";
 
 export default function UnfocusedRegion() {
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   if (!focusRegion) {
     return null;

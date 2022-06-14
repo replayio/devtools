@@ -1,5 +1,5 @@
 import classnames from "classnames";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { ChatAltIcon } from "@heroicons/react/solid";
 import { Comment } from "ui/state/comments";
 import { getCanvas } from "ui/actions/app";
@@ -8,7 +8,7 @@ const MARKER_DIAMETER = 28;
 const MARKER_RADIUS = 14;
 
 export default function VideoComment({ comment }: { comment: Comment }) {
-  const canvas = useSelector(getCanvas);
+  const canvas = useAppSelector(getCanvas);
 
   if (!canvas || !comment) {
     return null;

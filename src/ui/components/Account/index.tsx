@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { setLoadingFinished } from "ui/reducers/app";
 import useAuth0 from "ui/utils/useAuth0";
 
@@ -8,7 +8,7 @@ import Login from "../shared/Login/Login";
 
 export default function Account() {
   const { isLoading, isAuthenticated } = useAuth0();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(setLoadingFinished(true));

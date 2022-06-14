@@ -16,7 +16,8 @@ import {
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { HoveredItem } from "ui/state/timeline";
 import { getExecutionPoint } from "../../../selectors";
 import type { Breakpoint } from "../../../reducers/types";
@@ -33,8 +34,8 @@ function Points({
   breakpoint: any;
   hoveredItem: HoveredItem | null;
 }) {
-  const executionPoint = useSelector(getExecutionPoint);
-  const duration = useSelector(selectors.getRecordingDuration);
+  const executionPoint = useAppSelector(getExecutionPoint);
+  const duration = useAppSelector(selectors.getRecordingDuration);
   const displayedPoints = useMemo(() => {
     if (!duration) {
       // We haven't loaded yet, bailing early

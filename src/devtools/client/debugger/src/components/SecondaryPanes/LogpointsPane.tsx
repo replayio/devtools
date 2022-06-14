@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getLogpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -8,8 +8,8 @@ import { Context } from "../../selectors";
 import { Breakpoint, Source } from "../../reducers/types";
 
 export default function LogpointsPane() {
-  const dispatch = useDispatch();
-  const logpointSources = useSelector(getLogpointSources);
+  const dispatch = useAppDispatch();
+  const logpointSources = useAppSelector(getLogpointSources);
   const emptyContent = (
     <>
       {`Click on the `}

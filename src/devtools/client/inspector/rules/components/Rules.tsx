@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { RuleState } from "../state/rules";
 
@@ -11,9 +11,10 @@ type RulesProps = {
   showNewDeclarationEditor: Function;
   showSelectorEditor: Function;
   query: string;
+  children?: React.ReactNode;
 };
 
-export const Rules: FC<RulesProps> = ({ rules, children, ...rest }) => {
+export const Rules = ({ rules, children, ...rest }: RulesProps) => {
   return (
     <>
       {rules.map(rule => (

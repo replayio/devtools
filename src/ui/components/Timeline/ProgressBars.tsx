@@ -1,6 +1,6 @@
 import { clamp } from "lodash";
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import {
   getCurrentTime,
   getHoverTime,
@@ -10,10 +10,10 @@ import {
 import { getVisiblePosition } from "ui/utils/timeline";
 
 export default function ProgressBars() {
-  const currentTime = useSelector(getCurrentTime);
-  const hoverTime = useSelector(getHoverTime);
-  const precachedTime = useSelector(getPlaybackPrecachedTime);
-  const zoomRegion = useSelector(getZoomRegion);
+  const currentTime = useAppSelector(getCurrentTime);
+  const hoverTime = useAppSelector(getHoverTime);
+  const precachedTime = useAppSelector(getPlaybackPrecachedTime);
+  const zoomRegion = useAppSelector(getZoomRegion);
 
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
   const hoverPercent = getVisiblePosition({ time: hoverTime, zoom: zoomRegion }) * 100;

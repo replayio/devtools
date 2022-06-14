@@ -1,13 +1,13 @@
 import classNames from "classnames";
 import React, { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setConsoleFilterDrawerExpanded } from "ui/actions/layout";
 import Icon from "ui/components/shared/Icon";
 import { getConsoleFilterDrawerExpanded } from "ui/reducers/layout";
 
 export const FilterDrawerToggle: FC = () => {
-  const expanded = useSelector(getConsoleFilterDrawerExpanded);
-  const dispatch = useDispatch();
+  const expanded = useAppSelector(getConsoleFilterDrawerExpanded);
+  const dispatch = useAppDispatch();
 
   const onClick = () => {
     dispatch(setConsoleFilterDrawerExpanded(!expanded));

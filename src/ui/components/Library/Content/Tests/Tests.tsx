@@ -1,5 +1,5 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { Test, useGetTestsForWorkspace } from "ui/hooks/tests";
 import { getWorkspaceId } from "ui/reducers/app";
 import { LibraryContext } from "../../useFilters";
@@ -34,7 +34,7 @@ function TestsContextWrapper({ children }: { children: ReactNode }) {
 }
 
 export function Tests() {
-  const workspaceId = useSelector(getWorkspaceId);
+  const workspaceId = useAppSelector(getWorkspaceId);
   const [initialized, setInitialized] = useState(false);
   const { setPreview } = useContext(LibraryContext);
   const { tests, loading } = useGetTestsForWorkspace(workspaceId!);

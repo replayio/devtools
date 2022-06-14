@@ -2,11 +2,11 @@ import React, { FC } from "react";
 import FilterSettings from "devtools/client/webconsole/components/FilterBar/FilterSettings";
 import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 import EventListeners from "devtools/client/debugger/src/components/SecondaryPanes/EventListeners";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getConsoleFilterDrawerExpanded } from "ui/reducers/layout";
 
 export const FilterDrawer: FC = () => {
-  const expanded = useSelector(getConsoleFilterDrawerExpanded);
+  const expanded = useAppSelector(getConsoleFilterDrawerExpanded);
 
   if (!expanded) {
     return null;

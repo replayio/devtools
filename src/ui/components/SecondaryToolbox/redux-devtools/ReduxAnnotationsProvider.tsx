@@ -1,6 +1,6 @@
 import { ThreadFront } from "protocol/thread";
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { useFeature } from "ui/hooks/settings";
 
 import { ReduxAnnotationsContext, processReduxAnnotations } from "./redux-annotations";
@@ -12,7 +12,7 @@ interface RAPProps {
 
 export const ReduxAnnotationsProvider = ({ children }: RAPProps) => {
   const [annotations, setAnnotations] = useState<ReduxActionAnnotation[]>([]);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isStrictEffectsSecondRenderRef = useRef(false);
   const { value: reduxDevtoolsEnabled } = useFeature("showRedux");
 

@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Row, TableInstance } from "react-table";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { Column, Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
@@ -42,8 +42,8 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
-  const dispatch = useDispatch() as AppDispatch;
-  const loadedRegions = useSelector(getLoadedRegions);
+  const dispatch = useAppDispatch() as AppDispatch;
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
 
   const onSeek = (request: RequestSummary) => {
@@ -87,7 +87,7 @@ const RequestTable = ({
         className={classNames("flex h-full w-full flex-col overflow-x-auto", styles.request)}
         {...getTableProps()}
       >
-        <HeaderGroups columns={columns} headerGroups={headerGroups} />
+        <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
         <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;
