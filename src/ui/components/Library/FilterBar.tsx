@@ -10,11 +10,13 @@ export function FilterBar({
   setDisplayedText,
   setAppliedText,
   setView,
+  view,
 }: {
   displayedString: string;
   setDisplayedText: (str: string) => void;
   setAppliedText: (str: string) => void;
   setView: (view: View) => void;
+  view: View;
 }) {
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDisplayedText(e.target.value);
@@ -26,8 +28,8 @@ export function FilterBar({
   };
 
   return (
-    <div className="flex flex-grow relative items-center space-x-3">
-      <FilterDropdown setAppliedText={setAppliedText} setView={setView} />
+    <div className="relative flex flex-grow items-center space-x-3">
+      <FilterDropdown setAppliedText={setAppliedText} setView={setView} view={view} />
       <div className="flex flex-grow">
         <TextInput
           value={displayedString}

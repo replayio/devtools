@@ -1,4 +1,7 @@
-import { MouseEvent, useContext, useEffect, useRef } from "react";
+import { useContext } from "react";
+
+import Link from "next/link";
+
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
@@ -17,26 +20,14 @@ function PullRequestDetails({ id, title }: { id: string; title: string }) {
 function CommitDetails({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const title = metadata.source?.commit.title || "Unknown commit message";
-  const id = metadata.source?.commit.id ? metadata.source.commit.id.substring(0, 7) : "Unknown ID";
-  const { setView, setAppliedText } = useContext(LibraryContext);
-
-  const onViewTestRun = (e: MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    setView("recordings");
-    setAppliedText(`test-run:${metadata.test!.run!.id}`);
-  };
 
   return (
-    <button
-      className="overflow-hidden text-left whitespace-pre overflow-ellipsis hover:underline"
-      onClick={onViewTestRun}
+    <Link
+      className="overflow-hidden overflow-ellipsis whitespace-pre text-left hover:cursor-pointer hover:underline"
+      href={`/recording/${recording.id}`}
     >
-      <span>
-        {title} ({id})
-      </span>
-    </button>
+      {title}
+    </Link>
   );
 }
 
@@ -46,10 +37,12 @@ function ReplayDetails({ recording }: { recording: Recording }) {
 
   return (
     <div className="flex items-center space-x-3 text-xs text-gray-500">
-      <div className="flex items-center space-x-1">
-        <MaterialIcon>fork_right</MaterialIcon>
-        <span>{metadata.source?.branch || "Unknown branch"}</span>
-      </div>
+      {metadata.source?.branch && (
+        <div className="flex items-center space-x-1">
+          <MaterialIcon>fork_right</MaterialIcon>
+          <span>{metadata.source?.branch || "Unknown"}</span>
+        </div>
+      )}
       {metadata.source?.merge ? (
         <PullRequestDetails id={metadata.source.merge.id} title={metadata.source.merge.title} />
       ) : null}
@@ -58,13 +51,27 @@ function ReplayDetails({ recording }: { recording: Recording }) {
   );
 }
 
+function ResultTab({ passed }: { passed: boolean }) {
+  return (
+    <div
+      className={`mr-4 h-full w-1 rounded-tr-md rounded-br-md ${
+        passed ? "bg-transparent" : "bg-red-500"
+      }`}
+    />
+  );
+}
+
+const hasPassed = (recording: Recording) => recording.metadata.test?.result === "passed";
+
 export function ReplayRow({ recording }: { recording: Recording }) {
-  const { preview, setPreview } = useContext(LibraryContext);
+  const { preview } = useContext(LibraryContext);
   const { metadata, date } = recording;
   const isFocused = preview?.view === "tests" && recording.id === preview.recordingId;
 
   const onClick = (e: React.MouseEvent) => {
-    setPreview({ view: "tests", id: recording.metadata.test!.path!, recordingId: recording.id });
+    e.stopPropagation();
+    e.preventDefault();
+    document.location = `/recording/${recording.id}`;
   };
 
   return (
@@ -74,8 +81,8 @@ export function ReplayRow({ recording }: { recording: Recording }) {
       passed={metadata.test?.result === "passed"}
       recordingId={recording.id}
     >
-      <div className="flex flex-row items-center flex-grow py-2 space-x-2 overflow-hidden">
-        <div className="flex flex-col flex-grow overflow-hidden">
+      <div className=" flex flex-grow flex-row items-center overflow-hidden py-2">
+        <div className="flex flex-grow flex-col overflow-hidden">
           <CommitDetails recording={recording} />
           <ReplayDetails recording={recording} />
         </div>

@@ -227,7 +227,7 @@ function convertTestRun(testRun: any) {
       title: source?.commit?.title || "Unknown Commit",
     },
     date: firstRecording.date,
-    branch: source?.branch || "Unknown Branch",
+    branch: source?.branch || "Unknown",
     event: source?.trigger?.name || "Unknown",
     recordings,
   };

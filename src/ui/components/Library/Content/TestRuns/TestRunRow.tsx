@@ -60,9 +60,12 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className={`flex flex-grow cursor-pointer flex-row items-center space-x-4 overflow-hidden border-b border-themeBorder px-4 py-3 ${
-        isSelected ? "bg-blue-100" : ""
+      className={`my-0.5 flex flex-grow cursor-pointer flex-row items-center space-x-4 overflow-hidden rounded-md border-b bg-white px-4 py-3 ${
+        isSelected ? "selected" : ""
       }`}
+      style={{
+        backgroundColor: isSelected ? "#A3DEFA" : "",
+      }}
       onClick={onClick}
     >
       <Badge recordings={testRun.recordings} />
@@ -73,7 +76,12 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
         </div>
         <div className="flex h-4 flex-row items-end space-x-0.5 overflow-hidden">
           {displayedRecordings.map((r, i) => (
-            <ResultBar recording={r} key={i} maxDuration={longestDuration} />
+            <ResultBar
+              isSelected={isSelected}
+              recording={r}
+              key={i}
+              maxDuration={longestDuration}
+            />
           ))}
         </div>
       </div>

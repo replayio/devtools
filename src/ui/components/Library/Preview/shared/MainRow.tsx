@@ -4,7 +4,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 function ResultTab({ passed }: { passed: boolean }) {
   return (
     <div
-      className={`w-2 h-full rounded-tr-md rounded-br-md ${
+      className={`mr-2 h-full w-1 rounded-tr-md rounded-br-md ${
         passed ? "bg-transparent" : "bg-red-500"
       }`}
     />
@@ -37,11 +37,14 @@ export function MainRow({
       className={`group flex flex-grow flex-row items-center border-b pr-2 transition duration-150 ${
         isFocused ? "bg-blue-100" : "hover:bg-gray-100"
       }`}
+      style={{
+        backgroundColor: isFocused ? "#A3DEFA" : "",
+      }}
       ref={rowNode}
       onClick={onClick}
     >
       <ResultTab passed={passed} />
-      <ViewReplayButton isFocused={isFocused} recordingId={recordingId} />
+      {/* <ViewReplayButton isFocused={isFocused} recordingId={recordingId} /> */}
       {children}
     </div>
   );

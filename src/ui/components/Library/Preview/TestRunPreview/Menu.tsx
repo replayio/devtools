@@ -6,7 +6,7 @@ import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 function MenuIcon({ onContextMenu }: { onContextMenu: (e: MouseEvent) => void }) {
   return (
     <button
-      className="grid items-center justify-center w-6 h-6 opacity-0 group-hover:opacity-100"
+      className="grid h-6 w-6 items-center justify-center opacity-0 group-hover:opacity-100"
       onContextMenu={onContextMenu}
       onClick={onContextMenu}
     >
@@ -38,7 +38,7 @@ type ContextMenuType = {
   pageY: number;
 };
 
-export function MainContextMenu({ runUrl }: { runUrl: string }) {
+export function MainContextMenu({ runUrl }: { runUrl: string | undefined }) {
   const [contextMenu, setContextMenu] = useState<ContextMenuType | null>(null);
 
   const onContextMenu = (e: MouseEvent) => {

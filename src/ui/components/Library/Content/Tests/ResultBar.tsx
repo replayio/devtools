@@ -4,22 +4,33 @@ import { LibraryContext } from "../../useFilters";
 import { TestsContext } from "./Tests";
 import { TestTooltip } from "./TestTooltip";
 
-function getColor(passed: boolean, testRunId?: string | null, hoveredRunId?: string | null) {
+function getColor(
+  passed: boolean,
+  isSelected: boolean,
+  testRunId?: string | null,
+  hoveredRunId?: string | null
+) {
   const shouldHighlight = !!(hoveredRunId && testRunId === hoveredRunId);
 
   if (shouldHighlight) {
-    return passed ? "bg-gray-400" : "bg-red-500";
+    return passed ? "bg-gray-200" : "bg-red-500";
   }
 
-  return passed ? "bg-gray-200" : "bg-red-300";
+  if (passed) {
+    return isSelected ? "bg-white" : "bg-gray-100";
+  }
+
+  return "bg-red-400";
 }
 
 export function ResultBar({
   recording,
   maxDuration,
+  isSelected,
 }: {
   recording: Recording;
   maxDuration: number;
+  isSelected: boolean;
 }) {
   const { setPreview } = useContext(LibraryContext);
   const { hoveredRunId, setHoveredRunId, hoveredRecordingId, setHoveredRecordingId } =
@@ -46,7 +57,7 @@ export function ResultBar({
   };
 
   const passed = recording.metadata.test?.result === "passed";
-  const color = getColor(passed, testRunId, hoveredRunId);
+  const color = getColor(passed, isSelected, testRunId, hoveredRunId);
 
   return (
     <div style={{ height }} className="relative">
