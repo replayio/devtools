@@ -34,6 +34,18 @@
     "no-nested-ternary": 0,
     "no-param-reassign": 0,
     "no-restricted-syntax": 0,
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-redux",
+            "importNames": ["useDispatch", "useSelector"],
+            "message": "Please import 'useAppDispatch/useAppSelector' from 'ui/setup/hooks' instead."
+          }
+        ]
+      }
+    ],
     "react/button-has-type": 0,
     "react/forbid-prop-types": 0,
     "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
@@ -53,7 +65,7 @@
   },
   "settings": {
     "react": {
-      "version": "16.8"
+      "version": "18.1"
     }
   }
 }
