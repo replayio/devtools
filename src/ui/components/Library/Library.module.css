@@ -32,7 +32,7 @@
 }
 
 :root:global(.theme-dark) .dropdownDivider {
-  border-bottom: 1px solid var(--theme-base-80);
+  border-bottom: 1px solid var(--chrome);
 }
 
 :root:global(.theme-dark) .editButton {

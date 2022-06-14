@@ -2,8 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Dispatch } from "@reduxjs/toolkit";
-import { SourceLocation } from "devtools/client/debugger/src/reducers/types";
+import classNames from "classnames";
+import { badges } from "components/PrefixBadgePicker/PrefixBadgePicker";
+import { PrefixBadge, SourceLocation } from "devtools/client/debugger/src/reducers/types";
 import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
 import { StateContext } from "devtools/client/webconsole/components/Search";
 import constants from "devtools/client/webconsole/constants";
@@ -17,7 +18,7 @@ import {
   setFocusRegionBeginTime,
 } from "ui/actions/timeline";
 import { ContextMenu } from "ui/components/ContextMenu";
-import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
 import {
@@ -36,6 +37,7 @@ import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
 
 import type { State as ConsoleSearchState } from "../Search/useConsoleSearch";
+import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
 
 function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
   if (!locA) {
@@ -250,7 +252,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
         </div>
         {contextMenu !== null && (
           <ContextMenu x={contextMenu.pageX} y={contextMenu.pageY} close={this.closeContextMenu}>
-            <Dropdown>
+            <Dropdown widthClass="">
               <DropdownItem onClick={this.setFocusStart}>
                 <>
                   <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
@@ -263,6 +265,30 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
                   Set focus end
                 </>
               </DropdownItem>
+              {contextMenu?.message?.type === "logPoint" && (
+                <>
+                  <DropdownDivider />
+                  <DropdownItem onClick={noop}>
+                    <div className={styles.ColorPickerRow}>
+                      {badges.map(badge => (
+                        <div
+                          key={badge}
+                          className={
+                            badge === "unicorn"
+                              ? styles.UnicornBadge
+                              : classNames(styles.ColorBadge, styles[badge])
+                          }
+                          onClick={() => this.selectBadge(badge)}
+                        />
+                      ))}
+                      <div
+                        className={styles.EmptyBadge}
+                        onClick={() => this.selectBadge(undefined)}
+                      />
+                    </div>
+                  </DropdownItem>
+                </>
+              )}
             </Dropdown>
           </ContextMenu>
         )}
@@ -306,8 +332,23 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
     });
   };
 
+  selectBadge = (badge: PrefixBadge | undefined) => {
+    const { breakpoints, dispatch } = this.props;
+    const { message } = this.state.contextMenu!;
+
+    const matchingBreakpoint = breakpoints.find(breakpoint =>
+      compareLocation(message.frame, breakpoint.location)
+    );
+
+    if (matchingBreakpoint != null) {
+      dispatch(setBreakpointPrefixBadge(matchingBreakpoint, badge));
+    }
+
+    this.closeContextMenu();
+  };
+
   setFocusEnd = async () => {
-    const { dispatch, focusRegion } = this.props;
+    const { dispatch } = this.props;
     const { message } = this.state.contextMenu!;
 
     this.setState({ contextMenu: null });
@@ -318,7 +359,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    (dispatch as AppDispatch)(setFocusRegionEndTime(time, true));
+    dispatch(setFocusRegionEndTime(time, true));
   };
 
   setFocusStart = async () => {
@@ -333,7 +374,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    (dispatch as AppDispatch)(setFocusRegionBeginTime(time, true));
+    dispatch(setFocusRegionBeginTime(time, true));
   };
 }
 
@@ -362,7 +403,7 @@ function mapStateToProps(state: UIState) {
   };
 }
 
-const mapDispatchToProps = (dispatch: Dispatch) => ({
+const mapDispatchToProps = (dispatch: AppDispatch) => ({
   dispatch,
 });
 
@@ -464,3 +505,5 @@ function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) 
     );
   }
 }
+
+function noop() {}
