@@ -28,6 +28,7 @@ runs:
     - run: npm run test-e2e -- --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
+        RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
         RECORD_REPLAY_NODE: replay-node/macOS-replay-node
         RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
