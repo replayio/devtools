@@ -9,6 +9,42 @@ import { getExampleRecordingId } from "./getExample";
 import { recordPlaywright, uploadLastRecording } from "./recordPlaywright";
 import { reportError, waitUntilMessage } from "./utils";
 
+function setTestId(file: string) {
+  const testId = file + "-" + Date.now();
+  process.env.RECORD_REPLAY_METADATA = JSON.stringify({
+    "x-replay-test": {
+      testId,
+    },
+  });
+
+  return testId;
+}
+
+function appendTestMetadata(testId: string, file: string, success: boolean) {
+  const recordings = listAllRecordings()
+    .filter(r => (r.metadata["x-replay-test"] as any)?.testId === testId)
+    .sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
+
+  let recordingId: string | undefined;
+
+  if (recordings) {
+    recordings.forEach(recording => {
+      recordingId = String(recording.id);
+      addMetadata(
+        recordingId,
+        test.init({
+          file: file,
+          path: ["", config.browserName, file],
+          title: file,
+          result: success ? "passed" : "failed",
+        })
+      );
+    });
+  } else {
+    console.error("Failed to find any recordings for test", script);
+  }
+}
+
 export async function runClassicTest(args: {
   example: string;
   isNodeExample?: boolean;
@@ -34,12 +70,7 @@ export async function runClassicTest(args: {
   const apolloLogs: any[] = [];
   const websocketLogs: any[] = [];
 
-  const testId = script + "-" + Date.now();
-  process.env.RECORD_REPLAY_METADATA = JSON.stringify({
-    "x-replay-test": {
-      testId,
-    },
-  });
+  const testId = setTestId(script);
 
   try {
     await recordPlaywright(config.browserName, async page => {
@@ -76,28 +107,7 @@ export async function runClassicTest(args: {
     console.error("Recording test failed:", e);
   }
 
-  const recordings = listAllRecordings()
-    .filter(r => (r.metadata["x-replay-test"] as any)?.testId === testId)
-    .sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
-
-  let recordingId: string | undefined;
-
-  if (recordings) {
-    recordings.forEach(recording => {
-      recordingId = String(recording.id);
-      addMetadata(
-        recordingId,
-        test.init({
-          file: script,
-          path: ["", config.browserName, script],
-          title: script,
-          result: success ? "passed" : "failed",
-        })
-      );
-    });
-  } else {
-    console.error("Failed to find any recordings for test", script);
-  }
+  appendTestMetadata(testId, script, success);
 
   if (saveFixture && success) {
     const testName = script.substring(0, script.length - 3);
@@ -128,15 +138,19 @@ export async function runPlaywrightTest(args: {
   }
   expect(exampleRecordingId).toBeTruthy();
 
+  const testId = setTestId(args.example);
+
   const url = `${config.devtoolsUrl}/recording/${exampleRecordingId}`;
+  let success = false;
   try {
     await recordPlaywright(config.browserName, async page => {
       await page.goto(url);
       await args.script(page);
     });
+    success = true;
   } catch (e) {
-    const recordingId = await uploadLastRecording(url);
-    reportError(`${args.script}: https://app.replay.io/recording/${recordingId}`);
-    throw e;
+    console.error(e);
   }
+
+  appendTestMetadata(testId, args.example, success);
 }
