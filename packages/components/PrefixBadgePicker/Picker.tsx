@@ -88,6 +88,7 @@ export function Picker<Values extends any>({
           if (nextIsOpen) {
             setIsActive(true);
           } else {
+            /** Wait until the fill is finished animating before removing the active background color. */
             setTimeout(() => {
               setIsActive(false);
               transitioning.current = false;
