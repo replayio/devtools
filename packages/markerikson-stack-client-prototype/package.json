@@ -8,8 +8,10 @@
     "test": "jest"
   },
   "dependencies": {
-    "protocol": "file:../protocol",
-    "@uiw/react-codemirror": "^4.7.0",
-    "@codemirror/lang-javascript": "^6.0.0"
+    "@codemirror/lang-javascript": "^6.0.0",
+    "@uiw/react-codemirror": "^4.8.1",
+    "protocol": "file:../protocol"
+  },
+  "overrides": {
   }
 }
