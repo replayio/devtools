@@ -6,7 +6,7 @@ import { test, add as addMetadata } from "@replayio/replay/metadata";
 
 import config from "./config";
 import { getExampleRecordingId } from "./getExample";
-import { recordPlaywright, uploadLastRecording } from "./recordPlaywright";
+import { recordPlaywright } from "./recordPlaywright";
 import { reportError, waitUntilMessage } from "./utils";
 
 function setTestId(file: string) {

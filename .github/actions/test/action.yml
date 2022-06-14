@@ -39,3 +39,4 @@ runs:
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         public: true
+        filter: function($v) { $v.metadata.test and $v.status = "onDisk" }
