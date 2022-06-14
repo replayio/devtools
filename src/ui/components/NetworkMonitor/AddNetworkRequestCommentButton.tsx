@@ -1,4 +1,4 @@
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { createNetworkRequestComment } from "ui/actions/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
@@ -6,7 +6,7 @@ import { RequestSummary } from "./utils";
 
 export default function AddNetworkRequestCommentButton({ request }: { request: RequestSummary }) {
   const { value: networkRequestComments } = useFeature("networkRequestComments");
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
 
   const addRequestComment = () => {

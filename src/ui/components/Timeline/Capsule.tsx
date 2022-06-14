@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { MutableRefObject, useEffect, useRef, useState } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import ExternalLink from "ui/components/shared/ExternalLink";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
@@ -20,9 +20,9 @@ export default function Capsule({
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const progress = Math.round(useSelector(getLoadedAndIndexedProgress) * 100);
-  const loadingStatusSlow = useSelector(getLoadingStatusSlow);
-  const showFocusModeControls = useSelector(getShowFocusModeControls);
+  const progress = Math.round(useAppSelector(getLoadedAndIndexedProgress) * 100);
+  const loadingStatusSlow = useAppSelector(getLoadingStatusSlow);
+  const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 
   return (
     <div className={styles.Capsule}>

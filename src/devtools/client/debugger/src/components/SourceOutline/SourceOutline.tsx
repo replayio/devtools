@@ -9,7 +9,8 @@ import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 import { getOutlineSymbols } from "./getOutlineSymbols";
 import { FunctionSymbol, ClassSymbol } from "../../types";
-import { connect, ConnectedProps, useDispatch } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
@@ -41,7 +42,7 @@ export function SourceOutline({
     const symbol = findClosestEnclosedSymbol(symbols, cursorPosition);
     return outlineSymbols?.findIndex(a => a === symbol);
   }, [cursorPosition, outlineSymbols, symbols]);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (selectedSource) {

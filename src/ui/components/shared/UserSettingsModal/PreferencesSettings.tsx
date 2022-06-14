@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import hooks from "ui/hooks";
 import { useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
@@ -109,8 +109,8 @@ function PrivacyPreferences() {
 }
 
 function UiPreferences() {
-  const dispatch = useDispatch();
-  const theme = useSelector(getThemePreference);
+  const dispatch = useAppDispatch();
+  const theme = useAppSelector(getThemePreference);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
 
   const setSelected = (value: AppTheme) => {

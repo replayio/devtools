@@ -1,6 +1,7 @@
 import { installObserver, refreshGraphics } from "protocol/graphics";
 import React, { FC, useEffect, useRef } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { selectors } from "../reducers";
 import CommentsOverlay from "ui/components/Comments/VideoComments/index";
@@ -15,7 +16,7 @@ import { getViewMode } from "ui/reducers/layout";
 import Tooltip from "./shared/Tooltip";
 
 const HideVideoButton: FC = () => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onClick = () => {
     dispatch(setShowVideoPanel(false));
@@ -52,7 +53,7 @@ function Video({
   videoUrl,
 }: PropsFromRedux) {
   const recordingId = hooks.useGetRecordingId();
-  const viewMode = useSelector(getViewMode);
+  const viewMode = useAppSelector(getViewMode);
   const isPaused = !playback;
   const isNodeTarget = recordingTarget == "node";
 

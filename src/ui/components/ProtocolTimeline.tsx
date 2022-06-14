@@ -1,7 +1,7 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
@@ -35,7 +35,7 @@ const Spans = ({
   title: string;
   points?: TimeStampedPoint[];
 }) => {
-  const { endTime } = useSelector(getZoomRegion)!;
+  const { endTime } = useAppSelector(getZoomRegion)!;
 
   return (
     <div className="relative z-10 h-1 w-full" title={title}>
@@ -68,7 +68,7 @@ const Spans = ({
 };
 
 export default function ProtocolTimeline() {
-  const loadedRegions = useSelector(getLoadedRegions);
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const { value: showProtocolTimeline } = useFeature("protocolTimeline");
   const firstPaint = gPaintPoints[0];
   const lastPaint = gPaintPoints[gPaintPoints.length - 1];

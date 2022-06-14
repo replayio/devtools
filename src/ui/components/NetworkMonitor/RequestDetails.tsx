@@ -3,8 +3,8 @@ import CloseButton from "devtools/client/debugger/src/components/shared/Button/C
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import sortBy from "lodash/sortBy";
 import { WiredFrame } from "protocol/thread/pause";
-import React, { FC, ReactNode, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { hideRequestDetails, seekToRequestFrame, selectAndFetchRequest } from "ui/actions/network";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -24,8 +24,8 @@ interface Detail {
   value: string | React.ReactChild;
 }
 
-export const RequestDetailsUnavailable: FC = () => {
-  const dispatch = useDispatch();
+export const RequestDetailsUnavailable = () => {
+  const dispatch = useAppDispatch();
   const closePanel = () => dispatch(hideRequestDetails());
 
   return (
@@ -44,7 +44,7 @@ export const RequestDetailsUnavailable: FC = () => {
   );
 };
 
-const RequestDetailsTabs: FC<{ children?: ReactNode }> = ({ children }) => {
+const RequestDetailsTabs = ({ children }: { children?: ReactNode }) => {
   return (
     <div
       className={classNames(
@@ -152,7 +152,7 @@ const StackTrace = ({
   frames: WiredFrame[];
   request: RequestSummary;
 }) => {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const selectFrame = async (cx: any, frame: any) => {
     dispatch(seekToRequestFrame(request, frame, cx));
   };
@@ -296,10 +296,10 @@ const RequestDetails = ({
   previousRequestId: string | null;
   nextRequestId: string | null;
 }) => {
-  const dispatch = useDispatch();
-  const frames = useSelector(getFormattedFrames)[request.point.point];
+  const dispatch = useAppDispatch();
+  const frames = useAppSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
-  const loadedRegions = useSelector(getLoadedRegions)?.loaded;
+  const loadedRegions = useAppSelector(getLoadedRegions)?.loaded;
 
   // Keyboard shortcuts handler.
   useEffect(() => {

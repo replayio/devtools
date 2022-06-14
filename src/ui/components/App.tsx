@@ -1,5 +1,6 @@
 import React, { ReactNode, useEffect, createContext } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isTest } from "ui/utils/environment";
 import { actions } from "ui/actions";
 import { ModalType } from "ui/state/app";
@@ -35,7 +36,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
 
 function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
-  const loadingFinished = useSelector(selectors.getLoadingFinished);
+  const loadingFinished = useAppSelector(selectors.getLoadingFinished);
 
   // Dismiss modal if the "Escape" key is pressed.
   useEffect(() => {
@@ -110,7 +111,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   const auth = useAuth0();
   const dismissNag = hooks.useDismissNag();
   const userInfo = useGetUserInfo();
-  const theme = useSelector(selectors.getTheme);
+  const theme = useAppSelector(selectors.getTheme);
 
   useEffect(() => {
     if (userInfo.nags && shouldShowNag(userInfo.nags, Nag.FIRST_LOG_IN)) {

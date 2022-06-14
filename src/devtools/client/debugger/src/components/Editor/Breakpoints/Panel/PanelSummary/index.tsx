@@ -4,7 +4,7 @@ import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/b
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { createFloatingCodeComment, createFrameComment } from "ui/actions/comments";
 import { enterFocusMode } from "ui/actions/timeline";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
@@ -42,7 +42,7 @@ export default function PanelSummary({
   const conditionValue = breakpoint.options.condition;
   const logValue = breakpoint.options.logValue;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const isLoaded = Boolean(analysisPoints && !isHot);
   const isEditable = isLoaded && isTeamDeveloper;

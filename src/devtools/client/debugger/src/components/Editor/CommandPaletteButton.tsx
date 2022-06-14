@@ -1,12 +1,13 @@
 import React from "react";
 import classNames from "classnames";
-import { useDispatch, useSelector } from "react-redux";
+
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "../../reducers/sources";
 import { deselectSource } from "../../actions/sources/select";
 
 export default function CommandPaletteButton() {
-  const selectedSource = useSelector(getSelectedSource);
-  const dispatch = useDispatch();
+  const selectedSource = useAppSelector(getSelectedSource);
+  const dispatch = useAppDispatch();
 
   const showCommandPalette = () => dispatch(deselectSource());
 

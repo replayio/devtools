@@ -1,6 +1,6 @@
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import React, { FC, useEffect, useRef } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import cx from "classnames";
 import { actions } from "ui/actions";
 import { Command } from "./CommandPalette";
@@ -11,8 +11,8 @@ type CommandButtonProps = {
   active: boolean;
 };
 
-const CommandButton: FC<CommandButtonProps> = ({ command, active }) => {
-  const dispatch = useDispatch();
+const CommandButton = ({ command, active }: CommandButtonProps) => {
+  const dispatch = useAppDispatch();
 
   const buttonNode = useRef<HTMLButtonElement | null>(null);
   const { label, shortcut, key } = command;

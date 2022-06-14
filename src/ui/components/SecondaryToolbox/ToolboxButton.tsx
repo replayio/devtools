@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import Icon from "../shared/Icon";
@@ -20,9 +20,9 @@ export const ToolboxButton: FC<{ title?: string; onClick?: () => void }> = ({
   );
 };
 
-export const ShowVideoButton: FC = () => {
-  const dispatch = useDispatch();
-  const showVideoPanel = useSelector(getShowVideoPanel);
+export const ShowVideoButton = () => {
+  const dispatch = useAppDispatch();
+  const showVideoPanel = useAppSelector(getShowVideoPanel);
 
   const onClick = () => {
     dispatch(setShowVideoPanel(true));

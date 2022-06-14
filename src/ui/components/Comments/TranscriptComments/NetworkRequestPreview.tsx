@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setSelectedPanel } from "ui/actions/layout";
 import { selectAndFetchRequest } from "ui/actions/network";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -12,9 +12,9 @@ import { trackEvent } from "ui/utils/telemetry";
 import { isInFocusSpan } from "ui/utils/timeline";
 
 export default function NetworkRequestPreview({ networkRequestId }: { networkRequestId: string }) {
-  const dispatch = useDispatch();
-  const request = useSelector((state: UIState) => getSummaryById(state, networkRequestId));
-  const focusRegion = useSelector(getFocusRegion);
+  const dispatch = useAppDispatch();
+  const request = useAppSelector((state: UIState) => getSummaryById(state, networkRequestId));
+  const focusRegion = useAppSelector(getFocusRegion);
 
   if (!request) {
     return null;

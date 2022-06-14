@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ToolboxLayout } from "ui/state/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { setToolboxLayout } from "ui/actions/layout";
@@ -42,8 +42,8 @@ function LayoutOption({
   icon: string;
   collapseDropdown: () => void;
 }) {
-  const toolboxLayout = useSelector(getToolboxLayout);
-  const dispatch = useDispatch();
+  const toolboxLayout = useAppSelector(getToolboxLayout);
+  const dispatch = useAppDispatch();
 
   const onClick = () => {
     dispatch(setToolboxLayout(value));
@@ -56,7 +56,7 @@ function LayoutOption({
 }
 
 export default function ToolboxOptions() {
-  const toolboxLayout = useSelector(getToolboxLayout);
+  const toolboxLayout = useAppSelector(getToolboxLayout);
   const [expanded, setExpanded] = useState(false);
   const button = <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />;
   const collapseDropdown = () => setExpanded(false);

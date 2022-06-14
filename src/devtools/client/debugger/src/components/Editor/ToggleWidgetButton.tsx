@@ -1,8 +1,8 @@
 import { PointDescription } from "@replayio/protocol";
 import ReactDOM from "react-dom";
 import React, { useState, useEffect, MouseEventHandler, FC, ReactNode } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
-import { actions } from "ui/actions";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
@@ -93,9 +93,9 @@ function QuickActions({
 }) {
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
-  const dispatch = useDispatch();
-  const analysisPoints = useSelector(getPointsForHoveredLineNumber);
-  const executionPoint = useSelector(getExecutionPoint);
+  const dispatch = useAppDispatch();
+  const analysisPoints = useAppSelector(getPointsForHoveredLineNumber);
+  const executionPoint = useAppSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { height } = targetNode.getBoundingClientRect();

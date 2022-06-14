@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import hooks from "ui/hooks";
 import { subscriptionEndsIn } from "ui/utils/workspace";
@@ -8,7 +8,7 @@ import { TrialEnd } from "../shared/TrialEnd";
 
 export default function TeamTrialEnd({ currentWorkspaceId }: { currentWorkspaceId: string }) {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const { members } = hooks.useGetWorkspaceMembers(currentWorkspaceId);
   const router = useRouter();
   const { userId: localUserId } = hooks.useGetUserId();

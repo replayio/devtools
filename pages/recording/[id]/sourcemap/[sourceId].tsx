@@ -1,7 +1,8 @@
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 import { initSocket, client } from "protocol/socket";
-import { useDispatch, useStore } from "react-redux";
+import { useStore } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { UIStore } from "ui/actions";
 import { ExpectedError } from "ui/state/app";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
@@ -104,7 +105,7 @@ function SourcemapVisualizer({
   map: string;
   url: string | undefined;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   // TODO [hbenl] Fix react-hooks/exhaustive-deps
   // Is this really something we only want to do on-mount (even if source/map/url change)?
@@ -134,7 +135,7 @@ function SourcemapVisualizer({
 }
 
 export default function SourceMapLoader() {
-  const store = useStore();
+  const store: UIStore = useStore();
   const recordingId = useGetRecordingId();
   const sourceId = useRouter().query.sourceId as string;
   const [sourcemapResult, setSourcemapResult] = useState<SourcemapResult | undefined>();

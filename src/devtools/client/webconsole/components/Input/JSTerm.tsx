@@ -1,6 +1,6 @@
 import { Editor } from "codemirror";
 import React, { useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   EditorWithAutocomplete,
   Keys,
@@ -43,10 +43,10 @@ const getJsTermApi = (
 };
 
 export default function JSTerm() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const isInLoadedRegion = useSelector(getIsInLoadedRegion);
+  const isInLoadedRegion = useAppSelector(getIsInLoadedRegion);
 
   const [value, setValue] = useState("");
   const [autocompletePreview, setAutocompletePreview] = useState<string | null>(null);
@@ -114,7 +114,7 @@ export default function JSTerm() {
 }
 
 function InaccessibleEditor() {
-  const playback = useSelector(getPlayback);
+  const playback = useAppSelector(getPlayback);
   const msg = playback ? "Console evaluations are disabled during playback" : "Loading…";
 
   return <div className="flex h-full items-center italic text-gray-400">{msg}</div>;

@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
@@ -42,8 +42,8 @@ const RequestTable = ({
 }) => {
   const { columns, getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = table;
 
-  const dispatch = useDispatch() as AppDispatch;
-  const loadedRegions = useSelector(getLoadedRegions);
+  const dispatch = useAppDispatch() as AppDispatch;
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
 
   const onSeek = (request: RequestSummary) => {

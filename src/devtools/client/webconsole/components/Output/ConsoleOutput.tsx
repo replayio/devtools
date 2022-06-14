@@ -9,7 +9,8 @@ import { StateContext } from "devtools/client/webconsole/components/Search";
 import constants from "devtools/client/webconsole/constants";
 import { Frame, Message } from "devtools/client/webconsole/reducers/messages";
 import React from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   enterFocusMode,
   setFocusRegionEndTime,
@@ -381,11 +382,11 @@ async function getTimeForMessage(message: Message): Promise<number> {
 }
 
 function TrimmedMessageCountRow({ position }: { position: "before" | "after" }) {
-  const dispatch = useDispatch();
-  const focusRegion = useSelector(getFocusRegion);
-  const zoomRegion = useSelector(getZoomRegion);
-  const showFocusModeControls = useSelector(getShowFocusModeControls);
-  const { countAfter, countBefore, isFilteredCountExact, messageIDs } = useSelector(
+  const dispatch = useAppDispatch();
+  const focusRegion = useAppSelector(getFocusRegion);
+  const zoomRegion = useAppSelector(getZoomRegion);
+  const showFocusModeControls = useAppSelector(getShowFocusModeControls);
+  const { countAfter, countBefore, isFilteredCountExact, messageIDs } = useAppSelector(
     selectors.getVisibleMessageData
   );
 

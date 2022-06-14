@@ -1,6 +1,7 @@
 import { ThreadFront } from "protocol/thread";
 import React, { useEffect, useState, useRef, useMemo } from "react";
-import { connect, ConnectedProps, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { UIState } from "ui/state";
@@ -60,8 +61,8 @@ function ViewLoader() {
 }
 
 function Body() {
-  const sidePanelCollapsed = useSelector(getPaneCollapse);
-  const viewMode = useSelector(getViewMode);
+  const sidePanelCollapsed = useAppSelector(getPaneCollapse);
+  const viewMode = useAppSelector(getViewMode);
 
   return (
     <div className="vertical-panels pr-2">

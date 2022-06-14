@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import classnames from "classnames";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { actions } from "../actions";
 import { selectors } from "../reducers";
 
@@ -37,9 +37,9 @@ function ToolbarButton({
   name: PrimaryPanelName;
   showBadge?: boolean;
 }) {
-  const selectedPrimaryPanel = useSelector(selectors.getSelectedPrimaryPanel);
-  const panelCollapsed = useSelector(selectors.getPaneCollapse);
-  const dispatch = useDispatch();
+  const selectedPrimaryPanel = useAppSelector(selectors.getSelectedPrimaryPanel);
+  const panelCollapsed = useAppSelector(selectors.getPaneCollapse);
+  const dispatch = useAppDispatch();
 
   const handleClick = (panelName: PrimaryPanelName) => {
     if (panelCollapsed || (selectedPrimaryPanel == panelName && !panelCollapsed)) {
@@ -82,9 +82,9 @@ function ToolbarButton({
 }
 
 export default function Toolbar() {
-  const isPaused = useSelector(selectors.hasFrames);
-  const viewMode = useSelector(selectors.getViewMode);
-  const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
+  const isPaused = useAppSelector(selectors.hasFrames);
+  const viewMode = useAppSelector(selectors.getViewMode);
+  const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
   const recordingId = useGetRecordingId();
   const { comments, loading } = hooks.useGetComments(recordingId);

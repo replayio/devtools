@@ -1,15 +1,15 @@
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { replayPlayback, startPlayback, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
 import { displayedEndForFocusRegion } from "ui/utils/timeline";
 
 export default function PlayPauseButton() {
-  const dispatch = useDispatch();
-  const currentTime = useSelector(selectors.getCurrentTime);
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const playback = useSelector(selectors.getPlayback);
-  const recordingDuration = useSelector(selectors.getRecordingDuration);
+  const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const playback = useAppSelector(selectors.getPlayback);
+  const recordingDuration = useAppSelector(selectors.getRecordingDuration);
 
   const isAtEnd = focusRegion
     ? currentTime === displayedEndForFocusRegion(focusRegion)

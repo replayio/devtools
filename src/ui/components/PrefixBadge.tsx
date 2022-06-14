@@ -2,7 +2,7 @@ import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/b
 import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import { Breakpoint } from "devtools/client/debugger/src/selectors";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { useFeature } from "ui/hooks/settings";
 import { PrefixBadgePicker } from "../../../packages/components";
 
@@ -12,7 +12,7 @@ import styles from "./PrefixBadge.module.css";
 // Clicking this item will show the PrefixBadgePicker.
 export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoint }) {
   const { value: enableUnicornConsole } = useFeature("unicornConsole");
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   if (!enableUnicornConsole) {
     return null;

@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
@@ -26,10 +26,10 @@ export type EditMode = {
 };
 
 export default function Timeline() {
-  const dispatch = useDispatch();
-  const hoverTime = useSelector(selectors.getHoverTime);
-  const timelineDimensions = useSelector(selectors.getTimelineDimensions);
-  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const dispatch = useAppDispatch();
+  const hoverTime = useAppSelector(selectors.getHoverTime);
+  const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   const progressBarRef = useRef<HTMLDivElement>(null);
 

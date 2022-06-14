@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setFocusRegion, setTimelineToTime } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { UnsafeFocusRegion } from "ui/state/timeline";
@@ -24,8 +24,8 @@ type Props = {
 };
 
 export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const showFocusModeControls = useSelector(selectors.getShowFocusModeControls);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const showFocusModeControls = useAppSelector(selectors.getShowFocusModeControls);
 
   if (!focusRegion || !showFocusModeControls) {
     return null;
@@ -35,10 +35,10 @@ export default function ConditionalFocuser({ editMode, setEditMode }: Props) {
 }
 
 function Focuser({ editMode, setEditMode }: Props) {
-  const dispatch = useDispatch();
-  const currentTime = useSelector(selectors.getCurrentTime);
-  const focusRegion = useSelector(selectors.getFocusRegion);
-  const zoomRegion = useSelector(selectors.getZoomRegion);
+  const dispatch = useAppDispatch();
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggableAreaRef = useRef<HTMLDivElement>(null);

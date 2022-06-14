@@ -1,10 +1,10 @@
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { TimeRange } from "ui/utils/app";
 
 const NonLoadingRegion = ({ range }: { range: TimeRange }) => {
-  const { endTime } = useSelector(getZoomRegion)!;
+  const { endTime } = useAppSelector(getZoomRegion)!;
   const { start, end } = range;
   const style = {
     left: `${(start / endTime) * 100}%`,
@@ -19,7 +19,7 @@ const NonLoadingRegion = ({ range }: { range: TimeRange }) => {
 };
 
 export default function NonLoadingRegions() {
-  const timeRanges = useSelector(getNonLoadingTimeRanges);
+  const timeRanges = useAppSelector(getNonLoadingTimeRanges);
 
   return (
     <>

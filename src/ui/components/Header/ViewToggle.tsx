@@ -1,5 +1,5 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
 import { isTest } from "ui/utils/environment";
 import hooks from "ui/hooks";
@@ -19,8 +19,8 @@ const MODES = [
 ] as const;
 
 export default function ViewToggle() {
-  const dispatch = useDispatch();
-  const viewMode = useSelector(getViewMode);
+  const dispatch = useAppDispatch();
+  const viewMode = useAppSelector(getViewMode);
   const recordingId = hooks.useGetRecordingId();
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
