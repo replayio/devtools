@@ -8,7 +8,7 @@ import { LibraryContext, View } from "./useFilters";
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
 export function FilterDropdown() {
-  const { setAppliedText, setView } = useContext(LibraryContext);
+  const { setAppliedText, setView, view } = useContext(LibraryContext);
   const [expanded, setExpanded] = useState(false);
   const { value: testSupport } = useFeature("testSupport");
 
@@ -28,9 +28,11 @@ export function FilterDropdown() {
     setView(view);
   };
 
+  const buttonLabel = view === "recordings" ? "Filters" : view == "test-runs" ? "Runs" : "Tests";
+
   const button = (
     <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
-      <div className="text-sm">Filters</div>
+      <div className="text-sm">{buttonLabel}</div>
       <div className="text-sm material-icons">expand_more</div>
     </div>
   );
@@ -52,13 +54,9 @@ export function FilterDropdown() {
         {testSupport ? (
           <>
             <DropdownDivider />
-            <DropdownItem onClick={() => handleSetView("recordings")}>
-              Show Recordings View
-            </DropdownItem>
-            <DropdownItem onClick={() => handleSetView("tests")}>Show Tests View</DropdownItem>
-            <DropdownItem onClick={() => handleSetView("test-runs")}>
-              Show Test Runs View
-            </DropdownItem>
+            <DropdownItem onClick={() => handleSetView("recordings")}>Show Recordings</DropdownItem>
+            <DropdownItem onClick={() => handleSetView("tests")}>Show Tests</DropdownItem>
+            <DropdownItem onClick={() => handleSetView("test-runs")}>Show Runs</DropdownItem>
           </>
         ) : null}
       </Dropdown>

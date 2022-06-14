@@ -81,13 +81,12 @@ export default function ViewerHeader({
           {recordings.length != 0 ? <>({recordings.length})</> : <></>}
         </span>
       ) : null}
-      {testSupport ? <div>/ {view}</div> : null}
     </ViewerHeaderLeft>
   );
 
   return (
     <div className={`flex flex-row items-center justify-between ${styles.libraryHeaderButton}`}>
-      {HeaderLeft}
+      {!testSupport && HeaderLeft}
       <div className="flex flex-row items-center space-x-3">
         {currentWorkspaceId ? <TeamTrialEnd currentWorkspaceId={currentWorkspaceId} /> : null}
         <ViewerHeaderActions

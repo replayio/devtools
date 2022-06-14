@@ -26,18 +26,24 @@ export function ReplayRow({ recording }: { recording: Recording }) {
     setAppliedText(`test-path:${encodeURIComponent(JSON.stringify(metadata.test!.path))}`);
   };
 
+  const onViewReplay = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    document.location = `/recording/${recording.id}`;
+  };
+
   return (
     <MainRow
-      onClick={onClick}
+      onClick={onViewReplay}
       isFocused={isFocused}
       passed={metadata.test?.result === "passed"}
       recordingId={recording.id}
     >
-      <div className="flex flex-row items-center flex-grow overflow-hidden">
-        <div className="flex flex-col flex-grow py-2 overflow-hidden">
+      <div className="flex flex-grow flex-row items-center overflow-hidden">
+        <div className="flex flex-grow flex-col overflow-hidden py-2">
           <button
-            className="overflow-hidden text-left whitespace-pre hover:underline overflow-ellipsis"
-            onClick={onViewTest}
+            className="overflow-hidden overflow-ellipsis whitespace-pre text-left hover:underline"
+            onClick={onViewReplay}
           >
             <span>{metadata.test?.title}</span>
           </button>
@@ -47,7 +53,7 @@ export function ReplayRow({ recording }: { recording: Recording }) {
             </button>
           </div>
         </div>
-        {runUrl ? <MainContextMenu runUrl={runUrl} /> : null}
+        {<MainContextMenu runUrl={runUrl} />}
       </div>
     </MainRow>
   );
