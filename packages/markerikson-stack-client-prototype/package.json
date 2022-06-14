@@ -12,6 +12,5 @@
     "@uiw/react-codemirror": "^4.8.1",
     "protocol": "file:../protocol"
   },
-  "overrides": {
-  }
+  "overrides": {}
 }
