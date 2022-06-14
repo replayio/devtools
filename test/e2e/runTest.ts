@@ -25,13 +25,10 @@ function appendTestMetadata(testId: string, file: string, success: boolean) {
     .filter(r => (r.metadata["x-replay-test"] as any)?.testId === testId)
     .sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
 
-  let recordingId: string | undefined;
-
   if (recordings) {
     recordings.forEach(recording => {
-      recordingId = String(recording.id);
       addMetadata(
-        recordingId,
+        String(recording.id),
         test.init({
           file: file,
           path: ["", config.browserName, file],

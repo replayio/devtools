@@ -1,6 +1,5 @@
 import playwright from "@recordreplay/playwright";
 import { uploadRecording } from "@replayio/replay";
-import { findLast } from "lodash";
 
 import config from "./config";
 
@@ -28,5 +27,14 @@ export async function recordPlaywright(
     await page.close();
     await context.close();
     await browser.close();
+  }
+}
+
+export async function uploadLastRecording(id?: string) {
+  if (id) {
+    return await uploadRecording(id as any, {
+      verbose: true,
+      server: config.backendUrl,
+    });
   }
 }
