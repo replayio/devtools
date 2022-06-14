@@ -5,6 +5,7 @@ import { useContext } from "react";
 import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { ResultBar } from "../Tests/ResultBar";
+import Badge from "../Badge";
 
 function PrimaryInfo({ testRun }: { testRun: TestRun }) {
   return (
@@ -49,32 +50,28 @@ function SecondaryInfo({ testRun }: { testRun: TestRun }) {
 }
 
 export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
-  const { preview, setPreview } = useContext(LibraryContext);
-  const results = testRun.recordings.map(r => r.metadata?.test?.result);
+  const { preview } = useContext(LibraryContext);
 
   const displayedRecordings = testRun.recordings.filter(r => r.metadata?.test?.result);
   const longestDuration = Math.max(...testRun.recordings.map(r => r.duration));
 
-  const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const isSelected = preview?.id.toString() === testRun.id;
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className={`flex flex-row items-center flex-grow px-4 py-3 overflow-hidden border-b cursor-pointer border-themeBorder space-x-4 ${
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-4 overflow-hidden border-b border-themeBorder px-4 py-3 ${
         isSelected ? "bg-blue-100" : ""
       }`}
       onClick={onClick}
     >
-      <div className="grid items-center justify-center w-8 h-8 font-medium text-red-700 bg-gray-200 rounded-md">
-        {failCount}
-      </div>
-      <div className="flex flex-col flex-grow space-y-1">
+      <Badge recordings={testRun.recordings} />
+      <div className="flex flex-grow flex-col space-y-1">
         <div className="flex flex-row justify-between space-x-4">
           <PrimaryInfo testRun={testRun} />
           <SecondaryInfo testRun={testRun} />
         </div>
-        <div className="flex flex-row h-4 space-x-0.5 items-end overflow-hidden">
+        <div className="flex h-4 flex-row items-end space-x-0.5 overflow-hidden">
           {displayedRecordings.map((r, i) => (
             <ResultBar recording={r} key={i} maxDuration={longestDuration} />
           ))}
