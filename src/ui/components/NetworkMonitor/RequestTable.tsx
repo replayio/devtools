@@ -1,7 +1,7 @@
 import classNames from "classnames";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Row, TableInstance } from "react-table";
+import { Column, Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
@@ -87,7 +87,7 @@ const RequestTable = ({
         className={classNames("flex h-full w-full flex-col overflow-x-auto", styles.request)}
         {...getTableProps()}
       >
-        <HeaderGroups columns={columns} headerGroups={headerGroups} />
+        <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
         <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
           {rows.map((row: Row<RequestSummary>) => {
             let firstInFuture = false;

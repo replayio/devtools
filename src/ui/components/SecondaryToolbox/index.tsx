@@ -41,9 +41,10 @@ interface PanelButtonsProps {
 
 interface PanelButtonProps {
   panel: SecondaryPanelName;
+  children?: React.ReactNode;
 }
 
-const PanelButton: FC<PanelButtonProps> = ({ panel, children }) => {
+const PanelButton = ({ panel, children }: PanelButtonProps) => {
   const selectedPanel = useAppSelector(selectors.getSelectedPanel);
   const dispatch = useAppDispatch();
 

@@ -35,6 +35,8 @@ import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/uti
 import ConsoleLoadingBar from "./ConsoleLoadingBar";
 import styles from "./ConsoleOutput.module.css";
 
+import type { State as ConsoleSearchState } from "../Search/useConsoleSearch";
+
 function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
   if (!locA) {
     return false;
@@ -109,7 +111,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
   }
 
   scrollCurrentSearchResultIntoView() {
-    const { index, results, visible } = this.context;
+    const { index, results, visible } = this.context as ConsoleSearchState;
 
     if (!visible) {
       return;
