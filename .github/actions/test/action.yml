@@ -37,5 +37,5 @@ runs:
     - uses: replayio/action-upload@main
       if: always()
       with:
-        apiKey: ${{ inputs.api-key }}
+        apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         public: true
