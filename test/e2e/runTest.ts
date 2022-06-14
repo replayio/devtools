@@ -1,6 +1,8 @@
 import fs from "fs";
 
 import { Page } from "@recordreplay/playwright";
+import { listAllRecordings } from "@replayio/replay";
+import { test, add as addMetadata } from "@replayio/replay/metadata";
 
 import config from "./config";
 import { getExampleRecordingId } from "./getExample";
@@ -31,6 +33,14 @@ export async function runClassicTest(args: {
   let success = false;
   const apolloLogs: any[] = [];
   const websocketLogs: any[] = [];
+
+  const testId = script + "-" + Date.now();
+  process.env.RECORD_REPLAY_METADATA = JSON.stringify({
+    "x-replay-test": {
+      testId,
+    },
+  });
+
   try {
     await recordPlaywright(config.browserName, async page => {
       if (saveFixture) {
@@ -66,6 +76,29 @@ export async function runClassicTest(args: {
     console.error("Recording test failed:", e);
   }
 
+  const recordings = listAllRecordings()
+    .filter(r => (r.metadata["x-replay-test"] as any)?.testId === testId)
+    .sort((a, b) => new Date(a.createTime).getTime() - new Date(b.createTime).getTime());
+
+  let recordingId: string | undefined;
+
+  if (recordings) {
+    recordings.forEach(recording => {
+      recordingId = String(recording.id);
+      addMetadata(
+        recordingId,
+        test.init({
+          file: script,
+          path: ["", config.browserName, script],
+          title: script,
+          result: success ? "passed" : "failed",
+        })
+      );
+    });
+  } else {
+    console.error("Failed to find any recordings for test", script);
+  }
+
   if (saveFixture && success) {
     const testName = script.substring(0, script.length - 3);
     fs.writeFileSync(
@@ -78,11 +111,6 @@ export async function runClassicTest(args: {
     );
   }
 
-  if (!success) {
-    console.log("Test failed, uploading recording");
-    const recordingId = await uploadLastRecording(testUrl);
-    reportError(`${script}: https://app.replay.io/recording/${recordingId}`);
-  }
   expect(success).toBe(true);
 }
 

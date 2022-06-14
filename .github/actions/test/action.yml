@@ -1,5 +1,9 @@
 name: "Test"
 description: "Run end-to-end tests. Note that this action assumes that Node and Next.js have already been properly setup. See the setup-next task for details."
+inputs:
+  api-key:
+    description: Replay.io API Key
+
 runs:
   using: "composite"
   steps:
@@ -23,3 +27,7 @@ runs:
         RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
         SHOULD_RECORD_EXAMPLES: true
+    - uses: replayio/action-upload@main
+      with:
+        apiKey: ${{ inputs.api-key }}
+        public: true
