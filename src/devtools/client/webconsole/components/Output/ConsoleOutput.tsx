@@ -265,23 +265,30 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
                   Set focus end
                 </>
               </DropdownItem>
-              <DropdownDivider />
-              <DropdownItem onClick={noop}>
-                <div className={styles.ColorPickerRow}>
-                  {badges.map(badge => (
-                    <div
-                      key={badge}
-                      className={
-                        badge === "unicorn"
-                          ? styles.UnicornBadge
-                          : classNames(styles.ColorBadge, styles[badge])
-                      }
-                      onClick={() => this.selectBadge(badge)}
-                    />
-                  ))}
-                  <div className={styles.EmptyBadge} onClick={() => this.selectBadge(undefined)} />
-                </div>
-              </DropdownItem>
+              {contextMenu?.message?.type === "logPoint" && (
+                <>
+                  <DropdownDivider />
+                  <DropdownItem onClick={noop}>
+                    <div className={styles.ColorPickerRow}>
+                      {badges.map(badge => (
+                        <div
+                          key={badge}
+                          className={
+                            badge === "unicorn"
+                              ? styles.UnicornBadge
+                              : classNames(styles.ColorBadge, styles[badge])
+                          }
+                          onClick={() => this.selectBadge(badge)}
+                        />
+                      ))}
+                      <div
+                        className={styles.EmptyBadge}
+                        onClick={() => this.selectBadge(undefined)}
+                      />
+                    </div>
+                  </DropdownItem>
+                </>
+              )}
             </Dropdown>
           </ContextMenu>
         )}
