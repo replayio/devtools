@@ -227,7 +227,6 @@ const HeadersPanel = ({ request }: { request: RequestSummary }) => {
           <TriangleToggle open={requestExpanded} />
           General
         </div>
-        <AddNetworkRequestCommentButton request={request} />
       </div>
       {requestExpanded && <DetailTable className={styles.request} details={details} />}
       <div
@@ -362,8 +361,11 @@ const RequestDetails = ({
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
       </RequestDetailsTabs>
-      <div className={classNames("requestDetails", styles.requestDetails)}>
+      <div className={classNames("requestDetails relative", styles.requestDetails)}>
         <div>
+          <div className="absolute top-1 right-1">
+            <AddNetworkRequestCommentButton request={request} />
+          </div>
           {activeTab === "headers" && <HeadersPanel request={request} />}
           {activeTab === "cookies" && <Cookies request={request} />}
           {activeTab === "response" && <ResponseBody request={request} />}
