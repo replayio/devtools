@@ -43,10 +43,15 @@ function LineHitCounts({ cm }: Props) {
 
       doc.eachLine((lineHandle: any) => {
         lineNumber++;
+
         const hitCount = hitCountMap?.get(lineNumber) || 0;
-        const className = hitCount > 0 ? styles.HitsBadge : styles.NoHitsBadge;
-        const innerHTML = hitCount > 0 ? `${hitCount}x` : "&nbsp;";
-        const title = hitCount > 0 ? `${hitCount} hits` : "";
+        if (hitCount === 0) {
+          return;
+        }
+
+        const className = styles.HitsBadge;
+        const innerHTML = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+        const title = `${hitCount} hits`;
 
         const markerNode = document.createElement("div");
         markerNode.className = className;

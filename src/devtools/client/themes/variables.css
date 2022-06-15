@@ -192,9 +192,8 @@
   --caret-color: #18181a;
   --debug-line-border: var(--primary-accent);
   --debug-line-background: #e8f5fb;
-  --gutter-hit-count-background: #e6f5cf;
-  --gutter-hit-count-foreground: #868c77;
-  --gutter-hit-count-no-hits: #eaeaea;
+  --gutter-hit-count-background: #f3f4f6;
+  --gutter-hit-count-foreground: #aeaeae;
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
@@ -452,9 +451,8 @@
   --caret-color: #fff;
   --debug-line-border: var(--theme-base-85);
   --debug-line-background: var(--theme-base-100);
-  --gutter-hit-count-background: #050;
-  --gutter-hit-count-foreground: #69e261;
-  --gutter-hit-count-no-hits: var(--grey-50);
+  --gutter-hit-count-background: #081121;
+  --gutter-hit-count-foreground: #6a717e;
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);

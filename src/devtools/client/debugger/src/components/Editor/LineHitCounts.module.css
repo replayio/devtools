@@ -1,16 +1,21 @@
-.HitsBadge,
-.NoHitsBadge {
-  width: 30px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: right;
-}
-
 .HitsBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: calc(1rem - 4px);
+  margin: 2px;
+  padding-top: 1px;
+
+  font-family: sans-serif;
+  font-size: 9px;
+
   background-color: var(--gutter-hit-count-background);
   color: var(--gutter-hit-count-foreground);
-}
+  border-radius: 0.5rem;
 
-.NoHitsBadge {
-  background-color: var(--gutter-hit-count-no-hits);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
