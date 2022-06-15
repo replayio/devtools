@@ -5,7 +5,13 @@ import { useFeature } from "ui/hooks/settings";
 import { AddCommentButton } from "components/AddCommentButton";
 import { RequestSummary } from "./utils";
 
-export default function AddNetworkRequestCommentButton({ request }: { request: RequestSummary }) {
+export default function AddNetworkRequestCommentButton({
+  request,
+  className,
+}: {
+  request: RequestSummary;
+  className?: string;
+}) {
   const { value: networkRequestComments } = useFeature("networkRequestComments");
   const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
@@ -18,5 +24,5 @@ export default function AddNetworkRequestCommentButton({ request }: { request: R
     return null;
   }
 
-  return <AddCommentButton onClick={addRequestComment} />;
+  return <AddCommentButton className={className} onClick={addRequestComment} />;
 }
