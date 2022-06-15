@@ -67,7 +67,7 @@ export async function runClassicTest(args: {
   const apolloLogs: any[] = [];
   const websocketLogs: any[] = [];
 
-  const testId = setTestId(script);
+  // const testId = setTestId(script);
 
   try {
     await recordPlaywright(config.browserName, async page => {
@@ -104,7 +104,7 @@ export async function runClassicTest(args: {
     console.error("Recording test failed:", e);
   }
 
-  appendTestMetadata(testId, script, success);
+  // appendTestMetadata(testId, script, success);
 
   if (saveFixture && success) {
     const testName = script.substring(0, script.length - 3);
@@ -135,7 +135,7 @@ export async function runPlaywrightTest(args: {
   }
   expect(exampleRecordingId).toBeTruthy();
 
-  const testId = setTestId(args.example);
+  // const testId = setTestId(args.example);
 
   const url = `${config.devtoolsUrl}/recording/${exampleRecordingId}`;
   let success = false;
@@ -149,5 +149,5 @@ export async function runPlaywrightTest(args: {
     console.error(e);
   }
 
-  appendTestMetadata(testId, args.example, success);
+  // appendTestMetadata(testId, args.example, success);
 }
