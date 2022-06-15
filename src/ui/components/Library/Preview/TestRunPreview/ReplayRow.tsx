@@ -6,7 +6,7 @@ import { MainContextMenu } from "./Menu";
 
 export function ReplayRow({ recording }: { recording: Recording }) {
   const { preview, setPreview } = useContext(LibraryContext);
-  const { setView, setAppliedText } = useContext(LibraryContext);
+  const { setView } = useContext(LibraryContext);
   const { metadata } = recording;
   const isFocused = preview?.view === "test-runs" && recording.id === preview.recordingId;
   const runUrl = recording.metadata?.source?.trigger?.url;
@@ -22,8 +22,8 @@ export function ReplayRow({ recording }: { recording: Recording }) {
     e.stopPropagation();
     e.preventDefault();
 
-    setView("recordings");
-    setAppliedText(`test-path:${encodeURIComponent(JSON.stringify(metadata.test!.path))}`);
+    setView("tests");
+    setPreview({ view: "tests", id: recording.metadata.test!.path!, recordingId: recording.id });
   };
 
   return (

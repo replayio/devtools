@@ -11,8 +11,6 @@ export function TestPreview() {
     return <>Loading…</>;
   }
 
-  // const mostRecentFailure = test.recordings.find(r => r.metadata.test?.result === "failed");
-
   return (
     <>
       <div className="flex flex-col p-4 space-y-2 border-b">

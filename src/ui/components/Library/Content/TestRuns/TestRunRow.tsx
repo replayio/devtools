@@ -1,7 +1,7 @@
 import { TestRun } from "ui/hooks/tests";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
-import { useContext } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { ResultBar } from "../Tests/ResultBar";
@@ -51,11 +51,19 @@ function SecondaryInfo({ testRun }: { testRun: TestRun }) {
 
 export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { preview } = useContext(LibraryContext);
+  const rowNode = useRef<HTMLDivElement>(null);
 
   const displayedRecordings = testRun.recordings.filter(r => r.metadata?.test?.result);
   const longestDuration = Math.max(...testRun.recordings.map(r => r.duration));
 
   const isSelected = preview?.id.toString() === testRun.id;
+
+  useEffect(() => {
+    if (isSelected) {
+      rowNode.current!.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
@@ -67,6 +75,7 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
         backgroundColor: isSelected ? "#A3DEFA" : "",
       }}
       onClick={onClick}
+      ref={rowNode}
     >
       <Badge recordings={testRun.recordings} />
       <div className="flex flex-col flex-grow space-y-1">

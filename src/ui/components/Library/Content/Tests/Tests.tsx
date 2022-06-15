@@ -36,15 +36,17 @@ function TestsContextWrapper({ children }: { children: ReactNode }) {
 export function Tests() {
   const workspaceId = useAppSelector(getWorkspaceId);
   const [initialized, setInitialized] = useState(false);
-  const { setPreview } = useContext(LibraryContext);
+  const { setPreview, preview } = useContext(LibraryContext);
   const { tests, loading } = useGetTestsForWorkspace(workspaceId!);
 
   useEffect(() => {
     if (!loading && tests && !initialized) {
-      setPreview({ view: "tests", id: tests[0].path, recordingId: tests[0].recordings[0].id! });
+      const recordingId = preview?.recordingId || tests[0].recordings[0].id!;
+      const id = preview?.id as string[] || tests[0].path;
+      setPreview({ view: "tests", id, recordingId });
       setInitialized(true);
     }
-  }, [tests, loading, initialized, setPreview]);
+  }, [tests, loading, initialized, setPreview, preview]);
 
   if (loading) {
     return <div>Loading…</div>;

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useRef } from "react";
 import { Test } from "ui/hooks/tests";
 import { LibraryContext } from "../../useFilters";
 import { ResultBar } from "./ResultBar";
@@ -6,12 +6,20 @@ import Badge from "../Badge";
 
 export function TestRow({ test, onClick }: { test: Test; onClick: () => void }) {
   const { preview } = useContext(LibraryContext);
-  const { path, recordings, date } = test;
+  const { path, recordings } = test;
+  const rowNode = useRef<HTMLDivElement>(null);
 
   const displayedRecordings = test.recordings.filter(r => r.metadata?.test?.result).reverse();
   const longestDuration = Math.max(...test.recordings.map(r => r.duration));
 
   const isSelected = preview?.id.toString() === path.toString();
+
+  useEffect(() => {
+    if (isSelected) {
+      rowNode.current!.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
@@ -19,6 +27,7 @@ export function TestRow({ test, onClick }: { test: Test; onClick: () => void }) 
       className="flex flex-row items-center px-4 py-3 space-x-4 bg-white border-b cursor-pointer border-themeBorder"
       style={{ backgroundColor: isSelected ? "#A3DEFA" : "" }}
       onClick={onClick}
+      ref={rowNode}
     >
       <Badge recordings={recordings} />
 

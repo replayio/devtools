@@ -37,18 +37,22 @@ export function TestRuns() {
   const workspaceId = useAppSelector(getWorkspaceId);
   const { testRuns, loading } = useGetTestRunsForWorkspace(workspaceId!);
   const [initialized, setInitialized] = useState(false);
-  const { setPreview } = useContext(LibraryContext);
+  const { setPreview, preview } = useContext(LibraryContext);
+
+  console.log({preview});
 
   useEffect(() => {
     if (!loading && testRuns && !initialized) {
+      const recordingId = preview?.recordingId || testRuns[0].recordings[0].id!;
+      const id = preview?.id as string || testRuns[0].id;
       setPreview({
         view: "test-runs",
-        id: testRuns[0].id,
-        recordingId: testRuns[0].recordings[0].id!,
+        id,
+        recordingId,
       });
       setInitialized(true);
     }
-  }, [testRuns, loading, initialized, setPreview]);
+  }, [testRuns, loading, initialized, setPreview, preview]);
 
   if (loading) {
     return <div>Loading…</div>;

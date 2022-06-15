@@ -17,16 +17,18 @@ function PullRequestDetails({ id, title }: { id: string; title: string }) {
 function CommitDetails({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const title = metadata.source?.commit.title || "Unknown commit message";
-  const id = metadata.source?.commit.id ? metadata.source.commit.id.substring(0, 7) : "Unknown ID";
-
-  const { setView, setAppliedText } = useContext(LibraryContext);
+  const { setPreview, setView } = useContext(LibraryContext);
 
   const onViewTestRun = (e: MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
 
-    setView("recordings");
-    setAppliedText(`test-run:${metadata.test!.run!.id}`);
+    setView("test-runs");
+    setPreview({
+      view: "test-runs",
+      id: recording.metadata.test!.run!.id!,
+      recordingId: recording.id,
+    });
   };
 
   return (
