@@ -28,7 +28,7 @@ export function FilterDropdown() {
     setView(view);
   };
 
-  const buttonLabel = view === "recordings" ? "Filters" : view == "test-runs" ? "Runs" : "Tests";
+  const buttonLabel = view === "recordings" ? "Filters" : "Test Runs";
 
   const button = (
     <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
@@ -55,7 +55,6 @@ export function FilterDropdown() {
           <>
             <DropdownDivider />
             <DropdownItem onClick={() => handleSetView("recordings")}>Show Recordings</DropdownItem>
-            <DropdownItem onClick={() => handleSetView("tests")}>Show Tests</DropdownItem>
             <DropdownItem onClick={() => handleSetView("test-runs")}>Show Runs</DropdownItem>
           </>
         ) : null}

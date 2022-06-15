@@ -4,8 +4,6 @@ import { getTruncatedRelativeDate } from "../../RecordingRow";
 import { useContext } from "react";
 import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
-import { ResultBar } from "../Tests/ResultBar";
-import Badge from "../Badge";
 
 function PrimaryInfo({ testRun }: { testRun: TestRun }) {
   return (
@@ -51,9 +49,8 @@ function SecondaryInfo({ testRun }: { testRun: TestRun }) {
 
 export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { preview } = useContext(LibraryContext);
-
+  const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const displayedRecordings = testRun.recordings.filter(r => r.metadata?.test?.result);
-  const longestDuration = Math.max(...testRun.recordings.map(r => r.duration));
 
   const isSelected = preview?.id.toString() === testRun.id;
 
@@ -68,21 +65,15 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
       }}
       onClick={onClick}
     >
-      <Badge recordings={testRun.recordings} />
+      <div className="grid items-center justify-center w-8 h-8 font-medium text-red-700 bg-gray-300 rounded-md">
+        {failCount}
+      </div>
       <div className="flex flex-col flex-grow space-y-1">
         <div className="flex flex-row justify-between space-x-4">
           <PrimaryInfo testRun={testRun} />
           <SecondaryInfo testRun={testRun} />
         </div>
         <div className="flex h-4 flex-row items-end space-x-0.5 overflow-hidden">
-          {displayedRecordings.map((r, i) => (
-            <ResultBar
-              isSelected={isSelected}
-              recording={r}
-              key={i}
-              maxDuration={longestDuration}
-            />
-          ))}
         </div>
       </div>
     </div>

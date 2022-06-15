@@ -6,7 +6,6 @@ import styles from "./Library.module.css";
 import { LibraryContext } from "./useFilters";
 import { Preview } from "./Preview/Preview";
 import { TestRuns } from "./Content/TestRuns/TestRuns";
-import { Tests } from "./Content/Tests/Tests";
 import { Recordings } from "./Content/Recordings";
 
 export default function Viewer({
@@ -47,10 +46,8 @@ export default function Viewer({
                 selectedIds={selectedIds}
                 setSelectedIds={setSelectedIds}
               />
-            ) : view === "test-runs" ? (
-              <TestRuns />
             ) : (
-              <Tests />
+              <TestRuns />
             )}
           </div>
         </div>
