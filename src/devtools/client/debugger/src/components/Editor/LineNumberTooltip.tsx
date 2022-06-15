@@ -59,7 +59,7 @@ type Props = {
 };
 
 export default function LineNumberTooltipWrapper(props: Props) {
-  const { value } = useFeature("inlineHitCounts");
+  const { value } = useFeature("hitCounts");
   return value ? null : <LineNumberTooltip {...props} />;
 }
 

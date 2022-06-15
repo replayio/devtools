@@ -11,7 +11,7 @@ import styles from "./LineHitCounts.module.css";
 type Props = { cm: any };
 
 export default function LineHitCountsWrapper(props: Props) {
-  const { value } = useFeature("inlineHitCounts");
+  const { value } = useFeature("hitCounts");
   return value ? <LineHitCounts {...props} /> : null;
 }
 

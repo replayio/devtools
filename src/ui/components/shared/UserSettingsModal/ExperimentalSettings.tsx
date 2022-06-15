@@ -66,7 +66,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
     label: "Inline hit counts",
     description: "Show line hit counts in the source view",
-    key: "inlineHitCounts",
+    key: "hitCounts",
   },
 ];
 
@@ -116,7 +116,7 @@ export default function ExperimentalSettings({}) {
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
-  const { value: inlineHitCounts, update: updateInlineHitCounts } = useFeature("inlineHitCounts");
+  const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -139,8 +139,8 @@ export default function ExperimentalSettings({}) {
       updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
-    } else if (key === "inlineHitCounts") {
-      updateInlineHitCounts(!enableLargeText);
+    } else if (key === "hitCounts") {
+      updateHitCounts(!enableLargeText);
     }
   };
 
@@ -149,7 +149,7 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     enableResolveRecording,
-    inlineHitCounts,
+    hitCounts,
     turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,

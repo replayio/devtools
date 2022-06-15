@@ -21,7 +21,7 @@ export type LocalExperimentalUserSettings = {
   enableNetworkRequestComments: boolean;
   turboReplay: boolean;
   enableResolveRecording: boolean;
-  inlineHitCounts: boolean;
+  hitCounts: boolean;
   unicornConsole: boolean;
   showRedux: boolean;
   enableLargeText: boolean;

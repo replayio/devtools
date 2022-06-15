@@ -33,7 +33,7 @@ pref("devtools.features.showRedux", true);
 pref("devtools.features.testSupport", false);
 pref("devtools.features.turboReplay", false);
 pref("devtools.features.unicornConsole", true);
-pref("devtools.features.inlineHitCounts", false);
+pref("devtools.features.hitCounts", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -57,7 +57,7 @@ export const features = new PrefsHelper("devtools.features", {
   commentAttachments: ["Bool", "commentAttachments"],
   enableLargeText: ["Bool", "enableLargeText"],
   httpBodies: ["Bool", "httpBodies"],
-  inlineHitCounts: ["Bool", "inlineHitCounts"],
+  hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   networkRequestComments: ["Bool", "networkRequestComments"],
   originalClassNames: ["Bool", "originalClassNames"],
