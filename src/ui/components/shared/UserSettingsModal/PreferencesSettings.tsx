@@ -145,7 +145,7 @@ function UiPreferences() {
             setSelected={str => str && updateDefaultMode(str)}
           />
         </div>
-        <div className="flex flex-col space-y-2 p-1">
+        <div className="flex flex-col space-y-2">
           <label
             className="flex cursor-pointer items-center space-x-2"
             data-private
