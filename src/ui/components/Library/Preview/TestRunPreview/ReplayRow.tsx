@@ -33,18 +33,16 @@ export function ReplayRow({ recording }: { recording: Recording }) {
       passed={metadata.test?.result === "passed"}
       recordingId={recording.id}
     >
-      <div className="flex flex-row items-center flex-grow overflow-hidden">
+      <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
         <div className="flex flex-col flex-grow py-2 overflow-hidden">
           <button
-            className="overflow-hidden text-left whitespace-pre hover:underline overflow-ellipsis"
+            className="overflow-hidden text-left whitespace-pre overflow-ellipsis hover:underline"
             onClick={onViewTest}
           >
             <span>{metadata.test?.title}</span>
           </button>
           <div className="flex space-x-2 text-xs text-gray-500">
-            <button className="flex flex-row space-x-1 hover:underline">
-              {metadata.test?.file}
-            </button>
+            <button className="flex flex-row space-x-1">{metadata.test?.file}</button>
           </div>
         </div>
         {runUrl ? <MainContextMenu runUrl={runUrl} /> : null}

@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useEffect, useRef } from "react";
+import { MouseEvent, useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
@@ -18,6 +18,7 @@ function CommitDetails({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const title = metadata.source?.commit.title || "Unknown commit message";
   const id = metadata.source?.commit.id ? metadata.source.commit.id.substring(0, 7) : "Unknown ID";
+
   const { setView, setAppliedText } = useContext(LibraryContext);
 
   const onViewTestRun = (e: MouseEvent) => {
@@ -33,9 +34,7 @@ function CommitDetails({ recording }: { recording: Recording }) {
       className="overflow-hidden text-left whitespace-pre overflow-ellipsis hover:underline"
       onClick={onViewTestRun}
     >
-      <span>
-        {title} ({id})
-      </span>
+      {title}
     </button>
   );
 }
@@ -48,7 +47,7 @@ function ReplayDetails({ recording }: { recording: Recording }) {
     <div className="flex items-center space-x-3 text-xs text-gray-500">
       <div className="flex items-center space-x-1">
         <MaterialIcon>fork_right</MaterialIcon>
-        <span>{metadata.source?.branch || "Unknown branch"}</span>
+        <span>{metadata.source?.branch || "Unknown Branch"}</span>
       </div>
       {metadata.source?.merge ? (
         <PullRequestDetails id={metadata.source.merge.id} title={metadata.source.merge.title} />
@@ -74,7 +73,7 @@ export function ReplayRow({ recording }: { recording: Recording }) {
       passed={metadata.test?.result === "passed"}
       recordingId={recording.id}
     >
-      <div className="flex flex-row items-center flex-grow py-2 space-x-2 overflow-hidden">
+      <div className="flex flex-row items-center flex-grow py-2 space-x-2 overflow-hidden ">
         <div className="flex flex-col flex-grow overflow-hidden">
           <CommitDetails recording={recording} />
           <ReplayDetails recording={recording} />

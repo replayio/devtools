@@ -137,11 +137,7 @@ function Library({
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-col flex-grow overflow-x-hidden">
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
-            <FilterBar
-              displayedString={displayedString}
-              setDisplayedText={setDisplayedText}
-              setView={handleSetView}
-            />
+            <FilterBar displayedString={displayedString} setDisplayedText={setDisplayedText} />
             <LaunchButton />
           </div>
           <ViewerRouter />

@@ -8,11 +8,9 @@ import { LibraryContext, View } from "./useFilters";
 export function FilterBar({
   displayedString,
   setDisplayedText,
-  setView,
 }: {
   displayedString: string;
   setDisplayedText: (str: string) => void;
-  setView: (view: View) => void;
 }) {
   const { setAppliedText } = useContext(LibraryContext);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
