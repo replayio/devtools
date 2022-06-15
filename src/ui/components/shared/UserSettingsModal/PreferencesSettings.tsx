@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import hooks from "ui/hooks";
-import { useStringPref } from "ui/hooks/settings";
+import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
 import { getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
@@ -112,6 +112,7 @@ function UiPreferences() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(getThemePreference);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
+  const { value: showHitCounts, update: updateShowHitCounts } = useFeature("hitCounts");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -143,6 +144,20 @@ function UiPreferences() {
             selected={defaultMode}
             setSelected={str => str && updateDefaultMode(str)}
           />
+        </div>
+        <div className="flex flex-col space-y-2 p-1">
+          <label
+            className="flex cursor-pointer items-center space-x-2"
+            data-private
+            htmlFor="showHitCounts"
+          >
+            <Checkbox
+              id="showHitCounts"
+              checked={showHitCounts}
+              onChange={() => updateShowHitCounts(!showHitCounts)}
+            />
+            <div>Show hit counts in Editor</div>
+          </label>
         </div>
       </div>
     </div>

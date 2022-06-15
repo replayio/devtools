@@ -63,6 +63,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Replay recordings across multiple instances",
     key: "turboReplay",
   },
+  {
+    label: "Inline hit counts",
+    description: "Show line hit counts in the source view",
+    key: "hitCounts",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -111,6 +116,7 @@ export default function ExperimentalSettings({}) {
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
+  const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -133,6 +139,8 @@ export default function ExperimentalSettings({}) {
       updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
+    } else if (key === "hitCounts") {
+      updateHitCounts(!enableLargeText);
     }
   };
 
@@ -141,6 +149,7 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     enableResolveRecording,
+    hitCounts,
     turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
