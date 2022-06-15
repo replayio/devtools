@@ -4,7 +4,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 function ResultTab({ passed }: { passed: boolean }) {
   return (
     <div
-      className={`mr-2 h-full w-1 rounded-tr-md rounded-br-md ${
+      className={`h-full w-1 rounded-tr-md rounded-br-md ${
         passed ? "bg-transparent" : "bg-red-500"
       }`}
     />
@@ -44,7 +44,7 @@ export function MainRow({
       onClick={onClick}
     >
       <ResultTab passed={passed} />
-      {/* <ViewReplayButton isFocused={isFocused} recordingId={recordingId} /> */}
+      <ViewReplayButton isFocused={isFocused} recordingId={recordingId} />
       {children}
     </div>
   );
@@ -58,7 +58,7 @@ function ViewReplayButton({ isFocused, recordingId }: { isFocused: boolean; reco
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <button className="flex items-center justify-center p-2 text-primaryAccent transition hover:text-primaryAccentHover">
+      <button className="flex items-center justify-center p-2 transition text-primaryAccent hover:text-primaryAccentHover">
         <MaterialIcon iconSize="2xl" outlined={!isFocused}>
           play_circle
         </MaterialIcon>

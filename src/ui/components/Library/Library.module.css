@@ -28,10 +28,8 @@
 }
 
 :root:global(.theme-dark) .recordingList {
-  /* background-color: var(--theme-base-100); */
+  background-color: var(--theme-base-100);
 }
-
-
 
 :root:global(.theme-dark) .dropdownDivider {
   border-bottom: 1px solid var(--chrome);
@@ -88,7 +86,9 @@
   color: #fff;
 }
 
-
+:root:global(.theme-light) .recordingList {
+  background-color: var(--theme-base-100);
+}
 
 :root:global(.theme-light) .dropdownDivider {
   border-bottom: 1px solid var(--theme-base-90);

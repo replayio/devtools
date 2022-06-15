@@ -86,7 +86,7 @@ export default function ViewerHeader({
 
   return (
     <div className={`flex flex-row items-center justify-between ${styles.libraryHeaderButton}`}>
-      {!testSupport && HeaderLeft}
+      {HeaderLeft}
       <div className="flex flex-row items-center space-x-3">
         {currentWorkspaceId ? <TeamTrialEnd currentWorkspaceId={currentWorkspaceId} /> : null}
         <ViewerHeaderActions

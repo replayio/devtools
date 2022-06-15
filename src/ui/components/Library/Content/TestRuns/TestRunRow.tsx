@@ -60,7 +60,7 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
   // Todo: Have a separate treatment for the "timedOut" result.
   return (
     <div
-      className={`my-0.5 flex flex-grow cursor-pointer flex-row items-center space-x-4 overflow-hidden rounded-md border-b bg-white px-4 py-3 ${
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-4 overflow-hidden rounded-md border-b bg-white px-4 py-3 ${
         isSelected ? "selected" : ""
       }`}
       style={{
@@ -69,7 +69,7 @@ export function TestRunRow({ testRun, onClick }: { testRun: TestRun; onClick: ()
       onClick={onClick}
     >
       <Badge recordings={testRun.recordings} />
-      <div className="flex flex-grow flex-col space-y-1">
+      <div className="flex flex-col flex-grow space-y-1">
         <div className="flex flex-row justify-between space-x-4">
           <PrimaryInfo testRun={testRun} />
           <SecondaryInfo testRun={testRun} />
