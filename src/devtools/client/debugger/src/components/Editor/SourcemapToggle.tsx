@@ -52,7 +52,7 @@ export function SourcemapToggle({
         setEnabled={setEnabled}
         disabled={!alternateSourceId}
       />
-      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Use Source Map</div>}
+      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Source Map</div>}
     </div>
   );
 }

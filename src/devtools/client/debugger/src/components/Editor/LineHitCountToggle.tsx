@@ -8,7 +8,7 @@ export default function LineHitCountToggle() {
   return (
     <div className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
       <Toggle enabled={value} setEnabled={update} />
-      <div>Show Hit Counts</div>
+      <div>Hit Counts</div>
     </div>
   );
 }
