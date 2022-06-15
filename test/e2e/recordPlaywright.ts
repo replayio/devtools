@@ -1,5 +1,5 @@
 import playwright from "@recordreplay/playwright";
-import { listAllRecordings, uploadRecording } from "@replayio/replay";
+import cli from "@replayio/replay";
 import { findLast } from "lodash";
 
 import config from "./config";
@@ -32,11 +32,12 @@ export async function recordPlaywright(
 }
 
 export async function uploadLastRecording(url: string) {
-  const list = listAllRecordings();
+  const list = cli.listAllRecordings();
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
   if (id) {
-    return await uploadRecording(id, {
+    return await cli.uploadRecording(id, {
+      apiKey: config.replayApiKey,
       server: config.backendUrl,
     });
   }

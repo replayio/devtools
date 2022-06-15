@@ -34,6 +34,7 @@ export async function recordNodeExample(scriptPath: string) {
   spawnSync(nodePath, [scriptPath], {
     env: {
       ...process.env,
+      RECORD_REPLAY_API_KEY: config.replayApiKey,
       RECORD_REPLAY_DISPATCH: config.backendUrl,
       RECORD_REPLAY_DRIVER: config.driverPath,
       RECORD_REPLAY_NODE: nodePath,
