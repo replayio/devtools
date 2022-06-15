@@ -317,7 +317,7 @@ if (typeof window === "object") {
   };
 
   (window as any).outstanding = () => {
-    const messages = [...gMessageWaiters.entries()].map(([id, { method }]) => ({
+    const messages = Array.from(gMessageWaiters.entries()).map(([id, { method }]) => ({
       id,
       method,
     }));

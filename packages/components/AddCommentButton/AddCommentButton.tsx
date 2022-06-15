@@ -1,5 +1,6 @@
 import type { MouseEventHandler } from "react";
 import { forwardRef, useRef, useState } from "react";
+import classNames from "classnames";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 import styled from "styled-components";
@@ -15,13 +16,15 @@ interface AddCommentButtonProps {
 
   /** Whether the button should submit a form or not. */
   type?: "button" | "submit";
+
+  className?: string;
 }
 
 /**
  * Initiate adding a comment from a button.
  */
 export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonProps>(
-  function AddCommentButton({ type, isPausedOnHit = false, onClick }, ref) {
+  function AddCommentButton({ type, isPausedOnHit = false, onClick, className }, ref) {
     const localRef = useRef<HTMLButtonElement>(null);
     const mergedRefs = mergeRefs([localRef, ref]);
     const [isHovered, setIsHovered] = useState(false);
@@ -44,7 +47,10 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         onMouseLeave={clearHover}
         $isOpened={isHovered}
         $isPausedOnHit={isPausedOnHit}
-        className="font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2"
+        className={classNames(
+          "font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
+          className
+        )}
       >
         <Icon name="comment-plus" fill="currentColor" />
         <TextFade visible={isHovered}>Add Comment</TextFade>
