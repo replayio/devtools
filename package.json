@@ -115,7 +115,7 @@
     "@recordreplay/playwright": "^1.18.3",
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@replayio/playwright": "^0.2.1",
-    "@replayio/replay": "^0.1.2",
+    "@replayio/replay": "^0.4.2",
     "@storybook/addon-actions": "^6.4.20",
     "@storybook/addon-essentials": "^6.5.9",
     "@storybook/addon-links": "^6.4.20",
