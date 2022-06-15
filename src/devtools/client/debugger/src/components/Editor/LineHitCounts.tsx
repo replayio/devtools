@@ -46,10 +46,12 @@ function LineHitCounts({ cm }: Props) {
         const hitCount = hitCountMap?.get(lineNumber) || 0;
         const className = hitCount > 0 ? styles.HitsBadge : styles.NoHitsBadge;
         const innerHTML = hitCount > 0 ? `${hitCount}x` : "&nbsp;";
+        const title = hitCount > 0 ? `${hitCount} hits` : "";
 
         const markerNode = document.createElement("div");
         markerNode.className = className;
         markerNode.innerHTML = innerHTML;
+        markerNode.title = title;
 
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
