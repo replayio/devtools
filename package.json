@@ -194,7 +194,7 @@
     "utf-8-validate": "^5.0.8",
     "webpack": "^5.71.0",
     "webpack-cli": "^4.9.2",
-    "webpack-retry-chunk-load-plugin": "^3.0.0"
+    "webpack-retry-chunk-load-plugin": "^3.1.1"
   },
   "browserslist": [
     "defaults"
