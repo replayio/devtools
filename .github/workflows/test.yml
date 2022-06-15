@@ -66,8 +66,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
-        with:
-          api-key: ${{ secrets.RECORD_REPLAY_API_KEY_E2E }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: 1/5
@@ -80,8 +78,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
-        with:
-          api-key: ${{ secrets.RECORD_REPLAY_API_KEY_E2E }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: 2/5
@@ -94,8 +90,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
-        with:
-          api-key: ${{ secrets.RECORD_REPLAY_API_KEY_E2E }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: 3/5
@@ -108,8 +102,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
-        with:
-          api-key: ${{ secrets.RECORD_REPLAY_API_KEY_E2E }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: 4/5
@@ -122,8 +114,6 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
-        with:
-          api-key: ${{ secrets.RECORD_REPLAY_API_KEY_E2E }}
         env:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: 5/5
