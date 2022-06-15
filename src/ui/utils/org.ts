@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
 import { getWorkspaceId } from "ui/reducers/app";
 import { Workspace, WorkspaceSettings } from "ui/types";
@@ -27,7 +27,7 @@ export function getOrganizationSettings(workspaces: Workspace[]) {
 
 export function useIsPublicEnabled() {
   const { workspaces, loading: loadingWorkspaces } = useGetNonPendingWorkspaces();
-  const currentWorkspaceId = useSelector(getWorkspaceId);
+  const currentWorkspaceId = useAppSelector(getWorkspaceId);
 
   if (loadingWorkspaces) {
     return false;

@@ -20,6 +20,7 @@ export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoi
 
   return (
     <PrefixBadgePicker
+      key={breakpoint.options.prefixBadge}
       initialValue={breakpoint.options.prefixBadge}
       onSelect={newPrefixBadge => dispatch(setBreakpointPrefixBadge(breakpoint, newPrefixBadge))}
     />

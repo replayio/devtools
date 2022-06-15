@@ -122,7 +122,11 @@ function Library({
   const handleSetView = (view: View) => {
     setView(view);
     setPreview(null);
-    setAppliedText("");
+
+    // If switching to test/test run view, we should clear the recording filters.
+    if (view !== "recordings") {
+      setAppliedText("");
+    }
   };
 
   return (
@@ -133,12 +137,7 @@ function Library({
         <Sidebar nonPendingWorkspaces={workspaces} />
         <div className="flex flex-col flex-grow overflow-x-hidden">
           <div className={`flex h-16 flex-row items-center space-x-3 p-5 ${styles.libraryHeader}`}>
-            <FilterBar
-              displayedString={displayedString}
-              setDisplayedText={setDisplayedText}
-              setAppliedText={setAppliedText}
-              setView={handleSetView}
-            />
+            <FilterBar displayedString={displayedString} setDisplayedText={setDisplayedText} />
             <LaunchButton />
           </div>
           <ViewerRouter />

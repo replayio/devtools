@@ -3,7 +3,7 @@ import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
 import { ThreadFront, ValueFront } from "protocol/thread";
 import { useMemo } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getPropertiesForObject } from "ui/utils/autocomplete";
 
 // Use eager eval to get the properties of the last complete object in the expression.
@@ -64,7 +64,7 @@ async function eagerEvaluateExpression(
 }
 
 export function useEagerEvaluateExpression() {
-  const frame = useSelector(getSelectedFrame);
+  const frame = useAppSelector(getSelectedFrame);
   const callback = useMemo(
     () => (expression: string) => {
       if (!frame) {
