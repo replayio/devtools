@@ -122,7 +122,11 @@ function Library({
   const handleSetView = (view: View) => {
     setView(view);
     setPreview(null);
-    setAppliedText("");
+
+    // If switching to test/test run view, we should clear the recording filters.
+    if (view !== "recordings") {
+      setAppliedText("");
+    }
   };
 
   return (
@@ -136,7 +140,6 @@ function Library({
             <FilterBar
               displayedString={displayedString}
               setDisplayedText={setDisplayedText}
-              setAppliedText={setAppliedText}
               setView={handleSetView}
             />
             <LaunchButton />

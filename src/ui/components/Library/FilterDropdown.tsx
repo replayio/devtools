@@ -1,19 +1,14 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import PortalDropdown from "../shared/PortalDropdown";
 import { useFeature } from "ui/hooks/settings";
 import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
-import { View } from "./useFilters";
+import { LibraryContext, View } from "./useFilters";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
-export function FilterDropdown({
-  setAppliedText,
-  setView,
-}: {
-  setAppliedText: (str: string) => void;
-  setView: (view: View) => void;
-}) {
+export function FilterDropdown() {
+  const { setAppliedText, setView } = useContext(LibraryContext);
   const [expanded, setExpanded] = useState(false);
   const { value: testSupport } = useFeature("testSupport");
 
