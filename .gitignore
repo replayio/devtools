@@ -17,3 +17,14 @@ yarn.lock
 .nova/
 schema.graphql
 /coverage/
+
+
+# Yarn 3 artifacts
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+*.tgz
