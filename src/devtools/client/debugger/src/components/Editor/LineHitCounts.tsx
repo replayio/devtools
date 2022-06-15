@@ -1,8 +1,10 @@
 import { useMemo, useLayoutEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
+import { setBreakpointHitCounts } from "../../actions/sources";
 import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
+import { getSelectedSourceId } from "../../selectors";
 
 import styles from "./LineHitCounts.module.css";
 
@@ -14,11 +16,19 @@ export default function LineHitCountsWrapper(props: Props) {
 }
 
 function LineHitCounts({ cm }: Props) {
+  const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
   );
+
+  const dispatch = useAppDispatch();
+
+  useLayoutEffect(() => {
+    // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
+    dispatch(setBreakpointHitCounts(sourceId, 0));
+  }, [dispatch, sourceId]);
 
   useLayoutEffect(() => {
     if (!cm) {
