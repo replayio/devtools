@@ -140,7 +140,7 @@ export default function ExperimentalSettings({}) {
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
     } else if (key === "hitCounts") {
-      updateHitCounts(!enableLargeText);
+      updateHitCounts(!hitCounts);
     }
   };
 
