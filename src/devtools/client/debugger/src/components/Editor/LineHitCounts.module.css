@@ -4,7 +4,7 @@
   justify-content: center;
 
   width: 26px;
-  height: calc(1rem - 4px);
+  height: var(--theme-code-font-size);
   margin: 2px;
   padding-top: 1px;
 
