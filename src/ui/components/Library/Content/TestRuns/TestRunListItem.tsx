@@ -24,16 +24,16 @@ function Attributes({ testRun }: { testRun: TestRun }) {
       <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+      <AttributeContainer>{user!}</AttributeContainer>
       {recordings[0].metadata.source?.merge ? (
         <div
-          className="flex flex-row items-center space-x-1"
+          className="flex flex-row items-center mr-4 space-x-1"
           title={recordings[0].metadata.source.merge.title}
         >
           <div className="font-bold">PR</div>
           <div>{recordings[0].metadata.source.merge.id}</div>
         </div>
       ) : null}
-      <div>{user || "unknown"}</div>
     </div>
   );
 }
