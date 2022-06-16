@@ -130,5 +130,7 @@ jobs:
       - name: Install packages
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test

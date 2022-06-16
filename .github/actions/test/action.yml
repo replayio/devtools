@@ -25,6 +25,8 @@ runs:
     - name: Install packages
       if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn install
+      env:
+        YARN_CHECKSUM_BEHAVIOR: "update"
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
     - run: tar xf ./macOS-replay-playwright.tar.xz
