@@ -27,8 +27,10 @@ function LineHitCounts({ cm }: Props) {
 
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
-    dispatch(setBreakpointHitCounts(sourceId, 0));
-  }, [dispatch, sourceId]);
+    if (hitCounts === null) {
+      dispatch(setBreakpointHitCounts(sourceId, 0));
+    }
+  }, [dispatch, sourceId, hitCounts]);
 
   useLayoutEffect(() => {
     if (!cm) {
