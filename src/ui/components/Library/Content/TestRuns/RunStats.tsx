@@ -1,7 +1,7 @@
 import { TestRun } from "ui/hooks/tests";
 
 export function RunStats({ testRun }: { testRun: TestRun }) {
-  const failed = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
+  const failed = testRun.recordings.filter(r => r.metadata.test?.result !== "failed").length;
   const passed = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
 
   return (
