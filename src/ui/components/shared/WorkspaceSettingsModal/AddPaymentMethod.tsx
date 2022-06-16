@@ -5,6 +5,7 @@ import { Button } from "../Button";
 import { FieldRow } from "./FieldRow";
 import { InputField } from "./InputField";
 import { CountrySelect } from "./CountrySelect";
+import { PaymentMethod } from "@stripe/stripe-js";
 
 export const getValue = (form: HTMLFormElement, field: string) => {
   const input = form.elements.namedItem(field);
@@ -25,7 +26,7 @@ export function EnterPaymentMethod({
   stripePromise,
 }: {
   onCancel: () => void;
-  onSave: (billingDetails: { paymentMethodBillingId: string | null }) => void;
+  onSave: (billingDetails: { paymentMethodBillingId: PaymentMethod | string | null }) => void;
   workspaceId: string;
   stripePromise: Promise<any>;
 }) {

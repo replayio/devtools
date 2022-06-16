@@ -282,7 +282,7 @@ const messagesSlice = createSlice({
         state as MessageState
       );
     },
-    clearMessages(state) {
+    clearMessages(state, action: PayloadAction<void>) {
       const removedIds = [];
       for (const [id, maybeMessage] of Object.entries(state.messages.entities)) {
         const message = maybeMessage!;

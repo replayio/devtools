@@ -35,7 +35,6 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
   };
 
   return (
-    // @ts-expect-error React 18 children change
     <Sentry.ErrorBoundary onError={onError}>
       {unexpectedError ? <BlankViewportWrapper /> : children}
     </Sentry.ErrorBoundary>
