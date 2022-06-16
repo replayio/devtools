@@ -40,7 +40,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
+    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-600"} `}>
       <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
     </div>
   );
