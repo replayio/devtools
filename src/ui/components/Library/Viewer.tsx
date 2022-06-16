@@ -4,8 +4,8 @@ import { Recording } from "ui/types";
 
 import styles from "./Library.module.css";
 import { LibraryContext } from "./useFilters";
-import { Preview } from "./Preview/Preview";
-import { TestRuns } from "./Content/TestRuns/TestRuns";
+import { TestRunOverview } from "./Overview/TestRunOverview";
+import { TestRunList } from "./Content/TestRuns/TestRunList";
 import { Recordings } from "./Content/Recordings";
 
 export default function Viewer({
@@ -47,11 +47,11 @@ export default function Viewer({
                 setSelectedIds={setSelectedIds}
               />
             ) : (
-              <TestRuns />
+              <TestRunList />
             )}
           </div>
         </div>
-        {preview ? <Preview /> : null}
+        {preview ? <TestRunOverview /> : null}
       </div>
     </div>
   );

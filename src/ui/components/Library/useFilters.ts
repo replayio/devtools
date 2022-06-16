@@ -9,12 +9,11 @@ type LibraryContextType = {
   setAppliedText: (str: string) => void;
   preview: Preview | null;
 };
-export type Preview =
-  {
-      view: "test-runs";
-      id: string;
-      recordingId?: string | null;
-    };
+export type Preview = {
+  view: "test-runs";
+  id: string;
+  recordingId?: string | null;
+};
 export type View = "recordings" | "test-runs";
 
 export const LibraryContext = createContext<LibraryContextType>({
