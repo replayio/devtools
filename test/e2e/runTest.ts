@@ -3,6 +3,7 @@ import fs from "fs";
 import { Page } from "@recordreplay/playwright";
 import { listAllRecordings } from "@replayio/replay";
 import { test, add as addMetadata } from "@replayio/replay/metadata";
+import uuid from "uuid";
 
 import config from "./config";
 import { getExampleRecordingId } from "./getExample";
@@ -32,6 +33,11 @@ function appendTestMetadata(testId: string, file: string, success: boolean) {
         test.init({
           file: file,
           path: ["", config.browserName, file],
+          run: process.env.TEST_RUN_ID
+            ? {
+                id: process.env.TEST_RUN_ID,
+              }
+            : undefined,
           title: file,
           result: success ? "passed" : "failed",
         })
