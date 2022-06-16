@@ -28,6 +28,8 @@ jobs:
       - name: Install packages
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tsc
         run: yarn typecheck
   gql:
@@ -57,6 +59,8 @@ jobs:
       - name: Install packages
         if: steps.yarn-cache.outputs.cache-hit != 'true'
         run: yarn install
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Fetch GraphQL schema
         run: yarn gql:schema
         env:
