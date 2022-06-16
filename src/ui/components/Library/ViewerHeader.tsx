@@ -69,9 +69,12 @@ export default function ViewerHeader({
   isEditing: boolean;
   setIsEditing: (value: boolean) => void;
 }) {
-  const { value: testSupport } = useFeature("testSupport");
   const { view } = useContext(LibraryContext);
   const currentWorkspaceId = useAppSelector(getWorkspaceId);
+
+  if (view === "test-runs") {
+    return null;
+  }
 
   const HeaderLeft = (
     <ViewerHeaderLeft>
