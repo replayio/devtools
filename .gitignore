@@ -16,7 +16,7 @@ tsconfig.tsbuildinfo
 .nova/
 schema.graphql
 /coverage/
-
+storybook-static/
 
 # Yarn 3 artifacts
 .yarn/*
