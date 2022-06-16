@@ -59,7 +59,7 @@ interface State {
 class ConsoleOutput extends React.Component<PropsFromRedux, State> {
   outputNode = React.createRef<HTMLDivElement>();
 
-  _scrollTimeoutID: number | null = null;
+  _scrollTimeoutID: ReturnType<typeof setTimeout> | null = null;
   _prevSearchResultMessage: Message | null = null;
 
   static contextType = StateContext;

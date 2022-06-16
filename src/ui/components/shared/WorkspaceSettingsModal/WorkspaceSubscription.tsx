@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
+import { loadStripe, PaymentMethod } from "@stripe/stripe-js";
 
 import { assert } from "protocol/utils";
 import { isDevelopment } from "ui/utils/environment";
@@ -91,7 +91,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   const handleSave = async ({
     paymentMethodBillingId,
   }: {
-    paymentMethodBillingId: string | null;
+    paymentMethodBillingId: PaymentMethod | string | null;
   }) => {
     try {
       const planKey = workspace.subscription?.plan.key;
