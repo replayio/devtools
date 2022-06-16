@@ -19422,22 +19422,22 @@ __metadata:
 
 "protocol@file:../protocol::locator=bvaughn-architecture-demo%40workspace%3Apackages%2Fbvaughn-architecture-demo":
   version: 0.0.0
-  resolution: "protocol@file:../protocol#../protocol::hash=afe982&locator=bvaughn-architecture-demo%40workspace%3Apackages%2Fbvaughn-architecture-demo"
-  checksum: 2b407ce442b4f3523389670f7a2930fa7df3053e6efd992fa690e701f611389aa3481f2de89ce9584eafe7e99f379eef0a11b5edaed5fdc15143eb2979e76ff6
+  resolution: "protocol@file:../protocol#../protocol::hash=4e18a2&locator=bvaughn-architecture-demo%40workspace%3Apackages%2Fbvaughn-architecture-demo"
+  checksum: dc003aced52ed738927aa41a0a8d5071e1e9db58d647b9b9118d7ee3fd54a60c1c3ea96f01bcf596a19ce1324d789ba6ae7215f4626e7b905c251b784488362d
   languageName: node
   linkType: hard
 
 "protocol@file:../protocol::locator=markerikson-stack-client-prototype-227d06%40workspace%3Apackages%2Fmarkerikson-stack-client-prototype":
   version: 0.0.0
-  resolution: "protocol@file:../protocol#../protocol::hash=afe982&locator=markerikson-stack-client-prototype-227d06%40workspace%3Apackages%2Fmarkerikson-stack-client-prototype"
-  checksum: 2b407ce442b4f3523389670f7a2930fa7df3053e6efd992fa690e701f611389aa3481f2de89ce9584eafe7e99f379eef0a11b5edaed5fdc15143eb2979e76ff6
+  resolution: "protocol@file:../protocol#../protocol::hash=4e18a2&locator=markerikson-stack-client-prototype-227d06%40workspace%3Apackages%2Fmarkerikson-stack-client-prototype"
+  checksum: dc003aced52ed738927aa41a0a8d5071e1e9db58d647b9b9118d7ee3fd54a60c1c3ea96f01bcf596a19ce1324d789ba6ae7215f4626e7b905c251b784488362d
   languageName: node
   linkType: hard
 
 "protocol@file:packages/protocol::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "protocol@file:packages/protocol#packages/protocol::hash=afe982&locator=recordreplay-devtools%40workspace%3A."
-  checksum: 2b407ce442b4f3523389670f7a2930fa7df3053e6efd992fa690e701f611389aa3481f2de89ce9584eafe7e99f379eef0a11b5edaed5fdc15143eb2979e76ff6
+  resolution: "protocol@file:packages/protocol#packages/protocol::hash=4e18a2&locator=recordreplay-devtools%40workspace%3A."
+  checksum: dc003aced52ed738927aa41a0a8d5071e1e9db58d647b9b9118d7ee3fd54a60c1c3ea96f01bcf596a19ce1324d789ba6ae7215f4626e7b905c251b784488362d
   languageName: node
   linkType: hard
 
@@ -21402,8 +21402,8 @@ __metadata:
 
 "shared@file:packages/shared::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "shared@file:packages/shared#packages/shared::hash=2caf5a&locator=recordreplay-devtools%40workspace%3A."
-  checksum: ef0c1eeb34c39cb11f52377a73abc8313e2de5010a006ed470806858102d747e14936dd2861c2d66065f785f0109c7ced823ad4e2a1932073b669048ecba4f7b
+  resolution: "shared@file:packages/shared#packages/shared::hash=58ea11&locator=recordreplay-devtools%40workspace%3A."
+  checksum: d7eb103c20cd1ca463d42f4a633c63feac6e2370dc9853b577dceb8b4ecf2df29bf6fd4e11f374f0eef18e1962ab55a5fa5ee52ecdaef3dab561f54aa9857383
   languageName: node
   linkType: hard
 
@@ -23024,21 +23024,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-invariant@npm:^0.10.3":
+"ts-invariant@npm:0.10.3":
   version: 0.10.3
   resolution: "ts-invariant@npm:0.10.3"
   dependencies:
     tslib: ^2.1.0
   checksum: bb07d56fe4aae69d8860e0301dfdee2d375281159054bc24bf1e49e513fb0835bf7f70a11351344d213a79199c5e695f37ebbf5a447188a377ce0cd81d91ddb5
-  languageName: node
-  linkType: hard
-
-"ts-invariant@npm:^0.4.0":
-  version: 0.4.4
-  resolution: "ts-invariant@npm:0.4.4"
-  dependencies:
-    tslib: ^1.9.3
-  checksum: 58b32fb6b7c479e602e55b9eb63bb99a203c5db09367d3aa7c3cbe000ba62f919eea7f031f55172df9b6d362a6f1a87e906df84b04b8c74c88e507ac58f7a554
   languageName: node
   linkType: hard
 
