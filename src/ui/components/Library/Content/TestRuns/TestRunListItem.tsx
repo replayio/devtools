@@ -39,19 +39,11 @@ function Attributes({ testRun }: { testRun: TestRun }) {
 }
 
 function Status({ failCount }: { failCount: number }) {
-  if (failCount > 0) {
-    return (
-      <div className="flex text-red-500">
-        <MaterialIcon iconSize="xl">cancel</MaterialIcon>
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex text-green-500">
-        <MaterialIcon>check_circle</MaterialIcon>
-      </div>
-    );
-  }
+  return (
+    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
+      <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
+    </div>
+  );
 }
 
 export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
@@ -64,7 +56,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-row items-center flex-grow px-4 py-3 space-x-4 overflow-hidden bg-white border-b cursor-pointer"
+      className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b cursor-pointer"
       style={style}
       onClick={onClick}
     >

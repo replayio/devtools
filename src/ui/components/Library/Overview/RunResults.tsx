@@ -24,7 +24,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
 
   return (
     <div className="flex flex-col">
-      <div className="p-2 px-4 font-medium border-b" onClick={() => setExpanded(!expanded)}>
+      <div className="sticky top-0 p-2 px-4 font-medium bg-white border-b" onClick={() => setExpanded(!expanded)}>
         {label} ({recordings.length})
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}

@@ -14,8 +14,6 @@ const SIZE_STYLES = {
 type MaterialIconProps = React.HTMLProps<HTMLDivElement> & {
   children: string;
   outlined?: boolean;
-  // tailwind text color style, e.g. text-white, text-blue-200
-  color?: string;
   iconSize?: keyof typeof SIZE_STYLES;
   title?: string;
 };
