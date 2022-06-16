@@ -19444,8 +19444,8 @@ __metadata:
 
 "protocol@file:packages/protocol::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "protocol@file:packages/protocol#packages/protocol::hash=405bf8&locator=recordreplay-devtools%40workspace%3A."
-  checksum: a80548046b133d137bc7d2e9b360b169dbc76bb8e158d8415b84f45cf4387a961d66f8e29d9a938bb49df7fd36a594e1d77a3b18df0b8de7ff7e5cac267f7c16
+  resolution: "protocol@file:packages/protocol#packages/protocol::hash=a80425&locator=recordreplay-devtools%40workspace%3A."
+  checksum: fb8d3a56f1ec37e132a34422be2f854b5df87e8c1ff0dc1c2558dd88e87d93c539132820950433a17ee65c8f66eb7acf2f002314fbebdede235d8f540e04633d
   languageName: node
   linkType: hard
 
@@ -21419,8 +21419,8 @@ __metadata:
 
 "shared@file:packages/shared::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "shared@file:packages/shared#packages/shared::hash=4a86e4&locator=recordreplay-devtools%40workspace%3A."
-  checksum: 210e8e74b25662bbffda0050d45d0ca8d367f68369fbef085df9d2c80b8c146a5a996f7cd756b2c38c5dfc30c8afd27b64a1f52801fe9759e6469834bee6ef9e
+  resolution: "shared@file:packages/shared#packages/shared::hash=736796&locator=recordreplay-devtools%40workspace%3A."
+  checksum: 291871a1e5af2abe7a51512997d1d6d7961928b732a10ef7255deea328384f3242903e0a0a64a03036461f47bcb6227a4c1122a793efa928c4750a4d8a119239
   languageName: node
   linkType: hard
 
@@ -23035,21 +23035,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ts-invariant@npm:^0.10.3":
+"ts-invariant@npm:0.10.3":
   version: 0.10.3
   resolution: "ts-invariant@npm:0.10.3"
   dependencies:
     tslib: ^2.1.0
   checksum: bb07d56fe4aae69d8860e0301dfdee2d375281159054bc24bf1e49e513fb0835bf7f70a11351344d213a79199c5e695f37ebbf5a447188a377ce0cd81d91ddb5
-  languageName: node
-  linkType: hard
-
-"ts-invariant@npm:^0.4.0":
-  version: 0.4.4
-  resolution: "ts-invariant@npm:0.4.4"
-  dependencies:
-    tslib: ^1.9.3
-  checksum: 58b32fb6b7c479e602e55b9eb63bb99a203c5db09367d3aa7c3cbe000ba62f919eea7f031f55172df9b6d362a6f1a87e906df84b04b8c74c88e507ac58f7a554
   languageName: node
   linkType: hard
 
