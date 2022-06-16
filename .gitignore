@@ -17,3 +17,4 @@ yarn.lock
 .nova/
 schema.graphql
 /coverage/
+.pnpm-debug.log

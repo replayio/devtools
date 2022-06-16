@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "protocol": "file:../protocol"
+    "protocol": "workspace:*"
   },
   "scripts": {
     "dev": "next dev",
