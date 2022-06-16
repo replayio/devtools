@@ -13,7 +13,6 @@ cypress.env.json
 next-env.d.ts
 out
 tsconfig.tsbuildinfo
-yarn.lock
 .nova/
 schema.graphql
 /coverage/
