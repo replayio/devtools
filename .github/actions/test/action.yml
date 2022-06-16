@@ -3,9 +3,27 @@ description: "Run end-to-end tests. Note that this action assumes that Node and 
 runs:
   using: "composite"
   steps:
-    - uses: bahmutov/npm-install@v1
+    # - uses: bahmutov/npm-install@v1
+    #   with:
+    #     install-command: npm ci --legacy-peer-deps
+    # Get the yarn cache path.
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+    - name: Restore yarn cache
+      uses: actions/cache@v3
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
-        install-command: npm ci --legacy-peer-deps
+        #path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+        path: |
+          ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          **/node_modules
+        key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+        restore-keys: "yarn-cache-folder-"
+    # Actually install packages with Yarn
+    - name: Install packages
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
     - run: tar xf ./macOS-replay-playwright.tar.xz
