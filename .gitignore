@@ -18,3 +18,4 @@ yarn.lock
 schema.graphql
 /coverage/
 .pnpm-debug.log
+storybook-static/
