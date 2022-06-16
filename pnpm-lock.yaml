@@ -77,7 +77,7 @@ importers:
       '@types/react-virtualized-auto-sizer': ^1.0.1
       '@types/react-window': ^1.8.5
       '@types/styled-components': ^5.1.25
-      '@types/uuid': ^8.3.1
+      '@types/uuid': ^7
       '@typescript-eslint/eslint-plugin': ^5.18.0
       '@typescript-eslint/parser': ^5.20.0
       apollo: ^2.33.10
@@ -287,7 +287,7 @@ importers:
       '@types/react-virtualized-auto-sizer': 1.0.1
       '@types/react-window': 1.8.5
       '@types/styled-components': 5.1.25
-      '@types/uuid': 8.3.4
+      '@types/uuid': 7.0.5
       '@typescript-eslint/eslint-plugin': 5.28.0_evi7yu7wunhzwb24olrfvzynny
       '@typescript-eslint/parser': 5.28.0_sfmgizikprcxt7r54j7cnzjamu
       apollo: 2.34.0_typescript@4.6.3
@@ -6137,8 +6137,8 @@ packages:
     resolution: {integrity: sha512-EwmlvuaxPNej9+T4v5AuBPJa2x2UOJVdjCtDHgcDqitUeOtjnJKJ+apYjVcAoBEMjKW1VVFGZLUb5+qqa09XFA==}
     dev: false
 
-  /@types/uuid/8.3.4:
-    resolution: {integrity: sha512-c/I8ZRb51j+pYGAu5CrFMRxqZ2ke4y2grEBO5AUjgSkSk+qT2Ea+OdWElz/OiMf5MNpn2b17kuVBwZLQJXzihw==}
+  /@types/uuid/7.0.5:
+    resolution: {integrity: sha512-hKB88y3YHL8oPOs/CNlaXtjWn93+Bs48sDQR37ZUqG2tLeCS7EA1cmnkKsuQsub9OKEB/y/Rw9zqJqqNSbqVlQ==}
     dev: true
 
   /@types/webpack-env/1.17.0:

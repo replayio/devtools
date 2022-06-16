@@ -9,7 +9,7 @@ import type { UIStore } from "ui/actions";
 import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
-import { v4 as uuid } from "uuid";
+import { v4 as uuidv4 } from "uuid";
 
 import {
   createRecordingOwnerUserIdMock,
@@ -18,8 +18,8 @@ import {
   createGetUserMock,
 } from "../../test/mock/src/graphql";
 
-const recordingId = uuid();
-const userId = uuid();
+const recordingId = uuidv4();
+const userId = uuidv4();
 const user = { id: userId, uuid: userId };
 
 // Create common GraphQL mocks, reused from the E2E tests

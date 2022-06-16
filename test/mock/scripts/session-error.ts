@@ -2,7 +2,7 @@
 
 import { runTest, devtoolsURL } from "../src/runTest";
 import { installMockEnvironmentInPage, MockHandlerHelpers } from "../src/mockEnvironment";
-import { v4 as uuid } from "uuid";
+import uuid from "uuid/v4";
 import {
   createRecordingOwnerUserIdMock,
   createUserSettingsMock,

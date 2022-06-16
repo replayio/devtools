@@ -1,7 +1,7 @@
 // Source: https://github.com/janouma/jest-text-transformer
 
 const { statSync } = require("fs");
-const uuid = require("uuid/v4");
+const uuid = require("uuid");
 
 const cache = {};
 
@@ -15,7 +15,7 @@ module.exports = {
     if (!cached) {
       cached = cache[filename] = {
         lastModified: stat.atimeMs,
-        hash: uuid(),
+        hash: uuid.v4(),
       };
     }
 
@@ -23,7 +23,7 @@ module.exports = {
       cache[filename] = {
         ...cached,
         lastModified: stat.atimeMs,
-        hash: uuid(),
+        hash: uuid.v4(),
       };
     }
 
