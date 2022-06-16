@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 import { AttributeContainer } from "../Content/TestRuns/AttributeContainer";
 import { RunStats } from "../Content/TestRuns/RunStats";
@@ -24,17 +23,17 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   const branch = firstRecording.metadata.source?.branch || "Unknown branch";
 
   return (
-    <div className="flex flex-row items-center space-x-4 overflow-hidden text-xs">
+    <div className="flex flex-row flex-wrap items-center text-xs">
       <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
       <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
       <AttributeContainer icon="timer">
         {getTruncatedRelativeDate(firstRecording.date)}
       </AttributeContainer>
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-      {user ? <div>{user}</div> : null}
+      <AttributeContainer>{user!}</AttributeContainer>
       {firstRecording.metadata.source?.merge ? (
         <div
-          className="flex flex-row items-center space-x-1"
+          className="flex flex-row items-center mr-4 space-x-1"
           title={firstRecording.metadata.source.merge.title}
         >
           <div className="font-bold">PR</div>
@@ -52,7 +51,6 @@ export function RunSummary() {
     <div className="flex flex-col p-4 space-y-2 border-b">
       <Title testRun={testRun} />
       <Attributes testRun={testRun} />
-      {/* <Results testRun={testRun} /> */}
       <RunStats testRun={testRun} />
     </div>
   );

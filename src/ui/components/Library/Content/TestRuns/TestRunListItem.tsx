@@ -19,7 +19,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   const durationString = getDurationString(duration);
 
   return (
-    <div className="flex flex-row items-center space-x-4 text-xs font-light text-gray-500">
+    <div className="flex flex-row items-center text-xs font-light text-gray-500">
       <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
       <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
