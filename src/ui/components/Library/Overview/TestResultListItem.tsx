@@ -1,19 +1,9 @@
-import { MouseEvent, useContext, useEffect, useRef } from "react";
+import { MouseEvent, useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 import { LibraryContext } from "../useFilters";
 
-function StatusTab({ passed }: { passed: boolean }) {
-  return (
-    <div
-      className={`flex-shrink-0 h-full w-1 rounded-tr-md rounded-br-md ${
-        passed ? "bg-transparent" : "bg-red-500"
-      }`}
-    />
-  );
-}
-
-function ViewReplay({ recordingId }: { recordingId: string }) {
+function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (
     <a
       href={`/recording/${recordingId}`}
@@ -21,8 +11,12 @@ function ViewReplay({ recordingId }: { recordingId: string }) {
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <button className="flex items-center justify-center p-2 transition text-primaryAccent hover:text-primaryAccentHover">
-        <MaterialIcon iconSize="2xl" outlined>
+      <button className="flex items-center justify-center p-2 transition">
+        <MaterialIcon
+          iconSize="2xl"
+          outlined
+          className={passed ? "text-primaryAccent" : "text-red-500"}
+        >
           play_circle
         </MaterialIcon>
       </button>
@@ -60,16 +54,18 @@ function Title({ recording }: { recording: Recording }) {
 export function TestResultListItem({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const passed = metadata.test?.result === "passed";
-  const rowNode = useRef<HTMLDivElement>(null);
+  const recordingId = recording.id;
 
   return (
-    <div
+    <a
       className={`group flex items-center border-b pr-2 transition duration-150 hover:bg-gray-100`}
-      ref={rowNode}
+      href={`/recording/${recordingId}`}
+      target="_blank"
+      rel="noreferrer noopener"
+      title="View Replay"
     >
-      <StatusTab passed={passed} />
-      <ViewReplay recordingId={recording.id} />
+      <ViewReplay recordingId={recordingId} passed={passed} />
       <Title recording={recording} />
-    </div>
+    </a>
   );
 }

@@ -19,39 +19,31 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   const durationString = getDurationString(duration);
 
   return (
-    <div className="flex flex-row items-center space-x-4 text-xs font-light text-gray-500">
+    <div className="flex flex-row items-center text-xs font-light text-gray-500">
       <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
       <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
+      <AttributeContainer>{user!}</AttributeContainer>
       {recordings[0].metadata.source?.merge ? (
         <div
-          className="flex flex-row items-center space-x-1"
+          className="flex flex-row items-center mr-4 space-x-1"
           title={recordings[0].metadata.source.merge.title}
         >
           <div className="font-bold">PR</div>
           <div>{recordings[0].metadata.source.merge.id}</div>
         </div>
       ) : null}
-      <div>{user || "unknown"}</div>
     </div>
   );
 }
 
 function Status({ failCount }: { failCount: number }) {
-  if (failCount > 0) {
-    return (
-      <div className="flex text-red-500">
-        <MaterialIcon iconSize="xl">cancel</MaterialIcon>
-      </div>
-    );
-  } else {
-    return (
-      <div className="flex text-green-500">
-        <MaterialIcon>check_circle</MaterialIcon>
-      </div>
-    );
-  }
+  return (
+    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-600"} `}>
+      <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
+    </div>
+  );
 }
 
 export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
@@ -64,7 +56,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-row items-center flex-grow px-4 py-3 space-x-4 overflow-hidden bg-white border-b cursor-pointer"
+      className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b cursor-pointer"
       style={style}
       onClick={onClick}
     >
