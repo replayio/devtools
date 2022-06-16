@@ -3,9 +3,33 @@ description: "Run end-to-end tests. Note that this action assumes that Node and 
 runs:
   using: "composite"
   steps:
-    - uses: bahmutov/npm-install@v1
+    # - uses: bahmutov/npm-install@v1
+    #   with:
+    #     install-command: npm ci --legacy-peer-deps
+    - uses: pnpm/action-setup@v2.0.1
+      name: Install pnpm
+      id: pnpm-install
       with:
-        install-command: npm ci --legacy-peer-deps
+        version: 7
+        run_install: false
+
+    - name: Get pnpm store directory
+      id: pnpm-cache
+      shell: bash
+      run: |
+        echo "::set-output name=pnpm_cache_dir::$(pnpm store path)"
+
+    - uses: actions/cache@v3
+      name: Setup pnpm cache
+      with:
+        path: ${{ steps.pnpm-cache.outputs.pnpm_cache_dir }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
     - run: tar xf ./macOS-replay-playwright.tar.xz
@@ -14,7 +38,7 @@ runs:
       shell: bash
     - run: chmod +x ./replay-node/macOS-replay-node
       shell: bash
-    - run: npm run test-e2e -- --shard ${{ env.INPUT_STRIPE }}
+    - run: pnpm test-e2e -- --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
