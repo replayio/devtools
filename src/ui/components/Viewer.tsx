@@ -3,7 +3,7 @@ import SecondaryToolbox from "./SecondaryToolbox";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { prefs } from "ui/utils/prefs";
 import Video from "ui/components/Video";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getShowVideoPanel, getToolboxLayout } from "ui/reducers/layout";
 import { getRecordingTarget } from "ui/reducers/app";
 import { ToolboxLayout } from "ui/state/layout";
@@ -11,8 +11,8 @@ import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import Toolbox from "./Toolbox";
 
 const useGetShowVideo = () => {
-  const recordingTarget = useSelector(getRecordingTarget);
-  const showVideoPanel = useSelector(getShowVideoPanel);
+  const recordingTarget = useAppSelector(getRecordingTarget);
+  const showVideoPanel = useAppSelector(getShowVideoPanel);
   return showVideoPanel && recordingTarget !== "node";
 };
 
@@ -86,8 +86,8 @@ function maxSize(
 }
 
 export default function Viewer() {
-  const toolboxLayout = useSelector(getToolboxLayout);
-  const sidePanelCollapsed = useSelector(getPaneCollapse);
+  const toolboxLayout = useAppSelector(getToolboxLayout);
+  const sidePanelCollapsed = useAppSelector(getPaneCollapse);
 
   return (
     <SplitBox

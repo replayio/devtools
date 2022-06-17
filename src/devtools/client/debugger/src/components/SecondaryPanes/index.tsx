@@ -15,13 +15,13 @@ import CommandBar from "./CommandBar";
 import FrameTimeline from "./FrameTimeline";
 
 import Scopes from "./Scopes";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { UIState } from "ui/state";
 import { useDebuggerPrefs } from "../../utils/prefs";
 
 export default function SecondaryPanes() {
-  const hasFrames = useSelector((state: UIState) => !!getTopFrame(state));
-  const framesLoading = useSelector(getFramesLoading);
+  const hasFrames = useAppSelector((state: UIState) => !!getTopFrame(state));
+  const framesLoading = useAppSelector(getFramesLoading);
   const { value: scopesExpanded, update: updateScopesExpanded } =
     useDebuggerPrefs("scopes-visible");
   const { value: callstackVisible, update: updateCallstackVisible } =

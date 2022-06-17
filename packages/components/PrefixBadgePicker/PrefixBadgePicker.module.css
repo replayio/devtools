@@ -1,32 +1,14 @@
-.PrefixBadgePicker {
-  display: flex;
-  align-items: center;
-  position: relative;
-  align-self: start;
-  height: 1.5rem;
-}
-
-.PrefixBadgePickerFill {
-  position: absolute;
-  left: -2px;
-  height: 100%;
-  border-radius: 1rem;
-  background-color: var(--breakpoint-editfield-hover);
-  transition: background-color 0.18s ease-out;
-}
-
 .PrefixBadge {
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.25rem;
-  height: 1.25rem;
-  flex: 0 0 1.25rem;
+  width: 20px;
+  height: 26px;
 }
 
 .DefaultBadge {
-  background-color: var(--light-grey);
+  background-color: var(--badge-foreground);
   border-radius: 0.3rem;
 }
 
@@ -51,8 +33,7 @@
   background-size: auto 100%;
 }
 
-.active.PrefixBadge:hover .ColorBadge::before,
-.active .ColorBadge::before,
+.ColorBadge::before,
 .ColorBadge::after {
   grid-area: 1 / 1 / 1 / 1;
   content: "";
@@ -64,6 +45,12 @@
 .ColorBadge::before {
   width: 100%;
   height: 100%;
+  opacity: 0;
+  transition: opacity 0.18s ease-out;
+}
+
+[data-was-active="true"] .ColorBadge::before,
+[data-open="true"] .PrefixBadge:hover .ColorBadge::before {
   opacity: 0.2;
 }
 
@@ -74,52 +61,33 @@
 
 /* Background fill colors */
 
-:global(.theme-dark) .PrefixBadgePicker:hover .PrefixBadgePickerFill,
-:global(.theme-dark) .isOpen .PrefixBadgePickerFill {
-  background: #474c52;
+:global(.theme-light) .PrefixBadgePicker {
+  --badge-foreground: #dcdcdc;
+  --badge-background--active: #f8f8f8;
 }
 
-:root:global(.theme-light) .unicorn {
-  --primary-color: #ff6ddf;
-  color: #fff;
-}
-:root:global(.theme-dark) .unicorn {
-  --primary-color: #e110b3;
-  color: #fff;
+:global(.theme-dark) .PrefixBadgePicker {
+  --badge-foreground: #898f95;
+  --badge-background--active: #474c52;
 }
 
-:root:global(.theme-light) .purple {
-  --primary-color: #a973cd;
-  color: #fff;
+.green {
+  --primary-color: var(--badge-green-color);
+  color: var(--badge-green-contrast-color);
 }
-:root:global(.theme-dark) .purple {
-  --primary-color: #cc81ff;
-  color: #fff;
+.orange {
+  --primary-color: var(--badge-orange-color);
+  color: var(--badge-orange-contrast-color);
 }
-
-:root:global(.theme-light) .green {
-  --primary-color: #73cc6d;
-  color: #fff;
+.purple {
+  --primary-color: var(--badge-purple-color);
+  color: var(--badge-purple-contrast-color);
 }
-:root:global(.theme-dark) .green {
-  --primary-color: #69e261;
-  color: #050;
+.yellow {
+  --primary-color: var(--badge-yellow-color);
+  color: var(--badge-yellow-contrast-color);
 }
-
-:root:global(.theme-light) .orange {
-  --primary-color: #da7c04;
-  color: #fff;
-}
-:root:global(.theme-dark) .orange {
-  --primary-color: #ff9a19;
-  color: #fff;
-}
-
-:root:global(.theme-light) .yellow {
-  --primary-color: #e4cd00;
-  color: rgb(99, 79, 5);
-}
-:root:global(.theme-dark) .yellow {
-  --primary-color: #fee608;
-  color: rgb(99, 79, 5);
+.unicorn {
+  --primary-color: var(--badge-unicorn-color);
+  color: var(--badge-unicorn-contrast-color);
 }

@@ -36,9 +36,17 @@ class Scopes extends PureComponent {
 
     super(props);
 
-    this.state = {
-      scopes: getScopes(why, selectedFrame, frameScopes),
-    };
+    this.state = { scopes: null };
+    this.updateScopes(why, selectedFrame, frameScopes);
+  }
+
+  async updateScopes(why, selectedFrame, frameScopes) {
+    const scopes = getScopes(why, selectedFrame, frameScopes);
+    if (scopes) {
+      const scopesToLoad = scopes.filter(scope => scope.type === "value" && !scope.loaded);
+      await Promise.all(scopesToLoad.map(scope => scope.contents.load()));
+      this.setState({ scopes });
+    }
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -48,9 +56,8 @@ class Scopes extends PureComponent {
     const frameScopesChanged = frameScopes !== nextProps.frameScopes;
 
     if (isPausedChanged || selectedFrameChanged || frameScopesChanged) {
-      this.setState({
-        scopes: getScopes(nextProps.why, nextProps.selectedFrame, nextProps.frameScopes),
-      });
+      this.setState({ scopes: null });
+      this.updateScopes(nextProps.why, nextProps.selectedFrame, nextProps.frameScopes);
     }
   }
 

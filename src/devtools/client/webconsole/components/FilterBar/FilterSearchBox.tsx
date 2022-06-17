@@ -1,6 +1,7 @@
 import React, { ChangeEvent, KeyboardEvent, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
+// TODO Change require to import and convert the actions file to TS
 const actions = require("devtools/client/webconsole/actions/index");
 
 function TextInput(props: React.HTMLProps<HTMLInputElement>) {
@@ -15,7 +16,7 @@ function TextInput(props: React.HTMLProps<HTMLInputElement>) {
 }
 
 export function FilterSearchBox() {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [searchString, _setSearchString] = useState("");
   const setSearchString = (value: string) => {

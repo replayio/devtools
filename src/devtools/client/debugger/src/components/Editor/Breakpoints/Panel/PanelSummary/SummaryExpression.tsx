@@ -27,7 +27,7 @@ function Expression({ value, isEditable }: { value: string; isEditable: boolean 
   return (
     <div className={classNames({ expression: true })}>
       <div
-        className="cm-s-mozilla overflow-hidden whitespace-pre font-mono"
+        className="cm-s-mozilla overflow-hidden whitespace-pre"
         dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(value || "") }}
       />
     </div>

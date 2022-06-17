@@ -5,7 +5,7 @@ import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
 import type { ExperimentalUserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
-import { features } from "ui/utils/prefs";
+import { features, prefs } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
 import { useEffect, useMemo, useState } from "react";
 import { maybeTrackTeamChange } from "ui/utils/mixpanel";
@@ -103,6 +103,27 @@ export const useFeature = (prefKey: keyof typeof features) => {
     value: pref,
     update: (newValue: boolean) => {
       prefsService.setBoolPref(fullKey, newValue);
+    },
+  };
+};
+
+export const useStringPref = (prefKey: keyof typeof prefs) => {
+  const fullKey = `devtools.${prefKey}`;
+  const [pref, setPref] = useState(prefsService.getStringPref(fullKey));
+
+  useEffect(() => {
+    const onUpdate = (prefs: any) => {
+      setPref(prefs.getStringPref(fullKey));
+    };
+
+    prefsService.addObserver(fullKey, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate);
+  }, [fullKey]);
+
+  return {
+    value: pref,
+    update: (newValue: string) => {
+      prefsService.setStringPref(fullKey, newValue);
     },
   };
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getNonLoadingTimeRanges } from "ui/reducers/app";
 import { getHoverTime, getShowFocusModeControls, getZoomRegion } from "ui/reducers/timeline";
 import { getVisiblePosition } from "ui/utils/timeline";
@@ -13,10 +13,10 @@ const getTimestamp = (time?: number) => {
 };
 
 export default function Tooltip({ timelineWidth }: { timelineWidth: number }) {
-  const hoverTime = useSelector(getHoverTime);
-  const zoomRegion = useSelector(getZoomRegion);
-  const showFocusModeControls = useSelector(getShowFocusModeControls);
-  const nonLoadingRegion = useSelector(getNonLoadingTimeRanges);
+  const hoverTime = useAppSelector(getHoverTime);
+  const zoomRegion = useAppSelector(getZoomRegion);
+  const showFocusModeControls = useAppSelector(getShowFocusModeControls);
+  const nonLoadingRegion = useAppSelector(getNonLoadingTimeRanges);
   const shouldHideTooltip = !hoverTime || showFocusModeControls;
 
   if (shouldHideTooltip) {

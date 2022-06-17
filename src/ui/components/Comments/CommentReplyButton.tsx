@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import useAddCommentReply from "ui/hooks/comments/useAddCommentReply";
 import { Comment } from "ui/state/comments";
@@ -12,7 +12,7 @@ import styles from "./CommentReplyButton.module.css";
 
 export default function CommentReplyButton({ comment }: { comment: Comment }) {
   const { isAuthenticated } = useAuth0();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const addCommentReply = useAddCommentReply();
 

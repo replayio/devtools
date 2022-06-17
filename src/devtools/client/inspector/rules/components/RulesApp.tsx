@@ -7,7 +7,7 @@ import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { RulesState, RuleState } from "../state/rules";
 import { RuleInheritance } from "../models/rule";
 
@@ -35,7 +35,7 @@ export const RulesApp: FC<RulesAppProps> = ({
   showDeclarationNameEditor,
   showSelectorEditor,
 }) => {
-  const { rules } = useSelector((state: { rules: RulesState }) => ({
+  const { rules } = useAppSelector((state: { rules: RulesState }) => ({
     rules: state.rules.rules || [],
   }));
 

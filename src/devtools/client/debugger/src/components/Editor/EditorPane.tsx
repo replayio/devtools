@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import Editor from "./index";
 import EditorTabs from "./Tabs";
 import EditorFooter from "./Footer";
@@ -20,9 +20,9 @@ import { getSelectedSource } from "../../reducers/sources";
 
 export const EditorPane = () => {
   const [loadingEditor, setLoadingEditor] = useState(true);
-  const dispatch = useDispatch();
-  const toolboxLayout = useSelector(getToolboxLayout);
-  const selectedSource = useSelector(getSelectedSource);
+  const dispatch = useAppDispatch();
+  const toolboxLayout = useAppSelector(getToolboxLayout);
+  const selectedSource = useAppSelector(getSelectedSource);
   const panelEl = useRef(null);
   const { value: enableLargeText } = useFeature("enableLargeText");
 

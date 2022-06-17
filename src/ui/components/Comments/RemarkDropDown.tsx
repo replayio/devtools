@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import { Dropdown, DropdownItem } from "ui/components/Library/LibraryDropdown";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -24,7 +24,7 @@ export default function RemarkDropDown({
 }) {
   const { confirmDestructive } = useConfirm();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [isExpanded, setIsExpanded] = useState(false);
 

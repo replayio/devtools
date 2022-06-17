@@ -1,11 +1,11 @@
 import React from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedRequestBody } from "ui/reducers/network";
 import HttpBody from "./HttpBody";
 import { findHeader, RequestSummary } from "./utils";
 
 const RequestBody = ({ request }: { request: RequestSummary | undefined }) => {
-  const requestBody = useSelector(getSelectedRequestBody);
+  const requestBody = useAppSelector(getSelectedRequestBody);
 
   if (!request || !requestBody) {
     return null;

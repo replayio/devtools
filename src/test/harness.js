@@ -1,6 +1,7 @@
 // Harness for use by automated tests. Adapted from various test devtools
 // test harnesses.
 
+const { getDevicePixelRatio } = require("protocol/graphics");
 const { sendMessage } = require("protocol/socket");
 const { ThreadFront } = require("protocol/thread");
 const { assert } = require("protocol/utils");
@@ -825,10 +826,20 @@ async function ensurePseudoElementRulesExpanded() {
   }
 }
 
-function dispatchMouseEvent(element, eventName) {
+function dispatchMouseEvent(element, eventName, eventProperties = {}) {
   element.dispatchEvent(
-    new MouseEvent(eventName, { view: window, bubbles: true, cancelable: true })
+    new MouseEvent(eventName, { view: window, bubbles: true, cancelable: true, ...eventProperties })
   );
+}
+
+function dispatchMouseEventInGraphics(eventName, x, y) {
+  const graphicsNode = document.getElementById("graphics");
+  const bounds = graphicsNode.getBoundingClientRect();
+  const scale = bounds.width / graphicsNode.offsetWidth;
+  const pixelRatio = getDevicePixelRatio();
+  const clientX = bounds.left + x * scale * pixelRatio;
+  const clientY = bounds.top + y * scale * pixelRatio;
+  dispatchMouseEvent(document.body, eventName, { clientX, clientY });
 }
 
 async function checkHighlighterVisible(visible) {
@@ -938,6 +949,7 @@ const testCommands = {
   getAppliedRulesJSON,
   checkAppliedRules,
   dispatchMouseEvent,
+  dispatchMouseEventInGraphics,
   checkHighlighterVisible,
   checkHighlighterShape,
   getMouseTarget,

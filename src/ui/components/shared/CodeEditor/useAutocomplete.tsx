@@ -8,7 +8,7 @@ import {
   normalizeString,
 } from "ui/utils/autocomplete";
 import uniq from "lodash/uniq";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { UIState } from "ui/state";
 import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
@@ -46,7 +46,7 @@ async function getScopeMatches(expression: string, frameScope: any): Promise<str
 }
 
 function useGetScopeMatches(expression: string) {
-  const frameScope = useSelector((state: UIState) => getFrameScope(state, "0:0"));
+  const frameScope = useAppSelector((state: UIState) => getFrameScope(state, "0:0"));
   const getScopeMatchesForFrameScope = useCallback(
     (expression: string) => getScopeMatches(expression, frameScope),
     [frameScope]
@@ -78,7 +78,7 @@ async function getEvalMatches(
 
 // This tries to autocomplete the property of the current expression.
 function useGetEvalMatches(expression: string) {
-  const frame = useSelector(getSelectedFrame);
+  const frame = useAppSelector(getSelectedFrame);
   const getEvalMatchesForSelectedFrame = useCallback(
     (expression: string) => getEvalMatches(expression, frame),
     [frame]

@@ -1,5 +1,5 @@
 import playwright from "@recordreplay/playwright";
-import cli from "@replayio/replay";
+import * as cli from "@replayio/replay";
 import { findLast } from "lodash";
 
 import config from "./config";

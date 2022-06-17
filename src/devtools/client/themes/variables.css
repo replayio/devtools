@@ -108,6 +108,7 @@
 :root.theme-light {
   /*
   TABLE OF CONTENTS
+  - Badge colors
   - Color ramp
   - Core classes
   - Tabs
@@ -118,6 +119,18 @@
   - To Organise
   - (Previous styles; to organise)
   */
+
+  /* Badge colors */
+  --badge-green-color: #73cc6d;
+  --badge-green-contrast-color: #fff;
+  --badge-orange-color: #da7c04;
+  --badge-orange-contrast-color: #fff;
+  --badge-purple-color: #a973cd;
+  --badge-purple-contrast-color: #fff;
+  --badge-unicorn-color: #ff6ddf;
+  --badge-unicorn-contrast-color: #fff;
+  --badge-yellow-color: #e4cd00;
+  --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   /* Color ramp (Light) */
   --theme-base-100: hsl(0, 0%, 100%);
@@ -179,6 +192,8 @@
   --caret-color: #18181a;
   --debug-line-border: var(--primary-accent);
   --debug-line-background: #e8f5fb;
+  --gutter-hit-count-background: #f3f4f6;
+  --gutter-hit-count-foreground: #aeaeae;
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
@@ -353,6 +368,7 @@
 :root.theme-dark {
   /*
   TABLE OF CONTENTS
+  - Badge colors
   - Color ramp
   - Core classes
   - Tabs
@@ -363,6 +379,18 @@
   - To Organise
   - (Previous styles; to organise)
   */
+
+  /* Badge colors */
+  --badge-green-color: #69e261;
+  --badge-green-contrast-color: #050;
+  --badge-orange-color: #ff9a19;
+  --badge-orange-contrast-color: #fff;
+  --badge-purple-color: #cc81ff;
+  --badge-purple-contrast-color: #fff;
+  --badge-unicorn-color: #e110b3;
+  --badge-unicorn-contrast-color: #fff;
+  --badge-yellow-color: #fee608;
+  --badge-yellow-contrast-color: rgb(99, 79, 5);
 
   /* Color ramp (Dark) */
   --theme-base-100: #000; /* background chrome */
@@ -423,6 +451,8 @@
   --caret-color: #fff;
   --debug-line-border: var(--theme-base-85);
   --debug-line-background: var(--theme-base-100);
+  --gutter-hit-count-background: #081121;
+  --gutter-hit-count-foreground: #6a717e;
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);

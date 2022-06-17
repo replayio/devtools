@@ -1,0 +1,21 @@
+.HitsBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 26px;
+  height: var(--theme-code-font-size);
+  margin: 2px;
+  padding-top: 1px;
+
+  font-family: sans-serif;
+  font-size: 9px;
+
+  background-color: var(--gutter-hit-count-background);
+  color: var(--gutter-hit-count-foreground);
+  border-radius: 0.5rem;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

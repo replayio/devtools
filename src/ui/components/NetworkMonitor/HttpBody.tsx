@@ -2,7 +2,7 @@ import { BodyData } from "@replayio/protocol";
 import classNames from "classnames";
 import { useMemo, useState } from "react";
 import ReactJson from "react-json-view";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getTheme } from "ui/reducers/app";
 
 import MaterialIcon from "../shared/MaterialIcon";
@@ -71,7 +71,7 @@ const HttpBody = ({
   contentType: string;
   filename: string;
 }) => {
-  const theme = useSelector(getTheme);
+  const theme = useAppSelector(getTheme);
   const raw = useMemo(() => {
     return BodyPartsToUInt8Array(bodyParts, contentType);
   }, [contentType, bodyParts]);

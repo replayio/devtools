@@ -1,14 +1,14 @@
 import classNames from "classnames";
 import { getSelectedLocation } from "devtools/client/debugger/src/reducers/sources";
 import { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 
 export default function TabSpotlight() {
   const [isShown, setIsShown] = useState(false);
-  const selectedSource = useSelector(getSelectedLocation);
-  const layout = useSelector(getToolboxLayout);
-  const selectedPanel = useSelector(getSelectedPanel);
+  const selectedSource = useAppSelector(getSelectedLocation);
+  const layout = useAppSelector(getToolboxLayout);
+  const selectedPanel = useAppSelector(getSelectedPanel);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {

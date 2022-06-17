@@ -3,9 +3,10 @@ import React, { ReactNode, useState, FC } from "react";
 
 type ExpandableItemProps = {
   header: ReactNode;
+  children?: ReactNode;
 };
 
-export const ExpandableItem: FC<ExpandableItemProps> = ({ header, children }) => {
+export const ExpandableItem = ({ header, children }: ExpandableItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const hasChildren = children && React.Children.count(children) > 0;
 

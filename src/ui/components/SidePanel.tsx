@@ -5,7 +5,7 @@ import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import StatusDropdown from "./shared/StatusDropdown";
 import { useFeature } from "ui/hooks/settings";
 import { getSelectedPrimaryPanel } from "ui/reducers/layout";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import ProtocolViewer from "./ProtocolViewer";
 import CommentCardsList from "./Comments/CommentCardsList";
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
@@ -14,7 +14,7 @@ const Accordion = require("devtools/client/debugger/src/components/shared/Accord
 
 export default function SidePanel() {
   const { value: resolveRecording } = useFeature("resolveRecording");
-  const selectedPrimaryPanel = useSelector(getSelectedPrimaryPanel);
+  const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
 
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);

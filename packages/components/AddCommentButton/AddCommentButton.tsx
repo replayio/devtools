@@ -1,5 +1,6 @@
-import type { ComponentProps, MouseEventHandler } from "react";
+import type { MouseEventHandler } from "react";
 import { forwardRef, useRef, useState } from "react";
+import classNames from "classnames";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 import styled from "styled-components";
@@ -15,17 +16,26 @@ interface AddCommentButtonProps {
 
   /** Whether the button should submit a form or not. */
   type?: "button" | "submit";
+
+  className?: string;
 }
 
 /**
  * Initiate adding a comment from a button.
  */
 export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonProps>(
-  function AddCommentButton({ type, isPausedOnHit = false, onClick }, ref) {
+  function AddCommentButton({ type, isPausedOnHit = false, onClick, className }, ref) {
     const localRef = useRef<HTMLButtonElement>(null);
     const mergedRefs = mergeRefs([localRef, ref]);
     const [isHovered, setIsHovered] = useState(false);
-    const isOpened = isHovered;
+    const hoverRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const maybeHover = () => {
+      hoverRef.current = setTimeout(() => setIsHovered(true), 300);
+    };
+    const clearHover = () => {
+      hoverRef.current && clearTimeout(hoverRef.current);
+      setIsHovered(false);
+    };
 
     return (
       <StyledButton
@@ -33,14 +43,17 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         type={type}
         aria-label="Add comment"
         onClick={onClick}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        $isOpened={isOpened}
+        onMouseEnter={maybeHover}
+        onMouseLeave={clearHover}
+        $isOpened={isHovered}
         $isPausedOnHit={isPausedOnHit}
-        className="focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+        className={classNames(
+          "font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
+          className
+        )}
       >
         <Icon name="comment-plus" fill="currentColor" />
-        <TextFade visible={isOpened}>Add Comment</TextFade>
+        <TextFade visible={isHovered}>Add Comment</TextFade>
       </StyledButton>
     );
   }
@@ -52,8 +65,7 @@ const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean
     flexShrink: 0,
     alignItems: "center",
     lineHeight: "1rem",
-    fontWeight: 700,
-    fontSize: "0.625rem",
+    fontSize: "0.75rem",
     height: 26,
     paddingLeft: 3,
     borderRadius: "3rem",
@@ -64,12 +76,12 @@ const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean
     svg: { flexShrink: 0 },
   },
   props => ({
-    width: props.$isOpened ? 106 : 26,
+    width: props.$isOpened ? 122 : 26,
     backgroundColor: props.$isPausedOnHit ? "var(--secondary-accent)" : "var(--primary-accent)",
   })
 );
 
-const duration = 120;
+const duration = 100;
 
 const states = {
   entering: { opacity: 0, transform: "scale(0.98)" },
@@ -81,10 +93,10 @@ const states = {
 
 const StyledText = styled.span({
   whiteSpace: "nowrap",
-  transition: `all ${duration}ms 40ms ease-out`,
+  transition: `all ${duration}ms 40ms ease`,
   transform: "scale(0.98)",
   opacity: 0,
-  margin: "0 0.25rem",
+  margin: "0 0.5rem 0 0.25rem",
 });
 
 const TextFade = ({ children, visible }: { children: React.ReactNode; visible: boolean }) => (

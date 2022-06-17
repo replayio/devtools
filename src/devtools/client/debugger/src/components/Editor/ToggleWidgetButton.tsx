@@ -1,8 +1,8 @@
 import { PointDescription } from "@replayio/protocol";
 import ReactDOM from "react-dom";
 import React, { useState, useEffect, MouseEventHandler, FC, ReactNode } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
-import { actions } from "ui/actions";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
@@ -93,13 +93,14 @@ function QuickActions({
 }) {
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
-  const dispatch = useDispatch();
-  const analysisPoints = useSelector(getPointsForHoveredLineNumber);
-  const executionPoint = useSelector(getExecutionPoint);
+  const dispatch = useAppDispatch();
+  const analysisPoints = useAppSelector(getPointsForHoveredLineNumber);
+  const executionPoint = useAppSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { height } = targetNode.getBoundingClientRect();
   const { value: enableLargeText } = useFeature("enableLargeText");
+  const { value: hitCounts } = useFeature("hitCounts");
 
   const onAddLogpoint = () => {
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
@@ -141,8 +142,9 @@ function QuickActions({
   return (
     <div
       className={classNames(
-        "line-action-button absolute -right-1 z-50 flex translate-x-full transform flex-row space-x-px",
-        enableLargeText && "bottom-0.5"
+        "line-action-button absolute z-50 flex translate-x-full transform flex-row space-x-px",
+        enableLargeText && "bottom-0.5",
+        hitCounts ? "-right-9" : "-right-1"
       )}
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}

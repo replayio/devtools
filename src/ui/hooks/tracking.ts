@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getUploading } from "ui/reducers/app";
 import { Recording } from "ui/types";
 import { trackTiming } from "ui/utils/telemetry";
 
 export function useTrackLoadingIdleTime(uploadComplete: boolean, recording?: Recording) {
-  const uploading = useSelector(getUploading);
+  const uploading = useAppSelector(getUploading);
   const context = uploadComplete ? "warm" : "cold";
   const [started, setStarted] = useState(false);
   const [uploadProgressShown, setUploadProgressShown] = useState(false);

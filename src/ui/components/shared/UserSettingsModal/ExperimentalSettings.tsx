@@ -44,11 +44,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableBreakpointPanelAutocomplete",
   },
   {
-    label: "Default to Dev Tools",
-    description: "Open DevTools by default instead of the Viewer",
-    key: "defaultToDevTools",
-  },
-  {
     label: "Large Text",
     description: "Enable large text for Editor",
     key: "enableLargeText",
@@ -67,6 +62,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Turbo Replay",
     description: "Replay recordings across multiple instances",
     key: "turboReplay",
+  },
+  {
+    label: "Inline hit counts",
+    description: "Show line hit counts in the source view",
+    key: "hitCounts",
   },
 ];
 
@@ -106,8 +106,6 @@ export default function ExperimentalSettings({}) {
   } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: defaultToDevTools, update: updateDefaultToDevTools } =
-    useFeature("defaultToDevTools");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
     useFeature("networkRequestComments");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
@@ -118,6 +116,7 @@ export default function ExperimentalSettings({}) {
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
+  const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key === "enableEventLink") {
@@ -132,8 +131,6 @@ export default function ExperimentalSettings({}) {
       updateEnableNetworkRequestComments(!enableNetworkRequestComments);
     } else if (key == "turboReplay") {
       updateEnableTurboReplay(!enableTurboReplay);
-    } else if (key == "defaultToDevTools") {
-      updateDefaultToDevTools(!defaultToDevTools);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key == "unicornConsole") {
@@ -142,15 +139,17 @@ export default function ExperimentalSettings({}) {
       updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
+    } else if (key === "hitCounts") {
+      updateHitCounts(!hitCounts);
     }
   };
 
   const localSettings = {
-    defaultToDevTools,
     enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     enableResolveRecording,
+    hitCounts,
     turboReplay: enableTurboReplay,
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,

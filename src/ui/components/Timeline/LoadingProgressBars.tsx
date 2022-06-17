@@ -1,5 +1,5 @@
 import { clamp } from "lodash";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
 import { overlap } from "ui/utils/timeline";
@@ -7,8 +7,8 @@ import { overlap } from "ui/utils/timeline";
 import styles from "./LoadingProgressBars.module.css";
 
 export default function LoadingProgressBars() {
-  const loadedRegions = useSelector(getLoadedRegions);
-  const zoomRegion = useSelector(getZoomRegion);
+  const loadedRegions = useAppSelector(getLoadedRegions);
+  const zoomRegion = useAppSelector(getZoomRegion);
 
   const endTime = zoomRegion ? zoomRegion.endTime : 0;
   if (endTime === 0) {

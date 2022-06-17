@@ -1,7 +1,7 @@
 import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
 import {
   AnalysisStatus,
@@ -25,7 +25,7 @@ export function PanelStatus({
   analysisPoints?: LocationAnalysisSummary;
   prefixBadge: PrefixBadge;
 }) {
-  const time = useSelector(getCurrentTime);
+  const time = useAppSelector(getCurrentTime);
   let status = "";
 
   const points = analysisPoints?.data;

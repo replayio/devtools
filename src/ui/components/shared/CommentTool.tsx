@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getAreMouseTargetsLoading, getCanvas } from "ui/actions/app";
 import { createFrameComment } from "ui/actions/comments";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -59,10 +59,10 @@ type Coordinates = {
 };
 
 export default function CommentTool({ comments }: { comments: (Comment | Reply)[] }) {
-  const canvas = useSelector(getCanvas);
-  const areMouseTargetsLoading = useSelector(getAreMouseTargetsLoading);
+  const canvas = useAppSelector(getCanvas);
+  const areMouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const [mousePosition, setMousePosition] = useState<Coordinates | null>(null);
   const recordingId = useGetRecordingId();

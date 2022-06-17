@@ -1,6 +1,6 @@
 import classNames from "classnames";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { seekToComment } from "ui/actions/comments";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { Comment } from "ui/state/comments";
@@ -14,11 +14,11 @@ import LoomComment from "./LoomComment";
 import ReplyCard from "./ReplyCard";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
-  const currentTime = useSelector(getCurrentTime);
-  const executionPoint = useSelector(getExecutionPoint);
+  const currentTime = useAppSelector(getCurrentTime);
+  const executionPoint = useAppSelector(getExecutionPoint);
   const isPaused = currentTime === comment.time && executionPoint === comment.point;
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onClick = () => {
     dispatch(seekToComment(comment));

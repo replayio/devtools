@@ -149,7 +149,7 @@
   background-color: var(--console-error-background);
 }
 
-.webconsole-app .message.error .message-body {
+.webconsole-app .message.error .message-flex-body--collapsible .message-body {
   max-height: 1rem;
 }
 

@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { Recording } from "ui/types";
 import MaterialIcon from "../shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -22,7 +22,7 @@ function DeleteOption({
   onOptionClick: () => void;
   recording: Recording;
 }) {
-  const currentWorkspaceId = useSelector(getWorkspaceId);
+  const currentWorkspaceId = useAppSelector(getWorkspaceId);
   const { confirmDestructive } = useConfirm();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
 
@@ -50,7 +50,7 @@ function RenameOption({
   onOptionClick: () => void;
   recording: Recording;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const isPublicEnabled = useIsPublicEnabled();
 
   if (!isPublicEnabled) {
@@ -99,7 +99,7 @@ function ShareOption({
   onOptionClick: () => void;
   recording: Recording;
 }) {
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const handleShareClick = () => {
     dispatch(setModal("sharing", { recordingId: recording.id }));
     onOptionClick();
@@ -117,7 +117,7 @@ function MoveRecordingOption({
   const { permissions } = useGetUserPermissions(recording);
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const currentWorkspaceId = useSelector(getWorkspaceId);
+  const currentWorkspaceId = useAppSelector(getWorkspaceId);
 
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
     updateRecordingWorkspace(recording.id, currentWorkspaceId, targetWorkspaceId);

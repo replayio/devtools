@@ -1,17 +1,18 @@
-import { FC } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getShowVideoPanel } from "ui/reducers/layout";
 import Icon from "../shared/Icon";
 
-export const ToolboxButton: FC<{ title?: string; onClick?: () => void }> = ({
-  children,
-  title,
-  onClick = () => {},
-}) => {
+interface ToolboxButtonProps {
+  title?: string;
+  onClick?: () => void;
+  children?: React.ReactNode;
+}
+
+export const ToolboxButton = ({ children, title, onClick = () => {} }: ToolboxButtonProps) => {
   return (
     <button
-      className="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
+      className="toolbox-options flex items-center p-2 text-iconColor hover:text-gray-600"
       title={title}
       onClick={onClick}
     >
@@ -20,9 +21,9 @@ export const ToolboxButton: FC<{ title?: string; onClick?: () => void }> = ({
   );
 };
 
-export const ShowVideoButton: FC = () => {
-  const dispatch = useDispatch();
-  const showVideoPanel = useSelector(getShowVideoPanel);
+export const ShowVideoButton = () => {
+  const dispatch = useAppDispatch();
+  const showVideoPanel = useAppSelector(getShowVideoPanel);
 
   const onClick = () => {
     dispatch(setShowVideoPanel(true));

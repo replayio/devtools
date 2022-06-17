@@ -10,7 +10,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useSelector } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import Icon from "ui/components/shared/Icon";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { useGetUserInfo } from "ui/hooks/users";
@@ -79,7 +79,7 @@ const flattenRequests = (requestMap: { [key: number]: RequestSummary }): Request
 };
 
 function JSONViewer({ src }: { src: object }) {
-  const theme = useSelector(getTheme);
+  const theme = useAppSelector(getTheme);
 
   return (
     <ReactJson
@@ -204,9 +204,9 @@ export default function ProtocolViewer() {
   const [filterText, setFilterText] = useState("");
   const deferredFilterText = useDeferredValue(filterText);
 
-  const errorMap = useSelector(getProtocolErrorMap);
-  const requestMap = useSelector(getProtocolRequestMap);
-  const responseMap = useSelector(getProtocolResponseMap);
+  const errorMap = useAppSelector(getProtocolErrorMap);
+  const requestMap = useAppSelector(getProtocolRequestMap);
+  const responseMap = useAppSelector(getProtocolResponseMap);
 
   const [selectedChunk, setSelectedChunk] = useState<RequestSummaryChunk | null>(null);
 

@@ -16,12 +16,12 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
-  defaultToDevTools: boolean;
   enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
   enableNetworkRequestComments: boolean;
   turboReplay: boolean;
   enableResolveRecording: boolean;
+  hitCounts: boolean;
   unicornConsole: boolean;
   showRedux: boolean;
   enableLargeText: boolean;
@@ -163,6 +163,7 @@ type TestMetadata = {
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
+
 export type SourceMetadata = {
   result: "passed" | "failed";
   branch?: string;
@@ -176,6 +177,7 @@ export type SourceMetadata = {
     name: string;
     user?: string;
     workflow?: string;
+    url?: string;
   };
   provider?: string;
   repository?: string;

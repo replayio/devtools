@@ -2,7 +2,8 @@ import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { findIndex } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
-import { connect, ConnectedProps, useDispatch, useSelector } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { actions } from "ui/actions";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getFocusedEvents, getFocusedRequests, getSelectedRequestId } from "ui/reducers/network";
@@ -27,8 +28,8 @@ export const NetworkMonitor = ({
   requests,
   seek,
 }: PropsFromRedux) => {
-  const selectedRequestId = useSelector(getSelectedRequestId);
-  const dispatch = useDispatch();
+  const selectedRequestId = useAppSelector(getSelectedRequestId);
+  const dispatch = useAppDispatch();
   const [types, setTypes] = useState<Set<CanonicalRequestType>>(new Set([]));
   const [vert, setVert] = useState<boolean>(false);
 

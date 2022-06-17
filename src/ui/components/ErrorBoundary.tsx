@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { isDevelopment } from "ui/utils/environment";
 import { UnexpectedError } from "ui/state/app";
 import { getUnexpectedError } from "ui/reducers/app";
@@ -15,8 +15,8 @@ export const ReplayUpdatedError: UnexpectedError = {
 };
 
 export default function ErrorBoundary({ children }: { children: ReactNode }) {
-  const unexpectedError = useSelector(getUnexpectedError);
-  const dispatch = useDispatch();
+  const unexpectedError = useAppSelector(getUnexpectedError);
+  const dispatch = useAppDispatch();
 
   const onError = (error: Error) => {
     if (error.name === "ChunkLoadError") {
@@ -35,6 +35,7 @@ export default function ErrorBoundary({ children }: { children: ReactNode }) {
   };
 
   return (
+    // @ts-expect-error React 18 children change
     <Sentry.ErrorBoundary onError={onError}>
       {unexpectedError ? <BlankViewportWrapper /> : children}
     </Sentry.ErrorBoundary>
