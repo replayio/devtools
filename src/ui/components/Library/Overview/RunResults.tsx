@@ -13,8 +13,8 @@ export function RunResults() {
 
   return (
     <div className="flex flex-col overflow-y-auto">
-      <TestStatusGroup recordings={passedRecordings} label="Passed" />
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
+      <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>
   );
 }
@@ -29,7 +29,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   return (
     <div className="flex flex-col">
       <div
-        className="text-md sticky top-0 bg-white p-2  font-bold"
+        className=" sticky top-0 bg-gray-100 p-2 pl-3 font-bold hover:cursor-pointer hover:bg-gray-200"
         onClick={() => setExpanded(!expanded)}
       >
         {count} {label} Test{count > 1 ? "s" : ""}
