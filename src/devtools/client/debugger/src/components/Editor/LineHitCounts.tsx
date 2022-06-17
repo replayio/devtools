@@ -25,20 +25,19 @@ function LineHitCounts({ cm }: Props) {
     [hitCounts]
   );
   const dispatch = useAppDispatch();
-  const uniqueHitCounts = Array.from(
-    new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
-  );
-  const maxHitCount = Math.max(...uniqueHitCounts);
-  const hitCountColorMap = useMemo(
-    () =>
-      new Map(
-        uniqueHitCounts.map(hitCount => [
-          hitCount,
-          Math.min(1, Math.max(0, Math.log(hitCount) / Math.log(maxHitCount))) || 0,
-        ])
-      ),
-    [uniqueHitCounts, maxHitCount]
-  );
+  const hitCountColorMap = useMemo(() => {
+    const uniqueHitCounts = Array.from(
+      new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
+    );
+    const maxHitCount = Math.max(...uniqueHitCounts);
+
+    return new Map(
+      uniqueHitCounts.map(hitCount => [
+        hitCount,
+        Math.min(1, Math.max(0, Math.cbrt(hitCount) / Math.cbrt(maxHitCount))) || 0,
+      ])
+    );
+  }, [hitCounts]);
 
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
@@ -54,7 +53,11 @@ function LineHitCounts({ cm }: Props) {
 
     const doc = cm.editor.getDoc();
     const drawLines = () => {
-      cm.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers", "hit-markers"]);
+      cm.editor.setOption("gutters", [
+        "breakpoints",
+        "CodeMirror-linenumbers",
+        { className: "hit-markers", style: "width: 22px;" },
+      ]);
 
       let lineNumber = 0;
 
@@ -71,11 +74,15 @@ function LineHitCounts({ cm }: Props) {
         const title = `${hitCount} hits`;
 
         const markerNode = document.createElement("div");
+        const lowCountColor = "#a5c5eb";
+        const highCountColor = "#e34d91";
         const backgroundColor = interpolateLab(
-          "#BBEBFA",
-          "#1A4583"
+          lowCountColor,
+          highCountColor
         )(hitCountColorMap.get(hitCount) || 0);
-        const foregroundColor = getLuminance(backgroundColor) > 0.5 ? "#000" : "#fff";
+        const foregroundColor =
+          getLuminance(backgroundColor) > 0.5 ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,.99)";
+
         markerNode.className = className;
         markerNode.innerHTML = innerHTML;
         markerNode.title = title;
