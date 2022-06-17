@@ -32,7 +32,7 @@ export function createEditor() {
   const gutters = ["breakpoints", "CodeMirror-linenumbers"];
 
   if (features.hitCounts) {
-    gutters.push("hit-markers");
+    gutters.push({ className: "hit-markers", style: "width: 22px;" });
   }
 
   return new SourceEditor({
