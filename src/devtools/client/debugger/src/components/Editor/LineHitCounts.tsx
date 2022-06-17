@@ -1,4 +1,4 @@
-import { useMemo, useLayoutEffect } from "react";
+import { useMemo, useLayoutEffect, useState } from "react";
 import { interpolateLab } from "d3-interpolate";
 import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
@@ -18,13 +18,14 @@ export default function LineHitCountsWrapper(props: Props) {
 }
 
 function LineHitCounts({ cm }: Props) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
   );
-  const dispatch = useAppDispatch();
   const hitCountColorMap = useMemo(() => {
     const uniqueHitCounts = Array.from(
       new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
@@ -53,10 +54,11 @@ function LineHitCounts({ cm }: Props) {
 
     const doc = cm.editor.getDoc();
     const drawLines = () => {
+      const gutterWidth = isCollapsed ? 4 : 20;
       cm.editor.setOption("gutters", [
         "breakpoints",
         "CodeMirror-linenumbers",
-        { className: "hit-markers", style: "width: 22px;" },
+        { className: "hit-markers", style: `width: ${gutterWidth}px;` },
       ]);
 
       let lineNumber = 0;
@@ -83,8 +85,13 @@ function LineHitCounts({ cm }: Props) {
         const foregroundColor =
           getLuminance(backgroundColor) > 0.5 ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,.99)";
 
+        if (!isCollapsed) {
+          markerNode.innerHTML = innerHTML;
+        }
+
+        // Just for quick testing purposes, needs to be moved to LineHitCountsToggle
+        markerNode.onclick = () => setIsCollapsed(!isCollapsed);
         markerNode.className = className;
-        markerNode.innerHTML = innerHTML;
         markerNode.title = title;
         markerNode.style.backgroundColor = backgroundColor;
         markerNode.style.color = foregroundColor;
@@ -104,7 +111,7 @@ function LineHitCounts({ cm }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [cm, hitCountMap, hitCountColorMap]);
+  }, [cm, hitCountMap, hitCountColorMap, isCollapsed]);
 
   // We're just here for the hooks!
   return null;

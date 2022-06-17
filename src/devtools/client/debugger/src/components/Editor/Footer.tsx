@@ -4,6 +4,7 @@ import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
 import { getSelectedSourceWithContent } from "../../selectors";
 
+import LineHitCountsToggle from "./LineHitCountsToggle";
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
 
@@ -138,6 +139,7 @@ function SourceFooter() {
   return (
     <div className="source-footer">
       <SourcemapToggle />
+      {/* <LineHitCountsToggle /> */}
       <SourcemapVisualizerLink />
       <div className="source-footer-end">{cursorPositionUI}</div>
     </div>
