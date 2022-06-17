@@ -10,11 +10,13 @@ export async function recordPlaywright(
   browserName: BrowserName,
   script: (page: playwright.Page) => Promise<void>
 ) {
+  console.log(`recordPlaywright`)
   const browser = await (playwright as any)[browserName].launch({
     env: {
       ...process.env,
       RECORD_REPLAY_DRIVER: config.driverPath,
       RECORD_REPLAY_VERBOSE: config.driverPath ? "1" : undefined,
+      RECORD_REPLAY_PRETEND_NOT_RECORDING: 1,
     },
     executablePath: config.browserPath,
     headless: config.headless,
