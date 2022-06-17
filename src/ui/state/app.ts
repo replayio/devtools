@@ -53,7 +53,6 @@ export type SettingsTabTitle =
 
 export type ErrorActions =
   | "sign-in"
-  | "sign-out"
   | "refresh"
   | "library"
   | "request-access"

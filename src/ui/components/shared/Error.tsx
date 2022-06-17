@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
-import { connect, ConnectedProps, useDispatch } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+import { useAppDispatch } from "ui/setup/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import classNames from "classnames";
@@ -58,20 +59,6 @@ function SignInButton() {
   );
 }
 
-function SignOutButton() {
-  const { logout } = useAuth0();
-
-  const onClick = () => {
-    logout({ returnTo: window.location.origin + "/login" });
-  };
-
-  return (
-    <PrimaryButton color="blue" onClick={onClick}>
-      Sign out of Replay
-    </PrimaryButton>
-  );
-}
-
 function LibraryButton() {
   const onClick = () => {
     window.location.href = window.location.origin;
@@ -109,7 +96,7 @@ const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 
 function RequestRecordingAccessButton() {
   const requestRecordingAccess = useRequestRecordingAccess();
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const onClick = () => {
     requestRecordingAccess();
@@ -145,8 +132,6 @@ function ActionButton({ action, onAction }: { action: ErrorActions; onAction?: (
     return <RefreshButton />;
   } else if (action === "sign-in") {
     return <SignInButton />;
-  } else if (action === "sign-out") {
-    return <SignOutButton />;
   } else if (action === "library") {
     return <LibraryButton />;
   } else if (action === "team-billing") {
