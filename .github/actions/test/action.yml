@@ -38,7 +38,7 @@ runs:
       shell: bash
     - run: chmod +x ./replay-node/macOS-replay-node
       shell: bash
-    - run: pnpm test-e2e -- --shard ${{ env.INPUT_STRIPE }}
+    - run: pnpm test-e2e --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so

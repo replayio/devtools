@@ -14,7 +14,7 @@
     "lint": "trunk check",
     "lint:fix": "trunk check --fix",
     "typecheck": "tsc",
-    "typecheck:watch": "pnpm typecheck -- --watch",
+    "typecheck:watch": "pnpm typecheck --watch",
     "build-e2e-cra-test": "node public/test/examples/cra/build",
     "build-e2e-prod-bundle": "webpack --config public/test/examples/bundles/prod_bundle/webpack.config.js",
     "build-e2e-exceptions-bundle": "webpack --config public/test/examples/bundles/exceptions_bundle/webpack.config.js",
