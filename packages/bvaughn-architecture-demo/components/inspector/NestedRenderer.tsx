@@ -7,7 +7,7 @@ import {
   Property as ProtocolProperty,
 } from "@replayio/protocol";
 import { sortBy } from "lodash";
-import { FC, Suspense, useContext, useMemo, useState } from "react";
+import { FC, ReactNode, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
@@ -90,6 +90,7 @@ export default function NestedRenderer({
   //      We might need to call getObjectPreview()
 
   // TODO Support Array bucketing (e.g. [0...99])
+  //      We can also bucket containerEntries with "[[Entries]]"
 
   return (
     <div className={styles.Nested}>
@@ -145,28 +146,49 @@ function PropertyListRenderer({
     prototype = getObjectWithPreview(client, pauseId, prototypeId);
   }
 
+  console.log("containerEntries:", containerEntries);
+
   return (
     <div className={styles.Expanded}>
-      {/* TODO Wrap collapsible "[[Entries]]" element around these */}
-      {containerEntries.map(({ value }, index) => (
-        <span key={`containerEntry-${index}`} className={styles.ObjectProperty}>
-          <ValueRenderer pauseId={pauseId} isRootValue={false} value={value} />
-        </span>
-      ))}
+      {containerEntries.length > 0 && (
+        <Bucket
+          defaultExpanded={true}
+          enabled={true}
+          header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+        >
+          {containerEntries.map(({ key, value }, index) => (
+            <span key={`containerEntry-${index}`} className={styles.ObjectProperty}>
+              <ValueRenderer
+                pauseId={pauseId}
+                index={index}
+                isRootValue={false}
+                protocolKey={key}
+                protocolValue={value}
+              />
+            </span>
+          ))}
+        </Bucket>
+      )}
       {getterValues.map((property, index) => (
         <span key={`getterValue-${index}`} className={styles.ObjectProperty}>
-          <ValueRenderer pauseId={pauseId} isRootValue={false} value={property} />
+          <ValueRenderer pauseId={pauseId} isRootValue={false} protocolValue={property} />
         </span>
       ))}
       {sortedProperties.map((property, index) => (
         <span key={`property-${index}`} className={styles.ObjectProperty}>
-          <ValueRenderer pauseId={pauseId} isRootValue={false} value={property} />
+          <ValueRenderer pauseId={pauseId} isRootValue={false} protocolValue={property} />
         </span>
       ))}
 
       <span className={styles.Prototype}>
         <span className={styles.PrototypeName}>&lt;prototype&gt;</span>
-        {prototype !== null ? <ObjectRenderer object={prototype} pauseId={pauseId} /> : "null"}
+        {prototype !== null ? (
+          <span className={styles.PrototypeValue}>
+            <ObjectRenderer object={prototype} pauseId={pauseId} />
+          </span>
+        ) : (
+          "null"
+        )}
       </span>
     </div>
   );
@@ -184,7 +206,6 @@ function ArrayRenderer({ object, pauseId }: RendererProps) {
 
   const getterValue = object.preview?.getterValues?.find(({ name }) => name === "length");
   const length = getterValue?.value || 0;
-  console.log("<ArrayRenderer> length:", length, typeof length);
 
   return (
     <>
@@ -197,7 +218,7 @@ function ArrayRenderer({ object, pauseId }: RendererProps) {
               disableInteractions={true}
               isRootValue={false}
               pauseId={pauseId}
-              value={property}
+              protocolValue={property}
             />
           </span>
         ))}
@@ -210,7 +231,6 @@ function ArrayRenderer({ object, pauseId }: RendererProps) {
 function FunctionRenderer({ object }: RendererProps) {
   const { functionName, functionParameterNames = EMPTY_ARRAY as string[] } =
     object?.preview ?? (EMPTY_OBJECT as ProtocolObjectPreview);
-  console.log("<FunctionRenderer>", object);
 
   const jumpToDefinition = () => {
     // TODO In the real app, this should open the Source viewer.
@@ -258,7 +278,7 @@ function MapRenderer({ object, pauseId }: RendererProps) {
               disableInteractions={true}
               isRootValue={false}
               pauseId={pauseId}
-              value={value}
+              protocolValue={value}
             />
           </span>
         ))}
@@ -274,7 +294,6 @@ function ObjectRenderer({ object, pauseId }: RendererProps) {
   const properties = (object.preview?.properties ?? (EMPTY_ARRAY as ProtocolProperty[])).filter(
     property => property.flags !== 1
   );
-  console.log("<ObjectRenderer>", object);
 
   return (
     <>
@@ -286,7 +305,7 @@ function ObjectRenderer({ object, pauseId }: RendererProps) {
             disableInteractions={true}
             isRootValue={false}
             pauseId={pauseId}
-            value={property}
+            protocolValue={property}
           />
         </span>
       ))}
@@ -321,7 +340,7 @@ function SetRenderer({ object, pauseId }: RendererProps) {
                 disableInteractions={true}
                 isRootValue={false}
                 pauseId={pauseId}
-                value={property.value}
+                protocolValue={property.value}
               />
             </span>
           ))}
@@ -330,4 +349,35 @@ function SetRenderer({ object, pauseId }: RendererProps) {
       </>
     );
   }
+}
+
+// TODO The top-level NestedRenderer component could be refactored to use this wrapper.
+function Bucket({
+  children,
+  defaultExpanded,
+  enabled,
+  header,
+}: {
+  children: ReactNode;
+  defaultExpanded: boolean;
+  enabled: boolean;
+  header: ReactNode;
+}) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  return (
+    <div className={styles.Nested}>
+      <div className={styles.PreviewRow}>
+        {enabled && (
+          <button className={styles.ToggleButton} onClick={() => setIsExpanded(!isExpanded)}>
+            <Icon type={isExpanded ? "expanded" : "collapsed"} />
+          </button>
+        )}
+
+        {header}
+      </div>
+
+      {isExpanded ? <div className={styles.Expanded}>{children}</div> : null}
+    </div>
+  );
 }

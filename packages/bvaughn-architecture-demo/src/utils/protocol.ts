@@ -30,11 +30,17 @@ export type Value = {
 // This utility function maps from one ot the other.
 export function reformatValue(
   pauseId: PauseId,
-  protocolValue: ProtocolValue | ProtocolNamedValue
+  protocolValue: ProtocolValue | ProtocolNamedValue,
+  protocolKey?: ProtocolValue | undefined,
+  fallbackName: string | null = null
 ): Value {
-  const name = protocolValue.hasOwnProperty("name")
+  // TODO This is pretty convoluted; re-think how we can clean this up.
+  // Ideally the containerEntries for e.g. a Set would have the index as their key:value but they don't.
+  const name = protocolKey
+    ? protocolKey.value
+    : protocolValue.hasOwnProperty("name")
     ? (protocolValue as ProtocolNamedValue).name
-    : null;
+    : fallbackName;
 
   // TODO Do we need special handling for "uninitialized" or "unavailable" values?
 

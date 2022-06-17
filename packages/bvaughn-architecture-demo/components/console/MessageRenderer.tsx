@@ -32,7 +32,7 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
       {message.text}
       {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
         <Suspense key={index} fallback="Loading...">
-          <ValueRenderer isRootValue={true} pauseId={pauseId} value={argumentValue} />
+          <ValueRenderer isRootValue={true} pauseId={pauseId} protocolValue={argumentValue} />
         </Suspense>
       ))}
     </div>

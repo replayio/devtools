@@ -12,16 +12,23 @@ import ShallowRenderer from "./ShallowRenderer";
 
 export default function ValueRenderer({
   disableInteractions = false,
+  index,
   isRootValue,
   pauseId,
-  value,
+  protocolKey,
+  protocolValue,
 }: {
   disableInteractions?: boolean;
+  index?: number;
   isRootValue: boolean;
   pauseId: ProtocolPauseId;
-  value: ProtocolValue;
+  protocolKey?: ProtocolValue | undefined;
+  protocolValue: ProtocolValue;
 }) {
-  const clientValue: ClientValue = useMemo(() => reformatValue(pauseId, value), [pauseId, value]);
+  const clientValue: ClientValue = useMemo(
+    () => reformatValue(pauseId, protocolValue, protocolKey, index != null ? `${index}` : null),
+    [index, pauseId, protocolKey, protocolValue]
+  );
 
   switch (clientValue.type) {
     case "array":
