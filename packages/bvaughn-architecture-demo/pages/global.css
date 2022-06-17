@@ -21,4 +21,20 @@ body {
   --color-yellow-dark: #6c5914;
   --color-yellow-light: #fffac8;
   --color-white: #fff;
+
+  --object-inspector-go-to-definition-icon-color: #567;
+  --object-inspector-go-to-definition-icon-color-hover: #000;
+  --object-inspector-param-color: #dd00a8;
+  --object-inspector-nested-border-color: #0a84ff;
+  --object-inspector-array-length: #567;
+  --object-inspector-prototype: #9ca3af;
+
+  --value-type-boolean: #008b00;
+  --value-type-nan: #737373;
+  --value-type-null: #737373;
+  --value-type-number: #008b00;
+  --value-type-object: #0174e8;
+  --value-type-string: #0c0c0d;
+  --value-type-symbol: #dd00a8;
+  --value-type-undefined: #737373;
 }

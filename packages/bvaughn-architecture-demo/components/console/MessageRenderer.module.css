@@ -3,6 +3,8 @@
 .MessageRowWarning {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: 1ch;
   padding: 0.25rem;
   font-family: monospace;

@@ -4,6 +4,7 @@ import { ReplayClientInterface } from "../client/ReplayClient";
 import { Wakeable } from "./types";
 import { createWakeable } from "../utils/suspense";
 import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
+import { preCacheObjects } from "./ObjectPreviews";
 
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,
@@ -151,6 +152,15 @@ async function fetchMessages(
       lastFetchDidOverflow = overflow;
       lastFetchedFocusRange = focusRange;
       lastFetchedMessages = messages;
+
+      // Pre-cache ObjectPreview data for this Message (PauseId).
+      messages.forEach(message => {
+        const pauseId = client.getPauseIdForMessage(message);
+        const objects = message.data.objects;
+        if (objects) {
+          preCacheObjects(pauseId, objects);
+        }
+      });
     }
 
     wakeable.resolve(messages);
