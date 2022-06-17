@@ -1,34 +1,42 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestRun, useGetTestRunsForWorkspace } from "ui/hooks/tests";
 import { getWorkspaceId } from "ui/reducers/app";
-import styles from "../../Library.module.css";
 import { LibraryContext } from "../../useFilters";
 import { TestRunListItem } from "./TestRunListItem";
 
 export function TestRunList() {
   const workspaceId = useAppSelector(getWorkspaceId);
+  const { initialTestRunId } = useContext(LibraryContext);
+  const { preview } = useContext(LibraryContext);
   const { testRuns, loading } = useGetTestRunsForWorkspace(workspaceId!);
-  const [initialized, setInitialized] = useState(false);
   const { setPreview } = useContext(LibraryContext);
 
   useEffect(() => {
-    if (!loading && testRuns && !initialized) {
+    if (!loading && testRuns && !preview) {
+      let testRunId;
+
+      // Check that we have a test run that corresponds with the provided test run id
+      // from the URL. If not, use the first test run.
+      if (initialTestRunId && testRuns.some(run => run.id === initialTestRunId)) {
+        testRunId = initialTestRunId;
+      } else {
+        testRunId = testRuns[0].id;
+      }
+
       setPreview({
         view: "test-runs",
-        id: testRuns[0].id,
-        recordingId: testRuns[0].recordings[0].id!,
+        id: testRunId,
       });
-      setInitialized(true);
     }
-  }, [testRuns, loading, initialized, setPreview]);
+  }, [testRuns, loading, preview, setPreview, initialTestRunId]);
 
   if (loading) {
     return <div>Loading…</div>;
   }
 
   const onClick = (testRun: TestRun) => {
-    setPreview({ id: testRun.id, view: "test-runs", recordingId: testRun.recordings[0].id });
+    setPreview({ id: testRun.id, view: "test-runs" });
   };
 
   return (

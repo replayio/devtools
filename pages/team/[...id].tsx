@@ -1,13 +1,25 @@
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import Account from "ui/components/Account";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
+import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 
-function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
+function useGetTestParams() {
+  const { query } = useRouter();
+  const [workspaceId, view, testRunId] = Array.isArray(query.id) ? query.id : [query.id];
+
+  return { testRunId };
+}
+
+export default function TeamPage() {
   const { isAuthenticated } = useAuth0();
+  const { setWorkspaceId, setModal } = actions;
+  // This is not pretty but it gets the job done. There's a restructuring of how we
+  // think about pages/routes if we were to do this the right way. Todo: That.
+  const { testRunId } = useGetTestParams();
+  const dispatch = useAppDispatch();
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
   const { query, replace } = useRouter();
 
@@ -15,29 +27,34 @@ function TeamPage({ setWorkspaceId, setModal }: PropsFromRedux) {
 
   useEffect(() => {
     if (workspaceId && isAuthenticated) {
-      setWorkspaceId(workspaceId);
+      dispatch(actions.setWorkspaceId(workspaceId));
       updateDefaultWorkspace({
         variables: {
           workspaceId,
         },
       });
 
+      if (testRunId) {
+        return;
+      }
+
       replace("/");
     }
-  }, [isAuthenticated, workspaceId, replace, setWorkspaceId, updateDefaultWorkspace]);
+  }, [
+    isAuthenticated,
+    workspaceId,
+    replace,
+    setWorkspaceId,
+    updateDefaultWorkspace,
+    dispatch,
+    testRunId,
+  ]);
 
   useEffect(() => {
     if (isAuthenticated && workspaceId && modal === "settings") {
-      setModal("workspace-settings", view ? { view } : null);
+      dispatch(setModal("workspace-settings", view ? { view } : null));
     }
-  }, [isAuthenticated, workspaceId, modal, view, setModal]);
+  }, [isAuthenticated, workspaceId, modal, view, setModal, dispatch]);
 
-  return <Account />;
+  return <Account testRunId={testRunId} />;
 }
-
-const connector = connect(null, {
-  setWorkspaceId: actions.setWorkspaceId,
-  setModal: actions.setModal,
-});
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(TeamPage);
