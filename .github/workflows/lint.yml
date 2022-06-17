@@ -32,6 +32,6 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --no-frozen-lockfile
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1.0.1
