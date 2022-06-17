@@ -35,7 +35,7 @@ function LineHitCounts({ cm }: Props) {
     return new Map(
       uniqueHitCounts.map(hitCount => [
         hitCount,
-        Math.min(1, Math.max(0, Math.cbrt(hitCount) / Math.cbrt(maxHitCount))) || 0,
+        Math.min(1, Math.max(0, Math.log(hitCount) / Math.log(maxHitCount))) || 0,
       ])
     );
   }, [hitCounts]);
@@ -77,7 +77,7 @@ function LineHitCounts({ cm }: Props) {
 
         const markerNode = document.createElement("div");
         const lowCountColor = "#a5c5eb";
-        const highCountColor = "#e34d91";
+        const highCountColor = "#667dff";
         const backgroundColor = interpolateLab(
           lowCountColor,
           highCountColor
@@ -93,8 +93,8 @@ function LineHitCounts({ cm }: Props) {
         markerNode.onclick = () => setIsCollapsed(!isCollapsed);
         markerNode.className = className;
         markerNode.title = title;
-        markerNode.style.backgroundColor = backgroundColor;
-        markerNode.style.color = foregroundColor;
+        markerNode.style.setProperty("--gutter-hit-count-background", backgroundColor);
+        markerNode.style.setProperty("--gutter-hit-count-foreground", foregroundColor);
 
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });

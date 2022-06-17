@@ -6,14 +6,23 @@
   width: 100%;
   height: calc(var(--theme-code-font-size) * 1.4);
   position: relative;
-  top: -0.5px;
+  top: -0.25px;
 
   font-size: 8px;
-
-  background-color: var(--gutter-hit-count-background);
-  color: var(--gutter-hit-count-foreground);
+  border-left: 3px solid var(--gutter-hit-count-background);
 
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.HitsBadge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--gutter-hit-count-background);
+  opacity: 0.2;
 }
