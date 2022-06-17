@@ -5,15 +5,30 @@ import { RunStats } from "../Content/TestRuns/RunStats";
 import { getDuration, getDurationString } from "../Content/TestRuns/utils";
 import { getTruncatedRelativeDate } from "../RecordingRow";
 import { OverviewContext } from "./OverviewContainer";
+import { SourceMetadata } from "ui/types";
 
 function Title({ testRun }: { testRun: TestRun }) {
+  const title = testRun.commit?.title || "";
+  const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
   return (
-    <div className="flex flex-row items-center space-x-2 text-xl">
-      <div>{testRun.commit?.title}</div>
+    <div className="flex flex-row items-center space-x-2 text-xl font-bold">
+      <div>{formatted}</div>
     </div>
   );
 }
 
+function AttributeMerge({ source }: { source: SourceMetadata | undefined }) {
+  if (!source?.merge) {
+    return null;
+  }
+
+  return (
+    <div className="mr-4 flex flex-row items-center space-x-1" title={source.merge.title}>
+      <div className="font-bold">PR</div>
+      <div>{source.merge.id}</div>
+    </div>
+  );
+}
 function Attributes({ testRun }: { testRun: TestRun }) {
   const user = testRun.recordings[0].metadata.source?.trigger?.user;
   const firstRecording = testRun.recordings[0];
@@ -23,23 +38,16 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   const branch = firstRecording.metadata.source?.branch || "Unknown branch";
 
   return (
-    <div className="flex flex-row flex-wrap items-center text-xs">
+    <div className="items-left flex flex-col flex-wrap space-y-3 text-xs">
+      <AttributeContainer icon="person">{user!}</AttributeContainer>
       <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
+      <AttributeMerge source={firstRecording.metadata.source} />
+
       <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
-      <AttributeContainer icon="timer">
+      <AttributeContainer icon="schedule">
         {getTruncatedRelativeDate(firstRecording.date)}
       </AttributeContainer>
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-      <AttributeContainer>{user!}</AttributeContainer>
-      {firstRecording.metadata.source?.merge ? (
-        <div
-          className="flex flex-row items-center mr-4 space-x-1"
-          title={firstRecording.metadata.source.merge.title}
-        >
-          <div className="font-bold">PR</div>
-          <div>{firstRecording.metadata.source.merge.id}</div>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -48,10 +56,12 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-    <div className="flex flex-col p-4 space-y-2 border-b">
-      <Title testRun={testRun} />
+    <div className="flex flex-col space-y-2 border-b p-4">
+      <div className="flex flex-row justify-between">
+        <Title testRun={testRun} />
+        <RunStats testRun={testRun} />
+      </div>
       <Attributes testRun={testRun} />
-      <RunStats testRun={testRun} />
     </div>
   );
 }

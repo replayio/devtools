@@ -6,34 +6,48 @@ import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
+import { SourceMetadata } from "ui/types";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  return <div>{testRun.commit?.title || "Unknown"}</div>;
+  const title = testRun.commit?.title || "Unknown";
+  const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
+  return (
+    <div className="wrap flex shrink grow-0 flex-nowrap overflow-hidden text-ellipsis">
+      {formatted}
+    </div>
+  );
 }
 
-function Attributes({ testRun }: { testRun: TestRun }) {
+function AttributeMerge({ source }: { source: SourceMetadata | undefined }) {
+  if (!source?.merge) {
+    return null;
+  }
+
+  return (
+    <div className="mr-4 flex flex-row items-center space-x-1" title={source.merge.title}>
+      <div className="font-bold">PR</div>
+      <div>{source.merge.id}</div>
+    </div>
+  );
+}
+function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean }) {
   const { recordings, branch, date } = testRun;
   const user = testRun.recordings[0].metadata.source?.trigger?.user;
 
   const duration = getDuration(testRun.recordings);
   const durationString = getDurationString(duration);
+  const textColor = selected ? "text-gray-700" : "text-gray-500";
 
   return (
-    <div className="flex flex-row items-center text-xs font-light text-gray-500">
+    <div className={`${textColor} flex flex-row items-center text-xs font-light`}>
+      <AttributeContainer>{user!}</AttributeContainer>
+      <AttributeMerge source={recordings[0].metadata.source} />
+      <AttributeContainer maxWidth="160px" icon="fork_right">
+        {branch}
+      </AttributeContainer>
       <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
-      <AttributeContainer icon="fork_right">{branch}</AttributeContainer>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
-      <AttributeContainer>{user!}</AttributeContainer>
-      {recordings[0].metadata.source?.merge ? (
-        <div
-          className="flex flex-row items-center mr-4 space-x-1"
-          title={recordings[0].metadata.source.merge.title}
-        >
-          <div className="font-bold">PR</div>
-          <div>{recordings[0].metadata.source.merge.id}</div>
-        </div>
-      ) : null}
     </div>
   );
 }
@@ -56,16 +70,18 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b cursor-pointer"
+      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-md border-b bg-white px-4 py-3 hover:bg-[#e8f8ff]"
       style={style}
       onClick={onClick}
     >
       <Status failCount={failCount} />
-      <div className="flex flex-col flex-grow space-y-1">
-        <Title testRun={testRun} />
-        <Attributes testRun={testRun} />
+      <div className="flex flex-grow flex-col space-y-1">
+        <div className="flex flex-row justify-between">
+          <Title testRun={testRun} />
+          <RunStats testRun={testRun} />
+        </div>
+        <Attributes selected={isSelected} testRun={testRun} />
       </div>
-      <RunStats testRun={testRun} />
     </div>
   );
 }

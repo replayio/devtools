@@ -37,10 +37,10 @@ function Title({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
-      <div className="flex flex-col flex-grow py-2 overflow-hidden">
+    <div className="flex flex-grow flex-row items-center space-x-2 overflow-hidden">
+      <div className="flex flex-grow flex-col overflow-hidden py-2">
         <button
-          className="overflow-hidden text-left whitespace-pre overflow-ellipsis hover:underline max-w-min"
+          className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre text-left hover:underline"
           onClick={onViewTest}
         >
           {recording.metadata.test?.title}
@@ -58,7 +58,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
 
   return (
     <a
-      className={`group flex items-center border-b pr-2 transition duration-150 hover:bg-gray-100`}
+      className={`group flex items-center pr-2 transition duration-150 hover:bg-gray-100 hover:bg-gray-100`}
       href={`/recording/${recordingId}`}
       target="_blank"
       rel="noreferrer noopener"

@@ -13,22 +13,26 @@ export function RunResults() {
 
   return (
     <div className="flex flex-col overflow-y-auto">
-      <TestStatusGroup recordings={failedRecordings} label="Failed Tests" />
-      <TestStatusGroup recordings={passedRecordings} label="Passed Tests" />
+      <TestStatusGroup recordings={passedRecordings} label="Passed" />
+      <TestStatusGroup recordings={failedRecordings} label="Failed" />
     </div>
   );
 }
 
 function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label: string }) {
   const [expanded, setExpanded] = useState(true);
+  const count = recordings.length;
+  if (count == 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col">
       <div
-        className="sticky top-0 p-2 px-4 font-medium bg-white border-b"
+        className="text-md sticky top-0 bg-white p-2  font-bold"
         onClick={() => setExpanded(!expanded)}
       >
-        {label} ({recordings.length})
+        {count} {label} Test{count > 1 ? "s" : ""}
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}
     </div>
