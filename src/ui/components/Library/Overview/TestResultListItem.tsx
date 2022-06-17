@@ -31,9 +31,7 @@ function Title({ recording }: { recording: Recording }) {
     e.preventDefault();
 
     setView("recordings");
-    setAppliedText(
-      `test-path:${encodeURIComponent(JSON.stringify(recording.metadata.test!.path))}`
-    );
+    setAppliedText(`test-path:${JSON.stringify(recording.metadata.test!.path)}`);
   };
 
   return (
