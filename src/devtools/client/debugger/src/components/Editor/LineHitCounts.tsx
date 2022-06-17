@@ -1,4 +1,6 @@
 import { useMemo, useLayoutEffect } from "react";
+import { interpolateLab } from "d3-interpolate";
+import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -22,8 +24,21 @@ function LineHitCounts({ cm }: Props) {
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
   );
-
   const dispatch = useAppDispatch();
+  const uniqueHitCounts = Array.from(
+    new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
+  );
+  const maxHitCount = Math.max(...uniqueHitCounts);
+  const hitCountColorMap = useMemo(
+    () =>
+      new Map(
+        uniqueHitCounts.map(hitCount => [
+          hitCount,
+          Math.min(1, Math.max(0, Math.log(hitCount) / Math.log(maxHitCount))) || 0,
+        ])
+      ),
+    [uniqueHitCounts, maxHitCount]
+  );
 
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
@@ -56,9 +71,16 @@ function LineHitCounts({ cm }: Props) {
         const title = `${hitCount} hits`;
 
         const markerNode = document.createElement("div");
+        const backgroundColor = interpolateLab(
+          "#BBEBFA",
+          "#1A4583"
+        )(hitCountColorMap.get(hitCount) || 0);
+        const foregroundColor = getLuminance(backgroundColor) > 0.5 ? "#000" : "#fff";
         markerNode.className = className;
         markerNode.innerHTML = innerHTML;
         markerNode.title = title;
+        markerNode.style.backgroundColor = backgroundColor;
+        markerNode.style.color = foregroundColor;
 
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
@@ -75,7 +97,7 @@ function LineHitCounts({ cm }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [cm, hitCountMap]);
+  }, [cm, hitCountMap, hitCountColorMap]);
 
   // We're just here for the hooks!
   return null;

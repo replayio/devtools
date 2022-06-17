@@ -55,6 +55,11 @@ html[dir="rtl"] .editor-mount {
   color: var(--grey-50);
 }
 
+/** Pull the breakpoint badge above the hit count badge **/
+.CodeMirror-linenumber {
+  z-index: 5;
+}
+
 .function-search {
   max-height: 300px;
   overflow: hidden;
