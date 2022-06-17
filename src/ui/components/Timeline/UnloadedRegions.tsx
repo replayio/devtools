@@ -31,9 +31,12 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusRegion) {
-    const focusedAndLoaded = overlap([rangeForFocusRegion(focusRegion)], loadedRegions.loading)[0];
-    beginTime = focusedAndLoaded.begin.time;
-    endTime = focusedAndLoaded.end.time;
+    const overlappingRegions = overlap([rangeForFocusRegion(focusRegion)], loadedRegions.loading);
+    if (overlappingRegions.length > 0) {
+      const focusedAndLoaded = overlappingRegions[0];
+      beginTime = focusedAndLoaded.begin.time;
+      endTime = focusedAndLoaded.end.time;
+    }
   }
   const { endTime: recordingEndTime } = zoomRegion;
   const loadedRegionStart = getVisiblePosition({ time: beginTime, zoom: zoomRegion }) * 100;
