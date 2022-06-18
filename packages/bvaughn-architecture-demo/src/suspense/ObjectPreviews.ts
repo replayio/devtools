@@ -36,28 +36,46 @@ export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
 export function getObjectWithPreview(
   client: ReplayClientInterface,
   pauseId: PauseId,
-  objectId: ObjectId
+  objectId: ObjectId,
+  noOverflow: boolean = false
 ): Object {
   const objectIdMap = getOrCreateObjectWithPreviewMap(pauseId);
 
   let record = objectIdMap.get(objectId);
-  if (record == null || !record.value.hasOwnProperty("preview")) {
+
+  let shouldFetch = record == null;
+  if (noOverflow && record != null && record.status === STATUS_RESOLVED) {
+    if (record.value.preview == null) {
+      // No preview; this is just an Object.
+      shouldFetch = true;
+    } else if (record.value.preview.overflow) {
+      // Partial preview; not useful for rendering property lists.
+      shouldFetch = true;
+    }
+  }
+
+  if (shouldFetch) {
     const wakeable = createWakeable<Object>();
 
-    record = record || {
-      status: STATUS_PENDING,
-      value: wakeable,
-    };
+    if (record != null) {
+      record.status = STATUS_PENDING;
+      record.value = wakeable;
+    } else {
+      record = {
+        status: STATUS_PENDING,
+        value: wakeable,
+      };
+    }
 
     objectIdMap.set(objectId, record);
 
     fetchObjectWithPreview(client, pauseId, objectId, record, wakeable, objectIdMap);
   }
 
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
+  if (record!.status === STATUS_RESOLVED) {
+    return record!.value;
   } else {
-    throw record.value;
+    throw record!.value;
   }
 }
 

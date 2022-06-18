@@ -69,7 +69,7 @@ export default function ValueRenderer({
               ObjectPreviewRenderer = SetRenderer;
               break;
             default:
-              if (object.className.startsWith("HTML")) {
+              if (object.className.startsWith("HTML") && object.preview?.node != null) {
                 ObjectPreviewRenderer = HTMLElementRenderer;
               } else {
                 ObjectPreviewRenderer = ObjectRenderer;

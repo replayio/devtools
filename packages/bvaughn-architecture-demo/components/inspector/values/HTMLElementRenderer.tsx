@@ -14,7 +14,7 @@ import { ObjectPreviewRendererProps } from "./types";
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function HTMLElementRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
   const tagName = (object.preview?.node?.nodeName || "unknown").toLowerCase();
-  const properties = filterNonEnumerableProperties(object.preview.node?.attributes ?? []);
+  const properties = filterNonEnumerableProperties(object.preview?.node?.attributes ?? []);
 
   return (
     <>

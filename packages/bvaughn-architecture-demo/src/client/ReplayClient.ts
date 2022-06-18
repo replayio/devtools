@@ -1,6 +1,7 @@
 import {
   Message,
   ObjectId,
+  ObjectPreviewLevel,
   PauseData,
   PauseId,
   SessionId,
@@ -24,7 +25,11 @@ export interface ReplayClientInterface {
     overflow: boolean;
   }>;
   findSources(): Promise<void>;
-  getObjectWithPreview(objectId: ObjectId, pauseId: PauseId): Promise<PauseData>;
+  getObjectWithPreview(
+    objectId: ObjectId,
+    pauseId: PauseId,
+    level?: ObjectPreviewLevel
+  ): Promise<PauseData>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
 }
@@ -148,10 +153,14 @@ export class ReplayClient implements ReplayClient {
     });
   }
 
-  async getObjectWithPreview(objectId: ObjectId, pauseId: PauseId): Promise<PauseData> {
+  async getObjectWithPreview(
+    objectId: ObjectId,
+    pauseId: PauseId,
+    level?: ObjectPreviewLevel
+  ): Promise<PauseData> {
     const sessionId = this.getSessionIdThrows();
     const { data } = await client.Pause.getObjectPreview(
-      { object: objectId },
+      { level, object: objectId },
       sessionId,
       pauseId || undefined
     );

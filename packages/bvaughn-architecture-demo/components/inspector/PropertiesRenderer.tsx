@@ -40,18 +40,16 @@ export default function PropertiesRenderer({
 
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
-  if (object.preview == null) {
-    object = getObjectWithPreview(client, pauseId, object.objectId);
+  if (object.preview == null || object.preview.overflow) {
+    object = getObjectWithPreview(client, pauseId, object.objectId, true);
   }
 
-  // TODO (inspector) Support HTMLElement properties:
-  // object.preview.node.attributes ("NamedNodeMap")
-  // object.preview.nodes.childNodes ("NodeList")
-  // object.preview.nodes.style (id)
-
   const containerEntries = object.preview?.containerEntries ?? [];
-  const getterValues = filterNonEnumerableProperties(object.preview?.getterValues ?? []);
-  const sortedProperties = useMemo(() => {
+  const getterValues = useMemo(() => {
+    const enumerableProperties = filterNonEnumerableProperties(object.preview?.getterValues ?? []);
+    return sortBy(enumerableProperties, property => property.name);
+  }, [object]);
+  const properties = useMemo(() => {
     const enumerableProperties = filterNonEnumerableProperties(object.preview?.properties ?? []);
     return sortBy(enumerableProperties, property => property.name);
   }, [object]);
@@ -76,6 +74,8 @@ export default function PropertiesRenderer({
     }
   }
 
+  // TODO (inspector) Should we interleave getters and properties?
+
   return (
     <>
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
@@ -89,7 +89,7 @@ export default function PropertiesRenderer({
         />
       ))}
 
-      {sortedProperties.map((property, index) => (
+      {properties.map((property, index) => (
         <KeyValueRenderer
           key={`property-${index}`}
           layout="vertical"
