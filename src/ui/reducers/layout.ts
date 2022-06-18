@@ -5,7 +5,7 @@ import { LayoutState, ViewMode } from "ui/state/layout";
 import { features, prefs } from "ui/utils/prefs";
 
 export const syncInitialLayoutState: LayoutState = {
-  consoleFilterDrawerExpanded: true,
+  consoleFilterDrawerExpanded: prefs.consoleFilterDrawerExpanded as boolean,
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
   viewMode: prefs.defaultMode as ViewMode,
