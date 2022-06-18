@@ -4,14 +4,12 @@
 
 //
 
-import { getExecutionPoint, getResumePoint, getFramePositions } from "../../selectors";
+import { getResumePoint, getFramePositions } from "../../selectors";
 import { getLoadedRegions } from "ui/reducers/app";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { recordEvent } from "../../utils/telemetry";
 
 import { setFramePositions } from "./setFramePositions";
-
-const { log } = require("protocol/socket");
 
 /**
  * Debugger commands like stepOver, stepIn, stepUp
@@ -22,10 +20,6 @@ const { log } = require("protocol/socket");
  */
 export function command(cx, type) {
   return async (dispatch, getState, { client }) => {
-    log(`Debugger CommandStart ${type}`);
-
-    const point = getExecutionPoint(getState());
-
     if (!type) {
       return;
     }

@@ -17,7 +17,6 @@ import {
   timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
-import { log } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
@@ -274,8 +273,6 @@ export function togglePlayback(): UIThunkAction {
 
 export function startPlayback(): UIThunkAction {
   return (dispatch, getState) => {
-    log(`StartPlayback`);
-
     const state = getState();
     const currentTime = getCurrentTime(state);
 
@@ -301,8 +298,6 @@ export function startPlayback(): UIThunkAction {
 
 export function stopPlayback(): UIThunkAction {
   return (dispatch, getState) => {
-    log(`StopPlayback`);
-
     const playback = getPlayback(getState());
 
     if (playback) {
@@ -348,7 +343,6 @@ function playback(beginTime: number, endTime: number): UIThunkAction {
       currentTime = beginTime + (currentDate - beginDate);
 
       if (currentTime > endTime) {
-        log(`FinishPlayback`);
         dispatch(seekToTime(endTime));
         return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
       }
@@ -660,7 +654,6 @@ const shouldRerunAnalysisForBreakpoint = (
 export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
-    const zoomRegion = getZoomRegion(state);
     const focusRegion = getFocusRegion(state) as FocusRegion;
 
     if (!focusRegion) {

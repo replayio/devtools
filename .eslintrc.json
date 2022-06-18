@@ -45,7 +45,7 @@
           },
           {
             "name": "protocol/socket",
-            "importNames": ["client", "sendMessage"],
+            "importNames": ["client", "sendMessage", "log"],
             "message": "Please use ThreadFront."
           }
         ]

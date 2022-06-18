@@ -305,11 +305,6 @@ export function triggerEvent(method: string, params: any) {
   handler(params);
 }
 
-export function log(text: string) {
-  // Don't actually log anything. This is a convenient place to add a logpoint
-  // when reviewing recordings of the viewer.
-}
-
 // Debugging methods.
 if (typeof window === "object") {
   (window as any).disconnect = () => {
