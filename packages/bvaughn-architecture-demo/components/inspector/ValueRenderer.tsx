@@ -8,6 +8,7 @@ import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
 import ClientValueValueRenderer from "./values/ClientValueValueRenderer";
 import FunctionRenderer from "./values/FunctionRenderer";
+import HTMLElementRenderer from "./values/HTMLElementRenderer";
 import MapRenderer from "./values/MapRenderer";
 import ObjectRenderer from "./values/ObjectRenderer";
 import RegExpRenderer from "./values/RegExpRenderer";
@@ -43,6 +44,8 @@ export default function ValueRenderer({
         throw Error(`Could not find object with ID "${objectId}"`);
       }
 
+      // TODO (inspector) Handle HTML elements (e.g. <div class="foo"></div>)
+
       let ObjectPreviewRenderer: FC<ObjectPreviewRendererProps> | null = null;
       switch (type) {
         case "array":
@@ -53,7 +56,7 @@ export default function ValueRenderer({
           break;
         case "object":
         default:
-          switch (object?.className) {
+          switch (object.className) {
             case "Map":
             case "WeakMap":
               ObjectPreviewRenderer = MapRenderer;
@@ -66,7 +69,11 @@ export default function ValueRenderer({
               ObjectPreviewRenderer = SetRenderer;
               break;
             default:
-              ObjectPreviewRenderer = ObjectRenderer;
+              if (object.className.startsWith("HTML")) {
+                ObjectPreviewRenderer = HTMLElementRenderer;
+              } else {
+                ObjectPreviewRenderer = ObjectRenderer;
+              }
               break;
           }
           break;

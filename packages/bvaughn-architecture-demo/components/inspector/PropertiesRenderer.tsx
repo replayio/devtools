@@ -44,6 +44,11 @@ export default function PropertiesRenderer({
     object = getObjectWithPreview(client, pauseId, object.objectId);
   }
 
+  // TODO (inspector) Support HTMLElement properties:
+  // object.preview.node.attributes ("NamedNodeMap")
+  // object.preview.nodes.childNodes ("NodeList")
+  // object.preview.nodes.style (id)
+
   const containerEntries = object.preview?.containerEntries ?? [];
   const getterValues = filterNonEnumerableProperties(object.preview?.getterValues ?? []);
   const sortedProperties = useMemo(() => {

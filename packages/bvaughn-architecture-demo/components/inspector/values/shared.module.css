@@ -108,7 +108,32 @@
   content: ",";
   margin-right: 1ch;
 }
-.Value:last-of-type:after {
+.Value:last-of-type::after {
   content: "";
   margin-right: 0;
+}
+
+.HTMLOpeningTag {
+  display: flex;
+}
+.HTMLOpeningTag::before {
+  content: "<";
+}
+.HTMLOpeningTag::after {
+  content: ">";
+}
+
+.HTMLClosingTag {
+  display: flex;
+}
+.HTMLClosingTag::before {
+  content: "</";
+}
+.HTMLClosingTag::after {
+  content: ">";
+}
+
+.HtmlAttribute {
+  display: flex;
+  margin-left: 1ch;
 }

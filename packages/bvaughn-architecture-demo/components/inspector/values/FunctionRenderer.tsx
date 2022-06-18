@@ -12,7 +12,7 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
   const { functionName, functionParameterNames = [] } = object?.preview ?? {};
 
   const jumpToDefinition = () => {
-    // TODO (inspector) In the real app, this should open the Source viewer.
+    // In the real app, this would open the Source viewer.
     alert("Source viewer is not implemented yet");
   };
 
