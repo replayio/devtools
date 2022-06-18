@@ -6,8 +6,10 @@
 
 import { connect } from "react-redux";
 import { Component } from "react";
-import { getSelectedBreakableLines } from "../../selectors";
+import { getSelectedBreakableLines, getHitCountsForSelectedSource } from "../../selectors";
 import { fromEditorLine } from "../../utils/editor";
+import { getHitCountsByLine, getHitCountColors } from "../../utils/editor/hit-counts";
+import { features } from "ui/utils/prefs";
 
 class EmptyLines extends Component {
   componentDidMount() {
@@ -29,16 +31,24 @@ class EmptyLines extends Component {
   }
 
   disableEmptyLines() {
-    const { breakableLines, editor } = this.props;
+    const { breakableLines, editor, hitCounts } = this.props;
+    const hitCountsEnabled = features.hitCounts;
+    const hitCountsMap = getHitCountsByLine(hitCounts);
 
+    console.log(hitCountsMap);
     editor.codeMirror.operation(() => {
       editor.codeMirror.eachLine(lineHandle => {
         const line = fromEditorLine(editor.codeMirror.getLineNumber(lineHandle));
-
-        if (breakableLines.has(line)) {
-          editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+        const hitCount = hitCountsMap.get(line);
+        if (!hitCountsEnabled) {
+          if (hitCount) {
+            editor.codeMirror.addLineClass(lineHandle, "line", `hit-count-${hitCount}`);
+          }
         } else {
-          editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+          editor.codeMirror.removeLineClass(lineHandle, "line", "breakable-line");
+          if (breakableLines.has(line)) {
+            editor.codeMirror.addLineClass(lineHandle, "line", "breakable-line");
+          }
         }
       });
     });
@@ -51,9 +61,11 @@ class EmptyLines extends Component {
 
 const mapStateToProps = state => {
   const breakableLines = getSelectedBreakableLines(state);
+  const hitCounts = getHitCountsForSelectedSource(state);
 
   return {
     breakableLines,
+    hitCounts,
   };
 };
 

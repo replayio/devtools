@@ -4,7 +4,6 @@ export function AttributeContainer({
   children,
   icon,
   maxWidth = "none",
-  title,
 }: {
   children: string;
   icon?: string;
@@ -14,9 +13,9 @@ export function AttributeContainer({
   return (
     <div
       className={`mr-4 flex items-center space-x-1 overflow-hidden text-ellipsis`}
-      title={title || children}
+      title={children}
     >
-      <div className="w-4">{icon ? <MaterialIcon>{icon}</MaterialIcon> : null}</div>
+      {icon ? <MaterialIcon>{icon}</MaterialIcon> : null}
       <span style={{ maxWidth }} className="block overflow-hidden text-ellipsis whitespace-pre">
         {children}
       </span>

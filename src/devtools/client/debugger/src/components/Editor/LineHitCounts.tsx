@@ -1,51 +1,73 @@
 import { useMemo, useLayoutEffect, useState } from "react";
-import { interpolateLab } from "d3-interpolate";
-import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
 import { setBreakpointHitCounts } from "../../actions/sources";
 import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
 import { getSelectedSourceId } from "../../selectors";
+import { getHitCountColors } from "../../utils/editor/hit-counts";
 
 import styles from "./LineHitCounts.module.css";
 
-type Props = { cm: any };
+type Props = { cm: any; editorRef: any };
 
 export default function LineHitCountsWrapper(props: Props) {
   const { value } = useFeature("hitCounts");
-  return value ? <LineHitCounts {...props} /> : null;
-}
-
-function LineHitCounts({ cm }: Props) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
   const dispatch = useAppDispatch();
+
   const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
   );
-  const hitCountColorMap = useMemo(() => {
-    const uniqueHitCounts = Array.from(
-      new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
-    );
-    const maxHitCount = Math.max(...uniqueHitCounts);
 
-    return new Map(
-      uniqueHitCounts.map(hitCount => [
-        hitCount,
-        Math.min(1, Math.max(0, Math.log(hitCount) / Math.log(maxHitCount))) || 0,
-      ])
-    );
-  }, [hitCounts]);
-
+  const hitCountColor = getHitCountColors(hitCounts);
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
       dispatch(setBreakpointHitCounts(sourceId, 0));
     }
+
+    let styles = "";
+    for (const [
+      count,
+      { foregroundColor, backgroundColor, textColor, textHoverColor },
+    ] of hitCountColor) {
+      styles += `
+      .cm-s-mozilla .hit-count-${count} .CodeMirror-linenumber {
+        color: ${textColor};
+      }\n
+      .cm-s-mozilla .hit-count-${count}:hover .CodeMirror-linenumber {
+        color: ${textHoverColor};
+      }\n
+      
+      .hits-badge-${count} {
+        color: ${foregroundColor};
+        background-color: ${backgroundColor};
+      }\n
+      `;
+    }
+    const styleSheet = document.createElement("style");
+    styleSheet.innerHTML = styles;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
   }, [dispatch, sourceId, hitCounts]);
+
+  return value ? <LineHitCounts {...props} /> : null;
+}
+
+function LineHitCounts({ cm, editorRef }: Props) {
+  const [isCollapsed, setIsCollapsed] = useState(true);
+
+  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const hitCountMap = useMemo(
+    () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
+    [hitCounts]
+  );
 
   useLayoutEffect(() => {
     if (!cm) {
@@ -76,14 +98,6 @@ function LineHitCounts({ cm }: Props) {
         const title = `${hitCount} hits`;
 
         const markerNode = document.createElement("div");
-        const lowCountColor = "#a5c5eb";
-        const highCountColor = "#667dff";
-        const backgroundColor = interpolateLab(
-          lowCountColor,
-          highCountColor
-        )(hitCountColorMap.get(hitCount) || 0);
-        const foregroundColor =
-          getLuminance(backgroundColor) > 0.5 ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,.99)";
 
         if (!isCollapsed) {
           markerNode.innerHTML = innerHTML;
@@ -92,9 +106,11 @@ function LineHitCounts({ cm }: Props) {
         // Just for quick testing purposes, needs to be moved to LineHitCountsToggle
         markerNode.onclick = () => setIsCollapsed(!isCollapsed);
         markerNode.className = className;
+        markerNode.classList.add(`hits-badge-${hitCount}`);
         markerNode.title = title;
-        markerNode.style.setProperty("--gutter-hit-count-background", backgroundColor);
-        markerNode.style.setProperty("--gutter-hit-count-foreground", foregroundColor);
+        // const { backgroundColor, foregroundColor } = hitCountColor.get(hitCount);
+        // markerNode.style.backgroundColor = `var(--hit-count-${hitCount}-background)`;
+        // markerNode.style.color = `var(--hit-count-${hitCount}-foreground)`;
 
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
@@ -111,7 +127,7 @@ function LineHitCounts({ cm }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [cm, hitCountMap, hitCountColorMap, isCollapsed]);
+  }, [cm, hitCountMap, isCollapsed]);
 
   // We're just here for the hooks!
   return null;

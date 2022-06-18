@@ -457,7 +457,7 @@ class Editor extends PureComponent {
           />
         }
         <ColumnBreakpoints editor={editor} />
-        <LineHitCounts cm={editor} />
+        <LineHitCounts cm={editor} editorRef={this.$editorWrapper} />
       </div>
     );
   }

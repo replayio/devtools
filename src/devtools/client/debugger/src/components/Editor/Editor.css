@@ -47,16 +47,17 @@ html[dir="rtl"] .editor-mount {
   direction: ltr;
 }
 
-.theme-light .cm-s-mozilla .empty-line .CodeMirror-linenumber {
-  color: var(--grey-40);
+.theme-light .cm-s-mozilla .breakable-line .CodeMirror-linenumber {
+  color: var(--grey-60);
 }
 
 .theme-dark .cm-s-mozilla .empty-line .CodeMirror-linenumber {
-  color: var(--grey-50);
+  color: var(--grey-80);
 }
 
 /** Pull the breakpoint badge above the hit count badge **/
-.CodeMirror-linenumber {
+.editor-mount .cm-s-mozilla .CodeMirror-linenumber {
+  color: var(--grey-25);
   z-index: 5;
 }
 
