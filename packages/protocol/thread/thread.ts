@@ -14,8 +14,10 @@ import {
   FrameId,
   Location,
   MappedLocation,
+  keyboardEvents,
   Message,
   missingRegions,
+  navigationEvents,
   newSource,
   ObjectId,
   PauseDescription,
@@ -38,6 +40,8 @@ import {
   findAnnotationsResult,
   getHitCountsParameters,
   Frame,
+  PointRange,
+  TimeRange,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
@@ -331,6 +335,10 @@ class _ThreadFront {
       }
       return this.annotationWaiters.get(kind)!;
     }
+  }
+
+  setAccessToken(accessToken: string) {
+    return client.Authentication.setAccessToken({ accessToken });
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {
@@ -652,6 +660,10 @@ class _ThreadFront {
       : this.currentPause;
   }
 
+  loadRegion(region: TimeRange) {
+    return client.Session.loadRegion({ region }, ThreadFront.sessionId!);
+  }
+
   async loadAsyncParentFrames() {
     await this.ensureAllSources();
     const basePause = this.lastAsyncPause();
@@ -748,6 +760,10 @@ class _ThreadFront {
     const { promise, resolve } = defer<void>();
     this.invalidateCommandWaiters.push(resolve as () => void);
     return promise;
+  }
+
+  findStepInTarget(point: ExecutionPoint) {
+    return client.Debugger.findStepInTarget({ point }, this.sessionId!);
   }
 
   private async _findResumeTarget(point: ExecutionPoint, command: FindTargetCommand) {
@@ -857,6 +873,15 @@ class _ThreadFront {
     });
   }
 
+  getEndpoint() {
+    return client.Session.getEndpoint({}, ThreadFront.sessionId!);
+  }
+
+  async getPointNearTime(time: number) {
+    const { point } = await client.Session.getPointNearTime({ time }, this.sessionId!);
+    return point;
+  }
+
   async findNetworkRequests(
     onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
     onResponseBodyData: (body: responseBodyData) => void,
@@ -881,6 +906,20 @@ class _ThreadFront {
       { id: requestId, range: { end: 5e9 } },
       ThreadFront.sessionId!
     );
+  }
+
+  findMessagesInRange(range: PointRange) {
+    return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
+  }
+
+  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+    client.Session.addKeyboardEventsListener(onKeyboardEvents);
+    return client.Session.findKeyboardEvents({}, this.sessionId!);
+  }
+
+  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
+    client.Session.addNavigationEventsListener(onNavigationEvents);
+    return client.Session.findNavigationEvents({}, this.sessionId!);
   }
 
   async findConsoleMessages(
