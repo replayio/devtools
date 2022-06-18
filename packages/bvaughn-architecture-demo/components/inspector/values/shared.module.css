@@ -63,11 +63,9 @@
 .ArrayPropertyList::before {
   content: "[";
   margin-left: 1ch;
-  margin-right: 1ch;
 }
 .ArrayPropertyList::after {
   content: "]";
-  margin-left: 1ch;
 }
 
 .FunctionParametersList {
@@ -87,11 +85,9 @@
 .ObjectPropertyList::before {
   content: "{";
   margin-left: 1ch;
-  margin-right: 1ch;
 }
 .ObjectPropertyList::after {
   content: "}";
-  margin-left: 1ch;
 }
 
 .MapKey {

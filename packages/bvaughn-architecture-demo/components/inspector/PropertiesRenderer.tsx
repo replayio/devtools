@@ -9,6 +9,7 @@ import { FC, useContext, useMemo } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
+import { filterNonEnumerableProperties } from "../../src/utils/protocol";
 
 import Collapsible from "./Collapsible";
 import KeyValueRenderer from "./KeyValueRenderer";
@@ -44,11 +45,11 @@ export default function PropertiesRenderer({
   }
 
   const containerEntries = object.preview?.containerEntries ?? [];
-  const getterValues = object.preview?.getterValues ?? [];
-  const sortedProperties = useMemo(
-    () => sortBy(object.preview?.properties ?? [], property => property.name),
-    [object]
-  );
+  const getterValues = filterNonEnumerableProperties(object.preview?.getterValues ?? []);
+  const sortedProperties = useMemo(() => {
+    const enumerableProperties = filterNonEnumerableProperties(object.preview?.properties ?? []);
+    return sortBy(enumerableProperties, property => property.name);
+  }, [object]);
 
   const prototypeId = object.preview?.prototypeId ?? null;
   let prototype = null;

@@ -1,14 +1,17 @@
 import { ObjectPreviewRendererProps } from "./types";
 
-import styles from "./shared.module.css";
+import { filterNonEnumerableProperties } from "../../../src/utils/protocol";
+
 import ValueRenderer from "../ValueRenderer";
+
+import styles from "./shared.module.css";
 
 // Renders a protocol ObjectPreview representing an Array with a format of:
 //   Array (3) ["foo", bar, 123]
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  const properties = (object.preview?.properties ?? []).filter(property => property.flags !== 1);
+  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []);
 
   const getterValue = object.preview?.getterValues?.find(({ name }) => name === "length");
   const length = getterValue?.value || 0;

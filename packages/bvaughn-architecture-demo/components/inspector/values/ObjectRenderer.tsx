@@ -1,5 +1,7 @@
 import { ObjectPreviewRendererProps } from "./types";
 
+import { filterNonEnumerableProperties } from "../../../src/utils/protocol";
+
 import KeyValueRenderer from "../KeyValueRenderer";
 
 import styles from "./shared.module.css";
@@ -9,8 +11,7 @@ import styles from "./shared.module.css";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  // TODO (inspector) Is this the right way to filter properties?
-  const properties = (object.preview?.properties ?? []).filter(property => property.flags !== 1);
+  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []);
 
   return (
     <>

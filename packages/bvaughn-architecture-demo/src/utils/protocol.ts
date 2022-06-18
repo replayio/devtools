@@ -2,6 +2,7 @@ import {
   NamedValue as ProtocolNamedValue,
   ObjectId as ProtocolObjectId,
   PauseId,
+  Property,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import { getObjectThrows } from "../suspense/ObjectPreviews";
@@ -24,6 +25,11 @@ export type Value = {
   preview?: string;
   type: ValueType;
 };
+
+export function filterNonEnumerableProperties(properties: Property[]): Property[] {
+  // See https://static.replay.io/protocol/tot/Pause/#type-PropertyConfigurationFlags
+  return properties.filter(property => property.flags == null || property.flags & 4);
+}
 
 // TODO It would be nice if the protocol's Value objects used a consistent format.
 // As it is, these values have conditional fields which require special handling.
