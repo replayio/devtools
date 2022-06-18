@@ -1,0 +1,17 @@
+.Prototype {
+  color: var(--object-inspector-prototype-color);
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-height: 1rem;
+}
+.PrototypeName::after {
+  content: ":";
+  margin-right: 1ch;
+  color: var(--object-inspector-separator-color);
+}
+
+.BucketLabel {
+  color: var(--object-inspector-prototype-color);
+}

@@ -1,0 +1,16 @@
+.KeyValue {
+  display: flex;
+  gap: 0.5ch;
+}
+
+.Name {
+  color: var(--object-inspector-property-name-color);
+}
+.Name::after {
+  content: ":";
+  color: var(--object-inspector-color-color);
+}
+
+.ToggleAlignmentPadding {
+  margin-left: calc(1rem + 0.5ch);
+}

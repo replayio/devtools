@@ -30,17 +30,11 @@ export type Value = {
 // This utility function maps from one ot the other.
 export function reformatValue(
   pauseId: PauseId,
-  protocolValue: ProtocolValue | ProtocolNamedValue,
-  protocolKey?: ProtocolValue | undefined,
-  fallbackName: string | null = null
+  protocolValue: ProtocolValue | ProtocolNamedValue
 ): Value {
-  // TODO This is pretty convoluted; re-think how we can clean this up.
-  // Ideally the containerEntries for e.g. a Set would have the index as their key:value but they don't.
-  const name = protocolKey
-    ? protocolKey.value
-    : protocolValue.hasOwnProperty("name")
+  const name = protocolValue.hasOwnProperty("name")
     ? (protocolValue as ProtocolNamedValue).name
-    : fallbackName;
+    : null;
 
   // TODO Do we need special handling for "uninitialized" or "unavailable" values?
 
@@ -82,8 +76,6 @@ export function reformatValue(
     }
   } else if (protocolValue.hasOwnProperty("symbol")) {
     return { name, preview: `${protocolValue.symbol}`, type: "symbol" };
-  } else if (Object.keys(protocolValue).length === 0) {
-    return { name, preview: "undefined", type: "undefined" };
   } else {
     let objectId: ProtocolObjectId | undefined;
     if (protocolValue.hasOwnProperty("object")) {
@@ -98,23 +90,34 @@ export function reformatValue(
       objectId = protocolValue.set as ProtocolObjectId;
     }
 
-    const object = objectId ? getObjectThrows(pauseId, objectId) : null;
-    if (!object) {
-      throw Error(`Could not find object with id "${objectId}"`);
+    if (objectId) {
+      const object = objectId ? getObjectThrows(pauseId, objectId) : null;
+      if (!object) {
+        throw Error(`Could not find object with id "${objectId}"`);
+      }
+
+      let preview: string | undefined;
+      let type: ValueType = "object";
+      switch (object.className) {
+        case "Array":
+          type = "array";
+          break;
+        case "Function":
+          type = "function";
+          break;
+      }
+
+      return { name, objectId, preview, type };
     }
 
-    let preview: string | undefined;
-    let type: ValueType = "object";
-    switch (object.className) {
-      case "Array":
-        type = "array";
-        break;
-      case "Function":
-        type = "function";
-        break;
+    // Tricky: Values representing undefined don't have explicit "value" keys
+    // You have to detect them by the absence of an explicit "value" key–
+    // Meaning they won't have "value", "bigint", "symbol", or "unserializableNumber" keys.
+    // This is pretty awkward to work with and I wish the protocol would change.
+    const keys = Object.keys(protocolValue);
+    if (keys.length === 0 || (keys.length === 1 && keys[0] === "name")) {
+      return { name, preview: "undefined", type: "undefined" };
     }
-
-    return { name, objectId, preview, type };
   }
 
   throw Error(`Unsupported value type`);

@@ -24,10 +24,12 @@ body {
 
   --object-inspector-go-to-definition-icon-color: #567;
   --object-inspector-go-to-definition-icon-color-hover: #000;
-  --object-inspector-param-color: #dd00a8;
   --object-inspector-nested-border-color: #0a84ff;
-  --object-inspector-array-length: #567;
-  --object-inspector-prototype: #9ca3af;
+  --object-inspector-param-color: #dd00a8;
+  --object-inspector-property-name-color: #0a84ff;
+  --object-inspector-prototype-color: #9ca3af;
+  --object-inspector-separator-color: #737373;
+  --object-inspector-toggle-color: #737373;
 
   --value-type-boolean: #008b00;
   --value-type-nan: #737373;

@@ -1,11 +1,9 @@
-// This component only exists to demo the architectural changes.
-// It's not really meant for review.
-
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import { memo, Suspense, useContext, useMemo } from "react";
 
-import ValueRenderer from "../inspector/ValueRenderer";
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
+
+import Inspector from "../inspector";
 
 import styles from "./MessageRenderer.module.css";
 
@@ -30,11 +28,11 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   return (
     <div className={className}>
       {message.text}
-      {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-        <Suspense key={index} fallback="Loading...">
-          <ValueRenderer isRootValue={true} pauseId={pauseId} protocolValue={argumentValue} />
-        </Suspense>
-      ))}
+      <Suspense fallback="Loading...">
+        {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
+          <Inspector key={index} pauseId={pauseId} protocolValue={argumentValue} />
+        ))}
+      </Suspense>
     </div>
   );
 }
