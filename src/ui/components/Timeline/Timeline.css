@@ -42,6 +42,10 @@
   background: inherit;
 }
 
+.progress-bar-container:hover {
+  cursor: pointer;
+}
+
 .progress-bar-container {
   display: flex;
   position: relative;

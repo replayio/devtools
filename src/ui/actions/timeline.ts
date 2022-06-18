@@ -17,10 +17,12 @@ import {
   timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
+import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
 import { assert, waitForTime } from "protocol/utils";
+
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
   getCurrentTime,
@@ -192,7 +194,9 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
 
       paintGraphics(screen, mouse);
     } catch (error) {
-      console.error(error);
+      if (!(error instanceof DownloadCancelledError)) {
+        console.error(error);
+      }
     }
   };
 }
@@ -244,16 +248,14 @@ export function seekToTime(targetTime: number): UIThunkAction {
     }
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
-    const pointNearTime = await ThreadFront.getPointNearTime(targetTime);
-
-    if (Math.abs(pointNearTime.time - targetTime) > Math.abs(nearestEvent.time - targetTime)) {
-      dispatch(seek(nearestEvent.point, targetTime, false));
-    } else {
-      // I would prefer that we also use pointNearTime.time here, for accuracy,
-      // but it would be super annoying when it is off. Maybe when we have a
-      // more exact method.
-      dispatch(seek(pointNearTime.point, targetTime, false));
-    }
+    let bestPoint = nearestEvent;
+    try {
+      const pointNearTime = await ThreadFront.getPointNearTime(targetTime);
+      if (Math.abs(pointNearTime.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
+        bestPoint = pointNearTime;
+      }
+    } catch (e) {}
+    dispatch(seek(bestPoint.point, targetTime, false));
   };
 }
 
