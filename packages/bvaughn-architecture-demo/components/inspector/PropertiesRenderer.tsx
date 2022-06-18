@@ -1,14 +1,19 @@
-import { Object as ProtocolObject, PauseId as ProtocolPauseId } from "@replayio/protocol";
+import {
+  ContainerEntry as ProtocolContainerEntry,
+  Object as ProtocolObject,
+  PauseId,
+  PauseId as ProtocolPauseId,
+} from "@replayio/protocol";
 import { sortBy } from "lodash";
-import { useContext, useMemo } from "react";
+import { FC, useContext, useMemo } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import Collapsible from "./Collapsible";
 import KeyValueRenderer from "./KeyValueRenderer";
-
 import styles from "./PropertiesRenderer.module.css";
+import ValueRenderer from "./ValueRenderer";
 
 // TODO (inspector) Should we be alpha-sorting properties by name?
 
@@ -18,8 +23,6 @@ import styles from "./PropertiesRenderer.module.css";
 
 // TODO (inspector) Support Array bucketing (e.g. [0...99])
 // We can also bucket containerEntries with "[[Entries]]"
-
-// TODO (inspector) Support Map keys (special case)
 
 // Renders a list of key value properties.
 // This renderer can be used to show an expanded view of the values inside of Arrays and Objects.
@@ -53,24 +56,24 @@ export default function PropertiesRenderer({
     prototype = getObjectWithPreview(client, pauseId, prototypeId);
   }
 
+  let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
+  switch (object.className) {
+    case "Map":
+    case "WeakMap": {
+      EntriesRenderer = MapContainerEntriesRenderer;
+      break;
+    }
+    case "Set":
+    case "WeakSet": {
+      EntriesRenderer = SetContainerEntriesRenderer;
+      break;
+    }
+  }
+
   return (
     <>
-      {containerEntries.length > 0 && (
-        <Collapsible
-          defaultOpen={true}
-          header={<span className={styles.BucketLabel}>[[Entries]]</span>}
-          renderChildren={() =>
-            containerEntries.map(({ value }, index) => (
-              <KeyValueRenderer
-                key={`containerEntry-${index}`}
-                layout="vertical"
-                pauseId={pauseId}
-                protocolValue={value}
-              />
-            ))
-          }
-        />
-      )}
+      <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
+
       {getterValues.map((property, index) => (
         <KeyValueRenderer
           key={`getterValue-${index}`}
@@ -79,6 +82,7 @@ export default function PropertiesRenderer({
           protocolValue={property}
         />
       ))}
+
       {sortedProperties.map((property, index) => (
         <KeyValueRenderer
           key={`property-${index}`}
@@ -93,5 +97,119 @@ export default function PropertiesRenderer({
         {prototype !== null ? prototype.className : null}
       </span>
     </>
+  );
+}
+
+type EntriesRendererProps = {
+  containerEntries: ProtocolContainerEntry[];
+  pauseId: PauseId;
+};
+
+function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  if (containerEntries.length === 0) {
+    return null;
+  }
+
+  return (
+    <Collapsible
+      defaultOpen={true}
+      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+      renderChildren={() =>
+        containerEntries.map(({ key, value }, index) => (
+          <KeyValueRenderer key={index} layout="vertical" pauseId={pauseId} protocolValue={value} />
+        ))
+      }
+    />
+  );
+}
+
+// Map entries are a special case.
+// Unlike the other property lists, Map entries are formatted like:
+//   ▼ <index>: {"<key>" -> <value>}
+//        key: "<key>"
+//        key: <value>
+function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  return (
+    <Collapsible
+      defaultOpen={true}
+      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+      renderChildren={() => {
+        {
+          if (containerEntries.length === 0) {
+            return <div className={styles.NoEntries}>No properties</div>;
+          }
+
+          return containerEntries.map(({ key, value }, index) => (
+            <Collapsible
+              key={index}
+              header={
+                <>
+                  {index}: {"{"}
+                  <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
+                  {" → "}
+                  <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+                  {"}"}
+                </>
+              }
+              renderChildren={() => (
+                <>
+                  <KeyValueRenderer
+                    before={<div className={styles.MapEntryPrefix}>key</div>}
+                    layout="vertical"
+                    pauseId={pauseId}
+                    protocolValue={key!}
+                  />
+                  <KeyValueRenderer
+                    before={<div className={styles.MapEntryPrefix}>value</div>}
+                    layout="vertical"
+                    pauseId={pauseId}
+                    protocolValue={value}
+                  />
+                </>
+              )}
+            />
+          ));
+        }
+      }}
+    />
+  );
+}
+
+// Set entries are a special case.
+// Unlike the other property lists, Set entries are formatted like:
+//   ▼ <index>: <value>
+//        key: <value>
+function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  return (
+    <Collapsible
+      defaultOpen={true}
+      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
+      renderChildren={() => {
+        if (containerEntries.length === 0) {
+          return <div className={styles.NoEntries}>No properties</div>;
+        }
+
+        return containerEntries.map(({ value }, index) => (
+          <Collapsible
+            key={index}
+            header={
+              <>
+                {index}: {"{"}
+                <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+                {"}"}
+              </>
+            }
+            renderChildren={() => (
+              <KeyValueRenderer
+                before={<div className={styles.MapEntryPrefix}>value</div>}
+                layout="vertical"
+                pauseId={pauseId}
+                protocolValue={value}
+              />
+            )}
+          />
+        ));
+      }}
+    />
   );
 }

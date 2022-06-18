@@ -30,6 +30,8 @@ export default function ValueRenderer({
   const client = useContext(ReplayClientContext);
   const clientValue = useClientValue(protocolValue, pauseId);
 
+  // TODO (inspector) Handle getters – Lazily fetch values only after user input.
+
   switch (clientValue.type) {
     case "array":
     case "function":
@@ -53,12 +55,14 @@ export default function ValueRenderer({
         default:
           switch (object?.className) {
             case "Map":
+            case "WeakMap":
               ObjectPreviewRenderer = MapRenderer;
               break;
             case "RegExp":
               ObjectPreviewRenderer = RegExpRenderer;
               break;
             case "Set":
+            case "WeakSet":
               ObjectPreviewRenderer = SetRenderer;
               break;
             default:

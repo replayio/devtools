@@ -8,7 +8,7 @@
 }
 .Name::after {
   content: ":";
-  color: var(--object-inspector-color-color);
+  color: var(--object-inspector-separator-color);
 }
 
 .ToggleAlignmentPadding {

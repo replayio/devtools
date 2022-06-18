@@ -1,6 +1,6 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
-import { Suspense, useContext } from "react";
+import { ReactNode, Suspense, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
@@ -21,12 +21,14 @@ import ValueRenderer from "./ValueRenderer";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function KeyValueRenderer({
+  before = null,
   enableInspection = true,
   isNested = false,
   layout = "horizontal",
   pauseId,
   protocolValue,
 }: {
+  before?: ReactNode;
   enableInspection?: boolean;
   isNested?: boolean;
   layout?: "horizontal" | "vertical";
@@ -56,6 +58,7 @@ export default function KeyValueRenderer({
         !showCollapsibleView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
       )}
     >
+      {before}
       {name != null ? <span className={styles.Name}>{name}</span> : null}
       <ValueRenderer isNested={isNested} pauseId={pauseId} protocolValue={protocolValue} />
     </div>

@@ -16,8 +16,6 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
     alert("Source viewer is not implemented yet");
   };
 
-  // TODO (inspector) Handle getters – Lazy fetch values
-
   return (
     <>
       function {functionName}

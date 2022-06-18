@@ -15,3 +15,18 @@
 .BucketLabel {
   color: var(--object-inspector-prototype-color);
 }
+
+.MapEntryPrefix {
+  color: var(--object-inspector-property-name-color);
+}
+.MapEntryPrefix::after {
+  content: ":";
+  color: var(--object-inspector-separator-color);
+}
+
+.NoEntries {
+  color: var(--object-inspector-prototype-color);
+  font-style: italic;
+  min-height: 1rem;
+  padding-left: calc(0.5rem + 0.5ch);
+}
