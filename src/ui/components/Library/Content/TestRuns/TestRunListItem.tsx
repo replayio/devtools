@@ -48,8 +48,8 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-600"} `}>
-      <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
+    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
+      <MaterialIcon iconSize="xl">{`${failCount > 0 ? "cancel" : "check"} `}</MaterialIcon>
     </div>
   );
 }
