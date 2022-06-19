@@ -54,7 +54,7 @@ export default function LibraryLoader() {
   const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();
 
   if (userSettingsLoading || userInfoLoading) {
-    return <LoadingScreen />;
+    return <LoadingScreen fallbackMessage="Reloading team details..." />;
   }
 
   return <Library userSettings={userSettings} userInfo={userInfo} />;
@@ -85,11 +85,11 @@ function Library({
   }, [teamId, isValidTeamId, redirectToTeam]);
 
   if (!teamId) {
-    return <LoadingScreen />;
+    return <LoadingScreen fallbackMessage="Loading team information..." />;
   }
 
   return (
-    <div className="flex flex-row w-screen h-screen">
+    <div className="flex h-screen w-screen flex-row">
       <Navigation />
       <TeamPage />
       <LibraryNags />

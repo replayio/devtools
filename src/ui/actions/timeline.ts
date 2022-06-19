@@ -116,7 +116,6 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     }
 
     ThreadFront.timeWarp(point, time, hasFrames);
-    ThreadFront.initializedWaiter.resolve();
   };
 }
 
@@ -149,20 +148,6 @@ function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
   return async dispatch => {
     updatePausePointParams({ point, time, hasFrames });
     dispatch(setTimelineState({ currentTime: time, playback: null }));
-  };
-}
-
-function setRecordingDescription(duration: number): UIThunkAction {
-  return (dispatch, getState) => {
-    const zoomRegion = getZoomRegion(getState());
-
-    dispatch(
-      setTimelineState({
-        recordingDuration: duration,
-        currentTime: duration,
-        zoomRegion: { ...zoomRegion, endTime: duration },
-      })
-    );
   };
 }
 

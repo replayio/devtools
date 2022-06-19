@@ -80,7 +80,9 @@ function finish() {
 
 function isFullyLoaded() {
   const loadedRegions = app.selectors.getLoadedRegions();
+
   return (
+    ThreadFront.hasAllSources &&
     loadedRegions &&
     loadedRegions.loading.length > 0 &&
     loadedRegions.loaded.length > 0 &&
@@ -277,7 +279,7 @@ async function waitForPaused(url) {
 async function waitForPausedNoSource() {
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
-  store.dispatch({ type: "set_selected_primary_panel", panel: "debug" });
+  store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" });
 
   await waitUntil(() => isPaused(), { waitingFor: "execution to pause" });
 }

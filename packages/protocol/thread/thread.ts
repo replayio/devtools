@@ -152,6 +152,9 @@ class _ThreadFront {
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
   initializedWaiter = defer<void>();
 
+  // Waiter which resolves when there is at least one loading region
+  loadingHasBegun = defer<void>();
+
   // Map sourceId to info about the source.
   sources = new Map<string, Source>();
 
@@ -165,7 +168,7 @@ class _ThreadFront {
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
-  private hasAllSources = false;
+  hasAllSources = false;
 
   // Map URL to sourceId[].
   urlSources = new ArrayMap<string, SourceId>();
@@ -295,9 +298,13 @@ class _ThreadFront {
     // This is a placeholder which logs loading changes to the console.
     const sessionId = await this.waitForSession();
 
-    client.Session.addLoadedRegionsListener(listenerCallback);
-
-    await client.Session.listenForLoadChanges({}, sessionId);
+    client.Session.addLoadedRegionsListener(parameters => {
+      if (parameters.loading) {
+        this.loadingHasBegun.resolve();
+      }
+      listenerCallback(parameters);
+    });
+    client.Session.listenForLoadChanges({}, sessionId);
   }
 
   async getAnnotationKinds(): Promise<string[]> {
@@ -942,12 +949,12 @@ class _ThreadFront {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
   }
 
-  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
     client.Session.addKeyboardEventsListener(onKeyboardEvents);
     return client.Session.findKeyboardEvents({}, this.sessionId!);
   }
 
-  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
+  findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
     client.Session.addNavigationEventsListener(onNavigationEvents);
     return client.Session.findNavigationEvents({}, this.sessionId!);
   }
@@ -956,25 +963,19 @@ class _ThreadFront {
     onConsoleMessage: (pause: Pause, message: WiredMessage) => void,
     onConsoleOverflow: () => void
   ) {
-    const sessionId = await this.waitForSession();
-    // Wait for basic processing to start before fetching console messages.
     await this.ensureProcessed("basic");
+    client.Console.addNewMessageListener(async ({ message }) => {
+      await this.ensureAllSources();
+      const pause = wireUpMessage(message);
+      onConsoleMessage(pause, message as WiredMessage);
+    });
 
-    const messagesLoaded = client.Console.findMessages({}, sessionId).then(({ overflow }) => {
+    return client.Console.findMessages({}, this.sessionId!).then(({ overflow }) => {
       if (overflow) {
         console.warn("Too many console messages, not all will be shown");
         onConsoleOverflow();
       }
     });
-    client.Console.addNewMessageListener(async ({ message }) => {
-      await this.ensureAllSources();
-
-      const pause = wireUpMessage(message);
-
-      onConsoleMessage(pause, message as WiredMessage);
-    });
-
-    return messagesLoaded;
   }
 
   async getRootDOMNode() {

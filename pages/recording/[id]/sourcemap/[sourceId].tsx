@@ -7,7 +7,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { UIStore } from "ui/actions";
 import { ExpectedError } from "ui/state/app";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
-import { getAccessibleRecording, showLoadingProgress } from "ui/actions/session";
+import { getAccessibleRecording } from "ui/actions/session";
 import tokenManager from "ui/utils/tokenManager";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import renderSourcemap from "ui/utils/sourcemapVisualizer";
@@ -59,7 +59,6 @@ async function loadSourceMap(
     client.Session.addUnprocessedRegionsListener(regions =>
       store.dispatch(onUnprocessedRegions(regions))
     );
-    store.dispatch(showLoadingProgress());
 
     // find the requested source
     const result = await Promise.race([
@@ -146,7 +145,7 @@ export default function SourceMapLoader() {
   }, [recordingId, sourceId, store]);
 
   if (!sourcemapResult) {
-    return <LoadingScreen />;
+    return <LoadingScreen fallbackMessage="Loading source information..." />;
   }
 
   if ("error" in sourcemapResult) {

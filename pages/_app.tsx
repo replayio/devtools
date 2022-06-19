@@ -208,7 +208,7 @@ function Routing({ Component, pageProps }: AppProps) {
       <_App>
         <InstallRouteListener />
         <ErrorBoundary>
-          <React.Suspense fallback={<LoadingScreen />}>
+          <React.Suspense fallback={<LoadingScreen fallbackMessage="Fetching data..." />}>
             <Component {...pageProps} />
           </React.Suspense>
         </ErrorBoundary>

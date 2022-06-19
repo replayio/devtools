@@ -1,11 +1,6 @@
-import React, { ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import {
-  getAwaitingSourcemaps,
-  getDisplayedLoadingProgress,
-  getLoadingFinished,
-  getUploading,
-} from "ui/reducers/app";
+import { getAwaitingSourcemaps, getLoadingFinished, getUploading } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { LoadingTips } from "./LoadingTips";
 import { BubbleViewportWrapper } from "./Viewport";
@@ -31,64 +26,36 @@ export function LoadingScreenTemplate({
   );
 }
 
-// White progress screen used for showing the scanning progress of a replay
-export function ProgressBar({ progress }: { progress: number }) {
-  // We keep a low-water mark here, because it's possible for the amount that we
-  // have loaded to actually go *down* due to new unprocessed regions
-  const [minProgress, setMinProgress] = useState<number>(0);
-
-  const displayedProgress = useMemo(() => {
-    if (!progress) {
-      return minProgress;
-    }
-
-    if (progress > minProgress) {
-      setMinProgress(progress);
-    }
-
-    return Math.max(minProgress, progress);
-  }, [progress, minProgress]);
-
-  return (
-    <div className="relative h-1.5 w-full overflow-hidden rounded-lg bg-themeBase-90 p-0">
-      <div
-        className="t-0 absolute h-full bg-primaryAccent"
-        style={{ width: `${displayedProgress}%`, transitionDuration: "400ms" }}
-      />
-    </div>
-  );
-}
-
-function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRedux) {
+function LoadingScreen({
+  uploading,
+  awaitingSourcemaps,
+  fallbackMessage,
+  stalledTimeout = 2000,
+}: PropsFromRedux & { fallbackMessage: string; stalledTimeout?: number }) {
   // The backend send events in this order: uploading replay -> uploading sourcemaps.
+  let waitingForMessage = <span>{fallbackMessage}</span>;
   if (awaitingSourcemaps) {
-    return (
-      <LoadingScreenTemplate>
-        <span>Uploading sourcemaps</span>
-      </LoadingScreenTemplate>
-    );
+    waitingForMessage = <span>Uploading sourcemaps...</span>;
+    stalledTimeout = Infinity;
   } else if (uploading) {
-    const amount = `${Math.round(+uploading.amount)}Mb`;
-    const message = amount ? `Uploading ${amount}` : "Uploading";
-
-    return (
-      <LoadingScreenTemplate>
-        <span>{message}</span>
-      </LoadingScreenTemplate>
-    );
+    waitingForMessage = <span>Uploading {Math.round(+uploading.amount)}Mb</span>;
+    stalledTimeout = Infinity;
   }
 
-  // Right now there's no guarantee that once progress (basic processing progress)
-  // is at 100% that we're ready to close the loading screen and show the replay.
-  // It's possible that we're waiting on other things still (see
-  // jumpToInitialPausePoint). In that scenario, the loading progress bar appears
-  // to stall at 100%. This doesn't do much to fix it since it will still stall,
-  // but at least it will stall at <100%.
-  const adjustedProgress = Math.min(progress || 0, 90);
+  let [stalled, setStalled] = useState<boolean>(false);
+  useEffect(() => {
+    if (stalledTimeout === Infinity) {
+      return;
+    }
+
+    const timeout = setTimeout(() => setStalled(true), stalledTimeout);
+
+    return () => clearTimeout(timeout);
+  }, [fallbackMessage, stalledTimeout]);
 
   return (
-    <LoadingScreenTemplate showTips={!!progress}>
-      {progress ? <ProgressBar progress={adjustedProgress} /> : null}
+    <LoadingScreenTemplate showTips={true}>
+      <span>{stalled ? "This is taking longer than usual..." : waitingForMessage}</span>
     </LoadingScreenTemplate>
   );
 }
@@ -96,7 +63,6 @@ function LoadingScreen({ uploading, awaitingSourcemaps, progress }: PropsFromRed
 const connector = connect((state: UIState) => ({
   uploading: getUploading(state),
   awaitingSourcemaps: getAwaitingSourcemaps(state),
-  progress: getDisplayedLoadingProgress(state),
   finished: getLoadingFinished(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;

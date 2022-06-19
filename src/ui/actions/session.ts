@@ -19,7 +19,6 @@ import { getUserSettings } from "ui/hooks/settings";
 import { getUserId, getUserInfo } from "ui/hooks/users";
 import { setTrialExpired, setCurrentPoint } from "ui/reducers/app";
 import * as selectors from "ui/reducers/app";
-import { getSelectedPanel } from "ui/reducers/layout";
 import {
   eventReceived,
   requestSent,
@@ -165,8 +164,6 @@ export function createSocket(
         disableCache: !!prefs.disableCache,
       };
 
-      dispatch(showLoadingProgress());
-
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
       const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
@@ -237,9 +234,7 @@ export function createSocket(
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
-        await dispatch(showLoadingProgress());
-      } else {
-        await videoReady.promise;
+        dispatch(onLoadingFinished());
       }
 
       dispatch(onLoadingFinished());
@@ -248,6 +243,7 @@ export function createSocket(
 
       ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
+      await ThreadFront.loadingHasBegun.promise;
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
       const currentError = selectors.getUnexpectedError(getState());
@@ -263,22 +259,7 @@ export function createSocket(
         );
       }
     }
-  };
-}
-
-export function showLoadingProgress(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
-    let displayedProgress = selectors.getLoading(getState());
-    while (displayedProgress < 100) {
-      await waitForTime(200);
-
-      let progress = selectors.getLoading(getState());
-      const increment = Math.random();
-      const decayed = increment * ((100 - displayedProgress) / 40);
-      displayedProgress = Math.max(displayedProgress + decayed, progress);
-
-      dispatch(actions.setDisplayedLoadingProgress(displayedProgress));
-    }
+    ThreadFront.initializedWaiter.resolve();
   };
 }
 

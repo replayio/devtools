@@ -9,7 +9,11 @@ interface PropsFromParent {
 }
 
 function WaitForReduxSlice({ hasSlice, children, loading }: PropsFromParent & PropsFromRedux) {
-  return hasSlice ? <>{children}</> : <>{loading}</> || <LoadingScreen />;
+  return hasSlice ? (
+    <>{children}</>
+  ) : (
+    <>{loading}</> || <LoadingScreen fallbackMessage="Booting the debugger..." />
+  );
 }
 
 const connector = connect((state: any, { slice }: PropsFromParent) => ({
