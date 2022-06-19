@@ -165,6 +165,8 @@ export function bootstrapStore(initialState: Partial<UIState>) {
     // See devtools.ts and devtools-toolbox.ts for other reducers
     reducer: reducers,
     preloadedState: initialState,
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     middleware: gDM => {
       const originalMiddlewareArray = gDM({

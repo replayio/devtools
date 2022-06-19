@@ -1,7 +1,6 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { pref } from "devtools/shared/services";
-
-const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
+import { asyncStoreHelper } from "devtools/shared/async-store-helper";
 
 // app prefs.
 pref("devtools.defaultMode", "non-dev");

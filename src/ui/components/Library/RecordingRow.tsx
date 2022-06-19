@@ -36,7 +36,7 @@ export function getTruncatedRelativeDate(date: string) {
   return getRelativeDate(date, true);
 }
 
-export function getRelativeDate(date: string, truncate: boolean = false) {
+export function getRelativeDate(date: string, truncate = false) {
   let content = formatDistanceToNow(new Date(date), { addSuffix: true });
 
   if (truncate) {

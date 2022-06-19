@@ -181,8 +181,8 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return true;
     }
 
-    let previousMessage = messages.entities[visibleMessageIDs[index - 1]];
-    let currentMessage = messages.entities[visibleMessageIDs[index]];
+    const previousMessage = messages.entities[visibleMessageIDs[index - 1]];
+    const currentMessage = messages.entities[visibleMessageIDs[index]];
 
     if (!previousMessage || !currentMessage) {
       return false;

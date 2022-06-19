@@ -12,14 +12,14 @@ import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
 let inFlightWakeable: Wakeable<Message[]> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
-let lastFetchDidOverflow: boolean = false;
+let lastFetchDidOverflow = false;
 let lastFetchedFocusRange: TimeStampedPointRange | null = null;
 let lastFetchedMessages: Message[] | null = null;
 
 let lastFilteredFocusRange: TimeStampedPointRange | null = null;
 let lastFilteredMessages: Message[] | null = null;
-let lastFilteredCountAfter: number = 0;
-let lastFilteredCountBefore: number = 0;
+let lastFilteredCountAfter = 0;
+let lastFilteredCountBefore = 0;
 
 type getMessagesResponse = {
   countAfter: number;

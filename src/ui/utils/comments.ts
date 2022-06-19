@@ -45,7 +45,7 @@ export function isCommentContentEmpty(content: string | object): boolean {
   }
 }
 
-export function parseCommentContent(content: string | object): Object {
+export function parseCommentContent(content: string | object): object {
   if (typeof content === "object") {
     return content;
   }

@@ -48,7 +48,7 @@ export function injectCustomSocketSendMessageForTesting(
   };
 }
 
-let gPendingMessages: Request<CommandMethods>[] = [];
+const gPendingMessages: Request<CommandMethods>[] = [];
 let gNextMessageId = 1;
 
 export type CommandResponse =
@@ -111,7 +111,7 @@ type AnalysisCallbacks = {
 };
 
 let gSessionCallbacks: SessionCallbacks | undefined;
-export let gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
+export const gAnalysisCallbacks: Map<string, AnalysisCallbacks> = new Map();
 
 export async function createSession(
   recordingId: string,

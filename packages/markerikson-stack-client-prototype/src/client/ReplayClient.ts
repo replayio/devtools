@@ -94,7 +94,7 @@ export class ReplayClient implements ReplayClient {
         let lowIndex = 0;
         let highIndex = sortedMessages.length;
         while (lowIndex < highIndex) {
-          let middleIndex = (lowIndex + highIndex) >>> 1;
+          const middleIndex = (lowIndex + highIndex) >>> 1;
           const message = sortedMessages[middleIndex];
 
           if (compareNumericStrings(message.point.point, newMessagePoint)) {

@@ -52,7 +52,7 @@ const timelineSlice = createSlice({
       while (actionIndex < action.payload.length) {
         const actionPoint = action.payload[actionIndex];
 
-        let stateIndexPoint = state.points[stateIndex];
+        const stateIndexPoint = state.points[stateIndex];
 
         if (stateIndexPoint == null) {
           state.points.push(actionPoint);

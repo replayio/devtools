@@ -744,9 +744,9 @@ export function toggleFocusMode(): UIThunkAction {
   };
 }
 
-const PRECACHE_DURATION: number = 5000;
+const PRECACHE_DURATION = 5000;
 
-let precacheBeginTime: number = -1;
+let precacheBeginTime = -1;
 
 export function precacheScreenshots(beginTime: number): UIThunkAction {
   return async (dispatch, getState) => {

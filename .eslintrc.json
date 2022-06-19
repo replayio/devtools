@@ -4,7 +4,11 @@
     "browser": true,
     "es6": true
   },
-  "extends": ["plugin:react/recommended", "plugin:react-hooks/recommended"],
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
@@ -66,7 +70,10 @@
     "react/prop-types": 0,
     "react/react-in-jsx-scope": 0,
     "react/require-default-props": 0,
-    "sort-vars": "error"
+    "sort-vars": "error",
+    "@typescript-eslint/no-empty-function": 0,
+    "@typescript-eslint/ban-ts-comment": 0,
+    "@typescript-eslint/no-var-requires": 0
   },
   "settings": {
     "react": {

@@ -107,8 +107,8 @@ export function getNewZoomRegion({
   recordingDuration: number;
 }) {
   let scale = zoomRegion.scale;
-  let length = zoomRegion.endTime - zoomRegion.beginTime;
-  let leftToHover = hoverTime - zoomRegion.beginTime;
+  const length = zoomRegion.endTime - zoomRegion.beginTime;
+  const leftToHover = hoverTime - zoomRegion.beginTime;
   let rightToHover = zoomRegion.endTime - hoverTime;
 
   let newLength = recordingDuration / newScale;

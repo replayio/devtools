@@ -435,7 +435,7 @@ export class ValueFront {
       );
 
       if (this.className() === "Array") {
-        let result: JSONishValue[] = [];
+        const result: JSONishValue[] = [];
         for (const [key, value] of properties) {
           const index = parseInt(key);
           if (Number.isInteger(index)) {

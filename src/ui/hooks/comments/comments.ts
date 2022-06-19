@@ -71,6 +71,7 @@ export function useUpdateComment() {
     position: CommentPosition | null
   ) =>
     updateCommentContent({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
       variables: { commentId, newIsPublished, newContent, position },
     });
@@ -99,6 +100,7 @@ export function useUpdateCommentReply() {
 
   return async (id: string, newContent: string, newIsPublished: boolean) =>
     updateCommentReplyContent({
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore TypeScript types don't yet know about the $newIsPublished variable
       variables: { id, newContent, newIsPublished },
     });

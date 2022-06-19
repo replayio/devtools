@@ -459,7 +459,7 @@ function drawClick(cx: CanvasRenderingContext2D, x: number, y: number) {
 
 function calculateBounds(containerBounds: DOMRect, image: HTMLImageElement | null | undefined) {
   const maxScale = 1 / (gDevicePixelRatio || 1);
-  let bounds = { height: 0, width: 0, left: 0, top: 0, scale: 1 };
+  const bounds = { height: 0, width: 0, left: 0, top: 0, scale: 1 };
 
   if (image && image.width > 0 && image.height > 0) {
     bounds.width = image.width;
@@ -571,7 +571,7 @@ async function getScreenshotDimensions(screen: ScreenShot) {
   return { width: img.width, height: img.height };
 }
 
-export async function getFirstMeaningfulPaint(limit: number = 10) {
+export async function getFirstMeaningfulPaint(limit = 10) {
   for (const paintPoint of gPaintPoints.slice(0, limit)) {
     const { screen } = await getGraphicsAtTime(paintPoint.time);
     if (!screen) {

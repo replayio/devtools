@@ -108,8 +108,8 @@ function QuickActions({
 
   let next: PointDescription | undefined, prev: PointDescription | undefined;
 
-  let points = analysisPoints?.data;
-  let error = analysisPoints?.error;
+  const points = analysisPoints?.data;
+  const error = analysisPoints?.error;
 
   if (points && !error && executionPoint) {
     prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);

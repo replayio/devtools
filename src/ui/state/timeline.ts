@@ -6,6 +6,7 @@ export interface ZoomRegion {
   scale: number;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface FocusRegion {
   // We are moving towards using TimeStampedPoints for all ranges on the client,
   // to that end, we should avoid using fields directly from this object, and

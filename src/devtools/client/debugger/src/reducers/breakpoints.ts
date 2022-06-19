@@ -418,7 +418,7 @@ const customAnalysisResultComparator = (
   const d2 = b.data;
 
   // Verify that all point entries have identical sorted point/time values
-  let dataEqual =
+  const dataEqual =
     d1.length === d2.length &&
     d1.every((item, i) => {
       const otherItem = d2[i];

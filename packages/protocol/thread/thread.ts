@@ -119,7 +119,7 @@ declare global {
 }
 
 // Temporary experimental feature flag
-let repaintAfterEvaluationsExperimentalFlag: boolean = false;
+let repaintAfterEvaluationsExperimentalFlag = false;
 export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void {
   repaintAfterEvaluationsExperimentalFlag = value;
 }
@@ -127,11 +127,11 @@ export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void
 class _ThreadFront {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
-  actor: string = "MainThreadId";
+  actor = "MainThreadId";
 
   currentPoint: ExecutionPoint = "0";
-  currentTime: number = 0;
-  currentPointHasFrames: boolean = false;
+  currentTime = 0;
+  currentPointHasFrames = false;
 
   // Any pause for the current point.
   currentPause: Pause | null = null;
@@ -382,7 +382,7 @@ class _ThreadFront {
       this.allSourcesWaiter.resolve();
     });
     client.Debugger.addNewSourceListener(source => {
-      let { sourceId, kind, url, generatedSourceIds, contentHash } = source;
+      const { sourceId, kind, url, generatedSourceIds, contentHash } = source;
       this.sources.set(sourceId, { contentHash, generatedSourceIds, kind, url });
       if (url) {
         this.urlSources.add(url, sourceId);
@@ -504,7 +504,7 @@ class _ThreadFront {
     range: { beginPoint: ExecutionPoint; endPoint: ExecutionPoint } | null
   ) {
     assert(this.sessionId, "no sessionId");
-    let params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
+    const params: getHitCountsParameters = { sourceId, locations, maxHits: 10000 };
     if (range !== null && range.beginPoint !== "" && range.endPoint !== "") {
       params.range = { begin: range.beginPoint, end: range.endPoint };
     }

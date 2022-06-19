@@ -93,7 +93,7 @@ export const ReplayLink = Node.create<ReplayLinkOptions>({
           const attributes = getAttributes(match);
           const { tr } = state;
           const start = range.from;
-          let end = range.to;
+          const end = range.to;
 
           tr.replaceWith(start, end, this.type.create(attributes));
         },
