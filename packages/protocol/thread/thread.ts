@@ -654,10 +654,6 @@ class _ThreadFront {
       : this.currentPause;
   }
 
-  loadRegion(region: TimeRange) {
-    return client.Session.loadRegion({ region }, ThreadFront.sessionId!);
-  }
-
   async loadAsyncParentFrames() {
     await this.ensureAllSources();
     const basePause = this.lastAsyncPause();
@@ -678,6 +674,10 @@ class _ThreadFront {
     }
     assert(frames, "no frames");
     return frames.slice(1);
+  }
+
+  loadRegion(region: TimeRange) {
+    return client.Session.loadRegion({ region }, ThreadFront.sessionId!);
   }
 
   pauseForAsyncIndex(asyncIndex?: number) {

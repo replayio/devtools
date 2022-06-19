@@ -97,17 +97,14 @@ export default function Timeline() {
 
         <div
           className="progress-bar-container"
+          onClick={onClick}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
+          onMouseMove={onMouseMove}
         >
           <div className="progress-bar-stack">
             <ProtocolTimeline />
-            <div
-              className="progress-bar"
-              ref={progressBarRef}
-              onClick={onClick}
-              onMouseMove={onMouseMove}
-            >
+            <div className="progress-bar" ref={progressBarRef}>
               <ProgressBars />
               <PreviewMarkers />
               <Comments />
