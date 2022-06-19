@@ -115,7 +115,7 @@ export default function JSTerm() {
 
 function InaccessibleEditor() {
   const playback = useAppSelector(getPlayback);
-  const msg = playback ? "Console evaluations are disabled during playback" : "Loading…";
+  const msg = playback ? "Console evaluations are disabled during playback" : "Unavailable…";
 
   return <div className="flex h-full items-center italic text-gray-400">{msg}</div>;
 }
