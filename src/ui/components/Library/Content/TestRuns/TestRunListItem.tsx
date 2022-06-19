@@ -59,12 +59,12 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const isSelected = preview?.id.toString() === testRun.id;
   const style = {
-    backgroundColor: isSelected ? "rgb(209 238 255)" : "",
+    backgroundColor: isSelected ? "rgb(233 246 255)" : "",
   };
 
   return (
     <div
-      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-md border-b bg-white px-4 py-3 hover:bg-gray-100"
+      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b bg-white px-4 py-3 hover:bg-gray-50"
       style={style}
       onClick={onClick}
     >

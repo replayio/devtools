@@ -32,7 +32,7 @@ export function TestRunList() {
   };
 
   return (
-    <div className="recording-list flex flex-col space-y-1 overflow-y-auto   text-sm shadow-md">
+    <div className="recording-list flex flex-col space-y-0 overflow-y-auto text-sm shadow-md rounded-xl">
       {testRuns?.map((t, i) => (
         <TestRunListItem testRun={t} key={i} onClick={() => onClick(t)} />
       ))}
