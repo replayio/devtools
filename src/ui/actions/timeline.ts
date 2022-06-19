@@ -657,15 +657,19 @@ export function syncFocusedRegion(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
+    const zoomTime = getZoomRegion(state);
 
     if (!focusRegion) {
       return;
     }
 
-    ThreadFront.loadRegion({
-      begin: displayedBeginForFocusRegion(focusRegion),
-      end: displayedEndForFocusRegion(focusRegion),
-    });
+    ThreadFront.loadRegion(
+      {
+        begin: displayedBeginForFocusRegion(focusRegion),
+        end: displayedEndForFocusRegion(focusRegion),
+      },
+      zoomTime.endTime
+    );
 
     const { breakpoints } = state.breakpoints;
     const cx = getThreadContext(state);
