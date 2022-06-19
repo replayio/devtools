@@ -31,7 +31,7 @@ function Title({ recording }: { recording: Recording }) {
     e.stopPropagation();
     e.preventDefault();
 
-    setView("recordings");
+    setView("test-results");
     setAppliedText(`test-path:${JSON.stringify(recording.metadata.test!.path)}`);
   };
 

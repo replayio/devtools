@@ -45,7 +45,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
               expanded ? "bg-iconColor" : "rotate-90"
             } rotate bg-iconColor transition duration-140 ease-out`}
             size="small"
-          />          
+          />
         </div>
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}

@@ -6,7 +6,6 @@ import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
-import { SourceMetadata } from "ui/types";
 import styles from "../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
@@ -49,7 +48,7 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className={`pt-0.5 flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
+    <div className={`flex self-start pt-0.5 ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
       <MaterialIcon iconSize="xl">{`${failCount > 0 ? "cancel" : "check"} `}</MaterialIcon>
     </div>
   );
@@ -59,16 +58,16 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   const { preview } = useContext(LibraryContext);
   const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const isSelected = preview?.id.toString() === testRun.id;
- 
 
   return (
     <div
-      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${styles.libraryRow}     
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+        styles.libraryRow
+      }     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
       onClick={onClick}
     >
-    
       <Status failCount={failCount} />
       <div className="flex flex-grow flex-col space-y-1">
         <div className="flex flex-row justify-between">
