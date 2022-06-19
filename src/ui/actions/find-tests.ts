@@ -6,7 +6,6 @@ import { assert } from "protocol/utils";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
 import { comparePoints, pointPrecedes } from "protocol/execution-point-utils";
 import { Helpers } from "./logpoint";
-import { client } from "protocol/socket";
 import { Pause, ThreadFront, ValueFront } from "protocol/thread";
 import { WiredMessage } from "protocol/thread/thread";
 
@@ -124,10 +123,7 @@ class JestTestState {
 
     await Promise.all(
       analysisResults.map(async ({ key: callPoint, value: { names } }) => {
-        const { target } = await client.Debugger.findStepInTarget(
-          { point: callPoint },
-          this.sessionId
-        );
+        const { target } = await ThreadFront.findStepInTarget(callPoint);
         if (target.frame) {
           this.tests.push({ names, startPoint: target });
         }

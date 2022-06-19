@@ -2,7 +2,6 @@ import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@replayio/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
-import { client, sendMessage } from "protocol/socket";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import tokenManager from "ui/utils/tokenManager";
@@ -58,7 +57,7 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
-        sendMessage("Authentication.setAccessToken", { accessToken: token });
+        ThreadFront.setAccessToken(token);
       }
     });
     tokenManager.getToken();
@@ -67,11 +66,8 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
-    client.Session.findKeyboardEvents({}, sessionId);
-    client.Session.addKeyboardEventsListener(({ events }) => onKeyboardEvents(events, store));
-
-    client.Session.findNavigationEvents({}, sessionId);
-    client.Session.addNavigationEventsListener(({ events }) =>
+    ThreadFront.findKeyboardEvents(({ events }) => onKeyboardEvents(events, store));
+    ThreadFront.findNavigationEvents(({ events }) =>
       onNavigationEvents(events as ReplayNavigationEvent[], store)
     );
   });

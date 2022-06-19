@@ -42,6 +42,11 @@
             "name": "react-redux",
             "importNames": ["useDispatch", "useSelector"],
             "message": "Please import 'useAppDispatch/useAppSelector' from 'ui/setup/hooks' instead."
+          },
+          {
+            "name": "protocol/socket",
+            "importNames": ["client", "sendMessage"],
+            "message": "Please use ThreadFront."
           }
         ]
       }

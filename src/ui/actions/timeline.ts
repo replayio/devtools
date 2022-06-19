@@ -17,7 +17,7 @@ import {
   timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
-import { client, log } from "protocol/socket";
+import { log } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
@@ -98,7 +98,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     const { duration } = await ThreadFront.getRecordingDescription();
     dispatch(setRecordingDescription(duration));
 
-    const { endpoint } = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    const { endpoint } = await ThreadFront.getEndpoint();
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
@@ -245,9 +245,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
     }
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
-    const pointNearTime = (
-      await client.Session.getPointNearTime({ time: targetTime }, ThreadFront.sessionId!)
-    ).point;
+    const pointNearTime = await ThreadFront.getPointNearTime(targetTime);
 
     if (Math.abs(pointNearTime.time - targetTime) > Math.abs(nearestEvent.time - targetTime)) {
       dispatch(seek(nearestEvent.point, targetTime, false));
@@ -669,15 +667,10 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    client.Session.loadRegion(
-      {
-        region: {
-          begin: displayedBeginForFocusRegion(focusRegion),
-          end: displayedEndForFocusRegion(focusRegion),
-        },
-      },
-      ThreadFront.sessionId!
-    );
+    ThreadFront.loadRegion({
+      begin: displayedBeginForFocusRegion(focusRegion),
+      end: displayedEndForFocusRegion(focusRegion),
+    });
 
     const { breakpoints } = state.breakpoints;
     const cx = getThreadContext(state);

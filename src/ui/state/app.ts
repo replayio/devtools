@@ -1,6 +1,5 @@
 import {
   SessionId,
-  PointDescription,
   Location,
   MouseEvent,
   KeyboardEvent,
@@ -10,7 +9,6 @@ import {
   ExecutionPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import { AnalysisError } from "protocol/thread/analysis";
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
@@ -24,6 +22,7 @@ export type ModalOptionsType = {
   comment?: Reply;
   instructions?: string;
 } | null;
+
 export type ModalType =
   | "sharing"
   | "login"

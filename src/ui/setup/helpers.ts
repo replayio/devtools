@@ -1,6 +1,8 @@
 import { UIStore } from "ui/actions";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs, features, asyncStore } from "ui/utils/prefs";
+
+// eslint-disable-next-line no-restricted-imports
 import { triggerEvent, sendMessage } from "protocol/socket";
 import { getReplaySession, ReplaySession } from "./prefs";
 

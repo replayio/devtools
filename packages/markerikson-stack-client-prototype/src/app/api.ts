@@ -1,7 +1,6 @@
 import { createApi, fakeBaseQuery } from "@reduxjs/toolkit/query/react";
 import type {
   newSource,
-  ProtocolClient,
   Location,
   PointDescription,
   HitCount,
@@ -9,8 +8,8 @@ import type {
 } from "@replayio/protocol";
 import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
-
-import { client, initSocket } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { client } from "protocol/socket";
 import { replayClient } from "../client/ReplayClient";
 
 interface SourceGroups {

@@ -12,7 +12,6 @@ import {
 import { loadValue } from "devtools/packages/devtools-reps/object-inspector/items/utils";
 import { TestMessageHandlers } from "ui/actions/find-tests";
 import { LogpointHandlers } from "ui/actions/logpoint";
-import { client } from "protocol/socket";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
 import { WiredMessage, wireUpMessage } from "protocol/thread/thread";
 import type { UIStore, UIThunkAction } from "ui/actions";
@@ -278,16 +277,13 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
 
     dispatch(clearMessages());
 
-    const sessionEndpoint = await client.Session.getEndpoint({}, ThreadFront.sessionId!);
+    const sessionEndpoint = await ThreadFront.getEndpoint();
     const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).begin.point : "0";
     const end = focusRegion
       ? (focusRegion as UnsafeFocusRegion).end.point
       : sessionEndpoint.endpoint.point;
 
-    const { messages, overflow } = await client.Console.findMessagesInRange(
-      { range: { begin, end } },
-      ThreadFront.sessionId!
-    );
+    const { messages, overflow } = await ThreadFront.findMessagesInRange({ begin, end });
 
     // Store the result of the new analysis window for "soft focus" comparison next time.
     dispatch(setLastFetchedForFocusRegion(focusRegion));

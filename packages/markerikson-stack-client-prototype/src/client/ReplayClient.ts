@@ -5,6 +5,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+// eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { compareNumericStrings } from "protocol/utils";
 import { UserInfo } from "../graphql/types";

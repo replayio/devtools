@@ -1,5 +1,3 @@
-import type { ReplayEvent } from "ui/state/app";
-
 export const EVENT_KINDS: { [key: string]: EventKind } = {
   keydown: { icon: "keyboard", label: "Key Down", key: "event.keyboard.keydown" },
   keyup: { icon: "keyboard", label: "Key Up", key: "event.keyboard.keyup" },
