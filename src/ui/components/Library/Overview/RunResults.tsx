@@ -12,7 +12,7 @@ export function RunResults() {
   const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "failed");
 
   return (
-    <div className="flex flex-col overflow-y-auto">
+    <div className="flex flex-col">
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
       <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>

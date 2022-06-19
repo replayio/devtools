@@ -65,11 +65,6 @@ const GET_WORKSPACE_RECORDINGS = gql`
               isInitialized
               userRole
               metadata
-              comments {
-                user {
-                  id
-                }
-              }
               owner {
                 id
                 name

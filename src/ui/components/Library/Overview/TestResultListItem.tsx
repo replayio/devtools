@@ -53,6 +53,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const passed = metadata.test?.result === "passed";
   const recordingId = recording.id;
+  console.log(recording);
 
   return (
     <a
@@ -62,8 +63,18 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <ViewReplay recordingId={recordingId} passed={passed} />
-      <Title recording={recording} />
+      <div className="flex grow flex-row">
+        <div className="flex grow ">
+          <ViewReplay recordingId={recordingId} passed={passed} />
+          <Title recording={recording} />
+        </div>
+        {recording?.comments?.length > 0 && (
+          <div className="align-items-center flex flex-row space-x-1 text-gray-600">
+            <img src="/images/comment-outline.svg" className="w-3" />
+            <span>{recording?.comments?.length}</span>
+          </div>
+        )}
+      </div>
     </a>
   );
 }

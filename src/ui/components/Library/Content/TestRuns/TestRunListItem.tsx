@@ -1,10 +1,9 @@
 import { TestRun } from "ui/hooks/tests";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
 import { useContext } from "react";
 import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
-import { RunStats } from "./RunStats";
+import { TestStatus } from "./TestStatus";
 import { AttributeContainer } from "./AttributeContainer";
 
 function Title({ testRun }: { testRun: TestRun }) {
@@ -45,17 +44,8 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
   );
 }
 
-function Status({ failCount }: { failCount: number }) {
-  return (
-    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-600"} `}>
-      <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
-    </div>
-  );
-}
-
 export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { preview } = useContext(LibraryContext);
-  const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const isSelected = preview?.id.toString() === testRun.id;
   const style = {
     backgroundColor: isSelected ? "rgb(209 238 255)" : "",
@@ -63,15 +53,14 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-md border-b bg-white px-4 py-3 hover:bg-gray-100"
+      className="flex flex-grow cursor-pointer flex-row items-start space-x-3 overflow-hidden rounded-md border-b bg-white px-4 py-3 hover:bg-gray-100"
       style={style}
       onClick={onClick}
     >
-      <Status failCount={failCount} />
+      <TestStatus testRun={testRun} />
       <div className="flex flex-grow flex-col space-y-1">
         <div className="flex flex-row justify-between">
           <Title testRun={testRun} />
-          <RunStats testRun={testRun} />
         </div>
         <Attributes selected={isSelected} testRun={testRun} />
       </div>

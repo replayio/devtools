@@ -58,6 +58,11 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
                 duration
                 createdAt
                 metadata
+                comments {
+                  user {
+                    id
+                  }
+                }
               }
             }
           }
@@ -105,6 +110,11 @@ const GET_TEST_RUN = gql`
                 duration
                 createdAt
                 metadata
+                comments {
+                  user {
+                    id
+                  }
+                }
               }
             }
           }

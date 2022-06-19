@@ -16,7 +16,7 @@ export function RunStats({ testRun }: { testRun: TestRun }) {
   return (
     <div className="flex shrink space-x-2">
       {failed > 0 && <Pill styles="text-red-50 bg-red-400" value={failed} />}
-      {passed > 0 && <Pill styles="bg-green-400 text-green-50" value={passed} />}
+      {/* {passed > 0 && <Pill styles="bg-green-400 text-green-50" value={passed} />} */}
     </div>
   );
 }
