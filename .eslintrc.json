@@ -47,6 +47,10 @@
             "name": "protocol/socket",
             "importNames": ["client", "sendMessage", "log"],
             "message": "Please use ThreadFront."
+          },
+          {
+            "name": "lodash",
+            "message": "Please import lodash functions directly."
           }
         ]
       }

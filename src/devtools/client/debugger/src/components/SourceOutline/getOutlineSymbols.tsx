@@ -1,8 +1,8 @@
 import { fuzzySearch } from "../../utils/function";
-import { groupBy, keyBy } from "lodash";
+import groupBy from "lodash/groupBy";
+import keyBy from "lodash/keyBy";
 import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
 import { HitCount } from "../../reducers/sources";
-import { features } from "ui/utils/prefs";
 
 function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[] | null) {
   if (!hitCounts) {

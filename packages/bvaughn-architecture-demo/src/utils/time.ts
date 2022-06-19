@@ -4,7 +4,7 @@ import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
 import { TimeStampedPointRange } from "@replayio/protocol";
-import { padStart } from "lodash";
+import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 
 export function formatDuration(ms: number) {

@@ -4,7 +4,6 @@ import { User } from "ui/state/session";
 import { useGetUserId } from "./users";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";
 import { GetActiveSessions, GetActiveSessionsVariables } from "graphql/GetActiveSessions";
-import { filter } from "lodash";
 
 interface SessionUser extends User {
   sessionId?: string;
