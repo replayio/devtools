@@ -678,6 +678,19 @@ class _ThreadFront {
       : this.currentPause;
   }
 
+  async loadRegion(region: TimeRange, endTime: number) {
+    client.Session.unloadRegion(
+      { region: { begin: 0, end: region.begin } },
+      ThreadFront.sessionId!
+    );
+    client.Session.unloadRegion(
+      { region: { begin: region.end, end: endTime } },
+      ThreadFront.sessionId!
+    );
+
+    await client.Session.loadRegion({ region }, ThreadFront.sessionId!);
+  }
+
   async loadAsyncParentFrames() {
     await this.ensureAllSources();
     const basePause = this.lastAsyncPause();
@@ -698,10 +711,6 @@ class _ThreadFront {
     }
     assert(frames, "no frames");
     return frames.slice(1);
-  }
-
-  loadRegion(region: TimeRange) {
-    return client.Session.loadRegion({ region }, ThreadFront.sessionId!);
   }
 
   pauseForAsyncIndex(asyncIndex?: number) {
