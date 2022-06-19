@@ -1,4 +1,4 @@
-import { orderBy } from "lodash";
+import orderBy from "lodash/orderBy";
 import { useContext, useState } from "react";
 import { TestResultListItem } from "./TestResultListItem";
 import { OverviewContext } from "./OverviewContainer";

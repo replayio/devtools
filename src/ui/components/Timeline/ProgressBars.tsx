@@ -1,4 +1,4 @@
-import { clamp } from "lodash";
+import clamp from "lodash/clamp";
 import React from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import {

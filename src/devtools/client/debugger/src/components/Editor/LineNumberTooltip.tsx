@@ -1,6 +1,6 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
-import { minBy } from "lodash";
+import minBy from "lodash/minBy";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { KeyModifiers } from "ui/components/KeyModifiers";

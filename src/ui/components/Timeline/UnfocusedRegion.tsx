@@ -1,4 +1,4 @@
-import { clamp } from "lodash";
+import clamp from "lodash/clamp";
 import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";

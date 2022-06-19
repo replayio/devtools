@@ -1,6 +1,5 @@
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-import { findIndex } from "lodash";
 import React, { useEffect, useRef, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";

@@ -6,6 +6,8 @@ import type {
   HitCount,
   createPauseResult,
 } from "@replayio/protocol";
+
+// eslint-disable-next-line no-restricted-imports
 import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
 // eslint-disable-next-line no-restricted-imports

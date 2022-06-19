@@ -1,5 +1,5 @@
 import { RecordingId } from "@replayio/protocol";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 import { ReactNode, useContext, useMemo, useState } from "react";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { Recording } from "ui/types";
@@ -29,7 +29,7 @@ function RecordingsError() {
 
   return (
     <section
-      className={`flex flex-col flex-grow space-y-2 items-center justify-center text-lg ${styles.recordingsBackground}`}
+      className={`flex flex-grow flex-col items-center justify-center space-y-2 text-lg ${styles.recordingsBackground}`}
     >
       {msg}
     </section>
