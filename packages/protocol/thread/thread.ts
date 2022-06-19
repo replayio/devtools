@@ -48,7 +48,7 @@ import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
-import { client, log } from "../socket";
+import { client } from "../socket";
 import { defer, assert, EventEmitter, ArrayMap } from "../utils";
 
 import { Pause } from "./pause";
@@ -256,8 +256,6 @@ class _ThreadFront {
     // This helps when trying to debug logRocket sessions and the like
     console.debug({ sessionId });
 
-    log(`GotSessionId ${sessionId}`);
-
     const { buildId } = await client.Session.getBuildId({}, sessionId);
     this.recordingTargetWaiter.resolve(getRecordingTarget(buildId));
   }
@@ -346,8 +344,6 @@ class _ThreadFront {
   }
 
   timeWarp(point: ExecutionPoint, time: number, hasFrames?: boolean, frame?: Frame) {
-    log(`TimeWarp ${point}`);
-
     this.currentPoint = point;
     this.currentTime = time;
     this.currentPointHasFrames = !!hasFrames;
@@ -357,8 +353,6 @@ class _ThreadFront {
   }
 
   timeWarpToPause(pause: Pause) {
-    log(`TimeWarp ${pause.point} using existing pause`);
-
     const { point, time, hasFrames } = pause;
     assert(
       point && time && typeof hasFrames === "boolean",

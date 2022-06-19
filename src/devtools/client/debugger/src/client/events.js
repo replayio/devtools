@@ -5,7 +5,6 @@
 //
 
 const { ThreadFront } = require("protocol/thread");
-const { log } = require("protocol/socket");
 
 let actions;
 
@@ -18,7 +17,6 @@ function setupEvents(dependencies) {
 }
 
 async function paused(_, { point, time, frame }) {
-  log("ThreadFront.paused");
   actions.paused({ thread: ThreadFront.actor, executionPoint: point, time, frame });
 }
 

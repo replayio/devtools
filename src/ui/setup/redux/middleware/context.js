@@ -6,8 +6,6 @@
 
 import { validateContext } from "devtools/client/debugger/src/utils/context";
 
-const { log } = require("protocol/socket");
-
 function validateActionContext(getState, cx, action) {
   // Watch for other actions which are unaffected by thread changes.
 
@@ -30,12 +28,6 @@ function actionLogData(action) {
   return "";
 }
 
-function logAction(action) {
-  const data = actionLogData(action);
-  const status = action.status ? ` [${action.status}]` : "";
-  log(`Debugger ${action.type}${data}${status}`);
-}
-
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
 function context(storeApi) {
@@ -44,8 +36,6 @@ function context(storeApi) {
     if (cx) {
       validateActionContext(storeApi.getState, cx, action);
     }
-
-    logAction(action);
 
     return next(action);
   };

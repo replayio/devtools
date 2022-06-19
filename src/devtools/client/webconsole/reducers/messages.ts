@@ -17,7 +17,6 @@ import { pointEquals } from "protocol/execution-point-utils";
 import { getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
 import { getSourceNames } from "devtools/client/shared/source-utils";
 
-import { log } from "protocol/socket";
 import { assert, compareNumericStrings } from "protocol/utils";
 import { FocusRegion } from "ui/state/timeline";
 
@@ -376,10 +375,7 @@ function addMessage(newMessage: Message, state: MessageState): MessageState {
     const key = `${newMessage.logpointId || newMessage.evalId}:${newMessage.executionPoint}`;
     const existingMessage = state.logpointMessages.entities[key];
     if (existingMessage) {
-      log(`LogpointFinish ${newMessage.executionPoint}`);
       removedIds.push(existingMessage.messageId);
-    } else {
-      log(`LogpointStart ${newMessage.executionPoint}`);
     }
     logpointMessagesAdapter.upsertOne(state.logpointMessages, { key, messageId: newMessage.id });
   }

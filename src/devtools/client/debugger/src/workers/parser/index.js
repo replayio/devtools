@@ -6,16 +6,12 @@
 
 import { WorkerDispatcher } from "devtools/shared/worker-utils";
 
-const { log } = require("protocol/socket");
-
 export class ParserDispatcher extends WorkerDispatcher {
   async clearState() {
-    log(`WorkerDispatch Parser clearState`);
     return this.invoke("clearState");
   }
 
   async getSymbols(sourceId) {
-    log(`WorkerDispatch Parser getSymbols`);
     return this.invoke("getSymbols", sourceId);
   }
 
@@ -26,12 +22,10 @@ export class ParserDispatcher extends WorkerDispatcher {
       contentType: content.contentType || null,
     };
 
-    log(`WorkerDispatch Parser setSource`);
     return this.invoke("setSource", astSource);
   }
 
   async hasSyntaxError(input) {
-    log(`WorkerDispatch Parser hasSyntaxError`);
     return this.invoke("hasSyntaxError", input);
   }
 
