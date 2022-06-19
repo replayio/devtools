@@ -28,7 +28,7 @@ export default function Viewer({
       className={`flex flex-grow flex-col overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
     >
       <div className="flex h-full space-x-4 overflow-y-auto">
-        <div className="flex flex-col flex-grow w-full space-y-5">
+        <div className="flex w-full flex-grow flex-col space-y-5">
           <ViewerHeader
             recordings={recordings}
             selectedIds={selectedIds}
@@ -39,16 +39,16 @@ export default function Viewer({
             setIsEditing={setIsEditing}
           />
           <div className="flex-grow overflow-y-auto">
-            {view === "recordings" ? (
+            {(view === "recordings" || view === "test-results") && (
               <Recordings
+                view={view}
                 isEditing={isEditing}
                 recordings={recordings}
                 selectedIds={selectedIds}
                 setSelectedIds={setSelectedIds}
               />
-            ) : (
-              <TestRunList />
             )}
+            {view === "test-runs" && <TestRunList />}
           </div>
         </div>
         {preview ? <TestRunOverview /> : null}

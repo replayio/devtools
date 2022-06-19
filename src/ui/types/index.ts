@@ -153,7 +153,7 @@ export interface RecordingMetadata {
 }
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
-type TestMetadata = {
+export type TestMetadata = {
   result: "passed" | "failed" | "timedOut";
   title: string;
   version: number;

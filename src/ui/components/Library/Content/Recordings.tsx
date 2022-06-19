@@ -6,7 +6,8 @@ import { Recording } from "ui/types";
 import { isReplayBrowser } from "ui/utils/environment";
 import RecordingRow from "../RecordingRow";
 import styles from "../Library.module.css";
-import { LibraryContext } from "../useFilters";
+import { LibraryContext, View } from "../useFilters";
+import ResultRow from "../ResultRow";
 
 function RecordingsError() {
   const { filter, setAppliedText } = useContext(LibraryContext);
@@ -29,7 +30,7 @@ function RecordingsError() {
 
   return (
     <section
-      className={`flex flex-col flex-grow space-y-2 items-center justify-center text-lg ${styles.recordingsBackground}`}
+      className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg ${styles.recordingsBackground}`}
     >
       {msg}
     </section>
@@ -41,11 +42,13 @@ export function Recordings({
   selectedIds,
   setSelectedIds,
   isEditing,
+  view,
 }: {
   recordings: Recording[];
   selectedIds: string[];
   setSelectedIds: (ids: string[]) => void;
   isEditing: boolean;
+  view: View;
 }) {
   const [showMore, toggleShowMore] = useState(false);
 
@@ -68,16 +71,25 @@ export function Recordings({
 
   return (
     <div
-      className={`recording-list flex flex-col overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+      className={`recording-list flex flex-col space-y-1 overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
     >
-      {shownRecordings.map((r, i) => (
-        <RecordingRow
-          key={i}
-          recording={r}
-          selected={selectedIds.includes(r.id)}
-          {...{ addSelectedId, removeSelectedId, isEditing }}
-        />
-      ))}
+      {shownRecordings.map((r, i) =>
+        view === "recordings" ? (
+          <RecordingRow
+            key={i}
+            recording={r}
+            selected={selectedIds.includes(r.id)}
+            {...{ addSelectedId, removeSelectedId, isEditing }}
+          />
+        ) : (
+          <ResultRow
+            key={i}
+            recording={r}
+            selected={selectedIds.includes(r.id)}
+            {...{ addSelectedId, removeSelectedId, isEditing }}
+          />
+        )
+      )}
       {!showMore && recordings.length > 100 && (
         <div className="flex justify-center p-4">
           <SecondaryButton className="" color="blue" onClick={() => toggleShowMore(!showMore)}>

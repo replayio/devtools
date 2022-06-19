@@ -14,7 +14,7 @@ export type Preview = {
   id: string;
   recordingId?: string | null;
 };
-export type View = "recordings" | "test-runs";
+export type View = "recordings" | "test-runs" | "test-results";
 
 export const LibraryContext = createContext<LibraryContextType>({
   filter: "",

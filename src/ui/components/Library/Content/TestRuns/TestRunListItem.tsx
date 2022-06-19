@@ -6,7 +6,6 @@ import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
-import { SourceMetadata } from "ui/types";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";

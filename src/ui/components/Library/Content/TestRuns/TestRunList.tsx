@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { TestRun, useGetTestRunsForWorkspace } from "ui/hooks/tests";
 import { getWorkspaceId } from "ui/reducers/app";
-import styles from "../../Library.module.css";
 import { LibraryContext } from "../../useFilters";
 import { TestRunListItem } from "./TestRunListItem";
 
