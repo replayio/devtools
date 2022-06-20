@@ -11,7 +11,7 @@ function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "";
   const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
   return (
-    <div className="flex flex-row items-center space-x-2 text-xl font-semibold">
+    <div className="flex flex-row items-center space-x-2 text-xl font-medium">
       <div>{formatted}</div>
     </div>
   );
@@ -27,7 +27,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   const merge = firstRecording.metadata.source?.merge;
 
   return (
-    <div className="items-left flex flex-col flex-wrap space-y-3 text-xs">
+    <div className="flex flex-row flex-wrap items-center text-xs">
       <AttributeContainer icon="schedule">
         {getTruncatedRelativeDate(firstRecording.date)}
       </AttributeContainer>
@@ -51,7 +51,7 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-    <div className="flex flex-col space-y-2  p-4">
+    <div className="flex flex-col space-y-2  p-4 border-b mb-2">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
         <RunStats testRun={testRun} />

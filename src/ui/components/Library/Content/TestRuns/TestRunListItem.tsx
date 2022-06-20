@@ -12,7 +12,7 @@ function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
   return (
-    <div className="wrap flex shrink grow-0 flex-nowrap overflow-hidden text-ellipsis pr-2 font-semibold">
+    <div className="wrap flex shrink grow-0 flex-nowrap overflow-hidden text-ellipsis pr-2 font-medium">
       {formatted}
     </div>
   );
