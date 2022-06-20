@@ -4,14 +4,16 @@ import Icon from "../Icon";
 
 import styles from "./Collapsible.module.css";
 
+export type RenderChildrenFunction = () => ReactNode;
+
 export default function Collapsible({
+  children,
   defaultOpen = false,
   header,
-  renderChildren,
 }: {
+  children: ReactNode;
   defaultOpen?: boolean;
   header: ReactNode;
-  renderChildren: () => ReactNode;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -24,15 +26,7 @@ export default function Collapsible({
         {header}
       </div>
 
-      {isOpen ? (
-        <div className={styles.Children}>
-          <LazyChildren renderProp={renderChildren} />
-        </div>
-      ) : null}
+      {isOpen ? <div className={styles.Children}>{children}</div> : null}
     </div>
   );
-}
-
-function LazyChildren({ renderProp }: { renderProp: () => ReactNode }) {
-  return <>{renderProp()}</>;
 }

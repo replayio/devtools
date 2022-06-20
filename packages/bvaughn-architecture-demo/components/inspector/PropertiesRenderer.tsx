@@ -119,19 +119,27 @@ function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRenderer
   return (
     <Collapsible
       defaultOpen={true}
-      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
-      renderChildren={() =>
-        containerEntries.map(({ key, value }, index) => (
-          <KeyValueRenderer
-            key={index}
-            isNested={true}
-            layout="vertical"
-            pauseId={pauseId}
-            protocolValue={value}
-          />
-        ))
+      children={
+        <ContainerEntriesChildrenRenderer containerEntries={containerEntries} pauseId={pauseId} />
       }
+      header={<span className={styles.BucketLabel}>[[Entries]]</span>}
     />
+  );
+}
+
+function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  return (
+    <>
+      {containerEntries.map(({ key, value }, index) => (
+        <KeyValueRenderer
+          key={index}
+          isNested={true}
+          layout="vertical"
+          pauseId={pauseId}
+          protocolValue={value}
+        />
+      ))}
+    </>
   );
 }
 
@@ -144,48 +152,57 @@ function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
   return (
     <Collapsible
       defaultOpen={true}
+      children={
+        <MapContainerEntriesChildrenRenderer
+          containerEntries={containerEntries}
+          pauseId={pauseId}
+        />
+      }
       header={<span className={styles.BucketLabel}>[[Entries]]</span>}
-      renderChildren={() => {
-        {
-          if (containerEntries.length === 0) {
-            return <div className={styles.NoEntries}>No properties</div>;
-          }
-
-          return containerEntries.map(({ key, value }, index) => (
-            <Collapsible
-              key={index}
-              header={
-                <>
-                  {index}: {"{"}
-                  <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
-                  {" → "}
-                  <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
-                  {"}"}
-                </>
-              }
-              renderChildren={() => (
-                <>
-                  <KeyValueRenderer
-                    before={<div className={styles.MapEntryPrefix}>key</div>}
-                    isNested={true}
-                    layout="vertical"
-                    pauseId={pauseId}
-                    protocolValue={key!}
-                  />
-                  <KeyValueRenderer
-                    before={<div className={styles.MapEntryPrefix}>value</div>}
-                    isNested={true}
-                    layout="vertical"
-                    pauseId={pauseId}
-                    protocolValue={value}
-                  />
-                </>
-              )}
-            />
-          ));
-        }
-      }}
     />
+  );
+}
+
+function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  if (containerEntries.length === 0) {
+    return <div className={styles.NoEntries}>No properties</div>;
+  }
+
+  return (
+    <>
+      {containerEntries.map(({ key, value }, index) => (
+        <Collapsible
+          key={index}
+          children={
+            <>
+              <KeyValueRenderer
+                before={<div className={styles.MapEntryPrefix}>key</div>}
+                isNested={true}
+                layout="vertical"
+                pauseId={pauseId}
+                protocolValue={key!}
+              />
+              <KeyValueRenderer
+                before={<div className={styles.MapEntryPrefix}>value</div>}
+                isNested={true}
+                layout="vertical"
+                pauseId={pauseId}
+                protocolValue={value}
+              />
+            </>
+          }
+          header={
+            <>
+              {index}: {"{"}
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
+              {" → "}
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+              {"}"}
+            </>
+          }
+        />
+      ))}
+    </>
   );
 }
 
@@ -197,34 +214,45 @@ function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
   return (
     <Collapsible
       defaultOpen={true}
+      children={
+        <SetContainerEntriesChildrenRenderer
+          containerEntries={containerEntries}
+          pauseId={pauseId}
+        />
+      }
       header={<span className={styles.BucketLabel}>[[Entries]]</span>}
-      renderChildren={() => {
-        if (containerEntries.length === 0) {
-          return <div className={styles.NoEntries}>No properties</div>;
-        }
-
-        return containerEntries.map(({ value }, index) => (
-          <Collapsible
-            key={index}
-            header={
-              <>
-                {index}: {"{"}
-                <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
-                {"}"}
-              </>
-            }
-            renderChildren={() => (
-              <KeyValueRenderer
-                before={<div className={styles.MapEntryPrefix}>value</div>}
-                isNested={true}
-                layout="vertical"
-                pauseId={pauseId}
-                protocolValue={value}
-              />
-            )}
-          />
-        ));
-      }}
     />
+  );
+}
+
+function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
+  if (containerEntries.length === 0) {
+    return <div className={styles.NoEntries}>No properties</div>;
+  }
+
+  return (
+    <>
+      {containerEntries.map(({ value }, index) => (
+        <Collapsible
+          key={index}
+          children={
+            <KeyValueRenderer
+              before={<div className={styles.MapEntryPrefix}>value</div>}
+              isNested={true}
+              layout="vertical"
+              pauseId={pauseId}
+              protocolValue={value}
+            />
+          }
+          header={
+            <>
+              {index}: {"{"}
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+              {"}"}
+            </>
+          }
+        />
+      ))}
+    </>
   );
 }

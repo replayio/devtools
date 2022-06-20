@@ -1,11 +1,14 @@
 import {
   NamedValue as ProtocolNamedValue,
+  Object as ProtocolObject,
   ObjectId as ProtocolObjectId,
-  PauseId,
-  Property,
+  PauseId as ProtocolPauseId,
+  Property as ProtocolProperty,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import { getObjectThrows } from "../suspense/ObjectPreviews";
+
+type ObjectType = "html" | "map" | "other" | "regexp" | "set";
 
 type ValueType =
   | "array"
@@ -26,23 +29,52 @@ export type Value = {
   type: ValueType;
 };
 
-export function filterNonEnumerableProperties(properties: Property[]): Property[] {
+export function filterNonEnumerableProperties(properties: ProtocolProperty[]): ProtocolProperty[] {
   // See https://static.replay.io/protocol/tot/Pause/#type-PropertyConfigurationFlags
   return properties.filter(property => property.flags == null || property.flags & 4);
+}
+
+export function getObjectType(objectWithPreview: ProtocolObject): ObjectType {
+  switch (objectWithPreview.className) {
+    case "Map":
+    case "WeakMap":
+      return "map";
+      break;
+    case "RegExp":
+      return "regexp";
+      break;
+    case "Set":
+    case "WeakSet":
+      return "set";
+      break;
+    default:
+      if (
+        (objectWithPreview.className.startsWith("HTML") ||
+          objectWithPreview.className === "Text") &&
+        objectWithPreview.preview?.node != null
+      ) {
+        return "html";
+      } else {
+        return "other";
+      }
+      break;
+  }
 }
 
 // TODO It would be nice if the protocol's Value objects used a consistent format.
 // As it is, these values have conditional fields which require special handling.
 // This utility function maps from one ot the other.
+//
+// See https://linear.app/replay/issue/BAC-1808
 export function reformatValue(
-  pauseId: PauseId,
+  pauseId: ProtocolPauseId,
   protocolValue: ProtocolValue | ProtocolNamedValue
 ): Value {
   const name = protocolValue.hasOwnProperty("name")
     ? (protocolValue as ProtocolNamedValue).name
     : null;
 
-  // TODO Do we need special handling for "uninitialized" or "unavailable" values?
+  // TODO (inspector) Do we need special handling for "uninitialized" or "unavailable" values?
 
   if (protocolValue.hasOwnProperty("value")) {
     const value = protocolValue.value;

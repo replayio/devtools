@@ -3,6 +3,7 @@ import { FC, memo, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
+import { getObjectType } from "../../src/utils/protocol";
 
 import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
@@ -58,24 +59,22 @@ export default memo(function ValueRenderer({
           break;
         case "object":
         default:
-          switch (object.className) {
-            case "Map":
-            case "WeakMap":
+          switch (getObjectType(object)) {
+            case "html":
+              ObjectPreviewRenderer = HTMLElementRenderer;
+              break;
+            case "map":
               ObjectPreviewRenderer = MapRenderer;
               break;
-            case "RegExp":
+            case "regexp":
               ObjectPreviewRenderer = RegExpRenderer;
               break;
-            case "Set":
-            case "WeakSet":
+            case "set":
               ObjectPreviewRenderer = SetRenderer;
               break;
+            case "other":
             default:
-              if (object.className.startsWith("HTML") && object.preview?.node != null) {
-                ObjectPreviewRenderer = HTMLElementRenderer;
-              } else {
-                ObjectPreviewRenderer = ObjectRenderer;
-              }
+              ObjectPreviewRenderer = ObjectRenderer;
               break;
           }
           break;

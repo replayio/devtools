@@ -1,11 +1,13 @@
-import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
+import { getObjectType } from "../../src/utils/protocol";
 
 import Collapsible from "./Collapsible";
+import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
 import styles from "./KeyValueRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
@@ -40,16 +42,38 @@ export default function KeyValueRenderer({
 
   const { objectId, name, type } = clientValue;
 
+  let objectWithPreview: ProtocolObject | null = null;
+  let isHTMLType = false;
   let showCollapsibleView = false;
   if (enableInspection) {
     switch (type) {
       case "array":
       case "function":
       case "object": {
-        showCollapsibleView = true;
+        objectWithPreview = getObjectWithPreview(client, pauseId, objectId!);
+        if (objectWithPreview == null) {
+          throw Error(`Could not find object with ID "${objectId}"`);
+        }
+
+        if (getObjectType(objectWithPreview) === "html") {
+          isHTMLType = true;
+
+          if (
+            objectWithPreview.preview?.node?.childNodes != null &&
+            objectWithPreview.preview.node.childNodes.length > 0
+          ) {
+            // Don't show the expand/collapse toggle for HTML elements that have no children.
+            // This is what Chrome does and we're mimicking it.
+            showCollapsibleView = true;
+            console.log("showCollapsibleView?", objectWithPreview);
+          }
+        } else {
+          showCollapsibleView = true;
+        }
       }
     }
   }
+  console.log("<KeyValueRenderer>", protocolValue, objectWithPreview);
 
   const keyValue = (
     <div
@@ -70,23 +94,22 @@ export default function KeyValueRenderer({
   );
 
   if (showCollapsibleView) {
-    const object = getObjectWithPreview(client, pauseId, objectId!);
-    if (object == null) {
-      throw Error(`Could not find object with ID "${objectId}"`);
+    let children;
+    if (isHTMLType) {
+      children = (
+        <Suspense fallback="Loading...">
+          <HTMLChildrenRenderer object={objectWithPreview!} pauseId={pauseId} />
+        </Suspense>
+      );
+    } else {
+      children = (
+        <Suspense fallback="Loading...">
+          <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
+        </Suspense>
+      );
     }
 
-    // TODO (inspector) If this is an HTMLElement, render an HTMLPropertiesRenderer (which shows HTML children only)
-
-    return (
-      <Collapsible
-        header={keyValue}
-        renderChildren={() => (
-          <Suspense fallback="Loading...">
-            <PropertiesRenderer object={object} pauseId={pauseId} />
-          </Suspense>
-        )}
-      />
-    );
+    return <Collapsible children={children} header={keyValue} />;
   } else {
     return keyValue;
   }
