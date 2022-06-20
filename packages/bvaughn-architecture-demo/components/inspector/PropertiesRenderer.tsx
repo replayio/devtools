@@ -81,6 +81,7 @@ export default function PropertiesRenderer({
       {getterValues.map((property, index) => (
         <KeyValueRenderer
           key={`getterValue-${index}`}
+          isNested={true}
           layout="vertical"
           pauseId={pauseId}
           protocolValue={property}
@@ -90,6 +91,7 @@ export default function PropertiesRenderer({
       {properties.map((property, index) => (
         <KeyValueRenderer
           key={`property-${index}`}
+          isNested={true}
           layout="vertical"
           pauseId={pauseId}
           protocolValue={property}
@@ -120,7 +122,13 @@ function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRenderer
       header={<span className={styles.BucketLabel}>[[Entries]]</span>}
       renderChildren={() =>
         containerEntries.map(({ key, value }, index) => (
-          <KeyValueRenderer key={index} layout="vertical" pauseId={pauseId} protocolValue={value} />
+          <KeyValueRenderer
+            key={index}
+            isNested={true}
+            layout="vertical"
+            pauseId={pauseId}
+            protocolValue={value}
+          />
         ))
       }
     />
@@ -159,12 +167,14 @@ function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
                 <>
                   <KeyValueRenderer
                     before={<div className={styles.MapEntryPrefix}>key</div>}
+                    isNested={true}
                     layout="vertical"
                     pauseId={pauseId}
                     protocolValue={key!}
                   />
                   <KeyValueRenderer
                     before={<div className={styles.MapEntryPrefix}>value</div>}
+                    isNested={true}
                     layout="vertical"
                     pauseId={pauseId}
                     protocolValue={value}
@@ -206,6 +216,7 @@ function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
             renderChildren={() => (
               <KeyValueRenderer
                 before={<div className={styles.MapEntryPrefix}>value</div>}
+                isNested={true}
                 layout="vertical"
                 pauseId={pauseId}
                 protocolValue={value}

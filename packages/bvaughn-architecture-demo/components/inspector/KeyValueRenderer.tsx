@@ -30,8 +30,8 @@ export default function KeyValueRenderer({
 }: {
   before?: ReactNode;
   enableInspection?: boolean;
-  isNested?: boolean;
-  layout?: "horizontal" | "vertical";
+  isNested: boolean;
+  layout: "horizontal" | "vertical";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {

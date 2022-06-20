@@ -21,6 +21,7 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
           <span key={index} className={styles.Value}>
             <KeyValueRenderer
               enableInspection={false}
+              isNested={true}
               layout="horizontal"
               pauseId={pauseId}
               protocolValue={property}
