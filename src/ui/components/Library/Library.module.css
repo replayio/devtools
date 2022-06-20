@@ -28,7 +28,7 @@
 }
 
 :root:global(.theme-dark) .recordingList {
-  background-color: var(--theme-base-100);
+  background-color: red;
 }
 
 :root:global(.theme-dark) .dropdownDivider {
@@ -60,6 +60,11 @@
 :root:global(.theme-dark) .workspaceName {
   color: #fff;
 }
+
+/* Dark theme testsuites */
+
+
+
 
 /* Light */
 

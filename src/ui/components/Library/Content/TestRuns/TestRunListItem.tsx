@@ -7,6 +7,7 @@ import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
 import { SourceMetadata } from "ui/types";
+import styles from "../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";
@@ -64,10 +65,11 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 hover:bg-gray-50"
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 hover:bg-red-50 ${styles.libraryRow}`}
       style={style}
       onClick={onClick}
     >
+    
       <Status failCount={failCount} />
       <div className="flex flex-grow flex-col space-y-1">
         <div className="flex flex-row justify-between">
