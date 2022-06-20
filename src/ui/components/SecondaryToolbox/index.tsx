@@ -10,7 +10,6 @@ import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { ReduxDevToolsPanel } from "./ReduxDevTools";
 
-import { UIState } from "ui/state";
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
@@ -21,7 +20,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
-import { StartablePanelName } from "ui/utils/devtools-toolbox";
 import ReplayLogo from "../shared/ReplayLogo";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
@@ -51,10 +49,6 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
   const onClick = (panel: SecondaryPanelName) => {
     dispatch(setSelectedPanel(panel));
     trackEvent(`toolbox.secondary.${panel}_select`);
-
-    if (["debugger", "inspector", "react-components"].includes(panel)) {
-      gToolbox.selectTool(panel as StartablePanelName);
-    }
   };
 
   return (

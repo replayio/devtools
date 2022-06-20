@@ -42,7 +42,6 @@ export const initialAppState: AppState = {
   events: {},
   expectedError: null,
   hoveredLineNumberLocation: null,
-  initializedPanels: [],
   isNodePickerActive: false,
   isNodePickerInitializing: false,
   loadedRegions: null,
@@ -115,9 +114,7 @@ const appSlice = createSlice({
     updateTheme(state, action: PayloadAction<AppTheme>) {
       state.theme = action.payload;
     },
-    setInitializedPanels(state, action: PayloadAction<PanelName>) {
-      state.initializedPanels.push(action.payload);
-    },
+
     setLoading(state, action: PayloadAction<number>) {
       state.loading = action.payload;
     },
@@ -209,7 +206,6 @@ export const {
   setEventsForType,
   setExpectedError,
   setHoveredLineNumberLocation,
-  setInitializedPanels,
   setIsNodePickerActive,
   setIsNodePickerInitializing,
   setLoadedRegions,
@@ -240,7 +236,6 @@ export const getTheme = (state: UIState) =>
 export const getThemePreference = (state: UIState) => state.app.theme;
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
-export const getInitializedPanels = (state: UIState) => state.app.initializedPanels;
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
 
 export const getLoading = (state: UIState) => state.app.loading;

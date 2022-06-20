@@ -3,18 +3,16 @@ import { NodeFront, WiredEventListener } from "protocol/thread/node";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
+import Selection from "devtools/client/framework/selection";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
-export const EventListenersApp: FC = () => {
+export const EventListenersApp = ({ selection }: { selection: Selection }) => {
   const selectedNode = useRef<NodeFront | null>(null);
   const [listeners, setListeners] = useState<AnyListener[]>([]);
 
   useEffect(() => {
-    if (!gToolbox) {
-      return;
-    }
-
+    console.log("EventLstenersApp");
     const handler = async (node: NodeFront | null) => {
       selectedNode.current = node;
 
@@ -29,20 +27,20 @@ export const EventListenersApp: FC = () => {
     };
 
     // try getting listeners of the current selection
-    const nodeFront = gToolbox.selection.nodeFront;
+    const nodeFront = selection.nodeFront;
     if (!!nodeFront) {
       handler(nodeFront);
     }
 
-    // in either case, subscribe to changes to the selection
-    window.gToolbox.selection.on("new-node-front", handler);
-    window.gToolbox.selection.on("detached-front", handler);
+    // // in either case, subscribe to changes to the selection
+    selection.on("new-node-front", handler);
+    selection.on("detached-front", handler);
 
     return () => {
-      window.gToolbox.selection.off("new-node-front", handler);
-      window.gToolbox.selection.off("detached-front", handler);
+      selection.off("new-node-front", handler);
+      selection.off("detached-front", handler);
     };
-  }, []);
+  }, [selection]);
 
   const groupedSortedListeners: [string, AnyListener[]][] = useMemo(() => {
     // group listenerss by event type
@@ -100,15 +98,7 @@ export const EventListenersApp: FC = () => {
                             <span
                               className="cursor-pointer underline hover:text-gray-500"
                               title="Open in Debugger"
-                              onClick={() => {
-                                gToolbox.viewSourceInDebugger(
-                                  locationUrl,
-                                  location.line,
-                                  location.column,
-                                  location.sourceId,
-                                  true
-                                );
-                              }}
+                              onClick={() => {}}
                             >
                               {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:
                               {location.line}

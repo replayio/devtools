@@ -10,18 +10,18 @@
  */
 export function openLink(url) {
   return () => {
-    window.gToolbox.getPanel("debugger")?.openLink(url);
+    console.log("openLink", url);
   };
 }
 
 export function openElementInInspectorCommand(grip) {
   return () => {
-    window.gToolbox.getPanel("debugger")?.openElementInInspector(grip);
+    console.log("openElementInInspectorCommand", grip);
   };
 }
 
 export function openInspector(grip) {
   return () => {
-    window.gToolbox.getPanel("debugger")?.openInspector();
+    console.log("openInspector", grip);
   };
 }

@@ -31,7 +31,6 @@ import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
 import timeline, { pointsReceived, setPlaybackStalled } from "ui/reducers/timeline";
-import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 import {
   setMouseDownEventsCallback,
@@ -43,6 +42,8 @@ import {
 } from "protocol/graphics";
 
 import { extendStore, AppStore } from "../store";
+import * as inspectorReducers from "devtools/client/inspector/reducers";
+
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { UnexpectedError } from "ui/state/app";
@@ -51,7 +52,6 @@ const { setupApp, setupTimeline } = actions;
 
 declare global {
   interface Window {
-    gToolbox: DevToolsToolbox;
     L10N: any;
     hasAlreadyBootstrapped: boolean;
   }
@@ -65,7 +65,6 @@ declare global {
     };
     debugger?: any;
   }
-  const gToolbox: DevToolsToolbox;
 }
 
 enum SessionError {
@@ -124,8 +123,6 @@ export default async function DevTools(store: AppStore) {
   const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
   assert(dispatchUrl, "no dispatchUrl");
 
-  window.gToolbox = new DevToolsToolbox();
-
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
   window.app = window.app || {};
@@ -163,6 +160,7 @@ export default async function DevTools(store: AppStore) {
   };
 
   extendStore(store, initialState, reducers, extraThunkArgs);
+  extendStore(store, {}, inspectorReducers, {});
 
   dbgClient.bootstrap(store);
 

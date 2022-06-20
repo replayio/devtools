@@ -92,7 +92,6 @@ export interface AppState {
   events: Events;
   expectedError: ExpectedError | null;
   hoveredLineNumberLocation: Location | null;
-  initializedPanels: PanelName[];
   isNodePickerActive: boolean;
   isNodePickerInitializing: boolean;
   loadedRegions: LoadedRegions | null;

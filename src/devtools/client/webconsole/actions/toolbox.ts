@@ -9,7 +9,12 @@ import type { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
-
+import { selectSource } from "devtools/client/debugger/src/actions/sources";
+import {
+  getSourceByActorId,
+  getSourceByURL,
+  getContext,
+} from "devtools/client/debugger/src/selectors";
 type $FixTypeLater = any;
 
 export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
@@ -18,7 +23,7 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
       return;
     }
 
-    const highlighter = window.gToolbox.getHighlighter();
+    const highlighter = window.gInspector.getHighlighter();
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
       highlighter.highlight(nodeFront);
@@ -28,7 +33,7 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 
 export function unHighlightDomElement(): UIThunkAction {
   return () => {
-    const highlighter = window.gToolbox.getHighlighter();
+    const highlighter = window.gInspector.getHighlighter();
     if (highlighter) {
       highlighter.unhighlight();
     }
@@ -42,13 +47,12 @@ export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promi
       ThreadFront.timeWarpToPause(pause);
     }
 
-    window.gToolbox.selectTool("inspector");
     dispatch(setSelectedPanel("inspector"));
 
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
-    await window.gToolbox.selection.setNodeFront(nodeFront, {
+    await window.gInspector.selection.setNodeFront(nodeFront, {
       reason: "console",
     });
   };
@@ -79,13 +83,20 @@ export function onViewSourceInDebugger(
   frame: $FixTypeLater,
   openSourcesTab: $FixTypeLater
 ): UIThunkAction {
-  return () => {
-    window.gToolbox.viewSourceInDebugger(
-      frame.url,
-      frame.line,
-      frame.column,
-      frame.sourceId,
-      openSourcesTab
-    );
+  return (dispatch, getState) => {
+    const cx = getContext(getState());
+    const source = frame.sourceId
+      ? getSourceByActorId(getState(), frame.sourceId)
+      : getSourceByURL(getState(), frame.url);
+    if (source) {
+      dispatch(
+        selectSource(
+          cx,
+          frame.sourceId,
+          { sourceId: frame.sourceId, line: frame.line, column: frame.column },
+          openSourcesTab
+        )
+      );
+    }
   };
 }

@@ -8,7 +8,7 @@ const { assert } = require("protocol/utils");
 const mapValues = require("lodash/mapValues");
 const isEqual = require("lodash/isEqual");
 
-const dbg = gToolbox.getPanel("debugger").getVarsForTests();
+const dbg = window.app;
 
 export function waitForTime(ms, waitingFor) {
   console.log(`waiting ${ms}ms for ${waitingFor}`);
@@ -106,7 +106,7 @@ function selectConsole() {
 }
 
 function selectDebugger() {
-  return gToolbox.selectTool("debugger");
+  console.log("selectDebugger");
 }
 
 async function selectInspector() {
@@ -634,14 +634,6 @@ async function toggleMappedSources() {
   return clickElement(".mapped-source button");
 }
 
-async function playbackRecording() {
-  const timeline = await waitUntil(() => gToolbox.timeline, {
-    waitingFor: "timeline to be visible",
-  });
-  timeline.startPlayback();
-  await waitUntil(() => !timeline.state.playback, { waitingFor: "playback to start" });
-}
-
 async function findMarkupNode(text) {
   return waitUntil(
     () => {
@@ -706,8 +698,8 @@ async function getMarkupCanvasCoordinate(text, iframes = []) {
 }
 
 async function pickNode(x, y) {
-  gToolbox.nodePicker.clickNodePickerButton();
-  gToolbox.nodePicker.nodePickerMouseClickInCanvas({ x, y });
+  window.gNodePicker.clickNodePickerButton();
+  window.gNodePicker.nodePickerMouseClickInCanvas({ x, y });
 }
 
 async function selectMarkupNode(node) {
@@ -935,7 +927,6 @@ const testCommands = {
   addEventListenerLogpoints,
   toggleExceptionLogging,
   toggleMappedSources,
-  playbackRecording,
   findMarkupNode,
   toggleMarkupNode,
   searchMarkup,

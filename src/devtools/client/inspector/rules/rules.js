@@ -81,7 +81,7 @@ class RulesView {
   }
 
   destroy() {
-    // this.inspector.sidebar.off("select", this.onSelection);
+    this.inspector.sidebar.off("select", this.onSelection);
     this.selection.off("detached-front", this.onSelection);
     this.selection.off("new-node-front", this.onSelection);
 
