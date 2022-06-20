@@ -29,7 +29,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   return (
     <div className="flex flex-col">
       <div
-        className=" sticky top-0 bg-gray-100 p-2 pl-3 font-bold hover:cursor-pointer hover:bg-gray-200"
+        className=" top-0 p-2 pl-4 font-medium hover:cursor-pointer hover:bg-gray-50"
         onClick={() => setExpanded(!expanded)}
       >
         {count} {label} Test{count > 1 ? "s" : ""}

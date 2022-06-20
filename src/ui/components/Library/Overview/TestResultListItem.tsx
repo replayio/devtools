@@ -56,7 +56,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
 
   return (
     <a
-      className={`group flex items-center pr-2 transition duration-150 hover:bg-gray-50`}
+      className={`group flex items-center px-2 transition duration-150 hover:bg-gray-50`}
       href={`/recording/${recordingId}`}
       target="_blank"
       rel="noreferrer noopener"
