@@ -10,11 +10,16 @@
 }
 
 :root:global(.theme-dark) .libraryRow {
+  color: var(--body-color);
   background-color: var(--body-bgcolor);
 }
 
 :root:global(.theme-dark) .libraryRow:hover {
-  background-color: var(--theme-base-90);
+  background-color: #1c2534;
+}
+
+:root:global(.theme-dark) .libraryRowSelected {
+  background-color: #14243e;
 }
 
 :root:global(.theme-dark) .teamRow:hover,
@@ -28,7 +33,7 @@
 }
 
 :root:global(.theme-dark) .recordingList {
-  background-color: red;
+  background-color: var(--theme-base-100);
 }
 
 :root:global(.theme-dark) .dropdownDivider {
@@ -63,6 +68,10 @@
 
 /* Dark theme testsuites */
 
+:root:global(.theme-dark) .red {
+  background-color: #fff;
+}
+
 
 
 
@@ -79,10 +88,15 @@
 
 :root:global(.theme-light) .libraryRow {
   background-color: var(--theme-base-100);
+  color: var(--body-color);
 }
 
 :root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
+}
+
+:root:global(.theme-light) .libraryRowSelected {
+  background-color: rgb(233 246 255);
 }
 
 :root:global(.theme-light) .teamRow:hover,
