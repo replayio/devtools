@@ -1,5 +1,5 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { FC, useContext } from "react";
+import { FC, memo, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
@@ -19,12 +19,14 @@ import { ObjectPreviewRendererProps } from "./values/types";
 // This renderer only renders a value (no name) and can be used with both horizontal and vertical layouts.
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ValueRenderer({
+export default memo(function ValueRenderer({
   isNested,
+  layout = "horizontal",
   pauseId,
   protocolValue,
 }: {
   isNested: boolean;
+  layout?: "horizontal" | "vertical";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
@@ -39,12 +41,12 @@ export default function ValueRenderer({
     case "object": {
       const { objectId, type } = clientValue;
 
-      const object = getObjectWithPreview(client, pauseId, objectId!);
+      // Preview can overflow when rendering inline/horizontal mode.
+      const noOverflow = layout === "vertical";
+      const object = getObjectWithPreview(client, pauseId, objectId!, noOverflow);
       if (object == null) {
         throw Error(`Could not find object with ID "${objectId}"`);
       }
-
-      // TODO (inspector) Handle HTML elements (e.g. <div class="foo"></div>)
 
       let ObjectPreviewRenderer: FC<ObjectPreviewRendererProps> | null = null;
       switch (type) {
@@ -85,4 +87,4 @@ export default function ValueRenderer({
       return <ClientValueValueRenderer clientValue={clientValue} isNested={isNested} />;
     }
   }
-}
+});

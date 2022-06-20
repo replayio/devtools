@@ -60,7 +60,12 @@ export default function KeyValueRenderer({
     >
       {before}
       {name != null ? <span className={styles.Name}>{name}</span> : null}
-      <ValueRenderer isNested={isNested} pauseId={pauseId} protocolValue={protocolValue} />
+      <ValueRenderer
+        isNested={isNested}
+        layout={layout}
+        pauseId={pauseId}
+        protocolValue={protocolValue}
+      />
     </div>
   );
 
@@ -69,6 +74,8 @@ export default function KeyValueRenderer({
     if (object == null) {
       throw Error(`Could not find object with ID "${objectId}"`);
     }
+
+    // TODO (inspector) If this is an HTMLElement, render an HTMLPropertiesRenderer (which shows HTML children only)
 
     return (
       <Collapsible

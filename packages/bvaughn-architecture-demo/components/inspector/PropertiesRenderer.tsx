@@ -16,8 +16,6 @@ import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 import ValueRenderer from "./ValueRenderer";
 
-// TODO (inspector) Should we be alpha-sorting properties by name?
-
 // TODO (inspector) Make sure we're handler getter/setter and prototype props correctly.
 // e.g. We currently render "length: 0" twice for Arrays.
 // Maybe we need to merge and sort these three collections somehow?
