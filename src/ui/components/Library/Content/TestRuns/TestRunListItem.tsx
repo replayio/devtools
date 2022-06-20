@@ -64,7 +64,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b bg-white px-4 py-3 hover:bg-gray-50"
+      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 hover:bg-gray-50"
       style={style}
       onClick={onClick}
     >

@@ -26,7 +26,7 @@ export function OverviewContainer({ children }: { children: ReactNode }) {
   return (
     <OverviewContext.Provider value={{ testRun, loading } as OverviewContextType}>
       <div
-        className="flex flex-col overflow-hidden text-sm bg-white rounded-md shadow-md"
+        className="flex flex-col overflow-hidden text-sm bg-themeBase-100 rounded-md shadow-md"
         style={{ width: "50rem" }}
       >
         {children}
