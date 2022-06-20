@@ -17,7 +17,7 @@ import KeyValueRenderer from "./KeyValueRenderer";
 //         <li>Text...</li>
 //      ▼ <li>
 //            <h3>Header</h3>
-//            <section>Some more text...</section>
+//            Text in a text node...
 //         </li>
 export default function HTMLChildrenRenderer({
   object,
@@ -48,7 +48,7 @@ function HTMLChildRenderer({
   pauseId: ProtocolPauseId;
 }) {
   const client = useContext(ReplayClientContext);
-  const objectWithPreview = getObjectWithPreview(client, pauseId, objectId!);
+  const object = getObjectWithPreview(client, pauseId, objectId, true);
 
   // HACK
   const protocolValue = { object: objectId };
@@ -56,7 +56,7 @@ function HTMLChildRenderer({
   return (
     <KeyValueRenderer
       isNested={true}
-      layout="horizontal"
+      layout="vertical"
       pauseId={pauseId}
       protocolValue={protocolValue}
     />

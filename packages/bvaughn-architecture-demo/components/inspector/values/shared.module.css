@@ -139,7 +139,3 @@
   display: flex;
   margin-left: 1ch;
 }
-
-.ToggleAlignmentPadding {
-  margin-left: calc(1rem + 0.5ch);
-}

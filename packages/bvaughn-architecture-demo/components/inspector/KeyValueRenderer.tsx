@@ -7,11 +7,12 @@ import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 import { getObjectType } from "../../src/utils/protocol";
 
 import Collapsible from "./Collapsible";
-import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
+import HTMLCollapsible from "./HTMLCollapsible";
 import styles from "./KeyValueRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
+import HTMLElementRenderer from "./values/HTMLElementRenderer";
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //
@@ -43,7 +44,6 @@ export default function KeyValueRenderer({
   const { objectId, name, type } = clientValue;
 
   let objectWithPreview: ProtocolObject | null = null;
-  let isHTMLType = false;
   let showCollapsibleView = false;
   if (enableInspection) {
     switch (type) {
@@ -56,16 +56,38 @@ export default function KeyValueRenderer({
         }
 
         if (getObjectType(objectWithPreview) === "html") {
-          isHTMLType = true;
+          // HTMLElements require nested preview objects to be loaded also in order to properly render inline.
+          // This is because text node children and HTML element children are treated differently.
+          // Text node children may be rendered as part of the inline preview, if there is only one child.
+          if (objectWithPreview.preview!.overflow) {
+            objectWithPreview = getObjectWithPreview(client, pauseId, objectId!, true);
+          }
 
-          if (
-            objectWithPreview.preview?.node?.childNodes != null &&
-            objectWithPreview.preview.node.childNodes.length > 0
-          ) {
-            // Don't show the expand/collapse toggle for HTML elements that have no children.
-            // This is what Chrome does and we're mimicking it.
-            showCollapsibleView = true;
-            console.log("showCollapsibleView?", objectWithPreview);
+          const childNodes = objectWithPreview.preview?.node?.childNodes ?? [];
+          const htmlElementChildren = childNodes.filter(childNodeId => {
+            const childNode = getObjectWithPreview(client, pauseId, childNodeId);
+            return childNode.className !== "Text";
+          });
+
+          // Only show the expand/collapse toggle for HTML elements that have HTMLElements as children.
+          // Children that are text nodes will be rendered inline, as part of the value/preview.
+          if (htmlElementChildren.length > 0) {
+            return (
+              <div className={classNames(styles.KeyValue)}>
+                <HTMLCollapsible
+                  before={
+                    <>
+                      {before}
+                      {name != null ? <span className={styles.Name}>{name}</span> : null}
+                    </>
+                  }
+                  object={objectWithPreview!}
+                  pauseId={pauseId}
+                />
+              </div>
+            );
+          } else {
+            showCollapsibleView = false;
           }
         } else {
           showCollapsibleView = true;
@@ -73,9 +95,8 @@ export default function KeyValueRenderer({
       }
     }
   }
-  console.log("<KeyValueRenderer>", protocolValue, objectWithPreview);
 
-  const keyValue = (
+  const header = (
     <div
       className={classNames(
         styles.KeyValue,
@@ -94,23 +115,17 @@ export default function KeyValueRenderer({
   );
 
   if (showCollapsibleView) {
-    let children;
-    if (isHTMLType) {
-      children = (
-        <Suspense fallback="Loading...">
-          <HTMLChildrenRenderer object={objectWithPreview!} pauseId={pauseId} />
-        </Suspense>
-      );
-    } else {
-      children = (
-        <Suspense fallback="Loading...">
-          <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
-        </Suspense>
-      );
-    }
-
-    return <Collapsible children={children} header={keyValue} />;
+    return (
+      <Collapsible
+        children={
+          <Suspense fallback="Loading...">
+            <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
+          </Suspense>
+        }
+        header={header}
+      />
+    );
   } else {
-    return keyValue;
+    return header;
   }
 }

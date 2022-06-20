@@ -17,6 +17,8 @@ export default function Collapsible({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  // TODO (inspector) Use the Offscreen API to preserve child component state?
+
   return (
     <div className={styles.Collapsible}>
       <div className={styles.PreviewRow} onClick={() => setIsOpen(!isOpen)}>
