@@ -7055,6 +7055,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xstate/fsm@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@xstate/fsm@npm:2.0.0"
+  checksum: 8da3e3b726cb02e6a7ae7fc912917fe5892e37511c62af4b07339675910ee4ed4c2dc99b520e529ff14b5f3ff519f7a613e15fda0cf01e3cc7359a2200df322c
+  languageName: node
+  linkType: hard
+
 "@xtuc/ieee754@npm:^1.2.0":
   version: 1.2.0
   resolution: "@xtuc/ieee754@npm:1.2.0"
@@ -16798,6 +16805,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.8.1
+    "@xstate/fsm": ^2.0.0
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     lodash: ^4.17.21
