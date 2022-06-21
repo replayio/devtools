@@ -66,14 +66,6 @@
   color: #fff;
 }
 
-/* Dark theme testsuites */
-
-:root:global(.theme-dark) .red {
-  background-color: #fff;
-}
-
-
-
 
 /* Light */
 
