@@ -22831,6 +22831,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"test-subpackage@workspace:packages/test-subpackage":
+  version: 0.0.0-use.local
+  resolution: "test-subpackage@workspace:packages/test-subpackage"
+  languageName: unknown
+  linkType: soft
+
 "text-table@npm:^0.2.0":
   version: 0.2.0
   resolution: "text-table@npm:0.2.0"
