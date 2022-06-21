@@ -3,7 +3,6 @@ import { FC, memo, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-import { getObjectType } from "../../src/utils/protocol";
 
 import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
@@ -35,55 +34,43 @@ export default memo(function ValueRenderer({
   const clientValue = useClientValue(protocolValue, pauseId);
 
   // TODO (inspector) Handle getters – Lazily fetch values only after user input.
+  let ObjectPreviewRenderer: FC<ObjectPreviewRendererProps> | null = null;
 
   switch (clientValue.type) {
     case "array":
+      ObjectPreviewRenderer = ArrayRenderer;
+      break;
     case "function":
-    case "object": {
-      const { objectId, type } = clientValue;
-
-      // Preview can overflow when rendering inline/horizontal mode.
-      const noOverflow = layout === "vertical";
-      const object = getObjectWithPreview(client, pauseId, objectId!, noOverflow);
-      if (object == null) {
-        throw Error(`Could not find object with ID "${objectId}"`);
-      }
-
-      let ObjectPreviewRenderer: FC<ObjectPreviewRendererProps> | null = null;
-      switch (type) {
-        case "array":
-          ObjectPreviewRenderer = ArrayRenderer;
-          break;
-        case "function":
-          ObjectPreviewRenderer = FunctionRenderer;
-          break;
-        case "object":
-        default:
-          switch (getObjectType(object)) {
-            case "html":
-              ObjectPreviewRenderer = HTMLElementRenderer;
-              break;
-            case "map":
-              ObjectPreviewRenderer = MapRenderer;
-              break;
-            case "regexp":
-              ObjectPreviewRenderer = RegExpRenderer;
-              break;
-            case "set":
-              ObjectPreviewRenderer = SetRenderer;
-              break;
-            case "other":
-            default:
-              ObjectPreviewRenderer = ObjectRenderer;
-              break;
-          }
-          break;
-      }
-
-      return <ObjectPreviewRenderer object={object} pauseId={pauseId} />;
-    }
-    default: {
-      return <ClientValueValueRenderer clientValue={clientValue} isNested={isNested} />;
-    }
+      ObjectPreviewRenderer = FunctionRenderer;
+      break;
+    case "html-element":
+    case "html-text":
+      ObjectPreviewRenderer = HTMLElementRenderer;
+      break;
+    case "map":
+      ObjectPreviewRenderer = MapRenderer;
+      break;
+    case "regexp":
+      ObjectPreviewRenderer = RegExpRenderer;
+      break;
+    case "set":
+      ObjectPreviewRenderer = SetRenderer;
+      break;
+    case "object":
+      ObjectPreviewRenderer = ObjectRenderer;
+      break;
   }
+
+  if (ObjectPreviewRenderer !== null) {
+    // Preview can overflow when rendering inline/horizontal mode.
+    const noOverflow = layout === "vertical";
+    const object = getObjectWithPreview(client, pauseId, clientValue.objectId!, noOverflow);
+    if (object == null) {
+      throw Error(`Could not find object with ID "${clientValue.objectId}"`);
+    }
+
+    return <ObjectPreviewRenderer object={object} pauseId={pauseId} />;
+  }
+
+  return <ClientValueValueRenderer clientValue={clientValue} isNested={isNested} />;
 });

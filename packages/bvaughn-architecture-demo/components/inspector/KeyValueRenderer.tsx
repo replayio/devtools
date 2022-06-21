@@ -4,7 +4,6 @@ import { ReactNode, Suspense, useContext } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-import { getObjectType } from "../../src/utils/protocol";
 
 import Loader from "../Loader";
 
@@ -51,13 +50,18 @@ export default function KeyValueRenderer({
     switch (type) {
       case "array":
       case "function":
-      case "object": {
+      case "html-element":
+      case "html-text":
+      case "map":
+      case "object":
+      case "regexp":
+      case "set": {
         objectWithPreview = getObjectWithPreview(client, pauseId, objectId!);
         if (objectWithPreview == null) {
           throw Error(`Could not find object with ID "${objectId}"`);
         }
 
-        if (getObjectType(objectWithPreview) === "html") {
+        if (clientValue.type === "html-element" || clientValue.type === "html-text") {
           // HTMLElements require nested preview objects to be loaded also in order to properly render inline.
           // This is because text node children and HTML element children are treated differently.
           // Text node children may be rendered as part of the inline preview, if there is only one child.

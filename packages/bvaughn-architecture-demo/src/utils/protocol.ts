@@ -1,6 +1,5 @@
 import {
   NamedValue as ProtocolNamedValue,
-  Object as ProtocolObject,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
@@ -8,17 +7,20 @@ import {
 } from "@replayio/protocol";
 import { getObjectThrows } from "../suspense/ObjectPreviews";
 
-type ObjectType = "html" | "map" | "other" | "regexp" | "set";
-
 type ValueType =
   | "array"
   | "bigint"
   | "boolean"
   | "function"
+  | "html-element"
+  | "html-text" // Separate type makes it easier for text to be shown inline (e.g. "<div>Some text</div>")
+  | "map" // Map or WeakMap
   | "nan"
   | "null"
   | "number"
-  | "object"
+  | "object" // Fall back for all other types
+  | "regexp"
+  | "set" // Set or WeakSeat
   | "string"
   | "symbol"
   | "undefined";
@@ -33,33 +35,6 @@ export type Value = {
 export function filterNonEnumerableProperties(properties: ProtocolProperty[]): ProtocolProperty[] {
   // See https://static.replay.io/protocol/tot/Pause/#type-PropertyConfigurationFlags
   return properties.filter(property => property.flags == null || property.flags & 4);
-}
-
-export function getObjectType(objectWithPreview: ProtocolObject): ObjectType {
-  switch (objectWithPreview.className) {
-    case "Map":
-    case "WeakMap":
-      return "map";
-      break;
-    case "RegExp":
-      return "regexp";
-      break;
-    case "Set":
-    case "WeakSet":
-      return "set";
-      break;
-    default:
-      if (
-        (objectWithPreview.className.startsWith("HTML") ||
-          objectWithPreview.className === "Text") &&
-        objectWithPreview.preview?.node != null
-      ) {
-        return "html";
-      } else {
-        return "other";
-      }
-      break;
-  }
 }
 
 // TODO It would be nice if the protocol's Value objects used a consistent format.
@@ -135,14 +110,34 @@ export function reformatValue(
         throw Error(`Could not find object with id "${objectId}"`);
       }
 
+      const className = object.className;
+
       let preview: string | undefined;
       let type: ValueType = "object";
-      switch (object.className) {
+      switch (className) {
         case "Array":
           type = "array";
           break;
         case "Function":
           type = "function";
+          break;
+        case "Map":
+        case "WeakMap":
+          type = "map";
+          break;
+        case "RegExp":
+          type = "regexp";
+          break;
+        case "Set":
+        case "WeakSet":
+          type = "set";
+          break;
+        default:
+          if (className.startsWith("HTML")) {
+            type = "html-element";
+          } else if (className === "Text") {
+            type = "html-text";
+          }
           break;
       }
 

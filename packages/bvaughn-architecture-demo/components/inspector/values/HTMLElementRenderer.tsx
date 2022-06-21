@@ -60,6 +60,7 @@ export default function HTMLElementRenderer({
 
   const properties = filterNonEnumerableProperties(object.preview?.node?.attributes ?? []);
   const showOverflowMarker = properties.length > MAX_PROPERTIES_TO_PREVIEW;
+  const showInlineText = showChildrenIndicator && (inlineText || childNodes.length > 0);
 
   return (
     <>
@@ -72,7 +73,7 @@ export default function HTMLElementRenderer({
           {showOverflowMarker && <span className={styles.Value}>…</span>}
         </div>
       )}
-      {showChildrenIndicator && <div className={styles.HtmlText}>{inlineText || "…"}</div>}
+      {showInlineText && <div className={styles.HtmlText}>{inlineText || "…"}</div>}
       {showClosingTag && <div className={styles.HTMLClosingTag}>{tagName}</div>}
     </>
   );
