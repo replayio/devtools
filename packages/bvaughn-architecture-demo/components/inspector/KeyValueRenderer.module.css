@@ -9,6 +9,10 @@
   color: var(--object-inspector-expanded-key);
   font-weight: bold;
 }
+.VerticalNameWithFlag {
+  color: var(--object-inspector-expanded-key-with-flag);
+  font-weight: bold;
+}
 .HorizontalName::after,
 .VerticalName::after {
   content: ":";

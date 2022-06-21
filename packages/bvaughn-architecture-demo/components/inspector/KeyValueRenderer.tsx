@@ -96,6 +96,17 @@ export default function KeyValueRenderer({
     }
   }
 
+  let nameClass;
+  if (layout === "horizontal") {
+    nameClass = styles.HorizontalName;
+  } else {
+    if ((protocolValue as any).flags > 0) {
+      nameClass = styles.VerticalNameWithFlag;
+    } else {
+      nameClass = styles.VerticalName;
+    }
+  }
+
   const header = (
     <div
       className={classNames(
@@ -104,11 +115,7 @@ export default function KeyValueRenderer({
       )}
     >
       {before}
-      {name != null ? (
-        <span className={layout === "horizontal" ? styles.HorizontalName : styles.VerticalName}>
-          {name}
-        </span>
-      ) : null}
+      {name != null ? <span className={nameClass}>{name}</span> : null}
       <ValueRenderer
         isNested={isNested}
         layout={layout}

@@ -9,16 +9,11 @@ import { FC, useContext, useMemo } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-import { filterNonEnumerableProperties } from "../../src/utils/protocol";
 
 import Collapsible from "./Collapsible";
 import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 import ValueRenderer from "./ValueRenderer";
-
-// TODO (inspector) Make sure we're handler getter/setter and prototype props correctly.
-// e.g. We currently render "length: 0" twice for Arrays.
-// Maybe we need to merge and sort these three collections somehow?
 
 // TODO (inspector) Support Array bucketing (e.g. [0...99])
 // We can also bucket containerEntries with "[[Entries]]"
@@ -43,13 +38,10 @@ export default function PropertiesRenderer({
   }
 
   const containerEntries = object.preview?.containerEntries ?? [];
-  const getterValues = useMemo(() => {
-    const enumerableProperties = filterNonEnumerableProperties(object.preview?.getterValues ?? []);
-    return sortBy(enumerableProperties, property => property.name);
-  }, [object]);
   const properties = useMemo(() => {
-    const enumerableProperties = filterNonEnumerableProperties(object.preview?.properties ?? []);
-    return sortBy(enumerableProperties, property => property.name);
+    return sortBy(object.preview?.properties ?? [], property => property.name);
+    // const enumerableProperties = filterNonEnumerableProperties(object.preview?.properties ?? []);
+    // return sortBy(enumerableProperties, property => property.name);
   }, [object]);
 
   const prototypeId = object.preview?.prototypeId ?? null;
@@ -71,22 +63,18 @@ export default function PropertiesRenderer({
       break;
     }
   }
+  console.group("<PropertiesRenderer>", object);
+  console.log("preview:", object.preview);
+  console.log("properties:", properties);
+  console.log("containerEntries:", containerEntries);
+  console.log("prototype:", prototype);
+  console.groupEnd();
 
   // TODO (inspector) Should we interleave getters and properties?
 
   return (
     <>
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
-
-      {getterValues.map((property, index) => (
-        <KeyValueRenderer
-          key={`getterValue-${index}`}
-          isNested={true}
-          layout="vertical"
-          pauseId={pauseId}
-          protocolValue={property}
-        />
-      ))}
 
       {properties.map((property, index) => (
         <KeyValueRenderer
@@ -98,10 +86,15 @@ export default function PropertiesRenderer({
         />
       ))}
 
-      <span className={styles.Prototype}>
-        <span className={styles.PrototypeName}>[[Prototype]]</span>
-        {prototype !== null ? prototype.className : null}
-      </span>
+      <Collapsible
+        children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
+        header={
+          <span className={styles.Prototype}>
+            <span className={styles.PrototypeName}>[[Prototype]]</span>
+            {prototype !== null ? prototype.className : null}
+          </span>
+        }
+      />
     </>
   );
 }
