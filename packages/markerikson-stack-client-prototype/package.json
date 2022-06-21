@@ -10,6 +10,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.0.0",
     "@uiw/react-codemirror": "^4.8.1",
+    "@xstate/fsm": "^2.0.0",
     "protocol": "workspace:*"
   },
   "overrides": {}

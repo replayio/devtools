@@ -375,10 +375,12 @@ importers:
     specifiers:
       '@codemirror/lang-javascript': ^6.0.0
       '@uiw/react-codemirror': ^4.8.1
+      '@xstate/fsm': ^2.0.0
       protocol: workspace:*
     dependencies:
       '@codemirror/lang-javascript': 6.0.0
       '@uiw/react-codemirror': 4.9.4
+      '@xstate/fsm': 2.0.0
       protocol: link:../protocol
 
   packages/protocol:
@@ -6632,6 +6634,10 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       tslib: 2.4.0
+    dev: false
+
+  /@xstate/fsm/2.0.0:
+    resolution: {integrity: sha512-p/zcvBMoU2ap5byMefLkR+AM+Eh99CU/SDEQeccgKlmFNOMDwphaRGqdk+emvel/SaGZ7Rf9sDvzAplLzLdEVQ==}
     dev: false
 
   /@xtuc/ieee754/1.2.0:
