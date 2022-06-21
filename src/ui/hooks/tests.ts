@@ -17,7 +17,7 @@ export interface TestRun {
   date: string;
   branch: string;
   commit: SourceCommit;
-  event: "pull-request" | "push" | "unknown";
+  event: "pull_request" | "push" | "unknown";
 }
 
 const GET_TESTS_FOR_WORKSPACE = gql`

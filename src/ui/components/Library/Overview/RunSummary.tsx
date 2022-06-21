@@ -44,7 +44,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
         {getTruncatedRelativeDate(firstRecording.date)}
       </AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
-      {testRun.event !== "pull-request" && (
+      {testRun.event !== "pull_request" && (
         <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
       )}
       {merge && (
@@ -53,7 +53,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
         </AttributeContainer>
       )}
 
-      {branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
+      {!merge && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
     </div>
   );
