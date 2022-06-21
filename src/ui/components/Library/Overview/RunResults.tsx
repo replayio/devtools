@@ -3,6 +3,7 @@ import { useContext, useState } from "react";
 import { TestResultListItem } from "./TestResultListItem";
 import { OverviewContext } from "./OverviewContainer";
 import { Recording } from "ui/types";
+import styles from "../Library.module.css";
 
 export function RunResults() {
   const testRun = useContext(OverviewContext).testRun!;
@@ -29,7 +30,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   return (
     <div className="flex flex-col">
       <div
-        className=" top-0 p-2 pl-4 font-medium hover:cursor-pointer hover:bg-gray-50"
+        className={` top-0 p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRow}`}
         onClick={() => setExpanded(!expanded)}
       >
         {count} {label} Test{count > 1 ? "s" : ""}

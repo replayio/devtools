@@ -8,11 +8,11 @@ type LibraryContextType = {
   setView: (view: View) => void;
   setAppliedText: (str: string) => void;
   preview: Preview | null;
+  initialTestRunId: string | null;
 };
 export type Preview = {
   view: "test-runs";
   id: string;
-  recordingId?: string | null;
 };
 export type View = "recordings" | "test-runs";
 
@@ -23,6 +23,7 @@ export const LibraryContext = createContext<LibraryContextType>({
   setView: () => {},
   setAppliedText: () => {},
   preview: null,
+  initialTestRunId: null,
 });
 
 type Surrounder = {

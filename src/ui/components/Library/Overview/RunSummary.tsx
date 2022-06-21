@@ -1,19 +1,30 @@
 import { useContext } from "react";
+import { useSelector } from "react-redux";
+import { getWorkspaceId } from "ui/actions/app";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 import { AttributeContainer } from "../Content/TestRuns/AttributeContainer";
 import { RunStats } from "../Content/TestRuns/RunStats";
 import { getDuration, getDurationString } from "../Content/TestRuns/utils";
 import { getTruncatedRelativeDate } from "../RecordingRow";
 import { OverviewContext } from "./OverviewContainer";
-import { SourceMetadata } from "ui/types";
 
 function Title({ testRun }: { testRun: TestRun }) {
+  const workspaceId = useSelector(getWorkspaceId);
   const title = testRun.commit?.title || "";
   const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
+
+  const handleCopyLink = () => {
+    const url = `${window.location.origin}/team/${workspaceId}/test-run/${testRun.id}`;
+    navigator.clipboard.writeText(url);
+  };
 
   return (
     <div className="flex flex-row items-center space-x-2 text-xl font-medium">
       <div>{formatted}</div>
+      <button className="flex" onClick={handleCopyLink}>
+        <MaterialIcon>content_copy</MaterialIcon>
+      </button>
     </div>
   );
 }
@@ -52,7 +63,7 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-    <div className="mb-2 flex flex-col  space-y-2 border-b p-4">
+    <div className="flex flex-col p-4 mb-2 space-y-2 border-b">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
         <RunStats testRun={testRun} />

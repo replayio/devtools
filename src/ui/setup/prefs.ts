@@ -70,6 +70,12 @@ const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
 export const updatePrefs = (state: UIState, oldState: UIState) => {
   updateStandardPrefs(state, oldState, "theme", getTheme);
+  updateStandardPrefs(
+    state,
+    oldState,
+    "consoleFilterDrawerExpanded",
+    getConsoleFilterDrawerExpanded
+  );
 
   updateAsyncPrefs(
     state,
@@ -180,7 +186,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
 
   const currentReplaySession = {
     viewMode: getViewMode(state),
-    consoleFilterDrawerExpanded: getConsoleFilterDrawerExpanded(state),
     toolboxLayout: getToolboxLayout(state),
     showVideoPanel: getShowVideoPanel(state),
     selectedPrimaryPanel: getSelectedPrimaryPanel(state),
