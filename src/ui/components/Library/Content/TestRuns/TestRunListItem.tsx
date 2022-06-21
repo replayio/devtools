@@ -7,6 +7,7 @@ import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
 import { SourceMetadata } from "ui/types";
+import styles from "../../Library.module.css";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";
@@ -27,7 +28,7 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
   const textColor = selected ? "text-gray-700" : "text-gray-500";
   const merge = recordings[0].metadata.source?.merge;
   return (
-    <div className={`${textColor} flex flex-row items-center text-xs font-light`}>
+    <div className={`flex flex-row items-center text-xs font-light`}>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
       {merge && (
@@ -58,16 +59,16 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   const { preview } = useContext(LibraryContext);
   const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
   const isSelected = preview?.id.toString() === testRun.id;
-  const style = {
-    backgroundColor: isSelected ? "rgb(233 246 255)" : "",
-  };
+ 
 
   return (
     <div
-      className="flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 hover:bg-gray-50"
-      style={style}
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 ${styles.libraryRow}     
+      ${isSelected ? styles.libraryRowSelected : ""}
+      `}
       onClick={onClick}
     >
+    
       <Status failCount={failCount} />
       <div className="flex flex-grow flex-col space-y-1">
         <div className="flex flex-row justify-between">
