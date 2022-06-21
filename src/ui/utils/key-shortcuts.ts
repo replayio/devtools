@@ -4,6 +4,7 @@ import { KeyCodes } from "devtools/client/shared/keycodes";
 import { usesWindow } from "../../ssr";
 
 import mitt from "mitt";
+import { add5 } from "test-subpackage";
 
 const isOSX = Services.appinfo.OS === "Darwin";
 
@@ -344,3 +345,5 @@ export const removeGlobalShortcut = (key: string, callback: (e: KeyboardEvent) =
 
 export const mittEmitter = mitt();
 export const secondMittEmitter = mitt();
+
+const eleven = add5(6);
