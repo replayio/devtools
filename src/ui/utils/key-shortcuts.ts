@@ -3,6 +3,8 @@ import EventEmitter from "devtools/shared/event-emitter";
 import { KeyCodes } from "devtools/client/shared/keycodes";
 import { usesWindow } from "../../ssr";
 
+import mitt from "mitt";
+
 const isOSX = Services.appinfo.OS === "Darwin";
 
 // List of electron keys mapped to DOM API (DOM_VK_*) key code
@@ -339,3 +341,5 @@ export const removeGlobalShortcut = (key: string, callback: (e: KeyboardEvent) =
   }
   globalShortcuts.off(key, callback);
 };
+
+export const mittEmitter = mitt();
