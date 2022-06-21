@@ -105,6 +105,12 @@ const GET_TEST_RUN = gql`
                 duration
                 createdAt
                 metadata
+                metadata
+                comments {
+                  user {
+                    id
+                  }
+                }
               }
             }
           }
