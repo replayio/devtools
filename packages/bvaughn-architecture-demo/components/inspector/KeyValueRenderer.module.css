@@ -1,16 +1,21 @@
 .KeyValue {
   display: flex;
-  gap: 0.5ch;
 }
 
-.Name {
-  color: var(--object-inspector-property-name-color);
+.HorizontalName {
+  color: var(--object-inspector-inline-key);
 }
-.Name::after {
+.VerticalName {
+  color: var(--object-inspector-expanded-key);
+  font-weight: bold;
+}
+.HorizontalName::after,
+.VerticalName::after {
   content: ":";
+  margin-right: 0.5ch;
   color: var(--object-inspector-separator-color);
 }
 
 .ToggleAlignmentPadding {
-  margin-left: calc(1rem + 0.5ch);
+  margin-left: 1rem;
 }

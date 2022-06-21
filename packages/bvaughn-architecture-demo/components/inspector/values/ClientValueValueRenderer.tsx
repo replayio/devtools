@@ -14,6 +14,9 @@ export default function ClientValueValueRenderer({
 
   let className;
   switch (clientValue.type) {
+    case "bigint":
+      className = styles.BigInt;
+      break;
     case "boolean":
       className = styles.Boolean;
       break;

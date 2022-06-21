@@ -24,19 +24,27 @@ body {
 
   --object-inspector-go-to-definition-icon-color: #567;
   --object-inspector-go-to-definition-icon-color-hover: #000;
-  --object-inspector-nested-border-color: #0a84ff;
-  --object-inspector-param-color: #dd00a8;
-  --object-inspector-property-name-color: #0a84ff;
-  --object-inspector-prototype-color: #9ca3af;
+  --object-inspector-prototype-color: #6f7377;
   --object-inspector-separator-color: #737373;
   --object-inspector-toggle-color: #737373;
+  --object-inspector-function-keyword: #2020a7;
+  --object-inspector-function-name: #262729;
+  --object-inspector-expanded-key: #881180;
+  --object-inspector-inline-key: #6f7377;
+  --object-inspector-bucket-color: #6f7377;
 
-  --value-type-boolean: #008b00;
-  --value-type-nan: #737373;
-  --value-type-null: #737373;
-  --value-type-number: #008b00;
-  --value-type-object: #0174e8;
+  --value-type-bigint: #3f7d3f;
+  --value-type-boolean: #2020a7;
+  --value-type-nan: #2020a7;
+  --value-type-null: #82888c;
+  --value-type-number: #2020a7;
+  --value-type-object: #353639;
+  --value-type-regexp: #ca1811;
   --value-type-string: #0c0c0d;
-  --value-type-symbol: #dd00a8;
-  --value-type-undefined: #737373;
+  --value-type-symbol: #ca1811;
+  --value-type-undefined: #82888c;
+  --value-type-html-attribute-name: #9a4705;
+  --value-type-html-attribute-value: #3535b3;
+  --value-type-html-tag: #8f268a;
+  --value-type-html-text: #404144;
 }

@@ -12,6 +12,7 @@ type ObjectType = "html" | "map" | "other" | "regexp" | "set";
 
 type ValueType =
   | "array"
+  | "bigint"
   | "boolean"
   | "function"
   | "nan"
@@ -105,7 +106,7 @@ export function reformatValue(
         };
     }
   } else if (protocolValue.hasOwnProperty("bigint")) {
-    return { name, preview: `${protocolValue.bigint}n`, type: "number" };
+    return { name, preview: `${protocolValue.bigint}n`, type: "bigint" };
   } else if (protocolValue.hasOwnProperty("unserializableNumber")) {
     if (protocolValue.unserializableNumber === "NaN") {
       return { name, preview: "NaN", type: "nan" };

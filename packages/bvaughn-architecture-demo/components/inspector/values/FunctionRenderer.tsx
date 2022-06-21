@@ -18,7 +18,8 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
 
   return (
     <>
-      function {functionName}
+      <span className={styles.FunctionKeyword}>ƒ</span>
+      <span className={styles.FunctionName}>{functionName}</span>
       <span className={styles.FunctionParametersList}>
         {functionParameterNames.map((parameterName, index) => (
           <span key={index} className={styles.Value}>

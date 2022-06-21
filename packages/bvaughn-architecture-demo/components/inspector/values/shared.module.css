@@ -1,39 +1,41 @@
+.BigInt,
 .Boolean,
 .NaN,
 .Null,
 .Number,
+.RegExp,
 .String,
 .Symbol,
 .Undefined {
   display: flex;
   align-items: center;
   min-height: 1rem;
+  line-height: 1rem;
 }
-
+.BigInt {
+  color: var(--value-type-bigint);
+}
 .Boolean {
   color: var(--value-type-boolean);
 }
-
 .NaN {
   color: var(--value-type-nan);
 }
-
 .Null {
   color: var(--value-type-null);
 }
-
 .Number {
   color: var(--value-type-number);
 }
-
+.RegExp {
+  color: var(--value-type-regexp);
+}
 .String {
   color: var(--value-type-string);
 }
-
 .Symbol {
   color: var(--value-type-symbol);
 }
-
 .Undefined {
   color: var(--value-type-undefined);
 }
@@ -70,10 +72,10 @@
 
 .FunctionParametersList {
   display: flex;
+  color: var(--object-inspector-function-name);
 }
 .FunctionParametersList::before {
   content: "(";
-  margin-left: 1ch;
 }
 .FunctionParametersList::after {
   content: ")";
@@ -92,6 +94,7 @@
 
 .MapKey {
   display: flex;
+  color: var(--object-inspector-expanded-key);
 }
 .MapKey::after {
   color: var(--object-inspector-separator-color);
@@ -114,8 +117,10 @@
 }
 
 .HTMLOpeningTag {
-  color: var(--value-type-object);
+  color: var(--value-type-html-tag);
   display: flex;
+  min-height: 1rem;
+  line-height: 1rem;
 }
 .HTMLOpeningTag::before {
   content: "<";
@@ -125,8 +130,10 @@
 }
 
 .HTMLClosingTag {
-  color: var(--value-type-object);
+  color: var(--value-type-html-tag);
   display: flex;
+  min-height: 1rem;
+  line-height: 1rem;
 }
 .HTMLClosingTag::before {
   content: "</";
@@ -138,4 +145,25 @@
 .HtmlAttribute {
   display: flex;
   margin-left: 1ch;
+  color: var(--value-type-html-attribute-name);
+}
+
+.HtmlAttributeValue {
+  color: var(--value-type-html-attribute-value);
+}
+.HtmlAttributeValue::after,
+.HtmlAttributeValue::before {
+  content: '"';
+}
+
+.HtmlText {
+  color: var(--value-type-html-text);
+}
+
+.FunctionKeyword {
+  color: var(--object-inspector-function-keyword);
+  margin-right: 0.5ch;
+}
+.FunctionName {
+  color: var(--object-inspector-function-name);
 }

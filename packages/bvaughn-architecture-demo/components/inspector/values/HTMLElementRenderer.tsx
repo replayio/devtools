@@ -68,7 +68,7 @@ export default function HTMLElementRenderer({
           ))}
         </div>
       )}
-      {showChildrenIndicator ? inlineText || "…" : null}
+      {showChildrenIndicator && <div className={styles.HtmlText}>{inlineText || "…"}</div>}
       {showClosingTag && <div className={styles.HTMLClosingTag}>{tagName}</div>}
     </>
   );
@@ -85,8 +85,7 @@ function HTMLAttributeRenderer({
 
   return (
     <span className={styles.HtmlAttribute}>
-      <span className={styles.Name}>{name}</span>=
-      <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={protocolValue} />
+      {name}=<span className={styles.HtmlAttributeValue}>{protocolValue.value!}</span>
     </span>
   );
 }

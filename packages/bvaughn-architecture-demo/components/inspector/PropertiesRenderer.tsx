@@ -4,7 +4,7 @@ import {
   PauseId,
   PauseId as ProtocolPauseId,
 } from "@replayio/protocol";
-import { sortBy } from "lodash";
+import sortBy from "lodash/sortBy";
 import { FC, useContext, useMemo } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
@@ -193,9 +193,9 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           }
           header={
             <>
-              {index}: {"{"}
+              <span className={styles.MapIndex}>{index}</span>: {"{"}
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
-              {" → "}
+              &nbsp;{"→"}&nbsp;
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>
@@ -246,7 +246,7 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           }
           header={
             <>
-              {index}: {"{"}
+              <span className={styles.MapIndex}>{index}</span>: {"{"}
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>

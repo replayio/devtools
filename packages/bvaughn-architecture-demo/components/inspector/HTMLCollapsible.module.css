@@ -13,8 +13,6 @@
   align-items: flex-start;
   flex-wrap: wrap;
   min-height: 1rem;
-  gap: 0.5ch;
-  user-select: none;
 }
 
 .ArrowContainer {
@@ -25,7 +23,9 @@
 
 .ArrowCollapsed,
 .ArrowExpanded {
-  transform-origin: center;
+  width: 1rem;
+  height: 1rem;
+  transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
 }
 .ArrowExpanded {
@@ -39,13 +39,12 @@
 }
 
 .Children {
-  border-left: 1px solid var(--object-inspector-nested-border-color);
   margin-left: 0.5rem;
-  padding-left: calc(0.5rem + 0.5ch);
+  padding-left: 0.5rem;
 }
 
 .FooterCollapsed {
 }
 .FooterExpanded {
-  margin-left: calc(1rem + 0.5ch);
+  margin-left: 1rem;
 }

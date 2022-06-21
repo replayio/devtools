@@ -7,5 +7,5 @@ import styles from "./shared.module.css";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function RegExpRenderer({ object }: ObjectPreviewRendererProps) {
-  return <>{object?.preview?.regexpString ?? object.className}</>;
+  return <div className={styles.RegExp}>{object?.preview?.regexpString ?? object.className}</div>;
 }

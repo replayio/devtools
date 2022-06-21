@@ -5,7 +5,6 @@ import Icon from "../Icon";
 import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
 
 import styles from "./HTMLCollapsible.module.css";
-import useClientValue from "./useClientValue";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
 
 export type RenderChildrenFunction = () => ReactNode;

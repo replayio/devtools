@@ -13,15 +13,22 @@
 }
 
 .BucketLabel {
-  color: var(--object-inspector-prototype-color);
+  color: var(--object-inspector-bucket-color);
+}
+
+.MapIndex {
+  color: var(--object-inspector-expanded-key);
+  font-weight: bold;
 }
 
 .MapEntryPrefix {
-  color: var(--object-inspector-property-name-color);
+  color: var(--object-inspector-expanded-key);
+  font-weight: bold;
 }
 .MapEntryPrefix::after {
   content: ":";
   color: var(--object-inspector-separator-color);
+  margin-right: 0.5ch;
 }
 
 .NoEntries {

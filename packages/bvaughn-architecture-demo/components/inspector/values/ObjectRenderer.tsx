@@ -11,11 +11,12 @@ import styles from "./shared.module.css";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []);
+  const { className, preview } = object;
+  const properties = filterNonEnumerableProperties(preview?.properties ?? []);
 
   return (
     <>
-      {object.className}
+      {className !== "Object" ? className : null}
       <div className={styles.ObjectPropertyList}>
         {properties.map((property, index) => (
           <span key={index} className={styles.Value}>

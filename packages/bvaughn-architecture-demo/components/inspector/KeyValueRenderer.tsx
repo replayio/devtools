@@ -78,7 +78,7 @@ export default function KeyValueRenderer({
                   before={
                     <>
                       {before}
-                      {name != null ? <span className={styles.Name}>{name}</span> : null}
+                      {name != null ? <span className={styles.VerticalName}>{name}</span> : null}
                     </>
                   }
                   object={objectWithPreview!}
@@ -104,7 +104,11 @@ export default function KeyValueRenderer({
       )}
     >
       {before}
-      {name != null ? <span className={styles.Name}>{name}</span> : null}
+      {name != null ? (
+        <span className={layout === "horizontal" ? styles.HorizontalName : styles.VerticalName}>
+          {name}
+        </span>
+      ) : null}
       <ValueRenderer
         isNested={isNested}
         layout={layout}
