@@ -119,7 +119,7 @@ function RecordingRow({
   return (
     <RowWrapper recording={recording} isEditing={isEditing} onClick={toggleChecked}>
       <div
-        className={`group flex cursor-pointer flex-row border-b border-themeBorder ${styles.libraryRow}`}
+        className={`group flex cursor-pointer flex-row border-b border-chrome ${styles.libraryRow}`}
       >
         <div className="flex w-12 flex-shrink-0 flex-row items-center overflow-hidden overflow-ellipsis whitespace-pre px-4 py-3">
           {allowSelecting ? (

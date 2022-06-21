@@ -13,7 +13,7 @@ export function RunResults() {
   const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "failed");
 
   return (
-    <div className="flex flex-col overflow-y-auto">
+    <div className="flex flex-col overflow-y-auto no-scrollbar">
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
       <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>
@@ -30,7 +30,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   return (
     <div className="flex flex-col">
       <div
-        className={` top-0 p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRow}`}
+        className={` top-0 p-2 pl-4 font-medium hover:cursor-pointer`}
         onClick={() => setExpanded(!expanded)}
       >
         {count} {label} Test{count > 1 ? "s" : ""}

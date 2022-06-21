@@ -25,9 +25,9 @@ export default function Viewer({
 
   return (
     <div
-      className={`flex flex-grow flex-col overflow-hidden bg-gray-100 px-8 py-6 ${styles.libraryWrapper}`}
+      className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}
     >
-      <div className="flex h-full space-x-4 overflow-y-auto">
+      <div className="flex h-full space-x-2 overflow-y-auto">
         <div className="flex flex-col flex-grow w-full space-y-5">
           <ViewerHeader
             recordings={recordings}
@@ -38,7 +38,7 @@ export default function Viewer({
             isEditing={isEditing}
             setIsEditing={setIsEditing}
           />
-          <div className="flex-grow overflow-y-auto">
+          <div className="flex-grow overflow-y-auto no-scrollbar">
             {view === "recordings" ? (
               <Recordings
                 isEditing={isEditing}
