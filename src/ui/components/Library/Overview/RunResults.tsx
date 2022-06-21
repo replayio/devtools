@@ -4,6 +4,8 @@ import { TestResultListItem } from "./TestResultListItem";
 import { OverviewContext } from "./OverviewContainer";
 import { Recording } from "ui/types";
 import styles from "../Library.module.css";
+import classNames from "classnames";
+import Icon from "ui/components/shared/Icon";
 
 export function RunResults() {
   const testRun = useContext(OverviewContext).testRun!;
@@ -30,10 +32,19 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   return (
     <div className="flex flex-col">
       <div
-        className={` top-0 p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRow}`}
+        className={` top-0 flex grow flex-row p-2 pl-4 font-medium hover:cursor-pointer ${styles.libraryRowHeader}`}
         onClick={() => setExpanded(!expanded)}
       >
-        {count} {label} Test{count > 1 ? "s" : ""}
+        <div className="grow">
+          {count} {label} Test{count > 1 ? "s" : ""}
+        </div>
+        <div className="flex">
+          <Icon
+            filename="chevron"
+            className={`${expanded ? "bg-iconColor" : "rotate-90"} bg-iconColor`}
+            size="small"
+          />
+        </div>
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}
     </div>
