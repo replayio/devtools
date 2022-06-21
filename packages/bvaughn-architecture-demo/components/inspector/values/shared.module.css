@@ -61,6 +61,7 @@
 
 .ArrayPropertyList {
   display: flex;
+  flex-wrap: wrap;
 }
 .ArrayPropertyList::before {
   content: "[";
@@ -72,6 +73,7 @@
 
 .FunctionParametersList {
   display: flex;
+  flex-wrap: wrap;
   color: var(--object-inspector-function-name);
 }
 .FunctionParametersList::before {
@@ -83,6 +85,7 @@
 
 .ObjectPropertyList {
   display: flex;
+  flex-wrap: wrap;
 }
 .ObjectPropertyList::before {
   content: "{";

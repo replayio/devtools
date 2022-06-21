@@ -18,6 +18,8 @@ type Props = ObjectPreviewRendererProps & {
   showOpeningTag?: boolean;
 };
 
+const MAX_PROPERTIES_TO_PREVIEW = 5;
+
 // Renders a protocol ObjectPreview representing an HTMLElement with a format of:
 //   <tag-name attr="value" ...></tag-name>
 //
@@ -57,15 +59,17 @@ export default function HTMLElementRenderer({
   }
 
   const properties = filterNonEnumerableProperties(object.preview?.node?.attributes ?? []);
+  const showOverflowMarker = properties.length > MAX_PROPERTIES_TO_PREVIEW;
 
   return (
     <>
       {showOpeningTag && (
         <div className={styles.HTMLOpeningTag}>
           {tagName}
-          {properties.map((property, index) => (
+          {properties.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
             <HTMLAttributeRenderer key={index} pauseId={pauseId} protocolValue={property} />
           ))}
+          {showOverflowMarker && <span className={styles.Value}>…</span>}
         </div>
       )}
       {showChildrenIndicator && <div className={styles.HtmlText}>{inlineText || "…"}</div>}

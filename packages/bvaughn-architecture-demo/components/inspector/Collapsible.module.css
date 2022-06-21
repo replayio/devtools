@@ -7,7 +7,6 @@
   color: var(--value-type-object);
   display: flex;
   align-items: flex-start;
-  flex-wrap: wrap;
   min-height: 1rem;
 }
 
