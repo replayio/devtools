@@ -50,6 +50,20 @@ function Title({ recording }: { recording: Recording }) {
   );
 }
 
+function Comments({ recording }: { recording: Recording }) {
+  const numComments = recording?.comments?.length;
+  console.log(recording?.comments);
+  if (numComments == 0) {
+    return null;
+  }
+  return (
+    <div className="align-items-center flex flex-row space-x-1 text-gray-600">
+      <img src="/images/comment-outline.svg" className="w-3" />
+      <span>{numComments}</span>
+    </div>
+  );
+}
+
 export function TestResultListItem({ recording }: { recording: Recording }) {
   const { metadata } = recording;
   const passed = metadata.test?.result === "passed";
@@ -63,8 +77,13 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <ViewReplay recordingId={recordingId} passed={passed} />
-      <Title recording={recording} />
+      <div className="flex grow flex-row">
+        <div className="flex grow ">
+          <ViewReplay recordingId={recordingId} passed={passed} />
+          <Title recording={recording} />
+        </div>
+        <Comments recording={recording} />
+      </div>
     </a>
   );
 }

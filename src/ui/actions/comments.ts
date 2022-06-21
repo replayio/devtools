@@ -34,7 +34,7 @@ export function setHoveredComment(comment: any): SetHoveredComment {
 
 export function createComment(
   time: number,
-  point: string,
+  point: string | null,
   recordingId: RecordingId,
   options: CommentOptions
 ): UIThunkAction {
@@ -80,9 +80,6 @@ export function createFrameComment(
     const state = getState();
     const currentTime = getCurrentTime(state);
     const executionPoint = getExecutionPoint(state);
-    if (executionPoint == null) {
-      return;
-    }
 
     // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
     const sourceLocation = breakpoint
@@ -111,9 +108,6 @@ export function createFloatingCodeComment(
     const state = getState();
     const currentTime = getCurrentTime(state);
     const executionPoint = getExecutionPoint(state);
-    if (executionPoint == null) {
-      return;
-    }
 
     dispatch(
       createComment(currentTime, executionPoint, recordingId, {
@@ -133,9 +127,6 @@ export function createNetworkRequestComment(
     const state = getState();
     const time = request.triggerPoint?.time ?? getCurrentTime(state);
     const executionPoint = request.triggerPoint?.point || getExecutionPoint(state);
-    if (executionPoint == null) {
-      return;
-    }
 
     dispatch(
       createComment(time, executionPoint, recordingId, {

@@ -1,0 +1,39 @@
+.Collapsible {
+  display: flex;
+  flex-direction: column;
+}
+
+.PreviewRow {
+  color: var(--value-type-object);
+  display: flex;
+  align-items: flex-start;
+  min-height: 1rem;
+}
+
+.ArrowContainer {
+  width: 0.75rem;
+  height: 1rem;
+  position: relative;
+}
+
+.ArrowCollapsed,
+.ArrowExpanded {
+  transform-origin: 0.5rem 0.5rem;
+  transition: transform 200ms;
+  width: 1rem;
+  height: 1rem;
+}
+.ArrowExpanded {
+  transform: rotate(90deg);
+}
+
+.ArrowIcon {
+  fill: var(--object-inspector-toggle-color);
+  width: 1rem;
+  height: 1rem;
+}
+
+.Children {
+  margin-left: 0.5rem;
+  padding-left: 0.5rem;
+}
