@@ -2,6 +2,7 @@ import { MouseEvent, useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 import { LibraryContext } from "../useFilters";
+import styles from "../Library.module.css";
 
 function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (
@@ -56,7 +57,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
 
   return (
     <a
-      className={`group flex items-center px-2 transition duration-150 hover:bg-gray-50`}
+      className={`group flex items-center px-2 transition duration-150 ${styles.libraryRow}`}
       href={`/recording/${recordingId}`}
       target="_blank"
       rel="noreferrer noopener"

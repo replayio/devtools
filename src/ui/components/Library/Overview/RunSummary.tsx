@@ -51,7 +51,7 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-    <div className="flex flex-col space-y-2  p-4 border-b mb-2">
+    <div className="flex flex-col space-y-2  p-4 border-b mb-2 border-themeBorder">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
         <RunStats testRun={testRun} />
