@@ -81,10 +81,6 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
 
   return {
     ...syncInitialLayoutState,
-    consoleFilterDrawerExpanded:
-      "consoleFilterDrawerExpanded" in session
-        ? session.consoleFilterDrawerExpanded
-        : consoleFilterDrawerExpanded,
     viewMode: initialViewMode,
     selectedPanel: "selectedPanel" in session ? session.selectedPanel : selectedPanel,
     selectedPrimaryPanel: getDefaultSelectedPrimaryPanel(session, recording),
