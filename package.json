@@ -96,7 +96,8 @@
     "resize-observer-polyfill": "^1.5.1",
     "shared": "file:packages/shared",
     "slugify": "^1.6.5",
-    "styled-components": "^5.3.5"
+    "styled-components": "^5.3.5",
+    "test-subpackage": "workspace:*"
   },
   "devDependencies": {
     "@babel/core": "^7.17.8",
