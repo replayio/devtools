@@ -49,7 +49,7 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
 
 function Status({ failCount }: { failCount: number }) {
   return (
-    <div className={`flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
+    <div className={`pt-0.5 flex self-start ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
       <MaterialIcon iconSize="xl">{`${failCount > 0 ? "cancel" : "check"} `}</MaterialIcon>
     </div>
   );
@@ -63,7 +63,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 ${styles.libraryRow}     
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${styles.libraryRow}     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
       onClick={onClick}

@@ -25,7 +25,7 @@ export default function Viewer({
 
   return (
     <div
-      className={`flex flex-grow flex-col overflow-hidden px-4 py-6 ${styles.libraryWrapper}`}
+      className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}
     >
       <div className="flex h-full space-x-2 overflow-y-auto">
         <div className="flex flex-col flex-grow w-full space-y-5">
