@@ -1,4 +1,5 @@
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
+import Loader from "../Loader";
 import { memo, Suspense, useContext, useMemo } from "react";
 
 import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
@@ -28,7 +29,7 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   return (
     <div className={className}>
       {message.text}
-      <Suspense fallback="Loading...">
+      <Suspense fallback={<Loader />}>
         {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
           <Inspector key={index} pauseId={pauseId} protocolValue={argumentValue} />
         ))}

@@ -1,6 +1,7 @@
 import { ReactNode, useState } from "react";
 
 import Icon from "../Icon";
+import LazyOffscreen from "../LazyOffscreen";
 
 import styles from "./Collapsible.module.css";
 
@@ -17,8 +18,6 @@ export default function Collapsible({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
-  // TODO (inspector) Use the Offscreen API to preserve child component state?
-
   return (
     <div className={styles.Collapsible}>
       <div className={styles.PreviewRow} onClick={() => setIsOpen(!isOpen)}>
@@ -28,7 +27,9 @@ export default function Collapsible({
         {header}
       </div>
 
-      {isOpen ? <div className={styles.Children}>{children}</div> : null}
+      <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
+        <div className={styles.Children}>{children}</div>
+      </LazyOffscreen>
     </div>
   );
 }

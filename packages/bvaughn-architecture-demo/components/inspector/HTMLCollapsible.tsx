@@ -1,8 +1,10 @@
 import { Object as ProtocolObject, PauseId as ProtocolPauseId } from "@replayio/protocol";
 import { ReactNode, Suspense, useState } from "react";
 
-import Icon from "../Icon";
 import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
+import Icon from "../Icon";
+import LazyOffscreen from "../LazyOffscreen";
+import Loader from "../Loader";
 
 import styles from "./HTMLCollapsible.module.css";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
@@ -24,8 +26,6 @@ export default function HTMLCollapsible({
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // TODO (inspector) Use the Offscreen API to preserve child component state?
-
   return (
     <div className={isOpen ? styles.Expanded : styles.Collapsed}>
       <div className={styles.PreviewRow} onClick={() => setIsOpen(!isOpen)}>
@@ -44,9 +44,9 @@ export default function HTMLCollapsible({
         />
       </div>
 
-      {isOpen ? (
+      <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
         <div className={styles.Children}>
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<Loader />}>
             <HTMLChildrenRenderer object={object} pauseId={pauseId} />
           </Suspense>
 
@@ -58,7 +58,7 @@ export default function HTMLCollapsible({
             showOpeningTag={false}
           />
         </div>
-      ) : null}
+      </LazyOffscreen>
     </div>
   );
 }

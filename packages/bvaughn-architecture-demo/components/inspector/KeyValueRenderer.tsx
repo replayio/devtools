@@ -6,6 +6,8 @@ import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 import { getObjectType } from "../../src/utils/protocol";
 
+import Loader from "../Loader";
+
 import Collapsible from "./Collapsible";
 import HTMLCollapsible from "./HTMLCollapsible";
 import styles from "./KeyValueRenderer.module.css";
@@ -129,7 +131,7 @@ export default function KeyValueRenderer({
     return (
       <Collapsible
         children={
-          <Suspense fallback="Loading...">
+          <Suspense fallback={<Loader />}>
             <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
           </Suspense>
         }
