@@ -3,6 +3,7 @@ import {
   Object as ProtocolObject,
   PauseId,
   PauseId as ProtocolPauseId,
+  Property as ProtocolProperty,
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { FC, useContext, useMemo } from "react";
@@ -15,8 +16,7 @@ import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 import ValueRenderer from "./ValueRenderer";
 
-// TODO (inspector) Support Array bucketing (e.g. [0...99])
-// We can also bucket containerEntries with "[[Entries]]"
+const PROPERTY_BUCKET_SIZE = 100;
 
 // Renders a list of key value properties.
 // This renderer can be used to show an expanded view of the values inside of Arrays and Objects.
@@ -39,9 +39,10 @@ export default function PropertiesRenderer({
 
   const containerEntries = object.preview?.containerEntries ?? [];
   const properties = useMemo(() => {
-    return sortBy(object.preview?.properties ?? [], property => property.name);
-    // const enumerableProperties = filterNonEnumerableProperties(object.preview?.properties ?? []);
-    // return sortBy(enumerableProperties, property => property.name);
+    return sortBy(object.preview?.properties ?? [], property => {
+      const maybeNumber = Number(property.name);
+      return isNaN(maybeNumber) ? property.name : maybeNumber;
+    });
   }, [object]);
 
   const prototypeId = object.preview?.prototypeId ?? null;
@@ -63,18 +64,38 @@ export default function PropertiesRenderer({
       break;
     }
   }
-  console.group("<PropertiesRenderer>", object);
-  console.log("preview:", object.preview);
-  console.log("properties:", properties);
-  console.log("containerEntries:", containerEntries);
-  console.log("prototype:", prototype);
-  console.groupEnd();
 
-  // TODO (inspector) Should we interleave getters and properties?
+  // For collections that contain a lot of properties, group them into "buckets" of 100 props.
+  // This most commonly comes into play with large Arrays.
+  const buckets: { header: string; properties: ProtocolProperty[] }[] = [];
+  while (properties.length > PROPERTY_BUCKET_SIZE) {
+    const rangeStart = buckets.length * PROPERTY_BUCKET_SIZE;
+    const rangeStop = rangeStart + PROPERTY_BUCKET_SIZE - 1;
+    buckets.push({
+      header: `[${rangeStart} … ${rangeStop}]`,
+      properties: properties.splice(0, PROPERTY_BUCKET_SIZE),
+    });
+  }
 
   return (
     <>
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
+
+      {buckets.map((bucket, index) => (
+        <Collapsible
+          key={`bucketed-properties-${index}`}
+          children={bucket.properties.map((property, index) => (
+            <KeyValueRenderer
+              key={`property-${index}`}
+              isNested={true}
+              layout="vertical"
+              pauseId={pauseId}
+              protocolValue={property}
+            />
+          ))}
+          header={<span className={styles.Bucket}>{bucket.header}</span>}
+        />
+      ))}
 
       {properties.map((property, index) => (
         <KeyValueRenderer

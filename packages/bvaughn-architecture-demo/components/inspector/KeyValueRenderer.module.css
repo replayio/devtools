@@ -14,7 +14,8 @@
   font-weight: bold;
 }
 .HorizontalName::after,
-.VerticalName::after {
+.VerticalName::after,
+.VerticalNameWithFlag::after {
   content: ":";
   margin-right: 0.5ch;
   color: var(--object-inspector-separator-color);
