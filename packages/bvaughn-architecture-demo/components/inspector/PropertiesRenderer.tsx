@@ -107,15 +107,17 @@ export default function PropertiesRenderer({
         />
       ))}
 
-      <Collapsible
-        children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
-        header={
-          <span className={styles.Prototype}>
-            <span className={styles.PrototypeName}>[[Prototype]]</span>
-            {prototype !== null ? prototype.className : null}
-          </span>
-        }
-      />
+      {prototype != null && (
+        <Collapsible
+          children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
+          header={
+            <span className={styles.Prototype}>
+              <span className={styles.PrototypeName}>[[Prototype]]</span>
+              {prototype !== null ? prototype.className : null}
+            </span>
+          }
+        />
+      )}
     </>
   );
 }
