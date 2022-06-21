@@ -38,24 +38,23 @@ export function collapseFrames(frames) {
 
     return list;
   }
+
   const { newFrames, lastGroup } = collapseLastFrames(frames);
   frames = newFrames;
   let items = [];
   let currentGroup = null;
-  let prevItem = null;
+  let prev = null;
   for (const frame of frames) {
-    const prevLibrary = get(prevItem, "library");
-
     if (!currentGroup) {
       currentGroup = [frame];
-    } else if (prevLibrary && prevLibrary == frame.library) {
+    } else if (prev?.library && prev?.library == frame.library) {
       currentGroup.push(frame);
     } else {
       items = addGroupToList(currentGroup, items);
       currentGroup = [frame];
     }
 
-    prevItem = frame;
+    prev = frame;
   }
 
   items = addGroupToList(currentGroup, items);

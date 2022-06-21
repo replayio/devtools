@@ -1,6 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { LibraryContext } from "../useFilters";
+import styles from "../Library.module.css";
 
 // This is an oversimplification of the possible states for the testRun
 // as we fetch it and doesn't acccount for errors. Todo: Make it more robust.
@@ -26,7 +27,7 @@ export function OverviewContainer({ children }: { children: ReactNode }) {
   return (
     <OverviewContext.Provider value={{ testRun, loading } as OverviewContextType}>
       <div
-        className="flex flex-col overflow-hidden text-sm bg-themeBase-100 rounded-md shadow-md"
+        className={`flex flex-col overflow-hidden text-sm rounded-xl shadow-lg ${styles.libraryRow}`}
         style={{ width: "50rem" }}
       >
         {children}

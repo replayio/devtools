@@ -6,7 +6,7 @@ import useAuth0 from "ui/utils/useAuth0";
 import Library from "../Library/index";
 import Login from "../shared/Login/Login";
 
-export default function Account() {
+export default function Account({ testRunId }: { testRunId?: string }) {
   const { isLoading, isAuthenticated } = useAuth0();
   const dispatch = useAppDispatch();
 
@@ -22,5 +22,5 @@ export default function Account() {
     return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
-  return <Library />;
+  return <Library testRunId={testRunId} />;
 }

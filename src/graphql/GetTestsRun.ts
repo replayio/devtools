@@ -11,12 +11,23 @@ export interface GetTestsRun_node_Recording {
   __typename: "Recording";
 }
 
+export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments_user {
+  __typename: "User";
+  id: string;
+}
+
+export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments {
+  __typename: "Comment";
+  user: GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments_user | null;
+}
+
 export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node {
   __typename: "Recording";
   uuid: any;
   duration: number | null;
   createdAt: any;
   metadata: any | null;
+  comments: GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments[];
 }
 
 export interface GetTestsRun_node_Workspace_testRuns_recordings_edges {

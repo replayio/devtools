@@ -2,22 +2,20 @@ import classNames from "classnames";
 import CloseButton from "devtools/client/debugger/src/components/shared/Button/CloseButton";
 import PanelTabs from "devtools/client/shared/components/PanelTabs";
 import sortBy from "lodash/sortBy";
-import { WiredFrame } from "protocol/thread/pause";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { hideRequestDetails, seekToRequestFrame, selectAndFetchRequest } from "ui/actions/network";
+import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFormattedFrames } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
-
-import { Frames } from "../../../devtools/client/debugger/src/components/SecondaryPanes/Frames";
 
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
 import RequestBody from "./RequestBody";
 import styles from "./RequestDetails.module.css";
 import ResponseBody from "./ResponseBody";
 import { findHeader, RequestSummary } from "./utils";
+import { StackTrace } from "./StackTrace";
 
 interface Detail {
   name: string;
@@ -139,29 +137,6 @@ const Cookies = ({ request }: { request: RequestSummary }) => {
           return { name: value[0], value: value[1] };
         })}
       />
-    </div>
-  );
-};
-
-const StackTrace = ({
-  cx,
-  frames,
-  request,
-}: {
-  cx: any;
-  frames: WiredFrame[];
-  request: RequestSummary;
-}) => {
-  const dispatch = useAppDispatch();
-  const selectFrame = async (cx: any, frame: any) => {
-    dispatch(seekToRequestFrame(request, frame, cx));
-  };
-  return (
-    <div>
-      <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
-      <div className="px-2">
-        <Frames cx={cx} frames={frames} selectFrame={selectFrame} />
-      </div>
     </div>
   );
 };

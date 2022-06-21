@@ -1,13 +1,16 @@
 import {
-  ExecutionPoint,
   Message,
+  ObjectId,
+  ObjectPreviewLevel,
+  PauseData,
+  PauseId,
   SessionId,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
-import type { ThreadFront } from "protocol/thread";
+import { Pause, ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
 // TODO How should the client handle concurrent requests?
@@ -15,12 +18,18 @@ import { compareNumericStrings } from "protocol/utils";
 // Should we cancel in-flight requests and start new ones?
 
 export interface ReplayClientInterface {
+  getPauseIdForMessage(message: Message): PauseId;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;
   findSources(): Promise<void>;
+  getObjectWithPreview(
+    objectId: ObjectId,
+    pauseId: PauseId,
+    level?: ObjectPreviewLevel
+  ): Promise<PauseData>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
 }
@@ -43,6 +52,24 @@ export class ReplayClient implements ReplayClient {
       throw Error("Invalid session");
     }
     return sessionId;
+  }
+
+  getPauseIdForMessage(message: Message): PauseId {
+    // Pause mutates the Message objects passed ot it.
+    // We don't want that, so we have to deep clone the values first.
+    const clonedMessage = JSON.parse(JSON.stringify(message));
+
+    // TODO Create pauseId without the Pause; client.Session.createPause()
+    const pause = new Pause(this._threadFront);
+    pause.instantiate(
+      clonedMessage.pauseId,
+      clonedMessage.point.point,
+      clonedMessage.point.time,
+      !!clonedMessage.point.frame,
+      clonedMessage.data
+    );
+
+    return pause.pauseId!;
   }
 
   async initialize(recordingId: string, accessToken: string | null): Promise<SessionId> {
@@ -126,16 +153,28 @@ export class ReplayClient implements ReplayClient {
     });
   }
 
+  async getObjectWithPreview(
+    objectId: ObjectId,
+    pauseId: PauseId,
+    level?: ObjectPreviewLevel
+  ): Promise<PauseData> {
+    const sessionId = this.getSessionIdThrows();
+    const { data } = await client.Pause.getObjectPreview(
+      { level, object: objectId },
+      sessionId,
+      pauseId || undefined
+    );
+    return data;
+  }
+
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
     const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
-
     return point;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
-
     return endpoint;
   }
 }

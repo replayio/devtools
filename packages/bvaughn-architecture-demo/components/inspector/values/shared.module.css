@@ -1,0 +1,172 @@
+.BigInt,
+.Boolean,
+.NaN,
+.Null,
+.Number,
+.RegExp,
+.String,
+.Symbol,
+.Undefined {
+  display: flex;
+  align-items: center;
+  min-height: 1rem;
+  line-height: 1rem;
+}
+.BigInt {
+  color: var(--value-type-bigint);
+}
+.Boolean {
+  color: var(--value-type-boolean);
+}
+.NaN {
+  color: var(--value-type-nan);
+}
+.Null {
+  color: var(--value-type-null);
+}
+.Number {
+  color: var(--value-type-number);
+}
+.RegExp {
+  color: var(--value-type-regexp);
+}
+.String {
+  color: var(--value-type-string);
+}
+.Symbol {
+  color: var(--value-type-symbol);
+}
+.Undefined {
+  color: var(--value-type-undefined);
+}
+
+.IconButton {
+  height: 1rem;
+  width: 1rem;
+  outline: none;
+  background: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.JumpToDefinitionIcon {
+  height: 1rem;
+  width: 1rem;
+  color: var(--object-inspector-go-to-definition-icon-color);
+}
+.JumpToDefinitionIcon:hover {
+  color: var(--object-inspector-go-to-definition-icon-color-hover);
+}
+
+.ArrayPropertyList {
+  display: flex;
+  flex-wrap: wrap;
+}
+.ArrayPropertyList::before {
+  content: "[";
+  margin-left: 1ch;
+}
+.ArrayPropertyList::after {
+  content: "]";
+}
+
+.FunctionParametersList {
+  display: flex;
+  flex-wrap: wrap;
+  color: var(--object-inspector-function-name);
+}
+.FunctionParametersList::before {
+  content: "(";
+}
+.FunctionParametersList::after {
+  content: ")";
+}
+
+.ObjectPropertyList {
+  display: flex;
+  flex-wrap: wrap;
+}
+.ObjectPropertyList::before {
+  content: "{";
+  margin-left: 1ch;
+}
+.ObjectPropertyList::after {
+  content: "}";
+}
+
+.MapKey {
+  display: flex;
+  color: var(--object-inspector-expanded-key);
+}
+.MapKey::after {
+  color: var(--object-inspector-separator-color);
+  content: "→";
+  margin-left: 1ch;
+  margin-right: 1ch;
+}
+
+.Value {
+  display: flex;
+}
+.Value::after {
+  color: var(--object-inspector-separator-color);
+  content: ",";
+  margin-right: 1ch;
+}
+.Value:last-of-type::after {
+  content: "";
+  margin-right: 0;
+}
+
+.HTMLOpeningTag {
+  color: var(--value-type-html-tag);
+  display: flex;
+  min-height: 1rem;
+  line-height: 1rem;
+}
+.HTMLOpeningTag::before {
+  content: "<";
+}
+.HTMLOpeningTag::after {
+  content: ">";
+}
+
+.HTMLClosingTag {
+  color: var(--value-type-html-tag);
+  display: flex;
+  min-height: 1rem;
+  line-height: 1rem;
+}
+.HTMLClosingTag::before {
+  content: "</";
+}
+.HTMLClosingTag::after {
+  content: ">";
+}
+
+.HtmlAttribute {
+  display: flex;
+  margin-left: 1ch;
+  color: var(--value-type-html-attribute-name);
+}
+
+.HtmlAttributeValue {
+  color: var(--value-type-html-attribute-value);
+}
+.HtmlAttributeValue::after,
+.HtmlAttributeValue::before {
+  content: '"';
+}
+
+.HtmlText {
+  color: var(--value-type-html-text);
+}
+
+.FunctionKeyword {
+  color: var(--object-inspector-function-keyword);
+  margin-right: 0.5ch;
+}
+.FunctionName {
+  color: var(--object-inspector-function-name);
+}

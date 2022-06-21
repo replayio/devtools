@@ -1,8 +1,8 @@
 /* Dark */
 
 :root:global(.theme-dark) .libraryHeader {
-  background-color: var(--chrome);
-  border-bottom: 1px solid var(--theme-base-90);
+  background-color: #000;
+  border-bottom: 1px solid var(--theme-base-95);
 }
 
 :root:global(.theme-dark) .libraryWrapper {
