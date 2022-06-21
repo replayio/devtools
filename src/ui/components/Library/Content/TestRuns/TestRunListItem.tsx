@@ -28,7 +28,7 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
   const textColor = selected ? "text-gray-700" : "text-gray-500";
   const merge = recordings[0].metadata.source?.merge;
   return (
-    <div className={`${styles.libraryRow} flex flex-row items-center text-xs font-light`}>
+    <div className={`flex flex-row items-center text-xs font-light`}>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
       {merge && (
@@ -63,7 +63,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
 
   return (
     <div
-      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 hover:bg-red-50 ${styles.libraryRow}     
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-themeBase-95 bg-themeBase-100 px-4 py-3 ${styles.libraryRow}     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
       onClick={onClick}
