@@ -40,7 +40,7 @@ function isUnknownWorkspaceId(
   return !associatedWorkspaces.map(ws => ws.id).includes(id);
 }
 
-function LibraryLoader(props: PropsFromRedux) {
+function LibraryLoader(props: PropsFromRedux & { testRunId?: string }) {
   const { setModal } = props;
   const auth = useAuth0();
   const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
@@ -80,6 +80,7 @@ function LibraryLoader(props: PropsFromRedux) {
 type LibraryProps = PropsFromRedux & {
   workspaces: Workspace[];
   pendingWorkspaces?: Workspace[];
+  testRunId?: string;
 };
 
 function Library({
@@ -87,10 +88,11 @@ function Library({
   currentWorkspaceId,
   workspaces,
   pendingWorkspaces,
+  testRunId,
 }: LibraryProps) {
   const router = useRouter();
   const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
-  const [view, setView] = useState<View>("recordings");
+  const [view, setView] = useState<View>(testRunId ? "test-runs" : "recordings");
   const [preview, setPreview] = useState<Preview | null>(null);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
@@ -131,7 +133,15 @@ function Library({
 
   return (
     <LibraryContext.Provider
-      value={{ filter, view, preview, setPreview, setView: handleSetView, setAppliedText }}
+      value={{
+        filter,
+        view,
+        preview,
+        setPreview,
+        setView: handleSetView,
+        setAppliedText,
+        initialTestRunId: testRunId || null,
+      }}
     >
       <main className="flex flex-row w-full h-full">
         <Sidebar nonPendingWorkspaces={workspaces} />

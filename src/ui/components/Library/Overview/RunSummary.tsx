@@ -5,7 +5,6 @@ import { RunStats } from "../Content/TestRuns/RunStats";
 import { getDuration, getDurationString } from "../Content/TestRuns/utils";
 import { getTruncatedRelativeDate } from "../RecordingRow";
 import { OverviewContext } from "./OverviewContainer";
-import { SourceMetadata } from "ui/types";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "";
@@ -51,7 +50,7 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-    <div className="flex flex-col space-y-2  p-4 border-b mb-2">
+    <div className="flex flex-col p-4 mb-2 space-y-2 border-b">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
         <RunStats testRun={testRun} />
