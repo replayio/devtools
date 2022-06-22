@@ -31,7 +31,7 @@ export default function HTMLElementRenderer({
   showChildrenIndicator = true,
   showOpeningTag = true,
 }: Props) {
-  const client = useContext(ReplayClientContext)!;
+  const client = useContext(ReplayClientContext);
   const tagName = (object.preview?.node?.nodeName || "unknown").toLowerCase();
 
   if (object.className === "Text") {

@@ -16,7 +16,7 @@ if (typeof window !== "undefined") {
 }
 
 export default function Initializer({ children }: { children: ReactNode }) {
-  const replayClient = useContext(ReplayClientContext)!;
+  const replayClient = useContext(ReplayClientContext);
   const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
 
