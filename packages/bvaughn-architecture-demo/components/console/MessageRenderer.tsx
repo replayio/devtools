@@ -22,7 +22,7 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
     }
   }
 
-  const client = useContext(ReplayClientContext);
+  const client = useContext(ReplayClientContext)!;
   const pauseId = useMemo(() => client.getPauseIdForMessage(message), [client, message]);
 
   return (

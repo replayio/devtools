@@ -18,7 +18,9 @@ import { compareNumericStrings } from "protocol/utils";
 // Should we cancel in-flight requests and start new ones?
 
 export interface ReplayClientInterface {
+  configure(sessionId: string): void;
   getPauseIdForMessage(message: Message): PauseId;
+  getSessionId(): SessionId | null;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
@@ -34,16 +36,14 @@ export interface ReplayClientInterface {
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
 }
 
-export class ReplayClient implements ReplayClient {
+export class ReplayClient implements ReplayClientInterface {
+  private _dispatchURL: string;
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
 
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
+    this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
-
-    if (typeof window !== "undefined") {
-      initSocket(dispatchURL);
-    }
   }
 
   private getSessionIdThrows(): SessionId {
@@ -52,6 +52,13 @@ export class ReplayClient implements ReplayClient {
       throw Error("Invalid session");
     }
     return sessionId;
+  }
+
+  // Configures the client to use an already initialized session iD.
+  // This method should be used for apps that use the protocol package directly.
+  // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
+  configure(sessionId: string): void {
+    this._sessionId = sessionId;
   }
 
   getPauseIdForMessage(message: Message): PauseId {
@@ -72,7 +79,17 @@ export class ReplayClient implements ReplayClient {
     return pause.pauseId!;
   }
 
+  getSessionId(): SessionId | null {
+    return this._sessionId;
+  }
+
+  // Initializes the WebSocket and remote session.
+  // This method should be used for apps that only communicate with the Replay protocol through this client.
+  // Apps that use the protocol package directly should use the configure method instead.
   async initialize(recordingId: string, accessToken: string | null): Promise<SessionId> {
+    const socket = initSocket(this._dispatchURL);
+    await waitForOpenConnection(socket!);
+
     if (accessToken != null) {
       await client.Authentication.setAccessToken({ accessToken });
     }
@@ -177,4 +194,23 @@ export class ReplayClient implements ReplayClient {
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
   }
+}
+
+function waitForOpenConnection(
+  socket: WebSocket,
+  maxDurationMs = 2500,
+  intervalMs = 100
+): Promise<void> {
+  return new Promise<void>((resolve, reject) => {
+    const startTime = performance.now();
+    const intervalId = setInterval(() => {
+      if (performance.now() - startTime > maxDurationMs) {
+        clearInterval(intervalId);
+        reject(new Error("Timed out"));
+      } else if (socket.readyState === socket.OPEN) {
+        clearInterval(intervalId);
+        resolve();
+      }
+    }, intervalMs);
+  });
 }

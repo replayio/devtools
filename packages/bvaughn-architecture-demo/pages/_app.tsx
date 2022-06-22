@@ -1,7 +1,9 @@
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import React from "react";
+import React, { useMemo } from "react";
+import createReplayClient from "shared/client/createReplayClient";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import ErrorBoundary from "../components/ErrorBoundary";
 import Initializer from "../components/Initializer";
@@ -14,6 +16,7 @@ interface AuthProps {
 }
 
 function Routing({ Component, pageProps }: AppProps) {
+  const replayClient = useMemo(createReplayClient, []);
   return (
     <>
       <Head>
@@ -21,13 +24,15 @@ function Routing({ Component, pageProps }: AppProps) {
         <link rel="icon" type="image/svg+xml" href="/images/favicon.svg" />
         <title>Replay</title>
       </Head>
-      <ErrorBoundary>
-        <React.Suspense fallback={<Loader />}>
-          <Initializer>
-            <Component {...pageProps} />
-          </Initializer>
-        </React.Suspense>
-      </ErrorBoundary>
+      <ReplayClientContext.Provider value={replayClient}>
+        <ErrorBoundary>
+          <React.Suspense fallback={<Loader />}>
+            <Initializer>
+              <Component {...pageProps} />
+            </Initializer>
+          </React.Suspense>
+        </ErrorBoundary>
+      </ReplayClientContext.Provider>
     </>
   );
 }

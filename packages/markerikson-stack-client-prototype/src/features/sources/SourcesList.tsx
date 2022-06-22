@@ -1,12 +1,18 @@
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
 import { useGetSourcesQuery } from "../../app/api";
+import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
 import { sourceEntrySelected } from "./sourcesSlice";
 
 export const SourcesList = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
-  const { data } = useGetSourcesQuery();
+
+  const replayClient = useContext(ReplayClientContext)!;
+  const sessionId = replayClient.getSessionId()!;
+  const { data } = useGetSourcesQuery(sessionId);
 
   return (
     <ul>

@@ -6,8 +6,6 @@ import {
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-
 import KeyValueRenderer from "./KeyValueRenderer";
 
 // HTML entries are a special case.
@@ -46,8 +44,7 @@ function HTMLChildRenderer({
   objectId: ProtocolObjectId;
   pauseId: ProtocolPauseId;
 }) {
-  const client = useContext(ReplayClientContext);
-  const object = getObjectWithPreview(client, pauseId, objectId, true);
+  const client = useContext(ReplayClientContext)!;
 
   // HACK
   const protocolValue = { object: objectId };

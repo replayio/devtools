@@ -20,7 +20,7 @@ import styles from "./MessagesList.module.css";
 // Note that the props passed from the parent component would more likely be exposed through Context in a real app.
 // We're passing them as props in this case since the parent and child are right beside each other in the tree.
 export default function MessagesList() {
-  const replayClient = useContext(ReplayClientContext);
+  const replayClient = useContext(ReplayClientContext)!;
 
   const { filterByText, levelFlags } = useContext(ConsoleFiltersContext);
   const { range, isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
