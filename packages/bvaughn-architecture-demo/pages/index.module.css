@@ -30,7 +30,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  background-color: var(--color-gray-2);
+  background-color: var(--background-color-contrast-2);
   height: 2rem;
 }
 
@@ -40,18 +40,18 @@
   flex: 0 0 auto;
   display: flex;
   gap: 1ch;
-  border-right: 1px solid var(--color-gray-3);
-  border-bottom: 1px solid var(--color-gray-3);
+  border-right: 1px solid var(--background-color-contrast-3);
+  border-bottom: 1px solid var(--background-color-contrast-3);
 }
 
 .FilterInput {
   flex: 1;
   height: 100%;
-  background-color: var(--color-white);
+  background-color: var(--background-color-default);
   padding: 0 1ch;
   border: none;
   outline: none;
-  border-bottom: 1px solid var(--color-gray-3);
+  border-bottom: 1px solid var(--background-color-contrast-3);
 }
 
 .FilterLabel {
@@ -69,7 +69,7 @@
   align-items: center;
 }
 .FocusRegionRowOn {
-  background-color: var(--color-blue);
+  background-color: var(--color-brand);
 }
 
 .FocusToggleButton {
@@ -110,11 +110,11 @@
   width: 6px;
 }
 .RangeStartThumb {
-  background-color: var(--color-gray-4);
+  background-color: var(--background-color-contrast-4);
   border-radius: 4px 0px 0px 4px;
 }
 .RangeEndThumb {
-  background-color: var(--color-gray-4);
+  background-color: var(--background-color-contrast-4);
   border-radius: 0px 4px 4px 0px;
 }
 

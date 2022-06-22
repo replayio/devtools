@@ -15,10 +15,10 @@
 }
 
 .OverflowRow {
-  background-color: var(--color-red-dark);
-  color: var(--color-white);
+  background-color: var(--color-error);
+  color: var(--color-contrast);
 }
 
 .CountRow {
-  background-color: var(--color-gray-2);
+  background-color: var(--background-color-contrast-2);
 }

@@ -1,15 +1,15 @@
 .List {
-  border-right: 1px solid var(--color-gray-2);
+  border-right: 1px solid var(--background-color-contrast-2);
   height: 100%;
   overflow-y: auto;
-  background-color: var(--color-gray-2);
+  background-color: var(--background-color-contrast-2);
 }
 
 .Header {
   font-weight: bold;
   height: 2rem;
-  background-color: var(--color-gray-4);
-  color: var(--color-white);
+  background-color: var(--background-color-contrast-4);
+  color: var(--color-contrast);
   display: flex;
   align-items: center;
 }
