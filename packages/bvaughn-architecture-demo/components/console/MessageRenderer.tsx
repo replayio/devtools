@@ -2,7 +2,7 @@ import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/pr
 import Loader from "../Loader";
 import { memo, Suspense, useContext, useMemo } from "react";
 
-import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
+import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
 
 import Inspector from "../inspector";
 

@@ -3,7 +3,8 @@
 
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { ReplayClientContext } from "../src/contexts/ReplayClientContext";
+import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
+
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
 import { UserInfo } from "../src/graphql/types";
 import { getCurrentUserInfo } from "../src/graphql/User";

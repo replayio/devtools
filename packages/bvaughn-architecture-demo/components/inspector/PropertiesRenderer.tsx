@@ -8,7 +8,8 @@ import {
 import sortBy from "lodash/sortBy";
 import { FC, useContext, useMemo } from "react";
 
-import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
+import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import Collapsible from "./Collapsible";

@@ -5,10 +5,10 @@ import {
 } from "@replayio/protocol";
 import { useContext } from "react";
 
-import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
+import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
-import styles from "./HTMLChildrenRenderer.module.css";
 import KeyValueRenderer from "./KeyValueRenderer";
 
 // HTML entries are a special case.

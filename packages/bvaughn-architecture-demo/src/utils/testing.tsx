@@ -1,13 +1,15 @@
 import { act, render as rtlRender, RenderResult } from "@testing-library/react";
 import { ReactNode } from "react";
+
+import { ReplayClientInterface } from "../../../shared/client/ReplayClient";
+import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+
 import {
   ConsoleFiltersContext,
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
-import { ReplayClientContext } from "../contexts/ReplayClientContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { ReplayClientInterface } from "../client/ReplayClient";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).

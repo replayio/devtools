@@ -12,7 +12,8 @@ import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
-import { replayClient } from "../client/ReplayClient";
+
+import { getReplaySessionId } from "../client/globalReplayClient";
 
 interface SourceGroups {
   src: newSource[];
@@ -33,8 +34,7 @@ export const api = createApi({
 
         // Fetch the sources
         client.Debugger.addNewSourceListener(source => sources.push(source));
-        await client.Debugger.findSources({}, replayClient.getSessionIdThrows());
-
+        await client.Debugger.findSources({}, getReplaySessionId());
         const sourceGroups: SourceGroups = {
           src: [],
           node_modules: [],
@@ -67,7 +67,7 @@ export const api = createApi({
           {
             sourceId,
           },
-          replayClient.getSessionIdThrows()
+          getReplaySessionId()
         );
         return { data: demoSourceText.contents };
       },
@@ -75,7 +75,7 @@ export const api = createApi({
     }),
     getSourceHitCounts: build.query<Dictionary<HitCount[]>, string>({
       queryFn: async sourceId => {
-        const sessionId = replayClient.getSessionIdThrows();
+        const sessionId = getReplaySessionId();
         const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
           {
             sourceId,
@@ -99,7 +99,7 @@ export const api = createApi({
     }),
     getLineHitPoints: build.query<PointDescription[], Location>({
       queryFn: async location => {
-        const sessionId = replayClient.getSessionIdThrows();
+        const sessionId = getReplaySessionId();
 
         const data = await new Promise<PointDescription[]>(async resolve => {
           const { analysisId } = await client.Analysis.createAnalysis(
@@ -123,14 +123,14 @@ export const api = createApi({
     }),
     getPause: build.query<createPauseResult, PointDescription>({
       queryFn: async point => {
-        const sessionId = replayClient.getSessionIdThrows();
+        const sessionId = getReplaySessionId();
         const pause = await client.Session.createPause({ point: point.point }, sessionId);
         return { data: pause };
       },
       onCacheEntryAdded: async (arg, api) => {
         const { data: pauseEntry } = await api.cacheDataLoaded;
         await api.cacheEntryRemoved;
-        const sessionId = replayClient.getSessionIdThrows();
+        const sessionId = getReplaySessionId();
 
         // TODO Can confirm we get here, but the backend actually returned a "Method not yet implemented" error???
         // await client.Session.releasePause({ pauseId: pauseEntry.pauseId }, sessionId);

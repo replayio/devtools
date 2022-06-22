@@ -3,9 +3,10 @@
 
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 
-import { ReplayClientContext } from "../contexts/ReplayClientContext";
+import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+
+import asyncInitializeClient from "../client/asyncInitializeClient";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { asyncInitializeClient } from "../client/ReplayClient";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.

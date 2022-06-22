@@ -1,9 +1,11 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
-import { ReplayClientInterface } from "../client/ReplayClient";
+
+import { ReplayClientInterface } from "../../../shared/client/ReplayClient";
+
+import { createWakeable } from "../utils/suspense";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
-import { createWakeable } from "../utils/suspense";
 
 // TODO We could add some way for external code (in the client adapter) to pre-populate this cache with known points.
 // For example, when we get Paints they have a corresponding point (and time) which could be pre-loaded here.
