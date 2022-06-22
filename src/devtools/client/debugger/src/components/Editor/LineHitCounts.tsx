@@ -29,18 +29,24 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
   );
-  const hitCountColorMap = useMemo(() => {
-    const uniqueHitCounts = Array.from(
-      new Set(hitCounts ? hitCounts.map(hitCount => hitCount.hits) : [])
-    );
-    const maxHitCount = Math.max(...uniqueHitCounts);
 
-    return new Map(
-      uniqueHitCounts.map(hitCount => [
-        hitCount,
-        Math.min(1, Math.max(0, Math.log(hitCount) / Math.log(maxHitCount))) || 0,
-      ])
-    );
+  // Min/max hit counts are used to determine heat map color.
+  const { minHitCount, maxHitCount } = useMemo(() => {
+    let minHitCount = 0;
+    let maxHitCount = 0;
+    if (hitCounts) {
+      hitCounts.forEach(hitCount => {
+        if (minHitCount === 0) {
+          minHitCount = hitCount.hits;
+        } else if (minHitCount > hitCount.hits) {
+          minHitCount = hitCount.hits;
+        }
+        if (maxHitCount < hitCount.hits) {
+          maxHitCount = hitCount.hits;
+        }
+      });
+    }
+    return { minHitCount, maxHitCount };
   }, [hitCounts]);
 
   useLayoutEffect(() => {
@@ -57,12 +63,17 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
 
     const doc = editor.editor.getDoc();
     const drawLines = () => {
-      const gutterWidth = isCollapsed ? 5 : 20;
+      // Make sure we have enough room to fit large hit count numbers.
+      const numCharsToFit =
+        maxHitCount < 1000
+          ? Math.max(2, maxHitCount.toString().length)
+          : `${(maxHitCount / 1000).toFixed(1)}k`.length;
+      const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
 
       editor.editor.setOption("gutters", [
         "breakpoints",
         "CodeMirror-linenumbers",
-        { className: "hit-markers", style: `width: ${gutterWidth}px;` },
+        { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
 
       let lineNumber = 0;
@@ -71,34 +82,35 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         lineNumber++;
 
         const hitCount = hitCountMap?.get(lineNumber) || 0;
-        if (hitCount === 0) {
-          return;
-        }
 
-        const className = styles.HitsBadge;
-        const innerHTML = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
-        const title = `${hitCount} hits`;
+        // We use a gradient to indicate the "heat" (the number of hits).
+        // This absolute hit count values are relative, per file.
+        // Cubed root prevents high hit counts from lumping all other values together.
+        const NUM_GRADIENT_COLORS = 3;
+        let className = styles.HitsBadge0;
+        let index = null;
+        if (hitCount > 0) {
+          index = Math.min(
+            NUM_GRADIENT_COLORS - 1,
+            Math.round(
+              ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+            )
+          );
+          className = styles[`HitsBadge${index + 1}`];
+        } else {
+          // If this line wasn't hit any, dim the line number,
+          // even if it's a line that's technically reachable.
+          editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+        }
 
         const markerNode = document.createElement("div");
-        const lowCountColor = "#a5c5eb";
-        const highCountColor = "#667dff";
-        const backgroundColor = interpolateLab(
-          lowCountColor,
-          highCountColor
-        )(hitCountColorMap.get(hitCount) || 0);
-        const foregroundColor =
-          getLuminance(backgroundColor) > 0.5 ? "rgba(0,0,0,0.97)" : "rgba(255,255,255,.99)";
-
-        if (!isCollapsed) {
-          markerNode.innerHTML = innerHTML;
-        }
-
-        // Just for quick testing purposes, needs to be moved to LineHitCountsToggle
         markerNode.onclick = () => setIsCollapsed(!isCollapsed);
         markerNode.className = className;
-        markerNode.title = title;
-        markerNode.style.setProperty("--gutter-hit-count-background", backgroundColor);
-        markerNode.style.setProperty("--gutter-hit-count-foreground", foregroundColor);
+        if (!isCollapsed && hitCount > 0) {
+          markerNode.textContent =
+            hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+        }
+        markerNode.title = `${hitCount} hits`;
 
         doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
@@ -115,7 +127,7 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [editor, hitCountMap, hitCountColorMap, isCollapsed, setIsCollapsed]);
+  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, setIsCollapsed]);
 
   // We're just here for the hooks!
   return null;
