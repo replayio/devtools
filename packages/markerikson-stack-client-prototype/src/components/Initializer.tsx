@@ -2,8 +2,7 @@
 // It's just a bootstrap for things like auth that I didn't want to spend time actually implementing.
 
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
-
-import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import asyncInitializeClient from "../client/asyncInitializeClient";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";

@@ -1,7 +1,6 @@
 import { Message } from "@replayio/protocol";
 import { useContext } from "react";
-
-import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { ConsoleFiltersContext } from "../../src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "../../src/contexts/FocusContext";

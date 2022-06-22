@@ -1,8 +1,7 @@
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext } from "react";
-
-import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 

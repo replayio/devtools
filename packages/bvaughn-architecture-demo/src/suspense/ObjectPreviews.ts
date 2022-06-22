@@ -1,6 +1,5 @@
 import { Object, ObjectId, PauseId } from "@replayio/protocol";
-
-import { ReplayClientInterface } from "../../../shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/ReplayClient";
 
 import { createWakeable } from "../utils/suspense";
 

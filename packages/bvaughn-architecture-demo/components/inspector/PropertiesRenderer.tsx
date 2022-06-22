@@ -7,8 +7,7 @@ import {
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { FC, useContext, useMemo } from "react";
-
-import { ReplayClientContext } from "../../../shared/client/ReplayClientContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 

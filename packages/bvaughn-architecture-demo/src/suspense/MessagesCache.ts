@@ -1,6 +1,5 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
-
-import { ReplayClientInterface } from "../../../shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/ReplayClient";
 
 import { createWakeable } from "../utils/suspense";
 import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";

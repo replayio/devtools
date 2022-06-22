@@ -1,7 +1,6 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { useContext } from "react";
-
-import { ReplayClientContext } from "../../../../shared/client/ReplayClientContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { getObjectWithPreview } from "../../../src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "../../../src/utils/protocol";

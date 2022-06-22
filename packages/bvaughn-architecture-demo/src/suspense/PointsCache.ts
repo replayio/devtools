@@ -1,7 +1,6 @@
 import { ExecutionPoint } from "@replayio/protocol";
 import { unstable_getCacheForType as getCacheForType } from "react";
-
-import { ReplayClientInterface } from "../../../shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/ReplayClient";
 
 import { createWakeable } from "../utils/suspense";
 

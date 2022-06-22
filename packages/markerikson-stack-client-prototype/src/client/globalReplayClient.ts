@@ -2,7 +2,7 @@
 
 import { SessionId } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
-import { ReplayClient } from "../../../shared/client/ReplayClient";
+import { ReplayClient } from "shared/client/ReplayClient";
 
 // We can leverage this when writing tests (or UI demos) by injecting a stub client.
 let DISPATCH_URL = "wss://dispatch.replay.io";

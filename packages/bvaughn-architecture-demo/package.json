@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "protocol": "file:../protocol"
+    "protocol": "file:../protocol",
+    "shared": "file:../shared"
   },
   "scripts": {
     "dev": "next dev",
