@@ -27,7 +27,6 @@ import DebugLine from "./DebugLine";
 import EmptyLines from "./EmptyLines";
 import EditorMenu from "./EditorMenu";
 import LineNumberTooltip from "./LineNumberTooltip";
-import ToggleWidgetButton from "./ToggleWidgetButton";
 import HighlightLine from "./HighlightLine";
 import HighlightLines from "./HighlightLines";
 import EditorLoadingBar from "./EditorLoadingBar";
@@ -56,7 +55,7 @@ import {
   endOperation,
   clearDocuments,
 } from "../../utils/editor";
-import LineHitCounts from "./LineHitCounts";
+import Gutter from "./Gutter";
 
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
@@ -441,23 +440,18 @@ class Editor extends PureComponent {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        {
-          <KeyModifiersContext.Consumer>
-            {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
-          </KeyModifiersContext.Consumer>
-        }
-        <ToggleWidgetButton editor={editor} />
+        <KeyModifiersContext.Consumer>
+          {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
+        </KeyModifiersContext.Consumer>
         <HighlightLines editor={editor} />
-        {
-          <EditorMenu
-            editor={editor}
-            contextMenu={contextMenu}
-            clearContextMenu={this.clearContextMenu}
-            selectedSource={selectedSource}
-          />
-        }
+        <EditorMenu
+          editor={editor}
+          contextMenu={contextMenu}
+          clearContextMenu={this.clearContextMenu}
+          selectedSource={selectedSource}
+        />
         <ColumnBreakpoints editor={editor} />
-        <LineHitCounts cm={editor} />
+        <Gutter editor={editor} />
       </div>
     );
   }

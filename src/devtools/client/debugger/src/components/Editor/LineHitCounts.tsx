@@ -1,4 +1,4 @@
-import { useMemo, useLayoutEffect, useState } from "react";
+import { useMemo, useLayoutEffect } from "react";
 import { interpolateLab } from "d3-interpolate";
 import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
@@ -10,15 +10,18 @@ import { getSelectedSourceId } from "../../selectors";
 
 import styles from "./LineHitCounts.module.css";
 
-type Props = { cm: any };
+type Props = {
+  editor: any;
+  isCollapsed: boolean;
+  setIsCollapsed: (isCollapsed: boolean) => void;
+};
 
 export default function LineHitCountsWrapper(props: Props) {
   const { value } = useFeature("hitCounts");
   return value ? <LineHitCounts {...props} /> : null;
 }
 
-function LineHitCounts({ cm }: Props) {
-  const [isCollapsed, setIsCollapsed] = useState(true);
+function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
@@ -48,14 +51,15 @@ function LineHitCounts({ cm }: Props) {
   }, [dispatch, sourceId, hitCounts]);
 
   useLayoutEffect(() => {
-    if (!cm) {
+    if (!editor) {
       return;
     }
 
-    const doc = cm.editor.getDoc();
+    const doc = editor.editor.getDoc();
     const drawLines = () => {
-      const gutterWidth = isCollapsed ? 4 : 20;
-      cm.editor.setOption("gutters", [
+      const gutterWidth = isCollapsed ? 5 : 20;
+
+      editor.editor.setOption("gutters", [
         "breakpoints",
         "CodeMirror-linenumbers",
         { className: "hit-markers", style: `width: ${gutterWidth}px;` },
@@ -106,12 +110,12 @@ function LineHitCounts({ cm }: Props) {
     drawLines();
 
     return () => {
-      cm.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
 
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [cm, hitCountMap, hitCountColorMap, isCollapsed]);
+  }, [editor, hitCountMap, hitCountColorMap, isCollapsed, setIsCollapsed]);
 
   // We're just here for the hooks!
   return null;
