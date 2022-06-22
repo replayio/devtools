@@ -14,7 +14,7 @@
     "lint": "trunk check",
     "lint:fix": "trunk check --fix",
     "typecheck": "tsc",
-    "typecheck:watch": "npm run typecheck -- --watch",
+    "typecheck:watch": "yarn typecheck --watch",
     "build-e2e-cra-test": "node public/test/examples/cra/build",
     "build-e2e-prod-bundle": "webpack --config public/test/examples/bundles/prod_bundle/webpack.config.js",
     "build-e2e-exceptions-bundle": "webpack --config public/test/examples/bundles/exceptions_bundle/webpack.config.js",
@@ -29,7 +29,7 @@
     "build-storybook": "build-storybook",
     "gql:schema": "gq https://graphql.replay.io/v1/graphql -H \"X-Hasura-Admin-Secret: $HASURA_KEY\" --introspect > schema.graphql",
     "gql:gen": "apollo codegen:generate --localSchemaFile=schema.graphql --target=typescript --tagName=gql --outputFlat src/graphql",
-    "gql": "npm run gql:schema && npm run gql:gen"
+    "gql": "yarn gql:schema && yarn gql:gen"
   },
   "dependencies": {
     "@apollo/client": "^3.5.10",
@@ -45,6 +45,7 @@
     "@stripe/react-stripe-js": "^1.7.0",
     "@stripe/stripe-js": "^1.26.0",
     "@svgr/webpack": "^6.2.1",
+    "@tiptap/core": "^2.0.0-beta.176",
     "@tiptap/extension-mention": "^2.0.0-beta.95",
     "@tiptap/extension-placeholder": "^2.0.0-beta.48",
     "@tiptap/react": "^2.0.0-beta.108",
@@ -71,11 +72,11 @@
     "next": "^12.1.6",
     "next-global-css": "^1.3.1",
     "parse-script-tags": "^0.1.7",
+    "polished": "^4.2.2",
     "pretty-ms": "^7.0.1",
     "prop-types": "^15.8.1",
     "properties-parser": "^0.3.1",
     "protocol": "file:packages/protocol",
-    "polished": "^4.2.2",
     "react": "0.0.0-experimental-e7d0053e6-20220325",
     "react-canvas-confetti": "^1.3.0",
     "react-circular-progressbar": "^2.0.4",
@@ -84,6 +85,7 @@
     "react-devtools-inline_4_17_0": "npm:react-devtools-inline@4.17.0",
     "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
     "react-dom-factories": "^1.0.2",
+    "react-is": "^18.2.0",
     "react-json-view": "^1.21.3",
     "react-lazyload": "^3.2.0",
     "react-redux": "^8.0.2",
@@ -141,6 +143,7 @@
     "@types/lodash": "^4.14.181",
     "@types/logrocket-react": "^3.0.0",
     "@types/mixpanel-browser": "^2.35.6",
+    "@types/node": "^18.0.0",
     "@types/react": "^18.0.12",
     "@types/react-dom": "^18.0.5",
     "@types/react-lazyload": "^3.2.0",
@@ -194,7 +197,7 @@
     "tailwindcss": "^3.0.24",
     "ts-node": "^10.7.0",
     "tsconfig-paths": "^3.14.1",
-    "typescript": "^4.6.3",
+    "typescript": "4.6.3",
     "utf-8-validate": "^5.0.8",
     "webpack": "^5.71.0",
     "webpack-cli": "^4.9.2",
@@ -216,10 +219,13 @@
   "workspaces": [
     "packages/*"
   ],
-  "overrides": {
+  "resolutions": {
     "graphql": "15.8.0",
     "@auth0/auth0-react": "1.2.0",
     "react": "0.0.0-experimental-e7d0053e6-20220325",
-    "react-dom": "0.0.0-experimental-e7d0053e6-20220325"
+    "react-dom": "0.0.0-experimental-e7d0053e6-20220325",
+    "react-is": "18.2.0",
+    "ts-invariant": "0.10.3",
+    "typescript": "4.6.3"
   }
 }

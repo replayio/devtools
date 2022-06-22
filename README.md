@@ -10,15 +10,20 @@ Feel free to file any issues you see while recording or replaying.
 
 ### Setup instructions:
 
-Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Make sure to install [nvm](https://github.com/nvm-sh/nvm#installing-and-updating). Getting started is as simple as:
+Replay's DevTools is a React app built on top of the Replay [protocol](https://www.notion.so/replayio/Protocol-d8e7b5f428594589ab60c42afad782c1). Make sure to install [nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+> **Note**: We use Yarn 3 for package management - make sure you have Yarn installed globally first:
+> `npm i -g yarn`
+
+Getting started is as simple as:
 
 ```
 git clone git@github.com:RecordReplay/devtools.git
 cd devtools
 nvm use
-npm install
+yarn install
 cp .env.sample .env
-npm run dev
+yarn dev
 ```
 
 Once you see `Compiled succesfully` in your terminal, open your browser and go to [this link](http://localhost:8080/recording/d5ce272f-a3de-4af6-8943-2595cb54f1e3).
@@ -54,13 +59,13 @@ node test/mock/run.js [--pattern pat]
 To run the unit tests:
 
 ```
-npm test
+yarn test
 ```
 
 Note that any options passed after `--` will be passed on to the test runner (jest). So, if you wanted jest to watch the project for changes and run tests when files were saved you could run:
 
 ```
-npm test -- --watch
+yarn test --watch
 ```
 
 #### Running tests in VS Code

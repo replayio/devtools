@@ -51,6 +51,7 @@
         "src/devtools/client/shared/vendor/*",
         "node_modules/*"
       ],
+      "@recordreplay/accordion": ["packages/accordion/index.tsx"],
       "components": ["packages/components/index.ts"],
       "components/*": ["packages/components/*"],
       "icons": ["packages/icons/index.tsx"],

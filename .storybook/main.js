@@ -1,3 +1,5 @@
+const path = require("path");
+
 module.exports = {
   stories: [
     "../src/**/*.stories.mdx",
@@ -21,12 +23,15 @@ module.exports = {
   core: {
     builder: "webpack5",
   },
-
   webpackFinal: async (config, { configType }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
       components: require("path").resolve(__dirname, "../packages/components/index.ts"),
       icons: require("path").resolve(__dirname, "../packages/icons/index.tsx"),
+      "@recordreplay/accordion": require("path").resolve(
+        __dirname,
+        "../packages/accordion/index.tsx"
+      ),
     };
 
     config.resolve.modules = [
@@ -45,22 +50,34 @@ module.exports = {
       },
     ];
 
+    const existingBabelLoader = config.module.rules[0];
+
     config.module.rules = [
       {
         test: /\.properties$/,
         loader: "raw-loader",
       },
+      ...config.module.rules,
+      // Ensure that our homegrown "protocol" package gets compiled
+      {
+        ...existingBabelLoader,
+        include: filePath => {
+          const res = filePath.includes(`node_modules${path.sep}protocol`);
+          return res;
+        },
+        exclude: undefined,
+      },
       {
         test: /\.(j|t)sx?$/,
         exclude: request => {
-          return (
+          const res =
             request.includes("node_modules") ||
             request.includes("src/devtools/client/shared/vendor") ||
-            ["fs"].includes(request)
-          );
+            ["fs"].includes(request);
+
+          return res;
         },
       },
-      ...config.module.rules,
     ];
 
     return config;

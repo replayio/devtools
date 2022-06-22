@@ -2,7 +2,7 @@ FROM node:12
 
 build:
     COPY package.json package-lock.json ./
-    RUN npm install
+    RUN yarn install
     SAVE ARTIFACT node_modules
     COPY src src
     RUN mkdir -p ./dist

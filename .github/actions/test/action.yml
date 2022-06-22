@@ -4,9 +4,27 @@ description: "Run end-to-end tests. Note that this action assumes that Node and 
 runs:
   using: "composite"
   steps:
-    - uses: bahmutov/npm-install@v1
+    # Get the yarn cache path.
+    - name: Get yarn cache directory path
+      id: yarn-cache-dir-path
+      shell: bash
+      run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+    - name: Restore yarn cache
+      uses: actions/cache@v3
+      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
       with:
-        install-command: npm ci --legacy-peer-deps
+        path: |
+          ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          **/node_modules
+        key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+        restore-keys: "yarn-cache-folder-"
+    # Actually install packages with Yarn
+    - name: Install packages
+      if: steps.yarn-cache.outputs.cache-hit != 'true'
+      run: yarn install
+      shell: bash
+      env:
+        YARN_CHECKSUM_BEHAVIOR: "update"
     - run: mv macOS-replay-playwright/macOS-replay-playwright.tar.xz ./
       shell: bash
     - run: tar xf ./macOS-replay-playwright.tar.xz
@@ -15,7 +33,7 @@ runs:
       shell: bash
     - run: chmod +x ./replay-node/macOS-replay-node
       shell: bash
-    - run: npm run test-e2e -- --shard ${{ env.INPUT_STRIPE }}
+    - run: yarn test-e2e --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
         RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
