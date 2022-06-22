@@ -346,4 +346,4 @@ export const removeGlobalShortcut = (key: string, callback: (e: KeyboardEvent) =
 export const mittEmitter = mitt();
 export const secondMittEmitter = mitt();
 
-const eleven = add5(6);
+const twelve = add5(7);
