@@ -50,7 +50,13 @@ export function protocolValueToClientValue(
     ? (protocolValue as ProtocolNamedValue).name
     : null;
 
-  // TODO (inspector) Do we need special handling for "uninitialized" or "unavailable" values?
+  if (protocolValue.uninitialized || protocolValue.unavailable) {
+    return {
+      name,
+      preview: protocolValue.uninitialized ? "(uninitialized)" : "(unavailable)",
+      type: "string",
+    };
+  }
 
   if (protocolValue.hasOwnProperty("value")) {
     const value = protocolValue.value;
@@ -157,8 +163,17 @@ export function protocolValueToClientValue(
   throw Error(`Unsupported value type`);
 }
 
+export function clientValueToProtocolNamedValue(clientValue: any): ProtocolNamedValue {
+  const protocolValue = clientValueToProtocolValue(clientValue);
+  return {
+    ...protocolValue,
+    name: clientValue.name || "",
+  };
+}
+
 export function clientValueToProtocolValue(clientValue: any): ProtocolValue {
-  const protocolValue: ProtocolValue = {};
+  const protocolValue: ProtocolValue | ProtocolNamedValue = {};
+
   if (clientValue.contents.isUnavailable()) {
     protocolValue.unavailable = true;
   } else if (clientValue.contents.isUninitialized()) {

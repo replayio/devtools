@@ -86,11 +86,11 @@ function HTMLAttributeRenderer({
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
-  const { name } = useClientValue(protocolValue, pauseId);
+  const clientValue = useClientValue(protocolValue, pauseId);
 
   return (
     <span className={styles.HtmlAttribute}>
-      <span className={styles.HtmlAttributeName}>{name}</span>
+      <span className={styles.HtmlAttributeName}>{clientValue.name}</span>
       <span className={styles.HtmlAttributeValue}>{protocolValue.value!}</span>
     </span>
   );

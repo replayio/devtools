@@ -1,10 +1,11 @@
 import { Value as ProtocolValue } from "@replayio/protocol";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
 import "bvaughn-architecture-demo/pages/inspector.css";
 import { clientValueToProtocolValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
-import { useMemo } from "react";
+import { Suspense, useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getPreview } from "../../../selectors";
@@ -31,7 +32,9 @@ export default function NewObjectInspector() {
 
   return (
     <div className="preview-popup">
-      <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+      <Suspense fallback={<Loader />}>
+        <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+      </Suspense>
     </div>
   );
 }
