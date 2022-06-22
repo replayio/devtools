@@ -15,7 +15,7 @@ export function RunResults() {
   const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "failed");
 
   return (
-    <div className="flex flex-col overflow-y-auto no-scrollbar">
+    <div className="no-scrollbar flex flex-col overflow-y-auto">
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
       <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>
@@ -41,9 +41,11 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
         <div className="flex">
           <Icon
             filename="chevron"
-            className={`${expanded ? "bg-iconColor" : "rotate-90"} bg-iconColor`}
+            className={`${
+              expanded ? "bg-iconColor" : "rotate-90"
+            } rotate bg-iconColor transition duration-140 ease-out`}
             size="small"
-          />
+          />          
         </div>
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}
