@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
-import { useFeature } from "ui/hooks/settings";
 import { Nag } from "ui/hooks/users";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
@@ -59,8 +58,7 @@ type Props = {
 };
 
 export default function LineNumberTooltipWrapper(props: Props) {
-  const { value } = useFeature("hitCounts");
-  return value ? null : <LineNumberTooltip {...props} />;
+  return <LineNumberTooltip {...props} />;
 }
 
 function LineNumberTooltip({ editor, keyModifiers }: Props) {
