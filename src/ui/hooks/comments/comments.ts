@@ -17,7 +17,6 @@ export function useGetComments(recordingId: RecordingId): {
 } {
   const { data, loading, error } = useQuery<GetComments, GetCommentsVariables>(GET_COMMENTS, {
     variables: { recordingId },
-    pollInterval: 5000,
   });
 
   if (error) {
@@ -58,10 +57,7 @@ export function useUpdateComment() {
           success
         }
       }
-    `,
-    {
-      refetchQueries: ["GetComments"],
-    }
+    `
   );
 
   return async (
@@ -91,10 +87,7 @@ export function useUpdateCommentReply() {
           success
         }
       }
-    `,
-    {
-      refetchQueries: ["GetComments"],
-    }
+    `
   );
 
   return async (id: string, newContent: string, newIsPublished: boolean) =>

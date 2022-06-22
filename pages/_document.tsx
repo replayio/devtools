@@ -23,7 +23,7 @@ const csp = (props: any) => {
   const hash = cspHashOf(NextScript.getInlineScriptSource(props));
   return [
     `default-src 'self'`,
-    `connect-src 'self' https://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://webreplay.us.auth0.com https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
+    `connect-src 'self' https://api.replay.io wss://api.replay.io wss://dispatch.replay.io ws://*.replay.prod http://*.replay.prod https://telemetry.replay.io https://webreplay.us.auth0.com https://api-js.mixpanel.com https://*.sentry.io https://*.launchdarkly.com https://*.logrocket.io https://*.lr-ingest.io https://*.logrocket.com https://*.lr-in.com https://api.stripe.com https://vitals.vercel-insights.com ${
       // Required to talk to local backend in development. Enabling
       // localhost:8000 for prod to support the ?dispatch parameter when running
       // the local backend

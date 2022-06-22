@@ -4,7 +4,7 @@ import { Recording } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
-import { GET_RECORDING, GET_RECORDING_USER_ID } from "ui/graphql/recordings";
+import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/graphql/recordings";
 import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
@@ -42,7 +42,7 @@ import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
 } from "graphql/GetWorkspaceRecordings";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -178,6 +178,27 @@ export function useGetRecording(recordingId: RecordingId | null | undefined): {
   const isAuthorized = isTest() || recording;
 
   return { recording, isAuthorized: !!isAuthorized, loading };
+}
+
+export function useSubscribeRecording(recordingId: RecordingId | null | undefined) {
+  const { subscribeToMore } = useQuery<GetRecording, GetRecordingVariables>(GET_RECORDING, {
+    variables: { recordingId },
+    skip: !recordingId,
+  });
+  useEffect(
+    () =>
+      subscribeToMore({
+        document: SUBSCRIBE_RECORDING,
+        variables: { recordingId },
+        updateQuery: (prev, { subscriptionData }) => {
+          if (!subscriptionData) {
+            return prev;
+          }
+          return Object.assign({}, prev, subscriptionData.data.recording);
+        },
+      }),
+    [recordingId, subscribeToMore]
+  );
 }
 
 export function useIsTeamDeveloper() {
@@ -388,8 +409,7 @@ export function useUpdateIsPrivate() {
           success
         }
       }
-    `,
-    { refetchQueries: ["GetRecording"] }
+    `
   );
 
   return (recordingId: string, isPrivate: boolean) =>
@@ -756,8 +776,7 @@ export function useInitializeRecording() {
           }
         }
       }
-    `,
-    { refetchQueries: ["GetRecording"] }
+    `
   );
 
   return initializeRecording;
@@ -775,10 +794,7 @@ export function useUpdateRecordingTitle() {
           }
         }
       }
-    `,
-    {
-      refetchQueries: ["GetRecording"],
-    }
+    `
   );
 
   return (recordingId: string, title: string) =>
@@ -880,10 +896,7 @@ export function useUpdateRecordingResolution(recordingId: RecordingId) {
           success
         }
       }
-    `,
-    {
-      refetchQueries: ["GetRecording"],
-    }
+    `
   );
 
   return (isResolved: boolean) =>

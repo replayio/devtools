@@ -9,15 +9,11 @@ export default function useDeleteComment() {
           success
         }
       }
-    `,
-    {
-      refetchQueries: ["GetComments"],
-    }
+    `
   );
 
   return async (commentId: string) => {
     return deleteComment({
-      awaitRefetchQueries: true,
       variables: { commentId },
     });
   };

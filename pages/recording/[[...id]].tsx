@@ -15,6 +15,7 @@ import {
   useGetRecording,
   useGetRecordingId,
   useGetRawRecordingIdWithSlug,
+  useSubscribeRecording,
 } from "ui/hooks/recordings";
 import setup from "ui/setup/dynamic/devtools";
 import { Recording as RecordingInfo } from "ui/types";
@@ -127,6 +128,7 @@ function RecordingPage({
   const recordingId = useGetRecordingId();
   const rawRecordingId = useGetRawRecordingIdWithSlug();
   useRecordingSlug(recordingId);
+  useSubscribeRecording(recordingId);
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
   useEffect(() => {

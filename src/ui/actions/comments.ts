@@ -48,7 +48,6 @@ export function createComment(
 
     const response = await mutate({
       mutation: ADD_COMMENT_MUTATION,
-      refetchQueries: ["GetComments"],
       variables: {
         input: {
           content: "",

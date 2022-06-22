@@ -19,7 +19,6 @@ export function useGetActiveSessions(recordingId: RecordingId) {
     GET_ACTIVE_SESSIONS,
     {
       variables: { recordingId },
-      pollInterval: 5000,
     }
   );
 

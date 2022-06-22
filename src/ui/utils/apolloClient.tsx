@@ -8,7 +8,11 @@ import {
   from,
   HttpLink,
   ApolloError,
+  split,
 } from "@apollo/client";
+import { getMainDefinition } from "@apollo/client/utilities";
+import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
+import { createClient } from "graphql-ws";
 import { MockedResponse, MockLink } from "@apollo/client/testing";
 import { onError } from "@apollo/client/link/error";
 import { RetryLink } from "@apollo/client/link/retry";
@@ -116,11 +120,31 @@ function createHttpLink(token: string | undefined) {
   }
 
   const uri = process.env.NEXT_PUBLIC_API_URL;
-  return new HttpLink({
+  const httpLink = new HttpLink({
     uri,
     headers,
     fetch,
   });
+
+  if (typeof window === "undefined") {
+    return httpLink;
+  }
+
+  const wsLink = new GraphQLWsLink(
+    createClient({
+      url: process.env.NEXT_PUBLIC_API_SUBSCRIPTION_URL!,
+      connectionParams: { token },
+    })
+  );
+
+  return split(
+    ({ query }) => {
+      const definition = getMainDefinition(query);
+      return definition.kind === "OperationDefinition" && definition.operation === "subscription";
+    },
+    wsLink,
+    httpLink
+  );
 }
 
 export function createErrorLink(onAuthError?: () => void) {
