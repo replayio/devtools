@@ -6,9 +6,10 @@ import {
   Property as ProtocolProperty,
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
-import { FC, useContext, useMemo } from "react";
+import { FC, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import Loader from "../../components/Loader";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import Collapsible from "./Collapsible";
@@ -84,28 +85,34 @@ export default function PropertiesRenderer({
       {buckets.map((bucket, index) => (
         <Collapsible
           key={`bucketed-properties-${index}`}
-          children={bucket.properties.map((property, index) => (
-            <KeyValueRenderer
-              key={`property-${index}`}
-              isNested={true}
-              layout="vertical"
-              pauseId={pauseId}
-              protocolValue={property}
-            />
-          ))}
+          children={
+            <Suspense fallback={<Loader />}>
+              {bucket.properties.map((property, index) => (
+                <KeyValueRenderer
+                  key={`property-${index}`}
+                  isNested={true}
+                  layout="vertical"
+                  pauseId={pauseId}
+                  protocolValue={property}
+                />
+              ))}
+            </Suspense>
+          }
           header={<span className={styles.Bucket}>{bucket.header}</span>}
         />
       ))}
 
-      {properties.map((property, index) => (
-        <KeyValueRenderer
-          key={`property-${index}`}
-          isNested={true}
-          layout="vertical"
-          pauseId={pauseId}
-          protocolValue={property}
-        />
-      ))}
+      <Suspense fallback={<Loader />}>
+        {properties.map((property, index) => (
+          <KeyValueRenderer
+            key={`property-${index}`}
+            isNested={true}
+            layout="vertical"
+            pauseId={pauseId}
+            protocolValue={property}
+          />
+        ))}
+      </Suspense>
 
       {prototype != null && (
         <Collapsible
@@ -145,7 +152,7 @@ function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRenderer
 
 function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {containerEntries.map(({ key, value }, index) => (
         <KeyValueRenderer
           key={index}
@@ -155,7 +162,7 @@ function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entries
           protocolValue={value}
         />
       ))}
-    </>
+    </Suspense>
   );
 }
 
@@ -185,7 +192,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
   }
 
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {containerEntries.map(({ key, value }, index) => (
         <Collapsible
           key={index}
@@ -218,7 +225,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           }
         />
       ))}
-    </>
+    </Suspense>
   );
 }
 
@@ -247,7 +254,7 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
   }
 
   return (
-    <>
+    <Suspense fallback={<Loader />}>
       {containerEntries.map(({ value }, index) => (
         <Collapsible
           key={index}
@@ -269,6 +276,6 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           }
         />
       ))}
-    </>
+    </Suspense>
   );
 }

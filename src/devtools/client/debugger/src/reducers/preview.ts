@@ -7,13 +7,20 @@ import type { AnyAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
 import type { Preview } from "./types";
+import { ValueItem } from "devtools/packages/devtools-reps";
 
 // TODO Are we really putting more DOM nodes in state?
 type $FixTypeLater = any;
 
 export interface PreviewState {
   preview:
-    | (Preview & { previewId: string; expression: string; target: $FixTypeLater; resultGrip: any })
+    | (Preview & {
+        previewId: string;
+        expression: string;
+        target: $FixTypeLater;
+        resultGrip: any;
+        root: ValueItem;
+      })
     | null;
 }
 

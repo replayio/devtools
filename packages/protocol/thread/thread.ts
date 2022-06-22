@@ -110,7 +110,7 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
-type ThreadFrontEvent = "paused" | "resumed";
+type ThreadFrontEvent = "currentPause" | "paused" | "resumed";
 
 declare global {
   interface Window {
@@ -134,7 +134,7 @@ class _ThreadFront {
   currentPointHasFrames: boolean = false;
 
   // Any pause for the current point.
-  currentPause: Pause | null = null;
+  _currentPause: Pause | null = null;
 
   // Pauses created for async parent frames of the current point.
   asyncPauses: Pause[] = [];
@@ -247,6 +247,15 @@ class _ThreadFront {
         }
       });
     });
+  }
+
+  get currentPause(): Pause | null {
+    return this._currentPause;
+  }
+  set currentPause(value: Pause | null) {
+    this._currentPause = value;
+
+    this.emit("currentPause", value);
   }
 
   async setSessionId(sessionId: SessionId) {

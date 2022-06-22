@@ -49,6 +49,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableLargeText",
   },
   {
+    label: "New Object Inspector",
+    description: "Enable new Object Inspector UI for Source viewer",
+    key: "enableNewObjectInspector",
+  },
+  {
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
@@ -116,6 +121,10 @@ export default function ExperimentalSettings({}) {
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
   const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
+  const { value: enableNewObjectInspector, update: updateEnableNewObjectInspector } = useFeature(
+    "enableNewObjectInspector"
+  );
+
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
@@ -139,6 +148,8 @@ export default function ExperimentalSettings({}) {
       updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
+    } else if (key === "enableNewObjectInspector") {
+      updateEnableNewObjectInspector(!enableNewObjectInspector);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     }
@@ -154,6 +165,7 @@ export default function ExperimentalSettings({}) {
     unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
     enableLargeText,
+    enableNewObjectInspector,
   };
 
   const settings = { ...userSettings, ...localSettings };

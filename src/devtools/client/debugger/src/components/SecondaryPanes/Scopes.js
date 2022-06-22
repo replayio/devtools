@@ -16,6 +16,7 @@ import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 import { formatTimestamp } from "ui/utils/time";
+import { prefs as prefsService } from "devtools/shared/services";
 
 import actions from "../../actions";
 import {
@@ -29,6 +30,7 @@ import {
 import { getScopes } from "../../utils/pause/scopes";
 import { getScopeItemPath } from "../../utils/pause/scopes/utils";
 import { features } from "../../utils/prefs";
+import NewObjectInspector from "./NewObjectInspector";
 
 class Scopes extends PureComponent {
   constructor(props) {
@@ -152,11 +154,15 @@ class Scopes extends PureComponent {
     scopes.forEach((s, i) => {
       s.path = `scope${selectedFrame?.id}.${i}`;
     });
-    return (
-      <Redacted className="pane scopes-list">
-        {originalScopesUnavailable ? (
-          <div className="warning">The variables could not be mapped to their original names</div>
-        ) : null}
+
+    const enableNewObjectInspector = prefsService.getBoolPref(
+      "devtools.features.enableNewObjectInspector"
+    );
+    let objectInspector = null;
+    if (enableNewObjectInspector) {
+      objectInspector = <NewObjectInspector roots={scopes} />;
+    } else {
+      objectInspector = (
         <ObjectInspector
           roots={scopes}
           autoExpandAll={false}
@@ -176,6 +182,15 @@ class Scopes extends PureComponent {
           initiallyExpanded={initiallyExpanded}
           renderItemActions={this.renderWatchpointButton}
         />
+      );
+    }
+
+    return (
+      <Redacted className="pane scopes-list">
+        {originalScopesUnavailable ? (
+          <div className="warning">The variables could not be mapped to their original names</div>
+        ) : null}
+        {objectInspector}
       </Redacted>
     );
   }

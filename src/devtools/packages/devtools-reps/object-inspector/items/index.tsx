@@ -35,7 +35,7 @@ export interface IItem {
 }
 
 // An Item represents one node in the ObjectInspector tree:
-// ValueItems represent nodes that correspond to a ValueFront (i.e. a javascript value in the debuggee)
+// ValueItems represent nodes that correspond to a ValueFront (i.e. a javascript value in the debugger)
 // KeyValueItems represent nodes for entries in a native javascript container (i.e. Map, WeakMap, Set and WeakSet)
 // ContainerItems represent nodes with an arbitrary list of child nodes
 // - this is used to represent Scopes and the <entries> node of a native javascript container, for example

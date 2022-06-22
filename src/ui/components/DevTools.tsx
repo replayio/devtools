@@ -33,6 +33,7 @@ import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import useReplayClient from "ui/hooks/useReplayClient";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -113,6 +114,8 @@ function _DevTools({
     [recording]
   );
 
+  useReplayClient();
+
   useEffect(() => {
     import("./Viewer");
   }, []);
@@ -140,6 +143,7 @@ function _DevTools({
 
   useEffect(() => {
     createSocket(recordingId, ThreadFront);
+
     return () => {
       clearTrialExpired();
     };

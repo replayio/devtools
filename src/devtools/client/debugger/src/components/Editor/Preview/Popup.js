@@ -11,8 +11,12 @@ import {
   unHighlightDomElement,
 } from "devtools/client/webconsole/actions/toolbox";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
+import { prefs as prefsService } from "devtools/shared/services";
+
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
+
+import NewObjectInspector from "./NewObjectInspector";
 
 export class Popup extends Component {
   calculateMaxHeight = () => {
@@ -118,16 +122,23 @@ export class Popup extends Component {
       preview: { root },
     } = this.props;
 
-    if (root.type === "value") {
-      if (root.isFunction()) {
-        return this.renderFunctionPreview();
+    const enableNewObjectInspector = prefsService.getBoolPref(
+      "devtools.features.enableNewObjectInspector"
+    );
+    if (enableNewObjectInspector) {
+      return <NewObjectInspector />;
+    } else {
+      if (root.type === "value") {
+        if (root.isFunction()) {
+          return this.renderFunctionPreview();
+        }
+        if (root.isObject()) {
+          return <div>{this.renderObjectPreview()}</div>;
+        }
       }
-      if (root.isObject()) {
-        return <div>{this.renderObjectPreview()}</div>;
-      }
-    }
 
-    return this.renderSimplePreview();
+      return this.renderSimplePreview();
+    }
   }
 
   getPreviewType() {
