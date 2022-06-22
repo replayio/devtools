@@ -70,10 +70,13 @@ jobs:
           script: return require("uuid").v4()
     outputs:
       testRunId: ${{ steps.uuid.outputs.result }}
-  test0:
-    name: End-to-end tests (1)
+  e2etest:
+    name: End-to-end tests (${{ matrix.shard }})
     runs-on: macos-latest
     needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
+    strategy:
+      matrix:
+        shard: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
@@ -82,59 +85,7 @@ jobs:
         env:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          INPUT_STRIPE: 1/5
-  test1:
-    name: End-to-end tests (2)
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        env:
-          TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          INPUT_STRIPE: 2/5
-  test2:
-    name: End-to-end tests (3)
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        env:
-          TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          INPUT_STRIPE: 3/5
-  test3:
-    name: End-to-end tests (4)
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        env:
-          TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          INPUT_STRIPE: 4/5
-  test4:
-    name: End-to-end tests (5)
-    runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
-        env:
-          TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
-          PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
-          INPUT_STRIPE: 5/5
+          INPUT_STRIPE: ${{ matrix.shard }}/10
   mock-test:
     name: Mock Tests
     runs-on: macos-latest
