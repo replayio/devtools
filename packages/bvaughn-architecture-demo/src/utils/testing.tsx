@@ -122,6 +122,7 @@ export async function renderFocused(
 const MockReplayClient = {
   initialize: jest.fn().mockImplementation(async () => {}),
   getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
+  getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => {}),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),

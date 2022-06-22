@@ -1,9 +1,10 @@
-import { useMemo, useState } from "react";
-import type { HitCount, Location, PointDescription } from "@replayio/protocol";
-import { skipToken } from "@reduxjs/toolkit/dist/query";
-import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
+import type { HitCount, Location } from "@replayio/protocol";
+import { skipToken } from "@reduxjs/toolkit/dist/query";
+import CodeMirror from "@uiw/react-codemirror";
+import { useContext, useMemo, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
   useGetSourceTextQuery,
@@ -12,6 +13,7 @@ import {
   useGetPauseQuery,
 } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
+
 import { pointSelected } from "./sourcesSlice";
 
 export const SourceContent = () => {
@@ -23,8 +25,15 @@ export const SourceContent = () => {
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
   const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
 
-  const { currentData: sourceText } = useGetSourceTextQuery(selectedSourceId ?? skipToken);
-  const { currentData: sourceHits } = useGetSourceHitCountsQuery(selectedSourceId ?? skipToken);
+  const replayClient = useContext(ReplayClientContext);
+  const sessionId = replayClient.getSessionId()!;
+
+  const { currentData: sourceText } = useGetSourceTextQuery(
+    selectedSourceId ? { sessionId, sourceId: selectedSourceId } : skipToken
+  );
+  const { currentData: sourceHits } = useGetSourceHitCountsQuery(
+    selectedSourceId ? { sessionId, sourceId: selectedSourceId } : skipToken
+  );
 
   let closestHitPoint: HitCount | null = null;
   if (sourceHits && selectedLocation) {
@@ -37,11 +46,19 @@ export const SourceContent = () => {
     }, null as HitCount | null);
   }
 
+  const location = closestHitPoint?.location;
   const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
-    closestHitPoint?.location ?? skipToken
+    location ? { location, sessionId } : skipToken
   );
 
-  const { currentData: pause } = useGetPauseQuery(selectedPoint ?? skipToken);
+  const { currentData: pause } = useGetPauseQuery(
+    selectedPoint
+      ? {
+          point: selectedPoint,
+          sessionId,
+        }
+      : skipToken
+  );
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({
