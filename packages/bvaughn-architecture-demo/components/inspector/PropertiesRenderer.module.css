@@ -19,12 +19,10 @@
 
 .MapIndex {
   color: var(--object-inspector-expanded-key);
-  font-weight: bold;
 }
 
 .MapEntryPrefix {
   color: var(--object-inspector-expanded-key);
-  font-weight: bold;
 }
 .MapEntryPrefix::after {
   content: ":";

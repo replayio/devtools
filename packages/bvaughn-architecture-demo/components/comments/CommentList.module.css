@@ -8,8 +8,8 @@
 .Header {
   font-weight: bold;
   height: 2rem;
-  background-color: var(--background-color-contrast-4);
-  color: var(--color-contrast);
+  background-color: var(--background-color-contrast-2);
+  color: var(--color-default);
   display: flex;
   align-items: center;
 }

@@ -90,7 +90,8 @@ function HTMLAttributeRenderer({
 
   return (
     <span className={styles.HtmlAttribute}>
-      {name}=<span className={styles.HtmlAttributeValue}>{protocolValue.value!}</span>
+      <span className={styles.HtmlAttributeName}>{name}</span>
+      <span className={styles.HtmlAttributeValue}>{protocolValue.value!}</span>
     </span>
   );
 }

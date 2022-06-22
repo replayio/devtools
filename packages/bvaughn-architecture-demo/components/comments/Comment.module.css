@@ -5,15 +5,14 @@
   font-size: 1rem;
 }
 .UnpublishedComment {
-  border-left: 0.25rem solid var(--color-error);
-  background-color: var(--background-color-error);
+  background-color: var(--background-color-contrast-1);
 }
 
 .HeaderRow {
   display: flex;
   align-items: center;
   gap: 0.5ch;
-  padding: 0.25rem;
+  padding: 0.5rem;
   user-select: none;
 }
 
@@ -35,7 +34,7 @@
 }
 
 .Content {
-  padding: 0.25rem;
+  padding: 0.5rem;
 }
 
 .PublishedReply,
@@ -44,16 +43,16 @@
   padding-right: 0.25rem;
 }
 .UnpublishedReply {
-  border-left: 0.25rem solid var(--color-error);
-  background-color: var(--background-color-error);
+  background-color: var(--background-color-contrast-1);
 }
 
 .Button {
   padding: 0;
   outline: none;
   background: var(--background-color-contrast-1);
+  color: var(--color-default);
   border: 2px solid var(--background-color-contrast-2);
-  padding: 0.25rem;
+  padding: 0.5rem;
   display: flex;
   border-radius: 0.25rem;
   cursor: pointer;
@@ -77,9 +76,10 @@
   color: var(--color-brand);
   outline: none;
   border: none;
-  padding: 0.25rem;
-  background-color: var(--background-color-default);
-  border: 2px solid var(--background-color-contrast-1);
+  padding: 0.5rem;
+  background-color: var(--background-color-contrast-1);
+  color: var(--color-default);
+  border: 2px solid var(--background-color-contrast-2);
   border-radius: 0.25rem;
   margin: 0.25rem;
 }
@@ -91,7 +91,7 @@
   width: 100%;
   outline: none;
   border: none;
-  padding: 0.25rem;
+  padding: 0.5rem;
   background-color: var(--background-color-contrast-1);
   border: 2px solid var(--background-color-contrast-2);
   border-radius: 0.25rem;
