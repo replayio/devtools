@@ -4,9 +4,9 @@ import { ReactNode, useContext, useMemo, useState } from "react";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { Recording } from "ui/types";
 import { isReplayBrowser } from "ui/utils/environment";
-import RecordingRow from "../RecordingRow";
-import styles from "../Library.module.css";
-import { LibraryContext } from "../useFilters";
+import RecordingRow from "../../RecordingRow";
+import styles from "../../Library.module.css";
+import { LibraryContext } from "../../useFilters";
 
 function RecordingsError() {
   const { filter, setAppliedText } = useContext(LibraryContext);
@@ -36,7 +36,7 @@ function RecordingsError() {
   );
 }
 
-export function Recordings({
+export function RecordingList({
   recordings,
   selectedIds,
   setSelectedIds,

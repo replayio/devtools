@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunForWorkspace } from "ui/hooks/tests";
-import { LibraryContext } from "../useFilters";
 import styles from "../Library.module.css";
+import { TestRunsContext } from "../Content/TestRuns/TestRunsViewer";
 
 // This is an oversimplification of the possible states for the testRun
 // as we fetch it and doesn't acccount for errors. Todo: Make it more robust.
@@ -21,8 +21,8 @@ export const OverviewContext = createContext<OverviewContextType>({
 });
 
 export function OverviewContainer({ children }: { children: ReactNode }) {
-  const { preview } = useContext(LibraryContext);
-  const { testRun, loading } = useGetTestRunForWorkspace(preview!.id as string);
+  const { selectedRunId } = useContext(TestRunsContext);
+  const { testRun, loading } = useGetTestRunForWorkspace(selectedRunId!);
 
   return (
     <OverviewContext.Provider value={{ testRun, loading } as OverviewContextType}>

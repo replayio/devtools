@@ -4,26 +4,17 @@ import { getParams, updateUrlWithParams } from "ui/utils/environment";
 type LibraryContextType = {
   filter: string;
   view: View;
-  setPreview: (preview: Preview) => void;
   setView: (view: View) => void;
   setAppliedText: (str: string) => void;
-  preview: Preview | null;
-  initialTestRunId: string | null;
 };
-export type Preview = {
-  view: "test-runs";
-  id: string;
-};
+
 export type View = "recordings" | "test-runs";
 
 export const LibraryContext = createContext<LibraryContextType>({
   filter: "",
   view: "recordings",
-  setPreview: () => {},
   setView: () => {},
   setAppliedText: () => {},
-  preview: null,
-  initialTestRunId: null,
 });
 
 type Surrounder = {

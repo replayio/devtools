@@ -12,8 +12,7 @@ import { useGetUserInfo } from "ui/hooks/users";
 import LoadingScreen from "../shared/LoadingScreen";
 import { FilterBar } from "./FilterBar";
 import Sidebar from "./Sidebar";
-import { LibraryContext, Preview, useFilters, View } from "./useFilters";
-import ViewerRouter from "./ViewerRouter";
+import { LibraryContext, useFilters, View } from "./useFilters";
 import LaunchButton from "../shared/LaunchButton";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "./Library.module.css";
@@ -24,6 +23,8 @@ import {
   singleInvitation,
 } from "ui/utils/onboarding";
 import { useRouter } from "next/router";
+import { LibraryContent } from "./LibraryContent";
+import { useGetTestParams } from "./Content/TestRuns/TestRunsViewer";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -40,7 +41,7 @@ function isUnknownWorkspaceId(
   return !associatedWorkspaces.map(ws => ws.id).includes(id);
 }
 
-function LibraryLoader(props: PropsFromRedux & { testRunId?: string }) {
+function LibraryLoader(props: PropsFromRedux) {
   const { setModal } = props;
   const auth = useAuth0();
   const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
@@ -80,7 +81,6 @@ function LibraryLoader(props: PropsFromRedux & { testRunId?: string }) {
 type LibraryProps = PropsFromRedux & {
   workspaces: Workspace[];
   pendingWorkspaces?: Workspace[];
-  testRunId?: string;
 };
 
 function Library({
@@ -88,12 +88,11 @@ function Library({
   currentWorkspaceId,
   workspaces,
   pendingWorkspaces,
-  testRunId,
 }: LibraryProps) {
   const router = useRouter();
+  const { testRunId } = useGetTestParams();
   const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
   const [view, setView] = useState<View>(testRunId ? "test-runs" : "recordings");
-  const [preview, setPreview] = useState<Preview | null>(null);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   // TODO [jaril] Fix react-hooks/exhaustive-deps
@@ -123,8 +122,6 @@ function Library({
 
   const handleSetView = (view: View) => {
     setView(view);
-    setPreview(null);
-
     // If switching to test/test run view, we should clear the recording filters.
     if (view !== "recordings") {
       setAppliedText("");
@@ -136,11 +133,8 @@ function Library({
       value={{
         filter,
         view,
-        preview,
-        setPreview,
         setView: handleSetView,
         setAppliedText,
-        initialTestRunId: testRunId || null,
       }}
     >
       <main className="flex flex-row w-full h-full">
@@ -150,7 +144,9 @@ function Library({
             <FilterBar displayedString={displayedString} setDisplayedText={setDisplayedText} />
             <LaunchButton />
           </div>
-          <ViewerRouter />
+          <div className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}>
+            <LibraryContent />
+          </div>
         </div>
       </main>
     </LibraryContext.Provider>

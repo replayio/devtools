@@ -1,25 +1,24 @@
 import React, { useContext, useEffect } from "react";
 
-import Viewer from "./Viewer";
-
 import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import hooks from "ui/hooks";
-import Spinner from "../shared/Spinner";
-import { PendingTeamScreen } from "./PendingTeamScreen";
-import { MY_LIBRARY } from "../UploadScreen/libraryConstants";
+import Spinner from "../../../shared/Spinner";
+import { PendingTeamScreen } from "../../PendingTeamScreen";
+import { MY_LIBRARY } from "../../../UploadScreen/libraryConstants";
 import { actions } from "ui/actions";
-import { BlankViewportWrapper } from "../shared/Viewport";
-import Base64Image from "../shared/Base64Image";
+import { BlankViewportWrapper } from "../../../shared/Viewport";
+import Base64Image from "../../../shared/Base64Image";
 import { sendTelemetryEvent } from "ui/utils/telemetry";
 
-import { LibraryContext } from "./useFilters";
+import { LibraryContext } from "../../useFilters";
+import { RecordingsViewer } from "./RecordingsViewer";
 
 function ViewerLoader() {
   return (
-    <div className="grid h-full w-full items-center justify-items-center bg-chrome">
-      <Spinner className="text-themeBodyColor h-6 w-6 animate-spin" />
+    <div className="grid items-center w-full h-full justify-items-center bg-chrome">
+      <Spinner className="w-6 h-6 text-themeBodyColor animate-spin" />
     </div>
   );
 }
@@ -33,7 +32,7 @@ function MyLibrary() {
     return <ViewerLoader />;
   }
 
-  return <Viewer {...{ recordings, workspaceName: MY_LIBRARY }} />;
+  return <RecordingsViewer {...{ recordings, workspaceName: MY_LIBRARY }} />;
 }
 
 function TeamLibrary(props: ViewerRouterProps) {
@@ -66,7 +65,7 @@ function NonPendingTeamLibrary({ currentWorkspaceId }: ViewerRouterProps) {
   const workspace = workspaces.find(ws => ws.id === currentWorkspaceId)!;
 
   return (
-    <Viewer
+    <RecordingsViewer
       recordings={recordings}
       workspaceName={
         workspace.logo ? <Base64Image src={workspace.logo} className="max-h-12" /> : workspace.name

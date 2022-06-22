@@ -1,13 +1,12 @@
 import React, { useContext } from "react";
 import { useAppSelector } from "ui/setup/hooks";
-import { useFeature } from "ui/hooks/settings";
 import { getWorkspaceId } from "ui/reducers/app";
 import { Recording } from "ui/types";
-import { PrimaryButton, SecondaryButton } from "../shared/Button";
-import BatchActionDropdown from "./BatchActionDropdown";
-import styles from "./Library.module.css";
-import TeamTrialEnd from "./TeamTrialEnd";
-import { LibraryContext } from "./useFilters";
+import { PrimaryButton, SecondaryButton } from "../../../shared/Button";
+import BatchActionDropdown from "../../BatchActionDropdown";
+import styles from "../../Library.module.css";
+import TeamTrialEnd from "../../TeamTrialEnd";
+import { LibraryContext } from "../../useFilters";
 
 function ViewerHeaderActions({
   isEditing,

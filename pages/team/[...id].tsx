@@ -6,19 +6,9 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 
-function useGetTestParams() {
-  const { query } = useRouter();
-  const [workspaceId, view, testRunId] = Array.isArray(query.id) ? query.id : [query.id];
-
-  return { testRunId };
-}
-
 export default function TeamPage() {
   const { isAuthenticated } = useAuth0();
   const { setWorkspaceId, setModal } = actions;
-  // This is not pretty but it gets the job done. There's a restructuring of how we
-  // think about pages/routes if we were to do this the right way. Todo: That.
-  const { testRunId } = useGetTestParams();
   const dispatch = useAppDispatch();
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
   const { query, replace } = useRouter();
@@ -34,21 +24,9 @@ export default function TeamPage() {
         },
       });
 
-      if (testRunId) {
-        return;
-      }
-
       replace("/");
     }
-  }, [
-    isAuthenticated,
-    workspaceId,
-    replace,
-    setWorkspaceId,
-    updateDefaultWorkspace,
-    dispatch,
-    testRunId,
-  ]);
+  }, [isAuthenticated, workspaceId, replace, setWorkspaceId, updateDefaultWorkspace, dispatch]);
 
   useEffect(() => {
     if (isAuthenticated && workspaceId && modal === "settings") {
@@ -56,5 +34,5 @@ export default function TeamPage() {
     }
   }, [isAuthenticated, workspaceId, modal, view, setModal, dispatch]);
 
-  return <Account testRunId={testRunId} />;
+  return <Account />;
 }
