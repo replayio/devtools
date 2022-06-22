@@ -126,6 +126,7 @@ export async function createSession(
   });
 
   gSessionCallbacks = sessionCallbacks;
+
   return sessionId;
 }
 
