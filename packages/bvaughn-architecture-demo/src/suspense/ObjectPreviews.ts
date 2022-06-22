@@ -95,21 +95,37 @@ export function getObjectWithPreview(
 }
 
 export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
+  objects.forEach(object => preCacheObject(pauseId, object));
+}
+
+export function preCacheObject(pauseId: PauseId, object: Object): void {
   const { objectMap, previewRecordMap, fullPreviewRecordMap } =
     getOrCreateObjectWithPreviewMap(pauseId);
-  objects.forEach(object => {
-    const { objectId } = object;
+  const { objectId } = object;
 
-    // Always cache Objects in the objectMap map, even onces without previews or with overflow.
-    if (!objectMap.has(objectId)) {
-      objectMap.set(objectId, object);
+  // Always cache Objects in the objectMap map, even onces without previews or with overflow.
+  if (!objectMap.has(objectId)) {
+    objectMap.set(objectId, object);
+  }
+
+  // Only cache objects with previews in the recordMap map though.
+  if (object.preview != null) {
+    const record = previewRecordMap.get(objectId);
+    if (record == null) {
+      previewRecordMap.set(objectId, {
+        status: STATUS_RESOLVED,
+        value: object,
+      });
+    } else if (record.status !== STATUS_RESOLVED) {
+      // @ts-ignore
+      record.status = STATUS_RESOLVED;
+      record.value = object;
     }
 
-    // Only cache objects with previews in the recordMap map though.
-    if (object.preview != null) {
-      const record = previewRecordMap.get(objectId);
+    if (!object.preview.overflow) {
+      const record = fullPreviewRecordMap.get(objectId);
       if (record == null) {
-        previewRecordMap.set(objectId, {
+        fullPreviewRecordMap.set(objectId, {
           status: STATUS_RESOLVED,
           value: object,
         });
@@ -118,22 +134,8 @@ export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
         record.status = STATUS_RESOLVED;
         record.value = object;
       }
-
-      if (!object.preview.overflow) {
-        const record = fullPreviewRecordMap.get(objectId);
-        if (record == null) {
-          fullPreviewRecordMap.set(objectId, {
-            status: STATUS_RESOLVED,
-            value: object,
-          });
-        } else if (record.status !== STATUS_RESOLVED) {
-          // @ts-ignore
-          record.status = STATUS_RESOLVED;
-          record.value = object;
-        }
-      }
     }
-  });
+  }
 }
 
 async function fetchObjectWithPreview(

@@ -69,23 +69,8 @@ function HTMLChildRenderer({
 function isEmptyTextNode(object: ProtocolObject): boolean {
   if (object.className === "Text") {
     const textContent = object.preview?.getterValues?.find(value => value.name === "wholeText");
-    if (textContent) {
-      if (typeof textContent.value === "string") {
-        if (textContent.value.trim() === "") {
-          return true;
-        }
-      } else {
-        // HACK
-        // The Object Inspector might be rendered within the legacy Replay app.
-        // In that case, objects might contain ValueFronts instead of protocol values.
-        const maybeValueFront = textContent.value as any;
-        if (
-          typeof maybeValueFront.primitive === "function" &&
-          maybeValueFront.primitive().trim() === ""
-        ) {
-          return true;
-        }
-      }
+    if (textContent && typeof textContent.value === "string" && textContent.value.trim() === "") {
+      return true;
     }
   }
 

@@ -17,7 +17,7 @@ import {
 } from "@replayio/protocol";
 
 import { client } from "../socket";
-import { defer, assert, Deferred } from "../utils";
+import { defer, assert, Deferred, EventEmitter } from "../utils";
 
 import { NodeBoundsFront } from "./bounds";
 import { NodeFront } from "./node";
@@ -88,6 +88,8 @@ export interface EvaluationResult {
   failed?: boolean;
 }
 
+type PauseEvent = "objects";
+
 // Information about a protocol pause.
 export class Pause {
   ThreadFront: typeof ThreadFrontType;
@@ -109,6 +111,12 @@ export class Pause {
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
+  // added by EventEmitter.decorate(ThreadFront)
+  eventListeners!: Map<PauseEvent, ((value?: any) => void)[]>;
+  on!: (name: PauseEvent, handler: (value?: any) => void) => void;
+  off!: (name: PauseEvent, handler: (value?: any) => void) => void;
+  emit!: (name: PauseEvent, value?: any) => void;
+
   constructor(ThreadFront: typeof ThreadFrontType) {
     this.ThreadFront = ThreadFront;
     this.sessionId = ThreadFront.sessionId!;
@@ -128,6 +136,8 @@ export class Pause {
 
     this.documentNode = undefined;
     this.domFronts = new Map();
+
+    EventEmitter.decorate<any, PauseEvent>(this);
   }
 
   static getById(pauseId: PauseId) {
@@ -200,6 +210,7 @@ export class Pause {
         this.objects.set(o.objectId, o as WiredObject);
       }
     });
+    this.emit("objects", objects || []);
   }
 
   private _updateDataFronts({ frames, scopes, objects }: PauseData) {
