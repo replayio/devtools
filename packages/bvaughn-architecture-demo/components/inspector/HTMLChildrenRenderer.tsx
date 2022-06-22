@@ -44,7 +44,7 @@ function HTMLChildRenderer({
   objectId: ProtocolObjectId;
   pauseId: ProtocolPauseId;
 }) {
-  const client = useContext(ReplayClientContext)!;
+  const client = useContext(ReplayClientContext);
 
   // HACK
   const protocolValue = { object: objectId };
