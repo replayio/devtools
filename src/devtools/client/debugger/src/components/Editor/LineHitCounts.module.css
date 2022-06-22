@@ -9,7 +9,7 @@
   top: -0.25px;
 
   font-size: 8px;
-  border-left: 3px solid var(--gutter-hit-count-background);
+  border-left: 5px solid var(--gutter-hit-count-background);
 
   white-space: nowrap;
   overflow: hidden;

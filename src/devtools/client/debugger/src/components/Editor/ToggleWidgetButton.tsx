@@ -77,6 +77,7 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 };
 
 function QuickActions({
+  isLineHitCountsCollapsed,
   hoveredLineNumber,
   onMouseDown,
   keyModifiers,
@@ -84,6 +85,7 @@ function QuickActions({
   breakpoint,
   cx,
 }: {
+  isLineHitCountsCollapsed: boolean;
   hoveredLineNumber: number;
   onMouseDown: MouseEventHandler;
   keyModifiers: KeyModifiers;
@@ -144,7 +146,7 @@ function QuickActions({
       className={classNames(
         "line-action-button absolute z-50 flex translate-x-full transform flex-row space-x-px",
         enableLargeText && "bottom-0.5",
-        hitCounts ? "-right-9" : "-right-1"
+        hitCounts ? (isLineHitCountsCollapsed ? "-right-2" : "-right-5") : "-right-1"
       )}
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
@@ -155,9 +157,14 @@ function QuickActions({
   );
 }
 
-type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
+type ToggleWidgetButtonProps = PropsFromRedux & { editor: any; isLineHitCountsCollapsed: boolean };
 
-function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
+function ToggleWidgetButton({
+  editor,
+  cx,
+  breakpoints,
+  isLineHitCountsCollapsed,
+}: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
@@ -199,6 +206,7 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
     <KeyModifiersContext.Consumer>
       {keyModifiers => (
         <QuickActions
+          isLineHitCountsCollapsed={isLineHitCountsCollapsed}
           hoveredLineNumber={hoveredLineNumber}
           onMouseDown={onMouseDown}
           targetNode={targetNode}
