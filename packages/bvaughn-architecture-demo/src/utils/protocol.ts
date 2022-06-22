@@ -42,7 +42,7 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
 // This utility function maps from one ot the other.
 //
 // See https://linear.app/replay/issue/BAC-1808
-export function reformatValue(
+export function protocolValueToClientValue(
   pauseId: ProtocolPauseId,
   protocolValue: ProtocolValue | ProtocolNamedValue
 ): Value {
@@ -155,4 +155,28 @@ export function reformatValue(
   }
 
   throw Error(`Unsupported value type`);
+}
+
+export function clientValueToProtocolValue(clientValue: any): ProtocolValue {
+  const protocolValue: ProtocolValue = {};
+  if (clientValue.contents.isUnavailable()) {
+    protocolValue.unavailable = true;
+  } else if (clientValue.contents.isUninitialized()) {
+    protocolValue.uninitialized = true;
+  } else if (clientValue.contents.isUnserializableNumber()) {
+    protocolValue.unserializableNumber = `${clientValue.contents.primitive()}`;
+  } else if (clientValue.contents.isSymbol()) {
+    protocolValue.symbol = clientValue.contents.primitive() as string;
+  } else if (clientValue.contents.isBigInt()) {
+    protocolValue.bigint = `${clientValue.contents.primitive()}`;
+  } else if (clientValue.isObject()) {
+    protocolValue.object = clientValue.contents.objectId();
+  } else if (clientValue.isPrimitive()) {
+    const primitive = clientValue.contents.primitive();
+    if (primitive !== undefined) {
+      protocolValue.value = primitive;
+    }
+  }
+
+  return protocolValue;
 }

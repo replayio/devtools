@@ -23,6 +23,7 @@ pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
+pref("devtools.features.enableNewObjectInspector", false);
 pref("devtools.features.httpBodies", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.networkRequestComments", true);
@@ -58,6 +59,7 @@ export const features = new PrefsHelper("devtools.features", {
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
   enableLargeText: ["Bool", "enableLargeText"],
+  enableNewObjectInspector: ["Bool", "enableNewObjectInspector"],
   httpBodies: ["Bool", "httpBodies"],
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],

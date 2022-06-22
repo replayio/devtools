@@ -20,6 +20,7 @@ export class ValueFront {
   private _primitive: string | number | null | undefined;
   private _isBigInt: boolean;
   private _isSymbol: boolean;
+  private _isUnserializableNumber: boolean;
   private _object: WiredObject | null;
   private _uninitialized: boolean;
   private _unavailable: boolean;
@@ -33,6 +34,7 @@ export class ValueFront {
     this._primitive = undefined;
     this._isBigInt = false;
     this._isSymbol = false;
+    this._isUnserializableNumber = false;
 
     // For objects.
     this._object = null;
@@ -57,6 +59,7 @@ export class ValueFront {
       }
     } else if ("unserializableNumber" in protocolValue) {
       this._hasPrimitive = true;
+      this._isUnserializableNumber;
       this._primitive = Number(protocolValue.unserializableNumber);
     } else if ("bigint" in protocolValue) {
       this._hasPrimitive = true;
@@ -235,6 +238,14 @@ export class ValueFront {
 
   isBigInt() {
     return this._isBigInt;
+  }
+
+  isSymbol() {
+    return this._isSymbol;
+  }
+
+  isUnserializableNumber() {
+    return this._isUnserializableNumber;
   }
 
   primitive() {

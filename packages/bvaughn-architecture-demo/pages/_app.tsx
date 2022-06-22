@@ -8,6 +8,7 @@ import Initializer from "../components/Initializer";
 import Loader from "../components/Loader";
 
 import "./global.css";
+import "./inspector.css";
 
 interface AuthProps {
   apiKey?: string;

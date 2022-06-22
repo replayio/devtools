@@ -5,6 +5,7 @@ import {
 } from "@replayio/protocol";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import KeyValueRenderer from "./KeyValueRenderer";
 
@@ -46,6 +47,12 @@ function HTMLChildRenderer({
 }) {
   const client = useContext(ReplayClientContext);
 
+  // Filter out empty text nodes to avoid displaying a bunch of white space entries.
+  const object = getObjectWithPreview(client, pauseId, objectId);
+  if (isEmptyTextNode(object)) {
+    return null;
+  }
+
   // HACK
   const protocolValue = { object: objectId };
 
@@ -57,4 +64,30 @@ function HTMLChildRenderer({
       protocolValue={protocolValue}
     />
   );
+}
+
+function isEmptyTextNode(object: ProtocolObject): boolean {
+  if (object.className === "Text") {
+    const textContent = object.preview?.getterValues?.find(value => value.name === "wholeText");
+    if (textContent) {
+      if (typeof textContent.value === "string") {
+        if (textContent.value.trim() === "") {
+          return true;
+        }
+      } else {
+        // HACK
+        // The Object Inspector might be rendered within the legacy Replay app.
+        // In that case, objects might contain ValueFronts instead of protocol values.
+        const maybeValueFront = textContent.value as any;
+        if (
+          typeof maybeValueFront.primitive === "function" &&
+          maybeValueFront.primitive().trim() === ""
+        ) {
+          return true;
+        }
+      }
+    }
+  }
+
+  return false;
 }

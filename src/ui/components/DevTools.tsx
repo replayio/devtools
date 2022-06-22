@@ -1,5 +1,5 @@
 import { ThreadFront } from "protocol/thread";
-import React, { useEffect, useState, useRef, useMemo } from "react";
+import React, { useEffect, useState, useRef, useMemo, useContext } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import { clearTrialExpired, createSocket } from "ui/actions/session";
@@ -33,6 +33,8 @@ import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { useFeature } from "ui/hooks/settings";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -113,6 +115,16 @@ function _DevTools({
     [recording]
   );
 
+  // Wire up the ReplayClient used for the new Object Inspector component.
+  const replayClient = useContext(ReplayClientContext);
+  useEffect(() => {
+    async function initSession() {
+      const sessionId = await ThreadFront.waitForSession();
+      replayClient.configure(sessionId!);
+    }
+    initSession();
+  }, [replayClient]);
+
   useEffect(() => {
     import("./Viewer");
   }, []);
@@ -140,10 +152,11 @@ function _DevTools({
 
   useEffect(() => {
     createSocket(recordingId, ThreadFront);
+
     return () => {
       clearTrialExpired();
     };
-  }, [clearTrialExpired, createSocket, recordingId]);
+  }, [clearTrialExpired, createSocket, recordingId, replayClient]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {
