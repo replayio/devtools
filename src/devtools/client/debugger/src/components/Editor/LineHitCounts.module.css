@@ -1,12 +1,13 @@
-.HitsBadge {
+.HitsBadge0,
+.HitsBadge1,
+.HitsBadge2,
+.HitsBadge3 {
   display: flex;
   align-items: center;
   justify-content: center;
 
   width: 100%;
   height: calc(var(--theme-code-font-size) * 1.4);
-  position: relative;
-  top: -0.25px;
 
   font-size: 8px;
   border-left: 5px solid var(--gutter-hit-count-background);
@@ -14,15 +15,22 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  color: var(--line-hit-color);
 }
 
-.HitsBadge::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: var(--gutter-hit-count-background);
-  opacity: 0.2;
+.HitsBadge0 {
+  border-left: 5px solid var(--line-hit-border-color-0);
+}
+.HitsBadge1 {
+  background-color: var(--line-hit-background-color-1);
+  border-left: 5px solid var(--line-hit-border-color-1);
+}
+.HitsBadge2 {
+  background-color: var(--line-hit-background-color-2);
+  border-left: 5px solid var(--line-hit-border-color-2);
+}
+.HitsBadge3 {
+  background-color: var(--line-hit-background-color-3);
+  border-left: 5px solid var(--line-hit-border-color-3);
 }

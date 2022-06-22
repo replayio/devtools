@@ -194,6 +194,14 @@
   --debug-line-background: #e8f5fb;
   --gutter-hit-count-background: #f3f4f6;
   --gutter-hit-count-foreground: #aeaeae;
+  --line-hit-background-color-1: #bbeafa25;
+  --line-hit-background-color-2: #69a6ff25;
+  --line-hit-background-color-3: #2979ef25;
+  --line-hit-border-color-0: #d9dad9;
+  --line-hit-border-color-1: #bbeafa;
+  --line-hit-border-color-2: #69a6ff;
+  --line-hit-border-color-3: #2979ef;
+  --line-hit-color: #47628b;
 
   /* Breakpoints (Light) */
   --breakpoint-arrow-disabled: var(--theme-base-90);
@@ -453,6 +461,14 @@
   --debug-line-background: var(--theme-base-100);
   --gutter-hit-count-background: #081121;
   --gutter-hit-count-foreground: #6a717e;
+  --line-hit-background-color-1: #2563be25;
+  --line-hit-background-color-2: #6ba6ff25;
+  --line-hit-background-color-3: #baecfa25;
+  --line-hit-border-color-0: #445064;
+  --line-hit-border-color-1: #2563be;
+  --line-hit-border-color-2: #6ba6ff;
+  --line-hit-border-color-3: #baecfa;
+  --line-hit-color: #a4c6f8;
 
   /* Breakpoints (Dark) */
   --breakpoint-arrow-disabled: var(--theme-base-80);
