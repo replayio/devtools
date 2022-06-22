@@ -15,45 +15,47 @@ body {
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color-contrast-1: #192331;
-    --background-color-contrast-2: #3e434b;
+    --background-color-contrast-1: #0e1119;
+    --background-color-contrast-2: #2a3343;
     --background-color-contrast-3: #454950;
     --background-color-contrast-4: #e1e6ed;
-    --background-color-default: #202124;
-    --background-color-error: #ff0039;
-    --background-color-warning: #bd9b02;
+    --background-color-default: #192230;
+    --background-color-error: #4b2f36;
+    --background-color-warning: #42381f;
     --color-brand: #09a6e9;
     --color-contrast: #081121;
     --color-default: #ffffff;
-    --color-error: #ffffff;
-    --color-warning: #ffffff;
+    --color-error: #ffb3d2;
+    --color-warning: #fce2a1;
 
-    --object-inspector-go-to-definition-icon-color: #9aa0a5;
-    --object-inspector-go-to-definition-icon-color-hover: #b1b8be;
-    --object-inspector-prototype-color: #858b91;
-    --object-inspector-separator-color: #cfd3d5;
+    --object-inspector-go-to-definition-icon-color: #dddddd;
+    --object-inspector-go-to-definition-icon-color-hover: #ffffff;
+    --object-inspector-prototype-color: #939395;
+    --object-inspector-separator-color: #939395;
     --object-inspector-toggle-color: #9ba0a5;
-    --object-inspector-function-keyword: #f09666;
+    --object-inspector-function-keyword: #ff7de9;
     --object-inspector-function-name: #bcc5ce;
-    --object-inspector-expanded-key: #5ca9cf;
-    --object-inspector-expanded-key-with-flag: #45758c;
+    --object-inspector-expanded-key: #81d5ff;
+    --object-inspector-expanded-key-with-flag: #5ca9cf;
     --object-inspector-inline-key: #36d1c4;
-    --object-inspector-bucket-color: #858b91;
+    --object-inspector-bucket-color: #939395;
 
-    --value-type-bigint: #858585;
-    --value-type-boolean: #8e77ea;
-    --value-type-nan: #8e77ea;
-    --value-type-null: #6d7276;
-    --value-type-number: #8e77ea;
+    --value-type-bigint: #86de74;
+    --value-type-boolean: #86de74;
+    --value-type-nan: #86de74;
+    --value-type-null: #939395;
+    --value-type-number: #86de74;
     --value-type-object: #e6e9ec;
     --value-type-regexp: #34d3c6;
     --value-type-string: #e7eaed;
     --value-type-symbol: #34d3c6;
-    --value-type-undefined: #6d7276;
-    --value-type-html-attribute-name: #9abadc;
-    --value-type-html-attribute-value: #d7895e;
-    --value-type-html-tag: #59a4c7;
-    --value-type-html-text: #e2e5e8;
+    --value-type-undefined: #939395;
+    --value-type-html-attribute-name: #ff7de9;
+    --value-type-html-attribute-separator: #9ba0a5;
+    --value-type-html-attribute-value: #ae87f2;
+    --value-type-html-tag: #75bffe;
+    --value-type-html-tag-bracket: #e6e9ec;
+    --value-type-html-text: #d7d7db;
   }
 }
 
@@ -72,31 +74,33 @@ body {
     --color-error: #ff0000;
     --color-warning: #6c5914;
 
-    --object-inspector-go-to-definition-icon-color: #556677;
+    --object-inspector-go-to-definition-icon-color: #222222;
     --object-inspector-go-to-definition-icon-color-hover: #000000;
-    --object-inspector-prototype-color: #82888c;
-    --object-inspector-separator-color: #82888c;
-    --object-inspector-toggle-color: #82888c;
-    --object-inspector-function-keyword: #2020a7;
-    --object-inspector-function-name: #262729;
-    --object-inspector-expanded-key: #881180;
-    --object-inspector-expanded-key-with-flag: #ba77b4;
-    --object-inspector-inline-key: #82888c;
-    --object-inspector-bucket-color: #82888c;
+    --object-inspector-prototype-color: #737373;
+    --object-inspector-separator-color: #737373;
+    --object-inspector-toggle-color: #868688;
+    --object-inspector-function-keyword: #dd00a8;
+    --object-inspector-function-name: #0074e8;
+    --object-inspector-expanded-key: #0074e8;
+    --object-inspector-expanded-key-with-flag: #0074e8;
+    --object-inspector-inline-key: #0074e8;
+    --object-inspector-bucket-color: #737373;
 
-    --value-type-bigint: #3f7d3f;
-    --value-type-boolean: #2020a7;
-    --value-type-nan: #2020a7;
-    --value-type-null: #82888c;
-    --value-type-number: #2020a7;
-    --value-type-object: #353639;
-    --value-type-regexp: #ca1811;
+    --value-type-bigint: #058b00;
+    --value-type-boolean: #058b00;
+    --value-type-nan: #058b00;
+    --value-type-null: #737373;
+    --value-type-number: #058b00;
+    --value-type-object: #0c0c0d;
+    --value-type-regexp: #0074e8;
     --value-type-string: #0c0c0d;
-    --value-type-symbol: #ca1811;
-    --value-type-undefined: #82888c;
-    --value-type-html-attribute-name: #9a4705;
-    --value-type-html-attribute-value: #3535b3;
-    --value-type-html-tag: #8f268a;
-    --value-type-html-text: #404144;
+    --value-type-symbol: #dd00a9;
+    --value-type-undefined: #737373;
+    --value-type-html-attribute-name: #dd00a9;
+    --value-type-html-attribute-separator: #737373;
+    --value-type-html-attribute-value: #003eaa;
+    --value-type-html-tag: #0074e8;
+    --value-type-html-tag-bracket: #0c0c0d;
+    --value-type-html-text: #0c0c0d;
   }
 }

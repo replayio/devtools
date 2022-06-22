@@ -6,10 +6,11 @@
   flex-wrap: wrap;
   align-items: flex-start;
   gap: 1ch;
-  padding: 0.25rem;
-  font-family: monospace;
-  font-size: 10px;
+  padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--background-color-contrast-2);
+
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
 }
 .MessageRow {
   background-color: var(--background-color-default);
