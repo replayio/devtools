@@ -1,8 +1,8 @@
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import Loader from "../Loader";
@@ -13,7 +13,6 @@ import styles from "./KeyValueRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
 import ValueRenderer from "./ValueRenderer";
-import HTMLElementRenderer from "./values/HTMLElementRenderer";
 
 // Renders a protocol Object/ObjectPreview as a key+value pair.
 //

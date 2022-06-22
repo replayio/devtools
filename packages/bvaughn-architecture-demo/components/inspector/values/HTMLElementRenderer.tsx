@@ -1,12 +1,12 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { ReplayClientContext } from "../../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../../src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "../../../src/utils/protocol";
 
 import useClientValue from "../useClientValue";
-import ValueRenderer from "../ValueRenderer";
+
 import ClientValueValueRenderer from "./ClientValueValueRenderer";
 
 import styles from "./shared.module.css";

@@ -1,10 +1,11 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
+import { ReplayClientInterface } from "shared/client/ReplayClient";
 
-import { ReplayClientInterface } from "../client/ReplayClient";
-import { Wakeable } from "./types";
 import { createWakeable } from "../utils/suspense";
 import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
+
 import { preCacheObjects } from "./ObjectPreviews";
+import { Wakeable } from "./types";
 
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,

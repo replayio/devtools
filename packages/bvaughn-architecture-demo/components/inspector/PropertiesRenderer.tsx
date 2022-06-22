@@ -7,8 +7,8 @@ import {
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { FC, useContext, useMemo } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { ReplayClientContext } from "../../src/contexts/ReplayClientContext";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
 import Collapsible from "./Collapsible";

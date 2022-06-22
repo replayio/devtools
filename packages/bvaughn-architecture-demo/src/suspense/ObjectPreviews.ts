@@ -1,8 +1,9 @@
 import { Object, ObjectId, PauseId } from "@replayio/protocol";
-import { ReplayClientInterface } from "../client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/ReplayClient";
+
+import { createWakeable } from "../utils/suspense";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
-import { createWakeable } from "../utils/suspense";
 
 type ObjectMap = Map<ObjectId, Object>;
 type RecordMap = Map<ObjectId, Record<Object>>;
@@ -73,9 +74,7 @@ export function getObjectWithPreview(
   const recordMap = noOverflow ? maps.fullPreviewRecordMap : maps.previewRecordMap;
 
   let record = recordMap.get(objectId);
-
-  let shouldFetch = record == null;
-  if (shouldFetch) {
+  if (record == null) {
     const wakeable = createWakeable<Object>();
 
     record = {
