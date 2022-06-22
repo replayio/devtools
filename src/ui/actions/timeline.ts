@@ -93,12 +93,6 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    assert(ThreadFront.recordingId, "no recordingId");
-
-    await ThreadFront.waitForSession();
-    const { duration } = await ThreadFront.getRecordingDescription();
-    dispatch(setRecordingDescription(duration));
-
     const { endpoint } = await ThreadFront.getEndpoint();
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
@@ -111,7 +105,7 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     );
 
     let hasFrames = false;
-    const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId);
+    const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
     if (
       initialPausePoint &&
       isTimeInRegions(initialPausePoint.time, getLoadedRegions(state)!.loading)

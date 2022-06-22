@@ -122,6 +122,7 @@ export function createSocket(
   ThreadFront: typeof ThreadFrontType
 ): UIThunkAction {
   return async (dispatch, getState) => {
+    assert(recordingId, "no recordingId");
     try {
       if (ThreadFront.recordingId) {
         assert(
