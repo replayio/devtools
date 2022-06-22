@@ -4,13 +4,46 @@ import PortalDropdown from "../shared/PortalDropdown";
 import { useFeature } from "ui/hooks/settings";
 import { Dropdown, DropdownDivider, DropdownItem } from "./LibraryDropdown";
 import { LibraryContext, View } from "./useFilters";
+import { getWorkspaceId } from "ui/actions/app";
+import { useGetWorkspace } from "ui/hooks/workspaces";
+import { useAppSelector } from "ui/setup/hooks";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
+
+export function ViewOptions({
+  collapseDropdown,
+  workspaceId,
+}: {
+  collapseDropdown: () => void;
+  workspaceId: string;
+}) {
+  const { setView } = useContext(LibraryContext);
+  const { workspace } = useGetWorkspace(workspaceId);
+  const { value: testSupport } = useFeature("testSupport");
+
+  const handleSetView = (view: View) => {
+    collapseDropdown();
+    setView(view);
+  };
+
+  // Don't show the options if the feature flag is off, or the workspace is not a test workspace.
+  if (!testSupport || !workspace?.isTest) {
+    return null;
+  }
+
+  return (
+    <>
+      <DropdownDivider />
+      <DropdownItem onClick={() => handleSetView("recordings")}>Show Recordings</DropdownItem>
+      <DropdownItem onClick={() => handleSetView("test-runs")}>Show Runs</DropdownItem>
+    </>
+  );
+}
 
 export function FilterDropdown() {
   const { setAppliedText, setView, view } = useContext(LibraryContext);
   const [expanded, setExpanded] = useState(false);
-  const { value: testSupport } = useFeature("testSupport");
+  const currentWorkspaceId = useAppSelector(getWorkspaceId);
 
   const setStringAndCollapseDropdown = (str: string) => {
     setAppliedText(str);
@@ -22,10 +55,6 @@ export function FilterDropdown() {
     const isoString = new Date(new Date().getTime() - secondsAgo).toISOString().substr(0, 10);
 
     return setStringAndCollapseDropdown(`created:${isoString}`);
-  };
-  const handleSetView = (view: View) => {
-    setExpanded(false);
-    setView(view);
   };
 
   const buttonLabel = view === "recordings" ? "Filters" : "Test Runs";
@@ -51,12 +80,11 @@ export function FilterDropdown() {
         <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>
           Node replays
         </DropdownItem>
-        {testSupport ? (
-          <>
-            <DropdownDivider />
-            <DropdownItem onClick={() => handleSetView("recordings")}>Show Recordings</DropdownItem>
-            <DropdownItem onClick={() => handleSetView("test-runs")}>Show Runs</DropdownItem>
-          </>
+        {currentWorkspaceId ? (
+          <ViewOptions
+            collapseDropdown={() => setExpanded(false)}
+            workspaceId={currentWorkspaceId}
+          />
         ) : null}
       </Dropdown>
     </PortalDropdown>

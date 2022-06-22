@@ -31,6 +31,7 @@ OnlyOrganization.args = {
       id: "org1",
       name: "Organization",
       isOrganization: true,
+      isTest: false,
       settings: getDefaultOrganizationSettings(),
       isDomainLimitedCode: false,
       domain: "domain.com",
@@ -50,6 +51,7 @@ OrgLibraryDisabled.args = {
       id: "org1",
       name: "Organization",
       isOrganization: true,
+      isTest: false,
       settings: {
         features: {
           user: {
@@ -82,6 +84,7 @@ OrgPublicDisabled.args = {
       id: "org1",
       name: "Organization",
       isOrganization: true,
+      isTest: false,
       settings: {
         features: {
           user: {
@@ -114,6 +117,7 @@ OrgLibraryAndPublicDisabled.args = {
       id: "org1",
       name: "Organization",
       isOrganization: true,
+      isTest: false,
       settings: {
         features: {
           user: {
@@ -146,6 +150,7 @@ NoOrgs.args = {
       id: "team1",
       name: "Team 1",
       isOrganization: true,
+      isTest: false,
       settings: getDefaultOrganizationSettings(),
       isDomainLimitedCode: false,
       domain: "domain.com",
@@ -156,6 +161,7 @@ NoOrgs.args = {
       id: "team2",
       name: "Team 2",
       isOrganization: true,
+      isTest: false,
       settings: getDefaultOrganizationSettings(),
       isDomainLimitedCode: false,
       domain: "domain.com",
