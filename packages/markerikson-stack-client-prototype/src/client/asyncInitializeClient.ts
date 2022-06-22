@@ -1,9 +1,8 @@
+import { ReplayClientInterface } from "shared/client/ReplayClient";
 import { UserInfo } from "../graphql/types";
 import { getCurrentUserInfo } from "../graphql/User";
 
-import globalReplayClient from "./globalReplayClient";
-
-export default async function asyncInitializeClient() {
+export default async function asyncInitializeClient(replayClient: ReplayClientInterface) {
   // Read some of the hard-coded values from query params.
   // (This is just a prototype; no sense building a full authentication flow.)
   const url = new URL(window.location.href);
@@ -14,8 +13,8 @@ export default async function asyncInitializeClient() {
     throw Error(`Must specify "recordingId" parameter.`);
   }
 
-  const sessionId = await globalReplayClient.initialize(recordingId, accessToken);
-  const endpoint = await globalReplayClient.getSessionEndpoint(sessionId);
+  const sessionId = await replayClient.initialize(recordingId, accessToken);
+  const endpoint = await replayClient.getSessionEndpoint(sessionId);
   console.log("Loaded session: ", sessionId);
 
   // The demo doesn't use these directly, but the client throws if they aren't loaded.

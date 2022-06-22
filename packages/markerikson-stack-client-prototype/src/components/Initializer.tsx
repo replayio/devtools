@@ -20,17 +20,19 @@ export default function Initializer({ children }: { children: ReactNode }) {
   const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
 
+  const replayClient = useContext(ReplayClientContext);
+
   useEffect(() => {
     // The WebSocket and session/authentication are global.
     // We only need to initialize them once.
     if (!didInitializeRef.current) {
-      asyncInitializeClient().then(sessionData => {
+      asyncInitializeClient(replayClient).then(sessionData => {
         setContext(sessionData);
       });
     }
 
     didInitializeRef.current = true;
-  }, [client]);
+  }, [client, replayClient]);
 
   if (context === null) {
     return null;

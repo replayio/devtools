@@ -19,6 +19,7 @@ import { compareNumericStrings } from "protocol/utils";
 
 export interface ReplayClientInterface {
   getPauseIdForMessage(message: Message): PauseId;
+  getSessionId(): SessionId | null;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
@@ -70,6 +71,10 @@ export class ReplayClient implements ReplayClient {
     );
 
     return pause.pauseId!;
+  }
+
+  getSessionId(): SessionId | null {
+    return this._sessionId;
   }
 
   async initialize(recordingId: string, accessToken: string | null): Promise<SessionId> {
