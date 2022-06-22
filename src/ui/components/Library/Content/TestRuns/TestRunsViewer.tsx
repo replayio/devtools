@@ -40,10 +40,10 @@ export function TestRunsViewer() {
     if (testRuns) {
       const routeRunIndex = testRuns.findIndex(t => t.id === testRunId);
       if (routeRunIndex >= 0) {
-        setSelectedRunIndex(routeRunIndex)
+        setSelectedRunIndex(routeRunIndex);
       }
     }
-  }, [testRunId, testRuns])
+  }, [testRunId, testRuns]);
 
   if (loading || !testRuns) {
     return (

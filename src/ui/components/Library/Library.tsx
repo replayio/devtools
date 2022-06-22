@@ -25,6 +25,8 @@ import {
 import { useRouter } from "next/router";
 import { LibraryContent } from "./LibraryContent";
 import { useGetTestParams } from "./Content/TestRuns/TestRunsViewer";
+import { useGetWorkspace } from "ui/hooks/workspaces";
+import { useAppSelector } from "ui/setup/hooks";
 
 function isUnknownWorkspaceId(
   id: string | null,
@@ -50,6 +52,8 @@ function LibraryLoader(props: PropsFromRedux) {
   const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
   const { nags, loading: loading3 } = useGetUserInfo();
   const dismissNag = hooks.useDismissNag();
+  const workspaceId = useAppSelector(selectors.getWorkspaceId);
+  const { workspace, loading: loading4 } = useGetWorkspace(workspaceId);
 
   useEffect(() => {
     if (!userInfo.loading && !userSettingsLoading) {
@@ -71,14 +75,15 @@ function LibraryLoader(props: PropsFromRedux) {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading1 || loading2 || loading3) {
+  if (loading1 || loading2 || loading3 || loading4) {
     return <LoadingScreen />;
   }
 
-  return <Library {...{ ...props, workspaces, pendingWorkspaces }} />;
+  return <Library {...{ ...props, workspaces, pendingWorkspaces, currentWorkspace: workspace }} />;
 }
 
 type LibraryProps = PropsFromRedux & {
+  currentWorkspace?: Workspace;
   workspaces: Workspace[];
   pendingWorkspaces?: Workspace[];
 };
@@ -88,11 +93,14 @@ function Library({
   currentWorkspaceId,
   workspaces,
   pendingWorkspaces,
+  currentWorkspace,
 }: LibraryProps) {
   const router = useRouter();
   const { testRunId } = useGetTestParams();
   const { displayedString, setDisplayedText, setAppliedText, filter } = useFilters();
-  const [view, setView] = useState<View>(testRunId ? "test-runs" : "recordings");
+  const [view, setView] = useState<View>(
+    testRunId || currentWorkspace?.isTest ? "test-runs" : "recordings"
+  );
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   // TODO [jaril] Fix react-hooks/exhaustive-deps
@@ -104,6 +112,10 @@ function Library({
       updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    setView(currentWorkspace?.isTest ? "test-runs" : "recordings");
+  }, [currentWorkspace]);
 
   // FIXME [ryanjduffy]: Backwards compatibility for ?replayinvite=true flow
   if (isTeamLeaderInvite()) {

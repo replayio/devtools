@@ -108,12 +108,15 @@ export function useGetPendingWorkspaces() {
   return { pendingWorkspaces, loading };
 }
 
-export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; loading: boolean } {
+export function useGetWorkspace(workspaceId: string | null): {
+  workspace?: Workspace;
+  loading: boolean;
+} {
   // TODO: We need a better way to do this but this'll do for now
   const { workspaces, loading } = useGetNonPendingWorkspaces();
 
   return {
-    workspace: workspaces.find(ws => ws.id === workspaceId),
+    workspace: workspaceId ? workspaces.find(ws => ws.id === workspaceId) : undefined,
     loading,
   };
 }
@@ -190,6 +193,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 isDomainLimitedCode
                 hasPaymentMethod
                 isOrganization
+                isTest
                 subscription {
                   status
                   trialEnds

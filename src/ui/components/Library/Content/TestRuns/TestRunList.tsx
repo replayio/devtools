@@ -4,12 +4,17 @@ import { TestRunListItem } from "./TestRunListItem";
 import { TestRunsContext } from "./TestRunsViewer";
 
 export function TestRunList({ testRuns }: { testRuns: TestRun[] }) {
-  const { setSelectedRunIndex } = useContext(TestRunsContext);
+  const { selectedRunIndex, setSelectedRunIndex } = useContext(TestRunsContext);
 
   return (
-    <div className="recording-list flex flex-col space-y-0 overflow-y-auto text-sm shadow-md rounded-t-xl">
+    <div className="flex flex-col space-y-0 overflow-y-auto text-sm shadow-md recording-list rounded-t-xl">
       {testRuns?.map((t, i) => (
-        <TestRunListItem testRun={t} key={i} onClick={() => setSelectedRunIndex(i)} />
+        <TestRunListItem
+          testRun={t}
+          key={i}
+          onClick={() => setSelectedRunIndex(i)}
+          isSelected={selectedRunIndex === i}
+        />
       ))}
     </div>
   );

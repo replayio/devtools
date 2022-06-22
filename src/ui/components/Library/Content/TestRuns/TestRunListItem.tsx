@@ -2,18 +2,17 @@ import { TestRun } from "ui/hooks/tests";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
 import { useContext } from "react";
-import { LibraryContext } from "../../useFilters";
 import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
-import { SourceMetadata } from "ui/types";
 import styles from "../../Library.module.css";
+import { TestRunsContext } from "./TestRunsViewer";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
   return (
-    <div className="wrap flex shrink grow-0 flex-nowrap overflow-hidden text-ellipsis pr-2 font-medium">
+    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 flex-nowrap text-ellipsis">
       {formatted}
     </div>
   );
@@ -41,8 +40,6 @@ function Attributes({ testRun, selected }: { testRun: TestRun; selected: boolean
           {branch}
         </AttributeContainer>
       )}
-      {/* <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer> */}
-      {/* <AttributeContainer icon="timer">{durationString}</AttributeContainer> */}
     </div>
   );
 }
@@ -55,22 +52,28 @@ function Status({ failCount }: { failCount: number }) {
   );
 }
 
-export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
-  const { preview } = useContext(LibraryContext);
+export function TestRunListItem({
+  testRun,
+  onClick,
+  isSelected,
+}: {
+  testRun: TestRun;
+  onClick: () => void;
+  isSelected: boolean;
+}) {
   const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
-  const isSelected = preview?.id.toString() === testRun.id;
- 
 
   return (
     <div
-      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${styles.libraryRow}     
+      className={`flex flex-grow cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+        styles.libraryRow
+      }     
       ${isSelected ? styles.libraryRowSelected : ""}
       `}
       onClick={onClick}
     >
-    
       <Status failCount={failCount} />
-      <div className="flex flex-grow flex-col space-y-1">
+      <div className="flex flex-col flex-grow space-y-1">
         <div className="flex flex-row justify-between">
           <Title testRun={testRun} />
           <RunStats testRun={testRun} />

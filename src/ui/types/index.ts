@@ -222,6 +222,7 @@ export interface Workspace {
   settings: WorkspaceSettings;
   subscription?: Subscription;
   isOrganization: boolean;
+  isTest: boolean;
 }
 
 export interface WorkspaceSettings {
