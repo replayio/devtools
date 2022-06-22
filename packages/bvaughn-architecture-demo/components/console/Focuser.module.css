@@ -8,7 +8,7 @@
   align-items: center;
 }
 .FocusRegionRowOn {
-  background-color: var(--color-blue);
+  background-color: var(--color-brand);
 }
 
 .FocusToggleButton {
@@ -49,11 +49,11 @@
   width: 6px;
 }
 .RangeStartThumb {
-  background-color: var(--color-gray-4);
+  background-color: var(--background-color-contrast-4);
   border-radius: 4px 0px 0px 4px;
 }
 .RangeEndThumb {
-  background-color: var(--color-gray-4);
+  background-color: var(--background-color-contrast-4);
   border-radius: 0px 4px 4px 0px;
 }
 

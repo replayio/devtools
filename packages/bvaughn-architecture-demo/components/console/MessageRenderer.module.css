@@ -9,20 +9,20 @@
   padding: 0.25rem;
   font-family: monospace;
   font-size: 10px;
-  border-bottom: 1px solid var(--color-gray-2);
+  border-bottom: 1px solid var(--background-color-contrast-2);
 }
 .MessageRow {
-  background-color: var(--color-white);
+  background-color: var(--background-color-default);
 }
 .MessageRowError {
-  background-color: var(--color-red-light);
-  color: var(--color-red-dark);
+  background-color: var(--background-color-error);
+  color: var(--color-error);
 }
 .MessageRowWarning {
-  background-color: var(--color-yellow-light);
-  color: var(--color-yellow-dark);
+  background-color: var(--background-color-warning);
+  color: var(--color-warning);
 }
 
 .Time {
-  color: var(--color-blue);
+  color: var(--color-brand);
 }
