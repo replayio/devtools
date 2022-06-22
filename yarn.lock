@@ -13704,7 +13704,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-ws@npm:^5.4.1":
+"graphql-ws@npm:^5.4.1, graphql-ws@npm:^5.9.0":
   version: 5.9.0
   resolution: "graphql-ws@npm:5.9.0"
   peerDependencies:
@@ -20702,6 +20702,7 @@ __metadata:
     fuzzaldrin-plus: ^0.6.0
     glob: ^8.0.3
     graphql: 15.8.0
+    graphql-ws: ^5.9.0
     graphqurl: ^1.0.1
     identity-obj-proxy: ^3.0.0
     immer: ^9.0.7

@@ -18,15 +18,12 @@ export const ADD_COMMENT_MUTATION = gql`
 `;
 
 export default function useAddComment(): AddCommentMutation {
-  const [addComment] = useMutation<AddComment, AddCommentVariables>(ADD_COMMENT_MUTATION, {
-    refetchQueries: ["GetComments"],
-  });
+  const [addComment] = useMutation<AddComment, AddCommentVariables>(ADD_COMMENT_MUTATION);
 
   return async (comment: Comment) => {
     trackEvent("comments.create");
 
     return addComment({
-      awaitRefetchQueries: true,
       variables: {
         input: {
           ...omit(comment, ["id", "createdAt", "updatedAt", "replies", "user"]),

@@ -12,10 +12,7 @@ export default function useAddCommentReply() {
           }
         }
       }
-    `,
-    {
-      refetchQueries: ["GetComments"],
-    }
+    `
   );
 
   return async ({
@@ -28,7 +25,6 @@ export default function useAddCommentReply() {
     isPublished: boolean;
   }) => {
     return addCommentReply({
-      awaitRefetchQueries: true,
       variables: {
         input: {
           commentId,

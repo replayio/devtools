@@ -74,6 +74,7 @@ export function createGetRecordingMock(opts: {
     duration: 10,
     isInitialized: true,
     operations: { scriptDomains: [] },
+    activeSessions: null,
     owner: {
       __typename: "User",
       id: "mock-user-id",

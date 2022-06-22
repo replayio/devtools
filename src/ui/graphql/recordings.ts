@@ -28,6 +28,43 @@ export const GET_RECORDING = gql`
       metadata
       comments {
         id
+        isPublished
+        content
+        primaryLabel
+        secondaryLabel
+        createdAt
+        updatedAt
+        hasFrames
+        sourceLocation
+        time
+        point
+        position
+        networkRequestId
+        user {
+          id
+          name
+          picture
+        }
+        replies {
+          id
+          isPublished
+          content
+          createdAt
+          updatedAt
+          user {
+            id
+            name
+            picture
+          }
+        }
+      }
+      activeSessions {
+        id
+        user {
+          id
+          name
+          picture
+        }
       }
       owner {
         id
@@ -68,6 +105,65 @@ export const GET_RECORDING = gql`
               }
             }
           }
+        }
+      }
+    }
+  }
+`;
+
+export const SUBSCRIBE_RECORDING = gql`
+  subscription SubscribeRecording($recordingId: UUID!) {
+    recording(uuid: $recordingId) {
+      uuid
+      url
+      title
+      duration
+      createdAt
+      private
+      isInitialized
+      ownerNeedsInvite
+      userRole
+      operations
+      resolution
+      metadata
+      comments {
+        id
+        isPublished
+        content
+        primaryLabel
+        secondaryLabel
+        createdAt
+        updatedAt
+        hasFrames
+        sourceLocation
+        time
+        point
+        position
+        networkRequestId
+        user {
+          id
+          name
+          picture
+        }
+        replies {
+          id
+          isPublished
+          content
+          createdAt
+          updatedAt
+          user {
+            id
+            name
+            picture
+          }
+        }
+      }
+      activeSessions {
+        id
+        user {
+          id
+          name
+          picture
         }
       }
     }
