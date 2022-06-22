@@ -6073,6 +6073,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^18.0.0":
+  version: 18.0.0
+  resolution: "@types/node@npm:18.0.0"
+  checksum: aab2b325727a2599f6d25ebe0dedf58c40fb66a51ce4ca9c0226ceb70fcda2d3afccdca29db5942eb48b158ee8585a274a1e3750c718bbd5399d7f41d62dfdcc
+  languageName: node
+  linkType: hard
+
 "@types/normalize-package-data@npm:^2.4.0":
   version: 2.4.1
   resolution: "@types/normalize-package-data@npm:2.4.1"
@@ -19444,8 +19451,8 @@ __metadata:
 
 "protocol@file:packages/protocol::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "protocol@file:packages/protocol#packages/protocol::hash=a80425&locator=recordreplay-devtools%40workspace%3A."
-  checksum: fb8d3a56f1ec37e132a34422be2f854b5df87e8c1ff0dc1c2558dd88e87d93c539132820950433a17ee65c8f66eb7acf2f002314fbebdede235d8f540e04633d
+  resolution: "protocol@file:packages/protocol#packages/protocol::hash=405bf8&locator=recordreplay-devtools%40workspace%3A."
+  checksum: a80548046b133d137bc7d2e9b360b169dbc76bb8e158d8415b84f45cf4387a961d66f8e29d9a938bb49df7fd36a594e1d77a3b18df0b8de7ff7e5cac267f7c16
   languageName: node
   linkType: hard
 
@@ -19897,21 +19904,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:17.0.2, react-is@npm:^17.0.1, react-is@npm:^17.0.2":
-  version: 17.0.2
-  resolution: "react-is@npm:17.0.2"
-  checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
-  languageName: node
-  linkType: hard
-
-"react-is@npm:^16.13.1, react-is@npm:^16.7.0, react-is@npm:^16.9.0":
-  version: 16.13.1
-  resolution: "react-is@npm:16.13.1"
-  checksum: f7a19ac3496de32ca9ae12aa030f00f14a3d45374f1ceca0af707c831b2a6098ef0d6bdae51bd437b0a306d7f01d4677fcc8de7c0d331eb47ad0f46130e53c5f
-  languageName: node
-  linkType: hard
-
-"react-is@npm:^18.0.0":
+"react-is@npm:18.2.0":
   version: 18.2.0
   resolution: "react-is@npm:18.2.0"
   checksum: e72d0ba81b5922759e4aff17e0252bd29988f9642ed817f56b25a3e217e13eea8a7f2322af99a06edb779da12d5d636e9fda473d620df9a3da0df2a74141d53e
@@ -20324,6 +20317,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.3.0
     "@testing-library/user-event": ^14.1.0
+    "@tiptap/core": ^2.0.0-beta.176
     "@tiptap/extension-mention": ^2.0.0-beta.95
     "@tiptap/extension-placeholder": ^2.0.0-beta.48
     "@tiptap/react": ^2.0.0-beta.108
@@ -20339,6 +20333,7 @@ __metadata:
     "@types/lodash": ^4.14.181
     "@types/logrocket-react": ^3.0.0
     "@types/mixpanel-browser": ^2.35.6
+    "@types/node": ^18.0.0
     "@types/react": ^18.0.12
     "@types/react-dom": ^18.0.5
     "@types/react-lazyload": ^3.2.0
@@ -20418,6 +20413,7 @@ __metadata:
     react-devtools-inline_4_17_0: "npm:react-devtools-inline@4.17.0"
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     react-dom-factories: ^1.0.2
+    react-is: ^18.2.0
     react-json-view: ^1.21.3
     react-lazyload: ^3.2.0
     react-merge-refs: ^1.1.0
@@ -21419,8 +21415,8 @@ __metadata:
 
 "shared@file:packages/shared::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "shared@file:packages/shared#packages/shared::hash=736796&locator=recordreplay-devtools%40workspace%3A."
-  checksum: 291871a1e5af2abe7a51512997d1d6d7961928b732a10ef7255deea328384f3242903e0a0a64a03036461f47bcb6227a4c1122a793efa928c4750a4d8a119239
+  resolution: "shared@file:packages/shared#packages/shared::hash=4a86e4&locator=recordreplay-devtools%40workspace%3A."
+  checksum: 210e8e74b25662bbffda0050d45d0ca8d367f68369fbef085df9d2c80b8c146a5a996f7cd756b2c38c5dfc30c8afd27b64a1f52801fe9759e6469834bee6ef9e
   languageName: node
   linkType: hard
 
