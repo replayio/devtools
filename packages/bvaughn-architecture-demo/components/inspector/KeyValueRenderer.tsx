@@ -38,7 +38,7 @@ export default function KeyValueRenderer({
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
-  const client = useContext(ReplayClientContext);
+  const client = useContext(ReplayClientContext)!;
   const clientValue = useClientValue(protocolValue, pauseId);
 
   const { objectId, name, type } = clientValue;

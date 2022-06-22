@@ -30,7 +30,7 @@ export default memo(function ValueRenderer({
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
-  const client = useContext(ReplayClientContext);
+  const client = useContext(ReplayClientContext)!;
   const clientValue = useClientValue(protocolValue, pauseId);
 
   // TODO (inspector) Handle getters – Lazily fetch values only after user input.

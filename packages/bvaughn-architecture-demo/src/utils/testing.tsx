@@ -120,9 +120,10 @@ export async function renderFocused(
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 const MockReplayClient = {
-  initialize: jest.fn().mockImplementation(async () => {}),
+  configure: jest.fn().mockImplementation(async () => {}),
   getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
   getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
+  initialize: jest.fn().mockImplementation(async () => {}),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => {}),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),

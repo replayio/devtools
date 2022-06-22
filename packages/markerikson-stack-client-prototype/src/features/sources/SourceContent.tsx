@@ -25,7 +25,7 @@ export const SourceContent = () => {
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
   const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
 
-  const replayClient = useContext(ReplayClientContext);
+  const replayClient = useContext(ReplayClientContext)!;
   const sessionId = replayClient.getSessionId()!;
 
   const { currentData: sourceText } = useGetSourceTextQuery(

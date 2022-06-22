@@ -29,7 +29,7 @@ export default function PropertiesRenderer({
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
 }) {
-  const client = useContext(ReplayClientContext);
+  const client = useContext(ReplayClientContext)!;
 
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.

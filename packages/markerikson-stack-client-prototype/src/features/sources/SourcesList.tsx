@@ -10,7 +10,7 @@ export const SourcesList = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
 
-  const replayClient = useContext(ReplayClientContext);
+  const replayClient = useContext(ReplayClientContext)!;
   const sessionId = replayClient.getSessionId()!;
   const { data } = useGetSourcesQuery(sessionId);
 

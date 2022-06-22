@@ -16,11 +16,9 @@ if (typeof window !== "undefined") {
 }
 
 export default function Initializer({ children }: { children: ReactNode }) {
-  const client = useContext(ReplayClientContext);
+  const replayClient = useContext(ReplayClientContext)!;
   const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
-
-  const replayClient = useContext(ReplayClientContext);
 
   useEffect(() => {
     // The WebSocket and session/authentication are global.
@@ -32,7 +30,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
     }
 
     didInitializeRef.current = true;
-  }, [client, replayClient]);
+  }, [replayClient]);
 
   if (context === null) {
     return null;
