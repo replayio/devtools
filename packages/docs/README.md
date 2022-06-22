@@ -7,7 +7,7 @@ This is the docs site for Replay packages. It uses a NextJS site with Esbuild an
 To get started, clone the repo and run the following:
 
 ```bash
-npm run dev
+yarn dev
 ```
 
 This will start two servers. One is the NextJS development server and the other is a data gathering Node script that uses Esbuild and TS Morph to compile examples and collect type information.

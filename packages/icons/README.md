@@ -16,13 +16,13 @@ From the root of the project, move into the `icons` package and install the depe
 
 ```bash
 cd packages/icons
-npm install
+yarn install
 ```
 
 Now you can run the script to download and generate the icons:
 
 ```bash
-npm run build
+yarn build
 ```
 
 This will generate a `index.ts` file that can be committed to the project alongside any other changes.

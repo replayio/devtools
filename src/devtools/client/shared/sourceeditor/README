@@ -12,8 +12,8 @@ CSS files inside the codemirror directory [2].
 Then to recreate codemirror.bundle.js:
 
 > cd devtools/client/shared/sourceeditor
-> npm install
-> npm run build
+> yarn install
+> yarn build
 
 When investigating an issue in CodeMirror, you might want to have a non-minified bundle.
 You can do this by running `npm run build-unminified` instead of `npm run build`.

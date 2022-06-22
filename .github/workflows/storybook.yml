@@ -27,4 +27,4 @@ jobs:
         env:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Build Storybook
-        run: npm run build-storybook
+        run: yarn build-storybook

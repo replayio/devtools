@@ -44,11 +44,11 @@ replay-node --update
 Tests can be run using:
 
 ```sh
-npm run test-e2e
+yarn test-e2e
 ```
 
 To run a subset of tests, pass a naming pattern:
 
 ```sh
-npm run test-e2e breakpoints
+yarn test-e2e breakpoints
 ```

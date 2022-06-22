@@ -5,7 +5,7 @@ Editing any of these files manually is not recommended.
 ### Generating GraphQL types for Typescript
 
 ```bash
-HASURA_KEY=<key> npm run gql
+HASURA_KEY=<key> yarn gql
 ```
 
 Ask somebody on the team to provide the `<key>` to you, which is Hasura admin secret.

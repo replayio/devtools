@@ -61,7 +61,7 @@ jobs:
     name: Generate Test Run ID
     runs-on: ubuntu-latest
     steps:
-      - run: npm i uuid
+      - run: yarn add uuid
         shell: sh
       - uses: actions/github-script@v6
         id: uuid
