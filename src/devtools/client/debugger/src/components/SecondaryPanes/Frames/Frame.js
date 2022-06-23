@@ -81,11 +81,13 @@ export default class FrameComponent extends Component {
     );
   }
 
-  onMouseDown(e, frame, selectedFrame) {
+  onMouseDown(e, frame) {
     if (e.button !== 0) {
       return;
     }
 
+    e.stopPropagation();
+    e.preventDefault();
     trackEvent("call_stack.select_frame");
     this.props.selectFrame(this.props.cx, frame);
   }
