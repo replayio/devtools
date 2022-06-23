@@ -189,6 +189,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 domain
                 isDomainLimitedCode
                 hasPaymentMethod
+                isTest
                 isOrganization
                 subscription {
                   status
