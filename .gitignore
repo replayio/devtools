@@ -27,3 +27,4 @@ storybook-static/
 !.yarn/versions
 .pnp.*
 *.tgz
+test/.yarn/cache/
