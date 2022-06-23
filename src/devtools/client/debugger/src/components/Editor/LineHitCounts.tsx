@@ -1,6 +1,4 @@
 import { useMemo, useLayoutEffect } from "react";
-import { interpolateLab } from "d3-interpolate";
-import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -32,17 +30,17 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
 
   // Min/max hit counts are used to determine heat map color.
   const { minHitCount, maxHitCount } = useMemo(() => {
-    let minHitCount = 0;
+    let minHitCount = Infinity;
     let maxHitCount = 0;
     if (hitCounts) {
       hitCounts.forEach(hitCount => {
-        if (minHitCount === 0) {
-          minHitCount = hitCount.hits;
-        } else if (minHitCount > hitCount.hits) {
-          minHitCount = hitCount.hits;
-        }
-        if (maxHitCount < hitCount.hits) {
-          maxHitCount = hitCount.hits;
+        if (hitCount.hits > 0) {
+          if (minHitCount > hitCount.hits) {
+            minHitCount = hitCount.hits;
+          }
+          if (maxHitCount < hitCount.hits) {
+            maxHitCount = hitCount.hits;
+          }
         }
       });
     }
@@ -76,6 +74,15 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
 
+      // HACK
+      // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
+      // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
+      const gutterElement = editor.codeMirror.getGutterElement();
+      (gutterElement as HTMLElement).parentElement!.style.setProperty(
+        "--hit-count-gutter-width",
+        `-${gutterWidth}`
+      );
+
       let lineNumber = 0;
 
       doc.eachLine((lineHandle: any) => {
@@ -88,14 +95,16 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         // Cubed root prevents high hit counts from lumping all other values together.
         const NUM_GRADIENT_COLORS = 3;
         let className = styles.HitsBadge0;
-        let index = null;
+        let index = NUM_GRADIENT_COLORS - 1;
         if (hitCount > 0) {
-          index = Math.min(
-            NUM_GRADIENT_COLORS - 1,
-            Math.round(
-              ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-            )
-          );
+          if (minHitCount !== maxHitCount) {
+            index = Math.min(
+              NUM_GRADIENT_COLORS - 1,
+              Math.round(
+                ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+              )
+            );
+          }
           className = styles[`HitsBadge${index + 1}`];
         } else {
           // If this line wasn't hit any, dim the line number,
