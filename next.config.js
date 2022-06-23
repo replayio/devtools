@@ -1,7 +1,10 @@
 const { patchWebpackConfig } = require("next-global-css");
+const transpileModules = require("next-transpile-modules");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
 
-module.exports = {
+const withTM = transpileModules(["bvaughn-architecture-demo"]);
+
+const baseNextConfig = {
   // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
   // (see https://github.com/vercel/next.js/pull/34500)
   experimental: {},
@@ -145,3 +148,5 @@ module.exports = {
     return config;
   },
 };
+
+module.exports = withTM(baseNextConfig);
