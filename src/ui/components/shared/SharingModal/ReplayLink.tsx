@@ -21,9 +21,9 @@ export function CopyButton({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="copy-link relative flex flex-shrink-0 flex-col items-center">
+    <div className="relative flex flex-col items-center flex-shrink-0 copy-link">
       <button
-        className="rounded-lg border border-gray-400 p-2 py-1 transition hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
+        className="p-2 py-1 transition border border-gray-400 rounded-lg hover:border-primaryAccent hover:bg-primaryAccent hover:text-white"
         {...{ onClick }}
       >
         Copy Link
@@ -53,7 +53,7 @@ export function UrlCopy({ url }: { url: string }) {
   };
 
   return (
-    <div className="copy-link relative flex flex-col items-center">
+    <div className="relative flex flex-col items-center copy-link">
       <input
         className="text-sm"
         type="text"
