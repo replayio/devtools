@@ -61,13 +61,16 @@ export function EditorWithAutocomplete({
     autocompleteIndex,
     matches,
     shouldShowAutocomplete,
+    applyMatch,
     applySelectedMatch,
     moveAutocompleteCursor,
     resetAutocompleteIndex,
     setHideAutocomplete,
   } = useAutocomplete(value, onPreviewAvailable, options.isArgument);
 
-  const autocomplete = () => setValue(applySelectedMatch());
+  const autocomplete = (match: string) => {
+    setValue(applyMatch(match));
+  };
   const onSelection = (obj?: any) => {
     const cursorMoved = obj?.origin && ["*mouse", "+move"].includes(obj.origin);
 
@@ -87,7 +90,7 @@ export function EditorWithAutocomplete({
   const onAutocompleteKeyPress = (e: KeyboardEvent) => {
     if ((e.key === Keys.ENTER && !e.shiftKey) || e.key === Keys.TAB || e.key === Keys.ARROW_RIGHT) {
       e.preventDefault();
-      autocomplete();
+      setValue(applySelectedMatch());
     } else if (e.key === Keys.ARROW_DOWN) {
       e.preventDefault();
       moveAutocompleteCursor(-1);

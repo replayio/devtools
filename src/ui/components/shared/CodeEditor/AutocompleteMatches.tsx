@@ -1,7 +1,14 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import classNames from "classnames";
-import { createPortal } from "react-dom";
+import { FixedSizeList as List } from "react-window";
 import AppContainerPortal from "../AppContainerPortal";
+import { selectInstance } from "@redux-devtools/app";
+
+type ItemData = {
+  matches: string[];
+  onMatchClick: (match: string) => void;
+  selectedIndex: number;
+};
 
 export type AutocompleteMatchesOptions = {
   minLeft: number;
@@ -12,10 +19,12 @@ function Match({
   label,
   isSelected,
   onClick,
+  style,
 }: {
   label: string;
   isSelected: boolean;
   onClick: (match: string) => void;
+  style: React.CSSProperties;
 }) {
   const buttonNode = useRef<HTMLButtonElement>(null);
 
@@ -31,6 +40,11 @@ function Match({
         "w-full cursor-default px-1 text-left",
         isSelected ? "bg-primaryAccent text-white" : "hover:bg-toolbarBackgroundAlt"
       )}
+      style={{
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        ...style,
+      }}
       ref={buttonNode}
       onClick={() => onClick(label)}
     >
@@ -56,24 +70,69 @@ export default function AutocompleteMatches({
 }) {
   const { top, left } = containerRect;
 
+  const itemData: ItemData = useMemo(
+    () => ({
+      matches,
+      onMatchClick,
+      selectedIndex,
+    }),
+    [matches, onMatchClick, selectedIndex]
+  );
+
+  const listRef = useRef<List>(null);
+  const lastSelectedIndexRef = useRef(selectedIndex);
+  useLayoutEffect(() => {
+    if (selectedIndex !== lastSelectedIndexRef.current) {
+      lastSelectedIndexRef.current = selectedIndex;
+
+      listRef.current!.scrollToItem(selectedIndex);
+    }
+  }, [selectedIndex]);
+
   return (
     <AppContainerPortal>
       <div className="absolute z-10 -translate-y-full transform" style={{ top, left }}>
         <div
-          className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter text-menuColor bg-menuBgcolor py-1 font-mono shadow-sm"
+          className="autocomplete-matches flex flex-col overflow-y-auto overflow-x-hidden border border-splitter bg-menuBgcolor py-1 font-mono text-menuColor shadow-sm"
           style={{
             fontSize: "var(--theme-code-font-size)",
             marginLeft: `max(${options.minLeft}px, ${leftOffset}ch)`,
-            maxHeight: "160px",
-            maxWidth: "200px",
-            minWidth: "160px",
           }}
         >
-          {matches.map((match, i) => (
-            <Match label={match} isSelected={i === selectedIndex} key={i} onClick={onMatchClick} />
-          ))}
+          <List
+            height={160}
+            itemCount={matches.length}
+            itemData={itemData}
+            itemSize={13}
+            ref={listRef}
+            width={200}
+          >
+            {MatchRow}
+          </List>
         </div>
       </div>
     </AppContainerPortal>
+  );
+}
+
+function MatchRow({
+  data,
+  index,
+  style,
+}: {
+  data: ItemData;
+  index: number;
+  style: React.CSSProperties;
+}) {
+  const { matches, onMatchClick, selectedIndex } = data;
+  const match = matches[index];
+
+  return (
+    <Match
+      label={match}
+      isSelected={index === selectedIndex}
+      onClick={() => onMatchClick(match)}
+      style={style}
+    />
   );
 }
