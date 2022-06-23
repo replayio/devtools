@@ -88,14 +88,16 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         // Cubed root prevents high hit counts from lumping all other values together.
         const NUM_GRADIENT_COLORS = 3;
         let className = styles.HitsBadge0;
-        let index = null;
+        let index = NUM_GRADIENT_COLORS - 1;
         if (hitCount > 0) {
-          index = Math.min(
-            NUM_GRADIENT_COLORS - 1,
-            Math.round(
-              ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-            )
-          );
+          if (minHitCount !== maxHitCount) {
+            index = Math.min(
+              NUM_GRADIENT_COLORS - 1,
+              Math.round(
+                ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+              )
+            );
+          }
           className = styles[`HitsBadge${index + 1}`];
         } else {
           // If this line wasn't hit any, dim the line number,
