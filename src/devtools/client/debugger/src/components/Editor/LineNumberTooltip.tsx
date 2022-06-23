@@ -116,27 +116,20 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     }
   }, [hits]);
 
-  if (
-    breakpoints.some(
-      b =>
-        !b.disabled &&
-        b.location.sourceId === source?.id &&
-        b.location.line === lastHoveredLineNumber.current
-    )
-  ) {
-    return null;
-  }
-
   if (!targetNode || isMetaActive) {
     return null;
   }
 
-  if (hits === undefined) {
+  if (!hitCounts) {
     return (
       <StaticTooltip targetNode={targetNode}>
         <Wrapper loading>Loading…</Wrapper>
       </StaticTooltip>
     );
+  }
+
+  if (hits === undefined) {
+    return null;
   }
 
   const count = hits || 0;
