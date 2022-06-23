@@ -32,17 +32,17 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
 
   // Min/max hit counts are used to determine heat map color.
   const { minHitCount, maxHitCount } = useMemo(() => {
-    let minHitCount = 0;
+    let minHitCount = Infinity;
     let maxHitCount = 0;
     if (hitCounts) {
       hitCounts.forEach(hitCount => {
-        if (minHitCount === 0) {
-          minHitCount = hitCount.hits;
-        } else if (minHitCount > hitCount.hits) {
-          minHitCount = hitCount.hits;
-        }
-        if (maxHitCount < hitCount.hits) {
-          maxHitCount = hitCount.hits;
+        if (hitCount.hits > 0) {
+          if (minHitCount > hitCount.hits) {
+            minHitCount = hitCount.hits;
+          }
+          if (maxHitCount < hitCount.hits) {
+            maxHitCount = hitCount.hits;
+          }
         }
       });
     }
