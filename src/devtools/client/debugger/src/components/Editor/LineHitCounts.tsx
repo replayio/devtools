@@ -1,6 +1,4 @@
 import { useMemo, useLayoutEffect } from "react";
-import { interpolateLab } from "d3-interpolate";
-import { getLuminance } from "polished";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -75,6 +73,15 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         "CodeMirror-linenumbers",
         { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
+
+      // HACK
+      // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
+      // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
+      const gutterElement = editor.codeMirror.getGutterElement();
+      (gutterElement as HTMLElement).parentElement!.style.setProperty(
+        "--hit-count-gutter-width",
+        `-${gutterWidth}`
+      );
 
       let lineNumber = 0;
 

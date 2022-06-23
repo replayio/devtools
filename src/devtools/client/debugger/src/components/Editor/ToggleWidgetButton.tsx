@@ -150,7 +150,13 @@ function QuickActions({
       )}
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
-      style={{ top: `-${(1 / 2) * (18 - height)}px` }}
+      style={{
+        top: `-${(1 / 2) * (18 - height)}px`,
+
+        // If hit counts are shown, the button should not overlap with the gutter.
+        // The gutter size changes though based on the number of hits, so we use a CSS variable.
+        right: hitCounts ? "var(--hit-count-gutter-width)" : undefined,
+      }}
     >
       {button}
     </div>
