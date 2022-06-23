@@ -1,4 +1,5 @@
-import playwright from "@recordreplay/playwright";
+import replayPlaywright from "@recordreplay/playwright";
+import playwright from "playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
 
@@ -10,10 +11,15 @@ export async function recordPlaywright(
   browserName: BrowserName,
   script: (page: playwright.Page) => Promise<void>
 ) {
-  const browser = await (playwright as any)[browserName].launch({
+  const playwrightBrowsers = config.shouldRecordTest ? replayPlaywright : playwright;
+  // @ts-ignore
+  const browserEntry : playwright.BrowserType = playwrightBrowsers[browserName] ;
+  const browser = await browserEntry.launch({
     env: {
       ...process.env,
+      // @ts-ignore
       RECORD_REPLAY_DRIVER: config.driverPath,
+      // @ts-ignore
       RECORD_REPLAY_VERBOSE: config.driverPath ? "1" : undefined,
     },
     executablePath: config.browserPath,
