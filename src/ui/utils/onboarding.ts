@@ -1,16 +1,14 @@
 import { isReplayBrowser } from "ui/utils/environment";
 import { Nag } from "ui/hooks/users";
-
 import { shouldShowNag } from "./user";
 
 function queryParams() {
   return new URL(window.location.href).searchParams;
 }
 
-export const isTeamMemberInvite = () => queryParams().get("teaminvite");
-export const isTeamLeaderInvite = () => queryParams().get("replayinvite");
 export const hasTeamInvitationCode = () => queryParams().get("invitationcode");
-export const isTeamReferral = () => isTeamMemberInvite() || hasTeamInvitationCode();
+export const isTeamMemberInvite = () => queryParams().get("teaminvite");
+export const isTeamReferral = () => hasTeamInvitationCode();
 
 // This is for the user onboarding flow where the user signs up for Replay using
 // a Replay team invite that they received in their email.

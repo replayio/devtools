@@ -148,7 +148,7 @@ const settings: Settings<
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-grow flex-col space-y-3">
+        <div className="flex flex-col flex-grow space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
           <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
@@ -202,7 +202,7 @@ const settings: Settings<
 
       return (
         <div className="flex flex-col space-y-3">
-          <div className=" text-xs font-semibold uppercase">{`Danger Zone`}</div>
+          <div className="text-xs font-semibold uppercase ">{`Danger Zone`}</div>
           <div className="flex flex-row justify-between rounded-lg border border-red-300 p-1.5">
             <div className="flex flex-col">
               <div className="font-semibold">Delete this team</div>
