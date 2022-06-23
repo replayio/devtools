@@ -25,7 +25,9 @@ async function recordToCloud(state, browserName, exampleUrl) {
     },
   });
 
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    ignoreHTTPSErrors: true
+  });
   const page = await context.newPage();
   try {
     await page.goto(exampleUrl);
@@ -56,7 +58,9 @@ async function recordToFile(state, browserName, example) {
     },
   });
 
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    ignoreHTTPSErrors: true
+  });
   const page = await context.newPage();
   try {
     await page.goto(example);

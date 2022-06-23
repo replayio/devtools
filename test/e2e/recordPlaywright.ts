@@ -20,7 +20,9 @@ export async function recordPlaywright(
     headless: config.headless,
   });
 
-  const context = await browser.newContext();
+  const context = await browser.newContext({
+    ignoreHTTPSErrors: true					  
+  });
   const page = await context.newPage();
   try {
     return await script(page);
