@@ -1282,24 +1282,6 @@ class _ThreadFront {
     return this.getPreferredLocation(mappedLocation);
   }
 
-  async getRecordingDescription() {
-    assert(this.recordingId, "no recordingId");
-    let description;
-    try {
-      description = await client.Recording.getDescription({
-        recordingId: this.recordingId,
-      });
-    } catch (e) {
-      // Getting the description will fail if it was never set. For now we don't
-      // set the last screen in this case.
-      const sessionId = await this.waitForSession();
-      const { endpoint } = await client.Session.getEndpoint({}, sessionId);
-      description = { duration: endpoint.time };
-    }
-
-    return description;
-  }
-
   // Get the chosen (i.e. preferred and alternate) sources for the given URL.
   getChosenSourceIdsForUrl(url: string) {
     return this._chooseSourceIdList(this.getSourceIdsForURL(url));
