@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useEffect, useState } from "react";
 import { getWorkspaceId } from "ui/actions/app";
 import Spinner from "ui/components/shared/Spinner";
 import { useGetTestRunsForWorkspace } from "ui/hooks/tests";
@@ -30,20 +30,25 @@ export function useGetTestParams() {
 
 export function TestRunsViewer() {
   const { testRunId } = useGetTestParams();
-  const [selectedRunIndex, setSelectedRunIndex] = useState<number>(
-    testRunId ? Number(testRunId) : 0
-  );
+  const [selectedRunIndex, setSelectedRunIndex] = useState<number>(0);
+  const [initialized, setInitialized] = useState(false);
   const workspaceId = useAppSelector(getWorkspaceId);
   const { testRuns, loading } = useGetTestRunsForWorkspace(workspaceId!);
 
   useEffect(() => {
-    if (testRuns) {
+    if (testRuns && !initialized) {
       const routeRunIndex = testRuns.findIndex(t => t.id === testRunId);
       if (routeRunIndex >= 0) {
         setSelectedRunIndex(routeRunIndex);
       }
+
+      // This is a bandaid fix to make it so that we only override the selectedRunIndex
+      // from the URL once. It's necessary because we don't (yet) update the URL as the
+      // user selects different test runs.
+      // Todo: Do proper routing.
+      setInitialized(true);
     }
-  }, [testRunId, testRuns]);
+  }, [testRunId, testRuns, initialized]);
 
   if (loading || !testRuns) {
     return (

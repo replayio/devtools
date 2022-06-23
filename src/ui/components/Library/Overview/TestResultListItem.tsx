@@ -36,10 +36,10 @@ function Title({ recording }: { recording: Recording }) {
   };
 
   return (
-    <div className="flex flex-grow flex-row items-center space-x-2 overflow-hidden">
-      <div className="flex flex-grow flex-col overflow-hidden py-2">
+    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
+      <div className="flex flex-col flex-grow py-2 overflow-hidden">
         <button
-          className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre text-left hover:underline"
+          className="overflow-hidden text-left whitespace-pre max-w-min overflow-ellipsis hover:underline"
           onClick={onViewTest}
         >
           {recording.metadata.test?.title}
@@ -52,12 +52,11 @@ function Title({ recording }: { recording: Recording }) {
 
 function Comments({ recording }: { recording: Recording }) {
   const numComments = recording?.comments?.length;
-  console.log(recording?.comments);
   if (numComments == 0) {
     return null;
   }
   return (
-    <div className="align-items-center flex flex-row space-x-1 text-gray-600">
+    <div className="flex flex-row space-x-1 text-gray-600 align-items-center">
       <img src="/images/comment-outline.svg" className="w-3" />
       <span>{numComments}</span>
     </div>
@@ -77,7 +76,7 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
       rel="noreferrer noopener"
       title="View Replay"
     >
-      <div className="flex grow flex-row">
+      <div className="flex flex-row grow">
         <div className="flex grow ">
           <ViewReplay recordingId={recordingId} passed={passed} />
           <Title recording={recording} />

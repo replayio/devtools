@@ -161,7 +161,7 @@ NoOrgs.args = {
       id: "team2",
       name: "Team 2",
       isOrganization: true,
-      isTest: true,
+      isTest: false,
       settings: getDefaultOrganizationSettings(),
       isDomainLimitedCode: false,
       domain: "domain.com",

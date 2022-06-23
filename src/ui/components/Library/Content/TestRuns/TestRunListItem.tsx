@@ -1,12 +1,10 @@
 import { TestRun } from "ui/hooks/tests";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { getTruncatedRelativeDate } from "../../RecordingRow";
-import { useContext } from "react";
 import { getDuration, getDurationString } from "./utils";
 import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
 import styles from "../../Library.module.css";
-import { TestRunsContext } from "./TestRunsViewer";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";

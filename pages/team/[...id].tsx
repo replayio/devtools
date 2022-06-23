@@ -17,14 +17,12 @@ export default function TeamPage() {
 
   useEffect(() => {
     if (workspaceId && isAuthenticated) {
-      dispatch(actions.setWorkspaceId(workspaceId));
+      dispatch(setWorkspaceId(workspaceId));
       updateDefaultWorkspace({
         variables: {
           workspaceId,
         },
       });
-
-      replace("/");
     }
   }, [isAuthenticated, workspaceId, replace, setWorkspaceId, updateDefaultWorkspace, dispatch]);
 
