@@ -125,6 +125,9 @@ export default function useAutocomplete(
   };
   const applySelectedMatch = () => {
     const match = matches[selectedIndex];
+    return applyMatch(match);
+  };
+  const applyMatch = (match: string) => {
     return insertAutocompleteMatch(expression, match, isArgument);
   };
 
@@ -137,6 +140,7 @@ export default function useAutocomplete(
     autocompleteIndex: selectedIndex,
     matches,
     shouldShowAutocomplete: getShouldShowAutocomplete(expression, isHidden, matches),
+    applyMatch,
     applySelectedMatch,
     moveAutocompleteCursor,
     resetAutocompleteIndex: () => setSelectedIndex(0),
