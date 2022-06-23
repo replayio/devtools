@@ -24,11 +24,9 @@ export default function Viewer({
   };
 
   return (
-    <div
-      className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}
-    >
+    <div className={`flex flex-grow flex-col overflow-hidden p-4 ${styles.libraryWrapper}`}>
       <div className="flex h-full space-x-2 overflow-y-auto">
-        <div className="flex flex-col flex-grow w-full space-y-5">
+        <div className="flex w-full flex-grow flex-col space-y-5">
           <ViewerHeader
             recordings={recordings}
             selectedIds={selectedIds}
@@ -38,17 +36,17 @@ export default function Viewer({
             isEditing={isEditing}
             setIsEditing={setIsEditing}
           />
-          <div className="flex-grow overflow-y-auto no-scrollbar">
-            {view === "recordings" ? (
+          <div className="flex-grow overflow-y-auto">
+            {(view === "recordings" || view === "test-results") && (
               <Recordings
+                view={view}
                 isEditing={isEditing}
                 recordings={recordings}
                 selectedIds={selectedIds}
                 setSelectedIds={setSelectedIds}
               />
-            ) : (
-              <TestRunList />
             )}
+            {view === "test-runs" && <TestRunList />}
           </div>
         </div>
         {preview ? <TestRunOverview /> : null}

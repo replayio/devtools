@@ -26,10 +26,6 @@ function ViewerHeaderActions({
 }) {
   const { view } = useContext(LibraryContext);
 
-  if (view !== "recordings") {
-    return null;
-  }
-
   if (isEditing) {
     return (
       <>
@@ -72,7 +68,7 @@ export default function ViewerHeader({
   const { view } = useContext(LibraryContext);
   const currentWorkspaceId = useAppSelector(getWorkspaceId);
 
-  if (view === "test-runs") {
+  if (view !== "recordings") {
     return null;
   }
 

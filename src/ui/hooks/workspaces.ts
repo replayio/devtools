@@ -108,9 +108,16 @@ export function useGetPendingWorkspaces() {
   return { pendingWorkspaces, loading };
 }
 
-export function useGetWorkspace(workspaceId: string): { workspace?: Workspace; loading: boolean } {
+export function useGetWorkspace(workspaceId: string | null): {
+  workspace?: Workspace | null;
+  loading: boolean;
+} {
   // TODO: We need a better way to do this but this'll do for now
   const { workspaces, loading } = useGetNonPendingWorkspaces();
+
+  if (!workspaceId) {
+    return { workspace: null, loading: false };
+  }
 
   return {
     workspace: workspaces.find(ws => ws.id === workspaceId),

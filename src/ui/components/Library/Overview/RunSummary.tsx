@@ -15,9 +15,8 @@ function Title({ testRun }: { testRun: TestRun }) {
   const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
   const [showCopied, setShowCopied] = useState(false);
   const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-  
+
   const handleCopyLink = () => {
-    
     const url = `${window.location.origin}/team/${workspaceId}/test-run/${testRun.id}`;
     navigator.clipboard.writeText(url);
 
@@ -30,19 +29,21 @@ function Title({ testRun }: { testRun: TestRun }) {
   };
 
   return (
-    <div className="flex flex-row items-center space-x-2 text-xl font-medium">     
-      <div>{formatted} 
-      <button onClick={handleCopyLink} className="ml-2 hover:text-primaryAccent">
-        <MaterialIcon>content_copy</MaterialIcon>
-        {showCopied ? (
-      <div className="bg-opacity-700 transition-transform absolute mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl text-xs">
-        Copied
+    <div className="flex flex-row items-center space-x-2 text-xl font-medium">
+      <div>
+        {formatted}
+        <button onClick={handleCopyLink} className="ml-2 hover:text-primaryAccent">
+          <MaterialIcon>content_copy</MaterialIcon>
+          {showCopied ? (
+            <div className="bg-opacity-700 transition-transform absolute mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl text-xs">
+              Copied
+            </div>
+          ) : (
+            ""
+          )}
+        </button>
       </div>
-    ) : ""}
-      </button>      
-      </div>
-      
-    </div>    
+    </div>
   );
 }
 
@@ -80,7 +81,6 @@ export function RunSummary() {
   const testRun = useContext(OverviewContext).testRun!;
 
   return (
-
     <div className="flex flex-col p-4 mb-2 space-y-2 border-b border-themeBorder">
       <div className="flex flex-row justify-between">
         <Title testRun={testRun} />
