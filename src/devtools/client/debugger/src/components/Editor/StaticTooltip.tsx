@@ -18,7 +18,7 @@ export default function StaticTooltip({ targetNode, children }: StaticTooltipPro
       className={classNames(
         "pointer-events-none absolute bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px",
         enableLargeText && "bottom-6",
-        hitCounts ? "-right-9" : "-right-1"
+        hitCounts ? "-right-[20px]" : "-right-1"
       )}
     >
       {children}
