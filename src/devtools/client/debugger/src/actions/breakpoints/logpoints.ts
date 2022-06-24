@@ -2,7 +2,7 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
 
-import { Breakpoint, getBreakpointsForSourceId } from "../../reducers/breakpoints";
+import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import { getLogpointsForSource } from "../../reducers/breakpoints";
 import { removeRequestedBreakpoint } from "../../reducers/breakpoints";
 import { Source } from "../../reducers/sources";
@@ -41,7 +41,7 @@ export function toggleLogpoint(cx: Context, line: number, bp?: Breakpoint): UITh
 
 export function addLogpoint(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
-    const logpoints = getBreakpointsForSourceId(getState());
+    const logpoints = getBreakpointsForSelectedSource(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
     const shouldPause = isBreakable(breakpoint);
 

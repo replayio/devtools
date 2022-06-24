@@ -356,15 +356,20 @@ export function getBreakpointsDisabled(state: UIState) {
   return breakpoints.every(breakpoint => breakpoint.disabled);
 }
 
-export function getBreakpointsForSourceId(state: UIState, line?: number) {
-  const { id: sourceId } = getSelectedSource(state)!;
+export const getBreakpointsForSelectedSource = createSelector(
+  getBreakpointsList,
+  getSelectedSource,
+  (breakpoints, selectedSource) => {
+    if (!selectedSource) {
+      return [];
+    }
 
-  if (!sourceId) {
-    return [];
+    const sourceId = selectedSource.id;
+    return breakpoints.filter(bp => {
+      return bp.location.sourceId === sourceId;
+    });
   }
-
-  return getBreakpointsForSource(state, sourceId, line);
-}
+);
 
 export function getBreakpointsForSource(state: UIState, sourceId: string, line?: number) {
   if (!sourceId) {

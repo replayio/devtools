@@ -1,13 +1,12 @@
 import { PointDescription } from "@replayio/protocol";
 import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode } from "react";
+import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { Breakpoint, getBreakpointsForSource } from "../../reducers/breakpoints";
-import { getSelectedSource } from "../../reducers/sources";
+import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import classNames from "classnames";
 import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
 import hooks from "ui/hooks";
@@ -228,9 +227,8 @@ function ToggleWidgetButton({
 
 const connector = connect(
   (state: UIState) => ({
-    indexed: selectors.getIsIndexed(state),
     cx: selectors.getThreadContext(state),
-    breakpoints: getBreakpointsForSource(state, getSelectedSource(state)!.id),
+    breakpoints: getBreakpointsForSelectedSource(state),
   }),
   {}
 );
