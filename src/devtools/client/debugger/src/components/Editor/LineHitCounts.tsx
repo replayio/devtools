@@ -2,27 +2,31 @@ import { useMemo, useLayoutEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
+import { setHitCountsMode } from "../../reducers/ui";
 import { setBreakpointHitCounts } from "../../actions/sources";
 import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
-import { getSelectedSourceId } from "../../selectors";
+import { getSelectedSourceId, getHitCountsMode } from "../../selectors";
 
 import styles from "./LineHitCounts.module.css";
 
 type Props = {
   editor: any;
-  isCollapsed: boolean;
-  setIsCollapsed: (isCollapsed: boolean) => void;
 };
 
 export default function LineHitCountsWrapper(props: Props) {
   const { value } = useFeature("hitCounts");
-  return value ? <LineHitCounts {...props} /> : null;
+  const hitCountsMode = useAppSelector(getHitCountsMode);
+  return value && hitCountsMode && hitCountsMode != "disabled" ? (
+    <LineHitCounts {...props} />
+  ) : null;
 }
 
-function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
+function LineHitCounts({ editor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const hitCountsMode = useAppSelector(getHitCountsMode);
+  const isCollapsed = hitCountsMode == "hide-counts";
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
@@ -115,7 +119,9 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         }
 
         const markerNode = document.createElement("div");
-        markerNode.onclick = () => setIsCollapsed(!isCollapsed);
+        markerNode.onclick = () => {
+          dispatch(setHitCountsMode(isCollapsed ? "show-counts" : "hide-counts"));
+        };
         markerNode.className = className;
         if (!isCollapsed && hitCount > 0) {
           markerNode.textContent =
@@ -138,7 +144,7 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, setIsCollapsed]);
+  }, [editor, hitCountMap, isCollapsed, setHitCountsMode, minHitCount, maxHitCount]);
 
   // We're just here for the hooks!
   return null;

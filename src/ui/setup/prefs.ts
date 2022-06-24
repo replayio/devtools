@@ -24,7 +24,7 @@ import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
-import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
+import { getHitCountsMode, getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -99,6 +99,8 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
       "frameworkGroupingOn",
       state => state.ui.frameworkGroupingOn
     );
+
+    updateDebuggerPrefs(state, oldState, "hitCountsMode", getHitCountsMode);
 
     updateDebuggerPrefs(
       state,

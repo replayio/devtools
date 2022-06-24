@@ -46,6 +46,8 @@ pref("devtools.debugger.map-scopes-enabled", false);
 pref("devtools.debugger.prefs-schema-version", prefsSchemaVersion);
 pref("devtools.debugger.log-actions", true);
 pref("devtools.debugger.log-event-breakpoints", false);
+pref("devtools.debugger.hitCountsMode", "hide-counts");
+
 pref("devtools.debugger.features.workers", true);
 pref("devtools.debugger.features.async-stepping", false);
 pref("devtools.debugger.features.shortcuts", true);
@@ -107,6 +109,7 @@ export const prefs = new PrefsHelper("devtools", {
   logActions: ["Bool", "debugger.log-actions"],
   logEventBreakpoints: ["Bool", "debugger.log-event-breakpoints"],
   indentSize: ["Int", "editor.tabsize"],
+  hitCountsMode: ["String", "debugger.hitCountsMode"],
 });
 
 export const useDebuggerPrefs = prefKey => {

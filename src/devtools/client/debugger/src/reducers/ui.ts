@@ -22,6 +22,7 @@ export interface HighlightedRange {
   sourceId?: number;
 }
 
+export type HitCountMode = "hide-counts" | "show-counts" | "disabled";
 export interface UISliceState {
   selectedPrimaryPaneTab: SelectedPrimaryPaneTabType;
   activeSearch?: ActiveSearchType | null;
@@ -35,6 +36,7 @@ export interface UISliceState {
   viewport?: Range | null;
   cursorPosition?: Location | null;
   highlightedLineRange?: HighlightedRange;
+  hitCountsMode: HitCountMode;
 }
 
 export const createUIState = (): UISliceState => ({
@@ -50,6 +52,7 @@ export const createUIState = (): UISliceState => ({
   highlightedLineRange: undefined,
   viewport: null,
   cursorPosition: null,
+  hitCountsMode: prefs.hitCountsMode as HitCountMode,
 });
 
 const uiSlice = createSlice({
@@ -106,6 +109,9 @@ const uiSlice = createSlice({
     setCursorPosition(state, action: PayloadAction<Location | null>) {
       state.cursorPosition = action.payload;
     },
+    setHitCountsMode(state, action: PayloadAction<HitCountMode>) {
+      state.hitCountsMode = action.payload;
+    },
     // Need to ensure three pieces of UI are updated:
     // Here: pause info panel is open, sources are open
     // Layout reducer: selected primary panel is "explorer"
@@ -132,6 +138,7 @@ export const {
   highlightLineRange,
   setCursorPosition,
   setFullTextQuery,
+  setHitCountsMode,
   setPrimaryPaneTab,
   setShownSource,
   setViewport,
@@ -160,3 +167,4 @@ export const getViewport = (state: UIState) => state.ui.viewport;
 export const getCursorPosition = (state: UIState) => state.ui.cursorPosition;
 export const getFullTextSearchQuery = (state: UIState) => state.ui.fullTextSearchQuery;
 export const getFullTextSearchFocus = (state: UIState) => state.ui.fullTextSearchFocus;
+export const getHitCountsMode = (state: UIState) => state.ui.hitCountsMode;

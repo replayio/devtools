@@ -22,6 +22,7 @@ import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
 import { useFeature } from "ui/hooks/settings";
+import { getHitCountsMode } from "../../selectors";
 
 const QuickActionButton: FC<{
   showNag: boolean;
@@ -163,17 +164,14 @@ function QuickActions({
   );
 }
 
-type ToggleWidgetButtonProps = PropsFromRedux & { editor: any; isLineHitCountsCollapsed: boolean };
+type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
 
-function ToggleWidgetButton({
-  editor,
-  cx,
-  breakpoints,
-  isLineHitCountsCollapsed,
-}: ToggleWidgetButtonProps) {
+function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
+  const hitCountsMode = useAppSelector(getHitCountsMode);
 
+  const isLineHitCountsCollapsed = hitCountsMode === "hide-counts";
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
   const onMouseDown = (e: React.MouseEvent) => {
     // This keeps the cursor in CodeMirror from moving after clicking on the button.

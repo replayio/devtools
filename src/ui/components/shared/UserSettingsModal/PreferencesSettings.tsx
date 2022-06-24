@@ -6,11 +6,14 @@ import { EmailSubscription } from "ui/hooks/users";
 import { getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
 import { AppTheme } from "ui/state/app";
+import { useFeature } from "ui/hooks/settings";
 
 import { SelectMenu } from "../Forms";
 import Checkbox from "../Forms/Checkbox";
 
 import { CheckboxRow } from "./CheckboxRow";
+import { getHitCountsMode, HitCountMode } from "devtools/client/debugger/src/selectors";
+import { setHitCountsMode } from "devtools/client/debugger/src/reducers/ui";
 
 const EMAIL_NOTIFICATIONS = {
   [EmailSubscription.COLLABORATOR_REQUEST]: "When somebody invites you to collaborate on a replay",
@@ -111,7 +114,9 @@ function PrivacyPreferences() {
 function UiPreferences() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(getThemePreference);
+  const hitCountsMode = useAppSelector(getHitCountsMode);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
+  const { value: enableHitCounts } = useFeature("hitCounts");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -121,29 +126,49 @@ function UiPreferences() {
     <div className="space-y-4">
       <div className="text-lg">Appearance</div>
       <div className="flex flex-col space-y-4 p-1">
-        <div>Theme</div>
-        <div className="w-1/2">
-          <SelectMenu
-            options={[
-              { name: "Dark", id: "dark" },
-              { name: "Light", id: "light" },
-              { name: "System", id: "system" },
-            ]}
-            selected={theme}
-            setSelected={str => setSelected(str as AppTheme)}
-          />
+        <div className="flex flex-row justify-between">
+          <div>Theme</div>
+          <div className="w-1/2">
+            <SelectMenu
+              options={[
+                { name: "Dark", id: "dark" },
+                { name: "Light", id: "light" },
+                { name: "System", id: "system" },
+              ]}
+              selected={theme}
+              setSelected={str => setSelected(str as AppTheme)}
+            />
+          </div>
         </div>
-        <div>Default Mode</div>
-        <div className="w-1/2">
-          <SelectMenu
-            options={[
-              { name: "Viewer", id: "non-dev" },
-              { name: "DevTools", id: "dev" },
-            ]}
-            selected={defaultMode}
-            setSelected={str => str && updateDefaultMode(str)}
-          />
+        <div className="flex flex-row justify-between">
+          <div>Default Mode</div>
+          <div className="w-1/2">
+            <SelectMenu
+              options={[
+                { name: "Viewer", id: "non-dev" },
+                { name: "DevTools", id: "dev" },
+              ]}
+              selected={defaultMode}
+              setSelected={str => str && updateDefaultMode(str)}
+            />
+          </div>
         </div>
+        {enableHitCounts && (
+          <div className="flex flex-row justify-between">
+            <div>Heat Maps</div>
+            <div className="w-1/2">
+              <SelectMenu
+                options={[
+                  { name: "Hide Counts", id: "hide-counts" },
+                  { name: "Show Counts", id: "show-counts" },
+                  { name: "Disabled", id: "disabled" },
+                ]}
+                selected={hitCountsMode}
+                setSelected={mode => dispatch(setHitCountsMode(mode as HitCountMode))}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
