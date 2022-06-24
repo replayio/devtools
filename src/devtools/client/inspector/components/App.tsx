@@ -41,9 +41,7 @@ window.gInspector = new Inspector();
 
 const InspectorApp: FC = () => {
   const dispatch = useAppDispatch();
-  const { activeTab } = useAppSelector((state: UIState) => ({
-    activeTab: state.inspector.activeTab,
-  }));
+  const activeTab = useAppSelector(state => state.inspector.activeTab);
 
   const inspector = window.gInspector;
 
