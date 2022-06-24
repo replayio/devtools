@@ -15,10 +15,7 @@ export function waitForTime(ms, waitingFor) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const dbgSelectors = {};
-for (const [name, method] of Object.entries(dbg.selectors)) {
-  dbgSelectors[name] = (...args) => method(dbg.store.getState(), ...args);
-}
+const dbgSelectors = window.app.selectors;
 
 function waitForElapsedTime(time, ms) {
   const wait = time + ms - Date.now();
