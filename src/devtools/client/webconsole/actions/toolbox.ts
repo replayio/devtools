@@ -10,6 +10,7 @@ import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
+import { showSource } from "devtools/client/debugger/src/actions/ui";
 import {
   getSourceByActorId,
   getSourceByURL,
@@ -89,17 +90,18 @@ export function onViewSourceInDebugger(
   frame: $FixTypeLater,
   openSourcesTab: $FixTypeLater
 ): UIThunkAction {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const cx = getContext(getState());
     const source = frame.sourceId
       ? getSourceByActorId(getState(), frame.sourceId)
       : getSourceByURL(getState(), frame.url);
     if (source) {
-      dispatch(
+      dispatch(showSource(cx, source.id, openSourcesTab));
+      await dispatch(
         selectSource(
           cx,
-          frame.sourceId,
-          { sourceId: frame.sourceId, line: frame.line, column: frame.column },
+          source.id,
+          { sourceId: source.id, line: frame.line, column: frame.column },
           openSourcesTab
         )
       );
