@@ -244,10 +244,6 @@ class Editor extends PureComponent {
       return;
     }
 
-    if (target.classList.contains("CodeMirror-linenumber")) {
-      return;
-    }
-
     if (target.getAttribute("id") === "columnmarker") {
       return;
     }
@@ -262,24 +258,6 @@ class Editor extends PureComponent {
   onGutterClick = (cm, line, gutter, ev) => {
     const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
     const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
-
-    // Open the context menu then bail if the user clicks on a non-breakable line
-    if (ev.target.closest(".empty-line")) {
-      // I am pretty morally opposed to this code, but without it codemirror
-      // breaks in a myriad of ways.
-      setTimeout(() => {
-        this.props.openContextMenu({
-          x: ev.x,
-          y: ev.y,
-          contextMenuItem: {
-            location: sourceLocation,
-            sourceUrl: selectedSource.url,
-          },
-        });
-      }, 100);
-
-      return;
-    }
 
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
