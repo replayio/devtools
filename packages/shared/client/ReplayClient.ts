@@ -1,5 +1,6 @@
 import {
   Message,
+  newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
@@ -26,7 +27,7 @@ export interface ReplayClientInterface {
     messages: Message[];
     overflow: boolean;
   }>;
-  findSources(): Promise<void>;
+  findSources(): Promise<Source[]>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
@@ -164,10 +165,14 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async findSources(): Promise<void> {
-    await this._threadFront.findSources(() => {
-      // The demo doesn't use these directly, but the client throws if they aren't loaded.
+  async findSources(): Promise<Source[]> {
+    const sources: Source[] = [];
+
+    await this._threadFront.findSources((source: Source) => {
+      sources.push(source);
     });
+
+    return sources;
   }
 
   async getObjectWithPreview(

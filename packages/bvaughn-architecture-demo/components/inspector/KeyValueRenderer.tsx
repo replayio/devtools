@@ -5,10 +5,10 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
+import Expandable from "../Expandable";
 import Loader from "../Loader";
 
-import Collapsible from "./Collapsible";
-import HTMLCollapsible from "./HTMLCollapsible";
+import HTMLExpandable from "./HTMLExpandable";
 import styles from "./KeyValueRenderer.module.css";
 import PropertiesRenderer from "./PropertiesRenderer";
 import useClientValue from "./useClientValue";
@@ -44,7 +44,7 @@ export default function KeyValueRenderer({
   const { objectId, name, type } = clientValue;
 
   let objectWithPreview: ProtocolObject | null = null;
-  let showCollapsibleView = false;
+  let showExpandableView = false;
   if (enableInspection) {
     switch (type) {
       case "array":
@@ -79,7 +79,7 @@ export default function KeyValueRenderer({
           if (htmlElementChildren.length > 0) {
             return (
               <div className={classNames(styles.KeyValue)}>
-                <HTMLCollapsible
+                <HTMLExpandable
                   before={
                     <>
                       {before}
@@ -92,10 +92,10 @@ export default function KeyValueRenderer({
               </div>
             );
           } else {
-            showCollapsibleView = false;
+            showExpandableView = false;
           }
         } else {
-          showCollapsibleView = true;
+          showExpandableView = true;
         }
       }
     }
@@ -116,7 +116,7 @@ export default function KeyValueRenderer({
     <div
       className={classNames(
         styles.KeyValue,
-        !showCollapsibleView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
+        !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
       )}
     >
       {before}
@@ -130,9 +130,9 @@ export default function KeyValueRenderer({
     </div>
   );
 
-  if (showCollapsibleView) {
+  if (showExpandableView) {
     return (
-      <Collapsible
+      <Expandable
         children={
           <Suspense fallback={<Loader />}>
             <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />

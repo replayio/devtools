@@ -1,23 +1,11 @@
 @media (prefers-color-scheme: dark) {
   :root {
-    --background-color-contrast-1: #0e1119;
-    --background-color-contrast-2: #2a3343;
-    --background-color-contrast-3: #454950;
-    --background-color-contrast-4: #e1e6ed;
-    --background-color-default: #192230;
-    --background-color-error: #4b2f36;
-    --background-color-warning: #42381f;
-    --color-brand: #09a6e9;
-    --color-contrast: #081121;
-    --color-default: #ffffff;
-    --color-error: #ffb3d2;
-    --color-warning: #fce2a1;
+    --collapsible-toggle-color: #9ba0a5;
 
     --object-inspector-go-to-definition-icon-color: #dddddd;
     --object-inspector-go-to-definition-icon-color-hover: #ffffff;
     --object-inspector-prototype-color: #939395;
     --object-inspector-separator-color: #939395;
-    --object-inspector-toggle-color: #9ba0a5;
     --object-inspector-function-keyword: #ff7de9;
     --object-inspector-function-name: #bcc5ce;
     --object-inspector-expanded-key: #81d5ff;
@@ -63,7 +51,7 @@
     --object-inspector-go-to-definition-icon-color-hover: #000000;
     --object-inspector-prototype-color: #737373;
     --object-inspector-separator-color: #737373;
-    --object-inspector-toggle-color: #868688;
+    --collapsible-toggle-color: #868688;
     --object-inspector-function-keyword: #dd00a8;
     --object-inspector-function-name: #0074e8;
     --object-inspector-expanded-key: #0074e8;

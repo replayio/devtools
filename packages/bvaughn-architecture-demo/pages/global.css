@@ -25,3 +25,18 @@ body {
     color: #223344;
   }
 }
+
+:root {
+  --background-color-contrast-1: #0e1119;
+  --background-color-contrast-2: #2a3343;
+  --background-color-contrast-3: #454950;
+  --background-color-contrast-4: #e1e6ed;
+  --background-color-default: #192230;
+  --background-color-error: #4b2f36;
+  --background-color-warning: #42381f;
+  --color-brand: #09a6e9;
+  --color-contrast: #081121;
+  --color-default: #ffffff;
+  --color-error: #ffb3d2;
+  --color-warning: #fce2a1;
+}

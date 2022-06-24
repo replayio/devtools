@@ -12,7 +12,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Loader from "../../components/Loader";
 import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
 
-import Collapsible from "./Collapsible";
+import Expandable from "../Expandable";
+
 import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 import ValueRenderer from "./ValueRenderer";
@@ -83,7 +84,7 @@ export default function PropertiesRenderer({
       <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
 
       {buckets.map((bucket, index) => (
-        <Collapsible
+        <Expandable
           key={`bucketed-properties-${index}`}
           children={
             <Suspense fallback={<Loader />}>
@@ -115,7 +116,7 @@ export default function PropertiesRenderer({
       </Suspense>
 
       {prototype != null && (
-        <Collapsible
+        <Expandable
           children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
           header={
             <span className={styles.Prototype}>
@@ -140,7 +141,7 @@ function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRenderer
   }
 
   return (
-    <Collapsible
+    <Expandable
       defaultOpen={true}
       children={
         <ContainerEntriesChildrenRenderer containerEntries={containerEntries} pauseId={pauseId} />
@@ -173,7 +174,7 @@ function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entries
 //        key: <value>
 function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
-    <Collapsible
+    <Expandable
       defaultOpen={true}
       children={
         <MapContainerEntriesChildrenRenderer
@@ -194,7 +195,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
   return (
     <Suspense fallback={<Loader />}>
       {containerEntries.map(({ key, value }, index) => (
-        <Collapsible
+        <Expandable
           key={index}
           children={
             <>
@@ -235,7 +236,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
 //        key: <value>
 function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
-    <Collapsible
+    <Expandable
       defaultOpen={true}
       children={
         <SetContainerEntriesChildrenRenderer
@@ -256,7 +257,7 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
   return (
     <Suspense fallback={<Loader />}>
       {containerEntries.map(({ value }, index) => (
-        <Collapsible
+        <Expandable
           key={index}
           children={
             <KeyValueRenderer
