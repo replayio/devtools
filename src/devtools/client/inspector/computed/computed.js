@@ -144,6 +144,7 @@ UpdateProcess.prototype = {
  */
 function CssComputedView(inspector, document) {
   this.inspector = inspector;
+  this.store = inspector.store;
   this.styleDocument = document;
   this.styleWindow = this.styleDocument.defaultView;
 
@@ -478,13 +479,8 @@ CssComputedView.prototype = {
   },
 
   isPanelVisible: function () {
-    return this.inspector?.toolbox?.currentTool === "inspector";
-    // return (
-    //   this.inspector.toolbox &&
-    //   this.inspector.sidebar &&
-    //   this.inspector.toolbox.currentTool === "inspector" &&
-    //   this.inspector.sidebar.getCurrentTabID() == "computedview"
-    // );
+    const currentTool = getSelectedPanel(this.store.getState());
+    return currentTool === "inspector";
   },
 
   /**

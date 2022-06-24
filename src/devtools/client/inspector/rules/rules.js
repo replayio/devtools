@@ -25,6 +25,8 @@ const {
 } = require("devtools/client/inspector/rules/actions/rules");
 const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
 
+import { getSelectedPanel } from "ui/reducers/layout";
+
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
 class RulesView {
@@ -247,7 +249,8 @@ class RulesView {
    * Returns true if the rules panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector?.toolbox?.currentTool === "inspector";
+    const currentTool = getSelectedPanel(this.store.getState());
+    return currentTool === "inspector";
   }
 
   /**
