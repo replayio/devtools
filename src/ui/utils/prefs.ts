@@ -17,6 +17,7 @@ pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
 pref("devtools.toolbox-size", "50%");
 pref("devtools.consoleFilterDrawerExpanded", true);
+pref("devtools.hitCounts", "hide-counts");
 
 // app features
 pref("devtools.features.breakpointPanelAutocomplete", true);
@@ -52,6 +53,7 @@ export const prefs = new PrefsHelper("devtools", {
   theme: ["String", "theme"],
   toolboxSize: ["String", "toolbox-size"],
   consoleFilterDrawerExpanded: ["Bool", "consoleFilterDrawerExpanded"],
+  hitCounts: ["String", "hitCounts"],
 });
 
 export const features = new PrefsHelper("devtools.features", {

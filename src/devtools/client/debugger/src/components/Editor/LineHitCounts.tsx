@@ -5,24 +5,32 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { setBreakpointHitCounts } from "../../actions/sources";
 import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
 import { getSelectedSourceId } from "../../selectors";
+import { useStringPref } from "ui/hooks/settings";
 
 import styles from "./LineHitCounts.module.css";
 
 type Props = {
   editor: any;
-  isCollapsed: boolean;
-  setIsCollapsed: (isCollapsed: boolean) => void;
 };
 
 export default function LineHitCountsWrapper(props: Props) {
-  const { value } = useFeature("hitCounts");
-  return value ? <LineHitCounts {...props} /> : null;
+  const { value: hitCountsEnabled } = useFeature("hitCounts");
+  const { value: hitCountsMode } = useStringPref("hitCounts");
+
+  if (!hitCountsEnabled || hitCountsMode == "disabled") {
+    return null;
+  }
+
+  return <LineHitCounts {...props} />;
 }
 
-function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
+function LineHitCounts({ editor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId);
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
+  const isCollapsed = hitCountsMode == "hide-counts";
+
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
     [hitCounts]
@@ -115,7 +123,7 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
         }
 
         const markerNode = document.createElement("div");
-        markerNode.onclick = () => setIsCollapsed(!isCollapsed);
+        markerNode.onclick = () => updateHitCountsMode(isCollapsed ? "show-counts" : "hide-counts");
         markerNode.className = className;
         if (!isCollapsed && hitCount > 0) {
           markerNode.textContent =
@@ -138,7 +146,7 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, setIsCollapsed]);
+  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, updateHitCountsMode]);
 
   // We're just here for the hooks!
   return null;

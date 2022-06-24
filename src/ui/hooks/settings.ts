@@ -111,6 +111,11 @@ export const useStringPref = (prefKey: keyof typeof prefs) => {
   const fullKey = `devtools.${prefKey}`;
   const [pref, setPref] = useState(prefsService.getStringPref(fullKey));
 
+  const updateValue = useMemo(
+    () => (newValue: string) => prefsService.setStringPref(fullKey, newValue),
+    [fullKey]
+  );
+
   useEffect(() => {
     const onUpdate = (prefs: any) => {
       setPref(prefs.getStringPref(fullKey));
@@ -122,9 +127,7 @@ export const useStringPref = (prefKey: keyof typeof prefs) => {
 
   return {
     value: pref,
-    update: (newValue: string) => {
-      prefsService.setStringPref(fullKey, newValue);
-    },
+    update: updateValue,
   };
 };
 

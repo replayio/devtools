@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import hooks from "ui/hooks";
-import { useStringPref } from "ui/hooks/settings";
+import { useFeature, useStringPref } from "ui/hooks/settings";
 import { EmailSubscription } from "ui/hooks/users";
 import { getThemePreference } from "ui/reducers/app";
 import { updateTheme } from "ui/reducers/app";
@@ -107,11 +107,14 @@ function PrivacyPreferences() {
     </div>
   );
 }
+type HitCountMode = "hide-counts" | "show-counts" | "disabled";
 
 function UiPreferences() {
   const dispatch = useAppDispatch();
   const theme = useAppSelector(getThemePreference);
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
+  const { value: hitCountsMode, update: updateHitCounts } = useStringPref("hitCounts");
+  const hitCountsEnabled = useFeature("hitCounts");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -120,7 +123,7 @@ function UiPreferences() {
   return (
     <div className="space-y-4">
       <div className="text-lg">Appearance</div>
-      <div className="flex flex-col space-y-4 p-1">
+      <div className="flex flex-row justify-between">
         <div>Theme</div>
         <div className="w-1/2">
           <SelectMenu
@@ -133,6 +136,8 @@ function UiPreferences() {
             setSelected={str => setSelected(str as AppTheme)}
           />
         </div>
+      </div>
+      <div className="flex flex-row justify-between">
         <div>Default Mode</div>
         <div className="w-1/2">
           <SelectMenu
@@ -145,6 +150,22 @@ function UiPreferences() {
           />
         </div>
       </div>
+      {hitCountsEnabled && (
+        <div className="flex flex-row justify-between">
+          <div>Heat Maps</div>
+          <div className="w-1/2">
+            <SelectMenu
+              options={[
+                { name: "Hide Counts", id: "hide-counts" },
+                { name: "Show Counts", id: "show-counts" },
+                { name: "Hidden", id: "disabled" },
+              ]}
+              selected={hitCountsMode}
+              setSelected={mode => updateHitCounts(mode as HitCountMode)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
