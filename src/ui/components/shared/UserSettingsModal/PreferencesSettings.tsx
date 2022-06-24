@@ -51,7 +51,7 @@ function NotificationPreferences({
     <div className="space-y-4">
       <div className="text-lg">Notifications</div>
       <div>Choose which email updates you would like to receive:</div>
-      <div className="flex flex-col space-y-2 p-1">
+      <div className="flex flex-col p-1 space-y-2">
         {Object.entries(EMAIL_NOTIFICATIONS).map(([emailType, content]: string[], i) => (
           <Notification
             {...{ content, unsubscribedEmailTypes }}
@@ -89,9 +89,9 @@ function PrivacyPreferences() {
   return (
     <div className="space-y-4">
       <div className="text-lg">Privacy</div>
-      <div className="flex flex-col space-y-2 p-1">
+      <div className="flex flex-col p-1 space-y-2">
         <label
-          className="flex cursor-pointer items-center space-x-2"
+          className="flex items-center space-x-2 cursor-pointer"
           data-private
           htmlFor="disableLogRocket"
         >
@@ -115,6 +115,7 @@ function UiPreferences() {
   const { value: defaultMode, update: updateDefaultMode } = useStringPref("defaultMode");
   const { value: hitCountsMode, update: updateHitCounts } = useStringPref("hitCounts");
   const hitCountsEnabled = useFeature("hitCounts");
+  const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
 
   const setSelected = (value: AppTheme) => {
     dispatch(updateTheme(value));
@@ -166,6 +167,18 @@ function UiPreferences() {
           </div>
         </div>
       )}
+      <label
+        className="flex items-center p-1 space-x-2 cursor-pointer"
+        data-private
+        htmlFor="enable-large-text"
+      >
+        <Checkbox
+          id="enable-large-text"
+          checked={enableLargeText}
+          onChange={() => updateEnableLargeText(!enableLargeText)}
+        />
+        <div>Enable large text for Editor</div>
+      </label>
     </div>
   );
 }

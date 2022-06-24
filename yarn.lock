@@ -8932,7 +8932,28 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "bvaughn-architecture-demo@workspace:*, bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo":
+=======
+"bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo::locator=recordreplay-devtools%40workspace%3A.":
+  version: 0.1.0
+  resolution: "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo#packages/bvaughn-architecture-demo::hash=30f665&locator=recordreplay-devtools%40workspace%3A."
+  dependencies:
+    "@replayio/protocol": ^0.31.0
+    date-fns: ^2.28.0
+    lodash: ^4.17.21
+    next: ^12.1.6
+    pretty-ms: ^7.0.1
+    protocol: "workspace:*"
+    react: 0.0.0-experimental-e7d0053e6-20220325
+    react-dom: 0.0.0-experimental-e7d0053e6-20220325
+    shared: "workspace:*"
+  checksum: ad4e7ad3bb1678fc3800d148e4ac55967480a9c613f8009f9c805b910373f453070c58cf28ad7381309390637b2c53530072844837db492955760ae1e6ec14e8
+  languageName: node
+  linkType: hard
+
+"bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo":
+>>>>>>> eeebe215a (Move large text settings to the Appearance tab)
   version: 0.0.0-use.local
   resolution: "bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo"
   dependencies:

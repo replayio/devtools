@@ -24,11 +24,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Large Text",
-    description: "Enable large text for Editor",
-    key: "enableLargeText",
-  },
-  {
     label: "New Object Inspector",
     description: "Enable new Object Inspector UI for Source viewer",
     key: "enableNewObjectInspector",
@@ -85,7 +80,6 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
   const { value: enableNewObjectInspector, update: updateEnableNewObjectInspector } = useFeature(
     "enableNewObjectInspector"
   );
@@ -101,8 +95,6 @@ export default function ExperimentalSettings({}) {
       updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key === "enableLargeText") {
-      updateEnableLargeText(!enableLargeText);
     } else if (key === "enableNewObjectInspector") {
       updateEnableNewObjectInspector(!enableNewObjectInspector);
     } else if (key === "hitCounts") {
@@ -115,7 +107,6 @@ export default function ExperimentalSettings({}) {
     enableResolveRecording,
     hitCounts,
     turboReplay: enableTurboReplay,
-    enableLargeText,
     enableNewObjectInspector,
   };
 
