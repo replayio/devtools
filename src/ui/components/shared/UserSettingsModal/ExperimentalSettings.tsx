@@ -19,11 +19,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "showReact",
   },
   {
-    label: "Event Link",
-    description: "Jump from an event to a line of code",
-    key: "enableEventLink",
-  },
-  {
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
@@ -82,7 +77,6 @@ export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
-  const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
   const updateReact = hooks.useUpdateUserSetting("showReact");
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
@@ -99,9 +93,7 @@ export default function ExperimentalSettings({}) {
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
-    if (key === "enableEventLink") {
-      updateEventLink({ variables: { newValue: value } });
-    } else if (key === "showReact") {
+    if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
