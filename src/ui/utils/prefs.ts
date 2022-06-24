@@ -24,7 +24,6 @@ pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.enableNewObjectInspector", false);
-pref("devtools.features.httpBodies", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.networkRequestComments", true);
 pref("devtools.features.originalClassNames", false);
@@ -62,7 +61,6 @@ export const features = new PrefsHelper("devtools.features", {
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
   enableNewObjectInspector: ["Bool", "enableNewObjectInspector"],
-  httpBodies: ["Bool", "httpBodies"],
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   networkRequestComments: ["Bool", "networkRequestComments"],
