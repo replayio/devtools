@@ -63,6 +63,7 @@ export interface GetNonPendingWorkspaces_viewer_workspaces_edges_node {
   domain: string | null;
   isDomainLimitedCode: boolean | null;
   hasPaymentMethod: boolean;
+  isTest: boolean;
   isOrganization: boolean;
   subscription: GetNonPendingWorkspaces_viewer_workspaces_edges_node_subscription | null;
   settings: GetNonPendingWorkspaces_viewer_workspaces_edges_node_settings | null;
