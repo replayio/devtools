@@ -14,28 +14,11 @@ import { client, initSocket } from "protocol/socket";
 import { Pause, ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
+import { ReplayClientInterface } from "./types";
+
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
-
-export interface ReplayClientInterface {
-  configure(sessionId: string): void;
-  getPauseIdForMessage(message: Message): PauseId;
-  getSessionId(): SessionId | null;
-  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
-  findMessages(focusRange: TimeStampedPointRange | null): Promise<{
-    messages: Message[];
-    overflow: boolean;
-  }>;
-  findSources(): Promise<Source[]>;
-  getObjectWithPreview(
-    objectId: ObjectId,
-    pauseId: PauseId,
-    level?: ObjectPreviewLevel
-  ): Promise<PauseData>;
-  getPointNearTime(time: number): Promise<TimeStampedPoint>;
-  getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
-}
 
 export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;

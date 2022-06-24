@@ -1,6 +1,6 @@
 import { act, render as rtlRender, RenderResult } from "@testing-library/react";
 import { ReactNode } from "react";
-import { ReplayClientInterface } from "shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
