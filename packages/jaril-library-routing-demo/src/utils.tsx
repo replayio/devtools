@@ -1,7 +1,7 @@
 import { useRouter } from "next/router";
 
 function parseTeamParams(params: string[]) {
-  return { teamName: params[0], view: params[1], focusId: params[2] };
+  return { teamId: params[0], view: params[1], focusId: params[2] };
 }
 
 export function useGetTeamRouteParams() {

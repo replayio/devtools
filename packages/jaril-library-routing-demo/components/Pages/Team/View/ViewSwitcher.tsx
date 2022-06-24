@@ -1,10 +1,12 @@
 import Link from "next/link";
-import { useGetTeamRouteParams } from "../src/utils";
-import { TEAMS } from "./Library";
+import { useContext } from "react";
+import { TEAMS } from "../../../Library";
+import { TeamContext } from "../TeamPage";
+import { ViewContext } from "./ViewPage";
 
 export function ViewSwitcher() {
-  const { teamName } = useGetTeamRouteParams();
-  const isTestTeam = TEAMS.find(t => t.name === teamName)?.isTest;
+  const { teamId } = useContext(TeamContext);
+  const isTestTeam = TEAMS.find(t => t.name === teamId)?.isTest;
 
   if (!isTestTeam) {
     return null;
@@ -20,11 +22,12 @@ export function ViewSwitcher() {
 }
 
 function View({ children, view }: { children: string; view: string }) {
-  const { teamName, view: currentView } = useGetTeamRouteParams();
+  const { teamId } = useContext(TeamContext);
+  const { view: currentView } = useContext(ViewContext);
   const highlighted = currentView === view;
 
   return (
-    <Link href={`/team/${teamName}/${view}`}>
+    <Link href={`/team/${teamId}/${view}`}>
       <a className={highlighted ? "font-bold" : ""}>{children}</a>
     </Link>
   );
