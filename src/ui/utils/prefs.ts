@@ -32,7 +32,6 @@ pref("devtools.features.resolveRecording", false);
 pref("devtools.features.showRedux", true);
 pref("devtools.features.testSupport", false);
 pref("devtools.features.turboReplay", false);
-pref("devtools.features.unicornConsole", true);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.disableUnHitLines", false);
 
@@ -69,7 +68,6 @@ export const features = new PrefsHelper("devtools.features", {
   showRedux: ["Bool", "showRedux"],
   testSupport: ["Bool", "testSupport"],
   turboReplay: ["Bool", "turboReplay"],
-  unicornConsole: ["Bool", "unicornConsole"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

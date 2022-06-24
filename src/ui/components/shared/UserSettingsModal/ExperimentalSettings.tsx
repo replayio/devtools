@@ -49,11 +49,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableResolveRecording",
   },
   {
-    description: "Add prefixes to print statements",
-    key: "unicornConsole",
-    label: "Unicorn console",
-  },
-  {
     label: "Turbo Replay",
     description: "Replay recordings across multiple instances",
     key: "turboReplay",
@@ -98,8 +93,6 @@ export default function ExperimentalSettings({}) {
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
-  const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
-    useFeature("unicornConsole");
   const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
@@ -122,8 +115,6 @@ export default function ExperimentalSettings({}) {
       updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key == "unicornConsole") {
-      updateEnableUnicornConsole(!enableUnicornConsole);
     } else if (key === "showRedux") {
       updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
@@ -140,7 +131,6 @@ export default function ExperimentalSettings({}) {
     enableResolveRecording,
     hitCounts,
     turboReplay: enableTurboReplay,
-    unicornConsole: enableUnicornConsole,
     showRedux: enableReduxDevtools,
     enableLargeText,
     enableNewObjectInspector,
