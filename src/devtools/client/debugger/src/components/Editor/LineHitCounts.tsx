@@ -106,6 +106,8 @@ function LineHitCounts({ editor, isCollapsed, setIsCollapsed }: Props) {
             );
           }
           className = styles[`HitsBadge${index + 1}`];
+
+          editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
         } else {
           // If this line wasn't hit any, dim the line number,
           // even if it's a line that's technically reachable.
