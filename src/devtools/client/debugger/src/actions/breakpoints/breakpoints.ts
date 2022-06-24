@@ -9,8 +9,8 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import {
   Breakpoint,
+  getBreakpointsForSelectedSource,
   getBreakpointsForSource,
-  getBreakpointsForSourceId,
 } from "../../reducers/breakpoints";
 import {
   removeRequestedBreakpoint,
@@ -43,7 +43,7 @@ import {
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
-    const logpoints = getBreakpointsForSourceId(getState());
+    const logpoints = getBreakpointsForSelectedSource(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
     const logValue = isLogpoint(breakpoint);
 
