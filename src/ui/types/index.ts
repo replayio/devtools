@@ -17,7 +17,6 @@ export type ExperimentalUserSettings = {
 
 export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
-  enableNetworkRequestComments: boolean;
   enableNewObjectInspector: boolean;
   turboReplay: boolean;
   enableResolveRecording: boolean;

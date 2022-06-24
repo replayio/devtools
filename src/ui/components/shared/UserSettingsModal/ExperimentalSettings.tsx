@@ -34,11 +34,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Network Request Comments",
-    description: "Leave comments on a network request",
-    key: "enableNetworkRequestComments",
-  },
-  {
     label: "Large Text",
     description: "Enable large text for Editor",
     key: "enableLargeText",
@@ -102,8 +97,6 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
-    useFeature("networkRequestComments");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
   const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
     useFeature("unicornConsole");
@@ -125,8 +118,6 @@ export default function ExperimentalSettings({}) {
       updateReact({ variables: { newValue: value } });
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableNetworkRequestComments") {
-      updateEnableNetworkRequestComments(!enableNetworkRequestComments);
     } else if (key == "turboReplay") {
       updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
@@ -146,7 +137,6 @@ export default function ExperimentalSettings({}) {
 
   const localSettings = {
     enableColumnBreakpoints,
-    enableNetworkRequestComments,
     enableResolveRecording,
     hitCounts,
     turboReplay: enableTurboReplay,

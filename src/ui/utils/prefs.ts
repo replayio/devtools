@@ -25,7 +25,6 @@ pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.enableNewObjectInspector", false);
 pref("devtools.features.logProtocol", false);
-pref("devtools.features.networkRequestComments", true);
 pref("devtools.features.originalClassNames", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
@@ -63,7 +62,6 @@ export const features = new PrefsHelper("devtools.features", {
   enableNewObjectInspector: ["Bool", "enableNewObjectInspector"],
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
-  networkRequestComments: ["Bool", "networkRequestComments"],
   originalClassNames: ["Bool", "originalClassNames"],
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],

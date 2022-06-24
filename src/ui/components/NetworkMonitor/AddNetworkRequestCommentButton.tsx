@@ -12,17 +12,12 @@ export default function AddNetworkRequestCommentButton({
   request: RequestSummary;
   className?: string;
 }) {
-  const { value: networkRequestComments } = useFeature("networkRequestComments");
   const dispatch = useAppDispatch();
   const recordingId = useGetRecordingId();
 
   const addRequestComment = () => {
     dispatch(createNetworkRequestComment(request, recordingId));
   };
-
-  if (!networkRequestComments) {
-    return null;
-  }
 
   return <AddCommentButton className={className} onClick={addRequestComment} />;
 }
