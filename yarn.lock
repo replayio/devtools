@@ -8915,7 +8915,7 @@ __metadata:
 
 "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.1.0
-  resolution: "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo#packages/bvaughn-architecture-demo::hash=06437b&locator=recordreplay-devtools%40workspace%3A."
+  resolution: "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo#packages/bvaughn-architecture-demo::hash=2fec04&locator=recordreplay-devtools%40workspace%3A."
   dependencies:
     "@replayio/protocol": ^0.31.0
     date-fns: ^2.28.0
@@ -8926,7 +8926,7 @@ __metadata:
     react: 0.0.0-experimental-e7d0053e6-20220325
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     shared: "workspace:*"
-  checksum: 44e80a7d81ee4f7903616c3abcb5cd0e9428d8d79232510564074bf2bed738b70fab0672147e4d384c4486b67da079519b90fed3d2c765d4ed2454e857e02378
+  checksum: fb1369d68b581618c4d88c8003bdfadd762f6fde1364eb6e8e00bc2390a2d8c18f8eb5ad4f9879787dc0dae6296a7d4a4dd2cb965201d05ce84454ae4cd86663
   languageName: node
   linkType: hard
 
@@ -19468,8 +19468,8 @@ __metadata:
 
 "protocol@file:packages/protocol::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "protocol@file:packages/protocol#packages/protocol::hash=5199df&locator=recordreplay-devtools%40workspace%3A."
-  checksum: e42825f0fddf86aa2cb0cb2004786e90a13ec9a4d2e970d8bee9968f1315376ab9a966b9a6a977ee6c1cc2ef6ef3f6db3bbde441f068a4cb9020900de3bec355
+  resolution: "protocol@file:packages/protocol#packages/protocol::hash=f4ba8e&locator=recordreplay-devtools%40workspace%3A."
+  checksum: 80af10260b7bac302783a98dceb579a0e55cea1cd3cdb1f5c555d4bf364e3932caef479fa5721f3c7eb1d97661f750db563cc893edccfba0da585b4e5a97991d
   languageName: node
   linkType: hard
 
