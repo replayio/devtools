@@ -17,7 +17,13 @@ if (typeof window !== "undefined") {
   };
 }
 
-export default function Initializer({ children }: { children: ReactNode }) {
+export default function Initializer({
+  children,
+  recordingId = null,
+}: {
+  children: ReactNode;
+  recordingId?: string | null;
+}) {
   const client = useContext(ReplayClientContext);
   const [context, setContext] = useState<SessionContextType | null>(null);
   const didInitializeRef = useRef<boolean>(false);
@@ -31,12 +37,16 @@ export default function Initializer({ children }: { children: ReactNode }) {
         // (This is just a prototype; no sense building a full authentication flow.)
         const url = new URL(window.location.href);
         const accessToken = url.searchParams.get("accessToken");
-        const recordingId = url.searchParams.get("recordingId");
-        if (!recordingId) {
-          throw Error(`Must specify "recordingId" parameter.`);
+
+        let activeRecordingId = recordingId;
+        if (activeRecordingId === null) {
+          activeRecordingId = url.searchParams.get("recordingId");
+          if (!activeRecordingId) {
+            throw Error(`Must specify "recordingId" parameter.`);
+          }
         }
 
-        const sessionId = await client.initialize(recordingId, accessToken);
+        const sessionId = await client.initialize(activeRecordingId, accessToken);
         const endpoint = await client.getSessionEndpoint(sessionId);
 
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
@@ -53,7 +63,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
           currentUserInfo,
           duration: endpoint.time,
           endPoint: endpoint.point,
-          recordingId,
+          recordingId: activeRecordingId,
           sessionId,
         });
       };
@@ -62,7 +72,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
     }
 
     didInitializeRef.current = true;
-  }, [client]);
+  }, [client, recordingId]);
 
   if (context === null) {
     return null;
