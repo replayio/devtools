@@ -36,7 +36,7 @@ pref("devtools.features.showRedux", true);
 pref("devtools.features.testSupport", false);
 pref("devtools.features.turboReplay", false);
 pref("devtools.features.unicornConsole", true);
-pref("devtools.features.hitCounts", false);
+pref("devtools.features.hitCounts", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
