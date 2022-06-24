@@ -18,7 +18,6 @@ export function PanelInput({
   onEnter: () => void;
   onEscape: () => void;
 }) {
-  const { value: enableBreakpointPanelAutocomplete } = useFeature("breakpointPanelAutocomplete");
   const onKeyPress = (e: KeyboardEvent) => {
     if (e.key === Keys.ENTER && !e.shiftKey) {
       e.preventDefault();
@@ -33,14 +32,13 @@ export function PanelInput({
   const options = { minLeft: 24, autofocus, isArgument: true };
 
   return (
-    <div className="jsterm-input-container w-full">
+    <div className="w-full jsterm-input-container">
       <EditorWithAutocomplete
         onEditorMount={() => {}}
         onPreviewAvailable={() => {}}
         value={value}
         setValue={onChange}
         onRegularKeyPress={onKeyPress}
-        disableAutocomplete={!enableBreakpointPanelAutocomplete}
         opts={options}
       />
     </div>

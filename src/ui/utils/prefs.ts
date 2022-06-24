@@ -20,7 +20,6 @@ pref("devtools.consoleFilterDrawerExpanded", true);
 pref("devtools.hitCounts", "hide-counts");
 
 // app features
-pref("devtools.features.breakpointPanelAutocomplete", true);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
@@ -58,7 +57,6 @@ export const prefs = new PrefsHelper("devtools", {
 });
 
 export const features = new PrefsHelper("devtools.features", {
-  breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],

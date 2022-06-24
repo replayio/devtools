@@ -39,11 +39,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableNetworkRequestComments",
   },
   {
-    label: "Breakpoint Panel Autocomplete",
-    description: "Show autocomplete in the breakpoint panel",
-    key: "enableBreakpointPanelAutocomplete",
-  },
-  {
     label: "Large Text",
     description: "Enable large text for Editor",
     key: "enableLargeText",
@@ -105,10 +100,6 @@ export default function ExperimentalSettings({}) {
   const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
   const updateReact = hooks.useUpdateUserSetting("showReact");
 
-  const {
-    value: enableBreakpointPanelAutocomplete,
-    update: updateEnableBreakpointPanelAutocomplete,
-  } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
@@ -132,8 +123,6 @@ export default function ExperimentalSettings({}) {
       updateEventLink({ variables: { newValue: value } });
     } else if (key === "showReact") {
       updateReact({ variables: { newValue: value } });
-    } else if (key === "enableBreakpointPanelAutocomplete") {
-      updateEnableBreakpointPanelAutocomplete(!enableBreakpointPanelAutocomplete);
     } else if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableNetworkRequestComments") {
@@ -156,7 +145,6 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
-    enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
     enableNetworkRequestComments,
     enableResolveRecording,
@@ -176,7 +164,7 @@ export default function ExperimentalSettings({}) {
 
   return (
     <div className="space-y-6 overflow-auto">
-      <div className="flex flex-col space-y-2 p-1">
+      <div className="flex flex-col p-1 space-y-2">
         {EXPERIMENTAL_SETTINGS.map(setting => (
           <Experiment
             onChange={onChange}
@@ -187,7 +175,7 @@ export default function ExperimentalSettings({}) {
         ))}
         {RISKY_EXPERIMENTAL_SETTINGS.length > 0 && (
           <div>
-            <div className="my-4  flex items-center ">
+            <div className="flex items-center my-4 ">
               <Icon
                 filename="warning"
                 className="mr-2"
