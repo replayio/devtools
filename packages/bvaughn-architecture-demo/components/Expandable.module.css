@@ -1,4 +1,4 @@
-.Collapsible {
+.Expandable {
   display: flex;
   flex-direction: column;
 }
@@ -28,7 +28,7 @@
 }
 
 .ArrowIcon {
-  fill: var(--object-inspector-toggle-color);
+  fill: var(--collapsible-toggle-color);
   width: 1rem;
   height: 1rem;
 }

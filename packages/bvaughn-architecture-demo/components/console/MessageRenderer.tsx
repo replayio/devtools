@@ -3,21 +3,38 @@ import Loader from "../Loader";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { getSource } from "../../src/suspense/SourcesCache";
+
+import Expandable from "../Expandable";
+import Icon from "../Icon";
 import Inspector from "../inspector";
 
 import styles from "./MessageRenderer.module.css";
+import MessageStackRenderer from "./MessageStackRenderer";
+import Source from "./Source";
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
 function MessageRenderer({ message }: { message: ProtocolMessage }) {
   let className = styles.MessageRow;
+  let icon = null;
+  let showExpandable = false;
   switch (message.level) {
-    case "warning": {
-      className = styles.MessageRowWarning;
-      break;
-    }
     case "error": {
       className = styles.MessageRowError;
+      icon = <Icon className={styles.ErrorIcon} type="error" />;
+      showExpandable = true;
+      break;
+    }
+    case "trace": {
+      className = styles.MessageRowTrace;
+      showExpandable = true;
+      break;
+    }
+    case "warning": {
+      className = styles.MessageRowWarning;
+      icon = <Icon className={styles.WarningIcon} type="warning" />;
+      showExpandable = true;
       break;
     }
   }
@@ -25,14 +42,38 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   const client = useContext(ReplayClientContext);
   const pauseId = useMemo(() => client.getPauseIdForMessage(message), [client, message]);
 
+  const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
+  const location = frame ? frame.location[0] : null;
+  const source = location !== null ? getSource(client, location.sourceId) : null;
+
+  const primaryContent = (
+    <div className={styles.PrimaryRow}>
+      <div className={styles.LogContents}>
+        {icon}
+        {message.text && <span className={styles.MessageText}>{message.text}</span>}
+        <Suspense fallback={<Loader />}>
+          {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
+            <Inspector key={index} pauseId={pauseId} protocolValue={argumentValue} />
+          ))}
+        </Suspense>
+      </div>
+      <Suspense fallback={<Loader />}>
+        <div className={styles.Source}>{location && <Source location={location} />}</div>
+      </Suspense>
+    </div>
+  );
+
   return (
     <div className={className}>
-      {message.text}
-      <Suspense fallback={<Loader />}>
-        {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-          <Inspector key={index} pauseId={pauseId} protocolValue={argumentValue} />
-        ))}
-      </Suspense>
+      {showExpandable ? (
+        <Expandable
+          children={<MessageStackRenderer message={message} />}
+          className={styles.Expandable}
+          header={primaryContent}
+        />
+      ) : (
+        primaryContent
+      )}
     </div>
   );
 }

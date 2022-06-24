@@ -7,6 +7,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { SessionContext, SessionContextType } from "../src/contexts/SessionContext";
 import { UserInfo } from "../src/graphql/types";
 import { getCurrentUserInfo } from "../src/graphql/User";
+import { preCacheSources } from "../src/suspense/SourcesCache";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.
@@ -39,7 +40,8 @@ export default function Initializer({ children }: { children: ReactNode }) {
         const endpoint = await client.getSessionEndpoint(sessionId);
 
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
-        await client.findSources();
+        const sources = await client.findSources();
+        preCacheSources(sources);
 
         let currentUserInfo: UserInfo | null = null;
         if (accessToken) {

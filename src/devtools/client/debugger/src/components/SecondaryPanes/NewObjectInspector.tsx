@@ -1,6 +1,6 @@
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
-import Collapsible from "bvaughn-architecture-demo/components/inspector/Collapsible";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import "bvaughn-architecture-demo/pages/inspector.css";
 import { clientValueToProtocolNamedValue } from "bvaughn-architecture-demo/src/utils/protocol";
@@ -29,7 +29,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
             clientValueToProtocolNamedValue
           );
           children.push(
-            <Collapsible
+            <Expandable
               key={index}
               header={root.name}
               children={protocolValues.map((protocolValue, index) => (
