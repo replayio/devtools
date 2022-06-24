@@ -10,7 +10,7 @@ runs:
       run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
     - name: Restore yarn cache
       uses: actions/cache@v3
-      id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      id: yarn-cache
       with:
         path: |
           ${{ steps.yarn-cache-dir-path.outputs.dir }}
@@ -19,7 +19,6 @@ runs:
         restore-keys: "yarn-cache-folder-"
     # Actually install packages with Yarn
     - name: Install packages
-      if: steps.yarn-cache.outputs.cache-hit != 'true'
       run: yarn install
       shell: bash
       env:
