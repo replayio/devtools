@@ -21,7 +21,6 @@ export type LocalExperimentalUserSettings = {
   turboReplay: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
-  showRedux: boolean;
   enableLargeText: boolean;
 };
 

@@ -29,7 +29,6 @@ pref("devtools.features.originalClassNames", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.showRedux", true);
 pref("devtools.features.testSupport", false);
 pref("devtools.features.turboReplay", false);
 pref("devtools.features.hitCounts", true);
@@ -65,7 +64,6 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
-  showRedux: ["Bool", "showRedux"],
   testSupport: ["Bool", "testSupport"],
   turboReplay: ["Bool", "turboReplay"],
 });

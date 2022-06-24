@@ -19,11 +19,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "showReact",
   },
   {
-    label: "Redux DevTools",
-    description: "Inspect the Redux actions history",
-    key: "showRedux",
-  },
-  {
     label: "Event Link",
     description: "Jump from an event to a line of code",
     key: "enableEventLink",
@@ -93,7 +88,6 @@ export default function ExperimentalSettings({}) {
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
   const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
-  const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
@@ -115,8 +109,6 @@ export default function ExperimentalSettings({}) {
       updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key === "showRedux") {
-      updateEnableReduxDevtools(!enableReduxDevtools);
     } else if (key === "enableLargeText") {
       updateEnableLargeText(!enableLargeText);
     } else if (key === "enableNewObjectInspector") {
@@ -131,7 +123,6 @@ export default function ExperimentalSettings({}) {
     enableResolveRecording,
     hitCounts,
     turboReplay: enableTurboReplay,
-    showRedux: enableReduxDevtools,
     enableLargeText,
     enableNewObjectInspector,
   };

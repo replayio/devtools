@@ -75,12 +75,11 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   isNode,
 }) => {
-  const { value: showRedux } = useFeature("showRedux");
   const { userSettings } = hooks.useGetUserSettings();
   const { showReact } = userSettings;
 
   return (
-    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
+    <div className="flex flex-row items-center overflow-hidden panel-buttons theme-tab-font-size">
       {!isNode && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
       {!isNode && <PanelButton panel="inspector">Elements</PanelButton>}
@@ -90,7 +89,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
         </PanelButton>
       )}
       {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
-      {hasReduxAnnotations && showRedux && <PanelButton panel="redux-devtools">Redux</PanelButton>}
+      {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
       <PanelButton panel="network">Network</PanelButton>
     </div>
   );
@@ -112,8 +111,8 @@ function InspectorPanel() {
       <WaitForReduxSlice
         slice="inspector"
         loading={
-          <div className="align-center m-auto flex w-full justify-center">
-            <div className="relative flex w-96 flex-col items-center rounded-lg bg-white/75 p-8 py-4">
+          <div className="flex justify-center w-full m-auto align-center">
+            <div className="relative flex flex-col items-center p-8 py-4 rounded-lg w-96 bg-white/75">
               <ReplayLogo wide size="lg" />
               <div>Inspector is loading...</div>
             </div>
@@ -157,13 +156,13 @@ export default function SecondaryToolbox() {
           hasReduxAnnotations={hasReduxAnnotations}
           toolboxLayout={toolboxLayout}
         />
-        <div className="secondary-toolbox-right-buttons-container flex">
+        <div className="flex secondary-toolbox-right-buttons-container">
           <PanelButtonsScrollOverflowGradient />
           <ShowVideoButton />
           <ToolboxOptions />
         </div>
       </header>
-      <Redacted className="secondary-toolbox-content bg-chrome text-xs">
+      <Redacted className="text-xs secondary-toolbox-content bg-chrome">
         {selectedPanel === "network" && <NetworkMonitor />}
         {selectedPanel === "console" ? <ConsolePanel /> : null}
         {selectedPanel === "inspector" ? <InspectorPanel /> : null}
