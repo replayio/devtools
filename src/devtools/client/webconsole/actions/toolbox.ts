@@ -18,10 +18,14 @@ import {
 type $FixTypeLater = any;
 
 export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
-  return (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (grip.getPause() !== ThreadFront.currentPause) {
       return;
     }
+
+    // HACK This is ugly, but we lazy-load the component and also try to use `window.gInspector` in places.
+    // So, ensure it's loaded, _then_ use this global
+    await import("devtools/client/inspector/components/App");
 
     const highlighter = window.gInspector.getHighlighter();
     const nodeFront = grip.getNodeFront();
@@ -32,7 +36,8 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 }
 
 export function unHighlightDomElement(): UIThunkAction {
-  return () => {
+  return async () => {
+    await import("devtools/client/inspector/components/App");
     const highlighter = window.gInspector.getHighlighter();
     if (highlighter) {
       highlighter.unhighlight();
@@ -52,6 +57,7 @@ export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promi
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
+    await import("devtools/client/inspector/components/App");
     await window.gInspector.selection.setNodeFront(nodeFront, {
       reason: "console",
     });
