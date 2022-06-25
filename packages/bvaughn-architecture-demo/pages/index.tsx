@@ -1,4 +1,7 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useContext, useMemo } from "react";
+
+import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
+import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
 
 import CommentList from "../components/comments/CommentList";
 import ConsoleFilters from "../components/console/Filters";
@@ -16,18 +19,21 @@ import styles from "./index.module.css";
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.
 // Filed https://github.com/facebook/react/issues/24634
 
+let recordData = false;
+if (typeof window !== "undefined") {
+  const url = new URL(window.location.href);
+  recordData = url.searchParams.has("record");
+}
+
 export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  // To record mock data for a e2e test:
-  // const client = useContext(ReplayClientContext);
-  // const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
-  // <ReplayClientContext.Provider value={replayClientRecorder}>
-  //   ...
-  // </ReplayClientContext.Provider>
+  // Used to record mock data for e2e tests when a URL parameter is present:
+  const client = useContext(ReplayClientContext);
+  const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
 
-  return (
+  const content = (
     <Initializer>
       <FocusContextRoot>
         <div className={styles.Container}>
@@ -60,4 +66,14 @@ export default function HomePage() {
       </FocusContextRoot>
     </Initializer>
   );
+
+  if (recordData) {
+    return (
+      <ReplayClientContext.Provider value={replayClientRecorder}>
+        {content}
+      </ReplayClientContext.Provider>
+    );
+  } else {
+    return content;
+  }
 }

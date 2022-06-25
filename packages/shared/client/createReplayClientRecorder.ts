@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import { ReplayClientInterface, LogEntry } from "./types";
 
 export default function createReplayClientRecorder(
@@ -5,8 +6,9 @@ export default function createReplayClientRecorder(
 ): ReplayClientInterface {
   const logEntries: LogEntry[] = [];
 
-  const printInstructions = () => {
+  const printInstructions = (recordingId: RecordingId | null) => {
     console.log(`
+      const RECORDING_ID = "${recordingId || ''}";
       const replayClientPlayer = createReplayClientPlayer(
         JSON.parse(\`${JSON.stringify(logEntries)}\`)
       );
@@ -28,10 +30,10 @@ export default function createReplayClientRecorder(
           result.then((resolved: any) => {
             entry.result = resolved;
 
-            printInstructions();
+            printInstructions(replayClient.getRecordingId());
           });
         } else {
-          printInstructions();
+          printInstructions(replayClient.getRecordingId());
         }
 
         return result;

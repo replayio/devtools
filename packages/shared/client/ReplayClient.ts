@@ -5,6 +5,7 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  RecordingId,
   SessionId,
   TimeStampedPoint,
   TimeStampedPointRange,
@@ -22,6 +23,7 @@ import { ReplayClientInterface } from "./types";
 
 export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;
+  private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
 
@@ -63,6 +65,10 @@ export class ReplayClient implements ReplayClientInterface {
     return pause.pauseId!;
   }
 
+  getRecordingId(): RecordingId | null {
+    return this._recordingId;
+  }
+
   getSessionId(): SessionId | null {
     return this._sessionId;
   }
@@ -70,7 +76,9 @@ export class ReplayClient implements ReplayClientInterface {
   // Initializes the WebSocket and remote session.
   // This method should be used for apps that only communicate with the Replay protocol through this client.
   // Apps that use the protocol package directly should use the configure method instead.
-  async initialize(recordingId: string, accessToken: string | null): Promise<SessionId> {
+  async initialize(recordingId: RecordingId, accessToken: string | null): Promise<SessionId> {
+    this._recordingId = recordingId;
+
     const socket = initSocket(this._dispatchURL);
     await waitForOpenConnection(socket!);
 

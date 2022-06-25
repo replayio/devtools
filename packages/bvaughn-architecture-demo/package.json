@@ -14,6 +14,7 @@
     "shared": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.22.2",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^13.2.0",
     "jest": "^28.0.2",
@@ -25,6 +26,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "playwright": "playwright test playwright",
     "start": "next start",
     "lint": "next lint"
   }

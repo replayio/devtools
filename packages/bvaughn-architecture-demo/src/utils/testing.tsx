@@ -132,6 +132,7 @@ const MockReplayClient = {
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => {}),
   getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
+  getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
   getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
   initialize: jest.fn().mockImplementation(async () => {}),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),

@@ -5,6 +5,7 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  RecordingId,
   SessionId,
   TimeStampedPoint,
   TimeStampedPointRange,
@@ -20,6 +21,7 @@ export type LogEntry = {
 export interface ReplayClientInterface {
   configure(sessionId: string): void;
   getPauseIdForMessage(message: Message): PauseId;
+  getRecordingId(): RecordingId | null;
   getSessionId(): SessionId | null;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
