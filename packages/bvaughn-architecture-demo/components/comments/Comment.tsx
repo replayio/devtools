@@ -1,15 +1,15 @@
-import Icon from "@components/Icon";
-import { GraphQLClientContext } from "@source/contexts/GraphQLClientContext";
-import { SessionContext } from "@source/contexts/SessionContext";
+import Icon from "@bvaughn/components/Icon";
+import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import {
   addCommentReply as addCommentReplyGraphQL,
   deleteComment as deleteCommentGraphQL,
   deleteCommentReply as deleteCommentReplyGraphQL,
   updateComment as updateCommentGraphQL,
   updateCommentReply as updateCommentReplyGraphQL,
-} from "@source/graphql/Comments";
-import { Comment, User, UserInfo } from "@source/graphql/types";
-import { formatRelativeTime } from "@source/utils/time";
+} from "@bvaughn/src/graphql/Comments";
+import { Comment, User, UserInfo } from "@bvaughn/src/graphql/types";
+import { formatRelativeTime } from "@bvaughn/src/utils/time";
 import React, {
   ReactNode,
   unstable_useCacheRefresh as useCacheRefresh,

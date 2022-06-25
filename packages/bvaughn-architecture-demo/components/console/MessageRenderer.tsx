@@ -1,9 +1,9 @@
+import Expandable from "@bvaughn/components/Expandable";
+import Icon from "@bvaughn/components/Icon";
+import Inspector from "@bvaughn/components/inspector";
+import Loader from "@bvaughn/components/Loader";
+import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import Expandable from "@components/Expandable";
-import Icon from "@components/Icon";
-import Inspector from "@components/inspector";
-import Loader from "@components/Loader";
-import { getSource } from "@source/suspense/SourcesCache";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

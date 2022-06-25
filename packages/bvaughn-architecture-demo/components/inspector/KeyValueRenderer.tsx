@@ -1,8 +1,8 @@
+import Expandable from "@bvaughn/components/Expandable";
+import Loader from "@bvaughn/components/Loader";
+import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
-import Expandable from "@components/Expandable";
-import Loader from "@components/Loader";
-import { getObjectWithPreview } from "@source/suspense/ObjectPreviews";
 import { ReactNode, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

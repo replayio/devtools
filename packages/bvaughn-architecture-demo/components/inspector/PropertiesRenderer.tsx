@@ -1,5 +1,6 @@
-import Expandable from "@components/Expandable";
-import Loader from "@components/Loader";
+import Expandable from "@bvaughn/components/Expandable";
+import Loader from "@bvaughn/components/Loader";
+import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import {
   ContainerEntry as ProtocolContainerEntry,
   Object as ProtocolObject,
@@ -7,7 +8,6 @@ import {
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
 } from "@replayio/protocol";
-import { getObjectWithPreview } from "@source/suspense/ObjectPreviews";
 import sortBy from "lodash/sortBy";
 import { FC, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

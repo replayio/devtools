@@ -1,9 +1,9 @@
+import Inspector from "@bvaughn/components/inspector";
+import Expandable from "@bvaughn/components/Expandable";
+import Loader from "@bvaughn/components/Loader";
+import "@bvaughn/pages/inspector.css";
+import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Loader from "bvaughn-architecture-demo/components/Loader";
-import "bvaughn-architecture-demo/pages/inspector.css";
-import { clientValueToProtocolNamedValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";

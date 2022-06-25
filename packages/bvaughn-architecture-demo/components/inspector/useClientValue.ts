@@ -1,5 +1,5 @@
+import { protocolValueToClientValue, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { protocolValueToClientValue, Value as ClientValue } from "@source/utils/protocol";
 import { useMemo } from "react";
 
 export default function useClientValue(

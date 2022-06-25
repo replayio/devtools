@@ -1,10 +1,10 @@
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
+import useFilteredMessages from "@bvaughn/src/hooks/useFilteredMessages";
+import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { Message } from "@replayio/protocol";
-import { ConsoleFiltersContext } from "@source/contexts/ConsoleFiltersContext";
-import { FocusContext } from "@source/contexts/FocusContext";
-import useFilteredMessages from "@source/hooks/useFilteredMessages";
-import { getMessages } from "@source/suspense/MessagesCache";
-import { getClosestPointForTime } from "@source/suspense/PointsCache";
-import { suspendInParallel } from "@source/utils/suspense";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

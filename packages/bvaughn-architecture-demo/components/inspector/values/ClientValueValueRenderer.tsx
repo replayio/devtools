@@ -1,4 +1,4 @@
-import { Value as ClientValue } from "@source/utils/protocol";
+import { Value as ClientValue } from "@bvaughn/src/utils/protocol";
 
 import styles from "./shared.module.css";
 

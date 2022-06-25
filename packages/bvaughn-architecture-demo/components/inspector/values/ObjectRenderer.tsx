@@ -1,4 +1,4 @@
-import { filterNonEnumerableProperties } from "@source/utils/protocol";
+import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
 
 import KeyValueRenderer from "../KeyValueRenderer";
 

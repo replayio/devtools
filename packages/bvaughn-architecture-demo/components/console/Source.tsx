@@ -1,5 +1,5 @@
+import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { Location as ProtocolLocation } from "@replayio/protocol";
-import { getSource } from "@source/suspense/SourcesCache";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 

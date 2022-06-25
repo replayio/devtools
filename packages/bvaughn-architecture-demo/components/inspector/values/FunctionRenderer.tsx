@@ -1,4 +1,4 @@
-import Icon from "@components/Icon";
+import Icon from "@bvaughn/components/Icon";
 
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
