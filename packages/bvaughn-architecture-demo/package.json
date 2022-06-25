@@ -26,7 +26,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "playwright": "playwright test playwright",
+    "playwright": "playwright test tests",
+    "playwright:visual": "PWDEBUG=console yarn playwright",
     "start": "next start",
     "lint": "next lint"
   }
