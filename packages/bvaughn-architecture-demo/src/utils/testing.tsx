@@ -1,4 +1,5 @@
 import { act, render as rtlRender, RenderResult } from "@testing-library/react";
+import fetch from "isomorphic-fetch";
 import { ReactNode } from "react";
 import { ReplayClientInterface } from "shared/client/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -115,6 +116,13 @@ export async function renderFocused(
     consoleFiltersContext,
     focusContext,
   };
+}
+
+export function setupWindow(): void {
+  // @ts-ignore
+  window.location = new URL("http://localhost?recordingId=fake");
+
+  globalThis.fetch = fetch;
 }
 
 // This mock client is mostly useless by itself,

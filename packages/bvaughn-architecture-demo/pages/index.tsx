@@ -1,7 +1,4 @@
-import React, { Suspense, useContext, useMemo } from "react";
-
-import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
-import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
+import React, { Suspense } from "react";
 
 import CommentList from "../components/comments/CommentList";
 import ConsoleFilters from "../components/console/Filters";
@@ -23,42 +20,44 @@ export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  const client = useContext(ReplayClientContext);
-  const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
+  // To record mock data for a e2e test:
+  // const client = useContext(ReplayClientContext);
+  // const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
+  // <ReplayClientContext.Provider value={replayClientRecorder}>
+  //   ...
+  // </ReplayClientContext.Provider>
 
   return (
-    <ReplayClientContext.Provider value={replayClientRecorder}>
-      <Initializer>
-        <FocusContextRoot>
-          <div className={styles.Container}>
-            <div className={styles.CommentsContainer}>
-              <ErrorBoundary>
-                <Suspense fallback={<Loader />}>
-                  <CommentList />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-
-            <ConsoleFiltersContextRoot>
-              <div className={styles.ConsoleContainer}>
-                <div className={styles.Row}>
-                  <ConsoleFilters />
-                </div>
-                <div className={styles.ContentArea}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<Loader />}>
-                      <ConsoleMessages />
-                    </Suspense>
-                  </ErrorBoundary>
-                </div>
-                <div className={styles.Row}>
-                  <Focuser />
-                </div>
-              </div>
-            </ConsoleFiltersContextRoot>
+    <Initializer>
+      <FocusContextRoot>
+        <div className={styles.Container}>
+          <div className={styles.CommentsContainer}>
+            <ErrorBoundary>
+              <Suspense fallback={<Loader />}>
+                <CommentList />
+              </Suspense>
+            </ErrorBoundary>
           </div>
-        </FocusContextRoot>
-      </Initializer>
-    </ReplayClientContext.Provider>
+
+          <ConsoleFiltersContextRoot>
+            <div className={styles.ConsoleContainer}>
+              <div className={styles.Row}>
+                <ConsoleFilters />
+              </div>
+              <div className={styles.ContentArea}>
+                <ErrorBoundary>
+                  <Suspense fallback={<Loader />}>
+                    <ConsoleMessages />
+                  </Suspense>
+                </ErrorBoundary>
+              </div>
+              <div className={styles.Row}>
+                <Focuser />
+              </div>
+            </div>
+          </ConsoleFiltersContextRoot>
+        </div>
+      </FocusContextRoot>
+    </Initializer>
   );
 }
