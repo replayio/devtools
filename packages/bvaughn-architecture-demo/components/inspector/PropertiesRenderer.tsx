@@ -1,3 +1,6 @@
+import Expandable from "@bvaughn/components/Expandable";
+import Loader from "@bvaughn/components/Loader";
+import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import {
   ContainerEntry as ProtocolContainerEntry,
   Object as ProtocolObject,
@@ -8,11 +11,6 @@ import {
 import sortBy from "lodash/sortBy";
 import { FC, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import Loader from "../../components/Loader";
-import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-
-import Expandable from "../Expandable";
 
 import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";

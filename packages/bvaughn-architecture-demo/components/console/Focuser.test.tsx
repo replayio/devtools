@@ -1,6 +1,5 @@
+import { renderFocused } from "@bvaughn/src/utils/testing";
 import { fireEvent, screen } from "@testing-library/react";
-
-import { renderFocused } from "../../src/utils/testing";
 
 import Focuser from "./Focuser";
 

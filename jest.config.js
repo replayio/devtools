@@ -32,6 +32,8 @@ module.exports = {
 
     // Handle module aliases
     "^@/components/(.*)$": "<rootDir>/components/$1",
+
+    "^@bvaughn/(.*)": "<rootDir>/packages/bvaughn-architecture-demo/$1",
   },
   testEnvironment: "jsdom",
   testMatch: [

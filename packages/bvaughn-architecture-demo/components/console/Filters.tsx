@@ -1,6 +1,5 @@
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import React, { useContext } from "react";
-
-import { ConsoleFiltersContext } from "../../src/contexts/ConsoleFiltersContext";
 
 import styles from "./Filters.module.css";
 

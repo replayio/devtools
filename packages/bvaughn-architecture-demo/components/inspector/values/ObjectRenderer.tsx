@@ -1,10 +1,9 @@
-import { ObjectPreviewRendererProps } from "./types";
-
-import { filterNonEnumerableProperties } from "../../../src/utils/protocol";
+import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
 
 import KeyValueRenderer from "../KeyValueRenderer";
 
 import styles from "./shared.module.css";
+import { ObjectPreviewRendererProps } from "./types";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 
