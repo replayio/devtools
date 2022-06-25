@@ -43,8 +43,10 @@ function StackFrameRenderer({ frameId, frames }: { frameId: FrameId; frames: Fra
   } else {
     return (
       <>
-        <span>{frame.functionName || "(anonymous)"} @ </span>
-        <Source location={location} />
+        <span>{frame.functionName || "(anonymous)"}</span>
+        <span>
+          @ <Source className={styles.Source} location={location} />
+        </span>
       </>
     );
   }

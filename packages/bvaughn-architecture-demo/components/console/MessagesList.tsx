@@ -64,7 +64,11 @@ export default function MessagesList() {
   const isTransitionPending = isFocusTransitionPending;
 
   return (
-    <div className={isTransitionPending ? styles.ContainerPending : styles.Container}>
+    <div
+      className={isTransitionPending ? styles.ContainerPending : styles.Container}
+      data-test-id="Messages"
+      role="list"
+    >
       {didOverflow && (
         <div className={styles.OverflowRow}>There were too many messages to fetch them all</div>
       )}

@@ -1,11 +1,8 @@
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import NextApp from "next/app";
-import { Suspense } from "react";
 
 import ErrorBoundary from "../components/ErrorBoundary";
-import Initializer from "../components/Initializer";
-import Loader from "../components/Loader";
 
 import "./global.css";
 import "./inspector.css";
@@ -23,11 +20,7 @@ function Routing({ Component, pageProps }: AppProps) {
         <title>Replay</title>
       </Head>
       <ErrorBoundary>
-        <Suspense fallback={<Loader />}>
-          <Initializer>
-            <Component {...pageProps} />
-          </Initializer>
-        </Suspense>
+        <Component {...pageProps} />
       </ErrorBoundary>
     </>
   );

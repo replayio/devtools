@@ -6,7 +6,13 @@ import { getSource } from "../../src/suspense/SourcesCache";
 
 import styles from "./Source.module.css";
 
-export default function Source({ location }: { location: ProtocolLocation }) {
+export default function Source({
+  className = "",
+  location,
+}: {
+  className?: string;
+  location: ProtocolLocation;
+}) {
   const client = useContext(ReplayClientContext);
   const source = getSource(client, location.sourceId);
   if (source == null) {
@@ -21,7 +27,7 @@ export default function Source({ location }: { location: ProtocolLocation }) {
   };
 
   return (
-    <span className={styles.Source} onClick={openSource}>
+    <span className={`${styles.Source} ${className}`} onClick={openSource}>
       {fileName}:{location.line}
     </span>
   );

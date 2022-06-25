@@ -14,16 +14,20 @@
     "shared": "workspace:*"
   },
   "devDependencies": {
+    "@playwright/test": "^1.22.2",
     "@testing-library/jest-dom": "^5.16.3",
     "@testing-library/react": "^13.2.0",
     "jest": "^28.0.2",
     "jest-environment-jsdom": "^28.0.2",
     "next-transpile-modules": "^9.0.0",
+    "node-fetch": "^3.2.6",
     "typescript": "^4.6.3"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "playwright": "playwright test tests",
+    "playwright:visual": "PWDEBUG=console yarn playwright",
     "start": "next start",
     "lint": "next lint"
   }

@@ -25,8 +25,13 @@ export default function Expandable({
   };
 
   return (
-    <div className={`${styles.Expandable} ${className}`}>
-      <div className={styles.PreviewRow} onClick={toggle}>
+    <div className={`${styles.Expandable} ${className}`} data-test-id="Expandable">
+      <div
+        className={styles.PreviewRow}
+        onClick={toggle}
+        role="button"
+        data-test-id="ExpandablePreview"
+      >
         <div className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
         </div>
@@ -34,7 +39,9 @@ export default function Expandable({
       </div>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
-        <div className={styles.Children}>{children}</div>
+        <div className={styles.Children} data-test-id="ExpandableChildren">
+          {children}
+        </div>
       </LazyOffscreen>
     </div>
   );

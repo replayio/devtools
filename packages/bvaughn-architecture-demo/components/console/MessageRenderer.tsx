@@ -64,7 +64,7 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   );
 
   return (
-    <div className={className}>
+    <div className={className} data-test-id="Message" role="listitem">
       {showExpandable ? (
         <Expandable
           children={<MessageStackRenderer message={message} />}

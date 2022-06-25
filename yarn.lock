@@ -3232,6 +3232,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:^1.22.2":
+  version: 1.22.2
+  resolution: "@playwright/test@npm:1.22.2"
+  dependencies:
+    "@types/node": "*"
+    playwright-core: 1.22.2
+  bin:
+    playwright: cli.js
+  checksum: 55392a97d920b77374926415e16e649320a9d8243f4ddca09c61827580674ad6f50057c09d5d194212d4ce60abc2cdf5f939ddd87f3670e073e9dd6c418480d5
+  languageName: node
+  linkType: hard
+
 "@pmmmwh/react-refresh-webpack-plugin@npm:^0.5.3":
   version: 0.5.7
   resolution: "@pmmmwh/react-refresh-webpack-plugin@npm:0.5.7"
@@ -5921,6 +5933,13 @@ __metadata:
   version: 1.0.1
   resolution: "@types/is-function@npm:1.0.1"
   checksum: dfbb591936dfebd4686b109603bc3e2d23a17087d6ec913fb35cd6b5a4ef908ed68ab93cb27d508f1546d312edf03e663cb6738d3b67d420c68da961ac2b3d1f
+  languageName: node
+  linkType: hard
+
+"@types/isomorphic-fetch@npm:^0.0.36":
+  version: 0.0.36
+  resolution: "@types/isomorphic-fetch@npm:0.0.36"
+  checksum: 1ffaa1c97a019b1f7a682e2ae31bd4cc3f324198b422c62cece51b42d2750e0dde0c4df2320a52874d6c6019ee4b00ca2e736010d34b206a82e63ef82ef85bbe
   languageName: node
   linkType: hard
 
@@ -8915,7 +8934,7 @@ __metadata:
 
 "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.1.0
-  resolution: "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo#packages/bvaughn-architecture-demo::hash=2fec04&locator=recordreplay-devtools%40workspace%3A."
+  resolution: "bvaughn-architecture-demo@file:packages/bvaughn-architecture-demo#packages/bvaughn-architecture-demo::hash=d974d0&locator=recordreplay-devtools%40workspace%3A."
   dependencies:
     "@replayio/protocol": ^0.31.0
     date-fns: ^2.28.0
@@ -8926,7 +8945,7 @@ __metadata:
     react: 0.0.0-experimental-e7d0053e6-20220325
     react-dom: 0.0.0-experimental-e7d0053e6-20220325
     shared: "workspace:*"
-  checksum: fb1369d68b581618c4d88c8003bdfadd762f6fde1364eb6e8e00bc2390a2d8c18f8eb5ad4f9879787dc0dae6296a7d4a4dd2cb965201d05ce84454ae4cd86663
+  checksum: cf1fe47b111288cfca536dc7e19e08d2b8526828454b91aa36941d318c617d4583c366996918a6ade672055f0931ed61fb45749b7784b5c5f2af6176bbf2bfc9
   languageName: node
   linkType: hard
 
@@ -8934,6 +8953,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo"
   dependencies:
+    "@playwright/test": ^1.22.2
     "@replayio/protocol": ^0.31.0
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
@@ -8943,6 +8963,7 @@ __metadata:
     lodash: ^4.17.21
     next: ^12.1.6
     next-transpile-modules: ^9.0.0
+    node-fetch: ^3.2.6
     pretty-ms: ^7.0.1
     protocol: "workspace:*"
     react: 0.0.0-experimental-e7d0053e6-20220325
@@ -10573,6 +10594,13 @@ __metadata:
   version: 1.0.8
   resolution: "damerau-levenshtein@npm:1.0.8"
   checksum: d240b7757544460ae0586a341a53110ab0a61126570ef2d8c731e3eab3f0cb6e488e2609e6a69b46727635de49be20b071688698744417ff1b6c1d7ccd03e0de
+  languageName: node
+  linkType: hard
+
+"data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "data-uri-to-buffer@npm:4.0.0"
+  checksum: a010653869abe8bb51259432894ac62c52bf79ad761d418d94396f48c346f2ae739c46b254e8bb5987bded8a653d467db1968db3a69bab1d33aa5567baa5cfc7
   languageName: node
   linkType: hard
 
@@ -12373,6 +12401,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
+  version: 3.1.5
+  resolution: "fetch-blob@npm:3.1.5"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: 6493f21bfe196798343431d20c0284835202728d076dd2cbf502a2846679f9265f3b0c3a7224750ae1a770b925da09e592b05fe7c3a22ca27794a39a0039ab21
+  languageName: node
+  linkType: hard
+
 "fetch-retry@npm:^5.0.2":
   version: 5.0.2
   resolution: "fetch-retry@npm:5.0.2"
@@ -12787,6 +12825,15 @@ __metadata:
     node-domexception: 1.0.0
     web-streams-polyfill: 4.0.0-beta.1
   checksum: ad5f627e694a977edb1986c4b351c863196ee409e460c644adcb242bfc78ca9faa4877cba8113a71cecc0f0e21320d3c3d0acac95445817e014001ce147ba362
+  languageName: node
+  linkType: hard
+
+"formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "formdata-polyfill@npm:4.0.10"
+  dependencies:
+    fetch-blob: ^3.1.2
+  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -15033,7 +15080,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"isomorphic-fetch@npm:3.0.0":
+"isomorphic-fetch@npm:3.0.0, isomorphic-fetch@npm:^3.0.0":
   version: 3.0.0
   resolution: "isomorphic-fetch@npm:3.0.0"
   dependencies:
@@ -17684,7 +17731,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-domexception@npm:1.0.0":
+"node-domexception@npm:1.0.0, node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
   checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
@@ -17702,6 +17749,17 @@ __metadata:
     encoding:
       optional: true
   checksum: 8d816ffd1ee22cab8301c7756ef04f3437f18dace86a1dae22cf81db8ef29c0bf6655f3215cb0cdb22b420b6fe141e64b26905e7f33f9377a7fa59135ea3e10b
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^3.2.6":
+  version: 3.2.6
+  resolution: "node-fetch@npm:3.2.6"
+  dependencies:
+    data-uri-to-buffer: ^4.0.0
+    fetch-blob: ^3.1.4
+    formdata-polyfill: ^4.0.10
+  checksum: ece307ace3a3ff28638ccb0fa0545bb5c0cfd673a9d06fc314d937a73ae6a55917d5bacd7f080f9a9f1449ca20a5c01b1281d0e616acb20315e5ac315971da46
   languageName: node
   linkType: hard
 
@@ -18814,6 +18872,15 @@ __metadata:
   dependencies:
     find-up: ^5.0.0
   checksum: b167bb8dac7bbf22b1d5e30ec223e6b064b84b63010c9d49384619a36734caf95ed23ad23d4f9bd975e8e8082b60a83395f43a89bb192df53a7c25a38ecb57d9
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.22.2":
+  version: 1.22.2
+  resolution: "playwright-core@npm:1.22.2"
+  bin:
+    playwright: cli.js
+  checksum: 7381c35359b4338282f73dc902c1c1311e8e7cbf852f445dd6b430ebcb7eafc842b8e512d238fdc0b70d1da2b14046f297b19dac027c6a0a62ff217e70f6a07c
   languageName: node
   linkType: hard
 
@@ -20346,6 +20413,7 @@ __metadata:
     "@types/d3-interpolate": ^3.0.1
     "@types/escape-html": ^1.0.1
     "@types/fuzzaldrin-plus": ^0.6.2
+    "@types/isomorphic-fetch": ^0.0.36
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.181
     "@types/logrocket-react": ^3.0.0
@@ -20399,6 +20467,7 @@ __metadata:
     graphqurl: ^1.0.1
     identity-obj-proxy: ^3.0.0
     immer: ^9.0.7
+    isomorphic-fetch: ^3.0.0
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     jest-in-case: ^1.0.2
@@ -21433,8 +21502,8 @@ __metadata:
 
 "shared@file:packages/shared::locator=recordreplay-devtools%40workspace%3A.":
   version: 0.0.0
-  resolution: "shared@file:packages/shared#packages/shared::hash=fa9630&locator=recordreplay-devtools%40workspace%3A."
-  checksum: 6409f0b0ff2670ff2c885b67f2703363d618555f907795587768f4d6d676ee1443cca6b380ccdbd58d6418dcf1853af7e3e25ffd3d45ed84fa3836ef09c2c0db
+  resolution: "shared@file:packages/shared#packages/shared::hash=7f0f89&locator=recordreplay-devtools%40workspace%3A."
+  checksum: 4b347fc18d24d75fba49deace372f53a46311d0141b99781a4943dd15cc032cee648cb9c57c50783d2b5b441847c77362abf32e8ea15e409af84003bf5cefb16
   languageName: node
   linkType: hard
 
@@ -24097,7 +24166,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.2.0":
+"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.0":
   version: 3.2.1
   resolution: "web-streams-polyfill@npm:3.2.1"
   checksum: b119c78574b6d65935e35098c2afdcd752b84268e18746606af149e3c424e15621b6f1ff0b42b2676dc012fc4f0d313f964b41a4b5031e525faa03997457da02

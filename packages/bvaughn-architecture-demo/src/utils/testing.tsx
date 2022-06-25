@@ -1,6 +1,7 @@
 import { act, render as rtlRender, RenderResult } from "@testing-library/react";
+import fetch from "isomorphic-fetch";
 import { ReactNode } from "react";
-import { ReplayClientInterface } from "shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
@@ -117,6 +118,13 @@ export async function renderFocused(
   };
 }
 
+export function setupWindow(): void {
+  // @ts-ignore
+  window.location = new URL("http://localhost?recordingId=fake");
+
+  globalThis.fetch = fetch;
+}
+
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 const MockReplayClient = {
@@ -124,6 +132,7 @@ const MockReplayClient = {
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => {}),
   getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
+  getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
   getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
   initialize: jest.fn().mockImplementation(async () => {}),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),
