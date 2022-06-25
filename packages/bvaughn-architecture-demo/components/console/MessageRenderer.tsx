@@ -1,13 +1,11 @@
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import Loader from "../Loader";
+import Expandable from "@components/Expandable";
+import Icon from "@components/Icon";
+import Inspector from "@components/inspector";
+import Loader from "@components/Loader";
+import { getSource } from "@source/suspense/SourcesCache";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import { getSource } from "../../src/suspense/SourcesCache";
-
-import Expandable from "../Expandable";
-import Icon from "../Icon";
-import Inspector from "../inspector";
 
 import styles from "./MessageRenderer.module.css";
 import MessageStackRenderer from "./MessageStackRenderer";

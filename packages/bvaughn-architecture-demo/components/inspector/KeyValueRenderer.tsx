@@ -1,12 +1,10 @@
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
+import Expandable from "@components/Expandable";
+import Loader from "@components/Loader";
+import { getObjectWithPreview } from "@source/suspense/ObjectPreviews";
 import { ReactNode, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import { getObjectWithPreview } from "../../src/suspense/ObjectPreviews";
-
-import Expandable from "../Expandable";
-import Loader from "../Loader";
 
 import HTMLExpandable from "./HTMLExpandable";
 import styles from "./KeyValueRenderer.module.css";

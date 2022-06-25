@@ -1,9 +1,8 @@
 import { Frame, FrameId, Message as ProtocolMessage } from "@replayio/protocol";
+import Loader from "@components/Loader";
+import { getSource } from "@source/suspense/SourcesCache";
 import React, { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import Loader from "../../components/Loader";
-import { getSource } from "../../src/suspense/SourcesCache";
 
 import styles from "./MessageStackRenderer.module.css";
 import Source from "./Source";

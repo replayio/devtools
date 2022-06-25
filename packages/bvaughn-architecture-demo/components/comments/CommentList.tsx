@@ -1,8 +1,7 @@
+import { getCommentList } from "@source/suspense/CommentsCache";
+import { GraphQLClientContext } from "@source/contexts/GraphQLClientContext";
+import { SessionContext } from "@source/contexts/SessionContext";
 import { useContext } from "react";
-
-import { getCommentList } from "../../src/suspense/CommentsCache";
-import { GraphQLClientContext } from "../../src/contexts/GraphQLClientContext";
-import { SessionContext } from "../../src/contexts/SessionContext";
 
 import Comment from "./Comment";
 import styles from "./CommentList.module.css";

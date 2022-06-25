@@ -1,13 +1,12 @@
 import { Message } from "@replayio/protocol";
+import { ConsoleFiltersContext } from "@source/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@source/contexts/FocusContext";
+import useFilteredMessages from "@source/hooks/useFilteredMessages";
+import { getMessages } from "@source/suspense/MessagesCache";
+import { getClosestPointForTime } from "@source/suspense/PointsCache";
+import { suspendInParallel } from "@source/utils/suspense";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import { ConsoleFiltersContext } from "../../src/contexts/ConsoleFiltersContext";
-import { FocusContext } from "../../src/contexts/FocusContext";
-import useFilteredMessages from "../../src/hooks/useFilteredMessages";
-import { getMessages } from "../../src/suspense/MessagesCache";
-import { getClosestPointForTime } from "../../src/suspense/PointsCache";
-import { suspendInParallel } from "../../src/utils/suspense";
 
 import MessageRenderer from "./MessageRenderer";
 import styles from "./MessagesList.module.css";

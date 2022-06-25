@@ -1,10 +1,9 @@
-import createReplayClientPlayer from "../../../../shared/client/createReplayClientPlayer";
-import { ReplayClientContext } from "../../../../shared/client/ReplayClientContext";
-
-import MessagesList from "../../../components/console/MessagesList";
-import Initializer from "../../../components/Initializer";
-import { ConsoleFiltersContextRoot } from "../../../src/contexts/ConsoleFiltersContext";
-import { FocusContextRoot } from "../../../src/contexts/FocusContext";
+import MessagesList from "@components/console/MessagesList";
+import Initializer from "@components/Initializer";
+import { ConsoleFiltersContextRoot } from "@source/contexts/ConsoleFiltersContext";
+import { FocusContextRoot } from "@source/contexts/FocusContext";
+import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 // This data was recorded using createReplayClientRecorder().
 // To re-record it, append a "record" parameter to the player URL.

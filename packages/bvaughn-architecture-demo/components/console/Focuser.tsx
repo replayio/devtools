@@ -1,8 +1,7 @@
+import { FocusContext } from "@source/contexts/FocusContext";
+import { SessionContext } from "@source/contexts/SessionContext";
+import { formatTimestamp } from "@source/utils/time";
 import React, { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
-
-import { FocusContext } from "../../src/contexts/FocusContext";
-import { SessionContext } from "../../src/contexts/SessionContext";
-import { formatTimestamp } from "../../src/utils/time";
 
 import styles from "./Focuser.module.css";
 
