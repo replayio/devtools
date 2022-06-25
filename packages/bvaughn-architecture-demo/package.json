@@ -27,8 +27,10 @@
     "dev": "next dev",
     "build": "next build",
     "playwright": "playwright test tests",
+    "playwright:install": "npx playwright install chromium",
     "playwright:visual": "PWDEBUG=console yarn playwright",
     "start": "next start",
+    "test": "jest",
     "lint": "next lint"
   }
 }

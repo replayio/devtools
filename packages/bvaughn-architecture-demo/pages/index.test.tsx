@@ -1,9 +1,7 @@
 import { screen } from "@testing-library/react";
 import { createConsoleMessage } from "shared/utils/testing";
 
-import { setupWindow } from "../src/utils/testing";
-
-import { render } from "../src/utils/testing";
+import { render, setupWindow } from "../src/utils/testing";
 
 import HomePage from "./index";
 

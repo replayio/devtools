@@ -4,15 +4,18 @@ import { PlaywrightTestConfig, devices } from "@playwright/test";
 const config: PlaywrightTestConfig = {
   expect: {
     toMatchSnapshot: {
-      // Account for minor difference in e.g. text rendering and resolution
-      // between headless and in-browser tests.
-      threshold: 0.5,
+      // An acceptable ratio of pixels that are different to the total amount of pixels, between 0 and 1.
+      maxDiffPixelRatio: 0.1,
+
+      // An acceptable perceived color difference in the YIQ color space between the same pixel in compared images, between 0 (strict) and 1 (lax).
+      threshold: 0.05,
     },
   },
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
   retries: process.env.CI ? 2 : 0,
   use: {
+    browserName: "chromium",
     launchOptions: {
       // Useful for visual debugging
       slowMo: 250,
@@ -23,12 +26,6 @@ const config: PlaywrightTestConfig = {
       height: 400,
     },
   },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-    },
-  ],
   testDir: "tests",
   testMatch: ["**/*.ts"],
 };
