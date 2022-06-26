@@ -37,6 +37,7 @@ pref("devtools.features.testSupport", false);
 pref("devtools.features.turboReplay", false);
 pref("devtools.features.unicornConsole", true);
 pref("devtools.features.hitCounts", true);
+pref("devtools.features.disableUnHitLines", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -60,6 +61,7 @@ export const features = new PrefsHelper("devtools.features", {
   breakpointPanelAutocomplete: ["Bool", "breakpointPanelAutocomplete"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
+  disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
   enableNewObjectInspector: ["Bool", "enableNewObjectInspector"],
   httpBodies: ["Bool", "httpBodies"],

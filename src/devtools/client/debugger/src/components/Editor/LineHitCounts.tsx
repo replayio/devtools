@@ -8,6 +8,7 @@ import { getSelectedSourceId } from "../../selectors";
 import { useStringPref } from "ui/hooks/settings";
 
 import styles from "./LineHitCounts.module.css";
+import { features } from "ui/utils/prefs";
 
 type Props = {
   editor: any;
@@ -114,12 +115,16 @@ function LineHitCounts({ editor }: Props) {
             );
           }
           className = styles[`HitsBadge${index + 1}`];
+        }
 
-          editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
-        } else {
-          // If this line wasn't hit any, dim the line number,
-          // even if it's a line that's technically reachable.
-          editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+        if (features.disableUnHitLines) {
+          if (hitCount > 0) {
+            editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+          } else {
+            // If this line wasn't hit any, dim the line number,
+            // even if it's a line that's technically reachable.
+            editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+          }
         }
 
         const markerNode = document.createElement("div");
