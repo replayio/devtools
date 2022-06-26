@@ -35,6 +35,33 @@ export default function Search({ className }: { className: string }) {
     return null;
   }
 
+  let results = null;
+  if (searchState.results.length > 0) {
+    results = (
+      <div className={styles.Results}>
+        {searchState.index + 1} of {searchState.results.length} results
+        <button className={styles.ResultsIconButton} onClick={searchActions.goToPrevious}>
+          <Icon className={styles.ResultsIcon} type="up" />
+        </button>
+        <button className={styles.ResultsIconButton} onClick={searchActions.goToNext}>
+          <Icon className={styles.ResultsIcon} type="down" />
+        </button>
+        <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
+          <Icon className={styles.ResultsIcon} type="cancel" />
+        </button>
+      </div>
+    );
+  } else if (searchState.query !== "") {
+    results = (
+      <div className={styles.Results}>
+        No results found
+        <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
+          <Icon className={styles.ResultsIcon} type="cancel" />
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className={`${styles.Container} ${className}`}>
       <Icon className={styles.Icon} type="search" />
@@ -48,20 +75,7 @@ export default function Search({ className }: { className: string }) {
         value={searchState.query}
       />
 
-      {searchState.results.length > 0 && (
-        <div className={styles.Results}>
-          {searchState.index + 1} of {searchState.results.length} results
-          <button className={styles.ResultsIconButton} onClick={searchActions.goToPrevious}>
-            <Icon className={styles.ResultsIcon} type="up" />
-          </button>
-          <button className={styles.ResultsIconButton} onClick={searchActions.goToNext}>
-            <Icon className={styles.ResultsIcon} type="down" />
-          </button>
-          <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
-            <Icon className={styles.ResultsIcon} type="cancel" />
-          </button>
-        </div>
-      )}
+      {results}
     </div>
   );
 }

@@ -29,7 +29,7 @@ export default function MessagesList() {
 
   // This component only needs to render a pending UI when a focus changes,
   // because this might require an async backend request.
-  // Filter text changes are always processed synchronously by useFilteredMessages(),
+  // Filter text changes are always processed synchronously,
   // so dimming the UI would just cause a short flicker which we can avoid.
   const isTransitionPending = isFocusTransitionPending;
 
