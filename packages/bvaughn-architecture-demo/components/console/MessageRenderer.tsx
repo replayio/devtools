@@ -42,7 +42,6 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
 
   const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
-  const source = location !== null ? getSource(client, location.sourceId) : null;
 
   const primaryContent = (
     <div className={styles.PrimaryRow}>

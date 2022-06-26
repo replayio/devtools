@@ -3,12 +3,14 @@
 "use strict";
 
 const { spawn } = require("child_process");
-const { readFileSync } = require("fs");
 const { join } = require("path");
 
 const ROOT_PATH = join(__dirname);
 
 const TIMEOUT_DURATION = 60_000;
+
+const args = process.argv.slice(2);
+const udpateSnapshots = args.includes("--update-snapshots");
 
 let serverProcess = null;
 let testProcess = null;
@@ -97,7 +99,7 @@ function runServer() {
 async function runEndToEndTests() {
   logBright("Running e2e tests");
 
-  testProcess = spawn("yarn", ["playwright"], {
+  testProcess = spawn("yarn", ["playwright", udpateSnapshots ? "--update-snapshots" : ""], {
     ...process.env,
     cwd: ROOT_PATH,
   });
