@@ -2,8 +2,9 @@ import Expandable from "@bvaughn/components/Expandable";
 import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
-import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
+import { useRef } from "react";
+import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -13,7 +14,15 @@ import Source from "./Source";
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
-function MessageRenderer({ message }: { message: ProtocolMessage }) {
+function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: ProtocolMessage }) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  useLayoutEffect(() => {
+    if (isFocused) {
+      ref.current?.scrollIntoView({ block: "nearest" });
+    }
+  }, [isFocused]);
+
   let className = styles.MessageRow;
   let icon = null;
   let showExpandable = false;
@@ -37,12 +46,15 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
     }
   }
 
+  if (isFocused) {
+    className = `${className} ${styles.Focused}`;
+  }
+
   const client = useContext(ReplayClientContext);
   const pauseId = useMemo(() => client.getPauseIdForMessage(message), [client, message]);
 
   const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
-  const source = location !== null ? getSource(client, location.sourceId) : null;
 
   const primaryContent = (
     <div className={styles.PrimaryRow}>
@@ -62,7 +74,7 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   );
 
   return (
-    <div className={className} data-test-id="Message" role="listitem">
+    <div ref={ref} className={className} data-test-id="Message" role="listitem">
       {showExpandable ? (
         <Expandable
           children={<MessageStackRenderer message={message} />}
@@ -76,4 +88,4 @@ function MessageRenderer({ message }: { message: ProtocolMessage }) {
   );
 }
 
-export default memo(MessageRenderer);
+export default memo(MessageRenderer) as typeof MessageRenderer;

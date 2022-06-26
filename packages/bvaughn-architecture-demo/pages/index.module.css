@@ -21,11 +21,6 @@
   overflow: hidden;
 }
 
-.ContentArea {
-  flex: 1 1 auto;
-  overflow: auto;
-}
-
 .Row {
   display: flex;
   flex-direction: row;

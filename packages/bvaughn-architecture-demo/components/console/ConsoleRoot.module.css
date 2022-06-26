@@ -1,0 +1,20 @@
+.ConsoleRoot {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.ContentArea {
+  flex: 1 1 auto;
+  overflow: auto;
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--background-color-contrast-2);
+  height: 2rem;
+}

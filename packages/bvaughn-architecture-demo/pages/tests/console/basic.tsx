@@ -1,6 +1,5 @@
-import MessagesList from "@bvaughn/components/console/MessagesList";
+import ConsoleRoot from "@bvaughn/components/console";
 import Initializer from "@bvaughn/components/Initializer";
-import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -19,9 +18,7 @@ export default function Stacks() {
     <ReplayClientContext.Provider value={replayClientPlayer}>
       <Initializer recordingId={RECORDING_ID}>
         <FocusContextRoot>
-          <ConsoleFiltersContextRoot>
-            <MessagesList />
-          </ConsoleFiltersContextRoot>
+          <ConsoleRoot />
         </FocusContextRoot>
       </Initializer>
     </ReplayClientContext.Provider>

@@ -1,0 +1,30 @@
+.Container {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  border: 1px solid transparent;
+}
+.Container:focus-within {
+  border-color: var(--color-brand);
+}
+
+.Icon {
+  width: 2rem;
+  height: 2rem;
+}
+
+.Input {
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5ch;
+  background: none;
+  border: none;
+  outline: none;
+  background-color: var(--background-color-default);
+  border-top: 1px solid var(--background-color-contrast-3);
+  border-bottom: 1px solid var(--background-color-contrast-3);
+  color: var(--color-default);
+
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
+}

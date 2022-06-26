@@ -4,13 +4,11 @@ import createReplayClientRecorder from "../../shared/client/createReplayClientRe
 import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
 
 import CommentList from "../components/comments/CommentList";
-import ConsoleFilters from "../components/console/Filters";
-import ConsoleMessages from "../components/console/MessagesList";
+import ConsoleRoot from "../components/console";
 import ErrorBoundary from "../components/ErrorBoundary";
 import Focuser from "../components/console/Focuser";
 import Initializer from "../components/Initializer";
 import Loader from "../components/Loader";
-import { ConsoleFiltersContextRoot } from "../src/contexts/ConsoleFiltersContext";
 import { FocusContextRoot } from "../src/contexts/FocusContext";
 
 import styles from "./index.module.css";
@@ -44,24 +42,12 @@ export default function HomePage() {
               </Suspense>
             </ErrorBoundary>
           </div>
-
-          <ConsoleFiltersContextRoot>
-            <div className={styles.ConsoleContainer}>
-              <div className={styles.Row}>
-                <ConsoleFilters />
-              </div>
-              <div className={styles.ContentArea}>
-                <ErrorBoundary>
-                  <Suspense fallback={<Loader />}>
-                    <ConsoleMessages />
-                  </Suspense>
-                </ErrorBoundary>
-              </div>
-              <div className={styles.Row}>
-                <Focuser />
-              </div>
+          <div className={styles.ConsoleContainer}>
+            <ConsoleRoot />
+            <div className={styles.Row}>
+              <Focuser />
             </div>
-          </ConsoleFiltersContextRoot>
+          </div>
         </div>
       </FocusContextRoot>
     </Initializer>
