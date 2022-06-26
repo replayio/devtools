@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import useAuth0 from "ui/utils/useAuth0";
 import LogRocket from "ui/utils/logrocket";
@@ -105,6 +105,17 @@ function Library({
       updateDefaultWorkspace({ variables: { workspaceId: null } });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const currentWorkspace = useMemo(
+    () => workspaces.find(ws => ws.id === currentWorkspaceId),
+    [currentWorkspaceId, workspaces]
+  );
+
+  useEffect(() => {
+    if (typeof document == "object" && currentWorkspace) {
+      document.title = currentWorkspace.name;
+    }
+  }, [currentWorkspace]);
 
   // FIXME [ryanjduffy]: Backwards compatibility for ?replayinvite=true flow
   if (isTeamLeaderInvite()) {
