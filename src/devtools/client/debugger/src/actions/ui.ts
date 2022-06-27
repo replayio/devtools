@@ -97,7 +97,7 @@ export const toggleSourcesCollapse = toggleSources;
 export const expandSourcesPane = sourcesPanelExpanded;
 export const updateCursorPosition = setCursorPosition;
 
-export function openSourceLink(sourceId: string, line: number, column: number): UIThunkAction {
+export function openSourceLink(sourceId: string, line?: number, column?: number): UIThunkAction {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
     const location = { sourceId, line, column };

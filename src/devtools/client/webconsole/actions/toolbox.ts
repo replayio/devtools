@@ -16,6 +16,7 @@ import {
   getSourceByURL,
   getContext,
 } from "devtools/client/debugger/src/selectors";
+import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
 import { SourceLocation } from "@replayio/protocol";
 type $FixTypeLater = any;
 
@@ -47,7 +48,21 @@ export function unHighlightDomElement(): UIThunkAction {
   };
 }
 
-export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promise<void>> {
+export function openLink(url: string): UIThunkAction {
+  return (dispatch, getState) => {
+    const source = getSourceByURL(getState(), url);
+    if (source?.id) {
+      dispatch(openSourceLink(source.id));
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+}
+
+export function openNodeInInspector(
+  valueFront: ValueFront,
+  reason: "console" | "debugger" = "console"
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
     const pause = valueFront.getPause()!;
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
@@ -61,7 +76,7 @@ export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promi
 
     await import("devtools/client/inspector/components/App");
     await window.gInspector.selection.setNodeFront(nodeFront, {
-      reason: "console",
+      reason,
     });
   };
 }

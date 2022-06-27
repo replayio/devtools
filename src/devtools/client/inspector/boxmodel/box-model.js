@@ -323,4 +323,4 @@ BoxModel.prototype = {
   },
 };
 
-module.exports = BoxModel;
+export default BoxModel;

@@ -12,7 +12,6 @@ import * as sourcesActors from "./source-actors";
 import * as sourceTree from "./source-tree";
 import * as sources from "./sources";
 import * as tabs from "./tabs";
-import * as toolbox from "./toolbox";
 import * as ui from "./ui";
 
 const { MAX_LINE_HITS_TO_FETCH, ...sourcesActorsActions } = sourcesActors;
@@ -28,6 +27,5 @@ export default {
   ...fileSearch,
   ...quickOpen,
   ...sourceTree,
-  ...toolbox,
   ...preview,
 };

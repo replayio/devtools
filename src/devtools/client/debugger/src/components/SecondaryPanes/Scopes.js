@@ -270,7 +270,7 @@ const mapStateToProps = state => {
 export default connect(mapStateToProps, {
   enterFocusMode: enterFocusModeAction,
   openLink: actions.openLink,
-  openElementInInspector: actions.openElementInInspectorCommand,
+  openElementInInspector: actions.openNodeInInspector,
   highlightDomElement,
   unHighlightDomElement,
   setExpandedScope: actions.setExpandedScope,
