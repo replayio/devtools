@@ -20,7 +20,7 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   },
   {
     label: "New Object Inspector",
-    description: "Enable new Object Inspector UI for Source viewer",
+    description: "Preview objects with the new inspector",
     key: "enableNewObjectInspector",
   },
   {
@@ -62,8 +62,6 @@ export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
-  const updateReact = hooks.useUpdateUserSetting("showReact");
-
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
 
