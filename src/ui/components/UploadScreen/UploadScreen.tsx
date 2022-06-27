@@ -55,16 +55,16 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
   const isSaving = status === "saving";
   const isDeleting = status === "deleting";
   const shouldDisableActions = isSaving || isDeleting;
+  const saveButtonRef = React.useRef(null);
 
   useEffect(() => {      
-    document.getElementById("saveButton").focus(); // for easier upload    
+    saveButtonRef.current.focus(); // for faster/more keyboard accessible uploads
   }, []);
 
   return (
     <div className="space-x-5">
       <button
         type="button"
-        id="discardButton"
         onClick={onDiscard}
         disabled={shouldDisableActions}
         className="py-3.5 px-8 text-secondaryAccent hover:underline focus:outline-none focus:underline"        
@@ -73,9 +73,9 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
       </button>
       <input
         type="submit"
-        id="saveButton"
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
+        ref={saveButtonRef}
         className="focus:outline-none focus:ring focus:border-primaryAccentHover focus:ring-primaryAccentHover cursor-pointer shadow-sm rounded-xl bg-primaryAccent py-3.5 mb-8 px-16 font-bold text-white hover:bg-primaryAccentHover"
       />
     </div>
