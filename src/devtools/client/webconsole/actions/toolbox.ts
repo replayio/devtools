@@ -16,6 +16,7 @@ import {
   getSourceByURL,
   getContext,
 } from "devtools/client/debugger/src/selectors";
+import { SourceLocation } from "@replayio/protocol";
 type $FixTypeLater = any;
 
 export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
@@ -87,14 +88,14 @@ export function onMessageHover(
 }
 
 export function onViewSourceInDebugger(
-  frame: $FixTypeLater,
-  openSourcesTab: $FixTypeLater
+  frame: { sourceId?: string; url: string; line?: number; column: number },
+  openSourcesTab?: boolean
 ): UIThunkAction {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
     const source = frame.sourceId
       ? getSourceByActorId(getState(), frame.sourceId)
-      : getSourceByURL(getState(), frame.url);
+      : getSourceByURL(getState(), frame.url!);
     if (source) {
       dispatch(showSource(cx, source.id, openSourcesTab));
       await dispatch(

@@ -1,15 +1,18 @@
 import { FrameworkEventListener, getFrameworkEventListeners } from "ui/actions/event-listeners";
 import { NodeFront, WiredEventListener } from "protocol/thread/node";
 import React, { FC, useEffect, useMemo, useRef, useState } from "react";
+import { useAppDispatch } from "ui/setup/hooks";
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
 import Selection from "devtools/client/framework/selection";
+import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
 export const EventListenersApp = ({ selection }: { selection: Selection }) => {
   const selectedNode = useRef<NodeFront | null>(null);
   const [listeners, setListeners] = useState<AnyListener[]>([]);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     console.log("EventLstenersApp");
@@ -98,7 +101,18 @@ export const EventListenersApp = ({ selection }: { selection: Selection }) => {
                             <span
                               className="cursor-pointer underline hover:text-gray-500"
                               title="Open in Debugger"
-                              onClick={() => {}}
+                              onClick={() => {
+                                dispatch(
+                                  onViewSourceInDebugger(
+                                    {
+                                      url: locationUrl,
+                                      ...location,
+                                    },
+
+                                    true
+                                  )
+                                );
+                              }}
                             >
                               {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:
                               {location.line}
