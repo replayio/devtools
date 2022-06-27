@@ -25,7 +25,6 @@ export function createUserSettingsMock(): MockedResponse[] {
         enableEventLink: false,
         enableRepaint: false,
         enableTeams: true,
-        showReact: true,
       },
     },
   };

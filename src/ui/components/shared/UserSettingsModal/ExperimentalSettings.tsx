@@ -14,11 +14,6 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "React DevTools",
-    description: "Inspect the React component tree",
-    key: "showReact",
-  },
-  {
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
@@ -32,11 +27,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
-  },
-  {
-    label: "Turbo Replay",
-    description: "Replay recordings across multiple instances",
-    key: "turboReplay",
   },
   {
     label: "Inline hit counts",
@@ -76,7 +66,6 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
@@ -87,12 +76,8 @@ export default function ExperimentalSettings({}) {
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
-    if (key === "showReact") {
-      updateReact({ variables: { newValue: value } });
-    } else if (key == "enableColumnBreakpoints") {
+    if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "turboReplay") {
-      updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key === "enableNewObjectInspector") {
@@ -106,7 +91,6 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableResolveRecording,
     hitCounts,
-    turboReplay: enableTurboReplay,
     enableNewObjectInspector,
   };
 

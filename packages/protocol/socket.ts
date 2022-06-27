@@ -91,8 +91,6 @@ if (typeof window !== "undefined") {
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   disableCache?: boolean;
-  useMultipleControllers: boolean;
-  multipleControllerUseSnapshots: boolean;
 };
 
 type SessionCallbacks = {

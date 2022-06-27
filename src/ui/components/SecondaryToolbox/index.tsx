@@ -75,9 +75,6 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   isNode,
 }) => {
-  const { userSettings } = hooks.useGetUserSettings();
-  const { showReact } = userSettings;
-
   return (
     <div className="flex flex-row items-center overflow-hidden panel-buttons theme-tab-font-size">
       {!isNode && <NodePicker />}
@@ -88,7 +85,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
           <SourcesTabLabel />
         </PanelButton>
       )}
-      {hasReactComponents && showReact && <PanelButton panel="react-components">React</PanelButton>}
+      {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
       {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
       <PanelButton panel="network">Network</PanelButton>
     </div>
@@ -141,7 +138,7 @@ export default function SecondaryToolbox() {
   const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
-  if (selectedPanel === "react-components" && !(userSettings.showReact && hasReactComponents)) {
+  if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));
   }
 
