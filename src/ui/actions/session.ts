@@ -244,7 +244,7 @@ export function createSocket(
         await videoReady.promise;
       }
 
-      dispatch(actions.setLoadingFinished(true));
+      dispatch(onLoadingFinished());
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
@@ -285,7 +285,20 @@ export function showLoadingProgress(): UIThunkAction<Promise<void>> {
 }
 
 function onLoadingFinished(): UIThunkAction {
-  return async dispatch => {
+  return async (dispatch, getState, { ThreadFront }) => {
+    await waitForTime(300);
+    async function initThreadFront() {
+      await ThreadFront.waitForSession();
+      await ThreadFront.initializedWaiter.promise;
+      await ThreadFront.ensureAllSources();
+
+      ThreadFront.ensureCurrentPause();
+    }
+
+    initThreadFront();
+
+    await ThreadFront.initializedWaiter.promise;
+
     dispatch(actions.setLoadingFinished(true));
   };
 }
