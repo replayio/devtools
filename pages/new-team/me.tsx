@@ -1,4 +1,4 @@
-import Library from "../../components/LibraryNew";
+import Library from "ui/components/Library/LibraryNew";
 
 export default function TeamIndex() {
   return <Library />;

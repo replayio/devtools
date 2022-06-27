@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect } from "react";
-import { TEAMS } from "../components/Library";
+import { TEAMS } from "../components/LibraryNew";
 
 export default function HomePage() {
   const router = useRouter();

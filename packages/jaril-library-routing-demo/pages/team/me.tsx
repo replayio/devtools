@@ -1,4 +1,4 @@
-import Library from "../../components/Library";
+import Library from "../../components/LibraryNew";
 
 export default function TeamIndex() {
   return <Library />;

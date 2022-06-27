@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useContext } from "react";
-import { TEAMS } from "../../../LibraryNew";
+import { TEAMS } from "../../LibraryNew";
 import { TeamContext } from "../TeamPage";
 import { ViewContext } from "./ViewPage";
 
@@ -27,7 +27,7 @@ function View({ children, view }: { children: string; view: string }) {
   const highlighted = currentView === view;
 
   return (
-    <Link href={`/team/${teamId}/${view}`}>
+    <Link href={`/new-team/${teamId}/${view}`}>
       <a className={highlighted ? "font-bold" : ""}>{children}</a>
     </Link>
   );
