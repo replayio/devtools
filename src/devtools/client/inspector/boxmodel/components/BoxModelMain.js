@@ -25,7 +25,6 @@ class BoxModelMain extends React.PureComponent {
       onHideBoxModelHighlighter: PropTypes.func.isRequired,
       onShowBoxModelEditor: PropTypes.func.isRequired,
       onShowBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowRulePreviewTooltip: PropTypes.func.isRequired,
     };
   }
 

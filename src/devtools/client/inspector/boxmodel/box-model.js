@@ -7,6 +7,7 @@
 const { updateLayout } = require("devtools/client/inspector/boxmodel/actions/box-model");
 
 const Highlighter = require("highlighter/highlighter").default;
+import { getSelectedPanel } from "ui/reducers/layout";
 
 const NUMERIC = /^-?[\d\.]+$/;
 
@@ -66,14 +67,6 @@ BoxModel.prototype = {
     return this._highlighters;
   },
 
-  get rulePreviewTooltip() {
-    if (!this._tooltip) {
-      this._tooltip = new RulePreviewTooltip(this.inspector.toolbox.doc);
-    }
-
-    return this._tooltip;
-  },
-
   /**
    * Returns an object containing the box model's handler functions used in the box
    * model's React component props.
@@ -83,7 +76,6 @@ BoxModel.prototype = {
       onHideBoxModelHighlighter: this.onHideBoxModelHighlighter,
       onShowBoxModelEditor: this.onShowBoxModelEditor,
       onShowBoxModelHighlighter: this.onShowBoxModelHighlighter,
-      onShowRulePreviewTooltip: this.onShowRulePreviewTooltip,
     };
   },
 
@@ -91,12 +83,8 @@ BoxModel.prototype = {
    * Returns true if the layout panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return (
-      this.inspector.toolbox &&
-      this.inspector.sidebar &&
-      this.inspector.toolbox.currentTool === "inspector" &&
-      this.inspector.sidebar.getCurrentTabID() === "layoutview"
-    );
+    const currentTool = getSelectedPanel(this.store.getState());
+    return currentTool === "inspector" && this.inspector.sidebar.getCurrentTabID() === "layoutview";
   },
 
   /**
@@ -235,15 +223,7 @@ BoxModel.prototype = {
    *         The name of the property.
    */
   onShowRulePreviewTooltip(target, property) {
-    const { highlightProperty } = this.inspector.getPanel("ruleview").view;
-    const isHighlighted = highlightProperty(property);
-
-    // Only show the tooltip if the property is not highlighted.
-    // TODO: In the future, use an associated ruleId for toggling the tooltip instead of
-    // the Boolean returned from highlightProperty.
-    if (!isHighlighted) {
-      this.rulePreviewTooltip.show(target);
-    }
+    // TODO Can probably remove this
   },
 
   /**

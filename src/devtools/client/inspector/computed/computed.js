@@ -22,6 +22,7 @@ const {
 } = require("devtools/client/inspector/shared/node-types");
 const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overlay");
 import { ELEMENT_STYLE } from "shared/constants";
+import { getSelectedPanel } from "ui/reducers/layout";
 
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
