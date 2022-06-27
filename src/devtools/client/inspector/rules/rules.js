@@ -36,7 +36,6 @@ class RulesView {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
-    this.toolbox = inspector.toolbox;
     this.isNewRulesView = true;
 
     this.outputParser = new OutputParser(this.doc, this.cssProperties);
@@ -122,7 +121,6 @@ class RulesView {
     this.selection = null;
     this.showUserAgentStyles = null;
     this.store = null;
-    this.toolbox = null;
   }
 
   /**

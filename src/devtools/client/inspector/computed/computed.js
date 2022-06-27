@@ -133,6 +133,7 @@ UpdateProcess.prototype = {
   },
 };
 
+// TODO This appears to be dead - confirm and delete it
 /**
  * CssComputedView is a panel that manages the display of a table
  * sorted by style. There should be one instance of CssComputedView
@@ -1369,6 +1370,7 @@ SelectorView.prototype = {
   },
 };
 
+// TODO This appears to be dead - confirm and delete it
 function ComputedViewTool(inspector, window) {
   this.inspector = inspector;
   this.document = window.document;

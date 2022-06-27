@@ -231,7 +231,8 @@ StyleInspectorMenu.prototype = {
     });
     menu.append(menuitemSources);
 
-    menu.popup(screenX, screenY, this.inspector.toolbox.doc);
+    // TODO This is probably dead, delete this
+    menu.popup(screenX, screenY, this.inspector.toolbox?.doc);
     return menu;
   },
 

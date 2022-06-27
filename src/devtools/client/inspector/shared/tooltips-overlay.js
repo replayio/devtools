@@ -108,7 +108,8 @@ TooltipsOverlay.prototype = {
     if (tooltip) {
       return tooltip;
     }
-    const { doc } = this.view.inspector.toolbox;
+    // TODO This is probably dead, delete this
+    const doc = this.view.inspector.toolbox?.doc;
     switch (name) {
       case "colorPicker":
         const SwatchColorPickerTooltip = require("devtools/client/shared/widgets/tooltip/SwatchColorPickerTooltip");
