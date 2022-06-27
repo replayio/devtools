@@ -19,6 +19,10 @@
   color: var(--color-warning);
 }
 
+.Focused {
+  background-color: var(--background-color-contrast-1);
+}
+
 .MessageText {
   min-height: 1rem;
 }

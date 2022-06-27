@@ -1,4 +1,3 @@
-import { string } from "prop-types";
 import { useDeferredValue, useMemo, useReducer, useState } from "react";
 
 const EMPTY_ARRAY: any[] = [];
@@ -15,7 +14,7 @@ export type Action<Item> =
   | { type: "updateQuery"; query: string }
   | { type: "updateResults"; index: number; results: Item[] };
 
-export type Actions<Item> = {
+export type Actions = {
   goToNext: () => void;
   goToPrevious: () => void;
   search: (query: string) => void;
@@ -56,7 +55,7 @@ function reducer<Item>(state: State<Item>, action: Action<Item>): State<Item> {
 export default function useSearch<Item>(
   items: Item[],
   stableSearch: (query: string, items: Item[]) => Item[]
-): [State<Item>, Actions<Item>] {
+): [State<Item>, Actions] {
   const [state, dispatch] = useReducer<React.Reducer<State<Item>, Action<Item>>>(reducer, {
     index: -1,
     results: [],
@@ -106,7 +105,7 @@ export default function useSearch<Item>(
     dispatch({ type: "updateResults", index, results });
   }
 
-  const actions = useMemo<Actions<Item>>(
+  const actions = useMemo<Actions>(
     () => ({
       goToNext: () => dispatch({ type: "goToNext" }),
       goToPrevious: () => dispatch({ type: "goToPrevious" }),

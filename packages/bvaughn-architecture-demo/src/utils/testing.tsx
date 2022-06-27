@@ -81,6 +81,7 @@ export async function renderFocused(
   const consoleFiltersContext: ConsoleFiltersContextType = {
     filterByDisplayText: "",
     filterByText: "",
+    filteredMessages: [],
     isTransitionPending: false,
     levelFlags: {
       showErrors: true,
