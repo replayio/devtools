@@ -5,7 +5,7 @@ const config: PlaywrightTestConfig = {
   expect: {
     toMatchSnapshot: {
       // An acceptable ratio of pixels that are different to the total amount of pixels, between 0 and 1.
-      maxDiffPixelRatio: 0.1,
+      maxDiffPixelRatio: 0.05,
 
       // An acceptable perceived color difference in the YIQ color space between the same pixel in compared images, between 0 (strict) and 1 (lax).
       threshold: 0.05,

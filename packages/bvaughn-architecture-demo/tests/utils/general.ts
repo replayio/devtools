@@ -1,4 +1,6 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { expect, Locator, LocatorScreenshotOptions, Page } from "@playwright/test";
+
+const SCREENSHOT_OPTIONS: LocatorScreenshotOptions = { scale: "css", animations: "disabled" };
 
 export async function takeScreenshot(page: Page, locator: Locator, name: string) {
   if (!name.endsWith(".png")) {
@@ -6,8 +8,8 @@ export async function takeScreenshot(page: Page, locator: Locator, name: string)
   }
 
   await page.emulateMedia({ colorScheme: "dark" });
-  expect(await locator.screenshot()).toMatchSnapshot(["dark", name]);
+  expect(await locator.screenshot(SCREENSHOT_OPTIONS)).toMatchSnapshot(["dark", name]);
 
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await locator.screenshot()).toMatchSnapshot(["light", name]);
+  expect(await locator.screenshot(SCREENSHOT_OPTIONS)).toMatchSnapshot(["light", name]);
 }
