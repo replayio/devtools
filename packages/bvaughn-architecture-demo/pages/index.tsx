@@ -1,15 +1,15 @@
+import CommentList from "@bvaughn//components/comments/CommentList";
+import ConsoleRoot from "@bvaughn//components/console";
+import ErrorBoundary from "@bvaughn//components/ErrorBoundary";
+import Focuser from "@bvaughn//components/console/Focuser";
+import Initializer from "@bvaughn//components/Initializer";
+import Loader from "@bvaughn//components/Loader";
+import { FocusContextRoot } from "@bvaughn//src/contexts/FocusContext";
+import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
 import React, { Suspense, useContext, useMemo } from "react";
 
 import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
-
-import CommentList from "../components/comments/CommentList";
-import ConsoleRoot from "../components/console";
-import ErrorBoundary from "../components/ErrorBoundary";
-import Focuser from "../components/console/Focuser";
-import Initializer from "../components/Initializer";
-import Loader from "../components/Loader";
-import { FocusContextRoot } from "../src/contexts/FocusContext";
 
 import styles from "./index.module.css";
 
@@ -33,23 +33,25 @@ export default function HomePage() {
 
   const content = (
     <Initializer>
-      <FocusContextRoot>
-        <div className={styles.Container}>
-          <div className={styles.CommentsContainer}>
-            <ErrorBoundary>
-              <Suspense fallback={<Loader />}>
-                <CommentList />
-              </Suspense>
-            </ErrorBoundary>
-          </div>
-          <div className={styles.ConsoleContainer}>
-            <ConsoleRoot />
-            <div className={styles.Row}>
-              <Focuser />
+      <PauseContextRoot>
+        <FocusContextRoot>
+          <div className={styles.Container}>
+            <div className={styles.CommentsContainer}>
+              <ErrorBoundary>
+                <Suspense fallback={<Loader />}>
+                  <CommentList />
+                </Suspense>
+              </ErrorBoundary>
+            </div>
+            <div className={styles.ConsoleContainer}>
+              <ConsoleRoot />
+              <div className={styles.Row}>
+                <Focuser />
+              </div>
             </div>
           </div>
-        </div>
-      </FocusContextRoot>
+        </FocusContextRoot>
+      </PauseContextRoot>
     </Initializer>
   );
 

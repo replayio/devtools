@@ -11,6 +11,7 @@ export default function Icon({
     | "down"
     | "edit"
     | "error"
+    | "fast-forward"
     | "invisible"
     | "jump-to-definition"
     | "prompt"
@@ -48,6 +49,9 @@ export default function Icon({
     case "error":
       path =
         "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z";
+      break;
+    case "fast-forward":
+      path = "M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z";
       break;
     case "invisible":
       path =
