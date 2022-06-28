@@ -117,6 +117,7 @@
     "@babel/preset-typescript": "^7.15.0",
     "@babel/types": "^7.14.8",
     "@jest/console": "^28.0.2",
+    "@next/bundle-analyzer": "^12.2.0",
     "@recordreplay/playwright": "^1.18.3",
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@replayio/playwright": "^0.2.1",
