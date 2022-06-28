@@ -28,7 +28,6 @@ const config = {
     },
   },
   snapshotDir: "./snapshots",
-  timeout: 5000,
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
 };

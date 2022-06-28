@@ -70,6 +70,7 @@ export default function MessageHoverButton({
         button = (
           <button
             className={styles.AddCommentButton}
+            data-test-id="AddCommentButton"
             disabled={isPending}
             onClick={addCommentTransition}
             onMouseEnter={() => setIsHovered(true)}
@@ -85,6 +86,7 @@ export default function MessageHoverButton({
       button = (
         <button
           className={styles.FastForwardButton}
+          data-test-id="FastForwardButton"
           onClick={() => update(pauseId)}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
