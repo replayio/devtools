@@ -59,7 +59,7 @@ export default function SettingsPreview({
     <button
       className={classNames(
         !canEdit && "cursor-default",
-        "flex w-full flex-row items-center justify-between focus:outline-none"
+        "flex w-full flex-row items-center justify-between hover:text-primaryAccent focus:outline-none focus:text-primaryAccentHover"
       )}
       type="button"
       onClick={canEdit ? onClick : undefined}
@@ -72,7 +72,7 @@ export default function SettingsPreview({
         <div className="font-medium">{text}</div>
       </div>
       {canEdit ? (
-        <div className="flex flex-row items-center space-x-2 text-primaryAccent">
+        <div className="flex flex-row items-center space-x-2">
           <div className="font-medium">Edit</div>
           <span className="material-icons" style={{ fontSize: "24px" }}>
             edit
