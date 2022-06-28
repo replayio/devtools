@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { ReactNode, useContext } from "react";
 import { TeamContext } from "../../../TeamPage";
+import { TestRunOverviewContext } from "./TestRunOverviewPage";
 
-export function TestRunResultsList({ results }: { results: { title: string }[] }) {
+export function TestRunResultsList() {
+  const testRun = useContext(TestRunOverviewContext).testRun!;
+
+  console.log({ testRun });
+
   return (
     <div className="flex flex-col space-y-2 overflow-auto">
-      {results.map((r, i) => (
+      {testRun.recordings.map((r, i) => (
         <ListItem key={i} index={i}>
-          {r.title}
+          {r.metadata.test!.title}
         </ListItem>
       ))}
     </div>

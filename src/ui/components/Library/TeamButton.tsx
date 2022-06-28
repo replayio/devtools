@@ -8,7 +8,6 @@ import SidebarButton from "./SidebarButton";
 import classNames from "classnames";
 import { Workspace } from "ui/types";
 import { inUnpaidFreeTrial, subscriptionExpired } from "ui/utils/workspace";
-import { maybeTrackTeamChange } from "ui/utils/mixpanel";
 import { trackEvent } from "ui/utils/telemetry";
 
 function TeamButton({
@@ -78,7 +77,7 @@ function SettingsButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
+      className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
     >
       settings
     </button>

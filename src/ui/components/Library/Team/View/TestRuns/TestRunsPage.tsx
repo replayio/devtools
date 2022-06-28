@@ -1,18 +1,25 @@
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
+import { TestRun, useGetTestRunsForWorkspace } from "ui/hooks/tests";
 import { useGetTeamRouteParams } from "ui/utils/library";
-import { TestRunOverview } from "./Overview/TestRunOverview";
+import { TeamContext } from "../../TeamPage";
+import { TestRunOverviewPage } from "./Overview/TestRunOverviewPage";
 import { TestRunList } from "./TestRunList";
 
 type TestRunsContextType = {
   focusId: string;
+  testRuns: TestRun[] | null;
 };
 
 export const TestRunsContext = createContext<TestRunsContextType>(null as any);
 
 export function TestRunsContainer({ children }: { children: ReactNode }) {
   const { focusId } = useGetTeamRouteParams();
+  const { teamId } = useContext(TeamContext);
+  const { testRuns } = useGetTestRunsForWorkspace(teamId);
 
-  return <TestRunsContext.Provider value={{ focusId }}>{children}</TestRunsContext.Provider>;
+  return (
+    <TestRunsContext.Provider value={{ focusId, testRuns }}>{children}</TestRunsContext.Provider>
+  );
 }
 
 export function TestRunsPage() {
@@ -29,7 +36,7 @@ function TestRunsContent() {
   return (
     <div className="flex flex-row flex-grow">
       <TestRunList />
-      {focusId ? <TestRunOverview /> : null}
+      {focusId ? <TestRunOverviewPage /> : null}
     </div>
   );
 }

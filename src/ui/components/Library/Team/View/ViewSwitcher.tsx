@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { useContext } from "react";
-import { TEAMS } from "../../LibraryNew";
 import { TeamContext } from "../TeamPage";
 import { ViewContext } from "./ViewPage";
 
 export function ViewSwitcher() {
-  const { teamId } = useContext(TeamContext);
-  const isTestTeam = TEAMS.find(t => t.name === teamId)?.isTest;
+  const team = useContext(TeamContext).team;
 
-  if (!isTestTeam) {
+  if (!team?.isTest) {
     return null;
   }
 

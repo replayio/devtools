@@ -51,6 +51,8 @@ function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalTyp
     };
   }, [hideModal, loadingFinished]);
 
+  console.log({ modal, loadingFinished });
+
   if (!loadingFinished) {
     return null;
   }
@@ -159,6 +161,8 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   ) {
     return <TOSScreen />;
   }
+
+  console.log("modal", modal);
 
   return (
     <div id="app-container">

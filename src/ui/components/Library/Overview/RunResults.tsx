@@ -1,21 +1,20 @@
 import orderBy from "lodash/orderBy";
 import { useContext, useState } from "react";
 import { TestResultListItem } from "./TestResultListItem";
-import { OverviewContext } from "./OverviewContainer";
 import { Recording } from "ui/types";
 import styles from "../Library.module.css";
-import classNames from "classnames";
 import Icon from "ui/components/shared/Icon";
+import { TestRunOverviewContext } from "../Team/View/TestRuns/Overview/TestRunOverviewPage";
 
 export function RunResults() {
-  const testRun = useContext(OverviewContext).testRun!;
+  const testRun = useContext(TestRunOverviewContext).testRun!;
 
   const sortedRecordings = orderBy(testRun.recordings, "date", "desc");
   const passedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "passed");
   const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "failed");
 
   return (
-    <div className="no-scrollbar flex flex-col overflow-y-auto">
+    <div className="flex flex-col overflow-y-auto no-scrollbar">
       <TestStatusGroup recordings={failedRecordings} label="Failed" />
       <TestStatusGroup recordings={passedRecordings} label="Passed" />
     </div>
@@ -45,7 +44,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
               expanded ? "bg-iconColor" : "rotate-90"
             } rotate bg-iconColor transition duration-140 ease-out`}
             size="small"
-          />          
+          />
         </div>
       </div>
       {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}

@@ -105,7 +105,6 @@ const GET_TEST_RUN = gql`
                 duration
                 createdAt
                 metadata
-                metadata
                 comments {
                   user {
                     id
@@ -145,13 +144,15 @@ export function useGetTestForWorkspace(path: string[]): { test: Test | null; loa
   };
 }
 
-export function useGetTestRunForWorkspace(id: string): {
+export function useGetTestRunForWorkspace(
+  workspaceId: string,
+  testRunId: string
+): {
   testRun: TestRun | null;
   loading: boolean;
 } {
-  const workspaceId = useAppSelector(getWorkspaceId);
   const { data, loading } = useQuery(GET_TEST_RUN, {
-    variables: { id, workspaceId },
+    variables: { id: testRunId, workspaceId },
   });
 
   if (loading) {

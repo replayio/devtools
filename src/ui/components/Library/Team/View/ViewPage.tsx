@@ -1,6 +1,7 @@
-import { createContext, ReactNode, useContext } from "react";
+import { useRouter } from "next/router";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useGetTeamRouteParams } from "ui/utils/library";
-import { FilterBar } from "./FilterBar";
+import { FilterBarContainer } from "./FilterBarContainer";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestResultsPage } from "./TestResults/TestResultsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
@@ -12,15 +13,28 @@ type ViewContainerContextType = {
 
 export const ViewContext = createContext<ViewContainerContextType>(null as any);
 
-export function ViewContainer({ children }: { children: ReactNode }) {
-  const { view } = useGetTeamRouteParams();
+export function ViewContainer({
+  children,
+  defaultView,
+}: {
+  children: ReactNode;
+  defaultView: string;
+}) {
+  const router = useRouter();
+  const view = useGetTeamRouteParams().view;
+
+  useEffect(() => {
+    if (!view) {
+      router.push(`/${router.asPath}/${defaultView}`);
+    }
+  }, [view, router, defaultView]);
 
   return <ViewContext.Provider value={{ view }}>{children}</ViewContext.Provider>;
 }
 
-export function ViewPage() {
+export function ViewPage({ defaultView }: { defaultView: string }) {
   return (
-    <ViewContainer>
+    <ViewContainer defaultView={defaultView}>
       <ViewPageContent />
     </ViewContainer>
   );
@@ -32,7 +46,7 @@ export function ViewPageContent() {
   return (
     <div className="flex flex-col flex-grow overflow-hidden">
       <ViewSwitcher />
-      <FilterBar />
+      <FilterBarContainer />
       <div className="flex flex-row flex-grow overflow-hidden">
         {view === "recordings" ? (
           <RecordingsPage />

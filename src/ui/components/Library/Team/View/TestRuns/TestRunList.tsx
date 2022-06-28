@@ -1,20 +1,17 @@
-import { TestRunListItem } from "./TestRunListItem";
-import { useGetTestRuns } from "./useGetTestRuns";
+import { useContext } from "react";
+import { TestRunListItem } from "ui/components/Library/Content/TestRuns/TestRunListItem";
+import { TestRunsContext } from "./TestRunsPage";
 
 export function TestRunList() {
-  const { results, loading } = useGetTestRuns();
-
-  if (loading) {
-    return (
-      <div className="flex flex-col flex-grow p-4 space-y-2 overflow-auto bg-sky-200">Loading</div>
-    );
-  }
+  const { testRuns } = useContext(TestRunsContext);
 
   return (
-    <div className="flex flex-col flex-grow p-4 space-y-2 overflow-auto bg-sky-200">
-      {results.map((t, i) => (
-        <TestRunListItem key={i} testRun={t} />
-      ))}
+    <div className="flex flex-col flex-grow m-4 space-y-2 overflow-auto">
+      {testRuns ? (
+        testRuns.map((t, i) => <TestRunListItem key={i} testRun={t} onClick={() => ({})} />)
+      ) : (
+        <div>Loading Placeholder</div>
+      )}
     </div>
   );
 }

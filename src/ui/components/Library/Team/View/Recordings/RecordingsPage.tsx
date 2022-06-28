@@ -1,30 +1,24 @@
 import { useContext } from "react";
-import { useSimulateListQuery } from "ui/utils/library";
-import { ViewContext } from "../ViewPage";
+import Viewer from "ui/components/Library/Viewer";
+import Base64Image from "ui/components/shared/Base64Image";
+import hooks from "ui/hooks";
+import { TeamContext } from "../../TeamPage";
 
 export function RecordingsPage() {
-  return (
-    <div className="flex flex-col flex-grow p-4 space-y-2 overflow-auto bg-rose-200">
-      <RecordingsContent />
-    </div>
-  );
-}
+  const { teamId } = useContext(TeamContext);
+  const team = useContext(TeamContext).team!;
+  const FILTER = "";
+  const { recordings, loading } = hooks.useGetWorkspaceRecordings(teamId, FILTER);
 
-function RecordingsContent() {
-  const { view } = useContext(ViewContext);
-  const { results, loading } = useSimulateListQuery(view);
-
-  if (loading) {
-    return <div>Loading</div>;
+  if (loading || !recordings) {
+    return null;
   }
 
   return (
-    <>
-      {results.map((_, i) => (
-        <div className="p-4 bg-rose-300" key={i}>
-          Recording {i}
-        </div>
-      ))}
-    </>
+    <Viewer
+      recordings={recordings}
+      // workspaceName={team?.logo ? <Base64Image src={team.logo} className="max-h-12" /> : team.name}
+      workspaceName={"butts"}
+    />
   );
 }
