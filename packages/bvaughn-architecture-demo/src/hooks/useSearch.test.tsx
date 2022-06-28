@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { act } from "react-dom/test-utils";
-import { filterCommonTestWarnings, render } from "test/testUtils";
-import useSearch from "./useSearch";
 
+import { render } from "../utils/testing";
+
+import useSearch from "./useSearch";
 import type { Actions, State } from "./useSearch";
 
 type Item = {
@@ -16,8 +17,6 @@ function itemSearch(query: string, items: Item[]) {
 }
 
 describe("useSearch", () => {
-  filterCommonTestWarnings();
-
   let lastCommitedSearchActions: Actions | null = null;
   let lastCommitedSearchState: State<Item> | null = null;
   let updateSearchableItems: React.Dispatch<React.SetStateAction<Item[]>> | null = null;

@@ -1,0 +1,13 @@
+{
+  "name": "tests",
+  "packageManager": "yarn@3.2.1",
+  "devDependencies": {
+    "@playwright/test": "^1.22.2",
+    "playwright": "^1.22.2"
+  },
+  "scripts": {
+    "playwright:install": "npx playwright install chromium",
+    "test": "playwright test tests",
+    "test:visual": "PWDEBUG=console yarn test"
+  }
+}
