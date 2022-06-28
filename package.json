@@ -208,7 +208,7 @@
     "webpack-retry-chunk-load-plugin": "^3.0.0"
   },
   "browserslist": [
-    "defaults"
+    "chrome 95"
   ],
   "repository": {
     "type": "git",
