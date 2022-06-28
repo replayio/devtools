@@ -7,7 +7,8 @@
   font-family: Menlo, Consolas, monospace;
   font-size: 14px;
 }
-.MessageRow {
+.MessageRow,
+.MessageRowTrace {
   background-color: var(--background-color-default);
 }
 .MessageRowError {
@@ -17,6 +18,19 @@
 .MessageRowWarning {
   background-color: var(--background-color-warning);
   color: var(--color-warning);
+}
+
+.CurrentlyPausedAt {
+  position: relative;
+}
+.CurrentlyPausedAt::after {
+  content: " ";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-current);
 }
 
 .Focused {

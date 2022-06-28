@@ -166,6 +166,12 @@ export class ReplayClient implements ReplayClientInterface {
     return sources;
   }
 
+  async getAllFrames(pauseId: PauseId): Promise<PauseData> {
+    const sessionId = this.getSessionIdThrows();
+    const { data } = await client.Pause.getAllFrames({}, sessionId, pauseId);
+    return data;
+  }
+
   async getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,

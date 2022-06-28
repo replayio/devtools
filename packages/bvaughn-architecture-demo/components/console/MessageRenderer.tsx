@@ -2,12 +2,14 @@ import Expandable from "@bvaughn/components/Expandable";
 import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
+import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import MessageHoverButton from "./MessageHoverButton";
 import styles from "./MessageRenderer.module.css";
 import MessageStackRenderer from "./MessageStackRenderer";
 import Source from "./Source";
@@ -16,6 +18,10 @@ import Source from "./Source";
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
 function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: ProtocolMessage }) {
   const ref = useRef<HTMLDivElement>(null);
+
+  const [isHovered, setIsHovered] = useState(false);
+
+  const { pauseId: currentPauseId } = useContext(PauseContext);
 
   useLayoutEffect(() => {
     if (isFocused) {
@@ -50,6 +56,10 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     className = `${className} ${styles.Focused}`;
   }
 
+  if (currentPauseId === message.pauseId) {
+    className = `${className} ${styles.CurrentlyPausedAt}`;
+  }
+
   const client = useContext(ReplayClientContext);
   const pauseId = useMemo(() => client.getPauseIdForMessage(message), [client, message]);
 
@@ -74,7 +84,14 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   );
 
   return (
-    <div ref={ref} className={className} data-test-id="Message" role="listitem">
+    <div
+      ref={ref}
+      className={className}
+      data-test-id="Message"
+      role="listitem"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       {showExpandable ? (
         <Expandable
           children={<MessageStackRenderer message={message} />}
@@ -83,6 +100,10 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
         />
       ) : (
         primaryContent
+      )}
+
+      {isHovered && (
+        <MessageHoverButton message={message} pauseId={message.pauseId} messageRendererRef={ref} />
       )}
     </div>
   );

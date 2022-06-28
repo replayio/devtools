@@ -34,24 +34,12 @@
 
 @media (prefers-color-scheme: light) {
   :root {
-    --background-color-contrast-1: #e1e6ed;
-    --background-color-contrast-2: #d0d5dc;
-    --background-color-contrast-3: #82888c;
-    --background-color-contrast-4: #223344;
-    --background-color-default: #ffffff;
-    --background-color-error: #ffd3d3;
-    --background-color-warning: #fffac8;
-    --color-brand: #0a84ff;
-    --color-contrast: #ffffff;
-    --color-default: #223344;
-    --color-error: #ff0000;
-    --color-warning: #6c5914;
+    --collapsible-toggle-color: #868688;
 
     --object-inspector-go-to-definition-icon-color: #222222;
     --object-inspector-go-to-definition-icon-color-hover: #000000;
     --object-inspector-prototype-color: #737373;
     --object-inspector-separator-color: #737373;
-    --collapsible-toggle-color: #868688;
     --object-inspector-function-keyword: #dd00a8;
     --object-inspector-function-name: #0074e8;
     --object-inspector-expanded-key: #0074e8;

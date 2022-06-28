@@ -29,6 +29,7 @@ export interface ReplayClientInterface {
     overflow: boolean;
   }>;
   findSources(): Promise<Source[]>;
+  getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,

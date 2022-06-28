@@ -1,14 +1,19 @@
 import { RecordingId } from "@replayio/protocol";
 import { ReplayClientInterface, LogEntry } from "./types";
 
+const FAKE_ACCESS_TOKEN = "<fake-access-token>";
+const FAKE_RECORDING_ID = "<fake-recording-id>";
+
 export default function createReplayClientRecorder(
   replayClient: ReplayClientInterface
 ): ReplayClientInterface {
   const logEntries: LogEntry[] = [];
+  let hasAccessToken = false;
 
-  const printInstructions = (recordingId: RecordingId | null) => {
+  const printInstructions = () => {
     console.log(`
-      const RECORDING_ID = "${recordingId || ''}";
+      const ACCESS_TOKEN = ${hasAccessToken ? `"${FAKE_ACCESS_TOKEN}"` : null};
+      const RECORDING_ID = "${FAKE_RECORDING_ID}";
       const replayClientPlayer = createReplayClientPlayer(
         JSON.parse(\`${JSON.stringify(logEntries)}\`)
       );
@@ -19,6 +24,17 @@ export default function createReplayClientRecorder(
     get(target: any, prop: string) {
       return (...args: any[]) => {
         const result = target[prop](...args);
+
+        if (prop === "initialize") {
+          // client.initialize() receives the recording ID and (optionally) access token.
+          // This info is sensitive and so it shouldn't be recorded.
+          args[0] = FAKE_RECORDING_ID;
+          if (typeof args[1] === "string") {
+            args[1] = FAKE_ACCESS_TOKEN;
+            hasAccessToken = true;
+          }
+        }
+
         const entry: LogEntry = { args: args, isAsync: false, method: prop, result: result };
 
         logEntries.push(entry);
@@ -30,10 +46,10 @@ export default function createReplayClientRecorder(
           result.then((resolved: any) => {
             entry.result = resolved;
 
-            printInstructions(replayClient.getRecordingId());
+            printInstructions();
           });
         } else {
-          printInstructions(replayClient.getRecordingId());
+          printInstructions();
         }
 
         return result;

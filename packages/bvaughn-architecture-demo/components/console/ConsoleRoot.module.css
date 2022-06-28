@@ -16,5 +16,5 @@
   flex-direction: row;
   align-items: center;
   background-color: var(--background-color-contrast-2);
-  height: 2rem;
+  min-height: 2rem;
 }

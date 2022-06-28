@@ -10,6 +10,7 @@ import {
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
+import { PauseContext, PauseContextType } from "../contexts/PauseContext";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).
@@ -68,6 +69,7 @@ export async function renderFocused(
   options?: {
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
+    pauseContext?: Partial<PauseContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
   }
@@ -100,12 +102,21 @@ export async function renderFocused(
     ...options?.focusContext,
   };
 
+  const pauseContext: PauseContextType = {
+    isPending: false,
+    pauseId: null,
+    update: jest.fn(),
+    ...options?.pauseContext,
+  };
+
   const renderResponse = await render(
-    <FocusContext.Provider value={focusContext}>
-      <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
-        {children}
-      </ConsoleFiltersContext.Provider>
-    </FocusContext.Provider>,
+    <PauseContext.Provider value={pauseContext}>
+      <FocusContext.Provider value={focusContext}>
+        <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
+          {children}
+        </ConsoleFiltersContext.Provider>
+      </FocusContext.Provider>
+    </PauseContext.Provider>,
     {
       replayClient: options?.replayClient,
       sessionContext: options?.sessionContext,
@@ -136,6 +147,7 @@ const MockReplayClient = {
   getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
   getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
   initialize: jest.fn().mockImplementation(async () => {}),
+  getAllFrames: jest.fn().mockImplementation(async () => ({ data: {} })),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),
   getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
   getSessionEndpoint: jest.fn().mockImplementation(async () => ({

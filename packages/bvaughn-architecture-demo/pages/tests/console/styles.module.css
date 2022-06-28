@@ -1,0 +1,4 @@
+.Container {
+  background-color: var(--color-contrast);
+  padding: 1rem;
+}

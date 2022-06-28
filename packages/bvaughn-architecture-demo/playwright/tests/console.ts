@@ -10,6 +10,8 @@ test("should display list of messages", async ({ page }) => {
   await expect(list).toContainText("This is a log");
   await expect(list).toContainText("This is a warning");
   await expect(list).toContainText("This is an error");
+
+  await takeScreenshot(page, list, "message-list");
 });
 
 test("should display toggleable stack for errors", async ({ page }) => {
@@ -71,3 +73,26 @@ test("should expand and inspect objects", async ({ page }) => {
   await nestedKeyValue.click();
   await takeScreenshot(page, listItem, "nested-object-expanded");
 });
+
+test("should show support fast-forwarding to the message pause-point", async ({ page }) => {
+  await page.goto(URL);
+
+  const listItem = page.locator('[data-test-id="Message"]', { hasText: "This is a log" });
+  await takeScreenshot(page, listItem, "list-item");
+
+  await listItem.hover();
+  await takeScreenshot(page, listItem, "list-item-hovered");
+
+  const fastForwardButton = page.locator('[data-test-id="FastForwardButton"]');
+  await fastForwardButton.hover();
+  await takeScreenshot(page, listItem, "fast-forward-button-hovered");
+
+  await fastForwardButton.click();
+  await takeScreenshot(page, listItem, "add-comment-button-hovered");
+
+  await listItem.hover();
+  await takeScreenshot(page, listItem, "list-item-current");
+});
+
+// TODO Add test for leaving a comment on a console log;
+// This will require a  GraphQL requests recorder.

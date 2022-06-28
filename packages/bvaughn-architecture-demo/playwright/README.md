@@ -36,3 +36,13 @@ Note that the value passed for `HOST` varies by operating system:
 
 - Mac OS: "host.docker.internal"
 - Linux (GitHub CI): "172.17.0.1"
+
+## Authoring tests
+
+If you're writing new tests, it may be easier to run this command locally:
+
+```sh
+yarn test:visual --update-snapshots
+```
+
+Once you are satisfied with the test, delete any newly added snapshots (since they're specific to your operating system) and run the `+playwright-update-snapshots` Earthly target as shown above.
