@@ -52,7 +52,8 @@ function NonPendingTeamLibrary({ team }: { team: Workspace }) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(teamId, filter);
 
   if (loading) {
-    return <div>Loading placeholder</div>;
+    // TODO: Add a proper loading state indicator here -jaril.
+    return <div />;
   }
 
   return (

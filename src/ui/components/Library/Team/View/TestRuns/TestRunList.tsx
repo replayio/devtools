@@ -5,6 +5,7 @@ import { TestRunsContext } from "./TestRunsPage";
 export function TestRunList() {
   const { testRuns } = useContext(TestRunsContext);
 
+  // TODO: Add a proper loading state indicator here -jaril.
   return (
     <div className="flex flex-col flex-grow m-4 space-y-2 overflow-auto">
       {testRuns ? (

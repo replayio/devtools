@@ -26,6 +26,10 @@ export function TeamButton({
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
 
   const onClick = () => {
+    if (isNew) {
+      return;
+    }
+    
     updateDefaultWorkspace({ variables: { workspaceId: id === "me" ? null : id } });
     trackEvent("team_change", { workspaceId: id });
   };

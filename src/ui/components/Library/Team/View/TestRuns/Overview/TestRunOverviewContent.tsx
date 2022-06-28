@@ -7,6 +7,7 @@ import { RunSummary } from "ui/components/Library/Overview/RunSummary";
 export function TestRunOverviewContent() {
   const { testRun } = useContext(TestRunOverviewContext);
 
+  // TODO: Add a proper loading state indicator here -jaril.
   if (!testRun) {
     return (
       <div

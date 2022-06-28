@@ -1,5 +1,8 @@
-import { createContext, ReactNode, useContext } from "react";
+import { useRouter } from "next/router";
+import { createContext, ReactNode, useContext, useEffect } from "react";
+import { setModal } from "ui/actions/app";
 import { useGetWorkspace } from "ui/hooks/workspaces";
+import { useAppDispatch } from "ui/setup/hooks";
 import { Workspace } from "ui/types";
 import { useGetTeamRouteParams } from "ui/utils/library";
 import { ViewPage } from "./View/ViewPage";
@@ -33,7 +36,19 @@ export function MyLibraryContainer({ children }: { children: ReactNode }) {
 }
 
 export function TeamPage() {
+  const dispatch = useAppDispatch();
   const { teamId } = useGetTeamRouteParams();
+  const router = useRouter();
+
+  useEffect(() => {
+    const {
+      query: { settings },
+    } = router;
+
+    if (settings) {
+      dispatch(setModal("workspace-settings", settings ? { view: settings as string } : null));
+    }
+  }, [dispatch, router]);
 
   if (teamId === MY_LIBRARY_TEAM.id) {
     return (
