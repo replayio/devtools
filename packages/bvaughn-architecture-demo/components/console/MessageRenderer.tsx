@@ -8,8 +8,8 @@ import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import GoToPauseButton from "./GoToPauseButton";
 
+import MessageHoverButton from "./MessageHoverButton";
 import styles from "./MessageRenderer.module.css";
 import MessageStackRenderer from "./MessageStackRenderer";
 import Source from "./Source";
@@ -102,7 +102,9 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
         primaryContent
       )}
 
-      {isHovered && <GoToPauseButton pauseId={message.pauseId} messageRendererRef={ref} />}
+      {isHovered && (
+        <MessageHoverButton message={message} pauseId={message.pauseId} messageRendererRef={ref} />
+      )}
     </div>
   );
 }

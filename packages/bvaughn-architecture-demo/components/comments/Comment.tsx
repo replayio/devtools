@@ -230,7 +230,7 @@ function EditableRemark({
 
       {isEditing && (
         <textarea
-          className={styles.ReplyInput}
+          className={styles.Input}
           disabled={isPending}
           onBlur={onBlur}
           onChange={onChange}

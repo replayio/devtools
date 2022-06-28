@@ -4,6 +4,17 @@ import { GetComments } from "./generated/GetComments";
 import { GraphQLClientInterface } from "./GraphQLClient";
 import { Comment, CommentPosition } from "./types";
 
+const AddCommentMutation = `
+  mutation AddComment($input: AddCommentInput!) {
+    addComment(input: $input) {
+      success
+      comment {
+        id
+      }
+    }
+  }
+`;
+
 const AddCommentReplyMutation = `
   mutation AddCommentReply($input: AddCommentReplyInput!) {
     addCommentReply(input: $input) {
@@ -92,6 +103,33 @@ const UpdateCommentReplyMutation = `
     }
   }
 `;
+
+export async function addComment(
+  graphQLClient: GraphQLClientInterface,
+  accessToken: string,
+  recordingId: RecordingId,
+  config: {
+    content: string;
+    hasFrames: boolean;
+    isPublished: boolean;
+    point: string;
+    time: number;
+  }
+) {
+  await graphQLClient.send(
+    {
+      operationName: "AddComment",
+      query: AddCommentMutation,
+      variables: {
+        input: {
+          ...config,
+          recordingId,
+        },
+      },
+    },
+    accessToken
+  );
+}
 
 export async function addCommentReply(
   graphQLClient: GraphQLClientInterface,
