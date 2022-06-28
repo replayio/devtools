@@ -1,3 +1,4 @@
+import AvatarImage from "@bvaughn/components/AvatarImage";
 import { getCommentList } from "@bvaughn/src/suspense/CommentsCache";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
@@ -18,7 +19,7 @@ export default function CommentList() {
       <div className={styles.Header}>
         {currentUserInfo && (
           <div className={styles.HeaderLeft}>
-            <img className={styles.Avatar} src={currentUserInfo.picture} />
+            <AvatarImage className={styles.Avatar} src={currentUserInfo.picture} />
             {currentUserInfo.name}
           </div>
         )}

@@ -1,3 +1,4 @@
+import AvatarImage from "@bvaughn/components/AvatarImage";
 import Icon from "@bvaughn/components/Icon";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
@@ -198,7 +199,7 @@ function EditableRemark({
   return (
     <div className={className}>
       <div className={styles.HeaderRow}>
-        <img className={styles.Avatar} src={owner.picture} />
+        <AvatarImage className={styles.Avatar} src={owner.picture} />
         <div className={styles.UserName} title={owner.name}>
           {owner.name}
         </div>
