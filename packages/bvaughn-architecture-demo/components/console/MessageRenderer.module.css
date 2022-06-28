@@ -7,7 +7,8 @@
   font-family: Menlo, Consolas, monospace;
   font-size: 14px;
 }
-.MessageRow {
+.MessageRow,
+.MessageRowTrace {
   background-color: var(--background-color-default);
 }
 .MessageRowError {

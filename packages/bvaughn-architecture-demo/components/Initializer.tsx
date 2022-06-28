@@ -18,9 +18,11 @@ if (typeof window !== "undefined") {
 }
 
 export default function Initializer({
+  accessToken = null,
   children,
   recordingId = null,
 }: {
+  accessToken?: string | null;
   children: ReactNode;
   recordingId?: string | null;
 }) {
@@ -36,7 +38,7 @@ export default function Initializer({
         // Read some of the hard-coded values from query params.
         // (This is just a prototype; no sense building a full authentication flow.)
         const url = new URL(window.location.href);
-        const accessToken = url.searchParams.get("accessToken");
+        const activeAccessToken = accessToken || url.searchParams.get("accessToken");
 
         let activeRecordingId = recordingId;
         if (activeRecordingId === null) {
@@ -46,7 +48,7 @@ export default function Initializer({
           }
         }
 
-        const sessionId = await client.initialize(activeRecordingId, accessToken);
+        const sessionId = await client.initialize(activeRecordingId, activeAccessToken);
         const endpoint = await client.getSessionEndpoint(sessionId);
 
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
@@ -54,8 +56,8 @@ export default function Initializer({
         preCacheSources(sources);
 
         let currentUserInfo: UserInfo | null = null;
-        if (accessToken) {
-          currentUserInfo = await getCurrentUserInfo(accessToken);
+        if (activeAccessToken) {
+          currentUserInfo = await getCurrentUserInfo(activeAccessToken);
         }
 
         setContext({
