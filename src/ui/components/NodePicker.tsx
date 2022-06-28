@@ -115,7 +115,6 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
   };
 
   nodePickerMouseClick = (e: MouseEvent) => {
-    console.log("nodePickerMouseClick");
     this.props.setIsNodePickerActive(false);
     this.props.setMouseTargetsLoading(false);
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));

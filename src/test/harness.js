@@ -102,10 +102,6 @@ function selectConsole() {
   return clickElement("button.console-panel-button");
 }
 
-function selectDebugger() {
-  console.log("selectDebugger");
-}
-
 async function selectInspector() {
   await clickElement("button.inspector-panel-button");
   // ensure that the inspector is fully initialized, including its legacy
@@ -348,7 +344,6 @@ async function checkEvaluateInTopFrame(text, expected) {
   );
 
   await clearConsoleEvaluations();
-  selectDebugger();
 }
 
 async function clearConsoleEvaluations() {
@@ -870,7 +865,6 @@ async function getRecordingTarget() {
 
 const testCommands = {
   selectConsole,
-  selectDebugger,
   selectInspector,
   selectReactDevTools,
   assert,

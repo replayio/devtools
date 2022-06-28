@@ -241,7 +241,6 @@ export function selectionChanged(
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    console.log("selectNode", nodeId, reason);
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);

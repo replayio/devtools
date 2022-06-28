@@ -15,7 +15,6 @@ export const EventListenersApp = ({ selection }: { selection: Selection }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log("EventLstenersApp");
     const handler = async (node: NodeFront | null) => {
       selectedNode.current = node;
 
@@ -105,10 +104,9 @@ export const EventListenersApp = ({ selection }: { selection: Selection }) => {
                                 dispatch(
                                   onViewSourceInDebugger(
                                     {
-                                      url: locationUrl,
                                       ...location,
+                                      url: locationUrl,
                                     },
-
                                     true
                                   )
                                 );

@@ -2,7 +2,6 @@ Test.describe(`Test basic console time warping functionality.`, async () => {
   await Test.selectConsole();
   await Test.warpToMessage("Number 5");
 
-  await Test.selectDebugger();
   await Test.checkEvaluateInTopFrame("number", 5);
 
   const target = await Test.getRecordingTarget();
