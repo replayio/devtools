@@ -17614,6 +17614,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"next-compose-plugins@npm:^2.2.1":
+  version: 2.2.1
+  resolution: "next-compose-plugins@npm:2.2.1"
+  checksum: 771762fda2b12b81daf10431cbb494816cff96be02b44009692c6c0eefbacd62cbf51ddb93af8d3380ec00254c6a95d64d10f744d4b9ddadefc21efee7dc69fc
+  languageName: node
+  linkType: hard
+
 "next-global-css@npm:^1.3.1":
   version: 1.3.1
   resolution: "next-global-css@npm:1.3.1"
@@ -20504,6 +20511,7 @@ __metadata:
     mini-css-extract-plugin: ^2.6.0
     mixpanel-browser: ^2.43.0
     next: ^12.1.6
+    next-compose-plugins: ^2.2.1
     next-global-css: ^1.3.1
     node-polyfill-webpack-plugin: ^1.1.4
     parse-script-tags: ^0.1.7
