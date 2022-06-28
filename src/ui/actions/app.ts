@@ -74,7 +74,9 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
 
   ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
-  );
+  ).then(() => {
+    store.dispatch(setLoading(100));
+  });
 
   // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
   // Practically speaking though, there are cases where updates take so long it feels like things are broken.
