@@ -1,3 +1,4 @@
+.editorconfig
 .yarn
 playwright-report*
 test-results

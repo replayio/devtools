@@ -1,0 +1,20 @@
+VERSION 0.6
+
+install:
+    FROM  mcr.microsoft.com/playwright:v1.22.0-focal
+    RUN yarn set version 3.2.1
+    COPY . /playwright
+    WORKDIR /playwright
+    RUN yarn install
+    RUN yarn playwright:install
+    EXPOSE 3000
+
+playwright:
+    FROM +install
+    RUN yarn test
+
+playwright-update-snapshots:
+    FROM +install
+    RUN yarn test --update-snapshots
+    # TODO Change this structure
+    SAVE ARTIFACT ./snapshots AS LOCAL ./snapshots
