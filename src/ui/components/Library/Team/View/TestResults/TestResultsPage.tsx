@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { useSimulateListQuery } from "ui/utils/library";
-import { ViewContext } from "../ViewPage";
+import { ViewContext } from "../ViewContext";
 
 export function TestResultsPage() {
   return (
@@ -20,11 +20,11 @@ function TestResultsContent() {
 
   return (
     <>
-      {results.map((_, i) => (
+      {/* {results.map((_, i) => (
         <div className="p-4 bg-green-300" key={i}>
           Test Results {i}
         </div>
-      ))}
+      ))} */}
     </>
   );
 }

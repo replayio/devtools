@@ -6,6 +6,7 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
+import { MY_LIBRARY_TEAM } from "../Team/TeamContext";
 
 export function TeamButton({
   label,
@@ -29,8 +30,8 @@ export function TeamButton({
     if (isNew) {
       return;
     }
-    
-    updateDefaultWorkspace({ variables: { workspaceId: id === "me" ? null : id } });
+
+    updateDefaultWorkspace({ variables: { workspaceId: id === MY_LIBRARY_TEAM.id ? null : id } });
     trackEvent("team_change", { workspaceId: id });
   };
 
@@ -47,7 +48,7 @@ export function TeamButton({
           {label} {isTest && "(test)"}
         </span>
         {isNew ? (
-          <div className={"newbadge rounded-lg px-3 py-0.5 text-xs text-white"}>New</div>
+          <div className={"bg-primaryAccent rounded-lg px-3 py-0.5 text-xs text-white"}>New</div>
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </a>

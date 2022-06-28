@@ -5,7 +5,7 @@ import { Invitations } from "./Invitations";
 import { TeamButton } from "./TeamButton";
 import Profile from "./Profile";
 import { NewTeamButton } from "./NewTeamButton";
-import { MY_LIBRARY_TEAM } from "../Team/TeamPage";
+import { MY_LIBRARY_TEAM } from "../Team/TeamContext";
 
 export default function Navigation() {
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
@@ -31,7 +31,7 @@ function NavigationContent({ workspaces }: { workspaces: Workspace[] }) {
         style={scrollbarStyle}
       >
         <div className="flex flex-col">
-          <TeamButton label={MY_LIBRARY_TEAM.name} id={"me"} />
+          <TeamButton label={MY_LIBRARY_TEAM.name} id={MY_LIBRARY_TEAM.id} />
           <Invitations />
           {workspaces.map((w, i) => (
             <TeamButton label={w.name} key={i} id={w.id} isTest={w.isTest} />

@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { TestRunListItem } from "ui/components/Library/Content/TestRuns/TestRunListItem";
+import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
 import { TestRunsContext } from "./TestRunsPage";
 
 export function TestRunList() {

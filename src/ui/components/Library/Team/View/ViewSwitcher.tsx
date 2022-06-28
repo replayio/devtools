@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useContext } from "react";
-import { TeamContext } from "../TeamPage";
-import { ViewContext } from "./ViewPage";
+import { TeamContext } from "../TeamContext";
+import { ViewContext } from "./ViewContext";
 
 export function ViewSwitcher() {
   const team = useContext(TeamContext).team;

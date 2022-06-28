@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { useGetTeamRouteParams } from "ui/utils/library";
-import { TeamContext } from "../../../TeamPage";
+import { TeamContext } from "../../../TeamContext";
 import { TestRunsContext } from "../TestRunsPage";
 import { TestRunOverviewContent } from "./TestRunOverviewContent";
 

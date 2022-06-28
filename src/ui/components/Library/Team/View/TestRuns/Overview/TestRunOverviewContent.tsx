@@ -1,8 +1,8 @@
 import { useContext } from "react";
-import { RunResults } from "ui/components/Library/Overview/RunResults";
+import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
 import { TestRunOverviewContext } from "./TestRunOverviewPage";
 import styles from "../../../../Library.module.css";
-import { RunSummary } from "ui/components/Library/Overview/RunSummary";
+import { RunSummary } from "./RunSummary";
 
 export function TestRunOverviewContent() {
   const { testRun } = useContext(TestRunOverviewContext);

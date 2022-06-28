@@ -1,45 +1,17 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useContext, useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { setModal } from "ui/actions/app";
-import { useGetWorkspace } from "ui/hooks/workspaces";
 import { useAppDispatch } from "ui/setup/hooks";
-import { Workspace } from "ui/types";
 import { useGetTeamRouteParams } from "ui/utils/library";
+import { TeamContext, MY_LIBRARY_TEAM, TeamContextRoot, MyLibraryContainer } from "./TeamContext";
 import { ViewPage } from "./View/ViewPage";
-
-export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me" };
-
-type TeamContainerContextType = {
-  teamId: string;
-  team?: Workspace | typeof MY_LIBRARY_TEAM;
-};
-
-export const TeamContext = createContext<TeamContainerContextType>(null as any);
-
-export function TeamContainer({ children }: { children: ReactNode }) {
-  const { teamId } = useGetTeamRouteParams();
-  const { workspace } = useGetWorkspace(teamId);
-
-  return (
-    <TeamContext.Provider value={{ teamId, team: workspace }}>{children}</TeamContext.Provider>
-  );
-}
-
-export function MyLibraryContainer({ children }: { children: ReactNode }) {
-  const { teamId } = useGetTeamRouteParams();
-
-  return (
-    <TeamContext.Provider value={{ teamId, team: MY_LIBRARY_TEAM }}>
-      {children}
-    </TeamContext.Provider>
-  );
-}
 
 export function TeamPage() {
   const dispatch = useAppDispatch();
   const { teamId } = useGetTeamRouteParams();
   const router = useRouter();
 
+  // Check for ?settings="router" query parameter.
   useEffect(() => {
     const {
       query: { settings },
@@ -53,20 +25,19 @@ export function TeamPage() {
   if (teamId === MY_LIBRARY_TEAM.id) {
     return (
       <MyLibraryContainer>
-        <TeamPageContent />
+        <TeamContent />
       </MyLibraryContainer>
     );
   }
 
   return (
-    <TeamContainer>
-      <TeamPageContent />
-    </TeamContainer>
+    <TeamContextRoot>
+      <TeamContent />
+    </TeamContextRoot>
   );
 }
 
-function TeamPageContent() {
+function TeamContent() {
   const { team } = useContext(TeamContext);
-
   return <ViewPage defaultView={team?.isTest ? "runs" : "recordings"} />;
 }
