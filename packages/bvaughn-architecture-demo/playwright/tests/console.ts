@@ -1,8 +1,8 @@
 import { test, expect } from "@playwright/test";
 
-import { takeScreenshot } from "./utils/general";
+import { getBaseURL, takeScreenshot } from "./utils/general";
 
-const URL = "http://172.17.0.1:3000/tests/console/basic";
+const URL = `${getBaseURL()}/tests/console/basic`;
 
 test("should display list of messages", async ({ page }) => {
   await page.goto(URL);

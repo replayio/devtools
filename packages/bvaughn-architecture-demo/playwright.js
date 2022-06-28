@@ -98,7 +98,10 @@ function runServer() {
 async function runEndToEndTests() {
   logBright("Running e2e tests");
 
-  testProcess = spawn("earthly", ["+playwright"], {
+  // Default to "172.17.0.1" for CI.
+  const HOST = process.env.HOST || "172.17.0.1";
+
+  testProcess = spawn("earthly", ["+playwright", `--HOST=${HOST}`], {
     ...process.env,
     cwd: join(ROOT_PATH, "playwright"),
   });

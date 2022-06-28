@@ -10,11 +10,14 @@ install:
     EXPOSE 3000
 
 playwright:
+    ARG --required HOST
     FROM +install
+    ENV HOST $HOST
     RUN yarn test
 
 playwright-update-snapshots:
+    ARG --required HOST
     FROM +install
+    ENV HOST $HOST
     RUN yarn test --update-snapshots
-    # TODO Change this structure
     SAVE ARTIFACT ./snapshots AS LOCAL ./snapshots

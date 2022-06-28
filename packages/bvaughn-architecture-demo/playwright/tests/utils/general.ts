@@ -2,6 +2,11 @@ import { expect, Locator, LocatorScreenshotOptions, Page } from "@playwright/tes
 
 const SCREENSHOT_OPTIONS: LocatorScreenshotOptions = { scale: "css", animations: "disabled" };
 
+export function getBaseURL(): string {
+  const HOST = process.env.HOST || "localhost";
+  return `http://${HOST}:3000`;
+}
+
 export async function takeScreenshot(page: Page, locator: Locator, name: string) {
   if (!name.endsWith(".png")) {
     name += ".png";
