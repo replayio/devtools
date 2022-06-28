@@ -18,6 +18,12 @@ interface NodePickerState {
   nodePickerActive?: any;
 }
 
+declare global {
+  interface Window {
+    gNodePicker: NodePicker;
+  }
+}
+
 class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
   lastPickerPosition: Position | null = null;
   nodePickerRemoveTime?: number;
@@ -29,7 +35,8 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 
     EventEmitter.decorate(nodePicker);
     // Used in the test harness for picking a node.
-    gToolbox.nodePicker = this;
+
+    window.gNodePicker = this;
   }
 
   getHighlighter() {
@@ -111,7 +118,6 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     this.props.setIsNodePickerActive(false);
     this.props.setMouseTargetsLoading(false);
     this.nodePickerMouseClickInCanvas(this.mouseEventCanvasPosition(e));
-    gToolbox.selectTool("inspector");
   };
 
   // This is exposed separately for use in testing.
@@ -125,7 +131,7 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
       this.getHighlighter().highlight(nodeBounds);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
       if (node && this.getHighlighter().currentNode == nodeBounds) {
-        gToolbox.selection.setNodeFront(node);
+        window.gInspector.selection.setNodeFront(node);
       }
     } else {
       this.getHighlighter().unhighlight();

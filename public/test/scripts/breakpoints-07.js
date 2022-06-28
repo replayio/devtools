@@ -16,7 +16,7 @@
         );
         return JSON.stringify(foundSourceUrls) === '["bundle_input.js"]';
       },
-      { waitingFor: "bundle_input.js to be present in source urls" }
+      { waitingFor: "bundle_input.js to be present in source urls", timeout: 30 * 1000 }
     );
     Test.app.actions.closeQuickOpen();
 

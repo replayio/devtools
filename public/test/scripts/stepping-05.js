@@ -13,7 +13,6 @@ Test.describe(`Test stepping in pretty-printed code.`, async () => {
   await Test.addEventListenerLogpoints(["event.mouse.click"]);
 
   await Test.warpToMessage("click");
-  await Test.selectDebugger();
 
   await Test.stepInToLine(2);
   await Test.stepOutToLine(15);

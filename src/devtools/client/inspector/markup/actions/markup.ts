@@ -240,11 +240,14 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
-  return (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
-      window.gToolbox.selection.setNodeFront(nodeFront, { reason });
+      // HACK This is ugly, but we lazy-load the component and also try to use `window.gInspector` in places.
+      // So, ensure it's loaded, _then_ use this global
+      await import("devtools/client/inspector/components/App");
+      window.gInspector.selection.setNodeFront(nodeFront, { reason });
     }
   };
 }

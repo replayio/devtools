@@ -170,16 +170,7 @@ function update(state = initialSourcesState(), action: AnyAction) {
       };
 
     case "debuggerUI/setViewport":
-      // Interacting with the viewport while the debugger is selected is
-      // a scroll action. Ignore viewport events when the debugger is not
-      // selected, as CodeMirror will not update properly.
-      if (gToolbox.currentTool == "debugger") {
-        return {
-          ...state,
-          selectedLocationHasScrolled: true,
-        };
-      }
-      return state;
+      return { ...state, selectedLocationHasScrolled: true };
 
     case "CLEAR_SELECTED_LOCATION":
       location = { url: "" };

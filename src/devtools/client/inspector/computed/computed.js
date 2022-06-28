@@ -22,6 +22,7 @@ const {
 } = require("devtools/client/inspector/shared/node-types");
 const TooltipsOverlay = require("devtools/client/inspector/shared/tooltips-overlay");
 import { ELEMENT_STYLE } from "shared/constants";
+import { getSelectedPanel } from "ui/reducers/layout";
 
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 
@@ -132,6 +133,7 @@ UpdateProcess.prototype = {
   },
 };
 
+// TODO This appears to be dead - confirm and delete it
 /**
  * CssComputedView is a panel that manages the display of a table
  * sorted by style. There should be one instance of CssComputedView
@@ -144,6 +146,7 @@ UpdateProcess.prototype = {
  */
 function CssComputedView(inspector, document) {
   this.inspector = inspector;
+  this.store = inspector.store;
   this.styleDocument = document;
   this.styleWindow = this.styleDocument.defaultView;
 
@@ -478,13 +481,8 @@ CssComputedView.prototype = {
   },
 
   isPanelVisible: function () {
-    return this.inspector?.toolbox?.currentTool === "inspector";
-    // return (
-    //   this.inspector.toolbox &&
-    //   this.inspector.sidebar &&
-    //   this.inspector.toolbox.currentTool === "inspector" &&
-    //   this.inspector.sidebar.getCurrentTabID() == "computedview"
-    // );
+    const currentTool = getSelectedPanel(this.store.getState());
+    return currentTool === "inspector";
   },
 
   /**
@@ -1372,6 +1370,7 @@ SelectorView.prototype = {
   },
 };
 
+// TODO This appears to be dead - confirm and delete it
 function ComputedViewTool(inspector, window) {
   this.inspector = inspector;
   this.document = window.document;

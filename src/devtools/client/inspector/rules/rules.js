@@ -25,6 +25,8 @@ const {
 } = require("devtools/client/inspector/rules/actions/rules");
 const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
 
+import { getSelectedPanel } from "ui/reducers/layout";
+
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
 class RulesView {
@@ -34,7 +36,6 @@ class RulesView {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
-    this.toolbox = inspector.toolbox;
     this.isNewRulesView = true;
 
     this.outputParser = new OutputParser(this.doc, this.cssProperties);
@@ -81,7 +82,7 @@ class RulesView {
   }
 
   destroy() {
-    // this.inspector.sidebar.off("select", this.onSelection);
+    this.inspector.sidebar.off("select", this.onSelection);
     this.selection.off("detached-front", this.onSelection);
     this.selection.off("new-node-front", this.onSelection);
 
@@ -120,7 +121,6 @@ class RulesView {
     this.selection = null;
     this.showUserAgentStyles = null;
     this.store = null;
-    this.toolbox = null;
   }
 
   /**
@@ -247,7 +247,8 @@ class RulesView {
    * Returns true if the rules panel is visible, and false otherwise.
    */
   isPanelVisible() {
-    return this.inspector?.toolbox?.currentTool === "inspector";
+    const currentTool = getSelectedPanel(this.store.getState());
+    return currentTool === "inspector";
   }
 
   /**

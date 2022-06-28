@@ -12,12 +12,12 @@ import { UIStore } from "ui/actions";
 import MarkupView from "devtools/client/inspector/markup/markup";
 import BoxModel from "devtools/client/inspector/boxmodel/box-model";
 import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
+import Selection from "devtools/client/framework/selection";
 
 import CSSProperties from "./css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
-import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
 type InspectorEvent =
   | "ready" // Fired when the inspector panel is opened for the first time and ready to use
@@ -46,8 +46,8 @@ export class Inspector {
   markup: MarkupView;
   rules: RulesView;
   boxModel: BoxModel;
+  selection: Selection;
 
-  private _toolbox: DevToolsToolbox | null;
   private _highlighters?: any;
   private _destroyed?: boolean;
 
@@ -57,10 +57,10 @@ export class Inspector {
   off!: (name: InspectorEvent, handler: (value?: any) => void) => void;
   emit!: (name: InspectorEvent, value?: any) => void;
 
-  constructor(toolbox: DevToolsToolbox) {
+  constructor() {
     EventEmitter.decorate(this);
 
-    this._toolbox = toolbox;
+    this.selection = new Selection();
     this.panelDoc = window.document;
     this.panelWin = window;
     (this.panelWin as any).inspector = this;
@@ -73,8 +73,8 @@ export class Inspector {
     this.boxModel = new BoxModel(this, window);
   }
 
-  get toolbox() {
-    return this._toolbox;
+  getHighlighter() {
+    return Highlighter;
   }
 
   get highlighters() {
@@ -83,10 +83,6 @@ export class Inspector {
     }
 
     return this._highlighters;
-  }
-
-  get selection() {
-    return this.toolbox ? this.toolbox.selection : null;
   }
 
   get cssProperties() {
@@ -111,7 +107,6 @@ export class Inspector {
       this._highlighters = null;
     }
 
-    this._toolbox = null;
     this.panelDoc = null;
     (this.panelWin as any).inspector = null;
     this.panelWin = null;

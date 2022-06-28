@@ -5,7 +5,6 @@ import { ThreadFront } from "protocol/thread";
 import Highlighter from "highlighter/highlighter";
 import { selectors } from "ui/reducers";
 import { UIStore } from "ui/actions";
-import { DevToolsToolbox } from "ui/utils/devtools-toolbox";
 
 import { reset, newRoot, expandNode, updateNodeExpanded, selectionChanged } from "./actions/markup";
 import { assert } from "protocol/utils";
@@ -14,7 +13,6 @@ class MarkupView {
   inspector: Inspector | null;
   selection: Selection | null;
   store: UIStore | null;
-  toolbox: DevToolsToolbox | null;
   isInspectorVisible: boolean;
   isLoadingPostponed: boolean;
   hoveredNodeId: string | undefined;
@@ -25,7 +23,6 @@ class MarkupView {
     this.inspector = inspector;
     this.selection = inspector.selection;
     this.store = inspector.store;
-    this.toolbox = inspector.toolbox;
     this.isInspectorVisible = false;
     this.isLoadingPostponed = false;
     this.hoveredNodeId = undefined;
@@ -143,7 +140,6 @@ class MarkupView {
     this.inspector = null;
     this.selection = null;
     this.store = null;
-    this.toolbox = null;
   }
 
   /**

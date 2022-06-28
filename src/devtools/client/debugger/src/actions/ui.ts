@@ -8,6 +8,7 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 // @ts-ignore no definition
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import type { UIThunkAction } from "ui/actions";
+import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 
 import { closeQuickOpen } from "../reducers/quick-open";
 import {
@@ -96,7 +97,7 @@ export const toggleSourcesCollapse = toggleSources;
 export const expandSourcesPane = sourcesPanelExpanded;
 export const updateCursorPosition = setCursorPosition;
 
-export function openSourceLink(sourceId: string, line: number, column: number): UIThunkAction {
+export function openSourceLink(sourceId: string, line?: number, column?: number): UIThunkAction {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
     const location = { sourceId, line, column };
@@ -128,9 +129,13 @@ export function flashLineRange(location: HighlightedRange): UIThunkAction {
 }
 
 export function updateViewport(): UIThunkAction {
-  return dispatch => {
+  return (dispatch, getState) => {
     const viewport = getLocationsInViewport(getEditor());
-    dispatch(setViewport(viewport));
+    const currentPanel = getSelectedPanel(getState());
+    const toolboxLayout = getToolboxLayout(getState());
+    if (toolboxLayout === "ide" || currentPanel === "debugger") {
+      dispatch(setViewport(viewport));
+    }
   };
 }
 

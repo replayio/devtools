@@ -240,16 +240,15 @@ export function createSocket(
       if (recordingTarget === "node") {
         dispatch(setViewMode("dev"));
         await dispatch(showLoadingProgress());
-        dispatch(onLoadingFinished());
       } else {
         await videoReady.promise;
-        dispatch(onLoadingFinished());
       }
 
+      dispatch(onLoadingFinished());
       dispatch(actions.setUploading(null));
       dispatch(actions.setAwaitingSourcemaps(false));
 
-      ThreadFront.on("paused", ({ point }) => store.dispatch(setCurrentPoint(point)));
+      ThreadFront.on("paused", ({ point }) => dispatch(setCurrentPoint(point)));
 
       dispatch(jumpToInitialPausePoint());
     } catch (e: any) {
@@ -287,20 +286,19 @@ export function showLoadingProgress(): UIThunkAction<Promise<void>> {
 
 function onLoadingFinished(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const selectedPanel = getSelectedPanel(getState());
-    // This shouldn't hit when the selectedPanel is "comments"
-    // as that's not dealt with in toolbox, however we still
-    // need to init the toolbox so we're not checking for
-    // that here.
-    let i = 0;
-    while (!(window as any).gToolbox && i < 30) {
-      await waitForTime(1000);
-      i++;
-    }
-    (window as any).gToolbox.init(selectedPanel);
-
     await waitForTime(300);
+    async function initThreadFront() {
+      await ThreadFront.waitForSession();
+      await ThreadFront.initializedWaiter.promise;
+      await ThreadFront.ensureAllSources();
+
+      ThreadFront.ensureCurrentPause();
+    }
+
+    initThreadFront();
+
     await ThreadFront.initializedWaiter.promise;
+
     dispatch(actions.setLoadingFinished(true));
   };
 }

@@ -9,16 +9,28 @@ import type { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
-
+import { selectSource } from "devtools/client/debugger/src/actions/sources";
+import { showSource } from "devtools/client/debugger/src/actions/ui";
+import {
+  getSourceByActorId,
+  getSourceByURL,
+  getContext,
+} from "devtools/client/debugger/src/selectors";
+import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
+import { SourceLocation } from "@replayio/protocol";
 type $FixTypeLater = any;
 
 export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
-  return (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     if (grip.getPause() !== ThreadFront.currentPause) {
       return;
     }
 
-    const highlighter = window.gToolbox.getHighlighter();
+    // HACK This is ugly, but we lazy-load the component and also try to use `window.gInspector` in places.
+    // So, ensure it's loaded, _then_ use this global
+    await import("devtools/client/inspector/components/App");
+
+    const highlighter = window.gInspector.getHighlighter();
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
       highlighter.highlight(nodeFront);
@@ -27,29 +39,44 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 }
 
 export function unHighlightDomElement(): UIThunkAction {
-  return () => {
-    const highlighter = window.gToolbox.getHighlighter();
+  return async () => {
+    await import("devtools/client/inspector/components/App");
+    const highlighter = window.gInspector.getHighlighter();
     if (highlighter) {
       highlighter.unhighlight();
     }
   };
 }
 
-export function openNodeInInspector(valueFront: ValueFront): UIThunkAction<Promise<void>> {
+export function openLink(url: string): UIThunkAction {
+  return (dispatch, getState) => {
+    const source = getSourceByURL(getState(), url);
+    if (source?.id) {
+      dispatch(openSourceLink(source.id));
+    } else {
+      window.open(url, "_blank");
+    }
+  };
+}
+
+export function openNodeInInspector(
+  valueFront: ValueFront,
+  reason: "console" | "debugger" = "console"
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
     const pause = valueFront.getPause()!;
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 
-    window.gToolbox.selectTool("inspector");
     dispatch(setSelectedPanel("inspector"));
 
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
-    await window.gToolbox.selection.setNodeFront(nodeFront, {
-      reason: "console",
+    await import("devtools/client/inspector/components/App");
+    await window.gInspector.selection.setNodeFront(nodeFront, {
+      reason,
     });
   };
 }
@@ -76,16 +103,24 @@ export function onMessageHover(
 }
 
 export function onViewSourceInDebugger(
-  frame: $FixTypeLater,
-  openSourcesTab: $FixTypeLater
+  frame: { sourceId?: string; url: string; line?: number; column: number },
+  openSourcesTab?: boolean
 ): UIThunkAction {
-  return () => {
-    window.gToolbox.viewSourceInDebugger(
-      frame.url,
-      frame.line,
-      frame.column,
-      frame.sourceId,
-      openSourcesTab
-    );
+  return async (dispatch, getState) => {
+    const cx = getContext(getState());
+    const source = frame.sourceId
+      ? getSourceByActorId(getState(), frame.sourceId)
+      : getSourceByURL(getState(), frame.url!);
+    if (source) {
+      dispatch(showSource(cx, source.id, openSourcesTab));
+      await dispatch(
+        selectSource(
+          cx,
+          source.id,
+          { sourceId: source.id, line: frame.line, column: frame.column },
+          openSourcesTab
+        )
+      );
+    }
   };
 }

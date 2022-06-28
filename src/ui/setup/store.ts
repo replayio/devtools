@@ -161,8 +161,6 @@ export function bootstrapStore(initialState: Partial<UIState>) {
   >;
 
   const store = configureStore({
-    // NOTE: This is only the _initial_ setup! Other reducers are code-split for now.
-    // See devtools.ts and devtools-toolbox.ts for other reducers
     reducer: reducers,
     preloadedState: initialState,
     // @ts-ignore

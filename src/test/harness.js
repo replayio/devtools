@@ -8,17 +8,14 @@ const { assert } = require("protocol/utils");
 const mapValues = require("lodash/mapValues");
 const isEqual = require("lodash/isEqual");
 
-const dbg = gToolbox.getPanel("debugger").getVarsForTests();
+const dbg = window.app;
 
 export function waitForTime(ms, waitingFor) {
   console.log(`waiting ${ms}ms for ${waitingFor}`);
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-const dbgSelectors = {};
-for (const [name, method] of Object.entries(dbg.selectors)) {
-  dbgSelectors[name] = (...args) => method(dbg.store.getState(), ...args);
-}
+const dbgSelectors = window.app.selectors;
 
 function waitForElapsedTime(time, ms) {
   const wait = time + ms - Date.now();
@@ -103,10 +100,6 @@ async function clickElement(selector) {
 
 function selectConsole() {
   return clickElement("button.console-panel-button");
-}
-
-function selectDebugger() {
-  return gToolbox.selectTool("debugger");
 }
 
 async function selectInspector() {
@@ -351,7 +344,6 @@ async function checkEvaluateInTopFrame(text, expected) {
   );
 
   await clearConsoleEvaluations();
-  selectDebugger();
 }
 
 async function clearConsoleEvaluations() {
@@ -634,14 +626,6 @@ async function toggleMappedSources() {
   return clickElement(".mapped-source button");
 }
 
-async function playbackRecording() {
-  const timeline = await waitUntil(() => gToolbox.timeline, {
-    waitingFor: "timeline to be visible",
-  });
-  timeline.startPlayback();
-  await waitUntil(() => !timeline.state.playback, { waitingFor: "playback to start" });
-}
-
 async function findMarkupNode(text) {
   return waitUntil(
     () => {
@@ -706,8 +690,8 @@ async function getMarkupCanvasCoordinate(text, iframes = []) {
 }
 
 async function pickNode(x, y) {
-  gToolbox.nodePicker.clickNodePickerButton();
-  gToolbox.nodePicker.nodePickerMouseClickInCanvas({ x, y });
+  window.gNodePicker.clickNodePickerButton();
+  window.gNodePicker.nodePickerMouseClickInCanvas({ x, y });
 }
 
 async function selectMarkupNode(node) {
@@ -881,7 +865,6 @@ async function getRecordingTarget() {
 
 const testCommands = {
   selectConsole,
-  selectDebugger,
   selectInspector,
   selectReactDevTools,
   assert,
@@ -935,7 +918,6 @@ const testCommands = {
   addEventListenerLogpoints,
   toggleExceptionLogging,
   toggleMappedSources,
-  playbackRecording,
   findMarkupNode,
   toggleMarkupNode,
   searchMarkup,

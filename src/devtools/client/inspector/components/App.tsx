@@ -16,6 +16,7 @@ import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
 import { InspectorActiveTab } from "../state";
+import { Inspector } from "../inspector";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
   ruleview: "Rules",
@@ -31,32 +32,28 @@ const availableTabs: readonly InspectorActiveTab[] = [
   "eventsview",
 ] as const;
 
+declare global {
+  interface Window {
+    gInspector: Inspector;
+  }
+}
+window.gInspector = new Inspector();
+
 const InspectorApp: FC = () => {
   const dispatch = useAppDispatch();
-  const { initializedPanels, activeTab } = useAppSelector((state: UIState) => ({
-    initializedPanels: state.app.initializedPanels,
-    activeTab: state.inspector.activeTab,
-  }));
+  const activeTab = useAppSelector(state => state.inspector.activeTab);
 
-  const inspector = gToolbox.getPanel("inspector");
-  const inspectorInited = inspector && initializedPanels.includes("inspector");
+  const inspector = window.gInspector;
 
   const onSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
   };
 
   const markupView: JSX.Element | undefined = useMemo(() => {
-    if (!inspectorInited) {
-      return undefined;
-    }
     return <MarkupApp inspector={inspector} />;
-  }, [inspector, inspectorInited]);
+  }, [inspector]);
 
   const activePanel: ReactNode = useMemo(() => {
-    if (!inspectorInited) {
-      return null;
-    }
-
     switch (activeTab) {
       case "ruleview": {
         return <RulesApp {...inspector.rules.getRulesProps()} />;
@@ -73,14 +70,14 @@ const InspectorApp: FC = () => {
         return <LayoutApp {...layoutProps} />;
       }
       case "eventsview": {
-        return <EventListenersApp />;
+        return <EventListenersApp selection={inspector.selection} />;
       }
     }
     assert(
       false,
       "This code should be unreachable (handle all cases within the switch statement)."
     );
-  }, [inspector, inspectorInited, activeTab]);
+  }, [inspector, activeTab]);
 
   return (
     <div

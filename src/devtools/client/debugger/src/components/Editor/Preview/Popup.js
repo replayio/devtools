@@ -186,12 +186,12 @@ const mapStateToProps = state => ({
   cx: getThreadContext(state),
 });
 
-const { selectSourceURL, openLink, openElementInInspectorCommand, clearPreview } = actions;
+const { selectSourceURL, openLink, openNodeInInspector, clearPreview } = actions;
 
 const mapDispatchToProps = {
   selectSourceURL,
   openLink,
-  openElementInInspector: openElementInInspectorCommand,
+  openElementInInspector: openNodeInInspector,
   highlightDomElement,
   unHighlightDomElement,
   clearPreview,

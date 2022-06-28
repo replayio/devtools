@@ -107,7 +107,7 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
 
 export const getEvents = (state: UIState) => state.network.events;
 export const getRequests = (state: UIState) => state.network.requests;
-export const getFrames = (state: UIState) => state.network.frames;
+const getFrames = (state: UIState) => state.network.frames;
 export const getFocusedEvents = (state: UIState) => {
   const events = getEvents(state);
   const focusRegion = getFocusRegion(state);

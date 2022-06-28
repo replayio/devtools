@@ -19,7 +19,7 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { isTest } from "ui/utils/environment";
+import { isTest, getTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
 
@@ -112,9 +112,9 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
 
   ThreadFront.listenForLoadChanges(parameters => {
     lastLoadChangeUpdateTime = now();
-
     store.dispatch(setLoadedRegions(parameters));
   });
+  setupTests();
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
@@ -139,6 +139,16 @@ export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UI
 
     dispatch(setLoading(percentProgress));
   };
+}
+
+async function setupTests() {
+  const testName = getTest();
+  if (testName) {
+    window.Test = await import("test/harness");
+    const script = document.createElement("script");
+    script.src = `/test/scripts/${testName}`;
+    document.head.appendChild(script);
+  }
 }
 
 function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
@@ -216,7 +226,6 @@ export function executeCommand(key: CommandKey): UIThunkAction {
     } else if (key === "open_elements") {
       dispatch(setViewMode("dev"));
       dispatch(setSelectedPanel("inspector"));
-      gToolbox.selectTool("inspector");
     } else if (key === "open_file_search") {
       dispatch(setViewMode("dev"));
       dispatch(openQuickOpen());

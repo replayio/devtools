@@ -11,6 +11,7 @@ const ChangesApp = require("devtools/client/inspector/changes/components/Changes
 const { getChangesStylesheet } = require("devtools/client/inspector/changes/selectors/changes");
 const { resetChanges, trackChange } = require("devtools/client/inspector/changes/actions/changes");
 
+// TODO This appears to be dead - confirm and delete it
 class ChangesView {
   constructor(inspector, window) {
     this.document = window.document;

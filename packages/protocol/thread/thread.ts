@@ -269,14 +269,6 @@ class _ThreadFront {
     this.recordingTargetWaiter.resolve(getRecordingTarget(buildId));
   }
 
-  async initializeToolbox() {
-    await this.waitForSession();
-    await this.initializedWaiter.promise;
-    await this.ensureAllSources();
-
-    this.ensureCurrentPause();
-  }
-
   waitForSession() {
     return this.sessionWaiter.promise;
   }
@@ -722,14 +714,17 @@ class _ThreadFront {
     return frames.slice(1);
   }
 
-  pauseForAsyncIndex(asyncIndex?: number) {
+  async pauseForAsyncIndex(asyncIndex?: number) {
+    await ThreadFront.ensureAllSources();
     this.ensureCurrentPause();
-    return asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
+    const pause = asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
+    assert(pause, "no pause for given asyncIndex");
+
+    return pause;
   }
 
   async getScopes(asyncIndex: number, frameId: FrameId) {
-    await this.ensureAllSources();
-    const pause = this.pauseForAsyncIndex(asyncIndex);
+    const pause = await this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
     return await pause.getScopes(frameId);
   }
@@ -749,8 +744,7 @@ class _ThreadFront {
     frameId?: FrameId;
     pure?: boolean;
   }) {
-    await this.ensureAllSources();
-    const pause = this.pauseForAsyncIndex(asyncIndex);
+    const pause = await this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
     const rv = await pause.evaluate(frameId, text, pure);
     if (rv.returned) {
@@ -1043,10 +1037,8 @@ class _ThreadFront {
   }
 
   async getFrameSteps(asyncIndex: number, frameId: FrameId) {
-    await this.ensureAllSources();
-    const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
-    return await pause.getFrameSteps(frameId);
+    const pause = await this.pauseForAsyncIndex(asyncIndex);
+    return pause.getFrameSteps(frameId);
   }
 
   getPreferredLocationRaw(locations: MappedLocation) {

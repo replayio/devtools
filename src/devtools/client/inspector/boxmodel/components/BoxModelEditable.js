@@ -50,11 +50,7 @@ class BoxModelEditable extends PureComponent {
   }
 
   onMouseOver(event) {
-    const { onShowRulePreviewTooltip, property } = this.props;
-
-    if (event.shiftKey && HIGHLIGHT_RULE_PREF) {
-      onShowRulePreviewTooltip(event.target, property);
-    }
+    // TODO Can probably clear out much of this component
   }
 
   render() {

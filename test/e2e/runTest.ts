@@ -3,7 +3,6 @@ import fs from "fs";
 import { Page } from "@recordreplay/playwright";
 import { listAllRecordings } from "@replayio/replay";
 import { test, add as addMetadata } from "@replayio/replay/metadata";
-import uuid from "uuid";
 
 import config from "./config";
 import { getExampleRecordingId } from "./getExample";

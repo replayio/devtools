@@ -95,8 +95,6 @@ Dispatched by: `actions/sources/select.js` line 133
 
 ### `"SET_VIEWPORT"`
 
-Relies on a check of `gToolbox.currentTool` (ew, globals in a reducer! This should probably be moved into a thunk)
-
 Dispatched by: `components/Editor/index.js` line 112
 
 Note: a couple other functions in the codebase named `updateViewport`, but they're completely different (`server/actors/` folder, related to UI layout)
