@@ -84,14 +84,14 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
 }
 
 function redirectToLogin(req: NextApiRequest, res: NextApiResponse) {
-  const message = getQueryValue(req.query.error_description);
+  const message = getQueryValue(req.query.error_description!);
 
   res.redirect("/browser/error?type=auth&message=" + encodeURIComponent(message));
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const code = getQueryValue(req.query.code);
-  const state = getQueryValue(req.query.state);
+  const code = getQueryValue(req.query.code!);
+  const state = getQueryValue(req.query.state!);
   const browserAuth = req.cookies["replay-browser-auth"];
 
   if (!code || !state || !browserAuth) {

@@ -1,13 +1,20 @@
 const { patchWebpackConfig } = require("next-global-css");
 const transpileModules = require("next-transpile-modules");
 const { RetryChunkLoadPlugin } = require("webpack-retry-chunk-load-plugin");
+const withPlugins = require("next-compose-plugins");
+
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 
 const withTM = transpileModules(["bvaughn-architecture-demo"]);
 
 const baseNextConfig = {
   // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
   // (see https://github.com/vercel/next.js/pull/34500)
-  experimental: {},
+  experimental: {
+    browsersListForSwc: true,
+  },
 
   eslint: {
     // which folders to run ESLint on during production builds (next build)
@@ -149,4 +156,4 @@ const baseNextConfig = {
   },
 };
 
-module.exports = withTM(baseNextConfig);
+module.exports = withPlugins([withTM, withBundleAnalyzer], baseNextConfig);

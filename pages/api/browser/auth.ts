@@ -44,7 +44,7 @@ async function initAuthRequest(key: string) {
 }
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
-  const key = getQueryValue(req.query.key);
+  const key = getQueryValue(req.query.key!);
   if (!key) {
     res.statusCode = 400;
     res.statusMessage = "Missing parameter";
