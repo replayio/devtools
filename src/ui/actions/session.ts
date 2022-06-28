@@ -29,7 +29,7 @@ import type { ExpectedError, UnexpectedError } from "ui/state/app";
 import { Recording } from "ui/types";
 import { extractGraphQLError } from "ui/utils/apolloClient";
 import LogRocket from "ui/utils/logrocket";
-import { endMixpanelSession } from "ui/utils/mixpanel";
+import { endMixpanelSession, timeMixpanelEvent, trackMixpanelEvent } from "ui/utils/mixpanel";
 import { features, prefs } from "ui/utils/prefs";
 import { registerRecording, trackEvent } from "ui/utils/telemetry";
 import tokenManager from "ui/utils/tokenManager";
@@ -165,6 +165,7 @@ export function createSocket(
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
+      const timings = new Map<number, { method: string; start: number; end: number | undefined }>();
       const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
         onEvent: (event: ProtocolEvent) => {
           if (features.logProtocolEvents) {
@@ -172,11 +173,25 @@ export function createSocket(
           }
         },
         onRequest: (request: CommandRequest) => {
+          timings.set(request.id, { method: request.method, start: Date.now(), end: undefined });
+
           if (features.logProtocol) {
             dispatch(requestSent({ ...request, recordedAt: window.performance.now() }));
           }
         },
         onResponse: (response: CommandResponse) => {
+          const timing = timings.get(response.id);
+          if (timing) {
+            timing.end = Date.now();
+            timings.set(response.id, timing);
+            trackMixpanelEvent("protocol_message_completed", {
+              id: response.id,
+              duration_seconds: (timing.end! - timing.start) * 0.001,
+              ...timing,
+              end: timing.end!,
+            });
+          }
+
           if (features.logProtocol) {
             dispatch(responseReceived({ ...response, recordedAt: window.performance.now() }));
           }

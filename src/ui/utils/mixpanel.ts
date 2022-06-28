@@ -83,6 +83,10 @@ type MixpanelEvent =
   | ["onboarding.started_onboarding"]
   | ["onboarding.team_invite"]
   | ["paused"]
+  | [
+      "protocol_message_completed",
+      { id: number; method: string; start: number; end: number; duration_seconds: number }
+    ]
   | ["quick_open.open_quick_open"]
   | ["session.devtools_start", { userIsAuthor: boolean; workspaceUuid: WorkspaceUuid | null }]
   | ["session_end", { reason: string }]
