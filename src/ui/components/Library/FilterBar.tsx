@@ -3,16 +3,11 @@ import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
 import { TextInput } from "../shared/Forms";
 
 import { FilterDropdown } from "./FilterDropdown";
-import { LibraryContext, View } from "./useFilters";
+import { FilterContext } from "./Team/View/FilterContext";
 
-export function FilterBar({
-  displayedString,
-  setDisplayedText,
-}: {
-  displayedString: string;
-  setDisplayedText: (str: string) => void;
-}) {
-  const { setAppliedText } = useContext(LibraryContext);
+export function FilterBar() {
+  const { displayedString, setDisplayedText, setAppliedText } = useContext(FilterContext);
+
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDisplayedText(e.target.value);
   };

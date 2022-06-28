@@ -1,7 +1,9 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useGetTeamRouteParams } from "ui/utils/library";
+import { useFilters } from "../../useFilters";
 import { FilterBarContainer } from "./FilterBarContainer";
+import { FilterContext } from "./FilterContext";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestResultsPage } from "./TestResults/TestResultsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
@@ -12,7 +14,6 @@ type ViewContainerContextType = {
 };
 
 export const ViewContext = createContext<ViewContainerContextType>(null as any);
-
 export function ViewContainer({
   children,
   defaultView,
@@ -20,6 +21,7 @@ export function ViewContainer({
   children: ReactNode;
   defaultView: string;
 }) {
+  const filters = useFilters();
   const router = useRouter();
   const view = useGetTeamRouteParams().view;
 
@@ -29,7 +31,11 @@ export function ViewContainer({
     }
   }, [view, router, defaultView]);
 
-  return <ViewContext.Provider value={{ view }}>{children}</ViewContext.Provider>;
+  return (
+    <FilterContext.Provider value={filters}>
+      <ViewContext.Provider value={{ view }}>{children}</ViewContext.Provider>
+    </FilterContext.Provider>
+  );
 }
 
 export function ViewPage({ defaultView }: { defaultView: string }) {

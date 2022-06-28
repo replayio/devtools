@@ -9,6 +9,8 @@ export function useGetTeamRouteParams() {
   const { query } = useRouter();
   const params = Array.isArray(query.param) ? query.param : [query.param!];
 
+  console.log({ query });
+
   return parseTeamParams(params);
 }
 

@@ -1,6 +1,6 @@
 import hooks from "ui/hooks";
 import sortBy from "lodash/sortBy";
-import { TeamButton } from "./Navigation";
+import { TeamButton } from "./TeamButton";
 
 export function Invitations() {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();

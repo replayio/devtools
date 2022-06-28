@@ -25,7 +25,7 @@ const useGetTeamId = () => {
       if (defaultWorkspaceId) {
         router.push(`/new-team/${defaultWorkspaceId}`);
       } else {
-        router.push(`/new-team/null/recordings`);
+        router.push(`/new-team/me/recordings`);
       }
     }
   }, [settingsLoading, router, userSettings, teamId]);
@@ -33,7 +33,7 @@ const useGetTeamId = () => {
   return teamId || null;
 };
 
-export default function LibraryInitializer() {
+export default function Library() {
   const teamId = useGetTeamId();
 
   if (!teamId) {
