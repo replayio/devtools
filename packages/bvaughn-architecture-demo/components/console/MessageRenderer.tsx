@@ -1,5 +1,4 @@
 import Expandable from "@bvaughn/components/Expandable";
-import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
@@ -24,12 +23,10 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   }, [isFocused]);
 
   let className = styles.MessageRow;
-  let icon = null;
   let showExpandable = false;
   switch (message.level) {
     case "error": {
       className = styles.MessageRowError;
-      icon = <Icon className={styles.ErrorIcon} type="error" />;
       showExpandable = true;
       break;
     }
@@ -40,7 +37,6 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     }
     case "warning": {
       className = styles.MessageRowWarning;
-      icon = <Icon className={styles.WarningIcon} type="warning" />;
       showExpandable = true;
       break;
     }
@@ -59,7 +55,6 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   const primaryContent = (
     <div className={styles.PrimaryRow}>
       <div className={styles.LogContents}>
-        {icon}
         {message.text && <span className={styles.MessageText}>{message.text}</span>}
         <Suspense fallback={<Loader />}>
           {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
