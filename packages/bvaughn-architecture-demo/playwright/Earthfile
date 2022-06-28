@@ -13,7 +13,12 @@ playwright:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN yarn test
+    RUN node run_tests_for_earthly.js
+    IF [ -f playwright_error ]
+        SAVE ARTIFACT ./test-results AS LOCAL ./test-results
+        RUN echo "test run failed" && \
+            exit 0
+    END
 
 playwright-update-snapshots:
     ARG --required HOST

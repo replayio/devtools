@@ -1,3 +1,4 @@
 .yarn
+fail
 playwright-report*
 test-results

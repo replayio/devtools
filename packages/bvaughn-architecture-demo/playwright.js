@@ -3,13 +3,14 @@
 "use strict";
 
 const { spawn } = require("child_process");
+const { existsSync, rmSync } = require("fs");
 const { join } = require("path");
 
 const ROOT_PATH = join(__dirname);
 
 const TIMEOUT_DURATION = 60_000;
 
-const args = process.argv.slice(2);
+const TEST_RESULTS_PATH = join(__dirname, "playwright", "test-results");
 
 let serverProcess = null;
 let testProcess = null;
@@ -98,6 +99,10 @@ function runServer() {
 async function runEndToEndTests() {
   logBright("Running e2e tests");
 
+  if (existsSync(TEST_RESULTS_PATH)) {
+    rmSync(TEST_RESULTS_PATH, { recursive: true });
+  }
+
   // Default to "172.17.0.1" for CI.
   const HOST = process.env.HOST || "172.17.0.1";
 
@@ -121,6 +126,17 @@ async function runEndToEndTests() {
   });
   testProcess.on("exit", code => {
     logBright(`Tests completed with code: ${code}`);
+
+    // HACK
+    // If Playwright fails, it's important that we upload the test-results as GH artifacts.
+    // Unfortunately, Earthly won't save artifacts for non-zero exit codes:
+    // https://github.com/earthly/earthly/issues/988#issuecomment-873433240
+    //
+    // So the Earthfile always exits with code 0,
+    // and we use the presence of the 'test-results' folder to infer failure.
+    if (existsSync(TEST_RESULTS_PATH)) {
+      exitWithCode(1);
+    }
 
     exitWithCode(code);
   });
