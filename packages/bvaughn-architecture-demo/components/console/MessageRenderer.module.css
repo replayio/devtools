@@ -3,13 +3,7 @@
 .MessageRowTrace,
 .MessageRowWarning {
   padding: 0.5rem 1rem;
-  border-bottom: 1px solid var(--background-color-contrast-2);
-  font-family: Menlo, Consolas, monospace;
-  font-size: 14px;
-}
-.MessageRow,
-.MessageRowTrace {
-  background-color: var(--background-color-default);
+  border-bottom: 1px solid var(--background-color-contrast-1);
 }
 .MessageRowError {
   background-color: var(--background-color-error);
@@ -49,6 +43,7 @@
 .WarningIcon {
   width: 1rem;
   height: 1rem;
+  flex: 0 0 1rem;
 }
 .ErrorIcon {
   color: var(--color-error);

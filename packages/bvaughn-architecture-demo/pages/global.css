@@ -13,27 +13,29 @@ body {
 @media (prefers-color-scheme: dark) {
   html,
   body {
-    background-color: #192230;
-    color: #ffffff;
+    background-color: var(--background-color-default);
+    color: var(--color-default);
   }
 }
 
 @media (prefers-color-scheme: light) {
   html,
   body {
-    background-color: #ffffff;
-    color: #223344;
+    background-color: var(--background-color-default);
+    color: var(--color-default);
   }
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background-color-contrast-1: #0e1119;
-    --background-color-contrast-2: #2a3343;
-    --background-color-contrast-3: #454950;
-    --background-color-contrast-4: #e1e6ed;
-    --background-color-default: #192230;
+    --background-color-contrast-2: #192230;
+    --background-color-contrast-3: #2a3343;
+    --background-color-contrast-4: #454950;
+    --background-color-contrast-5: #e1e6ed;
+    --background-color-default: #081120;
     --background-color-error: #4b2f36;
+    --background-color-primary-button: #09a6e9;
     --background-color-secondary-button: #f02d5e;
     --background-color-warning: #42381f;
     --color-brand: #09a6e9;
@@ -41,6 +43,7 @@ body {
     --color-current: #f02d5e;
     --color-default: #ffffff;
     --color-error: #ffb3d2;
+    --color-primary-button: #ffffff;
     --color-secondary-button: #ffffff;
     --color-warning: #fce2a1;
   }
@@ -52,8 +55,10 @@ body {
     --background-color-contrast-2: #d0d5dc;
     --background-color-contrast-3: #82888c;
     --background-color-contrast-4: #223344;
+    --background-color-contrast-5: #081121;
     --background-color-default: #ffffff;
     --background-color-error: #ffd3d3;
+    --background-color-primary-button: #09a6e9;
     --background-color-secondary-button: #f02d5e;
     --background-color-warning: #fffac8;
     --color-brand: #0a84ff;
@@ -61,6 +66,7 @@ body {
     --color-current: #f02d5e;
     --color-default: #223344;
     --color-error: #ff0000;
+    --color-primary-button: #ffffff;
     --color-secondary-button: #ffffff;
     --color-warning: #6c5914;
   }

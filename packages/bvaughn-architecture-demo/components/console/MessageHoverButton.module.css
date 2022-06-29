@@ -14,8 +14,8 @@
 }
 
 .FastForwardButton {
-  background-color: var(--color-brand);
-  color: var(--background-color-contrast-4);
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
 }
 
 .AddCommentButton {

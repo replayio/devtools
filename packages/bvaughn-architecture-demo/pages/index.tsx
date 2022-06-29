@@ -35,19 +35,24 @@ export default function HomePage() {
     <Initializer>
       <PauseContextRoot>
         <FocusContextRoot>
-          <div className={styles.Container}>
-            <div className={styles.CommentsContainer}>
-              <ErrorBoundary>
-                <Suspense fallback={<Loader />}>
-                  <CommentList />
-                </Suspense>
-              </ErrorBoundary>
-            </div>
-            <div className={styles.ConsoleContainer}>
-              <ConsoleRoot />
-              <div className={styles.Row}>
-                <Focuser />
+          <div className={styles.VerticalContainer}>
+            <div className={styles.HorizontalContainer}>
+              <div className={styles.CommentsContainer}>
+                <ErrorBoundary>
+                  <Suspense fallback={<Loader />}>
+                    <CommentList />
+                  </Suspense>
+                </ErrorBoundary>
               </div>
+              <div className={styles.SourcesContainer}>
+                <div>Sources go here...</div>
+              </div>
+              <div className={styles.ConsoleContainer}>
+                <ConsoleRoot />
+              </div>
+            </div>
+            <div className={styles.Row}>
+              <Focuser />
             </div>
           </div>
         </FocusContextRoot>

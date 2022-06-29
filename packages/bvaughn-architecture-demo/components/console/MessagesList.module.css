@@ -3,6 +3,8 @@
   position: relative;
   overflow: auto;
   height: 100%;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
 }
 .ContainerPending {
   opacity: 0.5;
@@ -11,7 +13,7 @@
 .CountRow,
 .NoMessagesRow,
 .OverflowRow {
-  padding: 0.25rem;
+  padding: 0.5rem 1rem;
 }
 
 .OverflowRow {

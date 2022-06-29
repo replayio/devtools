@@ -1,14 +1,12 @@
 .List {
-  border-right: 1px solid var(--background-color-contrast-2);
   height: 100%;
-  overflow-y: auto;
+  border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
 }
 
 .Header {
-  font-weight: bold;
-  height: 2rem;
-  background-color: var(--background-color-contrast-2);
+  padding: 0.5rem;
+  font-size: 1.25rem;
   color: var(--color-default);
   display: flex;
   align-items: center;
@@ -22,10 +20,6 @@
   align-items: center;
   flex: 1 1 auto;
   gap: 1ch;
-}
-.HeaderRight {
-  justify-content: flex-end;
-  padding-right: 0.5rem;
 }
 
 .Avatar {
