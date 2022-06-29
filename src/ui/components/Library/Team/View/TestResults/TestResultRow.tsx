@@ -30,7 +30,7 @@ function Attributes({ recording }: { recording: Recording }) {
   const branch = recording.metadata.source?.branch;
   const merge = recording.metadata.source?.merge;
   const date = recording.date;
-  
+
   return (
     <div className="flex flex-row items-center text-xs font-light">
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
@@ -50,20 +50,14 @@ function Attributes({ recording }: { recording: Recording }) {
   );
 }
 
-export default function TestResultRow({
-  recording,
-}: {
-  recording: Recording;
-}) {
+export default function TestResultRow({ recording }: { recording: Recording }) {
   if (!recording?.metadata?.test) {
     return null;
   }
 
   return (
     <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
-      <div
-        className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b rounded-md cursor-pointer hover:bg-gray-100"
-      >
+      <div className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b rounded-md cursor-pointer hover:bg-gray-100">
         <Status test={recording.metadata.test} />
         <div className="flex flex-col flex-grow space-y-1">
           <div className="flex flex-row justify-between">

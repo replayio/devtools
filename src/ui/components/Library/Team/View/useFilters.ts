@@ -64,7 +64,7 @@ const useFilterString = (str: string, view: View) => {
   useEffect(() => {
     setAppliedString(str);
     setDisplayedString(str);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view]);
 
   const setDisplayedText = (newStr: string) => {
@@ -86,8 +86,10 @@ const useFilterString = (str: string, view: View) => {
 
 export function useFilters(view: View) {
   const initialString = decodeURIComponent(getParams().q || "");
-  const { appliedString, displayedString, setDisplayedText, setAppliedText } =
-    useFilterString(initialString, view);
+  const { appliedString, displayedString, setDisplayedText, setAppliedText } = useFilterString(
+    initialString,
+    view
+  );
 
   return {
     displayedString,

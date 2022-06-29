@@ -22,7 +22,6 @@ function ViewerHeaderActions({
   setIsEditing: (value: boolean) => void;
   handleDoneEditing: () => void;
 }) {
-
   if (isEditing) {
     return (
       <>
@@ -67,9 +66,9 @@ export default function ViewerHeader({
   const HeaderLeft = (
     <ViewerHeaderLeft>
       <span className={styles.workspaceName}>{workspaceName}</span>
-        <span className={styles.workspaceName}>
-          {recordings.length != 0 ? <>({recordings.length})</> : <></>}
-        </span>
+      <span className={styles.workspaceName}>
+        {recordings.length != 0 ? <>({recordings.length})</> : <></>}
+      </span>
     </ViewerHeaderLeft>
   );
 

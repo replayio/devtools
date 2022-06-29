@@ -6,11 +6,7 @@ import styles from "../../../Library.module.css";
 import { RecordingsError } from "../Recordings/RecordingsError";
 import TestResultRow from "./TestResultRow";
 
-export function TestResults({
-  recordings,
-}: {
-  recordings: Recording[];
-}) {
+export function TestResults({ recordings }: { recordings: Recording[] }) {
   const [showMore, toggleShowMore] = useState(false);
 
   const shownRecordings = useMemo(() => {
@@ -31,10 +27,7 @@ export function TestResults({
       className={`recording-list flex flex-col space-y-1 overflow-y-auto text-sm ${styles.recordingList}`}
     >
       {shownRecordings.map((r, i) => (
-        <TestResultRow
-          key={i}
-          recording={r}
-        />
+        <TestResultRow key={i} recording={r} />
       ))}
       {!showMore && recordings.length > 100 && (
         <div className="flex justify-center p-4">

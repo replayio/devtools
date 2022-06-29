@@ -1,26 +1,12 @@
-import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
-import { setModal } from "ui/actions/app";
-import { useAppDispatch } from "ui/setup/hooks";
+import { useContext } from "react";
+
 import { useGetTeamRouteParams } from "ui/utils/library";
+import { ParamHandler } from "./ParamHandlers/ParamHandler";
 import { TeamContext, MY_LIBRARY_TEAM, TeamContextRoot, MyLibraryContainer } from "./TeamContext";
 import { ViewPage } from "./View/ViewPage";
 
 export function TeamPage() {
-  const dispatch = useAppDispatch();
   const { teamId } = useGetTeamRouteParams();
-  const router = useRouter();
-
-  // Check for ?settings="router" query parameter.
-  useEffect(() => {
-    const {
-      query: { settings },
-    } = router;
-
-    if (settings) {
-      dispatch(setModal("workspace-settings", settings ? { view: settings as string } : null));
-    }
-  }, [dispatch, router]);
 
   if (teamId === MY_LIBRARY_TEAM.id) {
     return (
@@ -39,5 +25,11 @@ export function TeamPage() {
 
 function TeamContent() {
   const { team, isPendingTeam } = useContext(TeamContext);
-  return <ViewPage defaultView={team?.isTest && !isPendingTeam ? "runs" : "recordings"} />;
+
+  return (
+    <>
+      <ViewPage defaultView={team?.isTest && !isPendingTeam ? "runs" : "recordings"} />
+      <ParamHandler />
+    </>
+  );
 }

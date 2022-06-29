@@ -28,9 +28,5 @@ function TestResultsContent() {
     );
   }
 
-  return (
-    <TestResults
-      recordings={recordings}
-    />
-  );
+  return <TestResults recordings={recordings} />;
 }

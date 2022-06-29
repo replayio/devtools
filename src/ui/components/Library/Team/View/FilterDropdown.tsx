@@ -41,7 +41,7 @@ export function ViewOptions({ collapseDropdown }: { collapseDropdown: () => void
 }
 export function FilterDropdown() {
   const [expanded, setExpanded] = useState(false);
-  const {view} = useContext(ViewContext);
+  const { view } = useContext(ViewContext);
   const buttonLabel = viewLabels[view];
   const setStringAndCollapseDropdown = (str: string) => {
     setExpanded(false);

@@ -1,18 +1,17 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { setExpectedError } from "ui/actions/errors";
-import Login from "ui/components/shared/Login/Login";
 import hooks from "ui/hooks";
 import { useAppDispatch } from "ui/setup/hooks";
 import useAuth0 from "ui/utils/useAuth0";
 import useToken from "ui/utils/useToken";
 
-export default function Share() {
+export default function InvitationHandler() {
   const auth0 = useAuth0();
   const { loading } = useToken();
   const { push, query } = useRouter();
   const dispatch = useAppDispatch();
-  const [invitationCode] = Array.isArray(query.id) ? query.id : [query.id];
+  const invitationCode = query.code as string;
   const claimTeamInvitationCode = hooks.useClaimTeamInvitationCode(onCompleted, onError);
 
   function onCompleted() {

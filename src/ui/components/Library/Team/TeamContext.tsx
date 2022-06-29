@@ -25,7 +25,9 @@ export function TeamContextRoot({ children }: { children: ReactNode }) {
   const isPendingTeam = pendingWorkspaces?.some(w => w.id === teamId);
 
   return (
-    <TeamContext.Provider value={{ teamId, team: workspace, isPendingTeam }}>{children}</TeamContext.Provider>
+    <TeamContext.Provider value={{ teamId, team: workspace, isPendingTeam }}>
+      {children}
+    </TeamContext.Provider>
   );
 }
 
