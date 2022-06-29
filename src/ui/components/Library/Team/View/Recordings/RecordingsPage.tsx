@@ -37,18 +37,18 @@ function MyRecordingsPage({ team }: { team: typeof MY_LIBRARY_TEAM }) {
 // our own petard. The complexity is coming from the fact that we're trying
 // to display a non-workspace as a workspace.
 // TODO: Think of an alternative way to display pending workspaces that doesn't
-// require us having to display them like an actual workspace.
+// require us having to display them like an actual workspace. I named this
+// atrociously so that it's easier to find all the references to it when we file
+// a follow up.
 function TeamRecordingsPage({ team }: { team: Workspace }) {
-  const { teamId } = useContext(TeamContext);
+  const { teamId, isPendingTeam } = useContext(TeamContext);
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
 
   if (loading || !pendingWorkspaces) {
     return null;
   }
 
-  const isPending = pendingWorkspaces?.some(w => w.id === teamId);
-
-  if (isPending) {
+  if (isPendingTeam) {
     const workspace = pendingWorkspaces.find(w => w.id === teamId);
     return <PendingTeamScreen workspace={workspace!} />;
   } else {
