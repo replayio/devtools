@@ -33,7 +33,7 @@ export function ViewContextRoot({
   }, [view, router, defaultView]);
 
   const setView = (view: View) => {
-    router.push(`/new-team/${teamId}/${view}`);
+    router.push(`/team/${teamId}/${view}`);
   };
 
   return (

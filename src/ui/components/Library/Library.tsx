@@ -22,9 +22,9 @@ const useGetTeamId = (defaultTeamId: string | null) => {
     // by pushing a new route.
     if (teamId === undefined) {
       if (defaultTeamId) {
-        router.push(`/new-team/${defaultTeamId}`);
+        router.push(`/team/${defaultTeamId}`);
       } else {
-        router.push(`/new-team/me/recordings`);
+        router.push(`/team/me/recordings`);
       }
     }
   }, [router, defaultTeamId, teamId]);

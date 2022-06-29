@@ -56,7 +56,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   const isSelected = focusId === testRun.id;
 
   return (
-    <Link href={`/new-team/${teamId}/runs/${testRun.id}`}>
+    <Link href={`/team/${teamId}/runs/${testRun.id}`}>
       <a
         className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md border-b border-chrome bg-themeBase-100 px-3 py-3 ${
           styles.libraryRow

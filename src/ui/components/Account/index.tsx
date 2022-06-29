@@ -17,7 +17,7 @@ export default function Account() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      router.replace("/new-team");
+      router.replace("/team");
     }
   }, [isAuthenticated, router]);
 

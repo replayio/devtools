@@ -28,7 +28,7 @@ function Title({ recording }: { recording: Recording }) {
   return (
     <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
       <div className="flex flex-col flex-grow py-2 overflow-hidden">
-        <Link href={`/new-team/${teamId}/results?q=test-path:${path}`}>
+        <Link href={`/team/${teamId}/results?q=test-path:${path}`}>
           <a className="overflow-hidden text-left whitespace-pre max-w-min overflow-ellipsis hover:underline">
             {recording.metadata.test?.title}
           </a>

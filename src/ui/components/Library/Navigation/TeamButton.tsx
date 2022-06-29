@@ -20,7 +20,7 @@ export function TeamButton({
   isTest?: boolean;
 }) {
   const router = useRouter();
-  const basePath = `/new-team/${id}`;
+  const basePath = `/team/${id}`;
   const url = `${basePath}/${isTest ? "runs" : "recordings"}`;
   const isSelected = router.asPath.includes(basePath);
   const showSettingsButton = id && isSelected && !isNew;
