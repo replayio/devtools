@@ -4,6 +4,7 @@ export default function Icon({
 }: {
   className?: string;
   type:
+    | "add"
     | "arrow"
     | "cancel"
     | "comment"
@@ -16,6 +17,7 @@ export default function Icon({
     | "invisible"
     | "jump-to-definition"
     | "prompt"
+    | "save"
     | "search"
     | "share"
     | "up"
@@ -24,6 +26,11 @@ export default function Icon({
 }) {
   let path = "";
   switch (type) {
+    case "add": {
+      path =
+        "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z";
+      break;
+    }
     case "arrow": {
       path = "M8 5v14l11-7z";
       break;
@@ -68,6 +75,10 @@ export default function Icon({
       break;
     case "prompt":
       path = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+      break;
+    case "save":
+      path =
+        "M17 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V7l-4-4zm-5 16c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm3-10H5V5h10v4z";
       break;
     case "search":
       path =

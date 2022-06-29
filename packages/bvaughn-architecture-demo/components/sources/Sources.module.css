@@ -1,0 +1,39 @@
+.Sources {
+  flex: 1;
+  height: 100%;
+}
+
+.Tabs {
+  display: flex;
+  gap: 0.5ch;
+  overflow-x: auto;
+}
+
+.SelectedTab,
+.Tab {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  color: var(--color-default);
+}
+.SelectedTab {
+  background-color: var(--background-color-contrast-2);
+}
+.SelectedTab:hover,
+.Tab:hover {
+  background-color: var(--background-color-contrast-3);
+}
+
+.Content {
+  background-color: var(--background-color-contrast-2);
+  border-bottom-left-radius: 0.5rem;
+  border-bottom-right-radius: 0.5rem;
+  padding: 0.5rem;
+  flex: 1 1 auto;
+  overflow: auto;
+}

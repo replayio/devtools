@@ -2,6 +2,7 @@ import ConsoleRoot from "@bvaughn/components/console";
 import Initializer from "@bvaughn/components/Initializer";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
+import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -22,13 +23,15 @@ export default function Stacks() {
   return (
     <ReplayClientContext.Provider value={replayClientPlayer}>
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
-        <PauseContextRoot>
-          <FocusContextRoot>
-            <div className={styles.Container}>
-              <ConsoleRoot />
-            </div>
-          </FocusContextRoot>
-        </PauseContextRoot>
+        <PointsContextRoot>
+          <PauseContextRoot>
+            <FocusContextRoot>
+              <div className={styles.Container}>
+                <ConsoleRoot />
+              </div>
+            </FocusContextRoot>
+          </PauseContextRoot>
+        </PointsContextRoot>
       </Initializer>
     </ReplayClientContext.Provider>
   );

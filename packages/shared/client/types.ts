@@ -1,4 +1,5 @@
 import {
+  ContentType,
   Message,
   newSource as Source,
   ObjectId,
@@ -7,6 +8,7 @@ import {
   PauseId,
   RecordingId,
   SessionId,
+  SourceId,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -37,4 +39,5 @@ export interface ReplayClientInterface {
   ): Promise<PauseData>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
+  getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
 }

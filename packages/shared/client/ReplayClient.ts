@@ -1,4 +1,5 @@
 import {
+  ContentType,
   Message,
   newSource as Source,
   ObjectId,
@@ -7,6 +8,7 @@ import {
   PauseId,
   RecordingId,
   SessionId,
+  SourceId,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -195,6 +197,12 @@ export class ReplayClient implements ReplayClientInterface {
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
+  }
+
+  async getSourceContents(
+    sourceId: SourceId
+  ): Promise<{ contents: string; contentType: ContentType }> {
+    return this._threadFront.getSourceContents(sourceId);
   }
 }
 

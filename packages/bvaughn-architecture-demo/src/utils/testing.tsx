@@ -11,6 +11,7 @@ import {
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { PauseContext, PauseContextType } from "../contexts/PauseContext";
+import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).
@@ -37,6 +38,7 @@ export async function render(
     endPoint: "1000",
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
+    sourceIds: [],
     ...options?.sessionContext,
   };
 
@@ -70,6 +72,7 @@ export async function renderFocused(
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
     pauseContext?: Partial<PauseContextType>;
+    pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
   }
@@ -109,14 +112,24 @@ export async function renderFocused(
     ...options?.pauseContext,
   };
 
+  const pointsContext: PointsContextType = {
+    points: [],
+    addPoint: jest.fn(),
+    deletePoint: jest.fn(),
+    editPoint: jest.fn(),
+    ...options?.pointsContext,
+  };
+
   const renderResponse = await render(
-    <PauseContext.Provider value={pauseContext}>
-      <FocusContext.Provider value={focusContext}>
-        <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
-          {children}
-        </ConsoleFiltersContext.Provider>
-      </FocusContext.Provider>
-    </PauseContext.Provider>,
+    <PointsContext.Provider value={pointsContext}>
+      <PauseContext.Provider value={pauseContext}>
+        <FocusContext.Provider value={focusContext}>
+          <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
+            {children}
+          </ConsoleFiltersContext.Provider>
+        </FocusContext.Provider>
+      </PauseContext.Provider>
+    </PointsContext.Provider>,
     {
       replayClient: options?.replayClient,
       sessionContext: options?.sessionContext,
@@ -153,5 +166,9 @@ const MockReplayClient = {
   getSessionEndpoint: jest.fn().mockImplementation(async () => ({
     point: "1000",
     time: 1000,
+  })),
+  getSourceContents: jest.fn().mockImplementation(async () => ({
+    contents: "fake-source-contents",
+    contentType: "text/javascript",
   })),
 };

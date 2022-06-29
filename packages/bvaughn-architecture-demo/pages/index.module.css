@@ -29,12 +29,6 @@
   flex: 1 1 40%;
   height: 100%;
   overflow: hidden;
-
-  /* TODO */
-  align-items: center;
-  justify-content: center;
-  color: var(--background-color-contrast-3);
-  font-size: 2rem;
 }
 
 .ConsoleContainer {
