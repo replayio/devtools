@@ -17,7 +17,7 @@ const viewLabels = {
 
 export function ViewOptions({ collapseDropdown }: { collapseDropdown: () => void }) {
   const workspaceId = useAppSelector(getWorkspaceId);
-  const { setView } = useContext(ViewContext);
+  const { setView, view } = useContext(ViewContext);
   const { workspace } = useGetWorkspace(workspaceId);
   const { value: testSupport } = useFeature("testSupport");
 
@@ -34,8 +34,11 @@ export function ViewOptions({ collapseDropdown }: { collapseDropdown: () => void
   return (
     <>
       <DropdownDivider />
-      <DropdownItem onClick={() => handleSetView("runs")}>Show Runs</DropdownItem>
-      <DropdownItem onClick={() => handleSetView("results")}>Show Results</DropdownItem>
+      {view === "results" ? (
+        <DropdownItem onClick={() => handleSetView("runs")}>Show Test Runs</DropdownItem>
+      ) : (
+        <DropdownItem onClick={() => handleSetView("results")}>Show Test Results</DropdownItem>
+      )}
     </>
   );
 }

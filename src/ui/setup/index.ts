@@ -162,7 +162,6 @@ export async function bootstrapApp() {
       }
 
       setTelemetryContext(userInfo);
-      console.log(">1");
       maybeSetMixpanelContext({ ...userInfo, workspaceId });
     }
 
