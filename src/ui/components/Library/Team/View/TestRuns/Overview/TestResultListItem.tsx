@@ -4,7 +4,6 @@ import { Recording } from "ui/types";
 import { TeamContext } from "../../../TeamContext";
 import Link from "next/link";
 import styles from "../../../../Library.module.css";
-import { useRouter } from "next/router";
 
 function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (

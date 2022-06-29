@@ -2,10 +2,10 @@ import { ReactNode, useContext } from "react";
 import { PrimaryButton } from "ui/components/shared/Button";
 import { isReplayBrowser } from "ui/utils/environment";
 import styles from "../../../Library.module.css";
-import { LibraryContext } from "../useFilters";
+import { FilterContext } from "../FilterContext";
 
 export function RecordingsError() {
-  const { filter, setAppliedText } = useContext(LibraryContext);
+  const { filter, setAppliedText } = useContext(FilterContext);
   let msg: string | ReactNode;
 
   if (filter) {

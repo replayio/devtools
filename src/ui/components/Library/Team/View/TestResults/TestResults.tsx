@@ -1,4 +1,3 @@
-import { RecordingId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { useMemo, useState } from "react";
 import { SecondaryButton } from "ui/components/shared/Button";
@@ -9,14 +8,8 @@ import TestResultRow from "./TestResultRow";
 
 export function TestResults({
   recordings,
-  selectedIds,
-  setSelectedIds,
-  isEditing,
 }: {
   recordings: Recording[];
-  selectedIds: string[];
-  setSelectedIds: (ids: string[]) => void;
-  isEditing: boolean;
 }) {
   const [showMore, toggleShowMore] = useState(false);
 
@@ -28,10 +21,6 @@ export function TestResults({
     });
     return showMore ? sortedRecordings : sortedRecordings.slice(0, 100);
   }, [recordings, showMore]);
-
-  const addSelectedId = (recordingId: RecordingId) => setSelectedIds([...selectedIds, recordingId]);
-  const removeSelectedId = (recordingId: RecordingId) =>
-    setSelectedIds(selectedIds.filter(id => id !== recordingId));
 
   if (!recordings.length) {
     return <RecordingsError />;
@@ -45,8 +34,6 @@ export function TestResults({
         <TestResultRow
           key={i}
           recording={r}
-          selected={selectedIds.includes(r.id)}
-          {...{ addSelectedId, removeSelectedId, isEditing }}
         />
       ))}
       {!showMore && recordings.length > 100 && (

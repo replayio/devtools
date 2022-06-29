@@ -6,7 +6,6 @@ import { PrimaryButton, SecondaryButton } from "../../../../../shared/Button";
 import BatchActionDropdown from "./BatchActionDropdown";
 import styles from "../../../../Library.module.css";
 import TeamTrialEnd from "./TeamTrialEnd";
-import { LibraryContext } from "../../useFilters";
 
 function ViewerHeaderActions({
   isEditing,
@@ -23,7 +22,6 @@ function ViewerHeaderActions({
   setIsEditing: (value: boolean) => void;
   handleDoneEditing: () => void;
 }) {
-  const { view } = useContext(LibraryContext);
 
   if (isEditing) {
     return (
@@ -64,21 +62,14 @@ export default function ViewerHeader({
   isEditing: boolean;
   setIsEditing: (value: boolean) => void;
 }) {
-  const { view } = useContext(LibraryContext);
   const currentWorkspaceId = useAppSelector(getWorkspaceId);
-
-  if (view !== "recordings") {
-    return null;
-  }
 
   const HeaderLeft = (
     <ViewerHeaderLeft>
       <span className={styles.workspaceName}>{workspaceName}</span>
-      {view === "recordings" ? (
         <span className={styles.workspaceName}>
           {recordings.length != 0 ? <>({recordings.length})</> : <></>}
         </span>
-      ) : null}
     </ViewerHeaderLeft>
   );
 
