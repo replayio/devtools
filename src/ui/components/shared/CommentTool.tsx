@@ -7,6 +7,7 @@ import { setSelectedPrimaryPanel } from "ui/actions/layout";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { Canvas } from "ui/state/app";
 import { Comment, Reply } from "ui/state/comments";
+import useAuth0 from "ui/utils/useAuth0";
 
 const mouseEventCanvasPosition = (e: MouseEvent) => {
   const canvas = document.getElementById("graphics");
@@ -61,6 +62,7 @@ type Coordinates = {
 export default function CommentTool({ comments }: { comments: (Comment | Reply)[] }) {
   const canvas = useAppSelector(getCanvas);
   const areMouseTargetsLoading = useAppSelector(getAreMouseTargetsLoading);
+  const { isAuthenticated } = useAuth0();
 
   const dispatch = useAppDispatch();
 
@@ -77,7 +79,11 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
           return;
         }
 
-        dispatch(createFrameComment(mouseEventCanvasPosition(e), recordingId));
+        // Un-authenticated users can't comment on Replays.
+        if (isAuthenticated) {
+          dispatch(createFrameComment(mouseEventCanvasPosition(e), recordingId));
+        }
+
         dispatch(setSelectedPrimaryPanel("comments"));
       };
 
@@ -100,7 +106,12 @@ export default function CommentTool({ comments }: { comments: (Comment | Reply)[
         videoNode.removeEventListener("mouseleave", onMouseLeave);
       };
     }
-  }, [comments, dispatch, recordingId]);
+  }, [comments, dispatch, isAuthenticated, recordingId]);
+
+  // Un-authenticated users can't comment on Replays.
+  if (!isAuthenticated) {
+    return null;
+  }
 
   if (!mousePosition) {
     return null;

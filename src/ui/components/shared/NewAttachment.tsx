@@ -5,6 +5,7 @@ import * as actions from "ui/actions/app";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
 import Modal from "./NewModal";
+import useAuth0 from "ui/utils/useAuth0";
 
 function addLoomComment(loom: string) {
   return JSON.stringify({
@@ -22,6 +23,7 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
   const addCommentReply = hooks.useAddCommentReply();
   const [url, setUrl] = useState("");
   const loom = url.match(/loom\.com\/share\/(\S*?)(\"|\?|$)/)?.[1];
+  const { isAuthenticated } = useAuth0();
 
   const onChange = (e: any) => {
     setUrl(e.target.value);
@@ -40,6 +42,11 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
   };
 
   const color = !loom ? "bg-gray-300" : "bg-primaryAccent";
+
+  // Un-authenticated users can't comment on Replays.
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
