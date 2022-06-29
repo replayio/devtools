@@ -7,7 +7,7 @@ import { AttributeContainer } from "./AttributeContainer";
 import styles from "../../../Library.module.css";
 import Link from "next/link";
 import { TeamContext } from "../../TeamContext";
-import { TestRunsContext } from "./TestRunsPage";
+import { TestRunsContext } from "./TestRunsContext";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";
@@ -58,7 +58,7 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
   return (
     <Link href={`/new-team/${teamId}/runs/${testRun.id}`}>
       <a
-        className={`flex cursor-pointer flex-row items-center space-x-3 rounded-sm border-b border-chrome bg-themeBase-100 px-3 py-3 ${
+        className={`flex cursor-pointer flex-row items-center space-x-3 rounded-md border-b border-chrome bg-themeBase-100 px-3 py-3 ${
           styles.libraryRow
         }     
       ${isSelected ? styles.libraryRowSelected : ""}

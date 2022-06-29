@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import { View } from "ui/components/Library/Team/View/ViewContext";
 
 function parseTeamParams(params: string[]) {
-  return { teamId: params[0], view: params[1], focusId: params[2] };
+  return { teamId: params[0], view: params[1] as View, focusId: params[2] };
 }
 
 export function useGetTeamRouteParams() {

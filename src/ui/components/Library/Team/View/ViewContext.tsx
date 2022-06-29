@@ -1,12 +1,16 @@
 import { useRouter } from "next/router";
-import { createContext, ReactNode, useEffect } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useGetTeamRouteParams } from "ui/utils/library";
 import { useFilters } from "./useFilters";
 import { FilterContext } from "./FilterContext";
+import { TeamContext } from "../TeamContext";
 
 type ViewContainerContextType = {
-  view: string;
+  view: View;
+  setView: (view: View) => void;
 };
+
+export type View = "recordings" | "results" | "runs";
 
 export const ViewContext = createContext<ViewContainerContextType>(null as any);
 export function ViewContextRoot({
@@ -18,6 +22,7 @@ export function ViewContextRoot({
 }) {
   const filters = useFilters();
   const router = useRouter();
+  const { teamId } = useContext(TeamContext);
   const view = useGetTeamRouteParams().view;
 
   // Initialize the view to whatever the appropriate default view is for that team.
@@ -27,9 +32,13 @@ export function ViewContextRoot({
     }
   }, [view, router, defaultView]);
 
+  const setView = (view: View) => {
+    router.push(`/new-team/${teamId}/${view}`);
+  };
+
   return (
     <FilterContext.Provider value={filters}>
-      <ViewContext.Provider value={{ view }}>{children}</ViewContext.Provider>
+      <ViewContext.Provider value={{ view, setView }}>{children}</ViewContext.Provider>
     </FilterContext.Provider>
   );
 }

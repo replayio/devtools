@@ -3,6 +3,10 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
 import { LibraryContext } from "../../useFilters";
 import styles from "../../../../Library.module.css";
+import { useRouter } from "next/router";
+import { TeamContext } from "../../../TeamContext";
+import { FilterContext } from "../../FilterContext";
+import Link from "next/link";
 
 function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (
@@ -26,24 +30,17 @@ function ViewReplay({ recordingId, passed }: { recordingId: string; passed: bool
 }
 
 function Title({ recording }: { recording: Recording }) {
-  const { setView, setAppliedText } = useContext(LibraryContext);
-  const onViewTest = (e: MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-
-    setView("recordings");
-    setAppliedText(`test-path:${JSON.stringify(recording.metadata.test!.path)}`);
-  };
+  const { teamId } = useContext(TeamContext);
+  const path = `${JSON.stringify(recording.metadata.test!.path)}`;
 
   return (
     <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
       <div className="flex flex-col flex-grow py-2 overflow-hidden">
-        <button
-          className="overflow-hidden text-left whitespace-pre max-w-min overflow-ellipsis hover:underline"
-          onClick={onViewTest}
-        >
-          {recording.metadata.test?.title}
-        </button>
+        <Link href={`/new-team/${teamId}/results?test-path:${path}`}>
+          <a className="overflow-hidden text-left whitespace-pre max-w-min overflow-ellipsis hover:underline">
+            {recording.metadata.test?.title}
+          </a>
+        </Link>
         <div className="flex space-x-2 text-xs text-gray-500">{recording.metadata.test?.file}</div>
       </div>
     </div>
@@ -70,20 +67,20 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
   const recordingId = recording.id;
 
   return (
-    <a
-      className={`group flex items-center px-2 transition duration-150 ${styles.libraryRow}`}
-      href={`/recording/${recordingId}`}
-      target="_blank"
-      rel="noreferrer noopener"
-      title="View Replay"
-    >
-      <div className="flex flex-row grow">
-        <div className="flex grow ">
-          <ViewReplay recordingId={recordingId} passed={passed} />
-          <Title recording={recording} />
-        </div>
-        <Comments recording={recording} />
+    // <a
+    //   className={`group flex items-center px-2 transition duration-150 ${styles.libraryRow}`}
+    //   href={`/recording/${recordingId}`}
+    //   target="_blank"
+    //   rel="noreferrer noopener"
+    //   title="View Replay"
+    // >
+    <div className="flex flex-row grow">
+      <div className="flex grow ">
+        <ViewReplay recordingId={recordingId} passed={passed} />
+        <Title recording={recording} />
       </div>
-    </a>
+      <Comments recording={recording} />
+    </div>
+    // </a>
   );
 }

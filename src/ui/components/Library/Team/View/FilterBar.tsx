@@ -2,9 +2,11 @@ import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
 import { TextInput } from "../../../shared/Forms";
 import { FilterDropdown } from "./FilterDropdown";
 import { FilterContext } from "./FilterContext";
+import { ViewContext } from "./ViewContext";
 
 export function FilterBar() {
   const { displayedString, setDisplayedText, setAppliedText } = useContext(FilterContext);
+  const { view } = useContext(ViewContext);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setDisplayedText(e.target.value);
@@ -15,17 +17,21 @@ export function FilterBar() {
     }
   };
 
+  const showFilterInput = ["recordings", "results"].includes(view);
+
   return (
     <div className="relative flex items-center flex-grow space-x-3">
       <FilterDropdown />
-      <div className="flex flex-grow">
-        <TextInput
-          value={displayedString}
-          onChange={onChange}
-          placeholder="Search"
-          onKeyDown={onKeyPress}
-        />
-      </div>
+      {showFilterInput ? (
+        <div className="flex flex-grow">
+          <TextInput
+            value={displayedString}
+            onChange={onChange}
+            placeholder="Search"
+            onKeyDown={onKeyPress}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

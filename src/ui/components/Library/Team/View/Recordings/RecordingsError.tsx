@@ -25,7 +25,7 @@ export function RecordingsError() {
 
   return (
     <section
-      className={`flex flex-grow flex-col items-center justify-center space-y-2 text-lg ${styles.recordingsBackground}`}
+      className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg ${styles.recordingsBackground}`}
     >
       {msg}
     </section>

@@ -3,11 +3,11 @@ import sortBy from "lodash/sortBy";
 import { useMemo, useState } from "react";
 import { SecondaryButton } from "ui/components/shared/Button";
 import { Recording } from "ui/types";
-import RecordingRow from "./RecordingListItem/RecordingListItem";
 import styles from "../../../Library.module.css";
-import { RecordingsError } from "./RecordingsError";
+import { RecordingsError } from "../Recordings/RecordingsError";
+import TestResultRow from "./TestResultRow";
 
-export function Recordings({
+export function TestResults({
   recordings,
   selectedIds,
   setSelectedIds,
@@ -39,10 +39,10 @@ export function Recordings({
 
   return (
     <div
-      className={`recording-list flex flex-col space-y-1 overflow-y-auto rounded-md text-sm shadow-md ${styles.recordingList}`}
+      className={`recording-list flex flex-col space-y-1 overflow-y-auto text-sm ${styles.recordingList}`}
     >
       {shownRecordings.map((r, i) => (
-        <RecordingRow
+        <TestResultRow
           key={i}
           recording={r}
           selected={selectedIds.includes(r.id)}

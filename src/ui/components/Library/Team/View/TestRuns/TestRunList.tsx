@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
-import { TestRunsContext } from "./TestRunsPage";
+import { TestRunsContext } from "./TestRunsContext";
 
 export function TestRunList() {
   const { testRuns } = useContext(TestRunsContext);

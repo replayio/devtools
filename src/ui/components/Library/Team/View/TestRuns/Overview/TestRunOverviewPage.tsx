@@ -2,7 +2,7 @@ import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { useGetTeamRouteParams } from "ui/utils/library";
 import { TeamContext } from "../../../TeamContext";
-import { TestRunsContext } from "../TestRunsPage";
+import { TestRunsContext } from "../TestRunsContext";
 import { TestRunOverviewContent } from "./TestRunOverviewContent";
 
 type TestRunOverviewContainerContextType = {

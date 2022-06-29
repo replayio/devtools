@@ -1,19 +1,24 @@
-import { useContext, useState } from "react";
+import { MouseEvent, useContext, useState } from "react";
 import PortalDropdown from "../../../shared/PortalDropdown";
 import { useFeature } from "ui/hooks/settings";
 import { Dropdown, DropdownDivider, DropdownItem } from "../../LibraryDropdown";
-import { LibraryContext, View } from "./useFilters";
+import { View, ViewContext } from "./ViewContext";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
+const viewLabels = {
+  recordings: "Recordings",
+  runs: "Test Runs",
+  results: "Test Results",
+};
+
 export function FilterDropdown() {
-  const { setAppliedText, setView, view } = useContext(LibraryContext);
+  const { view, setView } = useContext(ViewContext);
   const [expanded, setExpanded] = useState(false);
   const { value: testSupport } = useFeature("testSupport");
 
   const setStringAndCollapseDropdown = (str: string) => {
-    setAppliedText(str);
-    setView("recordings");
+    // setAppliedText(str);
     setExpanded(false);
   };
   const handleCreatedSince = (days: number) => {
@@ -22,12 +27,16 @@ export function FilterDropdown() {
 
     return setStringAndCollapseDropdown(`created:${isoString}`);
   };
-  const handleSetView = (view: View) => {
-    setExpanded(false);
+  const handleSetView = (view: View, e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+
+    console.log({ view });
     setView(view);
+    setExpanded(false);
   };
 
-  const buttonLabel = view === "recordings" ? "Filters" : "Test Runs";
+  const buttonLabel = viewLabels[view];
 
   const button = (
     <div className="flex space-x-2 rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 py-1.5 text-sm text-themeTextFieldColor">
@@ -53,8 +62,8 @@ export function FilterDropdown() {
         {testSupport ? (
           <>
             <DropdownDivider />
-            <DropdownItem onClick={() => handleSetView("recordings")}>Show Recordings</DropdownItem>
-            <DropdownItem onClick={() => handleSetView("test-runs")}>Show Runs</DropdownItem>
+            <DropdownItem onClick={e => handleSetView("runs", e)}>Show Runs</DropdownItem>
+            <DropdownItem onClick={e => handleSetView("results", e)}>Show Results</DropdownItem>
           </>
         ) : null}
       </Dropdown>
