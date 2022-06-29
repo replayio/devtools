@@ -20,10 +20,10 @@ export function ViewContextRoot({
   children: ReactNode;
   defaultView: string;
 }) {
-  const filters = useFilters();
+  const view = useGetTeamRouteParams().view;
+  const filters = useFilters(view);
   const router = useRouter();
   const { teamId } = useContext(TeamContext);
-  const view = useGetTeamRouteParams().view;
 
   // Initialize the view to whatever the appropriate default view is for that team.
   useEffect(() => {

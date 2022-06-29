@@ -1,5 +1,6 @@
-import { createContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { getParams, updateUrlWithParams } from "ui/utils/environment";
+import { View } from "./ViewContext";
 
 type LibraryContextType = {
   filter: string;
@@ -14,7 +15,6 @@ export type Preview = {
   view: "test-runs";
   id: string;
 };
-export type View = "recordings" | "test-runs" | "test-results";
 
 export const LibraryContext = createContext<LibraryContextType>({
   filter: "",
@@ -80,9 +80,16 @@ export function encodeFilter(str: string) {
   return encodedStr;
 }
 
-const useFilterString = (str: string) => {
+const useFilterString = (str: string, view: View) => {
   const [appliedString, setAppliedString] = useState(str);
   const [displayedString, setDisplayedString] = useState(str);
+
+  // Reset the initial string whenever the view changes.
+  useEffect(() => {
+    setAppliedString(str);
+    setDisplayedString(str);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [view]);
 
   const setDisplayedText = (newStr: string) => {
     setDisplayedString(newStr);
@@ -101,10 +108,10 @@ const useFilterString = (str: string) => {
   };
 };
 
-export function useFilters() {
+export function useFilters(view: View) {
   const initialString = decodeURIComponent(getParams().q || "");
   const { appliedString, displayedString, setDisplayedText, setAppliedText } =
-    useFilterString(initialString);
+    useFilterString(initialString, view);
 
   return {
     displayedString,
