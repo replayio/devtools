@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { NonPendingTeamScreen } from "ui/components/Library/Team/View/Recordings/NonPendingTeam";
 import hooks from "ui/hooks";
 import { Workspace } from "ui/types";
@@ -22,12 +23,21 @@ function MyRecordingsPage({ team }: { team: typeof MY_LIBRARY_TEAM }) {
   const { recordings, loading } = hooks.useGetPersonalRecordings(filter);
 
   if (loading || !recordings) {
-    return null;
+    return (
+      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+        <LibrarySpinner />
+      </div>
+    );
   }
 
   return <RecordingsPageViewer recordings={recordings} workspaceName={team.name} />;
 }
 
+// Not a big fan of how we handle pending teams here, but we're hoisted by
+// our own petard. The complexity is coming from the fact that we're trying
+// to display a non-workspace as a workspace.
+// TODO: Think of an alternative way to display pending workspaces that doesn't
+// require us having to display them like an actual workspace.
 function TeamRecordingsPage({ team }: { team: Workspace }) {
   const { teamId } = useContext(TeamContext);
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();

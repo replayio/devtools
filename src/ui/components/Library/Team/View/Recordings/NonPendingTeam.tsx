@@ -5,6 +5,7 @@ import { TeamContext } from "../../TeamContext";
 import { FilterContext } from "../FilterContext";
 import hooks from "ui/hooks";
 import { RecordingsPageViewer } from "./RecordingsPageViewer";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 export function NonPendingTeamScreen({ team }: { team: Workspace }) {
   const { teamId } = useContext(TeamContext);
@@ -12,8 +13,11 @@ export function NonPendingTeamScreen({ team }: { team: Workspace }) {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(teamId, filter);
 
   if (loading) {
-    // TODO: Add a proper loading state indicator here -jaril.
-    return <div />;
+    return (
+      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+        <LibrarySpinner />
+      </div>
+    );
   }
 
   return (

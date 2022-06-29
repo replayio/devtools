@@ -1,4 +1,5 @@
 import { useContext, useState } from "react";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import hooks from "ui/hooks";
 import { TeamContext } from "../../TeamContext";
 import { FilterContext } from "../FilterContext";
@@ -21,8 +22,11 @@ function TestResultsContent() {
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(teamId, filter);
 
   if (loading) {
-    // TODO: Add a proper loading state indicator here -jaril.
-    return <div />;
+    return (
+      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+        <LibrarySpinner />
+      </div>
+    );
   }
 
   return (

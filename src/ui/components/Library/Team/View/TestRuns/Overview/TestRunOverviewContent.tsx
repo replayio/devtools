@@ -3,29 +3,24 @@ import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/Ru
 import { TestRunOverviewContext } from "./TestRunOverviewPage";
 import styles from "../../../../Library.module.css";
 import { RunSummary } from "./RunSummary";
+import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 
 export function TestRunOverviewContent() {
   const { testRun } = useContext(TestRunOverviewContext);
-
-  // TODO: Add a proper loading state indicator here -jaril.
-  if (!testRun) {
-    return (
-      <div
-        className={`flex flex-col overflow-hidden m-4 ml-0 text-sm rounded-xl shadow-lg ${styles.libraryRow}`}
-        style={{ width: "50rem" }}
-      >
-        Loading Placeholder
-      </div>
-    );
-  }
 
   return (
     <div
       className={`flex flex-col overflow-hidden m-4 ml-0 text-sm rounded-xl shadow-lg ${styles.libraryRow}`}
       style={{ width: "50rem" }}
     >
-      <RunSummary />
-      <RunResults />
+      {testRun ? (
+        <>
+          <RunSummary />
+          <RunResults />
+        </>
+      ) : (
+        <LibrarySpinner />
+      )}
     </div>
   );
 }
