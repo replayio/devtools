@@ -4,6 +4,8 @@
 
 "use strict";
 
+import useAuth0 from "ui/utils/useAuth0";
+
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
@@ -23,6 +25,7 @@ export default function PaywallMessage(props) {
   const { message, timestampsVisible, maybeScrollToBottom, isPaused, dispatch, topLevelClassName } =
     props;
   const { indent, source, level, timeStamp, executionPointTime } = message;
+  const { isAuthenticated } = useAuth0();
 
   return React.createElement(Message, {
     source,
@@ -39,6 +42,7 @@ export default function PaywallMessage(props) {
     executionPointTime,
     maybeScrollToBottom,
     message,
+    isAuthenticated,
     isPaused,
     dispatch,
   });

@@ -57,6 +57,7 @@ class Message extends React.Component {
           frame: PropTypes.any,
         })
       ),
+      isAuthenticated: PropTypes.bool.isRequired,
       isPaused: PropTypes.bool,
       maybeScrollToBottom: PropTypes.func,
       message: PropTypes.object.isRequired,
@@ -170,6 +171,7 @@ class Message extends React.Component {
       type,
       frame,
       message,
+      isAuthenticated,
       isFirstMessageForPoint,
     } = this.props;
 
@@ -188,6 +190,11 @@ class Message extends React.Component {
       dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
     };
     let handleAddComment = async () => {
+      // Un-authenticated users can't comment on Replays.
+      if (!isAuthenticated) {
+        return null;
+      }
+
       trackEvent("console.add_comment");
       const opts = {
         hasFrames: true,
@@ -225,6 +232,11 @@ class Message extends React.Component {
       // Handle cases where executionPoint is the same as pauseExecutionPoint.
       return;
     } else if (!["command", "result"].includes(type)) {
+      // Un-authenticated users can't comment on Replays.
+      if (!isAuthenticated) {
+        return null;
+      }
+
       overlayType = "debug";
       label = "Debug";
 

@@ -4,6 +4,8 @@
 
 "use strict";
 
+import useAuth0 from "ui/utils/useAuth0";
+
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
@@ -49,6 +51,8 @@ export default function EvaluationResult(props) {
     parameters,
     notes,
   } = message;
+
+  const { isAuthenticated } = useAuth0();
 
   let messageBody;
   if (typeof message.messageText !== "undefined" && message.messageText !== null) {
@@ -99,6 +103,7 @@ export default function EvaluationResult(props) {
     timestampsVisible,
     maybeScrollToBottom,
     message,
+    isAuthenticated,
     isPaused,
   });
 }

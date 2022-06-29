@@ -4,6 +4,8 @@
 
 "use strict";
 
+import useAuth0 from "ui/utils/useAuth0";
+
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
@@ -65,6 +67,8 @@ export default function ConsoleApiCall(props) {
     prefix,
     userProvidedStyles,
   } = message;
+
+  const { isAuthenticated } = useAuth0();
 
   let messageBody;
   const messageBodyConfig = {
@@ -148,6 +152,7 @@ export default function ConsoleApiCall(props) {
     executionPointTime,
     frame,
     indent,
+    isAuthenticated,
     isFirstMessageForPoint,
     isPaused,
     isPrimaryHighlighted,
