@@ -22,6 +22,7 @@ import { messages as messagesReducer } from "devtools/client/webconsole/reducers
 import { promise } from "ui/setup/redux/middleware/promise";
 import { context } from "ui/setup/redux/middleware/context";
 import protocolMessages from "ui/reducers/protocolMessages";
+import sources from "ui/reducers/sources";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -39,6 +40,7 @@ type ReduxDevToolsOptions = Exclude<
 // slice reducers we know will be added, to get the right state type.
 let reducers = {
   app: appReducer,
+  experimentalSources: sources,
   layout: layoutReducer,
   messages: messagesReducer,
   protocolMessages: protocolMessages,

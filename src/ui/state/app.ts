@@ -12,7 +12,6 @@ import {
 import type { RecordingTarget } from "protocol/thread/thread";
 import { Workspace } from "ui/types";
 import { Reply } from "./comments";
-import { PanelName } from "./layout";
 
 export type ModalOptionsType = {
   recordingId?: string;

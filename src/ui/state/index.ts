@@ -29,6 +29,7 @@ import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
+import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 
 // TODO Ideally this should be inferred from store setup
@@ -44,6 +45,7 @@ export interface UIState {
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
   eventListenerBreakpoints: EventListenersState;
+  experimentalSources: NewSourcesState;
   fileSearch: FileSearchState;
   inspector: InspectorState;
   layout: LayoutState;
@@ -57,11 +59,11 @@ export interface UIState {
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
-  sources: SourcesState;
   sourceActors: SourceActorsState;
   sourceTree: SourceTreeState;
+  sources: SourcesState;
   tabs: TabsState;
-  timeline: TimelineState;
   threads: ThreadsState;
+  timeline: TimelineState;
   ui: UISliceState;
 }
