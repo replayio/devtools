@@ -1,7 +1,6 @@
 .PublishedComment,
 .UnpublishedComment {
-  border-bottom: 2px solid var(--background-color-contrast-2);
-  background-color: var(--background-color-default);
+  border-top: 2px solid var(--background-color-default);
   font-size: 1rem;
 }
 .UnpublishedComment {
@@ -11,7 +10,7 @@
 .HeaderRow {
   display: flex;
   align-items: center;
-  gap: 0.5ch;
+  gap: 1ch;
   padding: 0.5rem;
   user-select: none;
 }

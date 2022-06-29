@@ -16,15 +16,7 @@ export default function CommentList() {
 
   return (
     <div className={styles.List}>
-      <div className={styles.Header}>
-        {currentUserInfo && (
-          <div className={styles.HeaderLeft}>
-            <AvatarImage className={styles.Avatar} src={currentUserInfo.picture} />
-            {currentUserInfo.name}
-          </div>
-        )}
-        <div className={styles.HeaderRight}>Comments</div>
-      </div>
+      <div className={styles.Header}>Comments</div>
       {commentList.map((comment, commentIndex) => (
         <Comment key={commentIndex} comment={comment} />
       ))}
