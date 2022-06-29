@@ -163,8 +163,6 @@ export function createSocket(
       const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache,
-        useMultipleControllers: !!features.turboReplay,
-        multipleControllerUseSnapshots: !!features.turboReplay,
       };
 
       dispatch(showLoadingProgress());

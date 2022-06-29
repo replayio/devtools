@@ -36,7 +36,6 @@ const emptySettings: ExperimentalUserSettings = {
   disableLogRocket: false,
   enableEventLink: false,
   enableTeams: true,
-  showReact: false,
   enableLargeText: false,
 };
 
@@ -46,7 +45,6 @@ const testSettings: ExperimentalUserSettings = {
   disableLogRocket: false,
   enableEventLink: false,
   enableTeams: true,
-  showReact: true,
   enableLargeText: false,
 };
 
@@ -143,15 +141,11 @@ function convertUserSettings(data: any): ExperimentalUserSettings {
     disableLogRocket: settings.disableLogRocket,
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
-    showReact: settings.showReact,
     enableLargeText: settings.enableLargeText,
   };
 }
 
-type MutableSettings = Extract<
-  SettingItemKey,
-  "disableLogRocket" | "enableEventLink" | "showReact"
->;
+type MutableSettings = Extract<SettingItemKey, "disableLogRocket" | "enableEventLink">;
 
 type GqlPair = {
   disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
@@ -170,13 +164,6 @@ const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
   enableEventLink: gql`
     mutation UpdateUserSettingsEventLink($newValue: Boolean) {
       updateUserSettings(input: { enableEventLink: $newValue }) {
-        success
-      }
-    }
-  `,
-  showReact: gql`
-    mutation UpdateUserSettingsReact($newValue: Boolean) {
-      updateUserSettings(input: { showReact: $newValue }) {
         success
       }
     }

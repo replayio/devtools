@@ -11,20 +11,14 @@ export type ExperimentalUserSettings = {
   disableLogRocket: boolean;
   enableEventLink: boolean;
   enableTeams: boolean;
-  showReact: boolean;
   enableLargeText: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
-  enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
-  enableNetworkRequestComments: boolean;
   enableNewObjectInspector: boolean;
-  turboReplay: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
-  unicornConsole: boolean;
-  showRedux: boolean;
   enableLargeText: boolean;
 };
 

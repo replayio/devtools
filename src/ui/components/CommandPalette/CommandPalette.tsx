@@ -15,7 +15,6 @@ export type Command = {
   key: CommandKey;
   label: string;
   shortcut?: string;
-  settingKey?: keyof ExperimentalUserSettings;
 };
 export type CommandKey =
   | "open_console"
@@ -57,7 +56,7 @@ const COMMANDS: readonly Command[] = [
   { key: "open_function_search", label: "Search for a function", shortcut: "CmdOrCtrl+O" },
   { key: "open_outline", label: "Open Outline" },
   { key: "open_print_statements", label: "Open Print Statements" },
-  { key: "open_react_devtools", label: "Open React DevTools", settingKey: "showReact" },
+  { key: "open_react_devtools", label: "Open React DevTools" },
   { key: "open_sources", label: "Open Sources" },
   { key: "show_comments", label: "Show Comments" },
   { key: "show_console_filters", label: "Show Console Filters" },
@@ -83,29 +82,13 @@ const DEFAULT_COMMANDS: readonly CommandKey[] = [
 const COMMAND_HEIGHT = 36;
 const ITEMS_TO_SHOW = 7;
 
-function getShownCommands(searchString: string, hasReactComponents: boolean) {
-  const { userSettings } = hooks.useGetUserSettings();
-
+function getShownCommands(searchString: string) {
   const commands: readonly Command[] = searchString
     ? filter(COMMANDS as Command[], searchString, { key: "label" })
     : COMMANDS;
 
-  const enabledCommands = commands.filter(command => {
-    if (command.settingKey) {
-      const isEnabled = userSettings[command.settingKey];
-
-      if (command.key === "open_react_devtools") {
-        return isEnabled && hasReactComponents;
-      }
-
-      return isEnabled;
-    }
-
-    return true;
-  });
-
   // This puts the default commands at the top of the list.
-  const sortedCommands = [...enabledCommands].sort(
+  const sortedCommands = [...commands].sort(
     (a, b) => DEFAULT_COMMANDS.indexOf(b.key) - DEFAULT_COMMANDS.indexOf(a.key)
   );
 
@@ -114,7 +97,7 @@ function getShownCommands(searchString: string, hasReactComponents: boolean) {
 
 function PaletteShortcut() {
   return (
-    <div className="absolute right-4 flex select-none text-primaryAccent">
+    <div className="absolute flex select-none right-4 text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
@@ -125,11 +108,10 @@ function CommandPalette({
   autoFocus = false,
   hideCommandPalette,
   executeCommand,
-  hasReactComponents,
 }: { autoFocus?: boolean } & PropsFromRedux) {
   const [searchString, setSearchString] = useState("");
   const [activeIndex, setActiveIndex] = useState(0);
-  const shownCommands = getShownCommands(searchString, hasReactComponents);
+  const shownCommands = getShownCommands(searchString);
 
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchString(e.target.value);
@@ -171,7 +153,7 @@ function CommandPalette({
         </div>
       </div>
       <div
-        className="flex flex-grow flex-col overflow-auto text-sm"
+        className="flex flex-col flex-grow overflow-auto text-sm"
         // By making sure there is always a fraction of an item showing we show
         // that there is more to scroll to "beyond the fold"
         style={{ maxHeight: COMMAND_HEIGHT * ITEMS_TO_SHOW }}
@@ -184,14 +166,9 @@ function CommandPalette({
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    hasReactComponents: selectors.hasReactComponents(state),
-  }),
-  {
-    hideCommandPalette: actions.hideCommandPalette,
-    executeCommand: actions.executeCommand,
-  }
-);
+const connector = connect(() => ({}), {
+  hideCommandPalette: actions.hideCommandPalette,
+  executeCommand: actions.executeCommand,
+});
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(CommandPalette);
