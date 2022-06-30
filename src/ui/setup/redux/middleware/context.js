@@ -18,16 +18,6 @@ function validateActionContext(getState, cx, action) {
   }
 }
 
-function actionLogData(action) {
-  switch (action.type) {
-    case "COMMAND":
-      return " " + action.command;
-    case "PAUSED":
-      return " " + JSON.stringify(action.executionPoint);
-  }
-  return "";
-}
-
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
 function context(storeApi) {

@@ -370,3 +370,18 @@ export const isCurrentTimeInLoadedRegion = createSelector(
     );
   }
 );
+
+export const isPointInLoadedRegion = createSelector(
+  getLoadedRegions,
+  (state: UIState, executionPoint: string) => executionPoint,
+  (regions: LoadedRegions | null, executionPoint: string) => {
+    return (
+      regions !== null &&
+      regions.loaded.some(
+        ({ begin, end }) =>
+          BigInt(executionPoint) >= BigInt(begin.point) &&
+          BigInt(executionPoint) <= BigInt(end.point)
+      )
+    );
+  }
+);

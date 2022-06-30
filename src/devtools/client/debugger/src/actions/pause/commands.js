@@ -2,22 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import { getResumePoint, getFramePositions } from "../../selectors";
 import { getLoadedRegions } from "ui/reducers/app";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
-import { recordEvent } from "../../utils/telemetry";
 
 import { setFramePositions } from "./setFramePositions";
 
-/**
- * Debugger commands like stepOver, stepIn, stepUp
- *
- * @param string $0.type
- * @memberof actions/pause
- * @static
- */
 export function command(cx, type) {
   return async (dispatch, getState, { client }) => {
     if (!type) {
@@ -39,12 +29,6 @@ export function command(cx, type) {
   };
 }
 
-/**
- * StepIn
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
 export function stepIn(cx) {
   return dispatch => {
     if (cx.isPaused) {
@@ -53,12 +37,6 @@ export function stepIn(cx) {
   };
 }
 
-/**
- * stepOver
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
 export function stepOver(cx) {
   return dispatch => {
     if (cx.isPaused) {
@@ -67,12 +45,14 @@ export function stepOver(cx) {
   };
 }
 
-/**
- * stepOut
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
+export function reverseStepOver(cx) {
+  return dispatch => {
+    if (cx.isPaused) {
+      return dispatch(command(cx, "reverseStepOver"));
+    }
+  };
+}
+
 export function stepOut(cx) {
   return dispatch => {
     if (cx.isPaused) {
@@ -81,45 +61,10 @@ export function stepOut(cx) {
   };
 }
 
-/**
- * resume
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
 export function resume(cx) {
-  return dispatch => {
-    if (cx.isPaused) {
-      recordEvent("continue");
-      return dispatch(command(cx, "resume"));
-    }
-  };
+  return dispatch => dispatch(command(cx, "resume"));
 }
 
-/**
- * rewind
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
 export function rewind(cx) {
-  return dispatch => {
-    if (cx.isPaused) {
-      return dispatch(command(cx, "rewind"));
-    }
-  };
-}
-
-/**
- * reverseStepOver
- * @memberof actions/pause
- * @static
- * @returns {Function} {@link command}
- */
-export function reverseStepOver(cx) {
-  return dispatch => {
-    if (cx.isPaused) {
-      return dispatch(command(cx, "reverseStepOver"));
-    }
-  };
+  return dispatch => dispatch(command(cx, "rewind"));
 }
