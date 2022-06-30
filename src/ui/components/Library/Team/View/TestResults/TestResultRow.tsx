@@ -3,6 +3,7 @@ import { getRecordingURL } from "ui/utils/recording";
 import { Recording, RecordingMetadata, TestMetadata } from "ui/types";
 import { AttributeContainer } from "../TestRuns/AttributeContainer";
 import { getTruncatedRelativeDate } from "../Recordings/RecordingListItem/RecordingListItem";
+import styles from "../../../Library.module.css";
 
 function Title({ metadata }: { metadata: RecordingMetadata }) {
   const title =
@@ -57,7 +58,7 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
 
   return (
     <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
-      <div className="flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden bg-white border-b rounded-md cursor-pointer hover:bg-gray-100">
+      <div className={`flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden rounded-md cursor-pointer ${styles.libraryRow}`}>
         <Status test={recording.metadata.test} />
         <div className="flex flex-col flex-grow space-y-1">
           <div className="flex flex-row justify-between">
