@@ -3,13 +3,15 @@ import { useEffect } from "react";
 import hooks from "ui/hooks";
 import { UserInfo } from "ui/hooks/users";
 import { ExperimentalUserSettings } from "ui/types";
-import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
+import { useGetTeamRouteParams, useRedirectToTeam } from "ui/components/Library/Team/utils";
 import logrocket from "ui/utils/logrocket";
 import useAuth0 from "ui/utils/useAuth0";
 import LoadingScreen from "../shared/LoadingScreen";
 import { LibraryNags } from "./LibraryNags";
 import Navigation from "./Navigation/Navigation";
 import { TeamPage } from "./Team/TeamPage";
+import { MY_LIBRARY_TEAM } from "./Team/TeamContext";
+import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 
 // This acts like a wrapper for useGetTeamRouteParams. In case the user does not specify a team,
 // this hook initializes a team based on their default workspace.
@@ -32,6 +34,21 @@ const useGetTeamId = (defaultTeamId: string | null) => {
   return teamId || null;
 };
 
+function useGetIsValidTeamId(teamId: string | null) {
+  const { workspaces, loading: loading1 } = hooks.useGetNonPendingWorkspaces();
+  const { pendingWorkspaces, loading: loading2 } = hooks.useGetPendingWorkspaces();
+
+  if (loading1 || loading2) {
+    return null;
+  }
+
+  if (teamId === MY_LIBRARY_TEAM.id) {
+    return true;
+  }
+
+  return !!(workspaces.find(w => w.id === teamId) || pendingWorkspaces?.find(w => w.id === teamId));
+}
+
 export default function LibraryLoader() {
   const { userSettings, loading: userSettingsLoading } = hooks.useGetUserSettings();
   const { loading: userInfoLoading, ...userInfo } = hooks.useGetUserInfo();
@@ -51,11 +68,21 @@ function Library({
   userInfo: UserInfo;
 }) {
   const teamId = useGetTeamId(userSettings.defaultWorkspaceId);
+  const isValidTeamId = useGetIsValidTeamId(teamId);
+  const updateDefaultWorkspace = useUpdateDefaultWorkspace();
+  const redirectToTeam = useRedirectToTeam();
   const auth = useAuth0();
 
   useEffect(() => {
     logrocket.createSession({ userInfo, auth0User: auth.user, userSettings });
   }, [auth, userInfo, userSettings]);
+  useEffect(() => {
+    if (teamId && isValidTeamId === false) {
+      redirectToTeam("me");
+      updateDefaultWorkspace({ variables: { workspaceId: MY_LIBRARY_TEAM.id }});
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [teamId, isValidTeamId, redirectToTeam])
 
   if (!teamId) {
     return <LoadingScreen />;

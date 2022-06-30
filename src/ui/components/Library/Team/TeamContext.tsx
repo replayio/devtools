@@ -3,6 +3,7 @@ import { Workspace } from "ui/types";
 import { useGetWorkspace } from "ui/hooks/workspaces";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
+import { LibrarySpinner } from "../LibrarySpinner";
 
 export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me" };
 type TeamContainerContextType = {
@@ -19,7 +20,7 @@ export function TeamContextRoot({ children }: { children: ReactNode }) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
 
   if (loading || !pendingWorkspaces) {
-    return null;
+    return <LibrarySpinner />
   }
 
   const isPendingTeam = pendingWorkspaces?.some(w => w.id === teamId);

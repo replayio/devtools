@@ -12,7 +12,7 @@ export function NonPendingTeamScreen({ team }: { team: Workspace }) {
   const { filter } = useContext(FilterContext);
   const { recordings, loading } = hooks.useGetWorkspaceRecordings(teamId, filter);
 
-  if (loading) {
+  if (!team || loading) {
     return (
       <div className="flex flex-col flex-grow p-4 overflow-hidden">
         <LibrarySpinner />
