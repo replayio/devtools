@@ -466,7 +466,8 @@ export class ValueFront {
 Object.setPrototypeOf(ValueFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
 export type PrimitiveValue = string | number | boolean | null | undefined;
-export function createPrimitiveValueFront(value: PrimitiveValue, pause: Pause | null = null) {
+export function createPrimitiveValueFront(value: PrimitiveValue) {
+  const pause = ThreadFront.ensureCurrentPause();
   return new ValueFront(pause, { value });
 }
 

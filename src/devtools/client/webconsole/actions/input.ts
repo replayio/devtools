@@ -6,18 +6,12 @@
 
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import * as messagesActions from "devtools/client/webconsole/actions/messages";
-import type { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { Pause } from "protocol/thread/pause";
 import { createPrimitiveValueFront } from "protocol/thread/value";
-import type { ThunkDispatch } from "redux-thunk";
-import { UIAction, UIThunkAction } from "ui/actions";
-import { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
+import { UIThunkAction } from "ui/actions";
 
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
-const { assert } = require("protocol/utils");
 
 type EvaluateJSAsyncOptions = {
   asyncIndex?: number;
@@ -33,38 +27,34 @@ type EvaluationResponse = {
 };
 type EvaluationResponseResult = any;
 
-async function dispatchExpression(
-  dispatch: ThunkDispatch<UIState, ThunkExtraArgs, UIAction>,
-  pause: Pause,
-  expression: string
-) {
-  // We use the messages action as it's doing additional transformation on the message.
-  let evalId = nextEvalId++;
-  dispatch(
-    messagesActions.messagesAdd([
-      new ConsoleCommand({
-        messageText: expression,
-        timeStamp: Date.now(),
-        evalId,
-        executionPoint: pause.point,
-        executionPointTime: pause.time,
-      }),
-    ])
-  );
-  dispatch({ type: EVALUATE_EXPRESSION, expression });
+function dispatchExpression(expression: string): UIThunkAction<Promise<number>> {
+  return async (dispatch, getState, { ThreadFront }) => {
+    // We use the messages action as it's doing additional transformation on the message.
+    const pause = await ThreadFront.ensureCurrentPause();
 
-  return evalId;
+    let evalId = nextEvalId++;
+    dispatch(
+      messagesActions.messagesAdd([
+        new ConsoleCommand({
+          messageText: expression,
+          timeStamp: Date.now(),
+          evalId,
+          executionPoint: pause.point,
+          executionPointTime: pause.time,
+        }),
+      ])
+    );
+
+    dispatch({ type: EVALUATE_EXPRESSION, expression });
+
+    return evalId;
+  };
 }
 
 export function paywallExpression(expression: string, reason = "team-user"): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex } = selectedFrame;
-    const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
-    const evalId = await dispatchExpression(dispatch, pause!, expression);
+    const evalId = await dispatch(dispatchExpression(expression));
+    const pause = await ThreadFront.ensureCurrentPause();
 
     dispatch(
       messagesActions.messagesAdd([
@@ -92,31 +82,24 @@ export function evaluateExpression(expression: string): UIThunkAction {
     if (!expression) {
       return null;
     }
-
-    const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex, protocolId: frameId } = selectedFrame;
-    const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
-    const evalId = await dispatchExpression(dispatch, pause!, expression);
+    const evalId = await dispatch(dispatchExpression(expression));
 
     dispatch(
       messagesActions.messagesAdd([
         {
           type: "evaluationResult",
-          result: createPrimitiveValueFront("Loading…", pause),
+          result: createPrimitiveValueFront("Loading…"),
           evalId,
         },
       ])
     );
 
     try {
-      const response: EvaluationResponse = await evaluateJSAsync(expression, ThreadFront, {
-        asyncIndex,
-        frameId,
-        forConsoleMessage: true,
-      });
+      const response: EvaluationResponse = await dispatch(
+        evaluateJSAsync(expression, {
+          forConsoleMessage: true,
+        })
+      );
       response.evalId = evalId;
 
       return dispatch(onExpressionEvaluated(response));
@@ -129,7 +112,7 @@ export function evaluateExpression(expression: string): UIThunkAction {
       return dispatch(
         onExpressionEvaluated({
           type: "evaluationResult",
-          result: createPrimitiveValueFront(msg, pause),
+          result: createPrimitiveValueFront(msg),
           evalId,
         })
       );
@@ -143,18 +126,8 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
       return null;
     }
 
-    const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex, protocolId: frameId } = selectedFrame;
-
     try {
-      const response = await evaluateJSAsync(expression, ThreadFront, {
-        asyncIndex: asyncIndex!,
-        frameId,
-        pure: true,
-      });
+      await dispatch(evaluateJSAsync(expression, { pure: true }));
     } catch (err: any) {
       let msg = "Error: Eager Evaluation failed";
       if (err.message) {
@@ -165,42 +138,38 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
   };
 }
 
-/**
- * Evaluate a JavaScript expression asynchronously.
- *
- * @param {String} string: The code you want to evaluate.
- * @param {Object} options: Options for evaluation. See evaluateJSAsync method on
- *                          devtools/shared/fronts/webconsole.js
- */
-async function evaluateJSAsync(
+function evaluateJSAsync(
   expression: string,
-  ThreadFront: typeof ThreadFrontType,
   options: EvaluateJSAsyncOptions = {}
-) {
-  const { asyncIndex, frameId, pure } = options;
-  //reminder that there would be no results if the function were impure -logan
-  const { returned, exception, failed } = await ThreadFront.evaluate({
-    asyncIndex: asyncIndex!,
-    frameId,
-    text: expression,
-    pure,
-  });
+): UIThunkAction<Promise<EvaluationResponse>> {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const { pure } = options;
 
-  let v;
-  if (failed || !(returned || exception)) {
-    v = createPrimitiveValueFront(
-      "Error: Evaluation failed",
-      await ThreadFront.pauseForAsyncIndex(asyncIndex!)
-    );
-  } else if (returned) {
-    v = returned;
-  } else {
-    v = exception;
-  }
+    const selectedFrame = getSelectedFrame(getState());
+    const asyncIndex = selectedFrame?.asyncIndex;
+    const frameId = selectedFrame?.protocolId;
 
-  return {
-    type: "evaluationResult",
-    result: v,
+    // reminder that there would be no results if the function were impure -logan
+    const { returned, exception, failed } = await ThreadFront.evaluate({
+      asyncIndex,
+      frameId,
+      text: expression,
+      pure,
+    });
+
+    let v;
+    if (failed || !(returned || exception)) {
+      v = createPrimitiveValueFront("Error: Evaluation failed");
+    } else if (returned) {
+      v = returned;
+    } else {
+      v = exception;
+    }
+
+    return {
+      type: "evaluationResult",
+      result: v,
+    };
   };
 }
 
