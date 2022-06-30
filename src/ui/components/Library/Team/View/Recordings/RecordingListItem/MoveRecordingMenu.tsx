@@ -1,5 +1,4 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { Workspace } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
 import { DropdownDivider, DropdownItem } from "../../../../LibraryDropdown";
@@ -7,13 +6,13 @@ import hooks from "ui/hooks";
 import { subscriptionExpired } from "ui/utils/workspace";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
-type RecordingOptionsDropdownProps = PropsFromRedux & {
+type RecordingOptionsDropdownProps = {
   onMoveRecording: (targetWorkspaceId: WorkspaceId | null) => void;
   workspaces: Workspace[];
   disableLibrary: boolean;
 };
 
-function MoveRecordingMenu({
+export default function MoveRecordingMenu({
   onMoveRecording,
   workspaces,
   disableLibrary,
@@ -48,7 +47,3 @@ function MoveRecordingMenu({
     </>
   );
 }
-
-const connector = connect(() => ({}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(MoveRecordingMenu);

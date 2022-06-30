@@ -1,7 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
 import hooks from "ui/hooks";
-import { connect, ConnectedProps } from "react-redux";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
 import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";
@@ -29,13 +28,13 @@ const getConfirmOptions = (count: number) => {
   };
 };
 
-type BatchActionDropdownProps = PropsFromRedux & {
+type BatchActionDropdownProps = {
   selectedIds: RecordingId[];
   setSelectedIds: any;
   recordings: Recording[];
 };
 
-function BatchActionDropdown({
+export default function BatchActionDropdown({
   selectedIds,
   setSelectedIds,
   recordings,
@@ -136,7 +135,3 @@ function BatchActionDropdown({
     </PortalDropdown>
   );
 }
-
-const connector = connect(() => ({}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(BatchActionDropdown);

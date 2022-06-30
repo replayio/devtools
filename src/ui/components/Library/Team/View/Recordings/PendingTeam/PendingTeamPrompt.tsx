@@ -1,16 +1,15 @@
 import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
-
-import { connect, ConnectedProps } from "react-redux";
-import { UIState } from "ui/state";
 import { useConfirm } from "ui/components/shared/Confirm";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
 import { useRedirectToTeam } from "../../../utils";
 
-type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
-
-function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
+export default function PendingTeamPrompt({
+  workspace,
+}: {
+  workspace: PendingWorkspaceInvitation;
+}) {
   const redirectToTeam = useRedirectToTeam(true);
   const [loading, setLoading] = useState<boolean>(false);
   const { id, name, inviterEmail } = workspace;
@@ -70,7 +69,3 @@ function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
     </div>
   );
 }
-
-const connector = connect((state: UIState) => ({}));
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(PendingTeamPrompt);
