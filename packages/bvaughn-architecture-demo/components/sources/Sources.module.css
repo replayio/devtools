@@ -1,12 +1,16 @@
 .Sources {
   flex: 1;
   height: 100%;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .Tabs {
   display: flex;
   gap: 0.5ch;
   overflow-x: auto;
+  flex: 0 0 auto;
 }
 
 .SelectedTab,

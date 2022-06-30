@@ -2,6 +2,9 @@
   display: flex;
   flex-direction: column;
   gap: 0.5ch;
+  background-color: var(--background-color-contrast-3);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
 }
 
 .Label {

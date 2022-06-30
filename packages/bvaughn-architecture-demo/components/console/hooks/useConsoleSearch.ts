@@ -77,7 +77,7 @@ export default function useConsoleSearch(): [State, Actions] {
   const messages = useFilteredMessages();
 
   const [state, dispatch] = useSearch<Loggable>(messages, search);
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState<boolean>(true);
 
   const externalActions = useMemo(
     () => ({

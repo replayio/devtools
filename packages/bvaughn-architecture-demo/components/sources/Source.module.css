@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  overflow: auto;
+  height: 100%;
 }
 
 .Header {
@@ -14,15 +14,16 @@
 .AddButton {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
-  padding: 0.25rem 0.5rem;
+  height: 1.5rem;
+  width: 1.5rem;
+  flex: 0 0 1.5rem;
   border-radius: 0.5rem;
-  height: 2rem;
-  display: flex;
+  display: none;
   align-items: center;
+  justify-content: center;
   border: none;
-  padding: 0.25rem 0.5rem;
+  padding: 0;
   margin: 0;
-  gap: 0.5ch;
   cursor: pointer;
 }
 .AddButton:disabled {
@@ -42,4 +43,47 @@
   color: var(--color-default);
   width: 4rem;
   padding: 0.25rem;
+}
+
+.SourceContents {
+  margin: 0;
+  overflow: auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.LineNumber {
+  height: 1.5rem;
+  width: 1.5rem;
+  flex: 0 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.LineWithHits,
+.LineWithoutHits {
+  white-space: pre-wrap;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5ch;
+}
+
+.LineWithoutHits .LineNumber {
+  color: var(--color-dim);
+}
+
+.LineWithHits:hover .AddButton {
+  display: flex;
+}
+.LineWithHits:hover .LineNumber {
+  display: none;
+}
+
+.PointPanel {
+  margin-left: calc(1.5rem + 0.5ch);
 }

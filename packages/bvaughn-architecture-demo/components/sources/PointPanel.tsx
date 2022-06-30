@@ -7,7 +7,7 @@ import Loader from "../Loader";
 
 import styles from "./PointPanel.module.css";
 
-export default function PointPanel({ point }: { point: Point }) {
+export default function PointPanel({ className, point }: { className: string; point: Point }) {
   const { deletePoint, editPoint } = useContext(PointsContext);
 
   const [editableContent, setEditableContent] = useState(point.content);
@@ -23,7 +23,7 @@ export default function PointPanel({ point }: { point: Point }) {
   }, [editableContent]);
 
   return (
-    <div className={styles.Point}>
+    <div className={`${styles.Point} ${className}`}>
       <div className={styles.Row}>
         <input
           className={styles.Input}

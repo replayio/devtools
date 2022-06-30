@@ -5,6 +5,7 @@
   overflow: hidden;
   border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
+  border: 1px solid var(--background-color-contrast-2);
 }
 
 .ContentArea {

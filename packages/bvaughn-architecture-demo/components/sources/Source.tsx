@@ -3,7 +3,7 @@ import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getSourceContents, gitSourceHitCounts } from "@bvaughn/src/suspense/SourcesCache";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
-import { ChangeEvent, useContext, useState } from "react";
+import { ChangeEvent, Fragment, useContext, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PointPanel from "./PointPanel";
@@ -20,8 +20,6 @@ export default function Source({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const [lineNumber, setLineNumber] = useState(1);
-
   const { addPoint, points } = useContext(PointsContext);
 
   const [sourceHitCounts, sourceContents] = suspendInParallel(
@@ -29,16 +27,8 @@ export default function Source({
     () => getSourceContents(client, sourceId)
   );
 
-  const numLines = sourceContents.contents.split("\n").length;
-  const lineHasHits = sourceHitCounts.has(lineNumber);
-
-  const onLineNumberChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(1, Math.min(numLines, parseInt(event.currentTarget.value, 10))) || 1;
-
-    setLineNumber(value);
-  };
-
-  const onAddPointButtonClick = () => {
+  const onAddPointButtonClick = (lineNumber: number) => {
+    const lineHasHits = sourceHitCounts.has(lineNumber);
     if (!lineHasHits) {
       return;
     }
@@ -62,30 +52,38 @@ export default function Source({
 
   return (
     <div className={styles.Source}>
-      <div className={styles.Header}>
-        <button
-          className={styles.AddButton}
-          disabled={!lineHasHits}
-          onClick={onAddPointButtonClick}
-        >
-          <Icon className={styles.AddButtonIcon} type="add" />
-          Add point
-        </button>
-        to line
-        <input
-          className={styles.LineNumberInput}
-          onChange={onLineNumberChange}
-          size={3}
-          type="number"
-          value={lineNumber}
-        />
-      </div>
+      <div className={styles.SourceContents}>
+        {sourceContents.contents.split("\n").map((line, index) => {
+          const lineNumber = index + 1;
+          const lineHasHits = sourceHitCounts.has(lineNumber);
+          const linePoints = points.filter(
+            point => point.location.sourceId === sourceId && point.location.line === lineNumber
+          );
 
-      {points
-        .filter(point => point.location.sourceId === sourceId)
-        .map(point => (
-          <PointPanel key={point.id} point={point} />
-        ))}
+          return (
+            <Fragment key={index}>
+              <div
+                key={index}
+                className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
+              >
+                <div className={styles.LineNumber}>{lineNumber}</div>
+                {lineHasHits && (
+                  <button
+                    className={styles.AddButton}
+                    onClick={() => onAddPointButtonClick(lineNumber)}
+                  >
+                    <Icon className={styles.AddButtonIcon} type="add" />
+                  </button>
+                )}
+                {line}
+              </div>
+              {linePoints.map(point => (
+                <PointPanel key={point.id} className={styles.PointPanel} point={point} />
+              ))}
+            </Fragment>
+          );
+        })}
+      </div>
     </div>
   );
 }
