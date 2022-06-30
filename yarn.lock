@@ -2657,7 +2657,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.12":
+"@jridgewell/trace-mapping@npm:^0.3.12, @jridgewell/trace-mapping@npm:^0.3.14":
   version: 0.3.14
   resolution: "@jridgewell/trace-mapping@npm:0.3.14"
   dependencies:
@@ -9940,6 +9940,13 @@ __metadata:
   dependencies:
     delayed-stream: ~1.0.0
   checksum: 49fa4aeb4916567e33ea81d088f6584749fc90c7abec76fd516bf1c5aa5c79f3584b5ba3de6b86d26ddd64bae5329c4c7479343250cfe71c75bb366eae53bb7c
+  languageName: node
+  linkType: hard
+
+"comlink@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "comlink@npm:4.3.1"
+  checksum: 557360a6558708c55aff74a25f834bfb9bfca8a42444682c4d5aead57681534a0206202be2a2760b4de124c3ba6d485b08978b6d5469cb3d26bf1438ee28a4f1
   languageName: node
   linkType: hard
 
@@ -20591,9 +20598,11 @@ __metadata:
     "@babel/preset-react": ^7.14.5
     "@babel/preset-typescript": ^7.15.0
     "@babel/types": ^7.14.8
+    "@bcoe/v8-coverage": ^0.2.3
     "@headlessui/react": ^1.4.3
     "@heroicons/react": ^1.0.6
     "@jest/console": ^28.0.2
+    "@jridgewell/trace-mapping": ^0.3.14
     "@next/bundle-analyzer": ^12.2.0
     "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
@@ -20660,6 +20669,7 @@ __metadata:
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     codemirror: ^5.65.2
+    comlink: ^4.3.1
     cookie: ^0.4.2
     css-loader: ^6.7.1
     d3-interpolate: ^3.0.1
@@ -20686,6 +20696,9 @@ __metadata:
     identity-obj-proxy: ^3.0.0
     immer: ^9.0.7
     isomorphic-fetch: ^3.0.0
+    istanbul-lib-coverage: ^3.2.0
+    istanbul-lib-report: ^3.0.0
+    istanbul-reports: ^3.1.4
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     jest-in-case: ^1.0.2
