@@ -1224,8 +1224,12 @@ class _ThreadFront {
 
   // Return whether sourceId is minified and has a pretty printed alternate.
   isMinifiedSource(sourceId: SourceId) {
+    return !!this.getPrettyPrintedSourceId(sourceId);
+  }
+
+  getPrettyPrintedSourceId(sourceId: SourceId) {
     const originalIds = this.originalSources.map.get(sourceId) || [];
-    return originalIds.some(id => {
+    return originalIds.find(id => {
       const info = this.sources.get(id);
       return info && info.kind == "prettyPrinted";
     });
