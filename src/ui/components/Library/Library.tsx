@@ -79,7 +79,7 @@ function Library({
   useEffect(() => {
     if (teamId && isValidTeamId === false) {
       redirectToTeam("me");
-      updateDefaultWorkspace({ variables: { workspaceId: MY_LIBRARY_TEAM.id } });
+      updateDefaultWorkspace({ variables: { workspaceId: MY_LIBRARY_TEAM.databaseId } });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [teamId, isValidTeamId, redirectToTeam]);

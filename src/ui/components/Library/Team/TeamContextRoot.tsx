@@ -5,7 +5,7 @@ import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { LibrarySpinner } from "../LibrarySpinner";
 
-export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me" };
+export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me", databaseId: null };
 type TeamContainerContextType = {
   teamId: string;
   team?: Workspace | typeof MY_LIBRARY_TEAM | null;
@@ -16,10 +16,10 @@ export const TeamContext = createContext<TeamContainerContextType>(null as any);
 
 export function TeamContextRoot({ children }: { children: ReactNode }) {
   const { teamId } = useGetTeamRouteParams();
-  const { workspace } = useGetWorkspace(teamId);
-  const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
+  const { workspace, loading: workspaceLoading } = useGetWorkspace(teamId);
+  const { pendingWorkspaces, loading: pendingWorkspacesLoading } = hooks.useGetPendingWorkspaces();
 
-  if (loading || !pendingWorkspaces) {
+  if (workspaceLoading || pendingWorkspacesLoading || !pendingWorkspaces) {
     return <LibrarySpinner />;
   }
 

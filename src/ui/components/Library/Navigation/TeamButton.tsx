@@ -31,7 +31,9 @@ export function TeamButton({
       return;
     }
 
-    updateDefaultWorkspace({ variables: { workspaceId: id === MY_LIBRARY_TEAM.id ? null : id } });
+    updateDefaultWorkspace({
+      variables: { workspaceId: id === MY_LIBRARY_TEAM.databaseId ? null : id },
+    });
     trackEvent("team_change", { workspaceId: id });
   };
 

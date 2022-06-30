@@ -15,9 +15,8 @@ function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const { id, name, inviterEmail } = workspace;
 
-  const acceptPendingInvitation = hooks.useAcceptPendingInvitation(onAcceptCompleted);
+  const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => {});
   const declinePendingInvitation = hooks.useRejectPendingInvitation(onDeclineCompleted);
-  const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
   const { confirmDestructive } = useConfirm();
 
@@ -38,11 +37,6 @@ function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
   };
   function onDeclineCompleted() {
     redirectToTeam();
-  }
-  function onAcceptCompleted() {
-    updateDefaultWorkspace({
-      variables: { workspaceId: id },
-    });
   }
 
   return (

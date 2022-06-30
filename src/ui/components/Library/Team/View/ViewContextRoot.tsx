@@ -28,7 +28,7 @@ export function ViewContextRoot({
   // Initialize the view to whatever the appropriate default view is for that team.
   useEffect(() => {
     if (!view) {
-      router.push(`/${router.asPath}/${defaultView}`);
+      router.push(`${router.asPath}/${defaultView}`);
     }
   }, [view, router, defaultView]);
 
