@@ -20,7 +20,7 @@ export function TeamContextRoot({ children }: { children: ReactNode }) {
   const { pendingWorkspaces, loading } = hooks.useGetPendingWorkspaces();
 
   if (loading || !pendingWorkspaces) {
-    return <LibrarySpinner />
+    return <LibrarySpinner />;
   }
 
   const isPendingTeam = pendingWorkspaces?.some(w => w.id === teamId);

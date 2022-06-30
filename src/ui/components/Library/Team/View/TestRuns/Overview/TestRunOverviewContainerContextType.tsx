@@ -13,7 +13,7 @@ export const TestRunOverviewContext = createContext<TestRunOverviewContainerCont
   null as any
 );
 
-export function TestRunOverviewContainer({ children }: { children: ReactNode; }) {
+export function TestRunOverviewContainer({ children }: { children: ReactNode }) {
   const { view } = useGetTeamRouteParams();
   const { teamId } = useContext(TeamContext);
   const { focusId } = useContext(TestRunsContext);
