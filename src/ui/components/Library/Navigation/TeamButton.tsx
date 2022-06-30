@@ -1,6 +1,7 @@
 import classNames from "classnames";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { MouseEvent } from "react";
 import { setModal } from "ui/actions/app";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
@@ -61,9 +62,15 @@ export function TeamButton({
 export function SettingsButton() {
   const dispatch = useAppDispatch();
 
+  const onClick = (e: MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    dispatch(setModal("workspace-settings"));
+  };
+
   return (
     <button
-      onClick={() => dispatch(setModal("workspace-settings"))}
+      onClick={onClick}
       className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
     >
       settings
