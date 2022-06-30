@@ -9,7 +9,7 @@ import {
 import { AttributeContainer } from "../AttributeContainer";
 import { RunStats } from "../RunStats";
 import { getDuration } from "../utils";
-import { TestRunOverviewContext } from "./TestRunOverviewPage";
+import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const workspaceId = useGetTeamIdFromRoute();

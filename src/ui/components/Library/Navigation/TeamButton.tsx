@@ -6,7 +6,7 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
-import { MY_LIBRARY_TEAM } from "../Team/TeamContext";
+import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
 
 export function TeamButton({
   label,

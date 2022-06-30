@@ -6,8 +6,8 @@ import { RunStats } from "./RunStats";
 import { AttributeContainer } from "./AttributeContainer";
 import styles from "../../../Library.module.css";
 import Link from "next/link";
-import { TeamContext } from "../../TeamContext";
-import { TestRunsContext } from "./TestRunsContext";
+import { TeamContext } from "../../TeamContextRoot";
+import { TestRunsContext } from "./TestRunsContextRoot";
 
 function Title({ testRun }: { testRun: TestRun }) {
   const title = testRun.commit?.title || "Unknown";

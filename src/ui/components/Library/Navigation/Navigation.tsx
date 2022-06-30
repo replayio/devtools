@@ -5,7 +5,7 @@ import { Invitations } from "./Invitations";
 import { TeamButton } from "./TeamButton";
 import Profile from "./Profile";
 import { NewTeamButton } from "./NewTeamButton";
-import { MY_LIBRARY_TEAM } from "../Team/TeamContext";
+import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
 import { LibrarySpinner } from "../LibrarySpinner";
 
 function Teams() {

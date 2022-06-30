@@ -2,7 +2,6 @@ import { useRouter } from "next/router";
 import { useEffect } from "react";
 import { setModal } from "ui/actions/app";
 import { useAppDispatch } from "ui/setup/hooks";
-import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 
 export function SettingsHandler() {
   const dispatch = useAppDispatch();

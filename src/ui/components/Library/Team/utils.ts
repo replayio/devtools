@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { View } from "ui/components/Library/Team/View/ViewContext";
+import { View } from "ui/components/Library/Team/View/ViewContextRoot";
 
 function parseTeamParams(params: string[]) {
   return { teamId: params[0] as string, view: params[1] as View, focusId: params[2] as string };

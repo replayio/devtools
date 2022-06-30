@@ -1,9 +1,8 @@
 import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunForWorkspace } from "ui/hooks/tests";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { TeamContext } from "../../../TeamContext";
-import { TestRunsContext } from "../TestRunsContext";
-import { TestRunOverviewContent } from "./TestRunOverviewContent";
+import { TeamContext } from "../../../TeamContextRoot";
+import { TestRunsContext } from "../TestRunsContextRoot";
 
 type TestRunOverviewContainerContextType = {
   view: string;
@@ -14,7 +13,7 @@ export const TestRunOverviewContext = createContext<TestRunOverviewContainerCont
   null as any
 );
 
-export function TestRunOverviewContainer({ children }: { children: ReactNode }) {
+export function TestRunOverviewContainer({ children }: { children: ReactNode; }) {
   const { view } = useGetTeamRouteParams();
   const { teamId } = useContext(TeamContext);
   const { focusId } = useContext(TestRunsContext);
@@ -24,13 +23,5 @@ export function TestRunOverviewContainer({ children }: { children: ReactNode }) 
     <TestRunOverviewContext.Provider value={{ view, testRun }}>
       {children}
     </TestRunOverviewContext.Provider>
-  );
-}
-
-export function TestRunOverviewPage() {
-  return (
-    <TestRunOverviewContainer>
-      <TestRunOverviewContent />
-    </TestRunOverviewContainer>
   );
 }

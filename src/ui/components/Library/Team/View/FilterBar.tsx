@@ -2,7 +2,7 @@ import React, { ChangeEvent, KeyboardEvent, useContext } from "react";
 import { TextInput } from "../../../shared/Forms";
 import { FilterDropdown } from "./FilterDropdown";
 import { FilterContext } from "./FilterContext";
-import { ViewContext } from "./ViewContext";
+import { ViewContext } from "./ViewContextRoot";
 
 export function FilterBar() {
   const { displayedString, setDisplayedText, setAppliedText } = useContext(FilterContext);

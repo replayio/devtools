@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Workspace } from "ui/types";
 import Base64Image from "ui/components/shared/Base64Image";
-import { TeamContext } from "../../TeamContext";
+import { TeamContext } from "../../TeamContextRoot";
 import { FilterContext } from "../FilterContext";
 import hooks from "ui/hooks";
 import { RecordingsPageViewer } from "./RecordingsPageViewer";

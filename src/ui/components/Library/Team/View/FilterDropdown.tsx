@@ -1,7 +1,7 @@
 import { useContext, useState } from "react";
 import PortalDropdown from "../../../shared/PortalDropdown";
 import { Dropdown, DropdownDivider, DropdownItem } from "../../LibraryDropdown";
-import { View, ViewContext } from "./ViewContext";
+import { View, ViewContext } from "./ViewContextRoot";
 import { useGetWorkspace } from "ui/hooks/workspaces";
 import { useFeature } from "ui/hooks/settings";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";

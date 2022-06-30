@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext } from "react";
 import { TestRun, useGetTestRunsForWorkspace } from "ui/hooks/tests";
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
-import { TeamContext } from "../../TeamContext";
+import { TeamContext } from "../../TeamContextRoot";
 
 type TestRunsContextType = {
   focusId: string;

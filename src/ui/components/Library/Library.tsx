@@ -10,7 +10,7 @@ import LoadingScreen from "../shared/LoadingScreen";
 import { LibraryNags } from "./LibraryNags";
 import Navigation from "./Navigation/Navigation";
 import { TeamPage } from "./Team/TeamPage";
-import { MY_LIBRARY_TEAM } from "./Team/TeamContext";
+import { MY_LIBRARY_TEAM } from "./Team/TeamContextRoot";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 
 // This acts like a wrapper for useGetTeamRouteParams. In case the user does not specify a team,

@@ -4,7 +4,7 @@ import { TestResultListItem } from "./TestResultListItem";
 import { Recording } from "ui/types";
 import styles from "../../../../Library.module.css";
 import Icon from "ui/components/shared/Icon";
-import { TestRunOverviewContext } from "./TestRunOverviewPage";
+import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 
 export function RunResults() {
   const testRun = useContext(TestRunOverviewContext).testRun!;

@@ -2,7 +2,7 @@ import { useContext } from "react";
 
 import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { ParamHandler } from "./ParamHandlers/ParamHandler";
-import { TeamContext, MY_LIBRARY_TEAM, TeamContextRoot, MyLibraryContainer } from "./TeamContext";
+import { TeamContext, MY_LIBRARY_TEAM, TeamContextRoot, MyLibraryContextRoot } from "./TeamContextRoot";
 import { ViewPage } from "./View/ViewPage";
 
 export function TeamPage() {
@@ -10,9 +10,9 @@ export function TeamPage() {
 
   if (teamId === MY_LIBRARY_TEAM.id) {
     return (
-      <MyLibraryContainer>
+      <MyLibraryContextRoot>
         <TeamContent />
-      </MyLibraryContainer>
+      </MyLibraryContextRoot>
     );
   }
 

@@ -3,7 +3,7 @@ import { FilterBarContainer } from "./FilterBarContainer";
 import { RecordingsPage } from "./Recordings/RecordingsPage";
 import { TestResultsPage } from "./TestResults/TestResultsPage";
 import { TestRunsPage } from "./TestRuns/TestRunsPage";
-import { ViewContextRoot, ViewContext } from "./ViewContext";
+import { ViewContextRoot, ViewContext } from "./ViewContextRoot";
 
 export function ViewPage({ defaultView }: { defaultView: string }) {
   return (

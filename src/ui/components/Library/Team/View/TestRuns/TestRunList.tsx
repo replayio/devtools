@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
 import { TestRunListItem } from "ui/components/Library/Team/View/TestRuns/TestRunListItem";
-import { TestRunsContext } from "./TestRunsContext";
+import { TestRunsContext } from "./TestRunsContextRoot";
 
 export function TestRunList() {
   const { testRuns } = useContext(TestRunsContext);

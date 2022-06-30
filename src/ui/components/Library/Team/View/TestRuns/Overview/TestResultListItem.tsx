@@ -1,7 +1,7 @@
 import { useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
-import { TeamContext } from "../../../TeamContext";
+import { TeamContext } from "../../../TeamContextRoot";
 import Link from "next/link";
 import styles from "../../../../Library.module.css";
 

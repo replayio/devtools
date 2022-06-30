@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { getParams, updateUrlWithParams } from "ui/utils/environment";
-import { View } from "./ViewContext";
+import { View } from "./ViewContextRoot";
 
 type Surrounder = {
   [open: string]: string;

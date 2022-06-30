@@ -32,7 +32,7 @@ export function TeamContextRoot({ children }: { children: ReactNode }) {
   );
 }
 
-export function MyLibraryContainer({ children }: { children: ReactNode }) {
+export function MyLibraryContextRoot({ children }: { children: ReactNode }) {
   const { teamId } = useGetTeamRouteParams();
 
   return (

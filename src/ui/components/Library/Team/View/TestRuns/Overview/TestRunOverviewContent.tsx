@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { RunResults } from "ui/components/Library/Team/View/TestRuns/Overview/RunResults";
-import { TestRunOverviewContext } from "./TestRunOverviewPage";
+import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 import styles from "../../../../Library.module.css";
 import { RunSummary } from "./RunSummary";
 import { LibrarySpinner } from "ui/components/Library/LibrarySpinner";
