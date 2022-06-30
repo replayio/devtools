@@ -1,11 +1,10 @@
-import React, { useContext } from "react";
-import { useAppSelector } from "ui/setup/hooks";
-import { getWorkspaceId } from "ui/reducers/app";
+import React from "react";
 import { Recording } from "ui/types";
 import { PrimaryButton, SecondaryButton } from "../../../../../shared/Button";
 import BatchActionDropdown from "./BatchActionDropdown";
 import styles from "../../../../Library.module.css";
 import TeamTrialEnd from "./TeamTrialEnd";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 function ViewerHeaderActions({
   isEditing,
@@ -61,7 +60,7 @@ export default function ViewerHeader({
   isEditing: boolean;
   setIsEditing: (value: boolean) => void;
 }) {
-  const currentWorkspaceId = useAppSelector(getWorkspaceId);
+  const currentWorkspaceId = useGetTeamIdFromRoute();
 
   const HeaderLeft = (
     <ViewerHeaderLeft>

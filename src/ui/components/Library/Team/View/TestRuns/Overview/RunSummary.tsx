@@ -1,8 +1,7 @@
 import { useContext, useState, useRef } from "react";
-import { useSelector } from "react-redux";
-import { getWorkspaceId } from "ui/actions/app";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import {
   getDurationString,
   getTruncatedRelativeDate,
@@ -13,7 +12,7 @@ import { getDuration } from "../utils";
 import { TestRunOverviewContext } from "./TestRunOverviewPage";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const workspaceId = useSelector(getWorkspaceId);
+  const workspaceId = useGetTeamIdFromRoute();
   const title = testRun.commit?.title || "";
   const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
   const [showCopied, setShowCopied] = useState(false);

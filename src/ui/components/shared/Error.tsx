@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import useAuth0 from "ui/utils/useAuth0";
 import Modal from "ui/components/shared/NewModal";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch } from "ui/setup/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
-import classNames from "classnames";
 import { ErrorActions, ExpectedError, UnexpectedError } from "ui/state/app";
 import hooks from "ui/hooks";
 import { setModal } from "ui/actions/app";
@@ -16,6 +14,7 @@ import { BubbleViewportWrapper } from "./Viewport";
 import { getRecordingId } from "ui/utils/recording";
 import { setExpectedError } from "ui/actions/errors";
 import { useRequestRecordingAccess } from "ui/hooks/recordings";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 export function PopupBlockedError() {
   return (
@@ -71,7 +70,9 @@ function LibraryButton() {
   );
 }
 
-function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFromRedux) {
+function TeamBillingButtonBase({ setModal }: BillingPropsFromRedux) {
+  const currentWorkspaceId = useGetTeamIdFromRoute();
+
   const router = useRouter();
   const onClick = () => {
     router.push(`/team/${currentWorkspaceId}/settings/billing`);
@@ -85,12 +86,7 @@ function TeamBillingButtonBase({ currentWorkspaceId, setModal }: BillingPropsFro
   );
 }
 
-const billingConnector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  { setModal }
-);
+const billingConnector = connect(() => ({}), { setModal });
 type BillingPropsFromRedux = ConnectedProps<typeof billingConnector>;
 const TeamBillingButton = billingConnector(TeamBillingButtonBase);
 

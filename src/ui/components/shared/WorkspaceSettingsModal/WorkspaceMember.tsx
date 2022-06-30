@@ -236,7 +236,7 @@ function Role({
       if (isPersonal) {
         hideModal();
         updateDefaultWorkspace({ variables: { workspaceId: null } });
-        redirectToTeam();
+        redirectToTeam("me");
       }
     }
   };

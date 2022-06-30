@@ -318,7 +318,7 @@ function SlideBody3({ hideModal, newWorkspace }: SlideBody3Props) {
   const onClick = () => {
     removeUrlParameters();
     updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
-    redirectToTeam(`/team/${newWorkspace.id}`);
+    redirectToTeam(`${newWorkspace.id}`);
     hideModal();
   };
 

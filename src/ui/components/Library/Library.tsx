@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import hooks from "ui/hooks";
 import { UserInfo } from "ui/hooks/users";
 import { ExperimentalUserSettings } from "ui/types";
-import { useGetTeamRouteParams } from "ui/utils/library";
+import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import logrocket from "ui/utils/logrocket";
 import useAuth0 from "ui/utils/useAuth0";
 import LoadingScreen from "../shared/LoadingScreen";

@@ -2,8 +2,6 @@ import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
 import hooks from "ui/hooks";
 import { connect, ConnectedProps } from "react-redux";
-import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { WorkspaceId } from "ui/state/app";
 import { Dropdown, DropdownItem } from "../../../../LibraryDropdown";
 import { DisabledButton, getButtonClasses } from "../../../../../shared/Button";
@@ -14,6 +12,7 @@ import MoveRecordingMenu from "../RecordingListItem/MoveRecordingMenu";
 import { useConfirm } from "../../../../../shared/Confirm";
 import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 const getConfirmOptions = (count: number) => {
   if (count === 1) {
@@ -39,9 +38,9 @@ type BatchActionDropdownProps = PropsFromRedux & {
 function BatchActionDropdown({
   selectedIds,
   setSelectedIds,
-  currentWorkspaceId,
   recordings,
 }: BatchActionDropdownProps) {
+  const currentWorkspaceId = useGetTeamIdFromRoute();
   const { userId, loading: userIdLoading } = hooks.useGetUserId();
   const { workspaces, loading: workspacesLoading } = hooks.useGetNonPendingWorkspaces();
   const [expanded, setExpanded] = useState(false);
@@ -138,8 +137,6 @@ function BatchActionDropdown({
   );
 }
 
-const connector = connect((state: UIState) => ({
-  currentWorkspaceId: selectors.getWorkspaceId(state),
-}));
+const connector = connect(() => ({}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(BatchActionDropdown);

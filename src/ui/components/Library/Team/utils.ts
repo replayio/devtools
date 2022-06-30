@@ -11,3 +11,17 @@ export function useGetTeamRouteParams() {
 
   return parseTeamParams(params);
 }
+
+export function useGetTeamIdFromRoute() {
+  const params = useGetTeamRouteParams();
+  return params.teamId;
+}
+
+export function useRedirectToTeam(replace: boolean = false) {
+  const router = useRouter();
+
+  return (id?: string) => {
+    const url = `/team/${id}`;
+    replace ? router.replace(url) : router.push(url);
+  };
+}

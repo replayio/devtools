@@ -1,7 +1,7 @@
 import { createContext, ReactNode } from "react";
 import { Workspace } from "ui/types";
 import { useGetWorkspace } from "ui/hooks/workspaces";
-import { useGetTeamRouteParams } from "ui/utils/library";
+import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 
 export const MY_LIBRARY_TEAM = { name: "Your Library", isTest: false, id: "me" };

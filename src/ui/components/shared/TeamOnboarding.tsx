@@ -142,7 +142,7 @@ function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyP
   });
 
   useEffect(() => {
-    redirectToTeam(`/team/${newWorkspace!.id}`);
+    redirectToTeam(`${newWorkspace!.id}`);
   });
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If

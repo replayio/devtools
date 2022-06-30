@@ -1,6 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import React, { useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch } from "ui/setup/hooks";
 import { Recording } from "ui/types";
 import MaterialIcon from "../../../../../shared/MaterialIcon";
 import hooks from "ui/hooks";
@@ -11,9 +11,9 @@ import classNames from "classnames";
 import MoveRecordingMenu from "./MoveRecordingMenu";
 import { useConfirm } from "../../../../../shared/Confirm";
 import { useIsPublicEnabled } from "ui/utils/org";
-import { getWorkspaceId } from "ui/reducers/app";
 import { setModal } from "ui/actions/app";
 import { useGetUserPermissions } from "ui/hooks/users";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 function DeleteOption({
   onOptionClick,
@@ -22,7 +22,7 @@ function DeleteOption({
   onOptionClick: () => void;
   recording: Recording;
 }) {
-  const currentWorkspaceId = useAppSelector(getWorkspaceId);
+  const currentWorkspaceId = useGetTeamIdFromRoute();
   const { confirmDestructive } = useConfirm();
   const deleteRecording = hooks.useDeleteRecordingFromLibrary();
 
@@ -117,7 +117,7 @@ function MoveRecordingOption({
   const { permissions } = useGetUserPermissions(recording);
   const { workspaces, loading } = hooks.useGetNonPendingWorkspaces();
   const updateRecordingWorkspace = hooks.useUpdateRecordingWorkspace();
-  const currentWorkspaceId = useAppSelector(getWorkspaceId);
+  const currentWorkspaceId = useGetTeamIdFromRoute();
 
   const updateRecording = (targetWorkspaceId: WorkspaceId | null) => {
     updateRecordingWorkspace(recording.id, currentWorkspaceId, targetWorkspaceId);

@@ -20,6 +20,7 @@ import OrganizationSettings from "./OrganizationSettings";
 import Base64Image from "../Base64Image";
 import { trackEvent } from "ui/utils/telemetry";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 export function WorkspaceMembers({
   members,
@@ -57,11 +58,12 @@ export function WorkspaceMembers({
   );
 }
 
-type WorkspaceFormProps = Pick<PropsFromRedux, "workspaceId"> & {
+type WorkspaceFormProps = {
   members?: WorkspaceUser[];
 };
 
-function WorkspaceForm({ workspaceId, members }: WorkspaceFormProps) {
+function WorkspaceForm({ members }: WorkspaceFormProps) {
+  const workspaceId = useGetTeamIdFromRoute();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -150,7 +152,7 @@ const settings: Settings<
       return (
         <div className="flex flex-col flex-grow space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm {...rest} workspaceId={workspaceId} members={members} />
+          <WorkspaceForm {...rest} members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
           <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
@@ -179,7 +181,7 @@ const settings: Settings<
     title: "Delete Team",
     icon: "cancel",
     component: function DeleteTeam({ hideModal, workspaceId }) {
-      const redirectToTeam = useRedirectToTeam();
+      const redirectToTeam = useRedirectToTeam(true);
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
       const { confirmDestructive } = useConfirm();
@@ -196,7 +198,7 @@ const settings: Settings<
             });
             hideModal();
             updateDefaultWorkspace({ variables: { workspaceId: null } });
-            redirectToTeam();
+            redirectToTeam("me");
           }
         });
       };
@@ -219,10 +221,11 @@ const settings: Settings<
   },
 ];
 
-function WorkspaceSettingsModal({ workspaceId, view, ...rest }: PropsFromRedux) {
+function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
+  const workspaceId = useGetTeamIdFromRoute();
   const [selectedTab, setTab] = useState<string>();
-  const { members } = hooks.useGetWorkspaceMembers(workspaceId!);
-  const { workspace } = hooks.useGetWorkspace(workspaceId!);
+  const { members } = hooks.useGetWorkspaceMembers(workspaceId);
+  const { workspace } = hooks.useGetWorkspace(workspaceId);
   const { userId: localUserId } = hooks.useGetUserId();
 
   useEffect(() => {
@@ -278,7 +281,7 @@ const connector = connect(
   (state: UIState) => {
     const opts = selectors.getModalOptions(state);
     const view = opts && "view" in opts ? opts.view : null;
-    return { workspaceId: selectors.getWorkspaceId(state), view };
+    return { view };
   },
   {
     hideModal: actions.hideModal,

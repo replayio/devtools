@@ -51,7 +51,7 @@ function AutoAccept(props: SingleInviteModalProps) {
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => {
     updateDefaultWorkspace({ variables: { workspaceId: workspace.id } });
     setAccepted(true);
-    redirectToTeam(`/team/${workspace.id}`);
+    redirectToTeam(`${workspace.id}`);
   });
 
   const didMountRef = useRef(false);

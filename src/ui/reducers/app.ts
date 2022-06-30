@@ -342,7 +342,6 @@ export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerA
 export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
-export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;

@@ -1,6 +1,6 @@
 import { useRouter } from "next/router";
 import { createContext, ReactNode, useContext, useEffect } from "react";
-import { useGetTeamRouteParams } from "ui/utils/library";
+import { useGetTeamRouteParams } from "ui/components/Library/Team/utils";
 import { useFilters } from "./useFilters";
 import { FilterContext } from "./FilterContext";
 import { TeamContext } from "../TeamContext";

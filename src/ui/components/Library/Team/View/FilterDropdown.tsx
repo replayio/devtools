@@ -2,10 +2,9 @@ import { useContext, useState } from "react";
 import PortalDropdown from "../../../shared/PortalDropdown";
 import { Dropdown, DropdownDivider, DropdownItem } from "../../LibraryDropdown";
 import { View, ViewContext } from "./ViewContext";
-import { getWorkspaceId } from "ui/actions/app";
-import { useAppSelector } from "ui/setup/hooks";
 import { useGetWorkspace } from "ui/hooks/workspaces";
 import { useFeature } from "ui/hooks/settings";
+import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
 
@@ -16,7 +15,7 @@ const viewLabels = {
 };
 
 export function ViewOptions({ collapseDropdown }: { collapseDropdown: () => void }) {
-  const workspaceId = useAppSelector(getWorkspaceId);
+  const workspaceId = useGetTeamIdFromRoute();
   const { setView, view } = useContext(ViewContext);
   const { workspace } = useGetWorkspace(workspaceId);
   const { value: testSupport } = useFeature("testSupport");
