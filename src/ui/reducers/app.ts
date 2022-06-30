@@ -173,9 +173,6 @@ const appSlice = createSlice({
     setVideoUrl(state, action: PayloadAction<string>) {
       state.videoUrl = action.payload;
     },
-    setWorkspaceId(state, action: PayloadAction<string | null>) {
-      state.workspaceId = action.payload;
-    },
     setDefaultSettingsTab(state, action: PayloadAction<SettingsTabTitle>) {
       state.defaultSettingsTab = action.payload;
     },
@@ -221,7 +218,6 @@ export const {
   setUnexpectedError,
   setUploading,
   setVideoUrl,
-  setWorkspaceId,
   updateTheme,
 } = appSlice.actions;
 

@@ -8,10 +8,13 @@ import * as actions from "ui/actions/app";
 import { UIState } from "ui/state";
 import { useConfirm } from "ui/components/shared/Confirm";
 import { PrimaryButton, SecondaryButton } from "ui/components/shared/Button";
+import { useRouter } from "next/router";
+import { useRedirectToTeam } from "../../../utils";
 
 type PendingTeamPromptProps = PropsFromRedux & { workspace: PendingWorkspaceInvitation };
 
-function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps) {
+function PendingTeamPrompt({ workspace }: PendingTeamPromptProps) {
+  const redirectToTeam = useRedirectToTeam();
   const [loading, setLoading] = useState<boolean>(false);
   const { id, name, inviterEmail } = workspace;
 
@@ -37,7 +40,7 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
     });
   };
   function onDeclineCompleted() {
-    setWorkspaceId(null);
+    redirectToTeam();
   }
   function onAcceptCompleted() {
     updateDefaultWorkspace({
@@ -77,11 +80,8 @@ function PendingTeamPrompt({ workspace, setWorkspaceId }: PendingTeamPromptProps
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    currentWorkspaceId: selectors.getWorkspaceId(state),
-  }),
-  { setWorkspaceId: actions.setWorkspaceId }
-);
+const connector = connect((state: UIState) => ({
+  currentWorkspaceId: selectors.getWorkspaceId(state),
+}));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(PendingTeamPrompt);

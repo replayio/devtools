@@ -24,6 +24,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { DownloadPage } from "./Onboarding/DownloadPage";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { useRouter } from "next/router";
+import { useRedirectToTeam } from "../Library/Team/utils";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -112,7 +113,7 @@ function TeamNamePage({
         <OnboardingHeader>What should we call you?</OnboardingHeader>
         <OnboardingBody>{`Keep it simple! Your company name is perfect`}</OnboardingBody>
       </OnboardingContent>
-      <div className="flex w-full flex-col py-3">
+      <div className="flex flex-col w-full py-3">
         <TextInput
           value={inputValue}
           onChange={onChange}
@@ -129,11 +130,8 @@ function TeamNamePage({
   );
 }
 
-function TeamMemberInvitationPage({
-  newWorkspace,
-  setWorkspaceId,
-  onSkipToDownload,
-}: SlideBodyProps) {
+function TeamMemberInvitationPage({ newWorkspace, onSkipToDownload }: SlideBodyProps) {
+  const redirectToTeam = useRedirectToTeam();
   const [inputValue, setInputValue] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -144,7 +142,7 @@ function TeamMemberInvitationPage({
   });
 
   useEffect(() => {
-    setWorkspaceId(newWorkspace!.id);
+    redirectToTeam(`/team/${newWorkspace!.id}`);
   });
 
   // This is hacky. A member entry will only have an e-mail if it was pending. If
@@ -185,8 +183,8 @@ function TeamMemberInvitationPage({
         <OnboardingBody>{`Replay is for your whole team. Invite anyone you’d like to record and discuss replays with`}</OnboardingBody>
       </OnboardingContent>
       <div className="w-9/12 space-y-3 text-xl">
-        <form className="flex w-full flex-col space-y-3 text-xl" onSubmit={handleAddMember}>
-          <div className="flex flex-grow flex-row space-x-3 text-black">
+        <form className="flex flex-col w-full space-y-3 text-xl" onSubmit={handleAddMember}>
+          <div className="flex flex-row flex-grow space-x-3 text-black">
             <TextInput
               placeholder="Email address"
               value={inputValue}
@@ -291,7 +289,6 @@ function TeamOnboarding(props: { organization?: boolean } & PropsFromRedux) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(TeamOnboarding);

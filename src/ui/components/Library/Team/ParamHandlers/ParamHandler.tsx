@@ -3,9 +3,5 @@ import { SettingsHandler } from "./SettingsHandler";
 
 export function ParamHandler() {
   const { settings, invitation } = useRouter().query;
-  return (
-    <>
-      {settings ? <SettingsHandler /> : null}
-    </>
-  );
+  return <>{settings ? <SettingsHandler /> : null}</>;
 }

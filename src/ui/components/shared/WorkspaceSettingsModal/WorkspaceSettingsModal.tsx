@@ -19,6 +19,7 @@ import GeneralSettings from "./GeneralSettings";
 import OrganizationSettings from "./OrganizationSettings";
 import Base64Image from "../Base64Image";
 import { trackEvent } from "ui/utils/telemetry";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 
 export function WorkspaceMembers({
   members,
@@ -128,7 +129,6 @@ const settings: Settings<
     isAdmin: boolean;
     workspaceId: string;
     hideModal: PropsFromRedux["hideModal"];
-    setWorkspaceId: PropsFromRedux["setWorkspaceId"];
   }
 > = [
   {
@@ -178,7 +178,8 @@ const settings: Settings<
   {
     title: "Delete Team",
     icon: "cancel",
-    component: function DeleteTeam({ hideModal, setWorkspaceId, workspaceId }) {
+    component: function DeleteTeam({ hideModal, workspaceId }) {
+      const redirectToTeam = useRedirectToTeam();
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
       const { confirmDestructive } = useConfirm();
@@ -194,8 +195,8 @@ const settings: Settings<
               variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
             });
             hideModal();
-            setWorkspaceId(null);
             updateDefaultWorkspace({ variables: { workspaceId: null } });
+            redirectToTeam();
           }
         });
       };
@@ -281,7 +282,6 @@ const connector = connect(
   },
   {
     hideModal: actions.hideModal,
-    setWorkspaceId: actions.setWorkspaceId,
   }
 );
 export type PropsFromRedux = ConnectedProps<typeof connector>;
