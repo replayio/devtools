@@ -32,6 +32,12 @@ if (process.env.E2E_CODE_COVERAGE) {
         sourceRoot: __dirname,
         resultDir: path.join(__dirname, "coverage"),
         reports: [["html"]],
+        rewritePath: ({ absolutePath, relativePath }) => {
+          // console.log("Original path: ", absolutePath);
+          const rewrittenPath = absolutePath.replace("_N_E/", "").replace(/\?(\w|\d)+$/, "");
+          // console.log("Rewritten path: ", rewrittenPath);
+          return rewrittenPath;
+        },
       },
     ],
   ];

@@ -1,8 +1,12 @@
 import path from "path";
+import fs from "fs";
 import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
+import type { Config as JestConfig } from "@jest/types";
 import { AggregatedResult, AssertionResult, Test, TestResult } from "@jest/test-result";
-import { create, ReportType, ReportOptions } from "istanbul-reports";
+
+import { CoverageMapData, createCoverageMap } from "istanbul-lib-coverage";
 import { createContext, Watermarks } from "istanbul-lib-report";
+import { create, ReportType, ReportOptions } from "istanbul-reports";
 
 import { Remote, wrap } from "comlink";
 import { Worker } from "worker_threads";
@@ -62,11 +66,13 @@ export default class E2ECoverageReporter
   private readonly watermarks?: Partial<Watermarks>;
   private readonly rewritePath?: CoverageReporterOptions["rewritePath"];
 
+  private readonly jestGlobalConfig: JestConfig.GlobalConfig;
+
   private readonly workerInstance: Worker;
   private readonly worker: Remote<CoverageWorker>;
 
   constructor(
-    globalConfig: any,
+    globalConfig: JestConfig.GlobalConfig,
     {
       exclude,
       sourceRoot,
@@ -76,6 +82,7 @@ export default class E2ECoverageReporter
       rewritePath,
     }: CoverageReporterOptions = {}
   ) {
+    this.jestGlobalConfig = globalConfig;
     this.exclude = typeof exclude === "string" ? [exclude] : exclude ?? [];
     this.resultDir = resultDir || "coverage";
     this.reports = reports;
@@ -98,6 +105,13 @@ export default class E2ECoverageReporter
       }
     );
     this.worker = wrap<CoverageWorker>(nodeEndpoint(this.workerInstance));
+
+    this.workerInstance.on("message", msg => {
+      if (msg.type === "RAW") {
+        return;
+      }
+      console.log("Worker: ", msg);
+    });
   }
 
   onRunStart(results: AggregatedResult, options: ReporterOnStartOptions) {
@@ -110,6 +124,13 @@ export default class E2ECoverageReporter
     const coverageFolder = "./coverage/testCoverage";
     const filename = `${testName}.coverage.json`;
     const testCoveragePath = path.join(coverageFolder, filename);
+
+    if (fs.existsSync(testCoveragePath)) {
+      console.log("Starting conversion of coverage: ", testCoveragePath);
+      this.worker.startConversion(testCoveragePath);
+    } else {
+      console.log("Could not find coverage file: ", testCoveragePath);
+    }
     // const { numPassingTests, numFailingTests } = testResult;
     // console.log("Test complete: ", test.path, "Result: ", testResult.displayName, {
     //   numPassingTests,
@@ -118,8 +139,61 @@ export default class E2ECoverageReporter
   }
 
   async onRunComplete(_: any, results: AggregatedResult) {
-    const workerValue = await this.worker.doSomethingUseful();
-    console.log("Received worker result: ", workerValue);
+    const sourceRoot = this.sourceRoot ?? this.jestGlobalConfig.rootDir;
+
+    console.log(
+      "Processing complete run results...",
+      this.sourceRoot,
+      this.jestGlobalConfig.rootDir
+    );
+
+    const totalCoverage = JSON.parse(
+      await this.worker.getTotalCoverage(sourceRoot, this.exclude)
+    ) as CoverageMapData;
+
+    // console.log("Total coverage: ", totalCoverage);
+
+    const coverage = createCoverageMap(
+      Object.fromEntries(
+        Object.entries(totalCoverage).map(([relativePath, data]) => {
+          const absolutePath = path.resolve(sourceRoot, relativePath);
+          // console.log("File path: ", absolutePath);
+          const newPath = this.rewritePath?.({ absolutePath, relativePath }) ?? absolutePath;
+
+          return [newPath, { ...data, path: newPath }];
+        })
+      )
+    );
+    // console.log("Coverage map: ", coverage);
+
+    const context = createContext({
+      coverageMap: coverage,
+      dir: path.resolve(this.jestGlobalConfig.rootDir, this.resultDir),
+      watermarks: this.watermarks,
+
+      sourceFinder: path => {
+        try {
+          // console.log("Looking up source file: ", path);
+          return fs.readFileSync(path, "utf8");
+        } catch (e) {
+          throw new Error(`Failed to read ${path}: ${e}`);
+        }
+      },
+    });
+
+    for (const reporterConfig of this.reports) {
+      let reporter;
+      if (typeof reporterConfig === "string") {
+        reporter = create(reporterConfig);
+      } else {
+        reporter = create(...reporterConfig);
+      }
+
+      reporter.execute(context);
+    }
+
+    // const workerValue = await this.worker.doSomethingUseful();
+    // console.log("Received worker result: ", workerValue);
     // console.log("Run complete");
     // console.log("First arg: ", _);
     // console.log("Results: ", results);
