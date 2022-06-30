@@ -11,7 +11,7 @@ export function RunResults() {
 
   const sortedRecordings = orderBy(testRun.recordings, "date", "desc");
   const passedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "passed");
-  const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result === "failed");
+  const failedRecordings = sortedRecordings.filter(r => r.metadata.test?.result !== "passed");
 
   return (
     <div className="flex flex-col overflow-y-auto no-scrollbar">

@@ -1,6 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
 import orderBy from "lodash/orderBy";
-import { useAppSelector } from "ui/setup/hooks";
 import { WorkspaceId } from "ui/state/app";
 import { Recording, SourceCommit } from "ui/types";
 
