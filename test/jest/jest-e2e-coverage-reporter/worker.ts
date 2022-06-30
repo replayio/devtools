@@ -59,15 +59,15 @@ class CoverageWorker {
 
     const [file] = this.#queue as [string, ...string[]];
 
-    parentPort?.postMessage("Opening file: " + file);
+    parentPort?.postMessage("Processing coverage file: " + file);
     const coverage: unknown = JSON.parse(await fs.readFile(file, "utf-8"));
     // await fs.unlink(file);
 
-    parentPort?.postMessage(`Coverage object: ${JSON.stringify(coverage).slice(0, 100)}`);
+    // parentPort?.postMessage(`Coverage object: ${JSON.stringify(coverage).slice(0, 100)}`);
     // const isValidCoverage = isProcessCov(coverage);
     const isValidCoverage = isScriptCovArray(coverage);
 
-    parentPort?.postMessage(`Valid coverage: ${isValidCoverage}`);
+    // parentPort?.postMessage(`Valid coverage: ${isValidCoverage}`);
     if (isValidCoverage) {
       for (const script of coverage) {
         // parentPort?.postMessage(`Script source: ${script.source}`);

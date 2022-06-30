@@ -120,7 +120,7 @@ export async function runClassicTest(args: {
             fs.mkdirSync(coverageFolder, { recursive: true });
           }
 
-          const testName = path.basename(script);
+          const testName = path.basename(script).replace(".js", "");
           const filename = `${testName}.coverage.json`;
           const outputPath = path.join(coverageFolder, filename);
           fs.writeFileSync(outputPath, JSON.stringify(coverage, null, 2), "utf8");

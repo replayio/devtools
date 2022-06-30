@@ -23,7 +23,6 @@ const e2eJestConfig = {
 };
 
 if (process.env.E2E_CODE_COVERAGE) {
-  console.log("Configuring custom reporter...");
   e2eJestConfig.reporters = [
     "default",
     [

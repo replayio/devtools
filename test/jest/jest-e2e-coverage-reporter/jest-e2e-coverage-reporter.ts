@@ -3,6 +3,7 @@ import fs from "fs";
 import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
 import type { Config as JestConfig } from "@jest/types";
 import { AggregatedResult, AssertionResult, Test, TestResult } from "@jest/test-result";
+import glob from "glob";
 
 import { CoverageMapData, createCoverageMap } from "istanbul-lib-coverage";
 import { createContext, Watermarks } from "istanbul-lib-report";
@@ -67,6 +68,7 @@ export default class E2ECoverageReporter
   private readonly rewritePath?: CoverageReporterOptions["rewritePath"];
 
   private readonly jestGlobalConfig: JestConfig.GlobalConfig;
+  private readonly coverageFilesAlreadySeen: Set<string>;
 
   private readonly workerInstance: Worker;
   private readonly worker: Remote<CoverageWorker>;
@@ -89,6 +91,8 @@ export default class E2ECoverageReporter
     this.sourceRoot = sourceRoot;
     this.watermarks = watermarks;
     this.rewritePath = rewritePath;
+
+    this.coverageFilesAlreadySeen = new Set();
 
     // Magic recipe for registering TS-Node before loading a worker file so that it's transpiled.
     // Ref: https://github.com/TypeStrong/ts-node/issues/711#issuecomment-679621830
@@ -115,7 +119,6 @@ export default class E2ECoverageReporter
   }
 
   onRunStart(results: AggregatedResult, options: ReporterOnStartOptions) {
-    // console.log("Test run starting: ", options);
     this.worker.reset();
   }
 
@@ -127,15 +130,11 @@ export default class E2ECoverageReporter
 
     if (fs.existsSync(testCoveragePath)) {
       console.log("Starting conversion of coverage: ", testCoveragePath);
+      this.coverageFilesAlreadySeen.add(testCoveragePath);
       this.worker.startConversion(testCoveragePath);
     } else {
       console.log("Could not find coverage file: ", testCoveragePath);
     }
-    // const { numPassingTests, numFailingTests } = testResult;
-    // console.log("Test complete: ", test.path, "Result: ", testResult.displayName, {
-    //   numPassingTests,
-    //   numFailingTests,
-    // });
   }
 
   async onRunComplete(_: any, results: AggregatedResult) {
@@ -146,6 +145,15 @@ export default class E2ECoverageReporter
       this.sourceRoot,
       this.jestGlobalConfig.rootDir
     );
+
+    // Find all JSON files we've accumulated, regardless of whether they're in this test run or not
+    const coverageJsonFiles = glob.sync("coverage/testCoverage/*.json");
+    for (let coverageFilePath of coverageJsonFiles) {
+      if (!this.coverageFilesAlreadySeen.has(coverageFilePath)) {
+        console.log("Processing additional file: ", coverageFilePath);
+        this.worker.startConversion(coverageFilePath);
+      }
+    }
 
     const totalCoverage = JSON.parse(
       await this.worker.getTotalCoverage(sourceRoot, this.exclude)
