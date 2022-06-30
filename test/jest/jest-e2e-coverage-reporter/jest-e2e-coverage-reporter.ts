@@ -1,7 +1,14 @@
+import path from "path";
 import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
 import { AggregatedResult, AssertionResult, Test, TestResult } from "@jest/test-result";
 import { create, ReportType, ReportOptions } from "istanbul-reports";
 import { createContext, Watermarks } from "istanbul-lib-report";
+
+import { Remote, wrap } from "comlink";
+import { Worker } from "worker_threads";
+import nodeEndpoint from "comlink/dist/umd/node-adapter";
+
+import type { CoverageWorker } from "./worker.js";
 
 /**
  * Options to the coverage repoter
@@ -55,6 +62,9 @@ export default class E2ECoverageReporter
   private readonly watermarks?: Partial<Watermarks>;
   private readonly rewritePath?: CoverageReporterOptions["rewritePath"];
 
+  private readonly workerInstance: Worker;
+  private readonly worker: Remote<CoverageWorker>;
+
   constructor(
     globalConfig: any,
     {
@@ -73,15 +83,34 @@ export default class E2ECoverageReporter
     this.watermarks = watermarks;
     this.rewritePath = rewritePath;
 
-    // console.log("Coverage reporter options", { exclude, sourceRoot, resultDir, reports });
+    // Magic recipe for registering TS-Node before loading a worker file so that it's transpiled.
+    // Ref: https://github.com/TypeStrong/ts-node/issues/711#issuecomment-679621830
+    this.workerInstance = new Worker(
+      `
+    require('ts-node/register');
+    require(require('worker_threads').workerData.runThisFileInTheWorker);
+  `,
+      {
+        eval: true,
+        workerData: {
+          runThisFileInTheWorker: require.resolve("./worker.ts"), // '/path/to/worker-script.ts'
+        },
+      }
+    );
+    this.worker = wrap<CoverageWorker>(nodeEndpoint(this.workerInstance));
   }
 
   onRunStart(results: AggregatedResult, options: ReporterOnStartOptions) {
-    console.log("Test run starting: ", options);
+    // console.log("Test run starting: ", options);
+    this.worker.reset();
   }
 
   async onTestResult(test: Test, testResult: TestResult, aggregatedResult: AggregatedResult) {
-    const { numPassingTests, numFailingTests } = testResult;
+    const testName = path.basename(test.path).replace(".test.ts", "");
+    const coverageFolder = "./coverage/testCoverage";
+    const filename = `${testName}.coverage.json`;
+    const testCoveragePath = path.join(coverageFolder, filename);
+    // const { numPassingTests, numFailingTests } = testResult;
     // console.log("Test complete: ", test.path, "Result: ", testResult.displayName, {
     //   numPassingTests,
     //   numFailingTests,
@@ -89,6 +118,8 @@ export default class E2ECoverageReporter
   }
 
   async onRunComplete(_: any, results: AggregatedResult) {
+    const workerValue = await this.worker.doSomethingUseful();
+    console.log("Received worker result: ", workerValue);
     // console.log("Run complete");
     // console.log("First arg: ", _);
     // console.log("Results: ", results);
