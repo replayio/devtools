@@ -1,3 +1,4 @@
+const path = require("path");
 // ts-jest does not compile custom reporters written in TS:
 // https://github.com/kulshekhar/ts-jest/issues/1811
 // Use ts-node to let that compile on import
@@ -25,7 +26,14 @@ if (process.env.E2E_CODE_COVERAGE) {
   console.log("Configuring custom reporter...");
   e2eJestConfig.reporters = [
     "default",
-    "<rootDir>/test/jest/jest-e2e-coverage-reporter/jest-e2e-coverage-reporter.ts",
+    [
+      "<rootDir>/test/jest/jest-e2e-coverage-reporter/jest-e2e-coverage-reporter.ts",
+      {
+        sourceRoot: __dirname,
+        resultDir: path.join(__dirname, "coverage"),
+        reports: [["html"]],
+      },
+    ],
   ];
 }
 
