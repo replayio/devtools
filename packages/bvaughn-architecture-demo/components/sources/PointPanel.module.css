@@ -1,7 +1,7 @@
 .Point {
   display: flex;
-  align-items: center;
-  gap: 1ch;
+  flex-direction: column;
+  gap: 0.5ch;
 }
 
 .Label {
@@ -46,4 +46,31 @@
 .SaveButtonIcon {
   width: 1rem;
   height: 1rem;
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+}
+
+.HitPointsList {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.5ch;
+}
+.HitPointsList::before {
+  content: "Hits:";
+}
+
+.HitPointListItem {
+  list-style-type: none;
+}
+.HitPointListItem::after {
+  content: ", ";
+}
+.HitPointListItem:last-of-type:after {
+  content: "";
 }

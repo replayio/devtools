@@ -2,6 +2,7 @@
   height: 100%;
   border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
+  overflow: auto;
 }
 
 .Header {

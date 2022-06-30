@@ -3,7 +3,7 @@ import {
   newSource as ProtocolSource,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { ReplayClientInterface } from "shared/client/types";
+import { LineHits, ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 
@@ -16,6 +16,10 @@ export type ProtocolSourceContents = {
 
 let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
+
+type LineNumberToHitCountMap = Map<number, LineHits>;
+
+const sourceIdToHitCountsMap: Map<ProtocolSourceId, Record<LineNumberToHitCountMap>> = new Map();
 
 const sourceIdToSourceContentsMap: Map<
   ProtocolSourceId,
@@ -65,6 +69,29 @@ export function getSourceContents(
   }
 }
 
+export function gitSourceHitCounts(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): LineNumberToHitCountMap {
+  let record = sourceIdToHitCountsMap.get(sourceId);
+  if (record == null) {
+    record = {
+      status: STATUS_PENDING,
+      value: createWakeable<LineNumberToHitCountMap>(),
+    };
+
+    sourceIdToHitCountsMap.set(sourceId, record);
+
+    fetchSourceHitCounts(client, sourceId, record, record.value);
+  }
+
+  if (record!.status === STATUS_RESOLVED) {
+    return record!.value;
+  } else {
+    throw record!.value;
+  }
+}
+
 async function fetchSources(client: ReplayClientInterface) {
   sources = await client.findSources();
 
@@ -83,6 +110,27 @@ async function fetchSourceContents(
 
     record.status = STATUS_RESOLVED;
     record.value = sourceContents;
+
+    wakeable.resolve(record.value);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
+
+    wakeable.reject(error);
+  }
+}
+
+async function fetchSourceHitCounts(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  record: Record<LineNumberToHitCountMap>,
+  wakeable: Wakeable<LineNumberToHitCountMap>
+) {
+  try {
+    const hitCounts = await client.gitSourceHitCounts(sourceId);
+
+    record.status = STATUS_RESOLVED;
+    record.value = hitCounts;
 
     wakeable.resolve(record.value);
   } catch (error) {

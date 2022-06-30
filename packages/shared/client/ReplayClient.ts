@@ -1,11 +1,13 @@
 import {
   ContentType,
+  Location,
   Message,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  PointDescription,
   RecordingId,
   SessionId,
   SourceId,
@@ -17,7 +19,7 @@ import { client, initSocket } from "protocol/socket";
 import { Pause, ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
-import { ReplayClientInterface } from "./types";
+import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -47,32 +49,6 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   configure(sessionId: string): void {
     this._sessionId = sessionId;
-  }
-
-  getPauseIdForMessage(message: Message): PauseId {
-    // Pause mutates the Message objects passed ot it.
-    // We don't want that, so we have to deep clone the values first.
-    const clonedMessage = JSON.parse(JSON.stringify(message));
-
-    // TODO Create pauseId without the Pause; client.Session.createPause()
-    const pause = new Pause(this._threadFront);
-    pause.instantiate(
-      clonedMessage.pauseId,
-      clonedMessage.point.point,
-      clonedMessage.point.time,
-      !!clonedMessage.point.frame,
-      clonedMessage.data
-    );
-
-    return pause.pauseId!;
-  }
-
-  getRecordingId(): RecordingId | null {
-    return this._recordingId;
-  }
-
-  getSessionId(): SessionId | null {
-    return this._sessionId;
   }
 
   // Initializes the WebSocket and remote session.
@@ -174,6 +150,28 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
+    const sessionId = this.getSessionIdThrows();
+    const data = await new Promise<PointDescription[]>(async resolve => {
+      const { analysisId } = await client.Analysis.createAnalysis(
+        {
+          mapper: "",
+          effectful: false,
+        },
+        sessionId
+      );
+
+      client.Analysis.addLocation({ analysisId, location }, sessionId);
+      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+      client.Analysis.addAnalysisPointsListener(({ points }) => {
+        resolve(points);
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+      });
+    });
+
+    return data;
+  }
+
   async getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
@@ -188,10 +186,32 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  getPauseIdForMessage(message: Message): PauseId {
+    // Pause mutates the Message objects passed ot it.
+    // We don't want that, so we have to deep clone the values first.
+    const clonedMessage = JSON.parse(JSON.stringify(message));
+
+    // TODO Create pauseId without the Pause; client.Session.createPause()
+    const pause = new Pause(this._threadFront);
+    pause.instantiate(
+      clonedMessage.pauseId,
+      clonedMessage.point.point,
+      clonedMessage.point.time,
+      !!clonedMessage.point.frame,
+      clonedMessage.data
+    );
+
+    return pause.pauseId!;
+  }
+
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
     const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
     return point;
+  }
+
+  getRecordingId(): RecordingId | null {
+    return this._recordingId;
   }
 
   async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
@@ -199,10 +219,54 @@ export class ReplayClient implements ReplayClientInterface {
     return endpoint;
   }
 
+  getSessionId(): SessionId | null {
+    return this._sessionId;
+  }
+
   async getSourceContents(
     sourceId: SourceId
   ): Promise<{ contents: string; contentType: ContentType }> {
     return this._threadFront.getSourceContents(sourceId);
+  }
+
+  async gitSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {
+    const sessionId = this.getSessionIdThrows();
+    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
+      {
+        sourceId,
+      },
+      sessionId
+    );
+
+    const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
+      {
+        sourceId,
+        locations: lineLocations,
+        maxHits: 250,
+      },
+      sessionId
+    );
+
+    const hitCounts: Map<number, LineHits> = new Map();
+
+    protocolHitCounts.forEach(({ hits, location }) => {
+      const previous = hitCounts.get(location.line) || {
+        columnHits: [],
+        hits: 0,
+      };
+
+      const columnHits: ColumnHits = {
+        hits: hits,
+        location: location,
+      };
+
+      hitCounts.set(location.line, {
+        columnHits: [...previous.columnHits, columnHits],
+        hits: previous.hits + hits,
+      });
+    });
+
+    return hitCounts;
   }
 }
 

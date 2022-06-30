@@ -25,6 +25,10 @@
   gap: 0.5ch;
   cursor: pointer;
 }
+.AddButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
 
 .AddButtonIcon {
   width: 1rem;

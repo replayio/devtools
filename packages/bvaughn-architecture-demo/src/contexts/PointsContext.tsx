@@ -9,9 +9,10 @@ type PointLocation = {
 
 export type Point = PointLocation & {
   id: number;
-  enabled: boolean;
+  badge: string | null;
   content: string;
   enableBreaking: boolean;
+  enabled: boolean;
   enableLogging: boolean;
 };
 
@@ -32,9 +33,10 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, pointLocation: PointLocation) => {
       const point: Point = {
+        badge: null,
         content: "",
-        enabled: true,
         enableBreaking: false,
+        enabled: true,
         enableLogging: false,
         ...partialPoint,
         ...pointLocation,

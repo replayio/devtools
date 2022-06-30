@@ -13,6 +13,7 @@
   flex-direction: row;
   flex: 1 1 auto;
   gap: 0.5rem;
+  overflow: auto;
 }
 
 .CommentsContainer {
