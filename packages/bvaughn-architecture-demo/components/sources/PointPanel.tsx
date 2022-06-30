@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
-import { Suspense, useContext, useState } from "react";
+import { Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Loader from "../Loader";
 
@@ -11,6 +11,16 @@ export default function PointPanel({ point }: { point: Point }) {
   const { deletePoint, editPoint } = useContext(PointsContext);
 
   const [editableContent, setEditableContent] = useState(point.content);
+
+  const isContentValid = useMemo(() => {
+    try {
+      // Cheap parser/validator.
+      new Function(editableContent);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }, [editableContent]);
 
   return (
     <div className={styles.Point}>
@@ -38,13 +48,14 @@ export default function PointPanel({ point }: { point: Point }) {
           log?
         </label>
         <small>
-          ({point.lineNumber}:{point.columnNumber})
+          ({point.location.line}:{point.location.column})
         </small>
         <button className={styles.DeleteButton} onClick={() => deletePoint(point.id)}>
           <Icon className={styles.DeleteButtonIcon} type="delete" />
         </button>
         <button
           className={styles.SaveButton}
+          disabled={!isContentValid}
           onClick={() => editPoint(point.id, { content: editableContent })}
         >
           <Icon className={styles.SaveButtonIcon} type="save" />
@@ -61,11 +72,7 @@ export default function PointPanel({ point }: { point: Point }) {
 
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
-  const hitPoints = getHitPointsForLocation(client, {
-    column: point.columnNumber,
-    line: point.lineNumber,
-    sourceId: point.sourceId,
-  });
+  const hitPoints = getHitPointsForLocation(client, point.location);
   return (
     <ul className={styles.HitPointsList}>
       {hitPoints.map(point => (

@@ -12,6 +12,31 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 const locationToHitPointsMap: Map<string, Record<TimeStampedPoint[]>> = new Map();
 const timeToExecutionPointMap: Map<number, Record<ExecutionPoint>> = new Map();
 
+export function getClosestPointForTime(
+  client: ReplayClientInterface,
+  time: number
+): ExecutionPoint {
+  let record = timeToExecutionPointMap.get(time);
+  if (record == null) {
+    const wakeable = createWakeable<ExecutionPoint>();
+
+    record = {
+      status: STATUS_PENDING,
+      value: wakeable,
+    };
+
+    timeToExecutionPointMap.set(time, record);
+
+    fetchClosestPointForTime(client, time, record, wakeable);
+  }
+
+  if (record.status === STATUS_RESOLVED) {
+    return record.value;
+  } else {
+    throw record.value;
+  }
+}
+
 export function getHitPointsForLocation(
   client: ReplayClientInterface,
   location: Location
@@ -38,28 +63,24 @@ export function getHitPointsForLocation(
   }
 }
 
-export function getClosestPointForTime(
+async function fetchClosestPointForTime(
   client: ReplayClientInterface,
-  time: number
-): ExecutionPoint {
-  let record = timeToExecutionPointMap.get(time);
-  if (record == null) {
-    const wakeable = createWakeable<ExecutionPoint>();
+  time: number,
+  record: Record<ExecutionPoint>,
+  wakeable: Wakeable<ExecutionPoint>
+) {
+  try {
+    const { point } = await client.getPointNearTime(time);
 
-    record = {
-      status: STATUS_PENDING,
-      value: wakeable,
-    };
+    record.status = STATUS_RESOLVED;
+    record.value = point;
 
-    timeToExecutionPointMap.set(time, record);
+    wakeable.resolve(point);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
 
-    fetchClosestPointForTime(client, time, record, wakeable);
-  }
-
-  if (record.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    throw record.value;
+    wakeable.reject(error);
   }
 }
 
@@ -76,27 +97,6 @@ async function fetchHitPointsForLocation(
     record.value = executionPoints;
 
     wakeable.resolve(executionPoints);
-  } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
-
-    wakeable.reject(error);
-  }
-}
-
-async function fetchClosestPointForTime(
-  client: ReplayClientInterface,
-  time: number,
-  record: Record<ExecutionPoint>,
-  wakeable: Wakeable<ExecutionPoint>
-) {
-  try {
-    const { point } = await client.getPointNearTime(time);
-
-    record.status = STATUS_RESOLVED;
-    record.value = point;
-
-    wakeable.resolve(point);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;

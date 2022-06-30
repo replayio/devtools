@@ -86,7 +86,6 @@ export async function renderFocused(
   const consoleFiltersContext: ConsoleFiltersContextType = {
     filterByDisplayText: "",
     filterByText: "",
-    filteredMessages: [],
     isTransitionPending: false,
     levelFlags: {
       showErrors: true,
@@ -113,10 +112,11 @@ export async function renderFocused(
   };
 
   const pointsContext: PointsContextType = {
-    points: [],
     addPoint: jest.fn(),
     deletePoint: jest.fn(),
     editPoint: jest.fn(),
+    isPending: false,
+    points: [],
     ...options?.pointsContext,
   };
 

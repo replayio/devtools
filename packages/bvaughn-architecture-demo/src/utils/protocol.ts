@@ -195,3 +195,92 @@ export function clientValueToProtocolValue(clientValue: any): ProtocolValue {
 
   return protocolValue;
 }
+
+export function primitiveToClientValue(value: any): Value {
+  switch (typeof value) {
+    case "bigint":
+      return {
+        name: null,
+        preview: `${value}n`,
+        type: "bigint",
+      };
+    case "boolean":
+      return {
+        name: null,
+        preview: `${value}`,
+        type: "boolean",
+      };
+    case "function":
+      return {
+        name: null,
+        preview: `${value}`,
+        type: "function",
+      };
+    case "number":
+      if (Number.isNaN(value)) {
+        return { name: null, preview: "NaN", type: "nan" };
+      } else {
+        return {
+          name: null,
+          preview: `${value}`,
+          type: "number",
+        };
+      }
+    case "object":
+      if (value === null) {
+        return {
+          name: null,
+          preview: "null",
+          type: "null",
+        };
+      } else if (Array.isArray(value)) {
+        return {
+          name: null,
+          preview: `[${value}]`,
+          type: "array",
+        };
+      }
+      break;
+    case "string":
+      return {
+        name: null,
+        preview: value,
+        type: "string",
+      };
+    case "symbol":
+      return {
+        name: null,
+        preview: value.toString(),
+        type: "symbol",
+      };
+    case "undefined":
+      return {
+        name: null,
+        preview: "undefined",
+        type: "undefined",
+      };
+  }
+
+  /* TODO (bvaughn:console:points)
+    case "Map":
+    case "WeakMap":
+      type = "map";
+      break;
+    case "RegExp":
+      type = "regexp";
+      break;
+    case "Set":
+    case "WeakSet":
+      type = "set";
+      break;
+    default:
+      if (className.startsWith("HTML")) {
+        type = "html-element";
+      } else if (className === "Text") {
+        type = "html-text";
+      }
+      break;
+  */
+
+  throw Error(`Unsupported value type`);
+}

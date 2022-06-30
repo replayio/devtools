@@ -1,25 +1,28 @@
-import { SourceId } from "@replayio/protocol";
-import { createContext, PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { Location, SourceId } from "@replayio/protocol";
+import {
+  createContext,
+  PropsWithChildren,
+  useCallback,
+  useMemo,
+  useState,
+  useTransition,
+} from "react";
 
-type PointLocation = {
-  sourceId: SourceId;
-  columnNumber: number;
-  lineNumber: number;
-};
-
-export type Point = PointLocation & {
-  id: number;
+export type Point = {
   badge: string | null;
+  condition: string | null;
   content: string;
   enableBreaking: boolean;
-  enabled: boolean;
   enableLogging: boolean;
+  id: number;
+  location: Location;
 };
 
 export type PointsContextType = {
-  addPoint: (partialPoint: Partial<Point> | null, pointLocation: PointLocation) => void;
+  addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
   deletePoint: (id: number) => void;
   editPoint: (id: number, partialPoint: Partial<Point>) => void;
+  isPending: boolean;
   points: Point[];
 };
 
@@ -29,60 +32,64 @@ export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const [points, setPoints] = useState<Point[]>([]);
+  const [isPending, startTransition] = useTransition();
 
-  const addPoint = useCallback(
-    (partialPoint: Partial<Point> | null, pointLocation: PointLocation) => {
+  const addPoint = useCallback((partialPoint: Partial<Point> | null, location: Location) => {
+    startTransition(() => {
       const point: Point = {
         badge: null,
         content: "",
+        condition: null,
         enableBreaking: false,
-        enabled: true,
         enableLogging: false,
         ...partialPoint,
-        ...pointLocation,
         id: idCounter++,
+        location,
       };
 
       setPoints(prevPoints => [...prevPoints, point]);
-    },
-    []
-  );
+    });
+  }, []);
 
   const deletePoint = useCallback((id: number) => {
-    setPoints((prevPoints: Point[]) => {
-      const index = prevPoints.findIndex(point => point.id === id);
-      if (index >= 0) {
-        const newPoints = prevPoints.slice();
-        newPoints.splice(index, 1);
-        return newPoints;
-      }
+    startTransition(() => {
+      setPoints((prevPoints: Point[]) => {
+        const index = prevPoints.findIndex(point => point.id === id);
+        if (index >= 0) {
+          const newPoints = prevPoints.slice();
+          newPoints.splice(index, 1);
+          return newPoints;
+        }
 
-      throw Error(`Could not find point with "${id}"`);
+        throw Error(`Could not find point with "${id}"`);
+      });
     });
   }, []);
 
   const editPoint = useCallback((id: number, partialPoint: Partial<Point>) => {
-    setPoints((prevPoints: Point[]) => {
-      const index = prevPoints.findIndex(point => point.id === id);
-      if (index >= 0) {
-        const prevPoint = prevPoints[index];
-        const newPoint: Point = {
-          ...prevPoint,
-          ...partialPoint,
-        };
+    startTransition(() => {
+      setPoints((prevPoints: Point[]) => {
+        const index = prevPoints.findIndex(point => point.id === id);
+        if (index >= 0) {
+          const prevPoint = prevPoints[index];
+          const newPoint: Point = {
+            ...prevPoint,
+            ...partialPoint,
+          };
 
-        const points = prevPoints.slice();
-        points.splice(index, 1, newPoint);
-        return points;
-      }
+          const points = prevPoints.slice();
+          points.splice(index, 1, newPoint);
+          return points;
+        }
 
-      throw Error(`Could not find point with "${id}"`);
+        throw Error(`Could not find point with "${id}"`);
+      });
     });
   }, []);
 
   const context = useMemo(
-    () => ({ addPoint, deletePoint, editPoint, points }),
-    [addPoint, deletePoint, editPoint, points]
+    () => ({ addPoint, deletePoint, editPoint, isPending, points }),
+    [addPoint, deletePoint, editPoint, isPending, points]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;

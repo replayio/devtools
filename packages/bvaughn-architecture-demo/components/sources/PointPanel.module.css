@@ -42,6 +42,10 @@
   color: var(--color-primary-button);
 }
 
+.SaveButton:disabled {
+  opacity: 0.5;
+}
+
 .DeleteButtonIcon,
 .SaveButtonIcon {
   width: 1rem;

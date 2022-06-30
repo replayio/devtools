@@ -53,8 +53,8 @@ export default function Source({
         enableLogging: true,
       },
       {
-        columnNumber: closestColumnNumber,
-        lineNumber,
+        column: closestColumnNumber,
+        line: lineNumber,
         sourceId,
       }
     );
@@ -82,7 +82,7 @@ export default function Source({
       </div>
 
       {points
-        .filter(point => point.sourceId === sourceId)
+        .filter(point => point.location.sourceId === sourceId)
         .map(point => (
           <PointPanel key={point.id} point={point} />
         ))}

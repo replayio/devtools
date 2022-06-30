@@ -9076,6 +9076,7 @@ __metadata:
     date-fns: ^2.28.0
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
+    js-tokens: ^8.0.0
     lodash: ^4.17.21
     next: ^12.1.6
     next-transpile-modules: ^9.0.0
@@ -15941,6 +15942,13 @@ __metadata:
   version: 4.0.0
   resolution: "js-tokens@npm:4.0.0"
   checksum: 8a95213a5a77deb6cbe94d86340e8d9ace2b93bc367790b260101d2f36a2eaf4e4e22d9fa9cf459b38af3a32fb4190e638024cf82ec95ef708680e405ea7cc78
+  languageName: node
+  linkType: hard
+
+"js-tokens@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "js-tokens@npm:8.0.0"
+  checksum: 7a069cf43d93bd5f0e047f975fcc7fcdf6176378d2ebff45020ed4360e031d013f5ed55e0a26cf9694537af9bb04f06aa6c200077f26bf7cb0f59102b46d0e56
   languageName: node
   linkType: hard
 
