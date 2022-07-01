@@ -1,5 +1,4 @@
 import { useContext, useState, useRef } from "react";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { TestRun } from "ui/hooks/tests";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import {
@@ -32,19 +31,7 @@ function Title({ testRun }: { testRun: TestRun }) {
 
   return (
     <div className="flex flex-row items-center space-x-2 text-xl font-medium">
-      <div>
-        {formatted}
-        <button onClick={handleCopyLink} className="ml-2 hover:text-primaryAccent">
-          <MaterialIcon>content_copy</MaterialIcon>
-          {showCopied ? (
-            <div className="bg-opacity-700 transition-transform absolute mb-1.5 rounded-lg bg-black p-1.5 text-white shadow-2xl text-xs">
-              Copied
-            </div>
-          ) : (
-            ""
-          )}
-        </button>
-      </div>
+      <div>{formatted}</div>
     </div>
   );
 }
