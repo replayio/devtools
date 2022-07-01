@@ -5,7 +5,7 @@ import { runPlaywrightTest } from "../runTest";
 it("Test source mapping of console errors.", async () => {
   // Not supported on chromium, needs source maps.
   // https://github.com/RecordReplay/chromium/issues/5
-  if (config.browserName !== "firefox") {
+  if (config.browserName !== "firefox" && !config.shouldSaveCoverageData) {
     return;
   }
   await runPlaywrightTest({

@@ -4,7 +4,7 @@ import { runClassicTest } from "../runTest";
 it("Test scope mapping and switching between generated/original sources.", async () => {
   // Not supported on chromium, needs source maps.
   // https://github.com/RecordReplay/chromium/issues/5
-  if (config.browserName !== "firefox") {
+  if (config.browserName !== "firefox" && !config.shouldSaveCoverageData) {
     return;
   }
   await runClassicTest({

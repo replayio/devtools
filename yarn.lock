@@ -2657,6 +2657,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@jridgewell/trace-mapping@npm:^0.3.12, @jridgewell/trace-mapping@npm:^0.3.14":
+  version: 0.3.14
+  resolution: "@jridgewell/trace-mapping@npm:0.3.14"
+  dependencies:
+    "@jridgewell/resolve-uri": ^3.0.3
+    "@jridgewell/sourcemap-codec": ^1.4.10
+  checksum: b9537b9630ffb631aef9651a085fe361881cde1772cd482c257fe3c78c8fd5388d681f504a9c9fe1081b1c05e8f75edf55ee10fdb58d92bbaa8dbf6a7bd6b18c
+  languageName: node
+  linkType: hard
+
 "@jridgewell/trace-mapping@npm:^0.3.7, @jridgewell/trace-mapping@npm:^0.3.9":
   version: 0.3.13
   resolution: "@jridgewell/trace-mapping@npm:0.3.13"
@@ -5986,7 +5996,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/glob@npm:*, @types/glob@npm:^7.1.1":
+"@types/glob@npm:*, @types/glob@npm:^7.1.1, @types/glob@npm:^7.2.0":
   version: 7.2.0
   resolution: "@types/glob@npm:7.2.0"
   dependencies:
@@ -9933,6 +9943,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"comlink@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "comlink@npm:4.3.1"
+  checksum: 557360a6558708c55aff74a25f834bfb9bfca8a42444682c4d5aead57681534a0206202be2a2760b4de124c3ba6d485b08978b6d5469cb3d26bf1438ee28a4f1
+  languageName: node
+  linkType: hard
+
 "comma-separated-tokens@npm:^1.0.0":
   version: 1.0.8
   resolution: "comma-separated-tokens@npm:1.0.8"
@@ -13451,7 +13468,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"glob@npm:^8.0.0, glob@npm:^8.0.1":
+"glob@npm:^8.0.0, glob@npm:^8.0.1, glob@npm:^8.0.3":
   version: 8.0.3
   resolution: "glob@npm:8.0.3"
   dependencies:
@@ -20581,9 +20598,11 @@ __metadata:
     "@babel/preset-react": ^7.14.5
     "@babel/preset-typescript": ^7.15.0
     "@babel/types": ^7.14.8
+    "@bcoe/v8-coverage": ^0.2.3
     "@headlessui/react": ^1.4.3
     "@heroicons/react": ^1.0.6
     "@jest/console": ^28.0.2
+    "@jridgewell/trace-mapping": ^0.3.14
     "@next/bundle-analyzer": ^12.2.0
     "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
@@ -20621,6 +20640,7 @@ __metadata:
     "@types/d3-interpolate": ^3.0.1
     "@types/escape-html": ^1.0.1
     "@types/fuzzaldrin-plus": ^0.6.2
+    "@types/glob": ^7.2.0
     "@types/isomorphic-fetch": ^0.0.36
     "@types/jest": ^27.4.1
     "@types/lodash": ^4.14.181
@@ -20650,6 +20670,7 @@ __metadata:
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     codemirror: ^5.65.2
+    comlink: ^4.3.1
     cookie: ^0.4.2
     css-loader: ^6.7.1
     d3-interpolate: ^3.0.1
@@ -20671,11 +20692,15 @@ __metadata:
     framer-motion: ^6.3.6
     fs-extra: ^10.0.1
     fuzzaldrin-plus: ^0.6.0
+    glob: ^8.0.3
     graphql: 15.8.0
     graphqurl: ^1.0.1
     identity-obj-proxy: ^3.0.0
     immer: ^9.0.7
     isomorphic-fetch: ^3.0.0
+    istanbul-lib-coverage: ^3.2.0
+    istanbul-lib-report: ^3.0.0
+    istanbul-reports: ^3.1.4
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     jest-in-case: ^1.0.2
@@ -20735,6 +20760,7 @@ __metadata:
     tsconfig-paths: ^3.14.1
     typescript: 4.6.3
     utf-8-validate: ^5.0.8
+    v8-to-istanbul: ^9.0.1
     webpack: ^5.71.0
     webpack-cli: ^4.9.2
     webpack-retry-chunk-load-plugin: ^3.0.0
@@ -24152,6 +24178,17 @@ __metadata:
     "@types/istanbul-lib-coverage": ^2.0.1
     convert-source-map: ^1.6.0
   checksum: d8ed2c39ba657dfd851a3c7b3f2b87e5b96c9face806ecfe5b627abe53b0c86f264f51425c591e451405b739e3f8a6728da59670f081790990710e813d8d3440
+  languageName: node
+  linkType: hard
+
+"v8-to-istanbul@npm:^9.0.1":
+  version: 9.0.1
+  resolution: "v8-to-istanbul@npm:9.0.1"
+  dependencies:
+    "@jridgewell/trace-mapping": ^0.3.12
+    "@types/istanbul-lib-coverage": ^2.0.1
+    convert-source-map: ^1.6.0
+  checksum: a49c34bf0a3af0c11041a3952a2600913904a983bd1bc87148b5c033bc5c1d02d5a13620fcdbfa2c60bc582a2e2970185780f0c844b4c3a220abf405f8af6311
   languageName: node
   linkType: hard
 
