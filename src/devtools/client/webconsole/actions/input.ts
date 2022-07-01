@@ -17,7 +17,6 @@ import { ThunkExtraArgs } from "ui/utils/thunk";
 const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
-const { assert } = require("protocol/utils");
 
 type EvaluateJSAsyncOptions = {
   asyncIndex?: number;
@@ -59,10 +58,8 @@ async function dispatchExpression(
 export function paywallExpression(expression: string, reason = "team-user"): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex } = selectedFrame;
+    const asyncIndex = selectedFrame?.asyncIndex;
+
     const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
     const evalId = await dispatchExpression(dispatch, pause!, expression);
 
@@ -94,10 +91,9 @@ export function evaluateExpression(expression: string): UIThunkAction {
     }
 
     const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex, protocolId: frameId } = selectedFrame;
+    const asyncIndex = selectedFrame?.asyncIndex;
+    const frameId = selectedFrame?.protocolId;
+
     const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
     const evalId = await dispatchExpression(dispatch, pause!, expression);
 
@@ -144,10 +140,8 @@ export function eagerEvalExpression(expression: string): UIThunkAction {
     }
 
     const selectedFrame = getSelectedFrame(getState());
-    if (!selectedFrame) {
-      return;
-    }
-    const { asyncIndex, protocolId: frameId } = selectedFrame;
+    const asyncIndex = selectedFrame?.asyncIndex;
+    const frameId = selectedFrame?.protocolId;
 
     try {
       const response = await evaluateJSAsync(expression, ThreadFront, {
