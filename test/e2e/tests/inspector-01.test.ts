@@ -7,8 +7,9 @@ it("Test basic inspector functionality: the inspector is able to show contents w
   if (config.browserName !== "firefox" && !config.shouldSaveCoverageData) {
     return;
   }
-  await runClassicTest({
-    example: "doc_inspector_basic.html",
-    script: "inspector-01.js",
-  });
+
+  // await runClassicTest({
+  //   example: "doc_inspector_basic.html",
+  //   script: "inspector-01.js",
+  // });
 });
