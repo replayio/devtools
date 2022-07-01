@@ -1,4 +1,4 @@
-import { useAppDispatch, useAppSelector } from "../../app/hooks";
+import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
 
 import { sourceEntrySelected } from "./sourcesSlice";
 import { getSourceGroups } from "./sourcesCache";
@@ -6,8 +6,9 @@ import { getSourceGroups } from "./sourcesCache";
 export const SourcesList = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
+  const store = useAppStore();
 
-  const data = getSourceGroups();
+  const data = getSourceGroups(store);
 
   return (
     <ul>

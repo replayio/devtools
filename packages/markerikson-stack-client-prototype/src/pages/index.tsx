@@ -8,11 +8,6 @@ import Loader from "../components/Loader";
 import { SourcesList } from "../features/sources/SourcesList";
 import { SourceContent } from "../features/sources/SourceContent";
 
-import store from "../app/store";
-import { setStore } from "../features/sources/sourcesCache";
-
-setStore(store);
-
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);
   const { currentUserInfo } = sessionData;
