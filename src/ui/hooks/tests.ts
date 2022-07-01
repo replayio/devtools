@@ -16,6 +16,7 @@ export interface TestRun {
   branch: string;
   commit: SourceCommit;
   event: "pull_request" | "push" | "unknown";
+  triggerUrl?: string;
 }
 
 const GET_TESTS_FOR_WORKSPACE = gql`
@@ -236,6 +237,7 @@ function convertTestRun(testRun: any) {
     date: firstRecording.date,
     branch: source?.branch || "Unknown",
     event: source?.trigger?.name || "Unknown",
+    triggerUrl: firstRecording.metadata?.source?.trigger?.url,
     recordings,
   };
 }
