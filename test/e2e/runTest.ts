@@ -79,7 +79,7 @@ export async function runClassicTest(args: {
   try {
     await recordPlaywright(config.browserName, async page => {
       if (saveCoverageData) {
-        page.coverage.startJSCoverage({ resetOnNavigation: false });
+        page.coverage?.startJSCoverage({ resetOnNavigation: false });
       }
 
       if (saveFixture) {
@@ -114,7 +114,7 @@ export async function runClassicTest(args: {
       } catch (err) {
       } finally {
         if (saveCoverageData) {
-          const coverage = await page.coverage.stopJSCoverage();
+          const coverage = await page.coverage?.stopJSCoverage();
           const coverageFolder = "./coverage/testCoverage";
           if (!fs.existsSync(coverageFolder)) {
             fs.mkdirSync(coverageFolder, { recursive: true });

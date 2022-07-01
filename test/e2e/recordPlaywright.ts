@@ -1,4 +1,6 @@
-import replayPlaywright from "@recordreplay/playwright";
+import replayPlaywright, { Page, BrowserType } from "@recordreplay/playwright";
+// Playwright only gets installed if we install the `test` folder, so fix
+// @ts-ignore
 import playwright from "playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
@@ -9,11 +11,10 @@ export type BrowserName = "firefox" | "chromium";
 
 export async function recordPlaywright(
   browserName: BrowserName,
-  script: (page: playwright.Page) => Promise<void>
+  script: (page: Page) => Promise<void>
 ) {
   const playwrightBrowsers = config.shouldRecordTest ? replayPlaywright : playwright;
-  // @ts-ignore
-  const browserEntry : playwright.BrowserType = playwrightBrowsers[browserName] ;
+  const browserEntry: BrowserType<any> = playwrightBrowsers[browserName];
   const browser = await browserEntry.launch({
     env: {
       ...process.env,
@@ -27,7 +28,7 @@ export async function recordPlaywright(
   });
 
   const context = await browser.newContext({
-    ignoreHTTPSErrors: true					  
+    ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
   try {
