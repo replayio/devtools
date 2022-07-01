@@ -17,8 +17,8 @@ function Teams() {
 
   return (
     <>
-      {workspaces.map((w, i) => (
-        <TeamButton label={w.name} key={i} id={w.id} isTest={w.isTest} />
+      {workspaces.map(w => (
+        <TeamButton label={w.name} key={w.id} id={w.id} isTest={w.isTest} />
       ))}
     </>
   );
@@ -31,10 +31,10 @@ export default function Navigation() {
   return (
     <div className={`flex w-64 flex-shrink-0 flex-col ${styles.sidebar}`}>
       <div className="p-4">
-        <img className="w-8 h-8" src="/images/logo.svg" />
+        <img className="h-8 w-8" src="/images/logo.svg" />
       </div>
       <div
-        className="flex flex-col flex-grow overflow-auto text-sm library-sidebar"
+        className="library-sidebar flex flex-grow flex-col overflow-auto text-sm"
         style={scrollbarStyle}
       >
         <div className="flex flex-col">
