@@ -1,13 +1,13 @@
-import { useGetSourcesQuery } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
 import { sourceEntrySelected } from "./sourcesSlice";
+import { getSourceGroups } from "./sourcesCache";
 
 export const SourcesList = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
 
-  const { data } = useGetSourcesQuery();
+  const data = getSourceGroups();
 
   return (
     <ul>
