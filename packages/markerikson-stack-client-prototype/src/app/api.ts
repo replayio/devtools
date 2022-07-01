@@ -29,7 +29,7 @@ export interface SourceGroups {
   other: newSource[];
 }
 
-const reIsJsSourceFile = /(js|ts)x?$/;
+const reIsJsSourceFile = /(js|ts)x?(\?[\w\d]+)*$/;
 
 const CACHE_DATA_PERMANENTLY = 10 * 365 * 24 * 60 * 60;
 

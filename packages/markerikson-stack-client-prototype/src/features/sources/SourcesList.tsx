@@ -22,7 +22,7 @@ export const SourcesList = () => {
         const onLineClicked = () => dispatch(sourceEntrySelected(entry.sourceId));
         return (
           <li key={entry.sourceId} onClick={onLineClicked}>
-            {entryText}
+            {entryText} ({entry.kind})
           </li>
         );
       })}
