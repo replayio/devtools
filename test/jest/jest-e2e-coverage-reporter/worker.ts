@@ -29,7 +29,6 @@ class CoverageWorker {
   #markReady?: () => void;
 
   constructor() {
-    // console.log("Coverage worker created!");
     parentPort?.postMessage("Coverage worker created");
   }
 
@@ -42,8 +41,6 @@ class CoverageWorker {
   }
 
   reset() {
-    // console.log("Resetting worker");
-    // parentPort?.postMessage("Resetting worker");
     this.#queue.length = 0;
     this.#sources.clear();
     this.#totalCoverage = { result: [] };
@@ -61,16 +58,11 @@ class CoverageWorker {
 
     parentPort?.postMessage("Processing coverage file: " + file);
     const coverage: unknown = JSON.parse(await fs.readFile(file, "utf-8"));
-    // await fs.unlink(file);
 
-    // parentPort?.postMessage(`Coverage object: ${JSON.stringify(coverage).slice(0, 100)}`);
-    // const isValidCoverage = isProcessCov(coverage);
     const isValidCoverage = isScriptCovArray(coverage);
 
-    // parentPort?.postMessage(`Valid coverage: ${isValidCoverage}`);
     if (isValidCoverage) {
       for (const script of coverage) {
-        // parentPort?.postMessage(`Script source: ${script.source}`);
         if (typeof script.source === "string") {
           if (this.#sources.get(script.url) !== script.source) {
             this.#sources.set(script.url, script.source);
@@ -81,7 +73,9 @@ class CoverageWorker {
         }
       }
 
+      parentPort?.postMessage(`Merging file: ${file}`);
       this.#totalCoverage = mergeProcessCovs([this.#totalCoverage, { result: coverage }]);
+      parentPort?.postMessage(`Finished merging file: ${file}`);
     }
 
     this.#queue.shift();
@@ -89,34 +83,37 @@ class CoverageWorker {
   }
 
   async getTotalCoverage(sourceRoot: string, exclude: readonly string[]) {
-    // parentPort?.postMessage(`Getting total coverage: (queue: ${this.#queue.length})`);
     if (this.#queue.length !== 0) {
       // We're still running
       await new Promise<void>(resolve => (this.#markReady = resolve));
     }
 
-    // parentPort?.postMessage(`Total coverage proceeding`);
-
     const sourceMaps = new Map(
       await Promise.all(
         Array.from(this.#sourceMaps, ([url, promise]) =>
           promise.then(map => {
-            // parentPort?.postMessage("Loaded sourcemap: " + url);
             return [url, map] as const;
           })
         )
       )
     );
 
-    return JSON.stringify(
-      await convertToIstanbulCoverage(
+    parentPort?.postMessage(`Finished merging coverage, converting to Istanbul...`);
+    let coverageMap: any = {};
+    try {
+      coverageMap = await convertToIstanbulCoverage(
         this.#totalCoverage,
         this.#sources,
         sourceMaps,
         exclude,
         sourceRoot
-      )
-    );
+      );
+    } catch (err) {
+      parentPort?.postMessage(`Error merging: ` + err);
+    }
+
+    parentPort?.postMessage(`Conversion complete`);
+    return JSON.stringify(coverageMap);
   }
 
   async doSomethingUseful() {
@@ -136,10 +133,12 @@ function isScriptCovArray(obj: unknown): obj is ScriptCovWithSource[] {
     obj.every(item => "scriptId" in item)
   );
 }
-function isProcessCov(obj: unknown): obj is ProcessCov {
-  return typeof obj === "object" && obj != null && Array.isArray((obj as ProcessCov).result);
-}
 
 function macrotick() {
   return new Promise(resolve => setTimeout(resolve));
 }
+
+process.on("uncaughtException", err => {
+  parentPort?.postMessage("Uncaught error in the worker: " + err);
+  process.exit(1); // mandatory (as per the Node.js docs)
+});

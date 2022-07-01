@@ -1,3 +1,4 @@
+// Ported from https://github.com/bgotink/playwright-coverage
 import path from "path";
 import fs from "fs";
 import { Reporter, ReporterOnStartOptions } from "@jest/reporters";
@@ -110,6 +111,8 @@ export default class E2ECoverageReporter
     );
     this.worker = wrap<CoverageWorker>(nodeEndpoint(this.workerInstance));
 
+    // Workers apparently can't do console logging directly.
+    // Listen for posted messages and log them to the console.
     this.workerInstance.on("message", msg => {
       if (msg.type === "RAW") {
         return;
@@ -159,20 +162,16 @@ export default class E2ECoverageReporter
       await this.worker.getTotalCoverage(sourceRoot, this.exclude)
     ) as CoverageMapData;
 
-    // console.log("Total coverage: ", totalCoverage);
-
     const coverage = createCoverageMap(
       Object.fromEntries(
         Object.entries(totalCoverage).map(([relativePath, data]) => {
           const absolutePath = path.resolve(sourceRoot, relativePath);
-          // console.log("File path: ", absolutePath);
           const newPath = this.rewritePath?.({ absolutePath, relativePath }) ?? absolutePath;
 
           return [newPath, { ...data, path: newPath }];
         })
       )
     );
-    // console.log("Coverage map: ", coverage);
 
     const context = createContext({
       coverageMap: coverage,
@@ -181,7 +180,6 @@ export default class E2ECoverageReporter
 
       sourceFinder: path => {
         try {
-          // console.log("Looking up source file: ", path);
           return fs.readFileSync(path, "utf8");
         } catch (e) {
           throw new Error(`Failed to read ${path}: ${e}`);
@@ -199,11 +197,10 @@ export default class E2ECoverageReporter
 
       reporter.execute(context);
     }
-
-    // const workerValue = await this.worker.doSomethingUseful();
-    // console.log("Received worker result: ", workerValue);
-    // console.log("Run complete");
-    // console.log("First arg: ", _);
-    // console.log("Results: ", results);
   }
 }
+
+process.on("uncaughtException", err => {
+  console.error("Uncaught error in the reporter: " + err);
+  process.exit(1);
+});

@@ -3,11 +3,9 @@ import type { ProcessCov } from "@bcoe/v8-coverage";
 import type { Suite, TestResult } from "@playwright/test/reporter";
 import { promises as fs } from "fs";
 import { createCoverageMap } from "istanbul-lib-coverage";
-import { parentPort } from "worker_threads";
 // @ts-ignore
 import { isMatch } from "micromatch";
 import { posix } from "path";
-// import type {RawSourceMap} from 'source-map';
 import type { SourceMapInput } from "@jridgewell/trace-mapping";
 import { pathToFileURL, URL } from "url";
 import v8ToIstanbul from "v8-to-istanbul";
@@ -44,11 +42,9 @@ export async function getSourceMap(
   url: string,
   source: string
 ): Promise<SourceMapInput | undefined> {
-  //  parentPort?.postMessage(`Checking sourcemap URL: ${url} (${source.length})`);
   const match = source.match(/\/\/# *sourceMappingURL=(.*)$/);
 
   if (match == null) {
-    // parentPort?.postMessage(`No match found`);
     return undefined;
   }
 
@@ -104,15 +100,11 @@ export async function convertToIstanbulCoverage(
   const istanbulCoverage = createCoverageMap({});
 
   for (const script of v8Coverage.result) {
-    // parentPort?.postMessage("Processing source: " + script.url);
     const source = sources.get(script.url);
-    const sourceMap = sourceMaps.get(script.url);
+    // TODO We're skipping out on using sourcemaps, actually - remove this?
+    // const sourceMap = sourceMaps.get(script.url);
 
     if (source == null) {
-      // || sourceMap == null) {
-      // parentPort?.postMessage(
-      //   `No source or sourceMap found (${source == null}, ${sourceMap == null})`
-      // );
       continue;
     }
 
@@ -149,12 +141,10 @@ export async function convertToIstanbulCoverage(
       0,
       {
         source,
+        // TODO We're skipping out on using sourcemaps
         // sourceMap: { sourcemap: sourceMap },
       },
       path => {
-        // parentPort?.postMessage(`Checking exclusion for: ${path}`);
-        // return false;
-
         let isExcluded = isExcludedCache.get(path)!;
 
         if (isExcluded != null) {
@@ -182,15 +172,11 @@ export async function convertToIstanbulCoverage(
     );
     await convertor.load();
 
-    // parentPort?.postMessage(`Loading functions: ${script.functions.length}`);
     convertor.applyCoverage(script.functions);
-    // parentPort?.postMessage(`Calling conversion`);
     const coverageMap = convertor.toIstanbul();
-    // parentPort?.postMessage(`Post-processing entries`);
 
     const dataEntries = Array.from(Object.entries(coverageMap), ([path, coverage]) => {
       path = sanitizePath(path);
-      // parentPort?.postMessage(`Sanitized path: ${path}`);
       return [
         path,
         {
@@ -202,17 +188,7 @@ export async function convertToIstanbulCoverage(
 
     const finalCoverageMap = Object.fromEntries(dataEntries);
     const keys = Object.keys(finalCoverageMap);
-    // parentPort?.postMessage(`Entry keys: ${keys}`);
     istanbulCoverage.merge(finalCoverageMap);
-    // parentPort?.postMessage(`Entry keys: ${keys}`);
-    // for (let [filePath, fileCoverage] of dataEntries) {
-    //   if ("path" in fileCoverage && "statementMap" in fileCoverage) {
-    //     // @ts-ignore
-
-    //   } else {
-    //     parentPort?.postMessage(`No valid data for: ${script.url}, ${filePath}`);
-    //   }
-    // }
   }
 
   return istanbulCoverage;
