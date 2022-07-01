@@ -29,7 +29,7 @@ export default function Navigation() {
   const scrollbarStyle = { scrollbarColor: "#6B7280 #1F2937" };
 
   return (
-    <div className={`flex w-64 flex-shrink-0 flex-col ${styles.sidebar}`}>
+    <div className={`flex w-64 flex-shrink-0 flex-col ${styles.navigation}`}>
       <div className="p-4">
         <img className="w-8 h-8" src="/images/logo.svg" />
       </div>

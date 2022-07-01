@@ -1,6 +1,5 @@
-import { useContext, useState, useRef } from "react";
+import { useContext } from "react";
 import { TestRun } from "ui/hooks/tests";
-import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import {
   getDurationString,
   getTruncatedRelativeDate,
@@ -11,27 +10,12 @@ import { getDuration } from "../utils";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const workspaceId = useGetTeamIdFromRoute();
   const title = testRun.commit?.title || "";
-  const formatted = title.length > 80 ? title.slice(0, 80) + "…" : title;
-  const [showCopied, setShowCopied] = useState(false);
-  const timeoutKey = useRef<NodeJS.Timeout | null>(null);
-
-  const handleCopyLink = () => {
-    const url = `${window.location.origin}/team/${workspaceId}/test-run/${testRun.id}`;
-    navigator.clipboard.writeText(url);
-
-    if (timeoutKey.current) {
-      clearTimeout(timeoutKey.current);
-    }
-
-    setShowCopied(true);
-    timeoutKey.current = setTimeout(() => setShowCopied(false), 2000);
-  };
+  const triggerUrl = testRun?.triggerUrl;
 
   return (
-    <div className="flex flex-row items-center space-x-2 text-xl font-medium">
-      <div>{formatted}</div>
+    <div className="flex flex-row items-center space-x-2 overflow-hidden">
+      <div className="overflow-hidden text-xl font-medium overflow-ellipsis whitespace-nowrap">{title}</div>
     </div>
   );
 }
