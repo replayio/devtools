@@ -111,9 +111,9 @@ export default function useFilteredMessages(): Loggable[] {
     const loggables: Loggable[] = [...filteredLogPoints, ...filteredMessages];
 
     return loggables.sort((a: Loggable, b: Loggable) => {
-      const timeA = isLogPointInstance(a) ? a.timeStampedHitPoint.time : a.point.time;
-      const timeB = isLogPointInstance(b) ? b.timeStampedHitPoint.time : b.point.time;
-      return timeA - timeB;
+      const pointA = isLogPointInstance(a) ? a.timeStampedHitPoint.point : a.point.point;
+      const pointB = isLogPointInstance(b) ? b.timeStampedHitPoint.point : b.point.point;
+      return pointA.localeCompare(pointB);
     });
   }, [filteredLogPoints, filteredMessages]);
 
