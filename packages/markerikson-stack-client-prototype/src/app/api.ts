@@ -13,22 +13,31 @@ import { Dictionary } from "lodash";
 import groupBy from "lodash/groupBy";
 // eslint-disable-next-line no-restricted-imports
 import { client } from "protocol/socket";
+import type { ReplayClientInterface } from "shared/client/types";
 
-interface SourceGroups {
+let sessionId: SessionId;
+let replayClient: ReplayClientInterface;
+
+export const setReplayClient = (_sessionId: SessionId, _replayClient: ReplayClientInterface) => {
+  sessionId = _sessionId;
+  replayClient = _replayClient;
+};
+
+export interface SourceGroups {
   src: newSource[];
   node_modules: newSource[];
   other: newSource[];
 }
 
-const reIsJsSourceFile = /(js|ts)x?$/;
+const reIsJsSourceFile = /(js|ts)x?(\?[\w\d]+)*$/;
 
 const CACHE_DATA_PERMANENTLY = 10 * 365 * 24 * 60 * 60;
 
 export const api = createApi({
   baseQuery: fakeBaseQuery(),
   endpoints: build => ({
-    getSources: build.query<SourceGroups, SessionId>({
-      queryFn: async (sessionId: SessionId) => {
+    getSources: build.query<SourceGroups, void>({
+      queryFn: async () => {
         const sources: newSource[] = [];
 
         // Fetch the sources
@@ -60,8 +69,8 @@ export const api = createApi({
       },
       keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),
-    getSourceText: build.query<string, { sessionId: SessionId; sourceId: string }>({
-      queryFn: async ({ sessionId, sourceId }) => {
+    getSourceText: build.query<string, string>({
+      queryFn: async sourceId => {
         const demoSourceText = await client.Debugger.getSourceContents(
           {
             sourceId,
@@ -72,11 +81,8 @@ export const api = createApi({
       },
       keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),
-    getSourceHitCounts: build.query<
-      Dictionary<HitCount[]>,
-      { sessionId: SessionId; sourceId: string }
-    >({
-      queryFn: async ({ sessionId, sourceId }) => {
+    getSourceHitCounts: build.query<Dictionary<HitCount[]>, string>({
+      queryFn: async sourceId => {
         const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
           {
             sourceId,
@@ -98,32 +104,30 @@ export const api = createApi({
       },
       keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),
-    getLineHitPoints: build.query<PointDescription[], { location: Location; sessionId: SessionId }>(
-      {
-        queryFn: async ({ location, sessionId }) => {
-          const data = await new Promise<PointDescription[]>(async resolve => {
-            const { analysisId } = await client.Analysis.createAnalysis(
-              {
-                mapper: "",
-                effectful: false,
-              },
-              sessionId
-            );
+    getLineHitPoints: build.query<PointDescription[], Location>({
+      queryFn: async location => {
+        const data = await new Promise<PointDescription[]>(async resolve => {
+          const { analysisId } = await client.Analysis.createAnalysis(
+            {
+              mapper: "",
+              effectful: false,
+            },
+            sessionId
+          );
 
-            client.Analysis.addLocation({ analysisId, location }, sessionId);
-            client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
-            client.Analysis.addAnalysisPointsListener(({ points }) => {
-              resolve(points);
-              client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-            });
+          client.Analysis.addLocation({ analysisId, location }, sessionId);
+          client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+          client.Analysis.addAnalysisPointsListener(({ points }) => {
+            resolve(points);
+            client.Analysis.releaseAnalysis({ analysisId }, sessionId);
           });
+        });
 
-          return { data };
-        },
-      }
-    ),
-    getPause: build.query<createPauseResult, { point: PointDescription; sessionId: SessionId }>({
-      queryFn: async ({ point, sessionId }) => {
+        return { data };
+      },
+    }),
+    getPause: build.query<createPauseResult, PointDescription>({
+      queryFn: async point => {
         const pause = await client.Session.createPause({ point: point.point }, sessionId);
         return { data: pause };
       },

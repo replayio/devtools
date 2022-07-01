@@ -1,9 +1,10 @@
+import React, { Suspense, useContext } from "react";
 import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
 
 import { SessionContext } from "../contexts/SessionContext";
-import { useContext } from "react";
 
+import Loader from "../components/Loader";
 import { SourcesList } from "../features/sources/SourcesList";
 import { SourceContent } from "../features/sources/SourceContent";
 
@@ -23,7 +24,9 @@ const IndexPage: NextPage = () => {
       <div style={{ display: "flex" }}>
         <div style={{ minWidth: 300 }}>
           <h2>Sources Entries</h2>
-          <SourcesList />
+          <Suspense fallback={<Loader />}>
+            <SourcesList />
+          </Suspense>
         </div>
         <div style={{ marginLeft: 10 }}>
           <h2>Source Contents</h2>
