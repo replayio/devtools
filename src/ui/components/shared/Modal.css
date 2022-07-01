@@ -29,6 +29,7 @@
   background: var(--modal-bgcolor);
   border: 1px solid var(--modal-border);
   backdrop-filter: blur(21px);
+   -webkit-backdrop-filter: blur(21px);
   color: var(--theme-toolbar-color);
   animation: linearFadeIn ease 200ms;
 }
