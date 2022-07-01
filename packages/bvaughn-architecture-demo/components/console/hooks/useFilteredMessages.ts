@@ -1,5 +1,6 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { LogPointInstance, LogPointsContext } from "@bvaughn/src/contexts/LogPointsContext";
+import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import { isLogPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
@@ -22,15 +23,32 @@ export default function useFilteredMessages(): Loggable[] {
   // If there is filterByText, it should apply to log points also.
   // We can only filter log points that either require no analysis or have already been analyzed.
   const filteredLogPoints = useMemo<LogPointInstance[]>(() => {
+    if (filterByTextLowercase === "") {
+      return logPoints;
+    }
+
     return logPoints.filter(logPoint => {
-      if (!logPoint.requiresAnalysis) {
-        return logPoint.point.content.toLowerCase().includes(filterByTextLowercase);
-      } else {
-        // TODO (bvaughn:console:points) Get this value from the Suspense cache and filter
-        // If it's safe to read Suspense cache (without suspending).
-        const hasBeenAnalyzed = false;
+      const analysis = getCachedAnalysis(
+        logPoint.point.location,
+        logPoint.timeStampedHitPoint,
+        logPoint.point.content
+      );
+
+      if (!analysis) {
+        // TODO (point) Tricky document
+        return true;
       }
-      return false;
+
+      // TODO (point) Do better filtering for non-string values
+      return (
+        analysis.values.find((value: any) => {
+          if (typeof value === "string") {
+            return value.toLowerCase().includes(filterByTextLowercase);
+          } else if (typeof value?.value === "string") {
+            return value?.value?.toLowerCase()?.includes(filterByTextLowercase);
+          }
+        }) != null
+      );
     });
   }, [filterByTextLowercase, logPoints]);
 
@@ -89,21 +107,15 @@ export default function useFilteredMessages(): Loggable[] {
     }
   }, [filterByTextLowercase, levelFlags, messages]);
 
-  const loggables = useMemo<Loggable[]>(() => {
+  const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [...filteredLogPoints, ...filteredMessages];
 
     return loggables.sort((a: Loggable, b: Loggable) => {
-      const timeA = isLogPointInstance(a) ? a.hitPoint.time : a.point.time;
-      const timeB = isLogPointInstance(b) ? b.hitPoint.time : b.point.time;
+      const timeA = isLogPointInstance(a) ? a.timeStampedHitPoint.time : a.point.time;
+      const timeB = isLogPointInstance(b) ? b.timeStampedHitPoint.time : b.point.time;
       return timeA - timeB;
     });
   }, [filteredLogPoints, filteredMessages]);
 
-  console.group("useFilteredMessages()", filterByText);
-  console.log("Messages:", filteredMessages);
-  console.log("Log points:", filteredLogPoints);
-  console.log("loggables:", loggables);
-  console.groupEnd();
-
-  return loggables;
+  return sortedLoggables;
 }

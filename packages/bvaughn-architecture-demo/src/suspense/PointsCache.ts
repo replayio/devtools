@@ -1,6 +1,5 @@
 import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
-
-import { ReplayClientInterface } from "../../../shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 

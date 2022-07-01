@@ -20,7 +20,7 @@ export default function Source({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { addPoint, points } = useContext(PointsContext);
+  const { addPoint, deletePoint, points } = useContext(PointsContext);
 
   const [sourceHitCounts, sourceContents] = suspendInParallel(
     () => gitSourceHitCounts(client, sourceId),
@@ -56,9 +56,39 @@ export default function Source({
         {sourceContents.contents.split("\n").map((line, index) => {
           const lineNumber = index + 1;
           const lineHasHits = sourceHitCounts.has(lineNumber);
-          const linePoints = points.filter(
+          const linePoint = points.find(
             point => point.location.sourceId === sourceId && point.location.line === lineNumber
           );
+
+          let hoverButton = null;
+          let lineSegments = null;
+          if (linePoint) {
+            hoverButton = (
+              <button className={styles.Button} onClick={() => deletePoint(linePoint.id)}>
+                <Icon className={styles.Icon} type="remove" />
+              </button>
+            );
+            lineSegments = (
+              <>
+                <pre className={styles.LineSegment}>
+                  {line.substring(0, linePoint.location.column)}
+                </pre>
+                <Icon className={styles.BreakpointIcon} type="breakpoint" />
+                <pre className={styles.LineSegment}>
+                  {line.substring(linePoint.location.column)}
+                </pre>
+              </>
+            );
+          } else {
+            hoverButton = (
+              <>
+                <button className={styles.Button} onClick={() => onAddPointButtonClick(lineNumber)}>
+                  <Icon className={styles.Icon} type="add" />
+                </button>
+              </>
+            );
+            lineSegments = <pre className={styles.LineSegment}>{line}</pre>;
+          }
 
           return (
             <Fragment key={index}>
@@ -67,19 +97,10 @@ export default function Source({
                 className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
-                {lineHasHits && (
-                  <button
-                    className={styles.AddButton}
-                    onClick={() => onAddPointButtonClick(lineNumber)}
-                  >
-                    <Icon className={styles.AddButtonIcon} type="add" />
-                  </button>
-                )}
-                {line}
+                {hoverButton}
+                {lineSegments}
               </div>
-              {linePoints.map(point => (
-                <PointPanel key={point.id} className={styles.PointPanel} point={point} />
-              ))}
+              {linePoint && <PointPanel className={styles.PointPanel} point={linePoint} />}
             </Fragment>
           );
         })}

@@ -117,6 +117,7 @@ export async function renderFocused(
     editPoint: jest.fn(),
     isPending: false,
     points: [],
+    pointsForAnalysis: [],
     ...options?.pointsContext,
   };
 
@@ -159,7 +160,6 @@ const MockReplayClient = {
   getAllFrames: jest.fn().mockImplementation(async () => []),
   getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
-  getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
   getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
   getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
   getSessionEndpoint: jest.fn().mockImplementation(async () => ({
@@ -173,4 +173,5 @@ const MockReplayClient = {
   })),
   gitSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
   initialize: jest.fn().mockImplementation(async () => {}),
+  runAnalysis: jest.fn().mockImplementation(async () => ({})),
 };

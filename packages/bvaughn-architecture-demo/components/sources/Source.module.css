@@ -11,7 +11,7 @@
   gap: 1ch;
 }
 
-.AddButton {
+.Button {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
   height: 1.5rem;
@@ -26,14 +26,18 @@
   margin: 0;
   cursor: pointer;
 }
-.AddButton:disabled {
+.Button:disabled {
   opacity: 0.5;
   cursor: default;
 }
 
-.AddButtonIcon {
+.BreakpointIcon,
+.Icon {
   width: 1rem;
   height: 1rem;
+}
+.BreakpointIcon {
+  color: var(--color-brand);
 }
 
 .LineNumberInput {
@@ -77,7 +81,7 @@
   color: var(--color-dim);
 }
 
-.LineWithHits:hover .AddButton {
+.LineWithHits:hover .Button {
   display: flex;
 }
 .LineWithHits:hover .LineNumber {
@@ -86,4 +90,8 @@
 
 .PointPanel {
   margin-left: calc(1.5rem + 0.5ch);
+}
+
+.LineSegment {
+  margin: 0;
 }

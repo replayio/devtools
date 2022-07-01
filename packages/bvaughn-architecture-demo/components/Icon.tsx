@@ -6,6 +6,7 @@ export default function Icon({
   type:
     | "add"
     | "arrow"
+    | "breakpoint"
     | "cancel"
     | "comment"
     | "confirm"
@@ -17,6 +18,7 @@ export default function Icon({
     | "invisible"
     | "jump-to-definition"
     | "prompt"
+    | "remove"
     | "save"
     | "search"
     | "share"
@@ -26,29 +28,28 @@ export default function Icon({
 }) {
   let path = "";
   switch (type) {
-    case "add": {
+    case "add":
       path =
         "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z";
       break;
-    }
-    case "arrow": {
+    case "arrow":
       path = "M8 5v14l11-7z";
       break;
-    }
-    case "cancel": {
+    case "breakpoint":
+      path =
+        "M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z";
+      break;
+    case "cancel":
       path =
         "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
       break;
-    }
-    case "comment": {
+    case "comment":
       path =
         "M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z";
       break;
-    }
-    case "confirm": {
+    case "confirm":
       path = "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z";
       break;
-    }
     case "delete":
       path = "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z";
       break;
@@ -75,6 +76,9 @@ export default function Icon({
       break;
     case "prompt":
       path = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
+      break;
+    case "remove":
+      path = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z";
       break;
     case "save":
       path =

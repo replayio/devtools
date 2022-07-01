@@ -1,6 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
+import { validate } from "@bvaughn/src/utils/points";
 import { Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Loader from "../Loader";
@@ -8,26 +9,22 @@ import Loader from "../Loader";
 import styles from "./PointPanel.module.css";
 
 export default function PointPanel({ className, point }: { className: string; point: Point }) {
-  const { deletePoint, editPoint } = useContext(PointsContext);
+  const { editPoint } = useContext(PointsContext);
 
   const [editableContent, setEditableContent] = useState(point.content);
 
-  const isContentValid = useMemo(() => {
-    try {
-      // Cheap parser/validator.
-      new Function(editableContent);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  }, [editableContent]);
+  const isContentValid = useMemo(() => validate(editableContent), [editableContent]);
 
   return (
     <div className={`${styles.Point} ${className}`}>
       <div className={styles.Row}>
         <input
           className={styles.Input}
+          disabled={!point.enableLogging}
           onChange={event => setEditableContent(event.currentTarget.value)}
+          onKeyDown={event =>
+            event.key === "Enter" && editPoint(point.id, { content: editableContent })
+          }
           placeholder="Content..."
           value={editableContent}
         />
@@ -50,9 +47,6 @@ export default function PointPanel({ className, point }: { className: string; po
         <small>
           ({point.location.line}:{point.location.column})
         </small>
-        <button className={styles.DeleteButton} onClick={() => deletePoint(point.id)}>
-          <Icon className={styles.DeleteButtonIcon} type="delete" />
-        </button>
         <button
           className={styles.SaveButton}
           disabled={!isContentValid}

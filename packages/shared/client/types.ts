@@ -46,7 +46,6 @@ export interface ReplayClientInterface {
     pauseId: PauseId,
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
-  getPauseIdForMessage(message: Message): PauseId;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
@@ -54,4 +53,9 @@ export interface ReplayClientInterface {
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   gitSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  runAnalysis<Result>(
+    location: Location,
+    timeStampedPoint: TimeStampedPoint,
+    mapper: string
+  ): Promise<Result>;
 }

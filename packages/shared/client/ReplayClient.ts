@@ -16,7 +16,7 @@ import {
 } from "@replayio/protocol";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
-import { Pause, ThreadFront } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
 import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
@@ -186,24 +186,6 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
-  getPauseIdForMessage(message: Message): PauseId {
-    // Pause mutates the Message objects passed ot it.
-    // We don't want that, so we have to deep clone the values first.
-    const clonedMessage = JSON.parse(JSON.stringify(message));
-
-    // TODO Create pauseId without the Pause; client.Session.createPause()
-    const pause = new Pause(this._threadFront);
-    pause.instantiate(
-      clonedMessage.pauseId,
-      clonedMessage.point.point,
-      clonedMessage.point.time,
-      !!clonedMessage.point.frame,
-      clonedMessage.data
-    );
-
-    return pause.pauseId!;
-  }
-
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
     const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
@@ -267,6 +249,33 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async runAnalysis<Result>(
+    location: Location,
+    timeStampedPoint: TimeStampedPoint,
+    mapper: string
+  ): Promise<Result> {
+    const sessionId = this.getSessionIdThrows();
+    const data = await new Promise<Result>(async resolve => {
+      const { analysisId } = await client.Analysis.createAnalysis(
+        {
+          mapper,
+          effectful: false,
+        },
+        sessionId
+      );
+
+      client.Analysis.addLocation({ analysisId, location }, sessionId);
+      client.Analysis.addPoints({ analysisId, points: [timeStampedPoint.point] }, sessionId);
+      client.Analysis.addAnalysisResultListener(({ results }) => {
+        resolve(results[0].value as Result);
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+      });
+      client.Analysis.runAnalysis({ analysisId }, sessionId);
+    });
+
+    return data;
   }
 }
 

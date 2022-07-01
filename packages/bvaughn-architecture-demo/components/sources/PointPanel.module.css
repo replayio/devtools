@@ -23,6 +23,9 @@
   width: 4rem;
   padding: 0.25rem;
 }
+.Input:disabled {
+  opacity: 0.5;
+}
 
 .DeleteButton,
 .SaveButton {
@@ -67,6 +70,10 @@
   padding: 0;
   display: flex;
   gap: 0.5ch;
+  overflow: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
 }
 .HitPointsList::before {
   content: "Hits:";

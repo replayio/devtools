@@ -1,15 +1,8 @@
-import { Point } from "@bvaughn/src/contexts/PointsContext";
-
-export function doesPointrequiresAnalysis(point: Point): boolean {
+export function validate(code: string): boolean {
   try {
-    runLocalAnalysis(point.content);
+    new Function(code);
     return true;
   } catch (error) {
     return false;
   }
-}
-
-export function runLocalAnalysis(text: string): any {
-  const getter = new Function(`return [${text}];`);
-  return getter();
 }

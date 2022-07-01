@@ -214,6 +214,7 @@ export function sendMessage<M extends CommandMethods>(
 const doSend = makeInfallible(message => {
   window.performance?.mark(`${message.method}_start`);
   const stringified = JSON.stringify(message);
+  //console.log("↥↥↥ [socket]", stringified);
   gSentBytes += stringified.length;
 
   gSessionCallbacks?.onRequest(message);
@@ -277,6 +278,7 @@ export const client = new ProtocolClient({
 
 function socketDataHandler(data: string) {
   gReceivedBytes += data.length;
+  //console.log("↧↧↧ [socket]", data);
   const msg = JSON.parse(data);
 
   if (msg.id) {
