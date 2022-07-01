@@ -33,7 +33,7 @@ export function TeamButton({
     }
 
     updateDefaultWorkspace({
-      variables: { workspaceId: id === MY_LIBRARY_TEAM.databaseId ? null : id },
+      variables: { workspaceId: id === MY_LIBRARY_TEAM.id ? MY_LIBRARY_TEAM.databaseId : id },
     });
     trackEvent("team_change", { workspaceId: id });
   };
@@ -47,11 +47,11 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
           {label} {isTest && "(test)"}
         </span>
         {isNew ? (
-          <div className={"bg-primaryAccent rounded-lg px-3 py-0.5 text-xs text-white"}>New</div>
+          <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
         ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </a>
@@ -71,7 +71,7 @@ export function SettingsButton() {
   return (
     <button
       onClick={onClick}
-      className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
+      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
     >
       settings
     </button>
