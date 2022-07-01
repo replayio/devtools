@@ -3,7 +3,6 @@ import PortalDropdown from "../../../shared/PortalDropdown";
 import { Dropdown, DropdownDivider, DropdownItem } from "../../LibraryDropdown";
 import { View, ViewContext } from "./ViewContextRoot";
 import { useGetWorkspace } from "ui/hooks/workspaces";
-import { useFeature } from "ui/hooks/settings";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
 const daysInSeconds = (days: number) => 1000 * 60 * 60 * 24 * days;
@@ -18,15 +17,14 @@ export function ViewOptions({ collapseDropdown }: { collapseDropdown: () => void
   const workspaceId = useGetTeamIdFromRoute();
   const { setView, view } = useContext(ViewContext);
   const { workspace } = useGetWorkspace(workspaceId);
-  const { value: testSupport } = useFeature("testSupport");
 
   const handleSetView = (view: View) => {
     collapseDropdown();
     setView(view);
   };
 
-  // Don't show the options if the feature flag is off, or the workspace is not a test workspace.
-  if (!testSupport || !workspace?.isTest) {
+  // Don't show the options if the workspace is not a test workspace.
+  if (!workspace?.isTest) {
     return null;
   }
 
@@ -71,11 +69,17 @@ export function FilterDropdown() {
       distance={0}
     >
       <Dropdown menuItemsClassName="z-50">
-        <DropdownItem onClick={() => setStringAndCollapseDropdown("")}>All Replays</DropdownItem>
-        <DropdownItem onClick={() => handleCreatedSince(7)}>Last 7 days</DropdownItem>
-        <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>
-          Node replays
-        </DropdownItem>
+        {view === "recordings" ? (
+          <>
+            <DropdownItem onClick={() => setStringAndCollapseDropdown("")}>
+              All Replays
+            </DropdownItem>
+            <DropdownItem onClick={() => handleCreatedSince(7)}>Last 7 days</DropdownItem>
+            <DropdownItem onClick={() => setStringAndCollapseDropdown("target:node")}>
+              Node replays
+            </DropdownItem>
+          </>
+        ) : null}
         <ViewOptions collapseDropdown={() => setExpanded(false)} />
       </Dropdown>
     </PortalDropdown>
