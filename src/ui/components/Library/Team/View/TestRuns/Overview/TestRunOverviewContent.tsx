@@ -10,7 +10,7 @@ export function TestRunOverviewContent() {
 
   return (
     <div
-      className={`flex flex-col overflow-hidden m-4 ml-0 text-sm rounded-xl shadow-lg ${styles.navigation}`}
+      className={`flex flex-col overflow-hidden m-4 ml-0 text-sm rounded-xl shadow-lg ${styles.runOverview}`}
       style={{ width: "50rem" }}
     >
       {testRun ? (
