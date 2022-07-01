@@ -29,7 +29,6 @@ pref("devtools.features.originalClassNames", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.testSupport", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.disableUnHitLines", false);
 
@@ -63,7 +62,6 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
-  testSupport: ["Bool", "testSupport"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

@@ -198,6 +198,7 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
                 hasPaymentMethod
                 isTest
                 isOrganization
+                isTest
                 subscription {
                   status
                   trialEnds

@@ -9,6 +9,7 @@ import MaterialIcon from "../MaterialIcon";
 import { AvatarImage } from "ui/components/Avatar";
 import { useConfirm } from "../Confirm";
 import { Dropdown, DropdownDivider, DropdownItem } from "ui/components/Library/LibraryDropdown";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 
 type WorkspaceMemberProps = {
   member: WorkspaceUser;
@@ -177,7 +178,7 @@ export function NonRegisteredWorkspaceMember({
       <div className="grid items-center justify-center" style={{ width: "28px", height: "28px" }}>
         <MaterialIcon iconSize="xl">mail_outline</MaterialIcon>
       </div>
-      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre">
+      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis">
         {member.email}
       </div>
       <PortalDropdown
@@ -204,16 +205,15 @@ export function NonRegisteredWorkspaceMember({
 function Role({
   canLeave,
   member,
-  setWorkspaceId,
   hideModal,
   isAdmin,
 }: {
   member: WorkspaceUser;
-  setWorkspaceId: any;
   hideModal: any;
   isAdmin: boolean;
   canLeave: boolean;
 }) {
+  const redirectToTeam = useRedirectToTeam(true);
   const [expanded, setExpanded] = useState(false);
   const deleteUserFromWorkspace = hooks.useDeleteUserFromWorkspace();
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
@@ -235,8 +235,8 @@ function Role({
       // to the personal workspace.
       if (isPersonal) {
         hideModal();
-        setWorkspaceId(null);
         updateDefaultWorkspace({ variables: { workspaceId: null } });
+        redirectToTeam("me");
       }
     }
   };
@@ -278,36 +278,23 @@ function Role({
   );
 }
 
-function WorkspaceMember({
-  member,
-  setWorkspaceId,
-  hideModal,
-  isAdmin,
-  canLeave = false,
-}: WorkspaceMemberProps) {
+function WorkspaceMember({ member, hideModal, isAdmin, canLeave = false }: WorkspaceMemberProps) {
   return (
     <li className="flex flex-row items-center space-x-1.5">
       <AvatarImage
         src={member.user!.picture}
-        className="avatar rounded-full"
+        className="rounded-full avatar"
         style={{ width: "28px", height: "28px" }}
       />
-      <div className="flex-grow overflow-hidden overflow-ellipsis whitespace-pre" data-private>
+      <div className="flex-grow overflow-hidden whitespace-pre overflow-ellipsis" data-private>
         {member.user!.name}
       </div>
-      <Role
-        member={member}
-        setWorkspaceId={setWorkspaceId}
-        hideModal={hideModal}
-        isAdmin={isAdmin}
-        canLeave={canLeave}
-      />
+      <Role member={member} hideModal={hideModal} isAdmin={isAdmin} canLeave={canLeave} />
     </li>
   );
 }
 
 const connector = connect(() => ({}), {
-  setWorkspaceId: actions.setWorkspaceId,
   hideModal: actions.hideModal,
 });
 export type PropsFromRedux = ConnectedProps<typeof connector>;

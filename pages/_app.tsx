@@ -103,7 +103,6 @@ import "ui/components/Comments/Comments.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
-import "ui/components/Library/Sidebar.css";
 import "ui/components/reactjs-popup.css";
 import "ui/components/Events/Events.css";
 import "ui/components/SecondaryToolbox/SecondaryToolbox.css";

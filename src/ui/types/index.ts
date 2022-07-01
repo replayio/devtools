@@ -147,9 +147,11 @@ export interface RecordingMetadata {
   source?: SourceMetadata;
 }
 
+export type TestResult = "passed" | "failed" | "timedOut";
+
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
 export type TestMetadata = {
-  result: "passed" | "failed" | "timedOut";
+  result: TestResult;
   title: string;
   version: number;
   run?: { id: string; title?: string };

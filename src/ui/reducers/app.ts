@@ -173,9 +173,6 @@ const appSlice = createSlice({
     setVideoUrl(state, action: PayloadAction<string>) {
       state.videoUrl = action.payload;
     },
-    setWorkspaceId(state, action: PayloadAction<string | null>) {
-      state.workspaceId = action.payload;
-    },
     setDefaultSettingsTab(state, action: PayloadAction<SettingsTabTitle>) {
       state.defaultSettingsTab = action.payload;
     },
@@ -221,7 +218,6 @@ export const {
   setUnexpectedError,
   setUploading,
   setVideoUrl,
-  setWorkspaceId,
   updateTheme,
 } = appSlice.actions;
 
@@ -346,7 +342,6 @@ export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerA
 export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
-export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;

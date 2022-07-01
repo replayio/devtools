@@ -92,7 +92,6 @@ function DownloadReplayModal({ hideModal, children }: PropsFromRedux & { childre
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(DownloadReplayModal);
