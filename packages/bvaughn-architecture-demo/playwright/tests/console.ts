@@ -99,32 +99,32 @@ test("should be searchable", async ({ page }) => {
 
   await page.fill('[data-test-id="ConsoleSearchInput"]', "an");
 
-  const console = page.locator('[data-test-id="ConsoleRoot"]');
-  await takeScreenshot(page, console, "single-result");
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await takeScreenshot(page, consoleRoot, "searchable-single-result");
 
   await page.fill('[data-test-id="ConsoleSearchInput"]', "a ");
-  await takeScreenshot(page, console, "result-1-of-3");
+  await takeScreenshot(page, consoleRoot, "searchable-result-1-of-3");
 
   await page.click('[data-test-id="ConsoleSearchGoToNextButton"]');
   await page.click('[data-test-id="ConsoleSearchGoToNextButton"]');
-  await takeScreenshot(page, console, "result-3-of-3");
+  await takeScreenshot(page, consoleRoot, "searchable-result-3-of-3");
 
   await page.click('[data-test-id="ConsoleSearchGoToPreviousButton"]');
-  await takeScreenshot(page, console, "result-2-of-3");
+  await takeScreenshot(page, consoleRoot, "searchable-result-2-of-3");
 });
 
 test("should be filterable", async ({ page }) => {
   await page.goto(URL);
 
   await page.fill('[data-test-id="ConsoleFilterInput"]', "an");
-  const console = page.locator('[data-test-id="ConsoleRoot"]');
-  await takeScreenshot(page, console, "single-result");
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await takeScreenshot(page, consoleRoot, "filtered-single-result");
 
   await page.fill('[data-test-id="ConsoleFilterInput"]', "a ");
-  await takeScreenshot(page, console, "three-results");
+  await takeScreenshot(page, consoleRoot, "filtered-three-results");
 
   await page.fill('[data-test-id="ConsoleFilterInput"]', "zzz");
-  await takeScreenshot(page, console, "no-results");
+  await takeScreenshot(page, consoleRoot, "filtered-no-results");
 });
 
 // TODO Add tests:
