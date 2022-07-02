@@ -9,7 +9,8 @@ import { RedactedSpan } from "ui/components/Redacted";
 import { isRegionLoaded } from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
-
+import { setExpandedPath } from "devtools/client/debugger/src/actions/pause/paused";
+import { getExpandedPaths } from "devtools/client/debugger/src/reducers/pause";
 import { Item, ValueItem, renderRep, shouldRenderRootsInReps, findPause } from "../items";
 
 import ObjectInspectorItem from "./ObjectInspectorItem";
@@ -105,7 +106,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
 
   getItemKey = (item: Item): string => item.path;
 
-  isExpanded = (item: Item): boolean => this.expandedPaths.has(item.path);
+  isExpanded = (item: Item): boolean => this.props.expandedPaths.includes(item.path);
 
   isItemExpandable = (item: Item): boolean => !item.isPrimitive();
 
@@ -113,11 +114,8 @@ class OI extends PureComponent<ObjectInspectorProps> {
     if (!this.isItemExpandable(item) || !this.props.isRegionLoaded) {
       return;
     }
-    if (expand) {
-      this.expandedPaths.add(item.path);
-    } else {
-      this.expandedPaths.delete(item.path);
-    }
+
+    this.props.setExpandedPath(item.path, expand);
 
     if (!expand) {
       this.forceUpdate();
@@ -131,7 +129,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
       try {
         await item.loadChildren();
       } catch {
-        this.expandedPaths.delete(item.path);
+        this.props.setExpandedPath(item.path, false);
       }
     }
 
@@ -186,7 +184,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
       this.roots = roots;
       this.focusedItem = focusedItem;
       this.activeItem = activeItem;
-      this.expandedPaths.clear();
+
       if (rootsChanged) {
         rootsChanged();
       }
@@ -260,9 +258,10 @@ const connector = connect(
     const roots = props.roots instanceof Function ? props.roots() : props.roots;
     return {
       isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
+      expandedPaths: getExpandedPaths(state),
     };
   },
-  { onViewSourceInDebugger }
+  { onViewSourceInDebugger, setExpandedPath }
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(ObjectInspector);

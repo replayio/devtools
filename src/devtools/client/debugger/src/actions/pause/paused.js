@@ -3,7 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
+import {
+  getSelectedFrame,
+  getExpandedPaths,
+  getThreadContext,
+  getSelectedLocation,
+} from "../../selectors";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
@@ -55,13 +60,20 @@ function pauseRequestedAt(executionPoint) {
   return { type: "PAUSE_REQUESTED_AT", executionPoint };
 }
 
-/**
- * Debugger has just paused
- *
- * @param {object} pauseInfo
- * @memberof actions/pause
- * @static
- */
+export function setExpandedPath(path, expand) {
+  return (dispatch, getState) => {
+    const expandedPaths = getExpandedPaths(getState());
+    const set = new Set(expandedPaths);
+    if (expand) {
+      set.add(path);
+    } else {
+      set.delete(path);
+    }
+
+    dispatch({ type: "SET_EXPANDED_PATH", paths: Array.from(set) });
+  };
+}
+
 export function paused({ executionPoint, frame, time }) {
   return async function (dispatch, getState, { ThreadFront }) {
     if (!isCurrentTimeInLoadedRegion(getState())) {

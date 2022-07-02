@@ -22,6 +22,7 @@ import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import { getSelectedSourceWithContent, getSource } from "./sources";
+import { ReplaySession } from "ui/setup/prefs";
 
 export interface Context {
   isPaused: boolean;
@@ -73,6 +74,7 @@ export interface PauseState {
   lastCommand: string | null;
   previousLocation: Location | null;
   expandedScopes: Set<string>;
+  expandedPaths: string[];
   lastExpandedScopes: [];
   shouldLogExceptions: boolean;
   replayFramePositions?: { positions: UnknownPositions[]; unexecuted: unknown } | null;
@@ -98,6 +100,7 @@ function createPauseState(): PauseState {
     lastCommand: null,
     previousLocation: null,
     expandedScopes: new Set(),
+    expandedPaths: [],
     lastExpandedScopes: [],
     shouldLogExceptions: prefs.logExceptions as boolean,
   };
@@ -122,6 +125,12 @@ function update(state = createPauseState(), action: AnyAction) {
     return state;
   }
   switch (action.type) {
+    case "SET_EXPANDED_PATH": {
+      return {
+        ...state,
+        expandedPaths: action.paths,
+      };
+    }
     case "PAUSE_REQUESTED_AT": {
       return {
         ...state,
@@ -422,6 +431,9 @@ export function getLastExpandedScopes(state: UIState) {
 
 export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
+}
+export function getExpandedPaths(state: UIState) {
+  return state.pause.expandedPaths;
 }
 
 export function getResumePoint(state: UIState, type: string) {
