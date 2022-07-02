@@ -156,7 +156,7 @@ export function setupWindow(): void {
 const MockReplayClient = {
   configure: jest.fn().mockImplementation(async () => {}),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
-  findSources: jest.fn().mockImplementation(async () => {}),
+  findSources: jest.fn().mockImplementation(async () => []),
   getAllFrames: jest.fn().mockImplementation(async () => []),
   getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
