@@ -14,7 +14,7 @@ import {
 } from "graphql/unsubscribeToEmailType";
 import { AcceptTOS, AcceptTOSVariables } from "graphql/AcceptTOS";
 import { GetUserId } from "graphql/GetUserId";
-import { GetUser } from "graphql/GetUser";
+import { GetUser, GetUser_viewer } from "graphql/GetUser";
 
 export async function getUserId() {
   const result = await query({
@@ -112,39 +112,57 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
   };
 }
 
-export function useGetUserInfo(): UserInfo & { loading: boolean } {
+function formatUserInfo(viewer: GetUser_viewer): UserInfo {
+  return {
+    id: viewer.user.id,
+    email: viewer.email!,
+    picture: viewer.user.picture!,
+    name: viewer.user.name!,
+    internal: viewer.internal!,
+    nags: viewer.nags as Nag[],
+    acceptedTOSVersion: viewer.acceptedTOSVersion ?? null,
+    unsubscribedEmailTypes: viewer?.unsubscribedEmailTypes as EmailSubscription[],
+    motd: viewer.motd!,
+    features: viewer.features || {
+      library: false,
+    },
+  };
+}
+
+// similar to useGetUserInfo except used when we're not sure if the user is logged in
+export function useSafeGetUserInfo(): { user?: UserInfo; error?: string; loading?: true } {
   const { data, loading, error } = useQuery<GetUser>(GET_USER_INFO);
 
   if (error) {
     console.error("Apollo error while fetching user:", error);
+    return { error: error.message };
   }
 
-  const id: string = data?.viewer?.user.id!;
-  const picture: string = data?.viewer?.user.picture!;
-  const name: string = data?.viewer?.user.name!;
-  const email: string = data?.viewer?.email!;
-  const internal: boolean = data?.viewer?.internal!;
-  const nags: Nag[] = data?.viewer?.nags as Nag[];
-  const unsubscribedEmailTypes: EmailSubscription[] = data?.viewer
-    ?.unsubscribedEmailTypes as EmailSubscription[];
-  const acceptedTOSVersion = data?.viewer?.acceptedTOSVersion ?? null;
-  const motd: string = data?.viewer?.motd!;
-  const features = data?.viewer?.features || {
-    library: false,
-  };
+  if (loading) {
+    return { loading };
+  }
+
+  if (!data?.viewer) {
+    return { error: "user is unavailable" };
+  }
+
+  return { user: formatUserInfo(data.viewer) };
+}
+
+export function useGetUserInfo(): { user?: UserInfo; error?: string; loading?: true } {
+  const { data, loading, error } = useQuery<GetUser>(GET_USER_INFO);
+
+  if (error) {
+    console.error("Apollo error while fetching user:", error);
+    return { error: error.message };
+  }
+
+  if (loading) {
+    return { loading };
+  }
 
   return {
-    loading,
-    id,
-    email,
-    picture,
-    name,
-    internal,
-    nags,
-    acceptedTOSVersion,
-    unsubscribedEmailTypes,
-    motd,
-    features,
+    user: formatUserInfo(data?.viewer as GetUser_viewer),
   };
 }
 
