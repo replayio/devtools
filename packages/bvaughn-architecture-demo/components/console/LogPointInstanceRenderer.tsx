@@ -4,7 +4,7 @@ import Loader from "@bvaughn/components/Loader";
 import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
 import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
-import { primitiveToClientValue, Value } from "@bvaughn/src/utils/protocol";
+import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
@@ -13,10 +13,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import MessageHoverButton from "./MessageHoverButton";
 import styles from "./MessageRenderer.module.css";
 import Source from "./Source";
-
-function isProtocolValue(value: any): boolean {
-  return value?.hasOwnProperty("value");
-}
 
 function LogPointInstanceRenderer({
   isFocused,

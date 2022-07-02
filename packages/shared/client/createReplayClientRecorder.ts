@@ -1,4 +1,4 @@
-import { RecordingId } from "@replayio/protocol";
+import { encode } from "./encoder";
 import { ReplayClientInterface, LogEntry } from "./types";
 
 const FAKE_ACCESS_TOKEN = "<fake-access-token>";
@@ -15,7 +15,7 @@ export default function createReplayClientRecorder(
       const ACCESS_TOKEN = ${hasAccessToken ? `"${FAKE_ACCESS_TOKEN}"` : null};
       const RECORDING_ID = "${FAKE_RECORDING_ID}";
       const replayClientPlayer = createReplayClientPlayer(
-        JSON.parse(\`${JSON.stringify(logEntries)}\`)
+        decode(\`${encode(logEntries)}\`)
       );
     `);
   };

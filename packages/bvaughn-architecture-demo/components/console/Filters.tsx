@@ -48,6 +48,7 @@ export default function Filters() {
       </div>
       <input
         className={styles.FilterInput}
+        data-test-id="ConsoleFilterInput"
         name="filter messages"
         value={filterByDisplayText}
         onChange={event => update(event.currentTarget.value, levelFlags)}

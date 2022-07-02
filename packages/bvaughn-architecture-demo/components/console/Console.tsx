@@ -16,7 +16,7 @@ export default function ConsoleRoot() {
     <ConsoleFiltersContextRoot>
       <LogPointsContextRoot>
         <SearchRoot>
-          <div className={styles.ConsoleRoot}>
+          <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
             <div className={styles.Row}>
               <Filters />
             </div>
@@ -27,7 +27,7 @@ export default function ConsoleRoot() {
                 </Suspense>
               </ErrorBoundary>
             </div>
-            <Search className={styles.Row} />
+            <Search className={styles.Row} hideOnEscape={false} />
             <Input className={styles.Row} />
           </div>
         </SearchRoot>

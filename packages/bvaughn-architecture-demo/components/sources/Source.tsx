@@ -95,6 +95,7 @@ export default function Source({
               <div
                 key={index}
                 className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
+                data-test-id={`SourceLine${lineNumber}`}
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
                 {hoverButton}

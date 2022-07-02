@@ -35,7 +35,9 @@ export default function useFilteredMessages(): Loggable[] {
       );
 
       if (!analysis) {
-        // TODO (point) Tricky document
+        // TRICKY
+        // If we haven't run analysis on the point yet, we don't know whether it should be filtered or not.
+        // Leave it in the filtered list so that it will load new data (Suspend) then we'll re-evaluate.
         return true;
       }
 

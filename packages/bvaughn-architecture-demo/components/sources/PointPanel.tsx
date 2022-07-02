@@ -16,7 +16,10 @@ export default function PointPanel({ className, point }: { className: string; po
   const isContentValid = useMemo(() => validate(editableContent), [editableContent]);
 
   return (
-    <div className={`${styles.Point} ${className}`}>
+    <div
+      className={`${styles.Point} ${className}`}
+      data-test-id={`PointPanel${point.location.line}`}
+    >
       <div className={styles.Row}>
         <input
           className={styles.Input}

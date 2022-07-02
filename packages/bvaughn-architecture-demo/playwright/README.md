@@ -42,7 +42,18 @@ Note that the value passed for `HOST` varies by operating system:
 If you're writing new tests, it may be easier to run this command locally:
 
 ```sh
-yarn test:visual --update-snapshots
+yarn test:visual
 ```
 
-Once you are satisfied with the test, delete any newly added snapshots (since they're specific to your operating system) and run the `+playwright-update-snapshots` Earthly target as shown above.
+This mode will run tests in a regular Chromium browser so that you can visibly inspect and debug failures. Screenshot comparisons will be skipped in this mode.
+
+Once you are satisfied with the test, run the `+playwright-update-snapshots` Earthly target as shown above.
+
+## Debugging failures in Docker
+
+If tests are failing in the Docker container, it can be helpful to record a video of the test using this target:
+
+```sh
+# packages/bvaughn-architecture-demo/playwright
+earthly +playwright-record-video --HOST=host.docker.internal
+```

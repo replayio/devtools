@@ -21,7 +21,7 @@ export default function Sources() {
   );
 
   return (
-    <div className={styles.Sources}>
+    <div className={styles.Sources} data-test-id="SourcesRoot">
       <div className={styles.Tabs}>
         {sourcesIdsToDisplay.map(sourceId => {
           const source = getSource(client, sourceId);

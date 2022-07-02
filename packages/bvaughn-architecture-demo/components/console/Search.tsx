@@ -5,7 +5,13 @@ import Icon from "../Icon";
 import styles from "./Search.module.css";
 import { SearchContext } from "./SearchContext";
 
-export default function Search({ className }: { className: string }) {
+export default function Search({
+  className,
+  hideOnEscape,
+}: {
+  className: string;
+  hideOnEscape: boolean;
+}) {
   const [searchState, searchActions] = useContext(SearchContext);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -15,8 +21,10 @@ export default function Search({ className }: { className: string }) {
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Escape": {
-        event.preventDefault();
-        searchActions.hide();
+        if (hideOnEscape) {
+          event.preventDefault();
+          searchActions.hide();
+        }
         break;
       }
       case "Enter": {
@@ -40,13 +48,25 @@ export default function Search({ className }: { className: string }) {
     results = (
       <div className={styles.Results}>
         {searchState.index + 1} of {searchState.results.length} results
-        <button className={styles.ResultsIconButton} onClick={searchActions.goToPrevious}>
+        <button
+          className={styles.ResultsIconButton}
+          data-test-id="ConsoleSearchGoToPreviousButton"
+          onClick={searchActions.goToPrevious}
+        >
           <Icon className={styles.ResultsIcon} type="up" />
         </button>
-        <button className={styles.ResultsIconButton} onClick={searchActions.goToNext}>
+        <button
+          className={styles.ResultsIconButton}
+          data-test-id="ConsoleSearchGoToNextButton"
+          onClick={searchActions.goToNext}
+        >
           <Icon className={styles.ResultsIcon} type="down" />
         </button>
-        <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
+        <button
+          className={styles.ResultsIconButton}
+          data-test-id="ConsoleSearchClearButton"
+          onClick={searchActions.hide}
+        >
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>
       </div>
@@ -63,11 +83,12 @@ export default function Search({ className }: { className: string }) {
   }
 
   return (
-    <div className={`${styles.Container} ${className}`}>
+    <div className={`${styles.Container} ${className}`} data-test-id="ConsoleSearch">
       <Icon className={styles.Icon} type="search" />
       <input
         autoFocus
         className={styles.Input}
+        data-test-id="ConsoleSearchInput"
         onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder="Find in logs"
