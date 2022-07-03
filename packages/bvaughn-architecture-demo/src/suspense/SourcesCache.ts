@@ -30,6 +30,19 @@ export function preCacheSources(value: ProtocolSource[]): void {
   sources = value;
 }
 
+export function getSources(client: ReplayClientInterface) {
+  if (sources !== null) {
+    return sources;
+  }
+
+  if (inProgressSourcesWakeable === null) {
+    inProgressSourcesWakeable = createWakeable();
+    fetchSources(client);
+  }
+
+  throw inProgressSourcesWakeable;
+}
+
 export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -69,7 +82,7 @@ export function getSourceContents(
   }
 }
 
-export function gitSourceHitCounts(
+export function getSourceHitCounts(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
 ): LineNumberToHitCountMap {
@@ -127,7 +140,7 @@ async function fetchSourceHitCounts(
   wakeable: Wakeable<LineNumberToHitCountMap>
 ) {
   try {
-    const hitCounts = await client.gitSourceHitCounts(sourceId);
+    const hitCounts = await client.getSourceHitCounts(sourceId);
 
     record.status = STATUS_RESOLVED;
     record.value = hitCounts;
@@ -139,4 +152,13 @@ async function fetchSourceHitCounts(
 
     wakeable.reject(error);
   }
+}
+
+export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
+  const sources = getSources(client);
+  return (
+    sources?.filter(source => {
+      return source != null && source.kind !== "inlineScript";
+    }) || []
+  );
 }

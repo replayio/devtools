@@ -1,6 +1,6 @@
 import Icon from "@bvaughn/components/Icon";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { getSourceContents, gitSourceHitCounts } from "@bvaughn/src/suspense/SourcesCache";
+import { getSourceContents, getSourceHitCounts } from "@bvaughn/src/suspense/SourcesCache";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
 import { ChangeEvent, Fragment, useContext, useState } from "react";
@@ -23,7 +23,7 @@ export default function Source({
   const { addPoint, deletePoint, points } = useContext(PointsContext);
 
   const [sourceHitCounts, sourceContents] = suspendInParallel(
-    () => gitSourceHitCounts(client, sourceId),
+    () => getSourceHitCounts(client, sourceId),
     () => getSourceContents(client, sourceId)
   );
 
@@ -56,6 +56,12 @@ export default function Source({
         {sourceContents.contents.split("\n").map((line, index) => {
           const lineNumber = index + 1;
           const lineHasHits = sourceHitCounts.has(lineNumber);
+          const lineHits = lineHasHits
+            ? sourceHitCounts.get(lineNumber)?.columnHits[0].hits || 0
+            : 0;
+
+          const hitCountBadge =
+            lineHits === 0 ? 1 : lineHits < 10 ? 1 : lineHits < 20 ? 2 : lineHits < 50 ? 3 : 4;
           const linePoint = points.find(
             point => point.location.sourceId === sourceId && point.location.line === lineNumber
           );
@@ -98,6 +104,9 @@ export default function Source({
                 data-test-id={`SourceLine${lineNumber}`}
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
+                <div
+                  className={`${styles[`LineHitCount-${hitCountBadge}`]} ${styles.LineHitCount}`}
+                ></div>
                 {hoverButton}
                 {lineSegments}
               </div>

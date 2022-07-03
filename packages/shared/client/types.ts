@@ -51,7 +51,7 @@ export interface ReplayClientInterface {
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
-  gitSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   runAnalysis<Result>(
     location: Location,

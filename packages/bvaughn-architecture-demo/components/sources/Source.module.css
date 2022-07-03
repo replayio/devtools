@@ -88,6 +88,29 @@
   display: none;
 }
 
+.LineHitCount {
+  width: 6px;
+  height: 100%
+}
+.LineHitCount-0 {
+  background-color: #ccc;
+}
+.LineHitCount-1 {
+  background-color: rgb(255, 147, 147);
+}
+
+.LineHitCount-2 {
+  background-color: blue;
+}
+
+.LineHitCount-3 {
+  background-color: violet;
+}
+
+.LineHitCount-4 {
+  background-color: green;
+}
+
 .PointPanel {
   margin-left: calc(1.5rem + 0.5ch);
 }

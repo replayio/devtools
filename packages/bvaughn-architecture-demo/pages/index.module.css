@@ -47,3 +47,13 @@
   flex-direction: row;
   align-items: center;
 }
+
+.ToolBar {
+  width: 30px;
+  align-items: center;
+  color: #b1bdcb;
+}
+
+.Selected {
+  color: #889cb4;
+}
