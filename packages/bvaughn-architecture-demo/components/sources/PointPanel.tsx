@@ -2,7 +2,7 @@ import Icon from "@bvaughn/components/Icon";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
-import { Suspense, useContext, useMemo, useState } from "react";
+import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Loader from "../Loader";
 
@@ -14,6 +14,18 @@ export default function PointPanel({ className, point }: { className: string; po
   const [editableContent, setEditableContent] = useState(point.content);
 
   const isContentValid = useMemo(() => validate(editableContent), [editableContent]);
+  const hasContentChanged = editableContent !== point.content;
+
+  const onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Enter":
+        editPoint(point.id, { content: editableContent });
+        break;
+      case "Escape":
+        setEditableContent(point.content);
+        break;
+    }
+  };
 
   return (
     <div
@@ -25,9 +37,7 @@ export default function PointPanel({ className, point }: { className: string; po
           className={styles.Input}
           disabled={!point.enableLogging}
           onChange={event => setEditableContent(event.currentTarget.value)}
-          onKeyDown={event =>
-            event.key === "Enter" && editPoint(point.id, { content: editableContent })
-          }
+          onKeyDown={onKeyDown}
           placeholder="Content..."
           value={editableContent}
         />
@@ -52,7 +62,7 @@ export default function PointPanel({ className, point }: { className: string; po
         </small>
         <button
           className={styles.SaveButton}
-          disabled={!isContentValid}
+          disabled={!isContentValid || !hasContentChanged}
           onClick={() => editPoint(point.id, { content: editableContent })}
         >
           <Icon className={styles.SaveButtonIcon} type="save" />
