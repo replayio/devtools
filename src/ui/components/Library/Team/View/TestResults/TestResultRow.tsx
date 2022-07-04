@@ -59,7 +59,7 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
   return (
     <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
       <div
-        className={`flex flex-row items-center flex-grow px-4 py-3 space-x-3 overflow-hidden rounded-md cursor-pointer ${styles.libraryRow}`}
+        className={`flex flex-row items-center px-3 py-3 space-x-3 border-b overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
       >
         <Status test={recording.metadata.test} />
         <div className="flex flex-col flex-grow space-y-1">
