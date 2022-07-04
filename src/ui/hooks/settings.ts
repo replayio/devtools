@@ -23,10 +23,6 @@ import {
   UpdateUserSettingsEventLink,
   UpdateUserSettingsEventLinkVariables,
 } from "graphql/UpdateUserSettingsEventLink";
-import {
-  UpdateUserSettingsReact,
-  UpdateUserSettingsReactVariables,
-} from "graphql/UpdateUserSettingsReact";
 import { GetUserSettings } from "graphql/GetUserSettings";
 import { isTest } from "ui/utils/environment";
 
@@ -150,7 +146,6 @@ type MutableSettings = Extract<SettingItemKey, "disableLogRocket" | "enableEvent
 type GqlPair = {
   disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
   enableEventLink: [UpdateUserSettingsEventLink, UpdateUserSettingsEventLinkVariables];
-  showReact: [UpdateUserSettingsReact, UpdateUserSettingsReactVariables];
 };
 
 const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
