@@ -148,7 +148,7 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   }, [theme]);
 
   if (auth.isLoading || userInfo.loading) {
-    return <LoadingScreen fallbackMessage="Authenticating..." />;
+    return <LoadingScreen fallbackMessage="" />;
   }
 
   if (

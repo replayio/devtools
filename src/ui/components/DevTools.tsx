@@ -55,7 +55,7 @@ function ViewLoader() {
   }
 
   return (
-    <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
+    <div className="absolute flex items-center justify-center w-full h-full bg-chrome">
       <ReplayLogo size="md" color="gray" />
     </div>
   );
@@ -66,8 +66,8 @@ function Body() {
   const viewMode = useAppSelector(getViewMode);
 
   return (
-    <div className="vertical-panels pr-2">
-      <div className="flex h-full flex-row overflow-hidden bg-chrome">
+    <div className="pr-2 vertical-panels">
+      <div className="flex flex-row h-full overflow-hidden bg-chrome">
         <Toolbar />
         <ReduxAnnotationsProvider>
           <SplitBox
@@ -168,11 +168,11 @@ function _DevTools({
   }, [recording]);
 
   if (!loadingFinished) {
-    return <LoadingScreen fallbackMessage="Starting a session..." />;
+    return <LoadingScreen fallbackMessage="" />;
   }
 
   if (loadedRegions === null) {
-    return <LoadingScreen fallbackMessage="Loading timeline..." />;
+    return <LoadingScreen fallbackMessage="" />;
   }
 
   return (
