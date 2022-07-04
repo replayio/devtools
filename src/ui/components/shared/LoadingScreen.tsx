@@ -5,6 +5,7 @@ import { UIState } from "ui/state";
 import { LoadingTips } from "./LoadingTips";
 import { BubbleViewportWrapper } from "./Viewport";
 import ReplayLogo from "./ReplayLogo";
+import Spinner from "../shared/Spinner";
 
 export function LoadingScreenTemplate({
   children,
@@ -33,7 +34,7 @@ function LoadingScreen({
   stalledTimeout = 9000,
 }: PropsFromRedux & { fallbackMessage: string; stalledTimeout?: number }) {
   // The backend send events in this order: uploading replay -> uploading sourcemaps.
-  let waitingForMessage = <span className="text-sm">{fallbackMessage}</span>;
+  let waitingForMessage = <Spinner className="w-4 h-4 text-gray-500 animate-spin" />;
   if (awaitingSourcemaps) {
     waitingForMessage = <span className="text-sm">Uploading sourcemaps...</span>;
     stalledTimeout = Infinity;
@@ -55,8 +56,11 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate showTips={true}>
-      <span>{stalled ? "This is taking longer than usual..." : waitingForMessage}</span>
-    </LoadingScreenTemplate>
+    <div className="flex text-xs">
+      <span>{waitingForMessage}</span>
+      <span className="ml-2">{stalled ? "This is taking longer than usual..." : ""}</span>
+    </div>
+  </LoadingScreenTemplate>
   );
 }
 
