@@ -15,7 +15,7 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex w-96 flex-col items-center space-y-8 rounded-lg bg-loadingBoxes p-8 py-4 pb-8 shadow-md">
+      <div className="relative flex flex-col items-center p-8 py-4 pb-8 space-y-8 rounded-lg shadow-md w-96 bg-loadingBoxes">
         <div className="flex flex-col items-center space-y-2">
           <ReplayLogo wide size="lg" />
           {children}
@@ -30,7 +30,7 @@ function LoadingScreen({
   uploading,
   awaitingSourcemaps,
   fallbackMessage,
-  stalledTimeout = 2000,
+  stalledTimeout = 9000,
 }: PropsFromRedux & { fallbackMessage: string; stalledTimeout?: number }) {
   // The backend send events in this order: uploading replay -> uploading sourcemaps.
   let waitingForMessage = <span>{fallbackMessage}</span>;
@@ -55,7 +55,7 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate showTips={true}>
-      <span>{stalled ? "This is taking longer than usual..." : waitingForMessage}</span>
+      <span className="text-sm">{stalled ? "This is taking longer than usual..." : waitingForMessage}</span>
     </LoadingScreenTemplate>
   );
 }
