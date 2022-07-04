@@ -126,7 +126,7 @@ export function createSocket(
       if (ThreadFront.recordingId) {
         assert(
           recordingId === ThreadFront.recordingId,
-          "can't create a session for 2 different recordings"
+          "Can't create a session for 2 different recordings"
         );
         return;
       }
