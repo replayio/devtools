@@ -9,13 +9,22 @@ export interface Test {
   date: string;
   recordings: Recording[];
 }
+
+export interface TestRunStats {
+  passed: number;
+  failed: number;
+}
 export interface TestRun {
   id: string;
-  recordings: Recording[];
+  commitTitle: string;
+  commitId: string;
+  mergeTitle: string;
+  mergeId: string;
+  user: string;
   date: string;
   branch: string;
-  commit: SourceCommit;
-  event: "pull_request" | "push" | "unknown";
+  stats: TestRunStats;
+  recordings?: Recording[];
   triggerUrl?: string;
 }
 
@@ -50,15 +59,16 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
         id
         testRuns {
           id
-          recordings {
-            edges {
-              node {
-                uuid
-                duration
-                createdAt
-                metadata
-              }
-            }
+          branch
+          commitId
+          commitTitle
+          mergeId
+          mergeTitle
+          user
+          date
+          stats {
+            passed
+            failed
           }
         }
       }
@@ -97,6 +107,18 @@ const GET_TEST_RUN = gql`
         id
         testRuns(id: $id) {
           id
+          id
+          branch
+          commitId
+          commitTitle
+          mergeId
+          mergeTitle
+          user
+          date
+          stats {
+            passed
+            failed
+          }
           recordings {
             edges {
               node {
@@ -223,21 +245,13 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
 }
 
 function convertTestRun(testRun: any) {
-  const recordings = unwrapRecordingsData(testRun.recordings);
+  const recordings = testRun.recordings ? unwrapRecordingsData(testRun.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
   const firstRecording = sortedRecordings[0];
-  const { source } = firstRecording.metadata;
 
   return {
     ...testRun,
-    commit: {
-      id: source?.commit?.id.slice(0, 7) || "Unknown ID",
-      title: source?.commit?.title || "Unknown Commit",
-    },
-    date: firstRecording.date,
-    branch: source?.branch || "Unknown",
-    event: source?.trigger?.name || "Unknown",
-    triggerUrl: firstRecording.metadata?.source?.trigger?.url,
     recordings,
+    triggerUrl: firstRecording?.metadata?.source?.trigger?.url,
   };
 }
