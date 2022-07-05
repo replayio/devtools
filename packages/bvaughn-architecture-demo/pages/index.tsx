@@ -7,7 +7,7 @@ import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
-import React, { useContext, useMemo } from "react";
+import React, { useContext, useMemo, useState, useTransition } from "react";
 import Icon from "../components/Icon";
 
 import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
@@ -32,7 +32,13 @@ export default function HomePage() {
   // Used to record mock data for e2e tests when a URL parameter is present:
   const client = useContext(ReplayClientContext);
   const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
-  const [panel, setPanel] = React.useState("sources");
+  const [panel, setPanel] = useState("sources");
+  const [isPending, startTransition] = useTransition();
+
+  const setPanelTransition = (panel: string) => {
+    startTransition(() => setPanel(panel));
+  };
+
   const content = (
     <Initializer>
       <PointsContextRoot>
@@ -41,18 +47,20 @@ export default function HomePage() {
             <div className={styles.VerticalContainer}>
               <div className={styles.HorizontalContainer}>
                 <div className={styles.ToolBar}>
-                  <div onClick={() => setPanel("comments")}>
-                    <Icon
-                      className={`${styles.Icon} ${panel == "comments" && styles.Selected}`}
-                      type="comments"
-                    />
-                  </div>
-                  <div onClick={() => setPanel("sources")}>
-                    <Icon
-                      className={`${styles.Icon} ${panel == "sources" && styles.Selected}`}
-                      type="document"
-                    />
-                  </div>
+                  <button
+                    className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                    disabled={isPending}
+                    onClick={() => setPanelTransition("comments")}
+                  >
+                    <Icon className={styles.TabIcon} type="comments" />
+                  </button>
+                  <button
+                    className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                    disabled={isPending}
+                    onClick={() => setPanelTransition("sources")}
+                  >
+                    <Icon className={styles.TabIcon} type="document" />
+                  </button>
                 </div>
                 <div className={styles.CommentsContainer}>
                   {panel == "comments" && <CommentList />}
