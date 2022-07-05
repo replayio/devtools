@@ -1,0 +1,90 @@
+.Point {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5ch;
+  background-color: var(--background-color-contrast-3);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+}
+
+.Label {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0.5ch;
+}
+
+.Input {
+  flex: 1;
+  background-color: var(--background-color-default);
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--color-default);
+  width: 4rem;
+  padding: 0.25rem;
+}
+.Input:disabled {
+  opacity: 0.5;
+}
+
+.DeleteButton,
+.SaveButton {
+  background: none;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: none;
+  margin: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.DeleteButton {
+  background-color: var(--background-color-secondary-button);
+  color: var(--color-secondary-button);
+}
+.SaveButton {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+
+.SaveButton:disabled {
+  opacity: 0.5;
+}
+
+.DeleteButtonIcon,
+.SaveButtonIcon {
+  width: 1rem;
+  height: 1rem;
+}
+
+.Row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1ch;
+}
+
+.HitPointsList {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.5ch;
+  overflow: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+.HitPointsList::before {
+  content: "Hits:";
+}
+
+.HitPointListItem {
+  list-style-type: none;
+}
+.HitPointListItem::after {
+  content: ", ";
+}
+.HitPointListItem:last-of-type:after {
+  content: "";
+}

@@ -6,8 +6,7 @@ import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
-import { memo, Suspense, useContext, useMemo } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { memo, Suspense, useContext } from "react";
 
 import MessageHoverButton from "./MessageHoverButton";
 import styles from "./MessageRenderer.module.css";
@@ -60,9 +59,6 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
-  const client = useContext(ReplayClientContext);
-  const pauseId = useMemo(() => client.getPauseIdForMessage(message), [client, message]);
-
   const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
 
@@ -73,7 +69,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
         {message.text && <span className={styles.MessageText}>{message.text}</span>}
         <Suspense fallback={<Loader />}>
           {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-            <Inspector key={index} pauseId={pauseId} protocolValue={argumentValue} />
+            <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
           ))}
         </Suspense>
       </div>
@@ -103,7 +99,12 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
       )}
 
       {isHovered && (
-        <MessageHoverButton message={message} pauseId={message.pauseId} messageRendererRef={ref} />
+        <MessageHoverButton
+          pauseId={message.pauseId}
+          showAddCommentButton={true}
+          targetRef={ref}
+          timeStampedPoint={message.point}
+        />
       )}
     </div>
   );

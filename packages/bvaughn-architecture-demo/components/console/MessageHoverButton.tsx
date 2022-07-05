@@ -3,7 +3,7 @@ import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext
 import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { Message, PauseId } from "@replayio/protocol";
+import { PauseId, TimeStampedPoint } from "@replayio/protocol";
 import {
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -18,13 +18,15 @@ import { createPortal } from "react-dom";
 import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
-  message,
-  messageRendererRef,
   pauseId,
+  showAddCommentButton,
+  targetRef,
+  timeStampedPoint,
 }: {
-  message: Message;
-  messageRendererRef: RefObject<HTMLDivElement | null>;
   pauseId: PauseId | null;
+  showAddCommentButton: boolean;
+  targetRef: RefObject<HTMLDivElement | null>;
+  timeStampedPoint: TimeStampedPoint;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -40,27 +42,27 @@ export default function MessageHoverButton({
 
   useLayoutEffect(() => {
     const button = ref.current;
-    const target = messageRendererRef.current;
+    const target = targetRef.current;
     if (button && target) {
       const buttonRect = button.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
       button.style.left = `${targetRect.left - buttonRect.width / 2}px`;
       button.style.top = `${targetRect.top}px`;
     }
-  }, [messageRendererRef]);
+  }, [targetRef]);
 
   let button = null;
   if (pauseId !== null) {
     if (isCurrentlyPausedAt) {
-      if (accessToken) {
+      if (showAddCommentButton && accessToken) {
         const addCommentTransition = () => {
           startTransition(async () => {
             await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
               content: "",
               hasFrames: true,
               isPublished: false,
-              point: message.point.point,
-              time: message.point.time,
+              point: timeStampedPoint.point,
+              time: timeStampedPoint.time,
             });
 
             invalidateCache();

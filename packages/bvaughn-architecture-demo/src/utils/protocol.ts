@@ -11,6 +11,7 @@ type ValueType =
   | "array"
   | "bigint"
   | "boolean"
+  | "error"
   | "function"
   | "html-element"
   | "html-text" // Separate type makes it easier for text to be shown inline (e.g. "<div>Some text</div>")
@@ -139,7 +140,12 @@ export function protocolValueToClientValue(
           type = "set";
           break;
         default:
-          if (className.startsWith("HTML")) {
+          if (
+            className.endsWith("Error") &&
+            object.preview?.properties?.find(property => property.name === "message")
+          ) {
+            type = "error";
+          } else if (className.startsWith("HTML")) {
             type = "html-element";
           } else if (className === "Text") {
             type = "html-text";
@@ -194,4 +200,91 @@ export function clientValueToProtocolValue(clientValue: any): ProtocolValue {
   }
 
   return protocolValue;
+}
+
+export function primitiveToClientValue(value: any): Value {
+  let type: ValueType = "object";
+  let preview: string | undefined;
+
+  switch (typeof value) {
+    case "bigint":
+      preview = `${value}n`;
+      type = "bigint";
+      break;
+    case "boolean":
+      preview = `${value}`;
+      type = "boolean";
+      break;
+    case "function":
+      preview = `${value}`;
+      type = "function";
+      break;
+    case "number":
+      if (Number.isNaN(value)) {
+        preview = "NaN";
+        type = "nan";
+      } else {
+        preview = `${value}`;
+        type = "number";
+      }
+      break;
+    case "object":
+      if (value === null) {
+        preview = "null";
+        type = "null";
+        break;
+      } else if (Array.isArray(value)) {
+        preview = `[${value}]`;
+        type = "array";
+        break;
+      } else {
+        const name = value.constructor.name;
+        switch (name) {
+          case "Map":
+          case "WeakMap":
+            preview = `${name}()`;
+            type = "map";
+            break;
+          case "RegExp":
+            preview = `${name}()`;
+            type = "regexp";
+            break;
+          case "Set":
+          case "WeakSet":
+            preview = `${name}()`;
+            type = "set";
+            break;
+          case "Text":
+            type = "html-text";
+            break;
+          default:
+            if (name?.startsWith("HTML")) {
+              preview = `<${name} />`;
+              type = "html-element";
+            } else {
+              preview = "Object";
+            }
+            break;
+        }
+      }
+      break;
+    case "string":
+      preview = value;
+      type = "string";
+      break;
+    case "symbol":
+      preview = value.toString();
+      type = "symbol";
+      break;
+    case "undefined":
+      preview = "undefined";
+      type = "undefined";
+      break;
+  }
+
+  return {
+    name: null,
+    preview,
+    type,
+  };
 }

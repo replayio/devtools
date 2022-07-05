@@ -1,11 +1,13 @@
-import CommentList from "@bvaughn//components/comments/CommentList";
-import ConsoleRoot from "@bvaughn//components/console";
-import ErrorBoundary from "@bvaughn//components/ErrorBoundary";
-import Focuser from "@bvaughn//components/console/Focuser";
-import Initializer from "@bvaughn//components/Initializer";
-import Loader from "@bvaughn//components/Loader";
-import { FocusContextRoot } from "@bvaughn//src/contexts/FocusContext";
+import CommentList from "@bvaughn/components/comments/CommentList";
+import ConsoleRoot from "@bvaughn/components/console";
+import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
+import Focuser from "@bvaughn/components/console/Focuser";
+import Initializer from "@bvaughn/components/Initializer";
+import Loader from "@bvaughn/components/Loader";
+import Sources from "@bvaughn/components/sources/Sources";
+import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
+import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import React, { Suspense, useContext, useMemo } from "react";
 
 import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
@@ -33,30 +35,32 @@ export default function HomePage() {
 
   const content = (
     <Initializer>
-      <PauseContextRoot>
-        <FocusContextRoot>
-          <div className={styles.VerticalContainer}>
-            <div className={styles.HorizontalContainer}>
-              <div className={styles.CommentsContainer}>
-                <ErrorBoundary>
-                  <Suspense fallback={<Loader />}>
-                    <CommentList />
-                  </Suspense>
-                </ErrorBoundary>
+      <PointsContextRoot>
+        <PauseContextRoot>
+          <FocusContextRoot>
+            <div className={styles.VerticalContainer}>
+              <div className={styles.HorizontalContainer}>
+                <div className={styles.CommentsContainer}>
+                  <ErrorBoundary>
+                    <Suspense fallback={<Loader />}>
+                      <CommentList />
+                    </Suspense>
+                  </ErrorBoundary>
+                </div>
+                <div className={styles.SourcesContainer}>
+                  <Sources />
+                </div>
+                <div className={styles.ConsoleContainer}>
+                  <ConsoleRoot />
+                </div>
               </div>
-              <div className={styles.SourcesContainer}>
-                <div>Sources go here...</div>
-              </div>
-              <div className={styles.ConsoleContainer}>
-                <ConsoleRoot />
+              <div className={styles.Row}>
+                <Focuser />
               </div>
             </div>
-            <div className={styles.Row}>
-              <Focuser />
-            </div>
-          </div>
-        </FocusContextRoot>
-      </PauseContextRoot>
+          </FocusContextRoot>
+        </PauseContextRoot>
+      </PointsContextRoot>
     </Initializer>
   );
 

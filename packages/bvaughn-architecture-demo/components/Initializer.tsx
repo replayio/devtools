@@ -67,6 +67,7 @@ export default function Initializer({
           endPoint: endpoint.point,
           recordingId: activeRecordingId,
           sessionId,
+          sourceIds: sources.map(source => source.sourceId),
         });
       };
 

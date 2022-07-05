@@ -32,7 +32,13 @@ export default function Input({ className }: { className: string }) {
   return (
     <div className={`${styles.Container} ${className}`}>
       <Icon className={styles.Icon} type="prompt" />
-      <input ref={ref} className={styles.Input} onKeyDown={onKeyDown} type="text" />
+      <input
+        ref={ref}
+        className={styles.Input}
+        onKeyDown={onKeyDown}
+        type="text"
+        placeholder="Terminal has not been implemented"
+      />
     </div>
   );
 }

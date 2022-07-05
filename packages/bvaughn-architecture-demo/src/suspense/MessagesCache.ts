@@ -157,10 +157,9 @@ async function fetchMessages(
 
       // Pre-cache ObjectPreview data for this Message (PauseId).
       messages.forEach(message => {
-        const pauseId = client.getPauseIdForMessage(message);
         const objects = message.data.objects;
         if (objects) {
-          preCacheObjects(pauseId, objects);
+          preCacheObjects(message.pauseId, objects);
         }
       });
     }

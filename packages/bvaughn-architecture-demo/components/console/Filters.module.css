@@ -1,21 +1,25 @@
 .FilterToggles {
-  padding: 0.5rem;
+  height: 2rem;
+  padding: 0 0.25rem;
   flex: 0 0 auto;
   display: flex;
   gap: 1ch;
-  border-right: 1px solid var(--background-color-default);
   border-bottom: 1px solid var(--background-color-default);
 }
 
 .FilterInput {
   flex: 1;
-  height: 2.5rem;
+  height: 2rem;
   background-color: var(--background-color-default);
   color: var(--color-default);
   padding: 0 1ch;
-  border: none;
+  border: 2px solid transparent;
   outline: none;
-  border-bottom: 1px solid var(--background-color-default);
+}
+.FilterInput:focus {
+  background-color: var(--background-color-contrast-1);
+  border-color: var(--color-brand);
+  border-top-right-radius: 0.5rem;
 }
 
 .FilterLabel {

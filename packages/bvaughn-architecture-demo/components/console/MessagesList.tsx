@@ -1,11 +1,14 @@
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
+import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import { Message } from "@replayio/protocol";
+import { isLogPointInstance } from "@bvaughn/src/utils/console";
+import { Message as ProtocolMessage } from "@replayio/protocol";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import useFilteredMessages, { Loggable } from "./hooks/useFilteredMessages";
 
 import useFocusRange from "./hooks/useFocusRange";
+import LogPointInstanceRenderer from "./LogPointInstanceRenderer";
 import MessageRenderer from "./MessageRenderer";
 import styles from "./MessagesList.module.css";
 import { SearchContext } from "./SearchContext";
@@ -18,7 +21,7 @@ export default function MessagesList() {
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
 
-  const { filteredMessages } = useContext(ConsoleFiltersContext);
+  const loggables = useFilteredMessages();
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
 
   const focusRange = useFocusRange();
@@ -52,16 +55,22 @@ export default function MessagesList() {
           {countBefore} messages filtered before the focus range
         </div>
       )}
-      {filteredMessages.length === 0 && (
-        <div className={styles.NoMessagesRow}>No messages found.</div>
+      {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
+      {loggables.map((loggable: Loggable, index: number) =>
+        isLogPointInstance(loggable) ? (
+          <LogPointInstanceRenderer
+            key={index}
+            isFocused={loggable === currentSearchResult}
+            logPointInstance={loggable as LogPointInstance}
+          />
+        ) : (
+          <MessageRenderer
+            key={index}
+            isFocused={loggable === currentSearchResult}
+            message={loggable as ProtocolMessage}
+          />
+        )
       )}
-      {filteredMessages.map((message: Message, index: number) => (
-        <MessageRenderer
-          key={index}
-          isFocused={message === currentSearchResult}
-          message={message}
-        />
-      ))}
       {countAfter > 0 && (
         <div className={styles.CountRow}>{countAfter} messages filtered after the focus range</div>
       )}

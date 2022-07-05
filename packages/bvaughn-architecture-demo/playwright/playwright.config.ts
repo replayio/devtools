@@ -8,12 +8,13 @@ const config = {
     browserName: "chromium",
     launchOptions: {
       // Useful for visual debugging
-      slowMo: 250,
+      slowMo: 1000,
     },
     trace: "on-first-retry",
+    video: process.env.RECORD_VIDEO ? "on" : "off",
     viewport: {
-      width: 800,
-      height: 400,
+      width: 1024,
+      height: 600,
     },
   },
   snapshotDir: "./snapshots",
