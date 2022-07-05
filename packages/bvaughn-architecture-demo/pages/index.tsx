@@ -59,7 +59,7 @@ export default function HomePage() {
                     disabled={isPending}
                     onClick={() => setPanelTransition("sources")}
                   >
-                    <Icon className={styles.TabIcon} type="document" />
+                    <Icon className={styles.TabIcon} type="source-explorer" />
                   </button>
                 </div>
                 <div className={styles.CommentsContainer}>

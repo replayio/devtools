@@ -248,7 +248,6 @@ export class ReplayClient implements ReplayClientInterface {
       });
     });
 
-    console.log("!!! getHitCounts() ->", hitCounts);
     return hitCounts;
   }
 

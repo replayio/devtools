@@ -3,6 +3,7 @@
   border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
   overflow: auto;
+  padding: 0 0.5rem;
 }
 
 .Header {
@@ -28,13 +29,15 @@
   flex-direction: column;
   width: fit-content;
 }
-.Source {
+
+.ListItem {
   display: flex;
   flex-wrap: nowrap;
-  margin-left: 1rem;
-  line-height: 2rem;
-  color: rgb(65, 63, 73);
+  gap: 0.5rem;
 }
 
-.Origin {
+.Icon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
 }
