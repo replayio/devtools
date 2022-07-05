@@ -2,6 +2,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { LogPointInstance, LogPointsContext } from "@bvaughn/src/contexts/LogPointsContext";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
 import { isLogPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
@@ -14,7 +15,8 @@ export type Loggable = ProtocolMessage | LogPointInstance;
 export default function useFilteredMessages(): Loggable[] {
   const client = useContext(ReplayClientContext);
   const logPoints = useContext(LogPointsContext);
-  const { filterByText, levelFlags } = useContext(ConsoleFiltersContext);
+  const { filterByText, showErrors, showExceptions, showLogs, showNodeModules, showWarnings } =
+    useContext(ConsoleFiltersContext);
 
   const focusRange = useFocusRange();
 
@@ -58,29 +60,54 @@ export default function useFilteredMessages(): Loggable[] {
 
   // Filter in-focus messages by the current criteria.
   const filteredMessages = useMemo<ProtocolMessage[]>(() => {
-    const { showErrors, showLogs, showWarnings } = levelFlags;
-    if (showErrors && showLogs && showWarnings && filterByTextLowercase === "") {
+    if (showErrors && showLogs && showNodeModules && showWarnings && filterByTextLowercase === "") {
       return messages;
     } else {
       return messages.filter((message: ProtocolMessage) => {
-        switch (message.level) {
-          case "warning": {
-            if (!showWarnings) {
+        switch (message.source) {
+          case "ConsoleAPI": {
+            switch (message.level) {
+              case "warning": {
+                if (!showWarnings) {
+                  return false;
+                }
+                break;
+              }
+              case "error": {
+                if (!showErrors) {
+                  return false;
+                }
+                break;
+              }
+              default: {
+                if (!showLogs) {
+                  return false;
+                }
+                break;
+              }
+            }
+            break;
+          }
+          case "PageError": {
+            if (!showExceptions) {
               return false;
             }
             break;
           }
-          case "error": {
-            if (!showErrors) {
-              return false;
+        }
+
+        // TODO This seems expensive; can we cache the message-to-node-modules relationship?
+        if (!showNodeModules) {
+          const isNodeModules = message.data.frames?.some(frame => {
+            const sourceId = frame.location?.[0].sourceId;
+            const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
+            if (source) {
+              return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
             }
-            break;
-          }
-          default: {
-            if (!showLogs) {
-              return false;
-            }
-            break;
+            return false;
+          });
+          if (isNodeModules) {
+            return false;
           }
         }
 
@@ -107,15 +134,22 @@ export default function useFilteredMessages(): Loggable[] {
         return true;
       });
     }
-  }, [filterByTextLowercase, levelFlags, messages]);
+  }, [
+    filterByTextLowercase,
+    messages,
+    showErrors,
+    showExceptions,
+    showLogs,
+    showNodeModules,
+    showWarnings,
+  ]);
 
   const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [...filteredLogPoints, ...filteredMessages];
-
     return loggables.sort((a: Loggable, b: Loggable) => {
-      const pointA = isLogPointInstance(a) ? a.timeStampedHitPoint.point : a.point.point;
-      const pointB = isLogPointInstance(b) ? b.timeStampedHitPoint.point : b.point.point;
-      return pointA.localeCompare(pointB);
+      const timeA = isLogPointInstance(a) ? a.timeStampedHitPoint.time : a.point.time;
+      const timeB = isLogPointInstance(b) ? b.timeStampedHitPoint.time : b.point.time;
+      return timeA - timeB;
     });
   }, [filteredLogPoints, filteredMessages]);
 

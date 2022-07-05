@@ -42,7 +42,7 @@ body {
     --color-contrast: #081121;
     --color-current: #f02d5e;
     --color-default: #ffffff;
-    --color-dim: #666666;
+    --color-dim: #aaaaaa;
     --color-error: #ffb3d2;
     --color-hit-counts-0: #445064;
     --color-hit-counts-1: #2563be;
@@ -70,7 +70,7 @@ body {
     --color-contrast: #ffffff;
     --color-current: #f02d5e;
     --color-default: #223344;
-    --color-dim: #777777;
+    --color-dim: #666666;
     --color-error: #ff0000;
     --color-hit-counts-0: #d9dad9;
     --color-hit-counts-1: #bbeafa;
