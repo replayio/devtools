@@ -1,8 +1,9 @@
-name: Run test suites (nightly)
+name: Recorder Performance Comparison
 on:
   workflow_dispatch:
-  schedule:
-    - cron:  '30 2 * * *'
+  push:
+    branches:
+      - main
 
 jobs:
   download-browser:
