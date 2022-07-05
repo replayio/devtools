@@ -12,8 +12,7 @@ import { getDuration } from "../utils";
 import { TestRunOverviewContext } from "./TestRunOverviewContainerContextType";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun.commit?.title || "";
-  const triggerUrl = testRun?.triggerUrl;
+  const title = testRun?.commitTitle;
 
   return (
     <div className="flex flex-row items-center space-x-2 overflow-hidden">
@@ -25,30 +24,21 @@ function Title({ testRun }: { testRun: TestRun }) {
 }
 
 function Attributes({ testRun }: { testRun: TestRun }) {
-  const user = testRun.recordings[0].metadata.source?.trigger?.user;
-  const firstRecording = testRun.recordings[0];
-
-  const duration = getDuration(testRun.recordings);
+  const duration = getDuration(testRun.recordings!);
   const durationString = getDurationString(duration);
-  const branch = firstRecording.metadata.source?.branch;
-  const merge = firstRecording.metadata.source?.merge;
+  const { user, date, mergeId, mergeTitle, branch } = testRun;
 
   return (
     <div className="flex flex-row flex-wrap items-center">
-      <AttributeContainer icon="schedule">
-        {getTruncatedRelativeDate(firstRecording.date)}
-      </AttributeContainer>
+      <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
       <AttributeContainer icon="person">{user!}</AttributeContainer>
-      {testRun.event !== "pull_request" && (
-        <AttributeContainer icon="play_circle">{testRun.event}</AttributeContainer>
-      )}
-      {merge && (
-        <AttributeContainer title={merge.title} icon="merge_type">
-          {merge.id}
+      {mergeId && (
+        <AttributeContainer title={mergeTitle} icon="merge_type">
+          {mergeId}
         </AttributeContainer>
       )}
 
-      {!merge && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
+      {!mergeId && branch && <AttributeContainer icon="fork_right">{branch}</AttributeContainer>}
       <AttributeContainer icon="timer">{durationString}</AttributeContainer>
     </div>
   );

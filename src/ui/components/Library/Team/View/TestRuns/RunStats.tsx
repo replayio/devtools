@@ -10,8 +10,7 @@ function Pill({ styles, value }: { styles: string; value: number }) {
   );
 }
 export function RunStats({ testRun }: { testRun: TestRun }) {
-  const failed = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
-  const passed = testRun.recordings.filter(r => r.metadata.test?.result === "passed").length;
+  const { passed, failed } = testRun.stats;
 
   return (
     <div className="flex space-x-2 shrink">
