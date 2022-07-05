@@ -7,7 +7,7 @@ export function TestRunList() {
   const { testRuns } = useContext(TestRunsContext);
 
   return (
-    <div className="flex flex-col flex-grow m-4 space-y-2 overflow-auto text-sm">
+    <div className="flex flex-col flex-grow m-4 space-y-0 overflow-auto text-sm no-scrollbar rounded-t-xl">
       {testRuns ? (
         testRuns.map((t, i) => <TestRunListItem key={i} testRun={t} onClick={() => ({})} />)
       ) : (
