@@ -104,10 +104,10 @@ export default function Source({
                 data-test-id={`SourceLine${lineNumber}`}
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
+                {hoverButton}
                 <div
                   className={`${styles[`LineHitCount-${hitCountBadge}`]} ${styles.LineHitCount}`}
-                ></div>
-                {hoverButton}
+                />
                 {lineSegments}
               </div>
               {linePoint && <PointPanel className={styles.PointPanel} point={linePoint} />}
