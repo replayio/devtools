@@ -226,6 +226,10 @@ export function seekToTime(targetTime: number): UIThunkAction {
       return;
     }
 
+    // getPointNearTime could take time while we're processing the recording
+    // so we optimistically set the timeline to the target time
+    dispatch(setTimelineToTime(targetTime));
+
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;
     try {
