@@ -78,6 +78,7 @@ type MixpanelEvent =
   | ["onboarding.skipped_replay_download"]
   | ["onboarding.started_onboarding"]
   | ["onboarding.team_invite"]
+  | ["paused"]
   | ["quick_open.open_quick_open"]
   | ["session.devtools_start", { userIsAuthor: boolean; workspaceUuid: WorkspaceUuid | null }]
   | ["session_end", { reason: string }]
