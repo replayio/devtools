@@ -4,6 +4,13 @@
 
 //
 
+import type { UIState } from "ui/state";
+import type { UIThunkAction } from "ui/actions";
+import type { ThunkExtraArgs } from "ui/utils/thunk";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { Source } from "../../reducers/sources";
+import type { AppDispatch } from "ui/setup/store";
+
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import {
@@ -14,11 +21,13 @@ import {
   getSourceActorsForSource,
 } from "../../selectors";
 
-import { fulfilled } from "../../utils/async-value";
+import { AsyncValue, fulfilled } from "../../utils/async-value";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 
-export async function loadSource(state, source, thunkArgs) {
+type ThunkArgs = { dispatch: AppDispatch; getState: () => UIState } & ThunkExtraArgs;
+
+export async function loadSource(state: UIState, source: Source, thunkArgs: ThunkArgs) {
   // We only need the source text from one actor, but messages sent to retrieve
   // the source might fail if the actor has or is about to shut down. Keep
   // trying with different actors until one request succeeds.
@@ -48,7 +57,7 @@ export async function loadSource(state, source, thunkArgs) {
   return { text, contentType };
 }
 
-async function loadSourceTextPromise(cx, source, thunkArgs) {
+async function loadSourceTextPromise(source: Source, thunkArgs: ThunkArgs) {
   const epoch = getSourcesEpoch(thunkArgs.getState());
   await thunkArgs.dispatch({
     type: "LOAD_SOURCE_TEXT",
@@ -58,33 +67,38 @@ async function loadSourceTextPromise(cx, source, thunkArgs) {
   });
 }
 
-export function loadSourceById(cx, sourceId) {
+export function loadSourceById(cx: Context, sourceId: string): UIThunkAction {
   return (dispatch, getState) => {
-    const source = getSourceFromId(getState(), sourceId);
-    return dispatch(loadSourceText({ cx, source }));
+    const source = getSourceFromId(getState(), sourceId)!;
+    return dispatch(loadSourceText({ source }));
   };
 }
 
 export const loadSourceText = memoizeableAction("loadSourceText", {
-  getValue: ({ source }, thunkArgs) => {
-    source = source ? getSource(thunkArgs.getState(), source.id) : null;
-    if (!source) {
+  getValue: (
+    { source }: { source: Source },
+    thunkArgs
+  ): AsyncValue<Source> | Source | null | undefined => {
+    const actualSource: Source | null = source ? getSource(thunkArgs.getState(), source.id) : null;
+    if (!actualSource) {
       return null;
     }
 
-    const { content } = getSourceWithContent(thunkArgs.getState(), source.id);
+    const { content } = getSourceWithContent(thunkArgs.getState(), actualSource.id);
+    // @ts-expect-error state doesn't exist?
     if (!content || content.state === "pending") {
+      // @ts-expect-error more mismatches AGGGHH KILL THIS!
       return content;
     }
 
     // This currently swallows source-load-failure since we return fulfilled
     // here when content.state === "rejected". In an ideal world we should
     // propagate that error upward.
-    return fulfilled(source);
+    return fulfilled(actualSource);
   },
   createKey: ({ source }, thunkArgs) => {
     const epoch = getSourcesEpoch(thunkArgs.getState());
-    return `${epoch}:${source.id}`;
+    return `${epoch}:${source!.id}`;
   },
-  action: ({ cx, source }, thunkArgs) => loadSourceTextPromise(cx, source, thunkArgs),
+  action: ({ source }, thunkArgs) => loadSourceTextPromise(source!, thunkArgs),
 });
