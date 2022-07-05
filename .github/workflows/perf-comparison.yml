@@ -69,6 +69,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
       - uses: ./.github/actions/test
+        with:
+          upload: false
         env:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: https://app.replay.io
