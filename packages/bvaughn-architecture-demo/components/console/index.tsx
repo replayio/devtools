@@ -1,3 +1,3 @@
-import Console from "./Console";
+import ConsoleRoot from "./ConsoleRoot";
 
-export default Console;
+export default ConsoleRoot;
