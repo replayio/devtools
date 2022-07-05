@@ -2,7 +2,7 @@ import CommentList from "@bvaughn/components/comments/CommentList";
 import ConsoleRoot from "@bvaughn/components/console";
 import Focuser from "@bvaughn/components/console/Focuser";
 import Initializer from "@bvaughn/components/Initializer";
-import SourceExplorer from "@bvaughn/components/source-explorer/SourceExplorer";
+import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
