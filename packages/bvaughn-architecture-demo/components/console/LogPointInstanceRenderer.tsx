@@ -1,4 +1,5 @@
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
@@ -10,9 +11,10 @@ import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import styles from "./LogPointInstanceRenderer.module.css";
 import MessageHoverButton from "./MessageHoverButton";
-import styles from "./MessageRenderer.module.css";
 import Source from "./Source";
+import { formatTimestamp } from "@bvaughn/src/utils/time";
 
 function LogPointInstanceRenderer({
   isFocused,
@@ -22,6 +24,7 @@ function LogPointInstanceRenderer({
   logPointInstance: LogPointInstance;
 }) {
   const client = useContext(ReplayClientContext);
+  const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -42,7 +45,7 @@ function LogPointInstanceRenderer({
     logPointInstance.point.content
   );
 
-  let className = styles.MessageRow;
+  let className = styles.LogPointRow;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
@@ -71,6 +74,11 @@ function LogPointInstanceRenderer({
 
   const primaryContent = (
     <div className={styles.PrimaryRow}>
+      {showTimestamps && (
+        <span className={styles.TimeStamp}>
+          {formatTimestamp(logPointInstance.timeStampedHitPoint.time)}
+        </span>
+      )}
       <div className={styles.LogContents}>{contents}</div>
       <Suspense fallback={<Loader />}>
         <div className={styles.Source}>

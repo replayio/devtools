@@ -8,6 +8,9 @@
 }
 
 .VerticalContainer {
+  display: flex;
+  flex-direction: row;
   flex: 1 1 auto;
-  overflow: hidden;
+  gap: 0.5rem;
+  overflow: auto;
 }
