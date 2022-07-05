@@ -12,7 +12,7 @@ function ViewReplay({ recordingId, passed }: { recordingId: string; passed: bool
         <MaterialIcon
           iconSize="2xl"
           outlined
-          className={passed ? "text-primaryAccent hover:text-blue-500" : "text-red-500 hover:text-red-700"}
+          className={passed ? "text-green-500 hover:text-green-700" : "text-red-500 hover:text-red-700"}
         >
           play_circle
         </MaterialIcon>
