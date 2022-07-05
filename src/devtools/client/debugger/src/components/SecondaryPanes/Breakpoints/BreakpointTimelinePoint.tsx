@@ -150,5 +150,6 @@ const MemoizedBreakpointTimelinePoint = React.memo(
     return true;
   }
 );
+MemoizedBreakpointTimelinePoint.displayName = "BreakpointTimelinePoint";
 
 export default connector(MemoizedBreakpointTimelinePoint);

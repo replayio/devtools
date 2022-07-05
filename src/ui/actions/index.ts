@@ -15,7 +15,7 @@ import * as eventListeners from "devtools/client/debugger/src/actions/event-list
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
-import consoleActions from "devtools/client/webconsole/actions";
+import * as consoleActions from "devtools/client/webconsole/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
 import { NetworkAction } from "./network";
 import { LayoutAction } from "./layout";

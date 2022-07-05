@@ -218,9 +218,3 @@ function onExpressionEvaluated(response: EvaluationResponse): UIThunkAction {
     return;
   };
 }
-
-module.exports = {
-  evaluateExpression,
-  paywallExpression,
-  eagerEvalExpression,
-};

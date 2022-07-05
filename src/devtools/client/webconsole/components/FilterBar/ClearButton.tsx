@@ -6,7 +6,7 @@ import { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
 const { MESSAGE_TYPE } = require("devtools/client/webconsole/constants");
-const actions = require("devtools/client/webconsole/actions/index");
+import * as actions from "devtools/client/webconsole/actions/index";
 import { getAllMessagesById } from "devtools/client/webconsole/selectors/messages";
 
 type Message = {
