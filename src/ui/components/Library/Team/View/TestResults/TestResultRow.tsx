@@ -18,9 +18,13 @@ function Title({ metadata }: { metadata: RecordingMetadata }) {
 
 function Status({ test }: { test: TestMetadata }) {
   return (
-<div className={`flex self-start pt-0.5 ${test.result === "passed" ? "text-red-500" : "text-green-500"} `}>
-<MaterialIcon iconSize="xl">{`${test.result === "passed" ? "cancel" : "check"} `}</MaterialIcon>
-</div>
+<MaterialIcon
+          iconSize="2xl"
+          outlined
+          className={test.result === "passed" ? "text-green-500 group-hover:text-green-700" : "text-red-500 group-hover:text-red-700"}
+        >
+          play_circle
+        </MaterialIcon>
   );
 }
 
@@ -55,7 +59,7 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
   }
 
   return (
-    <a href={getRecordingURL(recording)} style={{ color: "inherit", textDecoration: "inherit" }}>
+    <a href={getRecordingURL(recording)} className="group" style={{ color: "inherit", textDecoration: "inherit" }} rel="noreferrer noopener" target="_blank">
       <div
         className={`flex flex-row items-center px-3 py-3 space-x-3 border-b overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
       >
