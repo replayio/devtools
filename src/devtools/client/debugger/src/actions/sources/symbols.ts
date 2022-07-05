@@ -3,6 +3,8 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { selectors } from "ui/reducers";
+import type { AppDispatch } from "ui/setup/store";
+import type { Source } from "../../reducers/sources";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { loadSourceText } from "./loadSourceText";
@@ -10,7 +12,7 @@ import { loadSourceText } from "./loadSourceText";
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 
-async function doSetSymbols(source, thunkArgs) {
+async function doSetSymbols(source: Source, thunkArgs: { dispatch: AppDispatch }) {
   const sourceId = source.id;
   await thunkArgs.dispatch(loadSourceText({ source }));
 
@@ -22,7 +24,7 @@ async function doSetSymbols(source, thunkArgs) {
 }
 
 export const setSymbols = memoizeableAction("setSymbols", {
-  getValue: ({ source }, thunkArgs) => {
+  getValue: ({ source }: { source: Source }, thunkArgs) => {
     const symbols = selectors.getSymbols(thunkArgs.getState(), source);
     if (!symbols || symbols.loading) {
       return null;
