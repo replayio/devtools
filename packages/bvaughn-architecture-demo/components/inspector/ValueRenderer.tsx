@@ -15,6 +15,8 @@ import RegExpRenderer from "./values/RegExpRenderer";
 import SetRenderer from "./values/SetRenderer";
 import { ObjectPreviewRendererProps } from "./values/types";
 
+// TODO Add custom Date renderer (and ClientValue type)
+
 // Renders protocol Object/ObjectPreview values.
 // This renderer only renders a value (no name) and can be used with both horizontal and vertical layouts.
 //

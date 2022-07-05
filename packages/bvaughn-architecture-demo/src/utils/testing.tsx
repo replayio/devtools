@@ -84,14 +84,16 @@ export async function renderFocused(
   sessionContext: SessionContextType;
 }> {
   const consoleFiltersContext: ConsoleFiltersContextType = {
+    events: {},
     filterByDisplayText: "",
     filterByText: "",
     isTransitionPending: false,
-    levelFlags: {
-      showErrors: true,
-      showLogs: true,
-      showWarnings: true,
-    },
+    showErrors: true,
+    showExceptions: true,
+    showLogs: true,
+    showNodeModules: true,
+    showTimestamps: false,
+    showWarnings: true,
     update: jest.fn(),
     ...options?.consoleFiltersContext,
   };

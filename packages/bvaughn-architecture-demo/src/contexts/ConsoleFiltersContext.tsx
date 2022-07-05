@@ -7,13 +7,20 @@ import {
   useTransition,
 } from "react";
 
-export type ConsoleLevelFlags = {
+// Various boolean flags to types of console messages or attributes to show/hide.
+export type Toggles = {
+  events: {
+    [eventType: string]: boolean;
+  };
   showErrors: boolean;
+  showExceptions: boolean;
   showLogs: boolean;
+  showNodeModules: boolean;
+  showTimestamps: boolean;
   showWarnings: boolean;
 };
 
-export type ConsoleFiltersContextType = {
+export type ConsoleFiltersContextType = Toggles & {
   // Filter text to display in the UI.
   // This value is updated at React's default, higher priority.
   filterByDisplayText: string;
@@ -26,18 +33,23 @@ export type ConsoleFiltersContextType = {
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
   isTransitionPending: boolean;
 
-  // Types of console messages to include (or filter out).
-  levelFlags: ConsoleLevelFlags;
-
-  update: (filterByText: string, levelFlags: ConsoleLevelFlags) => void;
+  update: (
+    values: Partial<
+      Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+    >
+  ) => void;
 };
 
 export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(null as any);
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
-  const [levelFlags, setLevelFlags] = useState<ConsoleLevelFlags>({
+  const [toggles, setToggles] = useState<Toggles>({
+    events: {},
     showErrors: true,
+    showExceptions: true,
     showLogs: true,
+    showNodeModules: true,
+    showTimestamps: false,
     showWarnings: true,
   });
 
@@ -47,13 +59,32 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [filterByText, setFilterByText] = useState<string>("");
   const [deferredFilterByText, setDeferredFilterByText] = useState<string>("");
 
-  const updateFilters = useCallback((newFilterByText: string, newLevelFlags: ConsoleLevelFlags) => {
-    setLevelFlags(newLevelFlags);
-    setFilterByText(newFilterByText);
-    startTransition(() => {
-      setDeferredFilterByText(newFilterByText);
-    });
-  }, []);
+  const update = useCallback(
+    (
+      values: Partial<
+        Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+      >
+    ) => {
+      const { filterByText: newFilterByText, ...newToggles } = values;
+
+      setToggles(prevToggles => ({
+        ...prevToggles,
+        ...newToggles,
+        events: {
+          ...prevToggles.events,
+          ...newToggles.events,
+        },
+      }));
+
+      if (newFilterByText != null) {
+        setFilterByText(newFilterByText);
+        startTransition(() => {
+          setDeferredFilterByText(newFilterByText);
+        });
+      }
+    },
+    []
+  );
 
   // Using a deferred values enables the filter input to update quickly,
   // and the slower operation of filtering the messages in memory to be deferred.
@@ -61,13 +92,13 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
 
   const consoleFiltersContext = useMemo<ConsoleFiltersContextType>(
     () => ({
+      ...toggles,
       filterByDisplayText: filterByText,
       filterByText: deferredFilterByText,
       isTransitionPending,
-      levelFlags,
-      update: updateFilters,
+      update,
     }),
-    [deferredFilterByText, filterByText, isTransitionPending, levelFlags, updateFilters]
+    [deferredFilterByText, filterByText, isTransitionPending, toggles, update]
   );
 
   return (

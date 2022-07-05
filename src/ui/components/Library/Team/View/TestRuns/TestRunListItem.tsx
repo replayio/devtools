@@ -10,29 +10,30 @@ import { TeamContext } from "../../TeamContextRoot";
 import { TestRunsContext } from "./TestRunsContextRoot";
 
 function Title({ testRun }: { testRun: TestRun }) {
-  const title = testRun.commit?.title || "Unknown";
+  const title = testRun.commitTitle || "Unknown";
+  // TODO: This should be done in CSS.
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
+
   return (
-    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 flex-nowrap text-ellipsis">
+    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 text-ellipsis whitespace-nowrap">
       {formatted}
     </div>
   );
 }
 
 function Attributes({ testRun }: { testRun: TestRun }) {
-  const { recordings, branch, date } = testRun;
-  const user = testRun.recordings[0].metadata.source?.trigger?.user;
-  const merge = recordings[0].metadata.source?.merge;
+  const { mergeId, mergeTitle, user, date, branch } = testRun;
+
   return (
     <div className={`flex flex-row items-center text-xs font-light`}>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      <AttributeContainer icon="person">{user!}</AttributeContainer>
-      {merge && (
-        <AttributeContainer title={merge.title} icon="merge_type">
-          {merge.id}
+      <AttributeContainer icon="person">{user}</AttributeContainer>
+      {mergeId && (
+        <AttributeContainer title={mergeTitle} icon="merge_type">
+          {mergeId}
         </AttributeContainer>
       )}
-      {!merge && (
+      {!mergeId && (
         <AttributeContainer maxWidth="160px" icon="fork_right">
           {branch}
         </AttributeContainer>
@@ -52,7 +53,7 @@ function Status({ failCount }: { failCount: number }) {
 export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
-  const failCount = testRun.recordings.filter(r => r.metadata.test?.result !== "passed").length;
+  const failCount = testRun.stats.failed;
   const isSelected = focusId === testRun.id;
 
   return (
@@ -66,8 +67,8 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
         onClick={onClick}
       >
         <Status failCount={failCount} />
-        <div className="flex flex-col flex-grow space-y-1">
-          <div className="flex flex-row justify-between">
+        <div className="flex flex-col flex-grow space-y-1 overflow-hidden">
+          <div className="flex flex-row justify-between space-x-3">
             <Title testRun={testRun} />
             <RunStats testRun={testRun} />
           </div>

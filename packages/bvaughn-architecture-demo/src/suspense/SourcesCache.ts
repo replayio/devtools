@@ -51,6 +51,14 @@ export function getSource(
   return sources.find(source => source.sourceId === sourceId) || null;
 }
 
+export function getSourceIfAlreadyLoaded(sourceId: ProtocolSourceId): ProtocolSource | null {
+  if (sources !== null) {
+    return sources.find(source => source.sourceId === sourceId) || null;
+  }
+
+  return null;
+}
+
 export function getSourceContents(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId

@@ -35,10 +35,6 @@
   min-height: 1rem;
 }
 
-.Time {
-  color: var(--color-brand);
-}
-
 .ErrorIcon,
 .WarningIcon {
   width: 1rem;
@@ -71,4 +67,9 @@
 }
 .Source:hover {
   opacity: 1;
+}
+
+.TimeStamp {
+  color: var(--color-dim);
+  font-size: 0.8rem;
 }

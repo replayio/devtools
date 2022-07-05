@@ -2,7 +2,9 @@ import Expandable from "@bvaughn/components/Expandable";
 import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
@@ -21,6 +23,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   const [isHovered, setIsHovered] = useState(false);
 
   const { pauseId: currentPauseId } = useContext(PauseContext);
+  const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   useLayoutEffect(() => {
     if (isFocused) {
@@ -65,6 +68,9 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   const primaryContent = (
     <div className={styles.PrimaryRow}>
       <div className={styles.LogContents}>
+        {showTimestamps && (
+          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time)}</span>
+        )}
         {icon}
         {message.text && <span className={styles.MessageText}>{message.text}</span>}
         <Suspense fallback={<Loader />}>

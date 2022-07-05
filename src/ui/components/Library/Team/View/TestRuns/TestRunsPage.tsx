@@ -15,7 +15,7 @@ function TestRunsContent() {
   const { focusId } = useContext(TestRunsContext);
 
   return (
-    <div className="flex flex-row flex-grow">
+    <div className="flex flex-row flex-grow overflow-hidden">
       <TestRunList />
       {focusId ? <TestRunOverviewPage /> : null}
     </div>

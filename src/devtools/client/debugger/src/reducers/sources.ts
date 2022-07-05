@@ -231,7 +231,7 @@ function update(state = initialSourcesState(), action: AnyAction) {
     case "SET_FOCUSED_SOURCE_ITEM":
       return { ...state, focusedItem: action.item };
 
-    case "SOURCES_LOADED":
+    case "sources/allSourcesReceived":
       return { ...state, sourcesLoading: false };
   }
 
