@@ -207,8 +207,8 @@ export function removeBreakpointAtGeneratedLocation(
     const pending = getPendingBreakpointList(getState(), ThreadFront.recordingId!);
     for (const { location } of pending) {
       if (location.sourceUrl == target.sourceUrl && comparePosition(location, target)) {
-        // @ts-expect-error Location type mismatch
-        dispatch(removePendingBreakpoint(location, cx));
+        // @ts-expect-error location mismatch
+        dispatch(removePendingBreakpoint(location, ThreadFront.recordingId!, cx));
       }
     }
 
