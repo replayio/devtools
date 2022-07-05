@@ -47,16 +47,8 @@ export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
 ): ProtocolSource | null {
-  if (sources !== null) {
-    return sources.find(source => source.sourceId === sourceId) || null;
-  }
-
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable();
-    fetchSources(client);
-  }
-
-  throw inProgressSourcesWakeable;
+  const sources = getSources(client);
+  return sources.find(source => source.sourceId === sourceId) || null;
 }
 
 export function getSourceContents(
