@@ -8,11 +8,11 @@ import styles from "../../../../Library.module.css";
 function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (
     <Link href={`/recording/${recordingId}`}>
-      <a className="flex items-center justify-center p-2 transition">
+      <a className="flex items-center justify-center p-2 transition" rel="noreferrer noopener" target="_blank">
         <MaterialIcon
           iconSize="2xl"
           outlined
-          className={passed ? "text-primaryAccent" : "text-red-500"}
+          className={passed ? "text-primaryAccent hover:text-blue-500" : "text-red-500 hover:text-red-700"}
         >
           play_circle
         </MaterialIcon>
