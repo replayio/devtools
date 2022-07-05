@@ -2,14 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { UIThunkAction } from "ui/actions";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { SourceLocation } from "../../reducers/types";
+
 import { selectLocation } from "../sources";
 import { getContext } from "../../selectors";
 
 //sets pause preview location for frame timeline scrubber
-export function setPreviewPausedLocation(location) {
+export function setPreviewPausedLocation(location: SourceLocation): UIThunkAction {
   return (dispatch, getState) => {
     const cx = getContext(getState());
 
+    // @ts-expect-error sourcelocation mismatch
     dispatch(selectLocation(cx, location));
 
     dispatch({
