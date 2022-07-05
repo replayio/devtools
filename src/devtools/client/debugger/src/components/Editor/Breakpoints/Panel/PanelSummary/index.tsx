@@ -7,7 +7,6 @@ import "reactjs-popup/dist/index.css";
 import { useAppDispatch } from "ui/setup/hooks";
 import { createFloatingCodeComment, createFrameComment } from "ui/actions/comments";
 import { enterFocusMode } from "ui/actions/timeline";
-import PrefixBadgeButton from "ui/components/PrefixBadge";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -16,6 +15,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
+import useAuth0 from "ui/utils/useAuth0";
 
 export type Input = "condition" | "logValue";
 
@@ -43,6 +43,7 @@ export default function PanelSummary({
   const logValue = breakpoint.options.logValue;
 
   const dispatch = useAppDispatch();
+  const { isAuthenticated } = useAuth0();
 
   const isLoaded = Boolean(analysisPoints && !isHot);
   const isEditable = isLoaded && isTeamDeveloper;
@@ -60,6 +61,11 @@ export default function PanelSummary({
 
   const addComment = (e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Un-authenticated users can't comment on Replays.
+    if (!isAuthenticated) {
+      return null;
+    }
 
     trackEvent("breakpoint.add_comment");
 
@@ -90,7 +96,8 @@ export default function PanelSummary({
           This log cannot be edited because <br />
           it was hit {MAX_POINTS_FOR_FULL_ANALYSIS}+ times
         </Popup>
-        <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
+
+        {isAuthenticated && <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />}
       </div>
     );
   }
@@ -121,7 +128,7 @@ export default function PanelSummary({
           </Popup>
         ) : null}
       </div>
-      <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />
+      {isAuthenticated && <AddCommentButton onClick={addComment} isPausedOnHit={pausedOnHit} />}
     </div>
   );
 }

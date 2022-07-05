@@ -22,6 +22,10 @@
   background-color: #14243e;
 }
 
+:root:global(.theme-dark) .libraryRowSelected:hover {
+  background-color: #162641;
+}
+
 :root:global(.theme-dark) .teamRow:hover,
 :root:global(.theme-dark) .teamRowActive {
   background-color: var(--theme-base-90);
@@ -49,13 +53,18 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-dark) .sidebar {
+:root:global(.theme-dark) .navigation {
   background-color: var(--body-bgcolor);
   color: var(--body-color);
 }
 
 :root:global(.theme-dark) .workspaceName {
   color: #fff;
+}
+
+:root:global(.theme-dark) .runOverview {
+  color: var(--body-color);
+  background-color: var(--body-bgcolor);
 }
 
 /* Light */
@@ -74,12 +83,17 @@
   color: var(--body-color);
 }
 
+
 :root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
 }
 
 :root:global(.theme-light) .libraryRowSelected {
   background-color: rgb(233 246 255);
+}
+
+:root:global(.theme-light) .libraryRowSelected:hover {
+  background-color: rgb(229, 244, 255);
 }
 
 :root:global(.theme-light) .teamRow:hover,
@@ -106,11 +120,16 @@
   color: var(--body-color);
 }
 
-:root:global(.theme-light) .sidebar {
+:root:global(.theme-light) .navigation {
   background-color: #252525;
   color: hsl(0, 0%, 90%);
 }
 
 :root:global(.theme-light) .workspaceName {
+  color: var(--body-color);
+}
+
+:root:global(.theme-light) .runOverview {
+  background-color: var(--theme-base-100);
   color: var(--body-color);
 }

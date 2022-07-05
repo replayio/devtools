@@ -23,7 +23,6 @@ export interface GetUserSettings_viewer_settings {
   enableEventLink: boolean;
   enableRepaint: boolean;
   enableTeams: boolean;
-  showReact: boolean;
 }
 
 export interface GetUserSettings_viewer_defaultWorkspace {

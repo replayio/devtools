@@ -19,6 +19,7 @@ export default function CommentReplyButton({ comment }: { comment: Comment }) {
   // This should be replaced with useTransition() once we're using Suspense for comment data.
   const [isPending, setIsPending] = useState(false);
 
+  // Un-authenticated users can't comment on Replays.
   if (!isAuthenticated) {
     return null;
   }

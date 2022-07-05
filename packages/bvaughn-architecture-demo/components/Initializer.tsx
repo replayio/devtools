@@ -61,12 +61,13 @@ export default function Initializer({
         }
 
         setContext({
-          accessToken: accessToken || null,
+          accessToken: activeAccessToken,
           currentUserInfo,
           duration: endpoint.time,
           endPoint: endpoint.point,
           recordingId: activeRecordingId,
           sessionId,
+          sourceIds: sources.map(source => source.sourceId),
         });
       };
 
@@ -74,7 +75,7 @@ export default function Initializer({
     }
 
     didInitializeRef.current = true;
-  }, [client, recordingId]);
+  }, [accessToken, client, recordingId]);
 
   if (context === null) {
     return null;

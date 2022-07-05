@@ -14,59 +14,19 @@ interface ExperimentalSetting {
 
 const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
   {
-    label: "React DevTools",
-    description: "Inspect the React component tree",
-    key: "showReact",
-  },
-  {
-    label: "Redux DevTools",
-    description: "Inspect the Redux actions history",
-    key: "showRedux",
-  },
-  {
-    label: "Event Link",
-    description: "Jump from an event to a line of code",
-    key: "enableEventLink",
-  },
-  {
     label: "Column Breakpoints",
     description: "Add breakpoints within a line",
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Network Request Comments",
-    description: "Leave comments on a network request",
-    key: "enableNetworkRequestComments",
-  },
-  {
-    label: "Breakpoint Panel Autocomplete",
-    description: "Show autocomplete in the breakpoint panel",
-    key: "enableBreakpointPanelAutocomplete",
-  },
-  {
-    label: "Large Text",
-    description: "Enable large text for Editor",
-    key: "enableLargeText",
-  },
-  {
     label: "New Object Inspector",
-    description: "Enable new Object Inspector UI for Source viewer",
+    description: "Preview objects with the new inspector",
     key: "enableNewObjectInspector",
   },
   {
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
-  },
-  {
-    description: "Add prefixes to print statements",
-    key: "unicornConsole",
-    label: "Unicorn console",
-  },
-  {
-    label: "Turbo Replay",
-    description: "Replay recordings across multiple instances",
-    key: "turboReplay",
   },
   {
     label: "Inline hit counts",
@@ -102,25 +62,11 @@ export default function ExperimentalSettings({}) {
   const { userSettings, loading } = hooks.useGetUserSettings();
 
   // TODO: This is bad and should be updated with a better generalized hook
-  const updateEventLink = hooks.useUpdateUserSetting("enableEventLink");
-  const updateReact = hooks.useUpdateUserSetting("showReact");
-
-  const {
-    value: enableBreakpointPanelAutocomplete,
-    update: updateEnableBreakpointPanelAutocomplete,
-  } = useFeature("breakpointPanelAutocomplete");
   const { value: enableColumnBreakpoints, update: updateEnableColumnBreakpoints } =
     useFeature("columnBreakpoints");
-  const { value: enableNetworkRequestComments, update: updateEnableNetworkRequestComments } =
-    useFeature("networkRequestComments");
-  const { value: enableTurboReplay, update: updateEnableTurboReplay } = useFeature("turboReplay");
-  const { value: enableUnicornConsole, update: updateEnableUnicornConsole } =
-    useFeature("unicornConsole");
-  const { value: enableReduxDevtools, update: updateEnableReduxDevtools } = useFeature("showRedux");
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: enableLargeText, update: updateEnableLargeText } = useFeature("enableLargeText");
   const { value: enableNewObjectInspector, update: updateEnableNewObjectInspector } = useFeature(
     "enableNewObjectInspector"
   );
@@ -128,26 +74,10 @@ export default function ExperimentalSettings({}) {
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
   const onChange = (key: ExperimentalKey, value: any) => {
-    if (key === "enableEventLink") {
-      updateEventLink({ variables: { newValue: value } });
-    } else if (key === "showReact") {
-      updateReact({ variables: { newValue: value } });
-    } else if (key === "enableBreakpointPanelAutocomplete") {
-      updateEnableBreakpointPanelAutocomplete(!enableBreakpointPanelAutocomplete);
-    } else if (key == "enableColumnBreakpoints") {
+    if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
-    } else if (key == "enableNetworkRequestComments") {
-      updateEnableNetworkRequestComments(!enableNetworkRequestComments);
-    } else if (key == "turboReplay") {
-      updateEnableTurboReplay(!enableTurboReplay);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key == "unicornConsole") {
-      updateEnableUnicornConsole(!enableUnicornConsole);
-    } else if (key === "showRedux") {
-      updateEnableReduxDevtools(!enableReduxDevtools);
-    } else if (key === "enableLargeText") {
-      updateEnableLargeText(!enableLargeText);
     } else if (key === "enableNewObjectInspector") {
       updateEnableNewObjectInspector(!enableNewObjectInspector);
     } else if (key === "hitCounts") {
@@ -156,15 +86,9 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
-    enableBreakpointPanelAutocomplete,
     enableColumnBreakpoints,
-    enableNetworkRequestComments,
     enableResolveRecording,
     hitCounts,
-    turboReplay: enableTurboReplay,
-    unicornConsole: enableUnicornConsole,
-    showRedux: enableReduxDevtools,
-    enableLargeText,
     enableNewObjectInspector,
   };
 
@@ -176,7 +100,7 @@ export default function ExperimentalSettings({}) {
 
   return (
     <div className="space-y-6 overflow-auto">
-      <div className="flex flex-col space-y-2 p-1">
+      <div className="flex flex-col p-1 space-y-2">
         {EXPERIMENTAL_SETTINGS.map(setting => (
           <Experiment
             onChange={onChange}
@@ -187,7 +111,7 @@ export default function ExperimentalSettings({}) {
         ))}
         {RISKY_EXPERIMENTAL_SETTINGS.length > 0 && (
           <div>
-            <div className="my-4  flex items-center ">
+            <div className="flex items-center my-4 ">
               <Icon
                 filename="warning"
                 className="mr-2"

@@ -2,17 +2,24 @@ import React, { useEffect } from "react";
 import { useAppDispatch } from "ui/setup/hooks";
 import { setLoadingFinished } from "ui/reducers/app";
 import useAuth0 from "ui/utils/useAuth0";
-
-import Library from "../Library/index";
 import Login from "../shared/Login/Login";
+import { useRouter } from "next/router";
+import LoadingScreen from "../shared/LoadingScreen";
 
-export default function Account({ testRunId }: { testRunId?: string }) {
+export default function Account() {
+  const router = useRouter();
   const { isLoading, isAuthenticated } = useAuth0();
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(setLoadingFinished(true));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.replace("/team");
+    }
+  }, [isAuthenticated, router]);
 
   if (isLoading) {
     return null;
@@ -22,5 +29,5 @@ export default function Account({ testRunId }: { testRunId?: string }) {
     return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
-  return <Library testRunId={testRunId} />;
+  return <LoadingScreen fallbackMessage="Loading accounts details..." />;
 }

@@ -11,20 +11,14 @@ export type ExperimentalUserSettings = {
   disableLogRocket: boolean;
   enableEventLink: boolean;
   enableTeams: boolean;
-  showReact: boolean;
   enableLargeText: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
-  enableBreakpointPanelAutocomplete: boolean;
   enableColumnBreakpoints: boolean;
-  enableNetworkRequestComments: boolean;
   enableNewObjectInspector: boolean;
-  turboReplay: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
-  unicornConsole: boolean;
-  showRedux: boolean;
   enableLargeText: boolean;
 };
 
@@ -153,9 +147,11 @@ export interface RecordingMetadata {
   source?: SourceMetadata;
 }
 
+export type TestResult = "passed" | "failed" | "timedOut";
+
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/test.ts
 export type TestMetadata = {
-  result: "passed" | "failed" | "timedOut";
+  result: TestResult;
   title: string;
   version: number;
   run?: { id: string; title?: string };

@@ -27,9 +27,9 @@ export const RequestDetailsUnavailable = () => {
   const closePanel = () => dispatch(hideRequestDetails());
 
   return (
-    <div className="flex h-full w-full flex-col">
+    <div className="flex flex-col w-full h-full">
       <RequestDetailsTabs>
-        <div className="flex flex-grow justify-end">
+        <div className="flex justify-end flex-grow">
           <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
       </RequestDetailsTabs>
@@ -298,8 +298,6 @@ const RequestDetails = ({
     };
   }, [previousRequestId, nextRequestId, dispatch]);
 
-  const { value: httpBodies } = useFeature("httpBodies");
-
   const tabs: readonly { id: NetworkTab; title: string; visible: boolean }[] = [
     { id: "headers", title: "Headers", visible: true },
     {
@@ -307,8 +305,8 @@ const RequestDetails = ({
       title: "Cookies",
       visible: Boolean(findHeader(request.requestHeaders, "cookie")),
     },
-    { id: "request", title: "Request", visible: request.hasRequestBody && httpBodies },
-    { id: "response", title: "Response", visible: request.hasResponseBody && httpBodies },
+    { id: "request", title: "Request", visible: request.hasRequestBody },
+    { id: "response", title: "Response", visible: request.hasResponseBody },
     { id: "stackTrace", title: "Stack Trace", visible: Boolean(request.triggerPoint) },
     {
       id: "timings",
@@ -331,7 +329,7 @@ const RequestDetails = ({
   }
 
   return (
-    <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
+    <div className="w-full overflow-y-scroll border-l no-scrollbar border-themeBorder bg-bodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />

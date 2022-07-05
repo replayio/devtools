@@ -161,8 +161,11 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
     deleteRecording({ variables: { recordingId } });
   };
 
-  if (loading1 || loading2) {
-    return <LoadingScreen />;
+  if (loading1) {
+    return <LoadingScreen fallbackMessage="Loading recording metadata..." />;
+  }
+  if (loading2) {
+    return <LoadingScreen fallbackMessage="Loading team info..." />;
   }
 
   if (status === "deleted") {

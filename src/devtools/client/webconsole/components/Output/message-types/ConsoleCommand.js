@@ -4,6 +4,8 @@
 
 "use strict";
 
+import useAuth0 from "ui/utils/useAuth0";
+
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
@@ -25,6 +27,8 @@ export default function ConsoleCommand(props) {
   const { indent, source, type, level, timeStamp, executionPointTime } = message;
   const messageText = trimCode(message.messageText);
 
+  const { isAuthenticated } = useAuth0();
+
   // This uses a Custom Element to syntax highlight when possible. If it's not
   // (no CodeMirror editor), then it will just render text.
   const messageBody = React.createElement("syntax-highlighted", null, messageText);
@@ -41,6 +45,7 @@ export default function ConsoleCommand(props) {
     executionPointTime,
     maybeScrollToBottom,
     message,
+    isAuthenticated,
     isPaused,
     dispatch,
   });

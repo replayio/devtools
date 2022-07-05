@@ -28,12 +28,11 @@ export * from "../reducers/app";
 import {
   getIsIndexed,
   getLoadingStatusSlow,
-  setRecordingDuration,
+  durationSeen,
   setMouseTargetsLoading,
   setLoadedRegions,
   setLoadingStatusSlow,
   updateTheme,
-  setLoading,
   setSessionId,
   setModal,
   setEventsForType,
@@ -74,9 +73,7 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
 
   ThreadFront.ensureProcessed("basic", undefined, regions =>
     store.dispatch(onUnprocessedRegions(regions))
-  ).then(() => {
-    store.dispatch(setLoading(100));
-  });
+  );
 
   // The backend doesn't give up on loading and indexing; apparently it keeps trying until the entire session errors.
   // Practically speaking though, there are cases where updates take so long it feels like things are broken.
@@ -112,32 +109,16 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
 
   ThreadFront.listenForLoadChanges(parameters => {
     lastLoadChangeUpdateTime = now();
+
+    store.dispatch(durationSeen(Math.max(...parameters.loading.map(r => r.end.time))));
     store.dispatch(setLoadedRegions(parameters));
   });
   setupTests();
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
-  return (dispatch, getState) => {
-    let endPoint = Math.max(...regions.map(r => r.end.time), 0);
-    if (endPoint == 0) {
-      return;
-    }
-    const state = getState();
-    if (endPoint > selectors.getRecordingDuration(state)) {
-      dispatch(setRecordingDuration(endPoint));
-    } else {
-      endPoint = selectors.getRecordingDuration(state);
-    }
-
-    const unprocessedProgress = regions.reduce(
-      (sum, region) => sum + (region.end.time - region.begin.time),
-      0
-    );
-    const processedProgress = endPoint - unprocessedProgress;
-    const percentProgress = (processedProgress / endPoint) * 100;
-
-    dispatch(setLoading(percentProgress));
+  return dispatch => {
+    dispatch(durationSeen(Math.max(...regions.map(r => r.end.time), 0)));
   };
 }
 

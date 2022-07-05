@@ -1,5 +1,6 @@
 import fs from "fs";
 import fetch from "node-fetch";
+import path from "path";
 
 import { Page } from "@recordreplay/playwright";
 import { listAllRecordings } from "@replayio/replay";
@@ -93,6 +94,7 @@ export async function runClassicTest(args: {
 }) {
   const { example, isNodeExample, script } = args;
   const saveFixture = config.updateFixtures && args.saveFixture;
+  const saveCoverageData = config.shouldSaveCoverageData && config.browserName === "chromium";
 
   let exampleRecordingId: string | undefined;
   try {
@@ -114,6 +116,10 @@ export async function runClassicTest(args: {
 
   try {
     await recordPlaywright(config.browserName, async page => {
+      if (saveCoverageData) {
+        page.coverage?.startJSCoverage({ resetOnNavigation: false });
+      }
+
       if (saveFixture) {
         page.on("response", async function onResponse(response) {
           const url = response.url();
@@ -140,8 +146,24 @@ export async function runClassicTest(args: {
 
       await page.goto(testUrl);
       page.on("console", async msg => console.log(`${script}:`, msg.text()));
-      const result = await waitUntilMessage(page, "TestFinished", 240_000);
-      success = result.success;
+      try {
+        const result = await waitUntilMessage(page, "TestFinished", 240_000);
+        success = result.success;
+      } catch (err) {
+      } finally {
+        if (saveCoverageData) {
+          const coverage = await page.coverage?.stopJSCoverage();
+          const coverageFolder = "./coverage/testCoverage";
+          if (!fs.existsSync(coverageFolder)) {
+            fs.mkdirSync(coverageFolder, { recursive: true });
+          }
+
+          const testName = path.basename(script).replace(".js", "");
+          const filename = `${testName}.coverage.json`;
+          const outputPath = path.join(coverageFolder, filename);
+          fs.writeFileSync(outputPath, JSON.stringify(coverage, null, 2), "utf8");
+        }
+      }
     });
   } catch (e) {
     console.error("Recording test failed:", e);

@@ -8,6 +8,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 
 import { ContextMenu } from "./index";
+import useAuth0 from "ui/utils/useAuth0";
 
 export default function GutterContextMenu({
   close,
@@ -17,7 +18,7 @@ export default function GutterContextMenu({
   contextMenu: ContextMenuType;
 }) {
   const recordingId = useGetRecordingId();
-
+  const { isAuthenticated } = useAuth0();
   const dispatch = useAppDispatch();
 
   const addComment = (e: React.MouseEvent) => {
@@ -30,6 +31,11 @@ export default function GutterContextMenu({
     );
     close();
   };
+
+  // Un-authenticated users can't comment on Replays.
+  if (!isAuthenticated) {
+    return null;
+  }
 
   return (
     <ContextMenu close={close} x={contextMenu.x} y={contextMenu.y}>

@@ -11,12 +11,7 @@ import styles from "./PrefixBadge.module.css";
 // Rendered in log point PanelEditor, when a log point is being edited.
 // Clicking this item will show the PrefixBadgePicker.
 export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoint }) {
-  const { value: enableUnicornConsole } = useFeature("unicornConsole");
   const dispatch = useAppDispatch();
-
-  if (!enableUnicornConsole) {
-    return null;
-  }
 
   return (
     <PrefixBadgePicker
@@ -29,11 +24,6 @@ export default function PrefixBadgeButton({ breakpoint }: { breakpoint: Breakpoi
 
 // Rendered in the Console, to the left of message text.
 export function MessagePrefixBadge({ prefixBadge }: { prefixBadge: PrefixBadge }) {
-  const { value: enableUnicornConsole } = useFeature("unicornConsole");
-  if (!enableUnicornConsole) {
-    return null;
-  }
-
   if (!prefixBadge) {
     return null;
   }

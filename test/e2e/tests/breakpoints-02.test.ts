@@ -5,7 +5,7 @@ it("Test unhandled divergence while evaluating at a breakpoint.", async () => {
   // Not supported on chromium: this test uses dump() to trigger an evaluation
   // failure, but dump() is not a standard function and isn't implemented
   // in chromium.
-  if (config.browserName !== "firefox") {
+  if (config.browserName !== "firefox" && !config.shouldSaveCoverageData) {
     return;
   }
   await runClassicTest({

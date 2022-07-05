@@ -4,7 +4,7 @@ import { runClassicTest } from "../runTest";
 it("Test stepping in pretty-printed code.", async () => {
   // Not supported on chromium, needs event listener support.
   // https://github.com/RecordReplay/chromium/issues/7
-  if (config.browserName !== "firefox") {
+  if (config.browserName !== "firefox" && !config.shouldSaveCoverageData) {
     return;
   }
   await runClassicTest({

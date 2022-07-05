@@ -10,7 +10,7 @@ import { getSelectedSourceWithContent } from "../../reducers/sources";
 export default function SourcemapVisualizerLink() {
   const selectedSource = useAppSelector(getSelectedSourceWithContent);
   const alternateSource = useAppSelector(getAlternateSource);
-  if (!selectedSource || !alternateSource) {
+  if (!selectedSource) {
     return null;
   }
 

@@ -116,7 +116,6 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     }
 
     ThreadFront.timeWarp(point, time, hasFrames);
-    ThreadFront.initializedWaiter.resolve();
   };
 }
 
@@ -149,20 +148,6 @@ function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
   return async dispatch => {
     updatePausePointParams({ point, time, hasFrames });
     dispatch(setTimelineState({ currentTime: time, playback: null }));
-  };
-}
-
-function setRecordingDescription(duration: number): UIThunkAction {
-  return (dispatch, getState) => {
-    const zoomRegion = getZoomRegion(getState());
-
-    dispatch(
-      setTimelineState({
-        recordingDuration: duration,
-        currentTime: duration,
-        zoomRegion: { ...zoomRegion, endTime: duration },
-      })
-    );
   };
 }
 
@@ -240,6 +225,10 @@ export function seekToTime(targetTime: number): UIThunkAction {
     if (targetTime == null) {
       return;
     }
+
+    // getPointNearTime could take time while we're processing the recording
+    // so we optimistically set the timeline to the target time
+    dispatch(setTimelineToTime(targetTime));
 
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;

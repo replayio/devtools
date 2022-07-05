@@ -1,7 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
 import orderBy from "lodash/orderBy";
-import { useAppSelector } from "ui/setup/hooks";
-import { getWorkspaceId } from "ui/reducers/app";
 import { WorkspaceId } from "ui/state/app";
 import { Recording, SourceCommit } from "ui/types";
 
@@ -18,6 +16,7 @@ export interface TestRun {
   branch: string;
   commit: SourceCommit;
   event: "pull_request" | "push" | "unknown";
+  triggerUrl?: string;
 }
 
 const GET_TESTS_FOR_WORKSPACE = gql`
@@ -105,7 +104,6 @@ const GET_TEST_RUN = gql`
                 duration
                 createdAt
                 metadata
-                metadata
                 comments {
                   user {
                     id
@@ -128,9 +126,11 @@ function unwrapRecordingsData(recordings: any): Recording[] {
   }));
 }
 
-export function useGetTestForWorkspace(path: string[]): { test: Test | null; loading: boolean } {
+export function useGetTestForWorkspace(
+  path: string[],
+  workspaceId: string
+): { test: Test | null; loading: boolean } {
   const serializedPath = encodeURIComponent(JSON.stringify(path));
-  const workspaceId = useAppSelector(getWorkspaceId);
   const { data, loading } = useQuery(GET_TEST, {
     variables: { path: serializedPath, workspaceId },
   });
@@ -145,13 +145,15 @@ export function useGetTestForWorkspace(path: string[]): { test: Test | null; loa
   };
 }
 
-export function useGetTestRunForWorkspace(id: string): {
+export function useGetTestRunForWorkspace(
+  workspaceId: string,
+  testRunId: string
+): {
   testRun: TestRun | null;
   loading: boolean;
 } {
-  const workspaceId = useAppSelector(getWorkspaceId);
   const { data, loading } = useQuery(GET_TEST_RUN, {
-    variables: { id, workspaceId },
+    variables: { id: testRunId, workspaceId },
   });
 
   if (loading) {
@@ -235,6 +237,7 @@ function convertTestRun(testRun: any) {
     date: firstRecording.date,
     branch: source?.branch || "Unknown",
     event: source?.trigger?.name || "Unknown",
+    triggerUrl: firstRecording.metadata?.source?.trigger?.url,
     recordings,
   };
 }

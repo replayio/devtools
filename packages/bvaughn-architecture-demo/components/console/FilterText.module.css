@@ -1,0 +1,15 @@
+.Input {
+  width: 100%;
+  height: 2rem;
+  flex: 0 0 2rem;
+  background-color: var(--background-color-default);
+  color: var(--color-default);
+  padding: 0 1ch;
+  border: 2px solid transparent;
+  outline: none;
+}
+.Input:focus {
+  background-color: var(--background-color-contrast-1);
+  border-color: var(--color-brand);
+  border-top-right-radius: 0.5rem;
+}

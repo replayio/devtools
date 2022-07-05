@@ -1,0 +1,117 @@
+.Source {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  height: 100%;
+}
+
+.Header {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.Button {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+  height: 1.5rem;
+  width: 1.5rem;
+  flex: 0 0 1.5rem;
+  border-radius: 0.5rem;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.Button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.BreakpointIcon,
+.Icon {
+  width: 1rem;
+  height: 1rem;
+}
+.BreakpointIcon {
+  color: var(--color-brand);
+}
+
+.LineNumberInput {
+  background-color: var(--background-color-default);
+  border: none;
+  border-radius: 0.25rem;
+  color: var(--color-default);
+  width: 4rem;
+  padding: 0.25rem;
+}
+
+.SourceContents {
+  margin: 0;
+  overflow: auto;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.LineNumber {
+  height: 1.5rem;
+  width: 1.5rem;
+  flex: 0 0 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.LineWithHits,
+.LineWithoutHits {
+  white-space: pre-wrap;
+  font-family: Menlo, Consolas, monospace;
+  font-size: 14px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5ch;
+}
+
+.LineWithoutHits .LineNumber {
+  color: var(--color-dim);
+}
+
+.LineWithHits:hover .Button {
+  display: flex;
+}
+.LineWithHits:hover .LineNumber {
+  display: none;
+}
+
+.LineHitCount0,
+.LineHitCount1,
+.LineHitCount2,
+.LineHitCount3 {
+  flex: 0 0 0.25rem;
+  height: 100%;
+}
+.LineHitCount0 {
+  background-color: var(--color-hit-counts-0);
+}
+.LineHitCount1 {
+  background-color: var(--color-hit-counts-1);
+}
+.LineHitCount2 {
+  background-color: var(--color-hit-counts-2);
+}
+.LineHitCount3 {
+  background-color: var(--color-hit-counts-3);
+}
+
+.PointPanel {
+  margin-left: calc(1.5rem + 0.5ch);
+}
+
+.LineSegment {
+  margin: 0;
+}

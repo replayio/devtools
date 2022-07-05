@@ -1,7 +1,6 @@
-import { useAppSelector } from "ui/setup/hooks";
 import { useGetNonPendingWorkspaces } from "ui/hooks/workspaces";
-import { getWorkspaceId } from "ui/reducers/app";
 import { Workspace, WorkspaceSettings } from "ui/types";
+import { useGetTeamIdFromRoute } from "../components/Library/Team/utils";
 
 export function getDefaultOrganizationSettings(): WorkspaceSettings {
   return {
@@ -27,13 +26,13 @@ export function getOrganizationSettings(workspaces: Workspace[]) {
 
 export function useIsPublicEnabled() {
   const { workspaces, loading: loadingWorkspaces } = useGetNonPendingWorkspaces();
-  const currentWorkspaceId = useAppSelector(getWorkspaceId);
+  const teamId = useGetTeamIdFromRoute();
 
   if (loadingWorkspaces) {
     return false;
   }
 
-  return !isPublicDisabled(workspaces, currentWorkspaceId);
+  return !isPublicDisabled(workspaces, teamId);
 }
 
 export function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string | null) {

@@ -1,7 +1,5 @@
-import { ExecutionPoint } from "@replayio/protocol";
-import { unstable_getCacheForType as getCacheForType } from "react";
-
-import { ReplayClientInterface } from "../../../shared/client/types";
+import { ExecutionPoint, Location, TimeStampedPoint } from "@replayio/protocol";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 
@@ -10,22 +8,14 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 // TODO We could add some way for external code (in the client adapter) to pre-populate this cache with known points.
 // For example, when we get Paints they have a corresponding point (and time) which could be pre-loaded here.
 
-type TimeToRecordMap = Map<number, Record<ExecutionPoint>>;
-
-function createMap(): TimeToRecordMap {
-  return new Map();
-}
-
-function getRecordMap(): TimeToRecordMap {
-  return getCacheForType(createMap);
-}
+const locationToHitPointsMap: Map<string, Record<TimeStampedPoint[]>> = new Map();
+const timeToExecutionPointMap: Map<number, Record<ExecutionPoint>> = new Map();
 
 export function getClosestPointForTime(
   client: ReplayClientInterface,
   time: number
 ): ExecutionPoint {
-  const map = getRecordMap();
-  let record = map.get(time);
+  let record = timeToExecutionPointMap.get(time);
   if (record == null) {
     const wakeable = createWakeable<ExecutionPoint>();
 
@@ -34,9 +24,9 @@ export function getClosestPointForTime(
       value: wakeable,
     };
 
-    map.set(time, record);
+    timeToExecutionPointMap.set(time, record);
 
-    fetchPoint(client, time, record, wakeable);
+    fetchClosestPointForTime(client, time, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -46,7 +36,33 @@ export function getClosestPointForTime(
   }
 }
 
-async function fetchPoint(
+export function getHitPointsForLocation(
+  client: ReplayClientInterface,
+  location: Location
+): TimeStampedPoint[] {
+  const key = `${location.sourceId}:${location.line}:${location.column}`;
+  let record = locationToHitPointsMap.get(key);
+  if (record == null) {
+    const wakeable = createWakeable<TimeStampedPoint[]>();
+
+    record = {
+      status: STATUS_PENDING,
+      value: wakeable,
+    };
+
+    locationToHitPointsMap.set(key, record);
+
+    fetchHitPointsForLocation(client, location, record, wakeable);
+  }
+
+  if (record.status === STATUS_RESOLVED) {
+    return record.value;
+  } else {
+    throw record.value;
+  }
+}
+
+async function fetchClosestPointForTime(
   client: ReplayClientInterface,
   time: number,
   record: Record<ExecutionPoint>,
@@ -59,6 +75,27 @@ async function fetchPoint(
     record.value = point;
 
     wakeable.resolve(point);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
+
+    wakeable.reject(error);
+  }
+}
+
+async function fetchHitPointsForLocation(
+  client: ReplayClientInterface,
+  location: Location,
+  record: Record<TimeStampedPoint[]>,
+  wakeable: Wakeable<TimeStampedPoint[]>
+) {
+  try {
+    const executionPoints = await client.getHitPointsForLocation(location);
+
+    record.status = STATUS_RESOLVED;
+    record.value = executionPoints;
+
+    wakeable.resolve(executionPoints);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;

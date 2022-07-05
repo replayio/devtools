@@ -29,9 +29,9 @@ describe("MessageList", () => {
     expect(screen.getByText("This is a message")).toBeInTheDocument();
 
     // Basic message filters
-    expect(screen.getByRole("checkbox", { name: "Errors?" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Logs?" })).toBeInTheDocument();
-    expect(screen.getByRole("checkbox", { name: "Warnings?" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Errors" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Logs" })).toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Warnings" })).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Filter output")).toBeInTheDocument();
 
     // // Basic focus range UI should be rendered

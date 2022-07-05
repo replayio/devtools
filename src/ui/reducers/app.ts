@@ -72,8 +72,12 @@ const appSlice = createSlice({
     setMouseTargetsLoading(state, action: PayloadAction<boolean>) {
       state.mouseTargetsLoading = action.payload;
     },
-    setRecordingDuration(state, action: PayloadAction<number>) {
-      state.recordingDuration = action.payload;
+    durationSeen(state, action: PayloadAction<number>) {
+      // If this is the longest duration we have seen yet, we should update the
+      // store
+      if (action.payload > state.recordingDuration) {
+        state.recordingDuration = action.payload;
+      }
     },
     setUploading(state, action: PayloadAction<UploadInfo | null>) {
       state.uploading = action.payload;
@@ -82,12 +86,7 @@ const appSlice = createSlice({
       state.awaitingSourcemaps = action.payload;
     },
     setLoadedRegions(state, action: PayloadAction<LoadedRegions>) {
-      const recordingDuration = Math.max(
-        ...action.payload.loading.map(r => r.end.time),
-        state.recordingDuration
-      );
       state.loadedRegions = action.payload;
-      state.recordingDuration = recordingDuration;
 
       // This is inferred by an interval that checks the amount of time since the last update.
       // Whenever a new update comes in, this state should be reset.
@@ -113,10 +112,6 @@ const appSlice = createSlice({
     },
     updateTheme(state, action: PayloadAction<AppTheme>) {
       state.theme = action.payload;
-    },
-
-    setLoading(state, action: PayloadAction<number>) {
-      state.loading = action.payload;
     },
     setDisplayedLoadingProgress(state, action: PayloadAction<number | null>) {
       state.displayedLoadingProgress = action.payload;
@@ -173,9 +168,6 @@ const appSlice = createSlice({
     setVideoUrl(state, action: PayloadAction<string>) {
       state.videoUrl = action.payload;
     },
-    setWorkspaceId(state, action: PayloadAction<string | null>) {
-      state.workspaceId = action.payload;
-    },
     setDefaultSettingsTab(state, action: PayloadAction<SettingsTabTitle>) {
       state.defaultSettingsTab = action.payload;
     },
@@ -196,7 +188,7 @@ const appSlice = createSlice({
 
 export const {
   clearExpectedError,
-  setMouseTargetsLoading,
+  durationSeen: durationSeen,
   setAppMode,
   setAwaitingSourcemaps,
   setCanvas,
@@ -209,11 +201,10 @@ export const {
   setIsNodePickerActive,
   setIsNodePickerInitializing,
   setLoadedRegions,
-  setLoading,
   setLoadingFinished,
   setLoadingStatusSlow,
   setModal,
-  setRecordingDuration,
+  setMouseTargetsLoading,
   setRecordingTarget,
   setRecordingWorkspace,
   setSessionId,
@@ -221,7 +212,6 @@ export const {
   setUnexpectedError,
   setUploading,
   setVideoUrl,
-  setWorkspaceId,
   updateTheme,
 } = appSlice.actions;
 
@@ -238,7 +228,6 @@ export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
 export const getRecordingDuration = (state: UIState) => state.app.recordingDuration;
 
-export const getLoading = (state: UIState) => state.app.loading;
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
 export const getLoadingStatusSlow = (state: UIState) => state.app.loadingStatusSlow;
@@ -346,7 +335,6 @@ export const getIsNodePickerActive = (state: UIState) => state.app.isNodePickerA
 export const getIsNodePickerInitializing = (state: UIState) => state.app.isNodePickerInitializing;
 export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
-export const getWorkspaceId = (state: UIState) => state.app.workspaceId;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
@@ -362,6 +350,21 @@ export const isCurrentTimeInLoadedRegion = createSelector(
     return (
       regions !== null &&
       regions.loaded.some(({ begin, end }) => currentTime >= begin.time && currentTime <= end.time)
+    );
+  }
+);
+
+export const isPointInLoadedRegion = createSelector(
+  getLoadedRegions,
+  (state: UIState, executionPoint: string) => executionPoint,
+  (regions: LoadedRegions | null, executionPoint: string) => {
+    return (
+      regions !== null &&
+      regions.loaded.some(
+        ({ begin, end }) =>
+          BigInt(executionPoint) >= BigInt(begin.point) &&
+          BigInt(executionPoint) <= BigInt(end.point)
+      )
     );
   }
 );

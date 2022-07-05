@@ -1,4 +1,5 @@
 import { Page } from "@recordreplay/playwright";
+import { opt_in_tracking } from "mixpanel-browser";
 
 declare global {
   const app: any;
@@ -25,10 +26,14 @@ export default class TestHarness {
     });
   }
 
-  waitForMessage(text: string) {
-    return this.page.waitForFunction(text => {
-      const messages = document.querySelectorAll(".webconsole-output .message");
-      return [...messages].some(message => (message as HTMLElement).innerText.includes(text));
-    }, text);
+  waitForMessage(text: string, options?: { timeout?: number }) {
+    return this.page.waitForFunction(
+      text => {
+        const messages = document.querySelectorAll(".webconsole-output .message");
+        return [...messages].some(message => (message as HTMLElement).innerText.includes(text));
+      },
+      text,
+      options
+    );
   }
 }

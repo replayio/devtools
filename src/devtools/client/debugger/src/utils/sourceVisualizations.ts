@@ -1,6 +1,7 @@
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
+import { assert } from "protocol/utils";
 
 import type { Source } from "../reducers/sources";
 
@@ -44,24 +45,8 @@ function getSourceToVisualize(selectedSource: Source, alternateSource: Source) {
   if (alternateSource?.isOriginal) {
     return alternateSource.id;
   }
-  if (ThreadFront.getSourceKind(selectedSource.id) === "prettyPrinted") {
-    // for pretty-printed sources we show the sourcemap of the non-pretty-printed version
-    const nonPrettyPrintedSourceId = ThreadFront.getGeneratedSourceIds(selectedSource.id)?.[0];
-    if (nonPrettyPrintedSourceId) {
-      let hasSourceMap = ThreadFront.getSourceKind(nonPrettyPrintedSourceId) === "sourceMapped";
-      if (!hasSourceMap) {
-        const originalSourceIds = ThreadFront.getOriginalSourceIds(nonPrettyPrintedSourceId);
-        // originalSourceIds always contains the id of the pretty-printed version
-        hasSourceMap = originalSourceIds! && originalSourceIds.length > 1;
-      }
-      if (hasSourceMap) {
-        return nonPrettyPrintedSourceId;
-      }
-    }
-  } else if (ThreadFront.getOriginalSourceIds(selectedSource.id)?.length) {
-    return selectedSource.id;
-  }
-  return undefined;
+  const { sourceId } = getUniqueAlternateSourceId(selectedSource.id);
+  return sourceId;
 }
 
 export function getSourcemapVisualizerURL(
@@ -92,23 +77,28 @@ export function getUniqueAlternateSourceId(sourceId: string): {
   why?: "no-sourcemap" | "not-unique";
 } {
   const generatedSourceIds = ThreadFront.getGeneratedSourceIds(sourceId);
-  if (!generatedSourceIds?.length) {
+  const nonPrettyPrintedSourceId =
+    ThreadFront.getSourceKind(sourceId) === "prettyPrinted" ? generatedSourceIds?.[0] : sourceId;
+  assert(nonPrettyPrintedSourceId, "couldn't find minified version of pretty-printed source");
+
+  if (ThreadFront.getSourceKind(nonPrettyPrintedSourceId) === "sourceMapped") {
+    const generatedSourceId = ThreadFront.getGeneratedSourceIds(nonPrettyPrintedSourceId)?.[0];
+    assert(generatedSourceId, "couldn't find generated version of sourcemapped source");
+    const sourceId = ThreadFront.getPrettyPrintedSourceId(generatedSourceId) || generatedSourceId;
+    return { sourceId };
+  }
+
+  const sourcemappedSourceIds = ThreadFront.getOriginalSourceIds(nonPrettyPrintedSourceId)?.filter(
+    sourceId => ThreadFront.getSourceKind(sourceId) === "sourceMapped"
+  );
+  if (!sourcemappedSourceIds?.length) {
     return { why: "no-sourcemap" };
   }
-
-  const alternateSourceIds = [...ThreadFront.getAlternateSourceIds(sourceId)].filter(
-    sourceId => !ThreadFront.isMinifiedSource(sourceId)
-  );
-  if (alternateSourceIds.length > 2) {
+  if (sourcemappedSourceIds.length > 1) {
     return { why: "not-unique" };
   }
-
-  let alternateSourceId = alternateSourceIds.find(
-    alternateSourceId => alternateSourceId !== sourceId
-  );
-  if (!alternateSourceId) {
-    // the only alternate source is the minified version of the given source
-    return { sourceId: generatedSourceIds[0] };
-  }
-  return { sourceId: alternateSourceId };
+  return {
+    sourceId:
+      ThreadFront.getPrettyPrintedSourceId(sourcemappedSourceIds[0]) || sourcemappedSourceIds[0],
+  };
 }

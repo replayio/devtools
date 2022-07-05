@@ -1,26 +1,26 @@
-import useFocusRange from "@bvaughn/components/console/hooks/useFocusRange";
-import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import {
   createContext,
   PropsWithChildren,
   useCallback,
-  useContext,
   useMemo,
   useState,
   useTransition,
 } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getMessages } from "../suspense/MessagesCache";
 
-export type ConsoleLevelFlags = {
+// Various boolean flags to types of console messages or attributes to show/hide.
+export type Toggles = {
+  events: {
+    [eventType: string]: boolean;
+  };
   showErrors: boolean;
+  showExceptions: boolean;
   showLogs: boolean;
+  showNodeModules: boolean;
+  showTimestamps: boolean;
   showWarnings: boolean;
 };
 
-export type ConsoleFiltersContextType = {
-  filteredMessages: ProtocolMessage[];
-
+export type ConsoleFiltersContextType = Toggles & {
   // Filter text to display in the UI.
   // This value is updated at React's default, higher priority.
   filterByDisplayText: string;
@@ -33,21 +33,23 @@ export type ConsoleFiltersContextType = {
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
   isTransitionPending: boolean;
 
-  // Types of console messages to include (or filter out).
-  levelFlags: ConsoleLevelFlags;
-
-  update: (filterByText: string, levelFlags: ConsoleLevelFlags) => void;
+  update: (
+    values: Partial<
+      Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+    >
+  ) => void;
 };
 
 export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(null as any);
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
-  const client = useContext(ReplayClientContext);
-  const focusRange = useFocusRange();
-
-  const [levelFlags, setLevelFlags] = useState<ConsoleLevelFlags>({
+  const [toggles, setToggles] = useState<Toggles>({
+    events: {},
     showErrors: true,
+    showExceptions: true,
     showLogs: true,
+    showNodeModules: true,
+    showTimestamps: false,
     showWarnings: true,
   });
 
@@ -57,92 +59,46 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [filterByText, setFilterByText] = useState<string>("");
   const [deferredFilterByText, setDeferredFilterByText] = useState<string>("");
 
-  const updateFilters = useCallback((newFilterByText: string, newLevelFlags: ConsoleLevelFlags) => {
-    setLevelFlags(newLevelFlags);
-    setFilterByText(newFilterByText);
-    startTransition(() => {
-      setDeferredFilterByText(newFilterByText);
-    });
-  }, []);
+  const update = useCallback(
+    (
+      values: Partial<
+        Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+      >
+    ) => {
+      const { filterByText: newFilterByText, ...newToggles } = values;
+
+      setToggles(prevToggles => ({
+        ...prevToggles,
+        ...newToggles,
+        events: {
+          ...prevToggles.events,
+          ...newToggles.events,
+        },
+      }));
+
+      if (newFilterByText != null) {
+        setFilterByText(newFilterByText);
+        startTransition(() => {
+          setDeferredFilterByText(newFilterByText);
+        });
+      }
+    },
+    []
+  );
 
   // Using a deferred values enables the filter input to update quickly,
   // and the slower operation of filtering the messages in memory to be deferred.
   const [isTransitionPending, startTransition] = useTransition();
 
-  const { messages } = getMessages(client, focusRange);
-
-  // Filter in-focus messages by the current criteria.
-  const filteredMessages = useMemo<ProtocolMessage[]>(() => {
-    const { showErrors, showLogs, showWarnings } = levelFlags;
-    if (showErrors && showLogs && showWarnings && deferredFilterByText === "") {
-      return messages;
-    } else {
-      const deferredFilterByTextLowercase = deferredFilterByText.toLowerCase();
-
-      return messages.filter((message: ProtocolMessage) => {
-        switch (message.level) {
-          case "warning": {
-            if (!showWarnings) {
-              return false;
-            }
-            break;
-          }
-          case "error": {
-            if (!showErrors) {
-              return false;
-            }
-            break;
-          }
-          default: {
-            if (!showLogs) {
-              return false;
-            }
-            break;
-          }
-        }
-
-        if (deferredFilterByTextLowercase !== "") {
-          // TODO This is a hacky partial implementation of filter by text.
-          if (message.text && message.text.toLowerCase().includes(deferredFilterByTextLowercase)) {
-            return true;
-          } else {
-            if (message.argumentValues) {
-              return message.argumentValues.find((argumentValue: ProtocolValue) => {
-                if (
-                  argumentValue.value &&
-                  `${argumentValue.value}`.toLowerCase().includes(deferredFilterByTextLowercase)
-                ) {
-                  return true;
-                }
-              });
-            }
-          }
-
-          return false;
-        }
-
-        return true;
-      });
-    }
-  }, [deferredFilterByText, levelFlags, messages]);
-
   const consoleFiltersContext = useMemo<ConsoleFiltersContextType>(
     () => ({
-      filteredMessages,
+      ...toggles,
       filterByDisplayText: filterByText,
       filterByText: deferredFilterByText,
       isTransitionPending,
-      levelFlags,
-      update: updateFilters,
+      update,
     }),
-    [
-      deferredFilterByText,
-      filterByText,
-      filteredMessages,
-      isTransitionPending,
-      levelFlags,
-      updateFilters,
-    ]
+    [deferredFilterByText, filterByText, isTransitionPending, toggles, update]
   );
 
   return (

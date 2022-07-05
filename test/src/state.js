@@ -105,6 +105,9 @@ function processEnvironmentVariables(state) {
     const match = /(\d+)\/(\d+)/.exec(process.env.INPUT_STRIPE);
     state.stripeIndex = +match[1];
     state.stripeCount = +match[2];
+    console.log(`Running stripe ${state.stripeIndex} of ${state.stripeCount}`);
+  } else {
+    console.log("Running all tests");
   }
 }
 

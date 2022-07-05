@@ -8,6 +8,6 @@
   "scripts": {
     "playwright:install": "npx playwright install chromium",
     "test": "playwright test tests",
-    "test:visual": "PWDEBUG=console yarn test"
+    "test:visual": "PWDEBUG=console VISUAL_DEBUG=true yarn test"
   }
 }

@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
 import ClientValueValueRenderer from "./values/ClientValueValueRenderer";
+import ErrorRenderer from "./values/ErrorRenderer";
 import FunctionRenderer from "./values/FunctionRenderer";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
 import MapRenderer from "./values/MapRenderer";
@@ -13,6 +14,8 @@ import ObjectRenderer from "./values/ObjectRenderer";
 import RegExpRenderer from "./values/RegExpRenderer";
 import SetRenderer from "./values/SetRenderer";
 import { ObjectPreviewRendererProps } from "./values/types";
+
+// TODO Add custom Date renderer (and ClientValue type)
 
 // Renders protocol Object/ObjectPreview values.
 // This renderer only renders a value (no name) and can be used with both horizontal and vertical layouts.
@@ -38,6 +41,9 @@ export default memo(function ValueRenderer({
   switch (clientValue.type) {
     case "array":
       ObjectPreviewRenderer = ArrayRenderer;
+      break;
+    case "error":
+      ObjectPreviewRenderer = ErrorRenderer;
       break;
     case "function":
       ObjectPreviewRenderer = FunctionRenderer;

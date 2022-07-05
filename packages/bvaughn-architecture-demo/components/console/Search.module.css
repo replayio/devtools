@@ -2,31 +2,32 @@
   display: flex;
   width: 100%;
   align-items: center;
-  border: 1px solid transparent;
-}
-.Container:focus-within {
-  border-color: var(--color-brand);
+  border-top: 1px solid var(--background-color-contrast-2);
 }
 
 .Icon {
   width: 2rem;
-  height: 1.5rem;
+  height: 2rem;
+  padding: 0.25rem;
+  flex: 0 0 2rem;
 }
 
 .Input {
   width: 100%;
-  height: 100%;
+  height: 2rem;
   padding: 0 0.5ch;
   background: none;
-  border: none;
+  border: 2px solid transparent;
   outline: none;
   background-color: var(--background-color-default);
-  border-top: 1px solid var(--background-color-contrast-3);
-  border-bottom: 1px solid var(--background-color-contrast-3);
   color: var(--color-default);
 
   font-family: Menlo, Consolas, monospace;
   font-size: 14px;
+}
+.Input:focus {
+  background-color: var(--background-color-contrast-1);
+  border-color: var(--color-brand);
 }
 
 .Results {

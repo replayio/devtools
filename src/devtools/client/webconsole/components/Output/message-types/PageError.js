@@ -4,6 +4,8 @@
 
 "use strict";
 
+import useAuth0 from "ui/utils/useAuth0";
+
 // React & Redux
 const React = require("react");
 const PropTypes = require("prop-types");
@@ -53,6 +55,8 @@ export default function PageError(props) {
     notes,
   } = message;
 
+  const { isAuthenticated } = useAuth0();
+
   const messageBody = REPS.StringRep.rep({
     object: createPrimitiveValueFront(messageText),
     mode: MODE.LONG,
@@ -86,6 +90,7 @@ export default function PageError(props) {
     maybeScrollToBottom,
     message,
     pausedExecutionPoint,
+    isAuthenticated,
     isFirstMessageForPoint,
   });
 }

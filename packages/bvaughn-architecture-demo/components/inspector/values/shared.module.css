@@ -1,5 +1,6 @@
 .BigInt,
 .Boolean,
+.Error,
 .NaN,
 .Null,
 .Number,
@@ -17,6 +18,9 @@
 }
 .Boolean {
   color: var(--value-type-boolean);
+}
+.Error {
+  color: var(--value-type-error);
 }
 .NaN {
   color: var(--value-type-nan);

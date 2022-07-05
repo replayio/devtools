@@ -99,6 +99,7 @@ function Body() {
 function _DevTools({
   clearTrialExpired,
   createSocket,
+  loadedRegions,
   loadingFinished,
   sessionId,
   showCommandPalette,
@@ -113,7 +114,6 @@ function _DevTools({
     () => recording?.user && !recording.user.internal,
     [recording]
   );
-
   useReplayClient();
 
   useEffect(() => {
@@ -154,6 +154,7 @@ function _DevTools({
       endUploadWaitTracking(sessionId!);
     }
   }, [loadingFinished, uploadComplete, sessionId]);
+
   useEffect(() => {
     if (loadingFinished) {
       trackLoadingIdleTime(sessionId!);
@@ -167,7 +168,11 @@ function _DevTools({
   }, [recording]);
 
   if (!loadingFinished) {
-    return <LoadingScreen />;
+    return <LoadingScreen fallbackMessage="Starting a session..." />;
+  }
+
+  if (loadedRegions === null) {
+    return <LoadingScreen fallbackMessage="Loading timeline..." />;
   }
 
   return (
@@ -183,6 +188,7 @@ function _DevTools({
 const connector = connect(
   (state: UIState) => ({
     loadingFinished: selectors.getLoadingFinished(state),
+    loadedRegions: selectors.getLoadedRegions(state),
     sessionId: selectors.getSessionId(state),
     showCommandPalette: selectors.getShowCommandPalette(state),
   }),

@@ -20,4 +20,6 @@ export default {
   replayApiKey: "rwk_7XPbO5fhz0bkhANYXtN2dkm74wNQCchXf2OxVgAerTQ",
   updateFixtures: !!process.env.SHOULD_UPDATE_FIXTURES,
   useExampleFile: !process.env.SHOULD_RECORD_EXAMPLES,
+  shouldRecordTest: !process.env.DONT_RECORD_TEST,
+  shouldSaveCoverageData: !!process.env.E2E_CODE_COVERAGE,
 };

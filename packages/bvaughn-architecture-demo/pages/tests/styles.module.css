@@ -1,0 +1,16 @@
+.HorizontalContainer {
+  background-color: var(--color-contrast);
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.VerticalContainer {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  gap: 0.5rem;
+  overflow: auto;
+}

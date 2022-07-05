@@ -11,6 +11,7 @@ import {
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
 import { PauseContext, PauseContextType } from "../contexts/PauseContext";
+import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 
 // This particular method is written to enable testing the entire client.
 // The only context values it stubs out are the ReplayClient (ReplayClientContext).
@@ -37,6 +38,7 @@ export async function render(
     endPoint: "1000",
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
+    sourceIds: [],
     ...options?.sessionContext,
   };
 
@@ -70,6 +72,7 @@ export async function renderFocused(
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
     pauseContext?: Partial<PauseContextType>;
+    pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
   }
@@ -81,15 +84,16 @@ export async function renderFocused(
   sessionContext: SessionContextType;
 }> {
   const consoleFiltersContext: ConsoleFiltersContextType = {
+    events: {},
     filterByDisplayText: "",
     filterByText: "",
-    filteredMessages: [],
     isTransitionPending: false,
-    levelFlags: {
-      showErrors: true,
-      showLogs: true,
-      showWarnings: true,
-    },
+    showErrors: true,
+    showExceptions: true,
+    showLogs: true,
+    showNodeModules: true,
+    showTimestamps: false,
+    showWarnings: true,
     update: jest.fn(),
     ...options?.consoleFiltersContext,
   };
@@ -109,14 +113,26 @@ export async function renderFocused(
     ...options?.pauseContext,
   };
 
+  const pointsContext: PointsContextType = {
+    addPoint: jest.fn(),
+    deletePoint: jest.fn(),
+    editPoint: jest.fn(),
+    isPending: false,
+    points: [],
+    pointsForAnalysis: [],
+    ...options?.pointsContext,
+  };
+
   const renderResponse = await render(
-    <PauseContext.Provider value={pauseContext}>
-      <FocusContext.Provider value={focusContext}>
-        <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
-          {children}
-        </ConsoleFiltersContext.Provider>
-      </FocusContext.Provider>
-    </PauseContext.Provider>,
+    <PointsContext.Provider value={pointsContext}>
+      <PauseContext.Provider value={pauseContext}>
+        <FocusContext.Provider value={focusContext}>
+          <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
+            {children}
+          </ConsoleFiltersContext.Provider>
+        </FocusContext.Provider>
+      </PauseContext.Provider>
+    </PointsContext.Provider>,
     {
       replayClient: options?.replayClient,
       sessionContext: options?.sessionContext,
@@ -142,16 +158,22 @@ export function setupWindow(): void {
 const MockReplayClient = {
   configure: jest.fn().mockImplementation(async () => {}),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
-  findSources: jest.fn().mockImplementation(async () => {}),
-  getPauseIdForMessage: jest.fn().mockImplementation(async () => "fake-pause-id"),
-  getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
-  getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
-  initialize: jest.fn().mockImplementation(async () => {}),
-  getAllFrames: jest.fn().mockImplementation(async () => ({ data: {} })),
-  getObjectWithPreview: jest.fn().mockImplementation(async () => ({ data: {} })),
+  findSources: jest.fn().mockImplementation(async () => []),
+  getAllFrames: jest.fn().mockImplementation(async () => []),
+  getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
+  getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
   getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
+  getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
   getSessionEndpoint: jest.fn().mockImplementation(async () => ({
     point: "1000",
     time: 1000,
   })),
+  getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
+  getSourceContents: jest.fn().mockImplementation(async () => ({
+    contents: "fake-source-contents",
+    contentType: "text/javascript",
+  })),
+  getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
+  initialize: jest.fn().mockImplementation(async () => {}),
+  runAnalysis: jest.fn().mockImplementation(async () => ({})),
 };

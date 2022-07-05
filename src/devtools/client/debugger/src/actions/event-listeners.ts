@@ -9,7 +9,6 @@ import remove from "lodash/remove";
 import uniq from "lodash/uniq";
 import type { UIThunkAction } from "ui/actions";
 import type { UIStore } from "ui/actions";
-import type { AppDispatch } from "ui/setup/store";
 
 import * as selectors from "../selectors";
 
@@ -48,13 +47,6 @@ function setEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<vo
   return async (dispatch, getState, { client }) => {
     await client.setEventListenerBreakpoints(newEvents);
   };
-}
-
-async function updateExpanded(dispatch: AppDispatch, newExpanded: $FixTypeLater[]) {
-  dispatch({
-    type: "UPDATE_EVENT_LISTENER_EXPANDED",
-    expanded: newExpanded,
-  });
 }
 
 export function addEventListenerBreakpoints(

@@ -25,14 +25,11 @@ export const SourceContent = () => {
   const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
   const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
 
-  const replayClient = useContext(ReplayClientContext);
-  const sessionId = replayClient.getSessionId()!;
-
   const { currentData: sourceText } = useGetSourceTextQuery(
-    selectedSourceId ? { sessionId, sourceId: selectedSourceId } : skipToken
+    selectedSourceId ? selectedSourceId : skipToken
   );
   const { currentData: sourceHits } = useGetSourceHitCountsQuery(
-    selectedSourceId ? { sessionId, sourceId: selectedSourceId } : skipToken
+    selectedSourceId ? selectedSourceId : skipToken
   );
 
   let closestHitPoint: HitCount | null = null;
@@ -48,17 +45,10 @@ export const SourceContent = () => {
 
   const location = closestHitPoint?.location;
   const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
-    location ? { location, sessionId } : skipToken
+    location ? location : skipToken
   );
 
-  const { currentData: pause } = useGetPauseQuery(
-    selectedPoint
-      ? {
-          point: selectedPoint,
-          sessionId,
-        }
-      : skipToken
-  );
+  const { currentData: pause } = useGetPauseQuery(selectedPoint ? selectedPoint : skipToken);
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({

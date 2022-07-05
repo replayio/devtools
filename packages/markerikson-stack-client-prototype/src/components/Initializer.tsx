@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import asyncInitializeClient from "../client/asyncInitializeClient";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
+import { setReplayClient } from "../app/api";
 
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.
@@ -25,6 +26,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
     // We only need to initialize them once.
     if (!didInitializeRef.current) {
       asyncInitializeClient(replayClient).then(sessionData => {
+        setReplayClient(sessionData.sessionId, replayClient)
         setContext(sessionData);
       });
     }

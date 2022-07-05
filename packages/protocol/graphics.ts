@@ -1,6 +1,5 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
-import { decode } from "base64-arraybuffer";
 import ResizeObserverPolyfill from "resize-observer-polyfill";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";

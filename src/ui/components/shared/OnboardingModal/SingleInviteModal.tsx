@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 import hooks from "ui/hooks";
 import { PendingWorkspaceInvitation } from "ui/types";
 
@@ -14,7 +15,7 @@ function ModalLoader() {
   return (
     <OnboardingModalContainer>
       <OnboardingContent>
-        <Spinner className="h-4 w-4 animate-spin text-gray-500" />
+        <Spinner className="w-4 h-4 text-gray-500 animate-spin" />
       </OnboardingContent>
     </OnboardingModalContainer>
   );
@@ -42,14 +43,15 @@ function SingleInviteModalLoader(props: PropsFromRedux) {
 
 // Once we have the workspace, this component should handle auto-accepting that invitation.
 function AutoAccept(props: SingleInviteModalProps) {
-  const { setWorkspaceId, workspace } = props;
+  const redirectToTeam = useRedirectToTeam(true);
+  const { workspace } = props;
   const [accepted, setAccepted] = useState(false);
 
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
   const acceptPendingInvitation = hooks.useAcceptPendingInvitation(() => {
     updateDefaultWorkspace({ variables: { workspaceId: workspace.id } });
-    setWorkspaceId(workspace.id);
     setAccepted(true);
+    redirectToTeam(`${workspace.id}`);
   });
 
   const didMountRef = useRef(false);
@@ -93,7 +95,6 @@ function SingleInviteModal({ workspace }: SingleInviteModalProps) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(SingleInviteModalLoader);

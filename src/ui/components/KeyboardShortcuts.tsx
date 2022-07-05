@@ -14,6 +14,7 @@ import { deselectSource } from "devtools/client/debugger/src/actions/sources/sel
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import useAuth0 from "ui/utils/useAuth0";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {
@@ -55,6 +56,7 @@ function KeyboardShortcuts({
   closeOpenModalsOnEscape,
 }: PropsFromRedux) {
   const recordingId = useGetRecordingId();
+  const { isAuthenticated } = useAuth0();
   const { value: protocolTimeline, update: updateProtocolTimeline } =
     useFeature("protocolTimeline");
   const globalKeyboardShortcuts = useMemo(() => {
@@ -119,6 +121,11 @@ function KeyboardShortcuts({
     };
 
     const addComment = (e: KeyboardEvent) => {
+      // Un-authenticated users can't comment on Replays.
+      if (!isAuthenticated) {
+        return;
+      }
+
       if (!e.target || !isEditableElement(e.target)) {
         e.preventDefault();
         createFrameComment(null, recordingId);
@@ -165,6 +172,7 @@ function KeyboardShortcuts({
 
     return shortcuts;
   }, [
+    isAuthenticated,
     showCommandPaletteInEditor,
     setSelectedPrimaryPanel,
     focusFullTextInput,

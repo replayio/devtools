@@ -103,7 +103,6 @@ import "ui/components/Comments/Comments.css";
 import "ui/components/Comments/VideoComments/CommentsOverlay.css";
 import "ui/components/Header/UserOptions.css";
 import "ui/components/Header/ViewToggle.css";
-import "ui/components/Library/Sidebar.css";
 import "ui/components/reactjs-popup.css";
 import "ui/components/Events/Events.css";
 import "ui/components/SecondaryToolbox/SecondaryToolbox.css";
@@ -209,7 +208,7 @@ function Routing({ Component, pageProps }: AppProps) {
       <_App>
         <InstallRouteListener />
         <ErrorBoundary>
-          <React.Suspense fallback={<LoadingScreen />}>
+          <React.Suspense fallback={<LoadingScreen fallbackMessage="Fetching data..." />}>
             <Component {...pageProps} />
           </React.Suspense>
         </ErrorBoundary>

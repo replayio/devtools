@@ -27,10 +27,22 @@ export async function takeScreenshot(
   }
 
   await page.emulateMedia({ colorScheme: "dark" });
-  expect(await takeScreenshotHelper(page, locator, margin)).toMatchSnapshot(["dark", name]);
+
+  if (process.env.VISUAL_DEBUG) {
+    await new Promise(resolve => resolve(1000));
+  } else {
+    const screenshot = await takeScreenshotHelper(page, locator, margin);
+    expect(screenshot).toMatchSnapshot(["dark", name]);
+  }
 
   await page.emulateMedia({ colorScheme: "light" });
-  expect(await takeScreenshotHelper(page, locator, margin)).toMatchSnapshot(["light", name]);
+
+  if (process.env.VISUAL_DEBUG) {
+    await new Promise(resolve => resolve(1000));
+  } else {
+    const screenshot = await takeScreenshotHelper(page, locator, margin);
+    expect(screenshot).toMatchSnapshot(["light", name]);
+  }
 }
 
 async function takeScreenshotHelper(

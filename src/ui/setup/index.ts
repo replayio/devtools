@@ -4,8 +4,7 @@ import { setupAppHelper } from "./helpers";
 import { setupDOMHelpers } from "./dom";
 import { setTelemetryContext, setupTelemetry } from "ui/utils/telemetry";
 import { UIStore } from "ui/actions";
-import { getTheme, getWorkspaceId, initialAppState } from "ui/reducers/app";
-import { setWorkspaceId } from "ui/actions/app";
+import { getTheme, initialAppState } from "ui/reducers/app";
 import tokenManager from "ui/utils/tokenManager";
 import { setAccessTokenInBrowserPrefs, setUserInBrowserPrefs } from "ui/utils/browser";
 import { getUserInfo } from "ui/hooks/users";
@@ -154,12 +153,8 @@ export async function bootstrapApp() {
 
     const userInfo = await getUserInfo();
     if (userInfo) {
-      let workspaceId = getWorkspaceId(store.getState());
-      if (!workspaceId) {
-        const userSettings = await getUserSettings();
-        store.dispatch(setWorkspaceId(userSettings.defaultWorkspaceId));
-        workspaceId = userSettings.defaultWorkspaceId;
-      }
+      const userSettings = await getUserSettings();
+      const workspaceId = userSettings.defaultWorkspaceId;
 
       setTelemetryContext(userInfo);
       maybeSetMixpanelContext({ ...userInfo, workspaceId });

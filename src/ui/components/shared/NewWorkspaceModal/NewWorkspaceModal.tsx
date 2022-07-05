@@ -13,13 +13,13 @@ import { removeUrlParameters } from "ui/utils/environment";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { Workspace, WorkspaceUser } from "ui/types";
-import { features } from "ui/utils/prefs";
 import { isValidTeamName, validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
 import Modal from "../NewModal";
 import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsModal";
 import InvitationLink from "./InvitationLink";
 import { useConfirm } from "../Confirm";
+import { useRedirectToTeam } from "ui/components/Library/Team/utils";
 
 function ModalButton({
   children,
@@ -52,9 +52,9 @@ function SlideContent({
   children: React.ReactElement | (React.ReactElement | null)[];
 }) {
   return (
-    <div className="flex flex-grow flex-col space-y-3 overflow-hidden">
+    <div className="flex flex-col flex-grow space-y-3 overflow-hidden">
       <h2 className="text-2xl ">{headerText}</h2>
-      <div className="flex flex-grow flex-col space-y-3 overflow-hidden text-gray-500">
+      <div className="flex flex-col flex-grow space-y-3 overflow-hidden text-gray-500">
         {children}
       </div>
     </div>
@@ -311,14 +311,14 @@ type SlideBody3Props = PropsFromRedux & {
   current: number;
 };
 
-function SlideBody3({ setWorkspaceId, hideModal, newWorkspace }: SlideBody3Props) {
+function SlideBody3({ hideModal, newWorkspace }: SlideBody3Props) {
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
+  const redirectToTeam = useRedirectToTeam(true);
 
   const onClick = () => {
     removeUrlParameters();
-
-    setWorkspaceId(newWorkspace.id);
     updateDefaultWorkspace({ variables: { workspaceId: newWorkspace.id } });
+    redirectToTeam(`${newWorkspace.id}`);
     hideModal();
   };
 
@@ -370,7 +370,7 @@ function OnboardingModal(props: PropsFromRedux) {
     <>
       <Modal options={{ maskTransparency: "translucent" }} onMaskClick={props.hideModal}>
         <div
-          className="text-modalColor relative flex flex-col justify-between space-y-2 rounded-lg bg-modalBgcolor p-4 text-sm shadow-xl backdrop-blur-sm"
+          className="relative flex flex-col justify-between p-4 space-y-2 text-sm rounded-lg shadow-xl text-modalColor bg-modalBgcolor backdrop-blur-sm"
           style={{ width: "480px" }}
         >
           {slide}
@@ -382,7 +382,6 @@ function OnboardingModal(props: PropsFromRedux) {
 
 const connector = connect(() => ({}), {
   hideModal: actions.hideModal,
-  setWorkspaceId: actions.setWorkspaceId,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 export default connector(OnboardingModal);

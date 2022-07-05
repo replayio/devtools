@@ -109,12 +109,12 @@ export default function InvitationLink({
 
   const inputText = loading
     ? "Loading URL"
-    : `https://app.replay.io/team/invitation/${workspace.invitationCode}`;
+    : `https://app.replay.io/team/invitation?code=${workspace.invitationCode}`;
 
   return (
-    <div className="relative flex w-full flex-col space-y-3">
+    <div className="relative flex flex-col w-full space-y-3">
       {overlay ? (
-        <div className="pointer-events-none absolute -inset-8 top-0 bg-themeBase-60 opacity-10" />
+        <div className="absolute top-0 pointer-events-none -inset-8 bg-themeBase-60 opacity-10" />
       ) : null}
       {!hideHeader ? <div className="font-bold">{`Invite link`}</div> : null}
       <TextInputCopy text={inputText} isLarge={isLarge} />
