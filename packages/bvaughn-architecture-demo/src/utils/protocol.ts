@@ -1,5 +1,6 @@
 import {
   NamedValue as ProtocolNamedValue,
+  newSource as ProtocolSource,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
@@ -287,4 +288,59 @@ export function primitiveToClientValue(value: any): Value {
     preview,
     type,
   };
+}
+
+type SourceNode =
+  | { type: "protocol"; protocol: string }
+  | { type: "origin"; origin: string }
+  | {
+      type: "source";
+      source: ProtocolSource;
+      path: string;
+    };
+
+type SourceTree = SourceNode[];
+
+export function protocolSourcesToSourceTree(sources: ProtocolSource[]): SourceTree {
+  const sourceTree: SourceTree = [];
+
+  let protocol: string | null = null;
+  let origin: string | null = null;
+
+  sources.forEach(source => {
+    if (!source.url) {
+      return;
+    }
+    const url = new URL(source.url);
+    if (url.protocol == "replay-content:") {
+      return;
+    }
+    if (
+      url.protocol != "replay-content:" &&
+      url.protocol != "https:" &&
+      url.protocol !== protocol
+    ) {
+      sourceTree.push({
+        type: "protocol",
+        protocol: url.protocol,
+      });
+      protocol = url.protocol;
+    }
+    if (url.origin != null && url.origin !== origin) {
+      sourceTree.push({
+        type: "origin",
+        origin: url.origin,
+      });
+      origin = url.origin;
+    }
+    if (url.pathname) {
+      sourceTree.push({
+        type: "source",
+        source: source,
+        path: url.pathname,
+      });
+    }
+  });
+
+  return sourceTree;
 }

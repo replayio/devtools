@@ -44,6 +44,10 @@ body {
     --color-default: #ffffff;
     --color-dim: #666666;
     --color-error: #ffb3d2;
+    --color-hit-counts-0: #445064;
+    --color-hit-counts-1: #2563be;
+    --color-hit-counts-2: #6ba6ff;
+    --color-hit-counts-3: #baecfa;
     --color-primary-button: #ffffff;
     --color-secondary-button: #ffffff;
     --color-warning: #fce2a1;
@@ -68,6 +72,10 @@ body {
     --color-default: #223344;
     --color-dim: #777777;
     --color-error: #ff0000;
+    --color-hit-counts-0: #d9dad9;
+    --color-hit-counts-1: #bbeafa;
+    --color-hit-counts-2: #69a6ff;
+    --color-hit-counts-3: #2979ef;
     --color-primary-button: #ffffff;
     --color-secondary-button: #ffffff;
     --color-warning: #6c5914;

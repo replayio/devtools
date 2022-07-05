@@ -211,7 +211,7 @@ export class ReplayClient implements ReplayClientInterface {
     return this._threadFront.getSourceContents(sourceId);
   }
 
-  async gitSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {
+  async getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {
     const sessionId = this.getSessionIdThrows();
     const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
       {
@@ -248,7 +248,6 @@ export class ReplayClient implements ReplayClientInterface {
       });
     });
 
-    console.log("!!! getHitCounts() ->", hitCounts);
     return hitCounts;
   }
 

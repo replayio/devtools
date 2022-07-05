@@ -88,6 +88,26 @@
   display: none;
 }
 
+.LineHitCount0,
+.LineHitCount1,
+.LineHitCount2,
+.LineHitCount3 {
+  flex: 0 0 0.25rem;
+  height: 100%;
+}
+.LineHitCount0 {
+  background-color: var(--color-hit-counts-0);
+}
+.LineHitCount1 {
+  background-color: var(--color-hit-counts-1);
+}
+.LineHitCount2 {
+  background-color: var(--color-hit-counts-2);
+}
+.LineHitCount3 {
+  background-color: var(--color-hit-counts-3);
+}
+
 .PointPanel {
   margin-left: calc(1.5rem + 0.5ch);
 }
