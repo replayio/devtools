@@ -1,41 +1,40 @@
 .List {
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: var(--background-color-contrast-2);
-    overflow: auto;
-  }
-  
-  .Header {
-    padding: 0.5rem;
-    font-size: 1.25rem;
-    color: var(--color-default);
-    display: flex;
-    align-items: center;
-  }
-  .HeaderLeft,
-  .HeaderRight {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: flex;
-    align-items: center;
-    flex: 1 1 auto;
-    gap: 1ch;
-  }
-  
-  .SourceTree {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-  }
-  .Source {
-    display: flex;
-    flex-wrap: nowrap;
-    margin-left: 1rem;
-    line-height: 2rem;
-    color: rgb(65, 63, 73);
-  }
+  height: 100%;
+  border-radius: 0.5rem;
+  background-color: var(--background-color-contrast-2);
+  overflow: auto;
+}
 
-  .Origin {
+.Header {
+  padding: 0.5rem;
+  font-size: 1.25rem;
+  color: var(--color-default);
+  display: flex;
+  align-items: center;
+}
+.HeaderLeft,
+.HeaderRight {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  flex: 1 1 auto;
+  gap: 1ch;
+}
 
-  }
+.SourceTree {
+  display: flex;
+  flex-direction: column;
+  width: fit-content;
+}
+.Source {
+  display: flex;
+  flex-wrap: nowrap;
+  margin-left: 1rem;
+  line-height: 2rem;
+  color: rgb(65, 63, 73);
+}
+
+.Origin {
+}
