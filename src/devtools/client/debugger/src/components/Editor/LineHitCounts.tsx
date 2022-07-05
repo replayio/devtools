@@ -27,7 +27,7 @@ export default function LineHitCountsWrapper(props: Props) {
 
 function LineHitCounts({ editor }: Props) {
   const dispatch = useAppDispatch();
-  const sourceId = useAppSelector(getSelectedSourceId);
+  const sourceId = useAppSelector(getSelectedSourceId)!;
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
   const isCollapsed = hitCountsMode == "hide-counts";

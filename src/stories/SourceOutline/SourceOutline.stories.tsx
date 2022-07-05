@@ -26,6 +26,7 @@ Basic.args = {
     line: 264,
     column: 2,
   },
+  // @ts-expect-error missing a bunch of fields
   selectedSource: {
     id: "pp123",
     url: "pretty-source.js",

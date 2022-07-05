@@ -29,6 +29,7 @@ export function SourceOutline({
 }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
+    // @ts-expect-error symbols args mismatch
     () => getOutlineSymbols(symbols, filter, hitCounts),
     [symbols, filter, hitCounts]
   );
