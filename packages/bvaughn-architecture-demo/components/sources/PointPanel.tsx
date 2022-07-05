@@ -30,7 +30,7 @@ export default function PointPanel({ className, point }: { className: string; po
   return (
     <div
       className={`${styles.Point} ${className}`}
-      data-test-id={`PointPanel${point.location.line}`}
+      data-test-id={`PointPanel-${point.location.line}`}
     >
       <div className={styles.Row}>
         <input

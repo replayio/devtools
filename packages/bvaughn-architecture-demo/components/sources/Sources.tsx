@@ -1,6 +1,7 @@
 import Loader from "@bvaughn/components/Loader";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
+import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { SourceId as ProtocolSourceId } from "@replayio/protocol";
 import { Suspense, useContext, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -25,11 +26,12 @@ export default function Sources() {
       <div className={styles.Tabs}>
         {sourcesIdsToDisplay.map(sourceId => {
           const source = getSource(client, sourceId);
-          const fileName = source?.url?.split("/")?.pop();
+          const fileName = (source && getSourceFileName(source)) || "unknown";
           return (
             <button
               key={sourceId}
               className={sourceId === selectedSourceId ? styles.SelectedTab : styles.Tab}
+              data-test-id={`SourceTab-${fileName}`}
               onClick={() => setSelectedSourceId(sourceId)}
             >
               {fileName}
