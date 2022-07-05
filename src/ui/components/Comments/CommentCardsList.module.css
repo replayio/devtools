@@ -47,9 +47,14 @@
   --tw-text-opacity: 1;
   color: rgb(107 114 128 / var(--tw-text-opacity));
   font-size: 1rem;
-  line-height: 1.5rem;
   padding: 0.75rem;
   align-self: stretch;
+}
+
+.NoComments p
+{
+  margin-top: 1rem;
+  font-size: var(--devtools-base-font-size);
 }
 
 .NoCommentsIcon {

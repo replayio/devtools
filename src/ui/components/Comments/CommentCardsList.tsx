@@ -38,13 +38,12 @@ export default function CommentCardsList() {
     content = (
       <div className={styles.NoComments}>
         <MaterialIcon className={styles.NoCommentsIcon}>forum</MaterialIcon>
-        <h2>{isAuthenticated ? "Start a conversation" : "Sign in to get started"}</h2>
+        <h2>{isAuthenticated ? "" : "Sign in to get started"}</h2>
         <p>
           {isAuthenticated
             ? "Add a comment to the video, a line of code, or a console message."
             : "Once signed in, you can add comments and make your voice heard!"}
-        </p>
-        <img src="/images/comment-onboarding-arrow.svg" className={styles.NoCommentsArrow} />
+        </p>        
       </div>
     );
   }
