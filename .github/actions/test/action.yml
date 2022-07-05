@@ -51,7 +51,7 @@ runs:
         RECORD_REPLAY_NO_RECORD: ${{ inputs.no-record == true && '1' || '' }}
         SHOULD_RECORD_EXAMPLES: true
     - uses: replayio/action-upload@main
-      if: always() && inputs.upload == true
+      if: ${{ always() && inputs.upload == true }}
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         public: true
