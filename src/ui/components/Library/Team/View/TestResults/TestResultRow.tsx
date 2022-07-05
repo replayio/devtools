@@ -10,7 +10,7 @@ function Title({ metadata }: { metadata: RecordingMetadata }) {
     metadata?.source?.merge?.title || metadata?.source?.commit.title || metadata?.test?.title || "";
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
   return (
-    <div className="flex pr-2 overflow-hidden font-semibold wrap shrink grow-0 flex-nowrap text-ellipsis">
+    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 flex-nowrap text-ellipsis">
       {formatted}
     </div>
   );
@@ -18,11 +18,9 @@ function Title({ metadata }: { metadata: RecordingMetadata }) {
 
 function Status({ test }: { test: TestMetadata }) {
   return (
-    <div
-      className={`flex self-start ${test.result === "passed" ? "text-green-600" : "text-red-500"} `}
-    >
-      <MaterialIcon iconSize="xl">radio_button_checked</MaterialIcon>
-    </div>
+<div className={`flex self-start pt-0.5 ${test.result === "passed" ? "text-red-500" : "text-green-500"} `}>
+<MaterialIcon iconSize="xl">{`${test.result === "passed" ? "cancel" : "check"} `}</MaterialIcon>
+</div>
   );
 }
 
@@ -62,7 +60,7 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
         className={`flex flex-row items-center px-3 py-3 space-x-3 border-b overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
       >
         <Status test={recording.metadata.test} />
-        <div className="flex flex-col flex-grow space-y-1">
+        <div className="flex flex-col flex-grow space-y-2">
           <div className="flex flex-row justify-between">
             <Title metadata={recording.metadata} />
           </div>
