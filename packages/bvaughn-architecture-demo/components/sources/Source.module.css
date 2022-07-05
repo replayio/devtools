@@ -88,27 +88,24 @@
   display: none;
 }
 
-.LineHitCount {
-  width: 6px;
+.LineHitCount0,
+.LineHitCount1,
+.LineHitCount2,
+.LineHitCount3 {
+  flex: 0 0 0.25rem;
   height: 100%;
 }
-.LineHitCount-0 {
-  background-color: #ccc;
+.LineHitCount0 {
+  background-color: var(--color-hit-counts-0);
 }
-.LineHitCount-1 {
-  background-color: rgb(255, 147, 147);
+.LineHitCount1 {
+  background-color: var(--color-hit-counts-1);
 }
-
-.LineHitCount-2 {
-  background-color: blue;
+.LineHitCount2 {
+  background-color: var(--color-hit-counts-2);
 }
-
-.LineHitCount-3 {
-  background-color: violet;
-}
-
-.LineHitCount-4 {
-  background-color: green;
+.LineHitCount3 {
+  background-color: var(--color-hit-counts-3);
 }
 
 .PointPanel {
