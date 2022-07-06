@@ -1,6 +1,4 @@
-import { PlaywrightTestConfig } from "@playwright/test";
-
-const config: PlaywrightTestConfig = {
+const config = {
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
   retries: process.env.CI ? 2 : 0,
@@ -23,6 +21,7 @@ const config: PlaywrightTestConfig = {
 };
 
 if (process.env.VISUAL_DEBUG) {
+  // @ts-ignore
   config.workers = 1;
 }
 

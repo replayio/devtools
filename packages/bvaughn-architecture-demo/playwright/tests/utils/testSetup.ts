@@ -1,7 +1,6 @@
 import { ConsoleMessage, Page, test } from "@playwright/test";
 import { writeFileSync } from "fs";
 import { join } from "path";
-import { decode, encode } from "shared/client/encoder";
 
 const RECORD_PROTOCOL_DATA = !!process.env.RECORD_PROTOCOL_DATA;
 
