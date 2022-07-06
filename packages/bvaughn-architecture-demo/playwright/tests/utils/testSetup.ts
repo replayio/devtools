@@ -1,4 +1,5 @@
 import { ConsoleMessage, Page, test } from "@playwright/test";
+import ErrorStackParser from "error-stack-parser";
 import { writeFileSync } from "fs";
 import { join } from "path";
 
@@ -11,7 +12,21 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
     return;
   }
 
-  test.only("regenerate fixture data", async ({ page }, { titlePath }) => {
+  const parsed = ErrorStackParser.parse(new Error());
+  const path = parsed[1].fileName;
+  const fileName = path!.split("playwright/tests/")[1];
+
+  let testCount: number = 0;
+
+  test.beforeEach(() => {
+    testCount++;
+
+    if (testCount > 1) {
+      throw Error(`Test setup method cannot be run with other focused tests (see ${fileName})`);
+    }
+  });
+
+  test.only(`regenerate fixture data for ${fileName}`, async ({ page }) => {
     let lastConsoleMessage: ConsoleMessage | null = null;
 
     function onConsoleMessage(consoleMessage: ConsoleMessage) {
@@ -38,12 +53,11 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
       // @ts-ignore TypeScript doesn't properly handle this case.
       const text = lastConsoleMessage.text();
 
-      const testFileName = titlePath[0];
-      const fileName = join(__dirname, "..", "..", `${testFileName}.tmp`);
+      const fullFilePath = join(__dirname, "..", `${fileName}.tmp`);
 
-      console.log(`Writing updated fixture data to:\n${fileName}`);
+      console.log(`Writing updated fixture data to:\n${fullFilePath}`);
 
-      writeFileSync(fileName, text);
+      writeFileSync(fullFilePath, text);
     } else {
       throw Error("No new log entries were recorded");
     }

@@ -15,6 +15,7 @@
 
     --value-type-bigint: #86de74;
     --value-type-boolean: #86de74;
+    --value-type-date: #34d3c6;
     --value-type-error: #ffb3d2;
     --value-type-nan: #86de74;
     --value-type-null: #939395;
@@ -50,8 +51,9 @@
 
     --value-type-bigint: #058b00;
     --value-type-boolean: #058b00;
+    --value-type-date: #34d3c6;
+    --value-type-error: #0074e8;
     --value-type-nan: #86de74;
-    --value-type-error: #ff0000;
     --value-type-null: #737373;
     --value-type-number: #058b00;
     --value-type-object: #0c0c0d;

@@ -32,8 +32,13 @@ export default function HTMLExpandable({
   };
 
   return (
-    <div className={isOpen ? styles.Expanded : styles.Collapsed}>
-      <div className={styles.PreviewRow} onClick={toggle}>
+    <div className={isOpen ? styles.Expanded : styles.Collapsed} data-test-name="Expandable">
+      <div
+        className={styles.PreviewRow}
+        onClick={toggle}
+        role="button"
+        data-test-name="ExpandablePreview"
+      >
         <div className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
         </div>
@@ -50,7 +55,7 @@ export default function HTMLExpandable({
       </div>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
-        <div className={styles.Children}>
+        <div className={styles.Children} data-test-name="ExpandableChildren">
           <Suspense fallback={<Loader />}>
             <HTMLChildrenRenderer object={object} pauseId={pauseId} />
           </Suspense>

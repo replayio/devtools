@@ -92,7 +92,7 @@ function LogPointInstanceRenderer({
     <div
       ref={ref}
       className={className}
-      data-test-id="Message"
+      data-test-name="Message"
       role="listitem"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

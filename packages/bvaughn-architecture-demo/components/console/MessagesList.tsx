@@ -44,7 +44,7 @@ export default function MessagesList() {
   return (
     <div
       className={isTransitionPending ? styles.ContainerPending : styles.Container}
-      data-test-id="Messages"
+      data-test-name="Messages"
       role="list"
     >
       {didOverflow && (

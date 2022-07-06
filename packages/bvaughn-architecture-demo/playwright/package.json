@@ -3,6 +3,7 @@
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
     "@playwright/test": "^1.22.2",
+    "error-stack-parser": "^2.1.4",
     "playwright": "^1.22.2"
   },
   "scripts": {
