@@ -23,7 +23,7 @@
 .Count {
   flex: 0 0 auto;
   color: var(--color-dim);
-  font-size: 0.75rem;
+  font-size: var(--font-size-small);
 }
 
 .Checkbox {

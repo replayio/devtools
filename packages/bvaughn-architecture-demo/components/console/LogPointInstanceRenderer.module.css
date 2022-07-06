@@ -29,13 +29,14 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5ch;
-  width: 100%;
+  flex: 1 1 100%;
 }
 
 .Source {
-  flex: 0 0 auto;
+  flex: 0 1 25%;
   display: flex;
   opacity: 0.75;
+  overflow: hidden;
 }
 .Source:hover {
   opacity: 1;
@@ -43,5 +44,5 @@
 
 .TimeStamp {
   color: var(--color-dim);
-  font-size: 0.8rem;
+  font-size: var(--font-size-small);
 }

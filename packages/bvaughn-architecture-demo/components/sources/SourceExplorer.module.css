@@ -8,7 +8,7 @@
 
 .Header {
   padding: 0.5rem;
-  font-size: 1.25rem;
+  font-size: var(--font-size-large);
   color: var(--color-default);
   display: flex;
   align-items: center;

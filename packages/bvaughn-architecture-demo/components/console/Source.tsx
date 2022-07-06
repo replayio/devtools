@@ -26,7 +26,11 @@ export default function Source({
   };
 
   return (
-    <span className={`${styles.Source} ${className}`} onClick={openSource}>
+    <span
+      className={`${styles.Source} ${className}`}
+      onClick={openSource}
+      title={`${fileName}:${location.line}`}
+    >
       {fileName}:{location.line}
     </span>
   );
