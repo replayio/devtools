@@ -8,16 +8,16 @@ import styles from "../../../../Library.module.css";
 function ViewReplay({ recordingId, passed }: { recordingId: string; passed: boolean }) {
   return (
     <Link href={`/recording/${recordingId}`}>
-      <a className="flex items-center justify-center p-2 transition" rel="noreferrer noopener" target="_blank">
+    <a className="flex items-center justify-center p-2 transition cursor-pointer group">
         <MaterialIcon
           iconSize="2xl"
           outlined
-          className={passed ? "text-green-500 hover:text-green-700" : "text-red-500 hover:text-red-700"}
+          className={passed ? "text-green-500 group-hover:text-green-700" : "text-red-500 group-hover:text-red-700"}
         >
           play_circle
         </MaterialIcon>
       </a>
-    </Link>
+      </Link>
   );
 }
 
@@ -26,6 +26,9 @@ function Title({ recording }: { recording: Recording }) {
   const path = `${JSON.stringify(recording.metadata.test!.path)}`;
 
   return (
+    <Link href={`/recording/${recording.id}`}>
+      
+    <a className="flex flex-grow transition cursor-pointer group" rel="noreferrer noopener" target="_blank">
     <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
       <div className="flex flex-col flex-grow py-2 overflow-hidden">
         <Link href={`/team/${teamId}/results?q=test-path:${path}`}>
@@ -36,6 +39,9 @@ function Title({ recording }: { recording: Recording }) {
         <div className="text-xs text-gray-500">{recording.metadata.test?.file}</div>
       </div>
     </div>
+      </a>
+    
+    </Link>
   );
 }
 
