@@ -15,21 +15,11 @@ function pingTestMetrics(
   recordingId: string | undefined,
   test: {
     id: string;
-    runId: string;
     duration: number;
     recorded: boolean;
   }
 ) {
-  const body = JSON.stringify(
-    {
-      type: "test.finished",
-      recordingId,
-      test,
-    },
-    undefined,
-    2
-  );
-
+  const runId = process.env.TEST_RUN_ID;
   const webhookUrl = process.env.RECORD_REPLAY_WEBHOOK_URL;
 
   try {
@@ -37,6 +27,24 @@ function pingTestMetrics(
       console.log("RECORD_REPLAY_WEBHOOK_URL is undefined. Skipping test metrics");
       return;
     }
+
+    if (!runId) {
+      console.log("TEST_RUN_ID is undefined. Skipping test metrics");
+      return;
+    }
+
+    const body = JSON.stringify(
+      {
+        type: "test.finished",
+        recordingId,
+        test: {
+          ...test,
+          runId,
+        },
+      },
+      undefined,
+      2
+    );
 
     return fetch(`${webhookUrl}/api/metrics`, {
       method: "POST",
@@ -113,6 +121,7 @@ export async function runClassicTest(args: {
   const websocketLogs: any[] = [];
 
   const testId = setTestId(script);
+  const startTime = Date.now();
 
   try {
     await recordPlaywright(config.browserName, async page => {
@@ -167,6 +176,13 @@ export async function runClassicTest(args: {
     });
   } catch (e) {
     console.error("Recording test failed:", e);
+  } finally {
+    const testDuration = Date.now() - startTime;
+    pingTestMetrics(undefined, {
+      id: args.example,
+      duration: testDuration,
+      recorded: !process.env.RECORD_REPLAY_NO_RECORD,
+    });
   }
 
   appendTestMetadata(testId, script, success);
@@ -215,14 +231,11 @@ export async function runPlaywrightTest(args: {
     console.error(e);
   } finally {
     const testDuration = Date.now() - startTime;
-    if (process.env.TEST_RUN_ID) {
-      pingTestMetrics(undefined, {
-        id: args.example,
-        runId: process.env.TEST_RUN_ID,
-        duration: testDuration,
-        recorded: !process.env.RECORD_REPLAY_NO_RECORD,
-      });
-    }
+    pingTestMetrics(undefined, {
+      id: args.example,
+      duration: testDuration,
+      recorded: !process.env.RECORD_REPLAY_NO_RECORD,
+    });
   }
 
   appendTestMetadata(testId, args.example, success);
