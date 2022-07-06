@@ -75,6 +75,7 @@ jobs:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: https://app.replay.io
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
   e2etest-norecord:
     name: End-to-end tests (${{ matrix.shard }}) - No Record
     runs-on: macos-latest
@@ -96,3 +97,4 @@ jobs:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: https://app.replay.io
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
