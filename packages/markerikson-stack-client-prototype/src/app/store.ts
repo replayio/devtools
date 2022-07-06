@@ -1,13 +1,15 @@
 import { configureStore, ThunkAction, Action } from "@reduxjs/toolkit";
 
 import { api } from "./api";
-import sourcesReducer from "../features/sources/sourcesSlice";
+import selectedSourcesReducer from "../features/sources/selectedSourcesSlice";
+import sourceDetailsReducer from "../features/sources/sourceDetailsSlice";
 
 export function makeStore() {
   return configureStore({
     reducer: {
       [api.reducerPath]: api.reducer,
-      sources: sourcesReducer,
+      selectedSources: selectedSourcesReducer,
+      sourceDetails: sourceDetailsReducer,
     },
     middleware: gDM => gDM().concat(api.middleware),
   });
