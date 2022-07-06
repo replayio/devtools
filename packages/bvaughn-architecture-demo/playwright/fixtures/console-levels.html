@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script type="text/javascript">
+      function foo() {
+        console.log("This is a log");
+        bar();
+      }
+
+      function bar() {
+        console.warn("This is a warning", [1, 2, 3]);
+        baz();
+      }
+
+      function baz() {
+        console.error("This is an error", { foo, number: 123, string: "abc" });
+        console.trace("This is a trace");
+      }
+
+      foo();
+
+      // TODO Add console.info, console.debug
+      // TODO Add console.group, console.groupCollapsed, console.groupEnd (once backend supports them)
+    </script>
+  </body>
+</html>

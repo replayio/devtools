@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+  <body>
+    <script type="text/javascript">
+      function regularFunction() {}
+      const arrowFunction = (requiredParam, optionalParam = 123) => {};
+      const boundFunction = regularFunction.bind(this);
+      const overflowingFunction = (
+        a,
+        b,
+        c,
+        d,
+        e,
+        f,
+        g,
+        h,
+        i,
+        j,
+        k,
+        l,
+        m,
+        n,
+        o,
+        p,
+        q,
+        r,
+        s,
+        t,
+        u,
+        v,
+        w,
+        x,
+        y,
+        z
+      ) => {};
+
+      const booleanFalse = false;
+      const booleanTrue = true;
+      const numberNaN = NaN;
+      const number = 123;
+      const infinity = Infinity;
+      const negativeInfinity = Number.NEGATIVE_INFINITY;
+      const maxSafeInteger = Number.MAX_SAFE_INTEGER;
+      const bigInt = BigInt(123);
+      const string = "string";
+      const specialNull = null;
+      const specialUndefined = undefined;
+      const date = new Date();
+
+      const emptyObject = {};
+      const object = { foo: 123, bar: "abc", baz: true };
+      const objectWithNullPrototype = Object.create(null);
+      const objectWithGettersAndSetters = {
+        get foo() {},
+        set bar(value) {},
+        get baz() {},
+        set baz(value) {},
+        method(a, b, c) {},
+      };
+      const objectWithSideEffectfulGetter = {
+        _count: 0,
+        get count() {
+          return this._count++;
+        },
+      };
+
+      class BaseClass {
+        instanceProperty = ["a", "b", "c"];
+        static staticProperty = "string";
+        constructor(param, paramWithDefaults = 123) {}
+        get getter() {
+          return this.instanceProperty;
+        }
+        get setterGetterPair() {
+          return this._setterGetterPair;
+        }
+        set setterGetterPair(value) {
+          this._setterGetterPair = value;
+        }
+        instanceMethod(param) {}
+        boundInstanceMethod = (paramWithDefaults = 123) => {};
+        static staticMethod() {}
+      }
+      class SubClass extends BaseClass {
+        constructor(foo, bar) {
+          super(foo);
+        }
+        // Override
+        instanceMethod(a, b, c) {}
+      }
+
+      const emptyArray = [];
+      const array = [1, 2, 3];
+      const overflowingArray = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z",
+      ];
+      const arrayWithObjects = [{ foo: 123, bar: "abc" }, [1, 2]];
+      const arrayThatNeedsBucketing = new Array(205).fill(true).map((_, index) => index);
+
+      const htmlElement = document.createElement("div");
+      const htmlElementWithProps = document.createElement("title");
+      htmlElementWithProps.className = "Header";
+      htmlElementWithProps.title = "Click me to login";
+      const htmlElementWithAttributes = document.createElement("button");
+      htmlElementWithAttributes.setAttribute("name", "loginButton");
+      htmlElementWithAttributes.setAttribute("disabled", true);
+      htmlElementWithAttributes.textContent = "Login";
+      const htmlElementWithStyle = document.createElement("div");
+      htmlElementWithStyle.style = "background-color: yellow; color: black;";
+      const htmlElementWithChildren = document.createElement("ul");
+      const listItemOne = document.createElement("li");
+      listItemOne.className = "Header";
+      listItemOne.style = "background-color: yellow; color: black;";
+      listItemOne.textContent = "First item";
+      const listItemTwo = document.createElement("li");
+      const child = document.createElement("div");
+      child.textContent = "Second item";
+      listItemTwo.appendChild(child);
+      listItemTwo.appendChild(document.createTextNode("Text node"));
+      htmlElementWithChildren.appendChild(listItemOne);
+      htmlElementWithChildren.appendChild(listItemTwo);
+      htmlElementWithChildren.appendChild(document.createElement("li"));
+
+      const regex = /abc[123]+/i;
+      const symbol = Symbol.for("example");
+
+      const emptyMap = new Map();
+      const map = new Map([
+        ["one", 1],
+        ["two", "blah"],
+        ["three", true],
+        ["four", new Map()],
+      ]);
+      const weakMap = new WeakMap([
+        [regex, "abc"],
+        [map, 123],
+      ]);
+      const overflowingMap = new Map(Object.entries(overflowingArray));
+      const emptySet = new Set();
+      const set = new Set([1, "two", true, new Set()]);
+      const weakSet = new WeakSet([regex, set]);
+      const overflowingSet = new Set(overflowingArray);
+      const arrayOfHtmlElements = [
+        htmlElement,
+        htmlElementWithAttributes,
+        htmlElementWithProps,
+        htmlElementWithChildren,
+        htmlElementWithProps,
+      ];
+
+      const complexObject = {
+        // Simple props first
+        specialNull,
+        specialUndefined,
+        string,
+        booleanFalse,
+        booleanTrue,
+        number,
+        numberNaN,
+        infinity,
+        negativeInfinity,
+        maxSafeInteger,
+        bigInt,
+        symbol,
+
+        // Various function types
+        regularFunction,
+        arrowFunction,
+        boundFunction,
+        overflowingFunction,
+
+        // Various object types
+        emptyObject,
+        object,
+        objectWithNullPrototype,
+        objectWithGettersAndSetters,
+        objectWithSideEffectfulGetter,
+
+        // Various array types
+        emptyArray,
+        array,
+        arrayWithObjects,
+        overflowingArray,
+        arrayOfHtmlElements,
+        arrayThatNeedsBucketing,
+
+        // HTML elements
+        htmlElement,
+        htmlElementWithProps,
+        htmlElementWithStyle,
+        htmlElementWithAttributes,
+        htmlElementWithChildren,
+
+        // Special object types
+        date,
+        regex,
+        emptyMap,
+        map,
+        weakMap,
+        overflowingMap,
+        emptySet,
+        set,
+        weakSet,
+        overflowingSet,
+
+        // Classes and instances
+        BaseClass,
+        SubClass,
+        baseClass: new BaseClass(),
+        subClass: new SubClass(),
+      };
+
+      // Circular references
+      complexObject.circular = complexObject;
+
+      // Log some basic string substitution and styling.
+      console.log("string", 123, true, false);
+      console.log("%c foo %s bar %s baz", "color: red;", 123, true);
+
+      // Log individual values to simplify testing.
+      Object.entries(complexObject).forEach(([key, value]) => {
+        console.log(key, value);
+      });
+
+      // Log the entire object
+      console.log("Entire object:", complexObject);
+
+      // Log a really noisy message to test how things wrap.
+      console.log(...Object.values(complexObject), complexObject);
+    </script>
+  </body>
+</html>

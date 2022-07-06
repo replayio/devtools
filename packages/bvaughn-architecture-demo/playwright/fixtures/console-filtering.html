@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+  </head>
+  <body>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/react-is@18.2.0/umd/react-is.development.js"
+    ></script>
+    <script type="text/javascript">
+      let errorsToPrint = 2;
+      let logsToPrint = 10;
+      let warningsToPrint = 5;
+
+      function printError() {
+        console.error("This is an error for URL", window.location.href);
+
+        if (--errorsToPrint > 0) {
+          callbackAfterRandomDelay(printError);
+        } else {
+          console.trace("All errors printed");
+        }
+      }
+
+      function printLog() {
+        console.log("This is a console log");
+
+        if (--logsToPrint > 0) {
+          callbackAfterRandomDelay(printLog);
+        } else {
+          console.info("All logs printed");
+        }
+      }
+
+      function printWarning() {
+        console.warn("This is a warning at", new Date());
+
+        if (--warningsToPrint > 0) {
+          callbackAfterRandomDelay(printWarning);
+        } else {
+          console.info("All warnings printed");
+        }
+      }
+
+      function throwException() {
+        throw Error("This is an exception");
+      }
+
+      function callbackAfterRandomDelay(callback) {
+        const delay = Math.round(250 + Math.random() * 1000);
+        setTimeout(callback, delay);
+      }
+
+      callbackAfterRandomDelay(printError);
+      callbackAfterRandomDelay(printLog);
+      callbackAfterRandomDelay(printWarning);
+      callbackAfterRandomDelay(throwException);
+
+      // Trigger a warning from node_modules (or in this case, unpkg)
+      ReactIs.isAsyncMode({});
+    </script>
+  </body>
+</html>
