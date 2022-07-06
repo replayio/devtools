@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="utf-8" http-equiv="encoding" />
+  </head>
   <body>
     <script type="text/javascript">
       function regularFunction() {}
@@ -42,10 +46,11 @@
       const negativeInfinity = Number.NEGATIVE_INFINITY;
       const maxSafeInteger = Number.MAX_SAFE_INTEGER;
       const bigInt = BigInt(123);
-      const string = "string";
+      const string = "text";
       const specialNull = null;
       const specialUndefined = undefined;
       const date = new Date();
+      const error = new Error("This is an error");
 
       const emptyObject = {};
       const object = { foo: 123, bar: "abc", baz: true };
@@ -66,7 +71,7 @@
 
       class BaseClass {
         instanceProperty = ["a", "b", "c"];
-        static staticProperty = "string";
+        static staticProperty = "text";
         constructor(param, paramWithDefaults = 123) {}
         get getter() {
           return this.instanceProperty;
@@ -122,6 +127,7 @@
       const arrayWithObjects = [{ foo: 123, bar: "abc" }, [1, 2]];
       const arrayThatNeedsBucketing = new Array(205).fill(true).map((_, index) => index);
 
+      const htmlText = document.createTextNode("Text node");
       const htmlElement = document.createElement("div");
       const htmlElementWithProps = document.createElement("title");
       htmlElementWithProps.className = "Header";
@@ -173,6 +179,8 @@
         htmlElementWithProps,
       ];
 
+      // Note that the naming and ordering of properties in the object below is significant.
+      // The corresponding Playwright tests may operate on the first match for a given locator/selector.
       const complexObject = {
         // Simple props first
         specialNull,
@@ -196,18 +204,10 @@
 
         // Various object types
         emptyObject,
-        object,
+        simpleObject: object,
         objectWithNullPrototype,
         objectWithGettersAndSetters,
         objectWithSideEffectfulGetter,
-
-        // Various array types
-        emptyArray,
-        array,
-        arrayWithObjects,
-        overflowingArray,
-        arrayOfHtmlElements,
-        arrayThatNeedsBucketing,
 
         // HTML elements
         htmlElement,
@@ -215,16 +215,26 @@
         htmlElementWithStyle,
         htmlElementWithAttributes,
         htmlElementWithChildren,
+        htmlText,
+
+        // Various array types
+        emptyArray,
+        simpleArray: array,
+        arrayWithObjects,
+        overflowingArray,
+        arrayOfHtmlElements,
+        arrayThatNeedsBucketing,
 
         // Special object types
         date,
+        error,
         regex,
         emptyMap,
-        map,
+        simpleMap: map,
         weakMap,
         overflowingMap,
         emptySet,
-        set,
+        simpleSet: set,
         weakSet,
         overflowingSet,
 
@@ -239,7 +249,7 @@
       complexObject.circular = complexObject;
 
       // Log some basic string substitution and styling.
-      console.log("string", 123, true, false);
+      console.log("text", 123, true, false);
       console.log("%c foo %s bar %s baz", "color: red;", 123, true);
 
       // Log individual values to simplify testing.
