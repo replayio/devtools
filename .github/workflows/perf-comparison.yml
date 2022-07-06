@@ -91,6 +91,7 @@ jobs:
       - uses: ./.github/actions/test
         with:
           no-record: true
+          upload: false
         env:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: https://app.replay.io
