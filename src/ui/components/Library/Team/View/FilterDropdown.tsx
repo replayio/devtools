@@ -65,7 +65,7 @@ export function FilterDropdown() {
       buttonContent={button}
       setExpanded={setExpanded}
       expanded={expanded}
-      position="top-right"
+      position="bottom-right"
       distance={0}
     >
       <Dropdown menuItemsClassName="z-50">
