@@ -41,10 +41,10 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
-    addSource: (state, action: PayloadAction<newSource>) => {
+    addSources: (state, action: PayloadAction<newSource[]>) => {
       // Store the raw protocol information. Once we have recieved all sources
       // we will run over this and build it into the shape we want.
-      sourcesAdapter.addOne(state.sources, action.payload);
+      sourcesAdapter.addMany(state.sources, action.payload);
     },
     allSourcesReceived: state => {
       sourceDetailsAdapter.addMany(
@@ -67,5 +67,5 @@ export const getSelectedSourceDetails = createSelector(
   }
 );
 
-export const { addSource, allSourcesReceived } = sourcesSlice.actions;
+export const { addSources, allSourcesReceived } = sourcesSlice.actions;
 export default sourcesSlice.reducer;
