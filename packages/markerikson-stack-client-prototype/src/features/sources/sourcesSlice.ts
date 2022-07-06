@@ -88,9 +88,19 @@ export const getSelectedSourceDetails = createSelector(
   }
 );
 
-export const { selectAll: selectSourceDetails } = sourceDetailsAdapter.getSelectors(
-  (state: AppState) => state.sources.sourceDetails
-);
+export const { selectAll: selectSourceDetails, selectEntities: selectSourceDetailsEntities } =
+  sourceDetailsAdapter.getSelectors((state: AppState) => state.sources.sourceDetails);
+
+export const selectCanonicalSourceName = (
+  detailsEntities: EntityState<SourceDetails>["entities"],
+  sourceId: string
+) => {
+  const initialDetails = detailsEntities[sourceId];
+  if (initialDetails) {
+    const canonicalDetails = detailsEntities[initialDetails.canonicalId];
+    return canonicalDetails?.url;
+  }
+};
 
 export const selectLikelyAppOriginalSources = createSelector(
   selectSourceDetails,
