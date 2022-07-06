@@ -1,4 +1,5 @@
 import fs from "fs";
+import fetch from "node-fetch";
 import path from "path";
 
 import { Page } from "@recordreplay/playwright";
@@ -9,6 +10,43 @@ import config from "./config";
 import { getExampleRecordingId } from "./getExample";
 import { recordPlaywright } from "./recordPlaywright";
 import { reportError, waitUntilMessage } from "./utils";
+
+function pingTestMetrics(
+  recordingId: string | undefined,
+  test: {
+    id: string;
+    runId: string;
+    duration: number;
+    recorded: boolean;
+  }
+) {
+  const body = JSON.stringify(
+    {
+      type: "test.finished",
+      recordingId,
+      test,
+    },
+    undefined,
+    2
+  );
+
+  const webhookUrl = process.env.RECORD_REPLAY_WEBHOOK_URL;
+
+  try {
+    if (!webhookUrl) {
+      console.log("RECORD_REPLAY_WEBHOOK_URL is undefined. Skipping test metrics");
+      return;
+    }
+
+    return fetch(`${webhookUrl}/api/metrics`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body,
+    });
+  } catch (e) {
+    console.log("Failed to send test metrics", e);
+  }
+}
 
 function setTestId(file: string) {
   const testId = file + "-" + Date.now();
@@ -166,6 +204,7 @@ export async function runPlaywrightTest(args: {
 
   const url = `${config.devtoolsUrl}/recording/${exampleRecordingId}`;
   let success = false;
+  const startTime = Date.now();
   try {
     await recordPlaywright(config.browserName, async page => {
       await page.goto(url);
@@ -174,6 +213,16 @@ export async function runPlaywrightTest(args: {
     success = true;
   } catch (e) {
     console.error(e);
+  } finally {
+    const testDuration = Date.now() - startTime;
+    if (process.env.TEST_RUN_ID) {
+      pingTestMetrics(undefined, {
+        id: args.example,
+        runId: process.env.TEST_RUN_ID,
+        duration: testDuration,
+        recorded: !process.env.RECORD_REPLAY_NO_RECORD,
+      });
+    }
   }
 
   appendTestMetadata(testId, args.example, success);

@@ -1,5 +1,12 @@
 name: "Test"
 description: "Run end-to-end tests. Note that this action assumes that Node and Next.js have already been properly setup. See the setup-next task for details."
+inputs:
+  no-record:
+    type: boolean
+    default: false
+  upload:
+    type: boolean
+    default: true
 
 runs:
   using: "composite"
@@ -41,9 +48,10 @@ runs:
         RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
         RECORD_REPLAY_PLAYWRIGHT_HEADLESS: true
         RECORD_REPLAY_VERBOSE: 1
+        RECORD_REPLAY_NO_RECORD: ${{ inputs.no-record == 'true' && '1' || '' }}
         SHOULD_RECORD_EXAMPLES: true
     - uses: replayio/action-upload@main
-      if: always()
+      if: ${{ always() && inputs.upload == 'true' }}
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         public: true
