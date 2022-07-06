@@ -4,13 +4,16 @@
 
 //
 
+import type { UIThunkAction } from "ui/actions";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+
 import { getSourceActorsForSource } from "../../selectors";
 import {
   loadSourceActorBreakableLines,
   loadSourceActorBreakpointHitCounts,
 } from "../source-actors";
 
-export function setBreakableLines(cx, sourceId) {
+export function setBreakableLines(cx: Context, sourceId: string): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const actors = getSourceActorsForSource(getState(), sourceId);
 
@@ -20,7 +23,7 @@ export function setBreakableLines(cx, sourceId) {
   };
 }
 
-export function setBreakpointHitCounts(sourceId, lineNumber) {
+export function setBreakpointHitCounts(sourceId: string, lineNumber: number): UIThunkAction {
   return async (dispatch, getState) => {
     const actors = getSourceActorsForSource(getState(), sourceId);
 

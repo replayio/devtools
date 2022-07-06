@@ -41,17 +41,4 @@ export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./
 export * from "./debugLine";
 
 // TODO These declarations are still masking some usages
-
-export declare function getActiveSearch(state: UIState): string;
 export declare function getContext(state: UIState): Context;
-export declare function getCursorPosition(state: UIState): any;
-export declare function getDebugLineLocation(state: UIState): UrlLocation | undefined;
-export declare function getPaneCollapse(state: UIState): boolean;
-export declare function getPausePreviewLocation(state: UIState): UrlLocation;
-export declare function getSelectedPrimaryPaneTab(state: UIState): any;
-export declare function getSelectedSourceWithContent(state: UIState): any;
-export declare function getSourceActorsForSource(state: UIState, sourceId: string): any;
-export declare function getSourceWithContent(state: UIState, sourceId: string): any;
-export declare function getSourcesCollapsed(state: UIState): any;
-export declare function getSymbols(state: UIState, source: any): any;
-export declare function hasFrames(state: UIState): boolean;

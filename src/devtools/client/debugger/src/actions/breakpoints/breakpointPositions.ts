@@ -6,9 +6,14 @@
 
 import uniqBy from "lodash/uniqBy";
 
+import type { UIState } from "ui/state";
+import type { ThunkExtraArgs } from "ui/utils/thunk";
+import type { Source } from "../../reducers/sources";
+import type { AppDispatch } from "ui/setup/store";
+import type { SourceLocation } from "../../reducers/types";
+
 import {
   getSource,
-  getSourceFromId,
   getBreakpointPositionsForSource,
   getSourceActorsForSource,
 } from "../../selectors";
@@ -18,11 +23,13 @@ import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 import { loadSourceActorBreakpointColumns } from "../source-actors";
 
-function filterByUniqLocation(positions) {
+type ThunkArgs = { dispatch: AppDispatch; getState: () => UIState } & ThunkExtraArgs;
+
+function filterByUniqLocation(positions: SourceLocation[]) {
   return uniqBy(positions, getLocationKey);
 }
 
-function convertToList(results, source) {
+function convertToList(results: Record<number, number[]>, source: Source) {
   const { id, url } = source;
   const positions = [];
 
@@ -40,8 +47,8 @@ function convertToList(results, source) {
   return positions;
 }
 
-function groupByLine(results, sourceId, line) {
-  const positions = {};
+function groupByLine(results: SourceLocation[], sourceId: string, line: number) {
+  const positions: Record<number, SourceLocation[]> = {};
 
   // Ensure that we have an entry for the line fetched
   if (typeof line === "number") {
@@ -59,7 +66,7 @@ function groupByLine(results, sourceId, line) {
   return positions;
 }
 
-async function _setBreakpointPositions(sourceId, line, thunkArgs) {
+async function _setBreakpointPositions(sourceId: string, line: number, thunkArgs: ThunkArgs) {
   let generatedSource = getSource(thunkArgs.getState(), sourceId);
   if (!generatedSource) {
     return;
@@ -75,14 +82,14 @@ async function _setBreakpointPositions(sourceId, line, thunkArgs) {
     )
   );
 
-  const results = {};
+  const results: Record<number, number[]> = {};
   for (const columns of actorColumns) {
-    results[line] = (results[line] || []).concat(columns);
+    results[line] = (results[line] || []).concat(columns!);
   }
 
   let positions = convertToList(results, generatedSource);
-  positions = filterByUniqLocation(positions);
-  positions = groupByLine(positions, sourceId, line);
+  const filteredPositions = filterByUniqLocation(positions);
+  const groupedPositions = groupByLine(filteredPositions, sourceId, line);
 
   const source = getSource(thunkArgs.getState(), sourceId);
   // NOTE: it's possible that the source was removed during a navigate
@@ -93,18 +100,18 @@ async function _setBreakpointPositions(sourceId, line, thunkArgs) {
   thunkArgs.dispatch({
     type: "ADD_BREAKPOINT_POSITIONS",
     source,
-    positions,
+    positions: groupedPositions,
   });
 }
 
-function generatedSourceActorKey(state, sourceId) {
+function generatedSourceActorKey(state: UIState, sourceId: string) {
   const source = getSource(state, sourceId);
   const actors = source ? getSourceActorsForSource(state, source.id).map(({ actor }) => actor) : [];
   return [sourceId, ...actors].join(":");
 }
 
 export const setBreakpointPositions = memoizeableAction("setBreakpointPositions", {
-  getValue: ({ sourceId, line }, thunkArgs) => {
+  getValue: ({ sourceId, line }: { sourceId: string; line: number }, thunkArgs) => {
     const positions = getBreakpointPositionsForSource(thunkArgs.getState(), sourceId);
     if (!positions) {
       return null;

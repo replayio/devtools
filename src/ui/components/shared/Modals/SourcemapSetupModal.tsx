@@ -44,7 +44,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state),
+    selectedSource: getSelectedSourceWithContent(state)!,
   }),
   { hideModal: actions.hideModal }
 );

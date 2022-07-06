@@ -5,7 +5,6 @@
 
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const actions = require("devtools/client/webconsole/actions/index");
 
 FilterButton.displayName = "FilterButton";
 

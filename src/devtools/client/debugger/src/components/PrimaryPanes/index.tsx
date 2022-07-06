@@ -60,7 +60,6 @@ const mapStateToProps = (state: UIState) => {
   return {
     cx: getContext(state),
     selectedTab: getSelectedPrimaryPaneTab(state),
-    sourceSearchOn: getActiveSearch(state) === "source",
     sourcesCollapsed: getSourcesCollapsed(state),
   };
 };

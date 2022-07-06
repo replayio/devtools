@@ -289,10 +289,15 @@ async function getFrameScopes(frame: SelectedFrame) {
   return { scopes: converted[0], originalScopesUnavailable };
 }
 
+export interface SourceRange {
+  start: ProtocolSourceLocation;
+  end: ProtocolSourceLocation;
+}
+
 async function blackBox(
   sourceActor: SourceActor,
   isBlackBoxed: boolean,
-  range?: { start?: ProtocolSourceLocation; end?: ProtocolSourceLocation }
+  range?: Partial<SourceRange>
 ) {
   const begin = range ? range.start : undefined;
   const end = range ? range.end : undefined;
@@ -379,10 +384,7 @@ function getMainThread() {
 }
 async function getSourceActorBreakpointPositions(
   { actor }: { actor: string },
-  range?: {
-    start: ProtocolSourceLocation;
-    end: ProtocolSourceLocation;
-  }
+  range?: SourceRange
 ) {
   const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
   const rv: Record<number, number[]> = {};

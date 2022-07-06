@@ -10,19 +10,30 @@
  */
 
 import { recordEvent } from "../../utils/telemetry";
-import { features } from "../../utils/prefs";
+import type { UIState } from "ui/state";
+import type { UIThunkAction } from "ui/actions";
+import type { clientCommands } from "devtools/client/debugger/src/client/commands";
+import type { SourceRange } from "devtools/client/debugger/src/client/commands";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { Source } from "../../reducers/sources";
 import { getSourceActorsForSource } from "../../selectors";
 
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 
-async function blackboxActors(state, client, sourceId, isBlackBoxed, range) {
+async function blackboxActors(
+  state: UIState,
+  client: typeof clientCommands,
+  sourceId: string,
+  isBlackBoxed: boolean,
+  range?: Partial<SourceRange>
+) {
   for (const actor of getSourceActorsForSource(state, sourceId)) {
     await client.blackBox(actor, isBlackBoxed, range);
   }
   return { isBlackBoxed: !isBlackBoxed };
 }
 
-export function toggleBlackBox(cx, source) {
+export function toggleBlackBox(cx: Context, source: Source): UIThunkAction {
   return async (dispatch, getState, { client }) => {
     const { isBlackBoxed } = source;
 

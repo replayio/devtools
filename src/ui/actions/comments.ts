@@ -151,6 +151,7 @@ export function createLabels(
 
     let symbols = getSymbols(state, { id: sourceId });
     if (!symbols) {
+      // @ts-expect-error really only need source.id here
       symbols = await dispatch(setSymbols({ source: { id: sourceId } }));
     }
     const closestFunction = findClosestFunction(symbols, sourceLocation);

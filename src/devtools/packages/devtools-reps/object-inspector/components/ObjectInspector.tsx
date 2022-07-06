@@ -217,6 +217,7 @@ class OI extends PureComponent<ObjectInspectorProps> {
         onFocus={focusable ? this.focusItem : undefined}
         onActivate={focusable ? this.activateItem : undefined}
         renderItem={(item, depth, focused, arrow, expanded) => (
+          // @ts-expect-error some nested field mismatch
           <ObjectInspectorItem
             {...{
               ...this.props,

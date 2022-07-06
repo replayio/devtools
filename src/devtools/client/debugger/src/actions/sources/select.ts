@@ -256,7 +256,7 @@ export function showAlternateSource(
 
     if (isPausedInSource) {
       const executionPoint = getExecutionPoint(state);
-      await dispatch(paused({ executionPoint }));
+      await dispatch(paused({ executionPoint: executionPoint! }));
     } else {
       await dispatch(selectSource(getContext(state), newSourceId));
     }
