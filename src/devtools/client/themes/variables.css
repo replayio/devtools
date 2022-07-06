@@ -146,7 +146,7 @@
   --body-color: #38383d;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
-  --modal-bgcolor: rgba(255, 255, 255, 0.8);
+  --modal-bgcolor: rgba(255, 255, 255, 0.98);
   --modal-border: none;
   --tab-bgcolor-alt-subtle: var(--theme-base-100); /* info, events */
   --tab-bgcolor: var(--theme-base-90); /* bg tabs */
@@ -414,7 +414,7 @@
   --body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: rgba(0, 0, 0, 0.82);
+  --modal-bgcolor: rgba(0, 0, 0, 0.98);
   --modal-border: #222;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-bgcolor: var(--theme-base-100); /* bg tabs */
