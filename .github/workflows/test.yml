@@ -131,13 +131,23 @@ jobs:
       - name: Run tests
         run: yarn test
   comment-with-replay:
+    name: Add Comment with Replays
     needs: [e2etest, generate-test-run-id]
     runs-on: ubuntu-latest
     if: ${{ always() }}
     steps:
+    - uses: actions/download-artifact@v3
+    - uses: actions/github-script@v6
+      id: combine-recordings
+      with:
+        script: |
+          const shards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+          return shards.reduce((acc, shard) => {
+            return acc.concat(JSON.parse(require("fs").readFileSync(`recordings-${logId}.json`)));
+          });
     - uses: replayio/action-comment@main
       with:
-        apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
+        api-key: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
         issue-number: ${{ github.event.pull_request.number }}
-        recordings: ${{ needs.e2etest.outputs.recordings }}
+        recordings: ${{ needs.combine-recordings.outputs.result }}
         test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}

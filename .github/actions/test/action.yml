@@ -8,9 +8,9 @@ inputs:
     type: boolean
     default: true
 outputs:
-  recordings:
-    description: "Array of recordings uploaded"
-    value: ${{ steps.upload-recordings.outputs.result }}
+  recordings-log:
+    description: "File containing the array of recordings uploaded"
+    value: ${{ steps.recordings.log-path.outputs.result }}
 
 runs:
   using: "composite"
@@ -61,3 +61,18 @@ runs:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         public: true
         filter: function($v) { $v.metadata.test and $v.status = "onDisk" }
+    - uses: actions/github-script@v6
+      id: recordings-log-path
+      with:
+        script: |
+          const fs = require("fs");
+          const recordings = ${{ inputs.recordings || '[]' }};
+          const stripe = "${{ env.INPUT_STRIPE }}";
+          const logId = stripe.split("/")[0];
+          const output = `recordings-${logId}.json`;
+          fs.writeFileSync(output, JSON.stringify(recordings));
+          return output;
+    - uses: actions/upload-artifact@v3
+      with:
+        name: recordings-${{ env.INPUT_STRIPE }}.json
+        path: ${{ steps.recordings.log-path.outputs.result }}
