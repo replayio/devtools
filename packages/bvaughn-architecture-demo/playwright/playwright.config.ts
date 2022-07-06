@@ -1,6 +1,6 @@
-// playwright.config.ts
+import { PlaywrightTestConfig } from "@playwright/test";
 
-const config = {
+const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
   retries: process.env.CI ? 2 : 0,
@@ -8,7 +8,7 @@ const config = {
     browserName: "chromium",
     launchOptions: {
       // Useful for visual debugging
-      slowMo: 1000,
+      slowMo: 500,
     },
     trace: "on-first-retry",
     video: process.env.RECORD_VIDEO ? "on" : "off",
@@ -21,5 +21,9 @@ const config = {
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
 };
+
+if (process.env.VISUAL_DEBUG) {
+  config.workers = 1;
+}
 
 export default config;

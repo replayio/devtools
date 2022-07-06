@@ -159,6 +159,7 @@ async function fetchMessages(
       messages.forEach(message => {
         const objects = message.data.objects;
         if (objects) {
+          console.log("message.pauseId:", message.pauseId);
           preCacheObjects(message.pauseId, objects);
         }
       });

@@ -2,3 +2,4 @@
 .yarn
 playwright-report*
 test-results
+tests/*.tmp

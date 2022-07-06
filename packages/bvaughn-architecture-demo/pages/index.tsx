@@ -8,6 +8,7 @@ import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import React, { useContext, useMemo, useState, useTransition } from "react";
+import { hasFlag } from "shared/utils/url";
 import Icon from "../components/Icon";
 
 import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
@@ -19,11 +20,7 @@ import styles from "./index.module.css";
 // where React keeps quickly retrying after an error is thrown, rather than rendering an error boundary.
 // Filed https://github.com/facebook/react/issues/24634
 
-let recordData = false;
-if (typeof window !== "undefined") {
-  const url = new URL(window.location.href);
-  recordData = url.searchParams.has("record");
-}
+const recordData = hasFlag("record");
 
 export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,

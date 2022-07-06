@@ -16,12 +16,23 @@ export function getBaseURL(): string {
   return `http://${HOST}:3000`;
 }
 
+export function getURLFlags(): string {
+  const RECORD_PROTOCOL_DATA = !!process.env.RECORD_PROTOCOL_DATA;
+  return RECORD_PROTOCOL_DATA ? "record" : "";
+}
+
 export async function takeScreenshot(
   page: Page,
   locator: Locator,
   name: string,
   margin: number = 0
 ): Promise<void> {
+  if (process.env.RECORD_PROTOCOL_DATA) {
+    // We aren't visually debugging; we're just recording snapshot data.
+    // Skip this method to make the tests run faster.
+    return;
+  }
+
   if (!name.endsWith(".png")) {
     name += ".png";
   }
@@ -29,7 +40,7 @@ export async function takeScreenshot(
   await page.emulateMedia({ colorScheme: "dark" });
 
   if (process.env.VISUAL_DEBUG) {
-    await new Promise(resolve => resolve(1000));
+    await new Promise(resolve => resolve(500));
   } else {
     const screenshot = await takeScreenshotHelper(page, locator, margin);
     expect(screenshot).toMatchSnapshot(["dark", name]);
@@ -38,7 +49,7 @@ export async function takeScreenshot(
   await page.emulateMedia({ colorScheme: "light" });
 
   if (process.env.VISUAL_DEBUG) {
-    await new Promise(resolve => resolve(1000));
+    await new Promise(resolve => resolve(500));
   } else {
     const screenshot = await takeScreenshotHelper(page, locator, margin);
     expect(screenshot).toMatchSnapshot(["light", name]);
