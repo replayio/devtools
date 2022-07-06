@@ -37,8 +37,10 @@ function pingTestMetrics(
       {
         type: "test.finished",
         recordingId,
-        runId,
-        test,
+        test: {
+          ...test,
+          runId,
+        },
       },
       undefined,
       2
