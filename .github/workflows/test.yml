@@ -72,7 +72,6 @@ jobs:
       testRunId: ${{ steps.uuid.outputs.result }}
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
-    id: e2etest
     runs-on: macos-latest
     needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
     strategy:
@@ -137,5 +136,5 @@ jobs:
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
         issue-number: ${{ github.event.pull_request.number }}
-        recordings: ${{ steps.e2etest.outputs.recordings }}
+        recordings: ${{ needs.e2etest.outputs.recordings }}
         test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}
