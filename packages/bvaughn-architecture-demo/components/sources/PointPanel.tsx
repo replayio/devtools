@@ -19,7 +19,9 @@ export default function PointPanel({ className, point }: { className: string; po
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "Enter":
-        editPoint(point.id, { content: editableContent });
+        if (isContentValid && hasContentChanged) {
+          editPoint(point.id, { content: editableContent });
+        }
         break;
       case "Escape":
         setEditableContent(point.content);
@@ -30,7 +32,7 @@ export default function PointPanel({ className, point }: { className: string; po
   return (
     <div
       className={`${styles.Point} ${className}`}
-      data-test-id={`PointPanel${point.location.line}`}
+      data-test-id={`PointPanel-${point.location.line}`}
     >
       <div className={styles.Row}>
         <input

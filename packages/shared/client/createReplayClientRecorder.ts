@@ -1,21 +1,47 @@
+import { findMatch } from "shared/utils/client";
 import { encode } from "./encoder";
 import { ReplayClientInterface, LogEntry } from "./types";
 
 const FAKE_ACCESS_TOKEN = "<fake-access-token>";
-const FAKE_RECORDING_ID = "<fake-recording-id>";
 
 export default function createReplayClientRecorder(
   replayClient: ReplayClientInterface
 ): ReplayClientInterface {
   const logEntries: LogEntry[] = [];
+
   let hasAccessToken = false;
+  let recordingId: string | null = null;
+
+  // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
+  // In that case, it's important that it waits until all pending async requests have been resolved.
+  // See playwright/tests/utils/testSetup.ts
+  // const flagPendingClientRequest = () => {
+  //   if (typeof window !== "undefined") {
+  //     const global = window as any;
+  //     if (global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT == null) {
+  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT = 1;
+  //     } else {
+  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT++;
+  //     }
+  //   }
+  // };
+
+  // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
+  // In that case, it's important that it waits until all pending async requests have been resolved.
+  // See playwright/tests/utils/testSetup.ts
+  // const resolvePendingClientRequest = () => {
+  //   if (typeof window !== "undefined") {
+  //     const global = window as any;
+  //     global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT--;
+  //   }
+  // };
 
   const printInstructions = () => {
     console.log(`
       const ACCESS_TOKEN = ${hasAccessToken ? `"${FAKE_ACCESS_TOKEN}"` : null};
-      const RECORDING_ID = "${FAKE_RECORDING_ID}";
-      const replayClientPlayer = createReplayClientPlayer(
-        decode(\`${encode(logEntries)}\`)
+      const RECORDING_ID = "${recordingId}";
+      const replayClient = createReplayClientForPlaywrightTesting(
+        \`${encode(logEntries)}\`
       );
     `);
   };
@@ -27,8 +53,8 @@ export default function createReplayClientRecorder(
 
         if (prop === "initialize") {
           // client.initialize() receives the recording ID and (optionally) access token.
-          // This info is sensitive and so it shouldn't be recorded.
-          args[0] = FAKE_RECORDING_ID;
+          // This access token is sensitive and shouldn't be recorded.
+          recordingId = args[0];
           if (typeof args[1] === "string") {
             args[1] = FAKE_ACCESS_TOKEN;
             hasAccessToken = true;
@@ -37,16 +63,22 @@ export default function createReplayClientRecorder(
 
         const entry: LogEntry = { args: args, isAsync: false, method: prop, result: result };
 
-        logEntries.push(entry);
+        if (findMatch(logEntries, prop, args) === null) {
+          logEntries.push(entry);
+        }
 
         // Unwrap Promise values
         if (result != null && typeof result.then === "function") {
           entry.isAsync = true;
 
+          // flagPendingClientRequest();
+
           result.then((resolved: any) => {
             entry.result = resolved;
 
             printInstructions();
+
+            // resolvePendingClientRequest();
           });
         } else {
           printInstructions();

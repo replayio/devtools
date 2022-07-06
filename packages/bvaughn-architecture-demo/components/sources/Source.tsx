@@ -1,6 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getSourceContents, getSourceHitCounts } from "@bvaughn/src/suspense/SourcesCache";
+import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
 import { Fragment, useContext, useMemo } from "react";
@@ -21,6 +22,8 @@ export default function Source({
   const client = useContext(ReplayClientContext);
 
   const { addPoint, deletePoint, points } = useContext(PointsContext);
+
+  const fileName = getSourceFileName(source) || "unknown";
 
   const [hitCounts, sourceContents] = suspendInParallel(
     () => getSourceHitCounts(client, sourceId),
@@ -71,7 +74,7 @@ export default function Source({
   };
 
   return (
-    <div className={styles.Source}>
+    <div className={styles.Source} data-test-id={`Source-${fileName}`}>
       <div className={styles.SourceContents}>
         {sourceContents.contents.split("\n").map((line, index) => {
           const lineNumber = index + 1;
@@ -135,7 +138,7 @@ export default function Source({
               <div
                 key={index}
                 className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
-                data-test-id={`SourceLine${lineNumber}`}
+                data-test-id={`SourceLine-${lineNumber}`}
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
                 {hoverButton}

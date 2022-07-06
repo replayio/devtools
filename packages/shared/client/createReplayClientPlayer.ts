@@ -1,5 +1,4 @@
-import difference from "lodash/difference";
-import isEqual from "lodash/isEqual";
+import { findMatch } from "shared/utils/client";
 
 import { ReplayClientInterface, LogEntry } from "./types";
 
@@ -9,24 +8,9 @@ export default function createReplayClientPlayer(logEntries: LogEntry[]): Replay
     {
       get(_: any, prop: string) {
         return (...args: any[]) => {
-          const index = logEntries.findIndex(logEntry => {
-            if (logEntry.method !== prop) {
-              return false;
-            } else if (logEntry.args.length !== args.length) {
-              return false;
-            } else {
-              for (let index = 0; index < args.length; index++) {
-                if (!isEqual(args[index], logEntry.args[index])) {
-                  return false;
-                }
-              }
-            }
-
-            return true;
-          });
-
-          if (index >= 0) {
-            const { isAsync, result } = logEntries[index];
+          const logEntry = findMatch(logEntries, prop, args);
+          if (logEntry != null) {
+            const { isAsync, result } = logEntry;
             return isAsync ? Promise.resolve(result) : result;
           } else {
             throw Error(

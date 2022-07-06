@@ -1,27 +1,52 @@
-import { test, expect } from "@playwright/test";
+import { Page, test } from "@playwright/test";
 
-import { getBaseURL, takeScreenshot } from "./utils/general";
+import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/source-and-console`;
+const URL = `${getBaseURL()}/tests/source-and-console?${getURLFlags()}`;
 
-test("should not allow saving invalid log point values", async ({ page }) => {
+testSetup(async function regeneratorFunction({ page }) {
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
+
+  await fillLogPointText(page, 12, "printError");
+  const message = page.locator('[data-test-id="Message"]').first();
+  const keyValue = message.locator("[data-test-id=Expandable]");
+  await keyValue.click();
+
+  await fillLogPointText(page, 12, "z");
+});
+
+async function openSourceTab(page: Page) {
   await page.goto(URL);
 
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
+  await page.click('[data-test-id="SourceTab-test-console-levels.html"]');
+}
 
-  await page.fill('[data-test-id="PointPanel11"] input', "'1");
-  const PointPanel = page.locator('[data-test-id="PointPanel11"]');
-  await takeScreenshot(page, PointPanel, "point-panel-invalid");
+async function addLogPoint(page: Page, lineNumber: number) {
+  const selector = `[data-test-id="Source-test-console-levels.html"] [data-test-id="SourceLine-${lineNumber}"]`;
+  await page.hover(selector);
+  const button = page.locator(`${selector} button`);
+  await button.click();
+}
+
+async function fillLogPointText(page: Page, lineNumber: number, text: string) {
+  await page.fill(`[data-test-id="PointPanel-${lineNumber}"] input`, text);
+  await page.keyboard.press("Enter");
+}
+
+test("should not allow saving invalid log point values", async ({ page }) => {
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
+  await fillLogPointText(page, 12, "'1");
+
+  const pointPanel = page.locator('[data-test-id="PointPanel-12"]');
+  await takeScreenshot(page, pointPanel, "point-panel-invalid");
 });
 
 test("should support log points that only require local analysis", async ({ page }) => {
-  await page.goto(URL);
-
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
 
   const sourceRoot = page.locator('[data-test-id="SourcesRoot"]');
   await takeScreenshot(page, sourceRoot, "local-analysis-log-point-source");
@@ -31,14 +56,9 @@ test("should support log points that only require local analysis", async ({ page
 });
 
 test("should support log points that require remote analysis", async ({ page }) => {
-  await page.goto(URL);
-
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
-
-  await page.fill('[data-test-id="PointPanel11"] input', "foo");
-  await page.keyboard.press("Enter");
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
+  await fillLogPointText(page, 12, "printError");
 
   const sourceRoot = page.locator('[data-test-id="SourcesRoot"]');
   await takeScreenshot(page, sourceRoot, "remote-analysis-log-point-source");
@@ -53,25 +73,17 @@ test("should support log points that require remote analysis", async ({ page }) 
 });
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
-  await page.goto(URL);
-
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
-
-  await page.fill('[data-test-id="PointPanel11"] input', "z");
-  await page.keyboard.press("Enter");
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
+  await fillLogPointText(page, 12, "z");
 
   const messages = page.locator('[data-test-id="Messages"]');
   await takeScreenshot(page, messages, "invalid-remote-analysis-log-point-console");
 });
 
 test("should include log points in search results", async ({ page }) => {
-  await page.goto(URL);
-
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
 
   await page.fill('[data-test-id="ConsoleSearchInput"]', "stack");
   const messages = page.locator('[data-test-id="Messages"]');
@@ -79,11 +91,8 @@ test("should include log points in search results", async ({ page }) => {
 });
 
 test("should include log points when filtering data", async ({ page }) => {
-  await page.goto(URL);
-
-  await page.hover('[data-test-id="SourceLine11"]');
-  const button = page.locator('[data-test-id="SourceLine11"] button');
-  await button.click();
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
 
   await page.fill('[data-test-id="ConsoleFilterInput"]', "stack");
   const messages = page.locator('[data-test-id="Messages"]');

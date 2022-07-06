@@ -49,6 +49,16 @@ This mode will run tests in a regular Chromium browser so that you can visibly i
 
 Once you are satisfied with the test, run the `+playwright-update-snapshots` Earthly target as shown above.
 
+## Updating protocol fixture data
+
+Test fixture data may need to be updated (if new API calls are added or if the protocol format changes). The "test:update-fixture-data" can help regenerate the data:
+
+```sh
+yarn test:update-fixture-data
+```
+
+After this script finishes, it will write updated fixture data beside of each test (e.g. `console.ts` fixture data will be written to `console.ts.tmp`). Note that this data needs to be manually copied into the test harness file.
+
 ## Debugging failures in Docker
 
 If tests are failing in the Docker container, it can be helpful to record a video of the test using this target:

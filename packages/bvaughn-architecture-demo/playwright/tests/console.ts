@@ -1,11 +1,33 @@
 import { test, expect } from "@playwright/test";
 
-import { getBaseURL, takeScreenshot } from "./utils/general";
+import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/console`;
+const URL = `${getBaseURL()}/tests/console?${getURLFlags()}`;
+
+testSetup(async function regeneratorFunction({ page }) {
+  await page.goto(URL);
+
+  const warningListItem = page.locator('[data-test-id="Expandable"]', {
+    hasText: "This is a warning",
+  });
+  const arrayKeyValue = warningListItem.locator("[data-test-id=Expandable]", { hasText: "Array" });
+  await arrayKeyValue.click();
+
+  const errorListItem = page.locator('[data-test-id="Expandable"]', {
+    hasText: "This is an error",
+  });
+  const keyValue = errorListItem.locator("[data-test-id=Expandable]", { hasText: "foo" });
+  await keyValue.click();
+
+  const children = errorListItem.locator("[data-test-id=ExpandableChildren]");
+  const nestedKeyValue = children.locator("[data-test-id=Expandable]", { hasText: "foo" });
+  await nestedKeyValue.click();
+});
 
 test("should display list of messages", async ({ page }) => {
   await page.goto(URL);
+
   const list = page.locator('[data-test-id="Messages"]');
   await expect(list).toContainText("This is a log");
   await expect(list).toContainText("This is a warning");
