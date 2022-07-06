@@ -7,6 +7,10 @@ inputs:
   upload:
     type: boolean
     default: true
+outputs:
+  recordings:
+    description: "Array of recordings uploaded"
+    value: ${{ steps.upload-recordings.outputs.result }}
 
 runs:
   using: "composite"
@@ -51,6 +55,7 @@ runs:
         RECORD_REPLAY_NO_RECORD: ${{ inputs.no-record == 'true' && '1' || '' }}
         SHOULD_RECORD_EXAMPLES: true
     - uses: replayio/action-upload@main
+      id: upload-recordings
       if: ${{ always() && inputs.upload == 'true' }}
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
