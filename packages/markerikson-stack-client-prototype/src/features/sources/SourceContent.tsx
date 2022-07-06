@@ -1,36 +1,24 @@
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
-import type { HitCount, Location } from "@replayio/protocol";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import CodeMirror from "@uiw/react-codemirror";
 import { useContext, useMemo, useState } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import {
-  useGetSourceTextQuery,
-  useGetSourceHitCountsQuery,
-  useGetLineHitPointsQuery,
-  useGetPauseQuery,
-} from "../../app/api";
+import { useGetSourceTextQuery } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
-import { pointSelected, locationSelected } from "./selectedSourcesSlice";
+import { locationSelected } from "./selectedSourcesSlice";
 
 import { SelectedLocationHits } from "./SelectedLocationHits";
+import { SelectedPointStackFrames } from "./SelectedPointStackFrames";
 
 export const SourceContent = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
-  const selectedPoint = useAppSelector(state => state.selectedSources.selectedPoint);
 
   const { currentData: sourceText } = useGetSourceTextQuery(
     selectedSourceId ? selectedSourceId : skipToken
   );
-  const { currentData: sourceHits } = useGetSourceHitCountsQuery(
-    selectedSourceId ? selectedSourceId : skipToken
-  );
-
-  const { currentData: pause } = useGetPauseQuery(selectedPoint ? selectedPoint : skipToken);
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({
@@ -64,16 +52,7 @@ export const SourceContent = () => {
         </div>
 
         <div style={{ marginLeft: 10 }}>
-          <h3 style={{ marginTop: 0 }}>Current Pause Frames</h3>
-          <ul>
-            {pause?.data.frames?.map(frame => {
-              return (
-                <li key={frame.frameId}>
-                  {frame.functionName} / {JSON.stringify(frame.functionLocation)}
-                </li>
-              );
-            })}
-          </ul>
+          <SelectedPointStackFrames />
         </div>
       </div>
     </div>
