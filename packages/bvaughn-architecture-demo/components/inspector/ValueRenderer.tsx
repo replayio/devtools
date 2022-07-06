@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import useClientValue from "./useClientValue";
 import ArrayRenderer from "./values/ArrayRenderer";
 import ClientValueValueRenderer from "./values/ClientValueValueRenderer";
+import DateRenderer from "./values/DateRenderer";
 import ErrorRenderer from "./values/ErrorRenderer";
 import FunctionRenderer from "./values/FunctionRenderer";
 import HTMLElementRenderer from "./values/HTMLElementRenderer";
@@ -41,6 +42,9 @@ export default memo(function ValueRenderer({
   switch (clientValue.type) {
     case "array":
       ObjectPreviewRenderer = ArrayRenderer;
+      break;
+    case "date":
+      ObjectPreviewRenderer = DateRenderer;
       break;
     case "error":
       ObjectPreviewRenderer = ErrorRenderer;

@@ -1,5 +1,6 @@
 .BigInt,
 .Boolean,
+.Date,
 .Error,
 .NaN,
 .Null,
@@ -18,6 +19,9 @@
 }
 .Boolean {
   color: var(--value-type-boolean);
+}
+.Date {
+  color: var(--value-type-date);
 }
 .Error {
   color: var(--value-type-error);

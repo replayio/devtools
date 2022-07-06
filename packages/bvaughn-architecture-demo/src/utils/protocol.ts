@@ -12,6 +12,7 @@ type ValueType =
   | "array"
   | "bigint"
   | "boolean"
+  | "date"
   | "error"
   | "function"
   | "html-element"
@@ -125,6 +126,9 @@ export function protocolValueToClientValue(
       switch (className) {
         case "Array":
           type = "array";
+          break;
+        case "Date":
+          type = "date";
           break;
         case "Function":
           type = "function";
