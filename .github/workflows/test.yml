@@ -130,9 +130,12 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+  comment-with-replay:
+    needs: [e2etest, generate-test-run-id]
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
     - uses: replayio/action-comment@main
-      needs: [e2etest, generate-test-run-id]
-      if: ${{ always() }}
       with:
         apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
         issue-number: ${{ github.event.pull_request.number }}
