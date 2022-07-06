@@ -14,13 +14,11 @@ import {
 } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
-import { pointSelected } from "./selectedSourcesSlice";
+import { pointSelected, locationSelected } from "./selectedSourcesSlice";
+
+import { SelectedLocationHits } from "./SelectedLocationHits";
 
 export const SourceContent = () => {
-  const [selectedLocation, setSelectedLocation] = useState<Pick<
-    Location,
-    "line" | "column"
-  > | null>(null);
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
   const selectedPoint = useAppSelector(state => state.selectedSources.selectedPoint);
@@ -32,22 +30,6 @@ export const SourceContent = () => {
     selectedSourceId ? selectedSourceId : skipToken
   );
 
-  let closestHitPoint: HitCount | null = null;
-  if (sourceHits && selectedLocation) {
-    const lineHits = sourceHits[selectedLocation.line];
-    closestHitPoint = lineHits?.reduceRight((prevValue, hit) => {
-      if (hit.location.column < selectedLocation.column) {
-        return hit;
-      }
-      return prevValue;
-    }, null as HitCount | null);
-  }
-
-  const location = closestHitPoint?.location;
-  const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
-    location ? location : skipToken
-  );
-
   const { currentData: pause } = useGetPauseQuery(selectedPoint ? selectedPoint : skipToken);
 
   const domHandler = useMemo(() => {
@@ -57,12 +39,12 @@ export const SourceContent = () => {
         const line = editorView.state.doc.lineAt(pos!);
         const selectionRange = editorView.state.selection.ranges[0];
         const columnNumber = selectionRange.head - line.from;
-        setSelectedLocation({ line: line.number, column: columnNumber });
+        dispatch(locationSelected({ line: line.number, column: columnNumber }));
 
         return false;
       },
     });
-  }, []);
+  }, [dispatch]);
 
   if (!selectedSourceId) {
     return null;
@@ -78,26 +60,7 @@ export const SourceContent = () => {
           extensions={[domHandler, javascript({ jsx: true })]}
         />
         <div style={{ marginLeft: 10 }}>
-          <h3 style={{ marginTop: 0 }}>Selection Details</h3>
-          <div>Selected location: {JSON.stringify(selectedLocation)}</div>
-          <div>Closest point: {JSON.stringify(selectedLocation)}</div>
-          <h4>Location Hits</h4>
-          <ul>
-            {locationHitPoints?.map(point => {
-              const isSelected = point === selectedPoint;
-              let entryText: React.ReactNode = point.time;
-              if (isSelected) {
-                entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
-              }
-
-              const onPointClicked = () => dispatch(pointSelected(point));
-              return (
-                <li key={point.point} onClick={onPointClicked}>
-                  {entryText}
-                </li>
-              );
-            }) ?? null}
-          </ul>
+          <SelectedLocationHits />
         </div>
 
         <div style={{ marginLeft: 10 }}>
