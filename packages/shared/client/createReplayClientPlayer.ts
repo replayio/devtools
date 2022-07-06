@@ -13,6 +13,13 @@ export default function createReplayClientPlayer(logEntries: LogEntry[]): Replay
             const { isAsync, result } = logEntry;
             return isAsync ? Promise.resolve(result) : result;
           } else {
+            if (
+              typeof prop === "symbol" &&
+              (prop as Symbol).toString().includes("Symbol.iterator")
+            ) {
+              return undefined;
+            }
+
             throw Error(
               `Could not find matching log entry for method "${prop}" with args ${JSON.stringify(
                 args
