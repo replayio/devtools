@@ -24,13 +24,14 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
     await regeneratorFunction({ page });
 
     // Wait for all outstanding requests to be resolved/logged.
-    while (true) {
-      const pendingClientRequests = await page.evaluate("window.pendingClientRequests");
-      if (pendingClientRequests === 0 || pendingClientRequests == null) {
-        break;
-      }
-      await new Promise(resolve => setTimeout(resolve, 50));
-    }
+    // while (true) {
+    //   const count = await page.evaluate("window.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT");
+    //   if (count === 0 || count == null) {
+    //     break;
+    //   }
+    //
+    //   await new Promise(resolve => setTimeout(resolve, 50));
+    // }
 
     page.off("console", onConsoleMessage);
 

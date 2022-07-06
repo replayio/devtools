@@ -29,7 +29,6 @@ export function createReplayClientForPlaywrightTesting(encoded: string): ReplayC
     return createReplayClientRecorder(replayClient);
   } else {
     const decoded = decode(encoded);
-    console.log(JSON.stringify(decoded, null, 2));
     return createReplayClientPlayer(decoded);
   }
 }

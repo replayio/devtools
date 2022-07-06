@@ -4,12 +4,6 @@ import { ReplayClientInterface, LogEntry } from "./types";
 
 const FAKE_ACCESS_TOKEN = "<fake-access-token>";
 
-if (typeof window !== "undefined") {
-  // TODO Document this dependency.
-  // @ts-ignore
-  window.pendingClientRequests = 0;
-}
-
 export default function createReplayClientRecorder(
   replayClient: ReplayClientInterface
 ): ReplayClientInterface {
@@ -17,6 +11,30 @@ export default function createReplayClientRecorder(
 
   let hasAccessToken = false;
   let recordingId: string | null = null;
+
+  // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
+  // In that case, it's important that it waits until all pending async requests have been resolved.
+  // See playwright/tests/utils/testSetup.ts
+  // const flagPendingClientRequest = () => {
+  //   if (typeof window !== "undefined") {
+  //     const global = window as any;
+  //     if (global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT == null) {
+  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT = 1;
+  //     } else {
+  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT++;
+  //     }
+  //   }
+  // };
+
+  // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
+  // In that case, it's important that it waits until all pending async requests have been resolved.
+  // See playwright/tests/utils/testSetup.ts
+  // const resolvePendingClientRequest = () => {
+  //   if (typeof window !== "undefined") {
+  //     const global = window as any;
+  //     global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT--;
+  //   }
+  // };
 
   const printInstructions = () => {
     console.log(`
@@ -53,20 +71,14 @@ export default function createReplayClientRecorder(
         if (result != null && typeof result.then === "function") {
           entry.isAsync = true;
 
-          if (typeof window !== "undefined") {
-            // @ts-ignore
-            window.pendingClientRequests++;
-          }
+          // flagPendingClientRequest();
 
           result.then((resolved: any) => {
             entry.result = resolved;
 
             printInstructions();
 
-            if (typeof window !== "undefined") {
-              // @ts-ignore
-              window.pendingClientRequests--;
-            }
+            // resolvePendingClientRequest();
           });
         } else {
           printInstructions();
