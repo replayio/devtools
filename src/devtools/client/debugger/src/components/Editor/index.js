@@ -64,6 +64,7 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
+import { LoadingState } from "ui/reducers/sources";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
@@ -355,7 +356,7 @@ class Editor extends PureComponent {
       return showLoading(editor);
     }
 
-    if (selectedSource.content.state === "rejected") {
+    if (selectedSource.status === LoadingState.ERRORED) {
       let { value } = selectedSource.content;
       if (typeof value !== "string") {
         value = "Unexpected source error";
@@ -364,7 +365,8 @@ class Editor extends PureComponent {
       return this.showErrorMessage(value);
     }
 
-    return showSourceText(editor, selectedSource, selectedSource.content.value, symbols);
+    console.log({ selectedSource });
+    return showSourceText(editor, selectedSource, selectedSource.content, symbols);
   }
 
   clearEditor() {

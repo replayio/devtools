@@ -21,12 +21,7 @@ export * from "../reducers/ast";
 export * from "../reducers/source-tree";
 export * from "../reducers/preview";
 
-export {
-  getSourceActor,
-  hasSourceActor,
-  getSourceActors,
-  getSourceActorsForThread,
-} from "../reducers/source-actors";
+export { getSourceActor, hasSourceActor, getSourceActors } from "../reducers/source-actors";
 
 export * from "../reducers/quick-open";
 

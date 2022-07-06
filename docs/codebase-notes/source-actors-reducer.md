@@ -103,8 +103,6 @@ Generates a new `values` record with every entry's `breakpointHitCounts` field s
 - `querySourceActorsById`: maps `string[]` -> `SourceActor[]`
 - `querySourcesByThreadID`: retrieves `Record<ThreadName, SourceActor[]>`
 - `getSourceActorsForThread`: concatenates array of sources for thread IDs
-- `queryThreadsBySourceObject`: calculates `Record<SourceName, ThreadName[]>`
-- `getAllThreadsBySource`
 - `getSourceActorBreakpointHitCounts`
 - `getSourceActorBreakableLines`
 - `getSourceActorBreakpointColumns`

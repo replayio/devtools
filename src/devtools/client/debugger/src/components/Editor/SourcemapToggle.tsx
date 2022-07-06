@@ -1,14 +1,12 @@
-import { SourceId } from "@replayio/protocol";
-import { ThreadFront } from "protocol/thread";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { useAppSelector } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import { UIState } from "ui/state";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 import actions from "../../actions";
-import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSourceWithContent } from "../../reducers/sources";
-import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
 
 import Toggle from "./Toggle";
 
@@ -21,22 +19,16 @@ function SourcemapError({ onClick }: { onClick: () => void }) {
   );
 }
 
-export function SourcemapToggle({
-  selectedSource,
-  alternateSource,
-  setModal,
-  showAlternateSource,
-}: PropsFromRedux) {
-  let alternateSourceId: SourceId | undefined;
-  if (alternateSource) {
-    alternateSourceId = alternateSource.id;
-  } else {
-    const result = getUniqueAlternateSourceId(selectedSource.id);
-    alternateSourceId = result.sourceId;
-    if (!alternateSourceId && result.why === "not-unique") {
-      return null;
-    }
+export function SourcemapToggle({ selectedSource, setModal, showAlternateSource }: PropsFromRedux) {
+  const sourceDetails = useAppSelector(getSelectedSourceDetails);
+  if (!sourceDetails) {
+    return null;
   }
+  console.log({ sourceDetails });
+  if (sourceDetails.generated.length !== 1) {
+    return null;
+  }
+  const alternateSourceId = sourceDetails.generated[0];
 
   const setEnabled = (v: React.SetStateAction<boolean>) => {
     showAlternateSource(selectedSource.id, alternateSourceId!);
@@ -48,7 +40,7 @@ export function SourcemapToggle({
   return (
     <label className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
       <Toggle
-        enabled={ThreadFront.isSourceMappedSource(selectedSource.id)}
+        enabled={sourceDetails.id === sourceDetails.canonicalId}
         setEnabled={setEnabled}
         disabled={!alternateSourceId}
       />
@@ -60,12 +52,13 @@ export function SourcemapToggle({
 const connector = connect(
   (state: UIState) => ({
     selectedSource: getSelectedSourceWithContent(state)!,
-    alternateSource: getAlternateSource(state),
   }),
   {
     showAlternateSource: actions.showAlternateSource,
     setModal,
   }
 );
+
 type PropsFromRedux = ConnectedProps<typeof connector>;
+
 export default connector(SourcemapToggle);

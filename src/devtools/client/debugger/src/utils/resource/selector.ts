@@ -10,7 +10,6 @@ import {
   BaseResource,
   ResourceState,
   ResourceId,
-  EmptyObject,
 } from "./core";
 
 export function hasResource<T extends BaseResource>(state: ResourceState<T>, id: ResourceId) {
@@ -43,6 +42,8 @@ export function getMappedResource<T extends BaseResource, Result>(
   if (!validatedState) {
     throw new Error(`Resource ${id} does not exist`);
   }
+
+  // console.log({ finalId, validatedState });
 
   return map(validatedState.values[finalId], validatedState.identity[finalId]);
 }

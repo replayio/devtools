@@ -57,48 +57,6 @@ export async function loadSource(state: UIState, source: Source, thunkArgs: Thun
   return { text, contentType };
 }
 
-async function loadSourceTextPromise(source: Source, thunkArgs: ThunkArgs) {
-  const epoch = getSourcesEpoch(thunkArgs.getState());
-  await thunkArgs.dispatch({
-    type: "LOAD_SOURCE_TEXT",
-    sourceId: source.id,
-    epoch,
-    [PROMISE]: loadSource(thunkArgs.getState(), source, thunkArgs),
-  });
-}
-
-export function loadSourceById(cx: Context, sourceId: string): UIThunkAction {
-  return (dispatch, getState) => {
-    const source = getSourceFromId(getState(), sourceId)!;
-    return dispatch(loadSourceText({ source }));
-  };
-}
-
-export const loadSourceText = memoizeableAction("loadSourceText", {
-  getValue: (
-    { source }: { source: Source },
-    thunkArgs
-  ): AsyncValue<Source> | Source | null | undefined => {
-    const actualSource: Source | null = source ? getSource(thunkArgs.getState(), source.id) : null;
-    if (!actualSource) {
-      return null;
-    }
-
-    const { content } = getSourceWithContent(thunkArgs.getState(), actualSource.id);
-    // @ts-expect-error state doesn't exist?
-    if (!content || content.state === "pending") {
-      // @ts-expect-error more mismatches AGGGHH KILL THIS!
-      return content;
-    }
-
-    // This currently swallows source-load-failure since we return fulfilled
-    // here when content.state === "rejected". In an ideal world we should
-    // propagate that error upward.
-    return fulfilled(actualSource);
-  },
-  createKey: ({ source }, thunkArgs) => {
-    const epoch = getSourcesEpoch(thunkArgs.getState());
-    return `${epoch}:${source!.id}`;
-  },
-  action: ({ source }, thunkArgs) => loadSourceTextPromise(source!, thunkArgs),
-});
+export const loadSourceText = sourceId => {
+  return { type: "sources/sourceLoading", payload: sourceId };
+};

@@ -4,7 +4,6 @@
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIThunkAction } from "ui/actions";
-import { selectors } from "ui/reducers";
 import { trackEvent } from "ui/utils/telemetry";
 
 import {

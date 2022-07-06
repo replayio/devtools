@@ -30,16 +30,6 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-export function updateDocument(editor, source) {
-  if (!source) {
-    return;
-  }
-
-  const sourceId = source.id;
-  const doc = getDocument(sourceId) || editor.createDocument();
-  editor.replaceDocument(doc);
-}
-
 export function clearEditor(editor) {
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
@@ -70,7 +60,8 @@ export function showErrorMessage(editor, msg) {
 }
 
 function setEditorText(editor, sourceId, content) {
-  const contents = content.value
+  console.log({ sourceId, content });
+  const contents = content
     .split(/\r\n?|\n|\u2028|\u2029/)
     .map(line => {
       if (line.length >= 1000) {

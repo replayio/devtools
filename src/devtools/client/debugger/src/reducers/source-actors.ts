@@ -273,47 +273,6 @@ export function getSourceActors(state: UIState, ids: string[]) {
   return querySourceActorsById(state.sourceActors, ids);
 }
 
-const querySourcesByThreadID = makeReduceAllQuery(resourceAsSourceActor, actors => {
-  return actors.reduce((acc, actor) => {
-    acc[actor.thread] = acc[actor.thread] || [];
-    acc[actor.thread].push(actor);
-    return acc;
-  }, {} as Record<string, SourceActor[]>);
-});
-
-export function getSourceActorsForThread(state: UIState, ids: string[]) {
-  const sourcesByThread = querySourcesByThreadID(state.sourceActors);
-
-  let sources: SourceActor[] = [];
-  for (const id of Array.isArray(ids) ? ids : [ids]) {
-    sources = sources.concat(sourcesByThread[id] || []);
-  }
-  return sources;
-}
-
-const queryThreadsBySourceObject = makeReduceAllQuery<
-  SourceActor,
-  Pick<SourceActor, "thread" | "source">,
-  Record<string, string[]>
->(
-  actor => ({ thread: actor.thread, source: actor.source }),
-  actors =>
-    actors.reduce((acc, { source, thread }) => {
-      let sourceThreads = acc[source];
-      if (!sourceThreads) {
-        sourceThreads = [];
-        acc[source] = sourceThreads;
-      }
-
-      sourceThreads.push(thread);
-      return acc;
-    }, {} as Record<string, string[]>)
-);
-
-export function getAllThreadsBySource(state: UIState) {
-  return queryThreadsBySourceObject(state.sourceActors);
-}
-
 const rangesInclude = (ranges: LineRange[] | undefined, point: number): boolean => {
   return Boolean(ranges?.find(range => range.min <= point && range.max >= point));
 };

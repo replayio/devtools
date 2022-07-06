@@ -83,8 +83,7 @@ function reverseStepOver(point: string, loadedRegions: loadedRegions) {
 }
 
 async function sourceContents({ actor }: { actor: string }) {
-  const threadFront = ThreadFront;
-  const { contents, contentType } = await threadFront.getSourceContents(actor);
+  const { contents, contentType } = await ThreadFront.getSourceContents(actor);
   return { source: contents, contentType };
 }
 

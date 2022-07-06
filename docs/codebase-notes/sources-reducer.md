@@ -209,7 +209,6 @@ Executes `action.updates.forEach(update => sourcesReducer(state, update)`. Simil
 - `getOriginalSourceByURL(state, url)` (alias for `getSpecificSourceByURL`)
 - `getGeneratedSourceByURL(state, url)` (alias for `getSpecificSourceByURL`)
 - `getGeneratedSource(state, source)` (dummy - just `returns source`)
-- `getGeneratedSourceById(state, sourceId)` (alias for `getSourceFromId`)
 - `getPendingSelectedLocation(state)`
 - `getPrettySource(state, id)`
 - `hasPrettySource(state, id)`

@@ -10,6 +10,7 @@
  */
 
 import type { UIThunkAction } from "ui/actions";
+import { experimentalLoadSourceText } from "ui/reducers/sources";
 
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
@@ -113,7 +114,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
     }
 
     // load the source text if there is a pending breakpoint for it
-    await dispatch(loadSourceText({ cx, source }));
+    await dispatch(experimentalLoadSourceText(source.id));
 
     await dispatch(setBreakableLines(cx, source.id));
 

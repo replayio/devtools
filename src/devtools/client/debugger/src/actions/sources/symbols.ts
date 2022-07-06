@@ -11,10 +11,11 @@ import { loadSourceText } from "./loadSourceText";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
+import { experimentalLoadSourceText } from "ui/reducers/sources";
 
 async function doSetSymbols(source: Source, thunkArgs: { dispatch: AppDispatch }) {
   const sourceId = source.id;
-  await thunkArgs.dispatch(loadSourceText({ source }));
+  await thunkArgs.dispatch(experimentalLoadSourceText(sourceId));
 
   await thunkArgs.dispatch({
     type: "SET_SYMBOLS",

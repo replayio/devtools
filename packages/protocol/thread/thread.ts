@@ -124,7 +124,7 @@ export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void
   repaintAfterEvaluationsExperimentalFlag = value;
 }
 
-class _ThreadFront {
+export class _ThreadFront {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
   actor: string = "MainThreadId";
@@ -374,6 +374,20 @@ class _ThreadFront {
     this.emit("paused", { point, hasFrames, time });
   }
 
+  _newSourceListener(source: newSource) {
+    let { sourceId, kind, url, generatedSourceIds, contentHash } = source;
+    this.sources.set(sourceId, { contentHash, generatedSourceIds, kind, url });
+    if (url) {
+      this.urlSources.add(url, sourceId);
+    }
+    for (const generatedId of generatedSourceIds || []) {
+      this.originalSources.add(generatedId, sourceId);
+    }
+    const waiters = this.sourceWaiters.map.get(sourceId);
+    (waiters || []).forEach(resolve => resolve());
+    this.sourceWaiters.map.delete(sourceId);
+  }
+
   async findSources(onSource: (source: newSource) => void) {
     const sessionId = await this.waitForSession();
     this.onSource = onSource;
@@ -383,19 +397,7 @@ class _ThreadFront {
       this.groupSourceIds();
       this.allSourcesWaiter.resolve();
     });
-    client.Debugger.addNewSourceListener(source => {
-      let { sourceId, kind, url, generatedSourceIds, contentHash } = source;
-      this.sources.set(sourceId, { contentHash, generatedSourceIds, kind, url });
-      if (url) {
-        this.urlSources.add(url, sourceId);
-      }
-      for (const generatedId of generatedSourceIds || []) {
-        this.originalSources.add(generatedId, sourceId);
-      }
-      const waiters = this.sourceWaiters.map.get(sourceId);
-      (waiters || []).forEach(resolve => resolve());
-      this.sourceWaiters.map.delete(sourceId);
-    });
+    client.Debugger.addNewSourceListener(s => this._newSourceListener(s));
 
     await this.ensureAllSources();
     for (const [sourceId, source] of this.sources) {
@@ -511,7 +513,7 @@ class _ThreadFront {
       params.range = { begin: range.beginPoint, end: range.endPoint };
     }
 
-    const sourceIds = this.getCorrespondingSourceIds(sourceId); // ensure source is loaded
+    const sourceIds = this.getCorrespondingSourceIds(sourceId);
 
     const hitCountsForSources = await Promise.all(
       sourceIds.map(id =>
@@ -1285,7 +1287,7 @@ class _ThreadFront {
   }
 
   // Try to group identical sources together and save the result in `correspondingSourceIds`
-  private groupSourceIds() {
+  groupSourceIds() {
     for (const [sourceId, source] of this.sources.entries()) {
       if (!source.url) {
         this.correspondingSourceIds.set(sourceId, [sourceId]);

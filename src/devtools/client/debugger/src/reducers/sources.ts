@@ -1,5 +1,4 @@
 import type { AnyAction, Action } from "@reduxjs/toolkit";
-import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
 import type { UIState } from "ui/state";
 
@@ -434,14 +433,6 @@ export function getBlackBoxList(): string[] {
 
 const getSourcesState = (state: UIState) => state.sources;
 
-export function getSourceThreads(state: UIState, source: Source) {
-  return uniq(
-    getSourceActors(state, state.sources.actors[source.id]).map(
-      (actor: SourceActor) => actor.thread
-    )
-  );
-}
-
 export function getSourceInSources(sources: ResourceState<Source>, id: string) {
   return hasResource(sources, id) ? getMappedResource(sources, id, resourceAsSourceBase) : null;
 }
@@ -516,10 +507,6 @@ export function getGeneratedSource(state: UIState, source: Source) {
   }
 
   return source;
-}
-
-export function getGeneratedSourceById(state: UIState, sourceId: string) {
-  return getSourceFromId(state, sourceId);
 }
 
 export function getPendingSelectedLocation(state: UIState) {
@@ -616,14 +603,27 @@ export const getSelectedSource = createSelector(
   }
 );
 
+// export const getSelectedSourceWithContent = createSelector(
+//   getSelectedLocation,
+//   getSources,
+//   (selectedLocation, sources) => {
+//     const source = selectedLocation && getSourceInSources(sources, selectedLocation.sourceId!);
+//     return source ? getMappedResource(sources, source.id, resourceAsSourceWithContent) : null;
+//   }
+// );
+
 export const getSelectedSourceWithContent = createSelector(
-  getSelectedLocation,
-  getSources,
-  (selectedLocation, sources) => {
-    const source = selectedLocation && getSourceInSources(sources, selectedLocation.sourceId!);
-    return source ? getMappedResource(sources, source.id, resourceAsSourceWithContent) : null;
+  getSelectedSource,
+  (state: UIState) => state.experimentalSources.contents.entities,
+  (source, contents) => {
+    if (!source) {
+      return null;
+    }
+
+    return contents[source.id];
   }
 );
+
 export function getSourceWithContent(state: UIState, id: string) {
   return getMappedResource(state.sources.sources, id, resourceAsSourceWithContent);
 }
@@ -668,18 +668,6 @@ export function getSourceActorsForSource(state: UIState, id: string) {
   }
 
   return getSourceActors(state, actors);
-}
-
-export function canLoadSource(state: UIState, sourceId: string) {
-  // Return false if we know that loadSourceText() will fail if called on this
-  // source. This is used to avoid viewing such sources in the debugger.
-  const source = getSource(state, sourceId);
-  if (!source) {
-    return false;
-  }
-
-  const actors = getSourceActorsForSource(state, sourceId);
-  return actors.length != 0;
 }
 
 export function isSourceWithMap(state: UIState, id: string): boolean {
