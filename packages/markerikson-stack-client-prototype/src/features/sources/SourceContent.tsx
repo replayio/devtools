@@ -14,7 +14,7 @@ import {
 } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
-import { pointSelected } from "./sourcesSlice";
+import { pointSelected } from "./selectedSourcesSlice";
 
 export const SourceContent = () => {
   const [selectedLocation, setSelectedLocation] = useState<Pick<
@@ -22,8 +22,8 @@ export const SourceContent = () => {
     "line" | "column"
   > | null>(null);
   const dispatch = useAppDispatch();
-  const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
-  const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
+  const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
+  const selectedPoint = useAppSelector(state => state.selectedSources.selectedPoint);
 
   const { currentData: sourceText } = useGetSourceTextQuery(
     selectedSourceId ? selectedSourceId : skipToken

@@ -36,13 +36,14 @@ const CACHE_DATA_PERMANENTLY = 10 * 365 * 24 * 60 * 60;
 export const api = createApi({
   baseQuery: fakeBaseQuery(),
   endpoints: build => ({
-    getSources: build.query<SourceGroups, void>({
+    getSources: build.query<newSource[], void>({
       queryFn: async () => {
         const sources: newSource[] = [];
 
         // Fetch the sources
         client.Debugger.addNewSourceListener(source => sources.push(source));
         await client.Debugger.findSources({}, sessionId);
+        /*
         const sourceGroups: SourceGroups = {
           src: [],
           node_modules: [],
@@ -64,8 +65,9 @@ export const api = createApi({
             sourceGroups.other.push(entry);
           }
         });
+        */
 
-        return { data: sourceGroups };
+        return { data: sources };
       },
       keepUnusedDataFor: CACHE_DATA_PERMANENTLY,
     }),

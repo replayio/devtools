@@ -1,27 +1,31 @@
 import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
 
-import { sourceEntrySelected } from "./sourcesSlice";
-import { getSourceGroups } from "./sourcesCache";
+import { sourceEntrySelected } from "./selectedSourcesSlice";
+import { getSourceDetails } from "./sourcesCache";
 
 export const SourcesList = () => {
   const dispatch = useAppDispatch();
-  const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
+  const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
   const store = useAppStore();
 
-  const data = getSourceGroups(store);
+  const sourceDetails = getSourceDetails(store);
 
   return (
     <ul>
-      {data?.src.map(entry => {
-        const isSelected = selectedSourceId === entry.sourceId;
-        let entryText: React.ReactNode = new URL(entry.url!).pathname;
+      {sourceDetails.map(entry => {
+        const isSelected = selectedSourceId === entry.id;
+        let entryText: React.ReactNode = "Unknown URL";
+
+        if (entry.url) {
+          entryText = new URL(entry.url!).pathname;
+        }
         if (isSelected) {
           entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
         }
 
-        const onLineClicked = () => dispatch(sourceEntrySelected(entry.sourceId));
+        const onLineClicked = () => dispatch(sourceEntrySelected(entry.id));
         return (
-          <li key={entry.sourceId} onClick={onLineClicked}>
+          <li key={entry.id} onClick={onLineClicked}>
             {entryText} ({entry.kind})
           </li>
         );

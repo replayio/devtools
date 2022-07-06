@@ -2,6 +2,7 @@ import { unstable_getCacheForType as getCacheForType } from "react";
 import type { AppStore } from "../../app/store";
 
 import { api, SourceGroups } from "../../app/api";
+import { selectSourceDetails, SourceDetails } from "./sourcesSlice";
 
 /*
  * This entire file is _mostly_ WIP PROOF OF CONCEPT!
@@ -33,23 +34,24 @@ import { api, SourceGroups } from "../../app/api";
 
 // We know there's only one cache entry, since it's a "list of things" query.
 // Create a selector to read that cache entry from the Redux store.
-const selectSourceGroupsEntry = api.endpoints.getSources.select();
+const selectGetSourcesEntry = api.endpoints.getSources.select();
 
 // Use module-scoped variables for the cache, since this is a one-shot retrieval
 let hasPromiseListenerBeenAttached = false;
-let sourceGroups: SourceGroups | null = null;
+let sourceDetails: SourceDetails[] | null = null;
 
-export function getSourceGroups(store: AppStore): SourceGroups {
-  if (sourceGroups !== null) {
-    return sourceGroups;
+export function getSourceDetails(store: AppStore): SourceDetails[] {
+  if (sourceDetails !== null) {
+    return sourceDetails;
   }
 
-  let sourcesEntry: ReturnType<typeof selectSourceGroupsEntry> | undefined =
-    selectSourceGroupsEntry(store.getState());
+  let sourcesEntry: ReturnType<typeof selectGetSourcesEntry> | undefined = selectGetSourcesEntry(
+    store.getState()
+  );
 
   if (!sourcesEntry || sourcesEntry.isUninitialized) {
     store.dispatch(api.endpoints.getSources.initiate());
-    sourcesEntry = selectSourceGroupsEntry(store.getState());
+    sourcesEntry = selectGetSourcesEntry(store.getState());
   }
 
   const promise = api.util.getRunningOperationPromise("getSources", undefined)!;
@@ -57,7 +59,7 @@ export function getSourceGroups(store: AppStore): SourceGroups {
   if (!hasPromiseListenerBeenAttached) {
     hasPromiseListenerBeenAttached = true;
     promise.then(result => {
-      sourceGroups = result.data as SourceGroups;
+      sourceDetails = selectSourceDetails(store.getState());
     });
   }
 

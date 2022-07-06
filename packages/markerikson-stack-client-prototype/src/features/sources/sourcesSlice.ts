@@ -12,6 +12,8 @@ import omit from "lodash/omit";
 
 import type { AppState } from "../../app/store";
 
+import { api } from "../../app/api";
+
 export interface SourceDetails {
   canonicalId: string;
   correspondingSourceIds: string[];
@@ -43,6 +45,7 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
+    /*
     addSources: (state, action: PayloadAction<newSource[]>) => {
       // Store the raw protocol information. Once we have recieved all sources
       // we will run over this and build it into the shape we want.
@@ -54,11 +57,27 @@ const sourcesSlice = createSlice({
         newSourcesToCompleteSourceDetails(sourceSelectors.selectAll(state.sources))
       );
     },
+    */
+  },
+  extraReducers: builder => {
+    // Technically this could just be a `createReducer` now, but oh well
+    builder.addMatcher(api.endpoints.getSources.matchFulfilled, (state, action) => {
+      // TODO We really don't even need this if it's in RTKQ already
+      // and we're processing them all at once instead of trickling in
+      sourcesAdapter.addMany(state.sources, action.payload);
+
+      sourceDetailsAdapter.addMany(
+        state.sourceDetails,
+        newSourcesToCompleteSourceDetails(sourceSelectors.selectAll(state.sources))
+      );
+    });
   },
 });
 
+export default sourcesSlice.reducer;
+
 export const getSelectedSourceDetails = createSelector(
-  (state: AppState) => state.sourceDetails.sourceDetails,
+  (state: AppState) => state.sources.sourceDetails,
   (state: AppState) => state.selectedSources.selectedSourceId,
   (sourceDetails, id) => {
     if (id === null || id === undefined) {
@@ -69,8 +88,14 @@ export const getSelectedSourceDetails = createSelector(
   }
 );
 
-export const { addSources, allSourcesReceived } = sourcesSlice.actions;
-export default sourcesSlice.reducer;
+export const { selectAll: selectSourceDetails } = sourceDetailsAdapter.getSelectors(
+  (state: AppState) => state.sources.sourceDetails
+);
+
+export const selectLikelyAppOriginalSources = createSelector(
+  selectSourceDetails,
+  sourceDetails => {}
+);
 
 export interface Graph {
   addNode(node: string): void;
