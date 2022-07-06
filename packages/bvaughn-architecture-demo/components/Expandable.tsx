@@ -32,9 +32,9 @@ export default function Expandable({
         role="button"
         data-test-name="ExpandablePreview"
       >
-        <div className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
+        <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
-        </div>
+        </span>
         {header}
       </div>
 

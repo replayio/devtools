@@ -49,23 +49,27 @@
 }
 
 .PrimaryRow {
-  display: flex;
   width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: 1fr;
+  grid-column-gap: 1ch;
+  grid-row-gap: 0px;
 }
 
 .LogContents {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 0.5ch;
   flex: 1 1 100%;
 }
 
 .Source {
-  flex: 0 1 25%;
-  display: flex;
+  flex: 1 1 100%;
+  display: inline;
+  text-align: right;
   opacity: 0.75;
-  white-space: pre;
-  overflow: hidden;
 }
 .Source:hover {
   opacity: 1;

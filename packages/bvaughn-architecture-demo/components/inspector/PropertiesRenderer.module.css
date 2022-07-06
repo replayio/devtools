@@ -1,16 +1,8 @@
 .Bucket,
 .Prototype {
   color: var(--object-inspector-prototype-color);
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: flex-start;
+  display: inline;
   min-height: 1rem;
-}
-.PrototypeName::after {
-  content: ":";
-  margin-right: 1ch;
-  color: var(--object-inspector-separator-color);
 }
 
 .BucketLabel {
@@ -24,15 +16,14 @@
 .MapEntryPrefix {
   color: var(--object-inspector-expanded-key);
 }
-.MapEntryPrefix::after {
-  content: ":";
-  color: var(--object-inspector-separator-color);
-  margin-right: 0.5ch;
-}
 
 .NoEntries {
   color: var(--object-inspector-prototype-color);
   font-style: italic;
   min-height: 1rem;
   padding-left: calc(0.5rem + 0.5ch);
+}
+
+.Separator {
+  color: var(--object-inspector-separator-color);
 }

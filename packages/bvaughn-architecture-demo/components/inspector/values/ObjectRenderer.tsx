@@ -18,11 +18,14 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
   const showOverflowMarker =
     object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
 
+  const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+
   return (
     <>
       {className !== "Object" ? className : null}
       <div className={styles.ObjectPropertyList}>
-        {properties.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
+        {"{"}
+        {slice.map((property, index) => (
           <span key={index} className={styles.Value}>
             <KeyValueRenderer
               enableInspection={false}
@@ -31,8 +34,10 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
               pauseId={pauseId}
               protocolValue={property}
             />
+            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
           </span>
         ))}
+        {"}"}
         {showOverflowMarker && <span className={styles.Property}>…</span>}
       </div>
     </>

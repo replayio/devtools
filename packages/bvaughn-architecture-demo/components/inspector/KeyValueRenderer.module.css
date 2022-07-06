@@ -1,5 +1,5 @@
 .KeyValue {
-  display: flex;
+  display: inline;
 }
 
 .HorizontalName {
@@ -11,14 +11,11 @@
 .VerticalNameWithFlag {
   color: var(--object-inspector-expanded-key-with-flag);
 }
-.HorizontalName::after,
-.VerticalName::after,
-.VerticalNameWithFlag::after {
-  content: ":";
-  margin-right: 0.5ch;
-  color: var(--object-inspector-separator-color);
-}
 
 .ToggleAlignmentPadding {
   margin-left: 1rem;
+}
+
+.Separator {
+  color: var(--object-inspector-separator-color);
 }

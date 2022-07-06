@@ -81,7 +81,12 @@ export default function KeyValueRenderer({
                   before={
                     <>
                       {before}
-                      {name != null ? <span className={styles.VerticalName}>{name}</span> : null}
+                      {name != null ? (
+                        <>
+                          <span className={styles.VerticalName}>{name}</span>
+                          <span className={styles.Separator}>: </span>
+                        </>
+                      ) : null}
                     </>
                   }
                   object={objectWithPreview!}
@@ -119,7 +124,12 @@ export default function KeyValueRenderer({
       data-test-id="KeyValue"
     >
       {before}
-      {name != null ? <span className={nameClass}>{name}</span> : null}
+      {name != null ? (
+        <>
+          <span className={nameClass}>{name}</span>
+          <span className={styles.Separator}>: </span>
+        </>
+      ) : null}
       <ValueRenderer
         isNested={isNested}
         layout={layout}

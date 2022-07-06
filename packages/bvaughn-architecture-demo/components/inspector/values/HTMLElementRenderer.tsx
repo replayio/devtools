@@ -64,16 +64,24 @@ export default function HTMLElementRenderer({
   return (
     <>
       {showOpeningTag && (
-        <div className={styles.HTMLOpeningTag}>
+        <span className={styles.HTMLOpeningTag}>
+          <span className={styles.Bracket}>&lt;</span>
           {tagName}
           {properties.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
             <HTMLAttributeRenderer key={index} pauseId={pauseId} protocolValue={property} />
           ))}
           {showOverflowMarker && <span className={styles.Value}>…</span>}
-        </div>
+          <span className={styles.Bracket}>&gt;</span>
+        </span>
       )}
-      {showInlineText && <div className={styles.HtmlText}>{inlineText || "…"}</div>}
-      {showClosingTag && <div className={styles.HTMLClosingTag}>{tagName}</div>}
+      {showInlineText && <span className={styles.HtmlText}>{inlineText || "…"}</span>}
+      {showClosingTag && (
+        <span className={styles.HTMLClosingTag}>
+          <span className={styles.Bracket}>&lt;</span>
+          {tagName}
+          <span className={styles.Bracket}>&gt;</span>
+        </span>
+      )}
     </>
   );
 }
@@ -90,7 +98,8 @@ function HTMLAttributeRenderer({
   return (
     <span className={styles.HtmlAttribute}>
       <span className={styles.HtmlAttributeName}>{clientValue.name}</span>
-      <span className={styles.HtmlAttributeValue}>{protocolValue.value!}</span>
+      <span className={styles.Separator}>=</span>
+      <span className={styles.HtmlAttributeValue}>"{protocolValue.value!}"</span>
     </span>
   );
 }

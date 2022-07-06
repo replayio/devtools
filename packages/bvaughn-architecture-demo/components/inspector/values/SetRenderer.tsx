@@ -14,20 +14,24 @@ export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererPr
   const { containerEntries = [], containerEntryCount = 0, overflow = false } = object.preview || {};
   const showOverflowMarker = overflow || containerEntries.length > MAX_PROPERTIES_TO_PREVIEW;
 
+  const slice = containerEntries.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+
   if (containerEntryCount === 0) {
     return <>{object.className} (0)</>;
   } else {
     return (
       <>
         {object.className}
-        <div className={styles.ArrayLength}>({containerEntryCount})</div>
+        <span className={styles.ArrayLength}>({containerEntryCount})</span>
         <span className={styles.ArrayPropertyList}>
-          {containerEntries.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
+          [
+          {slice.map((property, index) => (
             <span key={index} className={styles.Value}>
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property.value} />
+              {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
             </span>
           ))}
-          {showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
+          ]{showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
         </span>
       </>
     );
