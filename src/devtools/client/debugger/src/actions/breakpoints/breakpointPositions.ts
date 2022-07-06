@@ -100,7 +100,7 @@ async function _setBreakpointPositions(sourceId: string, line: number, thunkArgs
   thunkArgs.dispatch({
     type: "ADD_BREAKPOINT_POSITIONS",
     source,
-    groupedPositions,
+    positions: groupedPositions,
   });
 }
 
