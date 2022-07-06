@@ -59,7 +59,7 @@
 
 .FocusTimeStamps {
   white-space: nowrap;
-  font-size: 14px;
+  font-size: var(--font-size-regular);
   background-color: rgba(255, 255, 255, 0.5);
   border-radius: 4px;
   padding: 2px 4px;

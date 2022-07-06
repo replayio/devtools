@@ -14,22 +14,30 @@ export default function MapRenderer({ object, pauseId }: ObjectPreviewRendererPr
   const { containerEntries = [], containerEntryCount = 0, overflow = false } = object.preview || {};
   const showOverflowMarker = overflow || containerEntries.length > MAX_PROPERTIES_TO_PREVIEW;
 
+  const slice = containerEntries.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+
   if (containerEntryCount === 0) {
     return <>{object.className} (0)</>;
   } else {
     return (
       <>
         {object.className}
-        <div className={styles.ArrayLength}>({containerEntryCount})</div>
-        <div className={styles.ObjectPropertyList}>
-          {containerEntries.slice(0, MAX_PROPERTIES_TO_PREVIEW).map(({ key, value }, index) => (
+        <span className={styles.ArrayLength}>({containerEntryCount})</span>
+        <span className={styles.ObjectPropertyList}>
+          {slice.map(({ key, value }, index) => (
             <span key={index} className={styles.Value}>
-              {key?.value && <span className={styles.MapKey}>{key?.value}</span>}
+              {key?.value && (
+                <>
+                  <span className={styles.MapKey}>{key?.value}</span>
+                  <span className={styles.Separator}> → </span>
+                </>
+              )}
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+              {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
             </span>
           ))}
           {showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
-        </div>
+        </span>
       </>
     );
   }

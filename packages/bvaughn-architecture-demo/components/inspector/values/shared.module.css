@@ -9,10 +9,7 @@
 .String,
 .Symbol,
 .Undefined {
-  display: flex;
-  align-items: center;
-  min-height: 1rem;
-  line-height: 1rem;
+  display: inline;
 }
 .BigInt {
   color: var(--value-type-bigint);
@@ -68,108 +65,53 @@
 }
 
 .ArrayPropertyList {
-  display: flex;
-  flex-wrap: wrap;
-}
-.ArrayPropertyList::before {
-  content: "[";
-  margin-left: 1ch;
-}
-.ArrayPropertyList::after {
-  content: "]";
+  display: inline;
 }
 
 .FunctionParametersList {
-  display: flex;
-  flex-wrap: wrap;
+  display: inline;
   color: var(--object-inspector-function-name);
-}
-.FunctionParametersList::before {
-  content: "(";
-}
-.FunctionParametersList::after {
-  content: ")";
 }
 
 .ObjectPropertyList {
-  display: flex;
-  flex-wrap: wrap;
-}
-.ObjectPropertyList::before {
-  content: "{";
-  margin-left: 1ch;
-}
-.ObjectPropertyList::after {
-  content: "}";
+  display: inline;
 }
 
 .MapKey {
-  display: flex;
+  display: inline;
   color: var(--object-inspector-expanded-key);
-}
-.MapKey::after {
-  color: var(--object-inspector-separator-color);
-  content: "→";
-  margin-left: 1ch;
-  margin-right: 1ch;
 }
 
 .Value {
-  display: flex;
+  display: inline;
 }
-.Value::after {
+
+.Separator {
   color: var(--object-inspector-separator-color);
-  content: ",";
-  margin-right: 1ch;
-}
-.Value:last-of-type::after {
-  content: "";
-  margin-right: 0;
 }
 
 .HTMLClosingTag,
 .HTMLOpeningTag {
   color: var(--value-type-html-tag);
-  display: flex;
-  min-height: 1rem;
   line-height: 1rem;
 }
-.HTMLOpeningTag::before,
-.HTMLOpeningTag::after,
-.HTMLClosingTag::before,
-.HTMLClosingTag::after {
+
+.Bracket {
   color: var(--value-type-html-tag-bracket);
-}
-.HTMLOpeningTag::before {
-  content: "<";
-}
-.HTMLOpeningTag::after {
-  content: ">";
-}
-.HTMLClosingTag::before {
-  content: "</";
-}
-.HTMLClosingTag::after {
-  content: ">";
 }
 
 .HtmlAttribute {
-  display: flex;
+  display: inline;
   margin-left: 1ch;
   color: var(--value-type-html-attribute-name);
 }
 
-.HtmlAttributeName::after {
-  content: "=";
+.Separator {
   color: var(--value-type-html-attribute-separator);
 }
 
 .HtmlAttributeValue {
   color: var(--value-type-html-attribute-value);
-}
-.HtmlAttributeValue::after,
-.HtmlAttributeValue::before {
-  content: '"';
 }
 
 .HtmlText {

@@ -75,16 +75,7 @@
   white-space: nowrap;
   width: 100%;
 }
-.HitPointsList::before {
-  content: "Hits:";
-}
 
 .HitPointListItem {
   list-style-type: none;
-}
-.HitPointListItem::after {
-  content: ", ";
-}
-.HitPointListItem:last-of-type:after {
-  content: "";
 }

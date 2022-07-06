@@ -19,17 +19,21 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
     alert("Source viewer is not implemented yet");
   };
 
+  const slice = functionParameterNames.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+
   return (
     <>
       <span className={styles.FunctionKeyword}>ƒ</span>
       <span className={styles.FunctionName}>{functionName}</span>
       <span className={styles.FunctionParametersList}>
-        {functionParameterNames.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((parameterName, index) => (
+        (
+        {slice.map((parameterName, index) => (
           <span key={index} className={styles.Value}>
             {parameterName}
+            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
           </span>
         ))}
-        {showOverflowMarker && <span className={styles.Value}>…</span>}
+        ){showOverflowMarker && <span className={styles.Value}>…</span>}
       </span>
       <button className={styles.IconButton} onClick={jumpToDefinition}>
         <Icon className={styles.JumpToDefinitionIcon} type="jump-to-definition" />

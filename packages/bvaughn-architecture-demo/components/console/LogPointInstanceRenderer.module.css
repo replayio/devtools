@@ -21,21 +21,27 @@
 }
 
 .PrimaryRow {
-  display: flex;
   width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, auto);
+  grid-template-rows: 1fr;
+  grid-column-gap: 1ch;
+  grid-row-gap: 0px;
 }
 
 .LogContents {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: 0.5ch;
-  width: 100%;
+  flex: 1 1 100%;
 }
 
 .Source {
-  flex: 0 0 auto;
+  flex: 1 1 100%;
   display: flex;
   opacity: 0.75;
+  overflow: hidden;
 }
 .Source:hover {
   opacity: 1;
@@ -43,5 +49,5 @@
 
 .TimeStamp {
   color: var(--color-dim);
-  font-size: 0.8rem;
+  font-size: var(--font-size-small);
 }

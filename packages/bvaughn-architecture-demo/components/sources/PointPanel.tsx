@@ -82,11 +82,14 @@ export default function PointPanel({ className, point }: { className: string; po
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const hitPoints = getHitPointsForLocation(client, point.location);
+
   return (
     <ul className={styles.HitPointsList}>
-      {hitPoints.map(point => (
+      <li className={styles.HitPointListItem}>Hits:</li>
+      {hitPoints.map((point, index) => (
         <li key={point.point} className={styles.HitPointListItem}>
           {point.time} ms
+          {index < hitPoints.length - 1 && ", "}
         </li>
       ))}
     </ul>

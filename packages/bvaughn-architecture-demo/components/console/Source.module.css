@@ -1,4 +1,5 @@
 .Source {
   cursor: pointer;
   text-decoration: underline;
+  flex-shrink: 1;
 }

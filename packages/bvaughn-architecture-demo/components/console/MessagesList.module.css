@@ -2,9 +2,10 @@
 .ContainerPending {
   flex: 1 1 auto;
   position: relative;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   font-family: Menlo, Consolas, monospace;
-  font-size: 14px;
+  font-size: var(--font-size-regular);
 }
 .ContainerPending {
   opacity: 0.5;

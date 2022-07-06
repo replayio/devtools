@@ -118,7 +118,7 @@ export default function PropertiesRenderer({
           children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
           header={
             <span className={styles.Prototype}>
-              <span className={styles.PrototypeName}>[[Prototype]]</span>
+              <span className={styles.PrototypeName}>[[Prototype]]: </span>
               {prototype !== null ? prototype.className : null}
             </span>
           }
@@ -198,14 +198,24 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           children={
             <>
               <KeyValueRenderer
-                before={<div className={styles.MapEntryPrefix}>key</div>}
+                before={
+                  <>
+                    <span className={styles.MapEntryPrefix}>key</span>
+                    <span className={styles.Separator}>: </span>
+                  </>
+                }
                 isNested={true}
                 layout="vertical"
                 pauseId={pauseId}
                 protocolValue={key!}
               />
               <KeyValueRenderer
-                before={<div className={styles.MapEntryPrefix}>value</div>}
+                before={
+                  <>
+                    <span className={styles.MapEntryPrefix}>value</span>
+                    <span className={styles.Separator}>: </span>
+                  </>
+                }
                 isNested={true}
                 layout="vertical"
                 pauseId={pauseId}
@@ -259,7 +269,12 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           key={index}
           children={
             <KeyValueRenderer
-              before={<div className={styles.MapEntryPrefix}>value</div>}
+              before={
+                <>
+                  <span className={styles.MapEntryPrefix}>value</span>
+                  <span className={styles.Separator}>: </span>
+                </>
+              }
               isNested={true}
               layout="vertical"
               pauseId={pauseId}

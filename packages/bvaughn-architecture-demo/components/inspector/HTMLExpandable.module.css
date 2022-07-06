@@ -9,8 +9,7 @@
 
 .PreviewRow {
   color: var(--value-type-object);
-  display: flex;
-  align-items: flex-start;
+  display: inline;
   min-height: 1rem;
 }
 
@@ -26,6 +25,7 @@
   height: 1rem;
   transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
+  display: inline-block;
 }
 .ArrowExpanded {
   transform: rotate(90deg);
@@ -40,6 +40,8 @@
 .Children {
   margin-left: 0.5rem;
   padding-left: 0.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .FooterCollapsed {

@@ -19,17 +19,21 @@ export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRenderer
   const getterValue = object.preview?.getterValues?.find(({ name }) => name === "length");
   const length = getterValue?.value || 0;
 
+  const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+
   return (
     <>
       Array
-      {length > 0 && <div className={styles.ArrayLength}>({length})</div>}
+      {length > 0 && <span className={styles.ArrayLength}>({length})</span>}
       <span className={styles.ArrayPropertyList}>
-        {properties.slice(0, MAX_PROPERTIES_TO_PREVIEW).map((property, index) => (
+        [
+        {slice.map((property, index) => (
           <span key={index} className={styles.Value}>
             <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property} />
+            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
           </span>
         ))}
-        {showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
+        ]{showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
       </span>
     </>
   );

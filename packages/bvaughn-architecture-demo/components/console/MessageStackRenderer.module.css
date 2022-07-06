@@ -1,6 +1,6 @@
 .StackGrid {
   display: inline-grid;
-  grid-template-columns: auto auto;
+  grid-template-columns: auto 100%;
   grid-column-gap: 1ch;
 }
 

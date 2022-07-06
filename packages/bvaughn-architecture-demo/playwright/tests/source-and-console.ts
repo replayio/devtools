@@ -72,7 +72,7 @@ test("should support log points that require remote analysis", async ({ page }) 
   await takeScreenshot(page, message, "remote-analysis-log-point-expanded-console");
 });
 
-test.only("should gracefully handle invalid remote analysis", async ({ page }) => {
+test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await openSourceTab(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "z");
