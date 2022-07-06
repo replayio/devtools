@@ -19,18 +19,8 @@ function pingTestMetrics(
     recorded: boolean;
   }
 ) {
-  const body = JSON.stringify(
-    {
-      type: "test.finished",
-      recordingId,
-      test,
-    },
-    undefined,
-    2
-  );
-
-  const webhookUrl = process.env.RECORD_REPLAY_WEBHOOK_URL;
   const runId = process.env.TEST_RUN_ID;
+  const webhookUrl = process.env.RECORD_REPLAY_WEBHOOK_URL;
 
   try {
     if (!webhookUrl) {
@@ -42,6 +32,17 @@ function pingTestMetrics(
       console.log("TEST_RUN_ID is undefined. Skipping test metrics");
       return;
     }
+
+    const body = JSON.stringify(
+      {
+        type: "test.finished",
+        recordingId,
+        runId,
+        test,
+      },
+      undefined,
+      2
+    );
 
     return fetch(`${webhookUrl}/api/metrics`, {
       method: "POST",
