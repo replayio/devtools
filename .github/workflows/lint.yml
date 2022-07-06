@@ -1,6 +1,11 @@
 name: Lint
 
-on: [pull_request, workflow_dispatch]
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   trunk_check_runner:
@@ -24,7 +29,7 @@ jobs:
       # Actually install packages with Yarn
       - name: Install packages
         run: yarn install
-      env:
-        YARN_CHECKSUM_BEHAVIOR: "update"
+        env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Trunk Check
         uses: trunk-io/trunk-action@v1.0.1
