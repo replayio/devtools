@@ -5,7 +5,7 @@ import styles from "../styles/Home.module.css";
 import { SessionContext } from "../contexts/SessionContext";
 
 import Loader from "../components/Loader";
-import { SourcesList } from "../features/sources/SourcesList";
+import { SourcesTree } from "../features/sourcesTree/SourcesTree";
 import { SourceContent } from "../features/sources/SourceContent";
 
 const IndexPage: NextPage = () => {
@@ -25,7 +25,7 @@ const IndexPage: NextPage = () => {
         <div style={{ minWidth: 300 }}>
           <h2>Sources Entries</h2>
           <Suspense fallback={<Loader />}>
-            <SourcesList />
+            <SourcesTree />
           </Suspense>
         </div>
         <div style={{ marginLeft: 10 }}>

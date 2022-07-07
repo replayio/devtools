@@ -1,6 +1,6 @@
 import util from "util";
 import { SourceDetails } from "../../sources/sourcesSlice";
-import { parse } from "../treeUtils";
+import { parseSourcesTree } from "../treeUtils";
 
 /*
 replay-content:///react-devtools-hook-script
@@ -1489,7 +1489,7 @@ describe("parse sources tree", () => {
   test("Does something useful", () => {
     const initialItems = urls.map(url => ({ url } as SourceDetails));
 
-    const tree = parse(initialItems);
+    const tree = parseSourcesTree(initialItems);
     console.log("Tree: ", util.inspect(tree, { depth: Infinity }));
   });
 });
