@@ -17037,6 +17037,7 @@ __metadata:
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.8.1
+    bvaughn-architecture-demo: "workspace:*"
     jest: ^28.0.2
     jest-environment-jsdom: ^28.0.2
     lodash: ^4.17.21
