@@ -37,6 +37,8 @@ export interface SourcesState {
   sources: EntityState<newSource>;
 }
 
+export type SourceDetailsEntities = SourcesState["sourceDetails"]["entities"];
+
 const initialState: SourcesState = {
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
