@@ -1,17 +1,9 @@
-import type { EventTypeToCountMap } from "@bvaughn/src/suspense/EventsCache";
+import type { Event } from "@bvaughn/src/suspense/EventsCache";
 import { useState } from "react";
 
 import styles from "./EventType.module.css";
 
-export default function EventType({
-  eventCategoryCounts,
-  eventType,
-  label,
-}: {
-  eventCategoryCounts: EventTypeToCountMap;
-  eventType: string;
-  label: string;
-}) {
+export default function EventType({ event }: { event: Event }) {
   const [checked, setChecked] = useState(false);
 
   // TODO (console-filters) Add to Console
@@ -24,8 +16,8 @@ export default function EventType({
         checked={checked}
         onChange={() => setChecked(!checked)}
       />
-      <span className={styles.Label}>{label}</span>
-      <span>{eventCategoryCounts.get(eventType) || 0}</span>
+      <span className={styles.Label}>{event.label}</span>
+      <span className={styles.Count}>{event.count}</span>
     </label>
   );
 }

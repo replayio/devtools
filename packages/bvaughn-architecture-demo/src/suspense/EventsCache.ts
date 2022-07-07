@@ -1,23 +1,32 @@
 import { EventHandlerType } from "@replayio/protocol";
 import { Events, ReplayClientInterface } from "shared/client/types";
-import { EventCategory, STANDARD_EVENT_CATEGORIES } from "../constants";
+import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
 import { Wakeable } from "./types";
 
-export type EventTypeToCountMap = Map<EventHandlerType, number>;
+export type Event = {
+  count: number;
+  label: string;
+  type: EventHandlerType;
+};
+
+export type EventCategory = {
+  category: string;
+  events: Event[];
+};
 
 let events: Events | null = null;
-let eventTypeToCountMap: EventTypeToCountMap | null = null;
-let inProgressEventCategoryCountsWakeable: Wakeable<EventTypeToCountMap> | null = null;
+let eventCategoryCounts: EventCategory[] | null = null;
+let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 let inProgressEventsWakeable: Wakeable<Events> | null = null;
 
-export function getEventCategoryCounts(client: ReplayClientInterface): EventTypeToCountMap {
-  if (eventTypeToCountMap !== null) {
-    return eventTypeToCountMap;
+export function getEventCategoryCounts(client: ReplayClientInterface): EventCategory[] {
+  if (eventCategoryCounts !== null) {
+    return eventCategoryCounts;
   }
 
   if (inProgressEventCategoryCountsWakeable === null) {
-    inProgressEventCategoryCountsWakeable = createWakeable<EventTypeToCountMap>();
+    inProgressEventCategoryCountsWakeable = createWakeable<EventCategory[]>();
 
     fetchEventCategoryCounts(client);
   }
@@ -40,29 +49,35 @@ export function getStandardEventPoints(client: ReplayClientInterface): Events {
 }
 
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
-  eventTypeToCountMap = new Map();
-
-  const eventTypes = STANDARD_EVENT_CATEGORIES.reduce(
-    (eventTypes: EventHandlerType[], current: EventCategory) => {
-      Object.keys(current.eventTypeMap).forEach((eventType: string) => {
-        eventTypes.push(eventType);
-      });
-      return eventTypes;
-    },
-    []
-  );
+  eventCategoryCounts = [];
 
   // Fetch event hit counts in parallel.
-  await Promise.all(
-    eventTypes.map(eventType =>
-      (async () => {
-        const count = await client.getEventCountForType(eventType);
-        eventTypeToCountMap!.set(eventType, count);
-      })()
-    )
-  );
+  const promises = [];
 
-  inProgressEventCategoryCountsWakeable!.resolve(eventTypeToCountMap);
+  STANDARD_EVENT_CATEGORIES.forEach(category => {
+    const categoryWithCounts: EventCategory = {
+      category: category.category,
+      events: [],
+    };
+
+    category.events.forEach(event => {
+      promises.push(
+        (async () => {
+          const count = await client.getEventCountForType(event.type);
+
+          categoryWithCounts.events.push({
+            count,
+            label: event.label,
+            type: event.type,
+          });
+        })()
+      );
+    });
+
+    eventCategoryCounts?.push(categoryWithCounts);
+  });
+
+  inProgressEventCategoryCountsWakeable!.resolve(eventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
 }
 

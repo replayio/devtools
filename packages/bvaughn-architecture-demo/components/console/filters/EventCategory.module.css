@@ -1,4 +1,7 @@
 .Header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
   cursor: pointer;
 }
 
@@ -7,4 +10,9 @@
   flex-direction: column;
   margin-top: 0.25rem;
   gap: 0.5rem;
+}
+
+.Count {
+  font-size: var(--font-size-small);
+  color: var(--color-dim);
 }

@@ -11,3 +11,8 @@
 .Label {
   flex-grow: 1;
 }
+
+.Count {
+  font-size: var(--font-size-small);
+  color: var(--color-dim);
+}

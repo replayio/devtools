@@ -1,6 +1,11 @@
-import { STANDARD_EVENT_CATEGORIES } from "@bvaughn/src/constants";
 import { getEventCategoryCounts, getStandardEventPoints } from "@bvaughn/src/suspense/EventsCache";
-import { useContext } from "react";
+import type {
+  Event as EventType,
+  EventCategory as EventCategoryType,
+} from "@bvaughn/src/suspense/EventsCache";
+import { suspendInParallel } from "@bvaughn/src/utils/suspense";
+import { KeyboardEvent, KeyboardEventKind, MouseEvent, MouseEventKind } from "@replayio/protocol";
+import { useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
@@ -9,12 +14,23 @@ import styles from "./EventsList.module.css";
 export default function EventsList() {
   const client = useContext(ReplayClientContext);
 
-  const { keyboardEvents, mouseEvents, navigationEvents } = getStandardEventPoints(client);
-  // console.log(JSON.stringify({ keyboardEvents, mouseEvents, navigationEvents }, null, 2));
+  const [eventCategoryCounts, standardEventPoints] = suspendInParallel(
+    () => getEventCategoryCounts(client),
+    () => getStandardEventPoints(client)
+  );
 
-  // TODO (console:filters)
-  const eventCategoryCounts = getEventCategoryCounts(client);
-  // console.log("eventCategoryCounts:", eventCategoryCounts);
+  const commonEventCategories = useMemo<EventCategoryType[]>(() => {
+    return [
+      {
+        category: "Keyboard",
+        events: convertEvents(standardEventPoints.keyboardEvents),
+      },
+      {
+        category: "Mouse",
+        events: convertEvents(standardEventPoints.mouseEvents),
+      },
+    ];
+  }, [standardEventPoints]);
 
   // TODO (console:filters)
   // Filter text
@@ -31,13 +47,41 @@ export default function EventsList() {
       {/* TODO (console:filter) Filter input */}
 
       <div className={styles.Header}>Common Events</div>
-      {/* TODO (console:filter) Keyboard events */}
-      {/* TODO (console:filter) Mouse events */}
+      {commonEventCategories.map(eventCategory => (
+        <EventCategory key={eventCategory.category} eventCategory={eventCategory} />
+      ))}
 
       <div className={styles.Header}>Other Events</div>
-      {STANDARD_EVENT_CATEGORIES.map(eventCategory => (
+      {eventCategoryCounts.map(eventCategory => (
         <EventCategory key={eventCategory.category} eventCategory={eventCategory} />
       ))}
     </div>
   );
+}
+
+// Helper method to convert–
+// from Protocol events (Session.findKeyboardEvents or Session.findMouseEvents)
+// to a local format used by the EventCategory component
+function convertEvents(events: KeyboardEvent[] | MouseEvent[]): EventType[] {
+  const returnEvents: EventType[] = [];
+  const kindToEventMap = new Map<KeyboardEventKind | MouseEventKind, EventType>();
+
+  events.forEach(({ kind }) => {
+    if (!kindToEventMap.has(kind)) {
+      const eventType: EventType = {
+        count: 1,
+        label: kind,
+        type: kind,
+      };
+
+      kindToEventMap.set(kind, eventType);
+
+      returnEvents.push(eventType);
+    } else {
+      const eventType = kindToEventMap.get(kind)!;
+      eventType.count++;
+    }
+  });
+
+  return returnEvents;
 }
