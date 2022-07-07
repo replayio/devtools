@@ -3,13 +3,17 @@ import type { NextPage } from "next";
 import styles from "../styles/Home.module.css";
 
 import { SessionContext } from "../contexts/SessionContext";
+import { useAppSelector } from "src/app/hooks";
 
 import Loader from "../components/Loader";
 import { SourcesTree } from "../features/sourcesTree/SourcesTree";
 import { SourceContent } from "../features/sources/SourceContent";
+import { SelectedLocationHits } from "../features/sources/SelectedLocationHits";
+import { SelectedPointStackFrames } from "../features/sources/SelectedPointStackFrames";
 
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);
+  const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
   const { currentUserInfo } = sessionData;
 
   return (
@@ -30,7 +34,13 @@ const IndexPage: NextPage = () => {
         </div>
         <div style={{ marginLeft: 10 }}>
           <h2>Source Contents</h2>
-          <SourceContent />
+          <SourceContent key={selectedSourceId} />
+        </div>
+        <div style={{ marginLeft: 10 }}>
+          <SelectedLocationHits />
+        </div>
+        <div style={{ marginLeft: 10 }}>
+          <SelectedPointStackFrames />
         </div>
       </div>
     </div>

@@ -9,9 +9,6 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
 import { locationSelected } from "./selectedSourcesSlice";
 
-import { SelectedLocationHits } from "./SelectedLocationHits";
-import { SelectedPointStackFrames } from "./SelectedPointStackFrames";
-
 export const SourceContent = () => {
   const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
@@ -47,13 +44,6 @@ export const SourceContent = () => {
           style={{ maxHeight: 600, overflowY: "auto", minWidth: 600, maxWidth: 600 }}
           extensions={[domHandler, javascript({ jsx: true })]}
         />
-        <div style={{ marginLeft: 10 }}>
-          <SelectedLocationHits />
-        </div>
-
-        <div style={{ marginLeft: 10 }}>
-          <SelectedPointStackFrames />
-        </div>
       </div>
     </div>
   );
