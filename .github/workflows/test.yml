@@ -142,8 +142,10 @@ jobs:
       id: combine-recordings
       with:
         script: |
+          const fs = require("fs");
+          const path = require("path");
           const shards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
-          return shards.reduce((acc, shard) => {
+          const recordings = shards.reduce((acc, shard) => {
             const file = `recordings-log-${shard}/recordings.json`;
             try {
               const content  = require("fs").readFileSync(file).toString()
@@ -154,9 +156,14 @@ jobs:
 
             return acc;
           }, []);
-    - uses: replayio/action-comment@main
+
+          const output = path.join(process.env.GITHUB_ACTION_PATH, "recordings.log");
+          fs.writeFileSync(JSON.stringify(recordings));
+
+          return output;
+    - uses: replayio/action-comment@ryan/bac-1931-action-upload-should-write-recordings-to
       with:
         api-key: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
         issue-number: ${{ github.event.pull_request.number }}
-        recordings: ${{ steps.combine-recordings.outputs.result }}
+        recordings-path: ${{ steps.combine-recordings.outputs.result }}
         test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}
