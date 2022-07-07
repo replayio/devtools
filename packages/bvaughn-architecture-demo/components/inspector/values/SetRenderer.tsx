@@ -24,14 +24,20 @@ export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererPr
         {object.className}
         <span className={styles.ArrayLength}>({containerEntryCount})</span>
         <span className={styles.ArrayPropertyList}>
-          [
+          {" ["}
           {slice.map((property, index) => (
             <span key={index} className={styles.Value}>
               <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property.value} />
               {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
             </span>
           ))}
-          ]{showOverflowMarker && <span className={styles.ObjectProperty}>…</span>}
+          {showOverflowMarker && (
+            <>
+              <span className={styles.Separator}>, </span>
+              <span className={styles.ObjectProperty}>…</span>
+            </>
+          )}
+          {"]"}
         </span>
       </>
     );

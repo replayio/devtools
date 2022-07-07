@@ -37,8 +37,13 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
             {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
           </span>
         ))}
+        {showOverflowMarker && (
+          <>
+            <span className={styles.Separator}>, </span>
+            <span className={styles.ObjectProperty}>…</span>
+          </>
+        )}
         {"}"}
-        {showOverflowMarker && <span className={styles.Property}>…</span>}
       </div>
     </>
   );

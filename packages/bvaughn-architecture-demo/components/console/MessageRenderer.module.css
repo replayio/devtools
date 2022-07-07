@@ -48,13 +48,17 @@
   color: var(--color-warning);
 }
 
-.PrimaryRow {
+.PrimaryRowWithTimestamps,
+.PrimaryRowWithoutTimestamps {
   width: 100%;
   display: grid;
-  grid-template-columns: repeat(2, auto);
-  grid-template-rows: 1fr;
   grid-column-gap: 1ch;
-  grid-row-gap: 0px;
+}
+.PrimaryRowWithTimestamps {
+  grid-template-columns: min-content auto auto;
+}
+.PrimaryRowWithoutTimestamps {
+  grid-template-columns: auto auto;
 }
 
 .LogContents {
