@@ -4,7 +4,7 @@ import classnames from "classnames";
 import styles from "../styles/Home.module.css";
 
 import { SessionContext } from "../contexts/SessionContext";
-import { useAppSelector } from "src/app/hooks";
+import { useAppSelector } from "../app/hooks";
 
 import Loader from "../components/Loader";
 import { SourcesTree } from "../features/sourcesTree/SourcesTree";

@@ -20,9 +20,12 @@ const sourcesSlice = createSlice({
   reducers: {
     sourceEntrySelected(state, action: PayloadAction<string | null>) {
       state.selectedSourceId = action.payload;
+      state.selectedLocation = null;
+      state.selectedPoint = null;
     },
     locationSelected(state, action: PayloadAction<PartialLocation | null>) {
       state.selectedLocation = action.payload;
+      state.selectedPoint = null;
     },
     pointSelected(state, action: PayloadAction<PointDescription | null>) {
       state.selectedPoint = action.payload;
