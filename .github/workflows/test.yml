@@ -88,6 +88,7 @@ jobs:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
   mock-test:
     name: Mock Tests
     runs-on: macos-latest
@@ -157,5 +158,5 @@ jobs:
       with:
         api-key: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCi
         issue-number: ${{ github.event.pull_request.number }}
-        recordings: ${{ needs.combine-recordings.outputs.result }}
+        recordings: ${{ steps.combine-recordings.outputs.result }}
         test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}
