@@ -83,15 +83,23 @@ function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const hitPoints = getHitPointsForLocation(client, point.location);
 
-  return (
-    <ul className={styles.HitPointsList}>
-      <li className={styles.HitPointListItem}>Hits:</li>
-      {hitPoints.map((point, index) => (
-        <li key={point.point} className={styles.HitPointListItem}>
-          {point.time} ms
-          {index < hitPoints.length - 1 && ", "}
-        </li>
-      ))}
-    </ul>
-  );
+  if (hitPoints.length === 0) {
+    return (
+      <ul className={styles.HitPointsList}>
+        <li className={styles.HitPointListItem}>No hits</li>
+      </ul>
+    );
+  } else {
+    return (
+      <ul className={styles.HitPointsList}>
+        <li className={styles.HitPointListItem}>Hits:</li>
+        {hitPoints.map((point, index) => (
+          <li key={point.point} className={styles.HitPointListItem}>
+            {point.time} ms
+            {index < hitPoints.length - 1 && ", "}
+          </li>
+        ))}
+      </ul>
+    );
+  }
 }

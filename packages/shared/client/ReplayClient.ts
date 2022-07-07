@@ -162,11 +162,24 @@ export class ReplayClient implements ReplayClientInterface {
       );
 
       client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
       client.Analysis.addAnalysisPointsListener(({ points }) => {
-        resolve(points);
+        client.Analysis.removeAnalysisPointsListener();
         client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        clearTimeout(timeoutId);
+
+        resolve(points);
       });
+      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+
+      // TOOD (BAC-1926) Sometimes the protocol won't return any points.
+      // In this case, we should eventually timeout and assume there are none.
+      let timeoutId = setTimeout(() => {
+        client.Analysis.removeAnalysisPointsListener();
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        resolve([]);
+      }, 500);
     });
 
     return data;
