@@ -68,6 +68,7 @@ runs:
     - uses: actions/github-script@v6
       id: recordings-log-path
       with:
+        result-encoding: string
         script: |
           const fs = require("fs");
           const path = require("path");
@@ -75,8 +76,6 @@ runs:
           const output = path.join(process.env.GITHUB_ACTION_PATH, "recordings-${{ steps.log-id.outputs.LOG_ID }}.json");
           fs.writeFileSync(output, JSON.stringify(recordings));
           return output;
-    - run: ls ${{ steps.recordings-log-path.outputs.result }}
-      shell: bash
     - uses: actions/upload-artifact@v3
       with:
         name: recordings-log
