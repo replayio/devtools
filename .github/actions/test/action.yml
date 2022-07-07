@@ -73,10 +73,10 @@ runs:
           const fs = require("fs");
           const path = require("path");
           const recordings = ${{ steps.upload-recordings.outputs.recordings || '[]' }};
-          const output = path.join(process.env.GITHUB_ACTION_PATH, "recordings-${{ steps.log-id.outputs.LOG_ID }}.json");
+          const output = path.join(process.env.GITHUB_ACTION_PATH, "recordings.json");
           fs.writeFileSync(output, JSON.stringify(recordings));
           return output;
     - uses: actions/upload-artifact@v3
       with:
-        name: recordings-log
+        name: recordings-log-${{ steps.log-id.outputs.LOG_ID }}
         path: ${{ steps.recordings-log-path.outputs.result }}
