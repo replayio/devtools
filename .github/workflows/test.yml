@@ -5,8 +5,11 @@ on:
   push:
     branches:
       - main
+permissions:
+  pull-requests: write
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   download-browser:
