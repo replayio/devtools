@@ -9,9 +9,7 @@ import { parseSourcesTree, SourceTreeNode } from "./treeUtils";
 
 import fileIcon from "./images/file-small.svg";
 import folderIcon from "./images/folder.svg";
-import globeIcon from "./images/globe.svg";
-
-console.log(fileIcon);
+import globeIcon from "./images/globe-small.svg";
 
 interface STIProps {
   node: SourceTreeNode;
@@ -42,13 +40,13 @@ const SourcesTreeItem = ({ node }: STIProps) => {
     <Expandable
       header={
         <span>
-          <img src={folderIcon.src} /> {node.name}
+          <img src={node.isRoot ? globeIcon.src : folderIcon.src} /> {node.name}
         </span>
       }
       key={node.name}
     >
       {sortedChildren.map(childNode => {
-        return <SourcesTreeItem node={childNode} key={childNode.name + node.sourceDetails?.id} />;
+        return <SourcesTreeItem node={childNode} key={childNode.name + node.sourceDetails?.url} />;
       })}
     </Expandable>
   );
@@ -70,26 +68,8 @@ export const SourcesTree = () => {
     <>
       <ul>
         {sourcesTree.map(node => {
-          return <SourcesTreeItem node={node} key={node.name + node.sourceDetails?.id} />;
+          return <SourcesTreeItem node={node} key={node.name + node.sourceDetails?.url} />;
         })}
-        {/* {sourceDetails.map(entry => {
-          const isSelected = selectedSourceId === entry.id;
-          let entryText: React.ReactNode = "Unknown URL";
-
-          if (entry.url) {
-            entryText = entry.url; // new URL(entry.url!).pathname;
-          }
-          if (isSelected) {
-            entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
-          }
-
-          const onLineClicked = () => dispatch(sourceEntrySelected(entry.id));
-          return (
-            <li key={entry.id} onClick={onLineClicked}>
-              {entryText}
-            </li>
-          );
-        })} */}
       </ul>
     </>
   );

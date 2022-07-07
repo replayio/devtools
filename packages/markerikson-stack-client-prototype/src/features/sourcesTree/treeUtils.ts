@@ -50,6 +50,7 @@ export function parseSourcesTree(data: SourceDetails[]): SourceTreeNode[] {
   const tree: SourceTreeNode[] = [];
   for (let detailsEntry of data) {
     if (!detailsEntry.url) {
+      console.log("Skipping entry: ", detailsEntry);
       continue;
     }
     const url = new URL(detailsEntry.url);
@@ -57,7 +58,15 @@ export function parseSourcesTree(data: SourceDetails[]): SourceTreeNode[] {
     const realPath = reRealPath.exec(pathname)?.groups?.["realPath"];
     if (realPath) {
       const split: string[] = realPath.split("/");
+      if (hostname) {
+        split.unshift(hostname);
+      } else if (protocol) {
+        split.unshift(protocol);
+      }
+
       createNode(split, tree, true, { protocol, hostname });
+    } else {
+      console.log("No real path: ", detailsEntry);
     }
   }
   return tree;
