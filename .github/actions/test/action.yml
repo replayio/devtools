@@ -75,7 +75,10 @@ runs:
           const recordings = ${{ steps.upload-recordings.outputs.recordings || '[]' }};
           const output = path.join(os.homedir(), "recordings-${{ steps.log-id.outputs.LOG_ID }}.json");
           fs.writeFileSync(output, JSON.stringify(recordings));
+          console.log(">>>", fs.readFileSync(output));
           return output;
+    - run: ls /home/runner
+      shell: bash
     - uses: actions/upload-artifact@v3
       with:
         name: recordings-log
