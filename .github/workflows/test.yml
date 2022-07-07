@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+env:
+  RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
 
 jobs:
   download-browser:
@@ -165,7 +167,7 @@ jobs:
           return output;
     - uses: replayio/action-comment@ryan/bac-1931-action-upload-should-write-recordings-to
       with:
-        api-key: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+        api-key: ${{ env.RECORD_REPLAY_API_KEY }}
         issue-number: ${{ github.event.pull_request.number }}
         recordings-path: ${{ steps.combine-recordings.outputs.result }}
         test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}

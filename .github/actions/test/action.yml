@@ -46,7 +46,6 @@ runs:
     - run: yarn test-e2e --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
-        RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
         RECORD_REPLAY_NODE: replay-node/macOS-replay-node
         RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
@@ -58,7 +57,7 @@ runs:
       id: upload-recordings
       if: ${{ always() && inputs.upload == 'true' }}
       with:
-        apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+        apiKey: ${{ env.RECORD_REPLAY_API_KEY }}
         public: true
         filter: function($v) { $v.metadata.test and $v.status = "onDisk" }
     - name: Get Recording Log ID
