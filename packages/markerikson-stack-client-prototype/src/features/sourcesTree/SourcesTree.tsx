@@ -27,10 +27,15 @@ const sortSourceNodes = (a: SourceTreeNode, b: SourceTreeNode) => {
 };
 
 const SourcesTreeItem = ({ node }: STIProps) => {
-  if (node.children.length === 0) {
+  const dispatch = useAppDispatch();
+
+  if (node.children.length === 0 && node.sourceDetails) {
+    const handleClick = () => {
+      dispatch(sourceEntrySelected(node.sourceDetails!.id));
+    };
     return (
-      <div>
-        <img src={fileIcon.src} /> {node.name}
+      <div onClick={handleClick}>
+        <img src={fileIcon.src} /> {node.name} ({node.sourceDetails!.kind})
       </div>
     );
   }
@@ -46,14 +51,18 @@ const SourcesTreeItem = ({ node }: STIProps) => {
       key={node.name}
     >
       {sortedChildren.map(childNode => {
-        return <SourcesTreeItem node={childNode} key={childNode.name + node.sourceDetails?.url} />;
+        return (
+          <SourcesTreeItem
+            node={childNode}
+            key={childNode.name + childNode.sourceDetails?.url + childNode.sourceDetails?.kind}
+          />
+        );
       })}
     </Expandable>
   );
 };
 
 export const SourcesTree = () => {
-  const dispatch = useAppDispatch();
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
   const store = useAppStore();
 
