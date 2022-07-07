@@ -73,7 +73,7 @@ runs:
           const os = require("os");
           const path = require("path");
           const recordings = ${{ steps.upload-recordings.outputs.recordings || '[]' }};
-          const output = path.join(os.homedir(), "recordings-${{ steps.log-id.outputs.LOG_ID }}.json");
+          const output = path.join(os.tmpdir(), "recordings-${{ steps.log-id.outputs.LOG_ID }}.json");
           fs.writeFileSync(output, JSON.stringify(recordings));
           console.log(">>>", fs.readFileSync(output));
           return output;
