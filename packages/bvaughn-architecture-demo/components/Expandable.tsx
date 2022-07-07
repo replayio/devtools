@@ -1,4 +1,4 @@
-import React, { ReactNode, useState } from "react";
+import React, { KeyboardEvent, MouseEvent, ReactNode, useState } from "react";
 
 import styles from "./Expandable.module.css";
 import Icon from "./Icon";
@@ -19,24 +19,36 @@ export default function Expandable({
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
-  const toggle = (event: React.MouseEvent) => {
+  const onClick = (event: MouseEvent) => {
     event.stopPropagation();
     setIsOpen(!isOpen);
   };
 
+  const onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "Enter":
+      case " ":
+        event.stopPropagation();
+        setIsOpen(!isOpen);
+        break;
+    }
+  };
+
   return (
     <div className={`${styles.Expandable} ${className}`} data-test-name="Expandable">
-      <button
+      <div
         className={styles.ToggleButton}
         data-test-name="ExpandablePreview"
-        onClick={toggle}
+        onClick={onClick}
+        onKeyDown={onKeyDown}
         role="button"
+        tabIndex={0}
       >
         <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
         </span>
         {header}
-      </button>
+      </div>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
         <div className={styles.Children} data-test-name="ExpandableChildren">
