@@ -1,5 +1,6 @@
-import React, { Suspense, useContext } from "react";
+import React, { Suspense, useContext, useEffect } from "react";
 import type { NextPage } from "next";
+import classnames from "classnames";
 import styles from "../styles/Home.module.css";
 
 import { SessionContext } from "../contexts/SessionContext";
@@ -13,8 +14,13 @@ import { SelectedPointStackFrames } from "../features/sources/SelectedPointStack
 
 const IndexPage: NextPage = () => {
   const sessionData = useContext(SessionContext);
+
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
   const { currentUserInfo } = sessionData;
+
+  useEffect(() => {
+    document.querySelector("html")!.classList.add("theme-light");
+  });
 
   return (
     <div className={styles.container}>
