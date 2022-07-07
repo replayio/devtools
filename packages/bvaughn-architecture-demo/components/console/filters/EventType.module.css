@@ -1,0 +1,13 @@
+.EventType {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.Checkbox {
+  margin: 0;
+}
+
+.Label {
+  flex-grow: 1;
+}

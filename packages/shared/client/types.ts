@@ -1,7 +1,11 @@
 import {
   ContentType,
+  EventHandlerType,
+  KeyboardEvent,
   Location,
   Message,
+  MouseEvent,
+  NavigationEvent,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
@@ -32,6 +36,12 @@ export type LineHits = {
   hits: number;
 };
 
+export type Events = {
+  keyboardEvents: KeyboardEvent[];
+  mouseEvents: MouseEvent[];
+  navigationEvents: NavigationEvent[];
+};
+
 export interface ReplayClientInterface {
   configure(sessionId: string): void;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
@@ -40,6 +50,8 @@ export interface ReplayClientInterface {
   }>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
+  getEventCountForType(eventType: EventHandlerType): Promise<number>;
+  getStandardEventPoints(): Promise<Events>;
   getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
     objectId: ObjectId,

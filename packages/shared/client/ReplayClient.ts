@@ -1,7 +1,14 @@
 import {
   ContentType,
+  EventHandlerType,
+  KeyboardEvent,
+  keyboardEvents,
   Location,
   Message,
+  MouseEvent,
+  mouseEvents,
+  NavigationEvent,
+  navigationEvents,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
@@ -14,12 +21,13 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
-import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
+import { ColumnHits, Events, LineHits, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -148,6 +156,46 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { data } = await client.Pause.getAllFrames({}, sessionId, pauseId);
     return data;
+  }
+
+  async getEventCountForType(eventType: EventHandlerType): Promise<number> {
+    const sessionId = this.getSessionIdThrows();
+    const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);
+    return count;
+  }
+
+  async getStandardEventPoints(): Promise<Events> {
+    const sessionId = this.getSessionIdThrows();
+
+    let keyboardEvents: KeyboardEvent[] = [];
+    let mouseEvents: MouseEvent[] = [];
+    let navigationEvents: NavigationEvent[] = [];
+
+    client.Session.addKeyboardEventsListener(({ events }: keyboardEvents) => {
+      keyboardEvents = [...keyboardEvents, ...events];
+    });
+    client.Session.addMouseEventsListener(({ events }: mouseEvents) => {
+      mouseEvents = [...mouseEvents, ...events];
+    });
+    client.Session.addNavigationEventsListener(({ events }: navigationEvents) => {
+      navigationEvents = [...navigationEvents, ...events];
+    });
+
+    await Promise.all([
+      client.Session.findKeyboardEvents({}, sessionId),
+      client.Session.findMouseEvents({}, sessionId),
+      client.Session.findNavigationEvents({}, sessionId),
+    ]);
+
+    client.Session.removeKeyboardEventsListener();
+    client.Session.removeMouseEventsListener();
+    client.Session.removeNavigationEventsListener();
+
+    return {
+      keyboardEvents: keyboardEvents!,
+      mouseEvents: mouseEvents!,
+      navigationEvents: navigationEvents!,
+    };
   }
 
   async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
