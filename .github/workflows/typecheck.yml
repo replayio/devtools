@@ -4,9 +4,6 @@ on: [pull_request, workflow_dispatch]
 
 jobs:
   typecheck:
-    # Intentionally disabled for now to avoid repeated CI failures
-    # TODO Fix this at some point?
-    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
