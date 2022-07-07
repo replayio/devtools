@@ -39,9 +39,16 @@ export function formatRelativeTime(date: Date): string {
   return "Now";
 }
 
-export function formatTimestamp(ms: number) {
-  const seconds = Math.round(ms / 1000.0);
-  return `${Math.floor(seconds / 60)}:${padStart(String(seconds % 60), 2, "0")}`;
+export function formatTimestamp(ms: number, showHighPrecision: boolean = false) {
+  const seconds = showHighPrecision ? Math.floor(ms / 1000) : Math.round(ms / 1000.0);
+  const minutesString = Math.floor(seconds / 60);
+  const secondsString = padStart(String(seconds % 60), 2, "0");
+  if (showHighPrecision) {
+    const millisecondsString = padStart(`${ms % 1000}`, 3, "0");
+    return `${minutesString}:${secondsString}.${millisecondsString}`;
+  } else {
+    return `${minutesString}:${secondsString}`;
+  }
 }
 
 export function isRangeEqual(

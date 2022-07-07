@@ -76,7 +76,7 @@ function LogPointInstanceRenderer({
     <div className={styles.PrimaryRow}>
       {showTimestamps && (
         <span className={styles.TimeStamp}>
-          {formatTimestamp(logPointInstance.timeStampedHitPoint.time)}
+          {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}
         </span>
       )}
       <div className={styles.LogContents}>{contents}</div>

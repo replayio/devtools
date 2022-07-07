@@ -92,7 +92,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
         }
       >
         {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time)}</span>
+          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
         )}
         {showExpandable ? (
           <Expandable

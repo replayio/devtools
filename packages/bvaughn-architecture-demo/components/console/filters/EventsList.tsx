@@ -32,16 +32,6 @@ export default function EventsList() {
     ];
   }, [standardEventPoints]);
 
-  // TODO (console:filters)
-  // Filter text
-  //
-  // Comment Events
-  // |> Keyboard
-  // |> Mouse
-  //
-  // Other Events
-  // |> ...
-
   return (
     <div className={styles.EventsList}>
       {/* TODO (console:filter) Filter input */}
