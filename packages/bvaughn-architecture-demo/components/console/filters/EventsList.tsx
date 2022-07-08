@@ -62,6 +62,7 @@ export default function EventsList() {
       {commonEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
+          disabled={isPending}
           eventCategory={eventCategory}
           filterByText={filterByText}
         />
@@ -71,6 +72,7 @@ export default function EventsList() {
       {eventCategoryCounts.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
+          disabled={isPending}
           eventCategory={eventCategory}
           filterByText={filterByText}
         />

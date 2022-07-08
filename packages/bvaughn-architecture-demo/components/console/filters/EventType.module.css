@@ -1,7 +1,11 @@
-.EventType {
+.EventType,
+.EventTypeDisabled {
   display: grid;
   grid-template-columns: min-content auto min-content;
   gap: 0.5ch;
+}
+.EventTypeDisabled {
+  opacity: 0.5;
 }
 
 .Checkbox {

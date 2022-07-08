@@ -6,9 +6,11 @@ import styles from "./EventCategory.module.css";
 import EventType from "./EventType";
 
 export default function EventCategory({
+  disabled,
   eventCategory,
   filterByText,
 }: {
+  disabled: boolean;
   eventCategory: EventCategoryType;
   filterByText: string;
 }) {
@@ -54,6 +56,7 @@ export default function EventCategory({
         <EventType
           key={event.type}
           categoryLabel={filterByText ? categoryName : null}
+          disabled={disabled}
           event={event}
         />
       ))}
