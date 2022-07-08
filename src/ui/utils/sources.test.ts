@@ -107,7 +107,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       pp1: {
         canonicalId: "1",
-        contentHash: undefined,
+        contentHash: "contentHash#1",
         correspondingSourceIds: ["pp1"],
         generated: [],
         generatedFrom: [],
@@ -176,7 +176,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       pp1: {
         canonicalId: "o1",
-        contentHash: undefined,
+        contentHash: "contentHash#1",
         correspondingSourceIds: ["pp1"],
         generated: [],
         generatedFrom: [],
@@ -188,7 +188,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
       },
       ppo1: {
         canonicalId: "o1",
-        contentHash: undefined,
+        contentHash: "contentHash#o1",
         correspondingSourceIds: ["ppo1"],
         generated: [],
         generatedFrom: [],
@@ -286,6 +286,87 @@ it("can link corresponding sources", () => {
       kind: "html",
       prettyPrinted: undefined,
       prettyPrintedFrom: undefined,
+      url: "/index.html",
+    },
+  });
+});
+
+it("is not fooled by pretty-printed sources with missing contentHashes", () => {
+  expect(
+    newSourcesToCompleteSourceDetails([
+      {
+        contentHash: "contentHash#h1",
+        kind: "html",
+        sourceId: "h1",
+        url: "/index.html",
+      },
+      {
+        generatedSourceIds: ["h1"],
+        kind: "prettyPrinted",
+        sourceId: "pph1",
+        url: "/index.html",
+      },
+      {
+        contentHash: "contentHash#h2",
+        kind: "html",
+        sourceId: "h2",
+        url: "/index.html",
+      },
+      {
+        kind: "prettyPrinted",
+        generatedSourceIds: ["h2"],
+        sourceId: "pph2",
+        url: "/index.html",
+      },
+    ])
+  ).toEqual({
+    h1: {
+      canonicalId: "h1",
+      contentHash: "contentHash#h1",
+      correspondingSourceIds: ["h1"],
+      generated: [],
+      generatedFrom: [],
+      id: "h1",
+      kind: "html",
+      prettyPrinted: "pph1",
+      prettyPrintedFrom: undefined,
+      url: "/index.html",
+    },
+    h2: {
+      canonicalId: "h2",
+      contentHash: "contentHash#h2",
+      correspondingSourceIds: ["h2"],
+      generated: [],
+      generatedFrom: [],
+      id: "h2",
+      kind: "html",
+      prettyPrinted: "pph2",
+      prettyPrintedFrom: undefined,
+      url: "/index.html",
+    },
+    pph1: {
+      canonicalId: "h1",
+      contentHash: "contentHash#h1",
+      correspondingSourceIds: ["pph1"],
+      generated: [],
+      generatedFrom: [],
+      id: "pph1",
+      kind: "prettyPrinted",
+      prettyPrinted: undefined,
+      prettyPrintedFrom: "h1",
+      url: "/index.html",
+    },
+    pph2: {
+      canonicalId: "h2",
+      contentHash: "contentHash#h2",
+      correspondingSourceIds: ["pph2"],
+      generated: [],
+      generatedFrom: [],
+      id: "pph2",
+      kind: "prettyPrinted",
+
+      prettyPrinted: undefined,
+      prettyPrintedFrom: "h2",
       url: "/index.html",
     },
   });
