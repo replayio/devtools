@@ -28,7 +28,7 @@ export function getDomain(url?: string) {
 /*
  * Checks if node name matches debugger host/domain.
  */
-function isExactDomainMatch(part: string, debuggeeHost: string) {
+function isExactDomainMatch(part: string, debuggeeHost?: string) {
   return part.startsWith("www.")
     ? part.substr("www.".length) === debuggeeHost
     : part === debuggeeHost;
@@ -99,7 +99,7 @@ const matcherFunctions = [isIndexName, isExactDomainMatch];
 export function createTreeNodeMatcher(
   part: string,
   isDir: boolean,
-  debuggeeHost: string,
+  debuggeeHost?: string,
   source?: Source,
   sortByUrl?: boolean
 ) {

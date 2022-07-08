@@ -16,7 +16,11 @@ import {
 import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
 import { getURL } from "./getURL";
 
-function createNodeInTree(part, path, tree, index) {
+import type { Source } from "../../reducers/sources";
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import type { ParsedUrl } from "./getURL";
+
+function createNodeInTree(part: string, path: string, tree: TreeDirectory, index: number) {
   const node = createDirectoryNode(part, path, []);
 
   // we are modifying the tree
@@ -32,7 +36,16 @@ function createNodeInTree(part, path, tree, index) {
  * 1. if it exists return it
  * 2. if it does not exist create it
  */
-function findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHost, source) {
+function findOrCreateNode(
+  parts: string[],
+  subTree: TreeDirectory,
+  path: string,
+  part: string,
+  index: number,
+  url: TreeNode,
+  debuggeeHost: string,
+  source: Source
+) {
   const addedPartIsFile = partIsFile(index, parts, url);
 
   const { found: childFound, index: childIndex } = findNodeInContents(
@@ -68,7 +81,7 @@ function findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHost, 
  * walk the source tree to the final node for a given url,
  * adding new nodes along the way
  */
-function traverseTree(url, tree, debuggeeHost, source) {
+function traverseTree(url: ParsedUrl, tree: TreeDirectory, debuggeeHost: string, source: Source) {
   const parts = url.path.replace(/\/$/, "").split("/");
   parts[0] = url.group;
 
@@ -78,16 +91,27 @@ function traverseTree(url, tree, debuggeeHost, source) {
 
     const debuggeeHostIfRoot = index === 1 ? debuggeeHost : null;
 
-    return findOrCreateNode(parts, subTree, path, part, index, url, debuggeeHostIfRoot, source);
+    return findOrCreateNode(
+      parts,
+      subTree,
+      path,
+      part,
+      index,
+      // @ts-expect-error Problem with `url` vs `TreeNode` here and in other fns?
+      url,
+      debuggeeHostIfRoot,
+      source
+    ) as TreeDirectory;
   }, tree);
 }
 
 /*
  * Add a source file to a directory node in the tree
  */
-function addSourceToNode(node, url, source) {
+function addSourceToNode(node: TreeDirectory, url: ParsedUrl, source: Source) {
   const isFile = !isPathDirectory(url.path);
 
+  // @ts-expect-error intentional error check apparently
   if (node.type == "source" && !isFile) {
     throw new Error(`Unexpected type "source" at: ${node.name}`);
   }
@@ -95,7 +119,7 @@ function addSourceToNode(node, url, source) {
   // if we have a file, and the subtree has no elements, overwrite the
   // subtree contents with the source
   if (isFile) {
-    // $FlowIgnore
+    // @ts-expect-error this is intentional
     node.type = "source";
     return source;
   }
@@ -103,7 +127,7 @@ function addSourceToNode(node, url, source) {
   const { filename } = url;
   const { found: childFound, index: childIndex } = findNodeInContents(
     node,
-    createTreeNodeMatcher(filename, false, null)
+    createTreeNodeMatcher(filename, false, undefined)
   );
 
   // if we are readding an existing file in the node, overwrite the existing
@@ -118,7 +142,7 @@ function addSourceToNode(node, url, source) {
   }
 
   // if this is a new file, add the new file;
-  const newNode = createSourceNode(filename, source.url, source);
+  const newNode = createSourceNode(filename, source.url!, source);
   const contents = node.contents.slice(0);
   contents.splice(childIndex, 0, newNode);
   return contents;
@@ -128,15 +152,15 @@ function addSourceToNode(node, url, source) {
  * @memberof utils/sources-tree
  * @static
  */
-export function addToTree(tree, source, debuggeeHost) {
+export function addToTree(tree: TreeDirectory, source: Source, debuggeeHost?: string) {
   const url = getURL(source, debuggeeHost);
 
   if (isInvalidUrl(url, source)) {
     return;
   }
 
-  const finalNode = traverseTree(url, tree, debuggeeHost, source);
+  const finalNode = traverseTree(url, tree, debuggeeHost!, source);
 
-  // $FlowIgnore
+  // @ts-expect-error intentional
   finalNode.contents = addSourceToNode(finalNode, url, source);
 }
