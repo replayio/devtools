@@ -296,7 +296,7 @@ export function getMode(
   const { contentType, value: text } = content!;
 
   if (extension === "jsx" || (symbols && symbols.hasJsx)) {
-    if (symbols && symbols.hasTypes) {
+    if (extension === "tsx" || (symbols && symbols.hasTypes)) {
       return { name: "text/typescript-jsx" };
     }
     return { name: "jsx" };
@@ -311,6 +311,8 @@ export function getMode(
   }
 
   const languageMimeMap = [
+    { ext: "ts", mode: "text/typescript" },
+    { ext: "tsx", mode: "text/typescript-jsx" },
     { ext: "c", mode: "text/x-csrc" },
     { ext: "kt", mode: "text/x-kotlin" },
     { ext: "cpp", mode: "text/x-c++src" },
