@@ -5,40 +5,74 @@ import { useMemo } from "react";
 import styles from "./EventCategory.module.css";
 import EventType from "./EventType";
 
-export default function EventCategory({ eventCategory }: { eventCategory: EventCategoryType }) {
-  const [eventToDisplay, totalCount] = useMemo(() => {
-    let totalCount = 0;
+export default function EventCategory({
+  eventCategory,
+  filterByText,
+}: {
+  eventCategory: EventCategoryType;
+  filterByText: string;
+}) {
+  const [eventsWithHits, totalHitCount] = useMemo(() => {
+    let totalHitCount = 0;
 
-    const eventToDisplay = eventCategory.events.filter(event => {
+    const eventsWithHits = eventCategory.events.filter(event => {
       if (event.count > 0) {
-        totalCount += event.count;
+        totalHitCount += event.count;
 
         return true;
       }
     });
 
-    return [eventToDisplay, totalCount];
+    return [eventsWithHits, totalHitCount];
   }, [eventCategory]);
 
-  if (totalCount === 0) {
+  const categoryName = eventCategory.category;
+
+  const filteredEvents = useMemo(() => {
+    if (!filterByText) {
+      return eventsWithHits;
+    }
+
+    const filterByTextLowerCase = filterByText.toLowerCase();
+
+    if (categoryName.toLowerCase().includes(filterByTextLowerCase)) {
+      return eventsWithHits;
+    }
+
+    return eventsWithHits.filter(({ label }) => {
+      return label.toLowerCase().includes(filterByTextLowerCase);
+    });
+  }, [categoryName, eventsWithHits, filterByText]);
+
+  if (filteredEvents.length === 0) {
     return null;
   }
 
-  return (
-    <Expandable
-      children={
-        <div className={styles.List}>
-          {eventToDisplay.map(event => (
-            <EventType key={event.type} event={event} />
-          ))}
-        </div>
-      }
-      header={
-        <div className={styles.Header}>
-          <span>{eventCategory.category}</span>
-          <span className={styles.Count}>{totalCount}</span>
-        </div>
-      }
-    />
+  const eventsList = (
+    <div className={styles.List}>
+      {filteredEvents.map(event => (
+        <EventType
+          key={event.type}
+          categoryLabel={filterByText ? categoryName : null}
+          event={event}
+        />
+      ))}
+    </div>
   );
+
+  if (filterByText) {
+    return eventsList;
+  } else {
+    return (
+      <Expandable
+        children={eventsList}
+        header={
+          <div className={styles.Header}>
+            <span className={styles.Category}>{eventCategory.category}</span>
+            <span className={styles.Count}>{totalHitCount}</span>
+          </div>
+        }
+      />
+    );
+  }
 }

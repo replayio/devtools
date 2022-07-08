@@ -5,7 +5,7 @@ import type {
 } from "@bvaughn/src/suspense/EventsCache";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { KeyboardEvent, KeyboardEventKind, MouseEvent, MouseEventKind } from "@replayio/protocol";
-import { useContext, useMemo } from "react";
+import { ChangeEvent, useContext, useMemo, useState, useTransition } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
@@ -14,6 +14,22 @@ import styles from "./EventsList.module.css";
 export default function EventsList() {
   const client = useContext(ReplayClientContext);
 
+  const [filterByDisplayText, setFilterByDisplayText] = useState("");
+  const [filterByText, setFilterByText] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  const onFilterTextChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const newFilterByText = event.currentTarget.value;
+    setFilterByDisplayText(newFilterByText);
+    startTransition(() => {
+      setFilterByText(newFilterByText);
+    });
+  };
+
+  // TODO (console-filters) Keyboard and mouse events overlap (and conflict).
+  // Maybe get rid of the call to getStandardEventPoints() and just use getEventCategoryCounts()
+  // Just pull keyboard and mouse events out and show them separately?
+  // That seems to be what the old console does.
   const [eventCategoryCounts, standardEventPoints] = suspendInParallel(
     () => getEventCategoryCounts(client),
     () => getStandardEventPoints(client)
@@ -34,16 +50,30 @@ export default function EventsList() {
 
   return (
     <div className={styles.EventsList}>
-      {/* TODO (console:filter) Filter input */}
+      <input
+        className={styles.FilterInput}
+        onChange={onFilterTextChange}
+        placeholder="Filter by event type"
+        type="text"
+        value={filterByDisplayText}
+      />
 
       <div className={styles.Header}>Common Events</div>
       {commonEventCategories.map(eventCategory => (
-        <EventCategory key={eventCategory.category} eventCategory={eventCategory} />
+        <EventCategory
+          key={eventCategory.category}
+          eventCategory={eventCategory}
+          filterByText={filterByText}
+        />
       ))}
 
       <div className={styles.Header}>Other Events</div>
       {eventCategoryCounts.map(eventCategory => (
-        <EventCategory key={eventCategory.category} eventCategory={eventCategory} />
+        <EventCategory
+          key={eventCategory.category}
+          eventCategory={eventCategory}
+          filterByText={filterByText}
+        />
       ))}
     </div>
   );

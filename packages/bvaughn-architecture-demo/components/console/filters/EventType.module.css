@@ -1,7 +1,7 @@
 .EventType {
-  display: flex;
-  align-items: center;
-  gap: 1ch;
+  display: grid;
+  grid-template-columns: min-content auto min-content;
+  gap: 0.5ch;
 }
 
 .Checkbox {
@@ -9,10 +9,22 @@
 }
 
 .Label {
-  flex-grow: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.CategoryPrefix {
+  color: var(--color-dim);
 }
 
 .Count {
   font-size: var(--font-size-small);
   color: var(--color-dim);
+}
+
+.ArrowIcon {
+  fill: var(--collapsible-toggle-color);
+  width: 1rem;
+  height: 1rem;
 }

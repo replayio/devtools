@@ -1,8 +1,14 @@
 .Header {
   width: 100%;
-  display: flex;
-  justify-content: space-between;
-  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto min-content;
+  gap: 0.5ch;
+}
+
+.Category {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .List {
