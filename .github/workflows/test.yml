@@ -5,6 +5,8 @@ on:
   push:
     branches:
       - main
+env:
+  RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
 
 jobs:
   download-browser:
@@ -88,6 +90,7 @@ jobs:
           TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
+          RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
   mock-test:
     name: Mock Tests
     runs-on: macos-latest
@@ -130,3 +133,39 @@ jobs:
           YARN_CHECKSUM_BEHAVIOR: "update"
       - name: Run tests
         run: yarn test
+  comment-with-replay:
+    name: Add Comment with Replays
+    needs: [e2etest, generate-test-run-id]
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+    - uses: actions/download-artifact@v3
+    - uses: actions/github-script@v6
+      id: combine-recordings
+      with:
+        script: |
+          const fs = require("fs");
+          const path = require("path");
+          const shards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+          const recordings = shards.reduce((acc, shard) => {
+            const file = `recordings-log-${shard}/recordings.json`;
+            try {
+              const content  = require("fs").readFileSync(file).toString()
+              return acc.concat(JSON.parse(content));
+            } catch (e) {
+              console.error("Failed to load", file);
+            }
+
+            return acc;
+          }, []);
+
+          const output = path.join("${{ env.GITHUB_ACTION_PATH }}", "recordings.log");
+          fs.writeFileSync(output, JSON.stringify(recordings));
+
+          return output;
+    - uses: replayio/action-comment@main
+      with:
+        api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+        issue-number: ${{ github.event.pull_request.number }}
+        recordings-path: ${{ steps.combine-recordings.outputs.result }}
+        test-run-id: ${{ needs.generate-test-run-id.outputs.testRunId }}

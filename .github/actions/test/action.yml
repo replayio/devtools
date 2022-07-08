@@ -7,6 +7,10 @@ inputs:
   upload:
     type: boolean
     default: true
+outputs:
+  recordings-log:
+    description: "File containing the array of recordings uploaded"
+    value: ${{ steps.recordings.log-path.outputs.result }}
 
 runs:
   using: "composite"
@@ -42,7 +46,6 @@ runs:
     - run: yarn test-e2e --shard ${{ env.INPUT_STRIPE }}
       shell: bash
       env:
-        RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
         RECORD_REPLAY_DRIVER: replay-driver/macOS-recordreplay.so
         RECORD_REPLAY_NODE: replay-node/macOS-replay-node
         RECORD_REPLAY_PATH: firefox/Nightly.app/Contents/MacOS/firefox
@@ -51,8 +54,17 @@ runs:
         RECORD_REPLAY_NO_RECORD: ${{ inputs.no-record == 'true' && '1' || '' }}
         SHOULD_RECORD_EXAMPLES: true
     - uses: replayio/action-upload@main
+      id: upload-recordings
       if: ${{ always() && inputs.upload == 'true' }}
       with:
-        apiKey: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
+        apiKey: ${{ env.RECORD_REPLAY_API_KEY }}
         public: true
         filter: function($v) { $v.metadata.test and $v.status = "onDisk" }
+    - name: Get Recording Log ID
+      id: log-id
+      run: echo ::set-output name=LOG_ID::$(echo $INPUT_STRIPE | cut -f1 -d /)
+      shell: bash
+    - uses: actions/upload-artifact@v3
+      with:
+        name: recordings-log-${{ steps.log-id.outputs.LOG_ID }}
+        path: ${{ steps.upload-recordings.outputs.recordings-path }}
