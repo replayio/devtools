@@ -1,8 +1,8 @@
-import { EventHandlerType } from "@replayio/protocol";
+import { EventHandlerType, PointDescription } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
-import { Wakeable } from "./types";
+import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type Event = {
   count: number;
@@ -15,6 +15,7 @@ export type EventCategory = {
   events: Event[];
 };
 
+let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<PointDescription[]>>();
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 
@@ -30,6 +31,29 @@ export function getEventCategoryCounts(client: ReplayClientInterface): EventCate
   }
 
   throw inProgressEventCategoryCountsWakeable;
+}
+
+export function getEventTypeEntryPoints(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType
+): PointDescription[] {
+  let record = eventTypeToEntryPointMap.get(eventType);
+  if (record == null) {
+    record = {
+      status: STATUS_PENDING,
+      value: createWakeable<PointDescription[]>(),
+    };
+
+    eventTypeToEntryPointMap.set(eventType, record);
+
+    fetchEventTypeEntryPoints(client, eventType,record);
+  }
+
+  if (record.status === STATUS_RESOLVED) {
+    return record.value;
+  } else {
+    throw record.value;
+  }
 }
 
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
@@ -65,4 +89,15 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
 
   inProgressEventCategoryCountsWakeable!.resolve(eventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
+}
+
+async function fetchEventTypeEntryPoints(client: ReplayClientInterface,eventType: EventHandlerType, record: Record<PointDescription[]>) {
+  const entryPoints = await client.getEntryPointsForEventType(eventType);
+
+  const wakeable = record.value;
+
+  record.status = STATUS_RESOLVED;
+  record.value = entryPoints;
+
+  wakeable.resolve(entryPoints);
 }

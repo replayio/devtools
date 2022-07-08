@@ -160,6 +160,7 @@ const MockReplayClient = {
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => []),
   getAllFrames: jest.fn().mockImplementation(async () => []),
+  getEntryPointsForEventType: jest.fn().mockImplementation(async () => []),
   getEventCountForType: jest.fn().mockImplementation(async () => 0),
   getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
   getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),

@@ -11,6 +11,7 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  PointDescription,
   RecordingId,
   SessionId,
   SourceId,
@@ -50,6 +51,7 @@ export interface ReplayClientInterface {
   }>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
+  getEntryPointsForEventType(eventType: EventHandlerType): Promise<PointDescription[]>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(

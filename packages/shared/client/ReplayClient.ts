@@ -1,14 +1,8 @@
 import {
   ContentType,
   EventHandlerType,
-  KeyboardEvent,
-  keyboardEvents,
   Location,
   Message,
-  MouseEvent,
-  mouseEvents,
-  NavigationEvent,
-  navigationEvents,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
@@ -21,7 +15,6 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -107,7 +100,7 @@ export class ReplayClient implements ReplayClientInterface {
     } else {
       const sortedMessages: Message[] = [];
 
-      // TOOD This won't work if there are every overlapping requests.
+      // TODO This won't work if there are every overlapping requests.
       // Do we need to implement some kind of locking mechanism to ensure only one read is going at a time?
       client.Console.addNewMessageListener(({ message }) => {
         const newMessagePoint = message.point.point;
@@ -158,23 +151,64 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  // TODO (console-refactor) Refactor to share code with getHitPointsForLocation
+  async getEntryPointsForEventType(eventType: EventHandlerType): Promise<TimeStampedPoint[]> {
+    const sessionId = this.getSessionIdThrows();
+    const data = await new Promise<PointDescription[]>(async resolve => {
+      const { analysisId } = await client.Analysis.createAnalysis(
+        {
+          effectful: false,
+          // TODO (console-refactor) This is different
+          mapper: "return [{ key: input.point, value: input }];",
+        },
+        sessionId
+      );
+
+      // TODO (console-refactor) This is different
+      client.Analysis.addEventHandlerEntryPoints({analysisId, eventType}, sessionId);
+      client.Analysis.addAnalysisPointsListener(({ points }) => {
+        client.Analysis.removeAnalysisPointsListener();
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        clearTimeout(timeoutId);
+
+        resolve(points);
+      });
+      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+
+      // TODO (BAC-1926) Sometimes the protocol won't return any points.
+      // In this case, we should eventually timeout and assume there are none.
+      let timeoutId = setTimeout(() => {
+        client.Analysis.removeAnalysisPointsListener();
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        resolve([]);
+      }, 500);
+    });
+
+    return data;
+  }
+
   async getEventCountForType(eventType: EventHandlerType): Promise<number> {
     const sessionId = this.getSessionIdThrows();
     const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);
     return count;
   }
 
-  async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
+  // TODO (console-refactor) Refactor to share with getEntryPointsForEventType.
+  async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
     const sessionId = this.getSessionIdThrows();
     const data = await new Promise<PointDescription[]>(async resolve => {
       const { analysisId } = await client.Analysis.createAnalysis(
         {
-          mapper: "",
           effectful: false,
+          // TODO (console-refactor) This is different
+          mapper: "",
         },
         sessionId
       );
 
+      // TODO (console-refactor) This is different
       client.Analysis.addLocation({ analysisId, location }, sessionId);
       client.Analysis.addAnalysisPointsListener(({ points }) => {
         client.Analysis.removeAnalysisPointsListener();
@@ -186,7 +220,7 @@ export class ReplayClient implements ReplayClientInterface {
       });
       client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
 
-      // TOOD (BAC-1926) Sometimes the protocol won't return any points.
+      // TODO (BAC-1926) Sometimes the protocol won't return any points.
       // In this case, we should eventually timeout and assume there are none.
       let timeoutId = setTimeout(() => {
         client.Analysis.removeAnalysisPointsListener();
@@ -287,8 +321,8 @@ export class ReplayClient implements ReplayClientInterface {
     const data = await new Promise<Result>(async resolve => {
       const { analysisId } = await client.Analysis.createAnalysis(
         {
-          mapper,
           effectful: false,
+          mapper,
         },
         sessionId
       );

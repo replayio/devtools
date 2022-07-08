@@ -1,3 +1,4 @@
+import { EventHandlerType } from "@replayio/protocol";
 import {
   createContext,
   PropsWithChildren,
@@ -10,7 +11,7 @@ import {
 // Various boolean flags to types of console messages or attributes to show/hide.
 export type Toggles = {
   events: {
-    [eventType: string]: boolean;
+    [eventType: EventHandlerType]: boolean;
   };
   showErrors: boolean;
   showExceptions: boolean;
