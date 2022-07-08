@@ -7,13 +7,15 @@
 import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
 
-export function getFilenameFromURL(url) {
+import type { Source } from "../../reducers/sources";
+
+export function getFilenameFromURL(url: string) {
   const { pathname } = parse(url);
   const filename = getUnicodeUrlPath(getFilenameFromPath(pathname));
   return filename;
 }
 
-export function getFilenameFromPath(pathname) {
+export function getFilenameFromPath(pathname: string) {
   let filename = "";
   if (pathname) {
     filename = pathname.substring(pathname.lastIndexOf("/") + 1);
@@ -26,9 +28,16 @@ export function getFilenameFromPath(pathname) {
 }
 
 const NoDomain = "(no domain)";
-const def = { path: "", group: "", filename: "" };
 
-export function getURL(source, defaultDomain = "") {
+export interface ParsedUrl {
+  path: string;
+  group: string;
+  filename: string;
+}
+
+const def: ParsedUrl = { path: "", group: "", filename: "" };
+
+export function getURL(source: Source, defaultDomain = "") {
   const { url } = source;
   if (!url) {
     return def;
