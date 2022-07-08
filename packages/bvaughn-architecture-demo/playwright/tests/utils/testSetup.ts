@@ -13,7 +13,7 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
       const nextErrorDialog = await page.locator("nextjs-portal");
       const count = await nextErrorDialog.count();
       if (count !== 0) {
-        throw Error('Next error overlay reported uncaught error');
+        throw Error("Next error overlay reported uncaught error");
       }
     });
 
@@ -51,7 +51,7 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
       if (count === 0 || count == null) {
         break;
       }
-    
+
       await new Promise(resolve => setTimeout(resolve, 50));
     }
 

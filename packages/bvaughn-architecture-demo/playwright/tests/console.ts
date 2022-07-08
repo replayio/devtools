@@ -19,12 +19,21 @@ testSetup(async function regeneratorFunction({ page }) {
   const errorListItem = page.locator('[data-test-name="Expandable"]', {
     hasText: "This is an error",
   });
-  const keyValue = errorListItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
-  await keyValue.click();
+  let keyValue = errorListItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
+  keyValue.click();
 
   const children = errorListItem.locator("[data-test-name=ExpandableChildren]");
   const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
   await nestedKeyValue.click();
+
+  await page.click('[date-test-id="EventCategoryHeader-Mouse"]');
+  await page.click('[data-test-id="EventTypes-event.mouse.click"]');
+
+  const eventTypeListItem = page.locator('[data-test-name="Expandable"]', {
+    hasText: "MouseEvent",
+  });
+  keyValue = eventTypeListItem.locator('[data-test-id="KeyValue"]', { hasText: "MouseEvent" });
+  await keyValue.click();
 });
 
 test("should display list of messages", async ({ page }) => {
@@ -36,6 +45,9 @@ test("should display list of messages", async ({ page }) => {
   await expect(list).toContainText("This is an error");
 
   await takeScreenshot(page, list, "message-list");
+
+  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await takeScreenshot(page, list, "message-list-with-timestamps");
 });
 
 test("should display toggleable stack for errors", async ({ page }) => {
@@ -151,8 +163,37 @@ test("should be filterable", async ({ page }) => {
   await takeScreenshot(page, consoleRoot, "filtered-no-results");
 });
 
+test("should log events in the console", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.click('[date-test-id="EventCategoryHeader-Mouse"]');
+  await page.click('[data-test-id="EventTypes-event.mouse.click"]');
+
+  const listItem = page
+    .locator('[data-test-name="Expandable"]', {
+      hasText: "MouseEvent",
+    })
+    .first();
+  await takeScreenshot(page, listItem, "event-types-mouse-click");
+
+  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps");
+
+  const keyValue = listItem.locator('[data-test-id="KeyValue"]', { hasText: "MouseEvent" });
+  await keyValue.click();
+  await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps-expanded");
+
+  const filterToggles = page.locator('[data-test-id="ConsoleFilterToggles"]');
+
+  await page.fill('[data-test-id="EventTypeFilterInput"]', "click");
+  await takeScreenshot(page, filterToggles, "event-types-filtered-toggle-list");
+
+  await page.fill('[data-test-id="EventTypeFilterInput"]', "zzz");
+  await takeScreenshot(page, filterToggles, "event-types-filtered-toggle-list-no-results");
+
+  // TODO Add tests for filtering and searching list (once supported)
+});
+
 // TODO Add tests:
 // 1. For fast-forwarding to a message.
-// 2. Show timestamps
-// 3. Filter node modules
-// 4. Show event types
+// 2. Filter node modules

@@ -5,6 +5,7 @@
     <meta content="utf-8" http-equiv="encoding" />
   </head>
   <body>
+    <button>Click to log data</button>
     <script type="text/javascript">
       function foo() {
         console.log("This is a log");
@@ -21,7 +22,8 @@
         console.trace("This is a trace");
       }
 
-      foo();
+      const button = document.querySelector("button");
+      button.addEventListener("click", foo);
 
       // TODO Add console.info, console.debug
       // TODO Add console.group, console.groupCollapsed, console.groupEnd (once backend supports them)

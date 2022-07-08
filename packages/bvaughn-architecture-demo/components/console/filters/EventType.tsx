@@ -20,7 +20,10 @@ export default function EventType({
   const toggle = () => update({ eventTypes: { [event.type]: !checked } });
 
   return (
-    <label className={disabled ? styles.EventTypeDisabled : styles.EventType}>
+    <label
+      className={disabled ? styles.EventTypeDisabled : styles.EventType}
+      data-test-id={`EventTypes-${event.type}`}
+    >
       <input
         className={styles.Checkbox}
         disabled={disabled}
