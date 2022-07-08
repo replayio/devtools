@@ -15,34 +15,34 @@ export function createWakeable<T>(): Wakeable<T> {
       rejectCallbacks.add(rejectCallback);
     },
     reject(error: Error) {
+      let thrown = false;
+      let thrownValue;
       rejectCallbacks.forEach(rejectCallback => {
-        let thrownValue = null;
-
         try {
           rejectCallback(error);
         } catch (error) {
+          thrown = true;
           thrownValue = error;
         }
-
-        if (thrownValue !== null) {
-          throw thrownValue;
-        }
       });
+      if (thrown) {
+        throw thrownValue;
+      }
     },
     resolve(value: T) {
+      let thrown = false;
+      let thrownValue;
       resolveCallbacks.forEach(resolveCallback => {
-        let thrownValue = null;
-
         try {
           resolveCallback(value);
         } catch (error) {
+          thrown = true;
           thrownValue = error;
         }
-
-        if (thrownValue !== null) {
-          throw thrownValue;
-        }
       });
+      if (thrown) {
+        throw thrownValue;
+      }
     },
   };
 
