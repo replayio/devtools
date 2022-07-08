@@ -11,6 +11,7 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
+  PointDescription,
   RecordingId,
   SessionId,
   SourceId,
@@ -18,6 +19,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import { AnalysisParams } from "protocol/analysisManager";
 
 export type LogEntry = {
   args: any[];
@@ -64,9 +66,5 @@ export interface ReplayClientInterface {
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
-  runAnalysis<Result>(
-    location: Location,
-    timeStampedPoint: TimeStampedPoint,
-    mapper: string
-  ): Promise<Result>;
+  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
 }

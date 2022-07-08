@@ -1,16 +1,29 @@
-.MessageRow,
-.MessageRowError,
-.MessageRowTrace,
-.MessageRowWarning {
+.Row,
+.ErrorRow,
+.TraceRow,
+.WarningRow {
   padding: 0.5rem 1rem;
   border-bottom: 1px solid var(--background-color-contrast-1);
 }
-.MessageRowError {
+.ErrorRow {
   background-color: var(--background-color-error);
   color: var(--color-error);
 }
-.MessageRowWarning {
+.WarningRow {
   background-color: var(--background-color-warning);
+  color: var(--color-warning);
+}
+
+.ErrorIcon,
+.WarningIcon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+}
+.ErrorIcon {
+  color: var(--color-error);
+}
+.WarningIcon {
   color: var(--color-warning);
 }
 
@@ -29,23 +42,6 @@
 
 .Focused {
   background-color: var(--background-color-contrast-1);
-}
-
-.MessageText {
-  min-height: 1rem;
-}
-
-.ErrorIcon,
-.WarningIcon {
-  width: 1rem;
-  height: 1rem;
-  flex: 0 0 1rem;
-}
-.ErrorIcon {
-  color: var(--color-error);
-}
-.WarningIcon {
-  color: var(--color-warning);
 }
 
 .PrimaryRowWithTimestamps,
@@ -71,9 +67,10 @@
 
 .Source {
   flex: 1 1 100%;
-  display: inline;
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
   opacity: 0.75;
+  overflow: hidden;
 }
 .Source:hover {
   opacity: 1;
@@ -82,4 +79,8 @@
 .TimeStamp {
   color: var(--color-dim);
   font-size: var(--font-size-small);
+}
+
+.MessageText {
+  min-height: 1rem;
 }

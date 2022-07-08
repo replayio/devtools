@@ -24,6 +24,7 @@
   height: 1rem;
   margin-right: 0.5ch;
   display: inline-block;
+  vertical-align: middle;
 }
 .ArrowExpanded {
   transform: rotate(90deg);

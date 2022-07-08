@@ -9,6 +9,14 @@ type RegeneratorFunction = ({ page }: { page: Page }) => Promise<void>;
 
 export default function testSetup(regeneratorFunction: RegeneratorFunction) {
   if (!RECORD_PROTOCOL_DATA) {
+    test.afterEach(async ({ page }) => {
+      const nextErrorDialog = await page.locator("nextjs-portal");
+      const count = await nextErrorDialog.count();
+      if (count !== 0) {
+        throw Error("Next error overlay reported uncaught error");
+      }
+    });
+
     return;
   }
 
@@ -38,14 +46,14 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
     await regeneratorFunction({ page });
 
     // Wait for all outstanding requests to be resolved/logged.
-    // while (true) {
-    //   const count = await page.evaluate("window.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT");
-    //   if (count === 0 || count == null) {
-    //     break;
-    //   }
-    //
-    //   await new Promise(resolve => setTimeout(resolve, 50));
-    // }
+    while (true) {
+      const count = await page.evaluate("window.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT");
+      if (count === 0 || count == null) {
+        break;
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 50));
+    }
 
     page.off("console", onConsoleMessage);
 

@@ -1,3 +1,4 @@
+import { EventHandlerType } from "@replayio/protocol";
 import {
   createContext,
   PropsWithChildren,
@@ -9,9 +10,6 @@ import {
 
 // Various boolean flags to types of console messages or attributes to show/hide.
 export type Toggles = {
-  events: {
-    [eventType: string]: boolean;
-  };
   showErrors: boolean;
   showExceptions: boolean;
   showLogs: boolean;
@@ -20,7 +18,19 @@ export type Toggles = {
   showWarnings: boolean;
 };
 
+export type EventTypes = {
+  [eventType: EventHandlerType]: boolean;
+};
+
 export type ConsoleFiltersContextType = Toggles & {
+  // Event types toggles to display in the UI.
+  // This value is updated at React's default, higher priority.
+  eventTypesForDisplay: EventTypes;
+
+  // Event types toggles to fetch for display in the console.
+  // This value is updated at a lower, transition priority.
+  eventTypes: EventTypes;
+
   // Filter text to display in the UI.
   // This value is updated at React's default, higher priority.
   filterByDisplayText: string;
@@ -35,7 +45,10 @@ export type ConsoleFiltersContextType = Toggles & {
 
   update: (
     values: Partial<
-      Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+      Omit<
+        ConsoleFiltersContextType,
+        "eventTypesForDisplay" | "filterByDisplayText" | "isTransitionPending" | "update"
+      >
     >
   ) => void;
 };
@@ -44,7 +57,6 @@ export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(nu
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [toggles, setToggles] = useState<Toggles>({
-    events: {},
     showErrors: true,
     showExceptions: true,
     showLogs: true,
@@ -59,22 +71,37 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [filterByText, setFilterByText] = useState<string>("");
   const [deferredFilterByText, setDeferredFilterByText] = useState<string>("");
 
+  const [eventTypes, setEventTypes] = useState<EventTypes>({});
+  const [deferredEventTypes, setDeferredEventTypes] = useState<EventTypes>({});
+
   const update = useCallback(
     (
       values: Partial<
-        Omit<ConsoleFiltersContextType, "filterByDisplayText" | "isTransitionPending" | "update">
+        Omit<
+          ConsoleFiltersContextType,
+          "eventTypesForDisplay" | "filterByDisplayText" | "isTransitionPending" | "update"
+        >
       >
     ) => {
-      const { filterByText: newFilterByText, ...newToggles } = values;
+      const { eventTypes: newEventTypes, filterByText: newFilterByText, ...newToggles } = values;
 
       setToggles(prevToggles => ({
         ...prevToggles,
         ...newToggles,
-        events: {
-          ...prevToggles.events,
-          ...newToggles.events,
-        },
       }));
+
+      if (newEventTypes != null) {
+        setEventTypes(prevEventTypes => ({
+          ...prevEventTypes,
+          ...newEventTypes,
+        }));
+        startTransition(() => {
+          setDeferredEventTypes(prevEventTypes => ({
+            ...prevEventTypes,
+            ...newEventTypes,
+          }));
+        });
+      }
 
       if (newFilterByText != null) {
         setFilterByText(newFilterByText);
@@ -93,12 +120,22 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const consoleFiltersContext = useMemo<ConsoleFiltersContextType>(
     () => ({
       ...toggles,
+      eventTypes: deferredEventTypes,
+      eventTypesForDisplay: eventTypes,
       filterByDisplayText: filterByText,
       filterByText: deferredFilterByText,
       isTransitionPending,
       update,
     }),
-    [deferredFilterByText, filterByText, isTransitionPending, toggles, update]
+    [
+      deferredEventTypes,
+      deferredFilterByText,
+      eventTypes,
+      filterByText,
+      isTransitionPending,
+      toggles,
+      update,
+    ]
   );
 
   return (

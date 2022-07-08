@@ -84,7 +84,8 @@ export async function renderFocused(
   sessionContext: SessionContextType;
 }> {
   const consoleFiltersContext: ConsoleFiltersContextType = {
-    events: {},
+    eventTypes: {},
+    eventTypesForDisplay: {},
     filterByDisplayText: "",
     filterByText: "",
     isTransitionPending: false,
@@ -176,5 +177,5 @@ const MockReplayClient = {
   })),
   getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
   initialize: jest.fn().mockImplementation(async () => {}),
-  runAnalysis: jest.fn().mockImplementation(async () => ({})),
+  runAnalysis: jest.fn().mockImplementation(async () => []),
 };

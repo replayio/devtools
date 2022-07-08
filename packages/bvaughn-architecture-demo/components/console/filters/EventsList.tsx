@@ -48,6 +48,7 @@ export default function EventsList() {
     <div className={styles.EventsList}>
       <input
         className={styles.FilterInput}
+        data-test-id="EventTypeFilterInput"
         onChange={onFilterTextChange}
         placeholder="Filter by event type"
         type="text"

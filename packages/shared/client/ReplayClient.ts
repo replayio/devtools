@@ -1,14 +1,8 @@
 import {
   ContentType,
   EventHandlerType,
-  KeyboardEvent,
-  keyboardEvents,
   Location,
   Message,
-  MouseEvent,
-  mouseEvents,
-  NavigationEvent,
-  navigationEvents,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
@@ -21,13 +15,13 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
+import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
-import { ColumnHits, Events, LineHits, ReplayClientInterface } from "./types";
+import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -42,6 +36,8 @@ export class ReplayClient implements ReplayClientInterface {
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
+
+    analysisManager.init();
   }
 
   private getSessionIdThrows(): SessionId {
@@ -107,7 +103,7 @@ export class ReplayClient implements ReplayClientInterface {
     } else {
       const sortedMessages: Message[] = [];
 
-      // TOOD This won't work if there are every overlapping requests.
+      // TODO This won't work if there are every overlapping requests.
       // Do we need to implement some kind of locking mechanism to ensure only one read is going at a time?
       client.Console.addNewMessageListener(({ message }) => {
         const newMessagePoint = message.point.point;
@@ -164,39 +160,24 @@ export class ReplayClient implements ReplayClientInterface {
     return count;
   }
 
-  async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
-    const sessionId = this.getSessionIdThrows();
-    const data = await new Promise<PointDescription[]>(async resolve => {
-      const { analysisId } = await client.Analysis.createAnalysis(
-        {
-          mapper: "",
-          effectful: false,
+  async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
+    const collectedPointDescriptions: PointDescription[] = [];
+    await analysisManager.runAnalysis(
+      {
+        effectful: false,
+        locations: [{ location }],
+        mapper: "",
+      },
+      {
+        onAnalysisError: (errorMessage: string) => {
+          throw Error(errorMessage);
         },
-        sessionId
-      );
-
-      client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.addAnalysisPointsListener(({ points }) => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        clearTimeout(timeoutId);
-
-        resolve(points);
-      });
-      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
-
-      // TOOD (BAC-1926) Sometimes the protocol won't return any points.
-      // In this case, we should eventually timeout and assume there are none.
-      let timeoutId = setTimeout(() => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        resolve([]);
-      }, 500);
-    });
-
-    return data;
+        onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
+          collectedPointDescriptions.push(...pointDescriptions);
+        },
+      }
+    );
+    return collectedPointDescriptions;
   }
 
   async getObjectWithPreview(
@@ -278,31 +259,17 @@ export class ReplayClient implements ReplayClientInterface {
     return hitCounts;
   }
 
-  async runAnalysis<Result>(
-    location: Location,
-    timeStampedPoint: TimeStampedPoint,
-    mapper: string
-  ): Promise<Result> {
-    const sessionId = this.getSessionIdThrows();
-    const data = await new Promise<Result>(async resolve => {
-      const { analysisId } = await client.Analysis.createAnalysis(
-        {
-          mapper,
-          effectful: false,
+  async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
+    return new Promise<Result[]>((resolve, reject) => {
+      analysisManager.runAnalysis(analysisParams, {
+        onAnalysisError: (errorMessage: string) => {
+          reject(errorMessage);
         },
-        sessionId
-      );
-
-      client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.addPoints({ analysisId, points: [timeStampedPoint.point] }, sessionId);
-      client.Analysis.addAnalysisResultListener(({ results }) => {
-        resolve(results[0].value as Result);
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+        onAnalysisResult: analysisEntries => {
+          resolve(analysisEntries.map(entry => entry.value));
+        },
       });
-      client.Analysis.runAnalysis({ analysisId }, sessionId);
     });
-
-    return data;
   }
 }
 

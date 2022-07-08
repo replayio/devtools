@@ -1,26 +1,75 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { LogPointInstance, LogPointsContext } from "@bvaughn/src/contexts/LogPointsContext";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
+import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
-import { isLogPointInstance } from "@bvaughn/src/utils/console";
-import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
+import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { suspendInParallel } from "@bvaughn/src/utils/suspense";
+import {
+  EventHandlerType,
+  Message as ProtocolMessage,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 import { useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./useFocusRange";
 
-export type Loggable = ProtocolMessage | LogPointInstance;
+export type Loggable = EventTypeLog | LogPointInstance | ProtocolMessage;
 
 export default function useFilteredMessages(): Loggable[] {
   const client = useContext(ReplayClientContext);
   const logPoints = useContext(LogPointsContext);
-  const { filterByText, showErrors, showExceptions, showLogs, showNodeModules, showWarnings } =
-    useContext(ConsoleFiltersContext);
+  const {
+    eventTypes,
+    filterByText,
+    showErrors,
+    showExceptions,
+    showLogs,
+    showNodeModules,
+    showWarnings,
+  } = useContext(ConsoleFiltersContext);
 
   const focusRange = useFocusRange();
 
   const filterByTextLowercase = filterByText.toLowerCase();
+
+  // Find the set of event type handlers we should be displaying in the console.
+  const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
+    const filteredEventHandlerTypes: EventHandlerType[] = [];
+    for (let [eventType, enabled] of Object.entries(eventTypes)) {
+      if (enabled) {
+        filteredEventHandlerTypes.push(eventType);
+      }
+    }
+    return filteredEventHandlerTypes;
+  }, [eventTypes]);
+
+  // Load the event type data from the protocol and flatten into a single array (to be filtered and sorted below).
+  const eventTypeLogs = useMemo<EventTypeLog[]>(() => {
+    return suspendInParallel(
+      ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPoints(client, eventType))
+    ).flat();
+  }, [client, eventTypesToLoad]);
+
+  const filteredEventTypeLogs = useMemo(() => {
+    if (filterByTextLowercase === "") {
+      return eventTypeLogs;
+    }
+
+    return eventTypeLogs.filter(eventTypeLog => {
+      return (
+        eventTypeLog.values.find((value: any) => {
+          if (typeof value === "string") {
+            return value.toLowerCase().includes(filterByTextLowercase);
+          } else if (typeof value?.value === "string") {
+            return value?.value?.toLowerCase()?.includes(filterByTextLowercase);
+          }
+        }) != null
+      );
+    });
+  }, [eventTypeLogs, filterByTextLowercase]);
 
   // If there is filterByText, it should apply to log points also.
   // We can only filter log points that either require no analysis or have already been analyzed.
@@ -145,13 +194,25 @@ export default function useFilteredMessages(): Loggable[] {
   ]);
 
   const sortedLoggables = useMemo<Loggable[]>(() => {
-    const loggables: Loggable[] = [...filteredLogPoints, ...filteredMessages];
+    const loggables: Loggable[] = [
+      ...filteredEventTypeLogs,
+      ...filteredLogPoints,
+      ...filteredMessages,
+    ];
     return loggables.sort((a: Loggable, b: Loggable) => {
-      const timeA = isLogPointInstance(a) ? a.timeStampedHitPoint.time : a.point.time;
-      const timeB = isLogPointInstance(b) ? b.timeStampedHitPoint.time : b.point.time;
-      return timeA - timeB;
+      return getTimeForSort(a) - getTimeForSort(b);
     });
-  }, [filteredLogPoints, filteredMessages]);
+  }, [filteredEventTypeLogs, filteredLogPoints, filteredMessages]);
 
   return sortedLoggables;
+}
+
+function getTimeForSort(value: Loggable): number {
+  if (isEventTypeLog(value)) {
+    return value.time;
+  } else if (isLogPointInstance(value)) {
+    return value.timeStampedHitPoint.time;
+  } else {
+    return value.point.time;
+  }
 }
