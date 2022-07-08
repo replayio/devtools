@@ -45,15 +45,6 @@ export default function EventCategory({
       return label.toLowerCase().includes(filterByTextLowerCase);
     });
   }, [categoryName, eventsWithHits, filterByText]);
-  ////////////////////////////
-  console.log(
-    "!!! <EventCategory>>",
-    eventCategory,
-    eventsWithHits,
-    filteredEvents,
-    JSON.stringify(eventCategory, null, 2)
-  );
-  ////////////////////////////
 
   if (filteredEvents.length === 0) {
     return null;

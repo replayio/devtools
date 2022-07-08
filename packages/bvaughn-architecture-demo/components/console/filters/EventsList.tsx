@@ -22,20 +22,10 @@ export default function EventsList() {
   };
 
   const eventCategoryCounts = getEventCategoryCounts(client);
-  ////////////////////////////
-  console.log(
-    "!!! <EventsList>",
-    eventCategoryCounts,
-    JSON.stringify(eventCategoryCounts, null, 2)
-  );
-  ////////////////////////////
 
   const [commonEventCategories, otherEventCategories] = useMemo<
     [EventCategoryType[], EventCategoryType[]]
   >(() => {
-    ////////////////////////////
-    console.log("!!! <EventsList> memo");
-    ////////////////////////////
     const commonEventCategories: EventCategoryType[] = [];
     const otherEventCategories: EventCategoryType[] = [];
 
