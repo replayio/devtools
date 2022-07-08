@@ -22,7 +22,6 @@ interface ParsedURL {
 }
 
 const defaultUrl: ParsedURL = {
-  // @ts-expect-error
   hash: "",
   host: "",
   hostname: "",
