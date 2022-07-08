@@ -4,7 +4,25 @@
 
 import memoize from "lodash/memoize";
 
-const defaultUrl = {
+interface ParsedURL {
+  hash: string;
+  host: string;
+  hostname: string;
+  href: string;
+  origin: string;
+  password: string;
+  path: string;
+  pathname: string;
+  port: string;
+  protocol: string;
+  search: string;
+  // This should be a "URLSearchParams" object
+  searchParams: Record<string, string>;
+  username: string;
+}
+
+const defaultUrl: ParsedURL = {
+  // @ts-expect-error
   hash: "",
   host: "",
   hostname: "",
@@ -21,14 +39,14 @@ const defaultUrl = {
   username: "",
 };
 
-export const parse = memoize(function parse(url) {
+export const parse = memoize(function parse(url): ParsedURL {
   try {
     if (url.startsWith("webpack://_N_E")) {
       url = `webpack:${url.substring(14)}`;
     } else if (url.startsWith("webpack-internal:///.")) {
       url = `webpack-internal:${url.substring(21)}`;
     }
-    const urlObj = new URL(url);
+    const urlObj = new URL(url) as unknown as ParsedURL;
     urlObj.path = urlObj.pathname + urlObj.search;
     return urlObj;
   } catch (err) {
@@ -41,6 +59,6 @@ export const parse = memoize(function parse(url) {
   }
 });
 
-export function sameOrigin(firstUrl, secondUrl) {
+export function sameOrigin(firstUrl: string, secondUrl: string) {
   return parse(firstUrl).origin == parse(secondUrl).origin;
 }
