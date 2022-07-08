@@ -46,7 +46,7 @@ export function getEventTypeEntryPoints(
 
     eventTypeToEntryPointMap.set(eventType, record);
 
-    fetchEventTypeEntryPoints(client, eventType,record);
+    fetchEventTypeEntryPoints(client, eventType, record);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -91,7 +91,11 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
   inProgressEventCategoryCountsWakeable = null;
 }
 
-async function fetchEventTypeEntryPoints(client: ReplayClientInterface,eventType: EventHandlerType, record: Record<PointDescription[]>) {
+async function fetchEventTypeEntryPoints(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType,
+  record: Record<PointDescription[]>
+) {
   const entryPoints = await client.getEntryPointsForEventType(eventType);
 
   const wakeable = record.value;

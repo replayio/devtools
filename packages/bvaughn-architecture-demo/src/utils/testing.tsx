@@ -84,7 +84,8 @@ export async function renderFocused(
   sessionContext: SessionContextType;
 }> {
   const consoleFiltersContext: ConsoleFiltersContextType = {
-    events: {},
+    eventTypes: {},
+    eventTypesForDisplay: {},
     filterByDisplayText: "",
     filterByText: "",
     isTransitionPending: false,

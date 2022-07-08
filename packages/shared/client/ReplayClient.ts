@@ -157,20 +157,22 @@ export class ReplayClient implements ReplayClientInterface {
   // TODO (console-refactor) Refactor to share code with getHitPointsForLocation
   async getEntryPointsForEventType(eventType: EventHandlerType): Promise<TimeStampedPoint[]> {
     const collectedPoints: TimeStampedPoint[] = [];
-    await analysisManager.runAnalysis({
-      effectful: false,
-      eventHandlerEntryPoints: [{eventType}],
-      // locations: [{ location }],
-      mapper: "return [{ key: input.point, value: input }];",
-    },
-    {
-      onAnalysisError: (errorMessage: string) => {
-        throw Error(errorMessage);
+    await analysisManager.runAnalysis(
+      {
+        effectful: false,
+        eventHandlerEntryPoints: [{ eventType }],
+        // locations: [{ location }],
+        mapper: "return [{ key: input.point, value: input }];",
       },
-      onAnalysisPoints: (points: TimeStampedPoint[]) => {
-        collectedPoints.push(...points);
-      },
-    });
+      {
+        onAnalysisError: (errorMessage: string) => {
+          throw Error(errorMessage);
+        },
+        onAnalysisPoints: (points: TimeStampedPoint[]) => {
+          collectedPoints.push(...points);
+        },
+      }
+    );
     return collectedPoints;
   }
 
@@ -183,19 +185,21 @@ export class ReplayClient implements ReplayClientInterface {
   // TODO (console-refactor) Refactor to share with getEntryPointsForEventType.
   async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
-    await analysisManager.runAnalysis({
-      effectful: false,
-      locations: [{ location }],
-      mapper: "",
-    },
-    {
-      onAnalysisError: (errorMessage: string) => {
-        throw Error(errorMessage);
+    await analysisManager.runAnalysis(
+      {
+        effectful: false,
+        locations: [{ location }],
+        mapper: "",
       },
-      onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
-        collectedPointDescriptions.push(...pointDescriptions);
-      },
-    });
+      {
+        onAnalysisError: (errorMessage: string) => {
+          throw Error(errorMessage);
+        },
+        onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
+          collectedPointDescriptions.push(...pointDescriptions);
+        },
+      }
+    );
     return collectedPointDescriptions;
   }
 
@@ -284,25 +288,27 @@ export class ReplayClient implements ReplayClientInterface {
     mapper: string
   ): Promise<Result> {
     return new Promise<Result>((resolve, reject) => {
-      analysisManager.runAnalysis({
-        effectful: false,
-        locations: [{ location }],
-        points: [timeStampedPoint.point],
-        mapper,
-      },
-      {
-        onAnalysisError: (errorMessage: string) => {
-          reject(errorMessage);
+      analysisManager.runAnalysis(
+        {
+          effectful: false,
+          locations: [{ location }],
+          points: [timeStampedPoint.point],
+          mapper,
         },
-        onAnalysisResult: (analysisEntries) => {
-          if (analysisEntries.length === 0) {
-            reject("No results found");
-          } else {
-            const analysisEntry = analysisEntries[0];
-            resolve(analysisEntry.value as Result);
-          }
-        },
-      });
+        {
+          onAnalysisError: (errorMessage: string) => {
+            reject(errorMessage);
+          },
+          onAnalysisResult: analysisEntries => {
+            if (analysisEntries.length === 0) {
+              reject("No results found");
+            } else {
+              const analysisEntry = analysisEntries[0];
+              resolve(analysisEntry.value as Result);
+            }
+          },
+        }
+      );
     });
   }
 }

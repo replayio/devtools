@@ -1,6 +1,6 @@
 import Icon from "@bvaughn/components/Icon";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import type { Event } from "@bvaughn/src/suspense/EventsCache";
+import { Event } from "@bvaughn/src/suspense/EventsCache";
 import { useContext } from "react";
 
 import styles from "./EventType.module.css";
@@ -14,10 +14,10 @@ export default function EventType({
   disabled: boolean;
   event: Event;
 }) {
-  const { events, update } = useContext(ConsoleFiltersContext);
+  const { eventTypesForDisplay, update } = useContext(ConsoleFiltersContext);
 
-  const checked = events[event.type] === true;
-  const toggle = () => update({ events: { [event.type]: !checked } });
+  const checked = eventTypesForDisplay[event.type] === true;
+  const toggle = () => update({ eventTypes: { [event.type]: !checked } });
 
   return (
     <label className={disabled ? styles.EventTypeDisabled : styles.EventType}>
