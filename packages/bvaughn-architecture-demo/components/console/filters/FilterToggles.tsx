@@ -1,10 +1,12 @@
+import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import React, { useContext, useMemo } from "react";
+import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
-import useFocusRange from "./hooks/useFocusRange";
+import useFocusRange from "../hooks/useFocusRange";
 
 export default function FilterToggles() {
   const focusRange = useFocusRange();
@@ -69,6 +71,10 @@ export default function FilterToggles() {
         label="Errors"
         onChange={showErrors => update({ showErrors })}
       />
+      <hr className={styles.Divider} />
+      <Suspense fallback={<Loader />}>
+        <EventsList />
+      </Suspense>
       <hr className={styles.Divider} />
       <Toggle
         checked={!showNodeModules}

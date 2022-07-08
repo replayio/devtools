@@ -65,22 +65,14 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
 
-  const primaryContent = (
-    <div className={styles.PrimaryRow}>
-      <div className={styles.LogContents}>
-        {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time)}</span>
-        )}
-        {icon}
-        {message.text && <span className={styles.MessageText}>{message.text}</span>}
-        <Suspense fallback={<Loader />}>
-          {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-            <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
-          ))}
-        </Suspense>
-      </div>
+  const logContents = (
+    <div className={styles.LogContents}>
+      {icon}
+      {message.text && <span className={styles.MessageText}>{message.text}</span>}
       <Suspense fallback={<Loader />}>
-        <div className={styles.Source}>{location && <Source location={location} />}</div>
+        {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
+          <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
+        ))}
       </Suspense>
     </div>
   );
@@ -94,15 +86,27 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {showExpandable ? (
-        <Expandable
-          children={<MessageStackRenderer message={message} />}
-          className={styles.Expandable}
-          header={primaryContent}
-        />
-      ) : (
-        primaryContent
-      )}
+      <div
+        className={
+          showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
+        }
+      >
+        {showTimestamps && (
+          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
+        )}
+        {showExpandable ? (
+          <Expandable
+            children={<MessageStackRenderer message={message} />}
+            className={styles.Expandable}
+            header={logContents}
+          />
+        ) : (
+          logContents
+        )}
+        <Suspense fallback={<Loader />}>
+          <div className={styles.Source}>{location && <Source location={location} />}</div>
+        </Suspense>
+      </div>
 
       {isHovered && (
         <MessageHoverButton

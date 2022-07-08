@@ -5,8 +5,8 @@ import { LogPointsContextRoot } from "@bvaughn/src/contexts/LogPointsContext";
 import { Suspense } from "react";
 
 import styles from "./ConsoleRoot.module.css";
-import FilterToggles from "./FilterToggles";
-import FilterText from "./FilterText";
+import FilterText from "./filters/FilterText";
+import FilterToggles from "./filters/FilterToggles";
 import Input from "./Input";
 import MessagesList from "./MessagesList";
 import Search from "./Search";

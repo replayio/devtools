@@ -1,0 +1,33 @@
+.EventsList {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 0 0.75rem;
+  gap: 0.5rem;
+}
+
+.Header {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.FilterInput {
+  width: 100%;
+  height: 2rem;
+  padding: 0 0.5ch;
+  background: none;
+  border: 2px solid transparent;
+  outline: none;
+  background-color: var(--background-color-default);
+  color: var(--color-default);
+  font-family: Menlo, Consolas, monospace;
+  font-size: var(--font-size-regular);
+}
+.FilterInput:focus {
+  background-color: var(--background-color-contrast-1);
+  border-color: var(--color-brand);
+}
+.FilterInput:disabled {
+  opacity: 0.5;
+}

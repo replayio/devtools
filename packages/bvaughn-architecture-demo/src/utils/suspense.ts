@@ -9,12 +9,32 @@ export function createWakeable<T>(): Wakeable<T> {
   const resolveCallbacks: Set<(value: T) => void> = new Set();
   const rejectCallbacks: Set<(error: Error) => void> = new Set();
 
+  let status: "unresolved" | "resolved" | "rejected" = "unresolved";
+  let data: T | Error | null = null;
+
   const wakeable: Wakeable<T> = {
     then(resolveCallback: (value: T) => void, rejectCallback: (error: Error) => void) {
-      resolveCallbacks.add(resolveCallback);
-      rejectCallbacks.add(rejectCallback);
+      switch (status) {
+        case "unresolved":
+          resolveCallbacks.add(resolveCallback);
+          rejectCallbacks.add(rejectCallback);
+          break;
+        case "rejected":
+          rejectCallback(data as Error);
+          break;
+        case "resolved":
+          resolveCallback(data as T);
+          break;
+      }
     },
     reject(error: Error) {
+      if (status !== "unresolved") {
+        throw Error(`Wakeable has already been ${status}`);
+      }
+
+      status = "rejected";
+      data = error;
+
       rejectCallbacks.forEach(rejectCallback => {
         let thrownValue = null;
 
@@ -28,8 +48,18 @@ export function createWakeable<T>(): Wakeable<T> {
           throw thrownValue;
         }
       });
+
+      rejectCallbacks.clear();
+      resolveCallbacks.clear();
     },
     resolve(value: T) {
+      if (status !== "unresolved") {
+        throw Error(`Wakeable has already been ${status}`);
+      }
+
+      status = "resolved";
+      data = value;
+
       resolveCallbacks.forEach(resolveCallback => {
         let thrownValue = null;
 
@@ -43,6 +73,9 @@ export function createWakeable<T>(): Wakeable<T> {
           throw thrownValue;
         }
       });
+
+      rejectCallbacks.clear();
+      resolveCallbacks.clear();
     },
   };
 

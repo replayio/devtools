@@ -1,9 +1,9 @@
 .Expandable {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
 }
 
-.PreviewRow {
+.ToggleButton {
   color: var(--value-type-object);
   display: flex;
   align-items: flex-start;
@@ -22,6 +22,7 @@
   transition: transform 200ms;
   width: 1rem;
   height: 1rem;
+  margin-right: 0.5ch;
   display: inline-block;
 }
 .ArrowExpanded {

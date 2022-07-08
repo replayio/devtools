@@ -1,0 +1,24 @@
+.Header {
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto min-content;
+  gap: 0.5ch;
+}
+
+.Category {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.List {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.25rem;
+  gap: 0.5rem;
+}
+
+.Count {
+  font-size: var(--font-size-small);
+  color: var(--color-dim);
+}

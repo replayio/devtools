@@ -1,7 +1,14 @@
 import {
   ContentType,
+  EventHandlerType,
+  KeyboardEvent,
+  keyboardEvents,
   Location,
   Message,
+  MouseEvent,
+  mouseEvents,
+  NavigationEvent,
+  navigationEvents,
   newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
@@ -14,12 +21,13 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import ConsoleSettings from "devtools/client/webconsole/components/FilterBar/ConsoleSettings";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
-import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
+import { ColumnHits, Events, LineHits, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -150,6 +158,12 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  async getEventCountForType(eventType: EventHandlerType): Promise<number> {
+    const sessionId = this.getSessionIdThrows();
+    const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);
+    return count;
+  }
+
   async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
     const sessionId = this.getSessionIdThrows();
     const data = await new Promise<PointDescription[]>(async resolve => {
@@ -162,11 +176,24 @@ export class ReplayClient implements ReplayClientInterface {
       );
 
       client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
       client.Analysis.addAnalysisPointsListener(({ points }) => {
-        resolve(points);
+        client.Analysis.removeAnalysisPointsListener();
         client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        clearTimeout(timeoutId);
+
+        resolve(points);
       });
+      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
+
+      // TOOD (BAC-1926) Sometimes the protocol won't return any points.
+      // In this case, we should eventually timeout and assume there are none.
+      let timeoutId = setTimeout(() => {
+        client.Analysis.removeAnalysisPointsListener();
+        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+
+        resolve([]);
+      }, 500);
     });
 
     return data;

@@ -39,7 +39,7 @@ export default function createReplayClientRecorder(
   const printInstructions = () => {
     console.log(`
       const ACCESS_TOKEN = ${hasAccessToken ? `"${FAKE_ACCESS_TOKEN}"` : null};
-      const RECORDING_ID = "${recordingId}";
+      const RECORDING_ID = getFlag("recordingId") || "${recordingId}";
       const replayClient = createReplayClientForPlaywrightTesting(
         \`${encode(logEntries)}\`
       );

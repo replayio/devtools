@@ -1,5 +1,6 @@
 .KeyValue {
   display: inline;
+  text-align: start;
 }
 
 .HorizontalName {
@@ -13,7 +14,7 @@
 }
 
 .ToggleAlignmentPadding {
-  margin-left: 1rem;
+  margin-left: 1.25rem;
 }
 
 .Separator {

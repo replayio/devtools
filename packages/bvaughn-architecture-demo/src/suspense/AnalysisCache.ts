@@ -1,4 +1,4 @@
-import { Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import { EventHandlerType, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -38,6 +38,26 @@ export function getCachedAnalysis(
   } else {
     return null;
   }
+}
+
+export function getEventTypePoints(
+  client: ReplayClientInterface,
+  eventType: EventHandlerType
+): any {
+  /* TODO (console:filters)
+    const collectedPoints: PointDescription[] = [];
+    await analysisManager.runAnalysis(
+      {
+        mapper: `return [{ key: input.point, value: input }];`,
+        effectful: false,
+        eventHandlerEntryPoints: [{ eventType }],
+      },
+      {
+        onAnalysisPoints: points => collectedPoints.push(...points),
+      }
+    );
+    eventTypePoints[eventType] = collectedPoints;
+  */
 }
 
 export function runAnalysis(

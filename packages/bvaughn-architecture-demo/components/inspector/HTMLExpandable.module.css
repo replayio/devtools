@@ -1,5 +1,5 @@
 .Expanded {
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
 }
 .Collapsed {
@@ -23,6 +23,7 @@
 .ArrowExpanded {
   width: 1rem;
   height: 1rem;
+  margin-right: 0.5ch;
   transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
   display: inline-block;
