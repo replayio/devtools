@@ -68,6 +68,7 @@
 .Source {
   flex: 1 1 100%;
   display: flex;
+  justify-content: flex-end;
   opacity: 0.75;
   overflow: hidden;
 }
