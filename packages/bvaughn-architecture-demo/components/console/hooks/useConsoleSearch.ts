@@ -1,5 +1,5 @@
 import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
-import { isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
 import useSearch from "@bvaughn/src/hooks/useSearch";
 import type { Actions as SearchActions, State as SearchState } from "@bvaughn/src/hooks/useSearch";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
@@ -15,7 +15,24 @@ function search(query: string, loggables: Loggable[]): Loggable[] {
 
   const needle = query.toLocaleLowerCase();
   loggables.forEach(loggable => {
-    if (isLogPointInstance(loggable)) {
+    if (isEventTypeLog(loggable)) {
+      loggable.values.some(value => {
+        // TODO Search non-primitive values (nested values) as well.
+        // Probably easier if we convert from ProtocolValue to ClientValue first.
+        if (typeof value === "string") {
+          if ((value as string).toLocaleLowerCase().includes(needle)) {
+            results.push(loggable);
+            return true;
+          }
+        } else if (typeof value?.value === "string") {
+          if (value?.value?.toLowerCase()?.includes(needle)) {
+            results.push(loggable);
+            return true;
+          }
+        }
+        return false;
+      });
+    } else if (isLogPointInstance(loggable)) {
       const logPointInstance = loggable as LogPointInstance;
       const analysis = getCachedAnalysis(
         logPointInstance.point.location,

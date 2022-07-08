@@ -14,9 +14,9 @@ export default function EventType({
   disabled: boolean;
   event: Event;
 }) {
-  const { eventTypesForDisplay, update } = useContext(ConsoleFiltersContext);
+  const { eventTypesForDisplay: eventTypes, update } = useContext(ConsoleFiltersContext);
 
-  const checked = eventTypesForDisplay[event.type] === true;
+  const checked = eventTypes[event.type] === true;
   const toggle = () => update({ eventTypes: { [event.type]: !checked } });
 
   return (

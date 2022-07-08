@@ -1,16 +1,17 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import { isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 import { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import useFilteredMessages, { Loggable } from "./hooks/useFilteredMessages";
 
+import useFilteredMessages, { Loggable } from "./hooks/useFilteredMessages";
 import useFocusRange from "./hooks/useFocusRange";
-import LogPointInstanceRenderer from "./LogPointInstanceRenderer";
-import MessageRenderer from "./MessageRenderer";
 import styles from "./MessagesList.module.css";
+import EventTypeRenderer from "./renderers/EventTypeRenderer";
+import LogPointInstanceRenderer from "./renderers/LogPointInstanceRenderer";
+import MessageRenderer from "./renderers/MessageRenderer";
 import { SearchContext } from "./SearchContext";
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.
@@ -57,7 +58,13 @@ export default function MessagesList() {
       )}
       {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
       {loggables.map((loggable: Loggable, index: number) =>
-        isLogPointInstance(loggable) ? (
+        isEventTypeLog(loggable) ? (
+          <EventTypeRenderer
+            key={index}
+            isFocused={loggable === currentSearchResult}
+            eventTypeLog={loggable}
+          />
+        ) : isLogPointInstance(loggable) ? (
           <LogPointInstanceRenderer
             key={index}
             isFocused={loggable === currentSearchResult}

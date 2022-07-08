@@ -156,6 +156,7 @@ async function fetchMessages(
       lastFetchedMessages = messages;
 
       // Pre-cache ObjectPreview data for this Message (PauseId).
+      // This will avoid us having to turn around and request it again when rendering the logs.
       messages.forEach(message => {
         const objects = message.data.objects;
         if (objects) {

@@ -10,10 +10,11 @@ import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
-import MessageHoverButton from "./MessageHoverButton";
-import styles from "./MessageRenderer.module.css";
-import MessageStackRenderer from "./MessageStackRenderer";
-import Source from "./Source";
+import MessageHoverButton from "../MessageHoverButton";
+import MessageStackRenderer from "../MessageStackRenderer";
+import Source from "../Source";
+
+import styles from "./shared.module.css";
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
@@ -31,23 +32,23 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     }
   }, [isFocused]);
 
-  let className = styles.MessageRow;
+  let className = styles.Row;
   let icon = null;
   let showExpandable = false;
   switch (message.level) {
     case "error": {
-      className = styles.MessageRowError;
+      className = styles.ErrorRow;
       icon = <Icon className={styles.ErrorIcon} type="error" />;
       showExpandable = true;
       break;
     }
     case "trace": {
-      className = styles.MessageRowTrace;
+      className = styles.TraceRow;
       showExpandable = true;
       break;
     }
     case "warning": {
-      className = styles.MessageRowWarning;
+      className = styles.WarningRow;
       icon = <Icon className={styles.WarningIcon} type="warning" />;
       showExpandable = true;
       break;

@@ -1,7 +1,8 @@
-import { EventHandlerType, PointDescription } from "@replayio/protocol";
+import { EventHandlerType, Frame, Location, Object, PauseId } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
+import { preCacheObjects } from "./ObjectPreviews";
 import { Record, STATUS_PENDING, STATUS_RESOLVED, Wakeable } from "./types";
 
 export type Event = {
@@ -15,7 +16,18 @@ export type EventCategory = {
   events: Event[];
 };
 
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<PointDescription[]>>();
+export type EventTypeLog = {
+  data: {
+    frames: Frame[];
+    objects: Object[];
+  };
+  location: Location[];
+  pauseId: PauseId;
+  time: number;
+  values: any[];
+};
+
+let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventTypeLog[]>>();
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 
@@ -36,12 +48,12 @@ export function getEventCategoryCounts(client: ReplayClientInterface): EventCate
 export function getEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType
-): PointDescription[] {
+): EventTypeLog[] {
   let record = eventTypeToEntryPointMap.get(eventType);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<PointDescription[]>(),
+      value: createWakeable<EventTypeLog[]>(),
     };
 
     eventTypeToEntryPointMap.set(eventType, record);
@@ -94,9 +106,17 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
 async function fetchEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType,
-  record: Record<PointDescription[]>
+  record: Record<EventTypeLog[]>
 ) {
-  const entryPoints = await client.getEntryPointsForEventType(eventType);
+  const entryPoints = await client.runAnalysis<EventTypeLog>({
+    effectful: false,
+    eventHandlerEntryPoints: [{ eventType }],
+    mapper: MAPPER,
+  });
+
+  // Pre-cache object previews that came back with our new analysis data.
+  // This will avoid us having to turn around and request them again when rendering the logs.
+  entryPoints.forEach(entryPoint => preCacheObjects(entryPoint.pauseId, entryPoint.data.objects));
 
   const wakeable = record.value;
 
@@ -105,3 +125,69 @@ async function fetchEventTypeEntryPoints(
 
   wakeable.resolve(entryPoints);
 }
+
+const MAPPER = `
+  const finalData = { frames: [], scopes: [], objects: [] };
+  function addPauseData({ frames, scopes, objects }) {
+    finalData.frames.push(...(frames || []));
+    finalData.scopes.push(...(scopes || []));
+    finalData.objects.push(...(objects || []));
+  }
+  function getTopFrame() {
+    const { frame, data } = sendCommand("Pause.getTopFrame");
+    addPauseData(data);
+    return finalData.frames.find((f) => f.frameId == frame);
+  }
+
+  const { point, time, pauseId } = input;
+  const { frameId, location } = getTopFrame();
+  const { result } = sendCommand("Pause.evaluateInFrame", {
+    frameId,
+    expression: "[...arguments]",
+  });
+  const values = [];
+  addPauseData(result.data);
+  if (result.exception) {
+    values.push(result.exception);
+  } else {
+    {
+      const { object } = result.returned;
+      const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
+        object,
+        name: "length",
+      });
+      addPauseData(lengthResult.data);
+      const length = lengthResult.returned.value;
+      for (let i = 0; i < length; i++) {
+        const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
+          object,
+          name: i.toString(),
+        });
+        values.push(elementResult.returned);
+        addPauseData(elementResult.data);
+      }
+    }
+  }
+  let frameworkListeners;
+
+  const { result: frameworkResult } = sendCommand("Pause.evaluateInFrame", {
+    frameId,
+    expression: "",
+  });
+  addPauseData(frameworkResult.data);
+  frameworkListeners = frameworkResult.returned;
+
+  return [
+    {
+      key: point,
+      value: {
+        time,
+        pauseId,
+        location,
+        values,
+        data: finalData,
+        frameworkListeners,
+      },
+    },
+  ];
+`;

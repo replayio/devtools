@@ -18,7 +18,7 @@ export type Toggles = {
   showWarnings: boolean;
 };
 
-type EventTypes = {
+export type EventTypes = {
   [eventType: EventHandlerType]: boolean;
 };
 

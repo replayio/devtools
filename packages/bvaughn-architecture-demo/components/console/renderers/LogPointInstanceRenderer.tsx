@@ -6,15 +6,16 @@ import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
 import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
+import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import styles from "./LogPointInstanceRenderer.module.css";
-import MessageHoverButton from "./MessageHoverButton";
-import Source from "./Source";
-import { formatTimestamp } from "@bvaughn/src/utils/time";
+import MessageHoverButton from "../MessageHoverButton";
+import Source from "../Source";
+
+import styles from "./shared.module.css";
 
 function LogPointInstanceRenderer({
   isFocused,
@@ -45,7 +46,7 @@ function LogPointInstanceRenderer({
     logPointInstance.point.content
   );
 
-  let className = styles.LogPointRow;
+  let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
@@ -73,7 +74,11 @@ function LogPointInstanceRenderer({
       ));
 
   const primaryContent = (
-    <div className={styles.PrimaryRow}>
+    <div
+      className={
+        showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
+      }
+    >
       {showTimestamps && (
         <span className={styles.TimeStamp}>
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}

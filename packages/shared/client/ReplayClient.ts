@@ -15,13 +15,13 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import analysisManager from "protocol/analysisManager";
+import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 
-import { ColumnHits, Events, LineHits, ReplayClientInterface } from "./types";
+import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -154,34 +154,12 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
-  // TODO (console-refactor) Refactor to share code with getHitPointsForLocation
-  async getEntryPointsForEventType(eventType: EventHandlerType): Promise<TimeStampedPoint[]> {
-    const collectedPoints: TimeStampedPoint[] = [];
-    await analysisManager.runAnalysis(
-      {
-        effectful: false,
-        eventHandlerEntryPoints: [{ eventType }],
-        mapper: "return [{ key: input.point, value: input }];",
-      },
-      {
-        onAnalysisError: (errorMessage: string) => {
-          throw Error(errorMessage);
-        },
-        onAnalysisPoints: (points: TimeStampedPoint[]) => {
-          collectedPoints.push(...points);
-        },
-      }
-    );
-    return collectedPoints;
-  }
-
   async getEventCountForType(eventType: EventHandlerType): Promise<number> {
     const sessionId = this.getSessionIdThrows();
     const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);
     return count;
   }
 
-  // TODO (console-refactor) Refactor to share with getEntryPointsForEventType.
   async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
     await analysisManager.runAnalysis(
@@ -281,33 +259,16 @@ export class ReplayClient implements ReplayClientInterface {
     return hitCounts;
   }
 
-  async runAnalysis<Result>(
-    location: Location,
-    timeStampedPoint: TimeStampedPoint,
-    mapper: string
-  ): Promise<Result> {
-    return new Promise<Result>((resolve, reject) => {
-      analysisManager.runAnalysis(
-        {
-          effectful: false,
-          locations: [{ location }],
-          points: [timeStampedPoint.point],
-          mapper,
+  async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
+    return new Promise<Result[]>((resolve, reject) => {
+      analysisManager.runAnalysis(analysisParams, {
+        onAnalysisError: (errorMessage: string) => {
+          reject(errorMessage);
         },
-        {
-          onAnalysisError: (errorMessage: string) => {
-            reject(errorMessage);
-          },
-          onAnalysisResult: analysisEntries => {
-            if (analysisEntries.length === 0) {
-              reject("No results found");
-            } else {
-              const analysisEntry = analysisEntries[0];
-              resolve(analysisEntry.value as Result);
-            }
-          },
-        }
-      );
+        onAnalysisResult: analysisEntries => {
+          resolve(analysisEntries.map(entry => entry.value));
+        },
+      });
     });
   }
 }

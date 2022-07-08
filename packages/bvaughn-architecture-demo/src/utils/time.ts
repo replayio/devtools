@@ -44,7 +44,7 @@ export function formatTimestamp(ms: number, showHighPrecision: boolean = false) 
   const minutesString = Math.floor(seconds / 60);
   const secondsString = padStart(String(seconds % 60), 2, "0");
   if (showHighPrecision) {
-    const millisecondsString = padStart(`${ms % 1000}`, 3, "0");
+    const millisecondsString = padStart(`${Math.round(ms) % 1000}`, 3, "0");
     return `${minutesString}:${secondsString}.${millisecondsString}`;
   } else {
     return `${minutesString}:${secondsString}`;
