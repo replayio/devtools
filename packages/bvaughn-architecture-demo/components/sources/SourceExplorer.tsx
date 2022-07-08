@@ -16,25 +16,25 @@ export default function SourceExplorer() {
     <div className={styles.List}>
       <div className={styles.Header}>Sources</div>
       <div className={styles.SourceTree}>
-        {sourceTree.map(node => {
+        {sourceTree.map((node, index) => {
           switch (node.type) {
             case "origin":
               return (
-                <div key={node.origin} className={styles.ListItem}>
+                <div key={index} className={styles.ListItem}>
                   <Icon className={styles.Icon} type="folder" />
                   {node.origin}
                 </div>
               );
             case "protocol":
               return (
-                <div key={node.protocol} className={styles.ListItem}>
+                <div key={index} className={styles.ListItem}>
                   <Icon className={styles.Icon} type="protocol" />
                   {node.protocol}
                 </div>
               );
             case "source":
               return (
-                <div key={node.source.sourceId} className={styles.ListItem}>
+                <div key={index} className={styles.ListItem}>
                   <Icon className={styles.Icon} type="document" />
                   {node.path}
                 </div>
