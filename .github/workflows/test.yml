@@ -163,7 +163,7 @@ jobs:
           fs.writeFileSync(output, JSON.stringify(recordings));
 
           return output;
-    - uses: replayio/action-comment@ryan/bac-1931-action-upload-should-write-recordings-to
+    - uses: replayio/action-comment@main
       with:
         api-key: ${{ env.RECORD_REPLAY_API_KEY }}
         issue-number: ${{ github.event.pull_request.number }}
