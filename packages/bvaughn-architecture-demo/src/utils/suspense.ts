@@ -8,13 +8,37 @@ import { Wakeable } from "../suspense/types";
 export function createWakeable<T>(): Wakeable<T> {
   const resolveCallbacks: Set<(value: T) => void> = new Set();
   const rejectCallbacks: Set<(error: Error) => void> = new Set();
+  let result:
+    | { status: "pending"; value: undefined }
+    | { status: "resolved"; value: T }
+    | { status: "rejected"; value: Error } = {
+    status: "pending",
+    value: undefined,
+  };
 
   const wakeable: Wakeable<T> = {
     then(resolveCallback: (value: T) => void, rejectCallback: (error: Error) => void) {
-      resolveCallbacks.add(resolveCallback);
-      rejectCallbacks.add(rejectCallback);
+      switch (result.status) {
+        case "resolved":
+          resolveCallback(result.value);
+          return;
+        case "rejected":
+          rejectCallback(result.value);
+          return;
+        default:
+          resolveCallbacks.add(resolveCallback);
+          rejectCallbacks.add(rejectCallback);
+          return;
+      }
     },
     reject(error: Error) {
+      if (result.status !== "pending") {
+        return;
+      }
+      result = {
+        status: "rejected",
+        value: error,
+      };
       rejectCallbacks.forEach(rejectCallback => {
         let thrownValue = null;
 
@@ -30,6 +54,13 @@ export function createWakeable<T>(): Wakeable<T> {
       });
     },
     resolve(value: T) {
+      if (result.status !== "pending") {
+        return;
+      }
+      result = {
+        status: "resolved",
+        value,
+      };
       resolveCallbacks.forEach(resolveCallback => {
         let thrownValue = null;
 
