@@ -161,7 +161,6 @@ export class ReplayClient implements ReplayClientInterface {
       {
         effectful: false,
         eventHandlerEntryPoints: [{ eventType }],
-        // locations: [{ location }],
         mapper: "return [{ key: input.point, value: input }];",
       },
       {
