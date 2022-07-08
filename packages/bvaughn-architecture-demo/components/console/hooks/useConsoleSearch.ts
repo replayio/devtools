@@ -47,6 +47,11 @@ function search(query: string, loggables: Loggable[]): Loggable[] {
             results.push(loggable);
             return true;
           }
+        } else if (typeof value?.value === "string") {
+          if (value?.value?.toLowerCase()?.includes(needle)) {
+            results.push(loggable);
+            return true;
+          }
         }
         return false;
       });
