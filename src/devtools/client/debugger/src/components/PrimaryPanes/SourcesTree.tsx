@@ -7,7 +7,9 @@
 // Dependencies
 import React, { Component } from "react";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 
 // Selectors
 import {
@@ -21,8 +23,6 @@ import {
   getContext,
 } from "../../selectors";
 
-import { getGeneratedSourceByURL } from "../../reducers/sources";
-
 // Actions
 import actions from "../../actions";
 
@@ -35,16 +35,18 @@ import {
   createTree,
   getDirectories,
   isDirectory,
-  findSourceTreeNodes,
   getSourceFromNode,
   nodeHasChildren,
   updateTree,
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
-import { getRawSourceURL } from "../../utils/source";
 import { trackEvent } from "ui/utils/telemetry";
+import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
+import { Source } from "../../reducers/sources";
 
-function shouldAutoExpand(depth, item, debuggeeUrl) {
+type $FixTypeLater = any;
+
+function shouldAutoExpand(depth: number, item: TreeNode, debuggeeUrl: string) {
   if (depth !== 1) {
     return false;
   }
@@ -53,37 +55,74 @@ function shouldAutoExpand(depth, item, debuggeeUrl) {
   return item.name === host;
 }
 
-function findSource({ sources }, itemPath, source) {
+function findSource(sources: Record<string, Source>, itemPath: string, source: Source) {
   if (source) {
     return sources[source.id];
   }
   return source;
 }
 
-class SourcesTree extends Component {
-  constructor(props) {
+const mapStateToProps = (state: UIState) => {
+  const selectedSource = getSelectedSource(state);
+  const shownSource = getShownSource(state);
+  const sources = getDisplayedSources(state);
+
+  return {
+    cx: getContext(state),
+    sourcesLoading: getSourcesLoading(state),
+    shownSource: shownSource,
+    selectedSource: selectedSource,
+    debuggeeUrl: getDebuggeeUrl(state),
+    expanded: getExpandedState(state),
+    focused: getFocusedSourceItem(state),
+    sources: sources,
+    sourceCount: Object.values(sources).length,
+  };
+};
+
+const connector = connect(mapStateToProps, {
+  selectSource: actions.selectSource,
+  setExpandedState: actions.setExpandedState,
+  focusItem: actions.focusItem,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+interface STState {
+  uncollapsedTree: TreeDirectory;
+  sourceTree: TreeNode;
+  parentMap: WeakMap<object, any>;
+  listItems?: (TreeDirectory | TreeSource)[];
+  highlightItems?: (TreeDirectory | TreeSource)[];
+}
+
+class SourcesTree extends Component<PropsFromRedux, STState> {
+  constructor(props: PropsFromRedux) {
     super(props);
     const { debuggeeUrl, sources } = this.props;
 
     const state = createTree({
       debuggeeUrl,
       sources,
-    });
+    }) as STState;
 
     if (props.shownSource) {
-      const listItems = getDirectories(props.shownSource, state.sourceTree);
+      const listItems = getDirectories(props.shownSource, state.sourceTree as TreeDirectory);
       state.listItems = listItems;
     }
 
     if (props.selectedSource) {
-      const highlightItems = getDirectories(props.selectedSource, state.sourceTree);
+      const highlightItems = getDirectories(
+        props.selectedSource,
+        this.state.sourceTree as TreeDirectory
+      );
       state.highlightItems = highlightItems;
     }
 
     this.state = state;
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
     const { debuggeeUrl, sources, shownSource, selectedSource } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
 
@@ -99,12 +138,12 @@ class SourcesTree extends Component {
     }
 
     if (nextProps.shownSource && nextProps.shownSource != shownSource) {
-      const listItems = getDirectories(nextProps.shownSource, sourceTree);
+      const listItems = getDirectories(nextProps.shownSource, sourceTree as TreeDirectory);
       return this.setState({ listItems });
     }
 
     if (nextProps.selectedSource && nextProps.selectedSource != selectedSource) {
-      const highlightItems = getDirectories(nextProps.selectedSource, sourceTree);
+      const highlightItems = getDirectories(nextProps.selectedSource, sourceTree as TreeDirectory);
       this.setState({ highlightItems });
     }
 
@@ -123,28 +162,28 @@ class SourcesTree extends Component {
     }
   }
 
-  selectItem = item => {
+  selectItem = (item: TreeNode) => {
     if (item.type == "source" && !Array.isArray(item.contents)) {
       trackEvent("source_explorer.select_source");
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };
 
-  onFocus = item => {
+  onFocus = (item: TreeNode) => {
     this.props.focusItem(item);
   };
 
-  onActivate = item => {
+  onActivate = (item: TreeNode) => {
     this.selectItem(item);
   };
 
   // NOTE: we get the source from sources because item.contents is cached
-  getSource(item) {
+  getSource(item: TreeNode) {
     const source = getSourceFromNode(item);
-    return findSource(this.props, item.path, source);
+    return findSource(this.props.sources, item.path, source!);
   }
 
-  getPath = item => {
+  getPath = (item: TreeNode) => {
     const { path } = item;
     const source = this.getSource(item);
 
@@ -157,20 +196,21 @@ class SourcesTree extends Component {
     return `${path}/${source.id}/${blackBoxedPart}`;
   };
 
-  onExpand = (item, expandedState) => {
+  onExpand = (item: TreeNode, expandedState: $FixTypeLater) => {
     this.props.setExpandedState(expandedState);
   };
 
-  onCollapse = (item, expandedState) => {
+  onCollapse = (item: TreeNode, expandedState: $FixTypeLater) => {
     this.props.setExpandedState(expandedState);
   };
 
   isEmpty() {
     const { sourceTree } = this.state;
+    // @ts-expect-error single/array mismatch
     return sourceTree.contents.length === 0;
   }
 
-  renderEmptyElement(message) {
+  renderEmptyElement(message: string) {
     return (
       <div key="empty" className="no-sources-message">
         {message}
@@ -178,15 +218,22 @@ class SourcesTree extends Component {
     );
   }
 
-  getRoots = sourceTree => {
+  getRoots = (sourceTree: TreeNode) => {
     return sourceTree.contents;
   };
 
-  getChildren = item => {
+  getChildren = (item: TreeNode) => {
     return nodeHasChildren(item) ? item.contents : [];
   };
 
-  renderItem = (item, depth, focused, _, expanded, { setExpanded }) => {
+  renderItem = (
+    item: TreeNode,
+    depth: number,
+    focused: boolean,
+    _: any,
+    expanded: boolean,
+    { setExpanded }: { setExpanded: () => void }
+  ) => {
     const { debuggeeUrl } = this.props;
 
     return (
@@ -216,7 +263,7 @@ class SourcesTree extends Component {
       expanded,
       focused,
       getChildren: this.getChildren,
-      getParent: item => parentMap.get(item),
+      getParent: (item: TreeNode) => parentMap.get(item),
       getPath: this.getPath,
       getRoots: () => this.getRoots(sourceTree),
       highlightItems,
@@ -262,26 +309,4 @@ class SourcesTree extends Component {
   }
 }
 
-const mapStateToProps = (state, props) => {
-  const selectedSource = getSelectedSource(state);
-  const shownSource = getShownSource(state);
-  const sources = getDisplayedSources(state);
-
-  return {
-    cx: getContext(state),
-    sourcesLoading: getSourcesLoading(state),
-    shownSource: shownSource,
-    selectedSource: selectedSource,
-    debuggeeUrl: getDebuggeeUrl(state),
-    expanded: getExpandedState(state),
-    focused: getFocusedSourceItem(state),
-    sources: sources,
-    sourceCount: Object.values(sources).length,
-  };
-};
-
-export default connect(mapStateToProps, {
-  selectSource: actions.selectSource,
-  setExpandedState: actions.setExpandedState,
-  focusItem: actions.focusItem,
-})(SourcesTree);
+export default connector(SourcesTree);
