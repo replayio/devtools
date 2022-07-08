@@ -10,6 +10,8 @@ import { useStringPref } from "ui/hooks/settings";
 import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
 
+import { resizeBreakpointGutter } from "../../utils/ui";
+
 type Props = {
   editor: any;
 };
@@ -82,6 +84,7 @@ function LineHitCounts({ editor }: Props) {
         "CodeMirror-linenumbers",
         { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
+      resizeBreakpointGutter(editor.editor);
 
       // HACK
       // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
@@ -147,6 +150,7 @@ function LineHitCounts({ editor }: Props) {
 
     return () => {
       editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      resizeBreakpointGutter(editor.editor);
 
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
