@@ -78,7 +78,11 @@ export function partIsFile(index: number, parts: string[], url: TreeNode) {
   return isLastPart && !isDirectory(url);
 }
 
-export function createDirectoryNode(name: string, path: string, contents: TreeNode[]) {
+export function createDirectoryNode(
+  name: string,
+  path: string,
+  contents: TreeNode[]
+): TreeDirectory {
   return {
     type: "directory",
     name,
@@ -87,7 +91,7 @@ export function createDirectoryNode(name: string, path: string, contents: TreeNo
   };
 }
 
-export function createSourceNode(name: string, path: string, contents: Source) {
+export function createSourceNode(name: string, path: string, contents: Source): TreeSource {
   return {
     type: "source",
     name,
