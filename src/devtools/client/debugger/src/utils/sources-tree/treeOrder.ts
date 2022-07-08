@@ -8,10 +8,13 @@ import { parse } from "../url";
 
 import { nodeHasChildren } from "./utils";
 
+import type { Source } from "../../reducers/sources";
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+
 /*
  * Gets domain from url (without www prefix)
  */
-export function getDomain(url) {
+export function getDomain(url?: string) {
   if (!url) {
     return null;
   }
@@ -25,7 +28,7 @@ export function getDomain(url) {
 /*
  * Checks if node name matches debugger host/domain.
  */
-function isExactDomainMatch(part, debuggeeHost) {
+function isExactDomainMatch(part: string, debuggeeHost: string) {
   return part.startsWith("www.")
     ? part.substr("www.".length) === debuggeeHost
     : part === debuggeeHost;
@@ -34,7 +37,7 @@ function isExactDomainMatch(part, debuggeeHost) {
 /*
  * Checks if node name matches IndexName
  */
-function isIndexName(part, ...rest) {
+function isIndexName(part: string, ...rest: any[]) {
   return part === IndexName;
 }
 
@@ -45,6 +48,8 @@ function isIndexName(part, ...rest) {
  * in sorting order, or zero if the node is found.
  */
 
+export type FindNodeInContentsMatcher = (node: TreeNode) => number;
+
 /*
  * Performs a binary search to insert a node into contents. Returns positive
  * number, index of the found child, or negative number, which can be used
@@ -52,7 +57,7 @@ function isIndexName(part, ...rest) {
  * The matcher is a function that returns result of comparision of a node with
  * lookup value.
  */
-export function findNodeInContents(tree, matcher) {
+export function findNodeInContents(tree: TreeNode, matcher: FindNodeInContentsMatcher) {
   if (tree.type === "source" || tree.contents.length === 0) {
     return { found: false, index: 0 };
   }
@@ -91,8 +96,14 @@ const matcherFunctions = [isIndexName, isExactDomainMatch];
  * - hosts/directories (not files) sorted by name
  * - files sorted by name
  */
-export function createTreeNodeMatcher(part, isDir, debuggeeHost, source, sortByUrl) {
-  return node => {
+export function createTreeNodeMatcher(
+  part: string,
+  isDir: boolean,
+  debuggeeHost: string,
+  source?: Source,
+  sortByUrl?: boolean
+) {
+  return (node: TreeNode) => {
     for (let i = 0; i < matcherFunctions.length; i++) {
       // Check part against exceptions
       if (matcherFunctions[i](part, debuggeeHost)) {
@@ -122,7 +133,7 @@ export function createTreeNodeMatcher(part, isDir, debuggeeHost, source, sortByU
     }
 
     if (sortByUrl && node.type === "source" && source) {
-      return node.contents.url.localeCompare(source.url);
+      return node.contents.url!.localeCompare(source.url!);
     }
 
     if (isExactDomainMatch(part, node.name)) {
