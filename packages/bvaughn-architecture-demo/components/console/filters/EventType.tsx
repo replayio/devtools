@@ -1,6 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import type { Event } from "@bvaughn/src/suspense/EventsCache";
-import { useState } from "react";
+import { useContext } from "react";
 
 import styles from "./EventType.module.css";
 
@@ -13,8 +14,10 @@ export default function EventType({
   disabled: boolean;
   event: Event;
 }) {
-  // TODO (console-filters) This state should live in the Context (and be applied to the Console list).
-  const [checked, setChecked] = useState(false);
+  const { events, update } = useContext(ConsoleFiltersContext);
+
+  const checked = events[event.type] === true;
+  const toggle = () => update({ events: { [event.type]: !checked } });
 
   return (
     <label className={disabled ? styles.EventTypeDisabled : styles.EventType}>
@@ -23,7 +26,7 @@ export default function EventType({
         disabled={disabled}
         type="checkbox"
         checked={checked}
-        onChange={() => setChecked(!checked)}
+        onChange={toggle}
       />
       <span className={styles.Label}>
         {categoryLabel && (
