@@ -9,6 +9,17 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
 
 const withTM = transpileModules(["bvaughn-architecture-demo"]);
 
+/**
+ * @type {Pick<
+ *   import('next').NextConfig,
+ *   | 'webpack'
+ *   | 'experimental'
+ *   | 'eslint'
+ *   | 'redirects'
+ *   | 'productionBrowserSourceMaps'
+ *   | 'headers'
+ * >}
+ */
 const baseNextConfig = {
   // bumping Next from 12.0.9 to 12.1.0 required this as a temp WAR
   // (see https://github.com/vercel/next.js/pull/34500)
@@ -76,6 +87,17 @@ const baseNextConfig = {
     ];
   },
 
+  /**
+   * @type {(
+   *   config: import('webpack').Configuration,
+   *   context: {
+   *     dev: boolean
+   *     webpack: import('webpack')
+   *     buildId: string
+   *     dev: boolean
+   *   }
+   * ) => import('webpack').Configuration}
+   */
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     const entry = config.entry;
     config.entry = () => {

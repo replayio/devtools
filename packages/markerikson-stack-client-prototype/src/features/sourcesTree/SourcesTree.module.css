@@ -1,0 +1,11 @@
+.treeItem {
+}
+
+.treeItem.active {
+  color: var(--theme-selection-color);
+  background-color: var(--theme-selection-background);
+}
+
+.treeItem:hover:not(.active) {
+  background-color: var(--theme-toolbar-background-hover);
+}

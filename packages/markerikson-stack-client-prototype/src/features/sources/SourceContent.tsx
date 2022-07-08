@@ -1,54 +1,21 @@
 import { javascript } from "@codemirror/lang-javascript";
 import { EditorView } from "@codemirror/view";
-import type { HitCount, Location } from "@replayio/protocol";
 import { skipToken } from "@reduxjs/toolkit/dist/query";
 import CodeMirror from "@uiw/react-codemirror";
 import { useContext, useMemo, useState } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import {
-  useGetSourceTextQuery,
-  useGetSourceHitCountsQuery,
-  useGetLineHitPointsQuery,
-  useGetPauseQuery,
-} from "../../app/api";
+import { useGetSourceTextQuery } from "../../app/api";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 
-import { pointSelected } from "./sourcesSlice";
+import { locationSelected } from "./selectedSourcesSlice";
 
 export const SourceContent = () => {
-  const [selectedLocation, setSelectedLocation] = useState<Pick<
-    Location,
-    "line" | "column"
-  > | null>(null);
   const dispatch = useAppDispatch();
-  const selectedSourceId = useAppSelector(state => state.sources.selectedSourceId);
-  const selectedPoint = useAppSelector(state => state.sources.selectedPoint);
+  const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
 
   const { currentData: sourceText } = useGetSourceTextQuery(
     selectedSourceId ? selectedSourceId : skipToken
   );
-  const { currentData: sourceHits } = useGetSourceHitCountsQuery(
-    selectedSourceId ? selectedSourceId : skipToken
-  );
-
-  let closestHitPoint: HitCount | null = null;
-  if (sourceHits && selectedLocation) {
-    const lineHits = sourceHits[selectedLocation.line];
-    closestHitPoint = lineHits?.reduceRight((prevValue, hit) => {
-      if (hit.location.column < selectedLocation.column) {
-        return hit;
-      }
-      return prevValue;
-    }, null as HitCount | null);
-  }
-
-  const location = closestHitPoint?.location;
-  const { currentData: locationHitPoints } = useGetLineHitPointsQuery(
-    location ? location : skipToken
-  );
-
-  const { currentData: pause } = useGetPauseQuery(selectedPoint ? selectedPoint : skipToken);
 
   const domHandler = useMemo(() => {
     return EditorView.domEventHandlers({
@@ -57,12 +24,12 @@ export const SourceContent = () => {
         const line = editorView.state.doc.lineAt(pos!);
         const selectionRange = editorView.state.selection.ranges[0];
         const columnNumber = selectionRange.head - line.from;
-        setSelectedLocation({ line: line.number, column: columnNumber });
+        dispatch(locationSelected({ line: line.number, column: columnNumber }));
 
         return false;
       },
     });
-  }, []);
+  }, [dispatch]);
 
   if (!selectedSourceId) {
     return null;
@@ -77,41 +44,6 @@ export const SourceContent = () => {
           style={{ maxHeight: 600, overflowY: "auto", minWidth: 600, maxWidth: 600 }}
           extensions={[domHandler, javascript({ jsx: true })]}
         />
-        <div style={{ marginLeft: 10 }}>
-          <h3 style={{ marginTop: 0 }}>Selection Details</h3>
-          <div>Selected location: {JSON.stringify(selectedLocation)}</div>
-          <div>Closest point: {JSON.stringify(selectedLocation)}</div>
-          <h4>Location Hits</h4>
-          <ul>
-            {locationHitPoints?.map(point => {
-              const isSelected = point === selectedPoint;
-              let entryText: React.ReactNode = point.time;
-              if (isSelected) {
-                entryText = <span style={{ fontWeight: "bold" }}>{entryText}</span>;
-              }
-
-              const onPointClicked = () => dispatch(pointSelected(point));
-              return (
-                <li key={point.point} onClick={onPointClicked}>
-                  {entryText}
-                </li>
-              );
-            }) ?? null}
-          </ul>
-        </div>
-
-        <div style={{ marginLeft: 10 }}>
-          <h3 style={{ marginTop: 0 }}>Current Pause Frames</h3>
-          <ul>
-            {pause?.data.frames?.map(frame => {
-              return (
-                <li key={frame.frameId}>
-                  {frame.functionName} / {JSON.stringify(frame.functionLocation)}
-                </li>
-              );
-            })}
-          </ul>
-        </div>
       </div>
     </div>
   );
