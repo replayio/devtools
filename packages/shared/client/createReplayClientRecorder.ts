@@ -15,26 +15,26 @@ export default function createReplayClientRecorder(
   // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
   // In that case, it's important that it waits until all pending async requests have been resolved.
   // See playwright/tests/utils/testSetup.ts
-  // const flagPendingClientRequest = () => {
-  //   if (typeof window !== "undefined") {
-  //     const global = window as any;
-  //     if (global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT == null) {
-  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT = 1;
-  //     } else {
-  //       global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT++;
-  //     }
-  //   }
-  // };
+  const flagPendingClientRequest = () => {
+    if (typeof window !== "undefined") {
+      const global = window as any;
+      if (global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT == null) {
+        global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT = 1;
+      } else {
+        global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT++;
+      }
+    }
+  };
 
   // Playwright test runner might listen to the data logged by printInstructions() to update test fixtures.
   // In that case, it's important that it waits until all pending async requests have been resolved.
   // See playwright/tests/utils/testSetup.ts
-  // const resolvePendingClientRequest = () => {
-  //   if (typeof window !== "undefined") {
-  //     const global = window as any;
-  //     global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT--;
-  //   }
-  // };
+  const resolvePendingClientRequest = () => {
+    if (typeof window !== "undefined") {
+      const global = window as any;
+      global.REPLAY_CLIENT_RECORDER_PENDING_REQUEST_COUNT--;
+    }
+  };
 
   const printInstructions = () => {
     console.log(`
@@ -71,14 +71,14 @@ export default function createReplayClientRecorder(
         if (result != null && typeof result.then === "function") {
           entry.isAsync = true;
 
-          // flagPendingClientRequest();
+          flagPendingClientRequest();
 
           result.then((resolved: any) => {
             entry.result = resolved;
 
             printInstructions();
 
-            // resolvePendingClientRequest();
+            resolvePendingClientRequest();
           });
         } else {
           printInstructions();
