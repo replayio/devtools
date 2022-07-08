@@ -15,6 +15,7 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
+import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -35,6 +36,8 @@ export class ReplayClient implements ReplayClientInterface {
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
+
+    analysisManager.init();
   }
 
   private getSessionIdThrows(): SessionId {
@@ -153,40 +156,22 @@ export class ReplayClient implements ReplayClientInterface {
 
   // TODO (console-refactor) Refactor to share code with getHitPointsForLocation
   async getEntryPointsForEventType(eventType: EventHandlerType): Promise<TimeStampedPoint[]> {
-    const sessionId = this.getSessionIdThrows();
-    const data = await new Promise<PointDescription[]>(async resolve => {
-      const { analysisId } = await client.Analysis.createAnalysis(
-        {
-          effectful: false,
-          // TODO (console-refactor) This is different
-          mapper: "return [{ key: input.point, value: input }];",
-        },
-        sessionId
-      );
-
-      // TODO (console-refactor) This is different
-      client.Analysis.addEventHandlerEntryPoints({analysisId, eventType}, sessionId);
-      client.Analysis.addAnalysisPointsListener(({ points }) => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        clearTimeout(timeoutId);
-
-        resolve(points);
-      });
-      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
-
-      // TODO (BAC-1926) Sometimes the protocol won't return any points.
-      // In this case, we should eventually timeout and assume there are none.
-      let timeoutId = setTimeout(() => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        resolve([]);
-      }, 500);
+    const collectedPoints: TimeStampedPoint[] = [];
+    await analysisManager.runAnalysis({
+      effectful: false,
+      eventHandlerEntryPoints: [{eventType}],
+      // locations: [{ location }],
+      mapper: "return [{ key: input.point, value: input }];",
+    },
+    {
+      onAnalysisError: (errorMessage: string) => {
+        throw Error(errorMessage);
+      },
+      onAnalysisPoints: (points: TimeStampedPoint[]) => {
+        collectedPoints.push(...points);
+      },
     });
-
-    return data;
+    return collectedPoints;
   }
 
   async getEventCountForType(eventType: EventHandlerType): Promise<number> {
@@ -197,40 +182,21 @@ export class ReplayClient implements ReplayClientInterface {
 
   // TODO (console-refactor) Refactor to share with getEntryPointsForEventType.
   async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
-    const sessionId = this.getSessionIdThrows();
-    const data = await new Promise<PointDescription[]>(async resolve => {
-      const { analysisId } = await client.Analysis.createAnalysis(
-        {
-          effectful: false,
-          // TODO (console-refactor) This is different
-          mapper: "",
-        },
-        sessionId
-      );
-
-      // TODO (console-refactor) This is different
-      client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.addAnalysisPointsListener(({ points }) => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        clearTimeout(timeoutId);
-
-        resolve(points);
-      });
-      client.Analysis.findAnalysisPoints({ analysisId }, sessionId);
-
-      // TODO (BAC-1926) Sometimes the protocol won't return any points.
-      // In this case, we should eventually timeout and assume there are none.
-      let timeoutId = setTimeout(() => {
-        client.Analysis.removeAnalysisPointsListener();
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
-
-        resolve([]);
-      }, 500);
+    const collectedPointDescriptions: PointDescription[] = [];
+    await analysisManager.runAnalysis({
+      effectful: false,
+      locations: [{ location }],
+      mapper: "",
+    },
+    {
+      onAnalysisError: (errorMessage: string) => {
+        throw Error(errorMessage);
+      },
+      onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
+        collectedPointDescriptions.push(...pointDescriptions);
+      },
     });
-
-    return data;
+    return collectedPointDescriptions;
   }
 
   async getObjectWithPreview(
@@ -317,26 +283,27 @@ export class ReplayClient implements ReplayClientInterface {
     timeStampedPoint: TimeStampedPoint,
     mapper: string
   ): Promise<Result> {
-    const sessionId = this.getSessionIdThrows();
-    const data = await new Promise<Result>(async resolve => {
-      const { analysisId } = await client.Analysis.createAnalysis(
-        {
-          effectful: false,
-          mapper,
+    return new Promise<Result>((resolve, reject) => {
+      analysisManager.runAnalysis({
+        effectful: false,
+        locations: [{ location }],
+        points: [timeStampedPoint.point],
+        mapper,
+      },
+      {
+        onAnalysisError: (errorMessage: string) => {
+          reject(errorMessage);
         },
-        sessionId
-      );
-
-      client.Analysis.addLocation({ analysisId, location }, sessionId);
-      client.Analysis.addPoints({ analysisId, points: [timeStampedPoint.point] }, sessionId);
-      client.Analysis.addAnalysisResultListener(({ results }) => {
-        resolve(results[0].value as Result);
-        client.Analysis.releaseAnalysis({ analysisId }, sessionId);
+        onAnalysisResult: (analysisEntries) => {
+          if (analysisEntries.length === 0) {
+            reject("No results found");
+          } else {
+            const analysisEntry = analysisEntries[0];
+            resolve(analysisEntry.value as Result);
+          }
+        },
       });
-      client.Analysis.runAnalysis({ analysisId }, sessionId);
     });
-
-    return data;
   }
 }
 
