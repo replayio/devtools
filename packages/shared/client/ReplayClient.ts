@@ -164,40 +164,6 @@ export class ReplayClient implements ReplayClientInterface {
     return count;
   }
 
-  async getStandardEventPoints(): Promise<Events> {
-    const sessionId = this.getSessionIdThrows();
-
-    let keyboardEvents: KeyboardEvent[] = [];
-    let mouseEvents: MouseEvent[] = [];
-    let navigationEvents: NavigationEvent[] = [];
-
-    client.Session.addKeyboardEventsListener(({ events }: keyboardEvents) => {
-      keyboardEvents = [...keyboardEvents, ...events];
-    });
-    client.Session.addMouseEventsListener(({ events }: mouseEvents) => {
-      mouseEvents = [...mouseEvents, ...events];
-    });
-    client.Session.addNavigationEventsListener(({ events }: navigationEvents) => {
-      navigationEvents = [...navigationEvents, ...events];
-    });
-
-    await Promise.all([
-      client.Session.findKeyboardEvents({}, sessionId),
-      client.Session.findMouseEvents({}, sessionId),
-      client.Session.findNavigationEvents({}, sessionId),
-    ]);
-
-    client.Session.removeKeyboardEventsListener();
-    client.Session.removeMouseEventsListener();
-    client.Session.removeNavigationEventsListener();
-
-    return {
-      keyboardEvents: keyboardEvents!,
-      mouseEvents: mouseEvents!,
-      navigationEvents: navigationEvents!,
-    };
-  }
-
   async getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]> {
     const sessionId = this.getSessionIdThrows();
     const data = await new Promise<PointDescription[]>(async resolve => {

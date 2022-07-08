@@ -51,7 +51,6 @@ export interface ReplayClientInterface {
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
-  getStandardEventPoints(): Promise<Events>;
   getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
     objectId: ObjectId,

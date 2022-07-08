@@ -1,10 +1,5 @@
-import { getEventCategoryCounts, getStandardEventPoints } from "@bvaughn/src/suspense/EventsCache";
-import type {
-  Event as EventType,
-  EventCategory as EventCategoryType,
-} from "@bvaughn/src/suspense/EventsCache";
-import { suspendInParallel } from "@bvaughn/src/utils/suspense";
-import { KeyboardEvent, KeyboardEventKind, MouseEvent, MouseEventKind } from "@replayio/protocol";
+import { getEventCategoryCounts } from "@bvaughn/src/suspense/EventsCache";
+import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
 import { ChangeEvent, useContext, useMemo, useState, useTransition } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -26,27 +21,38 @@ export default function EventsList() {
     });
   };
 
-  // TODO (console-filters) Keyboard and mouse events overlap (and conflict).
-  // Maybe get rid of the call to getStandardEventPoints() and just use getEventCategoryCounts()
-  // Just pull keyboard and mouse events out and show them separately?
-  // That seems to be what the old console does.
-  const [eventCategoryCounts, standardEventPoints] = suspendInParallel(
-    () => getEventCategoryCounts(client),
-    () => getStandardEventPoints(client)
+  const eventCategoryCounts = getEventCategoryCounts(client);
+  ////////////////////////////
+  console.log(
+    "!!! <EventsList>",
+    eventCategoryCounts,
+    JSON.stringify(eventCategoryCounts, null, 2)
   );
+  ////////////////////////////
 
-  const commonEventCategories = useMemo<EventCategoryType[]>(() => {
-    return [
-      {
-        category: "Keyboard",
-        events: convertEvents(standardEventPoints.keyboardEvents),
-      },
-      {
-        category: "Mouse",
-        events: convertEvents(standardEventPoints.mouseEvents),
-      },
-    ];
-  }, [standardEventPoints]);
+  const [commonEventCategories, otherEventCategories] = useMemo<
+    [EventCategoryType[], EventCategoryType[]]
+  >(() => {
+    ////////////////////////////
+    console.log("!!! <EventsList> memo");
+    ////////////////////////////
+    const commonEventCategories: EventCategoryType[] = [];
+    const otherEventCategories: EventCategoryType[] = [];
+
+    eventCategoryCounts.forEach(category => {
+      switch (category.category) {
+        case "Keyboard":
+        case "Mouse":
+          commonEventCategories.push(category);
+          break;
+        default:
+          otherEventCategories.push(category);
+          break;
+      }
+    });
+
+    return [commonEventCategories, otherEventCategories];
+  }, [eventCategoryCounts]);
 
   return (
     <div className={styles.EventsList}>
@@ -69,7 +75,7 @@ export default function EventsList() {
       ))}
 
       <div className={styles.Header}>Other Events</div>
-      {eventCategoryCounts.map(eventCategory => (
+      {otherEventCategories.map(eventCategory => (
         <EventCategory
           key={eventCategory.category}
           disabled={isPending}
@@ -79,31 +85,4 @@ export default function EventsList() {
       ))}
     </div>
   );
-}
-
-// Helper method to convert–
-// from Protocol events (Session.findKeyboardEvents or Session.findMouseEvents)
-// to a local format used by the EventCategory component
-function convertEvents(events: KeyboardEvent[] | MouseEvent[]): EventType[] {
-  const returnEvents: EventType[] = [];
-  const kindToEventMap = new Map<KeyboardEventKind | MouseEventKind, EventType>();
-
-  events.forEach(({ kind }) => {
-    if (!kindToEventMap.has(kind)) {
-      const eventType: EventType = {
-        count: 1,
-        label: kind,
-        type: kind,
-      };
-
-      kindToEventMap.set(kind, eventType);
-
-      returnEvents.push(eventType);
-    } else {
-      const eventType = kindToEventMap.get(kind)!;
-      eventType.count++;
-    }
-  });
-
-  return returnEvents;
 }

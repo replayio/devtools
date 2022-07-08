@@ -1,5 +1,5 @@
 import { EventHandlerType } from "@replayio/protocol";
-import { Events, ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
 import { Wakeable } from "./types";
@@ -15,10 +15,8 @@ export type EventCategory = {
   events: Event[];
 };
 
-let events: Events | null = null;
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
-let inProgressEventsWakeable: Wakeable<Events> | null = null;
 
 export function getEventCategoryCounts(client: ReplayClientInterface): EventCategory[] {
   if (eventCategoryCounts !== null) {
@@ -34,25 +32,11 @@ export function getEventCategoryCounts(client: ReplayClientInterface): EventCate
   throw inProgressEventCategoryCountsWakeable;
 }
 
-export function getStandardEventPoints(client: ReplayClientInterface): Events {
-  if (events !== null) {
-    return events;
-  }
-
-  if (inProgressEventsWakeable === null) {
-    inProgressEventsWakeable = createWakeable<Events>();
-
-    fetchStandardEventPoints(client);
-  }
-
-  throw inProgressEventsWakeable;
-}
-
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
   eventCategoryCounts = [];
 
   // Fetch event hit counts in parallel.
-  const promises = [];
+  const promises: Promise<void>[] = [];
 
   STANDARD_EVENT_CATEGORIES.forEach(category => {
     const categoryWithCounts: EventCategory = {
@@ -77,13 +61,8 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
     eventCategoryCounts?.push(categoryWithCounts);
   });
 
+  await Promise.all(promises);
+
   inProgressEventCategoryCountsWakeable!.resolve(eventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
-}
-
-async function fetchStandardEventPoints(client: ReplayClientInterface) {
-  events = await client.getStandardEventPoints();
-
-  inProgressEventsWakeable!.resolve(events!);
-  inProgressEventsWakeable = null;
 }
