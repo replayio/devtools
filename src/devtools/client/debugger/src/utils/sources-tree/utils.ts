@@ -4,9 +4,9 @@
 
 //
 
-import { Source } from "../../reducers/sources";
 import { parse } from "../url";
 
+import type { Source } from "../../reducers/sources";
 import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 
 // Additional TS types ported from Mozilla Flow types:

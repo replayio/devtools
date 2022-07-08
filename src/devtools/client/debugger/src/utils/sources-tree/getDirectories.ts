@@ -7,8 +7,11 @@
 import { createParentMap } from "./utils";
 import flattenDeep from "lodash/flattenDeep";
 
-function findSourceItem(sourceTree, source) {
-  function _traverse(subtree) {
+import type { Source } from "../../reducers/sources";
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+
+function findSourceItem(sourceTree: TreeDirectory, source: Source) {
+  function _traverse(subtree: TreeNode) {
     if (subtree.type === "source") {
       if (subtree.contents.url === source.url) {
         return subtree;
@@ -17,31 +20,30 @@ function findSourceItem(sourceTree, source) {
       return null;
     }
 
-    const matches = subtree.contents.map(child => _traverse(child));
+    const matches: (TreeNode | null)[] = subtree.contents.map(child => _traverse(child));
     return matches && matches.filter(Boolean)[0];
   }
 
   return _traverse(sourceTree);
 }
 
-export function findSourceTreeNodes(sourceTree, path) {
-  function _traverse(subtree) {
+export function findSourceTreeNodes(sourceTree: TreeDirectory, path: string) {
+  function _traverse(subtree: TreeNode): TreeNode[] | TreeNode | undefined {
     if (subtree.path.endsWith(path)) {
       return subtree;
     }
 
     if (subtree.type === "directory") {
       const matches = subtree.contents.map(child => _traverse(child));
-      return matches && matches.filter(Boolean);
+      return matches && (matches.filter(Boolean) as TreeNode[]);
     }
   }
 
   const result = _traverse(sourceTree);
-  // $FlowIgnore
   return Array.isArray(result) ? flattenDeep(result) : result;
 }
 
-function getAncestors(sourceTree, item) {
+function getAncestors(sourceTree: TreeDirectory, item: TreeNode | null) {
   if (!item) {
     return null;
   }
@@ -59,7 +61,7 @@ function getAncestors(sourceTree, item) {
   }
 }
 
-export function getDirectories(source, sourceTree) {
+export function getDirectories(source: Source, sourceTree: TreeDirectory) {
   const item = findSourceItem(sourceTree, source);
   const ancestors = getAncestors(sourceTree, item);
   return ancestors || [sourceTree];
