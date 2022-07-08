@@ -5,11 +5,8 @@ on:
   push:
     branches:
       - main
-permissions:
-  pull-requests: write
 env:
   RECORD_REPLAY_API_KEY: rwk_yaEG8jo6gcisGHHoMj8SNoOMIHSbT7REuU5E1QnKCiL
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   download-browser:
@@ -161,8 +158,6 @@ jobs:
 
             return acc;
           }, []);
-
-          console.log(recordings);
 
           const output = path.join("${{ env.GITHUB_ACTION_PATH }}", "recordings.log");
           fs.writeFileSync(output, JSON.stringify(recordings));

@@ -66,9 +66,9 @@ function appendTestMetadata(testId: string, file: string, success: boolean) {
 
   if (recordings) {
     recordings.forEach(recording => {
-      addMetadata(
-        String(recording.id),
-        test.init({
+      addMetadata(String(recording.id), {
+        title: file,
+        ...test.init({
           file: file,
           path: ["", config.browserName, file],
           run: process.env.TEST_RUN_ID
@@ -78,8 +78,8 @@ function appendTestMetadata(testId: string, file: string, success: boolean) {
             : undefined,
           title: file,
           result: success ? "passed" : "failed",
-        })
-      );
+        }),
+      });
     });
   } else {
     console.error("Failed to find any recordings for test", file);
