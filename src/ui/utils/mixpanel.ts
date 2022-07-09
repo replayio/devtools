@@ -15,6 +15,8 @@ import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoint
 
 type MixpanelEvent =
   | ["breakpoint.add_comment"]
+  | ["breakpoint.add"]
+  | ["breakpoint.add_column"]
   | ["breakpoint.edit"]
   | ["breakpoint.minus_click"]
   | ["breakpoint.plus_click"]
@@ -25,6 +27,8 @@ type MixpanelEvent =
   | ["breakpoint.preview_has_hits"]
   | ["breakpoint.preview_no_hits"]
   | ["breakpoint.remove"]
+  | ["breakpoints.remove_all"]
+  | ["breakpoints.remove_all_in_source"]
   | ["breakpoint.set_condition"]
   | ["breakpoint.set_log"]
   | ["breakpoint.start_edit", { input: Input; hitsCount: number | null }]
@@ -87,6 +91,7 @@ type MixpanelEvent =
   | ["share_modal.set_private"]
   | ["share_modal.set_public"]
   | ["share_modal.set_team"]
+  | ["sources.select_location"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
   | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
   | ["timeline.comment_select"]
