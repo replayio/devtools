@@ -1176,25 +1176,29 @@ export class _ThreadFront {
   // Get the set of chosen sources from a list of source IDs which might
   // represent different generated locations.
   private _chooseSourceIdList(sourceIds: SourceId[]) {
-    const groups = this._groupSourceIds(sourceIds);
+    const groups = [];
+    // Group together a set of source IDs according to whether they are generated
+    // or original versions of each other.
+    while (sourceIds.length) {
+      // For the next source
+      const id = sourceIds[0];
+      // Find the alternate source ids for this source
+      // Filter down to the ones that we were handed here
+      const group = [...this.getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
+      // Add that group to groups
+      groups.push(group);
+      // Consider all of those sources accounted for
+      sourceIds = sourceIds.filter(id => !group.includes(id));
+    }
+    // Of these groups, for each, choose the "best" source ID
     return groups.map(ids => this._chooseSourceId(ids));
   }
 
-  // Group together a set of source IDs according to whether they are generated
-  // or original versions of each other.
-  private _groupSourceIds(sourceIds: SourceId[]) {
-    const groups = [];
-    while (sourceIds.length) {
-      const id = sourceIds[0];
-      const group = [...this.getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
-      groups.push(group);
-      sourceIds = sourceIds.filter(id => !group.includes(id));
-    }
-    return groups;
-  }
+  // I think that now the equivalent of that would be:
+  // uniq(sources.map(s => s.canonicalId));
 
   // Get all original/generated IDs which can represent a location in sourceId.
-  getAlternateSourceIds(sourceId: SourceId) {
+  private getAlternateSourceIds(sourceId: SourceId) {
     if (this.alternateSourceIds.has(sourceId)) {
       return this.alternateSourceIds.get(sourceId)!;
     }
@@ -1351,18 +1355,14 @@ export class _ThreadFront {
     return this.correspondingSourceIds.get(sourceId) || [sourceId];
   }
 
-  // Replace the sourceId in a location with the first corresponding sourceId
-  updateLocation(location: Location) {
-    location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
-  }
-
   // Replace all sourceIds in a mapped location with the first corresponding sourceId
   updateMappedLocation(mappedLocation: MappedLocation | undefined) {
     if (!mappedLocation) {
       return;
     }
     for (const location of mappedLocation) {
-      this.updateLocation(location);
+      // Replace the sourceId in a location with the first corresponding sourceId
+      location.sourceId = this.getCorrespondingSourceIds(location.sourceId)[0];
     }
   }
 }

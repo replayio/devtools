@@ -1228,7 +1228,6 @@ function SelectorView(tree, selectorInfo) {
   this._cacheStatusNames();
 
   this.openStyleEditor = this.openStyleEditor.bind(this);
-  // this._updateLocation = this._updateLocation.bind(this);
 
   const rule = this.selectorInfo.rule;
   if (!rule || !rule.parentStyleSheet || rule.type == ELEMENT_STYLE) {

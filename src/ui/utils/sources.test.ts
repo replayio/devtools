@@ -409,7 +409,7 @@ describe("ThreadFront source methods", () => {
     ThreadFront.groupSourceIds();
   });
 
-  describe("getSourceIdsForUrl", () => {
+  describe("getSourceIdsForURL", () => {
     it("returns original versions of sources for the given URL", () => {
       expect(ThreadFront.getSourceIdsForURL("/index.js")).toEqual(["1"]);
       expect(ThreadFront.getSourceIdsForURL("/index.html")).toEqual(["h1", "h2"]);
