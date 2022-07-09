@@ -17,20 +17,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.js",
         },
       ])
-    ).toEqual({
-      "1": {
-        canonicalId: "1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["1"],
-        generated: [],
-        generatedFrom: [],
-        id: "1",
-        kind: "scriptSource",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: undefined,
-        url: "/index.js",
-      },
-    });
+    ).toMatchSnapshot();
   });
 
   it("can backlink generated sources properly", () => {
@@ -50,32 +37,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.ts",
         },
       ])
-    ).toEqual({
-      "1": {
-        canonicalId: "o1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["1"],
-        generated: [],
-        generatedFrom: ["o1"],
-        id: "1",
-        kind: "scriptSource",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: undefined,
-        url: "/index.js",
-      },
-      o1: {
-        canonicalId: "o1",
-        contentHash: "contentHash#o1",
-        correspondingSourceIds: ["o1"],
-        generated: ["1"],
-        generatedFrom: [],
-        id: "o1",
-        kind: "sourceMapped",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: undefined,
-        url: "/index.ts",
-      },
-    });
+    ).toMatchSnapshot();
   });
 
   it("can link pretty-printed and minified sources", () => {
@@ -94,32 +56,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/src/index.js",
         },
       ])
-    ).toEqual({
-      "1": {
-        canonicalId: "1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["1"],
-        generated: [],
-        generatedFrom: [],
-        id: "1",
-        kind: "scriptSource",
-        prettyPrinted: "pp1",
-        prettyPrintedFrom: undefined,
-        url: "/index.js",
-      },
-      pp1: {
-        canonicalId: "1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["pp1"],
-        generated: [],
-        generatedFrom: [],
-        id: "pp1",
-        kind: "prettyPrinted",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: "1",
-        url: "/src/index.js",
-      },
-    });
+    ).toMatchSnapshot();
   });
 
   it("can combine original, generated, and pretty-printed sources", () => {
@@ -151,56 +88,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/src/index.ts",
         },
       ])
-    ).toEqual({
-      "1": {
-        canonicalId: "o1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["1"],
-        generated: [],
-        generatedFrom: ["o1"],
-        id: "1",
-        kind: "scriptSource",
-        prettyPrinted: "pp1",
-        prettyPrintedFrom: undefined,
-        url: "/index.js",
-      },
-      o1: {
-        canonicalId: "o1",
-        contentHash: "contentHash#o1",
-        correspondingSourceIds: ["o1"],
-        generated: ["1"],
-        generatedFrom: [],
-        id: "o1",
-        kind: "sourceMapped",
-        prettyPrinted: "ppo1",
-        prettyPrintedFrom: undefined,
-        url: "/src/index.ts",
-      },
-      pp1: {
-        canonicalId: "o1",
-        contentHash: "contentHash#1",
-        correspondingSourceIds: ["pp1"],
-        generated: [],
-        generatedFrom: [],
-        id: "pp1",
-        kind: "prettyPrinted",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: "1",
-        url: "/src/index.js",
-      },
-      ppo1: {
-        canonicalId: "o1",
-        contentHash: "contentHash#o1",
-        correspondingSourceIds: ["ppo1"],
-        generated: [],
-        generatedFrom: [],
-        id: "ppo1",
-        kind: "prettyPrinted",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: "o1",
-        url: "/src/index.ts",
-      },
-    });
+    ).toMatchSnapshot();
   });
 
   it("can put together HTML sources and their extracted scripts", () => {
@@ -220,32 +108,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.html",
         },
       ])
-    ).toEqual({
-      "2": {
-        canonicalId: "h1",
-        contentHash: "contentHash#2",
-        correspondingSourceIds: ["2"],
-        generated: [],
-        generatedFrom: ["h1"],
-        id: "2",
-        kind: "inlineScript",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: undefined,
-        url: "/index.html",
-      },
-      h1: {
-        canonicalId: "h1",
-        contentHash: "contentHash#h1",
-        correspondingSourceIds: ["h1"],
-        generated: ["2"],
-        generatedFrom: [],
-        id: "h1",
-        kind: "html",
-        prettyPrinted: undefined,
-        prettyPrintedFrom: undefined,
-        url: "/index.html",
-      },
-    });
+    ).toMatchSnapshot();
   });
 });
 
@@ -265,32 +128,7 @@ it("can link corresponding sources", () => {
         url: "/index.html",
       },
     ])
-  ).toEqual({
-    h1: {
-      canonicalId: "h1",
-      contentHash: "contentHash",
-      correspondingSourceIds: ["h1", "h2"],
-      generated: [],
-      generatedFrom: [],
-      id: "h1",
-      kind: "html",
-      prettyPrinted: undefined,
-      prettyPrintedFrom: undefined,
-      url: "/index.html",
-    },
-    h2: {
-      canonicalId: "h2",
-      contentHash: "contentHash",
-      correspondingSourceIds: ["h1", "h2"],
-      generated: [],
-      generatedFrom: [],
-      id: "h2",
-      kind: "html",
-      prettyPrinted: undefined,
-      prettyPrintedFrom: undefined,
-      url: "/index.html",
-    },
-  });
+  ).toMatchSnapshot();
 });
 
 it("is not fooled by pretty-printed sources with missing contentHashes", () => {
@@ -321,57 +159,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         url: "/index.html",
       },
     ])
-  ).toEqual({
-    h1: {
-      canonicalId: "h1",
-      contentHash: "contentHash#h1",
-      correspondingSourceIds: ["h1"],
-      generated: [],
-      generatedFrom: [],
-      id: "h1",
-      kind: "html",
-      prettyPrinted: "pph1",
-      prettyPrintedFrom: undefined,
-      url: "/index.html",
-    },
-    h2: {
-      canonicalId: "h2",
-      contentHash: "contentHash#h2",
-      correspondingSourceIds: ["h2"],
-      generated: [],
-      generatedFrom: [],
-      id: "h2",
-      kind: "html",
-      prettyPrinted: "pph2",
-      prettyPrintedFrom: undefined,
-      url: "/index.html",
-    },
-    pph1: {
-      canonicalId: "h1",
-      contentHash: "contentHash#h1",
-      correspondingSourceIds: ["pph1"],
-      generated: [],
-      generatedFrom: [],
-      id: "pph1",
-      kind: "prettyPrinted",
-      prettyPrinted: undefined,
-      prettyPrintedFrom: "h1",
-      url: "/index.html",
-    },
-    pph2: {
-      canonicalId: "h2",
-      contentHash: "contentHash#h2",
-      correspondingSourceIds: ["pph2"],
-      generated: [],
-      generatedFrom: [],
-      id: "pph2",
-      kind: "prettyPrinted",
-
-      prettyPrinted: undefined,
-      prettyPrintedFrom: "h2",
-      url: "/index.html",
-    },
-  });
+  ).toMatchSnapshot();
 });
 
 describe("ThreadFront source methods", () => {
