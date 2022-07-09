@@ -17,7 +17,24 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.js",
         },
       ])
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(`
+      Object {
+        "1": Object {
+          "canonicalId": "1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [],
+          "id": "1",
+          "kind": "scriptSource",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": undefined,
+          "url": "/index.js",
+        },
+      }
+    `);
   });
 
   it("can backlink generated sources properly", () => {
@@ -29,6 +46,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           sourceId: "1",
           url: "/index.js",
         },
+
         {
           contentHash: "contentHash#o1",
           kind: "sourceMapped",
@@ -37,7 +55,42 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.ts",
         },
       ])
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(`
+      Object {
+        "1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [
+            "o1",
+          ],
+          "id": "1",
+          "kind": "scriptSource",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": undefined,
+          "url": "/index.js",
+        },
+        "o1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#o1",
+          "correspondingSourceIds": Array [
+            "o1",
+          ],
+          "generated": Array [
+            "1",
+          ],
+          "generatedFrom": Array [],
+          "id": "o1",
+          "kind": "sourceMapped",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": undefined,
+          "url": "/index.ts",
+        },
+      }
+    `);
   });
 
   it("can link pretty-printed and minified sources", () => {
@@ -49,6 +102,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           sourceId: "1",
           url: "/index.js",
         },
+
         {
           generatedSourceIds: ["1"],
           kind: "prettyPrinted",
@@ -56,7 +110,38 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/src/index.js",
         },
       ])
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(`
+      Object {
+        "1": Object {
+          "canonicalId": "1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [],
+          "id": "1",
+          "kind": "scriptSource",
+          "prettyPrinted": "pp1",
+          "prettyPrintedFrom": undefined,
+          "url": "/index.js",
+        },
+        "pp1": Object {
+          "canonicalId": "1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "pp1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [],
+          "id": "pp1",
+          "kind": "prettyPrinted",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": "1",
+          "url": "/src/index.js",
+        },
+      }
+    `);
   });
 
   it("can combine original, generated, and pretty-printed sources", () => {
@@ -68,6 +153,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           sourceId: "1",
           url: "/index.js",
         },
+
         {
           contentHash: "contentHash#o1",
           generatedSourceIds: ["1"],
@@ -75,12 +161,14 @@ describe("newSourcesToCompleteSourceDetails", () => {
           sourceId: "o1",
           url: "/src/index.ts",
         },
+
         {
           generatedSourceIds: ["1"],
           kind: "prettyPrinted",
           sourceId: "pp1",
           url: "/src/index.js",
         },
+
         {
           generatedSourceIds: ["o1"],
           kind: "prettyPrinted",
@@ -88,7 +176,70 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/src/index.ts",
         },
       ])
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(`
+      Object {
+        "1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [
+            "o1",
+          ],
+          "id": "1",
+          "kind": "scriptSource",
+          "prettyPrinted": "pp1",
+          "prettyPrintedFrom": undefined,
+          "url": "/index.js",
+        },
+        "o1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#o1",
+          "correspondingSourceIds": Array [
+            "o1",
+          ],
+          "generated": Array [
+            "1",
+          ],
+          "generatedFrom": Array [],
+          "id": "o1",
+          "kind": "sourceMapped",
+          "prettyPrinted": "ppo1",
+          "prettyPrintedFrom": undefined,
+          "url": "/src/index.ts",
+        },
+        "pp1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#1",
+          "correspondingSourceIds": Array [
+            "pp1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [],
+          "id": "pp1",
+          "kind": "prettyPrinted",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": "1",
+          "url": "/src/index.js",
+        },
+        "ppo1": Object {
+          "canonicalId": "o1",
+          "contentHash": "contentHash#o1",
+          "correspondingSourceIds": Array [
+            "ppo1",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [],
+          "id": "ppo1",
+          "kind": "prettyPrinted",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": "o1",
+          "url": "/src/index.ts",
+        },
+      }
+    `);
   });
 
   it("can put together HTML sources and their extracted scripts", () => {
@@ -101,6 +252,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           generatedSourceIds: ["2"],
           url: "/index.html",
         },
+
         {
           contentHash: "contentHash#2",
           kind: "inlineScript",
@@ -108,7 +260,42 @@ describe("newSourcesToCompleteSourceDetails", () => {
           url: "/index.html",
         },
       ])
-    ).toMatchSnapshot();
+    ).toMatchInlineSnapshot(`
+      Object {
+        "2": Object {
+          "canonicalId": "h1",
+          "contentHash": "contentHash#2",
+          "correspondingSourceIds": Array [
+            "2",
+          ],
+          "generated": Array [],
+          "generatedFrom": Array [
+            "h1",
+          ],
+          "id": "2",
+          "kind": "inlineScript",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": undefined,
+          "url": "/index.html",
+        },
+        "h1": Object {
+          "canonicalId": "h1",
+          "contentHash": "contentHash#h1",
+          "correspondingSourceIds": Array [
+            "h1",
+          ],
+          "generated": Array [
+            "2",
+          ],
+          "generatedFrom": Array [],
+          "id": "h1",
+          "kind": "html",
+          "prettyPrinted": undefined,
+          "prettyPrintedFrom": undefined,
+          "url": "/index.html",
+        },
+      }
+    `);
   });
 });
 
@@ -121,6 +308,7 @@ it("can link corresponding sources", () => {
         sourceId: "h1",
         url: "/index.html",
       },
+
       {
         contentHash: "contentHash",
         kind: "html",
@@ -128,7 +316,40 @@ it("can link corresponding sources", () => {
         url: "/index.html",
       },
     ])
-  ).toMatchSnapshot();
+  ).toMatchInlineSnapshot(`
+    Object {
+      "h1": Object {
+        "canonicalId": "h1",
+        "contentHash": "contentHash",
+        "correspondingSourceIds": Array [
+          "h1",
+          "h2",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "h1",
+        "kind": "html",
+        "prettyPrinted": undefined,
+        "prettyPrintedFrom": undefined,
+        "url": "/index.html",
+      },
+      "h2": Object {
+        "canonicalId": "h2",
+        "contentHash": "contentHash",
+        "correspondingSourceIds": Array [
+          "h1",
+          "h2",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "h2",
+        "kind": "html",
+        "prettyPrinted": undefined,
+        "prettyPrintedFrom": undefined,
+        "url": "/index.html",
+      },
+    }
+  `);
 });
 
 it("is not fooled by pretty-printed sources with missing contentHashes", () => {
@@ -140,18 +361,21 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         sourceId: "h1",
         url: "/index.html",
       },
+
       {
         generatedSourceIds: ["h1"],
         kind: "prettyPrinted",
         sourceId: "pph1",
         url: "/index.html",
       },
+
       {
         contentHash: "contentHash#h2",
         kind: "html",
         sourceId: "h2",
         url: "/index.html",
       },
+
       {
         kind: "prettyPrinted",
         generatedSourceIds: ["h2"],
@@ -159,7 +383,66 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         url: "/index.html",
       },
     ])
-  ).toMatchSnapshot();
+  ).toMatchInlineSnapshot(`
+    Object {
+      "h1": Object {
+        "canonicalId": "h1",
+        "contentHash": "contentHash#h1",
+        "correspondingSourceIds": Array [
+          "h1",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "h1",
+        "kind": "html",
+        "prettyPrinted": "pph1",
+        "prettyPrintedFrom": undefined,
+        "url": "/index.html",
+      },
+      "h2": Object {
+        "canonicalId": "h2",
+        "contentHash": "contentHash#h2",
+        "correspondingSourceIds": Array [
+          "h2",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "h2",
+        "kind": "html",
+        "prettyPrinted": "pph2",
+        "prettyPrintedFrom": undefined,
+        "url": "/index.html",
+      },
+      "pph1": Object {
+        "canonicalId": "h1",
+        "contentHash": "contentHash#h1",
+        "correspondingSourceIds": Array [
+          "pph1",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "pph1",
+        "kind": "prettyPrinted",
+        "prettyPrinted": undefined,
+        "prettyPrintedFrom": "h1",
+        "url": "/index.html",
+      },
+      "pph2": Object {
+        "canonicalId": "h2",
+        "contentHash": "contentHash#h2",
+        "correspondingSourceIds": Array [
+          "pph2",
+        ],
+        "generated": Array [],
+        "generatedFrom": Array [],
+        "id": "pph2",
+        "kind": "prettyPrinted",
+        "prettyPrinted": undefined,
+        "prettyPrintedFrom": "h2",
+        "url": "/index.html",
+      },
+    }
+  `);
 });
 
 describe("ThreadFront source methods", () => {
