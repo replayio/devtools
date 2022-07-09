@@ -26,7 +26,7 @@ export default function Initializer({ children }: { children: ReactNode }) {
     // We only need to initialize them once.
     if (!didInitializeRef.current) {
       asyncInitializeClient(replayClient).then(sessionData => {
-        setReplayClient(sessionData.sessionId, replayClient)
+        setReplayClient(sessionData.sessionId, replayClient);
         setContext(sessionData);
       });
     }

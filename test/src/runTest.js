@@ -21,7 +21,7 @@ async function recordBrowser(state, test, testPath, browserName, saveFixture) {
   const websocketLogs = [];
 
   const context = await browser.newContext({
-    ignoreHTTPSErrors: true
+    ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
 

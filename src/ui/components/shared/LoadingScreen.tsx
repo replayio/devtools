@@ -55,7 +55,9 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate showTips={true}>
-      <span className="text-sm">{stalled ? "This is taking longer than usual..." : waitingForMessage}</span>
+      <span className="text-sm">
+        {stalled ? "This is taking longer than usual..." : waitingForMessage}
+      </span>
     </LoadingScreenTemplate>
   );
 }

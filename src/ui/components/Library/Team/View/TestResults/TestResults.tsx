@@ -22,8 +22,6 @@ export function TestResults({ recordings }: { recordings: Recording[] }) {
     return <RecordingsError />;
   }
 
-  
-
   return (
     <div
       className={`recording-list flex flex-col mb-1 overflow-y-auto text-sm rounded-t-xl border-b border-chrome no-scrollbar ${styles.recordingList}`}

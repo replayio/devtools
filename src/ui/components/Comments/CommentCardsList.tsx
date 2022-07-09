@@ -43,7 +43,7 @@ export default function CommentCardsList() {
           {isAuthenticated
             ? "Add a comment to the video, a line of code, or a console message."
             : "Once signed in, you can add comments and make your voice heard!"}
-        </p>        
+        </p>
       </div>
     );
   }
