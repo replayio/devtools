@@ -133,7 +133,6 @@ export function enableBreakpointsInSource(
   source: Source
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoints.remove_all_in_source");
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
@@ -152,7 +151,6 @@ export function enableBreakpointsInSource(
  */
 export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
@@ -247,7 +245,6 @@ export function _addBreakpointAtLine(
       return;
     }
 
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add");
 
     const breakpointLocation = {
@@ -292,7 +289,6 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
       logValue: getLogValue(source, state, location),
     };
 
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add_column");
 
     // @ts-expect-error Breakpoint location field mismatches

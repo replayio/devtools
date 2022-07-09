@@ -144,7 +144,6 @@ export function selectLocation(
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
-    // @ts-ignore MixpanelEvent mismatch
     trackEvent("sources.select_location");
 
     if (!client) {

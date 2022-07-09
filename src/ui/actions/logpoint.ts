@@ -247,7 +247,6 @@ async function setMultiSourceLogpoint(
   const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
   if (primitiveFronts) {
-    // TODO We're getting an _array_ of locations, but only using the first one?
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
       if (!points.error) {
@@ -517,7 +516,6 @@ export async function setEventLogpoint(
   points?: PointDescription[]
 ) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
-  const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
     mapper,
     effectful: true,

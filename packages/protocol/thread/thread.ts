@@ -401,6 +401,8 @@ export class _ThreadFront {
 
     await this.ensureAllSources();
     for (const [sourceId, source] of this.sources) {
+      // TODO @jcmorrow remove this check when we actually want to capture all
+      // sources in the experimental reducer
       if (sourceId === this.getCorrespondingSourceIds(sourceId)[0]) {
         onSource({ sourceId, ...source });
       }
