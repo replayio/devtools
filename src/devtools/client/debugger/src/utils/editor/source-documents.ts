@@ -7,22 +7,27 @@
 import { getMode } from "../source";
 
 import { isMinified } from "../isMinified";
+import { Doc } from "codemirror";
+import Editor from "./source-editor";
+import { SourceContent } from "ui/reducers/sources";
+import { Source } from "../../reducers/sources";
+import { SymbolDeclarations } from "../../selectors";
 
-let sourceDocs = {};
+let sourceDocs: Record<string, Doc> = {};
 
-export function getDocument(key) {
+export function getDocument(key: string) {
   return sourceDocs[key];
 }
 
-export function hasDocument(key) {
+export function hasDocument(key: string) {
   return !!getDocument(key);
 }
 
-export function setDocument(key, doc) {
+export function setDocument(key: string, doc: Doc) {
   sourceDocs[key] = doc;
 }
 
-export function removeDocument(key) {
+export function removeDocument(key: string) {
   delete sourceDocs[key];
 }
 
@@ -30,14 +35,14 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-export function clearEditor(editor) {
+export function clearEditor(editor: Editor) {
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
   editor.setText("");
   editor.setMode({ name: "text" });
 }
 
-export function showLoading(editor) {
+export function showLoading(editor: Editor) {
   let doc = getDocument("loading");
 
   if (doc) {
@@ -50,18 +55,16 @@ export function showLoading(editor) {
   }
 }
 
-export function showErrorMessage(editor, msg) {
-  let error;
-  error = L10N.getFormatStr("errorLoadingText3", msg);
+export function showErrorMessage(editor: Editor, msg: string) {
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
-  editor.setText(error);
+  editor.setText(msg);
   editor.setMode({ name: "text" });
 }
 
-function setEditorText(editor, sourceId, content) {
-  console.log({ sourceId, content });
-  const contents = content
+function setEditorText(editor: Editor, sourceId: string, content: SourceContent) {
+  console.log({ content });
+  const contents = content.value?.value
     .split(/\r\n?|\n|\u2028|\u2029/)
     .map(line => {
       if (line.length >= 1000) {
@@ -73,13 +76,18 @@ function setEditorText(editor, sourceId, content) {
   editor.setText(contents);
 }
 
-function setMode(editor, source, content, symbols) {
+function setMode(
+  editor: Editor,
+  source: Source,
+  content: SourceContent,
+  symbols: SymbolDeclarations
+) {
   // Disable modes for minified files with 1+ million characters Bug 1569829
-  if (content.type === "text" && isMinified(source) && content.value.length > 1000000) {
+  if (isMinified(source) && (content.value?.value.length || 0) > 1000000) {
     return;
   }
 
-  const mode = getMode(source, content, symbols);
+  const mode = getMode(source, content.value, symbols);
   const currentMode = editor.codeMirror.getOption("mode");
   if (!currentMode || currentMode.name != mode.name) {
     editor.setMode(mode);
@@ -90,7 +98,12 @@ function setMode(editor, source, content, symbols) {
  * Handle getting the source document or creating a new
  * document with the correct mode and text.
  */
-export function showSourceText(editor, source, content, symbols) {
+export function showSourceText(
+  editor: Editor,
+  source: Source,
+  content: SourceContent,
+  symbols: SymbolDeclarations
+) {
   if (hasDocument(source.id)) {
     const doc = getDocument(source.id);
     if (editor.codeMirror.doc === doc) {

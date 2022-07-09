@@ -72,11 +72,11 @@ const mapStateToProps = (state, props) => ({
   cx: getThreadContext(state),
   isPaused: getIsPaused(state),
   alternateSource: getAlternateSource(state),
-  hasMappedLocation:
-    (props.selectedSource.isOriginal ||
-      isSourceWithMap(state, props.selectedSource.id) ||
-      isPretty(props.selectedSource)) &&
-    !getPrettySource(state, props.selectedSource.id),
+  hasMappedLocation: false,
+  // (props.selectedSource.isOriginal ||
+  //   isSourceWithMap(state, props.selectedSource.id) ||
+  //   isPretty(props.selectedSource)) &&
+  // !getPrettySource(state, props.selectedSource.id),
 });
 
 const mapDispatchToProps = dispatch => ({

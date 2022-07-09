@@ -65,6 +65,7 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 import { LoadingState } from "ui/reducers/sources";
+import { getSelectedSource } from "../../selectors";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
@@ -100,7 +101,7 @@ class Editor extends PureComponent {
   updateEditor(props) {
     let editor = this.state.editor;
 
-    if (!this.state.editor && props.selectedSource) {
+    if (!this.state.editor && props.sourceContent) {
       editor = this.setupEditor();
     }
 
@@ -109,7 +110,7 @@ class Editor extends PureComponent {
     this.scrollToLocation(props, editor);
     endOperation();
 
-    if (this.props.selectedSource != props.selectedSource) {
+    if (this.props.sourceContent != props.sourceContent) {
       this.props.updateViewport();
       resizeBreakpointGutter(editor.codeMirror);
       resizeToggleButton(editor.codeMirror);
@@ -155,11 +156,11 @@ class Editor extends PureComponent {
   }
 
   onClosePress = e => {
-    const { cx, selectedSource } = this.props;
-    if (selectedSource) {
+    const { cx, sourceContent } = this.props;
+    if (sourceContent) {
       e.preventDefault();
       e.stopPropagation();
-      this.props.closeTab(cx, selectedSource);
+      this.props.closeTab(cx, sourceContent);
     }
   };
 
@@ -178,8 +179,8 @@ class Editor extends PureComponent {
 
   getCurrentLine() {
     const { codeMirror } = this.state.editor;
-    const { selectedSource } = this.props;
-    if (!selectedSource) {
+    const { sourceContent } = this.props;
+    if (!sourceContent) {
       return;
     }
 
@@ -232,9 +233,9 @@ class Editor extends PureComponent {
     event.stopPropagation();
     event.preventDefault();
 
-    const { selectedSource } = this.props;
+    const { sourceContent } = this.props;
     const { editor } = this.state;
-    if (!selectedSource || !editor) {
+    if (!sourceContent || !editor) {
       return;
     }
 
@@ -257,17 +258,17 @@ class Editor extends PureComponent {
   };
 
   onGutterClick = (cm, line, gutter, ev) => {
-    const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
-    const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
+    const { cx, sourceContent, sourceDetails, addBreakpointAtLine, toggleBlackBox } = this.props;
+    const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, sourceContent, ev);
 
     // ignore right clicks in the gutter
-    if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
+    if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !sourceContent) {
       return;
     }
 
     // if user clicks gutter to set breakpoint on blackboxed source, un-blackbox the source.
-    if (selectedSource && selectedSource.isBlackBoxed) {
-      toggleBlackBox(cx, selectedSource);
+    if (sourceDetails && sourceDetails.isBlackBoxed) {
+      toggleBlackBox(cx, sourceDetails);
     }
 
     if (typeof line !== "number") {
@@ -290,10 +291,10 @@ class Editor extends PureComponent {
   };
 
   onClick(e) {
-    const { cx, selectedSource, updateCursorPosition, jumpToMappedLocation } = this.props;
+    const { cx, sourceContent, updateCursorPosition, jumpToMappedLocation } = this.props;
 
-    if (selectedSource) {
-      const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, e);
+    if (sourceContent) {
+      const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, sourceContent, e);
 
       if (e.metaKey && e.altKey) {
         jumpToMappedLocation(cx, sourceLocation);
@@ -304,19 +305,19 @@ class Editor extends PureComponent {
   }
 
   shouldScrollToLocation(nextProps, editor) {
-    const { selectedLocation, selectedSource } = this.props;
+    const { selectedLocation, sourceContent } = this.props;
     if (
       !editor ||
-      !nextProps.selectedSource ||
+      !nextProps.sourceContent ||
       !nextProps.selectedLocation ||
       !nextProps.selectedLocation.line ||
-      !nextProps.selectedSource.content
+      !nextProps.sourceContent.content
     ) {
       return false;
     }
 
     const isFirstLoad =
-      (!selectedSource || !selectedSource.content) && nextProps.selectedSource.content;
+      (!sourceContent || !sourceContent.content) && nextProps.sourceContent.content;
     const locationChanged = selectedLocation !== nextProps.selectedLocation;
     const symbolsChanged = nextProps.symbols != this.props.symbols;
 
@@ -324,14 +325,14 @@ class Editor extends PureComponent {
   }
 
   scrollToLocation(nextProps, editor) {
-    const { selectedLocation, selectedSource } = nextProps;
+    const { selectedLocation, sourceContent } = nextProps;
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
       const line = toEditorLine(selectedLocation.line);
       let column;
 
-      if (selectedSource && hasDocument(selectedSource.id)) {
-        const doc = getDocument(selectedSource.id);
+      if (sourceContent && hasDocument(sourceContent.id)) {
+        const doc = getDocument(sourceContent.id);
         const lineText = doc.getLine(line);
         column = toEditorColumn(lineText, selectedLocation.column);
         column = Math.max(column, getIndentation(lineText));
@@ -342,22 +343,24 @@ class Editor extends PureComponent {
   }
 
   setText(props, editor) {
-    const { selectedSource, symbols } = props;
+    const { sourceContent, symbols } = props;
+    console.log({ sourceContent });
     if (!editor) {
       return;
     }
 
     // check if we previously had a selected source
-    if (!selectedSource) {
+    if (!sourceContent) {
       return this.clearEditor();
     }
 
-    if (!selectedSource.content) {
+    console.log({ sourceContent });
+    if (!sourceContent.value) {
       return showLoading(editor);
     }
 
-    if (selectedSource.status === LoadingState.ERRORED) {
-      let { value } = selectedSource.content;
+    if (sourceContent.status === LoadingState.ERRORED) {
+      let { value } = sourceContent.content;
       if (typeof value !== "string") {
         value = "Unexpected source error";
       }
@@ -365,8 +368,7 @@ class Editor extends PureComponent {
       return this.showErrorMessage(value);
     }
 
-    console.log({ selectedSource });
-    return showSourceText(editor, selectedSource, selectedSource.content, symbols);
+    return showSourceText(editor, sourceContent, sourceContent, symbols);
   }
 
   clearEditor() {
@@ -399,14 +401,20 @@ class Editor extends PureComponent {
   }
 
   renderItems() {
-    const { cx, selectedSource, closeContextMenu, contextMenu: gutterContextMenu } = this.props;
+    const {
+      cx,
+      sourceContent,
+      sourceDetails,
+      closeContextMenu,
+      contextMenu: gutterContextMenu,
+    } = this.props;
     const { editor, contextMenu } = this.state;
 
-    if (!selectedSource || !editor) {
+    if (!sourceContent || !editor) {
       return null;
     }
 
-    if (!getDocument(selectedSource.id)) {
+    if (!getDocument(sourceContent.id)) {
       return <EditorLoadingBar />;
     }
 
@@ -428,7 +436,7 @@ class Editor extends PureComponent {
           editor={editor}
           contextMenu={contextMenu}
           clearContextMenu={this.clearContextMenu}
-          selectedSource={selectedSource}
+          sourceDetails={sourceDetails}
         />
         <ColumnBreakpoints editor={editor} />
         <Gutter editor={editor} />
@@ -439,7 +447,7 @@ class Editor extends PureComponent {
   renderSearchBar() {
     const { editor } = this.state;
 
-    if (!this.props.selectedSource) {
+    if (!this.props.sourceContent) {
       return null;
     }
 
@@ -447,12 +455,12 @@ class Editor extends PureComponent {
   }
 
   render() {
-    const { selectedSource } = this.props;
+    const { sourceContent } = this.props;
 
     return (
       <div
         className={classnames("editor-wrapper", {
-          blackboxed: selectedSource && selectedSource.isBlackBoxed,
+          blackboxed: sourceContent && sourceContent.isBlackBoxed,
           showLineHits: true,
         })}
         ref={c => (this.$editorWrapper = c)}
@@ -471,15 +479,17 @@ Editor.childContextTypes = {
 };
 
 const mapStateToProps = state => {
-  const selectedSource = selectors.getSelectedSourceWithContent(state);
+  const sourceContent = selectors.getSelectedSourceWithContent(state);
+  const sourceDetails = getSelectedSource(state);
 
   return {
     cx: selectors.getThreadContext(state),
     contextMenu: getContextMenu(state),
     selectedLocation: selectors.getSelectedLocation(state),
-    selectedSource,
+    sourceContent,
+    sourceDetails,
     searchOn: selectors.getActiveSearch(state) === "file",
-    symbols: selectors.getSymbols(state, selectedSource),
+    symbols: selectors.getSymbols(state, sourceContent),
     selectedFrame: selectors.getSelectedFrame(state),
     mode: selectors.getViewMode(state),
   };

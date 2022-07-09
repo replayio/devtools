@@ -18,11 +18,13 @@ import Spinner from "ui/components/shared/Spinner";
 import { getHitCountsForSelectedSource } from "../../reducers/sources";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import { isFunctionSymbol } from "./isFunctionSymbol";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 export function SourceOutline({
   cx,
   cursorPosition,
-  selectedSource,
+  sourceContent,
+  sourceDetails,
   symbols,
   hitCounts,
   selectLocation,
@@ -46,11 +48,11 @@ export function SourceOutline({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (selectedSource) {
+    if (sourceDetails) {
       // We start by loading the first N lines of hits, where N is the line limit.
-      dispatch(setBreakpointHitCounts(selectedSource.id, 1));
+      dispatch(setBreakpointHitCounts(sourceDetails.id, 1));
     }
-  }, [dispatch, selectedSource]);
+  }, [dispatch, sourceDetails]);
 
   // TODO [jasonLaster] Fix react-hooks/exhaustive-deps
   useEffect(() => {
@@ -66,14 +68,14 @@ export function SourceOutline({
   const handleSelectSymbol = useCallback(
     (symbol: ClassSymbol | FunctionSymbol) => {
       selectLocation(cx, {
-        sourceId: selectedSource!.id,
-        sourceUrl: selectedSource!.url!,
+        sourceId: sourceDetails!.id,
+        sourceUrl: sourceDetails!.url!,
         line: symbol.location.start.line,
         column: symbol.location.start.column,
       });
       setFocusedSymbol(symbol);
     },
-    [selectLocation, selectedSource, cx]
+    [selectLocation, sourceDetails, cx]
   );
 
   const MemoizedOutlineItem = useCallback(
@@ -104,7 +106,7 @@ export function SourceOutline({
     [handleSelectSymbol, outlineSymbols, focusedSymbol]
   );
 
-  if (!selectedSource || !symbols) {
+  if (!sourceContent || !symbols) {
     return (
       <div className="text-themeBodyColor mx-2 mt-2 mb-4 space-y-3 whitespace-normal rounded-lg bg-themeTextFieldBgcolor p-3 text-center text-xs">
         {`Select a source to see available functions`}
@@ -159,14 +161,16 @@ export function SourceOutline({
 }
 
 const mapStateToProps = (state: UIState) => {
-  const selectedSource = selectors.getSelectedSourceWithContent(state);
-  const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
-  const hitCounts = selectedSource ? getHitCountsForSelectedSource(state) : null;
+  const sourceContent = selectors.getSelectedSourceWithContent(state);
+  const sourceDetails = getSelectedSourceDetails(state);
+  const symbols = sourceDetails ? selectors.getSymbols(state, sourceDetails) : null;
+  const hitCounts = sourceDetails ? getHitCountsForSelectedSource(state) : null;
   return {
     cursorPosition: selectors.getCursorPosition(state),
     cx: selectors.getContext(state),
     hitCounts,
-    selectedSource: selectedSource,
+    sourceContent,
+    sourceDetails,
     symbols,
   };
 };

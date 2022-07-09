@@ -31,11 +31,21 @@ export enum LoadingState {
   ERRORED = "errored",
 }
 
+// export interface SourceContent {
+//   content?: string;
+//   contentType?: ContentType;
+//   id: string;
+//   status: LoadingState;
+// }
+
 export interface SourceContent {
-  content?: string;
-  contentType?: ContentType;
   id: string;
   status: LoadingState;
+  value?: {
+    contentType: string;
+    type: string;
+    value: string;
+  };
 }
 
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
@@ -76,11 +86,18 @@ const sourcesSlice = createSlice({
         status: LoadingState.LOADING,
       });
     },
-    sourceLoaded: (state, action: PayloadAction<{ sourceId: string; contents: string }>) => {
+    sourceLoaded: (
+      state,
+      action: PayloadAction<{ sourceId: string; contents: string; contentType: string }>
+    ) => {
       contentsAdapter.upsertOne(state.contents, {
         id: action.payload.sourceId,
         status: LoadingState.LOADED,
-        content: action.payload.contents,
+        value: {
+          contentType: action.payload.contentType,
+          value: action.payload.contents,
+          type: action.payload.contentType.slice(0, action.payload.contentType.indexOf("/")),
+        },
       });
     },
     sourceErrored: (state, action: PayloadAction<string>) => {

@@ -57,6 +57,6 @@ export async function loadSource(state: UIState, source: Source, thunkArgs: Thun
   return { text, contentType };
 }
 
-export const loadSourceText = sourceId => {
+export const loadSourceText = (sourceId: string) => {
   return { type: "sources/sourceLoading", payload: sourceId };
 };
