@@ -1,10 +1,18 @@
-.HorizontalContainer {
-  background-color: var(--color-contrast);
-  display: flex;
+.Grid1Column,
+.Grid2Columns,
+.Grid3Columns {
+  background-color: var(--background-color-default);
+  display: grid;
   width: 100vw;
   height: 100vh;
   padding: 1rem;
   gap: 1rem;
+}
+.Grid2Columns {
+  grid-template-columns: 1fr 2fr;
+}
+.Grid3Columns {
+  grid-template-columns: 1fr 2fr 2fr;
 }
 
 .VerticalContainer {

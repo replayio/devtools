@@ -8,6 +8,7 @@ export default function Icon({
     | "arrow"
     | "breakpoint"
     | "cancel"
+    | "close"
     | "comment"
     | "comments"
     | "confirm"
@@ -45,6 +46,10 @@ export default function Icon({
         "M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z";
       break;
     case "cancel":
+      path =
+        "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
+      break;
+    case "close":
       path =
         "M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z";
       break;

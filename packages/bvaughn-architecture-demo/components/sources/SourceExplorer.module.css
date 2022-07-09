@@ -1,9 +1,9 @@
 .List {
+  flex: 1 1 auto;
   height: 100%;
   border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
   overflow: auto;
-  padding: 0 0.5rem;
 }
 
 .Header {
@@ -27,13 +27,26 @@
 .SourceTree {
   display: flex;
   flex-direction: column;
-  width: fit-content;
+  white-space: pre;
 }
 
+.FocusedListItem,
 .ListItem {
   display: flex;
   flex-wrap: nowrap;
   gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  cursor: default;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.2s ease-in-out;
+}
+.ListItem:hover {
+  background-color: var(--background-color-contrast-1);
+}
+.FocusedListItem {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
 }
 
 .Icon {

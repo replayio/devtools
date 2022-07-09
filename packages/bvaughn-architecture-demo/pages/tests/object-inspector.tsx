@@ -3,6 +3,7 @@ import Initializer from "@bvaughn/components/Initializer";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
+import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { createReplayClientForPlaywrightTesting } from "shared/utils/client";
 import { getFlag } from "shared/utils/url";
@@ -13,17 +14,19 @@ export default function Console() {
   return (
     <ReplayClientContext.Provider value={replayClient}>
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
-        <PointsContextRoot>
-          <PauseContextRoot>
-            <FocusContextRoot>
-              <div className={styles.HorizontalContainer}>
-                <div className={styles.VerticalContainer}>
-                  <ConsoleRoot />
+        <SourcesContextRoot>
+          <PointsContextRoot>
+            <PauseContextRoot>
+              <FocusContextRoot>
+                <div className={styles.Grid1Column}>
+                  <div className={styles.VerticalContainer}>
+                    <ConsoleRoot />
+                  </div>
                 </div>
-              </div>
-            </FocusContextRoot>
-          </PauseContextRoot>
-        </PointsContextRoot>
+              </FocusContextRoot>
+            </PauseContextRoot>
+          </PointsContextRoot>
+        </SourcesContextRoot>
       </Initializer>
     </ReplayClientContext.Provider>
   );

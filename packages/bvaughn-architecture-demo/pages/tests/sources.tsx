@@ -1,4 +1,3 @@
-import ConsoleRoot from "@bvaughn/components/console";
 import Initializer from "@bvaughn/components/Initializer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
@@ -12,7 +11,7 @@ import { getFlag } from "shared/utils/url";
 
 import styles from "./styles.module.css";
 
-export default function SourceAndConsole() {
+export default function Source() {
   return (
     <ReplayClientContext.Provider value={replayClient}>
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
@@ -20,15 +19,12 @@ export default function SourceAndConsole() {
           <PointsContextRoot>
             <PauseContextRoot>
               <FocusContextRoot>
-                <div className={styles.Grid3Columns}>
+                <div className={styles.Grid2Columns}>
                   <div className={styles.VerticalContainer}>
                     <SourceExplorer />
                   </div>
                   <div className={styles.VerticalContainer}>
                     <Sources />
-                  </div>
-                  <div className={styles.VerticalContainer}>
-                    <ConsoleRoot />
                   </div>
                 </div>
               </FocusContextRoot>
