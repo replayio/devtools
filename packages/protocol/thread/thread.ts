@@ -665,6 +665,7 @@ class _ThreadFront {
     if (!this.currentPause) {
       this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
     }
+    return this.currentPause;
   }
 
   async getFrames() {
