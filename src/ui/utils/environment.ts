@@ -112,8 +112,11 @@ export function getPausePointParams() {
   const hasFramesParam = url.searchParams.get("hasFrames");
   const hasFrames = hasFramesParam ? hasFramesParam == "true" : false;
 
+  const focusRegionParam = url.searchParams.get("focusRegion");
+  const focusRegion = focusRegionParam ? decodeBase64FromURL(focusRegionParam) : null;
+
   if (pointParam && timeParam) {
-    return { point, time, hasFrames };
+    return { point, time, hasFrames, focusRegion };
   }
 
   return null;
@@ -128,7 +131,9 @@ export function updateUrlWithParams(params: Record<string, string>) {
   const url = new URL(window.location.toString());
 
   Object.entries(params).forEach(([key, value]) => {
-    url.searchParams.set(key, value);
+    if (value !== undefined && value !== null) {
+      url.searchParams.set(key, value);
+    }
   });
 
   window.history.replaceState({}, "", url.toString());
@@ -142,6 +147,22 @@ export function getLoginReferrerParam() {
 
 export function removeUrlParameters() {
   window.history.pushState({}, document.title, window.location.pathname);
+}
+
+export function encodeObjectToURL(obj: Object): string | undefined {
+  try {
+    return encodeURIComponent(btoa(JSON.stringify(obj)));
+  } catch (e) {
+    return undefined;
+  }
+}
+
+export function decodeBase64FromURL(urlParam: string): Object | undefined {
+  try {
+    return JSON.parse(atob(decodeURIComponent(urlParam)));
+  } catch (e) {
+    return undefined;
+  }
 }
 
 export function launchAndRecordUrl(url: string) {

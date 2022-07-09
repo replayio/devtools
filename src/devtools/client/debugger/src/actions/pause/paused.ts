@@ -11,7 +11,10 @@ import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../s
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
-import { isPointInLoadedRegion } from "ui/reducers/app";
+import { isPointInLoadingRegion } from "ui/reducers/app";
+import { setFocusRegion } from "ui/actions/timeline";
+import { TimeStampedPoint } from "@replayio/protocol";
+import maxBy from "lodash/maxBy";
 
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;
@@ -79,8 +82,8 @@ export function paused({
   return async function (dispatch, getState, { ThreadFront }) {
     dispatch(pauseRequestedAt(executionPoint));
 
-    if (!isPointInLoadedRegion(getState(), executionPoint)) {
-      return;
+    if (!isPointInLoadingRegion(getState(), executionPoint)) {
+      dispatch(failedToCreatePause(executionPoint, ""));
     }
 
     trackEvent("paused");

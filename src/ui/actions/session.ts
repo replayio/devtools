@@ -269,8 +269,6 @@ function onLoadingFinished(): UIThunkAction {
       await ThreadFront.waitForSession();
       await ThreadFront.initializedWaiter.promise;
       await ThreadFront.ensureAllSources();
-
-      ThreadFront.ensureCurrentPause();
     }
 
     initThreadFront();

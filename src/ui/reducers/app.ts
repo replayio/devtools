@@ -356,11 +356,26 @@ export const isCurrentTimeInLoadedRegion = createSelector(
 
 export const isPointInLoadedRegion = createSelector(
   getLoadedRegions,
-  (state: UIState, executionPoint: string) => executionPoint,
+  (_state: UIState, executionPoint: string) => executionPoint,
   (regions: LoadedRegions | null, executionPoint: string) => {
     return (
       regions !== null &&
       regions.loaded.some(
+        ({ begin, end }) =>
+          BigInt(executionPoint) >= BigInt(begin.point) &&
+          BigInt(executionPoint) <= BigInt(end.point)
+      )
+    );
+  }
+);
+
+export const isPointInLoadingRegion = createSelector(
+  getLoadedRegions,
+  (_state: UIState, executionPoint: string) => executionPoint,
+  (regions: LoadedRegions | null, executionPoint: string) => {
+    return (
+      regions !== null &&
+      regions.loading.some(
         ({ begin, end }) =>
           BigInt(executionPoint) >= BigInt(begin.point) &&
           BigInt(executionPoint) <= BigInt(end.point)
