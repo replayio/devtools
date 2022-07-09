@@ -104,7 +104,7 @@ export function onMessageHover(
 
 export function onViewSourceInDebugger(
   frame: { sourceId?: string; url: string; line?: number; column: number },
-  openSourcesTab?: boolean
+  openSourceIdsTab?: boolean
 ): UIThunkAction {
   return async (dispatch, getState) => {
     const cx = getContext(getState());
@@ -112,13 +112,13 @@ export function onViewSourceInDebugger(
       ? getSourceByActorId(getState(), frame.sourceId)
       : getSourceByURL(getState(), frame.url!);
     if (source) {
-      dispatch(showSource(cx, source.id, openSourcesTab));
+      dispatch(showSource(cx, source.id, openSourceIdsTab));
       await dispatch(
         selectSource(
           cx,
           source.id,
           { sourceId: source.id, line: frame.line, column: frame.column },
-          openSourcesTab
+          openSourceIdsTab
         )
       );
     }

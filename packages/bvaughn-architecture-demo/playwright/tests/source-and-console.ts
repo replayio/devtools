@@ -20,7 +20,8 @@ testSetup(async function regeneratorFunction({ page }) {
 async function openSourceTab(page: Page) {
   await page.goto(URL);
 
-  await page.click('[data-test-id="SourceTab-test-console-levels.html"]');
+  await page.click('[date-test-id="SourceExplorerSource-h1"]');
+  await page.click('[data-test-id="SourceTab-h1"]');
 }
 
 async function addLogPoint(page: Page, lineNumber: number) {

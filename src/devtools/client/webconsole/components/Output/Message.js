@@ -123,10 +123,10 @@ class Message extends React.Component {
     e.preventDefault();
   }
 
-  onViewSourceInDebugger = (frame, openSourcesTab = true) => {
+  onViewSourceInDebugger = (frame, openSourceIdsTab = true) => {
     const { dispatch } = this.props;
     trackEvent("console.select_source ");
-    dispatch(actions.onViewSourceInDebugger(frame, openSourcesTab));
+    dispatch(actions.onViewSourceInDebugger(frame, openSourceIdsTab));
   };
 
   toggleMessage(e) {

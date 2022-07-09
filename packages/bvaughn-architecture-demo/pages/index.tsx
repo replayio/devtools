@@ -1,18 +1,18 @@
 import CommentList from "@bvaughn/components/comments/CommentList";
 import ConsoleRoot from "@bvaughn/components/console";
 import Focuser from "@bvaughn/components/console/Focuser";
+import Icon from "@bvaughn/components/Icon";
 import Initializer from "@bvaughn/components/Initializer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
+import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import React, { useContext, useMemo, useState, useTransition } from "react";
+import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";
-import Icon from "../components/Icon";
-
-import createReplayClientRecorder from "../../shared/client/createReplayClientRecorder";
-import { ReplayClientContext } from "../../shared/client/ReplayClientContext";
 
 import styles from "./index.module.css";
 
@@ -38,45 +38,47 @@ export default function HomePage() {
 
   const content = (
     <Initializer>
-      <PointsContextRoot>
-        <PauseContextRoot>
-          <FocusContextRoot>
-            <div className={styles.VerticalContainer}>
-              <div className={styles.HorizontalContainer}>
-                <div className={styles.ToolBar}>
-                  <button
-                    className={panel === "comments" ? styles.TabSelected : styles.Tab}
-                    disabled={isPending}
-                    onClick={() => setPanelTransition("comments")}
-                  >
-                    <Icon className={styles.TabIcon} type="comments" />
-                  </button>
-                  <button
-                    className={panel === "sources" ? styles.TabSelected : styles.Tab}
-                    disabled={isPending}
-                    onClick={() => setPanelTransition("sources")}
-                  >
-                    <Icon className={styles.TabIcon} type="source-explorer" />
-                  </button>
+      <SourcesContextRoot>
+        <PointsContextRoot>
+          <PauseContextRoot>
+            <FocusContextRoot>
+              <div className={styles.VerticalContainer}>
+                <div className={styles.HorizontalContainer}>
+                  <div className={styles.ToolBar}>
+                    <button
+                      className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                      disabled={isPending}
+                      onClick={() => setPanelTransition("comments")}
+                    >
+                      <Icon className={styles.TabIcon} type="comments" />
+                    </button>
+                    <button
+                      className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                      disabled={isPending}
+                      onClick={() => setPanelTransition("sources")}
+                    >
+                      <Icon className={styles.TabIcon} type="source-explorer" />
+                    </button>
+                  </div>
+                  <div className={styles.CommentsContainer}>
+                    {panel == "comments" && <CommentList />}
+                    {panel == "sources" && <SourceExplorer />}
+                  </div>
+                  <div className={styles.SourcesContainer}>
+                    <Sources />
+                  </div>
+                  <div className={styles.ConsoleContainer}>
+                    <ConsoleRoot />
+                  </div>
                 </div>
-                <div className={styles.CommentsContainer}>
-                  {panel == "comments" && <CommentList />}
-                  {panel == "sources" && <SourceExplorer />}
-                </div>
-                <div className={styles.SourcesContainer}>
-                  <Sources />
-                </div>
-                <div className={styles.ConsoleContainer}>
-                  <ConsoleRoot />
+                <div className={styles.Row}>
+                  <Focuser />
                 </div>
               </div>
-              <div className={styles.Row}>
-                <Focuser />
-              </div>
-            </div>
-          </FocusContextRoot>
-        </PauseContextRoot>
-      </PointsContextRoot>
+            </FocusContextRoot>
+          </PauseContextRoot>
+        </PointsContextRoot>
+      </SourcesContextRoot>
     </Initializer>
   );
 

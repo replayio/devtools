@@ -107,7 +107,7 @@ export function openSourceLink(sourceId: string, line?: number, column?: number)
   };
 }
 
-export function showSource(cx: Context, sourceId: string, openSourcesTab = true): UIThunkAction {
+export function showSource(cx: Context, sourceId: string, openSourceIdsTab = true): UIThunkAction {
   return (dispatch, getState) => {
     const source = getSource(getState(), sourceId);
 
@@ -117,7 +117,7 @@ export function showSource(cx: Context, sourceId: string, openSourcesTab = true)
 
     dispatch(setPrimaryPaneTab("sources"));
     // @ts-ignore apparently empty options is legal
-    dispatch(selectSource(cx, source.id, {}, openSourcesTab));
+    dispatch(selectSource(cx, source.id, {}, openSourceIdsTab));
   };
 }
 

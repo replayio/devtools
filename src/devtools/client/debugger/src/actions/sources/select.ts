@@ -103,13 +103,13 @@ export function selectSource(
   cx: Context,
   sourceId: string,
   options: PartialLocation = {} as PartialLocation,
-  openSourcesTab?: boolean
+  openSourceIdsTab?: boolean
 ): UIThunkAction {
   return async dispatch => {
     // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
-    return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
+    return dispatch(selectSpecificLocation(cx, location, openSourceIdsTab));
   };
 }
 
@@ -139,7 +139,7 @@ export function addTab(source: Source) {
 export function selectLocation(
   cx: Context,
   location: PartialLocation,
-  openSourcesTab = true
+  openSourceIdsTab = true
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
@@ -184,7 +184,7 @@ export function selectLocation(
 
     // Yank the user to the editor tab in case the debugger/editor is tucked in
     // the toolbox.
-    if (layout !== "ide" && openSourcesTab) {
+    if (layout !== "ide" && openSourceIdsTab) {
       dispatch(setSelectedPanel("debugger"));
     }
 
@@ -220,9 +220,9 @@ export function selectLocation(
 export function selectSpecificLocation(
   cx: Context,
   location: PartialLocation,
-  openSourcesTab?: boolean
+  openSourceIdsTab?: boolean
 ) {
-  return selectLocation(cx, location, openSourcesTab);
+  return selectLocation(cx, location, openSourceIdsTab);
 }
 
 // The RRP protocol values include both generated and original information about
