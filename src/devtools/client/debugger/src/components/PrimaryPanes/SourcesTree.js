@@ -38,7 +38,7 @@ import {
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
 import { trackEvent } from "ui/utils/telemetry";
-import { getSelectedSourceDetails, sourcesLoading } from "ui/reducers/sources";
+import { getSelectedSourceDetails, getSourcesLoading } from "ui/reducers/sources";
 
 function shouldAutoExpand(depth, item, debuggeeUrl) {
   if (depth !== 1) {
@@ -265,7 +265,7 @@ const mapStateToProps = (state, props) => {
 
   return {
     cx: getContext(state),
-    sourcesLoading: sourcesLoading(state),
+    sourcesLoading: getSourcesLoading(state),
     shownSource: shownSource,
     selectedSource: selectedSource,
     debuggeeUrl: getDebuggeeUrl(state),

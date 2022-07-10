@@ -4,13 +4,9 @@
 
 //
 
+import { getSelectedSourceWithContent } from "ui/reducers/sources";
 import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
-import {
-  getSelectedSourceWithContent,
-  getFileSearchModifiers,
-  getFileSearchQuery,
-  getFileSearchResults,
-} from "../selectors";
+import { getFileSearchModifiers, getFileSearchQuery, getFileSearchResults } from "../selectors";
 import { isFulfilled } from "../utils/async-value";
 import {
   clearSearch,

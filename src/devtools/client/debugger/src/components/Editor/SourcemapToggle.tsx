@@ -3,10 +3,9 @@ import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import { UIState } from "ui/state";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
 
 import actions from "../../actions";
-import { getSelectedSourceWithContent } from "../../reducers/sources";
 
 import Toggle from "./Toggle";
 

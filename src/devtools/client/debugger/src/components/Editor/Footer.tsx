@@ -1,8 +1,7 @@
 import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { getSelectedSourceWithContent } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
-
-import { getSelectedSourceWithContent } from "../../selectors";
 
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";

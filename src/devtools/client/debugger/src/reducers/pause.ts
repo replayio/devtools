@@ -21,7 +21,7 @@ import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getSelectedSourceWithContent, getSource } from "./sources";
+import { getSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
 
 export interface Context {
   isPaused: boolean;
@@ -471,7 +471,7 @@ export function getAlternateSource(state: UIState) {
     return null;
   }
 
-  return getSource(state, alternateSourceId);
+  return getSourceDetails(state, alternateSourceId);
 }
 
 export default update;

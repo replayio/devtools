@@ -1,11 +1,11 @@
 import { getSourcemapVisualizerURL } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import React from "react";
 import Icon from "ui/components/shared/Icon";
+import { getSelectedSourceWithContent } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSourceWithContent } from "../../reducers/sources";
 
 export default function SourcemapVisualizerLink() {
   const selectedSource = useAppSelector(getSelectedSourceWithContent);

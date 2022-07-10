@@ -41,7 +41,7 @@ import {
   getAllSourceDetails,
   getSelectedSourceDetails,
   sourceSelectors,
-  sourcesLoading,
+  getSourcesLoading,
 } from "ui/reducers/sources";
 
 const maxResults = 100;
@@ -468,7 +468,7 @@ function mapStateToProps(state) {
     selectedSource,
     sourceCount: sourceSelectors.selectTotal(state.experimentalSources.sources).length,
     sourceList: getAllSourceDetails(state),
-    sourcesLoading: sourcesLoading(state),
+    sourcesLoading: getSourcesLoading(state),
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     tabs,

@@ -1,11 +1,5 @@
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from "@reduxjs/toolkit";
-import { newSource, SourceKind } from "@replayio/protocol";
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
+import { Location, newSource, SourceKind } from "@replayio/protocol";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -46,10 +40,11 @@ const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => sour
 const contentsAdapter = createEntityAdapter<SourceContent>();
 export const sourceSelectors = sourcesAdapter.getSelectors();
 const sourceDetailSelectors = sourceDetailsAdapter.getSelectors();
+export const contentSelectors = contentsAdapter.getSelectors();
 
 export interface SourcesState {
   allSourcesRecieved: boolean;
-  currentlySelectedSourceId: string | null;
+  selectedLocationHistory: Location[];
   contents: EntityState<SourceContent>;
   sourceDetails: EntityState<SourceDetails>;
   sources: EntityState<newSource>;
@@ -57,8 +52,8 @@ export interface SourcesState {
 
 const initialState: SourcesState = {
   allSourcesRecieved: false,
-  currentlySelectedSourceId: null,
   contents: contentsAdapter.getInitialState(),
+  selectedLocationHistory: [],
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
 };
@@ -110,20 +105,11 @@ const sourcesSlice = createSlice({
         status: LoadingState.ERRORED,
       });
     },
+    selectLocation: (state, action: PayloadAction<Location>) => {
+      state.selectedLocationHistory.unshift(action.payload);
+    },
   },
 });
-
-export const getSelectedSourceDetails = createSelector(
-  (state: UIState) => state.experimentalSources.sourceDetails,
-  (state: UIState) => state.experimentalSources.currentlySelectedSourceId,
-  (sourceDetails, id) => {
-    if (id === null || id === undefined) {
-      return null;
-    }
-
-    return sourceDetails.entities[id];
-  }
-);
 
 export const { addSources, allSourcesReceived, sourceLoading, sourceLoaded, sourceErrored } =
   sourcesSlice.actions;
@@ -154,16 +140,34 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
   };
 };
 
-export const sourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesRecieved;
+export const getSourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesRecieved;
 export const getAllSourceDetails = (state: UIState) =>
   sourceDetailSelectors.selectAll(state.experimentalSources.sourceDetails);
+export const getSelectedLocation = (state: UIState) =>
+  state.experimentalSources.selectedLocationHistory[0];
+export const getSelectedSourceId = (state: UIState) => {
+  const location = getSelectedLocation(state);
+  return location?.sourceId;
+};
+export const getSelectedSourceDetails = (state: UIState) => {
+  const selectedSourceId = getSelectedSourceId(state);
+  return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
+};
+// This is a selector we used to have, so for the sake of making it easier to
+// port old code I've aliased it.
+export const getSelectedSource = getSelectedSourceDetails;
 export const getSourcesById = (state: UIState, ids: string[]) => {
   return ids.map(id => sourceSelectors.selectById(state.experimentalSources.sources, id)!);
 };
-export const getSelectedSourceWithContent = (state: UIState) => {
-  return (
-    state.experimentalSources.currentlySelectedSourceId &&
-    state.experimentalSources.contents.entities[state.experimentalSources.currentlySelectedSourceId]
-  );
+export const getSourceDetails = (state: UIState, id: string) => {
+  return sourceSelectors.selectById(state.experimentalSources.sources, id);
 };
+export const getSourceContent = (state: UIState, id: string) => {
+  return state.experimentalSources.contents.entities[id];
+};
+export const getSelectedSourceWithContent = (state: UIState) => {
+  const selectedSourceId = getSelectedSourceId(state);
+  return selectedSourceId ? getSourceContent(state, selectedSourceId) : null;
+};
+
 export default sourcesSlice.reducer;

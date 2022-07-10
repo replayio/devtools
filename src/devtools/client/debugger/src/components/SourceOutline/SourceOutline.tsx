@@ -18,7 +18,7 @@ import Spinner from "ui/components/shared/Spinner";
 import { getHitCountsForSelectedSource } from "../../reducers/sources";
 import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import { isFunctionSymbol } from "./isFunctionSymbol";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
 
 export function SourceOutline({
   cx,
@@ -161,7 +161,7 @@ export function SourceOutline({
 }
 
 const mapStateToProps = (state: UIState) => {
-  const sourceContent = selectors.getSelectedSourceWithContent(state);
+  const sourceContent = getSelectedSourceWithContent(state);
   const sourceDetails = getSelectedSourceDetails(state);
   const symbols = sourceDetails ? selectors.getSymbols(state, sourceDetails) : null;
   const hitCounts = sourceDetails ? getHitCountsForSelectedSource(state) : null;

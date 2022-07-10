@@ -4,16 +4,12 @@
 
 //
 import { Component } from "react";
+import { getSelectedSourceWithContent } from "ui/reducers/sources";
 import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
 import { connect } from "react-redux";
-import {
-  getVisibleSelectedFrame,
-  getSelectedLocation,
-  getSelectedSourceWithContent,
-  getPauseCommand,
-} from "../../selectors";
+import { getVisibleSelectedFrame, getSelectedLocation, getPauseCommand } from "../../selectors";
 
 function isDebugLine(selectedFrame, selectedLocation) {
   if (!selectedFrame) {
