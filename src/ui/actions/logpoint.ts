@@ -15,7 +15,7 @@ import {
 } from "@replayio/protocol";
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
-import { UIStore } from "ui/actions";
+import { UIStore, UIThunkAction } from "ui/actions";
 import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { ProtocolError } from "ui/state/app";
 
@@ -39,7 +39,6 @@ import {
   analysisResultsRequested,
 } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getFocusRegion } from "ui/reducers/timeline";
-import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getLoadedRegions } from "./app";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 
@@ -234,143 +233,128 @@ export async function setLogpoint(
   setMultiSourceLogpoint(logGroupId, locations, text, condition);
 }
 
-// This should really be a thunk that creates a Breakpoint in the breakpoints
-// slice, and an accompanying analysis in the analysis slice, and those two can
-// watch *each other* to be informed of actions they might need to take.
-async function setMultiSourceLogpoint(
+function setMultiSourceLogpoint(
   logGroupId: string,
   locations: Location[],
   text: string,
   condition: string
-) {
-  const primitives = primitiveValues(text);
-  const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
+): UIThunkAction<Promise<void>> {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const primitives = primitiveValues(text);
+    const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
-  if (primitiveFronts) {
-    const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
-    if (points) {
-      if (!points.error) {
-        showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
-      }
-      // If we're only displaying only primitives, we can bail out if there's no condition or the condition request is done
-      if (!condition && points.isCompleted) {
-        return;
+    if (primitiveFronts) {
+      const points = getAnalysisPointsForLocation(getState(), locations[0], condition);
+      if (points) {
+        if (!points.error) {
+          showPrimitiveLogpoints(logGroupId, points.data || [], primitiveFronts);
+        }
+        // If we're displaying only primitives, we can bail out if there's no
+        // condition or the condition request is done
+        if (!condition && points.isCompleted) {
+          return;
+        }
       }
     }
-  }
 
-  await Promise.all(
-    locations.map(({ sourceId }) => ThreadFront.getBreakpointPositionsCompressed(sourceId))
-  );
-
-  const focusRegion = getFocusRegion(store.getState());
-  const mapper = formatLogpoint({ text, condition });
-  const params: AnalysisParams = {
-    mapper,
-    effectful: true,
-    locations: locations.map(location => ({ location })),
-  };
-
-  let timeRange: TimeStampedPointRange | null = null;
-
-  if (focusRegion) {
-    const ufr = focusRegion as UnsafeFocusRegion;
-    params.range = {
-      begin: ufr.begin.point,
-      end: ufr.end.point,
+    const focusRegion = getFocusRegion(getState());
+    const mapper = formatLogpoint({ text, condition });
+    const params: AnalysisParams = {
+      mapper,
+      effectful: true,
+      locations: locations.map(location => ({ location })),
     };
 
-    timeRange = rangeForFocusRegion(focusRegion);
-  } else {
-    const loadedRegions = getLoadedRegions(store.getState());
-    // Per discussion, `loading` is always a 0 or 1-item array
-    timeRange = loadedRegions?.loading[0] ?? null;
-  }
+    let timeRange: TimeStampedPointRange | null = null;
 
-  let analysis: Analysis;
-  try {
-    analysis = await createAnalysis(params);
-    const { analysisId } = analysis;
+    if (focusRegion) {
+      timeRange = rangeForFocusRegion(focusRegion);
+      params.range = {
+        begin: timeRange.begin.point,
+        end: timeRange.end.point,
+      };
+    } else {
+      const loadedRegions = getLoadedRegions(getState());
+      // Per discussion, `loading` is always a 0 or 1-item array
+      timeRange = loadedRegions?.loading[0] ?? null;
+    }
 
-    store.dispatch(analysisCreated({ analysisId, location: locations[0], condition, timeRange }));
+    let analysis: Analysis;
+    try {
+      analysis = await createAnalysis(params);
+      const { analysisId } = analysis;
 
-    await Promise.all(locations.map(location => analysis.addLocation(location)));
+      dispatch(analysisCreated({ analysisId, location: locations[0], condition, timeRange }));
 
-    store.dispatch(analysisPointsRequested(analysisId));
-    const { points, error } = await analysis.findPoints();
+      await Promise.all(locations.map(location => analysis.addLocation(location)));
 
-    let analysisResults: AnalysisEntry[] = [];
+      dispatch(analysisPointsRequested(analysisId));
+      const { points, error } = await analysis.findPoints();
 
-    // The analysis points may have arrived in any order, so we have to sort
-    // them after they arrive.
-    points.sort((a, b) => compareNumericStrings(a.point, b.point));
+      // The analysis points may have arrived in any order, so we have to sort
+      // them after they arrive.
+      points.sort((a, b) => compareNumericStrings(a.point, b.point));
 
-    if (error) {
-      store.dispatch(
-        analysisErrored({
+      if (error) {
+        dispatch(
+          analysisErrored({
+            analysisId,
+            error: AnalysisError.TooManyPointsToFind,
+            points,
+          })
+        );
+
+        return;
+      }
+
+      dispatch(
+        analysisPointsReceived({
           analysisId,
-          error: AnalysisError.TooManyPointsToFind,
           points,
         })
       );
 
-      return;
-    }
-
-    store.dispatch(
-      analysisPointsReceived({
-        analysisId,
-        points,
-      })
-    );
-
-    if (!condition) {
-      if (primitiveFronts) {
-        showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
-      } else {
-        showLogpointsLoading(logGroupId, points);
+      if (!condition) {
+        if (primitiveFronts) {
+          showPrimitiveLogpoints(logGroupId, points, primitiveFronts);
+        } else {
+          showLogpointsLoading(logGroupId, points);
+        }
       }
-    }
 
-    const shouldGetResults = condition || !primitives;
+      const shouldGetResults = condition || !primitives;
 
-    if (shouldGetResults && points.length <= MAX_POINTS_FOR_FULL_ANALYSIS) {
-      store.dispatch(analysisResultsRequested(analysisId));
+      if (shouldGetResults && points.length <= MAX_POINTS_FOR_FULL_ANALYSIS) {
+        dispatch(analysisResultsRequested(analysisId));
 
-      const { results, error: runError } = await analysis.runAnalysis();
+        const { results, error: runError } = await analysis.runAnalysis();
 
-      analysisResults = results;
+        if (runError) {
+          dispatch(
+            analysisErrored({
+              analysisId,
+              error: AnalysisError.TooManyPointsToRun,
+              results,
+            })
+          );
 
-      if (runError) {
-        // TODO Should we be doing this for _all_ locations?
-        store.dispatch(
-          analysisErrored({
+          removeLogpoint(logGroupId);
+          return;
+        }
+
+        dispatch(
+          analysisResultsReceived({
             analysisId,
-            error: AnalysisError.TooManyPointsToRun,
             results,
           })
         );
 
-        removeLogpoint(logGroupId);
-        return;
+        showLogpointsResult(logGroupId, results);
       }
-
-      store.dispatch(
-        analysisResultsReceived({
-          analysisId,
-          results,
-        })
-      );
-
-      showLogpointsResult(logGroupId, results);
+    } finally {
+      await analysis!.releaseAnalysis();
     }
-
-    // MAYBE
-    // Rather than running *this* analysis, create a *new* analysis which only has
-    // the found points which fall *inside* of our current focusRegion, and run *that*.
-  } finally {
-    await analysis!.releaseAnalysis();
-  }
+  };
 }
 
 function primitiveValues(text: string) {

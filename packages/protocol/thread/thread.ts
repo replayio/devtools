@@ -440,15 +440,6 @@ export class _ThreadFront {
     return info ? info.kind : null;
   }
 
-  async ensureSource(sourceId: SourceId) {
-    if (!this.sources.has(sourceId)) {
-      const { promise, resolve } = defer<void>();
-      this.sourceWaiters.add(sourceId, resolve as () => void);
-      await promise;
-    }
-    return this.sources.get(sourceId)!;
-  }
-
   async ensureAllSources() {
     await this.allSourcesWaiter.promise;
   }
@@ -459,8 +450,8 @@ export class _ThreadFront {
   }
 
   async getSourceURL(sourceId: SourceId) {
-    const info = await this.ensureSource(sourceId);
-    return info.url;
+    this.ensureAllSources();
+    return this.sources.get(sourceId)?.url;
   }
 
   getSourceIdsForURL(url: string) {
@@ -476,9 +467,16 @@ export class _ThreadFront {
 
   getGeneratedSourceIdsForURL(url: string) {
     // Ignore IDs which are original versions of another ID with the same URL.
+
+    // All ids that have this URL. Could be multiple types.
+    // (e.g. pretty-printed, original, generated)
     const ids = this.urlSources.map.get(url) || [];
+
     return ids.filter(id => {
+      // All ids that were generated from this ID
       const generatedIds = this.sources.get(id)?.generatedSourceIds;
+
+      // All of these generated ids are *not* in our map of URLs to IDs.
       return (generatedIds || []).every(generatedId => !ids.includes(generatedId));
     });
   }
@@ -1089,7 +1087,7 @@ export class _ThreadFront {
   }
 
   async getAlternateLocation(locations: MappedLocation) {
-    await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
+    this.ensureAllSources();
     const { alternateId } = this._chooseSourceId(locations.map(l => l.sourceId));
     if (alternateId) {
       return locations.find(l => l.sourceId == alternateId);
