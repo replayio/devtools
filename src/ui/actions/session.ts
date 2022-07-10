@@ -167,10 +167,10 @@ export function createSocket(
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
       const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
-        onEvent: (event: ProtocolEvent) => {
-          if (features.logProtocol) {
-            dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
-          }
+        onEvent: (_event: ProtocolEvent) => {
+          // if (features.logProtocol) {
+          //   // dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
+          // }
         },
         onRequest: (request: CommandRequest) => {
           if (features.logProtocol) {

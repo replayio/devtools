@@ -76,7 +76,10 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 
 export default protocolMessagesSlice.reducer;
 
-export const getProtocolEvents = (state: UIState) => state.protocolMessages.events;
+export const getProtocolEvents = (_state: UIState) => {
+  console.log("protocol events are disabled");
+  return [];
+};
 export const getProtocolErrorMap = (state: UIState) => state.protocolMessages.idToErrorMap;
 export const getProtocolRequestMap = (state: UIState) => state.protocolMessages.idToRequestMap;
 export const getProtocolResponseMap = (state: UIState) => state.protocolMessages.idToResponseMap;
