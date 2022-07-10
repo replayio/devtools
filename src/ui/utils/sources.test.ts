@@ -31,6 +31,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "scriptSource",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": undefined,
+          "stableId": "scriptSource:/index.js:contentHash#1",
           "url": "/index.js",
         },
       }
@@ -71,6 +72,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "scriptSource",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": undefined,
+          "stableId": "scriptSource:/index.js:contentHash#1",
           "url": "/index.js",
         },
         "o1": Object {
@@ -87,6 +89,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "sourceMapped",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": undefined,
+          "stableId": "sourceMapped:/index.ts:contentHash#o1",
           "url": "/index.ts",
         },
       }
@@ -124,6 +127,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "scriptSource",
           "prettyPrinted": "pp1",
           "prettyPrintedFrom": undefined,
+          "stableId": "scriptSource:/index.js:contentHash#1",
           "url": "/index.js",
         },
         "pp1": Object {
@@ -138,6 +142,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "prettyPrinted",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": "1",
+          "stableId": "prettyPrinted:/src/index.js:contentHash#1",
           "url": "/src/index.js",
         },
       }
@@ -192,6 +197,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "scriptSource",
           "prettyPrinted": "pp1",
           "prettyPrintedFrom": undefined,
+          "stableId": "scriptSource:/index.js:contentHash#1",
           "url": "/index.js",
         },
         "o1": Object {
@@ -208,6 +214,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "sourceMapped",
           "prettyPrinted": "ppo1",
           "prettyPrintedFrom": undefined,
+          "stableId": "sourceMapped:/src/index.ts:contentHash#o1",
           "url": "/src/index.ts",
         },
         "pp1": Object {
@@ -222,6 +229,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "prettyPrinted",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": "1",
+          "stableId": "prettyPrinted:/src/index.js:contentHash#1",
           "url": "/src/index.js",
         },
         "ppo1": Object {
@@ -236,6 +244,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "prettyPrinted",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": "o1",
+          "stableId": "prettyPrinted:/src/index.ts:contentHash#o1",
           "url": "/src/index.ts",
         },
       }
@@ -276,6 +285,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "inlineScript",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": undefined,
+          "stableId": "inlineScript:/index.html:contentHash#2",
           "url": "/index.html",
         },
         "h1": Object {
@@ -292,6 +302,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
           "kind": "html",
           "prettyPrinted": undefined,
           "prettyPrintedFrom": undefined,
+          "stableId": "html:/index.html:contentHash#h1",
           "url": "/index.html",
         },
       }
@@ -331,6 +342,7 @@ it("can link corresponding sources", () => {
         "kind": "html",
         "prettyPrinted": undefined,
         "prettyPrintedFrom": undefined,
+        "stableId": "html:/index.html:contentHash",
         "url": "/index.html",
       },
       "h2": Object {
@@ -346,6 +358,7 @@ it("can link corresponding sources", () => {
         "kind": "html",
         "prettyPrinted": undefined,
         "prettyPrintedFrom": undefined,
+        "stableId": "html:/index.html:contentHash",
         "url": "/index.html",
       },
     }
@@ -397,6 +410,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         "kind": "html",
         "prettyPrinted": "pph1",
         "prettyPrintedFrom": undefined,
+        "stableId": "html:/index.html:contentHash#h1",
         "url": "/index.html",
       },
       "h2": Object {
@@ -411,6 +425,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         "kind": "html",
         "prettyPrinted": "pph2",
         "prettyPrintedFrom": undefined,
+        "stableId": "html:/index.html:contentHash#h2",
         "url": "/index.html",
       },
       "pph1": Object {
@@ -425,6 +440,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         "kind": "prettyPrinted",
         "prettyPrinted": undefined,
         "prettyPrintedFrom": "h1",
+        "stableId": "prettyPrinted:/index.html:contentHash#h1",
         "url": "/index.html",
       },
       "pph2": Object {
@@ -439,6 +455,7 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
         "kind": "prettyPrinted",
         "prettyPrinted": undefined,
         "prettyPrintedFrom": "h2",
+        "stableId": "prettyPrinted:/index.html:contentHash#h2",
         "url": "/index.html",
       },
     }

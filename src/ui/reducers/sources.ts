@@ -5,7 +5,7 @@ import {
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { ContentType, newSource, SourceKind } from "@replayio/protocol";
+import { newSource, SourceKind } from "@replayio/protocol";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { UIThunkAction } from "ui/actions";
@@ -14,14 +14,15 @@ import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 
 export interface SourceDetails {
   canonicalId: string;
+  contentHash?: string;
   correspondingSourceIds: string[];
   generated: string[];
   generatedFrom: string[];
   id: string;
   kind: SourceKind;
-  contentHash?: string;
   prettyPrinted?: string;
   prettyPrintedFrom?: string;
+  stableId: string;
   url?: string;
 }
 
@@ -30,13 +31,6 @@ export enum LoadingState {
   LOADED = "loaded",
   ERRORED = "errored",
 }
-
-// export interface SourceContent {
-//   content?: string;
-//   contentType?: ContentType;
-//   id: string;
-//   status: LoadingState;
-// }
 
 export interface SourceContent {
   id: string;

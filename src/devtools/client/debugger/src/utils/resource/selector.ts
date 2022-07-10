@@ -43,7 +43,5 @@ export function getMappedResource<T extends BaseResource, Result>(
     throw new Error(`Resource ${id} does not exist`);
   }
 
-  // console.log({ finalId, validatedState });
-
   return map(validatedState.values[finalId], validatedState.identity[finalId]);
 }

@@ -6,6 +6,19 @@ import keyBy from "lodash/keyBy";
 import { SourceDetails } from "ui/reducers/sources";
 import newGraph from "./graph";
 
+// Having stable IDs is an important piece of working with sources. Since the
+// backend can return different IDs on each load, anytime we want to persist
+// something that references a source, we should use the stable ID. It's also
+// how we identify corresponding sources (sources that were loaded multiple
+// times during a recording with the same URL and the same content).
+export const stableIdForSource = (source: {
+  contentHash?: string;
+  kind?: string;
+  url?: string;
+}): string => {
+  return `${source.kind}:${source.url!}:${source.contentHash}`;
+};
+
 const fullSourceDetails = (
   attributes: Partial<SourceDetails> & {
     id: string;
@@ -17,12 +30,9 @@ const fullSourceDetails = (
     correspondingSourceIds: [],
     generated: [],
     generatedFrom: [],
+    stableId: stableIdForSource(attributes),
     ...attributes,
   };
-};
-
-export const keyForSource = (source: newSource): string => {
-  return `${source.url!}:${source.contentHash}`;
 };
 
 export const newSourcesToCompleteSourceDetails = (
@@ -51,7 +61,8 @@ export const newSourcesToCompleteSourceDetails = (
     // We handle pretty-printed (pp) files and their generated links a little
     // differently. Because Replay makes the pp sources, their structure is
     // predictable. All pp sources will have one generatedSourceId, and it will
-    // be the minified source.
+    // be the minified source. It will also be missing a contentHash, so we do
+    // some workarounds for that as well.
     if (source.kind === "prettyPrinted") {
       return;
     }
@@ -75,6 +86,8 @@ export const newSourcesToCompleteSourceDetails = (
     canonical.connectNode(generated.from(source.sourceId)![0], source.sourceId);
   });
 
+  // We can use the contentHash of a non-pretty-printed source to stand in for
+  // the missing contentHash of a pretty-printed source.
   // TODO @jcmorrow: remove this once we include the contentHash with prettyPrinted sources
   const contentHashForSource = (source: newSource) => {
     return source.kind === "prettyPrinted"
@@ -82,12 +95,8 @@ export const newSourcesToCompleteSourceDetails = (
       : source.contentHash;
   };
 
-  const keyForSource = (source: newSource): string => {
-    return `${source.kind}:${source.url!}:${contentHashForSource(source)}`;
-  };
-
   newSources.forEach(source => {
-    const key = keyForSource(source);
+    const key = stableIdForSource({ ...source, contentHash: contentHashForSource(source) });
     if (corresponding[key] === undefined) {
       corresponding[key] = [];
     }
@@ -107,7 +116,8 @@ export const newSourcesToCompleteSourceDetails = (
     returnValue[source.sourceId] = fullSourceDetails({
       ...omit(source, "sourceId", "generatedSourceIds"),
       contentHash: contentHashForSource(source),
-      correspondingSourceIds: corresponding[keyForSource(source)],
+      correspondingSourceIds:
+        corresponding[stableIdForSource({ ...source, contentHash: contentHashForSource(source) })],
       id: source.sourceId,
       prettyPrinted: prettyPrinted.from(source.sourceId)?.[0],
       prettyPrintedFrom: prettyPrinted.to(source.sourceId)?.[0],
