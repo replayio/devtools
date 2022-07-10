@@ -21,7 +21,7 @@ export function loadGlobalFunctions(): UIThunkAction {
 
     await ThreadFront.ensureAllSources();
 
-    const sourceById = getSources(getState()).values;
+    const sourceById = getState().experimentalSources.sourceDetails.entities;
     // Empty query to grab all of the functions, which we can easily filter later.
     const query = "";
     const sourceIds = getSourceIDsToSearch(sourceById);

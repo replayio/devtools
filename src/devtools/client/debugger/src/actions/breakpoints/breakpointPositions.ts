@@ -8,20 +8,13 @@ import uniqBy from "lodash/uniqBy";
 
 import type { UIState } from "ui/state";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
-import type { Source } from "../../reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
 import type { SourceLocation } from "../../reducers/types";
-
-import {
-  getSource,
-  getBreakpointPositionsForSource,
-  getSourceActorsForSource,
-} from "../../selectors";
 
 import { getLocationKey } from "../../utils/breakpoint";
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
-import { loadSourceActorBreakpointColumns } from "../source-actors";
+import { SourceDetails } from "ui/reducers/sources";
 
 type ThunkArgs = { dispatch: AppDispatch; getState: () => UIState } & ThunkExtraArgs;
 
@@ -29,7 +22,7 @@ function filterByUniqLocation(positions: SourceLocation[]) {
   return uniqBy(positions, getLocationKey);
 }
 
-function convertToList(results: Record<number, number[]>, source: Source) {
+function convertToList(results: Record<number, number[]>, source: SourceDetails) {
   const { id, url } = source;
   const positions = [];
 
@@ -102,12 +95,6 @@ async function _setBreakpointPositions(sourceId: string, line: number, thunkArgs
     source,
     positions: groupedPositions,
   });
-}
-
-function generatedSourceActorKey(state: UIState, sourceId: string) {
-  const source = getSource(state, sourceId);
-  const actors = source ? getSourceActorsForSource(state, source.id).map(({ actor }) => actor) : [];
-  return [sourceId, ...actors].join(":");
 }
 
 export const setBreakpointPositions = memoizeableAction("setBreakpointPositions", {

@@ -332,43 +332,6 @@ function pauseGrip(func: Function) {
   return ThreadFront.pauseGrip(func);
 }
 
-export function prepareSourcePayload(source: {
-  actor: string;
-  url?: string;
-  sourceMapURL?: string;
-}) {
-  clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
-  return { thread: ThreadFront.actor, source };
-}
-
-async function getSources(client: any) {
-  const { sources } = await client.getSources();
-
-  return sources.map((source: any) => prepareSourcePayload(source));
-}
-
-// Fetch the sources for all the targets
-async function fetchSources() {
-  let sources = await getSources(ThreadFront);
-
-  return sources;
-}
-
-// Check if any of the targets were paused before we opened
-// the debugger. If one is paused. Fake a `pause` RDP event
-// by directly calling the client event listener.
-async function checkIfAlreadyPaused() {
-  // @ts-expect-error this function has got to actually be dead
-  const pausedPacket = ThreadFront.getLastPausePacket();
-  if (pausedPacket) {
-    // @ts-expect-error ditto
-    clientEvents.paused(ThreadFront, pausedPacket);
-  }
-}
-
-function getMainThread() {
-  return currentThreadFront.actor;
-}
 async function getSourceActorBreakpointPositions(
   { actor }: { actor: string },
   range?: SourceRange
@@ -459,9 +422,6 @@ const clientCommands = {
   getFrames,
   loadAsyncParentFrames,
   logExceptions,
-  fetchSources,
-  checkIfAlreadyPaused,
-  getMainThread,
   fetchEventTypePoints,
   setEventListenerBreakpoints,
   getFrontByID,
