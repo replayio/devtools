@@ -64,7 +64,7 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
-import { LoadingState } from "ui/reducers/sources";
+import { getSelectedSourceDetails, LoadingState } from "ui/reducers/sources";
 import { getSelectedSource } from "../../selectors";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
@@ -480,7 +480,7 @@ Editor.childContextTypes = {
 
 const mapStateToProps = state => {
   const sourceContent = selectors.getSelectedSourceWithContent(state);
-  const sourceDetails = getSelectedSource(state);
+  const sourceDetails = getSelectedSourceDetails(state);
 
   return {
     cx: selectors.getThreadContext(state),

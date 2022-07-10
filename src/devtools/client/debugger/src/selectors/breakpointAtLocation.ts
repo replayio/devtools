@@ -9,6 +9,7 @@ import type { Breakpoint, Position } from "../reducers/types";
 
 import { getSelectedSource } from "../reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 function getColumn(column: number, selectedSource: Source) {
   return column;
@@ -75,7 +76,7 @@ function findClosestPosition(positions?: Position[], column?: number) {
  * user clicks in the gutter or on a token.
  */
 export function getBreakpointAtLocation(state: UIState, location: Position) {
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSourceDetails(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");
   }
@@ -85,7 +86,7 @@ export function getBreakpointAtLocation(state: UIState, location: Position) {
 }
 
 export function getBreakpointsAtLine(state: UIState, line: number) {
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSourceDetails(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");
   }

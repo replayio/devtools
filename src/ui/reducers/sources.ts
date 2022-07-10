@@ -6,7 +6,6 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { newSource, SourceKind } from "@replayio/protocol";
-import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -45,15 +44,20 @@ export interface SourceContent {
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
 const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => source.sourceId });
 const contentsAdapter = createEntityAdapter<SourceContent>();
-const sourceSelectors = sourcesAdapter.getSelectors();
+export const sourceSelectors = sourcesAdapter.getSelectors();
+const sourceDetailSelectors = sourceDetailsAdapter.getSelectors();
 
 export interface SourcesState {
+  allSourcesRecieved: boolean;
+  currentlySelectedSourceId: string | null;
   contents: EntityState<SourceContent>;
   sourceDetails: EntityState<SourceDetails>;
   sources: EntityState<newSource>;
 }
 
 const initialState: SourcesState = {
+  allSourcesRecieved: false,
+  currentlySelectedSourceId: null,
   contents: contentsAdapter.getInitialState(),
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
@@ -69,6 +73,7 @@ const sourcesSlice = createSlice({
       sourcesAdapter.addMany(state.sources, action.payload);
     },
     allSourcesReceived: state => {
+      state.allSourcesRecieved = true;
       sourceDetailsAdapter.addMany(
         state.sourceDetails,
         newSourcesToCompleteSourceDetails(sourceSelectors.selectAll(state.sources))
@@ -110,7 +115,7 @@ const sourcesSlice = createSlice({
 
 export const getSelectedSourceDetails = createSelector(
   (state: UIState) => state.experimentalSources.sourceDetails,
-  getSelectedSourceId,
+  (state: UIState) => state.experimentalSources.currentlySelectedSourceId,
   (sourceDetails, id) => {
     if (id === null || id === undefined) {
       return null;
@@ -149,4 +154,16 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
   };
 };
 
+export const sourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesRecieved;
+export const getAllSourceDetails = (state: UIState) =>
+  sourceDetailSelectors.selectAll(state.experimentalSources.sourceDetails);
+export const getSourcesById = (state: UIState, ids: string[]) => {
+  return ids.map(id => sourceSelectors.selectById(state.experimentalSources.sources, id)!);
+};
+export const getSelectedSourceWithContent = (state: UIState) => {
+  return (
+    state.experimentalSources.currentlySelectedSourceId &&
+    state.experimentalSources.contents.entities[state.experimentalSources.currentlySelectedSourceId]
+  );
+};
 export default sourcesSlice.reducer;

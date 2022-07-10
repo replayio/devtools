@@ -6,16 +6,16 @@ import { createSelector } from "reselect";
 import uniqBy from "lodash/uniqBy";
 
 import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
-import { getSelectedSource } from "../reducers/sources";
 
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 import { Breakpoint } from "../reducers/types";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 /*
  * Finds the breakpoints, which appear in the selected source.
  */
 export const getVisibleBreakpoints = createSelector(
-  getSelectedSource,
+  getSelectedSourceDetails,
   getBreakpointsList,
   (selectedSource, breakpoints) => {
     if (!selectedSource) {
@@ -30,7 +30,7 @@ export const getVisibleBreakpoints = createSelector(
  * Finds the requested breakpoints, which appear in the selected source.
  */
 export const getVisibleRequestedBreakpoints = createSelector(
-  getSelectedSource,
+  getSelectedSourceDetails,
   getRequestedBreakpointsList,
   (selectedSource, breakpoints) => {
     if (!selectedSource) {
@@ -48,7 +48,7 @@ export const getVisibleRequestedBreakpoints = createSelector(
 export const getFirstVisibleBreakpoints = createSelector(
   getVisibleBreakpoints,
   getVisibleRequestedBreakpoints,
-  getSelectedSource,
+  getSelectedSourceDetails,
   (breakpoints, requestedBreakpoints, selectedSource) => {
     if (!breakpoints || !selectedSource) {
       return [];

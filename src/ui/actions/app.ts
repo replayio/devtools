@@ -17,7 +17,6 @@ import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
-import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { isTest, getTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";

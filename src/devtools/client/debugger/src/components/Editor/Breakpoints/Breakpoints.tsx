@@ -9,17 +9,15 @@ import type { UIState } from "ui/state";
 import type { Context } from "../../../reducers/pause";
 import Breakpoint from "./Breakpoint";
 
-import {
-  getSelectedSource,
-  getFirstVisibleBreakpoints,
-} from "devtools/client/debugger/src/selectors";
+import { getFirstVisibleBreakpoints } from "devtools/client/debugger/src/selectors";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 const connector = connect((state: UIState) => ({
   // Retrieves only the first breakpoint per line so that the
   // breakpoint marker represents only the first breakpoint
   breakpoints: getFirstVisibleBreakpoints(state),
-  selectedSource: getSelectedSource(state),
+  selectedSource: getSelectedSourceDetails(state),
 }));
 
 type $FixTypeLater = any;

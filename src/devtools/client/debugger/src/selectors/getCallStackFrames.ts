@@ -5,23 +5,23 @@
 import type { UIState } from "ui/state";
 import type { SelectedFrame } from "../reducers/pause";
 
-import type { SourceResources, Source } from "../reducers/sources";
-import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
 import { getFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
 import get from "lodash/get";
 import { createSelector } from "reselect";
+import { SourceDetails } from "ui/reducers/sources";
+import { EntityState } from "@reduxjs/toolkit";
 
 function getLocation(frame: SelectedFrame) {
   return frame.location;
 }
 
-function getSourceForFrame(sources: SourceResources, frame: SelectedFrame) {
+function getSourceForFrame(sources: EntityState<SourceDetails>, frame: SelectedFrame) {
   const sourceId = getLocation(frame).sourceId;
-  return getSourceInSources(sources, sourceId);
+  return sources.entities[sourceId];
 }
 
-function appendSource(sources: SourceResources, frame: SelectedFrame) {
+function appendSource(sources: EntityState<SourceDetails>, frame: SelectedFrame) {
   return {
     ...frame,
     location: getLocation(frame),
@@ -32,7 +32,7 @@ function appendSource(sources: SourceResources, frame: SelectedFrame) {
 // eslint-disable-next-line
 export const getCallStackFrames = createSelector(
   getFrames,
-  getSources,
+  (state: UIState) => state.experimentalSources.sourceDetails,
   // Inlined to infer correct types
   (frames, sources) => {
     if (!frames) {

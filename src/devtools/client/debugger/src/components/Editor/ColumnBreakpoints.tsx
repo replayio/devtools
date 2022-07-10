@@ -2,21 +2,20 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { Component } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
-import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
+import { visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import { getLocationKey } from "../../utils/breakpoint";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 // eslint-disable-next-line max-len
 
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
-  selectedSource: getSelectedSource(state),
+  selectedSource: getSelectedSourceDetails(state),
   columnBreakpoints: visibleColumnBreakpoints(state),
 });
 

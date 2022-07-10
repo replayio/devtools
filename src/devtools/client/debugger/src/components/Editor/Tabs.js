@@ -14,6 +14,7 @@ import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
 import CommandPaletteButton from "./CommandPaletteButton";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 class Tabs extends PureComponent {
   _draggedSource;
@@ -168,7 +169,7 @@ class Tabs extends PureComponent {
 }
 
 const mapStateToProps = state => ({
-  selectedSource: getSelectedSource(state),
+  selectedSource: getSelectedSourceDetails(state),
   tabSources: getSourcesForTabs(state),
   isPaused: getIsPaused(state),
   toolboxLayout: getToolboxLayout(state),

@@ -15,9 +15,7 @@ import {
   getQuickOpenQuery,
   getQuickOpenType,
   getQuickOpenProject,
-  getSelectedSource,
   getSourceContent,
-  getSourcesLoading,
   getSymbols,
   getTabs,
   getDisplayedSources,
@@ -39,7 +37,12 @@ import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
-import { getSourceCount } from "../reducers/sources";
+import {
+  getAllSourceDetails,
+  getSelectedSourceDetails,
+  sourceSelectors,
+  sourcesLoading,
+} from "ui/reducers/sources";
 
 const maxResults = 100;
 
@@ -447,7 +450,7 @@ export class QuickOpenModal extends Component {
 }
 
 function mapStateToProps(state) {
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSourceDetails(state);
   const tabs = getTabs(state);
 
   return {
@@ -463,9 +466,9 @@ function mapStateToProps(state) {
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
     selectedSource,
-    sourceCount: getSourceCount(state),
-    sourceList: getSourceList(state),
-    sourcesLoading: getSourcesLoading(state),
+    sourceCount: sourceSelectors.selectTotal(state.experimentalSources.sources).length,
+    sourceList: getAllSourceDetails(state),
+    sourcesLoading: sourcesLoading(state),
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     tabs,

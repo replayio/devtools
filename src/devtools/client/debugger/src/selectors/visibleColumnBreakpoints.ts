@@ -7,20 +7,17 @@ import type { Location } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
+import {
+  getSelectedSourceDetails,
+  getSelectedSourceWithContent,
+  getSourcesById,
+  SourceContent,
+} from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
 
-import {
-  getSource,
-  getSelectedSource,
-  getSelectedSourceWithContent,
-  getBreakpointPositions,
-  getBreakpointPositionsForSource,
-} from "../reducers/sources";
-import type { Source, SourceWithContent } from "../reducers/sources";
 import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
 import { getViewport } from "../reducers/ui";
-import type { AsyncValue } from "../utils/async-value";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
@@ -61,20 +58,6 @@ function findBreakpoint(location: Location, breakpointMap: BreakpointMap) {
   }
 }
 
-function filterByLineCount(positions: Location[], selectedSource: Source) {
-  const lineCount: Record<number, number> = {};
-
-  for (const { line } of positions) {
-    if (!lineCount[line]) {
-      lineCount[line] = 0;
-    }
-
-    lineCount[line] = lineCount[line] + 1;
-  }
-
-  return positions.filter(({ line }) => lineCount[line] > 1);
-}
-
 // filter out positions that are not being shown
 function filterVisible(positions: Location[], viewport: Range) {
   return positions.filter(location => {
@@ -90,7 +73,7 @@ function filterByBreakpoints(positions: Location[], breakpointMap: BreakpointMap
 }
 
 // Filters out breakpoints to the right of the line. (bug 1552039)
-function filterInLine(positions: Location[], selectedContent: SourceWithContent["content"]) {
+function filterInLine(positions: Location[], selectedContent: SourceContent) {
   return positions.filter(position => {
     const lineText = getLineText(selectedContent, position.line);
 
@@ -112,8 +95,9 @@ function convertToList<T>(breakpointPositions: Record<string, T>) {
 }
 
 const getVisibleBreakpointPositions = createSelector(
-  getSelectedSource,
-  getBreakpointPositions,
+  getSelectedSourceDetails,
+  // getBreakpointPositions,
+  (state: UIState) => ({} as Record<string, Record<string, unknown>>),
   (source, positions) => {
     if (!source) {
       return [];
@@ -171,8 +155,9 @@ export const visibleColumnBreakpoints = createSelector(
 );
 
 export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: SourceLocation) {
-  const positions = getBreakpointPositionsForSource(state, sourceId);
-  const source = getSource(state, sourceId);
+  // const positions = getBreakpointPositionsForSource(state, sourceId);
+  const positions: Record<string, unknown> = {};
+  const source = getSourcesById(state, [sourceId])[0];
 
   if (!source || !positions) {
     return;

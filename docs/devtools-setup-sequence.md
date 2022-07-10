@@ -47,7 +47,7 @@ There's also some setting of global variables, like `window.gToolbox` for manipu
   - sets up reducers:
     - `app, comments, contextMenus, network, reactDevTools, timeline`
     - Debugger (`devtools/client/debugger/src/reducers/index.js`:
-      - `sourceActors, sources, breakpoints, pendingBreakpoints, asyncRequests, pause, ui, fileSearch, ast, quickOpen, sourceTree, threads, eventListenerBreakpoints, preview`
+      - `sources, breakpoints, pendingBreakpoints, asyncRequests, pause, ui, fileSearch, ast, quickOpen, sourceTree, threads, eventListenerBreakpoints, preview`
     - Web console ( `devtools/client/webconsole/reducers/index.js`):
       - `filters, messages, consoleUI`
   - Bootstraps workers: `parser` and `search`

@@ -9,7 +9,6 @@
  * @module reducers/index
  */
 
-import sourceActors from "./source-actors";
 import sources from "./sources";
 import breakpoints from "./breakpoints";
 import pendingBreakpoints from "./pending-breakpoints";
@@ -25,7 +24,6 @@ import threads from "./threads";
 import eventListenerBreakpoints from "./event-listeners";
 
 export default {
-  sourceActors,
   sources,
   breakpoints,
   pendingBreakpoints,

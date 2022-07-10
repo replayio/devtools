@@ -4,6 +4,7 @@ import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -177,7 +178,7 @@ export function removeBreakpoints(
 export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
-    const selectedSource = getSelectedSource(state);
+    const selectedSource = getSelectedSourceDetails(state);
 
     if (!selectedSource) {
       return;
@@ -202,7 +203,7 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
 export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const state = getState();
-    const source = getSelectedSource(state)!;
+    const source = getSelectedSourceDetails(state)!;
 
     const initialLocation = {
       sourceId: source.id,
@@ -239,7 +240,7 @@ export function _addBreakpointAtLine(
 ): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
-    const source = getSelectedSource(state);
+    const source = getSelectedSourceDetails(state);
 
     if (!source) {
       return;
@@ -272,7 +273,7 @@ export function _addBreakpointAtLine(
 export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
-    const source = getSelectedSource(state);
+    const source = getSelectedSourceDetails(state);
     const { column, line } = location;
 
     if (!source) {

@@ -13,10 +13,6 @@ import type { UIState } from "ui/state";
 import { createSelector } from "reselect";
 
 import { isSimilarTab } from "../utils/tabs";
-import { makeShallowQuery } from "../utils/resource";
-
-import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-import type { Source } from "./sources";
 
 export interface Tab {
   sourceId: string | null;
@@ -249,15 +245,11 @@ export const getSourceTabs = createSelector(
 
 export const getSourcesForTabs = (state: UIState) => {
   const tabs = getSourceTabs(state);
-  const sources = getSources(state);
-  return querySourcesForTabs(sources, tabs);
+  return getSourcesById(
+    state,
+    tabs.map(tab => tab.sourceId)
+  );
 };
-
-const querySourcesForTabs = makeShallowQuery({
-  filter: (_, tabs: Tab[]) => tabs.map(({ sourceId }) => sourceId!),
-  map: resourceAsSourceBase,
-  reduce: items => items,
-});
 
 export function tabExists(state: UIState, sourceId: string) {
   return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);

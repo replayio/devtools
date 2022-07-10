@@ -33,29 +33,11 @@ let store: UIStore;
 type $FixTypeLater = any;
 
 async function setupDebugger() {
-  const sourceInfos: $FixTypeLater[] = [];
   const sources: newSource[] = [];
   await ThreadFront.findSources(newSource => {
     sources.push(newSource);
-
-    // We only process *one* source for each group of corresponding sources in
-    // the old way. Bail if we are not looking at the first source in this group.
-    if (newSource.sourceId === ThreadFront.getCorrespondingSourceIds(newSource.sourceId)[0]) {
-      // @ts-expect-error `sourceMapURL` doesn't exist?
-      // const { sourceId, url, sourceMapURL } = newSource;
-      // sourceInfos.push({
-      //   type: "generated",
-      //   data: prepareSourcePayload({
-      //     actor: sourceId,
-      //     url,
-      //     sourceMapURL,
-      //   }),
-      // });
-    }
   });
-  await store.dispatch(actions.newQueuedSources(sourceInfos));
   store.dispatch(addSources(sources));
-
   store.dispatch(allSourcesReceived());
 }
 

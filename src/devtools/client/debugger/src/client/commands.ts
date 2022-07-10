@@ -21,12 +21,12 @@ import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thr
 import { WiredNamedValue } from "protocol/thread/pause";
 import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
 
-import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 import { SelectedFrame } from "../reducers/pause";
-import type { SourceActor } from "../reducers/source-actors";
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
 
 import { createFrame, makeSourceId } from "./create";
+
+const MAX_LINE_HITS_TO_FETCH = 1000;
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -45,11 +45,9 @@ interface BreakpointDetails {
 let currentThreadFront: any;
 let currentTarget: any;
 let devToolsClient: any;
-let sourceActors: Record<string, string> = {};
 let breakpoints: Record<string, BreakpointDetails> = {};
 
 function setupCommands() {
-  sourceActors = {};
   breakpoints = {};
 }
 
@@ -333,9 +331,6 @@ function pauseGrip(func: Function) {
   // @ts-expect-error this function doesn't appear to exist
   return ThreadFront.pauseGrip(func);
 }
-function registerSourceActor(sourceActorId: string, sourceId: string) {
-  sourceActors[sourceActorId] = sourceId;
-}
 
 export function prepareSourcePayload(source: {
   actor: string;
@@ -369,13 +364,6 @@ async function checkIfAlreadyPaused() {
     // @ts-expect-error ditto
     clientEvents.paused(ThreadFront, pausedPacket);
   }
-}
-
-function getSourceForActor(actor: string) {
-  if (!sourceActors[actor]) {
-    throw new Error(`Unknown source actor: ${actor}`);
-  }
-  return sourceActors[actor];
 }
 
 function getMainThread() {
@@ -451,7 +439,6 @@ const clientCommands = {
   rewind,
   reverseStepOver,
   sourceContents,
-  getSourceForActor,
   getSourceActorBreakpointPositions,
   getSourceActorBreakableLines,
   getSourceActorBreakpointHitCounts,
@@ -474,7 +461,6 @@ const clientCommands = {
   logExceptions,
   fetchSources,
   checkIfAlreadyPaused,
-  registerSourceActor,
   getMainThread,
   fetchEventTypePoints,
   setEventListenerBreakpoints,

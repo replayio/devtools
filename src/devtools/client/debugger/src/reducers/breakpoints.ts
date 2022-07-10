@@ -17,7 +17,6 @@ import {
 } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import string from "devtools/packages/devtools-reps/reps/string";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { compareNumericStrings } from "protocol/utils";
 import type { UIState } from "ui/state";
@@ -25,12 +24,11 @@ import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
-import { shallowEqual } from "../utils/resource/compare";
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
-import { getSelectedSource } from "./sources";
 import type { Breakpoint, SourceLocation } from "./types";
 import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
@@ -358,7 +356,7 @@ export function getBreakpointsDisabled(state: UIState) {
 
 export const getBreakpointsForSelectedSource = createSelector(
   getBreakpointsList,
-  getSelectedSource,
+  getSelectedSourceDetails,
   (breakpoints, selectedSource) => {
     if (!selectedSource) {
       return [];

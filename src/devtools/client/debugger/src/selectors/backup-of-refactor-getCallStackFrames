@@ -1,0 +1,33 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+
+import { getFrames, SelectedFrame } from "../reducers/pause";
+import { annotateFrames } from "../utils/pause/frames";
+import get from "lodash/get";
+import { getSourcesById } from "ui/reducers/sources";
+import { UIState } from "ui/state";
+import { createSelector } from "@reduxjs/toolkit";
+
+export const formatCallStackFrames = (state: UIState, frames: SelectedFrame[]) => {
+  if (!frames) {
+    return null;
+  }
+
+  const formattedFrames = frames
+    .map(f => {
+      return {
+        ...f,
+        source: getSourcesById(state, [f.location.sourceId])[0],
+      };
+    })
+    .filter(frame => !get(frame, "source.isBlackBoxed"));
+
+  return annotateFrames(formattedFrames);
+};
+
+export const getCallStackFrames = createSelector(
+  (state: UIState) => state,
+  getFrames,
+  formatCallStackFrames
+).resultFunc;

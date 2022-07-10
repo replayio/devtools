@@ -36,6 +36,7 @@ import {
 import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 class Tab extends PureComponent {
   onTabContextMenu = (event, tab) => {
@@ -205,7 +206,7 @@ class Tab extends PureComponent {
 }
 
 const mapStateToProps = (state, { source }) => {
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSourceDetails(state);
 
   return {
     cx: getContext(state),

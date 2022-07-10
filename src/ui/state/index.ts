@@ -19,7 +19,6 @@ import { PauseState } from "devtools/client/debugger/src/selectors";
 import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
-import type { SourceActorsState } from "devtools/client/debugger/src/reducers/source-actors";
 import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
@@ -59,7 +58,6 @@ export interface UIState {
   quickOpen: QuickOpenState;
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
-  sourceActors: SourceActorsState;
   sourceTree: SourceTreeState;
   sources: SourcesState;
   tabs: TabsState;

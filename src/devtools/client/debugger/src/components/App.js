@@ -6,22 +6,14 @@ import React, { Component, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
 import { connect } from "react-redux";
-import { features } from "../utils/prefs";
-import { prefs } from "../../../../../ui/utils/prefs";
 import actions from "../actions";
 import { setUnexpectedError } from "ui/actions/errors";
 import A11yIntention from "./A11yIntention";
-import { ShortcutsModal } from "./ShortcutsModal";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
-import {
-  getActiveSearch,
-  getPaneCollapse,
-  getQuickOpenEnabled,
-  getSelectedSource,
-} from "../selectors";
+import { getPaneCollapse } from "../selectors";
 
 import { getSelectedPanel } from "ui/reducers/layout";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 
@@ -91,7 +83,7 @@ function DebuggerLoader(props) {
 
 const mapStateToProps = state => ({
   selectedPanel: getSelectedPanel(state),
-  selectedSource: getSelectedSource(state),
+  selectedSource: getSelectedSourceDetails(state),
   toolboxLayout: getToolboxLayout(state),
   startPanelCollapsed: getPaneCollapse(state),
 });

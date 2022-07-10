@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 import React, { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
@@ -13,17 +11,17 @@ import Breakpoint from "./Breakpoint";
 import BreakpointHeading from "./BreakpointHeading";
 import { createHeadlessEditor } from "../../../utils/editor/create-editor";
 import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoint";
-import { getSelectedSource } from "../../../selectors";
 import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { actions } from "ui/actions";
 import type { Breakpoint as BreakpointType, Source } from "../../../reducers/types";
 
 import type { BreakpointOrLogpointSources } from "../../../selectors/breakpointSources";
+import { getSelectedSourceDetails } from "ui/reducers/sources";
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSource(state),
+    selectedSource: getSelectedSourceDetails(state),
   }),
   {
     seek: actions.removeBreakpoint,

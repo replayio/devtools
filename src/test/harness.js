@@ -374,9 +374,9 @@ async function waitForScopeValue(name, value) {
 
 async function toggleBlackboxSelectedSource() {
   const { getSelectedSource } = dbgSelectors;
-  const blackboxed = getSelectedSource().isBlackBoxed;
-  dbg.actions.toggleBlackBox(getContext(), getSelectedSource());
-  await waitUntil(() => getSelectedSource().isBlackBoxed != blackboxed, {
+  const blackboxed = getSelectedSourceDetails().isBlackBoxed;
+  dbg.actions.toggleBlackBox(getContext(), getSelectedSourceDetails());
+  await waitUntil(() => getSelectedSourceDetails().isBlackBoxed != blackboxed, {
     waitingFor: "source to be blackboxed",
   });
   await ThreadFront.waitForInvalidateCommandsToFinish();

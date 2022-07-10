@@ -13,15 +13,12 @@ import { connect } from "react-redux";
 import {
   getShownSource,
   getSelectedSource,
-  getSourcesLoading,
   getDebuggeeUrl,
   getExpandedState,
   getDisplayedSources,
   getFocusedSourceItem,
   getContext,
 } from "../../selectors";
-
-import { getGeneratedSourceByURL } from "../../reducers/sources";
 
 // Actions
 import actions from "../../actions";
@@ -35,14 +32,13 @@ import {
   createTree,
   getDirectories,
   isDirectory,
-  findSourceTreeNodes,
   getSourceFromNode,
   nodeHasChildren,
   updateTree,
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
-import { getRawSourceURL } from "../../utils/source";
 import { trackEvent } from "ui/utils/telemetry";
+import { getSelectedSourceDetails, sourcesLoading } from "ui/reducers/sources";
 
 function shouldAutoExpand(depth, item, debuggeeUrl) {
   if (depth !== 1) {
@@ -263,13 +259,13 @@ class SourcesTree extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const selectedSource = getSelectedSource(state);
+  const selectedSource = getSelectedSourceDetails(state);
   const shownSource = getShownSource(state);
   const sources = getDisplayedSources(state);
 
   return {
     cx: getContext(state),
-    sourcesLoading: getSourcesLoading(state),
+    sourcesLoading: sourcesLoading(state),
     shownSource: shownSource,
     selectedSource: selectedSource,
     debuggeeUrl: getDebuggeeUrl(state),

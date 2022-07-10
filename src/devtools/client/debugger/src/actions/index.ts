@@ -8,19 +8,15 @@ import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
 import * as preview from "./preview";
 import * as quickOpen from "./quick-open";
-import * as sourcesActors from "./source-actors";
 import * as sourceTree from "./source-tree";
 import * as sources from "./sources";
 import * as tabs from "./tabs";
 import * as ui from "./ui";
 
-const { MAX_LINE_HITS_TO_FETCH, ...sourcesActorsActions } = sourcesActors;
-
 export default {
   ...breakpoints,
   ...logExceptions,
   ...sources,
-  ...sourcesActorsActions,
   ...tabs,
   ...pause,
   ...ui,
