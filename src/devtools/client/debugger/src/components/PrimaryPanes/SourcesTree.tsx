@@ -114,7 +114,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     if (props.selectedSource) {
       const highlightItems = getDirectories(
         props.selectedSource,
-        this.state.sourceTree as TreeDirectory
+        state.sourceTree as TreeDirectory
       );
       state.highlightItems = highlightItems;
     }
