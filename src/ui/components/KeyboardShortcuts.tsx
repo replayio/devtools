@@ -15,7 +15,7 @@ import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import useAuth0 from "ui/utils/useAuth0";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
   return (dispatch, getState) => {
@@ -211,7 +211,7 @@ function KeyboardShortcuts({
 const connector = connect(
   (state: UIState) => ({
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-    selectedSource: getSelectedSourceDetails(state),
+    selectedSource: getSelectedSource(state),
     toolboxLayout: selectors.getToolboxLayout(state),
     viewMode: selectors.getViewMode(state),
   }),

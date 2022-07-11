@@ -8,7 +8,7 @@ import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
 import {
-  getSelectedSourceDetails,
+  getSelectedSource,
   getSelectedSourceWithContent,
   getSourcesById,
   SourceContent,
@@ -95,7 +95,7 @@ function convertToList<T>(breakpointPositions: Record<string, T>) {
 }
 
 const getVisibleBreakpointPositions = createSelector(
-  getSelectedSourceDetails,
+  getSelectedSource,
   // getBreakpointPositions,
   (state: UIState) => ({} as Record<string, Record<string, unknown>>),
   (source, positions) => {

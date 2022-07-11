@@ -28,7 +28,7 @@ import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpo
 
 import type { Breakpoint, SourceLocation } from "./types";
 import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
@@ -356,7 +356,7 @@ export function getBreakpointsDisabled(state: UIState) {
 
 export const getBreakpointsForSelectedSource = createSelector(
   getBreakpointsList,
-  getSelectedSourceDetails,
+  getSelectedSource,
   (breakpoints, selectedSource) => {
     if (!selectedSource) {
       return [];

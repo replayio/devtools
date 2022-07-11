@@ -13,7 +13,7 @@ import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
 import { getToolboxLayout } from "ui/reducers/layout";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 class Tabs extends PureComponent {
   _draggedSource;
@@ -167,7 +167,7 @@ class Tabs extends PureComponent {
 }
 
 const mapStateToProps = state => ({
-  selectedSource: getSelectedSourceDetails(state),
+  selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
   isPaused: getIsPaused(state),
   toolboxLayout: getToolboxLayout(state),

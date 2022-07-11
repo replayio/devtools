@@ -5,7 +5,7 @@
 import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-import { getAllSourceDetails, getSelectedSourceDetails, getSourcesById } from "ui/reducers/sources";
+import { getAllSourceDetails, getSelectedSource, getSourcesById } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
 import type { Breakpoint } from "../reducers/types";
@@ -25,14 +25,14 @@ function getBreakpointsForSource(
 export const findBreakpointSources = (state: UIState) => {
   // const breakpoints = getBreakpointsList(state);
   // const sources = getAllSourceDetails(state);
-  // const selectedSource = getSelectedSourceDetails(state)!;
+  // const selectedSource = getSelectedSource(state)!;
   return [];
 };
 
 export const getBreakpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSourceDetails,
+  getSelectedSource,
   (breakpoints, sources, selectedSource) => {
     return [];
     // return sources
@@ -49,7 +49,7 @@ export type BreakpointOrLogpointSources = ReturnType<typeof getLogpointSources>[
 export const getLogpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSourceDetails,
+  getSelectedSource,
   (breakpoints, sources, selectedSource) => {
     return sources
       .map(source => ({

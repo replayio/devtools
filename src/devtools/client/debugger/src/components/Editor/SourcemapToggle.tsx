@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import { UIState } from "ui/state";
-import { getSelectedSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
+import { getSelectedSource, getSelectedSourceWithContent } from "ui/reducers/sources";
 
 import actions from "../../actions";
 
@@ -19,7 +19,7 @@ function SourcemapError({ onClick }: { onClick: () => void }) {
 }
 
 export function SourcemapToggle({ selectedSource, setModal, showAlternateSource }: PropsFromRedux) {
-  const sourceDetails = useAppSelector(getSelectedSourceDetails);
+  const sourceDetails = useAppSelector(getSelectedSource);
   if (!sourceDetails) {
     return null;
   }

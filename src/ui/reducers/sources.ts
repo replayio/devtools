@@ -169,14 +169,14 @@ export const getSelectedSourceId = (state: UIState) => {
   console.log({ location });
   return location?.sourceId;
 };
-export const getSelectedSourceDetails = (state: UIState) => {
+export const getSelectedSource = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);
   console.log({ selectedSourceId });
   return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
 };
 // This is a selector we used to have, so for the sake of making it easier to
 // port old code I've aliased it.
-export const getSelectedSource = getSelectedSourceDetails;
+export const getSelectedSource = getSelectedSource;
 export const getSourcesById = (state: UIState, ids: string[]) => {
   return ids.map(
     id => sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)!

@@ -26,7 +26,7 @@ import classnames from "classnames";
 import SearchInput from "../shared/SearchInput";
 import debounce from "lodash/debounce";
 import { PluralForm } from "devtools/shared/plural-form";
-import { getSelectedSourceDetails, getSourceContent } from "ui/reducers/sources";
+import { getSelectedSource, getSourceContent } from "ui/reducers/sources";
 
 function getShortcuts() {
   const searchAgainKey = "Cmd+G";
@@ -319,7 +319,7 @@ SearchBar.contextTypes = {
 };
 
 const mapStateToProps = (state, p) => {
-  const selectedSource = getSelectedSourceDetails(state);
+  const selectedSource = getSelectedSource(state);
 
   return {
     cx: getContext(state),

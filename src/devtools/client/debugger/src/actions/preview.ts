@@ -17,7 +17,7 @@ import {
   getSelectedSource,
   getSelectedFrame,
 } from "../selectors";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 type $FixTypeLater = any;
 
@@ -72,7 +72,7 @@ export function setPreview(
 
     const { previewId } = getPreview(getState())!;
 
-    const source = getSelectedSourceDetails(getState());
+    const source = getSelectedSource(getState());
     if (!source) {
       clearPreview(cx, previewId);
       return;

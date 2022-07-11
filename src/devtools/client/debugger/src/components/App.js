@@ -83,7 +83,7 @@ function DebuggerLoader(props) {
 
 const mapStateToProps = state => ({
   selectedPanel: getSelectedPanel(state),
-  selectedSource: getSelectedSourceDetails(state),
+  selectedSource: getSelectedSource(state),
   toolboxLayout: getToolboxLayout(state),
   startPanelCollapsed: getPaneCollapse(state),
 });

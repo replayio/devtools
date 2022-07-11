@@ -23,7 +23,7 @@ import { getActiveSearch, getSourcesForTabs, getContext } from "../../selectors"
 import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
-import { getSelectedSourceDetails, getUniqueUrlForSource } from "ui/reducers/sources";
+import { getSelectedSource, getUniqueUrlForSource } from "ui/reducers/sources";
 import { truncateMiddleText } from "../../utils/text";
 
 class Tab extends PureComponent {
@@ -191,7 +191,7 @@ class Tab extends PureComponent {
 }
 
 const mapStateToProps = (state, { source }) => {
-  const selectedSource = getSelectedSourceDetails(state);
+  const selectedSource = getSelectedSource(state);
 
   return {
     activeSearch: getActiveSearch(state),

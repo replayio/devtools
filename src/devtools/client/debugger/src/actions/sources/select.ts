@@ -14,7 +14,7 @@ import { setSelectedPanel } from "ui/actions/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
 import {
   experimentalLoadSourceText,
-  getSelectedSourceDetails,
+  getSelectedSource,
   getSourceDetails,
   getSourceByUrl,
   SourceDetails,
@@ -135,7 +135,7 @@ export function selectLocation(
   openSourcesTab = true
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
-    const currentSource = getSelectedSourceDetails(getState());
+    const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
     if (!client) {
@@ -202,7 +202,7 @@ export function selectLocation(
     dispatch(setSymbols({ cx, source: loadedSource }));
 
     // If a new source is selected update the file search results
-    const newSource = getSelectedSourceDetails(getState());
+    const newSource = getSelectedSource(getState());
     if (currentSource && currentSource !== newSource) {
       const { updateActiveFileSearch } = await import("../ui");
       dispatch(updateActiveFileSearch(cx));

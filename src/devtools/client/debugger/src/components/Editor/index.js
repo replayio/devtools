@@ -67,7 +67,7 @@ import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 import {
   LoadingState,
   getSelectedLocation,
-  getSelectedSourceDetails,
+  getSelectedSource,
   getSelectedSourceWithContent,
 } from "ui/reducers/sources";
 import { getSelectedSource } from "../../selectors";
@@ -486,7 +486,7 @@ Editor.childContextTypes = {
 
 const mapStateToProps = state => {
   const sourceContent = getSelectedSourceWithContent(state);
-  const sourceDetails = getSelectedSourceDetails(state);
+  const sourceDetails = getSelectedSource(state);
 
   return {
     cx: selectors.getThreadContext(state),

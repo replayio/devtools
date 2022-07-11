@@ -36,11 +36,7 @@ import {
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
 import { trackEvent } from "ui/utils/telemetry";
-import {
-  getAllSourceDetails,
-  getSelectedSourceDetails,
-  getSourcesLoading,
-} from "ui/reducers/sources";
+import { getAllSourceDetails, getSelectedSource, getSourcesLoading } from "ui/reducers/sources";
 
 function shouldAutoExpand(depth, item, debuggeeUrl) {
   if (depth !== 1) {
@@ -262,7 +258,7 @@ class SourcesTree extends Component {
 }
 
 const mapStateToProps = (state, props) => {
-  const selectedSource = getSelectedSourceDetails(state);
+  const selectedSource = getSelectedSource(state);
   const shownSource = getShownSource(state);
   const sources = getAllSourceDetails(state);
 

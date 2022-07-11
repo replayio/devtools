@@ -9,13 +9,13 @@ import { visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import { getLocationKey } from "../../utils/breakpoint";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 // eslint-disable-next-line max-len
 
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
-  selectedSource: getSelectedSourceDetails(state),
+  selectedSource: getSelectedSource(state),
   columnBreakpoints: visibleColumnBreakpoints(state),
 });
 

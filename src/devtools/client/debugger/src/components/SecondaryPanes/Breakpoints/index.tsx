@@ -17,11 +17,11 @@ import { actions } from "ui/actions";
 import type { Breakpoint as BreakpointType, Source } from "../../../reducers/types";
 
 import type { BreakpointOrLogpointSources } from "../../../selectors/breakpointSources";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceDetails(state),
+    selectedSource: getSelectedSource(state),
   }),
   {
     seek: actions.removeBreakpoint,

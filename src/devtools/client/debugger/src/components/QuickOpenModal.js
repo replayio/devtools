@@ -37,7 +37,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 import {
   getAllSourceDetails,
-  getSelectedSourceDetails,
+  getSelectedSource,
   getSourcesLoading,
   sourceSelectors,
 } from "ui/reducers/sources";
@@ -448,7 +448,7 @@ export class QuickOpenModal extends Component {
 }
 
 function mapStateToProps(state) {
-  const selectedSource = getSelectedSourceDetails(state);
+  const selectedSource = getSelectedSource(state);
   const tabs = getTabs(state);
 
   return {

@@ -11,13 +11,13 @@ import Breakpoint from "./Breakpoint";
 
 import { getFirstVisibleBreakpoints } from "devtools/client/debugger/src/selectors";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 const connector = connect((state: UIState) => ({
   // Retrieves only the first breakpoint per line so that the
   // breakpoint marker represents only the first breakpoint
   breakpoints: getFirstVisibleBreakpoints(state),
-  selectedSource: getSelectedSourceDetails(state),
+  selectedSource: getSelectedSource(state),
 }));
 
 type $FixTypeLater = any;
