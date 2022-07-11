@@ -12,6 +12,7 @@ import { rangeForFocusRegion } from "ui/utils/timeline";
 import { getCorrespondingSourceIds, getSelectedSourceId, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
 import { fetchHitCounts as fetchHitCountsFromProtocol } from "protocol/thread/hitCounts";
+import sortBy from "lodash/sortBy";
 
 const MAX_LINE_HITS_TO_FETCH = 1000;
 
@@ -54,11 +55,10 @@ const hitCountsSlice = createSlice({
     },
     hitCountsReceived: (
       state,
-      action: PayloadAction<{ sourceId: string; hitCounts: HitCount[] }>
+      action: PayloadAction<{ id: string; hitCounts: HitCount[] }>
     ) => {
       hitCountAdapter.upsertOne(state.hitCounts, {
-        hitCounts: action.payload.hitCounts,
-        id: action.payload.sourceId,
+        ...action.payload,
         status: LoadingState.LOADED,
       });
     },
@@ -84,24 +84,32 @@ export const getBoundsForLineNumber = (line: number) => {
 export const getCacheKeyForSourceHitCounts = (
   state: UIState,
   sourceId: string,
-  lineNumber: number
+  lineNumber: number = 0
 ) => {
   const sourceDetails = getSourceDetails(state, sourceId);
   if (!sourceDetails) {
     throw `Source with ID ${sourceId} not found`;
   }
+  const focusRegion = getFocusRegion(state);
+  console.log({focusRegion})
+  const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
+  console.log({range})
+  const rangeSection = range ? `${range.begin.point}-${range.end.point}` : "";
+  console.log({rangeSection})
   const correspondingSourceIds = sourceDetails.correspondingSourceIds;
+  const correspondingSourceIdsSection = correspondingSourceIds.join("&");
 
   const { lower, upper } = getBoundsForLineNumber(lineNumber);
+  const lineNumberSection = `${lower}-${upper}`;
 
-  return `${correspondingSourceIds.join(":")}-${lower}-${upper}`;
+  return [correspondingSourceIdsSection, lineNumberSection, rangeSection].join("|");
 };
 
 export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
-    const state = getState();
-    const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId, lineNumber);
+    const cacheKey = getCacheKeyForSourceHitCounts(getState(), sourceId, lineNumber);
     const status = getState().hitCounts.hitCounts.entities[cacheKey]?.status;
+    console.log({cacheKey, status})
 
     if (status === LoadingState.LOADING || status === LoadingState.LOADED) {
       return;
@@ -118,13 +126,16 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
       // for each breakable line. We only display the number of times that the
       // *first* possible breakpoint on a line was hit, so we can throw the rest
       // of them away.
-      locationsToFetch.forEach(location => {
-        const sortedColumns = location.columns.sort((a, b) => a - b);
-        location.columns = sortedColumns.slice(0, 1);
+      locationsToFetch.map(location => {
+        const sortedColumns = sortBy(location.columns, (a, b) => a - b);
+        return {
+          ...location,
+          columns: sortedColumns.slice(0, 1),
+        };
       });
-      const focusRegion = getFocusRegion(state);
+      const focusRegion = getFocusRegion(getState());
       const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
-      const correspondingSourceIds = getCorrespondingSourceIds(state, sourceId)!;
+      const correspondingSourceIds = getCorrespondingSourceIds(getState(), sourceId)!;
 
       const hitCounts = await fetchHitCountsFromProtocol(
         correspondingSourceIds,
@@ -136,9 +147,10 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
             }
           : null
       );
-      dispatch(hitCountsReceived({ sourceId: cacheKey, hitCounts }));
+      dispatch(hitCountsReceived({ id: cacheKey, hitCounts }));
     } catch (e) {
       dispatch(hitCountsFailed({ id: cacheKey, error: String(e) }));
+      throw e;
     }
   };
 };
@@ -146,7 +158,7 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
 export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCountsSlice.actions;
 
 export const getHitCountsForSource = (state: UIState, sourceId: string) => {
-  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId, 0);
+  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId);
   return (
     hitCountAdapter.getSelectors().selectById(state.hitCounts.hitCounts, cacheKey)?.hitCounts ||
     null
