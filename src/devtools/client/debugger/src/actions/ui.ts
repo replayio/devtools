@@ -9,6 +9,12 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import type { UIThunkAction } from "ui/actions";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import {
+  getSelectedLocation,
+  getSourceContent,
+  getSourceDetails,
+  SourceDetails,
+} from "ui/reducers/sources";
 
 import { closeQuickOpen } from "../reducers/quick-open";
 import {
@@ -25,17 +31,7 @@ import {
   ActiveSearchType,
   HighlightedRange,
 } from "../reducers/ui";
-import {
-  getActiveSearch,
-  getQuickOpenEnabled,
-  getSource,
-  getSourceContent,
-  getFileSearchQuery,
-  selectedLocationHasScrolled,
-  getSelectedLocation,
-  getContext,
-  Source,
-} from "../selectors";
+import { getActiveSearch, getQuickOpenEnabled, getFileSearchQuery, getContext } from "../selectors";
 import { isFulfilled } from "../utils/async-value";
 import { copyToTheClipboard } from "../utils/clipboard";
 // @ts-ignore no definition
@@ -109,7 +105,7 @@ export function openSourceLink(sourceId: string, line?: number, column?: number)
 
 export function showSource(cx: Context, sourceId: string, openSourcesTab = true): UIThunkAction {
   return (dispatch, getState) => {
-    const source = getSource(getState(), sourceId);
+    const source = getSourceDetails(getState(), sourceId);
 
     if (!source) {
       return;
@@ -117,7 +113,7 @@ export function showSource(cx: Context, sourceId: string, openSourcesTab = true)
 
     dispatch(setPrimaryPaneTab("sources"));
     // @ts-ignore apparently empty options is legal
-    dispatch(selectSource(cx, source.id, {}, openSourcesTab));
+    dispatch(selectSource(cx, source.sourceId, {}, openSourcesTab));
   };
 }
 
@@ -139,7 +135,7 @@ export function updateViewport(): UIThunkAction {
   };
 }
 
-export function copyToClipboard(source: Source): UIThunkAction {
+export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
     if (content && isFulfilled(content) && content.value!.type === "text") {
@@ -170,7 +166,8 @@ export function refreshCodeMirror(): UIThunkAction {
     const handler = () => {
       codeMirror.off("refresh", handler);
       setTimeout(() => {
-        const hasScrolled = selectedLocationHasScrolled(getState());
+        // TODO @jcmorrow add this back in
+        const hasScrolled = false; // selectedLocationHasScrolled(getState());
         if (!hasScrolled) {
           const location = getSelectedLocation(getState());
           const cx = getContext(getState());

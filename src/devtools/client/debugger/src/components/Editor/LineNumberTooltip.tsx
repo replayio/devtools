@@ -1,5 +1,4 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
-import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import minBy from "lodash/minBy";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -12,9 +11,9 @@ import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
-import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
-
 import StaticTooltip from "./StaticTooltip";
+import { getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
+import { getSelectedSource } from "ui/reducers/sources";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -92,7 +91,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       if (lineNumber !== lastHoveredLineNumber.current) {
         lastHoveredLineNumber.current = lineNumber;
       }
-      dispatch(setBreakpointHitCounts(source!.id, lineNumber));
+      dispatch(fetchBreakpointHitCounts(source!.sourceId, lineNumber));
       dispatch(updateHoveredLineNumber(lineNumber));
       setTargetNode(lineNumberNode);
     };

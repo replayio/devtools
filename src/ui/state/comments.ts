@@ -1,12 +1,5 @@
-import { RecordingId } from "@replayio/protocol";
+import { Location, RecordingId } from "@replayio/protocol";
 import { User } from "ui/types";
-
-export interface SourceLocation {
-  sourceUrl: string;
-  line: number;
-  column: number;
-  sourceId: string;
-}
 
 export interface CommentPosition {
   x: number;
@@ -16,7 +9,7 @@ export interface CommentPosition {
 export type CommentOptions = {
   position: CommentPosition | null;
   hasFrames: boolean;
-  sourceLocation: SourceLocation | null;
+  sourceLocation: Location | null;
   networkRequestId?: string;
 };
 
@@ -30,7 +23,7 @@ export interface Remark {
   isPublished: boolean;
   point: string;
   recordingId: RecordingId;
-  sourceLocation: SourceLocation | null;
+  sourceLocation: Location | null;
   time: number;
   updatedAt: string;
   user: User;

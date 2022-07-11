@@ -8,6 +8,7 @@ import React, { Component } from "react";
 
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
+import { getSelectedLocation } from "ui/reducers/sources";
 import { actions } from "ui/actions";
 
 import classnames from "classnames";
@@ -181,7 +182,7 @@ class FrameTimeline extends Component {
 export default connect(
   state => ({
     framePositions: selectors.getFramePositions(state),
-    selectedLocation: selectors.getSelectedLocation(state),
+    selectedLocation: getSelectedLocation(state),
     selectedFrame: selectors.getSelectedFrame(state),
     executionPoint: selectors.getExecutionPoint(state),
   }),

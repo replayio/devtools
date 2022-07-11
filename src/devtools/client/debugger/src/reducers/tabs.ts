@@ -13,6 +13,8 @@ import type { UIState } from "ui/state";
 import { createSelector } from "reselect";
 
 import { isSimilarTab } from "../utils/tabs";
+import { getSourcesById } from "ui/reducers/sources";
+import compact from "lodash/compact";
 
 export interface Tab {
   sourceId: string | null;
@@ -245,10 +247,7 @@ export const getSourceTabs = createSelector(
 
 export const getSourcesForTabs = (state: UIState) => {
   const tabs = getSourceTabs(state);
-  return getSourcesById(
-    state,
-    tabs.map(tab => tab.sourceId)
-  );
+  return getSourcesById(state, compact(tabs.map(tab => tab.sourceId)));
 };
 
 export function tabExists(state: UIState, sourceId: string) {

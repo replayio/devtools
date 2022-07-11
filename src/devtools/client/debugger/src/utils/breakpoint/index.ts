@@ -4,10 +4,9 @@
 
 import type { Location } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
+import { getSourceDetails } from "packages/markerikson-stack-client-prototype/src/features/sources/sourcesCache";
 import type { UIState } from "ui/state";
 
-import type { SourceActor } from "../../reducers/source-actors";
-import { getSource, getSourceActorsForSource } from "../../reducers/sources";
 import type {
   Breakpoint,
   PendingBreakpoint,
@@ -61,44 +60,6 @@ export function makePendingLocationId(location: SourceLocation, recordingId: str
   return `${recordingId}:${sourceUrlString}:${line}:${columnString}`;
 }
 
-export function makeBreakpointLocation(state: UIState, location: SourceLocation): SourceLocation {
-  const source = getSource(state, location.sourceId);
-  if (!source) {
-    throw new Error("no source");
-  }
-
-  let sourceUrl;
-  let sourceId: string;
-
-  if (source.url) {
-    sourceUrl = source.url;
-  } else {
-    sourceId = getSourceActorsForSource(state, source.id)[0].id;
-  }
-
-  return {
-    line: location.line,
-    column: location.column,
-    sourceUrl,
-    sourceId: sourceId!,
-  };
-}
-
-export function makeSourceActorLocation(sourceActor: SourceActor, location: Location) {
-  return {
-    sourceActor,
-    line: location.line,
-    column: location.column,
-  };
-}
-
-// The ID for a BreakpointActor is derived from its location in its SourceActor.
-export function makeBreakpointActorId(location: SourceActorLocation) {
-  const { sourceActor, line, column } = location;
-  const columnString = column || "";
-  return `${sourceActor}:${line}:${columnString}`;
-}
-
 export function assertBreakpoint(breakpoint: Breakpoint) {
   assertLocation(breakpoint.location);
 }
@@ -121,7 +82,10 @@ export function assertPendingLocation(location: PendingLocation) {
   // sourceUrl is null when the source does not have a url
   assert(sourceUrl !== undefined, "location must have a source url");
   assert(location.hasOwnProperty("line"), "location must have a line");
-  assert(location.hasOwnProperty("column") != null, "location must have a column");
+  assert(
+    location.hasOwnProperty("column") && location.column != null,
+    "location must have a column"
+  );
 }
 
 // syncing

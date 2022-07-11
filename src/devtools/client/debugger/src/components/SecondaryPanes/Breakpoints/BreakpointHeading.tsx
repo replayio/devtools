@@ -8,14 +8,16 @@ import { connect, ConnectedProps } from "react-redux";
 
 import type { UIState } from "ui/state";
 import actions from "../../../actions";
-import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
-import { getHasSiblingOfSameName, getContext } from "../../../selectors";
+import { getFileURL } from "../../../utils/source";
+import { getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
 import type { Breakpoint, Source } from "../../../reducers/types";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { getUniqueUrlForSource } from "ui/reducers/sources";
+import { truncateMiddleText } from "../../../utils/text";
 
 type BHExtraProps = {
   source: Source;
@@ -25,7 +27,7 @@ type BHExtraProps = {
 
 const mapStateToProps = (state: UIState, { source }: BHExtraProps) => ({
   cx: getContext(state),
-  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+  fileName: getUniqueUrlForSource(state, source.id),
   executionPoint: getExecutionPoint(state),
 });
 
@@ -43,16 +45,13 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   getLabel() {
-    const { breakpoint, source, hasSiblingOfSameName } = this.props;
+    const { breakpoint, fileName, source } = this.props;
     const { column, line } = breakpoint.location;
 
     const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
     const location = `:${line}${columnVal}`;
 
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
-    const fileName = getTruncatedFileName(source, query);
-
-    return `${fileName}${location}`;
+    return `${truncateMiddleText(fileName || source.id, 30)}${location}`;
   }
 
   removeBreakpoint = (event: React.MouseEvent) => {
@@ -69,10 +68,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
   };
 
   render() {
-    const { source, hasSiblingOfSameName } = this.props;
-
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
-    const fileName = getTruncatedFileName(source, query);
+    const { source, fileName } = this.props;
 
     return (
       <div
@@ -81,7 +77,9 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
         onContextMenu={this.onContextMenu}
         onClick={this.onClick}
       >
-        <Redacted className="breakpoint-heading-label">{fileName}</Redacted>
+        <Redacted className="breakpoint-heading-label">
+          {truncateMiddleText(fileName || source.id, 30)}
+        </Redacted>
         <div className="breakpoint-heading-actions">
           <CloseButton
             buttonClass={null}

@@ -1,9 +1,8 @@
-import { RecordingId } from "@replayio/protocol";
+import { Location, RecordingId } from "@replayio/protocol";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { setSymbols } from "devtools/client/debugger/src/actions/sources/symbols";
 import { getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { getTextAtLocation } from "devtools/client/debugger/src/reducers/sources";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
 import {
   waitForEditor,
@@ -18,13 +17,14 @@ import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
-import { Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
+import { Comment, Reply, CommentOptions } from "ui/state/comments";
 import { trackEvent } from "ui/utils/telemetry";
 import { mutate } from "ui/utils/apolloClient";
 
 import type { UIThunkAction } from "./index";
 import { setSelectedPrimaryPanel } from "./layout";
 import { seek } from "./timeline";
+import { getSourceDetails, getTextAtLocation } from "ui/reducers/sources";
 
 type SetHoveredComment = Action<"set_hovered_comment"> & { comment: any };
 
@@ -139,11 +139,12 @@ export function createNetworkRequestComment(
 }
 
 export function createLabels(
-  sourceLocation: SourceLocation
+  sourceLocation: Location
 ): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    const { sourceId, sourceUrl, line } = sourceLocation;
-    const filename = getFilenameFromURL(sourceUrl);
+    const { sourceId, line } = sourceLocation;
+    const sourceDetails = getSourceDetails(getState(), sourceId);
+    const filename = getFilenameFromURL(sourceDetails!.url);
     if (!sourceId) {
       return { primary: `${filename}:${line}`, secondary: "" };
     }
@@ -151,13 +152,12 @@ export function createLabels(
 
     let symbols = getSymbols(state, { id: sourceId });
     if (!symbols) {
-      // @ts-expect-error really only need source.id here
       symbols = await dispatch(setSymbols({ source: { id: sourceId } }));
     }
     const closestFunction = findClosestFunction(symbols, sourceLocation);
     const primary = closestFunction?.name || `${filename}:${line}`;
 
-    let snippet = getTextAtLocation(state, sourceId, sourceLocation) || "";
+    let snippet = getTextAtLocation(state, sourceLocation) || "";
     if (!snippet) {
       const sourceContent = await ThreadFront.getSourceContents(sourceId);
       const lineText = sourceContent.contents.split("\n")[line - 1];

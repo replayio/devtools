@@ -13,14 +13,7 @@ import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
 
-import {
-  getGeneratedSourceByURL,
-  getHasSiblingOfSameName,
-  hasPrettySource as checkHasPrettySource,
-  getContext,
-  getExtensionNameBySourceUrl,
-  getSourceContent,
-} from "../../selectors";
+import { getContext, getExtensionNameBySourceUrl, getSourceContent } from "../../selectors";
 import actions from "../../actions";
 
 import {
@@ -33,6 +26,7 @@ import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
+import { getUniqueUrlForSource } from "ui/reducers/sources";
 
 class SourceTreeItem extends Component {
   componentDidMount() {
@@ -100,7 +94,7 @@ class SourceTreeItem extends Component {
     }
 
     if (!this.props.sourceContent) {
-      await this.props.loadSourceText({ cx, source });
+      await this.props.loadSourceText(source);
     }
     const data = this.props.sourceContent;
     if (!data) {
@@ -137,7 +131,7 @@ class SourceTreeItem extends Component {
   }
 
   renderIcon(item, depth) {
-    const { source, hasPrettySource } = this.props;
+    const { source } = this.props;
 
     if (item.name === "webpack://") {
       return <AccessibleImage className="webpack" />;
@@ -155,11 +149,11 @@ class SourceTreeItem extends Component {
       return <AccessibleImage className="folder" />;
     }
 
-    if (source && source.isBlackBoxed) {
+    if (source?.isBlackBoxed) {
       return <AccessibleImage className="blackBox" />;
     }
 
-    if (hasPrettySource) {
+    if (source?.prettyPrintedTo) {
       return <AccessibleImage className="prettyPrint" />;
     }
 
@@ -198,8 +192,7 @@ class SourceTreeItem extends Component {
   }
 
   render() {
-    const { item, depth, source, focused, hasMatchingGeneratedSource, hasSiblingOfSameName } =
-      this.props;
+    const { item, depth, source, focused, hasSiblingOfSameName } = this.props;
 
     const suffix = null;
 
@@ -231,14 +224,6 @@ class SourceTreeItem extends Component {
   }
 }
 
-function getHasMatchingGeneratedSource(state, source) {
-  if (!source) {
-    return false;
-  }
-
-  return !!getGeneratedSourceByURL(state, source.url);
-}
-
 function getSourceContentValue(state, source) {
   const content = getSourceContent(state, source.id);
   return content && isFulfilled(content) ? content.value : null;
@@ -252,9 +237,7 @@ const mapStateToProps = (state, props) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
-    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
+    filename: getUniqueUrlForSource(state, source),
     sourceContent: source ? getSourceContentValue(state, source) : null,
     extensionName:
       (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,

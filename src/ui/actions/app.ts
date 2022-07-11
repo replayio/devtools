@@ -40,6 +40,7 @@ import {
 } from "../reducers/app";
 
 import { toggleFocusMode } from "./timeline";
+import { isEqual } from "lodash";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -176,7 +177,7 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
 
     // Skip dispatching if the new canvas value is identical to what's in the store.
     // This improves perf slightly, especially since this was dispatching frequently.
-    if (!shallowEqual(existingCanvas, canvas)) {
+    if (!isEqual(existingCanvas, canvas)) {
       dispatch(setCanvasAction(canvas));
     }
   };

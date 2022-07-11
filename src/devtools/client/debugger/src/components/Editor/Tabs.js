@@ -8,11 +8,10 @@ import { connect } from "react-redux";
 
 import Tab from "./Tab";
 
-import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
+import { getSourcesForTabs, getIsPaused } from "../../selectors";
 import { isPretty } from "../../utils/source";
 import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
-import CommandPaletteButton from "./CommandPaletteButton";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { getSelectedSourceDetails } from "ui/reducers/sources";
 
@@ -132,11 +131,10 @@ class Tabs extends PureComponent {
   };
 
   renderTabs() {
-    const { tabSources, toolboxLayout } = this.props;
+    const { tabSources } = this.props;
 
     return (
       <div className="source-tabs tab" ref="sourceTabs">
-        {toolboxLayout == "ide" && <CommandPaletteButton />}
         {tabSources.map((source, index) => {
           return (
             <Tab

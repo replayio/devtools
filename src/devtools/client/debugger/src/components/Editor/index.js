@@ -65,9 +65,10 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 import {
+  LoadingState,
+  getSelectedLocation,
   getSelectedSourceDetails,
   getSelectedSourceWithContent,
-  LoadingState,
 } from "ui/reducers/sources";
 import { getSelectedSource } from "../../selectors";
 const cssVars = {
@@ -459,6 +460,7 @@ class Editor extends PureComponent {
   }
 
   render() {
+    console.log(this.props);
     const { sourceContent } = this.props;
 
     return (
@@ -489,7 +491,7 @@ const mapStateToProps = state => {
   return {
     cx: selectors.getThreadContext(state),
     contextMenu: getContextMenu(state),
-    selectedLocation: selectors.getSelectedLocation(state),
+    selectedLocation: getSelectedLocation(state),
     sourceContent,
     sourceDetails,
     searchOn: selectors.getActiveSearch(state) === "file",

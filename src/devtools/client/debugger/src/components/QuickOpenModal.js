@@ -10,7 +10,6 @@ import { basename } from "../utils/path";
 import debounce from "lodash/debounce";
 import actions from "../actions";
 import {
-  getSourceList,
   getQuickOpenEnabled,
   getQuickOpenQuery,
   getQuickOpenType,
@@ -18,7 +17,6 @@ import {
   getSourceContent,
   getSymbols,
   getTabs,
-  getDisplayedSources,
   isSymbolsLoading,
   getContext,
 } from "../selectors";
@@ -40,8 +38,8 @@ import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 import {
   getAllSourceDetails,
   getSelectedSourceDetails,
-  sourceSelectors,
   getSourcesLoading,
+  sourceSelectors,
 } from "ui/reducers/sources";
 
 const maxResults = 100;
@@ -455,7 +453,7 @@ function mapStateToProps(state) {
 
   return {
     cx: getContext(state),
-    displayedSources: getDisplayedSources(state),
+    displayedSources: getAllSourceDetails(state),
     enabled: getQuickOpenEnabled(state),
     globalFunctions: getGlobalFunctions(state) || [],
     globalFunctionsLoading: isGlobalFunctionsLoading(state),

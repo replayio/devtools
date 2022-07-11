@@ -5,14 +5,11 @@
 //
 
 import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
+import { SourceDetails } from "ui/reducers/sources";
 
 import type { SymbolDeclarations } from "../reducers/ast";
-import type { SourceActor } from "../reducers/source-actors";
 import type { SourceContent, Location, SourceWithContent, Source } from "../reducers/sources";
 
-import type { AsyncValue } from "./async-value";
-import { isFulfilled } from "./async-value";
-import { memoizeLast } from "./memoizeLast";
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";
 import { parse as parseURL } from "./url";
@@ -363,8 +360,8 @@ export function getMode(
   return { name: "text" };
 }
 
-export function isInlineScript(source: SourceActor) {
-  return source.introductionType === "scriptElement";
+export function isInlineScript(source: SourceDetails) {
+  return source.kind === "inlineScript";
 }
 
 type SourceContentObject = {
@@ -376,13 +373,7 @@ type SourceContentObject = {
 // Cache line-split source file text
 const sourceContentToLines = new WeakMap<SourceContentObject, string[]>();
 
-export const getLineText = (asyncContent: SourceWithContent["content"], line: number) => {
-  if (!asyncContent || !isFulfilled(asyncContent)) {
-    return "";
-  }
-
-  const content = asyncContent.value;
-
+export const getLineText = (content: SourceContent, line: number) => {
   if (!content) {
     return "";
   }

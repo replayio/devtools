@@ -15,10 +15,9 @@ import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import Spinner from "ui/components/shared/Spinner";
-import { getHitCountsForSelectedSource } from "../../reducers/sources";
-import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import { isFunctionSymbol } from "./isFunctionSymbol";
 import { getSelectedSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
+import { getHitCountsForSelectedSource, loadBreakpointHitCounts } from "ui/reducers/hitCounts";
 
 export function SourceOutline({
   cx,
@@ -50,7 +49,7 @@ export function SourceOutline({
   useEffect(() => {
     if (sourceDetails) {
       // We start by loading the first N lines of hits, where N is the line limit.
-      dispatch(setBreakpointHitCounts(sourceDetails.id, 1));
+      dispatch(loadBreakpointHitCounts(sourceDetails.id));
     }
   }, [dispatch, sourceDetails]);
 

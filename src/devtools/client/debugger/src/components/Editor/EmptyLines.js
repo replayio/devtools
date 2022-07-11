@@ -6,7 +6,6 @@
 
 import { connect } from "react-redux";
 import { Component } from "react";
-import { getSelectedBreakableLines } from "../../selectors";
 import { fromEditorLine } from "../../utils/editor";
 
 class EmptyLines extends Component {
@@ -50,10 +49,11 @@ class EmptyLines extends Component {
 }
 
 const mapStateToProps = state => {
-  const breakableLines = getSelectedBreakableLines(state);
+  // TODO @jcmorrow will fix breakable lines soon!
+  // const breakableLines = getSelectedBreakableLines(state);
 
   return {
-    breakableLines,
+    breakableLines: new Map(),
   };
 };
 

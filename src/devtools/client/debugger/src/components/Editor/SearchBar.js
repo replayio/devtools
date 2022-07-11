@@ -12,8 +12,6 @@ import AccessibleImage from "../shared/AccessibleImage";
 import actions from "../../actions";
 import {
   getActiveSearch,
-  getSelectedSource,
-  getSourceContent,
   getFileSearchQuery,
   getFileSearchModifiers,
   getFileSearchResults,
@@ -28,7 +26,7 @@ import classnames from "classnames";
 import SearchInput from "../shared/SearchInput";
 import debounce from "lodash/debounce";
 import { PluralForm } from "devtools/shared/plural-form";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSourceDetails, getSourceContent } from "ui/reducers/sources";
 
 function getShortcuts() {
   const searchAgainKey = "Cmd+G";

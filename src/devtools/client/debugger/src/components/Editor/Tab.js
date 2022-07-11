@@ -15,28 +15,16 @@ import { copyToTheClipboard } from "../../utils/clipboard";
 
 import { actions } from "ui/actions";
 
-import {
-  getFileURL,
-  getRawSourceURL,
-  getSourceQueryString,
-  getTruncatedFileName,
-  isPretty,
-  shouldBlackbox,
-} from "../../utils/source";
+import { getFileURL, getRawSourceURL, isPretty, shouldBlackbox } from "../../utils/source";
 import { getTabMenuItems } from "../../utils/tabs";
 
-import {
-  getSelectedSource,
-  getActiveSearch,
-  getSourcesForTabs,
-  getHasSiblingOfSameName,
-  getContext,
-} from "../../selectors";
+import { getActiveSearch, getSourcesForTabs, getContext } from "../../selectors";
 
 import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSourceDetails, getUniqueUrlForSource } from "ui/reducers/sources";
+import { truncateMiddleText } from "../../utils/text";
 
 class Tab extends PureComponent {
   onTabContextMenu = (event, tab) => {
@@ -152,15 +140,14 @@ class Tab extends PureComponent {
       selectedSource,
       selectSource,
       closeTab,
+      filename,
       source,
-      tabSources,
-      hasSiblingOfSameName,
       onDragOver,
       onDragStart,
       onDragEnd,
     } = this.props;
-    const sourceId = source.id;
-    const active = selectedSource && sourceId == selectedSource.id && !this.isSourceSearchEnabled();
+    const active =
+      selectedSource && source.id == selectedSource.id && !this.isSourceSearchEnabled();
     const isPrettyCode = isPretty(source);
 
     function onClickClose(e) {
@@ -173,15 +160,13 @@ class Tab extends PureComponent {
       e.preventDefault();
       e.stopPropagation();
       trackEvent("tabs.select");
-      return selectSource(cx, sourceId);
+      return selectSource(cx, source.id);
     }
 
     const className = classnames("source-tab", {
       active,
       pretty: isPrettyCode,
     });
-
-    const query = hasSiblingOfSameName ? getSourceQueryString(source) : "";
 
     return (
       <Redacted
@@ -190,15 +175,15 @@ class Tab extends PureComponent {
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         className={className}
-        key={sourceId}
+        key={source.id}
         onClick={handleTabClick}
         // Accommodate middle click to close tab
         onMouseUp={e => e.button === 1 && closeTab(cx, source)}
-        onContextMenu={e => this.onTabContextMenu(e, sourceId)}
+        onContextMenu={e => this.onTabContextMenu(e, source.id)}
         title={getFileURL(source, false)}
       >
         <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
-        <div className="filename">{getTruncatedFileName(source, query)}</div>
+        <div className="filename">{truncateMiddleText(filename || source.id, 30)}</div>
         <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
       </Redacted>
     );
@@ -209,23 +194,23 @@ const mapStateToProps = (state, { source }) => {
   const selectedSource = getSelectedSourceDetails(state);
 
   return {
-    cx: getContext(state),
-    tabSources: getSourcesForTabs(state),
-    selectedSource,
     activeSearch: getActiveSearch(state),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+    cx: getContext(state),
+    filename: getUniqueUrlForSource(state, selectedSource),
+    selectedSource,
+    tabSources: getSourcesForTabs(state),
   };
 };
 
 export default connect(
   mapStateToProps,
   {
-    selectSource: actions.selectSource,
-    copyToClipboard: actions.copyToClipboard,
     closeTab: actions.closeTab,
     closeTabs: actions.closeTabs,
-    showSource: actions.showSource,
+    copyToClipboard: actions.copyToClipboard,
     ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
+    selectSource: actions.selectSource,
+    showSource: actions.showSource,
     toggleBlackBox: actions.toggleBlackBox,
   },
   null,

@@ -2,13 +2,12 @@ import { useMemo, useLayoutEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { setBreakpointHitCounts } from "../../actions/sources";
-import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
-import { getSelectedSourceId } from "../../selectors";
 import { useStringPref } from "ui/hooks/settings";
 
 import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
+import { getSelectedSourceId } from "ui/reducers/sources";
+import { getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
 
 type Props = {
   editor: any;
@@ -59,7 +58,7 @@ function LineHitCounts({ editor }: Props) {
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
-      dispatch(setBreakpointHitCounts(sourceId, 0));
+      dispatch(loadBreakpointHitCounts(sourceId, 0));
     }
   }, [dispatch, sourceId, hitCounts]);
 

@@ -12,39 +12,28 @@
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
-import { experimentalLoadSourceText, getSelectedSourceDetails } from "ui/reducers/sources";
+import {
+  experimentalLoadSourceText,
+  getSelectedSourceDetails,
+  getSourceDetails,
+  getSourceByUrl,
+  SourceDetails,
+  selectLocation as setSelectedLocation,
+} from "ui/reducers/sources";
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
-import {
-  getSource,
-  getSourceByURL,
-  getActiveSearch,
-  getSelectedSource,
-  getExecutionPoint,
-  getThreadContext,
-  getContext,
-} from "../../selectors";
+import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { setBreakableLines } from "./breakableLines";
-import { loadSourceText } from "./loadSourceText";
 import { setSymbols } from "./symbols";
 
 type PartialLocation = Parameters<typeof createLocation>[0];
-
-export const setSelectedLocation = (cx: Context, source: Source, location: Location) => ({
-  type: "SET_SELECTED_LOCATION",
-  cx,
-  source,
-  location,
-});
 
 interface PendingSelectedLocationOptions {
   line: number;
@@ -85,7 +74,8 @@ export function selectSourceURL(
   options: PendingSelectedLocationOptions
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState) => {
-    const source = getSourceByURL(getState(), url);
+    const source = getSourceByUrl(getState(), url);
+    console.log({ source });
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
     }
@@ -107,6 +97,7 @@ export function selectSource(
   openSourcesTab?: boolean
 ): UIThunkAction {
   return async dispatch => {
+    console.log({ sourceId });
     // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
@@ -121,9 +112,10 @@ export function deselectSource(): UIThunkAction {
   };
 }
 
-export function addTab(source: Source) {
+export function addTab(source: SourceDetails) {
   const { url, id: sourceId } = source;
-  const isOriginal = source.isOriginal;
+  console.log({ url, sourceId });
+  const isOriginal = source.canonicalId === sourceId;
 
   return {
     type: "ADD_TAB",
@@ -147,12 +139,13 @@ export function selectLocation(
     trackEvent("sources.select_location");
 
     if (!client) {
+      console.log("NO CLIENT");
       // No connection, do nothing. This happens when the debugger is
       // shut down too fast and it tries to display a default source.
       return;
     }
 
-    let source = getSource(getState(), location.sourceId);
+    let source = getSourceDetails(getState(), location.sourceId);
     // The location may contain a sourceId from another session (e.g. when the user clicks
     // on a comment that has a source location), but a sourceId is not guaranteed
     // to be stable across sessions (although most of the time it is).
@@ -161,10 +154,11 @@ export function selectLocation(
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
       sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
-      source = getSource(getState(), sourceId);
+      source = getSourceDetails(getState(), sourceId);
       location = { ...location, sourceId };
     }
     if (!source) {
+      console.log("NO SOURCE");
       // If there is no source we deselect the current selected source
       return dispatch(clearSelectedLocation(cx));
     }
@@ -174,12 +168,13 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
+    console.log({ source });
+    console.log(tabExists(getState(), source.id));
     if (!tabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
 
-    // @ts-ignore Partial Location mismatch
-    dispatch(setSelectedLocation(cx, source, location));
+    dispatch(setSelectedLocation(location));
     const layout = getToolboxLayout(getState());
 
     // Yank the user to the editor tab in case the debugger/editor is tucked in
@@ -188,14 +183,16 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
+    console.log({ source });
     await dispatch(experimentalLoadSourceText(source.id));
-    await dispatch(setBreakableLines(cx, source.id));
+    // TODO @jcmorrow reenable this
+    // await dispatch(setBreakableLines(cx, source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));
     dispatch(setShownSource(source));
 
-    const loadedSource = getSource(getState(), source.id);
+    const loadedSource = getSourceDetails(getState(), source.id);
 
     if (!loadedSource) {
       // If there was a navigation while we were loading the loadedSource

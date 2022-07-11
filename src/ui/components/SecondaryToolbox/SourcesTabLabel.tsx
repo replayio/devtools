@@ -1,8 +1,8 @@
 import classNames from "classnames";
-import { getSelectedLocation } from "devtools/client/debugger/src/reducers/sources";
 import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
+import { getSelectedLocation } from "ui/reducers/sources";
 
 export default function TabSpotlight() {
   const [isShown, setIsShown] = useState(false);
