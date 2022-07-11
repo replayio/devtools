@@ -31,6 +31,7 @@ import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { HitCountsState } from "ui/reducers/hitCounts";
 import { BreakableLinesState } from "ui/reducers/breakableLines";
+import { PossibleBreakpointsState } from "ui/reducers/possibleBreakpoints";
 
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
@@ -56,6 +57,7 @@ export interface UIState {
   network: NetworkState;
   pause: PauseState;
   pendingBreakpoints: PendingBreakpointsState;
+  possibleBreakpoints: PossibleBreakpointsState;
   preview: PreviewState;
   protocolMessages: ProtocolMessagesState;
   quickOpen: QuickOpenState;

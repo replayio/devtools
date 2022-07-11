@@ -2,7 +2,11 @@ import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@r
 import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 import { getSelectedSourceId } from "./sources";
+import { getFocusRegion } from "./timeline";
+
+const MAX_LINE_HITS_TO_FETCH = 1000;
 
 export interface HitCount {
   location: Location;
@@ -59,12 +63,33 @@ const hitCountsSlice = createSlice({
   },
 });
 
-export const loadBreakpointHitCounts = (sourceId: string): UIThunkAction => {
-  return (dispatch, getState) => {
+export const fetchHitCounts = (sourceId: string, line: number): UIThunkAction => {
+  return async (dispatch, getState, { ThreadFront }) => {
     dispatch(hitCountsRequested(sourceId));
+
+    const locations = await ThreadFront.getBreakpointPositionsCompressed(sourceId);
+    // See `source-actors` where MAX_LINE_HITS_TO_FETCH is defined for an
+    // explanation of the bounds here.
+    const lowerBound = Math.floor(line / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;
+    const upperBound = lowerBound + MAX_LINE_HITS_TO_FETCH;
+    const locationsToFetch = locations
+      .filter(location => location.line >= lowerBound && location.line < upperBound)
+      .map(location => ({ ...location, columns: [location.columns.sort((a, b) => a - b)[0]] }));
+    const focusRegion = getFocusRegion(getState());
+    const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
+    const hitCounts = await ThreadFront.getHitCounts(
+      sourceId,
+      locationsToFetch,
+      range
+        ? {
+            beginPoint: range.begin.point,
+            endPoint: range.end.point,
+          }
+        : null
+    );
     // TODO @jcmorrow actually get the hitCounts
     // await ThreadFront.getHitCounts(sourceId)
-    dispatch(hitCountsReceived({ sourceId, hitCounts: [] }));
+    dispatch(hitCountsReceived({ sourceId, hitCounts: hitCounts.hits }));
   };
 };
 

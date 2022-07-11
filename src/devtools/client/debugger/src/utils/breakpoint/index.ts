@@ -4,21 +4,17 @@
 
 import type { Location } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
-import { getSourceDetails } from "packages/markerikson-stack-client-prototype/src/features/sources/sourcesCache";
-import type { UIState } from "ui/state";
 
 import type {
   Breakpoint,
   PendingBreakpoint,
   SourceLocation,
-  SourceActorLocation,
   PendingLocation,
 } from "../../reducers/types";
 import assert from "../assert";
 import { features } from "../prefs";
 
 export * from "./astBreakpointLocation";
-export * from "./breakpointPositions";
 
 // Return the first argument that is a string, or null if nothing is a
 // string.

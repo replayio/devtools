@@ -7,7 +7,7 @@ import { useStringPref } from "ui/hooks/settings";
 import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
 import { getSelectedSourceId } from "ui/reducers/sources";
-import { getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
+import { fetchHitCounts, getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
 
 type Props = {
   editor: any;
@@ -58,7 +58,7 @@ function LineHitCounts({ editor }: Props) {
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
-      dispatch(loadBreakpointHitCounts(sourceId, 0));
+      dispatch(fetchHitCounts(sourceId, 0));
     }
   }, [dispatch, sourceId, hitCounts]);
 

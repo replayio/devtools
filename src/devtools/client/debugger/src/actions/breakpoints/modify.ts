@@ -13,14 +13,10 @@ import {
   setRequestedBreakpoint,
 } from "../../reducers/breakpoints";
 import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
-import type { Location, Source } from "../../reducers/sources";
 import {
   getBreakpoint,
-  getBreakpointPositionsForLocation,
   getFirstBreakpointPosition,
   getSymbols,
-  getSource,
-  getSourceContent,
   getBreakpointsList,
   getRequestedBreakpointLocations,
   getPendingBreakpointList,
@@ -30,7 +26,12 @@ import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 import { comparePosition } from "../../utils/location";
 import { getTextAtPosition } from "../../utils/source";
 
-import { setBreakpointPositions } from "./breakpointPositions";
+import { getSourceContent, getSourceDetails } from "ui/reducers/sources";
+import { Location } from "@replayio/protocol";
+import {
+  fetchPossibleBreakpointsForSource,
+  getPossibleBreakpointsForSource,
+} from "ui/reducers/possibleBreakpoints";
 
 type $FixTypeLater = any;
 
@@ -80,7 +81,6 @@ export function addBreakpoint(
   initialLocation: Location,
   options: Breakpoint["options"] = {},
   disabled = false,
-  shouldTrack = false,
   shouldCancel = () => false
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
@@ -88,7 +88,7 @@ export function addBreakpoint(
 
     dispatch(setRequestedBreakpoint({ sourceId, line }));
 
-    await dispatch(setBreakpointPositions({ sourceId, line }));
+    await dispatch(fetchPossibleBreakpointsForSource(sourceId));
 
     // check if the user deleted the requested breakpoint in the meantime
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
@@ -96,15 +96,20 @@ export function addBreakpoint(
       return;
     }
 
-    const location = column
-      ? getBreakpointPositionsForLocation(getState(), initialLocation)
-      : getFirstBreakpointPosition(getState(), initialLocation);
+    const firstLocationOnLine = getPossibleBreakpointsForSource(
+      getState(),
+      initialLocation.sourceId
+    )!.find(lineLocation => {
+      lineLocation.line === line;
+    })!.columns[0];
 
-    if (!location) {
-      return;
-    }
+    const location = {
+      sourceId,
+      line,
+      column: firstLocationOnLine,
+    };
 
-    const source = getSource(getState(), location.sourceId);
+    const source = getSourceDetails(getState(), location.sourceId);
     if (!source) {
       return;
     }
@@ -254,7 +259,6 @@ export function setBreakpointOptions(
   options: Partial<Breakpoint["options"]> = {}
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
-    // @ts-expect-error Location field mismatch
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));

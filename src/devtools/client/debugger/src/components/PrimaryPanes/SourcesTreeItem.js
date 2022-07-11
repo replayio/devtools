@@ -13,7 +13,7 @@ import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
 
-import { getContext, getExtensionNameBySourceUrl, getSourceContent } from "../../selectors";
+import { getContext, getExtensionNameBySourceUrl } from "../../selectors";
 import actions from "../../actions";
 
 import {
@@ -26,7 +26,7 @@ import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
 import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
-import { getUniqueUrlForSource } from "ui/reducers/sources";
+import { getSourceContent, getUniqueUrlForSource } from "ui/reducers/sources";
 
 class SourceTreeItem extends Component {
   componentDidMount() {

@@ -29,15 +29,14 @@ import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
 
-import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
   addBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
-  runAnalysis,
 } from "./modify";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
@@ -202,24 +201,21 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
     const state = getState();
     const source = getSelectedSource(state)!;
 
-    const initialLocation = {
+    const initialLocation: Location = {
       sourceId: source.id,
-      sourceUrl: source.url,
-      column: undefined,
+      column: 0,
       line,
     };
 
     // Set the initial location here as a placeholder to be checked after any async activity.
-    // @ts-ignore Location field mismatches
     dispatch(setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
     // original line number, or 2) hovered on a different line number altogether. In that
     // case, we should bail.
-    // @ts-ignore Types don't overlap
     if (selectors.getHoveredLineNumberLocation(getState()) !== initialLocation) {
       return;
     }
@@ -289,7 +285,6 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
 
     trackEvent("breakpoint.add_column");
 
-    // @ts-expect-error Breakpoint location field mismatches
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }
@@ -311,7 +306,7 @@ export function setBreakpointPrefixBadge(
   };
 }
 
-function getLogValue(source: Source, state: UIState, location: Location) {
+function getLogValue(source: SourceDetails, state: UIState, location: Location) {
   const file = getFilename(source);
   const symbols = getSymbols(state, source);
   const { line, column } = location;

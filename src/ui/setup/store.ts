@@ -24,6 +24,7 @@ import { context } from "ui/setup/redux/middleware/context";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 import hitCounts from "ui/reducers/hitCounts";
+import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
 import breakableLines from "ui/reducers/breakableLines";
 
 type UIStateReducers = {
@@ -47,6 +48,7 @@ let reducers = {
   hitCounts,
   layout: layoutReducer,
   messages: messagesReducer,
+  possibleBreakpoints: possibleBreakpoints,
   protocolMessages: protocolMessages,
   tabs: tabsReducer,
 } as unknown as UIStateReducers;

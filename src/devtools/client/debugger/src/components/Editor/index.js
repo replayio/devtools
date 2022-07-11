@@ -348,7 +348,6 @@ class Editor extends PureComponent {
 
   setText(props, editor) {
     const { sourceContent, symbols } = props;
-    console.log({ sourceContent });
     if (!editor) {
       return;
     }
@@ -358,7 +357,6 @@ class Editor extends PureComponent {
       return this.clearEditor();
     }
 
-    console.log({ sourceContent });
     if (!sourceContent.value) {
       return showLoading(editor);
     }
@@ -459,7 +457,6 @@ class Editor extends PureComponent {
   }
 
   render() {
-    console.log(this.props);
     const { sourceContent } = this.props;
 
     return (

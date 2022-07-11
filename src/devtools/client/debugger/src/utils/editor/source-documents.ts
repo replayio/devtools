@@ -63,7 +63,6 @@ export function showErrorMessage(editor: Editor, msg: string) {
 }
 
 function setEditorText(editor: Editor, sourceId: string, content: SourceContent) {
-  console.log({ content });
   const contents = content.value?.value
     .split(/\r\n?|\n|\u2028|\u2029/)
     .map(line => {

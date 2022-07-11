@@ -7,6 +7,7 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import { fromEditorLine } from "../../utils/editor";
+import { getBreakableLinesForSelectedSource } from "ui/reducers/breakableLines";
 
 class EmptyLines extends Component {
   componentDidMount() {
@@ -34,7 +35,7 @@ class EmptyLines extends Component {
       editor.codeMirror.eachLine(lineHandle => {
         const line = fromEditorLine(editor.codeMirror.getLineNumber(lineHandle));
 
-        if (breakableLines.has(line)) {
+        if (breakableLines.includes(line)) {
           editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
         } else {
           editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
@@ -49,11 +50,9 @@ class EmptyLines extends Component {
 }
 
 const mapStateToProps = state => {
-  // TODO @jcmorrow will fix breakable lines soon!
-  // const breakableLines = getSelectedBreakableLines(state);
-
+  const breakableLines = getBreakableLinesForSelectedSource(state) || [];
   return {
-    breakableLines: new Map(),
+    breakableLines,
   };
 };
 

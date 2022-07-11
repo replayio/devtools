@@ -1,5 +1,7 @@
 import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { UIThunkAction } from "ui/actions";
+import { UIState } from "ui/state";
+import { getSelectedSourceId } from "./sources";
 
 export interface SourceBreakableLines {
   error?: string;
@@ -55,7 +57,11 @@ const breakableLinesSlice = createSlice({
 });
 
 export const fetchBreakableLinesForSource = (sourceId: string): UIThunkAction => {
-  return async (dispatch, _getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const status = getState().breakableLines.breakableLines.entities[sourceId]?.status;
+    if (status === LoadingState.LOADED || status === LoadingState.LOADING) {
+      return;
+    }
     dispatch(breakableLinesSlice.actions.breakableLinesRequested(sourceId));
     try {
       const lineLocations = await ThreadFront.getBreakpointPositionsCompressed(sourceId);
@@ -71,6 +77,13 @@ export const fetchBreakableLinesForSource = (sourceId: string): UIThunkAction =>
       );
     }
   };
+};
+export const getBreakableLinesForSelectedSource = (state: UIState) => {
+  const sourceId = getSelectedSourceId(state);
+  if (!sourceId) {
+    return null;
+  }
+  return state.breakableLines.breakableLines.entities[sourceId]?.lines;
 };
 
 export default breakableLinesSlice.reducer;

@@ -24,7 +24,7 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
   const alternate = await ThreadFront.getAlternateLocation(frame.location);
   if (alternate) {
     alternateLocation = {
-      sourceId: clientCommands.getSourceForActor(alternate.sourceId),
+      sourceId: alternate.sourceId,
       line: alternate.line,
       column: alternate.column,
     };

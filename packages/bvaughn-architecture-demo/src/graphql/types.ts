@@ -1,4 +1,4 @@
-import { RecordingId, SourceLocation } from "@replayio/protocol";
+import { SourceLocation } from "@replayio/protocol";
 
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",

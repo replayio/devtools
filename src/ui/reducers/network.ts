@@ -41,7 +41,6 @@ const initialState = (): NetworkState => ({
 });
 
 const update = (state: NetworkState = initialState(), action: NetworkAction): NetworkState => {
-  console.log(action);
   switch (action.type) {
     case "NETWORK_REQUESTS_LOADED":
       return {

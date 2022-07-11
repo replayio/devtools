@@ -142,7 +142,6 @@ export const {
 export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
     const existing = getState().experimentalSources.contents.entities[sourceId];
-    console.log({ existing });
     if (existing?.status === LoadingState.LOADING || existing?.status === LoadingState.LOADED) {
       return;
     }
@@ -151,7 +150,6 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
     try {
       const response = await ThreadFront.getSourceContents(sourceId);
 
-      console.log({ response });
       parser.setSource(sourceId, {
         type: "text",
         value: response.contents,
@@ -172,13 +170,10 @@ export const getSelectedLocation = (state: UIState) =>
   state.experimentalSources.selectedLocationHistory[0];
 export const getSelectedSourceId = (state: UIState) => {
   const location = getSelectedLocation(state);
-  console.log({ stack: new Error().stack });
-  console.log({ location });
   return location?.sourceId;
 };
 export const getSelectedSource = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);
-  console.log({ selectedSourceId });
   return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
 };
 export const getSourcesById = (state: UIState, ids: string[]) => {

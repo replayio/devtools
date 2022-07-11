@@ -14,7 +14,6 @@ import {
   getQuickOpenQuery,
   getQuickOpenType,
   getQuickOpenProject,
-  getSourceContent,
   getSymbols,
   getTabs,
   isSymbolsLoading,
@@ -38,6 +37,7 @@ import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 import {
   getAllSourceDetails,
   getSelectedSource,
+  getSourceContent,
   getSourcesLoading,
   sourceSelectors,
 } from "ui/reducers/sources";
