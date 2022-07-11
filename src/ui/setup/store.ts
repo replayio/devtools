@@ -41,8 +41,9 @@ type ReduxDevToolsOptions = Exclude<
 // slice reducers we know will be added, to get the right state type.
 let reducers = {
   app: appReducer,
+  breakableLines,
   experimentalSources: sources,
-  hitCounts: hitCounts,
+  hitCounts,
   layout: layoutReducer,
   messages: messagesReducer,
   protocolMessages: protocolMessages,

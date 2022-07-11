@@ -45,6 +45,7 @@ export const contentSelectors = contentsAdapter.getSelectors();
 
 export interface SourcesState {
   allSourcesRecieved: boolean;
+  selectedLocationHasScrolled: boolean;
   selectedLocationHistory: Partial<Location>[];
   contents: EntityState<SourceContent>;
   sourceDetails: EntityState<SourceDetails>;
@@ -55,6 +56,7 @@ export interface SourcesState {
 const initialState: SourcesState = {
   allSourcesRecieved: false,
   contents: contentsAdapter.getInitialState(),
+  selectedLocationHasScrolled: false,
   selectedLocationHistory: [],
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
@@ -120,6 +122,11 @@ const sourcesSlice = createSlice({
     selectLocation: (state, action: PayloadAction<Partial<Location>>) => {
       state.selectedLocationHistory.unshift(action.payload);
     },
+  },
+  extraReducers: builder => {
+    builder.addCase("debuggerUI/setViewport", state => {
+      state.selectedLocationHasScrolled = true;
+    });
   },
 });
 
@@ -224,5 +231,6 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
     return sourceDetails.url;
   }
 };
-
+export const getSelectedLocationHasScrolled = (state: UIState) =>
+  state.experimentalSources.selectedLocationHasScrolled;
 export default sourcesSlice.reducer;

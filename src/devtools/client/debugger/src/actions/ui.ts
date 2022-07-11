@@ -11,6 +11,7 @@ import type { UIThunkAction } from "ui/actions";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import {
   getSelectedLocation,
+  getSelectedLocationHasScrolled,
   getSourceContent,
   getSourceDetails,
   SourceDetails,
@@ -166,8 +167,7 @@ export function refreshCodeMirror(): UIThunkAction {
     const handler = () => {
       codeMirror.off("refresh", handler);
       setTimeout(() => {
-        // TODO @jcmorrow add this back in
-        const hasScrolled = false; // selectedLocationHasScrolled(getState());
+        const hasScrolled = getSelectedLocationHasScrolled(getState());
         if (!hasScrolled) {
           const location = getSelectedLocation(getState());
           const cx = getContext(getState());

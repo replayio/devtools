@@ -31,6 +31,7 @@ import { LayoutState } from "./layout";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { HitCountsState } from "ui/reducers/hitCounts";
+import { BreakableLinesState } from "ui/reducers/breakableLines";
 
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
@@ -38,6 +39,7 @@ export interface UIState {
   ast: ASTState;
   asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
+  breakableLines: BreakableLinesState;
   breakpoints: BreakpointsState;
   changes: ChangesState;
   classList: ClassListState;

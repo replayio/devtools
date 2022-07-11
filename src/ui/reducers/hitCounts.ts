@@ -1,6 +1,5 @@
 import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Location } from "@replayio/protocol";
-import { ThreadFront } from "protocol/thread";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { getSelectedSourceId } from "./sources";
