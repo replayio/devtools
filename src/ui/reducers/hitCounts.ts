@@ -108,7 +108,7 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
     }
 
     try {
-      dispatch(hitCountsRequested(sourceId));
+      dispatch(hitCountsRequested(cacheKey));
       const { lower, upper } = getBoundsForLineNumber(lineNumber);
       const locations = await ThreadFront.getBreakpointPositionsCompressed(sourceId);
       const locationsToFetch = locations.filter(
@@ -136,7 +136,7 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
             }
           : null
       );
-      dispatch(hitCountsReceived({ sourceId: cacheKey, hitCounts: hitCounts.hits }));
+      dispatch(hitCountsReceived({ sourceId: cacheKey, hitCounts }));
     } catch (e) {
       dispatch(hitCountsFailed({ id: cacheKey, error: String(e) }));
     }

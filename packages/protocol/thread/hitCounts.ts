@@ -38,17 +38,5 @@ export const fetchHitCounts = async (
   );
 
   // Merge hit counts from corresponding sources
-  return correspondingHitCounts.reduce((acc: { hits: HitCount[] }, current) => {
-    for (const newHit of current.hits) {
-      console.log({ acc, current });
-      const match = acc.hits.find(
-        hit =>
-          hit.location.line == newHit.location.line && hit.location.column == newHit.location.column
-      );
-      if (match) {
-        match.hits += newHit.hits;
-      }
-    }
-    return acc;
-  }, {} as { hits: HitCount[] });
+  return combineHitCounts(correspondingHitCounts.flatMap(result => result.hits));
 };
