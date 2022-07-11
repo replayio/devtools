@@ -49,7 +49,7 @@ export function parseLineColumn(query) {
 
 export function formatSourcesForList(source, tabUrls) {
   const title = getTruncatedFileName(source);
-  const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(source) || ""}`;
+  const relativeUrlWithQuery = `${source.url}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
   return {
@@ -138,7 +138,7 @@ export function formatSources(sources, tabUrls) {
       continue;
     }
 
-    if (!!source.relativeUrl && !isPretty(source) && !sourceURLs.has(source.url)) {
+    if (!isPretty(source) && !sourceURLs.has(source.url)) {
       formattedSources.push(formatSourcesForList(source, tabUrls));
       sourceURLs.add(source.url);
     }
