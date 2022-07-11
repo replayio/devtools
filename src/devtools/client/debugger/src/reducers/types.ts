@@ -3,10 +3,8 @@
 // https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/types.js
 // Converted with: https://flow-to-ts.netlify.app
 
-import type { SourceActor } from "./source-actors";
+import type { Location } from "@replayio/protocol";
 import type { CallDeclaration } from "./ast";
-
-export type SourceActorId = string;
 
 export type SearchModifiers = {
   caseSensitive: boolean;
@@ -48,7 +46,6 @@ export type SourceId = string;
  * @memberof types
  * @static
  */
-export type ActorId = string;
 export type QueuedSourceData =
   | {
       type: "original";
@@ -69,11 +66,6 @@ export type GeneratedSourceData = {
   // Many of our tests rely on being able to set a specific ID for the Source
   // object. We may want to consider avoiding that eventually.
   id?: string;
-};
-export type SourceActorLocation = {
-  readonly sourceActor: SourceActorId;
-  readonly line: number;
-  readonly column?: number;
 };
 
 /**
@@ -113,15 +105,12 @@ export type PendingLocation = {
   readonly column?: number;
   readonly sourceUrl?: string;
 };
-// Type of location used when setting breakpoints in the server. Exactly one of
-// { sourceUrl, sourceId } must be specified. Soon this will replace
-// SourceLocation and PendingLocation, and SourceActorLocation will be removed
-// (bug 1524374).
+
 export type BreakpointLocation = {
   readonly line: number;
   readonly column?: number;
   readonly sourceUrl?: string;
-  readonly sourceId?: SourceActorId;
+  readonly sourceId?: string;
 };
 export type ASTLocation = {
   readonly name: string | null | undefined;
@@ -137,9 +126,9 @@ export type ASTLocation = {
  */
 export type Breakpoint = {
   readonly id: BreakpointId;
-  readonly location: SourceLocation;
+  readonly location: Location;
   readonly astLocation: ASTLocation | null | undefined;
-  readonly generatedLocation: SourceLocation;
+  readonly generatedLocation: Location;
   readonly disabled: boolean;
   readonly text: string;
   readonly originalText: string;
@@ -159,10 +148,6 @@ export type BreakpointOptions = {
   shouldPause?: boolean;
   prefixBadge?: PrefixBadge;
 };
-export type BreakpointActor = {
-  readonly actor: ActorId;
-  readonly source: SourceActor;
-};
 
 /**
  * XHR Breakpoint
@@ -175,17 +160,6 @@ export type XHRBreakpoint = {
   readonly loading: boolean;
   readonly disabled: boolean;
   readonly text: string;
-};
-
-/**
- * Breakpoint Result is the return from an add/modify Breakpoint request
- *
- * @memberof types
- * @static
- */
-export type BreakpointResult = {
-  id: ActorId;
-  actualLocation: SourceActorLocation;
 };
 
 /**
@@ -358,7 +332,6 @@ export type Expression = {
  * @static
  */
 export type Grip = {
-  actor: string;
   class: string;
   extensible: boolean;
   frozen: boolean;
@@ -404,15 +377,6 @@ export type Source = {
 };
 
 /**
- * Script
- * This describes scripts which are sent to the debug server to be eval'd
- * @memberof types
- * @static
- * FIXME: This needs a real type definition
- */
-export type Script = any;
-
-/**
  * Describes content of the binding.
  * FIXME Define these type more clearly
  */
@@ -431,7 +395,6 @@ export type ScopeBindings = Record<string, BindingContents>;
  * @static
  */
 export type Scope = {
-  actor: ActorId;
   parent: Scope | null | undefined;
   bindings?: {
     arguments: Array<ScopeBindings>;
@@ -441,7 +404,6 @@ export type Scope = {
   object: Record<string, any> | null | undefined;
   function:
     | {
-        actor: ActorId;
         class: string;
         displayName: string;
         location: SourceLocation;
@@ -454,7 +416,6 @@ export type Scope = {
 };
 export type ThreadType = "mainThread" | "worker" | "contentProcess";
 export type Thread = {
-  readonly actor: ThreadId;
   readonly url: URL;
   readonly type: ThreadType;
   readonly name: string;

@@ -1,10 +1,4 @@
-import {
-  createEntityAdapter,
-  createSlice,
-  EntityState,
-  PayloadAction,
-  createAsyncThunk,
-} from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -53,10 +47,7 @@ const hitCountsSlice = createSlice({
         status: LoadingState.LOADING,
       });
     },
-    hitCountsReceived: (
-      state,
-      action: PayloadAction<{ id: string; hitCounts: HitCount[] }>
-    ) => {
+    hitCountsReceived: (state, action: PayloadAction<{ id: string; hitCounts: HitCount[] }>) => {
       hitCountAdapter.upsertOne(state.hitCounts, {
         ...action.payload,
         status: LoadingState.LOADED,
@@ -91,11 +82,8 @@ export const getCacheKeyForSourceHitCounts = (
     throw `Source with ID ${sourceId} not found`;
   }
   const focusRegion = getFocusRegion(state);
-  console.log({focusRegion})
   const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
-  console.log({range})
   const rangeSection = range ? `${range.begin.point}-${range.end.point}` : "";
-  console.log({rangeSection})
   const correspondingSourceIds = sourceDetails.correspondingSourceIds;
   const correspondingSourceIdsSection = correspondingSourceIds.join("&");
 
@@ -109,7 +97,6 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
   return async (dispatch, getState, { ThreadFront }) => {
     const cacheKey = getCacheKeyForSourceHitCounts(getState(), sourceId, lineNumber);
     const status = getState().hitCounts.hitCounts.entities[cacheKey]?.status;
-    console.log({cacheKey, status})
 
     if (status === LoadingState.LOADING || status === LoadingState.LOADED) {
       return;

@@ -11,8 +11,8 @@ import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
 import StaticTooltip from "./StaticTooltip";
-import { fetchHitCounts, getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
 import { getSelectedSource } from "ui/reducers/sources";
+import { fetchHitCounts, getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -68,6 +68,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const source = useAppSelector(getSelectedSource);
   const breakpoints = useAppSelector(selectors.getBreakpointsList);
+  const focusRegion = useAppSelector(selectors.getFocusRegion);
 
   let hits: number | undefined;
 
@@ -109,7 +110,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     if (lastHoveredLineNumber.current) {
       dispatch(fetchHitCounts(source!.id, lastHoveredLineNumber.current));
     }
-  }, [dispatch, source, lastHoveredLineNumber]);
+  }, [dispatch, source, lastHoveredLineNumber, focusRegion]);
 
   useEffect(() => {
     if (hits) {

@@ -97,7 +97,6 @@ export function selectSource(
   openSourcesTab?: boolean
 ): UIThunkAction {
   return async dispatch => {
-    // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectSpecificLocation(cx, location, openSourcesTab));
@@ -132,22 +131,16 @@ export function selectLocation(
   location: PartialLocation,
   openSourcesTab = true
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
-  return async (dispatch, getState, { client, ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
-    if (!client) {
-      // No connection, do nothing. This happens when the debugger is
-      // shut down too fast and it tries to display a default source.
-      return;
-    }
-
     let source = getSourceDetails(getState(), location.sourceId);
-    // The location may contain a sourceId from another session (e.g. when the user clicks
-    // on a comment that has a source location), but a sourceId is not guaranteed
-    // to be stable across sessions (although most of the time it is).
-    // We try to work around this by comparing source URLs and, if they don't match,
-    // use the preferred source for the location's URL.
+    // The location may contain a sourceId from another session (e.g. when the
+    // user clicks on a comment that has a source location), but a sourceId is
+    // not guaranteed to be stable across sessions (although most of the time it
+    // is). We try to work around this by comparing source URLs and, if they
+    // don't match, use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
       sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
@@ -177,8 +170,8 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
-    await dispatch(experimentalLoadSourceText(source.id));
-    await dispatch(fetchBreakableLinesForSource(source.id));
+    dispatch(experimentalLoadSourceText(source.id));
+    // dispatch(fetchBreakableLinesForSource(source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));

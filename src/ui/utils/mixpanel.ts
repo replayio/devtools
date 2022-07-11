@@ -92,6 +92,7 @@ type MixpanelEvent =
   | ["share_modal.set_public"]
   | ["share_modal.set_team"]
   | ["sources.select_location"]
+  | ["sources.select"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
   | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
   | ["timeline.comment_select"]

@@ -120,7 +120,6 @@ class SourcesTree extends Component {
   selectItem = item => {
     if (item.type == "source" && !Array.isArray(item.contents)) {
       trackEvent("source_explorer.select_source");
-      console.log({ item });
       this.props.selectSource(this.props.cx, item.contents.id);
     }
   };

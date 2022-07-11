@@ -193,7 +193,7 @@ export const getSourceByUrl = (state: UIState, url: string) => {
   return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
 };
 export const getSourceContent = (state: UIState, id: string) => {
-  return state.experimentalSources.contents.entities[id];
+  return state.experimentalSources.contents.entities[id]?.value;
 };
 export const getSelectedSourceWithContent = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);

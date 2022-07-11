@@ -22,13 +22,10 @@ export const EditorPane = () => {
   const dispatch = useAppDispatch();
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const selectedSource = useAppSelector(getSelectedSource);
-  console.log({ selectedSource });
   const panelEl = useRef(null);
   const { value: enableLargeText } = useFeature("enableLargeText");
 
   const nodeWidth = useWidthObserver(panelEl);
-
-  console.log({ loadingEditor });
 
   // ExperimentFeature: LargeText Logic
   useLayoutEffect(() => {

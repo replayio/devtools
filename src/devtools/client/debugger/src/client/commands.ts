@@ -291,24 +291,6 @@ export interface SourceRange {
   end: ProtocolSourceLocation;
 }
 
-async function blackBox(
-  sourceActor: SourceActor,
-  isBlackBoxed: boolean,
-  range?: Partial<SourceRange>
-) {
-  const begin = range ? range.start : undefined;
-  const end = range ? range.end : undefined;
-  if (isBlackBoxed) {
-    await ThreadFront.unblackbox(sourceActor.actor, begin, end);
-  } else {
-    await ThreadFront.blackbox(sourceActor.actor, begin, end);
-  }
-}
-
-function interrupt(thread: any) {
-  // @ts-expect-error this function doesn't appear to exist
-  return ThreadFront.interrupt();
-}
 function setEventListenerBreakpoints(ids: string[]) {
   setEventLogpoints(ids);
 }
@@ -327,60 +309,6 @@ function logExceptions(shouldLog: boolean) {
   }
 }
 
-function pauseGrip(func: Function) {
-  // @ts-expect-error this function doesn't appear to exist
-  return ThreadFront.pauseGrip(func);
-}
-
-async function getSourceActorBreakpointPositions(
-  { actor }: { actor: string },
-  range?: SourceRange
-) {
-  const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
-  const rv: Record<number, number[]> = {};
-  linePositions.forEach(({ line, columns }) => (rv[line] = columns));
-  return rv;
-}
-
-async function getSourceActorBreakableLines({ actor }: { actor: string }) {
-  const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
-  return positions.map(({ line }) => line);
-}
-
-async function getSourceActorBreakpointHitCounts(
-  { id }: { id: string },
-  lineNumber: number,
-  focusRegion: FocusRegion | null
-) {
-  const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
-  // See `source-actors` where MAX_LINE_HITS_TO_FETCH is defined for an
-  // explanation of the bounds here.
-  const lowerBound = Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;
-  const upperBound = lowerBound + MAX_LINE_HITS_TO_FETCH;
-  const locationsToFetch = locations
-    .filter(location => location.line >= lowerBound && location.line < upperBound)
-    .map(location => ({ ...location, columns: [location.columns.sort((a, b) => a - b)[0]] }));
-
-  return {
-    max: upperBound,
-    min: lowerBound,
-    ...(await ThreadFront.getHitCounts(
-      id,
-      locationsToFetch,
-      focusRegion
-        ? {
-            beginPoint: (focusRegion as UnsafeFocusRegion).begin.point,
-            endPoint: (focusRegion as UnsafeFocusRegion).end.point,
-          }
-        : null
-    )),
-  };
-}
-
-function getFrontByID(actorID: string) {
-  return devToolsClient.getFrontByID(actorID);
-}
-
 function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }
@@ -390,43 +318,36 @@ function pickExecutionPoints(count: any, options: any) {
 }
 
 const clientCommands = {
+  addWatchpoint,
   autocomplete,
-  blackBox,
+  evaluate,
+  evaluateExpressions,
+  fetchAncestorFramePositions,
+  fetchEventTypePoints,
+  getFrameScopes,
+  getFrames,
+  getProperties,
+  hasBreakpoint,
+  loadAsyncParentFrames,
+  logExceptions,
+  navigate,
+  pickExecutionPoints,
   releaseActor,
-  interrupt,
-  pauseGrip,
+  reload,
+  removeBreakpoint,
+  removeWatchpoint,
+  removeXHRBreakpoint,
   resume,
+  reverseStepOver,
+  rewind,
+  runAnalysis,
+  setBreakpoint,
+  setEventListenerBreakpoints,
+  setXHRBreakpoint,
+  sourceContents,
   stepIn,
   stepOut,
   stepOver,
-  rewind,
-  reverseStepOver,
-  sourceContents,
-  getSourceActorBreakpointPositions,
-  getSourceActorBreakableLines,
-  getSourceActorBreakpointHitCounts,
-  hasBreakpoint,
-  setBreakpoint,
-  setXHRBreakpoint,
-  removeXHRBreakpoint,
-  addWatchpoint,
-  removeWatchpoint,
-  removeBreakpoint,
-  runAnalysis,
-  evaluate,
-  evaluateExpressions,
-  navigate,
-  reload,
-  getProperties,
-  getFrameScopes,
-  getFrames,
-  loadAsyncParentFrames,
-  logExceptions,
-  fetchEventTypePoints,
-  setEventListenerBreakpoints,
-  getFrontByID,
-  fetchAncestorFramePositions,
-  pickExecutionPoints,
 };
 
 export { setupCommands, clientCommands };

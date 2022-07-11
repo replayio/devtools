@@ -5,7 +5,6 @@ import {
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import type { UIThunkAction } from "ui/actions";
 
-import { getSources } from "../reducers/sources";
 import { formatProjectFunctions } from "../utils/quick-open";
 
 export function loadGlobalFunctions(): UIThunkAction {

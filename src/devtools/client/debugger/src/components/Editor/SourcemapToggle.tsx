@@ -23,7 +23,6 @@ export function SourcemapToggle({ selectedSource, setModal, showAlternateSource 
   if (!sourceDetails) {
     return null;
   }
-  console.log({ sourceDetails });
   if (sourceDetails.generated.length !== 1) {
     return null;
   }

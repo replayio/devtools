@@ -49,8 +49,10 @@ class EmptyLines extends Component {
   }
 }
 
+const emptyBreakableLines = [];
+
 const mapStateToProps = state => {
-  const breakableLines = getBreakableLinesForSelectedSource(state) || [];
+  const breakableLines = getBreakableLinesForSelectedSource(state) || emptyBreakableLines;
   return {
     breakableLines,
   };
