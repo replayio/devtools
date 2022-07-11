@@ -76,7 +76,6 @@ export function selectSourceURL(
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState) => {
     const source = getSourceByUrl(getState(), url);
-    console.log({ source });
     if (!source) {
       return dispatch(setPendingSelectedLocation(cx, url, options));
     }
@@ -98,7 +97,6 @@ export function selectSource(
   openSourcesTab?: boolean
 ): UIThunkAction {
   return async dispatch => {
-    console.log({ sourceId });
     // @ts-ignore Unknown Mixpanel event?
     trackEvent("sources.select");
     const location = createLocation({ ...options, sourceId });
@@ -115,7 +113,6 @@ export function deselectSource(): UIThunkAction {
 
 export function addTab(source: SourceDetails) {
   const { url, id: sourceId } = source;
-  console.log({ url, sourceId });
   const isOriginal = source.canonicalId === sourceId;
 
   return {
@@ -140,7 +137,6 @@ export function selectLocation(
     trackEvent("sources.select_location");
 
     if (!client) {
-      console.log("NO CLIENT");
       // No connection, do nothing. This happens when the debugger is
       // shut down too fast and it tries to display a default source.
       return;
@@ -159,7 +155,6 @@ export function selectLocation(
       location = { ...location, sourceId };
     }
     if (!source) {
-      console.log("NO SOURCE");
       // If there is no source we deselect the current selected source
       return dispatch(clearSelectedLocation(cx));
     }
@@ -169,8 +164,6 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
-    console.log({ source });
-    console.log(tabExists(getState(), source.id));
     if (!tabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
@@ -184,7 +177,6 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
-    console.log({ source });
     await dispatch(experimentalLoadSourceText(source.id));
     await dispatch(fetchBreakableLinesForSource(source.id));
     // Set shownSource to null first, then the actual source to trigger
