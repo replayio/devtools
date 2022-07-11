@@ -40,7 +40,7 @@ import {
 } from "../reducers/app";
 
 import { toggleFocusMode } from "./timeline";
-import { isEqual } from "lodash";
+import isEqual from "lodash/isEqual";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";

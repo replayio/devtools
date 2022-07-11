@@ -10,7 +10,7 @@ function Title({ metadata }: { metadata: RecordingMetadata }) {
     metadata?.source?.merge?.title || metadata?.source?.commit.title || metadata?.test?.title || "";
   const formatted = title.length > 80 ? title.slice(0, 80) + "..." : title;
   return (
-    <div className="flex pr-2 overflow-hidden font-medium wrap shrink grow-0 flex-nowrap text-ellipsis">
+    <div className="wrap flex shrink grow-0 flex-nowrap overflow-hidden text-ellipsis pr-2 font-medium">
       {formatted}
     </div>
   );
@@ -71,10 +71,10 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
       target="_blank"
     >
       <div
-        className={`flex flex-row items-center px-3 py-3 space-x-3 border-b overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
+        className={`flex cursor-pointer flex-row items-center space-x-3 overflow-hidden rounded-sm border-b px-3 py-3 ${styles.libraryRow}`}
       >
         <Status test={recording.metadata.test} />
-        <div className="flex flex-col flex-grow space-y-2">
+        <div className="flex flex-grow flex-col space-y-2">
           <div className="flex flex-row justify-between">
             <Title metadata={recording.metadata} />
           </div>

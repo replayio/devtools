@@ -24,6 +24,7 @@ import { context } from "ui/setup/redux/middleware/context";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 import hitCounts from "ui/reducers/hitCounts";
+import breakableLines from "ui/reducers/breakableLines";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;

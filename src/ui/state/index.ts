@@ -18,7 +18,6 @@ import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/selectors";
 import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
-import type { SourcesState } from "devtools/client/debugger/src/reducers/sources";
 import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";
 import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
@@ -63,7 +62,6 @@ export interface UIState {
   reactDevTools: ReactDevToolsState;
   rules: RulesState;
   sourceTree: SourceTreeState;
-  sources: SourcesState;
   tabs: TabsState;
   threads: ThreadsState;
   timeline: TimelineState;
