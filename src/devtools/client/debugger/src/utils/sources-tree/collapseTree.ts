@@ -6,10 +6,12 @@
 
 import { createDirectoryNode } from "./utils";
 
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+
 /**
  * Take an existing source tree, and return a new one with collapsed nodes.
  */
-function _collapseTree(node, depth) {
+function _collapseTree(node: TreeNode, depth: number): TreeNode {
   // Node is a folder.
   if (node.type === "directory") {
     if (!Array.isArray(node.contents)) {
@@ -45,7 +47,7 @@ function _collapseTree(node, depth) {
   return node;
 }
 
-export function collapseTree(node) {
+export function collapseTree(node: TreeNode) {
   const tree = _collapseTree(node, 0);
   return tree;
 }

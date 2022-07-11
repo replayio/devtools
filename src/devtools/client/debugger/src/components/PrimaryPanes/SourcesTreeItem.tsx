@@ -5,9 +5,12 @@
 //
 
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
+
 import { showMenu } from "devtools/shared/contextmenu";
+import type { UIState } from "ui/state";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
 
 import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
@@ -31,10 +34,45 @@ import {
 } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
-import { downloadFile } from "../../utils/utils";
 import { isFulfilled } from "../../utils/async-value";
 
-class SourceTreeItem extends Component {
+type $FixTypeLater = any;
+
+interface STIProps {
+  item: $FixTypeLater;
+  depth: number;
+  focused: boolean;
+  autoExpand: boolean;
+  expanded: boolean;
+  focusItem: (item: $FixTypeLater) => void;
+  selectItem: (item: $FixTypeLater) => void;
+  source: Source;
+  debuggeeUrl: string;
+  setExpanded: (item: $FixTypeLater, a: boolean, b: boolean) => void;
+}
+
+const mapStateToProps = (state: UIState, props: STIProps) => {
+  const { source, item } = props;
+  return {
+    cx: getContext(state),
+    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
+    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
+    sourceContent: source ? getSourceContentValue(state, source) : null,
+    extensionName:
+      (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
+  };
+};
+
+const connector = connect(mapStateToProps, {
+  toggleBlackBox: actions.toggleBlackBox,
+  loadSourceText: actions.loadSourceText,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type FinalSTIProps = PropsFromRedux & STIProps;
+
+class SourceTreeItem extends Component<FinalSTIProps> {
   componentDidMount() {
     const { autoExpand, item } = this.props;
     if (autoExpand) {
@@ -42,7 +80,7 @@ class SourceTreeItem extends Component {
     }
   }
 
-  onClick = e => {
+  onClick = () => {
     const { item, focusItem, selectItem } = this.props;
 
     focusItem(item);
@@ -51,7 +89,7 @@ class SourceTreeItem extends Component {
     }
   };
 
-  onContextMenu = (event, item) => {
+  onContextMenu = (event: React.MouseEvent, item: $FixTypeLater) => {
     const copySourceUri2Label = "Copy source URI";
     const copySourceUri2Key = "u";
 
@@ -94,22 +132,7 @@ class SourceTreeItem extends Component {
     showMenu(event, menuOptions);
   };
 
-  handleDownloadFile = async (cx, source, item) => {
-    if (!source) {
-      return;
-    }
-
-    if (!this.props.sourceContent) {
-      await this.props.loadSourceText({ cx, source });
-    }
-    const data = this.props.sourceContent;
-    if (!data) {
-      return;
-    }
-    downloadFile(data, item.name);
-  };
-
-  addCollapseExpandAllOptions = (menuOptions, item) => {
+  addCollapseExpandAllOptions = (menuOptions: $FixTypeLater[], item: $FixTypeLater) => {
     const { setExpanded } = this.props;
 
     menuOptions.push({
@@ -136,7 +159,7 @@ class SourceTreeItem extends Component {
     );
   }
 
-  renderIcon(item, depth) {
+  renderIcon(item: $FixTypeLater, depth: number) {
     const { source, hasPrettySource } = this.props;
 
     if (item.name === "webpack://") {
@@ -164,13 +187,13 @@ class SourceTreeItem extends Component {
     }
 
     if (source) {
-      return <SourceIcon source={source} shouldHide={icon => icon === "extension"} />;
+      return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;
     }
 
     return null;
   }
 
-  renderItemName(depth) {
+  renderItemName(depth: number) {
     const { item, extensionName } = this.props;
 
     if (isExtensionDirectory(depth, extensionName)) {
@@ -231,37 +254,21 @@ class SourceTreeItem extends Component {
   }
 }
 
-function getHasMatchingGeneratedSource(state, source) {
+function getHasMatchingGeneratedSource(state: UIState, source?: Source) {
   if (!source) {
     return false;
   }
 
-  return !!getGeneratedSourceByURL(state, source.url);
+  return !!getGeneratedSourceByURL(state, source.url!);
 }
 
-function getSourceContentValue(state, source) {
+function getSourceContentValue(state: UIState, source: Source) {
   const content = getSourceContent(state, source.id);
   return content && isFulfilled(content) ? content.value : null;
 }
 
-function isExtensionDirectory(depth, extensionName) {
+function isExtensionDirectory(depth: number, extensionName: string | null) {
   return extensionName && (depth === 1 || depth === 0);
 }
 
-const mapStateToProps = (state, props) => {
-  const { source, item } = props;
-  return {
-    cx: getContext(state),
-    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
-    sourceContent: source ? getSourceContentValue(state, source) : null,
-    extensionName:
-      (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
-  };
-};
-
-export default connect(mapStateToProps, {
-  toggleBlackBox: actions.toggleBlackBox,
-  loadSourceText: actions.loadSourceText,
-})(SourceTreeItem);
+export default connector(SourceTreeItem);

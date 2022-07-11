@@ -4,16 +4,20 @@
 
 //
 
-import { parse } from "../../utils/url";
+import { parse } from "../url";
 
-import { isPretty } from "../source";
-import { getURL } from "./getURL";
+import type { Source } from "../../reducers/sources";
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 
-export function nodeHasChildren(item) {
+// Additional TS types ported from Mozilla Flow types:
+// https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/utils/sources-tree
+export type SourcesMap = Record<string, Source>;
+
+export function nodeHasChildren(item: TreeNode) {
   return item.type == "directory" && Array.isArray(item.contents);
 }
 
-export function isExactUrlMatch(pathPart, debuggeeUrl) {
+export function isExactUrlMatch(pathPart: string, debuggeeUrl: string) {
   // compare to hostname with an optional 'www.' prefix
   const { host } = parse(debuggeeUrl);
   if (!host) {
@@ -22,7 +26,7 @@ export function isExactUrlMatch(pathPart, debuggeeUrl) {
   return host === pathPart || host.replace(/^www\./, "") === pathPart.replace(/^www\./, "");
 }
 
-export function isPathDirectory(path) {
+export function isPathDirectory(path: string) {
   // Assume that all urls point to files except when they end with '/'
   // Or directory node has children
 
@@ -54,27 +58,31 @@ export function isPathDirectory(path) {
   }
 }
 
-export function isDirectory(item) {
+export function isDirectory(item: TreeNode) {
   return (item.type === "directory" || isPathDirectory(item.path)) && item.name != "(index)";
 }
 
-export function getSourceFromNode(item) {
+export function getSourceFromNode(item: TreeNode) {
   const { contents } = item;
   if (!isDirectory(item) && !Array.isArray(contents)) {
     return contents;
   }
 }
 
-export function isSource(item) {
+export function isSource(item: TreeNode) {
   return item.type === "source";
 }
 
-export function partIsFile(index, parts, url) {
+export function partIsFile(index: number, parts: string[], url: TreeNode) {
   const isLastPart = index === parts.length - 1;
   return isLastPart && !isDirectory(url);
 }
 
-export function createDirectoryNode(name, path, contents) {
+export function createDirectoryNode(
+  name: string,
+  path: string,
+  contents: TreeNode[]
+): TreeDirectory {
   return {
     type: "directory",
     name,
@@ -83,7 +91,7 @@ export function createDirectoryNode(name, path, contents) {
   };
 }
 
-export function createSourceNode(name, path, contents) {
+export function createSourceNode(name: string, path: string, contents: Source): TreeSource {
   return {
     type: "source",
     name,
@@ -92,10 +100,10 @@ export function createSourceNode(name, path, contents) {
   };
 }
 
-export function createParentMap(tree) {
+export function createParentMap(tree: TreeNode) {
   const map = new WeakMap();
 
-  function _traverse(subtree) {
+  function _traverse(subtree: TreeNode) {
     if (subtree.type === "directory") {
       for (const child of subtree.contents) {
         map.set(child, subtree);
@@ -113,7 +121,7 @@ export function createParentMap(tree) {
   return map;
 }
 
-export function getRelativePath(url) {
+export function getRelativePath(url: string) {
   const { pathname } = parse(url);
   if (!pathname) {
     return url;
@@ -123,12 +131,12 @@ export function getRelativePath(url) {
   return index !== -1 ? pathname.slice(index + 1) : "";
 }
 
-export function getRelativePathWithoutFile(url) {
+export function getRelativePathWithoutFile(url: string) {
   const path = getRelativePath(url);
   return path.slice(0, path.lastIndexOf("/"));
 }
 
-export function getPathWithoutThread(path) {
+export function getPathWithoutThread(path: string) {
   const pathParts = path.split(/(context\d+?\/)/).splice(2);
   if (pathParts && pathParts.length > 0) {
     return pathParts.join("");

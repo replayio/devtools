@@ -9,7 +9,13 @@ import { collapseTree } from "./collapseTree";
 import { createDirectoryNode, createParentMap } from "./utils";
 import { getDomain } from "./treeOrder";
 
-function getSourcesToAdd(newSources, prevSources) {
+import type { Source } from "../../reducers/sources";
+import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import type { ParsedUrl } from "./getURL";
+
+type SourcesMap = Record<string, Source>;
+
+function getSourcesToAdd(newSources: SourcesMap, prevSources: SourcesMap) {
   const sourcesToAdd = [];
 
   for (const sourceId in newSources) {
@@ -23,7 +29,7 @@ function getSourcesToAdd(newSources, prevSources) {
   return sourcesToAdd;
 }
 
-export function createTree({ debuggeeUrl, sources }) {
+export function createTree({ debuggeeUrl, sources }: { debuggeeUrl: string; sources: SourcesMap }) {
   const uncollapsedTree = createDirectoryNode("root", "", []);
 
   return updateTree({
@@ -34,13 +40,27 @@ export function createTree({ debuggeeUrl, sources }) {
   });
 }
 
-export function updateTree({ newSources, prevSources, debuggeeUrl, uncollapsedTree }) {
+interface UpdateTreeArgs {
+  newSources: SourcesMap;
+  prevSources: SourcesMap;
+  uncollapsedTree: TreeDirectory;
+  debuggeeUrl: string;
+  sourceTree?: TreeNode;
+}
+
+export function updateTree({
+  newSources,
+  prevSources,
+  debuggeeUrl,
+  uncollapsedTree,
+}: UpdateTreeArgs) {
   const debuggeeHost = getDomain(debuggeeUrl);
 
+  // @ts-expect-error This used to be nested records - somehow it still works?
   const sourcesToAdd = getSourcesToAdd(Object.values(newSources), Object.values(prevSources));
 
   for (const source of sourcesToAdd) {
-    addToTree(uncollapsedTree, source, debuggeeHost);
+    addToTree(uncollapsedTree, source, debuggeeHost!);
   }
 
   const newSourceTree = collapseTree(uncollapsedTree);

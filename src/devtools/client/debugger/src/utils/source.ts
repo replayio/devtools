@@ -110,7 +110,7 @@ export function getPrettySourceURL(url?: string) {
   return `${url}:formatted`;
 }
 
-export function getFileExtension(source?: Source) {
+export function getFileExtension(source: Source) {
   const { path } = getURL(source);
   if (!path) {
     return "";
@@ -120,7 +120,7 @@ export function getFileExtension(source?: Source) {
   return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
 }
 
-export function isNotJavaScript(source?: Source) {
+export function isNotJavaScript(source: Source) {
   return ["css", "svg", "png"].includes(getFileExtension(source));
 }
 
@@ -259,7 +259,6 @@ export function getSourcePath(url?: UrlResult): string {
     return "";
   }
 
-  // @ts-expect-error path field mismatch
   const { path, href } = parseURL(url);
   // for URLs like "about:home" the path is null so we pass the full href
   return path || href;
