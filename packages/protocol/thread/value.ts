@@ -72,7 +72,6 @@ export class ValueFront {
     } else if ("uninitialized" in protocolValue) {
       this._uninitialized = true;
     } else if ("unavailable" in protocolValue) {
-      console.log({ protocolValue });
       this._unavailable = true;
     } else {
       // When there are no keys the value is undefined.

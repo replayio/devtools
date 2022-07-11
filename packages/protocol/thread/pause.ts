@@ -345,19 +345,13 @@ export class Pause {
     // properly.
     let scopeChain = await this.ensureScopeChain(frame.scopeChain);
     let originalScopesUnavailable = false;
-    console.log(this.ThreadFront.hasPreferredGeneratedSource(frame.location));
     if (frame.originalScopeChain && !this.ThreadFront.hasPreferredGeneratedSource(frame.location)) {
       const originalScopeChain = await this.ensureScopeChain(frame.originalScopeChain);
 
-      console.log({ originalScopeChain });
       // if all original variables are unavailable (usually due to sourcemap issues),
       // we show the generated scope chain with a warning message instead
       originalScopesUnavailable = originalScopeChain.every(scope =>
-        (scope.bindings || []).every(binding => {
-          const result = binding.value.isUnavailable();
-          console.log({ result, binding });
-          return result;
-        })
+        (scope.bindings || []).every(binding => binding.value.isUnavailable())
       );
       if (!originalScopesUnavailable) {
         scopeChain = originalScopeChain;

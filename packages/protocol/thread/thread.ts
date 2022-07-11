@@ -450,7 +450,7 @@ export class _ThreadFront {
   }
 
   async getSourceURL(sourceId: SourceId) {
-    this.ensureAllSources();
+    await this.ensureAllSources();
     return this.sources.get(sourceId)?.url;
   }
 
@@ -1087,7 +1087,7 @@ export class _ThreadFront {
   }
 
   async getAlternateLocation(locations: MappedLocation) {
-    this.ensureAllSources();
+    await this.ensureAllSources();
     const { alternateId } = this._chooseSourceId(locations.map(l => l.sourceId));
     if (alternateId) {
       return locations.find(l => l.sourceId == alternateId);

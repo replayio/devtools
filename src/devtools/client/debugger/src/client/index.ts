@@ -30,8 +30,6 @@ export async function loadInitialState() {
 let boundActions: typeof actions;
 let store: UIStore;
 
-type $FixTypeLater = any;
-
 async function setupDebugger() {
   const sources: newSource[] = [];
   await ThreadFront.findSources(newSource => {
