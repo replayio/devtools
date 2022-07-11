@@ -1,4 +1,3 @@
-import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import minBy from "lodash/minBy";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -14,6 +13,7 @@ import { shouldShowNag } from "ui/utils/user";
 import StaticTooltip from "./StaticTooltip";
 import { fetchHitCounts, getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
 import { getSelectedSource } from "ui/reducers/sources";
+import { last } from "lodash";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -91,8 +91,6 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       if (lineNumber !== lastHoveredLineNumber.current) {
         lastHoveredLineNumber.current = lineNumber;
       }
-      dispatch(fetchHitCounts(source!.id, lineNumber));
-      dispatch(updateHoveredLineNumber(lineNumber));
       setTargetNode(lineNumberNode);
     };
     const clearHoveredLineNumber = () => {
@@ -107,6 +105,12 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
     };
   }, [dispatch, editor.codeMirror, source]);
+
+  useEffect(() => {
+    if (lastHoveredLineNumber.current) {
+      dispatch(fetchHitCounts(source!.id, lastHoveredLineNumber.current));
+    }
+  }, [dispatch, source, lastHoveredLineNumber]);
 
   useEffect(() => {
     if (hits) {
