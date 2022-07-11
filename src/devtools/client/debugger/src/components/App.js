@@ -13,7 +13,7 @@ import A11yIntention from "./A11yIntention";
 import { getPaneCollapse } from "../selectors";
 
 import { getSelectedPanel } from "ui/reducers/layout";
-import { getSelectedSourceDetails } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 

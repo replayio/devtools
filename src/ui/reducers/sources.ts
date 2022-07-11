@@ -181,9 +181,6 @@ export const getSelectedSource = (state: UIState) => {
   console.log({ selectedSourceId });
   return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
 };
-// This is a selector we used to have, so for the sake of making it easier to
-// port old code I've aliased it.
-export const getSelectedSource = getSelectedSource;
 export const getSourcesById = (state: UIState, ids: string[]) => {
   return ids.map(
     id => sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)!

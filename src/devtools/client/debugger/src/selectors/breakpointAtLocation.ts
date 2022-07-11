@@ -4,22 +4,20 @@
 
 import type { UIState } from "ui/state";
 
-import type { Source } from "../reducers/sources";
 import type { Breakpoint, Position } from "../reducers/types";
 
-import { getSelectedSource } from "../reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
 
-function getColumn(column: number, selectedSource: Source) {
+function getColumn(column: number, selectedSource: SourceDetails) {
   return column;
 }
 
-function getLocation(bp: Breakpoint, selectedSource: Source) {
+function getLocation(bp: Breakpoint, selectedSource: SourceDetails) {
   return bp.location;
 }
 
-function getBreakpointsForSource(state: UIState, selectedSource: Source) {
+function getBreakpointsForSource(state: UIState, selectedSource: SourceDetails) {
   const breakpoints = getBreakpointsList(state);
 
   return breakpoints.filter(bp => {
@@ -30,7 +28,7 @@ function getBreakpointsForSource(state: UIState, selectedSource: Source) {
 
 function findBreakpointAtLocation(
   breakpoints: Breakpoint[],
-  selectedSource: Source,
+  selectedSource: SourceDetails,
   { line, column }: Position
 ) {
   return breakpoints.find(breakpoint => {

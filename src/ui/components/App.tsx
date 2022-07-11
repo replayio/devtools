@@ -1,6 +1,6 @@
 import React, { ReactNode, useEffect, createContext } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useAppSelector } from "ui/setup/hooks";
 import { isTest } from "ui/utils/environment";
 import { actions } from "ui/actions";
 import { ModalType } from "ui/state/app";

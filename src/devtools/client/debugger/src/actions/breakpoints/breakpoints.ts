@@ -4,7 +4,7 @@ import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -18,15 +18,12 @@ import {
   removeBreakpoints as removeBreakpointsAction,
 } from "../../reducers/breakpoints";
 import { setBreakpoint } from "../../reducers/breakpoints";
-import { Source } from "../../reducers/sources";
 import { PrefixBadge } from "../../reducers/types";
 import {
   getBreakpointsList,
-  getSelectedSource,
   getBreakpointAtLocation,
   getFirstBreakpointPosition,
   getSymbols,
-  getThreadContext,
 } from "../../selectors";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
@@ -84,7 +81,7 @@ export function removeBreakpoint(
 
 export function removeBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: SourceDetails
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
@@ -111,7 +108,7 @@ export function removeBreakpointsInSource(
  */
 export function disableBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: SourceDetails
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
@@ -131,7 +128,7 @@ export function disableBreakpointsInSource(
  */
 export function enableBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: SourceDetails
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     trackEvent("breakpoints.remove_all_in_source");
