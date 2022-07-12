@@ -828,7 +828,7 @@ export class _ThreadFront {
     loadedRegions: loadedRegions
   ) {
     // Don't allow resumes until we've finished loading and did the initial
-    // warp to the endpoint.
+    // warp to point.
     await this.initializedWaiter.promise;
 
     let resumeEmitted = false;
