@@ -28,7 +28,6 @@ import { compareNumericStrings } from "protocol/utils";
 import { UIThunkAction } from "ui/actions";
 import { setMultiSourceLogpoint } from "ui/actions/logpoint";
 
-
 export enum AnalysisStatus {
   // Happy path
   Created = "Created",
@@ -188,7 +187,7 @@ const breakpointsSlice = createSlice({
         },
       });
     },
-    breakpointRemoved(state, action: PayloadAction<StableLocation>) {
+    breakpointRemoved(state, action: PayloadAction<Location>) {
       const id = getLocationKey(action.payload);
       breakpointsAdapter.removeOne(state.breakpoints, id);
       mappingsAdapter.removeOne(state.analysisMappings, id);
@@ -466,8 +465,11 @@ export function setBreakpointOptions(
   };
 }
 
-export function removeBreakpoint(): UIThunkAction {
-  return async (dispatch, getState) => {};
+export function removeBreakpoint(location: Location): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    await ThreadFront.removeBreakpoint(location.sourceId, location.line, location.column);
+    dispatch(breakpointRemoved(location));
+  };
 }
 
 export function getBreakpointsForSource(state: UIState, sourceId: string, line?: number) {

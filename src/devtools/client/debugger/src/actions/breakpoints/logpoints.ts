@@ -6,7 +6,12 @@ import { SourceDetails } from "ui/reducers/sources";
 import { isBreakable } from "../../utils/breakpoint";
 
 import { _addBreakpointAtLine } from "./breakpoints";
-import { getBreakpointsForSelectedSource, getLogpointsForSource } from "ui/reducers/breakpoints";
+import {
+  getBreakpointsForSelectedSource,
+  getLogpointsForSource,
+  removeBreakpoint,
+  setBreakpointOptions,
+} from "ui/reducers/breakpoints";
 import { Breakpoint } from "../../reducers/types";
 
 export function removeLogpointsInSource(cx: Context, source: SourceDetails): UIThunkAction {
@@ -41,14 +46,11 @@ export function addLogpoint(cx: Context, line: number): UIThunkAction {
 }
 
 export function removeLogpoint(cx: Context, bp: Breakpoint): UIThunkAction {
-  // TODO @jcmorrow fix this.
   return dispatch => {
     if (isBreakable(bp)) {
-      // Keep the breakpoint while removing the log value from its options,
-      // so that the breakable breakpoint remains.
-      // dispatch(removeBreakpointOption(cx, bp, "logValue"));
+      dispatch(setBreakpointOptions(bp.location, { logValue: null }));
     } else {
-      // dispatch(removeBreakpoint(cx, bp));
+      dispatch(removeBreakpoint(bp.location));
     }
   };
 }

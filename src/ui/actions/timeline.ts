@@ -1,5 +1,5 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
-import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
+import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
@@ -42,10 +42,6 @@ import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import {
-  getAnalysisMappingForLocation,
-  getStatusFlagsForAnalysisEntry,
-} from "devtools/client/debugger/src/selectors";
-import {
   displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   isTimeInRegions,
@@ -61,6 +57,10 @@ import {
 import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 import { UIState } from "ui/state";
+import {
+  getAnalysisMappingForLocation,
+  getStatusFlagsForAnalysisEntry,
+} from "ui/reducers/breakpoints";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -610,7 +610,6 @@ const shouldRerunAnalysisForBreakpoint = (
   //    If we don't need to re-run analysis after zooming in, then we won't need to refetch after zooming back out either,
   //    (unless our fetches have overflowed at some point).
 
-  // @ts-expect-error Location type mismatches
   const mappingEntry = getAnalysisMappingForLocation(state, bp.location);
   if (!mappingEntry) {
     return true;
