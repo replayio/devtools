@@ -5,7 +5,7 @@
 import zip from "lodash/zip";
 import type { UIThunkAction } from "ui/actions";
 
-import { getSourceByActorId, getSelectedFrame } from "../../selectors";
+import { getSelectedFrame } from "../../selectors";
 
 type $FixTypeLater = any;
 
@@ -23,7 +23,7 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
     const { sourceId: protocolSourceId } = await ThreadFront.getPreferredLocation(
       positions[0].frame!
     );
-    const sourceId = getSourceByActorId(getState(), protocolSourceId)?.id;
+    const sourceId = protocolSourceId;
 
     if (!sourceId) {
       return;

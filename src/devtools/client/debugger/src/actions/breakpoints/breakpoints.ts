@@ -149,7 +149,6 @@ export function toggleBreakpointAtLine(line: number): UIThunkAction {
     }
 
     const options = {
-      shouldLog: true,
       logValue: getLogValue(selectedSource, state, location),
     };
 

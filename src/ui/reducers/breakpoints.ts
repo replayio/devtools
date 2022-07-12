@@ -16,12 +16,8 @@ import type {
   BreakpointOptions,
   StableLocation,
 } from "devtools/client/debugger/src/reducers/types";
-import { AnalysisError } from "protocol/thread/analysis";
-import {
-  isLogpoint,
-  isMatchingLocation,
-  stableIdForLocation,
-} from "devtools/client/debugger/src/utils/breakpoint";
+import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { isLogpoint, isMatchingLocation } from "devtools/client/debugger/src/utils/breakpoint";
 import { getSelectedSource, getStableLocationForLocation, LoadingState } from "./sources";
 import { getLocationKey } from "./possibleBreakpoints";
 import { UIState } from "ui/state";
@@ -30,6 +26,8 @@ import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
 import uniqBy from "lodash/uniqBy";
 import { compareNumericStrings } from "protocol/utils";
 import { UIThunkAction } from "ui/actions";
+import { setMultiSourceLogpoint } from "ui/actions/logpoint";
+
 
 export enum AnalysisStatus {
   // Happy path
@@ -149,7 +147,7 @@ const breakpointsSlice = createSlice({
       state,
       action: PayloadAction<{ location: StableLocation; options: BreakpointOptions }>
     ) {
-      const id = stableIdForLocation(action.payload.location);
+      const id = getLocationKey(action.payload.location);
       const breakpoint: Breakpoint = {
         disabled: false,
         id,
@@ -170,7 +168,7 @@ const breakpointsSlice = createSlice({
       state,
       action: PayloadAction<{ location: StableLocation; serverId: string }>
     ) {
-      const id = stableIdForLocation(action.payload.location);
+      const id = getLocationKey(action.payload.location);
       breakpointsAdapter.updateOne(state.breakpoints, {
         id,
         changes: {
@@ -181,7 +179,7 @@ const breakpointsSlice = createSlice({
       });
     },
     breakpointErrored(state, action: PayloadAction<{ location: StableLocation; error: string }>) {
-      const id = stableIdForLocation(action.payload.location);
+      const id = getLocationKey(action.payload.location);
       breakpointsAdapter.updateOne(state.breakpoints, {
         id,
         changes: {
@@ -191,7 +189,7 @@ const breakpointsSlice = createSlice({
       });
     },
     breakpointRemoved(state, action: PayloadAction<StableLocation>) {
-      const id = stableIdForLocation(action.payload);
+      const id = getLocationKey(action.payload);
       breakpointsAdapter.removeOne(state.breakpoints, id);
       mappingsAdapter.removeOne(state.analysisMappings, id);
     },
@@ -400,9 +398,8 @@ export function addBreakpoint(
   return async (dispatch, getState, { ThreadFront }) => {
     const stableLocation = getStableLocationForLocation(getState(), location);
     const combinedOptions = {
-      shouldLog: true,
       shouldPause: false,
-      logGroupId: stableIdForLocation(stableLocation),
+      logGroupId: getLocationKey(stableLocation),
       ...options,
     };
     dispatch(breakpointRequested({ location: stableLocation, options: combinedOptions }));
@@ -414,9 +411,58 @@ export function addBreakpoint(
         combinedOptions.condition || undefined
       );
     }
+    if (combinedOptions.logValue) {
+      const sourceIds = ThreadFront.getCorrespondingSourceIds(location.sourceId);
+      const { line, column } = location;
+      const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+      dispatch(
+        setMultiSourceLogpoint(
+          combinedOptions.logGroupId!,
+          locations,
+          combinedOptions.logValue,
+          combinedOptions.condition || ""
+        )
+      );
+    }
     // I don't think we get the server ID back from threadfront. I don't think
     // we really need it though.
     dispatch(breakpointCreated({ location: stableLocation, serverId: "unknown" }));
+  };
+}
+
+export function setBreakpointOptions(
+  location: Location,
+  options: Partial<BreakpointOptions>
+): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const key = getLocationKey(location);
+    const existing = getState().breakpoints.breakpoints.entities[key];
+    if (!existing) {
+      return;
+    }
+
+    const combinedOptions = {
+      ...existing.options,
+      ...options,
+    };
+    breakpointsAdapter.updateOne(getState().breakpoints.breakpoints, {
+      id: key,
+      changes: { options: combinedOptions },
+    });
+
+    if (combinedOptions.logValue) {
+      const sourceIds = ThreadFront.getCorrespondingSourceIds(location.sourceId);
+      const { line, column } = location;
+      const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));
+      dispatch(
+        setMultiSourceLogpoint(
+          combinedOptions.logGroupId!,
+          locations,
+          combinedOptions.logValue!,
+          combinedOptions.condition || ""
+        )
+      );
+    }
   };
 }
 
@@ -492,7 +538,7 @@ const customAnalysisResultComparator = (
   return result;
 };
 
-export const getAnalysisMappingForLocation = (state: UIState, location: Location | null) => {
+export const getAnalysisMappingForLocation = (state: UIState, location: StableLocation | null) => {
   if (!location) {
     return undefined;
   }

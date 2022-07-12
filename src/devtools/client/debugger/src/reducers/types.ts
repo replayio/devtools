@@ -108,6 +108,7 @@ export type ASTLocation = {
 // stable across sessions. Instead, we use URLs with content-hashes to identify
 // sources when storing locations that might be used across sessions.
 export interface StableLocation extends SourceLocation {
+  column: number;
   contentHash: string;
   kind: SourceKind;
   url: string;

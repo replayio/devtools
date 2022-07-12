@@ -1,18 +1,15 @@
 import React, { PureComponent } from "react";
 import classnames from "classnames";
 import { connect } from "react-redux";
-const { getContext } = require("devtools/client/debugger/src/selectors");
 import PanelForm, { SubmitButton } from "./PanelForm";
-import actions from "devtools/client/debugger/src/actions";
-import { UIState } from "ui/state";
+import { setBreakpointOptions } from "ui/reducers/breakpoints";
 
 interface Props {
   showCondition: boolean;
   setShowCondition: (value: boolean) => void;
   toggleEditingOff: () => void;
-  cx: any;
   breakpoint: any;
-  setBreakpointOptions: (cx: any, location: any, options: any) => void;
+  setBreakpointOptions: (location: any, options: any) => void;
   inputToFocus: "condition" | "logValue";
 }
 interface State {
@@ -41,14 +38,8 @@ class PanelEditor extends PureComponent<Props, State> {
   hasError = () => !!this.state.logSyntaxError || this.state.conditionSyntaxError;
 
   handleSetBreakpoint = async () => {
-    const {
-      showCondition,
-      toggleEditingOff,
-      cx,
-      breakpoint,
-      setBreakpointOptions,
-      setShowCondition,
-    } = this.props;
+    const { showCondition, toggleEditingOff, breakpoint, setBreakpointOptions, setShowCondition } =
+      this.props;
     const { logValue, condition } = this.state;
     const newOptions: { logValue: string; condition?: string; prefixBadge?: string } = {
       logValue: stripTrailingSemiColon(logValue),
@@ -82,7 +73,7 @@ class PanelEditor extends PureComponent<Props, State> {
       newOptions.prefixBadge = breakpoint.options.prefixBadge;
     }
 
-    setBreakpointOptions(cx, breakpoint.location, newOptions);
+    setBreakpointOptions(breakpoint.location, newOptions);
   };
 
   setLogValue = (value: string) => this.setState({ logValue: value });
@@ -129,6 +120,6 @@ class PanelEditor extends PureComponent<Props, State> {
   }
 }
 
-export default connect((state: UIState) => ({ cx: getContext(state) }), {
-  setBreakpointOptions: actions.setBreakpointOptions,
+export default connect(null, {
+  setBreakpointOptions,
 })(PanelEditor);

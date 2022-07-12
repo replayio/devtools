@@ -15,17 +15,17 @@ import { getFilename } from "../utils/source";
 import { getBreakpointsList } from "./breakpoints";
 
 function getBreakpointsForSource(
-  source: Source,
-  selectedSource: Source,
+  source: SourceDetails,
+  selectedSource: SourceDetails,
   breakpoints: Breakpoint[]
 ) {
   return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == source.id);
 }
 
 export const findBreakpointSources = (state: UIState) => {
-  // const breakpoints = getBreakpointsList(state);
-  // const sources = getAllSourceDetails(state);
-  // const selectedSource = getSelectedSource(state)!;
+  const breakpoints = getBreakpointsList(state);
+  const sources = getAllSourceDetails(state);
+  const selectedSource = getSelectedSource(state)!;
   return [];
 };
 

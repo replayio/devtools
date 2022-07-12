@@ -15,6 +15,7 @@ import { LoadingState } from "ui/reducers/possibleBreakpoints";
 /*
  * Finds the breakpoints, which appear in the selected source.
  */
+console.log({ getSelectedSource });
 export const getVisibleBreakpoints = createSelector(
   getSelectedSource,
   getBreakpointsList,

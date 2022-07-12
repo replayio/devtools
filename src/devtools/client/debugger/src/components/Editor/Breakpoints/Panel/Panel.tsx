@@ -21,6 +21,7 @@ import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { getAnalysisPointsForLocation } from "ui/reducers/breakpoints";
+import { useAppSelector } from "ui/setup/hooks";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -29,23 +30,6 @@ function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
 
   return editor.getScrollInfo().clientWidth - panelIndent;
 }
-
-const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
-      state,
-      // @ts-expect-error Location vs SourceLocation
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
-    currentTime: selectors.getCurrentTime(state),
-    executionPoint: getExecutionPoint(state),
-  }),
-  {
-    setHoveredItem: actions.setHoveredItem,
-    clearHoveredItem: actions.clearHoveredItem,
-  }
-);
 
 type $FixTypeLater = any;
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -57,7 +41,6 @@ type PanelProps = PropsFromRedux & {
 };
 
 function Panel({
-  analysisPoints,
   breakpoint,
   currentTime,
   editor,
@@ -71,6 +54,9 @@ function Panel({
   const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
   const dismissNag = hooks.useDismissNag();
+  const analysisPoints = useAppSelector(state =>
+    getAnalysisPointsForLocation(state, breakpoint!.location, breakpoint!.options.condition)
+  );
   const points = analysisPoints?.data;
   const error = analysisPoints?.error;
   const pausedOnHit = !!points?.some(
@@ -169,5 +155,16 @@ function Panel({
     </Widget>
   );
 }
+
+const connector = connect(
+  (state: UIState) => ({
+    currentTime: selectors.getCurrentTime(state),
+    executionPoint: getExecutionPoint(state),
+  }),
+  {
+    setHoveredItem: actions.setHoveredItem,
+    clearHoveredItem: actions.clearHoveredItem,
+  }
+);
 
 export default connector(Panel);

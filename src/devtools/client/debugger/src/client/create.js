@@ -10,12 +10,11 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     return null;
   }
 
-  const { clientCommands } = await import("./commands");
   const { ThreadFront } = await import("protocol/thread");
 
   const { sourceId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
   const location = {
-    sourceId: clientCommands.getSourceForActor(sourceId),
+    sourceId: sourceId,
     line,
     column,
   };

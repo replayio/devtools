@@ -6,12 +6,13 @@ import type { UIThunkAction } from "ui/actions";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { Pause } from "protocol/thread/pause";
 
-import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
+import { getSelectedFrame, getThreadContext } from "../../selectors";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
 import { isPointInLoadedRegion } from "ui/reducers/app";
+import { getSelectedLocation } from "ui/reducers/sources";
 
 // How many times to fetch an async set of parent frames.
 const MaxAsyncFrames = 5;

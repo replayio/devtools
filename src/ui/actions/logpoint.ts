@@ -233,7 +233,7 @@ export async function setLogpoint(
   setMultiSourceLogpoint(logGroupId, locations, text, condition);
 }
 
-function setMultiSourceLogpoint(
+export function setMultiSourceLogpoint(
   logGroupId: string,
   locations: Location[],
   text: string,
