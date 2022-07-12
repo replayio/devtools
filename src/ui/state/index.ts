@@ -15,7 +15,6 @@ import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/selectors";
-import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";
 import { NetworkState } from "ui/reducers/network";
@@ -27,6 +26,7 @@ import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
+import type { BlackboxedState } from "ui/reducers/blackboxed";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { HitCountsState } from "ui/reducers/hitCounts";
 import { PossibleBreakpointsState } from "ui/reducers/possibleBreakpoints";
@@ -37,6 +37,7 @@ export interface UIState {
   app: AppState;
   ast: ASTState;
   asyncRequests: AsyncRequestsState;
+  blackboxed: BlackboxedState;
   boxModel: BoxModelState;
   breakpoints: BreakpointsState;
   changes: ChangesState;
@@ -54,7 +55,6 @@ export interface UIState {
   messages: MessageState;
   network: NetworkState;
   pause: PauseState;
-  pendingBreakpoints: PendingBreakpointsState;
   possibleBreakpoints: PossibleBreakpointsState;
   preview: PreviewState;
   protocolMessages: ProtocolMessagesState;

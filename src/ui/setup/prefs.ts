@@ -24,6 +24,7 @@ import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getTheme } from "ui/reducers/app";
 import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
+//TODO @jcmorrow fix this : )
 import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
 export interface ReplaySessions {

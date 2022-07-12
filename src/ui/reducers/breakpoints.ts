@@ -540,7 +540,7 @@ const customAnalysisResultComparator = (
   return result;
 };
 
-export const getAnalysisMappingForLocation = (state: UIState, location: StableLocation | null) => {
+export const getAnalysisMappingForLocation = (state: UIState, location: Location | null) => {
   if (!location) {
     return undefined;
   }

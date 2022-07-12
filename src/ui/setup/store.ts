@@ -25,6 +25,7 @@ import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 import hitCounts from "ui/reducers/hitCounts";
 import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
+import blackboxed from "ui/reducers/blackboxed";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -42,6 +43,7 @@ type ReduxDevToolsOptions = Exclude<
 // slice reducers we know will be added, to get the right state type.
 let reducers = {
   app: appReducer,
+  blackboxed,
   experimentalSources: sources,
   hitCounts,
   layout: layoutReducer,
