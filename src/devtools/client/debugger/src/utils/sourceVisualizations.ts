@@ -97,8 +97,10 @@ export function getUniqueAlternateSourceId(sourceId: string): {
   if (sourcemappedSourceIds.length > 1) {
     return { why: "not-unique" };
   }
-  return {
-    sourceId:
-      ThreadFront.getPrettyPrintedSourceId(sourcemappedSourceIds[0]) || sourcemappedSourceIds[0],
-  };
+
+  let alternateSourceId = sourcemappedSourceIds[0];
+  alternateSourceId = ThreadFront.getPrettyPrintedSourceId(alternateSourceId) || alternateSourceId;
+  alternateSourceId = ThreadFront.getCorrespondingSourceIds(alternateSourceId)[0];
+
+  return { sourceId: alternateSourceId };
 }
