@@ -5,7 +5,13 @@
 import sortBy from "lodash/sortBy";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
-import { getAllSourceDetails, getSelectedSource, getSourcesById } from "ui/reducers/sources";
+import {
+  getAllSourceDetails,
+  getSelectedSource,
+  getSourceDetails,
+  getSourcesById,
+  SourceDetails,
+} from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 
 import type { Breakpoint } from "../reducers/types";
@@ -14,33 +20,25 @@ import { getFilename } from "../utils/source";
 
 import { getBreakpointsList } from "./breakpoints";
 
-function getBreakpointsForSource(
-  source: SourceDetails,
-  selectedSource: SourceDetails,
-  breakpoints: Breakpoint[]
-) {
+function getBreakpointsForSource(source: SourceDetails, breakpoints: Breakpoint[]) {
   return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == source.id);
 }
 
 export const findBreakpointSources = (state: UIState) => {
   const breakpoints = getBreakpointsList(state);
-  const sources = getAllSourceDetails(state);
-  const selectedSource = getSelectedSource(state)!;
-  return [];
+  return uniq(breakpoints.map(bp => bp.location.sourceId)).map(id => getSourceDetails(state, id)!);
 };
 
 export const getBreakpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSource,
-  (breakpoints, sources, selectedSource) => {
-    return [];
-    // return sources
-    //   .map(source => ({
-    //     source,
-    //     breakpoints: getBreakpointsForSource(source).filter(bp => isBreakable(bp)),
-    //   }))
-    //   .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
+  (breakpoints, sources) => {
+    return sources
+      .map(source => ({
+        source,
+        breakpoints: getBreakpointsForSource(source, breakpoints).filter(bp => isBreakable(bp)),
+      }))
+      .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
   }
 );
 
@@ -49,14 +47,11 @@ export type BreakpointOrLogpointSources = ReturnType<typeof getLogpointSources>[
 export const getLogpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSource,
-  (breakpoints, sources, selectedSource) => {
+  (breakpoints, sources) => {
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource!, breakpoints).filter(bp =>
-          isLogpoint(bp)
-        ),
+        breakpoints: getBreakpointsForSource(source, breakpoints).filter(bp => isLogpoint(bp)),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
   }

@@ -23,10 +23,10 @@ export interface PossibleBreakpointsState {
   possibleBreakpoints: EntityState<SourcePossibleBreakpoints>;
 }
 
-const possibleBreakpoints = createEntityAdapter<SourcePossibleBreakpoints>();
+const possibleBreakpointsAdapter = createEntityAdapter<SourcePossibleBreakpoints>();
 
 const initialState = {
-  possibleBreakpoints: possibleBreakpoints.getInitialState(),
+  possibleBreakpoints: possibleBreakpointsAdapter.getInitialState(),
 };
 
 const possibleBreakpointsSlice = createSlice({
@@ -34,7 +34,7 @@ const possibleBreakpointsSlice = createSlice({
   initialState,
   reducers: {
     possibleBreakpointsRequested: (state, action: PayloadAction<string>) => {
-      possibleBreakpoints.upsertOne(state.possibleBreakpoints, {
+      possibleBreakpointsAdapter.upsertOne(state.possibleBreakpoints, {
         id: action.payload,
         status: LoadingState.LOADING,
       });
@@ -43,7 +43,7 @@ const possibleBreakpointsSlice = createSlice({
       state,
       action: PayloadAction<{ sourceId: string; possibleBreakpoints: SameLineSourceLocations[] }>
     ) => {
-      possibleBreakpoints.upsertOne(state.possibleBreakpoints, {
+      possibleBreakpointsAdapter.upsertOne(state.possibleBreakpoints, {
         possibleBreakpoints: action.payload.possibleBreakpoints,
         id: action.payload.sourceId,
         status: LoadingState.LOADED,
@@ -53,7 +53,7 @@ const possibleBreakpointsSlice = createSlice({
       state,
       action: PayloadAction<{ sourceId: string; error: string }>
     ) => {
-      possibleBreakpoints.upsertOne(state.possibleBreakpoints, {
+      possibleBreakpointsAdapter.upsertOne(state.possibleBreakpoints, {
         error: action.payload.error,
         id: action.payload.sourceId,
         status: LoadingState.ERRORED,
@@ -153,6 +153,12 @@ export const getPossibleBreakpointsForSelectedSource = (state: UIState): Locatio
     })
   );
 };
+
+const possibleBreakpointSelectors = possibleBreakpointsAdapter.getSelectors<UIState>(
+  (state: UIState) => state.possibleBreakpoints.possibleBreakpoints
+);
+
+export const { selectById: getPossibleBreakpointsById } = possibleBreakpointSelectors;
 
 export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
   return uniq(
