@@ -242,18 +242,21 @@ export function showAlternateSource(
       ThreadFront.preferSource(oldSourceId, false);
     }
 
-    let isPausedInSource = false;
+    let selectSourceByPausing = false;
     const state = getState();
     const frames = getFrames(state);
     if (frames) {
       const selectedFrameId = getSelectedFrameId(state);
       const selectedFrame = frames.find(f => f.id == selectedFrameId);
-      if (selectedFrame?.location.sourceId === oldSourceId) {
-        isPausedInSource = true;
+      if (
+        selectedFrame?.location.sourceId === oldSourceId &&
+        selectedFrame?.alternateLocation?.sourceId === newSourceId
+      ) {
+        selectSourceByPausing = true;
       }
     }
 
-    if (isPausedInSource) {
+    if (selectSourceByPausing) {
       const executionPoint = getExecutionPoint(state);
       await dispatch(paused({ executionPoint: executionPoint! }));
     } else {
