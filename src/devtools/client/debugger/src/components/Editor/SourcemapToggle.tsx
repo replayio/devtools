@@ -3,7 +3,7 @@ import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
 import { UIState } from "ui/state";
-import { getSelectedSource, getSelectedSourceWithContent } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 import actions from "../../actions";
 
@@ -18,7 +18,7 @@ function SourcemapError({ onClick }: { onClick: () => void }) {
   );
 }
 
-export function SourcemapToggle({ selectedSource, setModal, showAlternateSource }: PropsFromRedux) {
+export function SourcemapToggle({ setModal, showAlternateSource }: PropsFromRedux) {
   const sourceDetails = useAppSelector(getSelectedSource);
   if (!sourceDetails) {
     return null;
@@ -29,7 +29,7 @@ export function SourcemapToggle({ selectedSource, setModal, showAlternateSource 
   const alternateSourceId = sourceDetails.generated[0];
 
   const setEnabled = (v: React.SetStateAction<boolean>) => {
-    showAlternateSource(selectedSource.id, alternateSourceId!);
+    showAlternateSource(sourceDetails.id, alternateSourceId!);
   };
   const onErrorClick = () => {
     setModal("sourcemap-setup");
@@ -47,15 +47,10 @@ export function SourcemapToggle({ selectedSource, setModal, showAlternateSource 
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state)!,
-  }),
-  {
-    showAlternateSource: actions.showAlternateSource,
-    setModal,
-  }
-);
+const connector = connect(() => ({}), {
+  showAlternateSource: actions.showAlternateSource,
+  setModal,
+});
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

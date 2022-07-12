@@ -14,14 +14,13 @@ import type { Action } from "@reduxjs/toolkit";
 import type { AnyAction } from "@reduxjs/toolkit";
 import type { Location, Scope } from "@replayio/protocol";
 import type { UIState } from "ui/state";
-import type { Source } from "./sources";
 
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getSourceDetails, getSelectedSourceWithContent } from "ui/reducers/sources";
+import { getSourceDetails, getSelectedSourceWithContent, SourceContent } from "ui/reducers/sources";
 
 export interface Context {
   isPaused: boolean;
@@ -444,7 +443,7 @@ export function getResumePoint(state: UIState, type: string) {
 // Get the ID of any alternate source that can be switched to from selectedSource.
 // This only works when the debugger is paused somewhere, and we have an
 // alternate location for the location of the selected frame.
-function getAlternateSourceId(state: UIState, selectedSource: Source) {
+function getAlternateSourceId(state: UIState, selectedSource: SourceContent) {
   if (!selectedSource) {
     return null;
   }

@@ -21,7 +21,7 @@ import { getMatches } from "../workers/search";
 export function doSearch(cx, query, editor) {
   return (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
-    if (!selectedSource || !selectedSource.content) {
+    if (!selectedSource || !selectedSource.value) {
       return;
     }
 
@@ -33,7 +33,7 @@ export function doSearch(cx, query, editor) {
 export function doSearchForHighlight(query, editor, line, ch) {
   return async (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
-    if (!selectedSource || !selectedSource.content) {
+    if (!selectedSource || !selectedSource.value) {
       return;
     }
     dispatch(searchContentsForHighlight(query, editor, line, ch));
@@ -75,13 +75,13 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
     if (
       !editor ||
       !selectedSource ||
-      !selectedSource.content ||
-      !isFulfilled(selectedSource.content) ||
+      !selectedSource.value ||
+      !isFulfilled(selectedSource.value) ||
       !modifiers
     ) {
       return;
     }
-    const selectedContent = selectedSource.content.value;
+    const selectedContent = selectedSource.value;
 
     const ctx = { ed: editor, cm: editor.codeMirror };
 
@@ -109,7 +109,7 @@ export function searchContentsForHighlight(query, editor, line, ch) {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
-    if (!query || !editor || !selectedSource || !selectedSource.content || !modifiers) {
+    if (!query || !editor || !selectedSource || !selectedSource.value || !modifiers) {
       return;
     }
 

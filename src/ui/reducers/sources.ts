@@ -193,7 +193,7 @@ export const getSourceByUrl = (state: UIState, url: string) => {
   return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
 };
 export const getSourceContent = (state: UIState, id: string) => {
-  return state.experimentalSources.contents.entities[id]?.value;
+  return state.experimentalSources.contents.entities[id];
 };
 export const getSelectedSourceWithContent = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);
@@ -204,7 +204,7 @@ export const getTextAtLocation = (state: UIState, location: Location) => {
   if (!content) {
     return null;
   }
-  return getTextAtPosition(content, location);
+  return getTextAtPosition(content.value, location);
 };
 // This is useful if you are displaying a bunch of sources and want them to
 // ensure they all have unique names, even though some of them might have been

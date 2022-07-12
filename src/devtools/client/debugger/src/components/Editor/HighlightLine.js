@@ -23,12 +23,7 @@ function isDebugLine(selectedFrame, selectedLocation) {
 }
 
 function isDocumentReady(selectedSource, selectedLocation) {
-  return (
-    selectedLocation &&
-    selectedSource &&
-    selectedSource.content &&
-    hasDocument(selectedLocation.sourceId)
-  );
+  return selectedLocation && selectedSource?.value && hasDocument(selectedLocation.sourceId);
 }
 
 export class HighlightLine extends Component {
