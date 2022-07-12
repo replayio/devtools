@@ -265,11 +265,11 @@ export function getSourcePath(url?: UrlResult): string {
  * Returns amount of lines in the source. If source is a WebAssembly binary,
  * the function returns amount of bytes.
  */
-export function getSourceLineCount(content: SourceContent["value"]) {
+export function getSourceLineCount(content: SourceContent) {
   let count = 0;
 
-  for (let i = 0; i < content!.value.length; ++i) {
-    if (content!.value[i] === "\n") {
+  for (let i = 0; i < content.value!.value.length; ++i) {
+    if (content.value!.value[i] === "\n") {
       ++count;
     }
   }
@@ -280,16 +280,16 @@ export function getSourceLineCount(content: SourceContent["value"]) {
 // eslint-disable-next-line complexity
 export function getMode(
   source: SourceDetails,
-  content: SourceContent["value"],
+  content: SourceContent,
   symbols: SymbolDeclarations
 ) {
   const extension = getFileExtension(source);
 
-  if (content!.type !== "text") {
+  if (content.value!.type !== "text") {
     return { name: "text" };
   }
 
-  const { contentType, value: text } = content!;
+  const { contentType, value: text } = content.value!;
 
   if (extension === "jsx" || (symbols && symbols.hasJsx)) {
     if (extension === "tsx" || (symbols && symbols.hasTypes)) {
@@ -372,18 +372,18 @@ type SourceContentObject = {
 // Cache line-split source file text
 const sourceContentToLines = new WeakMap<SourceContentObject, string[]>();
 
-export const getLineText = (content: SourceContent["value"], line: number) => {
+export const getLineText = (content: SourceContent, line: number) => {
   if (!content) {
     return "";
   }
 
   let lines: string[] = [];
 
-  if (sourceContentToLines.has(content)) {
-    lines = sourceContentToLines.get(content)!;
+  if (sourceContentToLines.has(content.value!)) {
+    lines = sourceContentToLines.get(content.value!)!;
   } else {
-    lines = content.value.split("\n");
-    sourceContentToLines.set(content, lines);
+    lines = content.value!.value.split("\n");
+    sourceContentToLines.set(content.value!, lines);
   }
 
   const lineText = lines[line - 1];
@@ -391,7 +391,7 @@ export const getLineText = (content: SourceContent["value"], line: number) => {
 };
 
 export function getTextAtPosition(
-  asyncContent: SourceContent["value"],
+  asyncContent: SourceContent,
   location: { column?: number; line?: number }
 ) {
   const { column, line = 0 } = location;
@@ -412,7 +412,9 @@ export function getSourceClassnames(source?: SourceDetails) {
     return "prettyPrint";
   }
 
-  if (source.isBlackBoxed) {
+  // TODO @jcmorrow fix this.
+  if (false) {
+    //source.isBlackBoxed) {
     return "blackBox";
   }
 
