@@ -3,7 +3,7 @@
 // https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/types.js
 // Converted with: https://flow-to-ts.netlify.app
 
-import type { Location } from "@replayio/protocol";
+import type { Location, SourceKind } from "@replayio/protocol";
 import type { CallDeclaration } from "./ast";
 
 export type SearchModifiers = {
@@ -23,14 +23,6 @@ export type Mode =
       };
     };
 export type ThreadId = string;
-
-/**
- * Breakpoint ID
- *
- * @memberof types
- * @static
- */
-export type BreakpointId = string;
 
 /**
  * Source ID
@@ -106,12 +98,6 @@ export type PendingLocation = {
   readonly sourceUrl?: string;
 };
 
-export type BreakpointLocation = {
-  readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
-  readonly sourceId?: string;
-};
 export type ASTLocation = {
   readonly name: string | null | undefined;
   readonly offset: PartialPosition;
@@ -122,8 +108,9 @@ export type ASTLocation = {
 // stable across sessions. Instead, we use URLs with content-hashes to identify
 // sources when storing locations that might be used across sessions.
 export interface StableLocation extends SourceLocation {
-  url: string;
   contentHash: string;
+  kind: SourceKind;
+  url: string;
 }
 
 /**
@@ -133,14 +120,11 @@ export interface StableLocation extends SourceLocation {
  * @static
  */
 export type Breakpoint = {
-  readonly id: BreakpointId;
-  readonly location: StableLocation;
-  readonly astLocation: ASTLocation | null | undefined;
-  readonly generatedLocation: Location;
   readonly disabled: boolean;
-  readonly text: string;
-  readonly originalText: string;
+  readonly id: string;
+  readonly location: StableLocation;
   readonly options: BreakpointOptions;
+  readonly serverId?: string;
 };
 
 export type PrefixBadge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";

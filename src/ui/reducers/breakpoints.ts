@@ -6,10 +6,15 @@ import {
   EntityState,
 } from "@reduxjs/toolkit";
 import { AnalysisEntry, PointDescription, TimeStampedPointRange } from "@replayio/protocol";
-import type { Breakpoint as OriginalBreakpointType } from "devtools/client/debugger/src/reducers/types";
+import type {
+  Breakpoint as OriginalBreakpointType,
+  BreakpointOptions,
+  StableLocation,
+} from "devtools/client/debugger/src/reducers/types";
 import { AnalysisError } from "protocol/thread/analysis";
 import { LoadingState } from "./breakableLines";
 import { stableIdForLocation } from "devtools/client/debugger/src/utils/breakpoint";
+import { getStableLocationForLocation } from "./sources";
 
 export enum AnalysisStatus {
   // Happy path
@@ -123,57 +128,36 @@ const breakpointsSlice = createSlice({
   name: "breakpoints",
   initialState: initialBreakpointsState,
   reducers: {
-    setBreakpoint: {
-      reducer(state, action: PayloadAction<{ breakpoint: Breakpoint; recordingId: string }>) {
-        const { breakpoint } = action.payload;
-        const location = breakpoint.location;
-        const id = stableIdForLocation(location);
-        breakpointsAdapter.upsertOne(state.breakpoints, breakpoint);
-
-        mappingsAdapter.addOne(state.analysisMappings, {
-          locationId: id,
-          currentAnalysis: null,
-          lastSuccessfulAnalysis: null,
-          allAnalyses: [],
-        });
-
-        // Also remove any requested breakpoint that corresponds to this location
-        breakpointsSlice.caseReducers.removeRequestedBreakpoint(
-          state,
-          breakpointsSlice.actions.removeRequestedBreakpoint(location)
-        );
-      },
+    breakpointRequested(
+      state,
+      action: PayloadAction<{ location: StableLocation; options: Partial<BreakpointOptions> }>
+    ) {
+      const id = stableIdForLocation(action.payload.location);
+      const breakpoint: Breakpoint = {
+        disabled: false,
+        id,
+        status: LoadingState.LOADING,
+        ...action.payload,
+      };
+      breakpointsAdapter.upsertOne(state.breakpoints, breakpoint);
+      mappingsAdapter.addOne(state.analysisMappings, {
+        locationId: id,
+        currentAnalysis: null,
+        lastSuccessfulAnalysis: null,
+        allAnalyses: [],
+      });
     },
-    removeBreakpoint: {
-      reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
-        const id = stableIdForLocation(action.payload.location);
-        delete state.breakpoints[id];
-
-        mappingsAdapter.removeOne(state.analysisMappings, id);
-      },
-      prepare(location: SourceLocation, recordingId: string, cx?: Context) {
-        // Add cx to action.meta
-        return {
-          payload: { location, recordingId },
-          meta: { cx },
-        };
-      },
-    },
-    setRequestedBreakpoint(state, action: PayloadAction<LocationWithoutColumn>) {
-      const location = action.payload;
-      // @ts-ignore intentional field check
-      assert(!location.column, "location should have no column");
-      const requestedId = stableIdForLocation(location);
-      state.requestedBreakpoints[requestedId] = location;
-    },
-    removeRequestedBreakpoint(state, action: PayloadAction<LocationWithoutColumn>) {
-      const requestedId = stableIdForLocation({ ...action.payload, column: undefined });
-      delete state.requestedBreakpoints[requestedId];
+    removeBreakpoint(
+      state,
+      action: PayloadAction<{ location: StableLocation; recordingId: string }>
+    ) {
+      const id = stableIdForLocation(action.payload.location);
+      breakpointsAdapter.removeOne(state.breakpoints, id);
+      mappingsAdapter.removeOne(state.analysisMappings, id);
     },
     removeBreakpoints() {
       return initialBreakpointsState();
     },
-
     analysisCreated(
       state,
       action: PayloadAction<{
@@ -196,7 +180,7 @@ const breakpointsSlice = createSlice({
         status: AnalysisStatus.Created,
       });
 
-      const locationKey = stableIdForLocation(location);
+      const locationKey = stableIdForLocation(getStableLocationForLocation(state, location));
       const mapping = state.analysisMappings.entities[locationKey];
       if (mapping) {
         mapping.allAnalyses.push(analysisId);

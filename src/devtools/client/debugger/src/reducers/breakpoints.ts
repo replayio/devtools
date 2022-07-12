@@ -24,11 +24,16 @@ import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import assert from "../utils/assert";
-import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
+import {
+  getLocationKey,
+  isMatchingLocation,
+  isLogpoint,
+  stableIdForLocation,
+} from "../utils/breakpoint";
 
-import type { Breakpoint, SourceLocation } from "./types";
+import type { Breakpoint, BreakpointOptions, SourceLocation, StableLocation } from "./types";
 import { FocusRegion } from "ui/state/timeline";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
 export type { Breakpoint } from "./types";
 
 type LocationWithoutColumn = Omit<Location, "column">;
@@ -116,12 +121,91 @@ const breakpointsSlice = createSlice({
   name: "breakpoints",
   initialState: initialBreakpointsState,
   reducers: {
+    // export function addBreakpoint(
+    //   cx: Context,
+    //   initialLocation: Location,
+    //   options: Breakpoint["options"] = {},
+    //   disabled = false,
+    //   shouldTrack = false,
+    //   shouldCancel = () => false
+    // ): UIThunkAction<Promise<void>> {
+    //   return async (dispatch, getState, { client, ThreadFront }) => {
+    //     const { sourceId, column, line } = initialLocation;
+
+    //     dispatch(setRequestedBreakpoint({ sourceId, line }));
+
+    //     await dispatch(setBreakpointPositions({ sourceId, line }));
+
+    //     // check if the user deleted the requested breakpoint in the meantime
+    //     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
+    //     if (!(getLocationKey({ sourceId, line }) in requestedBreakpointLocations)) {
+    //       return;
+    //     }
+
+    //     const location = column
+    //       ? getBreakpointPositionsForLocation(getState(), initialLocation)
+    //       : getFirstBreakpointPosition(getState(), initialLocation);
+
+    //     if (!location) {
+    //       return;
+    //     }
+
+    //     const source = getSource(getState(), location.sourceId);
+    //     if (!source) {
+    //       return;
+    //     }
+
+    //     const symbols = getSymbols(getState(), source);
+    //     const astLocation = getASTLocation(source, symbols, location);
+
+    //     const originalContent = getSourceContent(getState(), source.id);
+    //     const originalText = getTextAtPosition(originalContent, location);
+
+    //     const content = getSourceContent(getState(), source.id);
+    //     const text = getTextAtPosition(content, location);
+
+    //     const id = getLocationKey(location);
+    //     const breakpoint = {
+    //       id,
+    //       disabled,
+    //       options,
+    //       location,
+    //       astLocation,
+    //       text,
+    //       originalText,
+    //     };
+
+    //     if (shouldCancel()) {
+    //       return;
+    //     }
+
+    //     // @ts-expect-error Breakpoint structure mismatch
+    //     dispatch(setBreakpoint(breakpoint, ThreadFront.recordingId!, cx));
+
+    //     if (disabled) {
+    //       // If we just clobbered an enabled breakpoint with a disabled one, we need
+    //       // to remove any installed breakpoint in the server.
+    //       await client.removeBreakpoint(location);
+    //     } else {
+    //       await client.setBreakpoint(breakpoint.location, breakpoint.options);
+    //     }
+    //   };
+    // }
+
     setBreakpoint: {
-      reducer(state, action: PayloadAction<{ breakpoint: Breakpoint; recordingId: string }>) {
-        const { breakpoint } = action.payload;
-        const location = breakpoint.location;
-        const id = getLocationKey(location);
-        state.breakpoints[id] = breakpoint;
+      reducer(
+        state,
+        action: PayloadAction<{
+          location: StableLocation;
+          options: Partial<BreakpointOptions>;
+        }>
+      ) {
+        const id = stableIdForLocation(action.payload.location);
+
+        // If we already have a breakpoint here, we should not do anything.
+        breakpointsAdapter.addOne(state, {
+          location,
+        });
 
         mappingsAdapter.addOne(state.analysisMappings, {
           locationId: id,

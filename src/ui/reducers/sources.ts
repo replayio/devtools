@@ -1,5 +1,6 @@
 import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Location, newSource, SourceKind } from "@replayio/protocol";
+import { StableLocation } from "devtools/client/debugger/src/reducers/types";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { UIThunkAction } from "ui/actions";
@@ -226,6 +227,21 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   } else {
     return sourceDetails.url;
   }
+};
+export const getStableLocationForLocation = (
+  state: UIState,
+  location: Location
+): StableLocation => {
+  const sourceDetails = getSourceDetails(state, location.sourceId);
+  if (!sourceDetails) {
+    throw "Cannot find source details for sourceId: " + location.sourceId;
+  }
+  return {
+    ...location,
+    kind: sourceDetails.kind,
+    url: sourceDetails.url!,
+    contentHash: sourceDetails.contentHash!,
+  };
 };
 export const getSelectedLocationHasScrolled = (state: UIState) =>
   state.experimentalSources.selectedLocationHasScrolled;
