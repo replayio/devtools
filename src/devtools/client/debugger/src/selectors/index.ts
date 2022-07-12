@@ -11,8 +11,6 @@ export * from "../reducers/tabs";
 export * from "../reducers/event-listeners";
 export * from "../reducers/pause";
 export * from "../reducers/threads";
-export * from "../reducers/breakpoints";
-export * from "../reducers/pending-breakpoints";
 export * from "../reducers/ui";
 export * from "../reducers/file-search";
 export * from "../reducers/ast";

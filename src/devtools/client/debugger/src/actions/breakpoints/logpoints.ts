@@ -3,25 +3,17 @@ import { UIThunkAction } from "ui/actions";
 import { trackEvent } from "ui/utils/telemetry";
 import { SourceDetails } from "ui/reducers/sources";
 
-import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
-import { getLogpointsForSource } from "../../reducers/breakpoints";
-import { removeRequestedBreakpoint } from "../../reducers/breakpoints";
-import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
 
 import { _addBreakpointAtLine } from "./breakpoints";
+import { getBreakpointsForSelectedSource, getLogpointsForSource } from "ui/reducers/breakpoints";
+import { Breakpoint } from "../../reducers/types";
 
 export function removeLogpointsInSource(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState) => {
     const breakpoints = getLogpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
       dispatch(removeLogpoint(cx, breakpoint));
-    }
-    const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
-    for (const location of Object.values(requestedBreakpointLocations)) {
-      if (location.sourceId === source.id) {
-        dispatch(removeRequestedBreakpoint(location));
-      }
     }
   };
 }
@@ -49,13 +41,14 @@ export function addLogpoint(cx: Context, line: number): UIThunkAction {
 }
 
 export function removeLogpoint(cx: Context, bp: Breakpoint): UIThunkAction {
+  // TODO @jcmorrow fix this.
   return dispatch => {
     if (isBreakable(bp)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the breakable breakpoint remains.
-      dispatch(removeBreakpointOption(cx, bp, "logValue"));
+      // dispatch(removeBreakpointOption(cx, bp, "logValue"));
     } else {
-      dispatch(_removeBreakpoint(cx, bp));
+      // dispatch(removeBreakpoint(cx, bp));
     }
   };
 }

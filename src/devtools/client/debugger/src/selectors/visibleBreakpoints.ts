@@ -10,6 +10,7 @@ import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 import { Breakpoint } from "../reducers/types";
 import { getSelectedSource } from "ui/reducers/sources";
+import { LoadingState } from "ui/reducers/possibleBreakpoints";
 
 /*
  * Finds the breakpoints, which appear in the selected source.
@@ -22,6 +23,7 @@ export const getVisibleBreakpoints = createSelector(
       return null;
     }
 
+    console.log({ breakpoints });
     return breakpoints.filter(bp => selectedSource && bp.location.sourceId === selectedSource.id);
   }
 );
@@ -31,13 +33,15 @@ export const getVisibleBreakpoints = createSelector(
  */
 export const getVisibleRequestedBreakpoints = createSelector(
   getSelectedSource,
-  getRequestedBreakpointsList,
+  getBreakpointsList,
   (selectedSource, breakpoints) => {
     if (!selectedSource) {
       return null;
     }
 
-    return breakpoints.filter(bp => bp.location.sourceId === selectedSource.id);
+    return breakpoints.filter(
+      bp => bp.status === LoadingState.LOADING && bp.location.sourceId === selectedSource.id
+    );
   }
 );
 

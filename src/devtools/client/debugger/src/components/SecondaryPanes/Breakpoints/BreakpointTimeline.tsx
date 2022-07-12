@@ -10,10 +10,6 @@ import { getVisiblePosition } from "ui/utils/timeline";
 import PortalTooltip from "ui/components/shared/PortalTooltip";
 import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
 
-import {
-  getAnalysisPointsForLocation,
-  LocationAnalysisSummary,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
 import { UIState } from "ui/state";
 import { connect, ConnectedProps } from "react-redux";
@@ -24,6 +20,7 @@ import type { Breakpoint } from "../../../reducers/types";
 import UnfocusedRegion from "ui/components/Timeline/UnfocusedRegion";
 import NonLoadingRegions from "ui/components/Timeline/NonLoadingRegions";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
+import { getAnalysisPointsForLocation } from "ui/reducers/breakpoints";
 
 function Points({
   analysisPoints,
@@ -140,8 +137,10 @@ const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(
       state,
-      // @ts-expect-error Location/SourceLocation
-      breakpoint.location,
+      // TODO @jcmorrow - StableLocations should probably require a column, and
+      // if the user requests a breakpoint for a line we should do that
+      // translation for them.
+      { column: 0, ...breakpoint.location },
       breakpoint.options.condition
     ),
     currentTime: selectors.getCurrentTime(state),

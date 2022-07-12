@@ -3,11 +3,8 @@ import sortedLastIndex from "lodash/sortedLastIndex";
 import { AnalysisError } from "protocol/thread/analysis";
 import { useAppSelector } from "ui/setup/hooks";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import {
-  AnalysisStatus,
-  LocationAnalysisSummary,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { AnalysisStatus, LocationAnalysisSummary } from "ui/reducers/breakpoints";
 
 const numberStatus = (current: number | undefined, total: number | undefined): string => {
   return `${current ?? "?"}/${total ?? "?"}`;

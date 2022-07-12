@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
@@ -12,10 +12,6 @@ import type { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import {
-  getAnalysisPointsForLocation,
-  AnalysisStatus,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
@@ -23,8 +19,8 @@ import FirstEditNag from "./FirstEditNag";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { prefs } from "ui/utils/prefs";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { getAnalysisPointsForLocation } from "ui/reducers/breakpoints";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge

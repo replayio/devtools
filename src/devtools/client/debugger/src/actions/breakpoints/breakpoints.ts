@@ -7,15 +7,13 @@ import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
 import {
+  addBreakpoint,
+  allBreakpointsRemoved,
   Breakpoint,
+  breakpointRemoved,
   getBreakpointsForSelectedSource,
   getBreakpointsForSource,
-} from "../../reducers/breakpoints";
-import {
-  removeRequestedBreakpoint,
-  removeBreakpoints as removeBreakpointsAction,
-} from "../../reducers/breakpoints";
-import { setBreakpoint } from "../../reducers/breakpoints";
+} from "ui/reducers/breakpoints";
 import { PrefixBadge } from "../../reducers/types";
 import { getBreakpointsList, getBreakpointAtLocation, getSymbols } from "../../selectors";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
@@ -40,7 +38,6 @@ export function removeBreakpointsAtLine(
   return (dispatch, getState) => {
     trackEvent("breakpoint.remove");
 
-    dispatch(removeRequestedBreakpoint({ sourceId, line }));
     const breakpoints = getBreakpointsForSource(getState(), sourceId, line);
 
     breakpoints.map(bp => dispatch(removeBreakpoint(cx, bp)));
@@ -55,9 +52,11 @@ export function removeBreakpoint(
     if (isLogpoint(breakpoint)) {
       // Keep the breakpoint while removing the log value from its options,
       // so that the print statement remains.
-      dispatch(removeBreakpointOption(cx, breakpoint, "shouldPause"));
+      // TODO @jcmorrow implement this
+      // In general this file could use some cleanup
+      // dispatch(removeBreakpointOption(cx, breakpoint, "shouldPause"));
     } else {
-      dispatch(_removeBreakpoint(cx, breakpoint));
+      dispatch(breakpointRemoved(breakpoint.location));
     }
   };
 }
@@ -75,10 +74,9 @@ export function removeBreakpointsInSource(
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());
     const locations = Object.values(requestedBreakpointLocations);
 
-    for (const location of locations) {
-      if (location.sourceId === source.id) {
-        dispatch(removeRequestedBreakpoint(location));
-      }
+    const breakpointsToRemove = getBreakpointsForSource(getState(), source.id);
+    for (const breakpoint of breakpointsToRemove) {
+      dispatch(breakpointRemoved(breakpoint.location));
     }
   };
 }
@@ -94,8 +92,8 @@ export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> 
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
-    await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
-    dispatch(removeBreakpointsAction());
+    await Promise.all(breakpointList.map(bp => bp && dispatch(breakpointRemoved(bp.location))));
+    dispatch(allBreakpointsRemoved());
   };
 }
 
@@ -110,7 +108,11 @@ export function removeBreakpoints(
   breakpoints: Breakpoint[]
 ): UIThunkAction<Promise<void[]>> {
   return async dispatch => {
-    return Promise.all(breakpoints.map(bp => dispatch(_removeBreakpoint(cx, bp))));
+    return Promise.all(
+      breakpoints.map(bp => {
+        dispatch(breakpointRemoved(bp.location));
+      })
+    );
   };
 }
 
@@ -123,16 +125,16 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
       return;
     }
 
-    const bp = getBreakpointAtLocation(state, { line, column: undefined });
+    // TODO @jcmorrow I think this should accept udnefined for the column
+    const bp = getBreakpointAtLocation(state, { line, column: 0 });
     if (bp) {
-      return dispatch(_removeBreakpoint(cx, bp));
+      return dispatch(breakpointRemoved(bp.location));
     }
     return dispatch(
-      addBreakpoint(cx, {
+      addBreakpoint({
         sourceId: selectedSource.id,
-        // @ts-ignore location field mismatches
-        sourceUrl: selectedSource.url,
         line,
+        column: 0,
       })
     );
   };
@@ -199,7 +201,7 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
 
     trackEvent("breakpoint.add_column");
 
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
+    return dispatch(addBreakpoint(breakpointLocation, options));
   };
 }
 
@@ -208,15 +210,16 @@ export function setBreakpointPrefixBadge(
   prefixBadge?: PrefixBadge
 ): UIThunkAction {
   return (dispatch, getState, { ThreadFront }) => {
-    dispatch(
-      setBreakpoint(
-        {
-          ...breakpoint,
-          options: { ...breakpoint.options, prefixBadge },
-        },
-        ThreadFront.recordingId!
-      )
-    );
+    // dispatch(
+    //   // TODO @jcmorrow Oh yeah, we need this too.
+    //   setBreakpoint(
+    //     {
+    //       ...breakpoint,
+    //       options: { ...breakpoint.options, prefixBadge },
+    //     },
+    //     ThreadFront.recordingId!
+    //   )
+    // );
   };
 }
 

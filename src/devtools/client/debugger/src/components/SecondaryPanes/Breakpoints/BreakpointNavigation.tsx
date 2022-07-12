@@ -6,9 +6,7 @@ import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import React, { useEffect } from "react";
 
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { actions } from "ui/actions";
-import PrefixBadgeButton from "ui/components/PrefixBadge";
 import Icon from "ui/components/shared/Icon";
 import { selectors } from "ui/reducers";
 import type { UIState } from "ui/state";
@@ -18,6 +16,7 @@ import { PanelStatus } from "./PanelStatus";
 
 import { trackEvent } from "ui/utils/telemetry";
 import { Breakpoint } from "../../../reducers/types";
+import { getAnalysisPointsForLocation } from "ui/reducers/breakpoints";
 
 const mapStateToProps = (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => {
   const analysisPoints = getAnalysisPointsForLocation(

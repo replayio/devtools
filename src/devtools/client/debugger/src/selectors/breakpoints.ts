@@ -5,14 +5,15 @@
 import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
+import { LoadingState } from "ui/reducers/possibleBreakpoints";
 
 export const getBreakpointsList = createSelector(
   (state: UIState) => state.breakpoints.breakpoints,
-  breakpoints => Object.values(breakpoints)
+  breakpoints => Object.values(breakpoints.entities)
 );
 
 export const getRequestedBreakpointLocations = (state: UIState) =>
-  state.breakpoints.requestedBreakpoints;
+  getBreakpointsList(state).filter(bp => bp.status === LoadingState.LOADING);
 
 export const getRequestedBreakpointsList = createSelector(
   getRequestedBreakpointLocations,

@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { selectors } from "ui/reducers";
 import { UIState } from "ui/state";
-import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import classNames from "classnames";
 import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
 import hooks from "ui/hooks";
@@ -16,11 +15,15 @@ import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
 import find from "lodash/find";
-import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
 import { useFeature, useStringPref } from "ui/hooks/settings";
+import { Breakpoint } from "../../reducers/types";
+import {
+  getBreakpointsForSelectedSource,
+  getPointsForHoveredLineNumber,
+} from "ui/reducers/breakpoints";
 
 const QuickActionButton: FC<{
   showNag: boolean;

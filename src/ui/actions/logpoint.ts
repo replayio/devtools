@@ -16,7 +16,6 @@ import {
 import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore, UIThunkAction } from "ui/actions";
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { ProtocolError } from "ui/state/app";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
@@ -30,6 +29,9 @@ import {
   MAX_POINTS_FOR_FULL_ANALYSIS,
 } from "protocol/thread/analysis";
 import { assert, compareNumericStrings } from "protocol/utils";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { getLoadedRegions } from "./app";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 import {
   analysisCreated,
   analysisErrored,
@@ -37,10 +39,8 @@ import {
   analysisPointsRequested,
   analysisResultsReceived,
   analysisResultsRequested,
-} from "devtools/client/debugger/src/reducers/breakpoints";
-import { getFocusRegion } from "ui/reducers/timeline";
-import { getLoadedRegions } from "./app";
-import { rangeForFocusRegion } from "ui/utils/timeline";
+  getAnalysisPointsForLocation,
+} from "ui/reducers/breakpoints";
 
 const TOO_MANY_HITS_TO_SHOW = 1000;
 

@@ -1,11 +1,10 @@
 import type { PointDescription, Location } from "@replayio/protocol";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
-import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { HoveredItem } from "ui/state/timeline";
 
 import Marker from "./Marker";
+import { getPointsForHoveredLineNumber } from "ui/reducers/breakpoints";
 
 export default function PreviewMarkers() {
   const currentTime = useAppSelector(selectors.getCurrentTime);
@@ -55,5 +54,7 @@ function getIsSecondaryHighlighted(
     return false;
   }
 
-  return getLocationKey(hoveredItem.location) == getLocationKey(location);
+  return (
+    hoveredItem.location.line === location.line && hoveredItem.location.column === location.column
+  );
 }

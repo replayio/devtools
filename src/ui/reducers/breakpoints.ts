@@ -25,11 +25,11 @@ import {
 import { getSelectedSource, getStableLocationForLocation, LoadingState } from "./sources";
 import { getLocationKey } from "./possibleBreakpoints";
 import { UIState } from "ui/state";
-import { getLocation } from "graphql";
 import { FocusRegion } from "ui/state/timeline";
 import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
 import uniqBy from "lodash/uniqBy";
 import { compareNumericStrings } from "protocol/utils";
+import { UIThunkAction } from "ui/actions";
 
 export enum AnalysisStatus {
   // Happy path
@@ -147,7 +147,7 @@ const breakpointsSlice = createSlice({
   reducers: {
     breakpointRequested(
       state,
-      action: PayloadAction<{ location: StableLocation; options: Partial<BreakpointOptions> }>
+      action: PayloadAction<{ location: StableLocation; options: BreakpointOptions }>
     ) {
       const id = stableIdForLocation(action.payload.location);
       const breakpoint: Breakpoint = {
@@ -164,11 +164,32 @@ const breakpointsSlice = createSlice({
         allAnalyses: [],
       });
     },
-    breakpointRemoved(
+    breakpointCreated(
       state,
-      action: PayloadAction<{ location: StableLocation; recordingId: string }>
+      action: PayloadAction<{ location: StableLocation; serverId: string }>
     ) {
       const id = stableIdForLocation(action.payload.location);
+      breakpointsAdapter.updateOne(state.breakpoints, {
+        id,
+        changes: {
+          serverId: action.payload.serverId,
+          error: undefined,
+          status: LoadingState.LOADED,
+        },
+      });
+    },
+    breakpointErrored(state, action: PayloadAction<{ location: StableLocation; error: string }>) {
+      const id = stableIdForLocation(action.payload.location);
+      breakpointsAdapter.updateOne(state.breakpoints, {
+        id,
+        changes: {
+          error: "",
+          status: LoadingState.ERRORED,
+        },
+      });
+    },
+    breakpointRemoved(state, action: PayloadAction<StableLocation>) {
+      const id = stableIdForLocation(action.payload);
       breakpointsAdapter.removeOne(state.breakpoints, id);
       mappingsAdapter.removeOne(state.analysisMappings, id);
     },
@@ -319,6 +340,8 @@ export const {
   analysisPointsRequested,
   analysisResultsReceived,
   analysisResultsRequested,
+  breakpointCreated,
+  breakpointErrored,
   breakpointRemoved,
   breakpointRequested,
 } = breakpointsSlice.actions;
@@ -365,6 +388,31 @@ export const getBreakpointsForSelectedSource = createSelector(
     });
   }
 );
+
+export function addBreakpoint(
+  location: Location,
+  options: Partial<BreakpointOptions> = {}
+): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const stableLocation = getStableLocationForLocation(getState(), location);
+    const combinedOptions = {
+      shouldLog: true,
+      shouldPause: false,
+      logGroupId: stableIdForLocation(stableLocation),
+      ...options,
+    };
+    dispatch(breakpointRequested({ location: stableLocation, options: combinedOptions }));
+    await ThreadFront.setBreakpoint(
+      location.sourceId,
+      location.line,
+      location.column,
+      combinedOptions.condition || undefined
+    );
+    // I don't think we get the server ID back from threadfront. I don't think
+    // we really need it though.
+    dispatch(breakpointCreated({ location: stableLocation, serverId: "unknown" }));
+  };
+}
 
 export function getBreakpointsForSource(state: UIState, sourceId: string, line?: number) {
   if (!sourceId) {

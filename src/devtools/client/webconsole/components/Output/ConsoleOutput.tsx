@@ -40,7 +40,7 @@ import type { State as ConsoleSearchState } from "../Search/useConsoleSearch";
 import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
 
 function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
-  if (!locA) {
+  if (!locA || !locB) {
     return false;
   }
   return locA.sourceId == locB.sourceId && locA.line == locB.line && locA.column == locB.column;

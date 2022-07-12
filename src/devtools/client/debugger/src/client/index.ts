@@ -6,23 +6,20 @@ import { newSource } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { bindActionCreators } from "redux";
 import type { UIStore } from "ui/actions";
+import { initialBreakpointsState } from "ui/reducers/breakpoints";
 import { addSources, allSourcesReceived } from "ui/reducers/sources";
 
 import actions from "../actions";
-import { initialBreakpointsState } from "../reducers/breakpoints";
 import * as selectors from "../selectors";
-import { asyncStore, verifyPrefSchema } from "../utils/prefs";
+import { verifyPrefSchema } from "../utils/prefs";
 
-import { setupCommands, clientCommands, prepareSourcePayload } from "./commands";
+import { setupCommands, clientCommands } from "./commands";
 import { setupEvents } from "./events";
 
 export async function loadInitialState() {
-  // @ts-expect-error missing `pendingBreakpoints` field
-  const pendingBreakpoints = await asyncStore.pendingBreakpoints;
   const breakpoints = initialBreakpointsState();
 
   return {
-    pendingBreakpoints,
     breakpoints,
   };
 }

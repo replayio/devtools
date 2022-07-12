@@ -9,8 +9,6 @@
  * @module reducers/index
  */
 
-import breakpoints from "./breakpoints";
-import pendingBreakpoints from "./pending-breakpoints";
 import asyncRequests from "./async-requests";
 import pause from "./pause";
 import ui from "./ui";
@@ -21,10 +19,10 @@ import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
 import eventListenerBreakpoints from "./event-listeners";
+import breakpoints from "ui/reducers/breakpoints";
 
 export default {
   breakpoints,
-  pendingBreakpoints,
   asyncRequests,
   pause,
   ui,
