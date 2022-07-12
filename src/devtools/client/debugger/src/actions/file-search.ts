@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import { UIThunkAction } from "ui/actions";
+import type { Context } from "../reducers/pause";
 
 import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
 import {
@@ -12,17 +13,26 @@ import {
   getFileSearchResults,
 } from "../selectors";
 import { isFulfilled } from "../utils/async-value";
+
 import {
+  // @ts-expect-error
   clearSearch,
+  // @ts-expect-error
   find,
+  // @ts-expect-error
   findNext,
+  // @ts-expect-error
   findPrev,
+  // @ts-expect-error
   removeOverlay,
+  // @ts-expect-error
   searchSourceForHighlight,
 } from "../utils/editor";
 import { getMatches } from "../workers/search";
 
-export function doSearch(cx, query, editor) {
+type $FixTypeLater = any;
+
+export function doSearch(cx: Context, query: string, editor: $FixTypeLater): UIThunkAction {
   return (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
@@ -34,7 +44,12 @@ export function doSearch(cx, query, editor) {
   };
 }
 
-export function doSearchForHighlight(query, editor, line, ch) {
+export function doSearchForHighlight(
+  query: string,
+  editor: $FixTypeLater,
+  line: number,
+  ch: number
+): UIThunkAction {
   return async (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
     if (!selectedSource || !selectedSource.content) {
@@ -44,7 +59,7 @@ export function doSearchForHighlight(query, editor, line, ch) {
   };
 }
 
-export function setFileSearchQuery(cx, query) {
+export function setFileSearchQuery(cx: Context, query: string) {
   return {
     type: "UPDATE_FILE_SEARCH_QUERY",
     cx,
@@ -52,11 +67,24 @@ export function setFileSearchQuery(cx, query) {
   };
 }
 
-export function toggleFileSearchModifier(cx, modifier) {
+export function toggleFileSearchModifier(
+  cx: Context,
+  modifier: "regexMatch" | "caseSensitive" | "wholeWord"
+) {
   return { type: "TOGGLE_FILE_SEARCH_MODIFIER", cx, modifier };
 }
 
-export function updateSearchResults(cx, characterIndex, line, matches) {
+interface SearchMatch {
+  line: number;
+  ch: number;
+}
+
+export function updateSearchResults(
+  cx: Context,
+  characterIndex: number,
+  line: number,
+  matches: SearchMatch[]
+) {
   const matchIndex = matches.findIndex(elm => elm.line === line && elm.ch === characterIndex);
 
   return {
@@ -71,7 +99,12 @@ export function updateSearchResults(cx, characterIndex, line, matches) {
   };
 }
 
-export function searchContents(cx, query, editor, focusFirstResult = true) {
+export function searchContents(
+  cx: Context,
+  query: string,
+  editor: $FixTypeLater,
+  focusFirstResult = true
+): UIThunkAction {
   return async (dispatch, getState) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
@@ -94,7 +127,7 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
       return;
     }
 
-    const text = selectedContent.value;
+    const text = selectedContent!.value;
     const matches = await getMatches(query, text, modifiers);
 
     const res = find(ctx, query, true, modifiers, focusFirstResult);
@@ -108,7 +141,12 @@ export function searchContents(cx, query, editor, focusFirstResult = true) {
   };
 }
 
-export function searchContentsForHighlight(query, editor, line, ch) {
+export function searchContentsForHighlight(
+  query: string,
+  editor: $FixTypeLater,
+  line: number,
+  ch: number
+): UIThunkAction {
   return async (dispatch, getState) => {
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
@@ -122,7 +160,7 @@ export function searchContentsForHighlight(query, editor, line, ch) {
   };
 }
 
-export function traverseResults(cx, rev, editor) {
+export function traverseResults(cx: Context, rev: boolean, editor: $FixTypeLater): UIThunkAction {
   return async (dispatch, getState) => {
     if (!editor) {
       return;
@@ -153,7 +191,7 @@ export function traverseResults(cx, rev, editor) {
   };
 }
 
-export function closeFileSearch(cx, editor) {
+export function closeFileSearch(cx: Context, editor: $FixTypeLater): UIThunkAction {
   return (dispatch, getState) => {
     if (editor) {
       const query = getFileSearchQuery(getState());

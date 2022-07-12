@@ -212,6 +212,7 @@ class SearchBar extends Component {
     const { cx, modifiers, toggleFileSearchModifier, query } = this.props;
     const { doSearch } = this;
 
+    // TODO Pull this component out
     function SearchModBtn({ modVal, className, svgName, tooltip }) {
       const preppedClass = classnames(className, {
         active: modifiers && modifiers[modVal],

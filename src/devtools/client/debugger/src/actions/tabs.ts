@@ -9,12 +9,17 @@
  * @module actions/tabs
  */
 
+import { UIThunkAction } from "ui/actions";
+import type { Context } from "../reducers/pause";
+import type { Source } from "../reducers/types";
+
+// @ts-expect-error
 import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
 import { getSourceByURL, getSourceTabs, getNewSelectedSourceId } from "../selectors";
 
-export function updateTab(source, framework) {
+export function updateTab(source: Source, framework: string) {
   const { url, id: sourceId } = source;
   const isOriginal = source.isOriginal;
 
@@ -27,7 +32,7 @@ export function updateTab(source, framework) {
   };
 }
 
-export function moveTab(url, tabIndex) {
+export function moveTab(url: string, tabIndex: number) {
   return {
     type: "MOVE_TAB",
     url,
@@ -35,7 +40,7 @@ export function moveTab(url, tabIndex) {
   };
 }
 
-export function moveTabBySourceId(sourceId, tabIndex) {
+export function moveTabBySourceId(sourceId: string, tabIndex: number) {
   return {
     type: "MOVE_TAB_BY_SOURCE_ID",
     sourceId,
@@ -47,7 +52,7 @@ export function moveTabBySourceId(sourceId, tabIndex) {
  * @memberof actions/tabs
  * @static
  */
-export function closeTab(cx, source) {
+export function closeTab(cx: Context, source: Source): UIThunkAction {
   return (dispatch, getState, { client }) => {
     removeDocument(source.id);
 
@@ -63,9 +68,9 @@ export function closeTab(cx, source) {
  * @memberof actions/tabs
  * @static
  */
-export function closeTabs(cx, urls) {
+export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
   return (dispatch, getState, { client }) => {
-    const sources = urls.map(url => getSourceByURL(getState(), url)).filter(Boolean);
+    const sources = urls.map(url => getSourceByURL(getState(), url)!).filter(Boolean);
 
     const tabs = getSourceTabs(getState());
     sources.map(source => removeDocument(source.id));

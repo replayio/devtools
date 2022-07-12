@@ -2,7 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { UIStore } from "ui/actions";
+import { UIThunkAction } from "ui/actions";
 
 import { exceptionLogpointErrorCleared } from "devtools/client/webconsole/reducers/messages";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
@@ -10,7 +11,7 @@ import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { clientCommands } from "../client/commands";
 import { getShouldLogExceptions } from "../reducers/pause";
 
-export function setupExceptions(store) {
+export function setupExceptions(store: UIStore) {
   if (getShouldLogExceptions(store.getState())) {
     clientCommands.logExceptions(true);
   }
@@ -21,7 +22,7 @@ export function setupExceptions(store) {
  * @memberof actions/pause
  * @static
  */
-export function logExceptions(shouldLogExceptions) {
+export function logExceptions(shouldLogExceptions: boolean): UIThunkAction {
   return (dispatch, getState, { client }) => {
     dispatch(exceptionLogpointErrorCleared());
 
