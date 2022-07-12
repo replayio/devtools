@@ -6,6 +6,7 @@ import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { removeLogpoint, removeLogpointsInSource } from "../../actions/breakpoints/logpoints";
 import { Context } from "../../selectors";
 import { Breakpoint, Source } from "../../reducers/types";
+import { SourceDetails } from "ui/reducers/sources";
 
 export default function LogpointsPane() {
   const dispatch = useAppDispatch();
@@ -28,7 +29,7 @@ export default function LogpointsPane() {
       onRemoveBreakpoint={(cx: Context, breakpoint: Breakpoint) =>
         dispatch(removeLogpoint(cx, breakpoint))
       }
-      onRemoveBreakpoints={(cx: Context, source: Source) =>
+      onRemoveBreakpoints={(cx: Context, source: SourceDetails) =>
         dispatch(removeLogpointsInSource(cx, source))
       }
     />

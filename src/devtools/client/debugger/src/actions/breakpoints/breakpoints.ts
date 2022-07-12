@@ -29,13 +29,6 @@ import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
 
-import {
-  _removeBreakpoint,
-  removeBreakpointOption,
-  addBreakpoint,
-  enableBreakpoint,
-  disableBreakpoint,
-} from "./modify";
 import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {

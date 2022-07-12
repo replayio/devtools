@@ -14,15 +14,15 @@ import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
-import type { Breakpoint, Source } from "../../../reducers/types";
+import type { Breakpoint } from "../../../reducers/types";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import { getUniqueUrlForSource } from "ui/reducers/sources";
+import { getUniqueUrlForSource, SourceDetails } from "ui/reducers/sources";
 import { truncateMiddleText } from "../../../utils/text";
 
 type BHExtraProps = {
-  source: Source;
+  source: SourceDetails;
   breakpoint: Breakpoint;
-  onRemoveBreakpoints: (cx: Context, source: Source) => void;
+  onRemoveBreakpoints: (cx: Context, source: SourceDetails) => void;
 };
 
 const mapStateToProps = (state: UIState, { source }: BHExtraProps) => ({

@@ -2,15 +2,15 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { Location } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 
 import type {
   Breakpoint,
   PendingBreakpoint,
-  SourceLocation,
   PendingLocation,
+  StableLocation,
 } from "../../reducers/types";
+
 import assert from "../assert";
 import { features } from "../prefs";
 
@@ -28,26 +28,26 @@ export function firstString(...args: any[]) {
 }
 
 // The ID for a Breakpoint is derived from its location in its Source.
-export function getLocationKey(location: SourceLocation & { scriptId?: string }) {
+export function getLocationKey(location: StableLocation & { scriptId?: string }) {
   const { sourceId, line, column } = location;
   const columnString = column || "";
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
-export function getLocationAndConditionKey(location: SourceLocation, condition: string) {
+export function getLocationAndConditionKey(location: StableLocation, condition: string) {
   return `${getLocationKey(location)}:${condition}`;
 }
 
-export function isMatchingLocation(location1?: SourceLocation, location2?: SourceLocation) {
+export function isMatchingLocation(location1?: StableLocation, location2?: StableLocation) {
   return location1 && location2 && getLocationKey(location1) === getLocationKey(location2);
 }
 
-export function getLocationWithoutColumn(location: Location) {
+export function getLocationWithoutColumn(location: StableLocation) {
   const { sourceId, line } = location;
   return `${sourceId}:${line}`;
 }
 
-export function makePendingLocationId(location: SourceLocation, recordingId: string) {
+export function makePendingLocationId(location: StableLocation, recordingId: string) {
   assertPendingLocation(location);
   const { sourceUrl, line, column } = location;
   const sourceUrlString = sourceUrl || "";
@@ -64,7 +64,7 @@ export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {
   assertPendingLocation(pendingBreakpoint.location);
 }
 
-export function assertLocation(location: SourceLocation) {
+export function assertLocation(location: StableLocation) {
   assertPendingLocation(location);
   const { sourceId } = location;
   assert(!!sourceId, "location must have a source id");
@@ -73,10 +73,9 @@ export function assertLocation(location: SourceLocation) {
 export function assertPendingLocation(location: PendingLocation) {
   assert(!!location, "location must exist");
 
-  const { sourceUrl } = location;
-
+  // TODO @jcmorrow... confirm if we actually don't need URL here.
   // sourceUrl is null when the source does not have a url
-  assert(sourceUrl !== undefined, "location must have a source url");
+  // assert(sourceUrl !== undefined, "location must have a source url");
   assert(location.hasOwnProperty("line"), "location must have a line");
   assert(
     location.hasOwnProperty("column") && location.column != null,
@@ -85,7 +84,7 @@ export function assertPendingLocation(location: PendingLocation) {
 }
 
 // syncing
-export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }: Location) {
+export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }: StableLocation) {
   return breakpoints.find(breakpoint => {
     const sameLine = breakpoint.location.line === line;
     if (!sameLine) {
@@ -102,7 +101,7 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
   });
 }
 
-function createPendingLocation(location: SourceLocation) {
+function createPendingLocation(location: StableLocation) {
   const { sourceUrl, line, column } = location;
   return { sourceUrl, line, column };
 }

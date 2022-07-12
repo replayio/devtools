@@ -204,7 +204,7 @@ export const getTextAtLocation = (state: UIState, location: Location) => {
   if (!content) {
     return null;
   }
-  return getTextAtPosition(content.value, location);
+  return getTextAtPosition(content, location);
 };
 // This is useful if you are displaying a bunch of sources and want them to
 // ensure they all have unique names, even though some of them might have been

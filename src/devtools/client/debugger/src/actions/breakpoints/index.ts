@@ -12,7 +12,6 @@
 // this will need to be changed so that addCLientBreakpoint is removed
 
 export * from "./modify";
-export * from "./syncBreakpoint";
 
 export * from "./breakpoints";
 export * from "./logpoints";

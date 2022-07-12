@@ -14,7 +14,7 @@ import { getLocationKey, sortSelectedBreakpoints } from "../../../utils/breakpoi
 import { waitForEditor } from "devtools/client/debugger/src/utils/editor/create-editor";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { actions } from "ui/actions";
-import type { Breakpoint as BreakpointType, Source } from "../../../reducers/types";
+import type { Breakpoint as BreakpointType } from "../../../reducers/types";
 
 import type { BreakpointOrLogpointSources } from "../../../selectors/breakpointSources";
 import { getSelectedSource } from "ui/reducers/sources";
@@ -35,7 +35,7 @@ type BreakpointsProps = PropsFromRedux & {
   emptyContent: React.ReactNode;
   breakpointSources: BreakpointOrLogpointSources[];
   onRemoveBreakpoint: (cx: Context, breakpoint: BreakpointType) => void;
-  onRemoveBreakpoints: (cx: Context, source: Source) => void;
+  onRemoveBreakpoints: (cx: Context, source: SourceDetails) => void;
 };
 
 interface BreakpointsState {
@@ -109,7 +109,6 @@ class Breakpoints extends Component<BreakpointsProps, BreakpointsState> {
             return (
               <div className="breakpoints-list-source" key={source.id}>
                 <BreakpointHeading
-                  // @ts-expect-error Source field mismatch
                   source={source}
                   key="header"
                   onRemoveBreakpoints={onRemoveBreakpoints}

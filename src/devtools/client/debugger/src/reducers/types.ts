@@ -118,6 +118,14 @@ export type ASTLocation = {
   readonly index: number;
 };
 
+// Usually, we use source ID's to identify sources. However, source IDs are not
+// stable across sessions. Instead, we use URLs with content-hashes to identify
+// sources when storing locations that might be used across sessions.
+export interface StableLocation extends SourceLocation {
+  url: string;
+  contentHash: string;
+}
+
 /**
  * Breakpoint is associated with a Source.
  *
@@ -126,7 +134,7 @@ export type ASTLocation = {
  */
 export type Breakpoint = {
   readonly id: BreakpointId;
-  readonly location: Location;
+  readonly location: StableLocation;
   readonly astLocation: ASTLocation | null | undefined;
   readonly generatedLocation: Location;
   readonly disabled: boolean;
