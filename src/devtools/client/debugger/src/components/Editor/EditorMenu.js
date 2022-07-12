@@ -73,6 +73,7 @@ const mapStateToProps = (state, props) => ({
   isPaused: getIsPaused(state),
   alternateSource: getAlternateSource(state),
   hasMappedLocation: false,
+  // TODO @jcmorrow this is lazy, gotta fix.
   // (props.selectedSource.isOriginal ||
   //   isSourceWithMap(state, props.selectedSource.id) ||
   //   isPretty(props.selectedSource)) &&

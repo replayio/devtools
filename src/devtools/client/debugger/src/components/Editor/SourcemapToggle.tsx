@@ -47,7 +47,7 @@ export function SourcemapToggle({ setModal, showAlternateSource }: PropsFromRedu
   );
 }
 
-const connector = connect(() => ({}), {
+const connector = connect(null, {
   showAlternateSource: actions.showAlternateSource,
   setModal,
 });
