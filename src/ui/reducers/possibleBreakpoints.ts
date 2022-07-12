@@ -1,5 +1,6 @@
 import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Location, SameLineSourceLocations } from "@replayio/protocol";
+import uniq from "lodash/uniq";
 import uniqBy from "lodash/uniqBy";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -110,7 +111,7 @@ function groupByLine(results: Location[], sourceId: string, line: number) {
 
 export const fetchPossibleBreakpointsForSource = (sourceId: string): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
-    const status = getState().breakableLines.breakableLines.entities[sourceId]?.status;
+    const status = getState().possibleBreakpoints.possibleBreakpoints.entities[sourceId]?.status;
     if (status === LoadingState.LOADED || status === LoadingState.LOADING) {
       return;
     }
@@ -142,6 +143,20 @@ export const getPossibleBreakpointsForSelectedSource = (state: UIState) => {
     return null;
   }
   return getPossibleBreakpointsForSource(state, sourceId);
+};
+export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
+  return uniq(
+    state.possibleBreakpoints.possibleBreakpoints.entities[sourceId]?.possibleBreakpoints?.map(
+      location => location.line
+    )
+  );
+};
+export const getBreakableLinesForSelectedSource = (state: UIState) => {
+  const sourceId = getSelectedSourceId(state);
+  if (!sourceId) {
+    return null;
+  }
+  return getBreakableLinesForSource(state, sourceId);
 };
 
 export default possibleBreakpointsSlice.reducer;

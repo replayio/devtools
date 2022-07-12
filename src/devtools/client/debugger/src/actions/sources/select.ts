@@ -11,8 +11,8 @@
 
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
-import { fetchBreakableLinesForSource } from "ui/reducers/breakableLines";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 import {
   experimentalLoadSourceText,
   getSelectedSource,
@@ -171,7 +171,7 @@ export function selectLocation(
     }
 
     dispatch(experimentalLoadSourceText(source.id));
-    // dispatch(fetchBreakableLinesForSource(source.id));
+    dispatch(fetchPossibleBreakpointsForSource(source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));

@@ -3,7 +3,6 @@ import { AppState } from "./app";
 import { ASTState } from "devtools/client/debugger/src/reducers/ast";
 import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/async-requests";
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
-import { BreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { ChangesState } from "devtools/client/inspector/changes/reducers/changes";
 import type { EventListenersState } from "devtools/client/debugger/src/selectors";
 import type { FileSearchState } from "devtools/client/debugger/src/selectors";
@@ -32,6 +31,7 @@ import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { HitCountsState } from "ui/reducers/hitCounts";
 import { BreakableLinesState } from "ui/reducers/breakableLines";
 import { PossibleBreakpointsState } from "ui/reducers/possibleBreakpoints";
+import { BreakpointsState } from "ui/reducers/breakpoints";
 
 // TODO Ideally this should be inferred from store setup
 export interface UIState {
@@ -39,7 +39,6 @@ export interface UIState {
   ast: ASTState;
   asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
-  breakableLines: BreakableLinesState;
   breakpoints: BreakpointsState;
   changes: ChangesState;
   classList: ClassListState;

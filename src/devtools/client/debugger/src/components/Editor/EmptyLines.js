@@ -7,7 +7,7 @@
 import { connect } from "react-redux";
 import { Component } from "react";
 import { fromEditorLine } from "../../utils/editor";
-import { getBreakableLinesForSelectedSource } from "ui/reducers/breakableLines";
+import { getBreakableLinesForSelectedSource } from "ui/reducers/possibleBreakpoints";
 
 class EmptyLines extends Component {
   componentDidMount() {
