@@ -19,6 +19,8 @@ import { getBreakpointsList, getBreakpointAtLocation, getSymbols } from "../../s
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
+import { getPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
+import minBy from "lodash/minBy";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
@@ -116,7 +118,7 @@ export function removeBreakpoints(
   };
 }
 
-export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction {
+export function toggleBreakpointAtLine(line: number): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const selectedSource = getSelectedSource(state);
@@ -125,18 +127,33 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
       return;
     }
 
-    // TODO @jcmorrow I think this should accept udnefined for the column
-    const bp = getBreakpointAtLocation(state, { line, column: 0 });
+    const possibleBreakpoints = getPossibleBreakpointsForSource(state, selectedSource.id)!;
+    const column = possibleBreakpoints.find(lineBreakpoint => lineBreakpoint.line === line)
+      ?.columns[0];
+
+    if (column === undefined) {
+      console.debug(`Impossible to break at requested line: ${line} in ${selectedSource.id}`);
+      return;
+    }
+
+    const location = {
+      sourceId: selectedSource.id,
+      line,
+      column,
+    };
+
+    const bp = getBreakpointAtLocation(state, location);
+
     if (bp) {
       return dispatch(breakpointRemoved(bp.location));
     }
-    return dispatch(
-      addBreakpoint({
-        sourceId: selectedSource.id,
-        line,
-        column: 0,
-      })
-    );
+
+    const options = {
+      shouldLog: true,
+      logValue: getLogValue(selectedSource, state, location),
+    };
+
+    return dispatch(addBreakpoint(location, options));
   };
 }
 
@@ -148,34 +165,14 @@ export function _addBreakpointAtLine(
   shouldPause: boolean
 ): UIThunkAction {
   return (dispatch, getState) => {
-    const state = getState();
-    const source = getSelectedSource(state);
-
-    if (!source) {
-      return;
-    }
-
     trackEvent("breakpoint.add");
-
-    const breakpointLocation = {
-      sourceId: source.id,
-      sourceUrl: source.url,
-      column: undefined,
-      line,
-    };
 
     const options: {
       shouldPause: boolean;
       logValue?: string;
     } = { shouldPause };
 
-    if (shouldLog) {
-      // @ts-ignore location field mismatches
-      options.logValue = getLogValue(source, state, breakpointLocation);
-    }
-
-    // @ts-ignore location field mismatches
-    return dispatch(addBreakpoint(cx, breakpointLocation, options, disabled));
+    return dispatch(toggleBreakpointAtLine(line));
   };
 }
 

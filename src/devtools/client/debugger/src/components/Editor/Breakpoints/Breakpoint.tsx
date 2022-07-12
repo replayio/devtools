@@ -13,7 +13,7 @@ import type { Context } from "../../../reducers/pause";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
+import { isBreakable } from "../../../utils/breakpoint";
 import type { Breakpoint as BreakpointType } from "../../../reducers/types";
 import { SourceDetails } from "ui/reducers/sources";
 import Editor from "../../../utils/editor/source-editor";

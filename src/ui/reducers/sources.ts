@@ -151,7 +151,6 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
     try {
       const response = await ThreadFront.getSourceContents(sourceId);
 
-      console.log({ sourceId });
       parser.setSource(sourceId, {
         type: "text",
         value: response.contents,

@@ -7,12 +7,8 @@ import type { Location } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
-import {
-  getSelectedSource,
-  getSelectedSourceWithContent,
-  getSourcesById,
-  SourceContent,
-} from "ui/reducers/sources";
+import { getPossibleBreakpointsForSelectedSource } from "ui/reducers/possibleBreakpoints";
+import { getSelectedSourceWithContent, getSourcesById, SourceContent } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { features } from "ui/utils/prefs";
 
@@ -53,7 +49,9 @@ function findBreakpoint(location: Location, breakpointMap: BreakpointMap) {
   const { line, column } = location;
   const breakpoints = breakpointMap[line] && breakpointMap[line][column];
 
-  if (breakpoints) {
+  if (!breakpoints) {
+    return undefined;
+  } else {
     return breakpoints[0];
   }
 }
@@ -68,7 +66,7 @@ function filterVisible(positions: Location[], viewport: Range) {
 // filter out positions that are not in the map
 function filterByBreakpoints(positions: Location[], breakpointMap: BreakpointMap) {
   return positions.filter(position => {
-    return breakpointMap[position.line];
+    return breakpointMap[position.line] && breakpointMap[position.line][position.column];
   });
 }
 
@@ -94,30 +92,12 @@ function convertToList<T>(breakpointPositions: Record<string, T>) {
   return ([] as T[]).concat(...Object.values(breakpointPositions));
 }
 
-const getVisibleBreakpointPositions = createSelector(
-  getSelectedSource,
-  // getBreakpointPositions,
-  (state: UIState) => ({} as Record<string, Record<string, unknown>>),
-  (source, positions) => {
-    if (!source) {
-      return [];
-    }
-
-    const sourcePositions = positions[source.id];
-    if (!sourcePositions) {
-      return [];
-    }
-
-    return convertToList(sourcePositions);
-  }
-);
-
 export const visibleColumnBreakpoints = createSelector(
   getVisibleBreakpoints,
   getVisibleRequestedBreakpoints,
   getViewport,
   getSelectedSourceWithContent,
-  getVisibleBreakpointPositions,
+  getPossibleBreakpointsForSelectedSource,
   (breakpoints, requestedBreakpoints, viewport, selectedSource, breakpointPositions) => {
     if (!selectedSource) {
       return [];
@@ -126,7 +106,7 @@ export const visibleColumnBreakpoints = createSelector(
     // We only want to show a column breakpoint if several conditions are matched
     // - it is the first breakpoint to appear at an the original location
     // - the position is in the current viewport
-    // - there is atleast one other breakpoint on that line
+    // - there is at least one other breakpoint on that line
     // - there is a breakpoint on that line
     // @ts-ignore nested field mismatch
     const allBreakpoints: Breakpoint[] = [...(breakpoints ?? []), ...(requestedBreakpoints ?? [])];
@@ -146,11 +126,11 @@ export const visibleColumnBreakpoints = createSelector(
     }
     const breakpointMap = groupBreakpoints(allBreakpoints);
     // @ts-ignore columns undefined
-    positions = filterVisible(positions, viewport);
-    positions = filterInLine(positions, selectedSource.content);
-    positions = filterByBreakpoints(positions, breakpointMap);
+    const visiblePositions = filterVisible(positions, viewport);
+    const positionsInLine = filterInLine(visiblePositions, selectedSource);
+    const positionsWithBreakpoint = filterByBreakpoints(positionsInLine, breakpointMap);
 
-    return formatPositions(positions, breakpointMap);
+    return formatPositions(positionsWithBreakpoint, breakpointMap);
   }
 );
 

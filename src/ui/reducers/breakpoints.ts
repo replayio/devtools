@@ -157,12 +157,14 @@ const breakpointsSlice = createSlice({
         ...action.payload,
       };
       breakpointsAdapter.upsertOne(state.breakpoints, breakpoint);
-      mappingsAdapter.addOne(state.analysisMappings, {
-        locationId: id,
-        currentAnalysis: null,
-        lastSuccessfulAnalysis: null,
-        allAnalyses: [],
-      });
+      if (action.payload.options.logValue) {
+        mappingsAdapter.addOne(state.analysisMappings, {
+          locationId: id,
+          currentAnalysis: null,
+          lastSuccessfulAnalysis: null,
+          allAnalyses: [],
+        });
+      }
     },
     breakpointCreated(
       state,
@@ -346,6 +348,8 @@ export const {
   breakpointRequested,
 } = breakpointsSlice.actions;
 
+export const { selectAll: selectAllBreakpoints } = breakpointsAdapter.getSelectors();
+
 export default breakpointsSlice.reducer;
 
 // Selectors
@@ -402,16 +406,22 @@ export function addBreakpoint(
       ...options,
     };
     dispatch(breakpointRequested({ location: stableLocation, options: combinedOptions }));
-    await ThreadFront.setBreakpoint(
-      location.sourceId,
-      location.line,
-      location.column,
-      combinedOptions.condition || undefined
-    );
+    if (combinedOptions.shouldPause) {
+      await ThreadFront.setBreakpoint(
+        location.sourceId,
+        location.line,
+        location.column,
+        combinedOptions.condition || undefined
+      );
+    }
     // I don't think we get the server ID back from threadfront. I don't think
     // we really need it though.
     dispatch(breakpointCreated({ location: stableLocation, serverId: "unknown" }));
   };
+}
+
+export function removeBreakpoint(): UIThunkAction {
+  return async (dispatch, getState) => {};
 }
 
 export function getBreakpointsForSource(state: UIState, sourceId: string, line?: number) {

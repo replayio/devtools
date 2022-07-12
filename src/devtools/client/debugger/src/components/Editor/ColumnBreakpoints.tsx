@@ -8,7 +8,6 @@ import ColumnBreakpoint from "./ColumnBreakpoint";
 import { visibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
-import { getLocationKey } from "../../utils/breakpoint";
 import { getSelectedSource } from "ui/reducers/sources";
 
 // eslint-disable-next-line max-len
@@ -41,7 +40,7 @@ class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
       breakpoints = columnBreakpoints.map((breakpoint, i) => (
         <ColumnBreakpoint
           cx={cx}
-          key={getLocationKey(breakpoint.location)}
+          key={breakpoint.breakpoint!.id}
           columnBreakpoint={breakpoint}
           editor={editor}
           source={selectedSource}

@@ -6,10 +6,11 @@ import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
 import { LoadingState } from "ui/reducers/possibleBreakpoints";
+import { selectAllBreakpoints } from "ui/reducers/breakpoints";
 
 export const getBreakpointsList = createSelector(
   (state: UIState) => state.breakpoints.breakpoints,
-  breakpoints => Object.values(breakpoints.entities)
+  breakpoints => selectAllBreakpoints(breakpoints)
 );
 
 export const getRequestedBreakpointLocations = (state: UIState) =>

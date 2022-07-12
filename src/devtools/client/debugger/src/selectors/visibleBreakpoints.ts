@@ -5,7 +5,7 @@
 import { createSelector } from "reselect";
 import uniqBy from "lodash/uniqBy";
 
-import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
+import { getBreakpointsList } from "./breakpoints";
 
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 import { Breakpoint } from "../reducers/types";
@@ -23,8 +23,9 @@ export const getVisibleBreakpoints = createSelector(
       return null;
     }
 
-    console.log({ breakpoints });
-    return breakpoints.filter(bp => selectedSource && bp.location.sourceId === selectedSource.id);
+    return breakpoints.filter(
+      bp => !!bp && selectedSource && bp.location.sourceId === selectedSource.id
+    );
   }
 );
 
@@ -40,7 +41,7 @@ export const getVisibleRequestedBreakpoints = createSelector(
     }
 
     return breakpoints.filter(
-      bp => bp.status === LoadingState.LOADING && bp.location.sourceId === selectedSource.id
+      bp => bp && bp.status === LoadingState.LOADING && bp.location.sourceId === selectedSource.id
     );
   }
 );
@@ -58,8 +59,8 @@ export const getFirstVisibleBreakpoints = createSelector(
       return [];
     }
 
-    // @ts-ignore Breakpoint location field mismatch
     const allBreakpoints: Breakpoint[] = [...breakpoints, ...requestedBreakpoints!];
+
     return uniqBy(sortSelectedBreakpoints(allBreakpoints), bp => bp.location.line);
   }
 );

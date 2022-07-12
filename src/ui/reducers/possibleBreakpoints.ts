@@ -137,13 +137,23 @@ export const fetchPossibleBreakpointsForSource = (sourceId: string): UIThunkActi
 export const getPossibleBreakpointsForSource = (state: UIState, sourceId: string) => {
   return state.possibleBreakpoints.possibleBreakpoints.entities[sourceId]?.possibleBreakpoints;
 };
-export const getPossibleBreakpointsForSelectedSource = (state: UIState) => {
+export const getPossibleBreakpointsForSelectedSource = (state: UIState): Location[] => {
   const sourceId = getSelectedSourceId(state);
   if (!sourceId) {
-    return null;
+    return [];
   }
-  return getPossibleBreakpointsForSource(state, sourceId);
+  const byLine: SameLineSourceLocations[] = getPossibleBreakpointsForSource(state, sourceId) || [];
+  return byLine.flatMap(line =>
+    line.columns.map(column => {
+      return {
+        sourceId,
+        line: line.line,
+        column,
+      };
+    })
+  );
 };
+
 export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
   return uniq(
     state.possibleBreakpoints.possibleBreakpoints.entities[sourceId]?.possibleBreakpoints?.map(
