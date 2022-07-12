@@ -10,6 +10,7 @@ import type {
   PendingLocation,
   StableLocation,
 } from "../../reducers/types";
+import { stableIdForSource } from "ui/utils/sources";
 
 import assert from "../assert";
 import { features } from "../prefs";
@@ -27,19 +28,23 @@ export function firstString(...args: any[]) {
   return null;
 }
 
-// The ID for a Breakpoint is derived from its location in its Source.
-export function getLocationKey(location: StableLocation & { scriptId?: string }) {
-  const { sourceId, line, column } = location;
-  const columnString = column || "";
-  return `${sourceId || location.scriptId}:${line}:${columnString}`;
+// This is just an alias to allow legacy calls to still work.
+export function getLocationKey(location: StableLocation) {
+  return stableIdForLocation(location);
+}
+
+export function stableIdForLocation(location: StableLocation) {
+  return [stableIdForSource(location), location.line, location.column].filter(Boolean).join(":");
 }
 
 export function getLocationAndConditionKey(location: StableLocation, condition: string) {
-  return `${getLocationKey(location)}:${condition}`;
+  return `${stableIdForLocation(location)}:${condition}`;
 }
 
 export function isMatchingLocation(location1?: StableLocation, location2?: StableLocation) {
-  return location1 && location2 && getLocationKey(location1) === getLocationKey(location2);
+  return (
+    location1 && location2 && stableIdForLocation(location1) === stableIdForLocation(location2)
+  );
 }
 
 export function getLocationWithoutColumn(location: StableLocation) {

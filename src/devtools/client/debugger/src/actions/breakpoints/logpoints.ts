@@ -10,7 +10,6 @@ import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
 
 import { _addBreakpointAtLine } from "./breakpoints";
-import { _removeBreakpoint, removeBreakpointOption } from "./modify";
 
 export function removeLogpointsInSource(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState) => {

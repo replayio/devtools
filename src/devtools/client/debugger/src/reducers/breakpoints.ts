@@ -27,7 +27,7 @@ import assert from "../utils/assert";
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
 
 import type { Breakpoint, SourceLocation } from "./types";
-import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
+import { FocusRegion } from "ui/state/timeline";
 import { getSelectedSource } from "ui/reducers/sources";
 export type { Breakpoint } from "./types";
 

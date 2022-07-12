@@ -2,8 +2,6 @@ import { SourceId, Location } from "@replayio/protocol";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
-import { selectors } from "ui/reducers";
-import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
@@ -19,17 +17,10 @@ import {
 } from "../../reducers/breakpoints";
 import { setBreakpoint } from "../../reducers/breakpoints";
 import { PrefixBadge } from "../../reducers/types";
-import {
-  getBreakpointsList,
-  getBreakpointAtLocation,
-  getFirstBreakpointPosition,
-  getSymbols,
-} from "../../selectors";
+import { getBreakpointsList, getBreakpointAtLocation, getSymbols } from "../../selectors";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
-
-import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
@@ -93,47 +84,6 @@ export function removeBreakpointsInSource(
 }
 
 /**
- * Disable all breakpoints in a source
- *
- * @memberof actions/breakpoints
- * @static
- */
-export function disableBreakpointsInSource(
-  cx: Context,
-  source: SourceDetails
-): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
-    const breakpoints = getBreakpointsForSource(getState(), source.id);
-    for (const breakpoint of breakpoints) {
-      if (!breakpoint.disabled) {
-        dispatch(disableBreakpoint(cx, breakpoint));
-      }
-    }
-  };
-}
-
-/**
- * Enable all breakpoints in a source
- *
- * @memberof actions/breakpoints
- * @static
- */
-export function enableBreakpointsInSource(
-  cx: Context,
-  source: SourceDetails
-): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
-    trackEvent("breakpoints.remove_all_in_source");
-    const breakpoints = getBreakpointsForSource(getState(), source.id);
-    for (const breakpoint of breakpoints) {
-      if (breakpoint.disabled) {
-        dispatch(enableBreakpoint(cx, breakpoint));
-      }
-    }
-  };
-}
-
-/**
  * Removes all breakpoints
  *
  * @memberof actions/breakpoints
@@ -173,7 +123,6 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
       return;
     }
 
-    // @ts-ignore column normally shouldn't be undefined
     const bp = getBreakpointAtLocation(state, { line, column: undefined });
     if (bp) {
       return dispatch(_removeBreakpoint(cx, bp));
@@ -186,34 +135,6 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
         line,
       })
     );
-  };
-}
-
-export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const source = getSelectedSource(state)!;
-
-    const initialLocation: Location = {
-      sourceId: source.id,
-      column: 0,
-      line,
-    };
-
-    // Set the initial location here as a placeholder to be checked after any async activity.
-    dispatch(setHoveredLineNumberLocation(initialLocation));
-
-    await dispatch(fetchPossibleBreakpointsForSource(source.id));
-    const location = getFirstBreakpointPosition(getState(), initialLocation);
-
-    // It's possible that after the `await` above the user is either 1) hovered off of the
-    // original line number, or 2) hovered on a different line number altogether. In that
-    // case, we should bail.
-    if (selectors.getHoveredLineNumberLocation(getState()) !== initialLocation) {
-      return;
-    }
-
-    dispatch(setHoveredLineNumberLocation(location));
   };
 }
 

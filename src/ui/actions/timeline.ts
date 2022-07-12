@@ -1,5 +1,4 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
-import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
 import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
