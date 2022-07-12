@@ -19,7 +19,7 @@ export type SelectedPrimaryPaneTabType = "sources" | "outline";
 export interface HighlightedRange {
   start?: number;
   end?: number;
-  sourceId?: number;
+  sourceId?: string;
 }
 
 export interface UISliceState {
