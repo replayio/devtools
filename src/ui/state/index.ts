@@ -29,7 +29,6 @@ import { LayoutState } from "./layout";
 import type { SourcesState as NewSourcesState } from "ui/reducers/sources";
 import { ProtocolMessagesState } from "ui/reducers/protocolMessages";
 import { HitCountsState } from "ui/reducers/hitCounts";
-import { BreakableLinesState } from "ui/reducers/breakableLines";
 import { PossibleBreakpointsState } from "ui/reducers/possibleBreakpoints";
 import { BreakpointsState } from "ui/reducers/breakpoints";
 
