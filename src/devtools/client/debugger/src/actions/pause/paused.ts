@@ -116,6 +116,10 @@ export function paused({
         dispatch(selectLocation(cx, selectedFrame.location, true));
       }
 
+      if (pause !== ThreadFront.currentPause) {
+        return;
+      }
+
       await Promise.all([
         dispatch(fetchAsyncFrames(cx)),
         dispatch(setFramePositions()),
