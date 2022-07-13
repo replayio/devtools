@@ -13,7 +13,7 @@ import type { UIState } from "ui/state";
 import { createSelector } from "reselect";
 
 import { isSimilarTab } from "../utils/tabs";
-import { makeShallowQuery } from "../utils/resource";
+import { makeShallowQuery, memoizeResourceShallow } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
 import type { Source } from "./sources";

@@ -16,7 +16,6 @@ import {
   getShownSource,
   getSelectedSource,
   getSourcesLoading,
-  getDebuggeeUrl,
   getExpandedState,
   getDisplayedSources,
   getFocusedSourceItem,
@@ -46,13 +45,12 @@ import { Source } from "../../reducers/sources";
 
 type $FixTypeLater = any;
 
-function shouldAutoExpand(depth: number, item: TreeNode, debuggeeUrl: string) {
+function shouldAutoExpand(depth: number, item: TreeNode) {
   if (depth !== 1) {
     return false;
   }
 
-  const { host } = debuggeeUrl.length ? parse(debuggeeUrl) : { host: "" };
-  return item.name === host;
+  return item.name === "";
 }
 
 function findSource(sources: Record<string, Source>, itemPath: string, source: Source) {
@@ -72,7 +70,6 @@ const mapStateToProps = (state: UIState) => {
     sourcesLoading: getSourcesLoading(state),
     shownSource: shownSource,
     selectedSource: selectedSource,
-    debuggeeUrl: getDebuggeeUrl(state),
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
     sources: sources,
@@ -99,10 +96,9 @@ interface STState {
 class SourcesTree extends Component<PropsFromRedux, STState> {
   constructor(props: PropsFromRedux) {
     super(props);
-    const { debuggeeUrl, sources } = this.props;
+    const { sources } = this.props;
 
     const state = createTree({
-      debuggeeUrl,
       sources,
     }) as STState;
 
@@ -123,19 +119,8 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
   }
 
   UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
-    const { debuggeeUrl, sources, shownSource, selectedSource } = this.props;
+    const { sources, shownSource, selectedSource } = this.props;
     const { uncollapsedTree, sourceTree } = this.state;
-
-    if (debuggeeUrl != nextProps.debuggeeUrl || nextProps.sourceCount === 0) {
-      // early recreate tree because of changes
-      // to project root, debuggee url or lack of sources
-      return this.setState(
-        createTree({
-          sources: nextProps.sources,
-          debuggeeUrl: nextProps.debuggeeUrl,
-        })
-      );
-    }
 
     if (nextProps.shownSource && nextProps.shownSource != shownSource) {
       const listItems = getDirectories(nextProps.shownSource, sourceTree as TreeDirectory);
@@ -152,9 +137,9 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     if (nextProps.sources != this.props.sources) {
       this.setState(
         updateTree({
+          debuggeeUrl: "",
           newSources: nextProps.sources,
           prevSources: sources,
-          debuggeeUrl,
           uncollapsedTree,
           sourceTree,
         })
@@ -234,19 +219,17 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     expanded: boolean,
     { setExpanded }: { setExpanded: () => void }
   ) => {
-    const { debuggeeUrl } = this.props;
-
     return (
       <SourcesTreeItem
         item={item}
         depth={depth}
         focused={focused}
-        autoExpand={shouldAutoExpand(depth, item, debuggeeUrl)}
+        autoExpand={shouldAutoExpand(depth, item)}
         expanded={expanded}
         focusItem={this.onFocus}
         selectItem={this.selectItem}
         source={this.getSource(item)}
-        debuggeeUrl={debuggeeUrl}
+        debuggeeUrl={""}
         setExpanded={setExpanded}
       />
     );

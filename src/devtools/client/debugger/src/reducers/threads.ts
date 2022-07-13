@@ -41,11 +41,3 @@ export default function update(state = initialThreadsState(), action: AnyAction)
       return state;
   }
 }
-
-export function getMainThread(state: UIState) {
-  return state.threads.mainThread;
-}
-
-export function getDebuggeeUrl(state: UIState) {
-  return getMainThread(state).url;
-}

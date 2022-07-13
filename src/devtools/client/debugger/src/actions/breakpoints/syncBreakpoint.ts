@@ -59,7 +59,6 @@ export function syncBreakpoint(
     const previousLocation = { ...location, sourceId };
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, dispatch);
 
-    // @ts-expect-error location/pendingLocation mismatch
     dispatch(removePendingBreakpoint(location, ThreadFront.recordingId!, cx));
 
     return dispatch(

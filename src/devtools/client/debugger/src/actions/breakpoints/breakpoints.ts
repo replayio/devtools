@@ -4,6 +4,7 @@ import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -25,13 +26,11 @@ import {
   getBreakpointAtLocation,
   getFirstBreakpointPosition,
   getSymbols,
-  getThreadContext,
 } from "../../selectors";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
 
-import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
@@ -59,7 +58,6 @@ export function removeBreakpointsAtLine(
   return (dispatch, getState) => {
     trackEvent("breakpoint.remove");
 
-    dispatch(removeRequestedBreakpoint({ sourceId, line }));
     const breakpoints = getBreakpointsForSource(getState(), sourceId, line);
 
     breakpoints.map(bp => dispatch(removeBreakpoint(cx, bp)));
@@ -154,7 +152,11 @@ export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> 
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
-    await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
+    await Promise.all(
+      breakpointList.map(bp => {
+        dispatch(_removeBreakpoint(cx, bp));
+      })
+    );
     dispatch(removeBreakpointsAction());
   };
 }
@@ -183,7 +185,6 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
       return;
     }
 
-    // @ts-ignore column normally shouldn't be undefined
     const bp = getBreakpointAtLocation(state, { line, column: undefined });
     if (bp) {
       return dispatch(_removeBreakpoint(cx, bp));
@@ -218,7 +219,7 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
     // @ts-ignore Location field mismatches
     dispatch(setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
@@ -229,7 +230,7 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
       return;
     }
 
-    dispatch(setHoveredLineNumberLocation(location));
+    dispatch(setHoveredLineNumberLocation(location!));
   };
 }
 

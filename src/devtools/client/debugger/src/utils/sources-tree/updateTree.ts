@@ -7,11 +7,9 @@
 import { addToTree } from "./addToTree";
 import { collapseTree } from "./collapseTree";
 import { createDirectoryNode, createParentMap } from "./utils";
-import { getDomain } from "./treeOrder";
 
 import type { Source } from "../../reducers/sources";
-import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
-import type { ParsedUrl } from "./getURL";
+import type { TreeNode, TreeDirectory } from "./types";
 
 type SourcesMap = Record<string, Source>;
 
@@ -29,11 +27,12 @@ function getSourcesToAdd(newSources: SourcesMap, prevSources: SourcesMap) {
   return sourcesToAdd;
 }
 
-export function createTree({ debuggeeUrl, sources }: { debuggeeUrl: string; sources: SourcesMap }) {
+export function createTree({ sources }: { sources: SourcesMap }) {
+  // This used to be used, but it's not anymore.
   const uncollapsedTree = createDirectoryNode("root", "", []);
 
   return updateTree({
-    debuggeeUrl,
+    debuggeeUrl: "",
     newSources: sources,
     prevSources: {},
     uncollapsedTree,
@@ -48,13 +47,8 @@ interface UpdateTreeArgs {
   sourceTree?: TreeNode;
 }
 
-export function updateTree({
-  newSources,
-  prevSources,
-  debuggeeUrl,
-  uncollapsedTree,
-}: UpdateTreeArgs) {
-  const debuggeeHost = getDomain(debuggeeUrl);
+export function updateTree({ newSources, prevSources, uncollapsedTree }: UpdateTreeArgs) {
+  const debuggeeHost = "";
 
   // @ts-expect-error This used to be nested records - somehow it still works?
   const sourcesToAdd = getSourcesToAdd(Object.values(newSources), Object.values(prevSources));

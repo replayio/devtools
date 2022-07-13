@@ -7,35 +7,28 @@ import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
 import type { UIState } from "ui/state";
 
-import type { Source } from "../reducers/sources";
-import { getSources, getSelectedSource, resourceAsSourceBase } from "../reducers/sources";
+import { resourceAsSourceBase, Source } from "../reducers/sources";
+import { getSources } from "../reducers/sources";
 import type { Breakpoint } from "../reducers/types";
 import { isBreakable, isLogpoint, sortSelectedBreakpoints } from "../utils/breakpoint";
-import { makeShallowQuery } from "../utils/resource";
+import { makeShallowQuery, memoizeResourceShallow } from "../utils/resource";
 import { getFilename } from "../utils/source";
 
 import { getBreakpointsList } from "./breakpoints";
 
-function getBreakpointsForSource(
-  source: Source,
-  selectedSource: Source,
-  breakpoints: Breakpoint[]
-) {
-  return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == source.id);
+function getBreakpointsForSource(sourceId: string, breakpoints: Breakpoint[]) {
+  return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == sourceId);
 }
 
 export const findBreakpointSources = (state: UIState) => {
   const breakpoints = getBreakpointsList(state);
   const sources = getSources(state);
-  const selectedSource = getSelectedSource(state)!;
-  return queryBreakpointSources(sources, { breakpoints, selectedSource });
+  return queryBreakpointSources(sources, { breakpoints });
 };
 
 const queryBreakpointSources = makeShallowQuery({
-  filter: (
-    _,
-    { breakpoints, selectedSource }: { breakpoints: Breakpoint[]; selectedSource: Source }
-  ) => uniq(breakpoints.map(bp => bp.location.sourceId)),
+  filter: (_, { breakpoints }: { breakpoints: Breakpoint[] }) =>
+    uniq(breakpoints.map(bp => bp.location.sourceId)),
   map: resourceAsSourceBase,
   reduce: sources => {
     const filtered = sources.filter(source => source && !source.isBlackBoxed);
@@ -46,14 +39,11 @@ const queryBreakpointSources = makeShallowQuery({
 export const getBreakpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSource,
-  (breakpoints, sources, selectedSource) => {
+  (breakpoints, sources) => {
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource!, breakpoints).filter(bp =>
-          isBreakable(bp)
-        ),
+        breakpoints: getBreakpointsForSource(source.id, breakpoints).filter(bp => isBreakable(bp)),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
   }
@@ -64,14 +54,11 @@ export type BreakpointOrLogpointSources = ReturnType<typeof getLogpointSources>[
 export const getLogpointSources = createSelector(
   getBreakpointsList,
   findBreakpointSources,
-  getSelectedSource,
-  (breakpoints, sources, selectedSource) => {
+  (breakpoints, sources) => {
     return sources
       .map(source => ({
         source,
-        breakpoints: getBreakpointsForSource(source, selectedSource!, breakpoints).filter(bp =>
-          isLogpoint(bp)
-        ),
+        breakpoints: getBreakpointsForSource(source.id, breakpoints).filter(bp => isLogpoint(bp)),
       }))
       .filter(({ breakpoints: bpSources }) => bpSources.length > 0);
   }

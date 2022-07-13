@@ -377,24 +377,6 @@ function getSourceForActor(actor: string) {
   return sourceActors[actor];
 }
 
-function getMainThread() {
-  return currentThreadFront.actor;
-}
-async function getSourceActorBreakpointPositions(
-  { actor }: { actor: string },
-  range?: SourceRange
-) {
-  const linePositions = await ThreadFront.getBreakpointPositionsCompressed(actor, range);
-  const rv: Record<number, number[]> = {};
-  linePositions.forEach(({ line, columns }) => (rv[line] = columns));
-  return rv;
-}
-
-async function getSourceActorBreakableLines({ actor }: { actor: string }) {
-  const positions = await ThreadFront.getBreakpointPositionsCompressed(actor);
-  return positions.map(({ line }) => line);
-}
-
 function getFrontByID(actorID: string) {
   return devToolsClient.getFrontByID(actorID);
 }
@@ -421,8 +403,6 @@ const clientCommands = {
   reverseStepOver,
   sourceContents,
   getSourceForActor,
-  getSourceActorBreakpointPositions,
-  getSourceActorBreakableLines,
   hasBreakpoint,
   setBreakpoint,
   setXHRBreakpoint,
@@ -443,7 +423,6 @@ const clientCommands = {
   fetchSources,
   checkIfAlreadyPaused,
   registerSourceActor,
-  getMainThread,
   fetchEventTypePoints,
   setEventListenerBreakpoints,
   getFrontByID,

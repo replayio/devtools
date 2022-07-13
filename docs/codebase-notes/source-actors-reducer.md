@@ -29,7 +29,7 @@ type SourceActorsState = ResourceState<SourceActor>;
 
 ### `"INSERT_SOURCE_ACTORS"`
 
-Just inserts resource entries from `action.items`, and adds `{breakpointPositions: new Map(), breakableLines: null}` to each.
+Just inserts resource entries from `action.items
 
 Dispatched by: `actions/newSources.js` line 254
 

@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 //
 
-import type { Location } from "@replayio/protocol";
+import type { Location, SameLineSourceLocations } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqBy from "lodash/uniqBy";
 import { createSelector } from "reselect";
@@ -12,15 +12,12 @@ import { features } from "ui/utils/prefs";
 
 import {
   getSource,
-  getSelectedSource,
   getSelectedSourceWithContent,
-  getBreakpointPositions,
   getBreakpointPositionsForSource,
 } from "../reducers/sources";
-import type { Source, SourceWithContent } from "../reducers/sources";
+import type { SourceWithContent } from "../reducers/sources";
 import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
 import { getViewport } from "../reducers/ui";
-import type { AsyncValue } from "../utils/async-value";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
@@ -61,20 +58,6 @@ function findBreakpoint(location: Location, breakpointMap: BreakpointMap) {
   }
 }
 
-function filterByLineCount(positions: Location[], selectedSource: Source) {
-  const lineCount: Record<number, number> = {};
-
-  for (const { line } of positions) {
-    if (!lineCount[line]) {
-      lineCount[line] = 0;
-    }
-
-    lineCount[line] = lineCount[line] + 1;
-  }
-
-  return positions.filter(({ line }) => lineCount[line] > 1);
-}
-
 // filter out positions that are not being shown
 function filterVisible(positions: Location[], viewport: Range) {
   return positions.filter(location => {
@@ -111,20 +94,23 @@ function convertToList<T>(breakpointPositions: Record<string, T>) {
   return ([] as T[]).concat(...Object.values(breakpointPositions));
 }
 
+const emptyBreakpointPositions: Location[] = [];
 const getVisibleBreakpointPositions = createSelector(
-  getSelectedSource,
-  getBreakpointPositions,
-  (source, positions) => {
-    if (!source) {
-      return [];
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
+  (state: UIState) => state.possibleBreakpoints,
+  (sourceId, positions) => {
+    if (!sourceId) {
+      return emptyBreakpointPositions;
     }
 
-    const sourcePositions = positions[source.id];
+    const sourcePositions: Location[] | undefined =
+      positions.entities[sourceId]?.possibleBreakpoints;
+
     if (!sourcePositions) {
-      return [];
+      return emptyBreakpointPositions;
     }
 
-    return convertToList(sourcePositions);
+    return sourcePositions;
   }
 );
 
@@ -135,10 +121,6 @@ export const visibleColumnBreakpoints = createSelector(
   getSelectedSourceWithContent,
   getVisibleBreakpointPositions,
   (breakpoints, requestedBreakpoints, viewport, selectedSource, breakpointPositions) => {
-    if (!selectedSource) {
-      return [];
-    }
-
     // We only want to show a column breakpoint if several conditions are matched
     // - it is the first breakpoint to appear at an the original location
     // - the position is in the current viewport
@@ -163,7 +145,7 @@ export const visibleColumnBreakpoints = createSelector(
     const breakpointMap = groupBreakpoints(allBreakpoints);
     // @ts-ignore columns undefined
     positions = filterVisible(positions, viewport);
-    positions = filterInLine(positions, selectedSource.content);
+    positions = filterInLine(positions, selectedSource!.content);
     positions = filterByBreakpoints(positions, breakpointMap);
 
     return formatPositions(positions, breakpointMap);
@@ -178,7 +160,16 @@ export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: S
     return;
   }
 
-  return sortSelectedLocations(convertToList(positions), source).find(
-    location => location.line == line
-  );
+  const possibleBreakpointsForLine = positions.find(position => {
+    return position.line === line;
+  });
+
+  const sortedLocations = sortSelectedLocations(possibleBreakpointsForLine);
+
+  return {
+    line: sortedLocations[0],
+    column: sortedLocations[1][0],
+    sourceId,
+    sourceUrl: source.url,
+  };
 }

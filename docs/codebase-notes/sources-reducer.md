@@ -24,7 +24,6 @@ interface SourceActor {
   thread: string;
   url: string;
   breakableLines?: unknown | null;
-  breakpointPositions?: Map<unknown, unknown>
 }
 
 interface Source {
@@ -47,8 +46,6 @@ interface SourcesState {
   plainUrls: Record<string, string[]>,
   content: Record<unknown, unknown>,
   actors: Record<string, SourceActorId[]>,
-  breakpointPositions: Record<SourceId, UnknownBreakpoints>,
-  breakableLines: Record<SourceId, number[]>,
   epoch: number,
   selectedLocation: {sourceId: SourceId, ...location} | null,
   pendingSelectedLocation: Location;
@@ -126,12 +123,6 @@ Checks if `action.status === "done"`. If yes, tries to update a "blackboxed list
 Updates `state.breakableLines[sourceId] = breakableLines`
 
 - **Dead** - not referenced anywhere
-
-### `"ADD_BREAKPOINT_POSITIONS"`
-
-Updates `state.breakpointPositions[sourceId]` and merges in new positions.
-
-Dispatched by: `actions/breakpoints/breakpointPositions.js` line 93, inside `_setBreakpointPositions`. This is another instance of `memoizableAction`
 
 ### `"NAVIGATE"`
 
@@ -235,13 +226,11 @@ Executes `action.updates.forEach(update => sourcesReducer(state, update)`. Simil
 - `getSourceActorsForSource(state, id)`
 - `canLoadSource(state, sourceId)`
 - `isSourceWithMap(state, id)`
-- `getBreakpointPositions(state)`
 - `getBreakpointPositionsForSource(state, sourceId)`
 - `hasBreakpointPositions(state, sourceId)`
 - `getBreakpointPositionsForLine(state, sourceId, line)`
 - `getBreakpointPositionsForLocation(state, location)`
 - `getBreakableLines(state, sourceId)`
-- `getSelectedBreakableLines`
 - `isSourceLoadingOrLoaded(state, sourceId)`
 - `selectedLocationHasScrolled(state)`
 - `getTextAtLocation(state, id, location)`

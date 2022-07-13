@@ -21,9 +21,10 @@ import { messages as messagesReducer } from "devtools/client/webconsole/reducers
 
 import { promise } from "ui/setup/redux/middleware/promise";
 import { context } from "ui/setup/redux/middleware/context";
+import hitCounts from "ui/reducers/hitCounts";
+import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
-import hitCounts from "ui/reducers/hitCounts";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -45,6 +46,7 @@ let reducers = {
   hitCounts: hitCounts,
   layout: layoutReducer,
   messages: messagesReducer,
+  possibleBreakpoints: possibleBreakpoints,
   protocolMessages: protocolMessages,
   tabs: tabsReducer,
 } as unknown as UIStateReducers;

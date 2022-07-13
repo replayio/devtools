@@ -1,6 +1,11 @@
 import type { AnyAction, Action } from "@reduxjs/toolkit";
+import { Location } from "@replayio/protocol";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
+import {
+  getPossibleBreakpointsForSelectedSource,
+  getPossibleBreakpointsForSource,
+} from "ui/reducers/possibleBreakpoints";
 import type { UIState } from "ui/state";
 
 import { pending, fulfilled, rejected, asSettled } from "../utils/async-value";
@@ -19,23 +24,8 @@ import {
 import type { ResourceState, ResourceId } from "../utils/resource/core";
 import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/source";
 
-import {
-  hasSourceActor,
-  getSourceActor,
-  getSourceActors,
-  getBreakableLinesForSourceActors,
-  SourceActor,
-} from "./source-actors";
+import { hasSourceActor, getSourceActor, getSourceActors, SourceActor } from "./source-actors";
 import { SourceLocation } from "./types";
-
-export interface Location {
-  url: string;
-  line: number;
-  column?: number;
-  sourceId: string;
-  sourceUrl: string;
-  // other fields? sourceId?
-}
 
 export interface SourceContent {
   state: "pending" | "fulfilled" | "rejected";
@@ -70,11 +60,10 @@ export interface SourcesState {
   plainUrls: Record<string, string[]>;
   content: Record<string, unknown>;
   actors: Record<string, string[]>;
-  breakpointPositions: Record<ResourceId, Record<string, Location>>;
   breakableLines: Record<string, number[]>;
   epoch: number;
-  selectedLocation?: Location | null;
-  pendingSelectedLocation?: Location;
+  selectedLocation?: (Location & { sourceUrl: string }) | null;
+  pendingSelectedLocation?: Location & { sourceUrl: string; url?: string };
   selectedLocationHasScrolled: boolean;
   // DEAD
   chromeAndExtensionsEnabled: boolean;
@@ -94,8 +83,6 @@ export function initialSourcesState(): SourcesState {
     plainUrls: {},
     content: {},
     actors: {},
-    breakpointPositions: {},
-    breakableLines: {},
     epoch: 1,
     selectedLocation: undefined,
     // @ts-ignore
@@ -110,7 +97,7 @@ export function initialSourcesState(): SourcesState {
 
 interface AddBreakpointPositionsAction extends Action<"ADD_BREAKPOINT_POSITIONS"> {
   source: Source;
-  positions: Record<string, Location[]>;
+  positions: Record<string, Location & { sourceUrl: string }[]>;
 }
 
 interface InsertSourceActorsAction extends Action<"INSERT_SOURCE_ACTORS"> {
@@ -215,18 +202,6 @@ function update(state = initialSourcesState(), action: AnyAction) {
       };
     }
 
-    case "ADD_BREAKPOINT_POSITIONS": {
-      const { source, positions } = action as AddBreakpointPositionsAction;
-      const breakpointPositions = state.breakpointPositions[source.id];
-
-      return {
-        ...state,
-        breakpointPositions: {
-          ...state.breakpointPositions,
-          [source.id]: { ...breakpointPositions, ...positions },
-        },
-      };
-    }
     case "SET_FOCUSED_SOURCE_ITEM":
       return { ...state, focusedItem: action.item };
 
@@ -300,19 +275,6 @@ function insertSourceActors(state: SourcesState, action: InsertSourceActorsActio
       ...(state.actors[sourceActor.source] || []),
       sourceActor.id,
     ];
-  }
-
-  const scriptActors = items.filter(item => item.introductionType === "scriptElement");
-  if (scriptActors.length > 0) {
-    const { ...breakpointPositions } = state.breakpointPositions;
-
-    // If new HTML sources are being added, we need to clear the breakpoint
-    // positions since the new source is a <script> with new breakpoints.
-    for (const { source } of scriptActors) {
-      delete breakpointPositions[source];
-    }
-
-    state = { ...state, breakpointPositions };
   }
 
   return state;
@@ -604,14 +566,14 @@ export const getSelectedLocation = createSelector(
 export type SelectedSource = ReturnType<typeof getSelectedSource>;
 
 export const getSelectedSource = createSelector(
-  getSelectedLocation,
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
   getSources,
-  (selectedLocation, sources) => {
-    if (!selectedLocation) {
+  (sourceId, sources) => {
+    if (!sourceId) {
       return;
     }
 
-    return getSourceInSources(sources, selectedLocation.sourceId!);
+    return getSourceInSources(sources, sourceId!);
   }
 );
 
@@ -675,13 +637,11 @@ export function isSourceWithMap(state: UIState, id: string): boolean {
   return getSourceActorsForSource(state, id).some(sourceActor => sourceActor.sourceMapURL);
 }
 
-export function getBreakpointPositions(state: UIState) {
-  return state.sources.breakpointPositions;
-}
-
+// Ideally probably I would actually rename this to better reflect the protocol
+// resource/new reducer, but that would lead to a much more shotgun-surgery
+// style refactor, which I'm trying to avoid
 export function getBreakpointPositionsForSource(state: UIState, sourceId: string) {
-  const positions = getBreakpointPositions(state);
-  return positions && positions[sourceId];
+  return getPossibleBreakpointsForSource(state, sourceId);
 }
 
 export function hasBreakpointPositions(state: UIState, sourceId: string) {
@@ -697,34 +657,6 @@ export function hasBreakpointPositionsForLine(state: UIState, sourceId: string, 
   return !!getBreakpointPositionsForLine(state, sourceId, line);
 }
 
-export function getBreakpointPositionsForLocation(state: UIState, location: Location) {
-  const { sourceId } = location;
-  const positions = getBreakpointPositionsForSource(state, sourceId!);
-  return findPosition(positions, location);
-}
-
-export function getBreakableLines(state: UIState, sourceId: string): number[] | null {
-  if (!sourceId) {
-    return null;
-  }
-  const source = getSource(state, sourceId);
-  if (!source) {
-    return null;
-  }
-
-  // We pull generated file breakable lines directly from the source actors
-  // so that breakable lines can be added as new source actors on HTML loads.
-  return getBreakableLinesForSourceActors(state.sourceActors, state.sources.actors[sourceId]);
-}
-
-export const getSelectedBreakableLines = createSelector(
-  (state: UIState) => {
-    const sourceId = getSelectedSourceId(state);
-    return sourceId && getBreakableLines(state, sourceId);
-  },
-  breakableLines => new Set(breakableLines || [])
-);
-
 export function isSourceLoadingOrLoaded(state: UIState, sourceId: string) {
   const { content } = getResource(state.sources.sources, sourceId);
   return content !== null;
@@ -734,7 +666,11 @@ export function selectedLocationHasScrolled(state: UIState) {
   return state.sources.selectedLocationHasScrolled;
 }
 
-export function getTextAtLocation(state: UIState, id: string, location: SourceLocation) {
+export function getTextAtLocation(
+  state: UIState,
+  id: string,
+  location: Location & { sourceUrl: string }
+) {
   const source = getSource(state, id);
   if (!source) {
     return null;
