@@ -344,7 +344,7 @@ TooltipsOverlay.prototype = {
     const doc = this.view.inspector.panelDoc;
     const maxDim = Services.prefs.getIntPref(PREF_IMAGE_TOOLTIP_SIZE);
 
-    let naturalWidth, naturalHeight;
+    let naturalHeight, naturalWidth;
     if (imageUrl.startsWith("data:")) {
       // If the imageUrl already is a data-url, save ourselves a round-trip
       const size = await getImageDimensions(doc, imageUrl);

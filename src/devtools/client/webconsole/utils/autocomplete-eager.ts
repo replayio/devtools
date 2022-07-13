@@ -66,6 +66,7 @@ async function eagerEvaluateExpression(
 export function useEagerEvaluateExpression() {
   const frame = useAppSelector(getSelectedFrame);
   const callback = useMemo(
+    // eslint-disable-next-line react/display-name
     () => (expression: string) => {
       if (!frame) {
         return null;

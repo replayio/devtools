@@ -32,6 +32,7 @@ describe("useConsoleSearch", () => {
     lastCommitedSearchState = null;
     messageIdCounter = 0;
 
+    // eslint-disable-next-line react/display-name
     TestComponent = () => {
       const [state, actions] = useConsoleSearch();
       lastCommitedSearchActions = actions;
