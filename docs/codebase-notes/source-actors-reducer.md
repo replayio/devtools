@@ -47,12 +47,6 @@ Updates an entry for the given `line` and `sourceId`, by recreating a `Map` and 
 
 Dispatched by: `actions/source-actors.js` line 46, inside the `loadSourceActorBreakpointColumns` memoized action
 
-### `"SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS"`
-
-Overwrites the `breakableLines` field in a resource entry, if it isn't `"pending"`.
-
-Dispatched by: `actions/source-actors.js` line 93, inside the `loadSourceActorBreakpointHitCounts` memoized action
-
 ### `"set_trim_region"`
 
 Updates `state.values` by setting every `breakpointHitCounts` field to null.
@@ -105,7 +99,6 @@ Generates a new `values` record with every entry's `breakpointHitCounts` field s
 - `getSourceActorsForThread`: concatenates array of sources for thread IDs
 - `queryThreadsBySourceObject`: calculates `Record<SourceName, ThreadName[]>`
 - `getAllThreadsBySource`
-- `getSourceActorBreakpointHitCounts`
 - `getSourceActorBreakableLines`
 - `getSourceActorBreakpointColumns`
 - `getBreakableLinesForSourceActors`

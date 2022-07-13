@@ -200,6 +200,9 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
 }
 
 export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<void>> {
+  // if you are hovering a line or a print statement panel that has hits, we
+  // will show those hits on the global timeline. In order to do that, we need
+  // to store the editor's hovered line number in global state.
   return async (dispatch, getState) => {
     const state = getState();
     const source = getSelectedSource(state)!;

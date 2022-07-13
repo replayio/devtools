@@ -23,6 +23,7 @@ import { promise } from "ui/setup/redux/middleware/promise";
 import { context } from "ui/setup/redux/middleware/context";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
+import hitCounts from "ui/reducers/hitCounts";
 
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
@@ -41,6 +42,7 @@ type ReduxDevToolsOptions = Exclude<
 let reducers = {
   app: appReducer,
   experimentalSources: sources,
+  hitCounts: hitCounts,
   layout: layoutReducer,
   messages: messagesReducer,
   protocolMessages: protocolMessages,

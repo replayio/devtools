@@ -14,7 +14,7 @@ import * as sources from "./sources";
 import * as tabs from "./tabs";
 import * as ui from "./ui";
 
-const { MAX_LINE_HITS_TO_FETCH, ...sourcesActorsActions } = sourcesActors;
+const { ...sourcesActorsActions } = sourcesActors;
 
 export default {
   ...breakpoints,
