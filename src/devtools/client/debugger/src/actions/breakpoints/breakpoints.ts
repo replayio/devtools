@@ -210,7 +210,7 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
     const initialLocation = {
       sourceId: source.id,
       sourceUrl: source.url,
-      column: undefined,
+      column: 0,
       line,
     };
 
@@ -294,7 +294,6 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
 
     trackEvent("breakpoint.add_column");
 
-    // @ts-expect-error Breakpoint location field mismatches
     return dispatch(addBreakpoint(cx, breakpointLocation, options, false));
   };
 }

@@ -28,7 +28,7 @@ import {
   isSourceLoadingOrLoaded,
 } from "../../selectors";
 import { ContextError } from "../../utils/context";
-import { getRawSourceURL, isInlineScript } from "../../utils/source";
+import { isInlineScript } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
@@ -63,28 +63,21 @@ function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
     const state = getState();
     const pendingLocation = getPendingSelectedLocation(state);
 
-    if (!pendingLocation || !pendingLocation.url) {
+    if (!pendingLocation) {
       return;
     }
 
     const source = getSource(state, sourceId);
 
-    if (!source || !source.url) {
+    if (!source) {
       return;
     }
 
-    const pendingUrl = pendingLocation.url;
-    const rawPendingUrl = getRawSourceURL(pendingUrl);
-
-    if (rawPendingUrl === source.url) {
+    // Source IDs are not stable across Replays (or even across Replay sessions)
+    // so we compare via URL
+    if (pendingLocation.url === source.url) {
       const { selectLocation } = await import("../sources");
-      await dispatch(
-        selectLocation(cx, {
-          column: pendingLocation.column,
-          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
-          sourceId: source.id,
-        })
-      );
+      await dispatch(selectLocation(cx, pendingLocation));
     }
   };
 }

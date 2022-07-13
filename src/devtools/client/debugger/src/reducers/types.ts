@@ -5,6 +5,7 @@
 
 import type { SourceActor } from "./source-actors";
 import type { CallDeclaration } from "./ast";
+import type { Location } from "@replayio/protocol";
 
 export type SourceActorId = string;
 
@@ -76,18 +77,9 @@ export type SourceActorLocation = {
   readonly column?: number;
 };
 
-/**
- * Source File Location
- *
- * @memberof types
- * @static
- */
-export type SourceLocation = {
-  readonly sourceId: SourceId;
-  readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
-};
+export interface SourceLocation extends Location {
+  sourceUrl?: string;
+}
 export type MappedLocation = {
   readonly location: SourceLocation;
   readonly generatedLocation: SourceLocation;
@@ -107,21 +99,6 @@ export type PartialRange = {
 export type Range = {
   end: Position;
   start: Position;
-};
-export type PendingLocation = {
-  readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
-};
-// Type of location used when setting breakpoints in the server. Exactly one of
-// { sourceUrl, sourceId } must be specified. Soon this will replace
-// SourceLocation and PendingLocation, and SourceActorLocation will be removed
-// (bug 1524374).
-export type BreakpointLocation = {
-  readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
-  readonly sourceId?: SourceActorId;
 };
 export type ASTLocation = {
   readonly name: string | null | undefined;
@@ -195,9 +172,9 @@ export type BreakpointResult = {
  * @static
  */
 export type PendingBreakpoint = {
-  readonly location: PendingLocation;
+  readonly location: SourceLocation;
   readonly astLocation: ASTLocation;
-  readonly generatedLocation?: PendingLocation;
+  readonly generatedLocation?: Location;
   readonly disabled: boolean;
   readonly text?: string;
   readonly options: BreakpointOptions;

@@ -47,7 +47,6 @@ const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(
       state,
-      // @ts-expect-error Location mismatch
       breakpoint.location,
       breakpoint.options.condition
     ),
@@ -86,7 +85,6 @@ function BreakpointTimelinePoint({
       target: "widget",
       point: point.point,
       time: point.time,
-      // @ts-expect-error Location mismatch
       location: breakpoint.location,
     });
 

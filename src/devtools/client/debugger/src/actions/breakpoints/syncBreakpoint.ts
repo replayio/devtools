@@ -2,9 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { UIState } from "ui/state";
 import type { UIThunkAction } from "ui/actions";
-import type { ThunkExtraArgs } from "ui/utils/thunk";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { Source } from "../../reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
@@ -59,11 +57,9 @@ export function syncBreakpoint(
     const previousLocation = { ...location, sourceId };
     const newLocation = await findNewLocation(cx, astLocation, previousLocation, source, dispatch);
 
-    // @ts-expect-error location/pendingLocation mismatch
     dispatch(removePendingBreakpoint(location, ThreadFront.recordingId!, cx));
 
     return dispatch(
-      // @ts-expect-error location/pendingLocation mismatch
       addBreakpoint(cx, newLocation, pendingBreakpoint.options, pendingBreakpoint.disabled)
     );
   };

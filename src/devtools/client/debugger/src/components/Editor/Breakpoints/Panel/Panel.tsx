@@ -38,7 +38,6 @@ const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
     analysisPoints: getAnalysisPointsForLocation(
       state,
-      // @ts-expect-error Location vs SourceLocation
       breakpoint.location,
       breakpoint.options.condition
     ),

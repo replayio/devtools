@@ -9,6 +9,7 @@
  * @module actions/sources
  */
 
+import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
@@ -16,7 +17,7 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
+import type { Source } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";

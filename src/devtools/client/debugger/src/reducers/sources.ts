@@ -1,4 +1,5 @@
 import type { AnyAction, Action } from "@reduxjs/toolkit";
+import { Location } from "@replayio/protocol";
 import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
 import type { UIState } from "ui/state";
@@ -27,15 +28,6 @@ import {
   SourceActor,
 } from "./source-actors";
 import { SourceLocation } from "./types";
-
-export interface Location {
-  url: string;
-  line: number;
-  column?: number;
-  sourceId: string;
-  sourceUrl: string;
-  // other fields? sourceId?
-}
 
 export interface SourceContent {
   state: "pending" | "fulfilled" | "rejected";
@@ -74,7 +66,10 @@ export interface SourcesState {
   breakableLines: Record<string, number[]>;
   epoch: number;
   selectedLocation?: Location | null;
-  pendingSelectedLocation?: Location;
+  // Source IDs are not stable across Replays (or even across Replay sessions)
+  // so we also add a URL, to be sure that we can identify this source the next
+  // time we see it.
+  pendingSelectedLocation?: Location & { url: string };
   selectedLocationHasScrolled: boolean;
   // DEAD
   chromeAndExtensionsEnabled: boolean;
@@ -98,8 +93,7 @@ export function initialSourcesState(): SourcesState {
     breakableLines: {},
     epoch: 1,
     selectedLocation: undefined,
-    // @ts-ignore
-    pendingSelectedLocation: prefs.pendingSelectedLocation,
+    pendingSelectedLocation: prefs.pendingSelectedLocation as Location & { url: string },
     selectedLocationHasScrolled: false,
     // @ts-ignore
     chromeAndExtensionsEnabled: prefs.chromeAndExtensionsEnabled,

@@ -20,7 +20,6 @@ import {
 import type { Source, SourceWithContent } from "../reducers/sources";
 import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
 import { getViewport } from "../reducers/ui";
-import type { AsyncValue } from "../utils/async-value";
 import { sortSelectedLocations } from "../utils/location";
 import { getLineText } from "../utils/source";
 
@@ -170,7 +169,7 @@ export const visibleColumnBreakpoints = createSelector(
   }
 );
 
-export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: SourceLocation) {
+export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: Location) {
   const positions = getBreakpointPositionsForSource(state, sourceId);
   const source = getSource(state, sourceId);
 

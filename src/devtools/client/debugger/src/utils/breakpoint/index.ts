@@ -13,7 +13,6 @@ import type {
   PendingBreakpoint,
   SourceLocation,
   SourceActorLocation,
-  PendingLocation,
 } from "../../reducers/types";
 import assert from "../assert";
 import { features } from "../prefs";
@@ -113,7 +112,7 @@ export function assertLocation(location: SourceLocation) {
   assert(!!sourceId, "location must have a source id");
 }
 
-export function assertPendingLocation(location: PendingLocation) {
+export function assertPendingLocation(location: SourceLocation) {
   assert(!!location, "location must exist");
 
   const { sourceUrl } = location;
@@ -142,20 +141,11 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
   });
 }
 
-function createPendingLocation(location: SourceLocation) {
-  const { sourceUrl, line, column } = location;
-  return { sourceUrl, line, column };
-}
-
 export function createPendingBreakpoint(bp: Breakpoint): PendingBreakpoint {
-  const pendingLocation = createPendingLocation(bp.location);
-
-  assertPendingLocation(pendingLocation);
-
   return {
     options: bp.options,
     disabled: bp.disabled,
-    location: pendingLocation,
+    location: bp.location,
     astLocation: bp.astLocation!,
   };
 }
