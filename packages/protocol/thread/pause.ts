@@ -557,6 +557,9 @@ export class Pause {
   }
 
   async getFrameSteps(frameId: FrameId) {
+    assert(this.createWaiter, "no createWaiter");
+    await this.createWaiter;
+
     if (!this.frameSteps.has(frameId)) {
       const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
         frameId,
