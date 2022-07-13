@@ -158,6 +158,7 @@ export function selectLocation(
     // We try to work around this by comparing source URLs and, if they don't match,
     // use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
+      await ThreadFront.ensureAllSources();
       let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
       sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
       source = getSource(getState(), sourceId);
