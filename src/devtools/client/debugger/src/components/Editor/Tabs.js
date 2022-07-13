@@ -101,7 +101,7 @@ class Tabs extends PureComponent {
       return;
     }
 
-    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`].getWrappedInstance());
+    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`]);
 
     /* $FlowIgnore: tabDOM.nodeType will always be of Node.ELEMENT_NODE since it comes from a ref;
       however; the return type of findDOMNode is null | Element | Text */
