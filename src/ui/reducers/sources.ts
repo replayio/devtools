@@ -1,22 +1,30 @@
-import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
-import { newSource, SourceKind } from "@replayio/protocol";
-import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
+import {
+  createEntityAdapter,
+  createSelector,
+  createSlice,
+  EntityState,
+  PayloadAction,
+} from "@reduxjs/toolkit";
+import { Location, newSource, SourceKind } from "@replayio/protocol";
+// import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 
 export interface SourceDetails {
   canonicalId: string;
+  contentHash?: string;
   correspondingSourceIds: string[];
   generated: string[];
   generatedFrom: string[];
   id: string;
   kind: SourceKind;
-  contentHash?: string;
   prettyPrinted?: string;
   prettyPrintedFrom?: string;
   url?: string;
+  // TODO stableId: string;
 }
 
 export enum LoadingState {
@@ -41,17 +49,24 @@ const contentsAdapter = createEntityAdapter<SourceContent>();
 
 export const sourceSelectors = sourcesAdapter.getSelectors();
 export const contentSelectors = contentsAdapter.getSelectors();
+const sourceDetailSelectors = sourceDetailsAdapter.getSelectors();
 
 export interface SourcesState {
+  allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
   sources: EntityState<newSource>;
   contents: EntityState<SourceContent>;
+  selectedLocationHistory: Partial<Location>[];
+  sourcesByUrl: { [url: string]: string[] };
 }
 
 const initialState: SourcesState = {
+  allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
+  selectedLocationHistory: [],
+  sourcesByUrl: {},
 };
 
 const sourcesSlice = createSlice({
@@ -64,10 +79,20 @@ const sourcesSlice = createSlice({
       sourcesAdapter.addMany(state.sources, action.payload);
     },
     allSourcesReceived: state => {
-      sourceDetailsAdapter.addMany(
-        state.sourceDetails,
-        newSourcesToCompleteSourceDetails(sourceSelectors.selectAll(state.sources))
-      );
+      state.allSourcesReceived = true;
+      const sources = sourceSelectors.selectAll(state.sources);
+      sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
+      const sourcesByUrl: Record<string, string[]> = {};
+      sources.forEach(source => {
+        if (!source.url) {
+          return;
+        }
+
+        if (!sourcesByUrl[source.url]) {
+          sourcesByUrl[source.url] = [];
+        }
+        sourcesByUrl[source.url].push(source.sourceId);
+      });
     },
     sourceLoading: (state, action: PayloadAction<string>) => {
       contentsAdapter.upsertOne(state.contents, {
@@ -100,10 +125,22 @@ const sourcesSlice = createSlice({
         status: LoadingState.ERRORED,
       });
     },
+    selectLocation: (state, action: PayloadAction<Partial<Location>>) => {
+      state.selectedLocationHistory.unshift(action.payload);
+    },
   },
 });
 
-export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
+export const {
+  addSources,
+  allSourcesReceived,
+  selectLocation,
+  sourceLoading,
+  sourceLoaded,
+  sourceErrored,
+} = sourcesSlice.actions;
+
+export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState, { ThreadFront }) => {
     const existing = getState().experimentalSources.contents.entities[sourceId];
     if (existing?.status === LoadingState.LOADING || existing?.status === LoadingState.LOADED) {
@@ -127,24 +164,91 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction => {
   };
 };
 
-const sourceDetailsSelectors = sourceDetailsAdapter.getSelectors<UIState>(
-  (state: UIState) => state.experimentalSources.sourceDetails
-);
+export const getSourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesReceived;
+export const getAllSourceDetails = (state: UIState) =>
+  sourceDetailSelectors.selectAll(state.experimentalSources.sourceDetails);
 
-export const getSourceDetails = sourceDetailsSelectors.selectById;
-export const getAllSourceDetails = sourceDetailsSelectors.selectAll;
-export const getSelectedSourceDetails = (state: UIState) => {
-  const selected = getSelectedSourceId(state);
-  if (!selected) {
-    return undefined;
-  }
+export const getSelectedLocation = (state: UIState) =>
+  state.experimentalSources.selectedLocationHistory[0];
 
-  return sourceDetailsSelectors.selectById(state, selected);
+export const getSelectedSourceId = (state: UIState) => {
+  const location = getSelectedLocation(state);
+  return location?.sourceId;
 };
-export const getCorrespondingSourceIds = (state: UIState, id: string) =>
-  getSourceDetails(state, id)?.correspondingSourceIds;
+export const getSelectedSource = (state: UIState) => {
+  const selectedSourceId = getSelectedSourceId(state);
+  return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
+};
+export const getSourcesById = (state: UIState, ids: string[]) => {
+  return ids.map(
+    id => sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)!
+  );
+};
+export const getSourceDetails = (state: UIState, id: string) => {
+  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
+};
+export const getCorrespondingSourceIds = (state: UIState, id: string) => {
+  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)
+    ?.correspondingSourceIds;
+};
+export const getSourceByUrl = (state: UIState, url: string) => {
+  const id = state.experimentalSources.sourcesByUrl[url][0];
+  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
+};
+export const getSourceContent = (state: UIState, id: string) => {
+  return state.experimentalSources.contents.entities[id];
+};
+export const getSelectedSourceWithContent = (state: UIState) => {
+  const selectedSourceId = getSelectedSourceId(state);
+  return selectedSourceId ? getSourceContent(state, selectedSourceId) : null;
+};
+export const getTextAtLocation = (state: UIState, location: Location) => {
+  const content = getSourceContent(state, location.sourceId);
+  if (!content) {
+    return null;
+  }
+  // TODO Rework selectors
+  return "";
+  // return getTextAtPosition(content, location);
+};
+// This is useful if you are displaying a bunch of sources and want them to
+// ensure they all have unique names, even though some of them might have been
+// loaded from the same URL. If that's the case, and either of the original URLs
+// had a query string, then we will add that query string back.
+export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
+  const sourceDetails = getSourceDetails(state, sourceId);
+  if (!sourceDetails || !sourceDetails.url) {
+    return null;
+  }
+  if (state.experimentalSources.sourcesByUrl[sourceDetails.url].length > 1) {
+    // I was going to put the query string back here...
+    // But I'm not sure we're actually *removing* query strings in the first
+    // place yet!
+    // TODO @jcmorrow - actually remove query strings, then add them back here.
+    // presence
+    const queryString = "";
+    return sourceDetails.url + queryString;
+  } else {
+    return sourceDetails.url;
+  }
+};
 
-export const { addSources, allSourcesReceived, sourceErrored, sourceLoaded, sourceLoading } =
-  sourcesSlice.actions;
+/*
+export const getStableLocationForLocation = (
+  state: UIState,
+  location: Location
+): StableLocation => {
+  const sourceDetails = getSourceDetails(state, location.sourceId);
+  if (!sourceDetails) {
+    throw "Cannot find source details for sourceId: " + location.sourceId;
+  }
+  return {
+    ...location,
+    kind: sourceDetails.kind,
+    url: sourceDetails.url!,
+    contentHash: sourceDetails.contentHash!,
+  };
+};
+*/
 
 export default sourcesSlice.reducer;
