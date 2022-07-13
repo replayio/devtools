@@ -21,9 +21,7 @@ export interface SourceHitCounts {
   status: LoadingState;
 }
 
-export interface HitCountsState {
-  hitCounts: EntityState<SourceHitCounts>;
-}
+export type HitCountsState = EntityState<SourceHitCounts>;
 
 export enum LoadingState {
   LOADING = "loading",
@@ -32,28 +30,26 @@ export enum LoadingState {
 }
 
 const hitCountsAdapter = createEntityAdapter<SourceHitCounts>();
-const initialState: HitCountsState = {
-  hitCounts: hitCountsAdapter.getInitialState(),
-};
+const initialState = hitCountsAdapter.getInitialState();
 
 const hitCountsSlice = createSlice({
   name: "hitCounts",
   initialState,
   reducers: {
     hitCountsRequested: (state, action: PayloadAction<string>) => {
-      hitCountsAdapter.upsertOne(state.hitCounts, {
+      hitCountsAdapter.upsertOne(state, {
         id: action.payload,
         status: LoadingState.LOADING,
       });
     },
     hitCountsReceived: (state, action: PayloadAction<{ id: string; hitCounts: HitCount[] }>) => {
-      hitCountsAdapter.upsertOne(state.hitCounts, {
+      hitCountsAdapter.upsertOne(state, {
         ...action.payload,
         status: LoadingState.LOADED,
       });
     },
     hitCountsFailed: (state, action: PayloadAction<{ id: string; error: string }>) => {
-      hitCountsAdapter.upsertOne(state.hitCounts, {
+      hitCountsAdapter.upsertOne(state, {
         id: action.payload.id,
         status: LoadingState.ERRORED,
         error: action.payload.error,
@@ -63,7 +59,7 @@ const hitCountsSlice = createSlice({
 });
 
 const hitCountsSelectors = hitCountsAdapter.getSelectors<UIState>(
-  (state: UIState) => state.hitCounts.hitCounts
+  (state: UIState) => state.hitCounts
 );
 
 const MAX_LINE_HITS_TO_FETCH = 1000;
