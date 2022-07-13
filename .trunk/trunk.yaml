@@ -6,7 +6,6 @@ lint:
     - actionlint@1.6.8
     - eslint@8.13.0
     - gitleaks@8.3.0
-    - markdownlint@0.31.1
     - prettier@2.5.1
   ignore:
     - linters: [ALL]
