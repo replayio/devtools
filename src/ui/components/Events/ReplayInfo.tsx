@@ -49,6 +49,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     setModal("privacy");
   };
 
+  const isTest = recording.metadata.test;
   return (
     <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
@@ -73,7 +74,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           ) : null}
         </div>
         <div className="group">
-          {recording.url ? (
+          {!isTest && recording.url ? (
             <Row>
               <Icon
                 filename="external"
@@ -89,6 +90,40 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
               </div>
             </Row>
           ) : null}
+        </div>
+        <div className="group">
+          {recording.metadata && (
+            <>
+              <Row>
+                <MaterialIcon>schedule</MaterialIcon>
+                <div
+                  className="overflow-hidden overflow-ellipsis whitespace-pre"
+                  title={recording.metadata.source?.branch}
+                >
+                  {time} ago
+                </div>
+              </Row>
+
+              <Row>
+                <MaterialIcon>person</MaterialIcon>
+                <div
+                  className="overflow-hidden overflow-ellipsis whitespace-pre"
+                  title={recording.metadata.source?.branch}
+                >
+                  {recording.metadata.source?.trigger?.user}
+                </div>
+              </Row>
+              <Row>
+                <MaterialIcon>fork_right</MaterialIcon>
+                <div
+                  className="overflow-hidden overflow-ellipsis whitespace-pre"
+                  title={recording.metadata.source?.branch}
+                >
+                  {recording.metadata.source?.branch}
+                </div>
+              </Row>
+            </>
+          )}
         </div>
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />

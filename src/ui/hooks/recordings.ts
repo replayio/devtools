@@ -8,7 +8,6 @@ import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/gr
 import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
-import { ColorSwatchIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@replayio/protocol";
 import {
   SetRecordingIsPrivate,

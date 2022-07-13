@@ -122,6 +122,11 @@ function HeaderTitle({
     }
   }, [editing, hasTitle, recording.title]);
 
+  const testName = recording.metadata?.test?.title;
+  if (testName) {
+    return <span className={className}>{testName}</span>;
+  }
+
   if (!canEditTitle) {
     return <span className={className}>{displayTitle}</span>;
   }
