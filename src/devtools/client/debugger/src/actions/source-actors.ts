@@ -3,15 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
-import { getFocusRegion } from "ui/reducers/timeline";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
-import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/utils/timeline";
 
 import {
   getSourceActor,
   getSourceActorBreakableLines,
   getSourceActorBreakpointColumns,
-  getSourceActorBreakpointHitCounts,
   SourceActor,
 } from "../reducers/source-actors";
 import { memoizeableAction } from "../utils/memoizableAction";
@@ -77,43 +74,3 @@ export const loadSourceActorBreakableLines = memoizeableAction("loadSourceActorB
     });
   },
 });
-
-export const MAX_LINE_HITS_TO_FETCH = 1000;
-// This will fetch hitCounts in chunks of lines. So if line 4 is request, lines
-// 1-500 will be fetched. If line 501 is request, lines 500-1000 will be
-// fetched.
-export const loadSourceActorBreakpointHitCounts = memoizeableAction(
-  "loadSourceActorBreakpointHitCounts",
-  {
-    createKey: ({ id, lineNumber }: { id: string; lineNumber: number }, { getState }) => {
-      const state = getState();
-      // We need to refetch if: we are beyond the maximum number of line hits fetchable
-      // Or the focusRegion has changed
-      const key = [
-        id,
-        Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH,
-        state.timeline.focusRegion
-          ? displayedBeginForFocusRegion(state.timeline.focusRegion)
-          : "no_focus_start",
-        state.timeline.focusRegion
-          ? displayedEndForFocusRegion(state.timeline.focusRegion)
-          : "no_focus_end",
-      ].join("-");
-      return key;
-    },
-    getValue: ({ id, lineNumber }, { getState }) =>
-      getSourceActorBreakpointHitCounts(getState(), id, lineNumber),
-    action: async ({ id, lineNumber }, { dispatch, getState, client }) => {
-      const state = getState();
-      await dispatch({
-        type: "SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS",
-        id,
-        [PROMISE]: client.getSourceActorBreakpointHitCounts(
-          getSourceActor(state, id),
-          lineNumber,
-          getFocusRegion(state)
-        ),
-      });
-    },
-  }
-);

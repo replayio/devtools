@@ -19,9 +19,7 @@ import {
 } from "ui/actions/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 import { WiredNamedValue } from "protocol/thread/pause";
-import { FocusRegion, UnsafeFocusRegion } from "ui/state/timeline";
 
-import { MAX_LINE_HITS_TO_FETCH } from "../actions/source-actors";
 import { SelectedFrame } from "../reducers/pause";
 import type { SourceActor } from "../reducers/source-actors";
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
@@ -397,36 +395,6 @@ async function getSourceActorBreakableLines({ actor }: { actor: string }) {
   return positions.map(({ line }) => line);
 }
 
-async function getSourceActorBreakpointHitCounts(
-  { id }: { id: string },
-  lineNumber: number,
-  focusRegion: FocusRegion | null
-) {
-  const locations = await ThreadFront.getBreakpointPositionsCompressed(id);
-  // See `source-actors` where MAX_LINE_HITS_TO_FETCH is defined for an
-  // explanation of the bounds here.
-  const lowerBound = Math.floor(lineNumber / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;
-  const upperBound = lowerBound + MAX_LINE_HITS_TO_FETCH;
-  const locationsToFetch = locations
-    .filter(location => location.line >= lowerBound && location.line < upperBound)
-    .map(location => ({ ...location, columns: [location.columns.sort((a, b) => a - b)[0]] }));
-
-  return {
-    max: upperBound,
-    min: lowerBound,
-    ...(await ThreadFront.getHitCounts(
-      id,
-      locationsToFetch,
-      focusRegion
-        ? {
-            beginPoint: (focusRegion as UnsafeFocusRegion).begin.point,
-            endPoint: (focusRegion as UnsafeFocusRegion).end.point,
-          }
-        : null
-    )),
-  };
-}
-
 function getFrontByID(actorID: string) {
   return devToolsClient.getFrontByID(actorID);
 }
@@ -455,7 +423,6 @@ const clientCommands = {
   getSourceForActor,
   getSourceActorBreakpointPositions,
   getSourceActorBreakableLines,
-  getSourceActorBreakpointHitCounts,
   hasBreakpoint,
   setBreakpoint,
   setXHRBreakpoint,

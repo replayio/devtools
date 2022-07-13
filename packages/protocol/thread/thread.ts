@@ -498,43 +498,6 @@ class _ThreadFront {
     return { contents, contentType };
   }
 
-  async getHitCounts(
-    sourceId: SourceId,
-    locations: SameLineSourceLocations[],
-    range: { beginPoint: ExecutionPoint; endPoint: ExecutionPoint } | null
-  ) {
-    assert(this.sessionId, "no sessionId");
-    let params: Omit<getHitCountsParameters, "sourceId"> = { locations, maxHits: 10000 };
-    if (range !== null && range.beginPoint !== "" && range.endPoint !== "") {
-      params.range = { begin: range.beginPoint, end: range.endPoint };
-    }
-
-    const sourceIds = this.getCorrespondingSourceIds(sourceId); // ensure source is loaded
-
-    const hitCountsForSources = await Promise.all(
-      sourceIds.map(id =>
-        client.Debugger.getHitCounts({ sourceId: id, ...params }, this.sessionId!)
-      )
-    );
-
-    // Merge hit counts from corresponding sources
-    let [hitCounts, ...hitCountsForCorrespondingSources] = hitCountsForSources;
-    for (const hitCountsForSource of hitCountsForCorrespondingSources) {
-      for (const newHit of hitCountsForSource.hits) {
-        const match = hitCounts.hits.find(
-          hit =>
-            hit.location.line == newHit.location.line &&
-            hit.location.column == newHit.location.column
-        );
-        if (match) {
-          match.hits += newHit.hits;
-        }
-      }
-    }
-
-    return hitCounts;
-  }
-
   async getEventHandlerCounts(eventTypes: string[]) {
     return Object.fromEntries(
       await Promise.all(

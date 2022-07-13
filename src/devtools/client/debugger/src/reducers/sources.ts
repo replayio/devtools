@@ -24,7 +24,6 @@ import {
   getSourceActor,
   getSourceActors,
   getBreakableLinesForSourceActors,
-  getSourceActorBreakpointHitCounts,
   SourceActor,
 } from "./source-actors";
 import { SourceLocation } from "./types";
@@ -636,16 +635,6 @@ export function getSourceContent(state: UIState, id: string) {
 export function getSelectedSourceId(state: UIState) {
   const source = getSelectedSource(state);
   return source && source.id;
-}
-
-export function getHitCountsForSource(state: UIState, sourceId: string): HitCount[] {
-  // @ts-ignore TODO Fix string[]/string mismatch
-  return getSourceActorBreakpointHitCounts(state, state.sources.actors[sourceId])!;
-}
-
-export function getHitCountsForSelectedSource(state: UIState) {
-  const id = getSelectedSourceId(state)!;
-  return getHitCountsForSource(state, id);
 }
 
 export const getDisplayedSources = createSelector(

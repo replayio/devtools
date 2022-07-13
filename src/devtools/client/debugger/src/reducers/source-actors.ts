@@ -318,25 +318,6 @@ const rangesInclude = (ranges: LineRange[] | undefined, point: number): boolean 
   return Boolean(ranges?.find(range => range.min <= point && range.max >= point));
 };
 
-export function getSourceActorBreakpointHitCounts(
-  state: UIState,
-  id: string,
-  lineNumber: number | undefined
-) {
-  const { breakpointHitCounts, breakpointHitCountLinesKnown } = getResource(state.sourceActors, id);
-  // It's important for `memoizableAction` that we don't return a promise for a
-  // different line range (for instance, returning a promise when line 1001 is
-  // requested, even though we are only currently loading lines 1-1000). This is
-  // why we keep track of the min and max requested.
-  if (
-    !breakpointHitCounts ||
-    (lineNumber && !rangesInclude(breakpointHitCountLinesKnown, lineNumber))
-  ) {
-    return null;
-  }
-  return breakpointHitCounts;
-}
-
 export function getSourceActorBreakableLines(state: UIState, id: string) {
   const { breakableLines } = getResource(state.sourceActors, id);
 
