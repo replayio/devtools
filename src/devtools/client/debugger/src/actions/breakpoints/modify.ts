@@ -94,6 +94,9 @@ export function addBreakpoint(
     const { sourceId, line, sourceUrl } = initialLocation;
     let column = initialLocation.column;
 
+    // Have to make sure we've got possible breakpoint locations available first
+    await dispatch(fetchPossibleBreakpointsForSource(sourceId));
+
     if (!column) {
       const lineBreakpoints = getPossibleBreakpointsForSource(getState(), sourceId);
       if (!lineBreakpoints) {
@@ -105,8 +108,6 @@ export function addBreakpoint(
     let location = { sourceId, line, column, sourceUrl };
 
     dispatch(setRequestedBreakpoint(location));
-
-    await dispatch(fetchPossibleBreakpointsForSource(sourceId));
 
     // check if the user deleted the requested breakpoint in the meantime
     const requestedBreakpointLocations = getRequestedBreakpointLocations(getState());

@@ -7,6 +7,7 @@ import {
 } from "protocol/thread/possibleBreakpoints";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
+import { listenForCondition } from "ui/setup/listenerMiddleware";
 
 export enum LoadingStatus {
   LOADING = "loading",
@@ -68,10 +69,22 @@ export function getLocationKey(location: Location & { scriptId?: string }) {
   return `${sourceId || location.scriptId}:${line}:${columnString}`;
 }
 
-export const fetchPossibleBreakpointsForSource = (sourceId: string): UIThunkAction => {
+export const fetchPossibleBreakpointsForSource = (
+  sourceId: string
+): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState) => {
     const status = adapterSelectors.selectById(getState(), sourceId)?.status;
-    if (status === LoadingStatus.LOADED || status === LoadingStatus.LOADING) {
+    if (status === LoadingStatus.LOADING) {
+      // in flight - resolve this thunk's promise when it completes
+      return dispatch(
+        listenForCondition(() => {
+          // Check the status of this source after every action
+          const status = adapterSelectors.selectById(getState(), sourceId)?.status;
+          return status === LoadingStatus.LOADED;
+        })
+      );
+    }
+    if (status === LoadingStatus.LOADED) {
       return;
     }
     dispatch(possibleBreakpointsSlice.actions.possibleBreakpointsRequested(sourceId));
