@@ -96,8 +96,7 @@ class MarkupView {
     this.isLoadingPostponed = false;
 
     await ThreadFront.ensureAllSources();
-    ThreadFront.ensureCurrentPause();
-    const pause = ThreadFront.currentPause;
+    const pause = ThreadFront.getCurrentPause();
     if (this.selection.nodeFront && this.selection.nodeFront.pause !== pause) {
       this.selection.setNodeFront(null);
     }
