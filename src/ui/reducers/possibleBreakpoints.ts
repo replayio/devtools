@@ -60,7 +60,7 @@ const possibleBreakpointsSlice = createSlice({
   },
 });
 
-const selectors = adapter.getSelectors<UIState>(state => state.possibleBreakpoints);
+const adapterSelectors = adapter.getSelectors<UIState>(state => state.possibleBreakpoints);
 
 export function getLocationKey(location: Location & { scriptId?: string }) {
   const { sourceId, line, column } = location;
@@ -70,7 +70,7 @@ export function getLocationKey(location: Location & { scriptId?: string }) {
 
 export const fetchPossibleBreakpointsForSource = (sourceId: string): UIThunkAction => {
   return async (dispatch, getState) => {
-    const status = selectors.selectById(getState(), sourceId)?.status;
+    const status = adapterSelectors.selectById(getState(), sourceId)?.status;
     if (status === LoadingStatus.LOADED || status === LoadingStatus.LOADING) {
       return;
     }
@@ -94,7 +94,7 @@ export const fetchPossibleBreakpointsForSource = (sourceId: string): UIThunkActi
   };
 };
 export const getPossibleBreakpointsForSource = (state: UIState, sourceId: string) => {
-  return selectors.selectById(state, sourceId)?.possibleBreakpoints;
+  return adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints;
 };
 
 export const getPossibleBreakpointsForSelectedSource = (state: UIState): Location[] => {
@@ -107,7 +107,9 @@ export const getPossibleBreakpointsForSelectedSource = (state: UIState): Locatio
 
 export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
   return uniq(
-    selectors.selectById(state, sourceId)?.possibleBreakpoints?.map(location => location.line)
+    adapterSelectors
+      .selectById(state, sourceId)
+      ?.possibleBreakpoints?.map(location => location.line)
   );
 };
 export const getBreakableLinesForSelectedSource = (state: UIState) => {
@@ -116,6 +118,13 @@ export const getBreakableLinesForSelectedSource = (state: UIState) => {
     return null;
   }
   return getBreakableLinesForSource(state, sourceId);
+};
+
+export const selectors = {
+  getBreakableLinesForSelectedSource,
+  getBreakableLinesForSource,
+  getPossibleBreakpointsForSelectedSource,
+  getPossibleBreakpointsForSource,
 };
 
 export default possibleBreakpointsSlice.reducer;
