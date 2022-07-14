@@ -246,7 +246,7 @@ export async function repaint(force = false) {
   }, 500);
 
   const { mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-  const pause = ThreadFront.ensureCurrentPause();
+  const pause = ThreadFront.getCurrentPause();
 
   const rv = await pause.repaintGraphics(force);
   graphicsFetched = true;

@@ -190,6 +190,10 @@ export class Pause {
     datas.forEach(d => this._updateDataFronts(d));
   }
 
+  ensureLoaded() {
+    return this.createWaiter;
+  }
+
   // we're cheating Typescript here: the objects that we add are of type Frame/Scope/ObjectDescription
   // but we pretend they are of type WiredFrame/WiredScope/WiredObject. These objects will be changed
   // in _updateDataFronts() so that they have the correct type afterwards.
