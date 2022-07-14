@@ -166,6 +166,7 @@ export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: S
 
   const sortedLocations = sortSelectedLocations(possibleBreakpointsForLine);
 
+  // There _should_ be at least one location here, but handle safely
   const [firstLocation] = sortedLocations;
 
   return {

@@ -16,7 +16,7 @@ export function createLocation({
   sourceUrl = "",
 }: {
   sourceId: string;
-  line: number;
+  line?: number;
   column?: number;
   sourceUrl?: string;
 }) {
