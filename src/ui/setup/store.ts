@@ -26,6 +26,8 @@ import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 
+import { listenerMiddleware } from "./listenerMiddleware";
+
 type UIStateReducers = {
   [key in keyof UIState]: Reducer<UIState[key]>;
 };
@@ -179,7 +181,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
         thunk: {
           extraArgument: extraThunkArgs,
         },
-      });
+      }).prepend(listenerMiddleware.middleware);
 
       let updatedMiddlewareArray = originalMiddlewareArray.concat([
         promise,
