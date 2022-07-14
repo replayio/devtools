@@ -160,15 +160,17 @@ export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: S
     return;
   }
 
-  const possibleBreakpointsForLine = positions.find(position => {
+  const possibleBreakpointsForLine = positions.filter(position => {
     return position.line === line;
   });
 
   const sortedLocations = sortSelectedLocations(possibleBreakpointsForLine);
 
+  const [firstLocation] = sortedLocations;
+
   return {
-    line: sortedLocations[0],
-    column: sortedLocations[1][0],
+    line: firstLocation?.line,
+    column: firstLocation?.column,
     sourceId,
     sourceUrl: source.url,
   };
