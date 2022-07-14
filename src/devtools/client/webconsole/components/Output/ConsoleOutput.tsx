@@ -38,6 +38,7 @@ import styles from "./ConsoleOutput.module.css";
 
 import type { State as ConsoleSearchState } from "../Search/useConsoleSearch";
 import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
+import { bindActionCreators } from "@reduxjs/toolkit";
 
 function compareLocation(locA: Frame | undefined, locB: SourceLocation) {
   if (!locA) {
@@ -341,7 +342,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
     );
 
     if (matchingBreakpoint != null) {
-      dispatch(setBreakpointPrefixBadge(matchingBreakpoint, badge));
+      this.props.setBreakpointPrefixBadge(matchingBreakpoint, badge);
     }
 
     this.closeContextMenu();
@@ -359,7 +360,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    dispatch(setFocusRegionEndTime(time, true));
+    this.props.setFocusRegionEndTime(time, true);
   };
 
   setFocusStart = async () => {
@@ -374,7 +375,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       return;
     }
 
-    dispatch(setFocusRegionBeginTime(time, true));
+    this.props.setFocusRegionBeginTime(time, true);
   };
 }
 
@@ -403,11 +404,21 @@ function mapStateToProps(state: UIState) {
   };
 }
 
-const mapDispatchToProps = (dispatch: AppDispatch) => ({
+const connector = connect(mapStateToProps, dispatch => ({
+  // Normally using `mapDispatch` as a function is pointless, since we can just
+  // pass in an object of action creators that get bound automatically.
+  // _But_, in this case, ConsoleOutput passes `dispatch` to `MessageContainer`,
+  // so we want to pass that through as well.
+  ...bindActionCreators(
+    {
+      setFocusRegionBeginTime,
+      setFocusRegionEndTime,
+      setBreakpointPrefixBadge,
+    },
+    dispatch
+  ),
   dispatch,
-});
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
+}));
 
 export default connector(ConsoleOutput);
 
