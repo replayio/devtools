@@ -11,10 +11,10 @@ import {
   removeBreakpoint,
   setBreakpoint,
   setRequestedBreakpoint,
+  getBreakpoint,
 } from "../../reducers/breakpoints";
 import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
 import {
-  getBreakpoint,
   getFirstBreakpointPosition,
   getSymbols,
   getSource,
