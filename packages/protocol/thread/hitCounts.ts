@@ -1,7 +1,6 @@
 import {
   ExecutionPoint,
   getHitCountsParameters,
-  getHitCountsResult,
   HitCount,
   SameLineSourceLocations,
 } from "@replayio/protocol";
@@ -41,4 +40,16 @@ export const fetchProtocolHitCounts = async (
 
   // Merge hit counts from corresponding sources
   return combineHitCounts(correspondingHitCounts.flatMap(result => result.hits));
+};
+
+export const firstColumnForLocations = (
+  locations: SameLineSourceLocations[]
+): SameLineSourceLocations[] => {
+  return locations.map(location => {
+    const column = Math.min(...location.columns)!;
+    return {
+      ...location,
+      columns: [column],
+    };
+  });
 };

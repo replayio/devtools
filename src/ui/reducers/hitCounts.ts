@@ -5,7 +5,7 @@ import { UIState } from "ui/state";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 import { getCorrespondingSourceIds, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
-import { fetchProtocolHitCounts } from "protocol/thread/hitCounts";
+import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
 import sortBy from "lodash/sortBy";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 
@@ -118,27 +118,20 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
       dispatch(hitCountsRequested(cacheKey));
       const { lower, upper } = getBoundsForLineNumber(lineNumber);
       const locations = await ThreadFront.getBreakpointPositionsCompressed(sourceId);
-      const locationsToFetch = locations.filter(
-        location => location.line >= lower && location.line < upper
-      );
       // When you fetch possible breakpoints, you will receive a list of columns
       // for each breakable line. We only display the number of times that the
       // *first* possible breakpoint on a line was hit, so we can throw the rest
       // of them away.
-      locationsToFetch.map(location => {
-        const sortedColumns = sortBy(location.columns, (a, b) => a - b);
-        return {
-          ...location,
-          columns: sortedColumns.slice(0, 1),
-        };
-      });
+      const firstColumnLocations = firstColumnForLocations(
+        locations.filter(location => location.line >= lower && location.line < upper)
+      );
       const focusRegion = getFocusRegion(getState());
       const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
       const correspondingSourceIds = getCorrespondingSourceIds(getState(), sourceId)!;
 
       const hitCounts = await fetchProtocolHitCounts(
         correspondingSourceIds,
-        locationsToFetch,
+        firstColumnLocations,
         range
           ? {
               beginPoint: range.begin.point,
