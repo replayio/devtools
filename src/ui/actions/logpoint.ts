@@ -97,9 +97,7 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       value: { time, pauseId, location, values, data, frameworkListeners },
     }) => {
       await ThreadFront.ensureAllSources();
-      const pause = new Pause(ThreadFront);
-      pause.instantiate(pauseId, point, time, /* hasFrames */ true);
-      pause.addData(data);
+      const pause = ThreadFront.instantiatePause(pauseId, point, time, /* hasFrames */ true, data);
       const valueFronts = values.map((v: any) => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
       assert(mappedLocation, "preferred mapped location not found");
