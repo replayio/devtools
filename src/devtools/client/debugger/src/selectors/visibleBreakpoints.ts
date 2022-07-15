@@ -6,23 +6,23 @@ import { createSelector } from "reselect";
 import uniqBy from "lodash/uniqBy";
 
 import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
-import { getSelectedSource } from "../reducers/sources";
 
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 import { Breakpoint } from "../reducers/types";
+import { UIState } from "ui/state";
 
 /*
  * Finds the breakpoints, which appear in the selected source.
  */
 export const getVisibleBreakpoints = createSelector(
-  getSelectedSource,
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
   getBreakpointsList,
-  (selectedSource, breakpoints) => {
-    if (!selectedSource) {
+  (selectedSourceId, breakpoints) => {
+    if (!selectedSourceId) {
       return null;
     }
 
-    return breakpoints.filter(bp => selectedSource && bp.location.sourceId === selectedSource.id);
+    return breakpoints.filter(bp => bp.location.sourceId === selectedSourceId);
   }
 );
 
@@ -30,14 +30,14 @@ export const getVisibleBreakpoints = createSelector(
  * Finds the requested breakpoints, which appear in the selected source.
  */
 export const getVisibleRequestedBreakpoints = createSelector(
-  getSelectedSource,
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
   getRequestedBreakpointsList,
-  (selectedSource, breakpoints) => {
-    if (!selectedSource) {
+  (selectedSourceId, breakpoints) => {
+    if (!selectedSourceId) {
       return null;
     }
 
-    return breakpoints.filter(bp => bp.location.sourceId === selectedSource.id);
+    return breakpoints.filter(bp => bp.location.sourceId === selectedSourceId);
   }
 );
 
@@ -48,7 +48,7 @@ export const getVisibleRequestedBreakpoints = createSelector(
 export const getFirstVisibleBreakpoints = createSelector(
   getVisibleBreakpoints,
   getVisibleRequestedBreakpoints,
-  getSelectedSource,
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
   (breakpoints, requestedBreakpoints, selectedSource) => {
     if (!breakpoints || !selectedSource) {
       return [];

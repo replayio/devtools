@@ -21,7 +21,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { assert, waitForTime } from "protocol/utils";
+import { waitForTime } from "protocol/utils";
 
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
@@ -637,7 +637,6 @@ const shouldRerunAnalysisForBreakpoint = (
   //    If we don't need to re-run analysis after zooming in, then we won't need to refetch after zooming back out either,
   //    (unless our fetches have overflowed at some point).
 
-  // @ts-expect-error Location type mismatches
   const mappingEntry = getAnalysisMappingForLocation(state, bp.location);
   if (!mappingEntry) {
     return true;
@@ -690,7 +689,6 @@ export function syncFocusedRegion(): UIThunkAction {
         // - Setting the breakpoint options calls `client.setBreakpoint`
         // - That calls `setLogpoint` in `actions/logpoint`
         // - Which finally runs `setMultiSourceLogpoint` with analysis
-        // @ts-expect-error Location type mismatches
         dispatch(setBreakpointOptions(cx, b.location, b.options));
       }
     }

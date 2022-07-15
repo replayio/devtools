@@ -61,7 +61,6 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const { cx, selectSpecificLocation } = this.props;
     event.preventDefault();
 
-    // @ts-expect-error Location mismatch
     selectSpecificLocation(cx, this.selectedLocation);
   };
 
@@ -80,8 +79,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
 
     const bpId = features.columnBreakpoints
       ? getLocationKey(this.selectedLocation)
-      : // @ts-expect-error Location mismatch
-        getLocationWithoutColumn(this.selectedLocation);
+      : getLocationWithoutColumn(this.selectedLocation);
     const frameId = features.columnBreakpoints
       ? getLocationKey(frame.selectedLocation)
       : getLocationWithoutColumn(frame.selectedLocation);

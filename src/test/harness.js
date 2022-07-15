@@ -238,7 +238,7 @@ async function waitForLoadedScopes() {
 }
 
 function waitForSelectedSource(url) {
-  const { getSelectedSourceWithContent, getBreakableLines } = dbgSelectors;
+  const { getSelectedSourceWithContent, getBreakableLinesForSource } = dbgSelectors;
 
   return waitUntil(
     () => {
@@ -259,7 +259,7 @@ function waitForSelectedSource(url) {
       // The hasSymbols check is disabled. Sometimes the parser worker fails for
       // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
       // return hasSymbols(source) && getBreakableLines(source.id);
-      return getBreakableLines(source.id);
+      return getBreakableLinesForSource(source.id);
     },
     { waitingFor: `source ${url} to be selected` }
   );

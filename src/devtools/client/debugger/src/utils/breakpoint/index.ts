@@ -52,7 +52,10 @@ export function getLocationWithoutColumn(location: Location) {
   return `${sourceId}:${line}`;
 }
 
-export function makePendingLocationId(location: SourceLocation, recordingId: string) {
+export function makePendingLocationId(
+  location: Location & { sourceUrl: string },
+  recordingId: string
+) {
   assertPendingLocation(location);
   const { sourceUrl, line, column } = location;
   const sourceUrlString = sourceUrl || "";
@@ -99,18 +102,8 @@ export function makeBreakpointActorId(location: SourceActorLocation) {
   return `${sourceActor}:${line}:${columnString}`;
 }
 
-export function assertBreakpoint(breakpoint: Breakpoint) {
-  assertLocation(breakpoint.location);
-}
-
 export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {
   assertPendingLocation(pendingBreakpoint.location);
-}
-
-export function assertLocation(location: SourceLocation) {
-  assertPendingLocation(location);
-  const { sourceId } = location;
-  assert(!!sourceId, "location must have a source id");
 }
 
 export function assertPendingLocation(location: PendingLocation) {
@@ -142,20 +135,14 @@ export function breakpointAtLocation(breakpoints: Breakpoint[], { line, column }
   });
 }
 
-function createPendingLocation(location: SourceLocation) {
-  const { sourceUrl, line, column } = location;
-  return { sourceUrl, line, column };
-}
-
-export function createPendingBreakpoint(bp: Breakpoint): PendingBreakpoint {
-  const pendingLocation = createPendingLocation(bp.location);
-
-  assertPendingLocation(pendingLocation);
+export function createPendingBreakpoint(bp: Breakpoint, sourceUrl: string): PendingBreakpoint {
+  const location = { ...bp.location, sourceUrl };
+  assertPendingLocation(location);
 
   return {
     options: bp.options,
     disabled: bp.disabled,
-    location: pendingLocation,
+    location,
     astLocation: bp.astLocation!,
   };
 }

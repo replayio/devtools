@@ -10,30 +10,21 @@ import type { Breakpoint, Position } from "../reducers/types";
 import { getSelectedSource } from "../reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
 
-function getColumn(column: number, selectedSource: Source) {
-  return column;
-}
-
-function getLocation(bp: Breakpoint, selectedSource: Source) {
-  return bp.location;
-}
-
 function getBreakpointsForSource(state: UIState, selectedSource: Source) {
   const breakpoints = getBreakpointsList(state);
 
   return breakpoints.filter(bp => {
-    const location = getLocation(bp, selectedSource);
+    const location = bp.location;
     return location.sourceId === selectedSource.id;
   });
 }
 
 function findBreakpointAtLocation(
   breakpoints: Breakpoint[],
-  selectedSource: Source,
-  { line, column }: Position
+  { line, column }: { line: number; column?: number }
 ) {
   return breakpoints.find(breakpoint => {
-    const location = getLocation(breakpoint, selectedSource);
+    const location = breakpoint.location;
     const sameLine = location.line === line;
     if (!sameLine) {
       return false;
@@ -43,28 +34,8 @@ function findBreakpointAtLocation(
       return true;
     }
 
-    return location.column === getColumn(column, selectedSource);
+    return location.column === column;
   });
-}
-
-// returns the closest active column breakpoint
-function findClosestPosition(positions?: Position[], column?: number) {
-  if (!positions || positions.length == 0) {
-    return null;
-  }
-
-  return positions.reduce((closestPos, currentPos) => {
-    const currentColumn = currentPos.column;
-    const closestColumn = closestPos.column;
-    // check that breakpoint has a column.
-    if (column && currentColumn && closestColumn) {
-      const currentDistance = Math.abs(currentColumn - column);
-      const closestDistance = Math.abs(closestColumn - column);
-
-      return currentDistance < closestDistance ? currentPos : closestPos;
-    }
-    return closestPos;
-  }, positions[0]);
 }
 
 /*
@@ -74,14 +45,17 @@ function findClosestPosition(positions?: Position[], column?: number) {
  * This is useful for finding a breakpoint when the
  * user clicks in the gutter or on a token.
  */
-export function getBreakpointAtLocation(state: UIState, location: Position) {
+export function getBreakpointAtLocation(
+  state: UIState,
+  location: { line: number; column?: number }
+) {
   const selectedSource = getSelectedSource(state);
   if (!selectedSource) {
     throw new Error("no selectedSource");
   }
   const breakpoints = getBreakpointsForSource(state, selectedSource);
 
-  return findBreakpointAtLocation(breakpoints, selectedSource, location);
+  return findBreakpointAtLocation(breakpoints, location);
 }
 
 export function getBreakpointsAtLine(state: UIState, line: number) {
@@ -91,5 +65,5 @@ export function getBreakpointsAtLine(state: UIState, line: number) {
   }
   const breakpoints = getBreakpointsForSource(state, selectedSource);
 
-  return breakpoints.filter(breakpoint => getLocation(breakpoint, selectedSource).line === line);
+  return breakpoints.filter(breakpoint => breakpoint.location.line === line);
 }

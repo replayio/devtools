@@ -1,10 +1,4 @@
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { newSource, SourceKind } from "@replayio/protocol";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { UIState } from "ui/state";

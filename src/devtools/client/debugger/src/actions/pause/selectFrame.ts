@@ -26,7 +26,6 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
     // Frames that aren't on-stack do not support evalling and may not
     // have live inspectable scopes, so we do not allow selecting them.
     if (frame.state !== "on-stack") {
-      // @ts-expect-error sourcelocation mismatch
       return dispatch(selectLocation(cx, frame.location));
     }
 
@@ -38,7 +37,6 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
 
     client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
 
-    // @ts-expect-error sourcelocation mismatch
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
 

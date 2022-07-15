@@ -11,7 +11,6 @@
 
 // this will need to be changed so that addCLientBreakpoint is removed
 
-export * from "./breakpointPositions";
 export * from "./modify";
 export * from "./syncBreakpoint";
 

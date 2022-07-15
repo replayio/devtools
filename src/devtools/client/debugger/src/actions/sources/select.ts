@@ -9,14 +9,17 @@
  * @module actions/sources
  */
 
+import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
+
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
+import type { Source } from "../../reducers/sources";
 import { tabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
@@ -32,13 +35,16 @@ import {
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { setBreakableLines } from "./breakableLines";
 import { loadSourceText } from "./loadSourceText";
 import { setSymbols } from "./symbols";
 
 type PartialLocation = Parameters<typeof createLocation>[0];
 
-export const setSelectedLocation = (cx: Context, source: Source, location: Location) => ({
+export const setSelectedLocation = (
+  cx: Context,
+  source: Source,
+  location: Location & { sourceUrl: string }
+) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
   source,
@@ -193,7 +199,7 @@ export function selectLocation(
     }
 
     await dispatch(loadSourceText({ source }));
-    await dispatch(setBreakableLines(cx, source.id));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));

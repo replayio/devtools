@@ -4,7 +4,6 @@
 
 //
 export * from "./blackbox";
-export * from "./breakableLines";
 export * from "./loadSourceText";
 export * from "./newSources";
 export * from "./select";
