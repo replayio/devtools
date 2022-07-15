@@ -42,6 +42,8 @@ import {
   Frame,
   PointRange,
   TimeRange,
+  PauseId,
+  PauseData,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
@@ -629,6 +631,23 @@ class _ThreadFront {
       this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
     }
     return this.currentPause;
+  }
+
+  instantiatePause(
+    pauseId: PauseId,
+    point: ExecutionPoint,
+    time: number,
+    hasFrames: boolean,
+    data: PauseData = {}
+  ) {
+    let pause = this.allPauses.get(point);
+    if (pause) {
+      return pause;
+    }
+    pause = new Pause(this);
+    pause.instantiate(pauseId, point, time, hasFrames, data);
+    this.allPauses.set(point, pause);
+    return pause;
   }
 
   async getFrames() {
@@ -1333,8 +1352,7 @@ EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
 export function wireUpMessage(message: Message): Pause {
   const wiredMessage = message as WiredMessage;
 
-  const pause = new Pause(ThreadFront);
-  pause.instantiate(
+  const pause = ThreadFront.instantiatePause(
     message.pauseId,
     message.point.point,
     message.point.time,
