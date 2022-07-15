@@ -147,6 +147,12 @@ test("should be searchable", async ({ page }) => {
 
   await page.click('[data-test-id="ConsoleSearchGoToPreviousButton"]');
   await takeScreenshot(page, consoleRoot, "searchable-result-2-of-3");
+
+  // Changes to filters should also update search results
+  await page.fill('[data-test-id="ConsoleFilterInput"]', "warning");
+
+  const searchResultsLabel = page.locator('[data-test-id="SearchResultsLabel"]');
+  await takeScreenshot(page, searchResultsLabel, "searchable-result-updated-after-filter");
 });
 
 test("should be filterable", async ({ page }) => {
@@ -190,10 +196,44 @@ test("should log events in the console", async ({ page }) => {
 
   await page.fill('[data-test-id="EventTypeFilterInput"]', "zzz");
   await takeScreenshot(page, filterToggles, "event-types-filtered-toggle-list-no-results");
+});
 
-  // TODO Add tests for filtering and searching list (once supported)
+test("should be searchable on complex content", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.fill('[data-test-id="ConsoleSearchInput"]', "Array(3) [1, 2, 3]");
+
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await takeScreenshot(page, consoleRoot, "searchable-complex-array-preview");
+
+  await page.fill('[data-test-id="ConsoleSearchInput"]', "number: 123, string:");
+  await takeScreenshot(page, consoleRoot, "searchable-complex-object-preview");
+});
+
+test("should be filterable on complex content", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.fill('[data-test-id="ConsoleFilterInput"]', "Array(3) [1, 2, 3]");
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await takeScreenshot(page, consoleRoot, "filtered-complex-array-preview");
+
+  await page.fill('[data-test-id="ConsoleFilterInput"]', "number: 123, string:");
+  await takeScreenshot(page, consoleRoot, "filtered-complex-object-preview");
+});
+
+test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.click('[data-test-id="FilterToggle-errors"]');
+  await page.click('[data-test-id="FilterToggle-exceptions"]');
+  await page.click('[data-test-id="FilterToggle-logs"]');
+
+  const list = page.locator("[data-test-name=Messages]");
+  await takeScreenshot(page, list, "filtered-all-warnings");
+
+  await page.click('[data-test-id="FilterToggle-hideNodeModules"]');
+  await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
 });
 
 // TODO Add tests:
-// 1. For fast-forwarding to a message.
-// 2. Filter node modules
+// * For fast-forwarding to a message.
