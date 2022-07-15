@@ -59,7 +59,7 @@ declare global {
   }
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
-    actions?: any;
+    actions?: typeof actions;
     selectors?: BoundSelectors;
     // We use 'command' in the backend and 'message' in the frontend so expose both :P
     console?: {
@@ -244,21 +244,25 @@ export default async function DevTools(store: AppStore) {
 type SelectorsObject = typeof selectors;
 
 // We expect that all Redux selectors take `state` as the first arg
-type ReduxSelectorFunction = (state: UIState, ...any: any[]) => any;
+type ReduxSelectorFunction = ((state: UIState, ...any: any[]) => any) | ((state: UIState) => any);
 
 // Do TS type transforms to extract "an object with just Redux selectors"
 type ObjectOfJustSelectorsHopefully = Pick<
   SelectorsObject,
-  KeysByType<SelectorsObject, ReduxSelectorFunction>
+  KeysAssignableToType<SelectorsObject, ReduxSelectorFunction>
 >;
+
+type SelectorWithoutStateArg<T extends ReduxSelectorFunction> = (
+  ...args: Tail<Parameters<T>>
+) => ReturnType<T>;
 
 // When we "bind" the selectors, we automatically pass in `state` as the first arg.
 // Create TS types that reflect that by removing the first arg from the type signature,
 // but still expect any other parameters.
 type BoundSelectors = {
-  [key in keyof ObjectOfJustSelectorsHopefully]: (
-    ...args: Tail<Parameters<ObjectOfJustSelectorsHopefully[key]>>
-  ) => ReturnType<ObjectOfJustSelectorsHopefully[key]>;
+  [key in keyof ObjectOfJustSelectorsHopefully]: SelectorWithoutStateArg<
+    ObjectOfJustSelectorsHopefully[key]
+  >;
 };
 
 function bindSelectors(store: UIStore, selectors: ObjectOfJustSelectorsHopefully) {
@@ -277,8 +281,8 @@ function bindSelectors(store: UIStore, selectors: ObjectOfJustSelectorsHopefully
 
 export type UnknownFunction = (...args: any[]) => any;
 
-type KeysByType<O extends object, T> = {
-  [K in keyof O]-?: T extends O[K] ? K : never;
+type KeysAssignableToType<O extends object, T> = {
+  [K in keyof O]-?: O[K] extends T ? K : never;
 }[keyof O];
 
 export type Tail<A> = A extends [any, ...infer Rest] ? Rest : never;

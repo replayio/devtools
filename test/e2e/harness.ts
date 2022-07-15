@@ -10,7 +10,7 @@ export default class TestHarness {
 
   async start() {
     await this.page.waitForFunction(() => window.app?.actions);
-    this.page.evaluate(() => window.app.actions.setViewMode("dev"));
+    this.page.evaluate(() => window.app.actions!.setViewMode("dev"));
     await this.page.waitForFunction(() => {
       const loadedRegions = app.selectors.getLoadedRegions();
       const fullyLoaded =
