@@ -22,7 +22,7 @@ import { initSocket, addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { bindActionCreators } from "redux";
-import { actions } from "ui/actions";
+import { actions, UIStore } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
 import app, { setEventsForType, setVideoUrl } from "ui/reducers/app";
@@ -47,6 +47,8 @@ import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { UnexpectedError } from "ui/state/app";
+import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
+import { UIState } from "ui/state";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -58,7 +60,7 @@ declare global {
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
     actions?: any;
-    selectors?: typeof selectors;
+    selectors?: BoundSelectors;
     // We use 'command' in the backend and 'message' in the frontend so expose both :P
     console?: {
       prefs: typeof consolePrefs;
@@ -125,10 +127,24 @@ export default async function DevTools(store: AppStore) {
 
   window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
+  const justSelectors = Object.fromEntries(
+    Object.entries(selectors).filter(([key, value]) => {
+      // The "selectors" object actually contains action creators, selectors, and other random bits.
+      // We want to filter it down to _just_ selectors if possible.
+      // We can eliminate anything that's not a function, _and_ anything that _appears_
+      // to be an RTK action creator.  Technially a few non-selectors will sneak through at runtime,
+      // but the runtime fields should _mostly_ match the TS types here.
+      return (
+        typeof value === "function" &&
+        typeof (value as ActionCreatorWithoutPayload).type !== "string"
+      );
+    })
+  ) as ObjectOfJustSelectorsHopefully;
+
   window.app = window.app || {};
   window.app.threadFront = ThreadFront;
   window.app.actions = bindActionCreators(actions, store.dispatch);
-  window.app.selectors = bindSelectors({ store, selectors });
+  window.app.selectors = bindSelectors(store, justSelectors);
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
@@ -224,10 +240,45 @@ export default async function DevTools(store: AppStore) {
   });
 }
 
-function bindSelectors(obj: any) {
-  return Object.keys(obj.selectors).reduce((bound, selector) => {
-    bound[selector] = (a: any, b: any, c: any) =>
-      obj.selectors[selector](obj.store.getState(), a, b, c);
+// The original Big Ball O' Exports containing selectors + other fields
+type SelectorsObject = typeof selectors;
+
+// We expect that all Redux selectors take `state` as the first arg
+type ReduxSelectorFunction = (state: UIState, ...any: any[]) => any;
+
+// Do TS type transforms to extract "an object with just Redux selectors"
+type ObjectOfJustSelectorsHopefully = Pick<
+  SelectorsObject,
+  KeysByType<SelectorsObject, ReduxSelectorFunction>
+>;
+
+// When we "bind" the selectors, we automatically pass in `state` as the first arg.
+// Create TS types that reflect that by removing the first arg from the type signature,
+// but still expect any other parameters.
+type BoundSelectors = {
+  [key in keyof ObjectOfJustSelectorsHopefully]: (
+    ...args: Tail<Parameters<ObjectOfJustSelectorsHopefully[key]>>
+  ) => ReturnType<ObjectOfJustSelectorsHopefully[key]>;
+};
+
+function bindSelectors(store: UIStore, selectors: ObjectOfJustSelectorsHopefully) {
+  // NOTE: While the object is named `selectors`, our use of `export * from someSlice`
+  // has caused a lot of action creators to be in the object as well.
+  // Additionally, the "binding" of passing in `state` automatically messes up the TS types here.
+  // I've attempted to get TS to accept that this is valid.
+  return Object.entries(selectors).reduce((bound, [key, originalSelector]) => {
+    // @ts-ignore
+    bound[key as keyof BoundSelectors] = (...args: any[]) =>
+      // @ts-ignore
+      originalSelector(obj.store.getState(), ...args);
     return bound;
-  }, {} as any);
+  }, {} as BoundSelectors);
 }
+
+export type UnknownFunction = (...args: any[]) => any;
+
+type KeysByType<O extends object, T> = {
+  [K in keyof O]-?: T extends O[K] ? K : never;
+}[keyof O];
+
+export type Tail<A> = A extends [any, ...infer Rest] ? Rest : never;
