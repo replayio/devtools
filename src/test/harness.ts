@@ -67,12 +67,12 @@ export async function waitUntil<T>(
   throw new Error(`waitUntil() timed out waiting for ${waitingFor}`);
 }
 
-function start() {
+export function start() {
   dbgActions.setViewMode("dev");
   return waitUntil(
     () =>
       isFullyLoaded() &&
-      app.selectors.getViewMode() == "dev" &&
+      dbgSelectors.getViewMode() == "dev" &&
       document.querySelector(".webconsole-app"),
     {
       timeout: 1000 * 120,
@@ -87,7 +87,7 @@ function finish() {
 }
 
 function isFullyLoaded() {
-  const loadedRegions = app.selectors.getLoadedRegions();
+  const loadedRegions = dbgSelectors.getLoadedRegions();
 
   return (
     ThreadFront.hasAllSources &&
@@ -662,7 +662,7 @@ function addEventListenerLogpoints(logpoints: string[]) {
 }
 
 async function toggleExceptionLogging() {
-  const shouldLogExceptions = app.selectors.getShouldLogExceptions();
+  const shouldLogExceptions = dbgSelectors.getShouldLogExceptions();
   dbgActions.logExceptions(!shouldLogExceptions);
 }
 
@@ -1022,7 +1022,7 @@ const commands = mapValues(testCommands, (command, name) => {
   };
 });
 
-async function describe(description: string, cbk: () => void) {
+export async function describe(description: string, cbk: () => void) {
   console.log(`# Test ${description}`);
   try {
     await start();
@@ -1033,9 +1033,11 @@ async function describe(description: string, cbk: () => void) {
   }
 }
 
-async function it(description: string, cbk: () => void) {
+export async function it(description: string, cbk: () => void) {
   console.log(`## ${description}`);
   await cbk();
 }
 
-module.exports = { ...commands, dbg, dbgSelectors, app, start, finish, describe, it };
+const TestHarness = { ...commands, dbg, dbgSelectors, app, start, finish, describe, it };
+
+export default TestHarness;
