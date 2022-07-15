@@ -2,7 +2,7 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Loader from "@bvaughn/components/Loader";
 import { LogPointsContextRoot } from "@bvaughn/src/contexts/LogPointsContext";
-import { Suspense } from "react";
+import { Suspense, useRef } from "react";
 
 import styles from "./ConsoleRoot.module.css";
 import FilterText from "./filters/FilterText";
@@ -13,10 +13,12 @@ import Search from "./Search";
 import SearchRoot from "./SearchRoot";
 
 export default function ConsoleRoot() {
+  const messageListRef = useRef<HTMLElement>(null);
+
   return (
     <ConsoleFiltersContextRoot>
       <LogPointsContextRoot>
-        <SearchRoot>
+        <SearchRoot messageListRef={messageListRef}>
           <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
             <div className={styles.FilterColumn}>
               <FilterToggles />
@@ -25,7 +27,7 @@ export default function ConsoleRoot() {
               <FilterText />
               <ErrorBoundary>
                 <Suspense fallback={<Loader />}>
-                  <MessagesList />
+                  <MessagesList ref={messageListRef} />
                 </Suspense>
               </ErrorBoundary>
               <Search className={styles.Row} hideOnEscape={false} />

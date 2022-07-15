@@ -1,10 +1,16 @@
-import { ReactNode, useMemo } from "react";
+import { MutableRefObject, ReactNode, useMemo } from "react";
 
 import { SearchContext } from "./SearchContext";
-import useConsoleSearch, { Actions, State } from "./hooks/useConsoleSearch";
+import useConsoleSearchDOM, { Actions, State } from "./hooks/useConsoleSearchDOM";
 
-export default function SearchRoot({ children }: { children: ReactNode }) {
-  const [state, actions] = useConsoleSearch();
+export default function SearchRoot({
+  children,
+  messageListRef,
+}: {
+  children: ReactNode;
+  messageListRef: MutableRefObject<HTMLElement | null>;
+}) {
+  const [state, actions] = useConsoleSearchDOM(messageListRef);
 
   const context = useMemo<[State, Actions]>(() => [state, actions], [state, actions]);
 

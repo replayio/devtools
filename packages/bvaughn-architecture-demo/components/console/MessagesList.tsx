@@ -3,10 +3,10 @@ import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage } from "@replayio/protocol";
-import { useContext } from "react";
+import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useFilteredMessages, { Loggable } from "./hooks/useFilteredMessages";
+import useFilteredMessagesDOM, { Loggable } from "./hooks/useFilteredMessagesDOM";
 import useFocusRange from "./hooks/useFocusRange";
 import styles from "./MessagesList.module.css";
 import EventTypeRenderer from "./renderers/EventTypeRenderer";
@@ -18,11 +18,11 @@ import { SearchContext } from "./SearchContext";
 // The primary purpose of this component is to showcase:
 // 1. Using React Suspense (and Suspense caches) for just-in-time loading of Protocol data
 // 2. Using an injected ReplayClientInterface to enable easy testing/mocking
-export default function MessagesList() {
+function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
-
-  const loggables = useFilteredMessages();
+  ``;
+  const loggables = useFilteredMessagesDOM(forwardedRef as MutableRefObject<HTMLElement>);
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
 
   const focusRange = useFocusRange();
@@ -46,6 +46,7 @@ export default function MessagesList() {
     <div
       className={isTransitionPending ? styles.ContainerPending : styles.Container}
       data-test-name="Messages"
+      ref={forwardedRef as MutableRefObject<HTMLDivElement>}
       role="list"
     >
       {didOverflow && (
@@ -84,3 +85,9 @@ export default function MessagesList() {
     </div>
   );
 }
+
+function MessagesListRefForwarder(_: Object, ref: ForwardedRef<HTMLElement>) {
+  return <MessagesList forwardedRef={ref} />;
+}
+
+export default forwardRef(MessagesListRefForwarder);

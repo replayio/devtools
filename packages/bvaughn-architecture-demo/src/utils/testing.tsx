@@ -6,6 +6,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
   ConsoleFiltersContext,
+  ConsoleFiltersContextRoot,
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
@@ -46,7 +47,9 @@ export async function render(
   await act(async () => {
     const result = rtlRender(
       <ReplayClientContext.Provider value={replayClient}>
-        <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>
+        <SessionContext.Provider value={sessionContext}>
+          <ConsoleFiltersContextRoot>{children}</ConsoleFiltersContextRoot>
+        </SessionContext.Provider>
       </ReplayClientContext.Provider>
     );
 
