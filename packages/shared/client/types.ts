@@ -11,9 +11,9 @@ import {
   ObjectPreviewLevel,
   PauseData,
   PauseId,
-  PointDescription,
   RecordingId,
   SessionId,
+  SearchSourceContentsMatch,
   SourceId,
   SourceLocation,
   TimeStampedPoint,
@@ -65,6 +65,10 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  searchSources(
+    opts: { query: string; sourceIds?: string[] },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
 }

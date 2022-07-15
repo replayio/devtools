@@ -10,8 +10,8 @@
  */
 
 import { UIThunkAction } from "ui/actions";
-import { setSelectedPanel } from "ui/actions/layout";
-import { getToolboxLayout } from "ui/reducers/layout";
+import { setSelectedPanel, setViewMode } from "ui/actions/layout";
+import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
@@ -144,6 +144,10 @@ export function selectLocation(
   return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
+
+    if (getViewMode(getState()) == "non-dev") {
+      dispatch(setViewMode("dev"));
+    }
 
     if (!client) {
       // No connection, do nothing. This happens when the debugger is
