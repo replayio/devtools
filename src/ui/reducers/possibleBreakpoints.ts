@@ -76,6 +76,7 @@ export const fetchPossibleBreakpointsForSource = (
     const status = adapterSelectors.selectById(getState(), sourceId)?.status;
     if (status === LoadingStatus.LOADING) {
       // in flight - resolve this thunk's promise when it completes
+      // TODO Replace this with RTK Query!
       return dispatch(
         listenForCondition(() => {
           // Check the status of this source after every action
