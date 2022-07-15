@@ -176,6 +176,7 @@ const MockReplayClient = {
     contentType: "text/javascript",
   })),
   getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
+  searchSources: jest.fn().mockImplementation(async () => []),
   initialize: jest.fn().mockImplementation(async () => {}),
   runAnalysis: jest.fn().mockImplementation(async () => []),
 };

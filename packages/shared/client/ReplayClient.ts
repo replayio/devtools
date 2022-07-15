@@ -12,6 +12,7 @@ import {
   RecordingId,
   SessionId,
   SourceId,
+  SearchSourceContentsMatch,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -257,6 +258,13 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async searchSources(
+    opts: { query: string; sourceIds?: string[] },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void> {
+    return this._threadFront.searchSources(opts, onMatches);
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
