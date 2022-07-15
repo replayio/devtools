@@ -20,7 +20,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
 import type { Source } from "../../reducers/sources";
-import { tabExists } from "../../reducers/tabs";
+import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
 import {
@@ -184,7 +184,7 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
-    if (!tabExists(getState(), source.id)) {
+    if (!getTabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
 

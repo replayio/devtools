@@ -43,15 +43,13 @@ function updateEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise
   };
 }
 
-function setEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
+function setEventListeners(newEvents: string[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     await client.setEventListenerBreakpoints(newEvents);
   };
 }
 
-export function addEventListenerBreakpoints(
-  eventsToAdd: $FixTypeLater[]
-): UIThunkAction<Promise<void>> {
+export function addEventListenerBreakpoints(eventsToAdd: string[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     try {
       const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());
@@ -64,7 +62,7 @@ export function addEventListenerBreakpoints(
 }
 
 export function removeEventListenerBreakpoints(
-  eventsToRemove: $FixTypeLater[]
+  eventsToRemove: string[]
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const activeListenerBreakpoints = selectors.getActiveEventListeners(getState());

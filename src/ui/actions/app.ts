@@ -125,7 +125,8 @@ export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UI
 async function setupTests() {
   const testName = getTest();
   if (testName) {
-    window.Test = await import("test/harness");
+    const Test = await import("test/harness");
+    window.Test = Test.default;
     const script = document.createElement("script");
     script.src = `/test/scripts/${testName}`;
     document.head.appendChild(script);

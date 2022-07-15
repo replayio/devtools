@@ -114,7 +114,7 @@ const getVisibleBreakpointPositions = createSelector(
   }
 );
 
-export const visibleColumnBreakpoints = createSelector(
+export const getVisibleColumnBreakpoints = createSelector(
   getVisibleBreakpoints,
   getVisibleRequestedBreakpoints,
   getViewport,
