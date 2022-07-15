@@ -8,6 +8,7 @@ import { getFocusRegion } from "./timeline";
 import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
 import sortBy from "lodash/sortBy";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
+import { listenForCondition } from "ui/setup/listenerMiddleware";
 
 export interface HitCount {
   location: Location;
@@ -18,12 +19,12 @@ export interface SourceHitCounts {
   error?: string;
   hitCounts?: HitCount[];
   id: string;
-  status: LoadingState;
+  status: LoadingStatus;
 }
 
 export type HitCountsState = EntityState<SourceHitCounts>;
 
-export enum LoadingState {
+export enum LoadingStatus {
   LOADING = "loading",
   LOADED = "loaded",
   ERRORED = "errored",
@@ -39,19 +40,19 @@ const hitCountsSlice = createSlice({
     hitCountsRequested: (state, action: PayloadAction<string>) => {
       hitCountsAdapter.upsertOne(state, {
         id: action.payload,
-        status: LoadingState.LOADING,
+        status: LoadingStatus.LOADING,
       });
     },
     hitCountsReceived: (state, action: PayloadAction<{ id: string; hitCounts: HitCount[] }>) => {
       hitCountsAdapter.upsertOne(state, {
         ...action.payload,
-        status: LoadingState.LOADED,
+        status: LoadingStatus.LOADED,
       });
     },
     hitCountsFailed: (state, action: PayloadAction<{ id: string; error: string }>) => {
       hitCountsAdapter.upsertOne(state, {
         id: action.payload.id,
-        status: LoadingState.ERRORED,
+        status: LoadingStatus.ERRORED,
         error: action.payload.error,
       });
     },
@@ -110,7 +111,18 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
     const cacheKey = getCacheKeyForSourceHitCounts(getState(), sourceId, lineNumber);
     const status = hitCountsSelectors.selectById(getState(), cacheKey)?.status;
 
-    if (status === LoadingState.LOADING || status === LoadingState.LOADED) {
+    if (status === LoadingStatus.LOADING) {
+      // in flight - resolve this thunk's promise when it completes
+      // TODO Replace this with RTK Query!
+      return dispatch(
+        listenForCondition(() => {
+          // Check the status of this source after every action
+          const status = hitCountsSelectors.selectById(getState(), cacheKey)?.status;
+          return status === LoadingStatus.LOADED;
+        })
+      );
+    }
+    if (status === LoadingStatus.LOADED) {
       return;
     }
 
