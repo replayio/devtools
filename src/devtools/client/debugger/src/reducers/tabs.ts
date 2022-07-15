@@ -259,7 +259,7 @@ const querySourcesForTabs = makeShallowQuery({
   reduce: items => items,
 });
 
-export function tabExists(state: UIState, sourceId: string) {
+export function getTabExists(state: UIState, sourceId: string) {
   return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);
 }
 
