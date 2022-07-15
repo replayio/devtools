@@ -1,6 +1,6 @@
 import Sequencer, { ShardOptions } from "@jest/test-sequencer";
 import { Test } from "@jest/test-result";
-import slash = require("slash");
+import slash from "slash";
 import * as crypto from "crypto";
 import * as path from "path";
 
