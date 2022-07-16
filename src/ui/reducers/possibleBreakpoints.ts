@@ -8,6 +8,7 @@ import {
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 
 export enum LoadingStatus {
   LOADING = "loading",
@@ -126,12 +127,19 @@ export const getBreakableLinesForSource = (state: UIState, sourceId: string) => 
       ?.possibleBreakpoints?.map(location => location.line)
   );
 };
+
+const computeBreakableLines = memoizeLast((possibleBreakpoints: Location[]) => {
+  return uniq(possibleBreakpoints?.map(location => location.line));
+});
+
 export const getBreakableLinesForSelectedSource = (state: UIState) => {
   const sourceId = state.sources.selectedLocation?.sourceId;
   if (!sourceId) {
     return null;
   }
-  return getBreakableLinesForSource(state, sourceId);
+  const possibleBreakpoints =
+    adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints || [];
+  return computeBreakableLines(possibleBreakpoints);
 };
 
 export const selectors = {
