@@ -6,9 +6,9 @@ import { rangeForFocusRegion } from "ui/utils/timeline";
 import { getCorrespondingSourceIds, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
 import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
-import sortBy from "lodash/sortBy";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { createSelector } from "reselect";
 
 export interface HitCount {
   location: Location;
@@ -159,20 +159,20 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
   };
 };
 
-export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCountsSlice.actions;
+export const getHitCountsForSelectedSource = createSelector(
+  getSelectedSourceId,
+  (state: UIState) => state.hitCounts,
+  (sourceId: string | null | undefined, hitCounts: HitCountsState) => {
+    if (!sourceId) {
+      return null;
+    }
 
-export const getHitCountsForSource = (state: UIState, sourceId: string) => {
-  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId);
-  return hitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
-};
+    const idsForSource = (hitCounts.ids as string[]).filter(id => id.startsWith(sourceId));
+    const hitCountList = idsForSource.flatMap(id => hitCounts.entities[id]?.hitCounts || []);
 
-export const getHitCountsForSelectedSource = (state: UIState) => {
-  const id = getSelectedSourceId(state);
-  if (!id) {
-    return null;
+    return hitCountList;
   }
+);
 
-  return getHitCountsForSource(state, id);
-};
-
+export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCountsSlice.actions;
 export default hitCountsSlice.reducer;

@@ -220,7 +220,6 @@ Executes `action.updates.forEach(update => sourcesReducer(state, update)`. Simil
 - `getSourceWithContent(state, id)`
 - `getSourceContent(state, id)`
 - `getSelectedSourceId(state)`
-- `getHitCountsForSource(state, sourceId)`
 - `getHitCountsForSelectedSource(state)`
 - `getDisplayedSources`
 - `getSourceActorsForSource(state, id)`
