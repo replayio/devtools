@@ -137,8 +137,11 @@ export const getBreakableLinesForSelectedSource = (state: UIState) => {
   if (!sourceId) {
     return null;
   }
-  const possibleBreakpoints =
-    adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints || [];
+  const possibleBreakpoints = adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints;
+  if (!possibleBreakpoints) {
+    return null;
+  }
+
   return computeBreakableLines(possibleBreakpoints);
 };
 
