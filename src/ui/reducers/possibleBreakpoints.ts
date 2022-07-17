@@ -25,6 +25,7 @@ export interface PossibleBreakpoints {
   error?: string;
   id: string;
   possibleBreakpoints?: Location[];
+  breakableLines?: number[];
   status: LoadingStatus;
 }
 
@@ -35,7 +36,7 @@ const adapter = createEntityAdapter<PossibleBreakpoints>();
 const initialState = adapter.getInitialState();
 
 const possibleBreakpointsSlice = createSlice({
-  name: "breakableLines",
+  name: "possibleBreakpoints",
   initialState,
   reducers: {
     possibleBreakpointsRequested: (state, action: PayloadAction<string>) => {
@@ -49,8 +50,9 @@ const possibleBreakpointsSlice = createSlice({
       action: PayloadAction<{ sourceId: string; possibleBreakpoints: Location[] }>
     ) => {
       adapter.upsertOne(state, {
-        possibleBreakpoints: action.payload.possibleBreakpoints,
+        breakableLines: computeBreakableLines(action.payload.possibleBreakpoints),
         id: action.payload.sourceId,
+        possibleBreakpoints: action.payload.possibleBreakpoints,
         status: LoadingStatus.LOADED,
       });
     },
@@ -125,37 +127,22 @@ export const getPossibleBreakpointsForSelectedSource = (state: UIState): Locatio
   return getPossibleBreakpointsForSource(state, sourceId) || [];
 };
 
-export const getBreakableLinesForSource = createSelector(
-  (state: UIState, sourceId: string) =>
-    state.possibleBreakpoints.entities[sourceId]?.possibleBreakpoints,
-  possibleBreakpoints => {
-    if (!possibleBreakpoints) {
-      return null;
-    }
-    return computeBreakableLines(possibleBreakpoints);
-  },
-  {
-    memoizeOptions: {
-      maxSize: 20,
-    },
-  }
-);
+export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
+  return adapterSelectors.selectById(state, sourceId)?.breakableLines;
+};
 
-const computeBreakableLines = (possibleBreakpoints: Location[]) => {
+export const computeBreakableLines = (possibleBreakpoints: Location[]) => {
   return uniq(possibleBreakpoints?.map(location => location.line));
 };
+
+const NO_BREAKABLE_LINES: number[] = [];
 
 export const getBreakableLinesForSelectedSource = (state: UIState) => {
   const sourceId = state.sources.selectedLocation?.sourceId;
   if (!sourceId) {
-    return null;
+    return NO_BREAKABLE_LINES;
   }
-  const possibleBreakpoints = adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints;
-  if (!possibleBreakpoints) {
-    return null;
-  }
-
-  return computeBreakableLines(possibleBreakpoints);
+  return getBreakableLinesForSource(state, sourceId);
 };
 
 export const selectors = {

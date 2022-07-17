@@ -67,9 +67,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   const isMetaActive = keyModifiers.meta;
   const source = useAppSelector(getSelectedSource);
 
-  const hitCounts = useAppSelector(state =>
-    getHitCountsForSource(state, source!.id, lastHoveredLineNumber.current || 0)
-  );
+  const hitCounts = useAppSelector(state => getHitCountsForSource(state, source!.id));
 
   let hits: number | undefined;
 

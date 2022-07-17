@@ -1,10 +1,4 @@
-import {
-  createSelector,
-  createEntityAdapter,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -12,8 +6,6 @@ import { rangeForFocusRegion } from "ui/utils/timeline";
 import { getCorrespondingSourceIds, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
 import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
-import sortBy from "lodash/sortBy";
-import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
 
 export interface HitCount {
@@ -28,7 +20,10 @@ export interface SourceHitCounts {
   status: LoadingStatus;
 }
 
-export type HitCountsState = EntityState<SourceHitCounts>;
+export type HitCountsState = {
+  aggregateHitCounts: EntityState<SourceHitCounts>;
+  hitCounts: EntityState<SourceHitCounts>;
+};
 
 export enum LoadingStatus {
   LOADING = "loading",
@@ -37,26 +32,37 @@ export enum LoadingStatus {
 }
 
 const hitCountsAdapter = createEntityAdapter<SourceHitCounts>();
-const initialState = hitCountsAdapter.getInitialState();
+const aggregateHitCountsAdapter = createEntityAdapter<SourceHitCounts>();
+const initialState = {
+  aggregateHitCounts: aggregateHitCountsAdapter.getInitialState(),
+  hitCounts: hitCountsAdapter.getInitialState(),
+};
 
 const hitCountsSlice = createSlice({
   name: "hitCounts",
   initialState,
   reducers: {
     hitCountsRequested: (state, action: PayloadAction<string>) => {
-      hitCountsAdapter.upsertOne(state, {
+      hitCountsAdapter.upsertOne(state.hitCounts, {
         id: action.payload,
         status: LoadingStatus.LOADING,
       });
     },
     hitCountsReceived: (state, action: PayloadAction<{ id: string; hitCounts: HitCount[] }>) => {
-      hitCountsAdapter.upsertOne(state, {
+      hitCountsAdapter.upsertOne(state.hitCounts, {
         ...action.payload,
+        status: LoadingStatus.LOADED,
+      });
+      const id = removeLineNumbersFromCacheKey(action.payload.id);
+      const existing = state.aggregateHitCounts.entities[id];
+      aggregateHitCountsAdapter.upsertOne(state.aggregateHitCounts, {
+        id,
+        hitCounts: [...(existing?.hitCounts ?? []), ...action.payload.hitCounts],
         status: LoadingStatus.LOADED,
       });
     },
     hitCountsFailed: (state, action: PayloadAction<{ id: string; error: string }>) => {
-      hitCountsAdapter.upsertOne(state, {
+      hitCountsAdapter.upsertOne(state.hitCounts, {
         id: action.payload.id,
         status: LoadingStatus.ERRORED,
         error: action.payload.error,
@@ -66,7 +72,10 @@ const hitCountsSlice = createSlice({
 });
 
 const hitCountsSelectors = hitCountsAdapter.getSelectors<UIState>(
-  (state: UIState) => state.hitCounts
+  (state: UIState) => state.hitCounts.hitCounts
+);
+const aggregateHitCountsSelectors = aggregateHitCountsAdapter.getSelectors<UIState>(
+  (state: UIState) => state.hitCounts.aggregateHitCounts
 );
 
 const MAX_LINE_HITS_TO_FETCH = 1000;
@@ -109,8 +118,10 @@ export const getCacheKeyForSourceHitCounts = (
   const lineNumberSection = `${lower}-${upper}`;
   const rangeSection = getCacheKeyForFocusRegion(state);
 
-  return [correspondingSourceIdsSection, lineNumberSection, rangeSection].join("|");
+  return [lineNumberSection, correspondingSourceIdsSection, rangeSection].join("|");
 };
+const removeLineNumbersFromCacheKey = (cacheKey: string) =>
+  cacheKey.slice(cacheKey.indexOf("|") + 1, cacheKey.length);
 
 export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAction => {
   return async (dispatch, getState, { ThreadFront }) => {
@@ -167,9 +178,9 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
 
 export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCountsSlice.actions;
 
-export const getHitCountsForSource = (state: UIState, sourceId: string, line: number = 0) => {
-  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId, line);
-  return hitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
+export const getHitCountsForSource = (state: UIState, sourceId: string) => {
+  const cacheKey = removeLineNumbersFromCacheKey(getCacheKeyForSourceHitCounts(state, sourceId, 0));
+  return aggregateHitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
 };
 
 export default hitCountsSlice.reducer;
