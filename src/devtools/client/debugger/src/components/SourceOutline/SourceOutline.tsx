@@ -16,7 +16,7 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import Spinner from "ui/components/shared/Spinner";
 import { isFunctionSymbol } from "./isFunctionSymbol";
-import { fetchHitCounts, getHitCountsForSelectedSource } from "ui/reducers/hitCounts";
+import { fetchHitCounts, getHitCountsForSource } from "ui/reducers/hitCounts";
 
 export function SourceOutline({
   cx,
@@ -160,7 +160,7 @@ export function SourceOutline({
 const mapStateToProps = (state: UIState) => {
   const selectedSource = selectors.getSelectedSourceWithContent(state);
   const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
-  const hitCounts = selectedSource ? getHitCountsForSelectedSource(state) : null;
+  const hitCounts = selectedSource ? getHitCountsForSource(state, selectedSource.id) : null;
   return {
     cursorPosition: selectors.getCursorPosition(state),
     cx: selectors.getContext(state),

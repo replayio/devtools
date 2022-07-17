@@ -1,4 +1,10 @@
-import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createEntityAdapter,
+  createSlice,
+  EntityState,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -161,18 +167,9 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
 
 export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCountsSlice.actions;
 
-export const getHitCountsForSource = (state: UIState, sourceId: string) => {
-  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId);
+export const getHitCountsForSource = (state: UIState, sourceId: string, line: number = 0) => {
+  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId, line);
   return hitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
-};
-
-export const getHitCountsForSelectedSource = (state: UIState) => {
-  const id = getSelectedSourceId(state);
-  if (!id) {
-    return null;
-  }
-
-  return getHitCountsForSource(state, id);
 };
 
 export default hitCountsSlice.reducer;

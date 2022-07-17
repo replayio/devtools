@@ -9,7 +9,7 @@ import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
 
 import { resizeBreakpointGutter } from "../../utils/ui";
-import { fetchHitCounts, getHitCountsForSelectedSource, HitCount } from "ui/reducers/hitCounts";
+import { fetchHitCounts, HitCount, getHitCountsForSource } from "ui/reducers/hitCounts";
 
 type Props = {
   editor: any;
@@ -29,7 +29,7 @@ export default function LineHitCountsWrapper(props: Props) {
 function LineHitCounts({ editor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
-  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
   const isCollapsed = hitCountsMode == "hide-counts";
 

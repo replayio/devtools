@@ -1,4 +1,10 @@
-import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSelector,
+  createEntityAdapter,
+  createSlice,
+  EntityState,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import type { Location, SameLineSourceLocations } from "@replayio/protocol";
 import uniq from "lodash/uniq";
 import {
@@ -8,7 +14,6 @@ import {
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
-import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 
 export enum LoadingStatus {
   LOADING = "loading",
@@ -120,17 +125,25 @@ export const getPossibleBreakpointsForSelectedSource = (state: UIState): Locatio
   return getPossibleBreakpointsForSource(state, sourceId) || [];
 };
 
-export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
-  return uniq(
-    adapterSelectors
-      .selectById(state, sourceId)
-      ?.possibleBreakpoints?.map(location => location.line)
-  );
-};
+export const getBreakableLinesForSource = createSelector(
+  (state: UIState, sourceId: string) =>
+    state.possibleBreakpoints.entities[sourceId]?.possibleBreakpoints,
+  possibleBreakpoints => {
+    if (!possibleBreakpoints) {
+      return null;
+    }
+    return computeBreakableLines(possibleBreakpoints);
+  },
+  {
+    memoizeOptions: {
+      maxSize: 20,
+    },
+  }
+);
 
-const computeBreakableLines = memoizeLast((possibleBreakpoints: Location[]) => {
+const computeBreakableLines = (possibleBreakpoints: Location[]) => {
   return uniq(possibleBreakpoints?.map(location => location.line));
-});
+};
 
 export const getBreakableLinesForSelectedSource = (state: UIState) => {
   const sourceId = state.sources.selectedLocation?.sourceId;
