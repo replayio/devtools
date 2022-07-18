@@ -21,6 +21,8 @@ export default function Icon({
     | "folder"
     | "invisible"
     | "jump-to-definition"
+    | "menu-closed"
+    | "menu-open"
     | "prompt"
     | "protocol"
     | "remove"
@@ -95,6 +97,13 @@ export default function Icon({
       break;
     case "jump-to-definition":
       path = "M12.34,6V4H18v5.66h-2V7.41l-5,5V20H9v-7.58c0-0.53,0.21-1.04,0.59-1.41l5-5H12.34z";
+      break;
+    case "menu-closed":
+      path = "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z";
+      break;
+    case "menu-open":
+      path =
+        "M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z";
       break;
     case "prompt":
       path = "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z";
