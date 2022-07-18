@@ -13,7 +13,6 @@ import useFocusRange from "./useFocusRange";
 
 export type Loggable = EventTypeLog | LogPointInstance | ProtocolMessage;
 
-// TODO Can we use "content-visbility" to leave them in the DOM, but shown/hidden for filtering purposes?
 export default function useFilteredMessagesDOM(
   listRef: MutableRefObject<HTMLElement | null>
 ): Loggable[] {
@@ -122,7 +121,10 @@ export default function useFilteredMessagesDOM(
     list.childNodes.forEach((node: ChildNode, index: number) => {
       const element = node as HTMLElement;
       const textContent = element.textContent?.toLocaleLowerCase();
-      element.style.display = textContent?.includes(needle) ? "inherit" : "none";
+      const matches = textContent?.includes(needle);
+
+      // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+      element.style.display = matches ? "inherit" : "none";
     });
   }, [
     filterByText,

@@ -20,7 +20,8 @@ function search(
   const list = listRef.current!;
   list.childNodes.forEach((node: ChildNode, index: number) => {
     const element = node as HTMLElement;
-    // HACK This needs to match (or at least respect) the filtering in useFilteredMessagesDOM()
+
+    // HACK Must be compatible with the style used by useFilteredMessagesDOM()
     if (element.style.display != "none") {
       const textContent = element.textContent?.toLocaleLowerCase();
       if (textContent?.includes(needle)) {
