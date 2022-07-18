@@ -9,7 +9,13 @@ import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
 
 import { resizeBreakpointGutter } from "../../utils/ui";
-import { fetchHitCounts, HitCount, getHitCountsForSource } from "ui/reducers/hitCounts";
+import {
+  fetchHitCounts,
+  HitCount,
+  getHitCountsForSource,
+  getBoundsForLineNumber,
+} from "ui/reducers/hitCounts";
+import { UIState } from "ui/state";
 
 type Props = {
   editor: any;
@@ -32,6 +38,10 @@ function LineHitCounts({ editor }: Props) {
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
   const isCollapsed = hitCountsMode == "hide-counts";
+  const currentLineNumber = useAppSelector(
+    (state: UIState) => state.app.hoveredLineNumberLocation?.line || 0
+  );
+  const { lower, upper } = getBoundsForLineNumber(currentLineNumber);
 
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
@@ -94,9 +104,9 @@ function LineHitCounts({ editor }: Props) {
         `-${gutterWidth}`
       );
 
-      let lineNumber = 0;
+      let lineNumber = lower;
 
-      doc.eachLine((lineHandle: any) => {
+      doc.eachLine(lower, upper, (lineHandle: any) => {
         lineNumber++;
 
         const hitCount = hitCountMap?.get(lineNumber) || 0;
@@ -154,7 +164,16 @@ function LineHitCounts({ editor }: Props) {
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, updateHitCountsMode]);
+  }, [
+    editor,
+    hitCountMap,
+    isCollapsed,
+    minHitCount,
+    maxHitCount,
+    updateHitCountsMode,
+    lower,
+    upper,
+  ]);
 
   // We're just here for the hooks!
   return null;
