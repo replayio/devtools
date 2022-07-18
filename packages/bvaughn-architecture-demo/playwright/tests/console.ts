@@ -133,12 +133,12 @@ test("should show support fast-forwarding to the message pause-point", async ({ 
 test("should be searchable", async ({ page }) => {
   await page.goto(URL);
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', "an");
+  await page.fill('[data-test-id="ConsoleSearchInput"]', " an ");
 
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
   await takeScreenshot(page, consoleRoot, "searchable-single-result");
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', "a ");
+  await page.fill('[data-test-id="ConsoleSearchInput"]', " a ");
   await takeScreenshot(page, consoleRoot, "searchable-result-1-of-3");
 
   await page.click('[data-test-id="ConsoleSearchGoToNextButton"]');
@@ -158,11 +158,11 @@ test("should be searchable", async ({ page }) => {
 test("should be filterable", async ({ page }) => {
   await page.goto(URL);
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "an");
+  await page.fill('[data-test-id="ConsoleFilterInput"]', " an ");
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
   await takeScreenshot(page, consoleRoot, "filtered-single-result");
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "a ");
+  await page.fill('[data-test-id="ConsoleFilterInput"]', " a ");
   await takeScreenshot(page, consoleRoot, "filtered-three-results");
 
   await page.fill('[data-test-id="ConsoleFilterInput"]', "zzz");
