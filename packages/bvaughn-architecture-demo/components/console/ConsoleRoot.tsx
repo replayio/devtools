@@ -11,6 +11,7 @@ import Input from "./Input";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
+import { LoggablesContextRoot } from "./LoggablesContext";
 
 export default function ConsoleRoot() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -18,40 +19,42 @@ export default function ConsoleRoot() {
 
   return (
     <ConsoleFiltersContextRoot>
-      <SearchContextRoot messageListRef={messageListRef}>
-        <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
-          <div className={styles.TopRow}>
-            <button
-              className={styles.MenuToggleButton}
-              date-test-id="ConsoleMenuToggleButton"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-            >
-              <Icon
-                className={styles.MenuToggleButtonIcon}
-                type={isMenuOpen ? "menu-open" : "menu-closed"}
-              />
-            </button>
-            <FilterText />
-          </div>
-          <div className={styles.BottomRow}>
-            <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-              <div className={styles.FilterColumn}>
-                <FilterToggles />
+      <LoggablesContextRoot messageListRef={messageListRef}>
+        <SearchContextRoot messageListRef={messageListRef}>
+          <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
+            <div className={styles.TopRow}>
+              <button
+                className={styles.MenuToggleButton}
+                date-test-id="ConsoleMenuToggleButton"
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
+              >
+                <Icon
+                  className={styles.MenuToggleButtonIcon}
+                  type={isMenuOpen ? "menu-open" : "menu-closed"}
+                />
+              </button>
+              <FilterText />
+            </div>
+            <div className={styles.BottomRow}>
+              <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+                <div className={styles.FilterColumn}>
+                  <FilterToggles />
+                </div>
+              </Offscreen>
+              <div className={styles.MessageColumn}>
+                <ErrorBoundary>
+                  <Suspense fallback={<Loader />}>
+                    <MessagesList ref={messageListRef} />
+                  </Suspense>
+                </ErrorBoundary>
+                <Search className={styles.Row} hideOnEscape={false} />
+                <Input className={styles.Row} />
               </div>
-            </Offscreen>
-            <div className={styles.MessageColumn}>
-              <ErrorBoundary>
-                <Suspense fallback={<Loader />}>
-                  <MessagesList ref={messageListRef} />
-                </Suspense>
-              </ErrorBoundary>
-              <Search className={styles.Row} hideOnEscape={false} />
-              <Input className={styles.Row} />
             </div>
           </div>
-        </div>
-      </SearchContextRoot>
+        </SearchContextRoot>
+      </LoggablesContextRoot>
     </ConsoleFiltersContextRoot>
   );
 }

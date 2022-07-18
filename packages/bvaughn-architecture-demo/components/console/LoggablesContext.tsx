@@ -8,16 +8,29 @@ import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { EventHandlerType, Message as ProtocolMessage } from "@replayio/protocol";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
-import { MutableRefObject, useContext, useEffect, useMemo } from "react";
+import {
+  createContext,
+  MutableRefObject,
+  ReactNode,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+} from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useFocusRange from "./useFocusRange";
+import useFocusRange from "./hooks/useFocusRange";
 
 export type Loggable = EventTypeLog | PointInstance | ProtocolMessage;
 
-export default function useFilteredMessagesDOM(
-  listRef: MutableRefObject<HTMLElement | null>
-): Loggable[] {
+export const LoggablesContext = createContext<Loggable[]>(null as any);
+
+export function LoggablesContextRoot({
+  children,
+  messageListRef,
+}: {
+  children: ReactNode;
+  messageListRef: MutableRefObject<HTMLElement | null>;
+}) {
   const client = useContext(ReplayClientContext);
   const { pointsForAnalysis: points } = useContext(PointsContext);
   const {
@@ -159,29 +172,25 @@ export default function useFilteredMessagesDOM(
     });
   }, [focusedEventTypeLogs, pointInstances, preFilteredMessages]);
 
-  useEffect(() => {
-    const needle = filterByText.toLocaleLowerCase();
-    const list = listRef.current!;
-    list.childNodes.forEach((node: ChildNode, index: number) => {
-      const element = node as HTMLElement;
-      const textContent = element.textContent?.toLocaleLowerCase();
-      const matches = textContent?.includes(needle);
+  const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 
-      // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
-      element.style.display = matches ? "inherit" : "none";
-    });
-  }, [
-    filterByText,
-    listRef,
-    showErrors,
-    showExceptions,
-    showLogs,
-    showNodeModules,
-    showWarnings,
-    sortedLoggables,
-  ]);
+  // We leverage the DOM for display text filtering because it more closely mimics the browser's built in find-in-page functionality.
+  // We could replace this by the search function from useConsoleSearch() and memoizing it, but it wouldn't work as well.
+  useLayoutEffect(() => {
+    const list = messageListRef.current;
+    if (list !== null) {
+      list.childNodes.forEach((node: ChildNode, index: number) => {
+        const element = node as HTMLElement;
+        const textContent = element.textContent?.toLocaleLowerCase();
+        const matches = textContent?.includes(filterByLowerCaseText);
 
-  return sortedLoggables;
+        // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+        element.style.display = matches ? "inherit" : "none";
+      });
+    }
+  }, [filterByLowerCaseText, messageListRef, sortedLoggables]);
+
+  return <LoggablesContext.Provider value={sortedLoggables}>{children}</LoggablesContext.Provider>;
 }
 
 function getTimeForSort(value: Loggable): number {

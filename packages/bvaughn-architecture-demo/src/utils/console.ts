@@ -1,4 +1,4 @@
-import { Loggable } from "@bvaughn/components/console/hooks/useFilteredMessagesDOM";
+import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 

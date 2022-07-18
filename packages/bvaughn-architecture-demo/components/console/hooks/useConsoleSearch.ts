@@ -1,12 +1,11 @@
+import { Loggable, LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import type { Actions as SearchActions, State as SearchState } from "@bvaughn/src/hooks/useSearch";
 import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import useSearch from "@bvaughn/src/hooks/useSearch";
-import type { Actions as SearchActions, State as SearchState } from "@bvaughn/src/hooks/useSearch";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import { useMemo, useState } from "react";
-
-import useFilteredMessages, { Loggable } from "./useFilteredMessages";
-import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import { useContext, useMemo, useState } from "react";
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -98,9 +97,9 @@ const INVISIBLE_STATE: State = {
 };
 
 export default function useConsoleSearch(): [State, Actions] {
-  const messages = useFilteredMessages();
+  const loggables = useContext(LoggablesContext);
 
-  const [state, dispatch] = useSearch<Loggable>(messages, search);
+  const [state, dispatch] = useSearch<Loggable>(loggables, search);
   const [visible, setVisible] = useState<boolean>(true);
 
   const externalActions = useMemo(

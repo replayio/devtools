@@ -6,8 +6,8 @@ import { Message as ProtocolMessage } from "@replayio/protocol";
 import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useFilteredMessagesDOM, { Loggable } from "./hooks/useFilteredMessagesDOM";
 import useFocusRange from "./hooks/useFocusRange";
+import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
 import EventTypeRenderer from "./renderers/EventTypeRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
@@ -21,8 +21,7 @@ import { SearchContext } from "./SearchContext";
 function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
-  ``;
-  const loggables = useFilteredMessagesDOM(forwardedRef as MutableRefObject<HTMLElement>);
+  const loggables = useContext(LoggablesContext);
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
 
   const focusRange = useFocusRange();
@@ -44,7 +43,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
 
   // Note that it's important to only render messages inside of the message lists.
   // Overflow notifications are displayed outside of the list, to avoid interfering with search.
-  // See useFilteredMessagesDOM() and useConsoleSearchDOM() for more info.
+  // See <LoggablesContextRoot> and useConsoleSearchDOM() for more info.
   return (
     <>
       {didOverflow && (
