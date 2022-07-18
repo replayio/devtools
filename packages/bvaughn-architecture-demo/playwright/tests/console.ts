@@ -235,5 +235,21 @@ test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
   await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
 });
 
+test("should be able to toggle side filter menu open and closed", async ({ page }) => {
+  await page.goto(URL);
+
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await takeScreenshot(page, consoleRoot, "filters-side-menu-open");
+
+  // Fill in filter text; this should be remembered when the side menu is re-opened.
+  await page.fill('[data-test-id="EventTypeFilterInput"]', "test");
+
+  await page.click('[date-test-id="ConsoleMenuToggleButton"]');
+  await takeScreenshot(page, consoleRoot, "filters-side-menu-closed");
+
+  await page.click('[date-test-id="ConsoleMenuToggleButton"]');
+  await takeScreenshot(page, consoleRoot, "filters-side-menu-reopened");
+});
+
 // TODO Add tests:
 // * For fast-forwarding to a message.
