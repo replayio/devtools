@@ -42,13 +42,11 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       ? searchState.results[searchState.index]
       : null;
 
+  // Note that it's important to only render messages inside of the message lists.
+  // Overflow notifications are displayed outside of the list, to avoid interfering with search.
+  // See useFilteredMessagesDOM() and useConsoleSearchDOM() for more info.
   return (
-    <div
-      className={isTransitionPending ? styles.ContainerPending : styles.Container}
-      data-test-name="Messages"
-      ref={forwardedRef as MutableRefObject<HTMLDivElement>}
-      role="list"
-    >
+    <>
       {didOverflow && (
         <div className={styles.OverflowRow}>There were too many messages to fetch them all</div>
       )}
@@ -57,32 +55,45 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
           {countBefore} messages filtered before the focus range
         </div>
       )}
-      {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
-      {loggables.map((loggable: Loggable, index: number) =>
-        isEventTypeLog(loggable) ? (
-          <EventTypeRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            eventTypeLog={loggable}
-          />
-        ) : isPointInstance(loggable) ? (
-          <PointInstanceRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            logPointInstance={loggable as PointInstance}
-          />
-        ) : (
-          <MessageRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            message={loggable as ProtocolMessage}
-          />
-        )
-      )}
+      <div
+        className={isTransitionPending ? styles.ContainerPending : styles.Container}
+        data-test-name="Messages"
+        ref={forwardedRef as MutableRefObject<HTMLDivElement>}
+        role="list"
+      >
+        {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
+        {loggables.map((loggable: Loggable, index: number) => {
+          if (isEventTypeLog(loggable)) {
+            return (
+              <EventTypeRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                eventTypeLog={loggable}
+              />
+            );
+          } else if (isPointInstance(loggable)) {
+            return (
+              <PointInstanceRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                logPointInstance={loggable as PointInstance}
+              />
+            );
+          } else {
+            return (
+              <MessageRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                message={loggable as ProtocolMessage}
+              />
+            );
+          }
+        })}
+      </div>
       {countAfter > 0 && (
         <div className={styles.CountRow}>{countAfter} messages filtered after the focus range</div>
       )}
-    </div>
+    </>
   );
 }
 
