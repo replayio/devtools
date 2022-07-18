@@ -2,7 +2,6 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import { LogPointsContextRoot } from "@bvaughn/src/contexts/LogPointsContext";
 import { Suspense, unstable_Offscreen as Offscreen, useRef, useState } from "react";
 
 import styles from "./ConsoleRoot.module.css";
@@ -19,42 +18,40 @@ export default function ConsoleRoot() {
 
   return (
     <ConsoleFiltersContextRoot>
-      <LogPointsContextRoot>
-        <SearchRoot messageListRef={messageListRef}>
-          <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
-            <div className={styles.TopRow}>
-              <button
-                className={styles.MenuToggleButton}
-                date-test-id="ConsoleMenuToggleButton"
-                onClick={() => setIsMenuOpen(!isMenuOpen)}
-                title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-              >
-                <Icon
-                  className={styles.MenuToggleButtonIcon}
-                  type={isMenuOpen ? "menu-open" : "menu-closed"}
-                />
-              </button>
-              <FilterText />
-            </div>
-            <div className={styles.BottomRow}>
-              <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-                <div className={styles.FilterColumn}>
-                  <FilterToggles />
-                </div>
-              </Offscreen>
-              <div className={styles.MessageColumn}>
-                <ErrorBoundary>
-                  <Suspense fallback={<Loader />}>
-                    <MessagesList ref={messageListRef} />
-                  </Suspense>
-                </ErrorBoundary>
-                <Search className={styles.Row} hideOnEscape={false} />
-                <Input className={styles.Row} />
+      <SearchRoot messageListRef={messageListRef}>
+        <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
+          <div className={styles.TopRow}>
+            <button
+              className={styles.MenuToggleButton}
+              date-test-id="ConsoleMenuToggleButton"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
+            >
+              <Icon
+                className={styles.MenuToggleButtonIcon}
+                type={isMenuOpen ? "menu-open" : "menu-closed"}
+              />
+            </button>
+            <FilterText />
+          </div>
+          <div className={styles.BottomRow}>
+            <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+              <div className={styles.FilterColumn}>
+                <FilterToggles />
               </div>
+            </Offscreen>
+            <div className={styles.MessageColumn}>
+              <ErrorBoundary>
+                <Suspense fallback={<Loader />}>
+                  <MessagesList ref={messageListRef} />
+                </Suspense>
+              </ErrorBoundary>
+              <Search className={styles.Row} hideOnEscape={false} />
+              <Input className={styles.Row} />
             </div>
           </div>
-        </SearchRoot>
-      </LogPointsContextRoot>
+        </div>
+      </SearchRoot>
     </ConsoleFiltersContextRoot>
   );
 }

@@ -1,23 +1,25 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { LogPointInstance, LogPointsContext } from "@bvaughn/src/contexts/LogPointsContext";
+import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
-import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { EventHandlerType, Message as ProtocolMessage } from "@replayio/protocol";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { MutableRefObject, useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./useFocusRange";
 
-export type Loggable = EventTypeLog | LogPointInstance | ProtocolMessage;
+export type Loggable = EventTypeLog | PointInstance | ProtocolMessage;
 
 export default function useFilteredMessagesDOM(
   listRef: MutableRefObject<HTMLElement | null>
 ): Loggable[] {
   const client = useContext(ReplayClientContext);
-  const logPoints = useContext(LogPointsContext);
+  const { pointsForAnalysis: points } = useContext(PointsContext);
   const {
     eventTypes,
     filterByText,
@@ -108,12 +110,54 @@ export default function useFilteredMessagesDOM(
     }
   }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
+  // Trim eventTypeLogs and logPoints by focusRange.
+  // Messages will have already been filtered from the backend.
+  const focusedEventTypeLogs = useMemo<EventTypeLog[]>(() => {
+    if (focusRange === null) {
+      return eventTypeLogs;
+    } else {
+      return eventTypeLogs.filter(
+        eventTypeLog =>
+          eventTypeLog.time >= focusRange.begin.time && eventTypeLog.time <= focusRange.end.time
+      );
+    }
+  }, [eventTypeLogs, focusRange]);
+
+  const pointInstances = useMemo<PointInstance[]>(() => {
+    const pointInstances: PointInstance[] = [];
+
+    points.forEach(point => {
+      if (point.enableLogging) {
+        const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+        if (hitPoints.length < MAX_POINTS_FOR_FULL_ANALYSIS) {
+          hitPoints.forEach(hitPoint => {
+            if (
+              focusRange === null ||
+              (hitPoint.time >= focusRange.begin.time && hitPoint.time <= focusRange.end.time)
+            ) {
+              pointInstances.push({
+                point,
+                timeStampedHitPoint: hitPoint,
+              });
+            }
+          });
+        }
+      }
+    });
+
+    return pointInstances;
+  }, [client, focusRange, points]);
+
   const sortedLoggables = useMemo<Loggable[]>(() => {
-    const loggables: Loggable[] = [...eventTypeLogs, ...logPoints, ...preFilteredMessages];
+    const loggables: Loggable[] = [
+      ...focusedEventTypeLogs,
+      ...pointInstances,
+      ...preFilteredMessages,
+    ];
     return loggables.sort((a: Loggable, b: Loggable) => {
       return getTimeForSort(a) - getTimeForSort(b);
     });
-  }, [eventTypeLogs, logPoints, preFilteredMessages]);
+  }, [focusedEventTypeLogs, pointInstances, preFilteredMessages]);
 
   useEffect(() => {
     const needle = filterByText.toLocaleLowerCase();
@@ -143,7 +187,7 @@ export default function useFilteredMessagesDOM(
 function getTimeForSort(value: Loggable): number {
   if (isEventTypeLog(value)) {
     return value.time;
-  } else if (isLogPointInstance(value)) {
+  } else if (isPointInstance(value)) {
     return value.timeStampedHitPoint.time;
   } else {
     return value.point.time;

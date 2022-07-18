@@ -1,26 +1,28 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { LogPointInstance, LogPointsContext } from "@bvaughn/src/contexts/LogPointsContext";
+import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
-import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import {
   EventHandlerType,
   Message as ProtocolMessage,
   Value as ProtocolValue,
 } from "@replayio/protocol";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./useFocusRange";
 
-export type Loggable = EventTypeLog | LogPointInstance | ProtocolMessage;
+export type Loggable = EventTypeLog | PointInstance | ProtocolMessage;
 
 export default function useFilteredMessages(): Loggable[] {
   const client = useContext(ReplayClientContext);
-  const logPoints = useContext(LogPointsContext);
+  const { pointsForAnalysis: points } = useContext(PointsContext);
   const {
     eventTypes,
     filterByText,
@@ -71,14 +73,34 @@ export default function useFilteredMessages(): Loggable[] {
     });
   }, [eventTypeLogs, filterByTextLowercase]);
 
+  const pointInstances = useMemo<PointInstance[]>(() => {
+    const pointInstances: PointInstance[] = [];
+
+    points.forEach(point => {
+      if (point.enableLogging) {
+        const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+        if (hitPoints.length < MAX_POINTS_FOR_FULL_ANALYSIS) {
+          hitPoints.forEach(hitPoint => {
+            pointInstances.push({
+              point,
+              timeStampedHitPoint: hitPoint,
+            });
+          });
+        }
+      }
+    });
+
+    return pointInstances;
+  }, [client, focusRange, points]);
+
   // If there is filterByText, it should apply to log points also.
   // We can only filter log points that either require no analysis or have already been analyzed.
-  const filteredLogPoints = useMemo<LogPointInstance[]>(() => {
+  const filteredLogPoints = useMemo<PointInstance[]>(() => {
     if (filterByTextLowercase === "") {
-      return logPoints;
+      return pointInstances;
     }
 
-    return logPoints.filter(logPoint => {
+    return pointInstances.filter(logPoint => {
       const analysis = getCachedAnalysis(
         logPoint.point.location,
         logPoint.timeStampedHitPoint,
@@ -103,7 +125,7 @@ export default function useFilteredMessages(): Loggable[] {
         }) != null
       );
     });
-  }, [filterByTextLowercase, logPoints]);
+  }, [filterByTextLowercase, pointInstances]);
 
   const { messages } = getMessages(client, focusRange);
 
@@ -210,7 +232,7 @@ export default function useFilteredMessages(): Loggable[] {
 function getTimeForSort(value: Loggable): number {
   if (isEventTypeLog(value)) {
     return value.time;
-  } else if (isLogPointInstance(value)) {
+  } else if (isPointInstance(value)) {
     return value.timeStampedHitPoint.time;
   } else {
     return value.point.time;

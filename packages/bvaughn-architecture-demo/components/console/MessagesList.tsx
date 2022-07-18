@@ -1,7 +1,7 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -10,8 +10,8 @@ import useFilteredMessagesDOM, { Loggable } from "./hooks/useFilteredMessagesDOM
 import useFocusRange from "./hooks/useFocusRange";
 import styles from "./MessagesList.module.css";
 import EventTypeRenderer from "./renderers/EventTypeRenderer";
-import LogPointInstanceRenderer from "./renderers/LogPointInstanceRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
+import PointInstanceRenderer from "./renderers/PointInstanceRenderer";
 import { SearchContext } from "./SearchContext";
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.
@@ -65,11 +65,11 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             isFocused={loggable === currentSearchResult}
             eventTypeLog={loggable}
           />
-        ) : isLogPointInstance(loggable) ? (
-          <LogPointInstanceRenderer
+        ) : isPointInstance(loggable) ? (
+          <PointInstanceRenderer
             key={index}
             isFocused={loggable === currentSearchResult}
-            logPointInstance={loggable as LogPointInstance}
+            logPointInstance={loggable as PointInstance}
           />
         ) : (
           <MessageRenderer

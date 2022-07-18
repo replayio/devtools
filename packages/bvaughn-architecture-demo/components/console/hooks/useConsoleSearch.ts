@@ -1,5 +1,4 @@
-import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
-import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import useSearch from "@bvaughn/src/hooks/useSearch";
 import type { Actions as SearchActions, State as SearchState } from "@bvaughn/src/hooks/useSearch";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
@@ -7,6 +6,7 @@ import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/pr
 import { useMemo, useState } from "react";
 
 import useFilteredMessages, { Loggable } from "./useFilteredMessages";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -32,8 +32,8 @@ function search(query: string, loggables: Loggable[]): Loggable[] {
         }
         return false;
       });
-    } else if (isLogPointInstance(loggable)) {
-      const logPointInstance = loggable as LogPointInstance;
+    } else if (isPointInstance(loggable)) {
+      const logPointInstance = loggable as PointInstance;
       const analysis = getCachedAnalysis(
         logPointInstance.point.location,
         logPointInstance.timeStampedHitPoint,
