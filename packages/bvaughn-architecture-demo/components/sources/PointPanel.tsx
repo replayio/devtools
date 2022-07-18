@@ -2,8 +2,10 @@ import Icon from "@bvaughn/components/Icon";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import useFocusRange from "../console/hooks/useFocusRange";
 import Loader from "../Loader";
 
 import styles from "./PointPanel.module.css";
@@ -34,6 +36,11 @@ export default function PointPanel({ className, point }: { className: string; po
       className={`${styles.Point} ${className}`}
       data-test-id={`PointPanel-${point.location.line}`}
     >
+      <div className={styles.Row}>
+        <Suspense fallback={<Loader />}>
+          <HitPointsWarning point={point} />
+        </Suspense>
+      </div>
       <div className={styles.Row}>
         <input
           className={styles.Input}
@@ -79,9 +86,27 @@ export default function PointPanel({ className, point }: { className: string; po
   );
 }
 
+function HitPointsWarning({ point }: { point: Point }) {
+  const client = useContext(ReplayClientContext);
+  const focusRange = useFocusRange();
+  const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+
+  if (hitPoints.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
+    return (
+      <div className={styles.HitPointsWarning}>
+        <Icon className={styles.HitPointsWarningIcon} type="warning" /> Use Focus Mode to reduce the
+        number of hits.
+      </div>
+    );
+  } else {
+    return null;
+  }
+}
+
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
-  const hitPoints = getHitPointsForLocation(client, point.location);
+  const focusRange = useFocusRange();
+  const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
 
   if (hitPoints.length === 0) {
     return (
@@ -93,10 +118,9 @@ function HitPoints({ point }: { point: Point }) {
     return (
       <ul className={styles.HitPointsList}>
         <li className={styles.HitPointListItem}>Hits:</li>
-        {hitPoints.map((point, index) => (
-          <li key={point.point} className={styles.HitPointListItem}>
-            {point.time} ms
-            {index < hitPoints.length - 1 && ", "}
+        {hitPoints.map(hitPoint => (
+          <li key={hitPoint.point} className={styles.HitPointListItem}>
+            •
           </li>
         ))}
       </ul>

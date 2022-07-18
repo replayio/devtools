@@ -1,11 +1,10 @@
+import { Loggable, LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
 import useSearchDOM from "@bvaughn/src/hooks/useSearchDOM";
 import type {
   Actions as SearchActions,
   State as SearchState,
 } from "@bvaughn/src/hooks/useSearchDOM";
-import { MutableRefObject, useMemo, useState } from "react";
-
-import useFilteredMessagesDOM, { Loggable } from "./useFilteredMessagesDOM";
+import { MutableRefObject, useContext, useMemo, useState } from "react";
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -21,7 +20,7 @@ function search(
   list.childNodes.forEach((node: ChildNode, index: number) => {
     const element = node as HTMLElement;
 
-    // HACK Must be compatible with the style used by useFilteredMessagesDOM()
+    // HACK Must be compatible with the style used by <LoggablesContextRoot>
     if (element.style.display != "none") {
       const textContent = element.textContent?.toLocaleLowerCase();
       if (textContent?.includes(needle)) {
@@ -53,9 +52,9 @@ const INVISIBLE_STATE: State = {
 export default function useConsoleSearchDOM(
   listRef: MutableRefObject<HTMLElement | null>
 ): [State, Actions] {
-  const messages = useFilteredMessagesDOM(listRef);
+  const loggables = useContext(LoggablesContext);
 
-  const [state, dispatch] = useSearchDOM<Loggable>(messages, search, listRef);
+  const [state, dispatch] = useSearchDOM<Loggable>(loggables, search, listRef);
   const [visible, setVisible] = useState<boolean>(true);
 
   const externalActions = useMemo(

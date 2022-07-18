@@ -1,9 +1,9 @@
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
-import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
-import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
+import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -17,12 +17,12 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
-function LogPointInstanceRenderer({
+function PointInstanceRenderer({
   isFocused,
   logPointInstance,
 }: {
   isFocused: boolean;
-  logPointInstance: LogPointInstance;
+  logPointInstance: PointInstance;
 }) {
   const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
@@ -115,4 +115,4 @@ function LogPointInstanceRenderer({
   );
 }
 
-export default memo(LogPointInstanceRenderer) as typeof LogPointInstanceRenderer;
+export default memo(PointInstanceRenderer) as typeof PointInstanceRenderer;

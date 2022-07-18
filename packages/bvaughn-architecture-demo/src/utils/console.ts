@@ -1,5 +1,5 @@
-import { Loggable } from "@bvaughn/components/console/hooks/useFilteredMessagesDOM";
-import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
+import { Loggable } from "@bvaughn/components/console/LoggablesContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 
 import { EventTypeLog } from "../suspense/EventsCache";
@@ -12,7 +12,7 @@ export function isEventTypeLog(loggable: Loggable): loggable is EventTypeLog {
   );
 }
 
-export function isLogPointInstance(loggable: Loggable): loggable is LogPointInstance {
+export function isPointInstance(loggable: Loggable): loggable is PointInstance {
   return loggable.hasOwnProperty("timeStampedHitPoint") && loggable.hasOwnProperty("point");
 }
 

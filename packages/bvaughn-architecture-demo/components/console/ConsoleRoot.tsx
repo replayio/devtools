@@ -2,7 +2,6 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import { LogPointsContextRoot } from "@bvaughn/src/contexts/LogPointsContext";
 import { Suspense, unstable_Offscreen as Offscreen, useRef, useState } from "react";
 
 import styles from "./ConsoleRoot.module.css";
@@ -11,7 +10,8 @@ import FilterToggles from "./filters/FilterToggles";
 import Input from "./Input";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
-import SearchRoot from "./SearchRoot";
+import { SearchContextRoot } from "./SearchContext";
+import { LoggablesContextRoot } from "./LoggablesContext";
 
 export default function ConsoleRoot() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -19,8 +19,8 @@ export default function ConsoleRoot() {
 
   return (
     <ConsoleFiltersContextRoot>
-      <LogPointsContextRoot>
-        <SearchRoot messageListRef={messageListRef}>
+      <LoggablesContextRoot messageListRef={messageListRef}>
+        <SearchContextRoot messageListRef={messageListRef}>
           <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
             <div className={styles.TopRow}>
               <button
@@ -53,8 +53,8 @@ export default function ConsoleRoot() {
               </div>
             </div>
           </div>
-        </SearchRoot>
-      </LogPointsContextRoot>
+        </SearchContextRoot>
+      </LoggablesContextRoot>
     </ConsoleFiltersContextRoot>
   );
 }

@@ -1,7 +1,6 @@
-import { Location, SourceId } from "@replayio/protocol";
+import { Location, TimeStampedPoint } from "@replayio/protocol";
 import {
   createContext,
-  Dispatch,
   PropsWithChildren,
   SetStateAction,
   useCallback,
@@ -18,6 +17,11 @@ export type Point = {
   enableLogging: boolean;
   id: number;
   location: Location;
+};
+
+export type PointInstance = {
+  point: Point;
+  timeStampedHitPoint: TimeStampedPoint;
 };
 
 export type PointsContextType = {

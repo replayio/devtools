@@ -1,17 +1,17 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { LogPointInstance } from "@bvaughn/src/contexts/LogPointsContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import { isEventTypeLog, isLogPointInstance } from "@bvaughn/src/utils/console";
+import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useFilteredMessagesDOM, { Loggable } from "./hooks/useFilteredMessagesDOM";
 import useFocusRange from "./hooks/useFocusRange";
+import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
 import EventTypeRenderer from "./renderers/EventTypeRenderer";
-import LogPointInstanceRenderer from "./renderers/LogPointInstanceRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
+import PointInstanceRenderer from "./renderers/PointInstanceRenderer";
 import { SearchContext } from "./SearchContext";
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.
@@ -21,8 +21,7 @@ import { SearchContext } from "./SearchContext";
 function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
-  ``;
-  const loggables = useFilteredMessagesDOM(forwardedRef as MutableRefObject<HTMLElement>);
+  const loggables = useContext(LoggablesContext);
   const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
 
   const focusRange = useFocusRange();
@@ -42,13 +41,11 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       ? searchState.results[searchState.index]
       : null;
 
+  // Note that it's important to only render messages inside of the message lists.
+  // Overflow notifications are displayed outside of the list, to avoid interfering with search.
+  // See <LoggablesContextRoot> and useConsoleSearchDOM() for more info.
   return (
-    <div
-      className={isTransitionPending ? styles.ContainerPending : styles.Container}
-      data-test-name="Messages"
-      ref={forwardedRef as MutableRefObject<HTMLDivElement>}
-      role="list"
-    >
+    <>
       {didOverflow && (
         <div className={styles.OverflowRow}>There were too many messages to fetch them all</div>
       )}
@@ -57,32 +54,45 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
           {countBefore} messages filtered before the focus range
         </div>
       )}
-      {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
-      {loggables.map((loggable: Loggable, index: number) =>
-        isEventTypeLog(loggable) ? (
-          <EventTypeRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            eventTypeLog={loggable}
-          />
-        ) : isLogPointInstance(loggable) ? (
-          <LogPointInstanceRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            logPointInstance={loggable as LogPointInstance}
-          />
-        ) : (
-          <MessageRenderer
-            key={index}
-            isFocused={loggable === currentSearchResult}
-            message={loggable as ProtocolMessage}
-          />
-        )
-      )}
+      <div
+        className={isTransitionPending ? styles.ContainerPending : styles.Container}
+        data-test-name="Messages"
+        ref={forwardedRef as MutableRefObject<HTMLDivElement>}
+        role="list"
+      >
+        {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
+        {loggables.map((loggable: Loggable, index: number) => {
+          if (isEventTypeLog(loggable)) {
+            return (
+              <EventTypeRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                eventTypeLog={loggable}
+              />
+            );
+          } else if (isPointInstance(loggable)) {
+            return (
+              <PointInstanceRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                logPointInstance={loggable as PointInstance}
+              />
+            );
+          } else {
+            return (
+              <MessageRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                message={loggable as ProtocolMessage}
+              />
+            );
+          }
+        })}
+      </div>
       {countAfter > 0 && (
         <div className={styles.CountRow}>{countAfter} messages filtered after the focus range</div>
       )}
-    </div>
+    </>
   );
 }
 
