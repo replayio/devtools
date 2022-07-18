@@ -10,7 +10,7 @@ import FilterToggles from "./filters/FilterToggles";
 import Input from "./Input";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
-import SearchRoot from "./SearchRoot";
+import { SearchContextRoot } from "./SearchContext";
 
 export default function ConsoleRoot() {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
@@ -18,7 +18,7 @@ export default function ConsoleRoot() {
 
   return (
     <ConsoleFiltersContextRoot>
-      <SearchRoot messageListRef={messageListRef}>
+      <SearchContextRoot messageListRef={messageListRef}>
         <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
           <div className={styles.TopRow}>
             <button
@@ -51,7 +51,7 @@ export default function ConsoleRoot() {
             </div>
           </div>
         </div>
-      </SearchRoot>
+      </SearchContextRoot>
     </ConsoleFiltersContextRoot>
   );
 }
