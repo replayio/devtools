@@ -60,7 +60,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
       >
-        {loggables.length === 0 && <div className={styles.NoMessagesRow}>No messages found.</div>}
         {loggables.map((loggable: Loggable, index: number) => {
           if (isEventTypeLog(loggable)) {
             return (
