@@ -15,9 +15,7 @@ export function loadGlobalFunctions(): UIThunkAction {
       return;
     }
 
-    dispatch({
-      type: "LOADING_GLOBAL_FUNCTIONS",
-    });
+    dispatch({ type: "LOADING_GLOBAL_FUNCTIONS" });
 
     await ThreadFront.ensureAllSources();
 

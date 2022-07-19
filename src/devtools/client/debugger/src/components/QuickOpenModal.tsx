@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
 import React, { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import fuzzyAldrin from "fuzzaldrin-plus";
@@ -43,7 +42,6 @@ import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
 import { getSourceCount } from "../reducers/sources";
-import { AnyTxtRecord } from "dns";
 
 const maxResults = 100;
 
@@ -61,41 +59,6 @@ function filter(values: SearchResult[], query: string) {
     preparedQuery,
   });
 }
-
-function mapStateToProps(state: UIState) {
-  const selectedSource = getSelectedSource(state)!;
-  const tabs = getTabs(state);
-
-  return {
-    cx: getContext(state),
-    displayedSources: getDisplayedSources(state),
-    enabled: getQuickOpenEnabled(state),
-    globalFunctions: getGlobalFunctions(state) || [],
-    globalFunctionsLoading: isGlobalFunctionsLoading(state),
-    project: getQuickOpenProject(state),
-    query: getQuickOpenQuery(state),
-    searchType: getQuickOpenType(state),
-    selectedContentLoaded: selectedSource
-      ? !!getSourceContent(state, selectedSource.id)
-      : undefined,
-    selectedSource,
-    sourceCount: getSourceCount(state),
-    sourceList: getSourceList(state),
-    sourcesLoading: getSourcesLoading(state),
-    symbols: formatSymbols(getSymbols(state, selectedSource)),
-    symbolsLoading: isSymbolsLoading(state, selectedSource),
-    tabs,
-    viewMode: getViewMode(state),
-  };
-}
-
-const connector = connect(mapStateToProps, {
-  closeQuickOpen: actions.closeQuickOpen,
-  highlightLineRange: actions.highlightLineRange,
-  selectSpecificLocation: actions.selectSpecificLocation,
-  setQuickOpenQuery: actions.setQuickOpenQuery,
-  setViewMode,
-});
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
@@ -184,7 +147,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   getFunctions() {
     const { project, symbols, globalFunctions } = this.props;
 
-    return project ? globalFunctions : symbols.functions;
+    return project ? globalFunctions || [] : symbols.functions;
   }
 
   searchFunctions(query: string) {
@@ -224,9 +187,16 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
   getDebounceMs = () => {
     const { sourceCount } = this.props;
-    const ms = sourceCount > 1000 ? 1000 : 200;
 
-    return ms;
+    if (sourceCount > 10_000) {
+      return 1000;
+    }
+
+    if (sourceCount > 1_000) {
+      return 100;
+    }
+
+    return 50;
   };
 
   getUpdateResultsCallback = () =>
@@ -457,7 +427,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   }
 
   render() {
-    const { enabled, query } = this.props;
+    const { enabled, query, sourcesLoading } = this.props;
     const { selectedIndex, results } = this.state;
 
     if (!enabled) {
@@ -491,6 +461,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
           selectedItemId={expanded && items[selectedIndex] ? items[selectedIndex].id : ""}
           size="big"
         />
+        {sourcesLoading && <div className="px-2 py-1">Sources Loading…</div>}
         {showLoadingResults ? <div className="px-2 py-1">Loading results…</div> : null}
         {results && items && (
           <ResultList
@@ -507,5 +478,41 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     );
   }
 }
+
+function mapStateToProps(state: UIState) {
+  const selectedSource = getSelectedSource(state)!;
+  const tabs = getTabs(state);
+  console.log(`symbols loading: ${isGlobalFunctionsLoading(state)}`);
+
+  return {
+    cx: getContext(state),
+    displayedSources: getDisplayedSources(state),
+    enabled: getQuickOpenEnabled(state),
+    globalFunctions: getGlobalFunctions(state),
+    globalFunctionsLoading: isGlobalFunctionsLoading(state),
+    project: getQuickOpenProject(state),
+    query: getQuickOpenQuery(state),
+    searchType: getQuickOpenType(state),
+    selectedContentLoaded: selectedSource
+      ? !!getSourceContent(state, selectedSource.id)
+      : undefined,
+    selectedSource,
+    sourceCount: getSourceCount(state),
+    sourceList: getSourceList(state),
+    sourcesLoading: getSourcesLoading(state),
+    symbols: formatSymbols(getSymbols(state, selectedSource)),
+    symbolsLoading: isSymbolsLoading(state, selectedSource),
+    tabs,
+    viewMode: getViewMode(state),
+  };
+}
+
+const connector = connect(mapStateToProps, {
+  closeQuickOpen: actions.closeQuickOpen,
+  highlightLineRange: actions.highlightLineRange,
+  selectSpecificLocation: actions.selectSpecificLocation,
+  setQuickOpenQuery: actions.setQuickOpenQuery,
+  setViewMode,
+});
 
 export default connector(QuickOpenModal);
