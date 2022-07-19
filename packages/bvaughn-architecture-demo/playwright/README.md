@@ -13,7 +13,7 @@ Then verify snapshots by running:
 
 ```sh
 # packages/bvaughn-architecture-demo/playwright
-earthly --push +playwright
+earthly +playwright
 ```
 
 ## Locally (to update snapshots)
