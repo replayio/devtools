@@ -74,6 +74,8 @@ export interface ASTState {
   // dead
   projectSymbolsLoading: null;
   symbols: Record<string, Symbol>;
+  loadingSourceFunctions: Record<string, boolean>;
+  sourceFunctions: Record<string, unknown[]>;
 }
 
 export function initialASTState(): ASTState {
@@ -82,6 +84,8 @@ export function initialASTState(): ASTState {
     projectSymbolsLoading: null,
     globalFunctions: null,
     loadingGlobalFunctions: false,
+    loadingSourceFunctions: {}
+    sourceFunctions: {}
   };
 }
 
@@ -115,6 +119,23 @@ function update(state = initialASTState(), action: AnyAction) {
         ...state,
         loadingGlobalFunctions: false,
         globalFunctions: action.globalFns,
+      };
+    }
+
+    case "LOADING_SOURCE_FUNCTIONS": {
+      state.loadingSourceFunctions[action.sourceId] = true;
+      return {
+        ...state,
+        loadingSourceFunctions: state.loadingSourceFunctions,
+      };
+    }
+    case "SET_SOURCE_FUNCTIONS": {
+      state.loadingSourceFunctions[action.sourceId] = false;
+      state.sourceFunctions[action.sourceId]= action.globalFns
+      return {
+        ...state,
+        loadingSourceFunctions: state.loadingSourceFunctions,
+        functions: state.sourceFunctions,
       };
     }
 

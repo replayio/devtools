@@ -38,3 +38,17 @@ export function loadGlobalFunctions(): UIThunkAction {
     });
   };
 }
+
+export function loadSourceFunctions(sourceId: string): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const functions: any[] = [];
+    await ThreadFront.searchFunctions({ query: "", sourceIds: [sourceId] }, matches => {
+      functions.push(...matches);
+    });
+
+    dispatch({
+      type: "SET_SOURCE_FUNCTIONS",
+      functions,
+    });
+  };
+}
