@@ -251,5 +251,36 @@ test("should be able to toggle side filter menu open and closed", async ({ page 
   await takeScreenshot(page, consoleRoot, "filters-side-menu-reopened");
 });
 
+test("should remember filter toggle preferences between reloads", async ({ page }) => {
+  await page.goto(URL);
+
+  // Toggle everything off and screenshot
+  await page.click('[data-test-id="FilterToggle-errors"]');
+  await page.click('[data-test-id="FilterToggle-exceptions"]');
+  await page.click('[data-test-id="FilterToggle-logs"]');
+  await page.click('[data-test-id="FilterToggle-warnings"]');
+  let filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  await takeScreenshot(page, filters, "initial-side-filter-values");
+
+  // Reload and verify screenshot unchanged
+  await page.reload();
+  filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  await takeScreenshot(page, filters, "initial-side-filter-values");
+
+  // Toggle everything on and screenshot
+  await page.click('[data-test-id="FilterToggle-errors"]');
+  await page.click('[data-test-id="FilterToggle-exceptions"]');
+  await page.click('[data-test-id="FilterToggle-logs"]');
+  await page.click('[data-test-id="FilterToggle-warnings"]');
+  await page.click('[data-test-id="FilterToggle-hideNodeModules"]');
+  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await takeScreenshot(page, filters, "updated-side-filter-values");
+
+  // Reload and verify screenshot unchanged
+  await page.reload();
+  filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  await takeScreenshot(page, filters, "updated-side-filter-values");
+});
+
 // TODO Add tests:
 // * For fast-forwarding to a message.
