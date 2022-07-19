@@ -13,18 +13,18 @@ import type { ASTLocation, PendingBreakpoint, SourceLocation } from "../../reduc
 import { setSymbols } from "../sources/symbols";
 import { assertPendingBreakpoint, findFunctionByName } from "../../utils/breakpoint";
 
-import { getSource } from "../../selectors";
 import { removePendingBreakpoint } from "../../reducers/pending-breakpoints";
+import { getSourceDetails, SourceDetails } from "ui/reducers/sources";
 import { addBreakpoint } from "./modify";
 
 async function findNewLocation(
   cx: Context,
   { name, offset, index }: ASTLocation,
   location: SourceLocation,
-  source: Source,
+  source: SourceDetails,
   dispatch: AppDispatch
 ): Promise<SourceLocation> {
-  const symbols = await dispatch(setSymbols({ cx, source }));
+  const symbols = await dispatch(setSymbols({ source }));
   const func = symbols ? findFunctionByName(symbols, name, index) : null;
 
   // Fallback onto the location line, if we do not find a function.
@@ -49,7 +49,7 @@ export function syncBreakpoint(
   return async (dispatch, getState, { ThreadFront }) => {
     assertPendingBreakpoint(pendingBreakpoint);
 
-    const source = getSource(getState(), sourceId);
+    const source = getSourceDetails(getState(), sourceId);
 
     if (!source) {
       return;

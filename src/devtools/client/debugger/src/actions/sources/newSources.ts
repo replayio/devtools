@@ -31,7 +31,7 @@ import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
-import { loadSourceText } from "./loadSourceText";
+import { experimentalLoadSourceText } from "ui/reducers/sources";
 
 interface SourceData {
   source: {
@@ -108,8 +108,10 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
     }
 
     // load the source text if there is a pending breakpoint for it
-    await dispatch(loadSourceText({ cx, source }));
-    await dispatch(fetchPossibleBreakpointsForSource(source.id));
+    const textPromise = dispatch(experimentalLoadSourceText(source.id));
+    const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
+
+    await Promise.all([textPromise, possibleBreakpointsPromise]);
 
     await Promise.all(
       pendingBreakpoints.map(bp => {

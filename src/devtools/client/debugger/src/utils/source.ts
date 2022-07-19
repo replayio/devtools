@@ -8,7 +8,8 @@ import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import type { SymbolDeclarations } from "../reducers/ast";
 import type { SourceActor } from "../reducers/source-actors";
-import type { Source, SourceContent, SourceWithContent } from "../reducers/sources";
+import type { Source, SourceWithContent } from "../reducers/sources";
+import type { SourceContent, SourceDetails } from "ui/reducers/sources";
 
 import { isFulfilled } from "./async-value";
 import { getURL } from "./sources-tree/getURL";

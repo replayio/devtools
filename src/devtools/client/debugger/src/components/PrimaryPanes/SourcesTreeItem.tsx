@@ -66,7 +66,6 @@ const mapStateToProps = (state: UIState, props: STIProps) => {
 
 const connector = connect(mapStateToProps, {
   toggleBlackBox: actions.toggleBlackBox,
-  loadSourceText: actions.loadSourceText,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;

@@ -7,14 +7,15 @@ import type { AppDispatch } from "ui/setup/store";
 import type { Source } from "../../reducers/sources";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
-import { loadSourceText } from "./loadSourceText";
+import { experimentalLoadSourceText } from "ui/reducers/sources";
+import type { SourceDetails } from "ui/reducers/sources";
 
 import { memoizeableAction } from "../../utils/memoizableAction";
 import { fulfilled } from "../../utils/async-value";
 
-async function doSetSymbols(source: Source, thunkArgs: { dispatch: AppDispatch }) {
+async function doSetSymbols(source: SourceDetails, thunkArgs: { dispatch: AppDispatch }) {
   const sourceId = source.id;
-  await thunkArgs.dispatch(loadSourceText({ source }));
+  await thunkArgs.dispatch(experimentalLoadSourceText(sourceId));
 
   await thunkArgs.dispatch({
     type: "SET_SYMBOLS",
@@ -24,7 +25,7 @@ async function doSetSymbols(source: Source, thunkArgs: { dispatch: AppDispatch }
 }
 
 export const setSymbols = memoizeableAction("setSymbols", {
-  getValue: ({ source }: { source: Source }, thunkArgs) => {
+  getValue: ({ source }, thunkArgs) => {
     const symbols = selectors.getSymbols(thunkArgs.getState(), source);
     if (!symbols || symbols.loading) {
       return null;
@@ -32,6 +33,6 @@ export const setSymbols = memoizeableAction("setSymbols", {
 
     return fulfilled(symbols);
   },
-  createKey: ({ source }) => source.id,
+  createKey: ({ source }: { source: SourceDetails }) => source.id,
   action: ({ source }, thunkArgs) => doSetSymbols(source, thunkArgs),
 });

@@ -11,6 +11,7 @@ import { prefs } from "../utils/prefs";
 import { closeQuickOpen } from "./quick-open";
 import type { Source } from "./sources";
 import type { Range } from "./types";
+import { convertSourceDetailsToSource, SourceDetails } from "ui/reducers/sources";
 
 export type ActiveSearchType = "project" | "file";
 
@@ -62,8 +63,8 @@ const uiSlice = createSlice({
     toggleFrameworkGrouping(state, action: PayloadAction<boolean>) {
       state.frameworkGroupingOn = action.payload;
     },
-    setShownSource(state, action: PayloadAction<Source | null>) {
-      state.shownSource = action.payload;
+    setShownSource(state, action: PayloadAction<SourceDetails | null>) {
+      state.shownSource = action.payload ? convertSourceDetailsToSource(action.payload) : null;
     },
     toggleStartPanel(state) {
       state.startPanelCollapsed = !state.startPanelCollapsed;

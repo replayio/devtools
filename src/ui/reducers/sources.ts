@@ -11,6 +11,9 @@ import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import { listenForCondition } from "ui/setup/listenerMiddleware";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
+import type { SourcesMap } from "devtools/client/debugger/src/utils/sources-tree";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 
 export interface SourceDetails {
@@ -27,7 +30,7 @@ export interface SourceDetails {
   // TODO stableId: string;
 }
 
-export enum LoadingState {
+export enum LoadingStatus {
   LOADING = "loading",
   LOADED = "loaded",
   ERRORED = "errored",
@@ -35,7 +38,7 @@ export enum LoadingState {
 
 export interface SourceContent {
   id: string;
-  status: LoadingState;
+  status: LoadingStatus;
   value?: {
     contentType: string;
     type: string;
@@ -48,8 +51,11 @@ const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => sour
 const contentsAdapter = createEntityAdapter<SourceContent>();
 
 export const sourceSelectors = sourcesAdapter.getSelectors();
-export const contentSelectors = contentsAdapter.getSelectors();
-const sourceDetailSelectors = sourceDetailsAdapter.getSelectors();
+export const contentsSelectors = contentsAdapter.getSelectors(
+  (state: UIState) => state.experimentalSources.contents
+);
+export const { selectAll: getAllSourceDetails, selectById: getSourceDetails } =
+  sourceDetailsAdapter.getSelectors((state: UIState) => state.experimentalSources.sourceDetails);
 
 export interface SourcesState {
   allSourcesReceived: boolean;
@@ -97,7 +103,7 @@ const sourcesSlice = createSlice({
     sourceLoading: (state, action: PayloadAction<string>) => {
       contentsAdapter.upsertOne(state.contents, {
         id: action.payload,
-        status: LoadingState.LOADING,
+        status: LoadingStatus.LOADING,
       });
     },
     sourceLoaded: (
@@ -106,7 +112,7 @@ const sourcesSlice = createSlice({
     ) => {
       contentsAdapter.upsertOne(state.contents, {
         id: action.payload.sourceId,
-        status: LoadingState.LOADED,
+        status: LoadingStatus.LOADED,
         value: {
           contentType: action.payload.contentType,
           value: action.payload.contents,
@@ -116,13 +122,13 @@ const sourcesSlice = createSlice({
     },
     sourceErrored: (state, action: PayloadAction<string>) => {
       const existing = state.contents.entities[action.payload];
-      if (existing?.status === LoadingState.LOADED) {
+      if (existing?.status === LoadingStatus.LOADED) {
         return;
       }
 
       contentsAdapter.upsertOne(state.contents, {
         id: action.payload,
-        status: LoadingState.ERRORED,
+        status: LoadingStatus.ERRORED,
       });
     },
     selectLocation: (state, action: PayloadAction<Partial<Location>>) => {
@@ -142,8 +148,19 @@ export const {
 
 export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState, { ThreadFront }) => {
-    const existing = getState().experimentalSources.contents.entities[sourceId];
-    if (existing?.status === LoadingState.LOADING || existing?.status === LoadingState.LOADED) {
+    const existing = contentsSelectors.selectById(getState(), sourceId);
+    if (existing?.status === LoadingStatus.LOADING) {
+      // in flight - resolve this thunk's promise when it completes
+      // TODO Replace this with RTK Query!
+      return dispatch(
+        listenForCondition(() => {
+          // Check the status of this source after every action
+          const status = contentsSelectors.selectById(getState(), sourceId)?.status;
+          return status === LoadingStatus.LOADED;
+        })
+      );
+    }
+    if (existing?.status === LoadingStatus.LOADED) {
       return;
     }
     dispatch(sourceLoading(sourceId));
@@ -165,8 +182,6 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Prom
 };
 
 export const getSourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesReceived;
-export const getAllSourceDetails = (state: UIState) =>
-  sourceDetailSelectors.selectAll(state.experimentalSources.sourceDetails);
 
 export const getSelectedLocation = (state: UIState) =>
   state.experimentalSources.selectedLocationHistory[0];
@@ -180,20 +195,14 @@ export const getSelectedSource = (state: UIState) => {
   return selectedSourceId ? getSourceDetails(state, selectedSourceId) : null;
 };
 export const getSourcesById = (state: UIState, ids: string[]) => {
-  return ids.map(
-    id => sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)!
-  );
-};
-export const getSourceDetails = (state: UIState, id: string) => {
-  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
+  return ids.map(id => getSourceDetails(state, id)!);
 };
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
-  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id)
-    ?.correspondingSourceIds;
+  return getSourceDetails(state, id)?.correspondingSourceIds;
 };
 export const getSourceByUrl = (state: UIState, url: string) => {
   const id = state.experimentalSources.sourcesByUrl[url][0];
-  return sourceDetailSelectors.selectById(state.experimentalSources.sourceDetails, id);
+  return getSourceDetails(state, id);
 };
 export const getSourceContent = (state: UIState, id: string) => {
   return state.experimentalSources.contents.entities[id];
@@ -231,6 +240,32 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   } else {
     return sourceDetails.url;
   }
+};
+
+export const getAllSourceDetailsAsSourceMap = createSelector(
+  (state: UIState) => state.experimentalSources.sourceDetails.entities,
+  sourcesEntities => {
+    const sourcesMap: SourcesMap = {};
+    for (let [id, sourceDetails] of Object.entries(sourcesEntities)) {
+      sourcesMap[id] = convertSourceDetailsToSource(sourceDetails!);
+    }
+
+    return sourcesMap;
+  }
+);
+
+export const convertSourceDetailsToSource = (sd: SourceDetails) => {
+  const source: Source = {
+    id: sd.id,
+    url: sd.url,
+    isOriginal: sd.id === sd.canonicalId,
+    isPrettyPrinted: sd.id.startsWith("pp"),
+    // TODO Implement blackboxing
+    isBlackBoxed: false,
+    isExtension: false,
+  };
+
+  return source;
 };
 
 /*
