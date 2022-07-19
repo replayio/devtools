@@ -3,7 +3,7 @@ import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
 import { useRef, useState } from "react";
@@ -23,7 +23,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { pauseId: currentPauseId } = useContext(PauseContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   useLayoutEffect(() => {
@@ -59,7 +59,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     className = `${className} ${styles.Focused}`;
   }
 
-  if (currentPauseId === message.pauseId) {
+  if (currentExecutionPoint === message.point.point) {
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
@@ -111,10 +111,10 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
 
       {isHovered && (
         <MessageHoverButton
-          pauseId={message.pauseId}
+          executionPoint={message.point.point}
           showAddCommentButton={true}
           targetRef={ref}
-          timeStampedPoint={message.point}
+          time={message.point.time}
         />
       )}
     </div>

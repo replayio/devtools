@@ -1,7 +1,7 @@
 import ConsoleRoot from "@bvaughn/components/console";
 import Initializer from "@bvaughn/components/Initializer";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -16,7 +16,7 @@ export default function Console() {
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
         <SourcesContextRoot>
           <PointsContextRoot>
-            <PauseContextRoot>
+            <TimelineContextRoot>
               <FocusContextRoot>
                 <div className={styles.Grid1Column}>
                   <div className={styles.VerticalContainer}>
@@ -24,7 +24,7 @@ export default function Console() {
                   </div>
                 </div>
               </FocusContextRoot>
-            </PauseContextRoot>
+            </TimelineContextRoot>
           </PointsContextRoot>
         </SourcesContextRoot>
       </Initializer>

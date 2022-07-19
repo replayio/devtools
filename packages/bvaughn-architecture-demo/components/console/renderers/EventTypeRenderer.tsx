@@ -1,17 +1,17 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
-import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { EventTypeLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Source from "../Source";
 
 import styles from "./shared.module.css";
+import MessageHoverButton from "../MessageHoverButton";
 
 function EventTypeRenderer({
   eventTypeLog,
@@ -20,14 +20,13 @@ function EventTypeRenderer({
   eventTypeLog: EventTypeLog;
   isFocused: boolean;
 }) {
-  const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { pauseId: currentPauseId } = useContext(PauseContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   useLayoutEffect(() => {
     if (isFocused) {
@@ -35,14 +34,14 @@ function EventTypeRenderer({
     }
   }, [isFocused]);
 
-  const { pauseId, values } = eventTypeLog;
+  const { point, pauseId, values } = eventTypeLog;
 
   let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
 
-  if (currentPauseId === pauseId) {
+  if (currentExecutionPoint === point) {
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
@@ -53,7 +52,7 @@ function EventTypeRenderer({
       key={index}
       isNested={false}
       layout="horizontal"
-      pauseId={pauseId!}
+      pauseId={pauseId}
       protocolValue={value}
     />
   ));
@@ -84,15 +83,14 @@ function EventTypeRenderer({
       onMouseLeave={() => setIsHovered(false)}
     >
       {primaryContent}
-      {
-        isHovered && null /* TODO (console-event-type) Add hover button support
+      {isHovered && (
         <MessageHoverButton
-          pauseId={pauseId}
+          executionPoint={eventTypeLog.point}
           showAddCommentButton={false}
           targetRef={ref}
-          timeStampedPoint={eventTypeLog.timeStampedHitPoint}
-        />*/
-      }
+          time={eventTypeLog.time}
+        />
+      )}
     </div>
   );
 }

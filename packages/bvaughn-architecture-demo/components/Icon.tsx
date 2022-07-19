@@ -26,6 +26,7 @@ export default function Icon({
     | "prompt"
     | "protocol"
     | "remove"
+    | "rewind"
     | "save"
     | "search"
     | "share"
@@ -114,6 +115,9 @@ export default function Icon({
       break;
     case "remove":
       path = "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11H7v-2h10v2z";
+      break;
+    case "rewind":
+      path = "M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z";
       break;
     case "save":
       path =

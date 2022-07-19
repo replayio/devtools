@@ -1,4 +1,4 @@
-import { Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -9,8 +9,10 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 type Value = any;
 
 type AnalysisResult = {
+  executionPoint: ExecutionPoint;
   isRemote: boolean;
   pauseId: PauseId | null;
+  time: number;
   values: Value[];
 };
 
@@ -81,8 +83,10 @@ async function runLocalOrRemoteAnalysis(
     const values = await runLocalAnalysis(code);
 
     const analysisResult: AnalysisResult = {
+      executionPoint: timeStampedPoint.point,
       isRemote: false,
       pauseId: null,
+      time: timeStampedPoint.time,
       values,
     };
 
@@ -95,8 +99,10 @@ async function runLocalOrRemoteAnalysis(
       const { pauseId, values } = await runRemoteAnalysis(client, location, timeStampedPoint, code);
 
       const analysisResult: AnalysisResult = {
+        executionPoint: timeStampedPoint.point,
         isRemote: true,
         pauseId,
+        time: timeStampedPoint.time,
         values,
       };
 

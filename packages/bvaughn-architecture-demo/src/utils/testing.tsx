@@ -11,7 +11,7 @@ import {
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { PauseContext, PauseContextType } from "../contexts/PauseContext";
+import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
 import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 
 // This particular method is written to enable testing the entire client.
@@ -74,7 +74,7 @@ export async function renderFocused(
   options?: {
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
-    pauseContext?: Partial<PauseContextType>;
+    timelineContext?: Partial<TimelineContextType>;
     pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
@@ -110,11 +110,12 @@ export async function renderFocused(
     ...options?.focusContext,
   };
 
-  const pauseContext: PauseContextType = {
+  const timelineContext: TimelineContextType = {
+    executionPoint: null,
     isPending: false,
-    pauseId: null,
+    time: null,
     update: jest.fn(),
-    ...options?.pauseContext,
+    ...options?.timelineContext,
   };
 
   const pointsContext: PointsContextType = {
@@ -129,13 +130,13 @@ export async function renderFocused(
 
   const renderResponse = await render(
     <PointsContext.Provider value={pointsContext}>
-      <PauseContext.Provider value={pauseContext}>
+      <TimelineContext.Provider value={timelineContext}>
         <FocusContext.Provider value={focusContext}>
           <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
             {children}
           </ConsoleFiltersContext.Provider>
         </FocusContext.Provider>
-      </PauseContext.Provider>
+      </TimelineContext.Provider>
     </PointsContext.Provider>,
     {
       replayClient: options?.replayClient,

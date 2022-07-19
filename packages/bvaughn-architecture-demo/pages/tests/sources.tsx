@@ -2,7 +2,7 @@ import Initializer from "@bvaughn/components/Initializer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -17,7 +17,7 @@ export default function Source() {
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
         <SourcesContextRoot>
           <PointsContextRoot>
-            <PauseContextRoot>
+            <TimelineContextRoot>
               <FocusContextRoot>
                 <div className={styles.Grid2Columns}>
                   <div className={styles.VerticalContainer}>
@@ -28,7 +28,7 @@ export default function Source() {
                   </div>
                 </div>
               </FocusContextRoot>
-            </PauseContextRoot>
+            </TimelineContextRoot>
           </PointsContextRoot>
         </SourcesContextRoot>
       </Initializer>

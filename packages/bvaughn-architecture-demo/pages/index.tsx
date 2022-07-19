@@ -6,7 +6,7 @@ import Initializer from "@bvaughn/components/Initializer";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { PauseContextRoot } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import React, { useContext, useMemo, useState, useTransition } from "react";
@@ -40,7 +40,7 @@ export default function HomePage() {
     <Initializer>
       <SourcesContextRoot>
         <PointsContextRoot>
-          <PauseContextRoot>
+          <TimelineContextRoot>
             <FocusContextRoot>
               <div className={styles.VerticalContainer}>
                 <div className={styles.HorizontalContainer}>
@@ -76,7 +76,7 @@ export default function HomePage() {
                 </div>
               </div>
             </FocusContextRoot>
-          </PauseContextRoot>
+          </TimelineContextRoot>
         </PointsContextRoot>
       </SourcesContextRoot>
     </Initializer>

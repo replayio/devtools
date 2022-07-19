@@ -1,9 +1,9 @@
 import Icon from "@bvaughn/components/Icon";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
-import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { PauseId, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint } from "@replayio/protocol";
 import {
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -18,27 +18,31 @@ import { createPortal } from "react-dom";
 import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
-  pauseId,
+  executionPoint,
   showAddCommentButton,
   targetRef,
-  timeStampedPoint,
+  time,
 }: {
-  pauseId: PauseId | null;
+  executionPoint: ExecutionPoint;
   showAddCommentButton: boolean;
   targetRef: RefObject<HTMLDivElement | null>;
-  timeStampedPoint: TimeStampedPoint;
+  time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
-  const { pauseId: currentPauseId, update } = useContext(PauseContext);
+  const {
+    executionPoint: currentExecutionPoint,
+    time: currentTime,
+    update,
+  } = useContext(TimelineContext);
 
   const invalidateCache = useCacheRefresh();
   const [isPending, startTransition] = useTransition();
 
-  const isCurrentlyPausedAt = currentPauseId === pauseId;
+  const isCurrentlyPausedAt = currentExecutionPoint === executionPoint;
 
   useLayoutEffect(() => {
     const button = ref.current;
@@ -52,53 +56,64 @@ export default function MessageHoverButton({
   }, [targetRef]);
 
   let button = null;
-  if (pauseId !== null) {
-    if (isCurrentlyPausedAt) {
-      if (showAddCommentButton && accessToken) {
-        const addCommentTransition = () => {
-          startTransition(async () => {
-            await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
-              content: "",
-              hasFrames: true,
-              isPublished: false,
-              point: timeStampedPoint.point,
-              time: timeStampedPoint.time,
-            });
-
-            invalidateCache();
+  if (isCurrentlyPausedAt) {
+    if (showAddCommentButton && accessToken) {
+      const addCommentTransition = () => {
+        startTransition(async () => {
+          await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
+            content: "",
+            hasFrames: true,
+            isPublished: false,
+            point: executionPoint,
+            time,
           });
-        };
 
-        button = (
-          <button
-            className={styles.AddCommentButton}
-            data-test-id="AddCommentButton"
-            disabled={isPending}
-            onClick={addCommentTransition}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            ref={ref}
-          >
-            <Icon className={styles.AddCommentButtonIcon} type="comment" />
-            {isHovered && <span className={styles.Label}>Add comment</span>}
-          </button>
-        );
-      }
-    } else {
+          invalidateCache();
+        });
+      };
+
       button = (
         <button
-          className={styles.FastForwardButton}
-          data-test-id="FastForwardButton"
-          onClick={() => update(pauseId)}
+          className={styles.AddCommentButton}
+          data-test-id="AddCommentButton"
+          disabled={isPending}
+          onClick={addCommentTransition}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           ref={ref}
         >
-          <Icon className={styles.FastForwardButtonIcon} type="fast-forward" />
-          {isHovered && <span className={styles.Label}>Fast-forward</span>}
+          <Icon className={styles.AddCommentButtonIcon} type="comment" />
+          {isHovered && <span className={styles.Label}>Add comment</span>}
         </button>
       );
     }
+  } else {
+    button = (
+      <button
+        className={styles.FastForwardButton}
+        data-test-id="FastForwardButton"
+        onClick={() => update(time, executionPoint)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        ref={ref}
+      >
+        <Icon
+          className={styles.FastForwardButtonIcon}
+          type={
+            currentExecutionPoint === null || executionPoint > currentExecutionPoint
+              ? "fast-forward"
+              : "rewind"
+          }
+        />
+        {isHovered && (
+          <span className={styles.Label}>
+            {currentExecutionPoint === null || executionPoint > currentExecutionPoint
+              ? "Fast-forward"
+              : "Rewind"}
+          </span>
+        )}
+      </button>
+    );
   }
 
   return button !== null ? createPortal(button, document.body) : null;
