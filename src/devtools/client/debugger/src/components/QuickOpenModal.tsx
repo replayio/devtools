@@ -482,7 +482,6 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 function mapStateToProps(state: UIState) {
   const selectedSource = getSelectedSource(state)!;
   const tabs = getTabs(state);
-  console.log(`symbols loading: ${isGlobalFunctionsLoading(state)}`);
 
   return {
     cx: getContext(state),
