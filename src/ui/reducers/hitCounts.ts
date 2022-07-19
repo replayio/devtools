@@ -157,6 +157,12 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
       const focusRegion = getFocusRegion(getState());
       const range = focusRegion ? rangeForFocusRegion(focusRegion) : undefined;
       const correspondingSourceIds = getCorrespondingSourceIds(getState(), sourceId)!;
+      // See https://linear.app/replay/issue/FE-412/two-different-responses-to-the-same-protocol-message-in-a-single
+      await Promise.all(
+        correspondingSourceIds.map(sourceId =>
+          ThreadFront.getBreakpointPositionsCompressed(sourceId)
+        )
+      );
 
       const hitCounts = await fetchProtocolHitCounts(
         correspondingSourceIds,
