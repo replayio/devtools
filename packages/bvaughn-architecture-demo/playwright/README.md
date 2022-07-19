@@ -13,7 +13,7 @@ Then verify snapshots by running:
 
 ```sh
 # packages/bvaughn-architecture-demo/playwright
-earthly +playwright
+earthly --push +playwright
 ```
 
 ## Locally (to update snapshots)
@@ -29,7 +29,7 @@ Then update snapshots by running:
 
 ```sh
 # packages/bvaughn-architecture-demo/playwright
-earthly +playwright-update-snapshots --HOST=host.docker.internal
+earthly --push +playwright-update-snapshots --HOST=host.docker.internal
 ```
 
 Note that the value passed for `HOST` varies by operating system:
@@ -65,5 +65,5 @@ If tests are failing in the Docker container, it can be helpful to record a vide
 
 ```sh
 # packages/bvaughn-architecture-demo/playwright
-earthly +playwright-record-video --HOST=host.docker.internal
+earthly --push +playwright-record-video --HOST=host.docker.internal
 ```

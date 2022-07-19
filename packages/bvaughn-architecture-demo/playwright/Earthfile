@@ -13,10 +13,10 @@ playwright:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN node run_tests_for_earthly.js
+    RUN --push node run_tests_for_earthly.js
     IF [ -f playwright_error ]
         SAVE ARTIFACT ./test-results AS LOCAL ./test-results
-        RUN echo "test run failed" && \
+        RUN --push echo "test run failed" && \
             exit 0
     END
 
@@ -24,12 +24,12 @@ playwright-update-snapshots:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN yarn test --update-snapshots
+    RUN --push yarn test --update-snapshots
     SAVE ARTIFACT ./snapshots AS LOCAL ./snapshots
 
 playwright-record-video:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN RECORD_VIDEO=true VISUAL_DEBUG=true yarn test
+    RUN --push RECORD_VIDEO=true VISUAL_DEBUG=true yarn test
     SAVE ARTIFACT ./test-results AS LOCAL ./test-results
