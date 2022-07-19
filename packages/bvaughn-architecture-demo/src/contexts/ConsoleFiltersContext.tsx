@@ -3,10 +3,14 @@ import {
   createContext,
   PropsWithChildren,
   useCallback,
+  useContext,
   useMemo,
   useState,
   useTransition,
 } from "react";
+import useLocalStorage from "bvaughn-architecture-demo/src/hooks/useLocalStorage";
+
+import { SessionContext } from "./SessionContext";
 
 // Various boolean flags to types of console messages or attributes to show/hide.
 export type Toggles = {
@@ -56,7 +60,10 @@ export type ConsoleFiltersContextType = Toggles & {
 export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(null as any);
 
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
-  const [toggles, setToggles] = useState<Toggles>({
+  const { recordingId } = useContext(SessionContext);
+
+  const localStorageKey = `Replay:Toggles:${recordingId}`;
+  const [toggles, setToggles] = useLocalStorage<Toggles>(localStorageKey, {
     showErrors: true,
     showExceptions: true,
     showLogs: true,
@@ -110,7 +117,7 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
         });
       }
     },
-    []
+    [setToggles]
   );
 
   // Using a deferred values enables the filter input to update quickly,
