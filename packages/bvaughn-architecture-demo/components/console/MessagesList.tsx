@@ -5,6 +5,7 @@ import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
 import { Message as ProtocolMessage } from "@replayio/protocol";
 import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import Icon from "../Icon";
 
 import useFocusRange from "./hooks/useFocusRange";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
@@ -47,7 +48,20 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   return (
     <>
       {didOverflow && (
-        <div className={styles.OverflowRow}>There were too many messages to fetch them all</div>
+        <div className={styles.OverflowRow}>
+          <Icon className={styles.OverflowRowIcon} type="warning" />
+          <div>
+            There are too many console messages so not all are being displayed.{" "}
+            <a
+              className={styles.OverflowLink}
+              href="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#8d72d62414a7490586ee5ac3adef09fb"
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              Read more
+            </a>
+          </div>
+        </div>
       )}
       {countBefore > 0 && (
         <div className={styles.CountRow}>

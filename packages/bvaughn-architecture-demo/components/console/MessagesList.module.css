@@ -11,16 +11,29 @@
   opacity: 0.5;
 }
 
-.CountRow,
-.OverflowRow {
+.CountRow {
+  background-color: var(--background-color-contrast-2);
   padding: 0.5rem 1rem;
 }
 
 .OverflowRow {
-  background-color: var(--color-error);
-  color: var(--color-contrast);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--background-color-error);
+  color: var(--color-error);
 }
 
-.CountRow {
-  background-color: var(--background-color-contrast-2);
+.OverflowRowIcon {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: 0 0 1.5rem;
+}
+
+.OverflowLink {
+  color: var(--color-error);
+}
+.OverflowLink:hover {
+  text-decoration: none;
 }
