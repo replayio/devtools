@@ -2,7 +2,7 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { PauseContext } from "@bvaughn/src/contexts/PauseContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
@@ -31,7 +31,7 @@ function PointInstanceRenderer({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { pauseId: currentPauseId } = useContext(PauseContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   useLayoutEffect(() => {
     if (isFocused) {
@@ -39,7 +39,7 @@ function PointInstanceRenderer({
     }
   }, [isFocused]);
 
-  const { isRemote, pauseId, values } = runAnalysis(
+  const { executionPoint, isRemote, pauseId, time, values } = runAnalysis(
     client,
     logPointInstance.point.location,
     logPointInstance.timeStampedHitPoint,
@@ -51,7 +51,7 @@ function PointInstanceRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  if (currentPauseId === pauseId) {
+  if (currentExecutionPoint === executionPoint) {
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
@@ -105,10 +105,10 @@ function PointInstanceRenderer({
       {primaryContent}
       {isHovered && (
         <MessageHoverButton
-          pauseId={pauseId}
+          executionPoint={executionPoint}
           showAddCommentButton={false}
           targetRef={ref}
-          timeStampedPoint={logPointInstance.timeStampedHitPoint}
+          time={time}
         />
       )}
     </div>

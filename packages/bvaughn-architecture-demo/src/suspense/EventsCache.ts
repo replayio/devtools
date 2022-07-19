@@ -1,4 +1,11 @@
-import { EventHandlerType, Frame, Location, Object, PauseId } from "@replayio/protocol";
+import {
+  EventHandlerType,
+  ExecutionPoint,
+  Frame,
+  Location,
+  Object,
+  PauseId,
+} from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 import { STANDARD_EVENT_CATEGORIES } from "../constants";
 import { createWakeable } from "../utils/suspense";
@@ -23,6 +30,7 @@ export type EventTypeLog = {
   };
   location: Location[];
   pauseId: PauseId;
+  point: ExecutionPoint;
   time: number;
   values: any[];
 };
@@ -139,7 +147,7 @@ const MAPPER = `
     return finalData.frames.find((f) => f.frameId == frame);
   }
 
-  const { point, time, pauseId } = input;
+  const { time, pauseId, point } = input;
   const { frameId, location } = getTopFrame();
   const { result } = sendCommand("Pause.evaluateInFrame", {
     frameId,
@@ -183,6 +191,7 @@ const MAPPER = `
       value: {
         time,
         pauseId,
+        point,
         location,
         values,
         data: finalData,
