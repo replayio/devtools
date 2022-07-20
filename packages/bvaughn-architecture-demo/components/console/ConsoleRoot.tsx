@@ -2,7 +2,7 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import { Suspense, unstable_Offscreen as Offscreen, useRef, useState } from "react";
+import { ReactNode, Suspense, unstable_Offscreen as Offscreen, useRef, useState } from "react";
 
 import styles from "./ConsoleRoot.module.css";
 import FilterText from "./filters/FilterText";
@@ -13,14 +13,23 @@ import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
 import { LoggablesContextRoot } from "./LoggablesContext";
 
-export default function ConsoleRoot() {
+export default function ConsoleRoot({
+  showSearchInputByDefault = true,
+  terminalInput = null,
+}: {
+  showSearchInputByDefault?: boolean;
+  terminalInput?: ReactNode;
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(true);
   const messageListRef = useRef<HTMLElement>(null);
 
   return (
     <ConsoleFiltersContextRoot>
       <LoggablesContextRoot messageListRef={messageListRef}>
-        <SearchContextRoot messageListRef={messageListRef}>
+        <SearchContextRoot
+          messageListRef={messageListRef}
+          showSearchInputByDefault={showSearchInputByDefault}
+        >
           <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
             <div className={styles.TopRow}>
               <button
@@ -48,8 +57,10 @@ export default function ConsoleRoot() {
                     <MessagesList ref={messageListRef} />
                   </Suspense>
                 </ErrorBoundary>
-                <Search className={styles.Row} hideOnEscape={false} />
-                <Input className={styles.Row} />
+
+                {terminalInput}
+
+                <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
               </div>
             </div>
           </div>
