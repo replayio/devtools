@@ -11,7 +11,7 @@ import {
 // This context stores (in memory) messages logged to the Replay Console terminal while viewing a recording.
 
 export type TerminalMessage = {
-  content: string;
+  expression: string;
   id: number;
   frameId: FrameId | null;
   pauseId: PauseId | null;

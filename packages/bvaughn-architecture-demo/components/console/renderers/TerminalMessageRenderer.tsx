@@ -54,7 +54,7 @@ function TerminalMessageRenderer({
         <div className={styles.TerminalLogContents}>
           <div className={styles.LogContents}>
             <Icon className={styles.PromptIcon} type="prompt" />
-            <SyntaxHighlightedExpression expression={terminalMessage.content} />
+            <SyntaxHighlightedExpression expression={terminalMessage.expression} />
           </div>
           <div className={styles.LogContents}>
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
@@ -87,7 +87,7 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
     getPauseData(client, pauseId);
   }
 
-  const result = evaluate(client, pauseId, frameId, terminalMessage.content);
+  const result = evaluate(client, pauseId, frameId, terminalMessage.expression);
   const { exception, returned } = result;
   if (exception) {
     return (

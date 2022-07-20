@@ -35,12 +35,12 @@ export default function Input() {
         event.preventDefault();
 
         const input = ref.current!;
-        const content = input.value.trim();
-        if (content !== "") {
+        const expression = input.value.trim();
+        if (expression !== "") {
           input.value = "";
 
           addMessage({
-            content,
+            expression,
             frameId: null,
             pauseId: pauseId!,
             point: executionPoint || "",
