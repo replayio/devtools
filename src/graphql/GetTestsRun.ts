@@ -11,6 +11,12 @@ export interface GetTestsRun_node_Recording {
   __typename: "Recording";
 }
 
+export interface GetTestsRun_node_Workspace_testRuns_stats {
+  __typename: "TestRunStats";
+  passed: number | null;
+  failed: number | null;
+}
+
 export interface GetTestsRun_node_Workspace_testRuns_recordings_edges_node_comments_user {
   __typename: "User";
   id: string;
@@ -43,6 +49,14 @@ export interface GetTestsRun_node_Workspace_testRuns_recordings {
 export interface GetTestsRun_node_Workspace_testRuns {
   __typename: "TestRun";
   id: string | null;
+  branch: string | null;
+  commitId: string | null;
+  commitTitle: string | null;
+  mergeId: string | null;
+  mergeTitle: string | null;
+  user: string | null;
+  date: any | null;
+  stats: GetTestsRun_node_Workspace_testRuns_stats | null;
   recordings: GetTestsRun_node_Workspace_testRuns_recordings | null;
 }
 
