@@ -27,14 +27,19 @@ async function blackboxActors(
   isBlackBoxed: boolean,
   range?: Partial<SourceRange>
 ) {
+  // TODO Rework blackboxing to actually do something again
+  /*
   for (const actor of getSourceActorsForSource(state, sourceId)) {
     await client.blackBox(actor, isBlackBoxed, range);
   }
+  */
   return { isBlackBoxed: !isBlackBoxed };
 }
 
-export function toggleBlackBox(cx: Context, source: Source | SourceWithContent): UIThunkAction {
+export function toggleBlackBox(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState, { client }) => {
+    // TODO Re-enable blackboxing
+    /*
     const { isBlackBoxed } = source;
 
     if (!isBlackBoxed) {
@@ -47,5 +52,6 @@ export function toggleBlackBox(cx: Context, source: Source | SourceWithContent):
       source,
       [PROMISE]: blackboxActors(getState(), client, source.id, isBlackBoxed),
     });
+    */
   };
 }

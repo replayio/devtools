@@ -314,9 +314,12 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     }
 
     // if user clicks gutter to set breakpoint on blackboxed source, un-blackbox the source.
+    // TODO Re-enable blackboxing
+    /*
     if (selectedSource && selectedSource.isBlackBoxed) {
       toggleBlackBox(cx, selectedSource);
     }
+    */
 
     if (typeof line !== "number") {
       return;

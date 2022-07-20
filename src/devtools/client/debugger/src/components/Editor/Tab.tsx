@@ -169,6 +169,8 @@ class Tab extends PureComponent<FinalTabProps> {
           },
         },
       },
+      // TODO Re-enable blackboxing
+      /*
       {
         item: {
           ...tabMenuItems.toggleBlackBox,
@@ -177,6 +179,7 @@ class Tab extends PureComponent<FinalTabProps> {
           click: () => toggleBlackBox(cx, source),
         },
       },
+      */
     ];
 
     showMenu(e, buildMenu(items));

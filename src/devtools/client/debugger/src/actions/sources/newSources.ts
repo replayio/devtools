@@ -127,14 +127,18 @@ function restoreBlackBoxedSources(cx: Context, sources: Source[]): UIThunkAction
     if (tabs.length == 0) {
       return;
     }
+    // TODO Re-enable blackboxing
+    /*
     for (const source of sources) {
       if (tabs.includes(source.url!) && !source.isBlackBoxed) {
         dispatch(toggleBlackBox(cx, source));
       }
     }
+    */
   };
 }
 
+// TODO Delete this!
 export function newQueuedSources(sourceInfo: SourceInfo[]): UIThunkAction<Promise<void>> {
   return async dispatch => {
     const generated: SourceData[] = [];

@@ -95,7 +95,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     event.stopPropagation();
     event.preventDefault();
 
-    const menuOptions = [];
+    const menuOptions: $FixTypeLater[] = [];
 
     if (!isDirectory(item)) {
       // Flow requires some extra handling to ensure the value of contents.
@@ -112,14 +112,16 @@ class SourceTreeItem extends Component<FinalSTIProps> {
 
         const { cx, source } = this.props;
         if (source) {
+          // TODO Re-enable blackboxing
+          /*
           const blackBoxMenuItem = {
             id: "node-menu-blackbox",
             label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
             accesskey: source.isBlackBoxed ? "U" : "B",
             disabled: !shouldBlackbox(source),
             click: () => this.props.toggleBlackBox(cx, source),
-          };
-          menuOptions.push(copySourceUri2, blackBoxMenuItem);
+          };*/
+          menuOptions.push(copySourceUri2);
         }
       }
     }
@@ -177,6 +179,8 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       return <AccessibleImage className="folder" />;
     }
 
+    // TODO Re-enable blackboxing
+    /*
     if (source && source.isBlackBoxed) {
       return <AccessibleImage className="blackBox" />;
     }
@@ -184,6 +188,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     if (hasPrettySource) {
       return <AccessibleImage className="prettyPrint" />;
     }
+    */
 
     if (source) {
       return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;

@@ -420,6 +420,8 @@ export function getSourceClassnames(source?: Source) {
     return "prettyPrint";
   }
 
+  // TODO Re-enable blackboxing
+  /*
   if (source.isBlackBoxed) {
     return "blackBox";
   }
@@ -427,6 +429,7 @@ export function getSourceClassnames(source?: Source) {
   if (isUrlExtension(source.url)) {
     return "extension";
   }
+  */
 
   return sourceTypes[getFileExtension(source) as keyof typeof sourceTypes] || defaultClassName;
 }

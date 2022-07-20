@@ -1,4 +1,7 @@
 Test.describe(`Test stepping in blackboxed sources.`, async () => {
+  
+  // TODO Re-enable blackboxing
+  /*
   // Stepping forward while in a blackboxed source should act like a step out.
   await Test.addBreakpoint("blackbox.js", 3);
   await Test.rewindToLine(3);
@@ -25,4 +28,5 @@ Test.describe(`Test stepping in blackboxed sources.`, async () => {
   // to the non-blackboxed caller.
   await Test.rewindToLine(17);
   await Test.reverseStepOverToLine(15);
+  */
 });

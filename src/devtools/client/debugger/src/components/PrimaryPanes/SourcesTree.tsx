@@ -176,7 +176,8 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
       return path;
     }
 
-    const blackBoxedPart = source.isBlackBoxed ? ":blackboxed" : "";
+    // TODO Re-enable blackboxing
+    const blackBoxedPart = /*source.isBlackBoxed ? ":blackboxed" :*/ "";
 
     return `${path}/${source.id}/${blackBoxedPart}`;
   };

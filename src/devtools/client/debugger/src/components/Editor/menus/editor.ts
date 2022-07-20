@@ -33,6 +33,8 @@ const showSourceMenuItem = (cx: Context, selectedSource: Source, editorActions: 
   click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
+// TODO Re-enable blackboxing
+/*
 const blackBoxMenuItem = (cx: Context, selectedSource: Source, editorActions: EditorActions) => ({
   id: "node-menu-blackbox",
   label: selectedSource.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
@@ -40,6 +42,7 @@ const blackBoxMenuItem = (cx: Context, selectedSource: Source, editorActions: Ed
   disabled: !shouldBlackbox(selectedSource),
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
+*/
 
 const sourceMapItem = (cx: Context, selectedSource: Source, alternateSource: Source | null) => ({
   id: "node-menu-source-map",
@@ -71,7 +74,8 @@ export function editorMenuItems({
     copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    blackBoxMenuItem(cx, selectedSource, editorActions),
+    // TODO Re-enable blackboxing
+    // blackBoxMenuItem(cx, selectedSource, editorActions),
     sourceMapItem(cx, selectedSource, alternateSource)
   );
 
