@@ -11,28 +11,23 @@ export interface GetTestsRunsForWorkspace_node_Recording {
   __typename: "Recording";
 }
 
-export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings_edges_node {
-  __typename: "Recording";
-  uuid: any;
-  duration: number | null;
-  createdAt: any;
-  metadata: any | null;
-}
-
-export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings_edges {
-  __typename: "TestRunRecordingEdge";
-  node: GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings_edges_node;
-}
-
-export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings {
-  __typename: "TestRunRecordingConnection";
-  edges: GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings_edges[];
+export interface GetTestsRunsForWorkspace_node_Workspace_testRuns_stats {
+  __typename: "TestRunStats";
+  passed: number | null;
+  failed: number | null;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace_testRuns {
   __typename: "TestRun";
   id: string | null;
-  recordings: GetTestsRunsForWorkspace_node_Workspace_testRuns_recordings | null;
+  branch: string | null;
+  commitId: string | null;
+  commitTitle: string | null;
+  mergeId: string | null;
+  mergeTitle: string | null;
+  user: string | null;
+  date: any | null;
+  stats: GetTestsRunsForWorkspace_node_Workspace_testRuns_stats | null;
 }
 
 export interface GetTestsRunsForWorkspace_node_Workspace {
