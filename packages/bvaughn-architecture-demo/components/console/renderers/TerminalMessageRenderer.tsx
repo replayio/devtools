@@ -2,9 +2,14 @@ import Icon from "@bvaughn/components/Icon";
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
 import Loader from "@bvaughn/components/Loader";
+import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { TerminalMessage } from "@bvaughn/src/contexts/TerminalContext";
-import { evaluate, getPause, getPauseData } from "@bvaughn/src/suspense/PauseCache";
+import {
+  evaluate,
+  getPauseData,
+  getPauseForExecutionPoint,
+} from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { memo, Suspense, useContext, useLayoutEffect, useRef } from "react";
@@ -49,8 +54,7 @@ function TerminalMessageRenderer({
         <div className={styles.TerminalLogContents}>
           <div className={styles.LogContents}>
             <Icon className={styles.PromptIcon} type="prompt" />
-            {/* TODO (FE-337) Add simple syntax highlighting via some simple tokenizer */}
-            {terminalMessage.content}
+            <SyntaxHighlightedExpression expression={terminalMessage.content} />
           </div>
           <div className={styles.LogContents}>
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
@@ -76,7 +80,7 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
   let frameId = terminalMessage.frameId;
   let pauseId = terminalMessage.pauseId;
   if (pauseId === null) {
-    const pauseData = getPause(client, terminalMessage.point);
+    const pauseData = getPauseForExecutionPoint(client, terminalMessage.point);
     frameId = pauseData.stack?.[0] ?? null;
     pauseId = pauseData.pauseId;
   } else {

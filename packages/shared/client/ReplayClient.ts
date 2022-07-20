@@ -74,9 +74,6 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<EvaluationResult> {
     const sessionId = this.getSessionIdThrows();
 
-    // TODO (FE-337) Do we need to require a pauseId?
-    // We don't currently have them for events.
-
     if (frameId === null) {
       const response = await client.Pause.evaluateInGlobal(
         {

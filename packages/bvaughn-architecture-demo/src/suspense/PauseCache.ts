@@ -63,7 +63,7 @@ export function getPauseData(client: ReplayClientInterface, pauseId: PauseId) {
   }
 }
 
-export function getPause(
+export function getPauseForExecutionPoint(
   client: ReplayClientInterface,
   executionPoint: ExecutionPoint
 ): createPauseResult {
