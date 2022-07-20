@@ -15,7 +15,6 @@ import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import { getRecordingTarget } from "ui/reducers/app";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
-import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
@@ -49,7 +48,7 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     setModal("privacy");
   };
 
-  const isTest = recording.metadata.test;
+  const isTest = recording.metadata?.test;
   return (
     <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">

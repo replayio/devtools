@@ -1,4 +1,10 @@
 import { gql, useQuery, useMutation } from "@apollo/client";
+import { assert } from "protocol/utils";
+import {
+  CreateNewWorkspace,
+  CreateNewWorkspaceVariables,
+  CreateNewWorkspace_createWorkspace_workspace,
+} from "graphql/CreateNewWorkspace";
 import {
   CreateWorkspaceAPIKey,
   CreateWorkspaceAPIKeyVariables,
@@ -10,6 +16,7 @@ import {
 } from "graphql/DeleteWorkspaceAPIKey";
 import { GetNonPendingWorkspaces } from "graphql/GetNonPendingWorkspaces";
 import { GetPendingWorkspaces } from "graphql/GetPendingWorkspaces";
+import { GetWorkspaceApiKeys, GetWorkspaceApiKeysVariables } from "graphql/GetWorkspaceApiKeys";
 import {
   UpdateWorkspaceCodeDomainLimitations,
   UpdateWorkspaceCodeDomainLimitationsVariables,
@@ -26,18 +33,50 @@ import {
   SET_WORKSPACE_DEFAULT_PAYMENT_METHOD,
   UPDATE_WORKSPACE_MEMBER_ROLE,
 } from "ui/graphql/workspaces";
+import { PendingWorkspaceInvitation, Subscription, Workspace } from "ui/types";
+import { UpdateWorkspaceLogo, UpdateWorkspaceLogoVariables } from "graphql/UpdateWorkspaceLogo";
 import {
-  PartialWorkspaceSettingsFeatures,
-  PendingWorkspaceInvitation,
-  Subscription,
-  Workspace,
-  WorkspaceUserRole,
-} from "ui/types";
+  UpdateWorkspaceSettings,
+  UpdateWorkspaceSettingsVariables,
+} from "graphql/UpdateWorkspaceSettings";
+import {
+  UpdateWorkspaceMemberRole,
+  UpdateWorkspaceMemberRoleVariables,
+} from "graphql/UpdateWorkspaceMemberRole";
+import {
+  SetWorkspaceDefaultPaymentMethod,
+  SetWorkspaceDefaultPaymentMethodVariables,
+} from "graphql/SetWorkspaceDefaultPaymentMethod";
+import {
+  DeleteWorkspacePaymentMethod,
+  DeleteWorkspacePaymentMethodVariables,
+} from "graphql/DeleteWorkspacePaymentMethod";
+import {
+  GetWorkspaceSubscription,
+  GetWorkspaceSubscriptionVariables,
+} from "graphql/GetWorkspaceSubscription";
+import {
+  ActivateWorkspaceSubscription,
+  ActivateWorkspaceSubscriptionVariables,
+} from "graphql/ActivateWorkspaceSubscription";
+import {
+  CancelWorkspaceSubscription,
+  CancelWorkspaceSubscriptionVariables,
+} from "graphql/CancelWorkspaceSubscription";
+import {
+  PrepareWorkspacePaymentMethod,
+  PrepareWorkspacePaymentMethodVariables,
+} from "graphql/PrepareWorkspacePaymentMethod";
 
 const NO_WORKSPACES: Workspace[] = [];
 
-export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
-  const [createNewWorkspace, { error }] = useMutation<any, { name: string; planKey?: string }>(
+export function useCreateNewWorkspace(
+  onCompleted: (data: CreateNewWorkspace_createWorkspace_workspace) => void
+) {
+  const [createNewWorkspace, { error }] = useMutation<
+    CreateNewWorkspace,
+    CreateNewWorkspaceVariables
+  >(
     gql`
       mutation CreateNewWorkspace($name: String!, $planKey: String!) {
         createWorkspace(input: { name: $name, planKey: $planKey }) {
@@ -54,6 +93,7 @@ export function useCreateNewWorkspace(onCompleted: (data: any) => void) {
     {
       refetchQueries: ["GetNonPendingWorkspaces"],
       onCompleted: data => {
+        assert(data.createWorkspace.workspace);
         onCompleted(data.createWorkspace.workspace);
       },
     }
@@ -99,7 +139,7 @@ export function useGetPendingWorkspaces() {
   let pendingWorkspaces: PendingWorkspaceInvitation[] | undefined = undefined;
   if (data?.viewer) {
     pendingWorkspaces = data.viewer.workspaceInvitations.edges.map(
-      ({ node: { workspace, inviterEmail } }: any) => ({
+      ({ node: { workspace, inviterEmail } }) => ({
         ...workspace,
         inviterEmail,
       })
@@ -126,13 +166,7 @@ export function useGetWorkspace(workspaceId: string | null): {
 }
 
 export function useUpdateWorkspaceLogo() {
-  const [updateWorkspaceLogo] = useMutation<
-    any,
-    {
-      workspaceId: string;
-      logo: string | null;
-    }
-  >(
+  const [updateWorkspaceLogo] = useMutation<UpdateWorkspaceLogo, UpdateWorkspaceLogoVariables>(
     gql`
       mutation UpdateWorkspaceLogo($workspaceId: ID!, $logo: String) {
         updateWorkspaceLogo(input: { workspaceId: $workspaceId, logo: $logo }) {
@@ -150,14 +184,8 @@ export function useUpdateWorkspaceLogo() {
 
 export function useUpdateWorkspaceSettings() {
   const [updateWorkspaceSettings] = useMutation<
-    any,
-    {
-      workspaceId: string;
-      name?: string | null;
-      logo?: string | null;
-      motd?: string | null;
-      features?: PartialWorkspaceSettingsFeatures;
-    }
+    UpdateWorkspaceSettings,
+    UpdateWorkspaceSettingsVariables
   >(
     gql`
       mutation UpdateWorkspaceSettings(
@@ -241,9 +269,18 @@ export function useGetNonPendingWorkspaces(): { workspaces: Workspace[]; loading
 
   let workspaces: Workspace[] = NO_WORKSPACES;
   if (data?.viewer) {
-    workspaces = data.viewer.workspaces.edges.map(({ node }: any) => {
-      const members = node.members.edges.map(({ node }: any) => node.user);
-      return { ...node, members };
+    workspaces = data.viewer.workspaces.edges.map(({ node }) => {
+      const members = node.members?.edges
+        .filter(({ node }) => "user" in node)
+        .map(({ node }) => {
+          assert("user" in node, "No user in workspace member");
+          return node.user;
+        });
+      return {
+        ...node,
+        subscription: node.subscription as Subscription | null,
+        members,
+      };
     });
   }
 
@@ -292,7 +329,7 @@ export function useDeleteWorkspace() {
 }
 
 export function useGetWorkspaceApiKeys(workspaceId: string) {
-  const { data, loading, error } = useQuery<{ node: Pick<Required<Workspace>, "apiKeys"> }>(
+  const { data, loading, error } = useQuery<GetWorkspaceApiKeys, GetWorkspaceApiKeysVariables>(
     GET_WORKSPACE_API_KEYS,
     {
       variables: { workspaceId },
@@ -326,8 +363,8 @@ export function useDeleteWorkspaceApiKey() {
 
 export function useUpdateWorkspaceMemberRole() {
   const [updateWorkspaceMemberRole, { loading, error }] = useMutation<
-    any,
-    { id: string; roles: WorkspaceUserRole[] }
+    UpdateWorkspaceMemberRole,
+    UpdateWorkspaceMemberRoleVariables
   >(UPDATE_WORKSPACE_MEMBER_ROLE, {
     refetchQueries: ["GetWorkspaceMembers"],
   });
@@ -335,22 +372,20 @@ export function useUpdateWorkspaceMemberRole() {
   return { updateWorkspaceMemberRole, loading, error };
 }
 
-export function useActivateWorkspaceSubscription(workspaceId: string) {
-  const [activateWorkspaceSubscription, { loading, error }] = useMutation<{
-    activateWorkspaceSubscription: {
-      subscription: Pick<Subscription, "status" | "effectiveUntil">;
-    };
-  }>(ACTIVATE_WORKSPACE_SUBSCRIPTION, {
-    variables: { workspaceId },
-  });
+export function useActivateWorkspaceSubscription() {
+  const [activateWorkspaceSubscription, { loading, error }] = useMutation<
+    ActivateWorkspaceSubscription,
+    ActivateWorkspaceSubscriptionVariables
+  >(ACTIVATE_WORKSPACE_SUBSCRIPTION);
 
   return { activateWorkspaceSubscription, loading, error };
 }
 
 export function useGetWorkspaceSubscription(workspaceId: string) {
-  const { data, loading, error, refetch } = useQuery<{
-    node: Pick<Required<Workspace>, "subscription">;
-  }>(GET_WORKSPACE_SUBSCRIPTION, {
+  const { data, loading, error, refetch } = useQuery<
+    GetWorkspaceSubscription,
+    GetWorkspaceSubscriptionVariables
+  >(GET_WORKSPACE_SUBSCRIPTION, {
     variables: { workspaceId },
   });
 
@@ -359,8 +394,8 @@ export function useGetWorkspaceSubscription(workspaceId: string) {
 
 export function useCancelWorkspaceSubscription() {
   const [cancelWorkspaceSubscription, { loading, error }] = useMutation<
-    Subscription,
-    { workspaceId: string }
+    CancelWorkspaceSubscription,
+    CancelWorkspaceSubscriptionVariables
   >(CANCEL_WORKSPACE_SUBSCRIPTION, {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
@@ -370,8 +405,8 @@ export function useCancelWorkspaceSubscription() {
 
 export function usePrepareWorkspacePaymentMethod() {
   const [prepareWorkspacePaymentMethod, { loading, error }] = useMutation<
-    { prepareWorkspacePaymentMethod: { paymentSecret: string } },
-    { workspaceId: string }
+    PrepareWorkspacePaymentMethod,
+    PrepareWorkspacePaymentMethodVariables
   >(PREPARE_WORKSPACE_PAYMENT_METHOD, {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
@@ -381,8 +416,8 @@ export function usePrepareWorkspacePaymentMethod() {
 
 export function useSetWorkspaceDefaultPaymentMethod() {
   const [setWorkspaceDefaultPaymentMethod, { loading, error }] = useMutation<
-    any,
-    { workspaceId: string; paymentMethodId: string }
+    SetWorkspaceDefaultPaymentMethod,
+    SetWorkspaceDefaultPaymentMethodVariables
   >(SET_WORKSPACE_DEFAULT_PAYMENT_METHOD, {
     refetchQueries: ["GetWorkspaceSubscription"],
   });
@@ -392,8 +427,8 @@ export function useSetWorkspaceDefaultPaymentMethod() {
 
 export function useDeleteWorkspacePaymentMethod() {
   const [deleteWorkspacePaymentMethod, { loading, error }] = useMutation<
-    any,
-    { workspaceId: string; paymentMethodId: string }
+    DeleteWorkspacePaymentMethod,
+    DeleteWorkspacePaymentMethodVariables
   >(DELETE_WORKSPACE_PAYMENT_METHOD, {
     refetchQueries: ["GetWorkspaceSubscription"],
   });

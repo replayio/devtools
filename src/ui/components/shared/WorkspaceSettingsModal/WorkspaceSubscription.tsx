@@ -14,6 +14,7 @@ import { DeleteConfirmation } from "./DeleteConfirmation";
 import { Details } from "./Details";
 import { PricingPage } from "./PricingPage";
 import { getSubscriptionWithPricing, Views } from "./utils";
+import { Subscription } from "ui/types";
 
 // By default, we use the test key for local development and the live key
 // otherwise. Setting RECORD_REPLAY_STRIPE_LIVE to a truthy value will force
@@ -34,7 +35,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
   const [resubscribe, setResubscribe] = useState(false);
   const { workspace, loading: wsLoading } = hooks.useGetWorkspace(workspaceId);
   const { data, loading, error, refetch } = hooks.useGetWorkspaceSubscription(workspaceId);
-  const { activateWorkspaceSubscription } = hooks.useActivateWorkspaceSubscription(workspaceId);
+  const { activateWorkspaceSubscription } = hooks.useActivateWorkspaceSubscription();
 
   // clear the confirmed state if changing views
   useEffect(() => {
@@ -54,20 +55,26 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     }
   });
 
-  if (loading || !data || wsLoading || !workspace) {
+  if (loading || !data?.node || wsLoading || !workspace) {
     return null;
   }
+  assert("subscription" in data.node, "No subscription in GetWorkspaceSubscription response");
 
   const handleResubscribe = async () => {
     try {
+      assert(
+        data.node && "subscription" in data.node,
+        "No subscription in GetWorkspaceSubscription response"
+      );
       const subscription = data.node.subscription;
-      const planKey = subscription.plan.key;
+      const planKey = subscription?.plan?.key;
       assert(planKey, "Workspace does not have a planKey");
 
       if (subscription.paymentMethods?.length) {
         assert(subscription.paymentMethods?.[0]?.id, "Payment method was not found");
         await activateWorkspaceSubscription({
           variables: {
+            workspaceId,
             planKey,
             paymentMethodBillingId: subscription.paymentMethods[0].id,
           },
@@ -94,7 +101,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     paymentMethodBillingId: PaymentMethod | string | null;
   }) => {
     try {
-      const planKey = workspace.subscription?.plan.key;
+      const planKey = workspace.subscription?.plan?.key;
       assert(planKey, "Workspace does not have a planKey");
 
       setView("details");
@@ -104,8 +111,9 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
       if (resubscribe) {
         await activateWorkspaceSubscription({
           variables: {
+            workspaceId,
             planKey,
-            paymentMethodBillingId,
+            paymentMethodBillingId: paymentMethodBillingId as any,
           },
         });
       }
@@ -146,7 +154,7 @@ export default function WorkspaceSubscription({ workspaceId }: { workspaceId: st
     );
   }
 
-  const subscriptionWithPricing = getSubscriptionWithPricing(subscription);
+  const subscriptionWithPricing = getSubscriptionWithPricing(subscription as Subscription);
 
   return (
     <section className="space-y-6 overflow-y-auto" style={{ marginRight: -16, paddingRight: 16 }}>

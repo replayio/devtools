@@ -13,7 +13,10 @@ import styles from "../../../../Library.module.css";
 import { useGetUserPermissions } from "ui/hooks/users";
 import { TestResult } from "./TestResult";
 
-export function getDurationString(durationMs: number) {
+export function getDurationString(durationMs: number | null | undefined) {
+  if (typeof durationMs !== "number") {
+    return "";
+  }
   const seconds = Math.round(durationMs / 1000);
   return `${seconds} sec`;
 }
@@ -53,7 +56,7 @@ export function getRelativeDate(date: string, truncate: boolean = false) {
   return content;
 }
 
-function ReplayTitle({ title }: { title?: string }) {
+function ReplayTitle({ title }: { title?: string | null }) {
   return (
     <div className={`${styles.replayTitle} overflow-hidden overflow-ellipsis whitespace-pre`}>
       {title || <span className="italic">Untitled</span>}

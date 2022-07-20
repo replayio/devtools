@@ -30,7 +30,7 @@ function ViewReplay({ recordingId, passed }: { recordingId: string; passed: bool
 
 function Title({ recording }: { recording: Recording }) {
   const { teamId } = useContext(TeamContext);
-  const path = `${JSON.stringify(recording.metadata.test!.path)}`;
+  const path = JSON.stringify(recording.metadata?.test?.path || []);
 
   return (
     <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
@@ -40,10 +40,10 @@ function Title({ recording }: { recording: Recording }) {
             className="overflow-hidden text-left whitespace-pre max-w-min overflow-ellipsis hover:underline"
             onClick={e => e.stopPropagation()}
           >
-            {recording.metadata.test?.title}
+            {recording.metadata?.test?.title}
           </a>
         </Link>
-        <div className="text-xs text-gray-500">{recording.metadata.test?.file}</div>
+        <div className="text-xs text-gray-500">{recording.metadata?.test?.file}</div>
       </div>
     </div>
   );
@@ -64,7 +64,7 @@ function Comments({ recording }: { recording: Recording }) {
 
 export function TestResultListItem({ recording }: { recording: Recording }) {
   const { metadata } = recording;
-  const passed = metadata.test?.result === "passed";
+  const passed = metadata?.test?.result === "passed";
   const recordingId = recording.id;
 
   // This keeps the navigation logic in JS instead of in a <a> tag. Otherwise,

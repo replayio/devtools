@@ -20,6 +20,7 @@ import { WorkspaceMembers } from "../WorkspaceSettingsModal/WorkspaceSettingsMod
 import InvitationLink from "./InvitationLink";
 import { useConfirm } from "../Confirm";
 import { useRedirectToTeam } from "ui/components/Library/Team/utils";
+import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 
 function ModalButton({
   children,
@@ -154,7 +155,7 @@ function SlideBody1({ hideModal, setNewWorkspace, setCurrent, total, current }: 
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
-  function onNewWorkspaceCompleted(workspace: Workspace) {
+  function onNewWorkspaceCompleted(workspace: CreateNewWorkspace_createWorkspace_workspace) {
     setNewWorkspace(workspace);
     updateDefaultWorkspace({
       variables: {

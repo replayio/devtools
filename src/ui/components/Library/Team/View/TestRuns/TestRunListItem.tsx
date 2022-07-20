@@ -27,7 +27,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
   return (
     <div className={`flex flex-row items-center text-xs font-light`}>
       <AttributeContainer icon="schedule">{getTruncatedRelativeDate(date)}</AttributeContainer>
-      <AttributeContainer icon="person">{user}</AttributeContainer>
+      <AttributeContainer icon="person">{user || ""}</AttributeContainer>
       {mergeId && (
         <AttributeContainer title={mergeTitle} icon="merge_type">
           {mergeId}
@@ -35,7 +35,7 @@ function Attributes({ testRun }: { testRun: TestRun }) {
       )}
       {!mergeId && (
         <AttributeContainer maxWidth="160px" icon="fork_right">
-          {branch}
+          {branch || ""}
         </AttributeContainer>
       )}
     </div>
@@ -53,7 +53,7 @@ function Status({ failCount }: { failCount: number }) {
 export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClick: () => void }) {
   const { focusId } = useContext(TestRunsContext);
   const { teamId } = useContext(TeamContext);
-  const failCount = testRun.stats.failed;
+  const failCount = testRun.stats?.failed || 0;
   const isSelected = focusId === testRun.id;
 
   return (

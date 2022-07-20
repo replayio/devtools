@@ -91,7 +91,7 @@ const OrganizationSettings = ({ workspaceId }: { workspaceId: string }) => {
 
   useEffect(() => {
     if (workspace) {
-      resetMessage(workspace.settings.motd || "");
+      resetMessage(workspace.settings?.motd || "");
     }
     // workspace can referentially change from polling for changes without the
     // workspace actually having changed so we're tying this hook invocation to

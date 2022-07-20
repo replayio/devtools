@@ -8,7 +8,11 @@ import PortalDropdown from "../shared/PortalDropdown";
 
 import { personalWorkspace } from "./libraryConstants";
 
-const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: string }) => {
+const TeamSelectButton = ({
+  selectedWorkspaceName,
+}: {
+  selectedWorkspaceName: string | undefined;
+}) => {
   return (
     <div className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-jellyfishBgcolor py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
       <span className="block truncate">{selectedWorkspaceName}</span>
@@ -21,7 +25,7 @@ const TeamSelectButton = ({ selectedWorkspaceName }: { selectedWorkspaceName: st
 
 interface DisplayedWorkspace {
   id: string;
-  name: string;
+  name?: string;
 }
 
 export default function TeamSelect({
@@ -64,7 +68,7 @@ export default function TeamSelect({
         <div className="max-h-48 overflow-auto">
           {displayedWorkspaces.map(workspace => (
             <DropdownItem onClick={() => handleSelect(workspace)} key={workspace.id}>
-              {workspace.name}
+              {workspace.name || ""}
             </DropdownItem>
           ))}
         </div>

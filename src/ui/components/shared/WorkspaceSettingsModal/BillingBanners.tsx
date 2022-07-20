@@ -24,7 +24,7 @@ export function BillingBanners({
     );
   }
 
-  if (subscription?.plan.key === "beta-v1") {
+  if (subscription?.plan?.key === "beta-v1") {
     return (
       <Banner icon={<span className="text-3xl">😍</span>} type="primary">
         We’ve gifted you a team plan for being a beta tester. Thank you!

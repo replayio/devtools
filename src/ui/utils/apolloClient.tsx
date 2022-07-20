@@ -1,4 +1,3 @@
-import { DocumentNode } from "graphql";
 import { defer } from "protocol/utils";
 import { memoizeLast } from "devtools/client/debugger/src/utils/memoizeLast";
 import {
@@ -9,6 +8,9 @@ import {
   HttpLink,
   ApolloError,
   split,
+  OperationVariables,
+  QueryOptions,
+  MutationOptions,
 } from "@apollo/client";
 import { getMainDefinition } from "@apollo/client/utilities";
 import { GraphQLWsLink } from "@apollo/client/link/subscriptions";
@@ -20,25 +22,21 @@ import { isE2ETest } from "ui/utils/environment";
 
 export let clientWaiter = defer<ApolloClient<NormalizedCacheObject>>();
 
-export async function query({ variables = {}, query }: { variables: any; query: DocumentNode }) {
+export async function query<TData = any, TVariables = OperationVariables>(
+  options: QueryOptions<TVariables, TData>
+) {
   const apolloClient = await clientWaiter.promise;
-  return await apolloClient.query({ variables, query });
+  return await apolloClient.query<TData, TVariables>(options);
 }
 
-export async function mutate({
-  variables = {},
-  mutation,
-  refetchQueries,
-}: {
-  variables: any;
-  mutation: DocumentNode;
-  refetchQueries?: any;
-}) {
+export async function mutate<TData = any, TVariables = OperationVariables>(
+  options: MutationOptions<TData, TVariables>
+) {
   if (isE2ETest()) {
     return;
   }
   const apolloClient = await clientWaiter.promise;
-  return await apolloClient.mutate({ variables, mutation, refetchQueries });
+  return await apolloClient.mutate<TData, TVariables>(options);
 }
 
 export const createApolloClient = memoizeLast(function (

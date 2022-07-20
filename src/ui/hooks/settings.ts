@@ -1,9 +1,8 @@
-const Services = require("devtools/shared/services");
 import { gql, useQuery, useMutation, DocumentNode } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
 import { SettingItemKey } from "ui/components/shared/SettingsModal/types";
 import useAuth0 from "ui/utils/useAuth0";
-import type { ExperimentalUserSettings } from "../types";
+import type { ApiKey, ExperimentalUserSettings } from "../types";
 import { ADD_USER_API_KEY, DELETE_USER_API_KEY, GET_USER_SETTINGS } from "ui/graphql/settings";
 import { features, prefs } from "ui/utils/prefs";
 import { prefs as prefsService } from "devtools/shared/services";
@@ -45,7 +44,7 @@ const testSettings: ExperimentalUserSettings = {
 };
 
 export async function getUserSettings(): Promise<ExperimentalUserSettings> {
-  const result = await query({ query: GET_USER_SETTINGS, variables: {} });
+  const result = await query<GetUserSettings>({ query: GET_USER_SETTINGS });
 
   if (isTest()) {
     return testSettings;
@@ -125,19 +124,19 @@ export const useStringPref = (prefKey: keyof typeof prefs) => {
   };
 };
 
-function convertUserSettings(data: any): ExperimentalUserSettings {
+function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUserSettings {
   if (!data?.viewer) {
     return emptySettings;
   }
 
   const settings = data.viewer.settings;
   return {
-    apiKeys: data.viewer.apiKeys,
+    apiKeys: data.viewer.apiKeys as ApiKey[],
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
-    enableLargeText: settings.enableLargeText,
+    enableLargeText: false,
   };
 }
 

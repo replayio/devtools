@@ -1,29 +1,48 @@
 import { gql, useQuery } from "@apollo/client";
+import {
+  GetTest,
+  GetTestVariables,
+  GetTest_node_Workspace_tests,
+  GetTest_node_Workspace_tests_recordings,
+} from "graphql/GetTest";
+import { GetTestsForWorkspace, GetTestsForWorkspaceVariables } from "graphql/GetTestsForWorkspace";
+import {
+  GetTestsRun,
+  GetTestsRunVariables,
+  GetTestsRun_node_Workspace_testRuns,
+  GetTestsRun_node_Workspace_testRuns_recordings,
+} from "graphql/GetTestsRun";
+import {
+  GetTestsRunsForWorkspace,
+  GetTestsRunsForWorkspaceVariables,
+  GetTestsRunsForWorkspace_node_Workspace_testRuns,
+} from "graphql/GetTestsRunsForWorkspace";
 import orderBy from "lodash/orderBy";
+import { assert } from "protocol/utils";
 import { WorkspaceId } from "ui/state/app";
-import { Recording, SourceCommit } from "ui/types";
+import { Recording } from "ui/types";
 
 export interface Test {
-  title: string;
-  path: string[];
+  title: string | null;
+  path: string[] | null;
   date: string;
   recordings: Recording[];
 }
 
 export interface TestRunStats {
-  passed: number;
-  failed: number;
+  passed: number | null;
+  failed: number | null;
 }
 export interface TestRun {
-  id: string;
-  commitTitle: string;
-  commitId: string;
-  mergeTitle: string;
-  mergeId: string;
-  user: string;
+  id: string | null;
+  commitTitle: string | null;
+  commitId: string | null;
+  mergeTitle: string | null;
+  mergeId: string | null;
+  user: string | null;
   date: string;
-  branch: string;
-  stats: TestRunStats;
+  branch: string | null;
+  stats: TestRunStats | null;
   recordings?: Recording[];
   triggerUrl?: string;
 }
@@ -140,8 +159,16 @@ const GET_TEST_RUN = gql`
   }
 `;
 
-function unwrapRecordingsData(recordings: any): Recording[] {
-  return recordings.edges.map((e: any) => ({
+function unwrapRecordingsData(
+  recordings:
+    | GetTest_node_Workspace_tests_recordings
+    | GetTestsRun_node_Workspace_testRuns_recordings
+    | null
+): Recording[] | undefined {
+  if (!recordings) {
+    return undefined;
+  }
+  return recordings.edges.map(e => ({
     ...e.node,
     id: e.node.uuid,
     date: e.node.createdAt,
@@ -153,16 +180,17 @@ export function useGetTestForWorkspace(
   workspaceId: string
 ): { test: Test | null; loading: boolean } {
   const serializedPath = encodeURIComponent(JSON.stringify(path));
-  const { data, loading } = useQuery(GET_TEST, {
+  const { data, loading } = useQuery<GetTest, GetTestVariables>(GET_TEST, {
     variables: { path: serializedPath, workspaceId },
   });
 
-  if (loading) {
+  if (loading || !data?.node) {
     return { test: null, loading };
   }
+  assert("tests" in data.node, "No tests in GetTest response");
 
   return {
-    test: convertTest(data.node.tests[0]),
+    test: convertTest(data.node.tests?.[0]),
     loading,
   };
 }
@@ -174,15 +202,16 @@ export function useGetTestRunForWorkspace(
   testRun: TestRun | null;
   loading: boolean;
 } {
-  const { data, loading } = useQuery(GET_TEST_RUN, {
+  const { data, loading } = useQuery<GetTestsRun, GetTestsRunVariables>(GET_TEST_RUN, {
     variables: { id: testRunId, workspaceId },
   });
 
-  if (loading) {
+  if (loading || !data?.node) {
     return { testRun: null, loading };
   }
+  assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-  const testRun = data.node.testRuns[0];
+  const testRun = data.node.testRuns?.[0];
 
   return {
     testRun: convertTestRun(testRun),
@@ -194,15 +223,18 @@ export function useGetTestsForWorkspace(workspaceId: WorkspaceId): {
   tests: Test[] | null;
   loading: boolean;
 } {
-  const { data, loading } = useQuery(GET_TESTS_FOR_WORKSPACE, {
-    variables: { workspaceId },
-  });
+  const { data, loading } = useQuery<GetTestsForWorkspace, GetTestsForWorkspaceVariables>(
+    GET_TESTS_FOR_WORKSPACE,
+    {
+      variables: { workspaceId },
+    }
+  );
 
-  if (loading) {
+  if (loading || !data?.node || !("tests" in data.node) || !data.node.tests) {
     return { tests: null, loading };
   }
 
-  const tests = data.node.tests.map(convertTest);
+  const tests = data.node.tests.map(test => convertTest(test)!);
   const sortedTests = orderBy(tests, ["date"], ["desc"]);
 
   return {
@@ -211,7 +243,10 @@ export function useGetTestsForWorkspace(workspaceId: WorkspaceId): {
   };
 }
 
-function convertTest(test: Test) {
+function convertTest(test: GetTest_node_Workspace_tests | undefined) {
+  if (!test) {
+    return null;
+  }
   const recordings = unwrapRecordingsData(test.recordings);
   const sortedRecordings = orderBy(recordings, "date", "desc");
   const firstRecording = sortedRecordings[0];
@@ -227,15 +262,19 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
   testRuns: TestRun[] | null;
   loading: boolean;
 } {
-  const { data, loading } = useQuery(GET_TEST_RUNS_FOR_WORKSPACE, {
-    variables: { workspaceId },
-  });
+  const { data, loading } = useQuery<GetTestsRunsForWorkspace, GetTestsRunsForWorkspaceVariables>(
+    GET_TEST_RUNS_FOR_WORKSPACE,
+    {
+      variables: { workspaceId },
+    }
+  );
 
-  if (loading) {
+  if (loading || !data?.node) {
     return { testRuns: null, loading };
   }
+  assert("testRuns" in data.node, "No testRuns in GetTestsRun response");
 
-  const testRuns = data.node.testRuns.map(convertTestRun);
+  const testRuns = data.node.testRuns?.map(testRun => convertTestRun(testRun)!);
   const sortedTestRuns = orderBy(testRuns, "date", "desc");
 
   return {
@@ -244,8 +283,16 @@ export function useGetTestRunsForWorkspace(workspaceId: WorkspaceId): {
   };
 }
 
-function convertTestRun(testRun: any) {
-  const recordings = testRun.recordings ? unwrapRecordingsData(testRun.recordings) : [];
+function convertTestRun(
+  testRun:
+    | GetTestsRun_node_Workspace_testRuns
+    | GetTestsRunsForWorkspace_node_Workspace_testRuns
+    | undefined
+): TestRun | null {
+  if (!testRun) {
+    return null;
+  }
+  const recordings = "recordings" in testRun ? unwrapRecordingsData(testRun.recordings) : [];
   const sortedRecordings = orderBy(recordings, "date", "desc");
   const firstRecording = sortedRecordings[0];
 

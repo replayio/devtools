@@ -177,7 +177,7 @@ export function launchAndRecordUrl(url: string) {
 }
 
 // Strip the URL of any query parameters
-export function getDisplayedUrl(url: string) {
+export function getDisplayedUrl(url: string | undefined) {
   if (!url) {
     return "";
   }

@@ -1,8 +1,8 @@
 export interface User {
-  name: string;
-  picture: string;
-  id: string;
-  internal: boolean;
+  name?: string | null;
+  picture?: string | null;
+  id?: string;
+  internal?: boolean;
 }
 
 export type ExperimentalUserSettings = {
@@ -77,20 +77,20 @@ type PlanKey =
   | "org-annual-v1";
 
 export interface Subscription {
-  id: string;
-  createdAt: string;
-  seatCount: number;
+  id?: string;
+  createdAt?: string;
+  seatCount?: number;
   effectiveFrom?: string;
-  effectiveUntil: string;
-  createdBy: User;
-  status: WorkspaceSubscriptionStatus;
-  trialEnds: string | null;
-  plan: {
-    id: string;
-    name: string;
+  effectiveUntil?: string;
+  createdBy?: User;
+  status: WorkspaceSubscriptionStatus | null;
+  trialEnds?: string | null;
+  plan?: {
+    id?: string;
+    name?: string;
     key: PlanKey;
-    createdAt: string;
-  };
+    createdAt?: string;
+  } | null;
   paymentMethods?: PaymentMethod[];
 }
 
@@ -123,23 +123,23 @@ export enum RecordingRole {
 
 export interface Recording {
   id: string;
-  url: string;
-  title: string;
-  duration: number;
+  url?: string;
+  title?: string | null;
+  duration: number | null;
   date: string;
-  private: boolean;
-  ownerNeedsInvite: boolean;
-  user?: User;
+  private?: boolean;
+  ownerNeedsInvite?: boolean;
+  user?: User | null;
   userId?: string;
-  isInitialized: boolean;
+  isInitialized?: boolean;
   workspace?: Workspace;
   collaborators?: string[];
   comments?: any;
   userRole?: RecordingRole;
   operations?: OperationsData;
-  resolution: { resolvedAt: string; resolvedBy: string };
-  collaboratorRequests: CollaboratorRequest[];
-  metadata: RecordingMetadata;
+  resolution?: { resolvedAt: string; resolvedBy: string };
+  collaboratorRequests?: CollaboratorRequest[] | null;
+  metadata?: RecordingMetadata;
 }
 
 export interface RecordingMetadata {
@@ -207,19 +207,19 @@ export interface PendingWorkspaceInvitation extends Workspace {
 
 export interface Workspace {
   apiKeys?: ApiKey[];
-  logo?: string;
-  domain: string;
-  hasPaymentMethod: boolean;
+  logo?: string | null;
+  domain?: string | null;
+  hasPaymentMethod?: boolean;
   id: string;
-  invitationCode: string;
-  isDomainLimitedCode: boolean;
+  invitationCode?: string | null;
+  isDomainLimitedCode?: boolean | null;
   members?: User[];
-  name: string;
+  name?: string;
   recordingCount?: number;
-  settings: WorkspaceSettings;
-  subscription?: Subscription;
-  isOrganization: boolean;
-  isTest: boolean;
+  settings?: WorkspaceSettings | null;
+  subscription?: Subscription | null;
+  isOrganization?: boolean;
+  isTest?: boolean;
 }
 
 export interface WorkspaceSettings {

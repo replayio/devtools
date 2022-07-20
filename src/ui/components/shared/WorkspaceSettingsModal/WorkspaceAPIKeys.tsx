@@ -1,5 +1,7 @@
+import { assert } from "protocol/utils";
 import React from "react";
 import hooks from "ui/hooks";
+import { ApiKey } from "ui/types";
 
 import APIKeys from "../APIKeys";
 
@@ -12,13 +14,14 @@ export default function WorkspaceAPIKeys({ workspaceId }: { workspaceId: string 
   const { deleteWorkspaceApiKey } = hooks.useDeleteWorkspaceApiKey();
   const { data } = hooks.useGetWorkspaceApiKeys(workspaceId);
 
-  if (!data) {
+  if (!data?.node) {
     return null;
   }
+  assert("apiKeys" in data.node, "No apiKeys in GetWorkspaceApiKeys response");
 
   return (
     <APIKeys
-      apiKeys={data.node.apiKeys}
+      apiKeys={data.node.apiKeys as ApiKey[]}
       description="API Keys allow you to upload recordings programmatically from your automated tests or from your continuous integration environment or upload source maps for sites that do not publish their source maps."
       loading={addLoading}
       error={addError}

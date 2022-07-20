@@ -20,7 +20,7 @@ const Row = ({ children }: { children: React.ReactNode }) => {
 };
 
 const useImageUpload = (
-  image: string | undefined,
+  image: string | null | undefined,
   maxSize: number,
   callback: (img: string) => void
 ) => {

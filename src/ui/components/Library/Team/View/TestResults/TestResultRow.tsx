@@ -33,9 +33,9 @@ function Status({ test }: { test: TestMetadata }) {
 }
 
 function Attributes({ recording }: { recording: Recording }) {
-  const user = recording.metadata.source?.trigger?.user;
-  const branch = recording.metadata.source?.branch;
-  const merge = recording.metadata.source?.merge;
+  const user = recording.metadata?.source?.trigger?.user;
+  const branch = recording.metadata?.source?.branch;
+  const merge = recording.metadata?.source?.merge;
   const date = recording.date;
 
   return (
