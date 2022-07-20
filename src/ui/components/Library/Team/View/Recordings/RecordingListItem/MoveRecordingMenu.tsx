@@ -40,7 +40,7 @@ export default function MoveRecordingMenu({
         ) : null}
         {availableWorkspaces.map(({ id, name }) => (
           <DropdownItem onClick={() => onMoveRecording(id)} key={id}>
-            {name}
+            {name || ""}
           </DropdownItem>
         ))}
       </div>

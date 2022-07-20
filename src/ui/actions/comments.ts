@@ -15,7 +15,7 @@ import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
 import { Action } from "redux";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
-import { ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
+import { AddCommentMutation, ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { Comment, Reply, SourceLocation, CommentOptions } from "ui/state/comments";
@@ -46,7 +46,7 @@ export function createComment(
 
     trackEvent("comments.create");
 
-    const response = await mutate({
+    await mutate<AddCommentMutation>({
       mutation: ADD_COMMENT_MUTATION,
       variables: {
         input: {
@@ -64,7 +64,6 @@ export function createComment(
         },
       },
     });
-    const id = response?.data?.addComment?.comment?.id;
 
     dispatch(setSelectedPrimaryPanel("comments"));
   };

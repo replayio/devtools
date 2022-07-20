@@ -9,6 +9,7 @@ import {
   UpdateCommentReplyContentVariables,
 } from "graphql/UpdateCommentReplyContent";
 import { GetComments, GetCommentsVariables } from "graphql/GetComments";
+import { GetCommentsTime, GetCommentsTimeVariables } from "graphql/GetCommentsTime";
 
 export function useGetComments(recordingId: RecordingId): {
   comments: Comment[];
@@ -23,10 +24,13 @@ export function useGetComments(recordingId: RecordingId): {
     console.error("Apollo error while fetching comments:", error);
   }
 
-  let comments = (data?.recording?.comments ?? []).map((comment: any) => ({
+  let comments = (data?.recording?.comments ?? []).map(comment => ({
     ...comment,
-    replies: comment.replies.map((reply: any) => ({
+    recordingId,
+    replies: comment.replies.map(reply => ({
       ...reply,
+      recordingId,
+      parentId: comment.id,
       hasFrames: comment.hasFrames,
       sourceLocation: comment.sourceLocation,
       time: comment.time,
@@ -100,7 +104,7 @@ export function useUpdateCommentReply() {
 export async function getFirstComment(
   recordingId: string
 ): Promise<{ time: number; point: string; hasFrames: boolean } | undefined> {
-  const commentsResult = await query({
+  const commentsResult = await query<GetCommentsTime, GetCommentsTimeVariables>({
     query: GET_COMMENTS_TIME,
     variables: { recordingId },
   });

@@ -20,7 +20,7 @@ import {
   RejectPendingInvitation,
   RejectPendingInvitationVariables,
 } from "graphql/RejectPendingInvitation";
-import { WorkspaceUser } from "ui/types";
+import { WorkspaceUser, WorkspaceUserRole } from "ui/types";
 
 export function useGetWorkspaceMembers(workspaceId: string) {
   const { data, loading, error } = useQuery<GetWorkspaceMembers, GetWorkspaceMembersVariables>(
@@ -71,7 +71,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
     }
   );
 
-  if (!workspaceId) {
+  if (!workspaceId || !data?.node || !("members" in data.node)) {
     return { members: [], loading: false };
   }
 
@@ -80,17 +80,16 @@ export function useGetWorkspaceMembers(workspaceId: string) {
   }
 
   let workspaceUsers: WorkspaceUser[] | undefined = undefined;
-  // @ts-ignore
-  const members = data?.node?.members;
+  const members = data.node.members;
   if (members) {
-    workspaceUsers = members.edges.map(({ node }: any) => {
+    workspaceUsers = members.edges.map(({ node }) => {
       if (node.__typename === "WorkspacePendingEmailMember") {
         return {
           membershipId: node.id,
           pending: true,
           email: node.email,
           createdAt: node.createdAt,
-          roles: node.roles,
+          roles: node.roles as WorkspaceUserRole[],
         };
       } else {
         return {
@@ -98,7 +97,7 @@ export function useGetWorkspaceMembers(workspaceId: string) {
           userId: node.user.id,
           pending: node.__typename === "WorkspacePendingUserMember",
           user: node.user,
-          roles: node.roles,
+          roles: node.roles as WorkspaceUserRole[],
         };
       }
     });

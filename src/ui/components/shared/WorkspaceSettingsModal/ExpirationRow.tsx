@@ -4,7 +4,7 @@ import { formatDate } from "./formatDate";
 import { isTrial } from "./utils";
 
 export function ExpirationRow({ subscription }: { subscription: Subscription }) {
-  if (subscription.plan.key.includes("beta") || !subscription.effectiveUntil) {
+  if (subscription.plan?.key.includes("beta") || !subscription.effectiveUntil) {
     return null;
   }
 

@@ -1,3 +1,4 @@
+import { assert } from "protocol/utils";
 import { PaymentMethod, PlanPricing, Subscription, SubscriptionWithPricing } from "ui/types";
 
 export type Views =
@@ -42,6 +43,7 @@ export const cardToDisplayType = (type: string) => {
 };
 
 export const pricingDetailsForSubscription = (subscription: Subscription): PlanPricing => {
+  assert(subscription.plan?.key, "Workspace does not have a planKey");
   switch (subscription.plan.key) {
     case "beta-v1":
     case "test-beta-v1":
@@ -105,7 +107,7 @@ const monthsPerCycle = (planPricing: SubscriptionWithPricing): number => {
 };
 
 const calcSubtotal = (planPricing: SubscriptionWithPricing): number => {
-  if (!planPricing.billingSchedule) {
+  if (!planPricing.billingSchedule || !planPricing.seatCount) {
     return 0;
   }
 

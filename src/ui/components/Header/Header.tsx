@@ -114,7 +114,7 @@ function HeaderTitle({
     }
 
     if (!editing) {
-      inputNode.current.innerText = hasTitle ? recording.title : "Untitled";
+      inputNode.current.innerText = hasTitle ? recording.title! : "Untitled";
     } else if (editing === EditState.Active && !hasTitle) {
       inputNode.current.innerText = "";
     } else if (editing === EditState.Saving && !inputNode.current.innerText) {

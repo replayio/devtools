@@ -6,7 +6,7 @@ import { AvatarImage } from "ui/components/Avatar";
 
 export interface CollaboratorDbData {
   collaborationId: string;
-  user: User;
+  user?: User;
   email?: string;
   createdAt: string;
 }
@@ -43,10 +43,10 @@ function Collaborator({
     iconAndName = (
       <>
         <div className="icon avatar">
-          <AvatarImage src={collaborator.user.picture} />
+          <AvatarImage src={collaborator.user?.picture} />
         </div>
         <div className="main">
-          <div className="name">{collaborator.user.name}</div>
+          <div className="name">{collaborator.user?.name}</div>
         </div>
       </>
     );
@@ -101,15 +101,15 @@ function Collaborators({ collaborators }: { collaborators: CollaboratorDbData[] 
 }
 
 export default function CollaboratorsList({
-  recording,
+  owner,
   collaborators,
 }: {
-  recording: Recording;
+  owner: User;
   collaborators: CollaboratorDbData[] | null;
 }) {
   return (
     <div className="permissions-list overflow-auto">
-      <Author user={recording.user} />
+      <Author user={owner} />
       {collaborators ? <Collaborators {...{ collaborators }} /> : null}
     </div>
   );

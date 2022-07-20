@@ -27,21 +27,21 @@ export interface Remark {
   id: string;
   // Unpublished remarks are only visible to their author.
   // Published comments are visible to everyone (who can view the recording).
-  isPublished: boolean;
+  isPublished: boolean | null;
   point: string;
   recordingId: RecordingId;
   sourceLocation: SourceLocation | null;
   time: number;
   updatedAt: string;
-  user: User;
+  user: User | null;
 }
 
 export interface Comment extends Remark {
   position: CommentPosition | null;
   networkRequestId: string | null;
-  primaryLabel?: string;
+  primaryLabel?: string | null;
   replies: Reply[];
-  secondaryLabel?: string;
+  secondaryLabel?: string | null;
 }
 
 export interface Reply extends Remark {

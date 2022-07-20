@@ -25,6 +25,7 @@ import { DownloadPage } from "./Onboarding/DownloadPage";
 import { DownloadingPage } from "./Onboarding/DownloadingPage";
 import { useRouter } from "next/router";
 import { useRedirectToTeam } from "../Library/Team/utils";
+import { CreateNewWorkspace_createWorkspace_workspace } from "graphql/CreateNewWorkspace";
 
 const DOWNLOAD_PAGE_INDEX = 4;
 
@@ -73,7 +74,7 @@ function TeamNamePage({
   const createNewWorkspace = hooks.useCreateNewWorkspace(onNewWorkspaceCompleted);
   const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
 
-  function onNewWorkspaceCompleted(workspace: Workspace) {
+  function onNewWorkspaceCompleted(workspace: CreateNewWorkspace_createWorkspace_workspace) {
     setNewWorkspace(workspace);
     updateDefaultWorkspace({
       variables: {

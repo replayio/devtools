@@ -17,15 +17,12 @@ import { GetUserId } from "graphql/GetUserId";
 import { GetUser } from "graphql/GetUser";
 
 export async function getUserId() {
-  const result = await query({
-    query: GET_USER_ID,
-    variables: {},
-  });
+  const result = await query<GetUserId>({ query: GET_USER_ID });
   return result?.data?.viewer?.user?.id;
 }
 
 export async function dismissNag(nag: Nag) {
-  await mutate({
+  await mutate<DismissNag, DismissNagVariables>({
     mutation: DISMISS_NAG,
     variables: { nag },
     refetchQueries: ["GetUser"],
@@ -51,8 +48,8 @@ export function useUserIsAuthor() {
 export type UserInfo = {
   motd: string | null;
   acceptedTOSVersion: number | null;
-  name: string;
-  picture: string;
+  name: string | null;
+  picture: string | null;
   email: string;
   id: string;
   internal: boolean;
@@ -86,10 +83,7 @@ export enum EmailSubscription {
 }
 
 export async function getUserInfo(): Promise<UserInfo | undefined> {
-  const result = await query({
-    query: GET_USER_INFO,
-    variables: {},
-  });
+  const result = await query<GetUser>({ query: GET_USER_INFO });
   const viewer = result?.data?.viewer;
   if (!viewer) {
     return undefined;
@@ -106,8 +100,8 @@ export async function getUserInfo(): Promise<UserInfo | undefined> {
     email: viewer.email,
     id: viewer.user.id,
     internal: viewer.internal,
-    nags: viewer.nags,
-    unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
+    nags: viewer.nags as Nag[],
+    unsubscribedEmailTypes: viewer.unsubscribedEmailTypes as EmailSubscription[],
     features: viewer.features || {},
   };
 }

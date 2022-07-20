@@ -102,7 +102,7 @@ function useGetPrivacyOptions(
     // to their library, or any team they belong to.
     options.push(
       <DropdownItem onClick={() => handleMoveToTeam(null)} key="option-private">
-        <DropdownItemContent icon="lock" selected={isPrivate && !workspaceId}>
+        <DropdownItemContent icon="lock" selected={!!isPrivate && !workspaceId}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Only people with access
           </span>
@@ -111,7 +111,7 @@ function useGetPrivacyOptions(
       <div key="option-team">
         {workspaces.map(({ id, name }) => (
           <DropdownItem onClick={() => handleMoveToTeam(id)} key={id}>
-            <DropdownItemContent icon="group" selected={isPrivate && id === workspaceId}>
+            <DropdownItemContent icon="group" selected={!!isPrivate && id === workspaceId}>
               <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
                 Members of {name}
               </span>
@@ -125,7 +125,7 @@ function useGetPrivacyOptions(
     // without moving the replay's team.
     options.push(
       <DropdownItem onClick={setPrivate} key="option-private">
-        <DropdownItemContent icon="group" selected={isPrivate}>
+        <DropdownItemContent icon="group" selected={!!isPrivate}>
           <span className="overflow-hidden overflow-ellipsis whitespace-pre text-xs">
             Members of {recording.workspace?.name || "this team"}
           </span>

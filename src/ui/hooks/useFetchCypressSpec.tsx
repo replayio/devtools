@@ -23,7 +23,7 @@ export function useFetchCypressSpec() {
       if (!recording || sourcesLoading) {
         return;
       }
-      const file = recording.metadata.test?.file;
+      const file = recording.metadata?.test?.file;
       if (!file) {
         return;
       }

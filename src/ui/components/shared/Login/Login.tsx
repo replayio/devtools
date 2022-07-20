@@ -14,6 +14,7 @@ const isOSX = Services.appinfo.OS === "Darwin";
 
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
+import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
 
 enum LoginReferrer {
   default = "default",
@@ -34,14 +35,14 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
   const [error, setError] = useState<string | boolean>(false);
 
   const onEnterpriseLogin = async () => {
-    const resp = await query({
+    const resp = await query<GetConnection, GetConnectionVariables>({
       query: GET_CONNECTION,
       variables: {
         email,
       },
     });
 
-    if (resp.data?.auth.connection) {
+    if (resp.data?.auth?.connection) {
       loginWithRedirect({
         appState: { returnTo: window.location.pathname + window.location.search },
         connection: resp.data.auth.connection,
