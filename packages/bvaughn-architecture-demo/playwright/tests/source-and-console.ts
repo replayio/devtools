@@ -17,6 +17,15 @@ testSetup(async function regeneratorFunction({ page }) {
   await fillLogPointText(page, 12, "z");
 });
 
+async function hideProtocolMessages(page: Page) {
+  // Hide other message types to make sure the log point is visible.
+  await page.click('[data-test-id="FilterToggle-exceptions"]');
+  await page.click('[data-test-id="FilterToggle-errors"]');
+  await page.click('[data-test-id="FilterToggle-logs"]');
+  await page.click('[data-test-id="FilterToggle-warnings"]');
+
+}
+
 async function openSourceTab(page: Page) {
   await page.goto(URL);
 
@@ -47,17 +56,19 @@ test("should not allow saving invalid log point values", async ({ page }) => {
 
 test("should support log points that only require local analysis", async ({ page }) => {
   await openSourceTab(page);
+  await hideProtocolMessages(page);
   await addLogPoint(page, 12);
 
   const sourceRoot = page.locator('[data-test-id="SourcesRoot"]');
   await takeScreenshot(page, sourceRoot, "local-analysis-log-point-source");
 
-  const messages = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, messages, "local-analysis-log-point-console");
+  const message = page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, message, "local-analysis-log-point-console");
 });
 
 test("should support log points that require remote analysis", async ({ page }) => {
   await openSourceTab(page);
+  await hideProtocolMessages(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "printError");
 
@@ -75,11 +86,12 @@ test("should support log points that require remote analysis", async ({ page }) 
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await openSourceTab(page);
+  await hideProtocolMessages(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "z");
 
-  const messages = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, messages, "invalid-remote-analysis-log-point-console");
+  const message = page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, message, "invalid-remote-analysis-log-point-console");
 });
 
 test("should include log points in search results", async ({ page }) => {

@@ -60,7 +60,7 @@ export default function Input() {
     }
   };
 
-  // TODO (FE-337) Add suspending eager evaluation row (share code with TerminalMessageRenderer)
+  // TODO (FE-346) Add eager evaluation row (share code with TerminalMessageRenderer)
 
   return (
     <div className={styles.Container}>

@@ -6,13 +6,13 @@ import styles from "./SyntaxHighlightedExpression.module.css";
 export default function SyntaxHighlightedExpression({ expression }: { expression: string }) {
   const tokens = useMemo<Token[]>(() => parseExpression(expression), [expression]);
   return (
-    <>
+    <span>
       {tokens.map((token, index) => (
         <span className={styles[token.type] || ""} key={index}>
           {token.value}
         </span>
       ))}
-    </>
+    </span>
   );
 }
 
