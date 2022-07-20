@@ -7,7 +7,7 @@ import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { useRef, useState } from "react";
+import { ReactNode, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -24,7 +24,6 @@ function PointInstanceRenderer({
   isFocused: boolean;
   logPointInstance: PointInstance;
 }) {
-  const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -39,39 +38,14 @@ function PointInstanceRenderer({
     }
   }, [isFocused]);
 
-  const { executionPoint, isRemote, pauseId, time, values } = runAnalysis(
-    client,
-    logPointInstance.point.location,
-    logPointInstance.timeStampedHitPoint,
-    logPointInstance.point.content
-  );
-
   let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
 
-  if (currentExecutionPoint === executionPoint) {
+  if (currentExecutionPoint === logPointInstance.timeStampedHitPoint.point) {
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
-
-  const contents = isRemote
-    ? values.map((value, index) => (
-        <KeyValueRenderer
-          key={index}
-          isNested={false}
-          layout="horizontal"
-          pauseId={pauseId!}
-          protocolValue={value}
-        />
-      ))
-    : values.map((value, index) => (
-        <ClientValueValueRenderer
-          key={index}
-          clientValue={primitiveToClientValue(value)}
-          isNested={false}
-        />
-      ));
 
   const primaryContent = (
     <div
@@ -84,7 +58,11 @@ function PointInstanceRenderer({
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}
         </span>
       )}
-      <div className={styles.LogContents}>{contents}</div>
+      <div className={styles.LogContents}>
+        <Suspense fallback={<Loader />}>
+          <AnalyzedContent logPointInstance={logPointInstance} />
+        </Suspense>
+      </div>
       <Suspense fallback={<Loader />}>
         <div className={styles.Source}>
           {location && <Source location={logPointInstance.point.location} />}
@@ -105,14 +83,46 @@ function PointInstanceRenderer({
       {primaryContent}
       {isHovered && (
         <MessageHoverButton
-          executionPoint={executionPoint}
+          executionPoint={logPointInstance.timeStampedHitPoint.point}
+          pauseId={null}
           showAddCommentButton={false}
           targetRef={ref}
-          time={time}
+          time={logPointInstance.timeStampedHitPoint.time}
         />
       )}
     </div>
   );
+}
+
+function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
+  const client = useContext(ReplayClientContext);
+
+  const { isRemote, pauseId, values } = runAnalysis(
+    client,
+    logPointInstance.point.location,
+    logPointInstance.timeStampedHitPoint,
+    logPointInstance.point.content
+  );
+
+  const children = isRemote
+    ? values.map((value, index) => (
+        <KeyValueRenderer
+          key={index}
+          isNested={false}
+          layout="horizontal"
+          pauseId={pauseId!}
+          protocolValue={value}
+        />
+      ))
+    : values.map((value, index) => (
+        <ClientValueValueRenderer
+          key={index}
+          clientValue={primitiveToClientValue(value)}
+          isNested={false}
+        />
+      ));
+
+  return <>{children}</>;
 }
 
 export default memo(PointInstanceRenderer) as typeof PointInstanceRenderer;

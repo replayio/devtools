@@ -15,6 +15,10 @@ import {
   SearchSourceContentsMatch,
   TimeStampedPoint,
   TimeStampedPointRange,
+  Result as EvaluationResult,
+  FrameId,
+  ExecutionPoint,
+  createPauseResult,
 } from "@replayio/protocol";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
@@ -54,6 +58,48 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   configure(sessionId: string): void {
     this._sessionId = sessionId;
+  }
+
+  async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
+    const sessionId = this.getSessionIdThrows();
+    const response = await client.Session.createPause({ point: executionPoint }, sessionId);
+
+    return response;
+  }
+
+  async evaluateExpression(
+    pauseId: PauseId,
+    expression: string,
+    frameId: FrameId | null
+  ): Promise<EvaluationResult> {
+    const sessionId = this.getSessionIdThrows();
+
+    // TODO (FE-337) Do we need to require a pauseId?
+    // We don't currently have them for events.
+
+    if (frameId === null) {
+      const response = await client.Pause.evaluateInGlobal(
+        {
+          expression,
+          pure: false,
+        },
+        sessionId,
+        pauseId
+      );
+      return response.result;
+    } else {
+      const response = await client.Pause.evaluateInFrame(
+        {
+          frameId,
+          expression,
+          pure: false,
+          useOriginalScopes: true,
+        },
+        sessionId,
+        pauseId
+      );
+      return response.result;
+    }
   }
 
   // Initializes the WebSocket and remote session.

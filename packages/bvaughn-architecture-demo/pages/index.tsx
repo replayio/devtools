@@ -3,9 +3,11 @@ import ConsoleRoot from "@bvaughn/components/console";
 import Focuser from "@bvaughn/components/console/Focuser";
 import Icon from "@bvaughn/components/Icon";
 import Initializer from "@bvaughn/components/Initializer";
+import Input from "@bvaughn/components/console/Input";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
+import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
@@ -68,7 +70,9 @@ export default function HomePage() {
                     <Sources />
                   </div>
                   <div className={styles.ConsoleContainer}>
-                    <ConsoleRoot />
+                    <TerminalContextRoot>
+                      <ConsoleRoot showSearchInputByDefault={false} terminalInput={<Input />} />
+                    </TerminalContextRoot>
                   </div>
                 </div>
                 <div className={styles.Row}>

@@ -32,6 +32,7 @@ export type EventTypeLog = {
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
+  type: "EventTypeLog";
   values: any[];
 };
 
@@ -126,12 +127,17 @@ async function fetchEventTypeEntryPoints(
   // This will avoid us having to turn around and request them again when rendering the logs.
   entryPoints.forEach(entryPoint => preCacheObjects(entryPoint.pauseId, entryPoint.data.objects));
 
+  const eventTypeLogs: EventTypeLog[] = entryPoints.map(entryPoint => ({
+    ...entryPoint,
+    type: "EventTypeLog",
+  }));
+
   const wakeable = record.value;
 
   record.status = STATUS_RESOLVED;
-  record.value = entryPoints;
+  record.value = eventTypeLogs;
 
-  wakeable.resolve(entryPoints);
+  wakeable.resolve(eventTypeLogs);
 }
 
 const MAPPER = `

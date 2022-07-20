@@ -1,8 +1,11 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
-import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
-import { Message as ProtocolMessage } from "@replayio/protocol";
+import {
+  isEventTypeLog,
+  isPointInstance,
+  isProtocolMessage,
+  isTerminalMessage,
+} from "@bvaughn/src/utils/console";
 import { ForwardedRef, forwardRef, MutableRefObject, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "../Icon";
@@ -13,6 +16,7 @@ import styles from "./MessagesList.module.css";
 import EventTypeRenderer from "./renderers/EventTypeRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
 import PointInstanceRenderer from "./renderers/PointInstanceRenderer";
+import TerminalMessageRenderer from "./renderers/TerminalMessageRenderer";
 import { SearchContext } from "./SearchContext";
 
 // This is an approximation of the console; the UI isn't meant to be the focus of this branch.
@@ -88,17 +92,27 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
               <PointInstanceRenderer
                 key={index}
                 isFocused={loggable === currentSearchResult}
-                logPointInstance={loggable as PointInstance}
+                logPointInstance={loggable}
               />
             );
-          } else {
+          } else if (isProtocolMessage(loggable)) {
             return (
               <MessageRenderer
                 key={index}
                 isFocused={loggable === currentSearchResult}
-                message={loggable as ProtocolMessage}
+                message={loggable}
               />
             );
+          } else if (isTerminalMessage(loggable)) {
+            return (
+              <TerminalMessageRenderer
+                key={index}
+                isFocused={loggable === currentSearchResult}
+                terminalMessage={loggable}
+              />
+            );
+          } else {
+            throw Error("Unsupported loggable type");
           }
         })}
       </div>

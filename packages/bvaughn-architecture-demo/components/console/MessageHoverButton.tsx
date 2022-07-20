@@ -3,7 +3,7 @@ import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import {
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -19,11 +19,13 @@ import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
   executionPoint,
+  pauseId,
   showAddCommentButton,
   targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
+  pauseId: PauseId | null;
   showAddCommentButton: boolean;
   targetRef: RefObject<HTMLDivElement | null>;
   time: number;
@@ -92,7 +94,7 @@ export default function MessageHoverButton({
       <button
         className={styles.FastForwardButton}
         data-test-id="FastForwardButton"
-        onClick={() => update(time, executionPoint)}
+        onClick={() => update(time, executionPoint, pauseId)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={ref}

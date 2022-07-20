@@ -86,6 +86,7 @@ function EventTypeRenderer({
       {isHovered && (
         <MessageHoverButton
           executionPoint={eventTypeLog.point}
+          pauseId={eventTypeLog.pauseId}
           showAddCommentButton={false}
           targetRef={ref}
           time={eventTypeLog.time}

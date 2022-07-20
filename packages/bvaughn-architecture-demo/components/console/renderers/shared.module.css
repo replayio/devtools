@@ -14,11 +14,16 @@
   color: var(--color-warning);
 }
 
+.EagerEvaluationIcon,
 .ErrorIcon,
+.PromptIcon,
 .WarningIcon {
   width: 1rem;
   height: 1rem;
   flex: 0 0 1rem;
+}
+.EagerEvaluationIcon {
+  color: var(--color-dim);
 }
 .ErrorIcon {
   color: var(--color-error);
@@ -45,7 +50,9 @@
 }
 
 .PrimaryRowWithTimestamps,
-.PrimaryRowWithoutTimestamps {
+.PrimaryRowWithoutTimestamps,
+.TerminalPrimaryRowWithTimestamps,
+.TerminalPrimaryRowWithoutTimestamps {
   width: 100%;
   display: grid;
   grid-column-gap: 1ch;
@@ -55,6 +62,12 @@
 }
 .PrimaryRowWithoutTimestamps {
   grid-template-columns: auto auto;
+}
+.TerminalPrimaryRowWithTimestamps {
+  grid-template-columns: min-content auto;
+}
+.TerminalPrimaryRowWithoutTimestamps {
+  grid-template-columns: auto;
 }
 
 .LogContents {
@@ -83,4 +96,10 @@
 
 .MessageText {
   min-height: 1rem;
+}
+
+.TerminalLogContents {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5ch;
 }

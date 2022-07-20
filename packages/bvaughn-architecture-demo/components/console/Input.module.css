@@ -2,13 +2,13 @@
   display: flex;
   width: 100%;
   align-items: center;
-  border-top: 1px solid var(--background-color-contrast-2);
 }
 
 .Icon {
   width: 2rem;
   height: 2rem;
   flex: 0 0 2rem;
+  border-top: 1px solid var(--background-color-default);
 }
 
 .Input {

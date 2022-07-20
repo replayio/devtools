@@ -6,6 +6,7 @@ import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
+import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { createReplayClientForPlaywrightTesting } from "shared/utils/client";
 import { getFlag } from "shared/utils/url";
@@ -28,7 +29,9 @@ export default function SourceAndConsole() {
                     <Sources />
                   </div>
                   <div className={styles.VerticalContainer}>
-                    <ConsoleRoot />
+                    <TerminalContextRoot>
+                      <ConsoleRoot />
+                    </TerminalContextRoot>
                   </div>
                 </div>
               </FocusContextRoot>
