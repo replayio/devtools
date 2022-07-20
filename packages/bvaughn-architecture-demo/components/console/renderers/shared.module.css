@@ -103,3 +103,10 @@
   flex-direction: column;
   gap: 0.5ch;
 }
+
+.Exception {
+  display: flex;
+  align-content: center;
+  gap: 0.5ch;
+  color: var(--color-error);
+}

@@ -4,7 +4,6 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { TerminalMessage } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { evaluate, getPause, getPauseData } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -85,8 +84,17 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
   }
 
   const result = evaluate(client, pauseId, frameId, terminalMessage.content);
-  const { exception, failed, returned } = result;
-  if (returned) {
+  const { exception, returned } = result;
+  if (exception) {
+    return (
+      <KeyValueRenderer
+        isNested={false}
+        layout="horizontal"
+        pauseId={pauseId}
+        protocolValue={exception}
+      />
+    );
+  } else if (returned) {
     return returned.value ? (
       <ClientValueValueRenderer
         clientValue={primitiveToClientValue(returned.value)}
@@ -100,10 +108,15 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
         protocolValue={returned}
       />
     );
-  } else {
-    // TODO (FE-337) Render exceptions and failed
-    return null;
   }
+
+  // Assume the evaluation failed (even if not explicitly)
+  return (
+    <div className={styles.Exception}>
+      <Icon className={styles.ErrorIcon} type="error" />
+      The expression could not be evaluated.
+    </div>
+  );
 }
 
 export default memo(TerminalMessageRenderer) as typeof TerminalMessageRenderer;
