@@ -183,10 +183,14 @@
   border-left: solid 1px #fff;
 }
 
+.theme-dark .cm-highlight
+{
+  background: rgba(24, 216, 255, 0.2);
+}
 
 .theme-dark .cm-s-mozilla.CodeMirror-focused .CodeMirror-selected {
   /* selected text (focused) */
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.7);
 }
 
 .theme-dark .cm-s-mozilla .CodeMirror-selected {

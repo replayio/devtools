@@ -184,6 +184,11 @@
   background: rgb(210, 210, 210);
 }
 
+.theme-light .cm-highlight
+{
+  background: rgba(255, 247, 3, 0.2);
+}
+
 .theme-light .cm-s-mozilla .CodeMirror-activeline-background {
   /* selected color with alpha */
   background: rgba(185, 215, 253, 0.35);
