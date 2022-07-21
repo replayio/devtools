@@ -107,6 +107,14 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.sources.sources = OMITTED;
     }
 
+    if (draft.experimentalSources) {
+      Object.values(draft.experimentalSources.contents.entities).forEach((contentsItem: any) => {
+        if (contentsItem.value) {
+          contentsItem.value.value = OMITTED;
+        }
+      });
+    }
+
     if (draft.pause) {
       draft.pause.frames = OMITTED;
       draft.pause.frameScopes = OMITTED;
