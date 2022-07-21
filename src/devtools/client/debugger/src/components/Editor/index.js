@@ -289,14 +289,10 @@ class Editor extends PureComponent {
   };
 
   onClick(e) {
-    const { cx, selectedSource, updateCursorPosition, jumpToMappedLocation } = this.props;
+    const { cx, selectedSource, updateCursorPosition } = this.props;
 
     if (selectedSource) {
       const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, e);
-
-      if (e.metaKey && e.altKey) {
-        jumpToMappedLocation(cx, sourceLocation);
-      }
 
       updateCursorPosition(sourceLocation);
     }
@@ -489,7 +485,6 @@ const mapDispatchToProps = dispatch => ({
       addBreakpointAtLine: actions.addBreakpointAtLine,
       closeContextMenu,
       closeTab: actions.closeTab,
-      jumpToMappedLocation: actions.jumpToMappedLocation,
       openContextMenu,
       toggleBlackBox: actions.toggleBlackBox,
       traverseResults: actions.traverseResults,

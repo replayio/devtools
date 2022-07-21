@@ -5,9 +5,13 @@
 //
 
 import { Component } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { showMenu } from "devtools/shared/contextmenu";
 
+import type { UIState } from "ui/state";
+import type { AppDispatch } from "ui/setup/store";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
+// @ts-expect-error still JS
 import { getSourceLocationFromMouseEvent } from "../../utils/editor";
 import { isPretty } from "../../utils/source";
 import {
@@ -20,55 +24,14 @@ import {
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
-class EditorMenu extends Component {
-  UNSAFE_componentWillUpdate(nextProps) {
-    this.props.clearContextMenu();
-    if (nextProps.contextMenu) {
-      this.showMenu(nextProps);
-    }
-  }
-
-  showMenu(props) {
-    const {
-      cx,
-      editor,
-      selectedSource,
-      editorActions,
-      hasMappedLocation,
-      alternateSource,
-      isPaused,
-      contextMenu: event,
-    } = props;
-
-    const location = getSourceLocationFromMouseEvent(
-      editor,
-      selectedSource,
-      // Use a coercion, as contextMenu is optional
-      event
-    );
-
-    showMenu(
-      event,
-      editorMenuItems({
-        cx,
-        editorActions,
-        selectedSource,
-        alternateSource,
-        hasMappedLocation,
-        location,
-        isPaused,
-        selectionText: editor.codeMirror.getSelection().trim(),
-        isTextSelected: editor.codeMirror.somethingSelected(),
-      })
-    );
-  }
-
-  render() {
-    return null;
-  }
+interface EditorMenuProps {
+  selectedSource: Source;
+  clearContextMenu: () => void;
+  contextMenu?: () => void;
+  editor: any;
 }
 
-const mapStateToProps = (state, props) => ({
+const mapStateToProps = (state: UIState, props: EditorMenuProps) => ({
   cx: getThreadContext(state),
   isPaused: getIsPaused(state),
   alternateSource: getAlternateSource(state),
@@ -79,8 +42,38 @@ const mapStateToProps = (state, props) => ({
     !getPrettySource(state, props.selectedSource.id),
 });
 
-const mapDispatchToProps = dispatch => ({
-  editorActions: editorItemActions(dispatch),
-});
+const connector = connect(mapStateToProps, dispatch => ({
+  editorActions: editorItemActions(dispatch as AppDispatch),
+}));
 
-export default connect(mapStateToProps, mapDispatchToProps)(EditorMenu);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type FinalEMProps = EditorMenuProps & PropsFromRedux;
+
+class EditorMenu extends Component<FinalEMProps> {
+  UNSAFE_componentWillUpdate(nextProps: FinalEMProps) {
+    this.props.clearContextMenu();
+    if (nextProps.contextMenu) {
+      this.showMenu(nextProps);
+    }
+  }
+
+  showMenu(props: FinalEMProps) {
+    const { cx, selectedSource, editorActions, alternateSource, contextMenu: event } = props;
+
+    showMenu(
+      event,
+      editorMenuItems({
+        cx,
+        editorActions,
+        selectedSource,
+        alternateSource,
+      })
+    );
+  }
+
+  render() {
+    return null;
+  }
+}
+
+export default connector(EditorMenu);

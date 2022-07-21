@@ -4,14 +4,20 @@
 
 //
 import { bindActionCreators } from "redux";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { AppDispatch } from "ui/setup/store";
+
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
 import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
 import { getSourcemapVisualizerURL } from "../../../utils/sourceVisualizations";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
+
+type EditorActions = ReturnType<typeof editorItemActions>;
 
 // menu items
 
-const copySourceUri2Item = (selectedSource, editorActions) => ({
+const copySourceUri2Item = (selectedSource: Source) => ({
   id: "node-menu-copy-source-url",
   label: "Copy source URI",
   accesskey: "u",
@@ -19,24 +25,7 @@ const copySourceUri2Item = (selectedSource, editorActions) => ({
   click: () => copyToTheClipboard(getRawSourceURL(selectedSource.url)),
 });
 
-const jumpToMappedLocationItem = (
-  cx,
-  selectedSource,
-  location,
-  hasMappedLocation,
-  editorActions
-) => ({
-  id: "node-menu-jump",
-  label: L10N.getFormatStr(
-    "editor.jumpToMappedLocation1",
-    selectedSource.isOriginal ? "generated" : "original"
-  ),
-  accesskey: "m",
-  disabled: !hasMappedLocation,
-  click: () => editorActions.jumpToMappedLocation(cx, location),
-});
-
-const showSourceMenuItem = (cx, selectedSource, editorActions) => ({
+const showSourceMenuItem = (cx: Context, selectedSource: Source, editorActions: EditorActions) => ({
   id: "node-menu-show-source",
   label: "Reveal in tree",
   accesskey: "r",
@@ -44,7 +33,7 @@ const showSourceMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
-const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
+const blackBoxMenuItem = (cx: Context, selectedSource: Source, editorActions: EditorActions) => ({
   id: "node-menu-blackbox",
   label: selectedSource.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
   accesskey: selectedSource.isBlackBoxed ? "U" : "B",
@@ -52,7 +41,7 @@ const blackBoxMenuItem = (cx, selectedSource, editorActions) => ({
   click: () => editorActions.toggleBlackBox(cx, selectedSource),
 });
 
-const sourceMapItem = (cx, selectedSource, alternateSource, editorActions) => ({
+const sourceMapItem = (cx: Context, selectedSource: Source, alternateSource: Source | null) => ({
   id: "node-menu-source-map",
   label: "Visualize source map",
   accesskey: selectedSource.isBlackBoxed ? "U" : "B",
@@ -65,25 +54,34 @@ const sourceMapItem = (cx, selectedSource, alternateSource, editorActions) => ({
   },
 });
 
-export function editorMenuItems({ cx, editorActions, selectedSource, alternateSource }) {
+export function editorMenuItems({
+  cx,
+  editorActions,
+  selectedSource,
+  alternateSource,
+}: {
+  cx: Context;
+  editorActions: EditorActions;
+  selectedSource: Source;
+  alternateSource: Source | null;
+}) {
   const items = [];
 
   items.push(
-    copySourceUri2Item(selectedSource, editorActions),
+    copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
     blackBoxMenuItem(cx, selectedSource, editorActions),
-    sourceMapItem(cx, selectedSource, alternateSource, editorActions)
+    sourceMapItem(cx, selectedSource, alternateSource)
   );
 
   return items;
 }
 
-export function editorItemActions(dispatch) {
+export function editorItemActions(dispatch: AppDispatch) {
   return bindActionCreators(
     {
       flashLineRange: actions.flashLineRange,
-      jumpToMappedLocation: actions.jumpToMappedLocation,
       showSource: actions.showSource,
       toggleBlackBox: actions.toggleBlackBox,
     },

@@ -35,7 +35,7 @@ export function getSourceIDsToSearch(
   });
 }
 
-function getSourceToVisualize(selectedSource: Source, alternateSource: Source) {
+function getSourceToVisualize(selectedSource: Source, alternateSource: Source | null) {
   if (!selectedSource) {
     return undefined;
   }
@@ -51,7 +51,7 @@ function getSourceToVisualize(selectedSource: Source, alternateSource: Source) {
 
 export function getSourcemapVisualizerURL(
   selectedSource: Source,
-  alternateSource: Source
+  alternateSource: Source | null
 ): string | null {
   const sourceId = getSourceToVisualize(selectedSource, alternateSource);
   if (!sourceId) {
