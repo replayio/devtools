@@ -7,7 +7,7 @@ import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { ReactNode, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -17,7 +17,8 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
-function PointInstanceRenderer({
+// Renders PointInstances with enableLogging=true.
+function LogPointRenderer({
   isFocused,
   logPointInstance,
 }: {
@@ -125,4 +126,4 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
   return <>{children}</>;
 }
 
-export default memo(PointInstanceRenderer) as typeof PointInstanceRenderer;
+export default memo(LogPointRenderer) as typeof LogPointRenderer;

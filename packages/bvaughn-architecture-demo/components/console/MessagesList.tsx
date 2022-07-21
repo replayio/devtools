@@ -15,7 +15,7 @@ import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
 import EventLogRenderer from "./renderers/EventLogRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
-import PointInstanceRenderer from "./renderers/PointInstanceRenderer";
+import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import { SearchContext } from "./SearchContext";
 
@@ -89,7 +89,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             );
           } else if (isPointInstance(loggable)) {
             return (
-              <PointInstanceRenderer
+              <LogPointRenderer
                 key={index}
                 isFocused={loggable === currentSearchResult}
                 logPointInstance={loggable}
