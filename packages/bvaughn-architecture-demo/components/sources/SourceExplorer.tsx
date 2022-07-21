@@ -56,7 +56,7 @@ export default function SourceExplorer() {
                 <div
                   key={index}
                   className={isFocused ? styles.FocusedListItem : styles.ListItem}
-                  date-test-id={`SourceExplorerSource-${sourceId}`}
+                  data-test-id={`SourceExplorerSource-${sourceId}`}
                   onClick={() => {
                     setSelectedIndex(index);
                     openSource(sourceId);

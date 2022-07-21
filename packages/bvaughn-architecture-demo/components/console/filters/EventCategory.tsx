@@ -72,7 +72,7 @@ export default function EventCategory({
         header={
           <div
             className={styles.Header}
-            date-test-id={`EventCategoryHeader-${eventCategory.category}`}
+            data-test-id={`EventCategoryHeader-${eventCategory.category}`}
           >
             <span className={styles.Category}>{eventCategory.category}</span>
             <span className={styles.Count}>{totalHitCount}</span>

@@ -24,6 +24,7 @@ type NewMessage = Omit<TerminalExpression, "id" | "type">;
 
 export type TerminalContextType = {
   addMessage: (newMessage: NewMessage) => void;
+  clearMessages: () => void;
   isPending: boolean;
   messages: TerminalExpression[];
 };
@@ -49,9 +50,11 @@ export function TerminalContextRoot({ children }: PropsWithChildren<{}>) {
     });
   }, []);
 
+  const clearMessages = useCallback(() => setMessages([]), []);
+
   const context = useMemo(
-    () => ({ addMessage, isPending, messages }),
-    [addMessage, isPending, messages]
+    () => ({ addMessage, clearMessages, isPending, messages }),
+    [addMessage, clearMessages, isPending, messages]
   );
 
   return <TerminalContext.Provider value={context}>{children}</TerminalContext.Provider>;

@@ -2,16 +2,23 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import { ReactNode, Suspense, unstable_Offscreen as Offscreen, useRef, useState } from "react";
+import {
+  ReactNode,
+  Suspense,
+  unstable_Offscreen as Offscreen,
+  useContext,
+  useRef,
+  useState,
+} from "react";
 
 import styles from "./ConsoleRoot.module.css";
 import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
-import Input from "./Input";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
 import { LoggablesContextRoot } from "./LoggablesContext";
+import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 
 export default function ConsoleRoot({
   showSearchInputByDefault = true,
@@ -20,6 +27,8 @@ export default function ConsoleRoot({
   showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
+  const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
+    useContext(TerminalContext);
   const [isMenuOpen, setIsMenuOpen] = useState(true);
   const messageListRef = useRef<HTMLElement>(null);
 
@@ -34,7 +43,7 @@ export default function ConsoleRoot({
             <div className={styles.TopRow}>
               <button
                 className={styles.MenuToggleButton}
-                date-test-id="ConsoleMenuToggleButton"
+                data-test-id="ConsoleMenuToggleButton"
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
               >
@@ -44,6 +53,16 @@ export default function ConsoleRoot({
                 />
               </button>
               <FilterText />
+              {consoleEvaluations.length > 0 && (
+                <button
+                  className={styles.DeleteTerminalExpressionButton}
+                  data-test-id="ClearConsoleEvaluationsButton"
+                  onClick={clearConsoleEvaluations}
+                  title="Clear console evaluations"
+                >
+                  <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
+                </button>
+              )}
             </div>
             <div className={styles.BottomRow}>
               <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>

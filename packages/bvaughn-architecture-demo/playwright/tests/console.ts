@@ -6,7 +6,7 @@ import {
   seekToMessage,
   showSearchInput,
 } from "./utils/console";
-import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import { getBaseURL, getElementCount, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 const URL = `${getBaseURL()}/tests/console?${getURLFlags()}`;
@@ -15,7 +15,7 @@ testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
 
   // Exploring Message values
-  const warningListItem = page.locator('[data-test-name="Expandable"]', {
+  const warningListItem = page.locator("[data-test-name=Expandable]", {
     hasText: "This is a warning",
   });
   const arrayKeyValue = warningListItem.locator("[data-test-name=Expandable]", {
@@ -23,7 +23,7 @@ testSetup(async function regeneratorFunction({ page }) {
   });
   await arrayKeyValue.click();
 
-  const errorListItem = page.locator('[data-test-name="Expandable"]', {
+  const errorListItem = page.locator("[data-test-name=Expandable]", {
     hasText: "This is an error",
   });
   let keyValue = errorListItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
@@ -37,20 +37,20 @@ testSetup(async function regeneratorFunction({ page }) {
   const firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);
 
-  await page.fill('[data-test-id="ConsoleTerminalInput"]', "location.href");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
   await page.keyboard.press("Enter");
 
-  await page.fill('[data-test-id="ConsoleTerminalInput"]', "+/");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
 
   // Event type data
-  await page.click('[date-test-id="EventCategoryHeader-Mouse"]');
+  await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
 
-  const eventTypeListItem = page.locator('[data-test-name="Expandable"]', {
+  const eventTypeListItem = page.locator("[data-test-name=Expandable]", {
     hasText: "MouseEvent",
   });
-  keyValue = eventTypeListItem.locator('[data-test-id="KeyValue"]', { hasText: "MouseEvent" });
+  keyValue = eventTypeListItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
   await keyValue.click();
 });
 
@@ -64,7 +64,7 @@ test("should display list of messages", async ({ page }) => {
 
   await takeScreenshot(page, list, "message-list");
 
-  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await page.click("[data-test-id=FilterToggle-showTimestamps]");
   await takeScreenshot(page, list, "message-list-with-timestamps");
 });
 
@@ -104,7 +104,7 @@ test("should display toggleable stack for traces", async ({ page }) => {
 test("should expand and inspect arrays", async ({ page }) => {
   await page.goto(URL);
 
-  const listItem = page.locator('[data-test-name="Expandable"]', { hasText: "This is a warning" });
+  const listItem = page.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
   await takeScreenshot(page, listItem, "array-collapsed");
 
   const keyValue = listItem.locator("[data-test-name=Expandable]", { hasText: "Array" });
@@ -115,7 +115,7 @@ test("should expand and inspect arrays", async ({ page }) => {
 test("should expand and inspect objects", async ({ page }) => {
   await page.goto(URL);
 
-  const listItem = page.locator('[data-test-name="Expandable"]', { hasText: "This is an error" });
+  const listItem = page.locator("[data-test-name=Expandable]", { hasText: "This is an error" });
   await takeScreenshot(page, listItem, "object-collapsed");
 
   const keyValue = listItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
@@ -153,7 +153,7 @@ test("should show an add-comment button for the current message", async ({ page 
   await listItem.hover();
   await takeScreenshot(page, listItem, "list-item-hovered");
 
-  const fastForwardButton = page.locator('[data-test-id="ConsoleMessageHoverButton"]');
+  const fastForwardButton = page.locator("[data-test-id=ConsoleMessageHoverButton]");
   await fastForwardButton.hover();
   await takeScreenshot(page, listItem, "fast-forward-button-hovered");
 
@@ -168,21 +168,21 @@ test("should show and hide search input when Enter and Escape are typed", async 
   await page.goto(URL);
 
   // Search should be hidden
-  let searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  let searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
   await expect(searchInput).toHaveCount(0);
 
   await showSearchInput(page);
 
-  searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
   await takeScreenshot(page, searchInput, "search-input-visible-and-focused");
 
   await hideSearchInput(page);
 
   // Search should be hidden again
-  searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
   await expect(searchInput).toHaveCount(0);
 
-  const terminalInput = page.locator('[data-test-id="ConsoleTerminalInput"]');
+  const terminalInput = page.locator("[data-test-id=ConsoleTerminalInput]");
   await takeScreenshot(page, terminalInput, "terminal-input-focused");
 });
 
@@ -191,68 +191,68 @@ test("should be searchable", async ({ page }) => {
 
   await showSearchInput(page);
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', " an ");
+  await page.fill("[data-test-id=ConsoleSearchInput]", " an ");
 
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "searchable-single-result");
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', " a ");
+  await page.fill("[data-test-id=ConsoleSearchInput]", " a ");
   await takeScreenshot(page, consoleRoot, "searchable-result-1-of-3");
 
-  await page.click('[data-test-id="ConsoleSearchGoToNextButton"]');
-  await page.click('[data-test-id="ConsoleSearchGoToNextButton"]');
+  await page.click("[data-test-id=ConsoleSearchGoToNextButton]");
+  await page.click("[data-test-id=ConsoleSearchGoToNextButton]");
   await takeScreenshot(page, consoleRoot, "searchable-result-3-of-3");
 
-  await page.click('[data-test-id="ConsoleSearchGoToPreviousButton"]');
+  await page.click("[data-test-id=ConsoleSearchGoToPreviousButton]");
   await takeScreenshot(page, consoleRoot, "searchable-result-2-of-3");
 
   // Changes to filters should also update search results
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "warning");
+  await page.fill("[data-test-id=ConsoleFilterInput]", "warning");
 
-  const searchResultsLabel = page.locator('[data-test-id="SearchResultsLabel"]');
+  const searchResultsLabel = page.locator("[data-test-id=SearchResultsLabel]");
   await takeScreenshot(page, searchResultsLabel, "searchable-result-updated-after-filter");
 });
 
 test("should be filterable", async ({ page }) => {
   await page.goto(URL);
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', " an ");
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await page.fill("[data-test-id=ConsoleFilterInput]", " an ");
+  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "filtered-single-result");
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', " a ");
+  await page.fill("[data-test-id=ConsoleFilterInput]", " a ");
   await takeScreenshot(page, consoleRoot, "filtered-three-results");
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "zzz");
+  await page.fill("[data-test-id=ConsoleFilterInput]", "zzz");
   await takeScreenshot(page, consoleRoot, "filtered-no-results");
 });
 
 test("should log events in the console", async ({ page }) => {
   await page.goto(URL);
 
-  await page.click('[date-test-id="EventCategoryHeader-Mouse"]');
+  await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
 
   const listItem = page
-    .locator('[data-test-name="Expandable"]', {
+    .locator("[data-test-name=Expandable]", {
       hasText: "MouseEvent",
     })
     .first();
   await takeScreenshot(page, listItem, "event-types-mouse-click");
 
-  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await page.click("[data-test-id=FilterToggle-showTimestamps]");
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps");
 
-  const keyValue = listItem.locator('[data-test-id="KeyValue"]', { hasText: "MouseEvent" });
+  const keyValue = listItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
   await keyValue.click();
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps-expanded");
 
-  const filterToggles = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  const filterToggles = page.locator("[data-test-id=ConsoleFilterToggles]");
 
-  await page.fill('[data-test-id="EventTypeFilterInput"]', "click");
+  await page.fill("[data-test-id=EventTypeFilterInput]", "click");
   await takeScreenshot(page, filterToggles, "event-types-filtered-toggle-list");
 
-  await page.fill('[data-test-id="EventTypeFilterInput"]', "zzz");
+  await page.fill("[data-test-id=EventTypeFilterInput]", "zzz");
   await takeScreenshot(page, filterToggles, "event-types-filtered-toggle-list-no-results");
 });
 
@@ -261,53 +261,53 @@ test("should be searchable on complex content", async ({ page }) => {
 
   await showSearchInput(page);
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', "Array(3) [1, 2, 3]");
+  await page.fill("[data-test-id=ConsoleSearchInput]", "Array(3) [1, 2, 3]");
 
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "searchable-complex-array-preview");
 
-  await page.fill('[data-test-id="ConsoleSearchInput"]', "number: 123, string:");
+  await page.fill("[data-test-id=ConsoleSearchInput]", "number: 123, string:");
   await takeScreenshot(page, consoleRoot, "searchable-complex-object-preview");
 });
 
 test("should be filterable on complex content", async ({ page }) => {
   await page.goto(URL);
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "Array(3) [1, 2, 3]");
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await page.fill("[data-test-id=ConsoleFilterInput]", "Array(3) [1, 2, 3]");
+  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "filtered-complex-array-preview");
 
-  await page.fill('[data-test-id="ConsoleFilterInput"]', "number: 123, string:");
+  await page.fill("[data-test-id=ConsoleFilterInput]", "number: 123, string:");
   await takeScreenshot(page, consoleRoot, "filtered-complex-object-preview");
 });
 
 test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
   await page.goto(URL);
 
-  await page.click('[data-test-id="FilterToggle-errors"]');
-  await page.click('[data-test-id="FilterToggle-exceptions"]');
-  await page.click('[data-test-id="FilterToggle-logs"]');
+  await page.click("[data-test-id=FilterToggle-errors]");
+  await page.click("[data-test-id=FilterToggle-exceptions]");
+  await page.click("[data-test-id=FilterToggle-logs]");
 
   const list = page.locator("[data-test-name=Messages]");
   await takeScreenshot(page, list, "filtered-all-warnings");
 
-  await page.click('[data-test-id="FilterToggle-hideNodeModules"]');
+  await page.click("[data-test-id=FilterToggle-hideNodeModules]");
   await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
 });
 
 test("should be able to toggle side filter menu open and closed", async ({ page }) => {
   await page.goto(URL);
 
-  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "filters-side-menu-open");
 
   // Fill in filter text; this should be remembered when the side menu is re-opened.
-  await page.fill('[data-test-id="EventTypeFilterInput"]', "test");
+  await page.fill("[data-test-id=EventTypeFilterInput]", "test");
 
-  await page.click('[date-test-id="ConsoleMenuToggleButton"]');
+  await page.click("[data-test-id=ConsoleMenuToggleButton]");
   await takeScreenshot(page, consoleRoot, "filters-side-menu-closed");
 
-  await page.click('[date-test-id="ConsoleMenuToggleButton"]');
+  await page.click("[data-test-id=ConsoleMenuToggleButton]");
   await takeScreenshot(page, consoleRoot, "filters-side-menu-reopened");
 });
 
@@ -315,30 +315,30 @@ test("should remember filter toggle preferences between reloads", async ({ page 
   await page.goto(URL);
 
   // Toggle everything off and screenshot
-  await page.click('[data-test-id="FilterToggle-errors"]');
-  await page.click('[data-test-id="FilterToggle-exceptions"]');
-  await page.click('[data-test-id="FilterToggle-logs"]');
-  await page.click('[data-test-id="FilterToggle-warnings"]');
-  let filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  await page.click("[data-test-id=FilterToggle-errors]");
+  await page.click("[data-test-id=FilterToggle-exceptions]");
+  await page.click("[data-test-id=FilterToggle-logs]");
+  await page.click("[data-test-id=FilterToggle-warnings]");
+  let filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, filters, "initial-side-filter-values");
 
   // Reload and verify screenshot unchanged
   await page.reload();
-  filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, filters, "initial-side-filter-values");
 
   // Toggle everything on and screenshot
-  await page.click('[data-test-id="FilterToggle-errors"]');
-  await page.click('[data-test-id="FilterToggle-exceptions"]');
-  await page.click('[data-test-id="FilterToggle-logs"]');
-  await page.click('[data-test-id="FilterToggle-warnings"]');
-  await page.click('[data-test-id="FilterToggle-hideNodeModules"]');
-  await page.click('[data-test-id="FilterToggle-showTimestamps"]');
+  await page.click("[data-test-id=FilterToggle-errors]");
+  await page.click("[data-test-id=FilterToggle-exceptions]");
+  await page.click("[data-test-id=FilterToggle-logs]");
+  await page.click("[data-test-id=FilterToggle-warnings]");
+  await page.click("[data-test-id=FilterToggle-hideNodeModules]");
+  await page.click("[data-test-id=FilterToggle-showTimestamps]");
   await takeScreenshot(page, filters, "updated-side-filter-values");
 
   // Reload and verify screenshot unchanged
   await page.reload();
-  filters = page.locator('[data-test-id="ConsoleFilterToggles"]');
+  filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, filters, "updated-side-filter-values");
 });
 
@@ -348,7 +348,7 @@ test("should evaluate and render local terminal expressions", async ({ page }) =
   let firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);
 
-  await page.fill('[data-test-id="ConsoleTerminalInput"]', "location.href");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
   await page.keyboard.press("Enter");
 
   await hideProtocolMessages(page);
@@ -363,13 +363,39 @@ test("should evaluate and render invalid local terminal expressions", async ({ p
   let firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);
 
-  await page.fill('[data-test-id="ConsoleTerminalInput"]', "+/");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
 
   await hideProtocolMessages(page);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
+});
+
+test("should show a button to clear terminal expressions", async ({ page }) => {
+  await page.goto(URL);
+
+  let firstListItem = await page.locator("[data-test-name=Message]").first();
+  await seekToMessage(page, firstListItem);
+
+  await hideProtocolMessages(page);
+
+  // Add some expressions
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
+  await page.keyboard.press("Enter");
+
+  expect(await getElementCount(page, "[data-test-name=Message]")).toBe(2);
+  expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(1);
+
+  // Click the button to clear them
+  await page.click("[data-test-id=ClearConsoleEvaluationsButton]");
+
+  // Verify an empty terminal
+
+  expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
+  expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
 
 // TODO (FE-337) Add tests for global expressions once pauseId issue is sorted out.
