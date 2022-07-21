@@ -1,3 +1,5 @@
+import { SearchSourceContentsMatch } from "@replayio/protocol";
+
 import { trackEvent } from "ui/utils/telemetry";
 import { ThreadFront } from "protocol/thread";
 import groupBy from "lodash/groupBy";
@@ -5,7 +7,11 @@ import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceV
 
 import { sliceCodePoints } from "ui/utils/codePointString";
 
-const formatSourceMatches = (source, matches) => ({
+import { Source } from "../../reducers/sources";
+
+type $FixTypeLater = any;
+
+const formatSourceMatches = (source: Source, matches: SearchSourceContentsMatch[]) => ({
   type: "RESULT",
   sourceId: source.id,
   filepath: source.url,
@@ -30,16 +36,24 @@ const formatSourceMatches = (source, matches) => ({
   }),
 });
 
-const formatMatchesBySource = (matches, sourcesById) => {
+const formatMatchesBySource = (
+  matches: SearchSourceContentsMatch[],
+  sourcesById: Record<string, Source>
+) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
   const filteredResults = Object.entries(resultsBySource)
-    .map(([sourceId, matches]) => [sourcesById[sourceId], matches])
+    .map(([sourceId, matches]) => [sourcesById[sourceId], matches] as const)
     .filter(([source]) => !!source);
 
   return filteredResults.map(([source, matches]) => formatSourceMatches(source, matches));
 };
 
-export async function search(query, sourcesById, updateResults, includeNodeModules) {
+export async function search(
+  query: string,
+  sourcesById: Record<string, Source>,
+  updateResults: (cb: (prevResults: $FixTypeLater) => any) => any,
+  includeNodeModules: boolean
+) {
   trackEvent("project_search.search");
 
   const sourceIds = getSourceIDsToSearch(sourcesById, includeNodeModules);

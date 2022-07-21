@@ -3,8 +3,12 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component, createRef } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { SearchSourceContentsMatch } from "@replayio/protocol";
+
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { trackEvent } from "ui/utils/telemetry";
+import { UIState } from "ui/state";
 
 import actions from "../../actions";
 import {
@@ -13,34 +17,60 @@ import {
   getFullTextSearchQuery,
   getFullTextSearchFocus,
 } from "../../selectors";
-import { connect } from "react-redux";
+
+// @ts-expect-error not TS yet
 import { getEditor } from "../../utils/editor";
 
 import { FullTextFilter } from "./FullTextFilter";
 import { FullTextResults } from "./FullTextResults";
 import { search } from "./search";
 
-function sanitizeQuery(query) {
+type $FixTypeLater = any;
+
+function sanitizeQuery(query: string) {
   // no '\' at end of query
   return query.replace(/\\$/, "");
 }
 
-export class FullTextSearch extends Component {
+const mapStateToProps = (state: UIState) => ({
+  cx: getContext(state),
+  sourcesById: getSources(state).values,
+  query: getFullTextSearchQuery(state),
+  focused: getFullTextSearchFocus(state),
+});
+
+const connector = connect(mapStateToProps, {
+  focusFullTextInput: actions.focusFullTextInput,
+  setFullTextQuery: actions.setFullTextQuery,
+  selectSpecificLocation: actions.selectSpecificLocation,
+  doSearchForHighlight: actions.doSearchForHighlight,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+interface FTSState {
+  focusedItem: SearchSourceContentsMatch | null;
+  query: string;
+  results: {
+    status: "DONE";
+    matchesBySource: $FixTypeLater[];
+  };
+  includeNodeModules: boolean;
+}
+
+export class FullTextSearch extends Component<PropsFromRedux, FTSState> {
+  searchRef = createRef<HTMLDivElement>();
   state = {
     focusedItem: null,
+    query: "",
     results: {
-      status: "DONE",
-      query: "",
+      status: "DONE" as const,
       matchesBySource: [],
-      includeNodeModules: true,
     },
+    includeNodeModules: true,
   };
 
-  componentDidMount() {
-    this.searchRef = createRef();
-  }
-
-  selectMatchItem = matchItem => {
+  selectMatchItem = (matchItem: $FixTypeLater) => {
     const { query, cx, doSearchForHighlight, selectSpecificLocation } = this.props;
     trackEvent("project_search.select");
 
@@ -56,13 +86,13 @@ export class FullTextSearch extends Component {
     );
   };
 
-  onKeyDown = e => {
+  onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const { sourcesById, setFullTextQuery, query } = this.props;
     const { includeNodeModules } = this.state;
 
     if (e.key === "ArrowDown") {
       trackEvent("project_search.go_to_first_result");
-      this.searchRef.current.querySelector(".file-result:first-child").focus();
+      this.searchRef.current!.querySelector<HTMLElement>(".file-result:first-child")!.focus();
       e.preventDefault();
       return;
     }
@@ -71,8 +101,9 @@ export class FullTextSearch extends Component {
       return;
     }
 
+    // @ts-expect-error e.target.value doesn't exist
     const sanitizedQuery = sanitizeQuery(e.target.value);
-    const updateResults = getNextResults => {
+    const updateResults = (getNextResults: (someResults: $FixTypeLater) => $FixTypeLater[]) => {
       this.setState(prevState => ({
         results: {
           ...prevState.results,
@@ -91,7 +122,7 @@ export class FullTextSearch extends Component {
     return null;
   };
 
-  onFocus = item => {
+  onFocus = (item: $FixTypeLater) => {
     if (this.state.focusedItem !== item) {
       this.setState({ focusedItem: item });
     }
@@ -114,20 +145,19 @@ export class FullTextSearch extends Component {
               setValue={setFullTextQuery}
               results={this.state.results}
               onKeyDown={this.onKeyDown}
-              onSearch={this.onSearch}
               focusFullTextInput={focusFullTextInput}
             />
           </div>
           <label className="select-none space-x-2 p-2" htmlFor="node-modules">
             <Checkbox
               id="node-modules"
-              value={includeNodeModules}
+              checked={includeNodeModules}
               onChange={e => this.setState({ includeNodeModules: !includeNodeModules })}
             />
             <span>Include node modules</span>
           </label>
           <FullTextResults
-            onItemSelect={item => this.selectMatchItem(item)}
+            onItemSelect={(item: $FixTypeLater) => this.selectMatchItem(item)}
             focusedItem={focusedItem}
             onFocus={this.onFocus}
             results={results}
@@ -138,16 +168,4 @@ export class FullTextSearch extends Component {
   }
 }
 
-const mapStateToProps = state => ({
-  cx: getContext(state),
-  sourcesById: getSources(state).values,
-  query: getFullTextSearchQuery(state),
-  focused: getFullTextSearchFocus(state),
-});
-
-export default connect(mapStateToProps, {
-  focusFullTextInput: actions.focusFullTextInput,
-  setFullTextQuery: actions.setFullTextQuery,
-  selectSpecificLocation: actions.selectSpecificLocation,
-  doSearchForHighlight: actions.doSearchForHighlight,
-})(FullTextSearch);
+export default connector(FullTextSearch);
