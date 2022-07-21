@@ -11,7 +11,7 @@
 
 import { UIThunkAction } from "ui/actions";
 import type { Context } from "../reducers/pause";
-import type { Source } from "../reducers/types";
+import type { Source } from "../reducers/sources";
 
 // @ts-expect-error
 import { removeDocument } from "../utils/editor";
