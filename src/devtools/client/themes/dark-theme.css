@@ -184,13 +184,13 @@
 }
 
 
-.theme-dark .cm-s-mozilla .CodeMirror-selected {
-  /* selected text (unfocused) */
+.theme-dark .cm-s-mozilla.CodeMirror-focused .CodeMirror-selected {
+  /* selected text (focused) */
   background: rgba(255, 255, 255, 0.3);
 }
 
-.theme-dark .cm-s-mozilla.CodeMirror-focused .CodeMirror-selected {
-  /* selected text (focused) */
+.theme-dark .cm-s-mozilla .CodeMirror-selected {
+  /* selected text (unfocused) */
   background: var(--theme-selection-background-hover);
 }
 
