@@ -8,6 +8,9 @@
     await Test.waitForSource("bundle_input.js");
 
     Test.app.actions.openQuickOpen();
+    await Test.waitUntil(() => document.querySelector(".modal-wrapper"), {
+      waitingFor: "the QuickOpenModal to appear"
+    });
     Test.app.actions.setQuickOpenQuery("bundle");
     await Test.waitUntil(
       () => {
