@@ -1,6 +1,7 @@
 import {
   ContentType,
   EventHandlerType,
+  FrameId,
   KeyboardEvent,
   Location,
   Message,
@@ -12,12 +13,15 @@ import {
   PauseData,
   PauseId,
   RecordingId,
+  Result as EvaluationResult,
   SessionId,
   SearchSourceContentsMatch,
   SourceId,
   SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
+  ExecutionPoint,
+  createPauseResult,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -46,6 +50,12 @@ export type Events = {
 
 export interface ReplayClientInterface {
   configure(sessionId: string): void;
+  createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
+  evaluateExpression(
+    pauseId: PauseId,
+    expression: string,
+    frameId: FrameId | null
+  ): Promise<EvaluationResult>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;

@@ -50,12 +50,13 @@ const INVISIBLE_STATE: State = {
 };
 
 export default function useConsoleSearchDOM(
-  listRef: MutableRefObject<HTMLElement | null>
+  listRef: MutableRefObject<HTMLElement | null>,
+  defaultVisible: boolean = true
 ): [State, Actions] {
   const loggables = useContext(LoggablesContext);
 
   const [state, dispatch] = useSearchDOM<Loggable>(loggables, search, listRef);
-  const [visible, setVisible] = useState<boolean>(true);
+  const [visible, setVisible] = useState<boolean>(defaultVisible);
 
   const externalActions = useMemo(
     () => ({

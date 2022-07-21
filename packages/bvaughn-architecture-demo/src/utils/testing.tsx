@@ -113,7 +113,8 @@ export async function renderFocused(
   const timelineContext: TimelineContextType = {
     executionPoint: null,
     isPending: false,
-    time: null,
+    pauseId: null,
+    time: 0,
     update: jest.fn(),
     ...options?.timelineContext,
   };
@@ -162,6 +163,11 @@ export function setupWindow(): void {
 // but its methods can be overridden individually (or observed/inspected) by test code.
 const MockReplayClient = {
   configure: jest.fn().mockImplementation(async () => {}),
+  createPause: jest.fn().mockImplementation(async () => ({
+    frames: [],
+    data: {},
+  })),
+  evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => []),
   getAllFrames: jest.fn().mockImplementation(async () => []),

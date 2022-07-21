@@ -22,6 +22,7 @@ export type Point = {
 export type PointInstance = {
   point: Point;
   timeStampedHitPoint: TimeStampedPoint;
+  type: "PointInstance";
 };
 
 export type PointsContextType = {

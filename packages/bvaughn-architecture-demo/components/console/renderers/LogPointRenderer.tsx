@@ -16,15 +16,17 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
+import { ExecutionPoint } from "@replayio/protocol";
+import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
-function PointInstanceRenderer({
+// Renders PointInstances with enableLogging=true.
+function LogPointRenderer({
   isFocused,
   logPointInstance,
 }: {
   isFocused: boolean;
   logPointInstance: PointInstance;
 }) {
-  const client = useContext(ReplayClientContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -39,39 +41,14 @@ function PointInstanceRenderer({
     }
   }, [isFocused]);
 
-  const { executionPoint, isRemote, pauseId, time, values } = runAnalysis(
-    client,
-    logPointInstance.point.location,
-    logPointInstance.timeStampedHitPoint,
-    logPointInstance.point.content
-  );
-
   let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
 
-  if (currentExecutionPoint === executionPoint) {
+  if (currentExecutionPoint === logPointInstance.timeStampedHitPoint.point) {
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
-
-  const contents = isRemote
-    ? values.map((value, index) => (
-        <KeyValueRenderer
-          key={index}
-          isNested={false}
-          layout="horizontal"
-          pauseId={pauseId!}
-          protocolValue={value}
-        />
-      ))
-    : values.map((value, index) => (
-        <ClientValueValueRenderer
-          key={index}
-          clientValue={primitiveToClientValue(value)}
-          isNested={false}
-        />
-      ));
 
   const primaryContent = (
     <div
@@ -84,7 +61,11 @@ function PointInstanceRenderer({
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}
         </span>
       )}
-      <div className={styles.LogContents}>{contents}</div>
+      <div className={styles.LogContents}>
+        <Suspense fallback={<Loader />}>
+          <AnalyzedContent logPointInstance={logPointInstance} />
+        </Suspense>
+      </div>
       <Suspense fallback={<Loader />}>
         <div className={styles.Source}>
           {location && <Source location={logPointInstance.point.location} />}
@@ -103,16 +84,77 @@ function PointInstanceRenderer({
       onMouseLeave={() => setIsHovered(false)}
     >
       {primaryContent}
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={executionPoint}
-          showAddCommentButton={false}
-          targetRef={ref}
-          time={time}
-        />
-      )}
+      <MessageHoverButtonWithWithPause
+        executionPoint={logPointInstance.timeStampedHitPoint.point}
+        isHovered={isHovered}
+        targetRef={ref}
+        time={logPointInstance.timeStampedHitPoint.time}
+      />
     </div>
   );
 }
 
-export default memo(PointInstanceRenderer) as typeof PointInstanceRenderer;
+function MessageHoverButtonWithWithPause({
+  executionPoint,
+  isHovered,
+  targetRef,
+  time,
+}: {
+  executionPoint: ExecutionPoint;
+  isHovered: boolean;
+  targetRef: React.RefObject<HTMLDivElement>;
+  time: number;
+}) {
+  const client = useContext(ReplayClientContext);
+
+  // Events don't have pause IDs, just execution points.
+  // So we need to load the nearest one before we can seek to it.
+  const pauseId = getClosestPointForTime(client, time);
+
+  if (!isHovered) {
+    return null;
+  }
+
+  return (
+    <MessageHoverButton
+      executionPoint={executionPoint}
+      pauseId={pauseId}
+      showAddCommentButton={false}
+      targetRef={targetRef}
+      time={time}
+    />
+  );
+}
+
+function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
+  const client = useContext(ReplayClientContext);
+
+  const { isRemote, pauseId, values } = runAnalysis(
+    client,
+    logPointInstance.point.location,
+    logPointInstance.timeStampedHitPoint,
+    logPointInstance.point.content
+  );
+
+  const children = isRemote
+    ? values.map((value, index) => (
+        <KeyValueRenderer
+          key={index}
+          isNested={false}
+          layout="horizontal"
+          pauseId={pauseId!}
+          protocolValue={value}
+        />
+      ))
+    : values.map((value, index) => (
+        <ClientValueValueRenderer
+          key={index}
+          clientValue={primitiveToClientValue(value)}
+          isNested={false}
+        />
+      ));
+
+  return <>{children}</>;
+}
+
+export default memo(LogPointRenderer) as typeof LogPointRenderer;

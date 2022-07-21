@@ -6,7 +6,7 @@ import testSetup from "./utils/testSetup";
 const URL = `${getBaseURL()}/tests/object-inspector?${getURLFlags()}`;
 
 async function filterByText(page: Page, text: string) {
-  await page.fill('[data-test-id="ConsoleFilterInput"]', text);
+  await page.fill("[data-test-id=ConsoleFilterInput]", text);
 }
 
 async function inspectAndTakeScreenshotOf(page: Page, partialText: string, screenshotName: string) {

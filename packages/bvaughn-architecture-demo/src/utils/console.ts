@@ -1,21 +1,21 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
-import { Message as ProtocolMessage } from "@replayio/protocol";
+import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
+import { EventLog } from "@bvaughn/src/suspense/EventsCache";
+import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 
-import { EventTypeLog } from "../suspense/EventsCache";
-
-export function isEventTypeLog(loggable: Loggable): loggable is EventTypeLog {
-  return (
-    loggable.hasOwnProperty("data") &&
-    loggable.hasOwnProperty("frameworkListeners") &&
-    loggable.hasOwnProperty("values")
-  );
+export function isEventLog(loggable: Loggable): loggable is EventLog {
+  return loggable.type === "EventLog";
 }
 
 export function isPointInstance(loggable: Loggable): loggable is PointInstance {
-  return loggable.hasOwnProperty("timeStampedHitPoint") && loggable.hasOwnProperty("point");
+  return loggable.type === "PointInstance";
 }
 
 export function isProtocolMessage(loggable: Loggable): loggable is ProtocolMessage {
-  return !loggable.hasOwnProperty("timeStampedHitPoint") || !loggable.hasOwnProperty("point");
+  return loggable.type === "ProtocolMessage";
+}
+
+export function isTerminalExpression(loggable: Loggable): loggable is TerminalExpression {
+  return loggable.type === "TerminalExpression";
 }

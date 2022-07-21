@@ -3,13 +3,16 @@ import ConsoleRoot from "@bvaughn/components/console";
 import Focuser from "@bvaughn/components/console/Focuser";
 import Icon from "@bvaughn/components/Icon";
 import Initializer from "@bvaughn/components/Initializer";
+import Input from "@bvaughn/components/console/Input";
+import Loader from "@bvaughn/components/Loader";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
+import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
-import React, { useContext, useMemo, useState, useTransition } from "react";
+import React, { Suspense, useContext, useMemo, useState, useTransition } from "react";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";
@@ -68,7 +71,16 @@ export default function HomePage() {
                     <Sources />
                   </div>
                   <div className={styles.ConsoleContainer}>
-                    <ConsoleRoot />
+                    <TerminalContextRoot>
+                      <ConsoleRoot
+                        showSearchInputByDefault={false}
+                        terminalInput={
+                          <Suspense fallback={<Loader />}>
+                            <Input />
+                          </Suspense>
+                        }
+                      />
+                    </TerminalContextRoot>
                   </div>
                 </div>
                 <div className={styles.Row}>

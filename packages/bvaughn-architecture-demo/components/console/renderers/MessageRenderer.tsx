@@ -112,6 +112,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
       {isHovered && (
         <MessageHoverButton
           executionPoint={message.point.point}
+          pauseId={message.pauseId}
           showAddCommentButton={true}
           targetRef={ref}
           time={message.point.time}

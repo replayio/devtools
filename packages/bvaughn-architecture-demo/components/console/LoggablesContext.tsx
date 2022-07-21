@@ -1,12 +1,13 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
-import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
+import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
+import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
-import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
+import { loggableSort } from "@bvaughn/src/utils/loggables";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
-import { EventHandlerType, Message as ProtocolMessage } from "@replayio/protocol";
+import { EventHandlerType } from "@replayio/protocol";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import {
   createContext,
@@ -20,9 +21,15 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./hooks/useFocusRange";
 
-export type Loggable = EventTypeLog | PointInstance | ProtocolMessage;
+export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
 export const LoggablesContext = createContext<Loggable[]>(null as any);
+
+// A "loggable" is anything that can be logged to the Console:
+// * Messages logged to the Console API (e.g. console.log) while a recording is in progress.
+// * Messages logged to the Replay Console terminal while viewing a recording.
+// * Log points (e.g. break points with logging behavior enabled).
+// * Events (e.g. "click") that have been toggled on by the user.
 
 export function LoggablesContextRoot({
   children,
@@ -57,7 +64,7 @@ export function LoggablesContextRoot({
   }, [eventTypes]);
 
   // Load the event type data from the protocol and flatten into a single array (to be filtered and sorted below).
-  const eventTypeLogs = useMemo<EventTypeLog[]>(() => {
+  const eventLogs = useMemo<EventLog[]>(() => {
     return suspendInParallel(
       ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPoints(client, eventType))
     ).flat();
@@ -123,18 +130,17 @@ export function LoggablesContextRoot({
     }
   }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
-  // Trim eventTypeLogs and logPoints by focusRange.
+  // Trim eventLogs and logPoints by focusRange.
   // Messages will have already been filtered from the backend.
-  const focusedEventTypeLogs = useMemo<EventTypeLog[]>(() => {
+  const focusedEventLogs = useMemo<EventLog[]>(() => {
     if (focusRange === null) {
-      return eventTypeLogs;
+      return eventLogs;
     } else {
-      return eventTypeLogs.filter(
-        eventTypeLog =>
-          eventTypeLog.time >= focusRange.begin.time && eventTypeLog.time <= focusRange.end.time
+      return eventLogs.filter(
+        eventLog => eventLog.time >= focusRange.begin.time && eventLog.time <= focusRange.end.time
       );
     }
-  }, [eventTypeLogs, focusRange]);
+  }, [eventLogs, focusRange]);
 
   const pointInstances = useMemo<PointInstance[]>(() => {
     const pointInstances: PointInstance[] = [];
@@ -151,6 +157,7 @@ export function LoggablesContextRoot({
               pointInstances.push({
                 point,
                 timeStampedHitPoint: hitPoint,
+                type: "PointInstance",
               });
             }
           });
@@ -161,16 +168,28 @@ export function LoggablesContextRoot({
     return pointInstances;
   }, [client, focusRange, points]);
 
+  const { messages: terminalExpressions } = useContext(TerminalContext);
+  const sortedTerminalExpressions = useMemo(() => {
+    if (focusRange === null) {
+      return terminalExpressions;
+    } else {
+      return terminalExpressions.filter(
+        terminalExpression =>
+          terminalExpression.time >= focusRange.begin.time &&
+          terminalExpression.time <= focusRange.end.time
+      );
+    }
+  }, [focusRange, terminalExpressions]);
+
   const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [
-      ...focusedEventTypeLogs,
+      ...focusedEventLogs,
       ...pointInstances,
       ...preFilteredMessages,
+      ...sortedTerminalExpressions,
     ];
-    return loggables.sort((a: Loggable, b: Loggable) => {
-      return getTimeForSort(a) - getTimeForSort(b);
-    });
-  }, [focusedEventTypeLogs, pointInstances, preFilteredMessages]);
+    return loggables.sort(loggableSort);
+  }, [focusedEventLogs, pointInstances, preFilteredMessages, sortedTerminalExpressions]);
 
   const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 
@@ -191,14 +210,4 @@ export function LoggablesContextRoot({
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);
 
   return <LoggablesContext.Provider value={sortedLoggables}>{children}</LoggablesContext.Provider>;
-}
-
-function getTimeForSort(value: Loggable): number {
-  if (isEventTypeLog(value)) {
-    return value.time;
-  } else if (isPointInstance(value)) {
-    return value.timeStampedHitPoint.time;
-  } else {
-    return value.point.time;
-  }
 }

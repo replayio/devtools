@@ -7,11 +7,13 @@ export const SearchContext = createContext<[State, Actions]>(null as any);
 export function SearchContextRoot({
   children,
   messageListRef,
+  showSearchInputByDefault,
 }: {
   children: ReactNode;
   messageListRef: MutableRefObject<HTMLElement | null>;
+  showSearchInputByDefault: boolean;
 }) {
-  const [state, actions] = useConsoleSearchDOM(messageListRef);
+  const [state, actions] = useConsoleSearchDOM(messageListRef, showSearchInputByDefault);
 
   const context = useMemo<[State, Actions]>(() => [state, actions], [state, actions]);
 

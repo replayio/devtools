@@ -8,19 +8,23 @@ import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
 import { preCacheObjects } from "./ObjectPreviews";
 import { Wakeable } from "./types";
 
+export type ProtocolMessage = Message & {
+  type: "ProtocolMessage";
+};
+
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
-let inFlightWakeable: Wakeable<Message[]> | null = null;
+let inFlightWakeable: Wakeable<ProtocolMessage[]> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
 let lastFetchedFocusRange: TimeStampedPointRange | null = null;
-let lastFetchedMessages: Message[] | null = null;
+let lastFetchedMessages: ProtocolMessage[] | null = null;
 
 let lastFilteredFocusRange: TimeStampedPointRange | null = null;
-let lastFilteredMessages: Message[] | null = null;
+let lastFilteredMessages: ProtocolMessage[] | null = null;
 let lastFilteredCountAfter: number = 0;
 let lastFilteredCountBefore: number = 0;
 
@@ -28,7 +32,7 @@ type getMessagesResponse = {
   countAfter: number;
   countBefore: number;
   didOverflow: boolean;
-  messages: Message[];
+  messages: ProtocolMessage[];
 };
 
 // Synchronously returns an array of filtered Messages,
@@ -136,10 +140,15 @@ export function getMessages(
 async function fetchMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
-  wakeable: Wakeable<Message[]>
+  wakeable: Wakeable<ProtocolMessage[]>
 ) {
   try {
     const { messages, overflow } = await client.findMessages(focusRange);
+
+    const protocolMessage: ProtocolMessage[] = messages.map(message => ({
+      ...message,
+      type: "ProtocolMessage",
+    }));
 
     // Only update cached values if this request hasn't been superceded by a newer one.
     //
@@ -153,7 +162,7 @@ async function fetchMessages(
 
       lastFetchDidOverflow = overflow;
       lastFetchedFocusRange = focusRange;
-      lastFetchedMessages = messages;
+      lastFetchedMessages = protocolMessage;
 
       // Pre-cache ObjectPreview data for this Message (PauseId).
       // This will avoid us having to turn around and request it again when rendering the logs.
@@ -165,7 +174,7 @@ async function fetchMessages(
       });
     }
 
-    wakeable.resolve(messages);
+    wakeable.resolve(protocolMessage);
   } catch (error) {
     inFlightFocusRange = null;
     inFlightWakeable = null;

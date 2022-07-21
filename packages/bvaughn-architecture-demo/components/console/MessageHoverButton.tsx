@@ -3,7 +3,7 @@ import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import {
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -19,11 +19,13 @@ import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
   executionPoint,
+  pauseId,
   showAddCommentButton,
   targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
+  pauseId: PauseId;
   showAddCommentButton: boolean;
   targetRef: RefObject<HTMLDivElement | null>;
   time: number;
@@ -33,11 +35,7 @@ export default function MessageHoverButton({
 
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
-  const {
-    executionPoint: currentExecutionPoint,
-    time: currentTime,
-    update,
-  } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
 
   const invalidateCache = useCacheRefresh();
   const [isPending, startTransition] = useTransition();
@@ -90,15 +88,15 @@ export default function MessageHoverButton({
   } else {
     button = (
       <button
-        className={styles.FastForwardButton}
-        data-test-id="FastForwardButton"
-        onClick={() => update(time, executionPoint)}
+        className={styles.ConsoleMessageHoverButton}
+        data-test-id="ConsoleMessageHoverButton"
+        onClick={() => update(time, executionPoint, pauseId)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={ref}
       >
         <Icon
-          className={styles.FastForwardButtonIcon}
+          className={styles.ConsoleMessageHoverButtonIcon}
           type={
             currentExecutionPoint === null || executionPoint > currentExecutionPoint
               ? "fast-forward"

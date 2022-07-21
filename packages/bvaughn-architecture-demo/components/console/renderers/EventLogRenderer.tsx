@@ -2,7 +2,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { EventTypeLog } from "@bvaughn/src/suspense/EventsCache";
+import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { useRef, useState } from "react";
 import { useLayoutEffect } from "react";
@@ -13,13 +13,7 @@ import Source from "../Source";
 import styles from "./shared.module.css";
 import MessageHoverButton from "../MessageHoverButton";
 
-function EventTypeRenderer({
-  eventTypeLog,
-  isFocused,
-}: {
-  eventTypeLog: EventTypeLog;
-  isFocused: boolean;
-}) {
+function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocused: boolean }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -34,7 +28,7 @@ function EventTypeRenderer({
     }
   }, [isFocused]);
 
-  const { point, pauseId, values } = eventTypeLog;
+  const { point, pauseId, values } = eventLog;
 
   let className = styles.Row;
   if (isFocused) {
@@ -45,7 +39,7 @@ function EventTypeRenderer({
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
-  const location = eventTypeLog.location[0];
+  const location = eventLog.location[0];
 
   const contents = values.map((value, index) => (
     <KeyValueRenderer
@@ -64,7 +58,7 @@ function EventTypeRenderer({
       }
     >
       {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(eventTypeLog.time, true)}</span>
+        <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)}</span>
       )}
       <div className={styles.LogContents}>{contents}</div>
       <Suspense fallback={<Loader />}>
@@ -85,14 +79,15 @@ function EventTypeRenderer({
       {primaryContent}
       {isHovered && (
         <MessageHoverButton
-          executionPoint={eventTypeLog.point}
+          executionPoint={eventLog.point}
+          pauseId={eventLog.pauseId}
           showAddCommentButton={false}
           targetRef={ref}
-          time={eventTypeLog.time}
+          time={eventLog.time}
         />
       )}
     </div>
   );
 }
 
-export default memo(EventTypeRenderer) as typeof EventTypeRenderer;
+export default memo(EventLogRenderer) as typeof EventLogRenderer;
