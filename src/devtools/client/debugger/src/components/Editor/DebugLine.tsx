@@ -4,21 +4,39 @@
 
 //
 import { PureComponent } from "react";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
+
 import {
   toEditorLine,
+  // @ts-expect-error not JS yet
   toEditorColumn,
   getDocument,
+  // @ts-expect-error not JS yet
   startOperation,
+  // @ts-expect-error not JS yet
   endOperation,
+  // @ts-expect-error not JS yet
   getTokenEnd,
 } from "../../utils/editor";
 import { isException } from "../../utils/pause";
 import { getIndentation } from "../../utils/indentation";
-import { connect } from "react-redux";
 import { getPauseReason, getDebugLineLocation } from "../../selectors";
 
-export class DebugLine extends PureComponent {
-  debugExpression;
+const mapStateToProps = (state: UIState) => {
+  return {
+    location: getDebugLineLocation(state),
+    why: getPauseReason(state),
+  };
+};
+
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export class DebugLine extends PureComponent<PropsFromRedux> {
+  debugExpression: any;
 
   componentDidMount() {
     const { why, location } = this.props;
@@ -30,7 +48,7 @@ export class DebugLine extends PureComponent {
     this.clearDebugLine(why, location);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: PropsFromRedux) {
     const { why, location } = this.props;
 
     startOperation();
@@ -39,7 +57,7 @@ export class DebugLine extends PureComponent {
     endOperation();
   }
 
-  setDebugLine(why, location) {
+  setDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
     if (!location) {
       return;
     }
@@ -72,7 +90,7 @@ export class DebugLine extends PureComponent {
     );
   }
 
-  clearDebugLine(why, location) {
+  clearDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
     if (!location) {
       return;
     }
@@ -90,7 +108,7 @@ export class DebugLine extends PureComponent {
     doc.removeLineClass(line, "line", lineClass);
   }
 
-  getTextClasses(why) {
+  getTextClasses(why: PropsFromRedux["why"]) {
     if (why && isException(why)) {
       return {
         markTextClass: "debug-expression-error",
@@ -106,11 +124,4 @@ export class DebugLine extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    location: getDebugLineLocation(state),
-    why: getPauseReason(state),
-  };
-};
-
-export default connect(mapStateToProps)(DebugLine);
+export default connector(DebugLine);
