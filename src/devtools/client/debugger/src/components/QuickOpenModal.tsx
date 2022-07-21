@@ -462,7 +462,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
           size="big"
         />
         {sourcesLoading && <div className="px-2 py-1">Sources Loading…</div>}
-        {showLoadingResults ? <div className="px-2 py-1">Loading results…</div> : null}
+        {!sourcesLoading && showLoadingResults && <div className="px-2 py-1">Loading results…</div>}
         {results && items && (
           <ResultList
             key="results"
