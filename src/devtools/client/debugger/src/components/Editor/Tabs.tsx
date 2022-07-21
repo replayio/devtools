@@ -4,7 +4,9 @@
 
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 
 import Tab from "./Tab";
 
@@ -15,14 +17,30 @@ import { trackEvent } from "ui/utils/telemetry";
 import CommandPaletteButton from "./CommandPaletteButton";
 import { getToolboxLayout } from "ui/reducers/layout";
 
-class Tabs extends PureComponent {
-  _draggedSource;
-  _draggedSourceIndex;
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
 
-  componentDidUpdate(prevProps) {
+const mapStateToProps = (state: UIState) => ({
+  selectedSource: getSelectedSource(state),
+  tabSources: getSourcesForTabs(state),
+  isPaused: getIsPaused(state),
+  toolboxLayout: getToolboxLayout(state),
+});
+
+const connector = connect(mapStateToProps, {
+  moveTabBySourceId: actions.moveTabBySourceId,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+class Tabs extends PureComponent<PropsFromRedux> {
+  _draggedSource: Source | { url: null; id: null } | null = null;
+  _draggedSourceIndex: number | null = null;
+
+  componentDidUpdate(prevProps: PropsFromRedux) {
     const { selectedSource } = this.props;
 
     if (selectedSource && selectedSource != prevProps.selectedSource) {
+      // @ts-expect-error DOM node stuff
       const sourceNodes = [...this.refs.sourceTabs.children];
       const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
 
@@ -35,7 +53,9 @@ class Tabs extends PureComponent {
   }
 
   getIsSelectedSourceNodeVisible() {
+    // @ts-expect-error DOM node stuff
     const containerNode = this.refs.sourceTabs.parentElement;
+    // @ts-expect-error DOM node stuff
     const sourceNodes = [...this.refs.sourceTabs.children];
     const selectedSourceNode = sourceNodes.find(node => node.classList.contains("active"));
 
@@ -61,7 +81,7 @@ class Tabs extends PureComponent {
     return this._draggedSource == null ? { url: null, id: null } : this._draggedSource;
   }
 
-  set draggedSource(source) {
+  set draggedSource(source: Source | { url: null; id: null } | null) {
     this._draggedSource = source;
   }
 
@@ -69,11 +89,11 @@ class Tabs extends PureComponent {
     return this._draggedSourceIndex == null ? -1 : this._draggedSourceIndex;
   }
 
-  set draggedSourceIndex(index) {
+  set draggedSourceIndex(index: number | null) {
     this._draggedSourceIndex = index;
   }
 
-  getIconClass(source) {
+  getIconClass(source: Source) {
     if (isPretty(source)) {
       return "prettyPrint";
     }
@@ -83,7 +103,7 @@ class Tabs extends PureComponent {
     return "file";
   }
 
-  onTabDragStart = (source, index) => {
+  onTabDragStart = (source: Source, index: number) => {
     trackEvent("tabs.drag_start");
     this.draggedSource = source;
     this.draggedSourceIndex = index;
@@ -95,17 +115,17 @@ class Tabs extends PureComponent {
     this.draggedSourceIndex = null;
   };
 
-  onTabDragOver = (e, source, hoveredTabIndex) => {
+  onTabDragOver = (e: React.MouseEvent, source: Source, hoveredTabIndex: number) => {
     const { moveTabBySourceId } = this.props;
     if (hoveredTabIndex === this.draggedSourceIndex) {
       return;
     }
 
-    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`]);
+    const tabDOM = ReactDOM.findDOMNode(this.refs[`tab_${source.id}`])! as HTMLElement;
 
     /* $FlowIgnore: tabDOM.nodeType will always be of Node.ELEMENT_NODE since it comes from a ref;
       however; the return type of findDOMNode is null | Element | Text */
-    const tabDOMRect = tabDOM.getBoundingClientRect();
+    const tabDOMRect = tabDOM!.getBoundingClientRect()!;
     const { pageX: mouseCursorX } = e;
     if (
       /* Case: the mouse cursor moves into the left half of any target tab */
@@ -114,8 +134,8 @@ class Tabs extends PureComponent {
     ) {
       // The current tab goes to the left of the target tab
       const targetTab =
-        hoveredTabIndex > this.draggedSourceIndex ? hoveredTabIndex - 1 : hoveredTabIndex;
-      moveTabBySourceId(this.draggedSource.id, targetTab);
+        hoveredTabIndex > this.draggedSourceIndex! ? hoveredTabIndex - 1 : hoveredTabIndex;
+      moveTabBySourceId(this.draggedSource!.id!, targetTab);
       this.draggedSourceIndex = targetTab;
     } else if (
       /* Case: the mouse cursor moves into the right half of any target tab */
@@ -124,8 +144,8 @@ class Tabs extends PureComponent {
     ) {
       // The current tab goes to the right of the target tab
       const targetTab =
-        hoveredTabIndex < this.draggedSourceIndex ? hoveredTabIndex + 1 : hoveredTabIndex;
-      moveTabBySourceId(this.draggedSource.id, targetTab);
+        hoveredTabIndex < this.draggedSourceIndex! ? hoveredTabIndex + 1 : hoveredTabIndex;
+      moveTabBySourceId(this.draggedSource!.id!, targetTab);
       this.draggedSourceIndex = targetTab;
     }
   };
@@ -166,14 +186,4 @@ class Tabs extends PureComponent {
     return <div className="source-header">{this.renderTabs()}</div>;
   }
 }
-
-const mapStateToProps = state => ({
-  selectedSource: getSelectedSource(state),
-  tabSources: getSourcesForTabs(state),
-  isPaused: getIsPaused(state),
-  toolboxLayout: getToolboxLayout(state),
-});
-
-export default connect(mapStateToProps, {
-  moveTabBySourceId: actions.moveTabBySourceId,
-})(Tabs);
+export default connector(Tabs);

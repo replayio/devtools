@@ -98,6 +98,8 @@ type MixpanelEvent =
   | ["sources.select_location"]
   | ["tabs.context_menu"]
   | ["tabs.close"]
+  | ["tabs.drag_start"]
+  | ["tabs.drag_stop"]
   | ["tabs.select"]
   | ["team_change", { workspaceId: WorkspaceId | null }]
   | ["team.change_default", { workspaceUuid: WorkspaceUuid | null }]
