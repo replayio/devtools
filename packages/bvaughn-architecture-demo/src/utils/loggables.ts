@@ -1,6 +1,6 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { ExecutionPoint } from "@replayio/protocol";
-import { isEventTypeLog, isPointInstance, isProtocolMessage, isTerminalMessage } from "./console";
+import { isEventTypeLog, isPointInstance, isProtocolMessage, isTerminalExpression } from "./console";
 
 export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
   if (isEventTypeLog(loggable)) {
@@ -9,7 +9,7 @@ export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
     return loggable.timeStampedHitPoint.point;
   } else if (isProtocolMessage(loggable)) {
     return loggable.point.point;
-  } else if (isTerminalMessage(loggable)) {
+  } else if (isTerminalExpression(loggable)) {
     return loggable.point;
   } else {
     throw Error("Unsupported loggable type");
@@ -23,7 +23,7 @@ export function getTimeForSort(loggable: Loggable): number {
     return loggable.timeStampedHitPoint.time;
   } else if (isProtocolMessage(loggable)) {
     return loggable.point.time;
-  } else if (isTerminalMessage(loggable)) {
+  } else if (isTerminalExpression(loggable)) {
     return loggable.time;
   } else {
     throw Error("Unsupported loggable type");
@@ -35,16 +35,16 @@ export function loggableSort(a: Loggable, b: Loggable): number {
   const bPoint = getExecutionPointForSort(b);
 
   // Terminal messages may be logged at the same point/time as other loggables.
-  // If this happens, TerminalMessages should always come last.
+  // If this happens, TerminalExpressions should always come last.
   if (aPoint === bPoint) {
-    const aIsTerminalMessage = isTerminalMessage(a);
-    const bIsTerminalMessage = isTerminalMessage(b);
-    if (aIsTerminalMessage && bIsTerminalMessage) {
+    const aIsTerminalExpression = isTerminalExpression(a);
+    const bIsTerminalExpression = isTerminalExpression(b);
+    if (aIsTerminalExpression && bIsTerminalExpression) {
       // Two terminal messages at the same time can be sorted by the order they were added in.
       return a.id - b.id;
-    } else if (aIsTerminalMessage) {
+    } else if (aIsTerminalExpression) {
       return 1;
-    } else if (bIsTerminalMessage) {
+    } else if (bIsTerminalExpression) {
       return -1;
     }
   }

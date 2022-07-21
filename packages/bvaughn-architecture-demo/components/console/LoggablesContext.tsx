@@ -1,6 +1,6 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { TerminalContext, TerminalMessage } from "@bvaughn/src/contexts/TerminalContext";
+import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
@@ -21,7 +21,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./hooks/useFocusRange";
 
-export type Loggable = EventTypeLog | PointInstance | ProtocolMessage | TerminalMessage;
+export type Loggable = EventTypeLog | PointInstance | ProtocolMessage | TerminalExpression;
 
 export const LoggablesContext = createContext<Loggable[]>(null as any);
 
@@ -169,28 +169,28 @@ export function LoggablesContextRoot({
     return pointInstances;
   }, [client, focusRange, points]);
 
-  const { messages: terminalMessages } = useContext(TerminalContext);
-  const sortedTerminalMessages = useMemo(() => {
+  const { messages: terminalExpressions } = useContext(TerminalContext);
+  const sortedTerminalExpressions = useMemo(() => {
     if (focusRange === null) {
-      return terminalMessages;
+      return terminalExpressions;
     } else {
-      return terminalMessages.filter(
-        terminalMessage =>
-          terminalMessage.time >= focusRange.begin.time &&
-          terminalMessage.time <= focusRange.end.time
+      return terminalExpressions.filter(
+        terminalExpression =>
+          terminalExpression.time >= focusRange.begin.time &&
+          terminalExpression.time <= focusRange.end.time
       );
     }
-  }, [focusRange, terminalMessages]);
+  }, [focusRange, terminalExpressions]);
 
   const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [
       ...focusedEventTypeLogs,
       ...pointInstances,
       ...preFilteredMessages,
-      ...sortedTerminalMessages,
+      ...sortedTerminalExpressions,
     ];
     return loggables.sort(loggableSort);
-  }, [focusedEventTypeLogs, pointInstances, preFilteredMessages, sortedTerminalMessages]);
+  }, [focusedEventTypeLogs, pointInstances, preFilteredMessages, sortedTerminalExpressions]);
 
   const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 

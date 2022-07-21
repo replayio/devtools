@@ -65,7 +65,7 @@ export default function Input() {
     }
   };
 
-  // TODO (FE-346) Add eager evaluation row (share code with TerminalMessageRenderer)
+  // TODO (FE-346) Add eager evaluation row (share code with TerminalExpressionRenderer)
 
   return (
     <div className={styles.Container}>

@@ -10,22 +10,22 @@ import {
 
 // This context stores (in memory) messages logged to the Replay Console terminal while viewing a recording.
 
-export type TerminalMessage = {
+export type TerminalExpression = {
   expression: string;
   id: number;
   frameId: FrameId | null;
   pauseId: PauseId | null;
   point: ExecutionPoint;
   time: number;
-  type: "TerminalMessage";
+  type: "TerminalExpression";
 };
 
-type NewMessage = Omit<TerminalMessage, "id" | "type">;
+type NewMessage = Omit<TerminalExpression, "id" | "type">;
 
 export type TerminalContextType = {
   addMessage: (newMessage: NewMessage) => void;
   isPending: boolean;
-  messages: TerminalMessage[];
+  messages: TerminalExpression[];
 };
 
 let idCounter: number = 0;
@@ -33,16 +33,16 @@ let idCounter: number = 0;
 export const TerminalContext = createContext<TerminalContextType>(null as any);
 
 export function TerminalContextRoot({ children }: PropsWithChildren<{}>) {
-  const [messages, setMessages] = useState<TerminalMessage[]>([]);
+  const [messages, setMessages] = useState<TerminalExpression[]>([]);
 
   const [isPending, startTransition] = useTransition();
 
-  const addMessage = useCallback((newMessage: Omit<TerminalMessage, "id" | "type">) => {
+  const addMessage = useCallback((newMessage: Omit<TerminalExpression, "id" | "type">) => {
     startTransition(() => {
-      const message: TerminalMessage = {
+      const message: TerminalExpression = {
         ...newMessage,
         id: idCounter++,
-        type: "TerminalMessage",
+        type: "TerminalExpression",
       };
 
       setMessages(prevMessages => [...prevMessages, message]);

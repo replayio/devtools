@@ -4,7 +4,7 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import Loader from "@bvaughn/components/Loader";
 import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import { TerminalMessage } from "@bvaughn/src/contexts/TerminalContext";
+import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import {
   evaluate,
   getPauseData,
@@ -17,12 +17,12 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./shared.module.css";
 
-function TerminalMessageRenderer({
+function TerminalExpressionRenderer({
   isFocused,
-  terminalMessage,
+  terminalExpression,
 }: {
   isFocused: boolean;
-  terminalMessage: TerminalMessage;
+  terminalExpression: TerminalExpression;
 }) {
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
@@ -49,17 +49,17 @@ function TerminalMessageRenderer({
         }
       >
         {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(terminalMessage.time, true)}</span>
+          <span className={styles.TimeStamp}>{formatTimestamp(terminalExpression.time, true)}</span>
         )}
         <div className={styles.TerminalLogContents}>
           <div className={styles.LogContents}>
             <Icon className={styles.PromptIcon} type="prompt" />
-            <SyntaxHighlightedExpression expression={terminalMessage.expression} />
+            <SyntaxHighlightedExpression expression={terminalExpression.expression} />
           </div>
           <div className={styles.LogContents}>
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
             <Suspense fallback={<Loader />}>
-              <EvaluatedContent terminalMessage={terminalMessage} />
+              <EvaluatedContent terminalExpression={terminalExpression} />
             </Suspense>
           </div>
         </div>
@@ -68,7 +68,7 @@ function TerminalMessageRenderer({
   );
 }
 
-function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessage }) {
+function EvaluatedContent({ terminalExpression }: { terminalExpression: TerminalExpression }) {
   const client = useContext(ReplayClientContext);
 
   // HACK
@@ -77,17 +77,17 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
   //
   // TODO (FE-337) This seems wrong for frameId?
   // We should probably expect this to be passed in explicitly (and so probably also pauseId)?
-  let frameId = terminalMessage.frameId;
-  let pauseId = terminalMessage.pauseId;
+  let frameId = terminalExpression.frameId;
+  let pauseId = terminalExpression.pauseId;
   if (pauseId === null) {
-    const pauseData = getPauseForExecutionPoint(client, terminalMessage.point);
+    const pauseData = getPauseForExecutionPoint(client, terminalExpression.point);
     frameId = pauseData.stack?.[0] ?? null;
     pauseId = pauseData.pauseId;
   } else {
     getPauseData(client, pauseId);
   }
 
-  const result = evaluate(client, pauseId, frameId, terminalMessage.expression);
+  const result = evaluate(client, pauseId, frameId, terminalExpression.expression);
   const { exception, returned } = result;
   if (exception) {
     return (
@@ -123,4 +123,4 @@ function EvaluatedContent({ terminalMessage }: { terminalMessage: TerminalMessag
   );
 }
 
-export default memo(TerminalMessageRenderer) as typeof TerminalMessageRenderer;
+export default memo(TerminalExpressionRenderer) as typeof TerminalExpressionRenderer;

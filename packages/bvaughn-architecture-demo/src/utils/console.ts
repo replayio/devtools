@@ -1,6 +1,6 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
-import { TerminalMessage } from "@bvaughn/src/contexts/TerminalContext";
+import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { EventTypeLog } from "@bvaughn/src/suspense/EventsCache";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 
@@ -16,6 +16,6 @@ export function isProtocolMessage(loggable: Loggable): loggable is ProtocolMessa
   return loggable.type === "ProtocolMessage";
 }
 
-export function isTerminalMessage(loggable: Loggable): loggable is TerminalMessage {
-  return loggable.type === "TerminalMessage";
+export function isTerminalExpression(loggable: Loggable): loggable is TerminalExpression {
+  return loggable.type === "TerminalExpression";
 }
