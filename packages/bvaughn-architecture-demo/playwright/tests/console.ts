@@ -369,7 +369,7 @@ test("should evaluate and render invalid local terminal expressions", async ({ p
   await hideProtocolMessages(page);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, firstListItem, "local-terminal-expression-valid");
+  await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
 });
 
 // TODO (FE-337) Add tests for global expressions once pauseId issue is sorted out.
