@@ -23,8 +23,7 @@
   display: flex;
 }
 
-.controlled .tree .node
-{
+.controlled .tree .node {
   cursor: pointer;
 }
 
