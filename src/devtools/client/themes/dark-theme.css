@@ -183,8 +183,7 @@
   border-left: solid 1px #fff;
 }
 
-.theme-dark .cm-highlight
-{
+.theme-dark .cm-highlight {
   background: rgba(24, 216, 255, 0.2);
 }
 
