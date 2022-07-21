@@ -1,7 +1,7 @@
 import { Loggable, LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import type { Actions as SearchActions, State as SearchState } from "@bvaughn/src/hooks/useSearch";
-import { isEventTypeLog, isPointInstance } from "@bvaughn/src/utils/console";
+import { isEventLog, isPointInstance } from "@bvaughn/src/utils/console";
 import useSearch from "@bvaughn/src/hooks/useSearch";
 import { getCachedAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
@@ -14,7 +14,7 @@ function search(query: string, loggables: Loggable[]): Loggable[] {
 
   const needle = query.toLocaleLowerCase();
   loggables.forEach(loggable => {
-    if (isEventTypeLog(loggable)) {
+    if (isEventLog(loggable)) {
       loggable.values.some(value => {
         // TODO Search non-primitive values (nested values) as well.
         // Probably easier if we convert from ProtocolValue to ClientValue first.

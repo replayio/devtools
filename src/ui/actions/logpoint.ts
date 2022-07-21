@@ -425,7 +425,7 @@ export function setLogpointByURL(
 }
 
 const eventTypePoints: Record<string, PointDescription[]> = {};
-const eventTypeLogGroupId: Record<string, string> = {};
+const eventLogGroupId: Record<string, string> = {};
 
 export async function fetchEventTypePoints(eventTypes: EventId[]) {
   await Promise.all(
@@ -493,16 +493,16 @@ export function newLogGroupId() {
 }
 
 export async function setEventLogpoints(eventTypes: string[]) {
-  for (const eventType in eventTypeLogGroupId) {
+  for (const eventType in eventLogGroupId) {
     if (eventTypes.indexOf(eventType) < 0) {
-      removeLogpoint(eventTypeLogGroupId[eventType]);
-      delete eventTypeLogGroupId[eventType];
+      removeLogpoint(eventLogGroupId[eventType]);
+      delete eventLogGroupId[eventType];
     }
   }
   for (const eventType of eventTypes) {
-    if (!eventTypeLogGroupId[eventType]) {
+    if (!eventLogGroupId[eventType]) {
       const logGroupId = newLogGroupId();
-      eventTypeLogGroupId[eventType] = logGroupId;
+      eventLogGroupId[eventType] = logGroupId;
       setEventLogpoint(logGroupId, [eventType], eventTypePoints[eventType]);
     }
   }

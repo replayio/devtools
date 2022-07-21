@@ -1,14 +1,9 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { ExecutionPoint } from "@replayio/protocol";
-import {
-  isEventTypeLog,
-  isPointInstance,
-  isProtocolMessage,
-  isTerminalExpression,
-} from "./console";
+import { isEventLog, isPointInstance, isProtocolMessage, isTerminalExpression } from "./console";
 
 export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
-  if (isEventTypeLog(loggable)) {
+  if (isEventLog(loggable)) {
     return loggable.point;
   } else if (isPointInstance(loggable)) {
     return loggable.timeStampedHitPoint.point;
@@ -22,7 +17,7 @@ export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
 }
 
 export function getTimeForSort(loggable: Loggable): number {
-  if (isEventTypeLog(loggable)) {
+  if (isEventLog(loggable)) {
     return loggable.time;
   } else if (isPointInstance(loggable)) {
     return loggable.timeStampedHitPoint.time;

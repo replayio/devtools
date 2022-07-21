@@ -23,7 +23,7 @@ export type EventCategory = {
   events: Event[];
 };
 
-export type EventTypeLog = {
+export type EventLog = {
   data: {
     frames: Frame[];
     objects: Object[];
@@ -32,11 +32,11 @@ export type EventTypeLog = {
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
-  type: "EventTypeLog";
+  type: "EventLog";
   values: any[];
 };
 
-let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventTypeLog[]>>();
+let eventTypeToEntryPointMap = new Map<EventHandlerType, Record<EventLog[]>>();
 let eventCategoryCounts: EventCategory[] | null = null;
 let inProgressEventCategoryCountsWakeable: Wakeable<EventCategory[]> | null = null;
 
@@ -57,12 +57,12 @@ export function getEventCategoryCounts(client: ReplayClientInterface): EventCate
 export function getEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType
-): EventTypeLog[] {
+): EventLog[] {
   let record = eventTypeToEntryPointMap.get(eventType);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<EventTypeLog[]>(),
+      value: createWakeable<EventLog[]>(),
     };
 
     eventTypeToEntryPointMap.set(eventType, record);
@@ -115,9 +115,9 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
 async function fetchEventTypeEntryPoints(
   client: ReplayClientInterface,
   eventType: EventHandlerType,
-  record: Record<EventTypeLog[]>
+  record: Record<EventLog[]>
 ) {
-  const entryPoints = await client.runAnalysis<EventTypeLog>({
+  const entryPoints = await client.runAnalysis<EventLog>({
     effectful: false,
     eventHandlerEntryPoints: [{ eventType }],
     mapper: MAPPER,
@@ -127,17 +127,17 @@ async function fetchEventTypeEntryPoints(
   // This will avoid us having to turn around and request them again when rendering the logs.
   entryPoints.forEach(entryPoint => preCacheObjects(entryPoint.pauseId, entryPoint.data.objects));
 
-  const eventTypeLogs: EventTypeLog[] = entryPoints.map(entryPoint => ({
+  const eventLogs: EventLog[] = entryPoints.map(entryPoint => ({
     ...entryPoint,
-    type: "EventTypeLog",
+    type: "EventLog",
   }));
 
   const wakeable = record.value;
 
   record.status = STATUS_RESOLVED;
-  record.value = eventTypeLogs;
+  record.value = eventLogs;
 
-  wakeable.resolve(eventTypeLogs);
+  wakeable.resolve(eventLogs);
 }
 
 const MAPPER = `

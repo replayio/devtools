@@ -1,7 +1,7 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import {
-  isEventTypeLog,
+  isEventLog,
   isPointInstance,
   isProtocolMessage,
   isTerminalExpression,
@@ -13,7 +13,7 @@ import Icon from "../Icon";
 import useFocusRange from "./hooks/useFocusRange";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
-import EventTypeRenderer from "./renderers/EventTypeRenderer";
+import EventLogRenderer from "./renderers/EventLogRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
 import PointInstanceRenderer from "./renderers/PointInstanceRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
@@ -79,12 +79,12 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         role="list"
       >
         {loggables.map((loggable: Loggable, index: number) => {
-          if (isEventTypeLog(loggable)) {
+          if (isEventLog(loggable)) {
             return (
-              <EventTypeRenderer
+              <EventLogRenderer
                 key={index}
                 isFocused={loggable === currentSearchResult}
-                eventTypeLog={loggable}
+                eventLog={loggable}
               />
             );
           } else if (isPointInstance(loggable)) {

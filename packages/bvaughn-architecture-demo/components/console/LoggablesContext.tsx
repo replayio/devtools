@@ -1,7 +1,7 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { EventTypeLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
+import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
@@ -21,7 +21,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./hooks/useFocusRange";
 
-export type Loggable = EventTypeLog | PointInstance | ProtocolMessage | TerminalExpression;
+export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
 export const LoggablesContext = createContext<Loggable[]>(null as any);
 
@@ -64,7 +64,7 @@ export function LoggablesContextRoot({
   }, [eventTypes]);
 
   // Load the event type data from the protocol and flatten into a single array (to be filtered and sorted below).
-  const eventTypeLogs = useMemo<EventTypeLog[]>(() => {
+  const eventLogs = useMemo<EventLog[]>(() => {
     return suspendInParallel(
       ...eventTypesToLoad.map(eventType => () => getEventTypeEntryPoints(client, eventType))
     ).flat();
@@ -130,18 +130,17 @@ export function LoggablesContextRoot({
     }
   }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
-  // Trim eventTypeLogs and logPoints by focusRange.
+  // Trim eventLogs and logPoints by focusRange.
   // Messages will have already been filtered from the backend.
-  const focusedEventTypeLogs = useMemo<EventTypeLog[]>(() => {
+  const focusedEventLogs = useMemo<EventLog[]>(() => {
     if (focusRange === null) {
-      return eventTypeLogs;
+      return eventLogs;
     } else {
-      return eventTypeLogs.filter(
-        eventTypeLog =>
-          eventTypeLog.time >= focusRange.begin.time && eventTypeLog.time <= focusRange.end.time
+      return eventLogs.filter(
+        eventLog => eventLog.time >= focusRange.begin.time && eventLog.time <= focusRange.end.time
       );
     }
-  }, [eventTypeLogs, focusRange]);
+  }, [eventLogs, focusRange]);
 
   const pointInstances = useMemo<PointInstance[]>(() => {
     const pointInstances: PointInstance[] = [];
@@ -184,13 +183,13 @@ export function LoggablesContextRoot({
 
   const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [
-      ...focusedEventTypeLogs,
+      ...focusedEventLogs,
       ...pointInstances,
       ...preFilteredMessages,
       ...sortedTerminalExpressions,
     ];
     return loggables.sort(loggableSort);
-  }, [focusedEventTypeLogs, pointInstances, preFilteredMessages, sortedTerminalExpressions]);
+  }, [focusedEventLogs, pointInstances, preFilteredMessages, sortedTerminalExpressions]);
 
   const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 
