@@ -27,13 +27,14 @@ import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/sou
 import { hasSourceActor, getSourceActor, getSourceActors, SourceActor } from "./source-actors";
 import { SourceLocation } from "./types";
 
+export interface SourceContentValue {
+  contentType: string;
+  type: string;
+  value: string;
+}
 export interface SourceContent {
   state: "pending" | "fulfilled" | "rejected";
-  value?: {
-    contentType: string;
-    type: string;
-    value: string;
-  };
+  value?: SourceContentValue;
 }
 
 export interface Source {

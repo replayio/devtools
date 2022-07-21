@@ -25,7 +25,7 @@ const MAX_VERTICAL_OFFSET = 3;
 
 type $FixTypeLater = any;
 
-export default class SourceEditor {
+export class SourceEditor {
   opts: $FixTypeLater;
   // @ts-expect-error  created later
   editor: Editor & { doc: Doc };
@@ -75,7 +75,7 @@ export default class SourceEditor {
     this.editor.setCursor({ line: line, ch: ch });
   }
 
-  setMode(value: string) {
+  setMode(value: string | CodeMirror.ModeSpec<CodeMirror.ModeSpecOptions>) {
     this.editor.setOption("mode", value);
   }
 
@@ -143,3 +143,5 @@ export default class SourceEditor {
     this.editor.scrollTo(0, top);
   }
 }
+
+export default SourceEditor;

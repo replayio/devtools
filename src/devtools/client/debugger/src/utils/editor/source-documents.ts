@@ -2,27 +2,34 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { Doc } from "codemirror";
 
 import { getMode } from "../source";
+import type { SourceEditor } from "./source-editor";
+import type {
+  SourceWithContent,
+  SourceContentValue,
+  Source,
+} from "devtools/client/debugger/src/reducers/sources";
 
 import { isMinified } from "../isMinified";
+import { SymbolDeclarations } from "../../selectors";
 
-let sourceDocs = {};
+let sourceDocs: Record<string, Doc> = {};
 
-export function getDocument(key) {
+export function getDocument(key: string) {
   return sourceDocs[key];
 }
 
-export function hasDocument(key) {
+export function hasDocument(key: string) {
   return !!getDocument(key);
 }
 
-export function setDocument(key, doc) {
+export function setDocument(key: string, doc: Doc) {
   sourceDocs[key] = doc;
 }
 
-export function removeDocument(key) {
+export function removeDocument(key: string) {
   delete sourceDocs[key];
 }
 
@@ -30,7 +37,7 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-export function updateDocument(editor, source) {
+export function updateDocument(editor: SourceEditor, source?: SourceWithContent) {
   if (!source) {
     return;
   }
@@ -40,14 +47,14 @@ export function updateDocument(editor, source) {
   editor.replaceDocument(doc);
 }
 
-export function clearEditor(editor) {
+export function clearEditor(editor: SourceEditor) {
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
   editor.setText("");
   editor.setMode({ name: "text" });
 }
 
-export function showLoading(editor) {
+export function showLoading(editor: SourceEditor) {
   let doc = getDocument("loading");
 
   if (doc) {
@@ -60,8 +67,9 @@ export function showLoading(editor) {
   }
 }
 
-export function showErrorMessage(editor, msg) {
+export function showErrorMessage(editor: SourceEditor, msg: string) {
   let error;
+  // @ts-expect-error L10N not defined
   error = L10N.getFormatStr("errorLoadingText3", msg);
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
@@ -69,8 +77,8 @@ export function showErrorMessage(editor, msg) {
   editor.setMode({ name: "text" });
 }
 
-function setEditorText(editor, sourceId, content) {
-  const contents = content.value
+function setEditorText(editor: SourceEditor, sourceId: string, content: SourceContentValue) {
+  const contents = content!.value
     .split(/\r\n?|\n|\u2028|\u2029/)
     .map(line => {
       if (line.length >= 1000) {
@@ -82,14 +90,20 @@ function setEditorText(editor, sourceId, content) {
   editor.setText(contents);
 }
 
-function setMode(editor, source, content, symbols) {
+function setMode(
+  editor: SourceEditor,
+  source: SourceWithContent,
+  content: SourceContentValue,
+  symbols: SymbolDeclarations
+) {
   // Disable modes for minified files with 1+ million characters Bug 1569829
-  if (content.type === "text" && isMinified(source) && content.value.length > 1000000) {
+  if (content!.type === "text" && isMinified(source) && content!.value.length > 1000000) {
     return;
   }
 
-  const mode = getMode(source, content, symbols);
+  const mode = getMode(source as Source, content, symbols);
   const currentMode = editor.codeMirror.getOption("mode");
+  // @ts-expect-error currentMode.name doesn't exist
   if (!currentMode || currentMode.name != mode.name) {
     editor.setMode(mode);
   }
@@ -99,7 +113,12 @@ function setMode(editor, source, content, symbols) {
  * Handle getting the source document or creating a new
  * document with the correct mode and text.
  */
-export function showSourceText(editor, source, content, symbols) {
+export function showSourceText(
+  editor: SourceEditor,
+  source: SourceWithContent,
+  content: SourceContentValue,
+  symbols: SymbolDeclarations
+) {
   if (hasDocument(source.id)) {
     const doc = getDocument(source.id);
     if (editor.codeMirror.doc === doc) {

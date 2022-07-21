@@ -8,7 +8,6 @@ import { connect, ConnectedProps } from "react-redux";
 
 // @ts-expect-error legacy untyped imports
 import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
-// @ts-expect-error legacy untyped imports
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
 import { UIState } from "ui/state";
@@ -125,6 +124,7 @@ export class HighlightLine extends Component<PropsFromRedux> {
     }
 
     const doc = getDocument(sourceId);
+    // @ts-expect-error method doesn't exist
     doc.addLineClass(editorLine, "line", "highlight-line");
     this.resetHighlightLine(doc, editorLine);
   }
@@ -152,6 +152,7 @@ export class HighlightLine extends Component<PropsFromRedux> {
     const { line, sourceId } = selectedLocation;
     const editorLine = toEditorLine(line);
     const doc = getDocument(sourceId);
+    // @ts-expect-error method doesn't exist
     doc.removeLineClass(editorLine, "line", "highlight-line");
   }
 
