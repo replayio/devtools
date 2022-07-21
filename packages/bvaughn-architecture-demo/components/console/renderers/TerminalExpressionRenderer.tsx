@@ -5,11 +5,7 @@ import Loader from "@bvaughn/components/Loader";
 import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import {
-  evaluate,
-  getPauseData,
-  getPauseForExecutionPoint,
-} from "@bvaughn/src/suspense/PauseCache";
+import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { memo, Suspense, useContext, useLayoutEffect, useRef } from "react";
@@ -71,22 +67,7 @@ function TerminalExpressionRenderer({
 function EvaluatedContent({ terminalExpression }: { terminalExpression: TerminalExpression }) {
   const client = useContext(ReplayClientContext);
 
-  // HACK
-  // The backend requires PauseData to be loaded before the evaluate command.
-  // This includes Pauses that have already been assigned ids.
-  //
-  // TODO (FE-337) This seems wrong for frameId?
-  // We should probably expect this to be passed in explicitly (and so probably also pauseId)?
-  let frameId = terminalExpression.frameId;
-  let pauseId = terminalExpression.pauseId;
-  if (pauseId === null) {
-    const pauseData = getPauseForExecutionPoint(client, terminalExpression.point);
-    frameId = pauseData.stack?.[0] ?? null;
-    pauseId = pauseData.pauseId;
-  } else {
-    getPauseData(client, pauseId);
-  }
-
+  const { frameId, pauseId } = terminalExpression;
   const result = evaluate(client, pauseId, frameId, terminalExpression.expression);
   const { exception, returned } = result;
   if (exception) {

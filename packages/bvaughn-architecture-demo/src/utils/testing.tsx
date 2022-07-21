@@ -114,7 +114,7 @@ export async function renderFocused(
     executionPoint: null,
     isPending: false,
     pauseId: null,
-    time: null,
+    time: 0,
     update: jest.fn(),
     ...options?.timelineContext,
   };

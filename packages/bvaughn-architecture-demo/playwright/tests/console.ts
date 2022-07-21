@@ -33,15 +33,25 @@ testSetup(async function regeneratorFunction({ page }) {
   const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
   await nestedKeyValue.click();
 
-  // Terminal expressions
-  const firstListItem = await page.locator("[data-test-name=Message]").first();
-  await seekToMessage(page, firstListItem);
+  // Global terminal expressions
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/!");
+  await page.keyboard.press("Enter");
 
+  // Load Pause data for local expressions
+  const firstListItem = await page.locator("[data-test-name=Message]", {
+    hasText: "This is a log",
+  });
+  await seekToMessage(page, firstListItem);
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
   await page.keyboard.press("Enter");
-
   await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
+  const lastListItem = await page.locator("[data-test-name=Message]", {
+    hasText: "This is a trace",
+  });
+  await seekToMessage(page, lastListItem);
 
   // Event type data
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
@@ -134,12 +144,16 @@ test("should support seeking to a message execution point", async ({ page }) => 
   const list = page.locator("[data-test-name=Messages]");
 
   // Fast-forward
-  const lastListItem = await page.locator("[data-test-name=Message]").last();
+  const lastListItem = await page.locator("[data-test-name=Message]", {
+    hasText: "This is a trace",
+  });
   await seekToMessage(page, lastListItem);
   await takeScreenshot(page, list, "message-list-seek-to-last-message");
 
-  // Fast-forward
-  const firstListItem = await page.locator("[data-test-name=Message]").first();
+  // Rewind
+  const firstListItem = await page.locator("[data-test-name=Message]", {
+    hasText: "This is a log",
+  });
   await seekToMessage(page, firstListItem);
   await takeScreenshot(page, list, "message-list-seek-to-first-message");
 });
@@ -372,6 +386,29 @@ test("should evaluate and render invalid local terminal expressions", async ({ p
   await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
 });
 
+test("should evaluate and render global terminal expressions", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
+  await page.keyboard.press("Enter");
+
+  await hideProtocolMessages(page);
+
+  const firstListItem = await page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, firstListItem, "global-terminal-expression-valid");
+});
+
+test("should evaluate and render invalid global terminal expressions", async ({ page }) => {
+  await page.goto(URL);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/!");
+  await page.keyboard.press("Enter");
+
+  await hideProtocolMessages(page);
+  const firstListItem = await page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, firstListItem, "global-terminal-expression-invalid");
+});
+
 test("should show a button to clear terminal expressions", async ({ page }) => {
   await page.goto(URL);
 
@@ -397,5 +434,3 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
-
-// TODO (FE-337) Add tests for global expressions once pauseId issue is sorted out.

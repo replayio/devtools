@@ -12,7 +12,7 @@ export type TimelineContextType = {
   executionPoint: ExecutionPoint | null;
   isPending: boolean;
   pauseId: PauseId | null;
-  time: number | null;
+  time: number;
   update: (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => void;
 };
 
@@ -21,7 +21,7 @@ export const TimelineContext = createContext<TimelineContextType>(null as any);
 export function TimelineContextRoot({ children }: PropsWithChildren<{}>) {
   const [executionPoint, setExecutionPoint] = useState<ExecutionPoint | null>(null);
   const [pauseId, setPauseId] = useState<PauseId | null>(null);
-  const [time, setTime] = useState<number | null>(null);
+  const [time, setTime] = useState<number>(0);
 
   const [isPending, startTransition] = useTransition();
 

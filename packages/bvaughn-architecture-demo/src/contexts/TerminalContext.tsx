@@ -13,8 +13,8 @@ import {
 export type TerminalExpression = {
   expression: string;
   id: number;
-  frameId: FrameId | null;
-  pauseId: PauseId | null;
+  frameId: FrameId;
+  pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
   type: "TerminalExpression";
