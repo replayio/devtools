@@ -6,7 +6,10 @@
 
 import PropTypes from "prop-types";
 import React, { Component } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
+
 import { CloseButton } from "../shared/Button";
 import AccessibleImage from "../shared/AccessibleImage";
 import actions from "../../actions";
@@ -20,6 +23,7 @@ import {
   getContext,
 } from "../../selectors";
 
+// @ts-expect-error not TS yet
 import { removeOverlay } from "../../utils/editor";
 
 import { scrollList } from "../../utils/result-list";
@@ -28,6 +32,9 @@ import classnames from "classnames";
 import SearchInput from "../shared/SearchInput";
 import debounce from "lodash/debounce";
 import { PluralForm } from "devtools/shared/plural-form";
+
+import type { Modifiers } from "devtools/client/debugger/src/reducers/file-search";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 function getShortcuts() {
   const searchAgainKey = "Cmd+G";
@@ -41,8 +48,95 @@ function getShortcuts() {
   };
 }
 
-class SearchBar extends Component {
-  constructor(props) {
+interface SMBProps {
+  modifiers: Modifiers;
+  className: string;
+  modVal: keyof Modifiers;
+  svgName: string;
+  tooltip: string;
+  toggleFileSearchModifier: (cx: Context, modVal: keyof Modifiers) => void;
+  doSearch: (query: string) => void;
+  query: string;
+  cx: Context;
+}
+
+function SearchModBtn({
+  modifiers,
+  modVal,
+  className,
+  svgName,
+  tooltip,
+  toggleFileSearchModifier,
+  doSearch,
+  query,
+  cx,
+}: SMBProps) {
+  const preppedClass = classnames(className, {
+    active: modifiers && modifiers[modVal],
+  });
+  return (
+    <button
+      className={preppedClass}
+      onMouseDown={() => {
+        toggleFileSearchModifier(cx, modVal);
+        doSearch(query);
+      }}
+      onKeyDown={e => {
+        if (e.key === "Enter") {
+          toggleFileSearchModifier(cx, modVal);
+          doSearch(query);
+        }
+      }}
+      title={tooltip}
+    >
+      <AccessibleImage className={svgName} />
+    </button>
+  );
+}
+
+const mapStateToProps = (state: UIState) => {
+  const selectedSource = getSelectedSource(state);
+
+  return {
+    cx: getContext(state),
+    searchOn: getActiveSearch(state) === "file",
+    selectedSource,
+    selectedContentLoaded: selectedSource ? !!getSourceContent(state, selectedSource.id) : false,
+    query: getFileSearchQuery(state),
+    modifiers: getFileSearchModifiers(state),
+    searchResults: getFileSearchResults(state),
+  };
+};
+
+const connector = connect(mapStateToProps, {
+  toggleFileSearchModifier: actions.toggleFileSearchModifier,
+  setFileSearchQuery: actions.setFileSearchQuery,
+  setActiveSearch: actions.setActiveSearch,
+  closeFileSearch: actions.closeFileSearch,
+  doSearch: actions.doSearch,
+  traverseResults: actions.traverseResults,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+interface SBProps {
+  editor: any;
+  showClose?: boolean;
+  size?: string;
+}
+
+type FinalSBProps = PropsFromRedux & SBProps;
+
+interface SBState {
+  query: string;
+  selectedResultIndex: number;
+  count: number;
+  index: number;
+  inputFocused: boolean;
+}
+
+class SearchBar extends Component<FinalSBProps, SBState> {
+  constructor(props: FinalSBProps) {
     super(props);
     this.state = {
       query: props.query,
@@ -54,6 +148,7 @@ class SearchBar extends Component {
   }
 
   componentWillUnmount() {
+    // @ts-expect-error old context who cares
     const shortcuts = this.context.shortcuts;
     const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
@@ -67,24 +162,30 @@ class SearchBar extends Component {
     // overwrite this.doSearch with debounced version to
     // reduce frequency of queries
     this.doSearch = debounce(this.doSearch, 100);
+    // @ts-expect-error old context who cares
     const shortcuts = this.context.shortcuts;
     const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
-    shortcuts.on(searchShortcut, e => this.toggleSearch(e));
-    shortcuts.on("Escape", e => this.onEscape(e));
+    // Not actually React events but whatever
+    shortcuts.on(searchShortcut, (e: React.KeyboardEvent) => this.toggleSearch(e));
+    shortcuts.on("Escape", (e: React.KeyboardEvent) => this.onEscape(e));
 
-    shortcuts.on(shiftSearchAgainShortcut, e => this.traverseResults(e, true));
+    shortcuts.on(shiftSearchAgainShortcut, (e: React.KeyboardEvent) =>
+      this.traverseResults(e, true)
+    );
 
-    shortcuts.on(searchAgainShortcut, e => this.traverseResults(e, false));
+    shortcuts.on(searchAgainShortcut, (e: React.KeyboardEvent) => this.traverseResults(e, false));
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
+    // @ts-expect-error string refs ugh!
     if (this.refs.resultList && this.refs.resultList.refs) {
+      // @ts-expect-error string refs ugh!
       scrollList(this.refs.resultList.refs, this.state.selectedResultIndex);
     }
   }
 
-  onEscape = e => {
+  onEscape = (e: React.KeyboardEvent) => {
     this.closeSearch(e);
   };
 
@@ -96,7 +197,7 @@ class SearchBar extends Component {
     }
   };
 
-  closeSearch = e => {
+  closeSearch = (e: React.KeyboardEvent) => {
     const { cx, closeFileSearch, editor, searchOn, query } = this.props;
     this.clearSearch();
     if (editor && searchOn) {
@@ -107,7 +208,7 @@ class SearchBar extends Component {
     this.setState({ query, inputFocused: false });
   };
 
-  toggleSearch = e => {
+  toggleSearch = (e: React.KeyboardEvent) => {
     e.stopPropagation();
     e.preventDefault();
     const { editor, searchOn, setActiveSearch } = this.props;
@@ -131,7 +232,7 @@ class SearchBar extends Component {
     }
   };
 
-  doSearch = query => {
+  doSearch = (query: string) => {
     const { cx, selectedSource, selectedContentLoaded } = this.props;
     if (!selectedSource || !selectedContentLoaded) {
       return;
@@ -140,7 +241,7 @@ class SearchBar extends Component {
     this.props.doSearch(cx, query, this.props.editor);
   };
 
-  traverseResults = (e, rev) => {
+  traverseResults = (e: React.KeyboardEvent, reverse: boolean) => {
     e.stopPropagation();
     e.preventDefault();
     const editor = this.props.editor;
@@ -148,36 +249,36 @@ class SearchBar extends Component {
     if (!editor) {
       return;
     }
-    this.props.traverseResults(this.props.cx, rev, editor);
+    this.props.traverseResults(this.props.cx, reverse, editor);
   };
 
   // Handlers
 
-  onChange = e => {
+  onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ query: e.target.value });
 
     return this.doSearch(e.target.value);
   };
 
-  onFocus = e => {
+  onFocus = (e: React.KeyboardEvent) => {
     this.setState({ inputFocused: true });
   };
 
-  onBlur = e => {
+  onBlur = (e: React.KeyboardEvent) => {
     this.setState({ inputFocused: false });
   };
 
-  onKeyDown = e => {
+  onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key !== "Enter" && e.key !== "F3") {
       return;
     }
 
     this.traverseResults(e, e.shiftKey);
     e.preventDefault();
-    return this.doSearch(e.target.value);
+    return this.doSearch((e.target as HTMLInputElement).value);
   };
 
-  onHistoryScroll = query => {
+  onHistoryScroll = (query: string) => {
     this.setState({ query });
     this.doSearch(query);
   };
@@ -212,48 +313,34 @@ class SearchBar extends Component {
     const { cx, modifiers, toggleFileSearchModifier, query } = this.props;
     const { doSearch } = this;
 
-    // TODO Pull this component out
-    function SearchModBtn({ modVal, className, svgName, tooltip }) {
-      const preppedClass = classnames(className, {
-        active: modifiers && modifiers[modVal],
-      });
-      return (
-        <button
-          className={preppedClass}
-          onMouseDown={() => {
-            toggleFileSearchModifier(cx, modVal);
-            doSearch(query);
-          }}
-          onKeyDown={e => {
-            if (e.key === "Enter") {
-              toggleFileSearchModifier(cx, modVal);
-              doSearch(query);
-            }
-          }}
-          title={tooltip}
-        >
-          <AccessibleImage className={svgName} />
-        </button>
-      );
-    }
+    const commonProps = {
+      cx,
+      modifiers,
+      toggleFileSearchModifier,
+      query,
+      doSearch,
+    };
 
     return (
       <div className="search-modifiers">
         <span className="pipe-divider" />
         <span className="search-type-name">{"Modifiers:"}</span>
         <SearchModBtn
+          {...commonProps}
           modVal="regexMatch"
           className="regex-match-btn"
           svgName="regex-match"
           tooltip={"Regex"}
         />
         <SearchModBtn
+          {...commonProps}
           modVal="caseSensitive"
           className="case-sensitive-btn"
           svgName="case-match"
           tooltip={"Case sensitive"}
         />
         <SearchModBtn
+          {...commonProps}
           modVal="wholeWord"
           className="whole-word-btn"
           svgName="whole-word-match"
@@ -297,8 +384,8 @@ class SearchBar extends Component {
           showErrorEmoji={this.shouldShowErrorEmoji()}
           onKeyDown={this.onKeyDown}
           onHistoryScroll={this.onHistoryScroll}
-          handleNext={e => this.traverseResults(e, false)}
-          handlePrev={e => this.traverseResults(e, true)}
+          handleNext={(e: React.KeyboardEvent) => this.traverseResults(e, false)}
+          handlePrev={(e: React.KeyboardEvent) => this.traverseResults(e, true)}
           shouldFocus={this.state.inputFocused}
           showClose={false}
         />
@@ -307,7 +394,7 @@ class SearchBar extends Component {
           {showClose && (
             <React.Fragment>
               <span className="pipe-divider" />
-              <CloseButton handleClick={this.closeSearch} buttonClass={size} />
+              <CloseButton handleClick={this.closeSearch} buttonClass={size} tooltip="" />
             </React.Fragment>
           )}
         </div>
@@ -316,29 +403,8 @@ class SearchBar extends Component {
   }
 }
 
+// @ts-expect-error contextTypes shenanigans
 SearchBar.contextTypes = {
   shortcuts: PropTypes.object,
 };
-
-const mapStateToProps = (state, p) => {
-  const selectedSource = getSelectedSource(state);
-
-  return {
-    cx: getContext(state),
-    searchOn: getActiveSearch(state) === "file",
-    selectedSource,
-    selectedContentLoaded: selectedSource ? !!getSourceContent(state, selectedSource.id) : false,
-    query: getFileSearchQuery(state),
-    modifiers: getFileSearchModifiers(state),
-    searchResults: getFileSearchResults(state),
-  };
-};
-
-export default connect(mapStateToProps, {
-  toggleFileSearchModifier: actions.toggleFileSearchModifier,
-  setFileSearchQuery: actions.setFileSearchQuery,
-  setActiveSearch: actions.setActiveSearch,
-  closeFileSearch: actions.closeFileSearch,
-  doSearch: actions.doSearch,
-  traverseResults: actions.traverseResults,
-})(SearchBar);
+export default connector(SearchBar);

@@ -6,12 +6,23 @@
 import { Component } from "react";
 import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 import { getHighlightedLineRange } from "../../selectors";
 
-class HighlightLines extends Component {
-  highlightLineRange;
+interface HLProps {
+  editor: any;
+}
 
+const connector = connect((state: UIState) => ({
+  highlightedLineRange: getHighlightedLineRange(state),
+}));
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type FinalHLProps = PropsFromRedux & HLProps;
+
+class HighlightLines extends Component<FinalHLProps> {
   componentDidMount() {
     this.highlightLineRange();
   }
@@ -33,13 +44,13 @@ class HighlightLines extends Component {
 
     const { codeMirror } = editor;
 
-    if (isEmpty(highlightedLineRange) || !codeMirror) {
+    if (isEmpty(highlightedLineRange) || !highlightedLineRange || !codeMirror) {
       return;
     }
 
     const { start, end } = highlightedLineRange;
     codeMirror.operation(() => {
-      range(start - 1, end).forEach(line => {
+      range(start! - 1, end).forEach(line => {
         codeMirror.removeLineClass(line, "line", "highlight-lines");
       });
     });
@@ -50,7 +61,7 @@ class HighlightLines extends Component {
 
     const { codeMirror } = editor;
 
-    if (isEmpty(highlightedLineRange) || !codeMirror) {
+    if (isEmpty(highlightedLineRange) || !highlightedLineRange || !codeMirror) {
       return;
     }
 
@@ -59,7 +70,7 @@ class HighlightLines extends Component {
     codeMirror.operation(() => {
       editor.alignLine(start);
 
-      range(start - 1, end).forEach(line => {
+      range(start! - 1, end).forEach(line => {
         codeMirror.addLineClass(line, "line", "highlight-lines");
       });
     });
@@ -70,6 +81,4 @@ class HighlightLines extends Component {
   }
 }
 
-export default connect(state => ({
-  highlightedLineRange: getHighlightedLineRange(state),
-}))(HighlightLines);
+export default connector(HighlightLines);
