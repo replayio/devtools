@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
 
-import { hideProtocolMessages, hideSearchInput, seekToMessage, showSearchInput } from "./utils/console";
+import {
+  hideProtocolMessages,
+  hideSearchInput,
+  seekToMessage,
+  showSearchInput,
+} from "./utils/console";
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 

@@ -8,7 +8,9 @@ export async function hideProtocolMessages(page: Page) {
 }
 
 export async function hideSearchInput(page: Page) {
-  const count = await page.evaluate(() => document.querySelectorAll('[data-test-id="ConsoleSearchInput"]').length);
+  const count = await page.evaluate(
+    () => document.querySelectorAll('[data-test-id="ConsoleSearchInput"]').length
+  );
   if (count > 0) {
     await page.focus('[data-test-id="ConsoleSearchInput"]');
     await page.keyboard.press("Escape");
@@ -22,7 +24,9 @@ export async function seekToMessage(page: Page, messageListItem: Locator) {
 
 export async function showSearchInput(page: Page) {
   // If already visible, just ensure we're focused in it.
-  const count = await page.evaluate(() => document.querySelectorAll('[data-test-id="ConsoleSearchInput"]').length);
+  const count = await page.evaluate(
+    () => document.querySelectorAll('[data-test-id="ConsoleSearchInput"]').length
+  );
   if (count > 0) {
     await page.focus('[data-test-id="ConsoleSearchInput"]');
   } else {
