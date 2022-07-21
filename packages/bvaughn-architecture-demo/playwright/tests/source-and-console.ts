@@ -1,5 +1,6 @@
 import { Page, test } from "@playwright/test";
 
+import { hideProtocolMessages } from "./utils/console";
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
@@ -10,21 +11,15 @@ testSetup(async function regeneratorFunction({ page }) {
   await addLogPoint(page, 12);
 
   await fillLogPointText(page, 12, "printError");
+
+  await hideProtocolMessages(page);
+
   const message = page.locator("[data-test-name=Message]").first();
   const keyValue = message.locator("[data-test-name=Expandable]");
   await keyValue.click();
 
   await fillLogPointText(page, 12, "z");
 });
-
-async function hideProtocolMessages(page: Page) {
-  // Hide other message types to make sure the log point is visible.
-  await page.click('[data-test-id="FilterToggle-exceptions"]');
-  await page.click('[data-test-id="FilterToggle-errors"]');
-  await page.click('[data-test-id="FilterToggle-logs"]');
-  await page.click('[data-test-id="FilterToggle-warnings"]');
-
-}
 
 async function openSourceTab(page: Page) {
   await page.goto(URL);

@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 
+import { hideProtocolMessages, hideSearchInput, seekToMessage, showSearchInput } from "./utils/console";
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
@@ -8,6 +9,7 @@ const URL = `${getBaseURL()}/tests/console?${getURLFlags()}`;
 testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
 
+  // Exploring Message values
   const warningListItem = page.locator('[data-test-name="Expandable"]', {
     hasText: "This is a warning",
   });
@@ -26,6 +28,17 @@ testSetup(async function regeneratorFunction({ page }) {
   const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
   await nestedKeyValue.click();
 
+  // Terminal expressions
+  const firstListItem = await page.locator("[data-test-name=Message]").first();
+  await seekToMessage(page, firstListItem);
+
+  await page.fill('[data-test-id="ConsoleTerminalInput"]', "location.href");
+  await page.keyboard.press("Enter");
+
+  await page.fill('[data-test-id="ConsoleTerminalInput"]', "+/");
+  await page.keyboard.press("Enter");
+
+  // Event type data
   await page.click('[date-test-id="EventCategoryHeader-Mouse"]');
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
 
@@ -110,7 +123,23 @@ test("should expand and inspect objects", async ({ page }) => {
   await takeScreenshot(page, listItem, "nested-object-expanded");
 });
 
-test("should show support fast-forwarding to the message pause-point", async ({ page }) => {
+test("should support seeking to a message execution point", async ({ page }) => {
+  await page.goto(URL);
+
+  const list = page.locator("[data-test-name=Messages]");
+
+  // Fast-forward
+  const lastListItem = await page.locator("[data-test-name=Message]").last();
+  await seekToMessage(page, lastListItem);
+  await takeScreenshot(page, list, "message-list-seek-to-last-message");
+
+  // Fast-forward
+  const firstListItem = await page.locator("[data-test-name=Message]").first();
+  await seekToMessage(page, firstListItem);
+  await takeScreenshot(page, list, "message-list-seek-to-first-message");
+});
+
+test("should show an add-comment button for the current message", async ({ page }) => {
   await page.goto(URL);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a log" });
@@ -119,7 +148,7 @@ test("should show support fast-forwarding to the message pause-point", async ({ 
   await listItem.hover();
   await takeScreenshot(page, listItem, "list-item-hovered");
 
-  const fastForwardButton = page.locator('[data-test-id="FastForwardButton"]');
+  const fastForwardButton = page.locator('[data-test-id="ConsoleMessageHoverButton"]');
   await fastForwardButton.hover();
   await takeScreenshot(page, listItem, "fast-forward-button-hovered");
 
@@ -130,8 +159,32 @@ test("should show support fast-forwarding to the message pause-point", async ({ 
   await takeScreenshot(page, listItem, "list-item-current");
 });
 
+test("should show and hide search input when Enter and Escape are typed", async ({ page }) => {
+  await page.goto(URL);
+
+  // Search should be hidden
+  let searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  await expect(searchInput).toHaveCount(0);
+
+  await showSearchInput(page);
+
+  searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  await takeScreenshot(page, searchInput, "search-input-visible-and-focused");
+
+  await hideSearchInput(page);
+
+  // Search should be hidden again
+  searchInput = page.locator('[data-test-id="ConsoleSearchInput"]');
+  await expect(searchInput).toHaveCount(0);
+
+  const terminalInput = page.locator('[data-test-id="ConsoleTerminalInput"]');
+  await takeScreenshot(page, terminalInput, "terminal-input-focused");
+});
+
 test("should be searchable", async ({ page }) => {
   await page.goto(URL);
+
+  await showSearchInput(page);
 
   await page.fill('[data-test-id="ConsoleSearchInput"]', " an ");
 
@@ -200,6 +253,8 @@ test("should log events in the console", async ({ page }) => {
 
 test("should be searchable on complex content", async ({ page }) => {
   await page.goto(URL);
+
+  await showSearchInput(page);
 
   await page.fill('[data-test-id="ConsoleSearchInput"]', "Array(3) [1, 2, 3]");
 
@@ -282,5 +337,34 @@ test("should remember filter toggle preferences between reloads", async ({ page 
   await takeScreenshot(page, filters, "updated-side-filter-values");
 });
 
-// TODO Add tests:
-// * For fast-forwarding to a message.
+test("should evaluate and render local terminal expressions", async ({ page }) => {
+  await page.goto(URL);
+
+  let firstListItem = await page.locator("[data-test-name=Message]").first();
+  await seekToMessage(page, firstListItem);
+
+  await page.fill('[data-test-id="ConsoleTerminalInput"]', "location.href");
+  await page.keyboard.press("Enter");
+
+  await hideProtocolMessages(page);
+
+  firstListItem = await page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, firstListItem, "local-terminal-expression-valid");
+});
+
+test("should evaluate and render invalid local terminal expressions", async ({ page }) => {
+  await page.goto(URL);
+
+  let firstListItem = await page.locator("[data-test-name=Message]").first();
+  await seekToMessage(page, firstListItem);
+
+  await page.fill('[data-test-id="ConsoleTerminalInput"]', "+/");
+  await page.keyboard.press("Enter");
+
+  await hideProtocolMessages(page);
+
+  firstListItem = await page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, firstListItem, "local-terminal-expression-valid");
+});
+
+// TODO (FE-337) Add tests for global expressions once pauseId issue is sorted out.

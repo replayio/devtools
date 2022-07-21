@@ -34,6 +34,11 @@ export default function Input() {
       case "Enter": {
         event.preventDefault();
 
+        if (pauseId === null) {
+          // TODO (FE-337) Once global evaluation is supported, remove this.
+          return;
+        }
+
         const input = ref.current!;
         const expression = input.value.trim();
         if (expression !== "") {
@@ -67,7 +72,7 @@ export default function Input() {
       <Icon className={styles.Icon} type="prompt" />
       <input
         className={styles.Input}
-        disabled={pauseId === null}
+        data-test-id="ConsoleTerminalInput"
         onKeyDown={onKeyDown}
         ref={ref}
         type="text"

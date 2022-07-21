@@ -92,15 +92,15 @@ export default function MessageHoverButton({
   } else {
     button = (
       <button
-        className={styles.FastForwardButton}
-        data-test-id="FastForwardButton"
+        className={styles.ConsoleMessageHoverButton}
+        data-test-id="ConsoleMessageHoverButton"
         onClick={() => update(time, executionPoint, pauseId)}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={ref}
       >
         <Icon
-          className={styles.FastForwardButtonIcon}
+          className={styles.ConsoleMessageHoverButtonIcon}
           type={
             currentExecutionPoint === null || executionPoint > currentExecutionPoint
               ? "fast-forward"
