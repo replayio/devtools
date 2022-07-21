@@ -13,7 +13,7 @@ export type TimelineContextType = {
   isPending: boolean;
   pauseId: PauseId | null;
   time: number | null;
-  update: (time: number, executionPoint: ExecutionPoint, pauseId: PauseId | null) => void;
+  update: (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => void;
 };
 
 export const TimelineContext = createContext<TimelineContextType>(null as any);
@@ -25,17 +25,14 @@ export function TimelineContextRoot({ children }: PropsWithChildren<{}>) {
 
   const [isPending, startTransition] = useTransition();
 
-  const update = useCallback(
-    (time: number, executionPoint: ExecutionPoint, pauseId: PauseId | null) => {
-      // Components might suspend in response to the this changing.
-      startTransition(() => {
-        setExecutionPoint(executionPoint);
-        setPauseId(pauseId);
-        setTime(time);
-      });
-    },
-    []
-  );
+  const update = useCallback((time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+    // Components might suspend in response to the this changing.
+    startTransition(() => {
+      setExecutionPoint(executionPoint);
+      setPauseId(pauseId);
+      setTime(time);
+    });
+  }, []);
 
   const context = useMemo(
     () => ({ executionPoint, isPending, pauseId, update, time }),

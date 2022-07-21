@@ -16,6 +16,8 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
+import { ExecutionPoint } from "@replayio/protocol";
+import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
 // Renders PointInstances with enableLogging=true.
 function LogPointRenderer({
@@ -82,16 +84,45 @@ function LogPointRenderer({
       onMouseLeave={() => setIsHovered(false)}
     >
       {primaryContent}
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={logPointInstance.timeStampedHitPoint.point}
-          pauseId={null}
-          showAddCommentButton={false}
-          targetRef={ref}
-          time={logPointInstance.timeStampedHitPoint.time}
-        />
-      )}
+      <MessageHoverButtonWithWithPause
+        executionPoint={logPointInstance.timeStampedHitPoint.point}
+        isHovered={isHovered}
+        targetRef={ref}
+        time={logPointInstance.timeStampedHitPoint.time}
+      />
     </div>
+  );
+}
+
+function MessageHoverButtonWithWithPause({
+  executionPoint,
+  isHovered,
+  targetRef,
+  time,
+}: {
+  executionPoint: ExecutionPoint;
+  isHovered: boolean;
+  targetRef: React.RefObject<HTMLDivElement>;
+  time: number;
+}) {
+  const client = useContext(ReplayClientContext);
+
+  // Events don't have pause IDs, just execution points.
+  // So we need to load the nearest one before we can seek to it.
+  const pauseId = getClosestPointForTime(client, time);
+
+  if (!isHovered) {
+    return null;
+  }
+
+  return (
+    <MessageHoverButton
+      executionPoint={executionPoint}
+      pauseId={pauseId}
+      showAddCommentButton={false}
+      targetRef={targetRef}
+      time={time}
+    />
   );
 }
 

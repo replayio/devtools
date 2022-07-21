@@ -25,7 +25,7 @@ export default function MessageHoverButton({
   time,
 }: {
   executionPoint: ExecutionPoint;
-  pauseId: PauseId | null;
+  pauseId: PauseId;
   showAddCommentButton: boolean;
   targetRef: RefObject<HTMLDivElement | null>;
   time: number;
@@ -35,11 +35,7 @@ export default function MessageHoverButton({
 
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
-  const {
-    executionPoint: currentExecutionPoint,
-    time: currentTime,
-    update,
-  } = useContext(TimelineContext);
+  const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
 
   const invalidateCache = useCacheRefresh();
   const [isPending, startTransition] = useTransition();
