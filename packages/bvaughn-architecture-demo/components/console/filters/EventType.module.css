@@ -33,4 +33,5 @@
   height: 1rem;
   vertical-align: middle;
   margin: 0 0.25ch;
+  display: inline-block;
 }

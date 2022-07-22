@@ -60,6 +60,7 @@
   height: 1rem;
   width: 1rem;
   color: var(--object-inspector-go-to-definition-icon-color);
+  display: inline-block;
 }
 .Icon:hover {
   color: var(--object-inspector-go-to-definition-icon-color-hover);

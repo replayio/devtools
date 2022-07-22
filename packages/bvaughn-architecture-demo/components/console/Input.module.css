@@ -9,6 +9,7 @@
   height: 2rem;
   flex: 0 0 2rem;
   border-top: 1px solid var(--background-color-default);
+  display: inline-block;
 }
 
 .Input {
