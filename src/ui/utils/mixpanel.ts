@@ -42,6 +42,7 @@ type MixpanelEvent =
   | ["console.clear_messages"]
   | ["console.overflow"]
   | ["editor.open_sourcemap_visualizer"]
+  | ["editor.mouse_over"]
   | ["events_timeline.select"]
   | ["events_timeline.select_source"]
   | ["error.unauthenticated_viewer"]

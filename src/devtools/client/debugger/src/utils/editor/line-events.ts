@@ -1,15 +1,17 @@
 import { trackEventOnce } from "ui/utils/mixpanel";
 
-export function dispatch(codeMirror, eventName, data) {
+type $FixTypeLater = any;
+
+export function dispatch(codeMirror: $FixTypeLater, eventName: string, data: $FixTypeLater) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
 
-export function safeJsonParse(text) {
+export function safeJsonParse(text: string) {
   let parsedJson;
 
   try {
     parsedJson = JSON.parse(text);
-  } catch (e) {
+  } catch (e: any) {
     console.error("Error while parsing text", text, e);
     throw Error(e);
   }
@@ -17,16 +19,17 @@ export function safeJsonParse(text) {
   return parsedJson;
 }
 
-export const getLineNumberNode = target => target.querySelector(".CodeMirror-linenumber");
-const isHoveredOnLine = target => !!target.closest(".CodeMirror-line");
-const isHoveredOnGutter = target => !!target.closest(".CodeMirror-gutter-wrapper");
+export const getLineNumberNode = (target: HTMLElement) =>
+  target.querySelector<HTMLElement>(".CodeMirror-linenumber");
+const isHoveredOnLine = (target: HTMLElement) => !!target.closest(".CodeMirror-line");
+const isHoveredOnGutter = (target: HTMLElement) => !!target.closest(".CodeMirror-gutter-wrapper");
 // This is some real ugly dom traversal but CodeMirror makes it difficult to do anything else.
 // If you do find yourself in the unfortunate situation of debugging something around here,
 // make sure you have your elements panel locked and loaded.
-const getLineNodeFromGutterTarget = target =>
-  target.closest(".CodeMirror-gutter-wrapper").parentElement.querySelector(".CodeMirror-line");
+const getLineNodeFromGutterTarget = (target: HTMLElement) =>
+  target.closest(".CodeMirror-gutter-wrapper")!.parentElement!.querySelector(".CodeMirror-line");
 
-function isValidTarget(target) {
+function isValidTarget(target: HTMLElement) {
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
@@ -35,20 +38,20 @@ function isValidTarget(target) {
   );
 }
 
-function emitLineMouseEnter(codeMirror, target) {
+function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
   trackEventOnce("editor.mouse_over");
   const lineNode = isHoveredOnLine(target)
     ? target.closest(".CodeMirror-line")
     : getLineNodeFromGutterTarget(target);
-  const row = lineNode.parentElement;
+  const row = lineNode!.parentElement!;
 
   const lineNumberNode = getLineNumberNode(row);
-  const lineNumber = safeJsonParse(lineNumberNode.childNodes[0].nodeValue);
+  const lineNumber = safeJsonParse(lineNumberNode!.childNodes[0]!.nodeValue!);
 
   target.addEventListener(
     "mouseleave",
     () => {
-      const gutterButton = lineNumberNode.querySelector(".CodeMirror-gutter-wrapper button");
+      const gutterButton = lineNumberNode!.querySelector(".CodeMirror-gutter-wrapper button");
 
       // Don't trigger a mouse leave event if the user ends up hovering on the gutter button.
       if (gutterButton && !gutterButton.matches(":hover")) {
@@ -64,15 +67,15 @@ function emitLineMouseEnter(codeMirror, target) {
   dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, lineNumberNode });
 }
 
-export function onLineMouseOver(codeMirror) {
-  return event => {
-    let target = event.target;
+export function onLineMouseOver(codeMirror: $FixTypeLater) {
+  return (event: MouseEvent) => {
+    let target = event.target! as HTMLElement;
 
     // Hacky, try to fix this.
     if (target.closest(".CodeMirror-linewidget")) {
       target = target
-        .closest(".CodeMirror-linewidget")
-        .parentElement.querySelector(".CodeMirror-line");
+        .closest(".CodeMirror-linewidget")!
+        .parentElement!.querySelector(".CodeMirror-line")!;
     }
 
     if (isValidTarget(target)) {
