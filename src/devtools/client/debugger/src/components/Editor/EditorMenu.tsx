@@ -10,7 +10,7 @@ import { showMenu } from "devtools/shared/contextmenu";
 
 import type { UIState } from "ui/state";
 import type { AppDispatch } from "ui/setup/store";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
+import type { Source, SourceWithContent } from "devtools/client/debugger/src/reducers/sources";
 // @ts-expect-error still JS
 import { getSourceLocationFromMouseEvent } from "../../utils/editor";
 import { isPretty } from "../../utils/source";
@@ -25,7 +25,7 @@ import {
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
 interface EditorMenuProps {
-  selectedSource: Source;
+  selectedSource: SourceWithContent;
   clearContextMenu: () => void;
   contextMenu?: () => void;
   editor: any;
@@ -65,6 +65,7 @@ class EditorMenu extends Component<FinalEMProps> {
       editorMenuItems({
         cx,
         editorActions,
+        // @ts-expect-error Source/SourceWithContent mismatch  but will be changed shortly
         selectedSource,
         alternateSource,
       })
