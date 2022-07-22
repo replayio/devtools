@@ -39,7 +39,6 @@ export async function render(
     endPoint: "1000",
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
-    sourceIds: [],
     ...options?.sessionContext,
   };
 
