@@ -53,14 +53,15 @@
   padding: 0;
   border: none;
   cursor: pointer;
+  vertical-align: middle;
 }
 
-.JumpToDefinitionIcon {
+.Icon {
   height: 1rem;
   width: 1rem;
   color: var(--object-inspector-go-to-definition-icon-color);
 }
-.JumpToDefinitionIcon:hover {
+.Icon:hover {
   color: var(--object-inspector-go-to-definition-icon-color-hover);
 }
 

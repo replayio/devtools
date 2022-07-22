@@ -14,7 +14,7 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
   const showOverflowMarker =
     object?.preview?.overflow || functionParameterNames.length > MAX_PROPERTIES_TO_PREVIEW;
 
-  const jumpToDefinition = () => {
+  const viewFunctionSource = () => {
     // In the real app, this would open the Source viewer.
     alert("Source viewer is not implemented yet");
   };
@@ -42,8 +42,8 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
         )}
         {")"}
       </span>
-      <button className={styles.IconButton} onClick={jumpToDefinition}>
-        <Icon className={styles.JumpToDefinitionIcon} type="jump-to-definition" />
+      <button className={styles.IconButton} onClick={viewFunctionSource}>
+        <Icon className={styles.Icon} type="view-function-source" />
       </button>
     </>
   );

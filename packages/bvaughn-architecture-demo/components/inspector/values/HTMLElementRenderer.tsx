@@ -1,3 +1,4 @@
+import Icon from "@bvaughn/components/Icon";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
@@ -61,6 +62,11 @@ export default function HTMLElementRenderer({
   const showOverflowMarker = properties.length > MAX_PROPERTIES_TO_PREVIEW;
   const showInlineText = showChildrenIndicator && (inlineText || childNodes.length > 0);
 
+  const viewHtmlElement = () => {
+    // In the real app, this would open the HTML Elements panel.
+    alert("Source viewer is not implemented yet");
+  };
+
   return (
     <>
       {showOpeningTag && (
@@ -82,6 +88,9 @@ export default function HTMLElementRenderer({
           <span className={styles.Bracket}>&gt;</span>
         </span>
       )}
+      <button className={styles.IconButton} onClick={viewHtmlElement}>
+        <Icon className={styles.Icon} type="view-html-element" />
+      </button>
     </>
   );
 }
