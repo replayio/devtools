@@ -1,7 +1,7 @@
 import Inspector from "@bvaughn/components/inspector";
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
-import "@bvaughn/pages/inspector.css";
+import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";

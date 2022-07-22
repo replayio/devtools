@@ -1,6 +1,6 @@
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
-import "@bvaughn/pages/inspector.css";
+import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolValue } from "@bvaughn/src/utils/protocol";
 import { Value as ProtocolValue } from "@replayio/protocol";
 import { ValueItem } from "devtools/packages/devtools-reps";
