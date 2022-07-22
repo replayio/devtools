@@ -2,9 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { SourceLocation } from "@replayio/protocol";
 import isEqual from "lodash/isEqual";
 
-function isValidToken(target) {
+type $FixTypeLater = any;
+
+function isValidToken(target: HTMLElement | null) {
   if (!target || !target.innerText || target.closest(".toggle-widget")) {
     return false;
   }
@@ -45,6 +48,7 @@ function isValidToken(target) {
     return false;
   }
 
+  // @ts-expect-error "role" doesn't exist on NamedNodeMap?
   if (target.attributes.role?.value == "presentation") {
     return false;
   }
@@ -57,11 +61,11 @@ function isValidToken(target) {
   return true;
 }
 
-function dispatch(codeMirror, eventName, data) {
+function dispatch(codeMirror: $FixTypeLater, eventName: string, data: any) {
   codeMirror.constructor.signal(codeMirror, eventName, data);
 }
 
-function invalidLeaveTarget(target) {
+function invalidLeaveTarget(target: HTMLElement | null) {
   if (!target || target.closest(".popover")) {
     return true;
   }
@@ -69,27 +73,27 @@ function invalidLeaveTarget(target) {
   return false;
 }
 
-export function onTokenMouseOver(codeMirror) {
-  let prevTokenPos = null;
+export function onTokenMouseOver(codeMirror: $FixTypeLater) {
+  let prevTokenPos: SourceLocation | null = null;
 
-  function onMouseLeave(event) {
-    if (invalidLeaveTarget(event.relatedTarget)) {
-      return addMouseLeave(event.target);
+  function onMouseLeave(event: MouseEvent) {
+    if (invalidLeaveTarget(event.relatedTarget as HTMLElement)) {
+      return addMouseLeave(event.target as HTMLElement);
     }
 
     prevTokenPos = null;
     dispatch(codeMirror, "tokenleave", event);
   }
 
-  function addMouseLeave(target) {
+  function addMouseLeave(target: HTMLElement) {
     target.addEventListener("mouseleave", onMouseLeave, {
       capture: true,
       once: true,
     });
   }
 
-  return enterEvent => {
-    const { target } = enterEvent;
+  return (enterEvent: MouseEvent) => {
+    const target = enterEvent.target as HTMLElement;
 
     if (!isValidToken(target)) {
       return;
@@ -110,7 +114,7 @@ export function onTokenMouseOver(codeMirror) {
   };
 }
 
-export function getTokenLocation(codeMirror, tokenEl) {
+export function getTokenLocation(codeMirror: $FixTypeLater, tokenEl: HTMLElement): SourceLocation {
   const { left, top, width, height } = tokenEl.getBoundingClientRect();
   const { line, ch } = codeMirror.coordsChar({
     left: left + width / 2,
