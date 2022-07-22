@@ -23,7 +23,6 @@ import {
   getContext,
 } from "../../selectors";
 
-// @ts-expect-error not TS yet
 import { removeOverlay } from "../../utils/editor";
 
 import { scrollList } from "../../utils/result-list";

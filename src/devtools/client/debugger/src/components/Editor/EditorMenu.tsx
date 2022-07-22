@@ -11,8 +11,6 @@ import { showMenu } from "devtools/shared/contextmenu";
 import type { UIState } from "ui/state";
 import type { AppDispatch } from "ui/setup/store";
 import type { Source, SourceWithContent } from "devtools/client/debugger/src/reducers/sources";
-// @ts-expect-error still JS
-import { getSourceLocationFromMouseEvent } from "../../utils/editor";
 import { isPretty } from "../../utils/source";
 import {
   getPrettySource,

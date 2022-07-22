@@ -5,7 +5,6 @@
 import { connect, ConnectedProps } from "react-redux";
 
 import { Component } from "react";
-// @ts-expect-error not JS yet
 import { fromEditorLine } from "../../utils/editor";
 import { getBreakableLinesForSelectedSource } from "ui/reducers/possibleBreakpoints";
 import { getBoundsForLineNumber } from "ui/reducers/hitCounts";

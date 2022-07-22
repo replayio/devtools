@@ -13,7 +13,6 @@ import { UIThunkAction } from "ui/actions";
 import type { Context } from "../reducers/pause";
 import type { Source, SourceWithContent } from "../reducers/sources";
 
-// @ts-expect-error
 import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 

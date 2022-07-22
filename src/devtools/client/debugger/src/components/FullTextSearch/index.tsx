@@ -18,7 +18,6 @@ import {
   getFullTextSearchFocus,
 } from "../../selectors";
 
-// @ts-expect-error not TS yet
 import { getEditor } from "../../utils/editor";
 
 import { FullTextFilter } from "./FullTextFilter";

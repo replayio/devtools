@@ -37,40 +37,24 @@ import { KeyModifiersContext } from "ui/components/KeyModifiers";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import {
-  // @ts-expect-error not JS yet
   showSourceText,
-  // @ts-expect-error not JS yet
   showLoading,
-  // @ts-expect-error not JS yet
   showErrorMessage,
-  // @ts-expect-error not JS yet
   getEditor,
-  // @ts-expect-error not JS yet
   clearEditor,
-  // @ts-expect-error not JS yet
   getCursorLine,
-  // @ts-expect-error not JS yet
   lineAtHeight,
-  // @ts-expect-error not JS yet
   fromEditorLine,
   getDocument,
-  // @ts-expect-error not JS yet
   scrollToColumn,
   toEditorLine,
-  // @ts-expect-error not JS yet
   toEditorColumn,
-  // @ts-expect-error not JS yet
   getSourceLocationFromMouseEvent,
   hasDocument,
-  // @ts-expect-error not JS yet
   onTokenMouseOver,
-  // @ts-expect-error not JS yet
   onLineMouseOver,
-  // @ts-expect-error not JS yet
   startOperation,
-  // @ts-expect-error not JS yet
   endOperation,
-  // @ts-expect-error not JS yet
   clearDocuments,
 } from "../../utils/editor";
 import Gutter from "./Gutter";
@@ -318,7 +302,11 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
   onGutterClick = (cm: any, line: number, gutter: any, ev: MouseEvent) => {
     const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
-    const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
+    const sourceLocation = getSourceLocationFromMouseEvent(
+      this.state.editor!,
+      selectedSource as any,
+      ev
+    );
 
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
@@ -353,7 +341,11 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     const { cx, selectedSource, updateCursorPosition } = this.props;
 
     if (selectedSource) {
-      const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, e);
+      const sourceLocation = getSourceLocationFromMouseEvent(
+        this.state.editor!,
+        selectedSource as any,
+        e
+      );
 
       updateCursorPosition(sourceLocation);
     }
@@ -384,7 +376,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
       const line = toEditorLine(selectedLocation.line);
-      let column;
+      let column: number | undefined;
 
       if (selectedSource && hasDocument(selectedSource.id)) {
         const doc = getDocument(selectedSource.id);
@@ -393,7 +385,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
         column = Math.max(column, getIndentation(lineText));
       }
 
-      scrollToColumn(editor.codeMirror, line, column);
+      scrollToColumn(editor.codeMirror, line, column!);
     }
   }
 
@@ -427,7 +419,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
       editor,
       selectedSource,
       (selectedSource.content as SourceContent).value as any,
-      symbols
+      symbols as any
     );
   }
 

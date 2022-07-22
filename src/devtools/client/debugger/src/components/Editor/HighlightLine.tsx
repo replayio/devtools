@@ -6,7 +6,6 @@ import type { Location } from "@replayio/protocol";
 import { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
-// @ts-expect-error legacy untyped imports
 import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 

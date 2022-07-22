@@ -10,14 +10,10 @@ import type { UIState } from "ui/state";
 
 import {
   toEditorLine,
-  // @ts-expect-error not JS yet
   toEditorColumn,
   getDocument,
-  // @ts-expect-error not JS yet
   startOperation,
-  // @ts-expect-error not JS yet
   endOperation,
-  // @ts-expect-error not JS yet
   getTokenEnd,
 } from "../../utils/editor";
 import { isException } from "../../utils/pause";
@@ -69,6 +65,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
 
     const line = toEditorLine(location.line);
     let { markTextClass, lineClass } = this.getTextClasses(why);
+    // @ts-expect-error method doesn't exist on Doc
     doc.addLineClass(line, "line", lineClass);
 
     const lineText = doc.getLine(line);
@@ -77,6 +74,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
 
     // If component updates because user clicks on
     // another source tab, codeMirror will be null.
+    // @ts-expect-error doc.cm doesn't exist
     const columnEnd = doc.cm ? getTokenEnd(doc.cm, line, column) : null;
 
     if (columnEnd === null) {
@@ -85,7 +83,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
 
     this.debugExpression = doc.markText(
       { ch: column, line },
-      { ch: columnEnd, line },
+      { ch: columnEnd!, line },
       { className: markTextClass }
     );
   }
@@ -105,6 +103,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
       return;
     }
     const { lineClass } = this.getTextClasses(why);
+    // @ts-expect-error method doesn't exist on Doc
     doc.removeLineClass(line, "line", lineClass);
   }
 
