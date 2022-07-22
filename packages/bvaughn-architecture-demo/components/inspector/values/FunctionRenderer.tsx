@@ -1,4 +1,6 @@
 import Icon from "@bvaughn/components/Icon";
+import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
+import { useContext } from "react";
 
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
@@ -10,13 +12,14 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function FunctionRenderer({ object }: ObjectPreviewRendererProps) {
-  const { functionName, functionParameterNames = [] } = object?.preview ?? {};
+  const { inspectFunctionDefinition } = useContext(InspectorContext);
+
+  const { functionLocation, functionName, functionParameterNames = [] } = object?.preview ?? {};
   const showOverflowMarker =
     object?.preview?.overflow || functionParameterNames.length > MAX_PROPERTIES_TO_PREVIEW;
 
   const viewFunctionSource = () => {
-    // In the real app, this would open the Source viewer.
-    alert("Source viewer is not implemented yet");
+    inspectFunctionDefinition(functionLocation!);
   };
 
   const slice = functionParameterNames.slice(0, MAX_PROPERTIES_TO_PREVIEW);
@@ -42,9 +45,15 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
         )}
         {")"}
       </span>
-      <button className={styles.IconButton} onClick={viewFunctionSource}>
-        <Icon className={styles.Icon} type="view-function-source" />
-      </button>
+      {functionLocation && (
+        <button
+          className={styles.IconButton}
+          onClick={viewFunctionSource}
+          title="Jump to definition"
+        >
+          <Icon className={styles.Icon} type="view-function-source" />
+        </button>
+      )}
     </>
   );
 }

@@ -1,4 +1,5 @@
 import Icon from "@bvaughn/components/Icon";
+import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
@@ -31,6 +32,7 @@ export default function HTMLElementRenderer({
   showChildrenIndicator = true,
   showOpeningTag = true,
 }: Props) {
+  const { inspectHTMLElement } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
   const tagName = (object.preview?.node?.nodeName || "unknown").toLowerCase();
 
@@ -63,8 +65,7 @@ export default function HTMLElementRenderer({
   const showInlineText = showChildrenIndicator && (inlineText || childNodes.length > 0);
 
   const viewHtmlElement = () => {
-    // In the real app, this would open the HTML Elements panel.
-    alert("Source viewer is not implemented yet");
+    inspectHTMLElement(object);
   };
 
   return (
@@ -88,7 +89,11 @@ export default function HTMLElementRenderer({
           <span className={styles.Bracket}>&gt;</span>
         </span>
       )}
-      <button className={styles.IconButton} onClick={viewHtmlElement}>
+      <button
+        className={styles.IconButton}
+        onClick={viewHtmlElement}
+        title="Click to select the node in the inspector"
+      >
         <Icon className={styles.Icon} type="view-html-element" />
       </button>
     </>
