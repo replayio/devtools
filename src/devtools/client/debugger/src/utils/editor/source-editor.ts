@@ -19,6 +19,8 @@ require("codemirror/addon/selection/active-line");
 require("codemirror/addon/edit/matchbrackets");
 
 export { CodeMirror };
+
+export type EditorWithDoc = Editor & { doc: Doc };
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;
@@ -28,14 +30,14 @@ type $FixTypeLater = any;
 export class SourceEditor {
   opts: $FixTypeLater;
   // @ts-expect-error  created later
-  editor: Editor & { doc: Doc };
+  editor: EditorWithDoc;
 
   constructor(opts: $FixTypeLater) {
     this.opts = opts;
   }
 
   appendToLocalElement(node: HTMLElement) {
-    this.editor = CodeMirror(node, this.opts) as Editor & { doc: Doc };
+    this.editor = CodeMirror(node, this.opts) as EditorWithDoc;
   }
 
   destroy() {

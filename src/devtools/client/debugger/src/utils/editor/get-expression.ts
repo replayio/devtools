@@ -2,9 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { SourceLocation } from "@replayio/protocol";
+import type { EditorWithDoc } from "./source-editor";
 //
 
-export function tokenAtTextPosition(cm, { line, column }) {
+export function tokenAtTextPosition(cm: EditorWithDoc, { line, column }: SourceLocation) {
   if (line < 0 || line >= cm.lineCount()) {
     return null;
   }
@@ -19,7 +21,7 @@ export function tokenAtTextPosition(cm, { line, column }) {
 
 // The strategy of querying codeMirror tokens was borrowed
 // from Chrome's inital implementation in JavaScriptSourceFrame.js#L414
-export function getExpressionFromCoords(cm, coord) {
+export function getExpressionFromCoords(cm: EditorWithDoc, coord: SourceLocation) {
   const token = tokenAtTextPosition(cm, coord);
   if (!token) {
     return null;
