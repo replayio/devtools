@@ -23,7 +23,6 @@ export default function Icon({
     | "fast-forward"
     | "folder"
     | "invisible"
-    | "jump-to-definition"
     | "menu-closed"
     | "menu-open"
     | "prompt"
@@ -35,6 +34,8 @@ export default function Icon({
     | "share"
     | "source-explorer"
     | "up"
+    | "view-function-source"
+    | "view-html-element"
     | "visible"
     | "warning";
 }) {
@@ -102,9 +103,6 @@ export default function Icon({
       path =
         "M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z";
       break;
-    case "jump-to-definition":
-      path = "M12.34,6V4H18v5.66h-2V7.41l-5,5V20H9v-7.58c0-0.53,0.21-1.04,0.59-1.41l5-5H12.34z";
-      break;
     case "menu-closed":
       path = "M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z";
       break;
@@ -147,6 +145,13 @@ export default function Icon({
       break;
     case "up":
       path = "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z";
+      break;
+    case "view-function-source":
+      path = "M12.34,6V4H18v5.66h-2V7.41l-5,5V20H9v-7.58c0-0.53,0.21-1.04,0.59-1.41l5-5H12.34z";
+      break;
+    case "view-html-element":
+      path =
+        "M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z";
       break;
     case "visible":
       path =
