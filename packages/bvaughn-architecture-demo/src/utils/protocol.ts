@@ -40,6 +40,16 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
   return properties.filter(property => property.flags == null || property.flags & 4);
 }
 
+function isProtocolProperty(
+  valueOrProperty: ProtocolValue | ProtocolNamedValue | ProtocolProperty
+): valueOrProperty is ProtocolProperty {
+  return (
+    valueOrProperty.hasOwnProperty("get") ||
+    valueOrProperty.hasOwnProperty("isSymbol") ||
+    valueOrProperty.hasOwnProperty("set")
+  );
+}
+
 // TODO It would be nice if the protocol's Value objects used a consistent format.
 // As it is, these values have conditional fields which require special handling.
 // This utility function maps from one ot the other.
@@ -47,7 +57,7 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
 // See https://linear.app/replay/issue/BAC-1808
 export function protocolValueToClientValue(
   pauseId: ProtocolPauseId,
-  protocolValue: ProtocolValue | ProtocolNamedValue
+  protocolValue: ProtocolValue | ProtocolNamedValue | ProtocolProperty
 ): Value {
   const name = protocolValue.hasOwnProperty("name")
     ? (protocolValue as ProtocolNamedValue).name
@@ -103,14 +113,14 @@ export function protocolValueToClientValue(
     let objectId: ProtocolObjectId | undefined;
     if (protocolValue.hasOwnProperty("object")) {
       objectId = protocolValue.object;
-    } else if (protocolValue.hasOwnProperty("get")) {
-      // TODO ProtocolValue doesn't define this field, but the backend returns it.
-      // @ts-ignore
-      objectId = protocolValue.get as ProtocolObjectId;
-    } else if (protocolValue.hasOwnProperty("set")) {
-      // TODO ProtocolValue doesn't define this field, but the backend returns it.
-      // @ts-ignore
-      objectId = protocolValue.set as ProtocolObjectId;
+    } else {
+      if (isProtocolProperty(protocolValue)) {
+        if (protocolValue.hasOwnProperty("get")) {
+          objectId = protocolValue.get;
+        } else if (protocolValue.hasOwnProperty("set")) {
+          objectId = protocolValue.set;
+        }
+      }
     }
 
     if (objectId) {
@@ -170,6 +180,19 @@ export function protocolValueToClientValue(
       return { name, preview: "undefined", type: "undefined" };
     }
   }
+
+  // (BAC-1986) Additional edge case where an Object Property is a symbol but has no corresponding object value.
+  if (isProtocolProperty(protocolValue)) {
+    if (protocolValue.isSymbol === true) {
+      return {
+        name,
+        preview: `${(protocolValue as ProtocolProperty).name}`,
+        type: "symbol",
+      };
+    }
+  }
+
+  console.error("Unsupported value type:", protocolValue);
 
   throw Error(`Unsupported value type`);
 }
