@@ -78,7 +78,7 @@ export function getEventTypeEntryPoints(
 }
 
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
-  eventCategoryCounts = [];
+  const pendingEventCategoryCounts: EventCategory[] = [];
 
   // Fetch event hit counts in parallel.
   const promises: Promise<void>[] = [];
@@ -103,12 +103,14 @@ async function fetchEventCategoryCounts(client: ReplayClientInterface) {
       );
     });
 
-    eventCategoryCounts?.push(categoryWithCounts);
+    pendingEventCategoryCounts.push(categoryWithCounts);
   });
 
   await Promise.all(promises);
 
-  inProgressEventCategoryCountsWakeable!.resolve(eventCategoryCounts);
+  eventCategoryCounts = pendingEventCategoryCounts;
+
+  inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
 }
 

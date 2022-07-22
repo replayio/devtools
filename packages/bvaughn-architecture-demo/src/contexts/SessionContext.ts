@@ -9,7 +9,6 @@ export type SessionContextType = {
   endPoint: ExecutionPoint;
   recordingId: string;
   sessionId: string;
-  sourceIds: SourceId[];
 };
 
 export const SessionContext = createContext<SessionContextType>(null as any);

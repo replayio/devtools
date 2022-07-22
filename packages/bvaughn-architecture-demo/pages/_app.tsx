@@ -5,7 +5,7 @@ import NextApp from "next/app";
 import ErrorBoundary from "../components/ErrorBoundary";
 
 import "./global.css";
-import "./inspector.css";
+import "./variables.css";
 
 interface AuthProps {
   apiKey?: string;

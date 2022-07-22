@@ -9,13 +9,16 @@ import {
   useTransition,
 } from "react";
 
+// The new console uses a numeric id but the legacy console uses a string.
+export type PointId = number | string;
+
 export type Point = {
   badge: string | null;
   condition: string | null;
   content: string;
   enableBreaking: boolean;
   enableLogging: boolean;
-  id: number;
+  id: PointId;
   location: Location;
 };
 
@@ -27,8 +30,8 @@ export type PointInstance = {
 
 export type PointsContextType = {
   addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
-  deletePoint: (id: number) => void;
-  editPoint: (id: number, partialPoint: Partial<Point>) => void;
+  deletePoint: (id: PointId) => void;
+  editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
   isPending: boolean;
   points: Point[];
   pointsForAnalysis: Point[];
@@ -70,7 +73,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const deletePoint = useCallback(
-    (id: number) => {
+    (id: PointId) => {
       setPointsHelper((prevPoints: Point[]) => {
         const index = prevPoints.findIndex(point => point.id === id);
         if (index >= 0) {
@@ -86,7 +89,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const editPoint = useCallback(
-    (id: number, partialPoint: Partial<Point>) => {
+    (id: PointId, partialPoint: Partial<Point>) => {
       setPointsHelper((prevPoints: Point[]) => {
         const index = prevPoints.findIndex(point => point.id === id);
         if (index >= 0) {

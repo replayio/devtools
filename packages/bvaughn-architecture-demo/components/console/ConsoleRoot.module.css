@@ -52,6 +52,7 @@
   height: 2rem;
   padding: 0.25rem;
   fill: var(--color-default);
+  display: inline-block;
 }
 
 .FilterColumn {
