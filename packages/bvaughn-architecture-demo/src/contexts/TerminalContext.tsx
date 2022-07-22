@@ -13,7 +13,7 @@ import {
 export type TerminalExpression = {
   expression: string;
   id: number;
-  frameId: FrameId;
+  frameId: FrameId | null;
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
