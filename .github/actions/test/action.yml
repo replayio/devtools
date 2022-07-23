@@ -57,7 +57,7 @@ runs:
       id: upload-recordings
       if: ${{ always() && inputs.upload == 'true' }}
       with:
-        apiKey: ${{ env.RECORD_REPLAY_API_KEY }}
+        api-key: ${{ env.RECORD_REPLAY_API_KEY }}
         public: true
         filter: function($v) { $v.metadata.test and $v.status = "onDisk" }
     - name: Get Recording Log ID
