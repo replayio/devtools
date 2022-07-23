@@ -1,6 +1,6 @@
 const React = require("react");
 const PropTypes = require("prop-types");
-const { COLOR, FONT_FAMILY, URI } = require("devtools/client/shared/output-parser");
+const { COLOR, FONT_FAMILY, URI } = require("packages/third-party/css/output-parser");
 
 const Color = require("devtools/client/inspector/rules/components/value/Color");
 const FontFamily = require("devtools/client/inspector/rules/components/value/FontFamily");

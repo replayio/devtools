@@ -111,18 +111,6 @@ TooltipsOverlay.prototype = {
     // TODO This is probably dead, delete this
     const doc = this.view.inspector.toolbox?.doc;
     switch (name) {
-      case "colorPicker":
-        const SwatchColorPickerTooltip = require("devtools/client/shared/widgets/tooltip/SwatchColorPickerTooltip");
-        tooltip = new SwatchColorPickerTooltip(doc, this.view.inspector, this._cssProperties);
-        break;
-      case "cubicBezier":
-        const SwatchCubicBezierTooltip = require("devtools/client/shared/widgets/tooltip/SwatchCubicBezierTooltip");
-        tooltip = new SwatchCubicBezierTooltip(doc);
-        break;
-      case "filterEditor":
-        const SwatchFilterTooltip = require("devtools/client/shared/widgets/tooltip/SwatchFilterTooltip");
-        tooltip = new SwatchFilterTooltip(doc);
-        break;
       case "interactiveTooltip":
         tooltip = new HTMLTooltip(doc, {
           type: "doorhanger",

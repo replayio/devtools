@@ -14,7 +14,6 @@ const {
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
 const { getCurrentZoom } = require("devtools/shared/layout/utils");
 const {
   getNodeDisplayName,

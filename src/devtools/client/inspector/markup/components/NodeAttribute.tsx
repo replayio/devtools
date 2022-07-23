@@ -5,7 +5,7 @@ import { UIState } from "ui/state";
 import { NodeInfo } from "../state/markup";
 
 const { truncateString } = require("devtools/shared/inspector/utils");
-const { parseAttribute } = require("devtools/client/shared/node-attribute-parser");
+const { parseAttribute } = require("packages/third-party/node-attribute-parser");
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;

@@ -4,7 +4,7 @@
 
 const { generateUUID } = require("devtools/shared/generate-uuid");
 const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
-const { escapeCSSComment } = require("devtools/shared/css/parsing-utils");
+const { escapeCSSComment } = require("packages/third-party/css/parsing-utils");
 import Rule from "./rule";
 import ElementStyle from "./element-style";
 import CSSProperties from "../../css-properties";

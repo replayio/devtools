@@ -6,9 +6,9 @@
 
 const SPECIALVALUES = new Set(["initial", "inherit", "unset"]);
 
-const { getCSSLexer } = require("devtools/shared/css/lexer");
+const { getCSSLexer } = require("./lexer");
 
-const { CSS_ANGLEUNIT } = require("devtools/shared/css/constants");
+const { CSS_ANGLEUNIT } = require("./constants");
 
 /**
  * This module is used to convert between various angle units.

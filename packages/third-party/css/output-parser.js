@@ -4,10 +4,9 @@
 
 "use strict";
 
-const Services = require("devtools/shared/services");
-const { angleUtils } = require("devtools/client/shared/css-angle");
-const { colorUtils } = require("devtools/shared/css/color");
-const { getCSSLexer } = require("devtools/shared/css/lexer");
+const { angleUtils } = require("./css-angle");
+const { colorUtils } = require("./color");
+const { getCSSLexer } = require("./lexer");
 
 // Functions that accept an angle argument.
 const ANGLE_TAKING_FUNCTIONS = [

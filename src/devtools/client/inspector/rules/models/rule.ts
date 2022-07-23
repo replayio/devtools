@@ -10,7 +10,7 @@ import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 import CSSProperties from "../../css-properties";
-import { parseNamedDeclarations } from "devtools/shared/css/parsing-utils";
+import { parseNamedDeclarations } from "packages/third-party/css/parsing-utils";
 import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
 const Services = require("devtools/shared/services");

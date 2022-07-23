@@ -5,10 +5,10 @@
 "use strict";
 
 const Services = require("devtools/shared/services");
-const { getCSSLexer } = require("devtools/shared/css/lexer");
-const { cssColors } = require("devtools/shared/css/color-db");
+const { getCSSLexer } = require("./lexer");
+const { cssColors } = require("./color-db");
 
-const { CSS_ANGLEUNIT } = require("devtools/shared/css/constants");
+const { CSS_ANGLEUNIT } = require("./constants");
 
 const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
 
