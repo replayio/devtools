@@ -3,7 +3,7 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs, features, asyncStore } from "ui/utils/prefs";
 
 // eslint-disable-next-line no-restricted-imports
-import { triggerEvent, sendMessage } from "protocol/socket";
+import { triggerEvent, sendMessage, client } from "protocol/socket";
 import { getReplaySession, ReplaySession } from "./prefs";
 
 declare global {
@@ -23,6 +23,8 @@ declare global {
     replaySession: Promise<ReplaySession> | undefined;
     triggerEvent: typeof triggerEvent;
     sendMessage: typeof sendMessage;
+    releaseSession: () => void;
+    client: typeof client;
   }
 }
 
@@ -55,9 +57,11 @@ export async function setupAppHelper(store: UIStore) {
     asyncStore,
     triggerEvent,
     replaySession,
+    client,
     sendMessage: (cmd, args = {}, pauseId) =>
       sendMessage(cmd, args, window.sessionId, pauseId as any),
 
+    releaseSession: () => client.Recording.releaseSession({ sessionId: window.sessionId }),
     dumpBasicProcessing,
     dumpPrefs: () =>
       JSON.stringify({ features: features.toJSON(), prefs: prefs.toJSON() }, null, 2),
