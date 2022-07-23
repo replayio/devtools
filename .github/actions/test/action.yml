@@ -65,8 +65,3 @@ runs:
       if: ${{ always() && inputs.upload == 'true' }}
       run: echo ::set-output name=LOG_ID::$(echo $INPUT_STRIPE | cut -f1 -d /)
       shell: bash
-    - uses: actions/upload-artifact@v3
-      if: ${{ always() && inputs.upload == 'true' }}
-      with:
-        name: recordings-log-${{ steps.log-id.outputs.LOG_ID }}
-        path: ${{ steps.upload-recordings.outputs.recordings-path }}
