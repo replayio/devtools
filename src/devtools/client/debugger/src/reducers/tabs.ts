@@ -13,7 +13,7 @@ import type { UIState } from "ui/state";
 import { createSelector } from "reselect";
 
 import { isSimilarTab } from "../utils/tabs";
-import { makeShallowQuery } from "../utils/resource";
+import { makeShallowQuery, memoizeResourceShallow } from "../utils/resource";
 
 import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
 import type { Source } from "./sources";
@@ -259,7 +259,7 @@ const querySourcesForTabs = makeShallowQuery({
   reduce: items => items,
 });
 
-export function tabExists(state: UIState, sourceId: string) {
+export function getTabExists(state: UIState, sourceId: string) {
   return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);
 }
 

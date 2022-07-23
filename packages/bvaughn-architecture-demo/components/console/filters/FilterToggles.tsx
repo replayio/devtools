@@ -1,6 +1,7 @@
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -47,7 +48,7 @@ export default function FilterToggles() {
   }, [messages]);
 
   return (
-    <div className={styles.Filters}>
+    <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
         checked={showExceptions}
         label="Exceptions"
@@ -103,7 +104,7 @@ function Toggle({
 }) {
   return (
     <div className={styles.Filter}>
-      <label className={styles.Label}>
+      <label className={styles.Label} data-test-id={`FilterToggle-${camelCase(label)}`}>
         <input
           className={styles.Checkbox}
           checked={checked}

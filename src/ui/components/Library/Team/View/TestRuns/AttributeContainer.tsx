@@ -8,7 +8,7 @@ export function AttributeContainer({
 }: {
   children: string;
   icon?: string;
-  title?: string;
+  title?: string | null;
   maxWidth?: string;
 }) {
   return (

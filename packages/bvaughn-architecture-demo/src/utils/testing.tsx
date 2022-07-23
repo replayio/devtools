@@ -6,11 +6,12 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import {
   ConsoleFiltersContext,
+  ConsoleFiltersContextRoot,
   ConsoleFiltersContextType,
 } from "../contexts/ConsoleFiltersContext";
 import { FocusContext, FocusContextType } from "../contexts/FocusContext";
 import { SessionContext, SessionContextType } from "../contexts/SessionContext";
-import { PauseContext, PauseContextType } from "../contexts/PauseContext";
+import { TimelineContext, TimelineContextType } from "../contexts/TimelineContext";
 import { PointsContext, PointsContextType } from "../contexts/PointsContext";
 
 // This particular method is written to enable testing the entire client.
@@ -38,7 +39,6 @@ export async function render(
     endPoint: "1000",
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
-    sourceIds: [],
     ...options?.sessionContext,
   };
 
@@ -46,7 +46,9 @@ export async function render(
   await act(async () => {
     const result = rtlRender(
       <ReplayClientContext.Provider value={replayClient}>
-        <SessionContext.Provider value={sessionContext}>{children}</SessionContext.Provider>
+        <SessionContext.Provider value={sessionContext}>
+          <ConsoleFiltersContextRoot>{children}</ConsoleFiltersContextRoot>
+        </SessionContext.Provider>
       </ReplayClientContext.Provider>
     );
 
@@ -71,7 +73,7 @@ export async function renderFocused(
   options?: {
     consoleFiltersContext?: Partial<ConsoleFiltersContextType>;
     focusContext?: Partial<FocusContextType>;
-    pauseContext?: Partial<PauseContextType>;
+    timelineContext?: Partial<TimelineContextType>;
     pointsContext?: Partial<PointsContextType>;
     replayClient?: Partial<ReplayClientInterface>;
     sessionContext?: Partial<SessionContextType>;
@@ -84,7 +86,8 @@ export async function renderFocused(
   sessionContext: SessionContextType;
 }> {
   const consoleFiltersContext: ConsoleFiltersContextType = {
-    events: {},
+    eventTypes: {},
+    eventTypesForDisplay: {},
     filterByDisplayText: "",
     filterByText: "",
     isTransitionPending: false,
@@ -106,11 +109,13 @@ export async function renderFocused(
     ...options?.focusContext,
   };
 
-  const pauseContext: PauseContextType = {
+  const timelineContext: TimelineContextType = {
+    executionPoint: null,
     isPending: false,
     pauseId: null,
+    time: 0,
     update: jest.fn(),
-    ...options?.pauseContext,
+    ...options?.timelineContext,
   };
 
   const pointsContext: PointsContextType = {
@@ -125,13 +130,13 @@ export async function renderFocused(
 
   const renderResponse = await render(
     <PointsContext.Provider value={pointsContext}>
-      <PauseContext.Provider value={pauseContext}>
+      <TimelineContext.Provider value={timelineContext}>
         <FocusContext.Provider value={focusContext}>
           <ConsoleFiltersContext.Provider value={consoleFiltersContext}>
             {children}
           </ConsoleFiltersContext.Provider>
         </FocusContext.Provider>
-      </PauseContext.Provider>
+      </TimelineContext.Provider>
     </PointsContext.Provider>,
     {
       replayClient: options?.replayClient,
@@ -157,6 +162,11 @@ export function setupWindow(): void {
 // but its methods can be overridden individually (or observed/inspected) by test code.
 const MockReplayClient = {
   configure: jest.fn().mockImplementation(async () => {}),
+  createPause: jest.fn().mockImplementation(async () => ({
+    frames: [],
+    data: {},
+  })),
+  evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
   findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
   findSources: jest.fn().mockImplementation(async () => []),
   getAllFrames: jest.fn().mockImplementation(async () => []),
@@ -175,6 +185,7 @@ const MockReplayClient = {
     contentType: "text/javascript",
   })),
   getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
+  searchSources: jest.fn().mockImplementation(async () => []),
   initialize: jest.fn().mockImplementation(async () => {}),
-  runAnalysis: jest.fn().mockImplementation(async () => ({})),
+  runAnalysis: jest.fn().mockImplementation(async () => []),
 };

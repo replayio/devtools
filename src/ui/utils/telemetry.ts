@@ -11,10 +11,23 @@ const timings: Record<string, number> = {};
 
 export function setupTelemetry() {
   const ignoreList = [
-    "Current thread has paused or resumed",
-    "Current thread has changed",
+    // network problems
     "Failed to load Stripe.js",
     "Stripe.js not available",
+    "A network error occurred.",
+    "NetworkError when attempting to fetch resource.",
+    "Response not successful: Received status code 500",
+    "Response not successful: Received status code 401",
+    // error messages from the backend
+    "The session is unknown or has been destroyed",
+    "The session was destroyed while the command was in progress",
+    "Internal error",
+    "Failed to perform command",
+    "Operation timed out",
+    // sporadic error from an apollo dependency
+    "already recomputing",
+    // sporadic error from asyncStorage, only happens in Mobile Safari
+    "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.",
   ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.

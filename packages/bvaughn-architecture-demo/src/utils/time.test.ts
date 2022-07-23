@@ -37,5 +37,10 @@ describe("Time util", () => {
       expect(formatTimestamp(60_010, true)).toEqual("1:00.010");
       expect(formatTimestamp(90_001, true)).toEqual("1:30.001");
     });
+
+    it("should round fractional values", () => {
+      expect(formatTimestamp(1.3, true)).toEqual("0:00.001");
+      expect(formatTimestamp(1.7, true)).toEqual("0:00.002");
+    });
   });
 });

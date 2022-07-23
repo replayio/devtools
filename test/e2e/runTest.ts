@@ -22,38 +22,36 @@ function pingTestMetrics(
   const runId = process.env.TEST_RUN_ID;
   const webhookUrl = process.env.RECORD_REPLAY_WEBHOOK_URL;
 
-  try {
-    if (!webhookUrl) {
-      console.log("RECORD_REPLAY_WEBHOOK_URL is undefined. Skipping test metrics");
-      return;
-    }
-
-    if (!runId) {
-      console.log("TEST_RUN_ID is undefined. Skipping test metrics");
-      return;
-    }
-
-    const body = JSON.stringify(
-      {
-        type: "test.finished",
-        recordingId,
-        test: {
-          ...test,
-          runId,
-        },
-      },
-      undefined,
-      2
-    );
-
-    return fetch(`${webhookUrl}/api/metrics`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body,
-    });
-  } catch (e) {
-    console.log("Failed to send test metrics", e);
+  if (!webhookUrl) {
+    console.log("RECORD_REPLAY_WEBHOOK_URL is undefined. Skipping test metrics");
+    return;
   }
+
+  if (!runId) {
+    console.log("TEST_RUN_ID is undefined. Skipping test metrics");
+    return;
+  }
+
+  const body = JSON.stringify(
+    {
+      type: "test.finished",
+      recordingId,
+      test: {
+        ...test,
+        runId,
+      },
+    },
+    undefined,
+    2
+  );
+
+  return fetch(`${webhookUrl}/api/metrics`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+  }).catch(e => {
+    console.log("Failed to send test metrics", e);
+  });
 }
 
 function setTestId(file: string) {

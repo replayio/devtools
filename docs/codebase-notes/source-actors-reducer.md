@@ -29,7 +29,7 @@ type SourceActorsState = ResourceState<SourceActor>;
 
 ### `"INSERT_SOURCE_ACTORS"`
 
-Just inserts resource entries from `action.items`, and adds `{breakpointPositions: new Map(), breakableLines: null}` to each.
+Just inserts resource entries from `action.items
 
 Dispatched by: `actions/newSources.js` line 254
 
@@ -46,12 +46,6 @@ Just removes the matching entries.
 Updates an entry for the given `line` and `sourceId`, by recreating a `Map` and calling `breakpointPosition.set(line, value)`, then updating the resource entry.
 
 Dispatched by: `actions/source-actors.js` line 46, inside the `loadSourceActorBreakpointColumns` memoized action
-
-### `"SET_SOURCE_ACTOR_BREAKPOINT_HIT_COUNTS"`
-
-Overwrites the `breakableLines` field in a resource entry, if it isn't `"pending"`.
-
-Dispatched by: `actions/source-actors.js` line 93, inside the `loadSourceActorBreakpointHitCounts` memoized action
 
 ### `"set_trim_region"`
 
@@ -105,7 +99,6 @@ Generates a new `values` record with every entry's `breakpointHitCounts` field s
 - `getSourceActorsForThread`: concatenates array of sources for thread IDs
 - `queryThreadsBySourceObject`: calculates `Record<SourceName, ThreadName[]>`
 - `getAllThreadsBySource`
-- `getSourceActorBreakpointHitCounts`
 - `getSourceActorBreakableLines`
 - `getSourceActorBreakpointColumns`
 - `getBreakableLinesForSourceActors`

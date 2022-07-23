@@ -46,7 +46,7 @@ export default function Search({
   let results = null;
   if (searchState.results.length > 0) {
     results = (
-      <div className={styles.Results}>
+      <div className={styles.Results} data-test-id="SearchResultsLabel">
         {searchState.index + 1} of {searchState.results.length} results
         <button
           className={styles.ResultsIconButton}

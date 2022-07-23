@@ -1,5 +1,6 @@
 import { Workspace, WorkspaceSubscriptionStatus } from "ui/types";
 import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
+import { assert } from "protocol/utils";
 
 export function inUnpaidFreeTrial(workspace: Workspace) {
   const subscription = workspace.subscription;
@@ -23,11 +24,14 @@ export function subscriptionEndsIn(workspace: Workspace, date?: Date | number) {
     subscription.status === WorkspaceSubscriptionStatus.Canceled ||
     subscription.status === WorkspaceSubscriptionStatus.Incomplete
   ) {
+    if (!subscription.effectiveUntil) {
+      return Infinity;
+    }
     return differenceInCalendarDays(new Date(subscription.effectiveUntil), date);
   }
 
   if (subscription.status === WorkspaceSubscriptionStatus.Active) {
-    return !workspace.hasPaymentMethod
+    return subscription.effectiveUntil && !workspace.hasPaymentMethod
       ? differenceInCalendarDays(new Date(subscription.effectiveUntil), date)
       : Infinity;
   }

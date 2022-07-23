@@ -1,5 +1,4 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
-import { setBreakpointHitCounts } from "devtools/client/debugger/src/actions/sources";
 import minBy from "lodash/minBy";
 import React, { useRef, useState, useEffect, ReactNode } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -7,14 +6,14 @@ import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
-import { getHitCountsForSelectedSource, getSelectedSource } from "../../reducers/sources";
+import { getSelectedSource } from "../../reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
+import { fetchHitCounts, getHitCountsForSource } from "ui/reducers/hitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -66,10 +65,9 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
-
-  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
   const source = useAppSelector(getSelectedSource);
-  const breakpoints = useAppSelector(selectors.getBreakpointsList);
+
+  const hitCounts = useAppSelector(state => getHitCountsForSource(state, source!.id));
 
   let hits: number | undefined;
 
@@ -92,8 +90,8 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       if (lineNumber !== lastHoveredLineNumber.current) {
         lastHoveredLineNumber.current = lineNumber;
       }
-      dispatch(setBreakpointHitCounts(source!.id, lineNumber));
       dispatch(updateHoveredLineNumber(lineNumber));
+      dispatch(fetchHitCounts(source!.id, lastHoveredLineNumber.current));
       setTargetNode(lineNumberNode);
     };
     const clearHoveredLineNumber = () => {

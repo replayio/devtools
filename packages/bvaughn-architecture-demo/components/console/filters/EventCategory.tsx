@@ -70,7 +70,10 @@ export default function EventCategory({
       <Expandable
         children={eventsList}
         header={
-          <div className={styles.Header}>
+          <div
+            className={styles.Header}
+            data-test-id={`EventCategoryHeader-${eventCategory.category}`}
+          >
             <span className={styles.Category}>{eventCategory.category}</span>
             <span className={styles.Count}>{totalHitCount}</span>
           </div>

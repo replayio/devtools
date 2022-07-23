@@ -88,8 +88,15 @@ const MaxPointsPerBatch = MAX_POINTS_FOR_FULL_ANALYSIS;
 
 class AnalysisManager {
   private handlers = new Map<AnalysisId, AnalysisHandler<any>>();
+  private initialized = false;
 
   init() {
+    if (this.initialized) {
+      return;
+    }
+
+    this.initialized = true;
+
     addEventListener("Analysis.analysisResult", this.onAnalysisResult);
     addEventListener("Analysis.analysisPoints", this.onAnalysisPoints);
     addEventListener("Analysis.analysisError", this.onAnalysisError);

@@ -38,10 +38,10 @@ export function useIsPublicEnabled() {
 export function isPublicDisabled(workspaces: Workspace[], selectedWorkspaceId: string | null) {
   const workspace = workspaces.find(w => w.id === selectedWorkspaceId);
   const publicDisabledMyLibrary = workspaces.some(
-    w => w.settings.features.recording.public === false
+    w => w.settings?.features.recording.public === false
   );
   return (
     (!selectedWorkspaceId && publicDisabledMyLibrary) ||
-    workspace?.settings.features.recording.public === false
+    workspace?.settings?.features.recording.public === false
   );
 }

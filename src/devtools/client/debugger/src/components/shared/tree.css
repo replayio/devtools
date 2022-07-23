@@ -23,6 +23,10 @@
   display: flex;
 }
 
+.controlled .tree .node {
+  cursor: pointer;
+}
+
 .tree .tree-node:not(.focused):hover {
   background-color: var(--theme-selection-background-hover);
 }

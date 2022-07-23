@@ -14,7 +14,6 @@ export function setPreviewPausedLocation(location: SourceLocation): UIThunkActio
   return (dispatch, getState) => {
     const cx = getContext(getState());
 
-    // @ts-expect-error sourcelocation mismatch
     dispatch(selectLocation(cx, location));
 
     dispatch({

@@ -21,7 +21,7 @@ async function recordBrowser(state, test, testPath, browserName, saveFixture) {
   const websocketLogs = [];
 
   const context = await browser.newContext({
-    ignoreHTTPSErrors: true
+    ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
 
@@ -146,7 +146,7 @@ async function runTest(state, test, exampleRecordingId, target, saveFixture) {
     testPath += "&longTimeout=1";
   }
 
-  let success, why, recordingId;
+  let recordingId, success, why;
   if (target == "gecko" || target == "chromium") {
     const browserName = target == "gecko" ? "firefox" : "chromium";
     const result = await recordBrowser(state, test, testPath, browserName, saveFixture);

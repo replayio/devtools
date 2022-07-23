@@ -1,5 +1,5 @@
 import { RecordingId } from "@replayio/protocol";
-import { gql, useQuery, useMutation } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { User } from "ui/state/session";
 import { useGetUserId } from "./users";
 import { GET_ACTIVE_SESSIONS } from "ui/graphql/sessions";

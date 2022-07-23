@@ -42,6 +42,8 @@ import {
   Frame,
   PointRange,
   TimeRange,
+  PauseId,
+  PauseData,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
@@ -399,9 +401,7 @@ class _ThreadFront {
 
     await this.ensureAllSources();
     for (const [sourceId, source] of this.sources) {
-      if (sourceId === this.getCorrespondingSourceIds(sourceId)[0]) {
-        onSource({ sourceId, ...source });
-      }
+      onSource({ sourceId, ...source });
     }
   }
 
@@ -498,43 +498,6 @@ class _ThreadFront {
       this.sessionId
     );
     return { contents, contentType };
-  }
-
-  async getHitCounts(
-    sourceId: SourceId,
-    locations: SameLineSourceLocations[],
-    range: { beginPoint: ExecutionPoint; endPoint: ExecutionPoint } | null
-  ) {
-    assert(this.sessionId, "no sessionId");
-    let params: Omit<getHitCountsParameters, "sourceId"> = { locations, maxHits: 10000 };
-    if (range !== null && range.beginPoint !== "" && range.endPoint !== "") {
-      params.range = { begin: range.beginPoint, end: range.endPoint };
-    }
-
-    const sourceIds = this.getCorrespondingSourceIds(sourceId); // ensure source is loaded
-
-    const hitCountsForSources = await Promise.all(
-      sourceIds.map(id =>
-        client.Debugger.getHitCounts({ sourceId: id, ...params }, this.sessionId!)
-      )
-    );
-
-    // Merge hit counts from corresponding sources
-    let [hitCounts, ...hitCountsForCorrespondingSources] = hitCountsForSources;
-    for (const hitCountsForSource of hitCountsForCorrespondingSources) {
-      for (const newHit of hitCountsForSource.hits) {
-        const match = hitCounts.hits.find(
-          hit =>
-            hit.location.line == newHit.location.line &&
-            hit.location.column == newHit.location.column
-        );
-        if (match) {
-          match.hits += newHit.hits;
-        }
-      }
-    }
-
-    return hitCounts;
   }
 
   async getEventHandlerCounts(eventTypes: string[]) {
@@ -663,10 +626,28 @@ class _ThreadFront {
     return pause;
   }
 
-  ensureCurrentPause() {
+  getCurrentPause() {
     if (!this.currentPause) {
       this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
     }
+    return this.currentPause;
+  }
+
+  instantiatePause(
+    pauseId: PauseId,
+    point: ExecutionPoint,
+    time: number,
+    hasFrames: boolean,
+    data: PauseData = {}
+  ) {
+    let pause = this.allPauses.get(point);
+    if (pause) {
+      return pause;
+    }
+    pause = new Pause(this);
+    pause.instantiate(pauseId, point, time, hasFrames, data);
+    this.allPauses.set(point, pause);
+    return pause;
   }
 
   async getFrames() {
@@ -674,16 +655,13 @@ class _ThreadFront {
       return [];
     }
 
-    await this.ensureAllSources();
-    this.ensureCurrentPause();
-    return await this.currentPause!.getFrames();
+    return await this.getCurrentPause().getFrames();
   }
 
   lastAsyncPause() {
-    this.ensureCurrentPause();
     return this.asyncPauses.length
       ? this.asyncPauses[this.asyncPauses.length - 1]
-      : this.currentPause;
+      : this.getCurrentPause();
   }
 
   async loadRegion(region: TimeRange, endTime: number) {
@@ -700,7 +678,7 @@ class _ThreadFront {
   }
 
   async loadAsyncParentFrames() {
-    await this.ensureAllSources();
+    await this.getCurrentPause().ensureLoaded();
     const basePause = this.lastAsyncPause();
     assert(basePause, "no lastAsyncPause");
     const baseFrames = await basePause.getFrames();
@@ -722,11 +700,8 @@ class _ThreadFront {
   }
 
   async pauseForAsyncIndex(asyncIndex?: number) {
-    await ThreadFront.ensureAllSources();
-    this.ensureCurrentPause();
-    const pause = asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.currentPause;
+    const pause = asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.getCurrentPause();
     assert(pause, "no pause for given asyncIndex");
-
     return pause;
   }
 
@@ -982,10 +957,9 @@ class _ThreadFront {
     if (!this.sessionId) {
       return null;
     }
-    await this.ensureAllSources();
-    this.ensureCurrentPause();
-    const pause = this.currentPause;
-    await this.currentPause!.loadDocument();
+    const pause = this.getCurrentPause();
+    await pause.ensureLoaded();
+    await pause.loadDocument();
     return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
   }
 
@@ -998,10 +972,9 @@ class _ThreadFront {
     if (!this.sessionId) {
       return [];
     }
-    await this.ensureAllSources();
-    this.ensureCurrentPause();
-    const pause = this.currentPause;
-    const nodes = await this.currentPause!.searchDOM(query);
+    const pause = this.getCurrentPause();
+    await pause.ensureLoaded();
+    const nodes = await pause.searchDOM(query);
     return pause == this.currentPause ? nodes : null;
   }
 
@@ -1009,10 +982,9 @@ class _ThreadFront {
     if (!this.sessionId) {
       return;
     }
-    const pause = this.currentPause;
-    await this.ensureAllSources();
-    this.ensureCurrentPause();
-    await this.currentPause!.loadMouseTargets();
+    const pause = this.getCurrentPause();
+    await pause.ensureLoaded();
+    await pause.loadMouseTargets();
     return pause == this.currentPause;
   }
 
@@ -1020,20 +992,16 @@ class _ThreadFront {
     if (!this.sessionId) {
       return null;
     }
-    const pause = this.currentPause;
-    await this.ensureAllSources();
-    this.ensureCurrentPause();
-    const nodeBounds = await this.currentPause!.getMouseTarget(x, y, nodeIds);
+    const pause = this.getCurrentPause();
+    await pause.ensureLoaded();
+    const nodeBounds = await pause.getMouseTarget(x, y, nodeIds);
     return pause == this.currentPause ? nodeBounds : null;
   }
 
   async ensureNodeLoaded(objectId: ObjectId) {
-    assert(this.currentPause, "no current pause");
-    const pause = this.currentPause;
+    const pause = this.getCurrentPause();
+    await pause.ensureLoaded();
     const node = await pause.ensureDOMFrontAndParents(objectId);
-    if (pause != this.currentPause) {
-      return null;
-    }
     return pause == this.currentPause ? node : null;
   }
 
@@ -1371,8 +1339,7 @@ EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
 export function wireUpMessage(message: Message): Pause {
   const wiredMessage = message as WiredMessage;
 
-  const pause = new Pause(ThreadFront);
-  pause.instantiate(
+  const pause = ThreadFront.instantiatePause(
     message.pauseId,
     message.point.point,
     message.point.time,

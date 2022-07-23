@@ -114,13 +114,18 @@ function HeaderTitle({
     }
 
     if (!editing) {
-      inputNode.current.innerText = hasTitle ? recording.title : "Untitled";
+      inputNode.current.innerText = hasTitle ? recording.title! : "Untitled";
     } else if (editing === EditState.Active && !hasTitle) {
       inputNode.current.innerText = "";
     } else if (editing === EditState.Saving && !inputNode.current.innerText) {
       inputNode.current.innerText = "Untitled";
     }
   }, [editing, hasTitle, recording.title]);
+
+  const testName = recording.metadata?.test?.title;
+  if (testName) {
+    return <span className={className}>{testName}</span>;
+  }
 
   if (!canEditTitle) {
     return <span className={className}>{displayTitle}</span>;

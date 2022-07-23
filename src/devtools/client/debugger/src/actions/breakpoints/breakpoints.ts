@@ -4,6 +4,7 @@ import { getFilename } from "devtools/client/debugger/src/utils/source";
 import type { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -25,13 +26,11 @@ import {
   getBreakpointAtLocation,
   getFirstBreakpointPosition,
   getSymbols,
-  getThreadContext,
 } from "../../selectors";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
 
-import { setBreakpointPositions } from "./breakpointPositions";
 import {
   _removeBreakpoint,
   removeBreakpointOption,
@@ -59,7 +58,6 @@ export function removeBreakpointsAtLine(
   return (dispatch, getState) => {
     trackEvent("breakpoint.remove");
 
-    dispatch(removeRequestedBreakpoint({ sourceId, line }));
     const breakpoints = getBreakpointsForSource(getState(), sourceId, line);
 
     breakpoints.map(bp => dispatch(removeBreakpoint(cx, bp)));
@@ -133,7 +131,6 @@ export function enableBreakpointsInSource(
   source: Source
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoints.remove_all_in_source");
     const breakpoints = getBreakpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {
@@ -152,11 +149,14 @@ export function enableBreakpointsInSource(
  */
 export function removeAllBreakpoints(cx: Context): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoints.remove_all");
 
     const breakpointList = getBreakpointsList(getState());
-    await Promise.all(breakpointList.map(bp => dispatch(_removeBreakpoint(cx, bp))));
+    await Promise.all(
+      breakpointList.map(bp => {
+        dispatch(_removeBreakpoint(cx, bp));
+      })
+    );
     dispatch(removeBreakpointsAction());
   };
 }
@@ -185,7 +185,6 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
       return;
     }
 
-    // @ts-ignore column normally shouldn't be undefined
     const bp = getBreakpointAtLocation(state, { line, column: undefined });
     if (bp) {
       return dispatch(_removeBreakpoint(cx, bp));
@@ -202,6 +201,9 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
 }
 
 export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<void>> {
+  // if you are hovering a line or a print statement panel that has hits, we
+  // will show those hits on the global timeline. In order to do that, we need
+  // to store the editor's hovered line number in global state.
   return async (dispatch, getState) => {
     const state = getState();
     const source = getSelectedSource(state)!;
@@ -217,7 +219,7 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
     // @ts-ignore Location field mismatches
     dispatch(setHoveredLineNumberLocation(initialLocation));
 
-    await dispatch(setBreakpointPositions({ sourceId: source.id, line }));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
     const location = getFirstBreakpointPosition(getState(), initialLocation);
 
     // It's possible that after the `await` above the user is either 1) hovered off of the
@@ -228,7 +230,7 @@ export function updateHoveredLineNumber(line: number): UIThunkAction<Promise<voi
       return;
     }
 
-    dispatch(setHoveredLineNumberLocation(location));
+    dispatch(setHoveredLineNumberLocation(location!));
   };
 }
 
@@ -247,7 +249,6 @@ export function _addBreakpointAtLine(
       return;
     }
 
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add");
 
     const breakpointLocation = {
@@ -292,7 +293,6 @@ export function addBreakpointAtColumn(cx: Context, location: Location): UIThunkA
       logValue: getLogValue(source, state, location),
     };
 
-    // @ts-ignore Mixpanel events
     trackEvent("breakpoint.add_column");
 
     // @ts-expect-error Breakpoint location field mismatches

@@ -10,6 +10,7 @@ const e2eJestConfig = {
   setupFilesAfterEnv: ["./test/e2e/setupEnv.ts"],
   testMatch: ["**/e2e/tests/*.test.ts"],
   testTimeout: 480_000,
+  testSequencer: "./test/jest/sequencer.ts",
   transform: {
     // Use babel-jest to transpile tests with the next/babel preset
     // https://jestjs.io/docs/configuration#transform-objectstring-pathtotransformer--pathtotransformer-object

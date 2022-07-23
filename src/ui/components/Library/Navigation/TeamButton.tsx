@@ -15,7 +15,7 @@ export function TeamButton({
   isTest,
   isNew,
 }: {
-  label: string;
+  label?: string;
   id: string | null;
   isNew?: boolean;
   isTest?: boolean;

@@ -97,9 +97,7 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       value: { time, pauseId, location, values, data, frameworkListeners },
     }) => {
       await ThreadFront.ensureAllSources();
-      const pause = new Pause(ThreadFront);
-      pause.instantiate(pauseId, point, time, /* hasFrames */ true);
-      pause.addData(data);
+      const pause = ThreadFront.instantiatePause(pauseId, point, time, /* hasFrames */ true, data);
       const valueFronts = values.map((v: any) => new ValueFront(pause, v));
       const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
       assert(mappedLocation, "preferred mapped location not found");
@@ -247,7 +245,6 @@ async function setMultiSourceLogpoint(
   const primitiveFronts = primitives?.map(literal => createPrimitiveValueFront(literal));
 
   if (primitiveFronts) {
-    // TODO We're getting an _array_ of locations, but only using the first one?
     const points = getAnalysisPointsForLocation(store.getState(), locations[0], condition);
     if (points) {
       if (!points.error) {
@@ -517,7 +514,6 @@ export async function setEventLogpoint(
   points?: PointDescription[]
 ) {
   const mapper = eventLogpointMapper(/* getFrameworkListeners */ true);
-  const sessionId = await ThreadFront.waitForSession();
   const params: AnalysisParams = {
     mapper,
     effectful: true,

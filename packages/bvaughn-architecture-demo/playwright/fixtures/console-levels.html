@@ -5,6 +5,13 @@
     <meta content="utf-8" http-equiv="encoding" />
   </head>
   <body>
+    <script
+      type="text/javascript"
+      src="https://unpkg.com/react-is@18.2.0/umd/react-is.development.js"
+    ></script>
+
+    <button>Click to log data</button>
+
     <script type="text/javascript">
       function foo() {
         console.log("This is a log");
@@ -21,7 +28,11 @@
         console.trace("This is a trace");
       }
 
-      foo();
+      const button = document.querySelector("button");
+      button.addEventListener("click", foo);
+
+      // Trigger a warning from node_modules (or in this case, unpkg)
+      ReactIs.isAsyncMode({});
 
       // TODO Add console.info, console.debug
       // TODO Add console.group, console.groupCollapsed, console.groupEnd (once backend supports them)

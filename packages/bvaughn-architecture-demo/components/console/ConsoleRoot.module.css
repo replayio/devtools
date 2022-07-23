@@ -1,10 +1,58 @@
 .ConsoleRoot {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
   border-radius: 0.5rem;
   background-color: var(--background-color-contrast-2);
+}
+
+.TopRow,
+.BottomRow {
+  display: flex;
+  flex-direction: row;
+  flex: 1 1 auto;
+  overflow: hidden;
+  background-color: var(--background-color-contrast-2);
+}
+.TopRow {
+  flex: 0 0 auto;
+  align-items: center;
+  border-bottom: 1px solid var(--background-color-default);
+}
+
+.MenuToggleButton,
+.DeleteTerminalExpressionButton {
+  width: 3rem;
+  height: 2rem;
+  flex: 0 0 3rem;
+  padding: 0;
+  background: none;
+  outline: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.MenuToggleButton {
+  border-top-left-radius: 0.5rem;
+}
+.DeleteTerminalExpressionButton {
+  border-top-right-radius: 0.5rem;
+}
+.MenuToggleButton:focus,
+.DeleteTerminalExpressionButton:focus {
+  border-color: var(--color-brand);
+}
+
+.DeleteTerminalExpressionIcon,
+.MenuToggleButtonIcon {
+  width: 3rem;
+  height: 2rem;
+  padding: 0.25rem;
+  fill: var(--color-default);
+  display: inline-block;
 }
 
 .FilterColumn {

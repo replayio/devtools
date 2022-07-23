@@ -1,10 +1,4 @@
-import {
-  createEntityAdapter,
-  createSelector,
-  createSlice,
-  EntityState,
-  PayloadAction,
-} from "@reduxjs/toolkit";
+import { createEntityAdapter, createSlice, EntityState, PayloadAction } from "@reduxjs/toolkit";
 import { newSource, SourceKind } from "@replayio/protocol";
 import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
 import { UIState } from "ui/state";
@@ -43,7 +37,7 @@ const sourcesSlice = createSlice({
   reducers: {
     addSources: (state, action: PayloadAction<newSource[]>) => {
       // Store the raw protocol information. Once we have recieved all sources
-      // we will run over this and build it into the shape we want.
+      // we will iterate over this and build it into the shape we want.
       sourcesAdapter.addMany(state.sources, action.payload);
     },
     allSourcesReceived: state => {
@@ -55,17 +49,23 @@ const sourcesSlice = createSlice({
   },
 });
 
-export const getSelectedSourceDetails = createSelector(
-  (state: UIState) => state.experimentalSources.sourceDetails,
-  getSelectedSourceId,
-  (sourceDetails, id) => {
-    if (id === null || id === undefined) {
-      return null;
-    }
-
-    return sourceDetails.entities[id];
-  }
+const sourceDetailsSelectors = sourceDetailsAdapter.getSelectors<UIState>(
+  (state: UIState) => state.experimentalSources.sourceDetails
 );
 
+export const getSourceDetails = sourceDetailsSelectors.selectById;
+export const getAllSourceDetails = sourceDetailsSelectors.selectAll;
+export const getSelectedSourceDetails = (state: UIState) => {
+  const selected = getSelectedSourceId(state);
+  if (!selected) {
+    return undefined;
+  }
+
+  return sourceDetailsSelectors.selectById(state, selected);
+};
+export const getCorrespondingSourceIds = (state: UIState, id: string) =>
+  getSourceDetails(state, id)?.correspondingSourceIds;
+
 export const { addSources, allSourcesReceived } = sourcesSlice.actions;
+
 export default sourcesSlice.reducer;

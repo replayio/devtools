@@ -8,11 +8,9 @@ import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import type { SymbolDeclarations } from "../reducers/ast";
 import type { SourceActor } from "../reducers/source-actors";
-import type { Source, SourceContent, Location, SourceWithContent } from "../reducers/sources";
+import type { Source, SourceContent, SourceWithContent } from "../reducers/sources";
 
-import type { AsyncValue } from "./async-value";
 import { isFulfilled } from "./async-value";
-import { memoizeLast } from "./memoizeLast";
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";
 import { parse as parseURL } from "./url";
@@ -110,7 +108,7 @@ export function getPrettySourceURL(url?: string) {
   return `${url}:formatted`;
 }
 
-export function getFileExtension(source?: Source) {
+export function getFileExtension(source: Source) {
   const { path } = getURL(source);
   if (!path) {
     return "";
@@ -120,7 +118,7 @@ export function getFileExtension(source?: Source) {
   return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
 }
 
-export function isNotJavaScript(source?: Source) {
+export function isNotJavaScript(source: Source) {
   return ["css", "svg", "png"].includes(getFileExtension(source));
 }
 
@@ -259,7 +257,6 @@ export function getSourcePath(url?: UrlResult): string {
     return "";
   }
 
-  // @ts-expect-error path field mismatch
   const { path, href } = parseURL(url);
   // for URLs like "about:home" the path is null so we pass the full href
   return path || href;

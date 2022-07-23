@@ -38,7 +38,7 @@ Two ways to initiate adding a breakpoint:
     - `dispatch(addBreakpoint(cx, breakpointLocation, options, disabled))`
 - `actions/breakpoints/modify.ts`:
   - line 78: thunk `addBreakpoint`:
-    - dispatches basic `setRequestedBreakpoint({sourceId, line})` and complex `setBreakpointPositions({ sourceId, line })` ( a `memoizableAction` that reads breakpoint positions and source actors from the store, loads source actor breakpoint columns, groups positions by line, and then inserts breakpoint position )
+    - dispatches basic `setRequestedBreakpoint({sourceId, line})`
     - bails out if the user canceled the breakpoint before that process finished (by checking `getRequestedBreakpointLocations` )
     - gathers pieces of the breakpoint ( `{id, disabled, options, location, astLocation, text, originalText}` )
     - `dispatch(setBreakpoint(breakpoint, ThreadFront.recordingId!, cx))` to add the breakpoint entry in the Redux store

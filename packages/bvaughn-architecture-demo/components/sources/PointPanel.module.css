@@ -56,6 +56,7 @@
 .SaveButtonIcon {
   width: 1rem;
   height: 1rem;
+  display: inline-block;
 }
 
 .Row {
@@ -78,4 +79,18 @@
 
 .HitPointListItem {
   list-style-type: none;
+}
+
+.HitPointsWarning {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--color-error);
+}
+.HitPointsWarningIcon {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  margin-right: 0.5ch;
+  display: inline-block;
 }

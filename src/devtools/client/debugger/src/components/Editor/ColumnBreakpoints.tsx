@@ -7,7 +7,7 @@
 import React, { Component } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
-import { getSelectedSource, visibleColumnBreakpoints, getContext } from "../../selectors";
+import { getSelectedSource, getVisibleColumnBreakpoints, getContext } from "../../selectors";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import { getLocationKey } from "../../utils/breakpoint";
@@ -17,7 +17,7 @@ import { getLocationKey } from "../../utils/breakpoint";
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
   selectedSource: getSelectedSource(state),
-  columnBreakpoints: visibleColumnBreakpoints(state),
+  columnBreakpoints: getVisibleColumnBreakpoints(state),
 });
 
 const connector = connect(mapStateToProps);

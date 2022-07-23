@@ -15,7 +15,6 @@ import * as actions from "ui/actions/app";
 import { showDurationWarning, getRecordingId } from "ui/utils/recording";
 import { getRecordingTarget } from "ui/reducers/app";
 import PrivacyDropdown from "../shared/SharingModal/PrivacyDropdown";
-import StatusDropdown from "../shared/StatusDropdown";
 import useAuth0 from "ui/utils/useAuth0";
 
 const Row = ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => {
@@ -49,12 +48,13 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
     setModal("privacy");
   };
 
+  const isTest = recording.metadata?.test;
   return (
-    <div className="flex-column flex flex items-center overflow-hidden border-splitter bg-bodyBgcolor">
+    <div className="flex items-center overflow-hidden flex-column border-splitter bg-bodyBgcolor">
       <div className="my-1.5 flex w-full cursor-default flex-col self-stretch overflow-hidden px-1.5 pb-0 text-xs">
         {recording.user ? (
           <Row>
-            <AvatarImage className="avatar h-5 w-5 rounded-full" src={recording.user.picture} />
+            <AvatarImage className="w-5 h-5 rounded-full avatar" src={recording.user.picture} />
             <div>{recording.user.name}</div>
             <div className="opacity-50">{time}</div>
           </Row>
@@ -73,14 +73,14 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
           ) : null}
         </div>
         <div className="group">
-          {recording.url ? (
+          {!isTest && recording.url ? (
             <Row>
               <Icon
                 filename="external"
                 className="cursor-pointer bg-iconColor group-hover:bg-primaryAccent"
               />
               <div
-                className="overflow-hidden overflow-ellipsis whitespace-pre"
+                className="overflow-hidden whitespace-pre overflow-ellipsis"
                 title={recording.url}
               >
                 <a href={recording.url} target="_blank" rel="noopener noreferrer">
@@ -89,6 +89,46 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
               </div>
             </Row>
           ) : null}
+        </div>
+        <div className="group">
+          {recording.metadata && (
+            <>
+              <Row>
+                <MaterialIcon>schedule</MaterialIcon>
+                <div
+                  className="overflow-hidden whitespace-pre overflow-ellipsis"
+                  title={recording.metadata.source?.branch}
+                >
+                  {time} ago
+                </div>
+              </Row>
+
+              {isTest ? (
+              <Row>
+                <MaterialIcon>person</MaterialIcon>
+                <div
+                  className="overflow-hidden whitespace-pre overflow-ellipsis"
+                  title={recording.metadata.source?.branch}
+                >
+                  {recording.metadata.source?.trigger?.user}
+                </div>
+              </Row>
+              ) : null}
+
+              {isTest ? (
+              <Row>
+                <MaterialIcon>fork_right</MaterialIcon>
+                <div
+                  className="overflow-hidden whitespace-pre overflow-ellipsis"
+                  title={recording.metadata.source?.branch}
+                >
+                  {recording.metadata.source?.branch}
+                </div>
+              </Row>
+              ) : null}
+
+            </>
+          )}
         </div>
         {recording.operations ? (
           <OperationsRow operations={recording.operations} onClick={showOperations} />

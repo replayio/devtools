@@ -162,7 +162,7 @@ function _DevTools({
   }, [loadingFinished, trackLoadingIdleTime, sessionId]);
 
   useEffect(() => {
-    if (recording && document.title !== recording.title) {
+    if (recording?.title && document.title !== recording.title) {
       document.title = recording.title;
     }
   }, [recording]);

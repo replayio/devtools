@@ -1,7 +1,6 @@
 import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@replayio/protocol";
 import { findAutomatedTests } from "ui/actions/find-tests";
-import { videoReady } from "protocol/graphics";
 import {
   addEventListener,
   CommandRequest,
@@ -168,7 +167,7 @@ export function createSocket(
 
       const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
         onEvent: (event: ProtocolEvent) => {
-          if (features.logProtocol) {
+          if (features.logProtocolEvents) {
             dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
           }
         },
@@ -270,8 +269,6 @@ function onLoadingFinished(): UIThunkAction {
       await ThreadFront.waitForSession();
       await ThreadFront.initializedWaiter.promise;
       await ThreadFront.ensureAllSources();
-
-      ThreadFront.ensureCurrentPause();
     }
 
     initThreadFront();

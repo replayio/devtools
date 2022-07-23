@@ -24,7 +24,7 @@ export default function EditableRemark({
 }) {
   const { userId } = useGetUserId();
 
-  const canEdit = remark.user.id === userId;
+  const canEdit = remark.user?.id === userId;
 
   const deleteComment = useDeleteComment();
   const deleteCommentReply = useDeleteCommentReply();
@@ -83,15 +83,15 @@ export default function EditableRemark({
   return (
     <>
       <div className={styles.HeaderRow}>
-        <AvatarImage className={styles.Avatar} src={remark.user.picture} />
-        <div className={styles.UserName} title={remark.user.name}>
-          {remark.user.name}
+        <AvatarImage className={styles.Avatar} src={remark.user?.picture} />
+        <div className={styles.UserName} title={remark.user?.name || undefined}>
+          {remark.user?.name}
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
         {showOptionsMenu && (
           <RemarkDropDown
             deleteRemark={deleteRemark}
-            isPublished={remark.isPublished}
+            isPublished={!!remark.isPublished}
             publishRemark={publishRemark}
             startEditing={startEditing}
             type={type}
@@ -127,14 +127,14 @@ export default function EditableRemark({
 
 function useCollaborators() {
   const recordingId = useGetRecordingId();
-  const { collaborators, recording } = useGetOwnersAndCollaborators(recordingId!);
+  const { collaborators, owner } = useGetOwnersAndCollaborators(recordingId!);
 
   const users = useMemo(
     () =>
-      collaborators && recording
-        ? ([...collaborators.map(c => c.user), recording.user].filter(Boolean) as User[])
+      collaborators && owner
+        ? ([...collaborators.map(c => c.user), owner].filter(Boolean) as User[])
         : undefined,
-    [collaborators, recording]
+    [collaborators, owner]
   );
 
   return users;

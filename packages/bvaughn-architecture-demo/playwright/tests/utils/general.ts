@@ -16,6 +16,14 @@ export function getBaseURL(): string {
   return `http://${HOST}:3000`;
 }
 
+export async function getElementCount(page: Page, queryString: string): Promise<number> {
+  const count = await page.evaluate(
+    queryString => document.querySelectorAll(queryString).length,
+    queryString
+  );
+  return count;
+}
+
 export function getURLFlags(): string {
   const RECORD_PROTOCOL_DATA = !!process.env.RECORD_PROTOCOL_DATA;
   return RECORD_PROTOCOL_DATA ? "record" : "";

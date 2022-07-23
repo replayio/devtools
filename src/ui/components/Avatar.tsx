@@ -9,8 +9,16 @@ const cx = classNames.bind(css);
 
 // The user image URLs that we get from Google sometimes fail to load, in that case
 // we fall back to a transparent image (instead of showing the browser's icon for broken images)
-export const AvatarImage = (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
-  <img data-private {...props} onError={e => (e.currentTarget.src = "/images/clear.png")} />
+type AvatarImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> & {
+  src: string | null | undefined;
+};
+export const AvatarImage = (props: AvatarImageProps) => (
+  <img
+    data-private
+    {...props}
+    src={props.src || undefined}
+    onError={e => (e.currentTarget.src = "/images/clear.png")}
+  />
 );
 
 export const AuthAvatar = ({ user }: { user: User }) => {

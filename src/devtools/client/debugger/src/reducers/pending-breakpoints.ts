@@ -4,12 +4,16 @@
 
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
+import { Location } from "@replayio/protocol";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { UIState } from "ui/state";
 
-import { createPendingBreakpoint, makePendingLocationId } from "../utils/breakpoint";
+import {
+  createPendingBreakpoint as savePendingBreakpoint,
+  makePendingLocationId,
+} from "../utils/breakpoint";
 
-import { setBreakpoint, removeBreakpoint, removeBreakpoints } from "./breakpoints";
+import { removeBreakpoint, removeBreakpoints, Breakpoint } from "./breakpoints";
 import { PendingBreakpoint, SourceLocation } from "./types";
 
 /**
@@ -21,13 +25,28 @@ const pendingBreakpointsSlice = createSlice({
   name: "pendingBreakpoints",
   initialState: {} as PendingBreakpointsState,
   reducers: {
+    createPendingBreakpoint: (
+      state,
+      action: PayloadAction<{ breakpoint: Breakpoint; recordingId: string; sourceUrl: string }>
+    ) => {
+      const { breakpoint, recordingId } = action.payload;
+      const pendingLocation = { ...breakpoint.location, sourceUrl: action.payload.sourceUrl };
+      // Pending breakpoints are a little special, they need to have extra
+      // details because they persist things across sessions.
+      const locationId = makePendingLocationId(pendingLocation, recordingId);
+      const pendingBreakpoint = savePendingBreakpoint(breakpoint, action.payload.sourceUrl);
+      state[locationId] = pendingBreakpoint;
+    },
     removePendingBreakpoint: {
-      reducer(state, action: PayloadAction<{ location: SourceLocation; recordingId: string }>) {
+      reducer(
+        state,
+        action: PayloadAction<{ location: Location & { sourceUrl: string }; recordingId: string }>
+      ) {
         const { location, recordingId } = action.payload;
         const locationId = makePendingLocationId(location, recordingId);
         delete state[locationId];
       },
-      prepare(location: SourceLocation, recordingId: string, cx?: Context) {
+      prepare(location: Location & { sourceUrl: string }, recordingId: string, cx?: Context) {
         // Add cx to action.meta
         return {
           payload: { location, recordingId },
@@ -38,12 +57,6 @@ const pendingBreakpointsSlice = createSlice({
   },
   extraReducers: builder => {
     builder
-      .addCase(setBreakpoint, (state, action) => {
-        const { breakpoint, recordingId } = action.payload;
-        const locationId = makePendingLocationId(breakpoint.location, recordingId);
-        const pendingBreakpoint = createPendingBreakpoint(breakpoint);
-        state[locationId] = pendingBreakpoint;
-      })
       .addCase(removeBreakpoint, (state, action) => {
         // same as removePendingBreakpoint
         const { location, recordingId } = action.payload;
@@ -56,7 +69,7 @@ const pendingBreakpointsSlice = createSlice({
   },
 });
 
-export const { removePendingBreakpoint } = pendingBreakpointsSlice.actions;
+export const { createPendingBreakpoint, removePendingBreakpoint } = pendingBreakpointsSlice.actions;
 
 export default pendingBreakpointsSlice.reducer;
 

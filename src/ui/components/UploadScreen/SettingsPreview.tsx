@@ -8,7 +8,7 @@ import { MY_LIBRARY, personalWorkspace } from "./libraryConstants";
 const getIconAndText = (
   isPublic: boolean,
   selectedWorkspaceId: string,
-  workspaceName: string
+  workspaceName?: string
 ): {
   text: string;
   icon: string;

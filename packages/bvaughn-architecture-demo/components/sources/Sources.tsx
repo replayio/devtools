@@ -1,51 +1,49 @@
 import Loader from "@bvaughn/components/Loader";
-import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { SourceId as ProtocolSourceId } from "@replayio/protocol";
-import { Suspense, useContext, useState } from "react";
+import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { ReplayClientInterface } from "shared/client/types";
+import Icon from "../Icon";
 import LazyOffscreen from "../LazyOffscreen";
 
 import Source from "./Source";
 import styles from "./Sources.module.css";
 
 export default function Sources() {
-  const { sourceIds } = useContext(SessionContext);
+  const { closeSource, focusedSourceId, openSource, openSourceIds } = useContext(SourcesContext);
   const client = useContext(ReplayClientContext);
-
-  const sourcesIdsToDisplay = getSourcesIdsToDisplay(client, sourceIds);
-
-  const [selectedSourceId, setSelectedSourceId] = useState<string | undefined>(
-    sourcesIdsToDisplay[0]
-  );
 
   return (
     <div className={styles.Sources} data-test-id="SourcesRoot">
       <div className={styles.Tabs}>
-        {sourcesIdsToDisplay.map(sourceId => {
+        {openSourceIds.map(sourceId => {
           const source = getSource(client, sourceId);
           const fileName = (source && getSourceFileName(source)) || "unknown";
           return (
-            <button
+            <div
               key={sourceId}
-              className={sourceId === selectedSourceId ? styles.SelectedTab : styles.Tab}
-              data-test-id={`SourceTab-${fileName}`}
-              onClick={() => setSelectedSourceId(sourceId)}
+              className={sourceId === focusedSourceId ? styles.SelectedTab : styles.Tab}
+              data-test-id={`SourceTab-${sourceId}`}
             >
-              {fileName}
-            </button>
+              <button className={styles.OpenButton} onClick={() => openSource(sourceId)}>
+                {fileName}
+              </button>
+              <button className={styles.CloseButton} onClick={() => closeSource(sourceId)}>
+                <Icon className={styles.Icon} type="close" />
+              </button>
+            </div>
           );
         })}
       </div>
       <div className={styles.Content}>
-        {sourcesIdsToDisplay.map(sourceId => {
+        {openSourceIds.length === 0 && <div className={styles.NoOpenSources}>Sources</div>}
+        {openSourceIds.map(sourceId => {
           const source = getSource(client, sourceId);
           return (
             <LazyOffscreen
               key={sourceId}
-              mode={sourceId === selectedSourceId ? "visible" : "hidden"}
+              mode={sourceId === focusedSourceId ? "visible" : "hidden"}
             >
               <Suspense fallback={<Loader />}>
                 <Source source={source!} sourceId={sourceId} />
@@ -56,14 +54,4 @@ export default function Sources() {
       </div>
     </div>
   );
-}
-
-function getSourcesIdsToDisplay(
-  client: ReplayClientInterface,
-  sourceIds: ProtocolSourceId[]
-): ProtocolSourceId[] {
-  return sourceIds.filter(sourceId => {
-    const source = getSource(client, sourceId);
-    return source != null && source.kind !== "inlineScript";
-  });
 }

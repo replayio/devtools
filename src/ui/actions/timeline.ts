@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, PauseId, TimeStampedPointRange } from "@replayio/protocol";
 import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
 import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
 import { refetchMessages } from "devtools/client/webconsole/actions/messages";
@@ -21,7 +21,7 @@ import { DownloadCancelledError } from "protocol/screenshot-cache";
 import { ThreadFront } from "protocol/thread";
 import { Pause } from "protocol/thread/pause";
 import { PauseEventArgs } from "protocol/thread/thread";
-import { assert, waitForTime } from "protocol/utils";
+import { waitForTime } from "protocol/utils";
 
 import { getFirstComment } from "ui/hooks/comments/comments";
 import {
@@ -38,7 +38,12 @@ import {
   pointsReceived,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
-import { getPausePointParams, getTest, updateUrlWithParams } from "ui/utils/environment";
+import {
+  encodeObjectToURL,
+  getPausePointParams,
+  getTest,
+  updateUrlWithParams,
+} from "ui/utils/environment";
 import KeyShortcuts, { isEditableElement } from "ui/utils/key-shortcuts";
 import { features } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
@@ -50,6 +55,7 @@ import {
   displayedBeginForFocusRegion,
   displayedEndForFocusRegion,
   isTimeInRegions,
+  rangeForFocusRegion,
 } from "ui/utils/timeline";
 
 import {
@@ -105,16 +111,19 @@ export function jumpToInitialPausePoint(): UIThunkAction {
     );
 
     let hasFrames = false;
+
     const initialPausePoint = await getInitialPausePoint(ThreadFront.recordingId!);
-    if (
-      initialPausePoint &&
-      isTimeInRegions(initialPausePoint.time, getLoadedRegions(state)!.loading)
-    ) {
+
+    if (initialPausePoint) {
+      const range = (initialPausePoint as any).focusRegion;
+      if (range) {
+        dispatch(setFocusRegionBeginTime(range.begin.time, false));
+        dispatch(setFocusRegionEndTime(range.end.time, true));
+      }
       point = initialPausePoint.point;
       hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
     }
-
     ThreadFront.timeWarp(point, time, hasFrames);
   };
 }
@@ -145,8 +154,15 @@ async function getInitialPausePoint(recordingId: string) {
 }
 
 function onPaused({ point, time, hasFrames }: PauseEventArgs): UIThunkAction {
-  return async dispatch => {
-    updatePausePointParams({ point, time, hasFrames });
+  return async (dispatch, getState) => {
+    const focusRegion = getFocusRegion(getState());
+    const params: PauseEventArgs & { focusRegion: FocusRegion | null } = {
+      focusRegion,
+      hasFrames,
+      point,
+      time,
+    };
+    updatePausePointParams(params);
     dispatch(setTimelineState({ currentTime: time, playback: null }));
   };
 }
@@ -184,12 +200,22 @@ function updatePausePointParams({
   point,
   time,
   hasFrames,
+  focusRegion,
 }: {
   point: ExecutionPoint;
   time: number;
   hasFrames: boolean;
+  focusRegion: FocusRegion | null;
 }) {
-  const params = { point, time: `${time}`, hasFrames: `${hasFrames}` };
+  const params: { point: string; time: string; hasFrames: string; focusRegion?: string } = {
+    point,
+    time: `${time}`,
+    hasFrames: `${hasFrames}`,
+    focusRegion: undefined,
+  };
+  if (focusRegion) {
+    params.focusRegion = encodeObjectToURL(rangeForFocusRegion(focusRegion));
+  }
   updateUrlWithParams(params);
 }
 
@@ -611,7 +637,6 @@ const shouldRerunAnalysisForBreakpoint = (
   //    If we don't need to re-run analysis after zooming in, then we won't need to refetch after zooming back out either,
   //    (unless our fetches have overflowed at some point).
 
-  // @ts-expect-error Location type mismatches
   const mappingEntry = getAnalysisMappingForLocation(state, bp.location);
   if (!mappingEntry) {
     return true;
@@ -664,7 +689,6 @@ export function syncFocusedRegion(): UIThunkAction {
         // - Setting the breakpoint options calls `client.setBreakpoint`
         // - That calls `setLogpoint` in `actions/logpoint`
         // - Which finally runs `setMultiSourceLogpoint` with analysis
-        // @ts-expect-error Location type mismatches
         dispatch(setBreakpointOptions(cx, b.location, b.options));
       }
     }

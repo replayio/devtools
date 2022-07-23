@@ -2,13 +2,20 @@ import { useMemo, useLayoutEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { setBreakpointHitCounts } from "../../actions/sources";
-import { HitCount, getHitCountsForSelectedSource } from "../../reducers/sources";
 import { getSelectedSourceId } from "../../selectors";
 import { useStringPref } from "ui/hooks/settings";
 
 import styles from "./LineHitCounts.module.css";
 import { features } from "ui/utils/prefs";
+
+import { resizeBreakpointGutter } from "../../utils/ui";
+import {
+  fetchHitCounts,
+  HitCount,
+  getHitCountsForSource,
+  getBoundsForLineNumber,
+} from "ui/reducers/hitCounts";
+import { UIState } from "ui/state";
 
 type Props = {
   editor: any;
@@ -28,9 +35,13 @@ export default function LineHitCountsWrapper(props: Props) {
 function LineHitCounts({ editor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
-  const hitCounts = useAppSelector(getHitCountsForSelectedSource);
+  const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
   const isCollapsed = hitCountsMode == "hide-counts";
+  const currentLineNumber = useAppSelector(
+    (state: UIState) => state.app.hoveredLineNumberLocation?.line || 0
+  );
+  const { lower, upper } = getBoundsForLineNumber(currentLineNumber);
 
   const hitCountMap = useMemo(
     () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
@@ -59,7 +70,7 @@ function LineHitCounts({ editor }: Props) {
   useLayoutEffect(() => {
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
-      dispatch(setBreakpointHitCounts(sourceId, 0));
+      dispatch(fetchHitCounts(sourceId, 0));
     }
   }, [dispatch, sourceId, hitCounts]);
 
@@ -82,6 +93,7 @@ function LineHitCounts({ editor }: Props) {
         "CodeMirror-linenumbers",
         { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
+      resizeBreakpointGutter(editor.editor);
 
       // HACK
       // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
@@ -92,9 +104,9 @@ function LineHitCounts({ editor }: Props) {
         `-${gutterWidth}`
       );
 
-      let lineNumber = 0;
+      let lineNumber = lower;
 
-      doc.eachLine((lineHandle: any) => {
+      doc.eachLine(lower, upper, (lineHandle: any) => {
         lineNumber++;
 
         const hitCount = hitCountMap?.get(lineNumber) || 0;
@@ -147,11 +159,21 @@ function LineHitCounts({ editor }: Props) {
 
     return () => {
       editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      resizeBreakpointGutter(editor.editor);
 
       doc.off("change", drawLines);
       doc.off("swapDoc", drawLines);
     };
-  }, [editor, hitCountMap, isCollapsed, minHitCount, maxHitCount, updateHitCountsMode]);
+  }, [
+    editor,
+    hitCountMap,
+    isCollapsed,
+    minHitCount,
+    maxHitCount,
+    updateHitCountsMode,
+    lower,
+    upper,
+  ]);
 
   // We're just here for the hooks!
   return null;

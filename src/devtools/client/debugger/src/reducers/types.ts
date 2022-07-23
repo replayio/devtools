@@ -5,6 +5,7 @@
 
 import type { SourceActor } from "./source-actors";
 import type { CallDeclaration } from "./ast";
+import { Location } from "@replayio/protocol";
 
 export type SourceActorId = string;
 
@@ -110,8 +111,8 @@ export type Range = {
 };
 export type PendingLocation = {
   readonly line: number;
-  readonly column?: number;
-  readonly sourceUrl?: string;
+  readonly column: number;
+  readonly sourceUrl: string;
 };
 // Type of location used when setting breakpoints in the server. Exactly one of
 // { sourceUrl, sourceId } must be specified. Soon this will replace
@@ -137,9 +138,8 @@ export type ASTLocation = {
  */
 export type Breakpoint = {
   readonly id: BreakpointId;
-  readonly location: SourceLocation;
+  readonly location: Location & { sourceUrl: string };
   readonly astLocation: ASTLocation | null | undefined;
-  readonly generatedLocation: SourceLocation;
   readonly disabled: boolean;
   readonly text: string;
   readonly originalText: string;
@@ -195,7 +195,7 @@ export type BreakpointResult = {
  * @static
  */
 export type PendingBreakpoint = {
-  readonly location: PendingLocation;
+  readonly location: Location & { sourceUrl: string };
   readonly astLocation: ASTLocation;
   readonly generatedLocation?: PendingLocation;
   readonly disabled: boolean;

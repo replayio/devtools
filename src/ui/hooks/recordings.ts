@@ -1,6 +1,6 @@
 import { ApolloError, gql, useQuery, useMutation } from "@apollo/client";
 import { query } from "ui/utils/apolloClient";
-import { Recording } from "ui/types";
+import { Recording, RecordingRole, User, Workspace } from "ui/types";
 import { WorkspaceId } from "ui/state/app";
 import { CollaboratorDbData } from "ui/components/shared/SharingModal/CollaboratorsList";
 import { useGetUserId } from "./users";
@@ -8,7 +8,6 @@ import { GET_RECORDING, GET_RECORDING_USER_ID, SUBSCRIBE_RECORDING } from "ui/gr
 import { useRouter } from "next/router";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { getRecordingId } from "ui/utils/recording";
-import { ColorSwatchIcon } from "@heroicons/react/solid";
 import { RecordingId } from "@replayio/protocol";
 import {
   SetRecordingIsPrivate,
@@ -29,9 +28,13 @@ import {
   AcceptRecordingCollaboratorRequest,
   AcceptRecordingCollaboratorRequestVariables,
 } from "graphql/AcceptRecordingCollaboratorRequest";
-import { GetRecording, GetRecordingVariables } from "graphql/GetRecording";
+import { GetRecording, GetRecordingVariables, GetRecording_recording } from "graphql/GetRecording";
 import { GetRecordingUserId, GetRecordingUserIdVariables } from "graphql/GetRecordingUserId";
-import { GetMyRecordings } from "graphql/GetMyRecordings";
+import {
+  GetMyRecordings,
+  GetMyRecordingsVariables,
+  GetMyRecordings_viewer_recordings_edges_node,
+} from "graphql/GetMyRecordings";
 import { getRecordingPhoto, getRecordingPhotoVariables } from "graphql/getRecordingPhoto";
 import {
   GetOwnerAndCollaborators,
@@ -41,8 +44,15 @@ import { GetRecordingPrivacy, GetRecordingPrivacyVariables } from "graphql/GetRe
 import {
   GetWorkspaceRecordings,
   GetWorkspaceRecordingsVariables,
+  GetWorkspaceRecordings_node_Workspace_recordings_edges,
+  GetWorkspaceRecordings_node_Workspace_recordings_edges_node,
 } from "graphql/GetWorkspaceRecordings";
 import { useEffect, useMemo } from "react";
+import { assert } from "protocol/utils";
+import {
+  UpdateRecordingResolution,
+  UpdateRecordingResolutionVariables,
+} from "graphql/UpdateRecordingResolution";
 
 function isTest() {
   return new URL(window.location.href).searchParams.get("test");
@@ -150,7 +160,7 @@ export function useGetRecordingId() {
 }
 
 export async function getRecording(recordingId: RecordingId) {
-  const result = await query({
+  const result = await query<GetRecording, GetRecordingVariables>({
     query: GET_RECORDING,
     variables: { recordingId },
   });
@@ -229,17 +239,19 @@ export function useHasNoRole() {
   return { hasNoRole: data?.recording?.userRole === "none", loading };
 }
 
-export function convertRecording(rec: any): Recording | undefined {
+export function convertRecording(
+  rec:
+    | GetRecording_recording
+    | GetMyRecordings_viewer_recordings_edges_node
+    | GetWorkspaceRecordings_node_Workspace_recordings_edges_node
+    | null
+    | undefined
+): Recording | undefined {
   if (!rec) {
     return undefined;
   }
 
-  const collaborators = rec.collaborators?.edges
-    ?.filter((e: any) => e.node.user)
-    .map((e: any) => e.node.user.id);
-  const collaboratorRequests = rec.collaboratorRequests?.edges.map((e: any) => e.node);
-
-  return {
+  const recording: Recording = {
     id: rec.uuid,
     user: rec.owner,
     userId: rec.owner?.id,
@@ -250,16 +262,41 @@ export function convertRecording(rec: any): Recording | undefined {
     private: rec.private,
     isInitialized: rec.isInitialized,
     date: rec.createdAt,
-    workspace: rec.workspace,
     comments: rec.comments,
-    collaborators,
-    collaboratorRequests,
-    ownerNeedsInvite: rec.ownerNeedsInvite,
-    userRole: rec.userRole,
-    operations: rec.operations,
-    resolution: rec.resolution,
-    metadata: rec.metadata,
+    userRole: rec.userRole as RecordingRole,
   };
+
+  if ("workspace" in rec) {
+    recording.workspace = rec.workspace as Workspace;
+  }
+  if ("collaborators" in rec) {
+    recording.collaborators = rec.collaborators?.edges
+      ?.filter(({ node }) => "user" in node && node.user)
+      .map(({ node }) => {
+        assert("user" in node);
+        return node.user.id;
+      });
+  }
+  if ("collaboratorRequests" in rec) {
+    recording.collaboratorRequests = rec.collaboratorRequests?.edges.map(({ node }) => node);
+  }
+  if ("ownerNeedsInvite" in rec) {
+    recording.ownerNeedsInvite = rec.ownerNeedsInvite;
+  }
+  if ("operations" in rec) {
+    recording.operations = rec.operations;
+  }
+  if ("resolution" in rec) {
+    recording.resolution = rec.resolution;
+  }
+  if ("metadata" in rec) {
+    recording.metadata = rec.metadata;
+  }
+  if ("userRole" in rec) {
+    recording.userRole = rec.userRole as RecordingRole;
+  }
+
+  return recording;
 }
 
 export function useGetRecordingPhoto(recordingId: RecordingId): {
@@ -294,7 +331,7 @@ export function useGetRecordingPhoto(recordingId: RecordingId): {
 export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   error: ApolloError | undefined;
   loading: boolean;
-  recording: Recording | undefined;
+  owner: User | null | undefined;
   collaborators: CollaboratorDbData[] | null;
 } {
   const { data, loading, error } = useQuery<
@@ -348,7 +385,7 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   );
 
   if (loading) {
-    return { collaborators: null, recording: undefined, loading, error };
+    return { collaborators: null, owner: undefined, loading, error };
   }
 
   if (error) {
@@ -358,10 +395,10 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
   let collaborators: CollaboratorDbData[] = [];
   if (data?.recording?.collaborators) {
     collaborators = data.recording.collaborators.edges
-      .map(({ node }: any) => ({
+      .map(({ node }) => ({
         collaborationId: node.id,
-        user: node.user,
-        email: node.email,
+        user: "user" in node ? node.user : undefined,
+        email: "email" in node ? node.email : undefined,
         createdAt: node.createdAt,
       }))
       .sort(
@@ -369,8 +406,9 @@ export function useGetOwnersAndCollaborators(recordingId: RecordingId): {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
       );
   }
-  const recording = convertRecording(data?.recording);
-  return { collaborators, recording, loading, error };
+  const owner = data?.recording?.owner;
+
+  return { collaborators, owner, loading, error };
 }
 
 export function useGetIsPrivate(recordingId: RecordingId) {
@@ -446,10 +484,13 @@ export function useIsOwner() {
 export function useGetPersonalRecordings(
   filter: string
 ): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
-  const { data, error, loading } = useQuery<GetMyRecordings>(GET_MY_RECORDINGS, {
-    pollInterval: 5000,
-    variables: { filter },
-  });
+  const { data, error, loading } = useQuery<GetMyRecordings, GetMyRecordingsVariables>(
+    GET_MY_RECORDINGS,
+    {
+      pollInterval: 5000,
+      variables: { filter },
+    }
+  );
 
   if (loading) {
     return { recordings: null, loading };
@@ -459,9 +500,9 @@ export function useGetPersonalRecordings(
     console.error("Failed to fetch recordings:", error);
   }
 
-  let recordings: any = [];
+  let recordings: Recording[] = [];
   if (data?.viewer) {
-    recordings = data.viewer.recordings.edges.map(({ node }: any) => convertRecording(node));
+    recordings = data.viewer.recordings.edges.map(({ node }) => convertRecording(node)!);
   }
   return { recordings, loading };
 }
@@ -488,10 +529,8 @@ export function useGetWorkspaceRecordings(
 
   let recordings: Recording[] = [];
 
-  // @ts-ignore
-  const recordingsData = data?.node?.recordings;
-  if (recordingsData) {
-    recordings = recordingsData.edges.map(({ node }: any) => convertRecording(node));
+  if (data?.node && "recordings" in data.node && data.node.recordings) {
+    recordings = data.node.recordings.edges.map(({ node }) => convertRecording(node)!);
   }
 
   return { recordings, loading };
@@ -517,14 +556,6 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
     `
   );
 
-  if (!isOptimistic) {
-    return (
-      recordingId: RecordingId,
-      currentWorkspaceId: WorkspaceId | null,
-      targetWorkspaceId: WorkspaceId | null
-    ) => updateRecordingWorkspace({ variables: { recordingId, workspaceId: targetWorkspaceId } });
-  }
-
   return (
     recordingId: RecordingId,
     currentWorkspaceId: WorkspaceId | null,
@@ -532,141 +563,7 @@ export function useUpdateRecordingWorkspace(isOptimistic: boolean = true) {
   ) => {
     updateRecordingWorkspace({
       variables: { recordingId, workspaceId: targetWorkspaceId },
-      update: store => {
-        const recordingsToTransfer = [];
-        // Immediately remove the recording from the current workspace
-        if (currentWorkspaceId) {
-          const data: any = store.readQuery({
-            query: GET_WORKSPACE_RECORDINGS,
-            variables: { workspaceId: currentWorkspaceId },
-          });
-
-          const newEdges = data.node.recordings.edges.filter(
-            (edge: any) => edge.node.uuid !== recordingId
-          );
-          const newData = {
-            ...data,
-            node: {
-              ...data.node,
-              recordings: {
-                ...data.node.recordings,
-                edges: newEdges,
-              },
-            },
-          };
-
-          recordingsToTransfer.push(
-            ...data.node.recordings.edges.filter((edge: any) => edge.node.uuid === recordingId)
-          );
-
-          store.writeQuery({
-            query: GET_WORKSPACE_RECORDINGS,
-            data: newData,
-            variables: { workspaceID: currentWorkspaceId },
-          });
-        } else {
-          const data: any = store.readQuery({
-            query: GET_MY_RECORDINGS,
-          });
-
-          const newEdges = data.viewer.recordings.edges.filter(
-            (edge: any) => edge.node.uuid !== recordingId
-          );
-          const newData = {
-            ...data,
-            viewer: {
-              ...data.viewer,
-              recordings: {
-                ...data.viewer.recordings,
-                edges: newEdges,
-              },
-            },
-          };
-
-          recordingsToTransfer.push(
-            ...data.viewer.recordings.edges.filter((edge: any) => edge.node.uuid === recordingId)
-          );
-
-          store.writeQuery({
-            query: GET_MY_RECORDINGS,
-            data: newData,
-          });
-        }
-
-        // Update the new targetWorkspace's associated query in the cache.
-        if (targetWorkspaceId) {
-          let data: any = null;
-
-          try {
-            data = store.readQuery({
-              query: GET_WORKSPACE_RECORDINGS,
-              variables: { workspaceId: targetWorkspaceId },
-            });
-          } catch (e) {}
-
-          // Bail if this query doesn't already exist in the cache
-          if (!data) {
-            return;
-          }
-
-          const newData = {
-            ...data,
-            node: {
-              ...data.node,
-              recordings: {
-                ...data.node.recordings,
-                edges: [...data.node.recordings.edges, ...recordingsToTransfer],
-              },
-            },
-          };
-
-          store.writeQuery({
-            query: GET_WORKSPACE_RECORDINGS,
-            data: newData,
-            variables: { workspaceID: targetWorkspaceId },
-          });
-        } else {
-          let data: any = null;
-
-          try {
-            data = store.readQuery({
-              query: GET_MY_RECORDINGS,
-            });
-          } catch (e) {}
-
-          // Bail if this query doesn't already exist in the cache
-          if (!data) {
-            return;
-          }
-
-          const newData = {
-            ...data,
-            viewer: {
-              ...data.viewer,
-              recordings: {
-                ...data.viewer.recordings,
-                edges: [...data.viewer.recordings.edges, ...recordingsToTransfer],
-              },
-            },
-          };
-
-          store.writeQuery({
-            query: GET_MY_RECORDINGS,
-            data: newData,
-          });
-        }
-      },
-      optimisticResponse: {
-        updateRecordingWorkspace: {
-          recording: {
-            uuid: recordingId,
-            __typename: "Recording",
-            workspace: { __typename: "Workspace", id: targetWorkspaceId! },
-          },
-          success: true,
-          __typename: "UpdateRecordingWorkspace",
-        },
-      },
+      refetchQueries: ["GetMyRecordings", "GetWorkspaceRecordings"],
     });
   };
 }
@@ -698,64 +595,7 @@ export function useDeleteRecordingFromLibrary() {
   return (recordingId: RecordingId, workspaceId: WorkspaceId | null) => {
     deleteRecording({
       variables: { recordingId },
-      optimisticResponse: {
-        deleteRecording: {
-          success: true,
-          __typename: "DeleteRecording",
-        },
-      },
-      update: store => {
-        if (workspaceId) {
-          const data: any = store.readQuery({
-            query: GET_WORKSPACE_RECORDINGS,
-            variables: { workspaceId },
-          });
-
-          const newEdges = data.node.recordings.edges.filter(
-            (edge: any) => edge.node.uuid !== recordingId
-          );
-          const newData = {
-            ...data,
-            node: {
-              ...data.node,
-              recordings: {
-                ...data.node.recordings,
-                edges: newEdges,
-              },
-            },
-          };
-
-          store.writeQuery({
-            query: GET_WORKSPACE_RECORDINGS,
-            data: newData,
-          });
-
-          return;
-        }
-
-        const data: any = store.readQuery({
-          query: GET_MY_RECORDINGS,
-        });
-
-        const newEdges = data.viewer.recordings.edges.filter(
-          (edge: any) => edge.node.uuid !== recordingId
-        );
-        const newData = {
-          ...data,
-          viewer: {
-            ...data.viewer,
-            recordings: {
-              ...data.viewer.recordings,
-              edges: newEdges,
-            },
-          },
-        };
-
-        store.writeQuery({
-          query: GET_MY_RECORDINGS,
-          data: newData,
-        });
-      },
+      refetchQueries: ["GetMyRecordings", "GetWorkspaceRecordings"],
     });
   };
 }
@@ -889,7 +729,10 @@ export function useAcceptRecordingRequest() {
 }
 
 export function useUpdateRecordingResolution(recordingId: RecordingId) {
-  const [updateRecordingResolution] = useMutation(
+  const [updateRecordingResolution] = useMutation<
+    UpdateRecordingResolution,
+    UpdateRecordingResolutionVariables
+  >(
     gql`
       mutation UpdateRecordingResolution($id: ID!, $isResolved: Boolean!) {
         updateRecordingResolution(input: { id: $id, isResolved: $isResolved }) {

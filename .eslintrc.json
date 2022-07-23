@@ -9,6 +9,7 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
+  "ignorePatterns": ["!.storybook"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true

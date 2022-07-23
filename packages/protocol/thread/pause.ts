@@ -152,19 +152,19 @@ export class Pause {
   create(point: ExecutionPoint, time: number) {
     assert(!this.createWaiter, "createWaiter already set");
     assert(!this.pauseId, "pauseId already set");
-    this.createWaiter = client.Session.createPause({ point }, this.sessionId).then(
-      ({ pauseId, stack, data }) => {
-        this._setPauseId(pauseId);
-        this.point = point;
-        this.time = time;
-        this.hasFrames = !!stack && stack.length > 0;
-        this.addData(data);
-        if (stack) {
-          this.stack = stack.map(id => this.frames.get(id)!);
-        }
-        pausesById.set(pauseId, this);
+    this.createWaiter = (async () => {
+      const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
+      await this.ThreadFront.ensureAllSources();
+      this._setPauseId(pauseId);
+      this.point = point;
+      this.time = time;
+      this.hasFrames = !!stack && stack.length > 0;
+      this.addData(data);
+      if (stack) {
+        this.stack = stack.map(id => this.frames.get(id)!);
       }
-    );
+      pausesById.set(pauseId, this);
+    })();
   }
 
   instantiate(
@@ -188,6 +188,10 @@ export class Pause {
   addData(...datas: PauseData[]) {
     datas.forEach(d => this._addDataObjects(d));
     datas.forEach(d => this._updateDataFronts(d));
+  }
+
+  ensureLoaded() {
+    return this.createWaiter;
   }
 
   // we're cheating Typescript here: the objects that we add are of type Frame/Scope/ObjectDescription
@@ -557,6 +561,9 @@ export class Pause {
   }
 
   async getFrameSteps(frameId: FrameId) {
+    assert(this.createWaiter, "no createWaiter");
+    await this.createWaiter;
+
     if (!this.frameSteps.has(frameId)) {
       const { steps } = await this.sendMessage(client.Pause.getFrameSteps, {
         frameId,

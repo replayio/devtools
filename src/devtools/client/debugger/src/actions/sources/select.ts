@@ -9,15 +9,18 @@
  * @module actions/sources
  */
 
+import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
-import { setSelectedPanel } from "ui/actions/layout";
-import { getToolboxLayout } from "ui/reducers/layout";
+import { setSelectedPanel, setViewMode } from "ui/actions/layout";
+import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
+
 import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import type { Location, Source } from "../../reducers/sources";
-import { tabExists } from "../../reducers/tabs";
+import type { Source } from "../../reducers/sources";
+import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
 import {
@@ -32,13 +35,16 @@ import {
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { setBreakableLines } from "./breakableLines";
 import { loadSourceText } from "./loadSourceText";
 import { setSymbols } from "./symbols";
 
 type PartialLocation = Parameters<typeof createLocation>[0];
 
-export const setSelectedLocation = (cx: Context, source: Source, location: Location) => ({
+export const setSelectedLocation = (
+  cx: Context,
+  source: Source,
+  location: Location & { sourceUrl: string }
+) => ({
   type: "SET_SELECTED_LOCATION",
   cx,
   source,
@@ -143,8 +149,11 @@ export function selectLocation(
 ): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
-    // @ts-ignore MixpanelEvent mismatch
     trackEvent("sources.select_location");
+
+    if (getViewMode(getState()) == "non-dev") {
+      dispatch(setViewMode("dev"));
+    }
 
     if (!client) {
       // No connection, do nothing. This happens when the debugger is
@@ -159,6 +168,7 @@ export function selectLocation(
     // We try to work around this by comparing source URLs and, if they don't match,
     // use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
+      await ThreadFront.ensureAllSources();
       let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
       sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
       source = getSource(getState(), sourceId);
@@ -174,7 +184,7 @@ export function selectLocation(
       dispatch(closeActiveSearch());
     }
 
-    if (!tabExists(getState(), source.id)) {
+    if (!getTabExists(getState(), source.id)) {
       dispatch(addTab(source));
     }
 
@@ -189,7 +199,7 @@ export function selectLocation(
     }
 
     await dispatch(loadSourceText({ source }));
-    await dispatch(setBreakableLines(cx, source.id));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component
     dispatch(setShownSource(null));
@@ -243,18 +253,21 @@ export function showAlternateSource(
       ThreadFront.preferSource(oldSourceId, false);
     }
 
-    let isPausedInSource = false;
+    let selectSourceByPausing = false;
     const state = getState();
     const frames = getFrames(state);
     if (frames) {
       const selectedFrameId = getSelectedFrameId(state);
       const selectedFrame = frames.find(f => f.id == selectedFrameId);
-      if (selectedFrame?.location.sourceId === oldSourceId) {
-        isPausedInSource = true;
+      if (
+        selectedFrame?.location.sourceId === oldSourceId &&
+        selectedFrame?.alternateLocation?.sourceId === newSourceId
+      ) {
+        selectSourceByPausing = true;
       }
     }
 
-    if (isPausedInSource) {
+    if (selectSourceByPausing) {
       const executionPoint = getExecutionPoint(state);
       await dispatch(paused({ executionPoint: executionPoint! }));
     } else {

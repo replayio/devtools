@@ -2,8 +2,7 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 // eslint-disable-next-line no-restricted-imports
 import { initSocket, client } from "protocol/socket";
-import { useStore } from "react-redux";
-import { useAppDispatch } from "ui/setup/hooks";
+import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { UIStore } from "ui/actions";
 import { ExpectedError } from "ui/state/app";
 import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
@@ -135,7 +134,7 @@ function SourcemapVisualizer({
 }
 
 export default function SourceMapLoader() {
-  const store: UIStore = useStore();
+  const store = useAppStore();
   const recordingId = useGetRecordingId();
   const sourceId = useRouter().query.sourceId as string;
   const [sourcemapResult, setSourcemapResult] = useState<SourcemapResult | undefined>();

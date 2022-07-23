@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cloneDeep from "lodash/cloneDeep";
 import { CommandRequest, CommandResponse } from "protocol/socket";
 import { UIState } from "ui/state";
+import { features } from "ui/utils/prefs";
 
 export interface Recorded {
   recordedAt: number;
@@ -76,7 +77,13 @@ export const { errorReceived, eventReceived, requestSent, responseReceived } =
 
 export default protocolMessagesSlice.reducer;
 
-export const getProtocolEvents = (state: UIState) => state.protocolMessages.events;
+export const getProtocolEvents = (_state: UIState) => {
+  if (!features.logProtocolEvents) {
+    console.log("protocol events are disabled");
+  }
+
+  return [];
+};
 export const getProtocolErrorMap = (state: UIState) => state.protocolMessages.idToErrorMap;
 export const getProtocolRequestMap = (state: UIState) => state.protocolMessages.idToRequestMap;
 export const getProtocolResponseMap = (state: UIState) => state.protocolMessages.idToResponseMap;

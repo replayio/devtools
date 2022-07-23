@@ -10,6 +10,7 @@
  */
 
 import type { UIThunkAction } from "ui/actions";
+import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 
 import { insertSourceActors } from "../../actions/source-actors";
 import { makeSourceId } from "../../client/create";
@@ -25,14 +26,11 @@ import {
   getPendingSelectedLocation,
   getPendingBreakpointsForSource,
   getContext,
-  isSourceLoadingOrLoaded,
 } from "../../selectors";
-import { ContextError } from "../../utils/context";
-import { getRawSourceURL, isInlineScript } from "../../utils/source";
+import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
-import { setBreakableLines } from "./breakableLines";
 import { loadSourceText } from "./loadSourceText";
 
 interface SourceData {
@@ -58,25 +56,21 @@ interface SourceInfo {
 
 // If a request has been made to show this source, go ahead and
 // select it.
-function checkSelectedSource(cx: Context, sourceId: string): UIThunkAction {
+function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
     const pendingLocation = getPendingSelectedLocation(state);
 
-    if (!pendingLocation || !pendingLocation.url) {
+    const pendingUrl = pendingLocation?.url || pendingLocation?.sourceUrl;
+    if (!pendingUrl) {
       return;
     }
-
-    const source = getSource(state, sourceId);
 
     if (!source || !source.url) {
       return;
     }
 
-    const pendingUrl = pendingLocation.url;
-    const rawPendingUrl = getRawSourceURL(pendingUrl);
-
-    if (rawPendingUrl === source.url) {
+    if (pendingUrl === source.url) {
       const { selectLocation } = await import("../sources");
       await dispatch(
         selectLocation(cx, {
@@ -109,13 +103,13 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
 
     for (const bp of pendingBreakpoints) {
       const line = bp.location.line;
-      dispatch(setRequestedBreakpoint({ line, sourceId }));
+      const column = bp.location.column;
+      dispatch(setRequestedBreakpoint({ column, line, sourceId }));
     }
 
     // load the source text if there is a pending breakpoint for it
     await dispatch(loadSourceText({ cx, source }));
-
-    await dispatch(setBreakableLines(cx, source.id));
+    await dispatch(fetchPossibleBreakpointsForSource(source.id));
 
     await Promise.all(
       pendingBreakpoints.map(bp => {
@@ -277,20 +271,6 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
     dispatch(addSources(cx, newSources));
     dispatch(insertSourceActors(newSourceActors));
 
-    for (const newSourceActor of newSourceActors) {
-      // Fetch breakable lines for new HTML scripts
-      // when the HTML file has started loading
-      if (
-        isInlineScript(newSourceActor) &&
-        isSourceLoadingOrLoaded(getState(), newSourceActor.source)
-      ) {
-        dispatch(setBreakableLines(cx, newSourceActor.source)).catch(error => {
-          if (!(error instanceof ContextError)) {
-            throw error;
-          }
-        });
-      }
-    }
     await dispatch(checkNewSources(cx, newSources));
 
     for (const { source } of newSourceActors) {
@@ -310,11 +290,10 @@ function addSources(cx: Context, sources: Source[]): UIThunkAction {
 function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
   return async (dispatch, getState) => {
     for (const source of sources) {
-      dispatch(checkSelectedSource(cx, source.id));
+      dispatch(checkSelectedSource(cx, source));
     }
 
     dispatch(restoreBlackBoxedSources(cx, sources));
-
     return sources;
   };
 }

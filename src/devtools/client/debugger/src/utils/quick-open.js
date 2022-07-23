@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { endTruncateStr } from "./utils";
+import { memoizeLast } from "./memoizeLast";
 import {
   isPretty,
   getTruncatedFileName,
@@ -97,7 +98,7 @@ export function formatProjectFunctions(functions, displayedSources) {
   return sourceFunctions;
 }
 
-export function formatSymbols(symbols) {
+export const formatSymbols = memoizeLast(symbols => {
   if (!symbols?.functions || symbols.loading) {
     return { functions: [] };
   }
@@ -105,7 +106,7 @@ export function formatSymbols(symbols) {
   return {
     functions: symbols.functions.map(formatSymbol),
   };
-}
+});
 
 export function formatShortcutResults() {
   return [

@@ -1,5 +1,5 @@
 .AddCommentButton,
-.FastForwardButton {
+.ConsoleMessageHoverButton {
   position: absolute;
   border-radius: 0.5rem;
   outline: none;
@@ -13,7 +13,7 @@
   cursor: pointer;
 }
 
-.FastForwardButton {
+.ConsoleMessageHoverButton {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
 }
@@ -24,9 +24,10 @@
 }
 
 .AddCommentButtonIcon,
-.FastForwardButtonIcon {
+.ConsoleMessageHoverButtonIcon {
   width: 1.25rem;
   height: 1.25rem;
+  display: inline-block;
 }
 
 .Label {

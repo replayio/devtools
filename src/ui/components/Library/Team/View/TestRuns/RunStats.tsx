@@ -10,7 +10,12 @@ function Pill({ styles, value }: { styles: string; value: number }) {
   );
 }
 export function RunStats({ testRun }: { testRun: TestRun }) {
-  const { passed, failed } = testRun.stats;
+  let passed = 0;
+  let failed = 0;
+  if (testRun.stats) {
+    passed = testRun.stats.passed || 0;
+    failed = testRun.stats.failed || 0;
+  }
 
   return (
     <div className="flex space-x-2 shrink">

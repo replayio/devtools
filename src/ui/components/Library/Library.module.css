@@ -83,7 +83,6 @@
   color: var(--body-color);
 }
 
-
 :root:global(.theme-light) .libraryRow:hover {
   background-color: var(--grey-10);
 }

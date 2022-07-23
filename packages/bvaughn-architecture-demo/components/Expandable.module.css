@@ -24,6 +24,7 @@
   height: 1rem;
   margin-right: 0.5ch;
   display: inline-block;
+  vertical-align: middle;
 }
 .ArrowExpanded {
   transform: rotate(90deg);
@@ -33,6 +34,7 @@
   fill: var(--collapsible-toggle-color);
   width: 1rem;
   height: 1rem;
+  display: inline-block;
 }
 
 .Children {

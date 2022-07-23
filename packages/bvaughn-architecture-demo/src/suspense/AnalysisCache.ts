@@ -1,4 +1,4 @@
-import { EventHandlerType, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -9,8 +9,10 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 type Value = any;
 
 type AnalysisResult = {
+  executionPoint: ExecutionPoint;
   isRemote: boolean;
   pauseId: PauseId | null;
+  time: number;
   values: Value[];
 };
 
@@ -38,26 +40,6 @@ export function getCachedAnalysis(
   } else {
     return null;
   }
-}
-
-export function getEventTypePoints(
-  client: ReplayClientInterface,
-  eventType: EventHandlerType
-): any {
-  /* TODO (console:filters)
-    const collectedPoints: PointDescription[] = [];
-    await analysisManager.runAnalysis(
-      {
-        mapper: `return [{ key: input.point, value: input }];`,
-        effectful: false,
-        eventHandlerEntryPoints: [{ eventType }],
-      },
-      {
-        onAnalysisPoints: points => collectedPoints.push(...points),
-      }
-    );
-    eventTypePoints[eventType] = collectedPoints;
-  */
 }
 
 export function runAnalysis(
@@ -101,8 +83,10 @@ async function runLocalOrRemoteAnalysis(
     const values = await runLocalAnalysis(code);
 
     const analysisResult: AnalysisResult = {
+      executionPoint: timeStampedPoint.point,
       isRemote: false,
       pauseId: null,
+      time: timeStampedPoint.time,
       values,
     };
 
@@ -115,8 +99,10 @@ async function runLocalOrRemoteAnalysis(
       const { pauseId, values } = await runRemoteAnalysis(client, location, timeStampedPoint, code);
 
       const analysisResult: AnalysisResult = {
+        executionPoint: timeStampedPoint.point,
         isRemote: true,
         pauseId,
+        time: timeStampedPoint.time,
         values,
       };
 
@@ -170,15 +156,26 @@ export async function runRemoteAnalysis(
   timeStampedPoint: TimeStampedPoint,
   code: string
 ): Promise<{ pauseId: PauseId; values: Value[] }> {
-  const result = await client.runAnalysis<RemoteAnalysisResult>(
-    location,
-    timeStampedPoint,
-    createMapperForAnalysis(code)
-  );
+  const results = await client.runAnalysis<RemoteAnalysisResult>({
+    effectful: false,
+    locations: [{ location }],
+    points: [timeStampedPoint.point],
+    mapper: createMapperForAnalysis(code),
+  });
+
+  if (results.length === 0) {
+    throw new Error("No results returned from analysis");
+  }
+
+  const result = results[0];
   const objects = result.data.objects;
   const pauseId = result.pauseId;
   const values = result.values;
+
+  // Pre-cache object previews that came back with our new analysis data.
+  // This will avoid us having to turn around and request them again when rendering the logs.
   objects.forEach(object => preCacheObject(pauseId, object));
+
   return { pauseId, values };
 }
 
@@ -187,54 +184,54 @@ function createMapperForAnalysis(code: string): string {
   return `
     const finalData = { frames: [], scopes: [], objects: [] };
     function addPauseData({ frames, scopes, objects }) {
-          finalData.frames.push(...(frames || []));
-          finalData.scopes.push(...(scopes || []));
-          finalData.objects.push(...(objects || []));
+      finalData.frames.push(...(frames || []));
+      finalData.scopes.push(...(scopes || []));
+      finalData.objects.push(...(objects || []));
     }
     function getTopFrame() {
-          const { frame, data } = sendCommand("Pause.getTopFrame");
+      const { frame, data } = sendCommand("Pause.getTopFrame");
       addPauseData(data);
-      return finalData.frames.find(f => f.frameId == frame);
+      return finalData.frames.find((f) => f.frameId == frame);
     }
-
-      const { point, time, pauseId } = input;
-      const { frameId, functionName, location } = getTopFrame();
-
-      const bindings = [
-            { name: "displayName", value: functionName || "" }
-      ];
-      const { result } = sendCommand("Pause.evaluateInFrame", {
-            frameId,
-            bindings,
-            expression: "[" + "${escapedCode}" + "]",
-        useOriginalScopes: true,
-      });
-      const values = [];
-      addPauseData(result.data);
-      if (result.exception) {
-            values.push(result.exception);
-      } else {
-            {
-          const { object } = result.returned;
-      const { result: lengthResult } = sendCommand(
-            "Pause.getObjectProperty",
-        { object, name: "length" }
-      );
-      addPauseData(lengthResult.data);
-      const length = lengthResult.returned.value;
-      for (let i = 0; i < length; i++) {
-            const { result: elementResult } = sendCommand(
-              "Pause.getObjectProperty",
-          { object, name: i.toString() }
-        );
-        values.push(elementResult.returned);
-        addPauseData(elementResult.data);
+    
+    const { point, time, pauseId } = input;
+    const { frameId, functionName, location } = getTopFrame();
+    
+    const bindings = [{ name: "displayName", value: functionName || "" }];
+    const { result } = sendCommand("Pause.evaluateInFrame", {
+      frameId,
+      bindings,
+      expression: "[" + "${escapedCode}" + "]",
+      useOriginalScopes: true,
+    });
+    const values = [];
+    addPauseData(result.data);
+    if (result.exception) {
+      values.push(result.exception);
+    } else {
+      {
+        const { object } = result.returned;
+        const { result: lengthResult } = sendCommand("Pause.getObjectProperty", {
+          object,
+          name: "length",
+        });
+        addPauseData(lengthResult.data);
+        const length = lengthResult.returned.value;
+        for (let i = 0; i < length; i++) {
+          const { result: elementResult } = sendCommand("Pause.getObjectProperty", {
+            object,
+            name: i.toString(),
+          });
+          values.push(elementResult.returned);
+          addPauseData(elementResult.data);
+        }
       }
     }
-      }
-      return [{
-            key: point,
-            value: { time, pauseId, location, values, data: finalData },
-      }];
-    `;
+    return [
+      {
+        key: point,
+        value: { time, pauseId, location, values, data: finalData },
+      },
+    ];
+  `;
 }

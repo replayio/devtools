@@ -9,16 +9,16 @@ type CollaboratorsProps = {
 };
 
 export default function Collaborators({ recordingId }: CollaboratorsProps) {
-  const { collaborators, recording, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
+  const { collaborators, owner, loading } = hooks.useGetOwnersAndCollaborators(recordingId!);
 
-  if (loading || !collaborators || !recording) {
+  if (loading || !collaborators || !owner) {
     return null;
   }
 
   return (
     <section className="flex w-full flex-col space-y-4">
       <EmailForm recordingId={recordingId} />
-      <CollaboratorsList {...{ recording, collaborators }} />
+      <CollaboratorsList {...{ owner, collaborators }} />
     </section>
   );
 }
