@@ -64,7 +64,3 @@ runs:
       id: log-id
       run: echo ::set-output name=LOG_ID::$(echo $INPUT_STRIPE | cut -f1 -d /)
       shell: bash
-    - uses: actions/upload-artifact@v3
-      with:
-        name: recordings-log-${{ steps.log-id.outputs.LOG_ID }}
-        path: ${{ steps.upload-recordings.outputs.recordings-path }}
