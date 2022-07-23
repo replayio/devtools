@@ -32,6 +32,7 @@ const emptySettings: ExperimentalUserSettings = {
   enableEventLink: false,
   enableTeams: true,
   enableLargeText: false,
+  queryCache: false,
 };
 
 const testSettings: ExperimentalUserSettings = {
@@ -41,6 +42,7 @@ const testSettings: ExperimentalUserSettings = {
   enableEventLink: false,
   enableTeams: true,
   enableLargeText: false,
+  queryCache: false,
 };
 
 export async function getUserSettings(): Promise<ExperimentalUserSettings> {
@@ -137,6 +139,7 @@ function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUse
     enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
     enableLargeText: false,
+    queryCache: false,
   };
 }
 

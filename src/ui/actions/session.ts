@@ -162,6 +162,7 @@ export function createSocket(
       const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache,
+        enableQueryCache: !!features.enableQueryCache,
       };
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;

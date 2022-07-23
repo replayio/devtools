@@ -91,6 +91,7 @@ if (typeof window !== "undefined") {
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   disableCache?: boolean;
+  enableQueryCache?: boolean;
 };
 
 type SessionCallbacks = {
