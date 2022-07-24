@@ -75,7 +75,6 @@ export default function HTMLElementRenderer({
 
     if (inspectHTMLElement !== null) {
       if (timestampedPointContext !== null) {
-        // TODO Read values from context
         inspectHTMLElement(
           protocolValue,
           pauseId,
