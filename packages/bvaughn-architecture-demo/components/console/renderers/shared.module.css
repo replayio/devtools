@@ -81,8 +81,7 @@
 
 .Source {
   flex: 1 1 100%;
-  display: flex;
-  justify-content: flex-end;
+  text-align: right;
   opacity: 0.75;
   overflow: hidden;
 }
@@ -93,6 +92,7 @@
 .TimeStamp {
   color: var(--color-dim);
   font-size: var(--font-size-small);
+  word-break: initial;
 }
 
 .MessageText {

@@ -2,12 +2,13 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -129,11 +130,21 @@ function MessageHoverButtonWithWithPause({
 function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
   const client = useContext(ReplayClientContext);
 
+  const { point, timeStampedHitPoint } = logPointInstance;
+
   const { isRemote, pauseId, values } = runAnalysis(
     client,
-    logPointInstance.point.location,
-    logPointInstance.timeStampedHitPoint,
-    logPointInstance.point.content
+    point.location,
+    timeStampedHitPoint,
+    point.content
+  );
+
+  const context = useMemo(
+    () => ({
+      executionPoint: timeStampedHitPoint.point,
+      time: timeStampedHitPoint.time,
+    }),
+    [timeStampedHitPoint]
   );
 
   const children = isRemote
@@ -154,7 +165,11 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
         />
       ));
 
-  return <>{children}</>;
+  return (
+    <InspectableTimestampedPointContext.Provider value={context}>
+      {children}
+    </InspectableTimestampedPointContext.Provider>
+  );
 }
 
 export default memo(LogPointRenderer) as typeof LogPointRenderer;

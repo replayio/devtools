@@ -91,6 +91,7 @@ export default function KeyValueRenderer({
                   }
                   object={objectWithPreview!}
                   pauseId={pauseId}
+                  protocolValue={protocolValue}
                 />
               </div>
             );
