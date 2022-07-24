@@ -31,5 +31,5 @@ playwright-record-video:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN --push RECORD_VIDEO=true VISUAL_DEBUG=true yarn test
+    RUN RECORD_VIDEO=true VISUAL_DEBUG=true yarn test
     SAVE ARTIFACT ./test-results AS LOCAL ./test-results
