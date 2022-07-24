@@ -24,7 +24,7 @@ playwright-update-snapshots:
     ARG --required HOST
     FROM +install
     ENV HOST $HOST
-    RUN --push yarn test --update-snapshots
+    RUN yarn test --update-snapshots
     SAVE ARTIFACT ./snapshots AS LOCAL ./snapshots
 
 playwright-record-video:
