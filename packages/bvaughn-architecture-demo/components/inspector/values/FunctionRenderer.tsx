@@ -1,6 +1,6 @@
 import Icon from "@bvaughn/components/Icon";
 import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
-import { useContext } from "react";
+import { MouseEvent, useContext } from "react";
 
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
@@ -18,8 +18,13 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
   const showOverflowMarker =
     object?.preview?.overflow || functionParameterNames.length > MAX_PROPERTIES_TO_PREVIEW;
 
-  const viewFunctionSource = () => {
-    inspectFunctionDefinition(functionLocation!);
+  const viewFunctionSource = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (inspectFunctionDefinition !== null) {
+      inspectFunctionDefinition(functionLocation!);
+    }
   };
 
   const slice = functionParameterNames.slice(0, MAX_PROPERTIES_TO_PREVIEW);
@@ -45,7 +50,7 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
         )}
         {")"}
       </span>
-      {functionLocation && (
+      {functionLocation && inspectFunctionDefinition !== null && (
         <button
           className={styles.IconButton}
           onClick={viewFunctionSource}

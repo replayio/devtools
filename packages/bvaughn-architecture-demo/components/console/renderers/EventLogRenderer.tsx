@@ -1,10 +1,11 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
+import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
@@ -22,13 +23,21 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
 
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
+  const { point, pauseId, time, values } = eventLog;
+
+  const context = useMemo(
+    () => ({
+      executionPoint: point,
+      time,
+    }),
+    [point, time]
+  );
+
   useLayoutEffect(() => {
     if (isFocused) {
       ref.current?.scrollIntoView({ block: "nearest" });
     }
   }, [isFocused]);
-
-  const { point, pauseId, values } = eventLog;
 
   let className = styles.Row;
   if (isFocused) {
@@ -68,25 +77,27 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
   );
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      data-test-name="Message"
-      role="listitem"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      {primaryContent}
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={eventLog.point}
-          pauseId={eventLog.pauseId}
-          showAddCommentButton={false}
-          targetRef={ref}
-          time={eventLog.time}
-        />
-      )}
-    </div>
+    <InspectableTimestampedPointContext.Provider value={context}>
+      <div
+        ref={ref}
+        className={className}
+        data-test-name="Message"
+        role="listitem"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {primaryContent}
+        {isHovered && (
+          <MessageHoverButton
+            executionPoint={eventLog.point}
+            pauseId={eventLog.pauseId}
+            showAddCommentButton={false}
+            targetRef={ref}
+            time={eventLog.time}
+          />
+        )}
+      </div>
+    </InspectableTimestampedPointContext.Provider>
   );
 }
 

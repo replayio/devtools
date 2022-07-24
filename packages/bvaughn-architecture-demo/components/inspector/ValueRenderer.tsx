@@ -78,7 +78,9 @@ export default memo(function ValueRenderer({
       throw Error(`Could not find object with ID "${clientValue.objectId}"`);
     }
 
-    return <ObjectPreviewRenderer object={object} pauseId={pauseId} />;
+    return (
+      <ObjectPreviewRenderer object={object} pauseId={pauseId} protocolValue={protocolValue} />
+    );
   }
 
   return <ClientValueValueRenderer clientValue={clientValue} isNested={isNested} />;

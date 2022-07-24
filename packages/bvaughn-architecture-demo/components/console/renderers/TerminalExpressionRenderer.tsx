@@ -4,11 +4,12 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import Loader from "@bvaughn/components/Loader";
 import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { memo, Suspense, useContext, useLayoutEffect, useRef } from "react";
+import { memo, ReactNode, Suspense, useContext, useLayoutEffect, useMemo, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./shared.module.css";
@@ -67,11 +68,22 @@ function TerminalExpressionRenderer({
 function EvaluatedContent({ terminalExpression }: { terminalExpression: TerminalExpression }) {
   const client = useContext(ReplayClientContext);
 
-  const { frameId, pauseId } = terminalExpression;
+  const { frameId, pauseId, point, time } = terminalExpression;
+
+  const context = useMemo(
+    () => ({
+      executionPoint: point,
+      time,
+    }),
+    [point, time]
+  );
+
   const result = evaluate(client, pauseId, frameId, terminalExpression.expression);
   const { exception, returned } = result;
+
+  let children: ReactNode | null = null;
   if (exception) {
-    return (
+    children = (
       <KeyValueRenderer
         isNested={false}
         layout="horizontal"
@@ -80,7 +92,7 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
       />
     );
   } else if (returned) {
-    return returned.value ? (
+    children = returned.value ? (
       <ClientValueValueRenderer
         clientValue={primitiveToClientValue(returned.value)}
         isNested={false}
@@ -92,6 +104,14 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
         pauseId={pauseId}
         protocolValue={returned}
       />
+    );
+  }
+
+  if (children !== null) {
+    return (
+      <InspectableTimestampedPointContext.Provider value={context}>
+        {children}
+      </InspectableTimestampedPointContext.Provider>
     );
   }
 

@@ -1,4 +1,8 @@
-import { Object as ProtocolObject, PauseId as ProtocolPauseId } from "@replayio/protocol";
+import {
+  Object as ProtocolObject,
+  PauseId as ProtocolPauseId,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 import { ReactNode, Suspense, useState } from "react";
 
 import HTMLChildrenRenderer from "./HTMLChildrenRenderer";
@@ -19,10 +23,12 @@ export default function HTMLExpandable({
   before = null,
   object,
   pauseId,
+  protocolValue,
 }: {
   before?: ReactNode;
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
+  protocolValue: ProtocolValue;
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -48,6 +54,7 @@ export default function HTMLExpandable({
         <HTMLElementRenderer
           pauseId={pauseId}
           object={object}
+          protocolValue={protocolValue}
           showClosingTag={!isOpen}
           showChildrenIndicator={!isOpen}
           showOpeningTag={true}
@@ -63,6 +70,7 @@ export default function HTMLExpandable({
           <HTMLElementRenderer
             pauseId={pauseId}
             object={object}
+            protocolValue={protocolValue}
             showClosingTag={true}
             showChildrenIndicator={false}
             showOpeningTag={false}

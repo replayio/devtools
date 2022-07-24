@@ -1,15 +1,17 @@
 import Icon from "@bvaughn/components/Icon";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
+import {
+  InspectableTimestampedPointContext,
+  InspectorContext,
+} from "@bvaughn/src/contexts/InspectorContext";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { filterNonEnumerableProperties, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { useContext } from "react";
+import { MouseEvent, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useClientValue from "../useClientValue";
 
 import ClientValueValueRenderer from "./ClientValueValueRenderer";
-
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
 
@@ -28,12 +30,15 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 export default function HTMLElementRenderer({
   object,
   pauseId,
+  protocolValue,
   showClosingTag = true,
   showChildrenIndicator = true,
   showOpeningTag = true,
 }: Props) {
   const { inspectHTMLElement } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
+  const timestampedPointContext = useContext(InspectableTimestampedPointContext);
+
   const tagName = (object.preview?.node?.nodeName || "unknown").toLowerCase();
 
   if (object.className === "Text") {
@@ -64,8 +69,21 @@ export default function HTMLElementRenderer({
   const showOverflowMarker = properties.length > MAX_PROPERTIES_TO_PREVIEW;
   const showInlineText = showChildrenIndicator && (inlineText || childNodes.length > 0);
 
-  const viewHtmlElement = () => {
-    inspectHTMLElement(object);
+  const viewHtmlElement = (event: MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (inspectHTMLElement !== null) {
+      if (timestampedPointContext !== null) {
+        // TODO Read values from context
+        inspectHTMLElement(
+          protocolValue,
+          pauseId,
+          timestampedPointContext.executionPoint,
+          timestampedPointContext.time
+        );
+      }
+    }
   };
 
   return (
@@ -89,13 +107,15 @@ export default function HTMLElementRenderer({
           <span className={styles.Bracket}>&gt;</span>
         </span>
       )}
-      <button
-        className={styles.IconButton}
-        onClick={viewHtmlElement}
-        title="Click to select the node in the inspector"
-      >
-        <Icon className={styles.Icon} type="view-html-element" />
-      </button>
+      {inspectHTMLElement !== null && (
+        <button
+          className={styles.IconButton}
+          onClick={viewHtmlElement}
+          title="Click to select the node in the inspector"
+        >
+          <Icon className={styles.Icon} type="view-html-element" />
+        </button>
+      )}
     </>
   );
 }

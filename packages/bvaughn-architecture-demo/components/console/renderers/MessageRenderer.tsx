@@ -3,10 +3,11 @@ import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
@@ -25,6 +26,14 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
 
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+
+  const context = useMemo(
+    () => ({
+      executionPoint: message.point.point,
+      time: message.point.time,
+    }),
+    [message.point]
+  );
 
   useLayoutEffect(() => {
     if (isFocused) {
@@ -79,46 +88,48 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   );
 
   return (
-    <div
-      ref={ref}
-      className={className}
-      data-test-name="Message"
-      role="listitem"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
+    <InspectableTimestampedPointContext.Provider value={context}>
       <div
-        className={
-          showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
-        }
+        ref={ref}
+        className={className}
+        data-test-name="Message"
+        role="listitem"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
-        )}
-        {showExpandable ? (
-          <Expandable
-            children={<MessageStackRenderer message={message} />}
-            className={styles.Expandable}
-            header={logContents}
-          />
-        ) : (
-          logContents
-        )}
-        <Suspense fallback={<Loader />}>
-          <div className={styles.Source}>{location && <Source location={location} />}</div>
-        </Suspense>
-      </div>
+        <div
+          className={
+            showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
+          }
+        >
+          {showTimestamps && (
+            <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
+          )}
+          {showExpandable ? (
+            <Expandable
+              children={<MessageStackRenderer message={message} />}
+              className={styles.Expandable}
+              header={logContents}
+            />
+          ) : (
+            logContents
+          )}
+          <Suspense fallback={<Loader />}>
+            <div className={styles.Source}>{location && <Source location={location} />}</div>
+          </Suspense>
+        </div>
 
-      {isHovered && (
-        <MessageHoverButton
-          executionPoint={message.point.point}
-          pauseId={message.pauseId}
-          showAddCommentButton={true}
-          targetRef={ref}
-          time={message.point.time}
-        />
-      )}
-    </div>
+        {isHovered && (
+          <MessageHoverButton
+            executionPoint={message.point.point}
+            pauseId={message.pauseId}
+            showAddCommentButton={true}
+            targetRef={ref}
+            time={message.point.time}
+          />
+        )}
+      </div>
+    </InspectableTimestampedPointContext.Provider>
   );
 }
 
