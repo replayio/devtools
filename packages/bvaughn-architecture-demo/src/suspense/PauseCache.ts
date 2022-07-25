@@ -127,6 +127,12 @@ async function fetchPauseData(
   try {
     const pauseData = await client.getAllFrames(pauseId);
 
+    // Pre-cache object previews that came back with our new analysis data.
+    // This will avoid us having to turn around and request them again when rendering the logs.
+    if (pauseData.objects) {
+      preCacheObjects(pauseId, pauseData.objects);
+    }
+
     record.status = STATUS_RESOLVED;
     record.value = pauseData;
 
@@ -148,6 +154,12 @@ async function fetchPauseId(
 
   try {
     const pause = await client.createPause(executionPoint);
+
+    // Pre-cache object previews that came back with our new analysis data.
+    // This will avoid us having to turn around and request them again when rendering the logs.
+    if (pause.data.objects) {
+      preCacheObjects(pause.pauseId, pause.data.objects);
+    }
 
     record.status = STATUS_RESOLVED;
     record.value = pause;
