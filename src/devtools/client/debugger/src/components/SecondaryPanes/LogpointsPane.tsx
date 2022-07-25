@@ -4,8 +4,6 @@ import { getLogpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { removeLogpoint, removeLogpointsInSource } from "../../actions/breakpoints/logpoints";
-import { Context } from "../../selectors";
-import { Breakpoint, Source } from "../../reducers/types";
 
 export default function LogpointsPane() {
   const dispatch = useAppDispatch();
@@ -25,12 +23,8 @@ export default function LogpointsPane() {
       type="print-statement"
       emptyContent={emptyContent}
       breakpointSources={logpointSources}
-      onRemoveBreakpoint={(cx: Context, breakpoint: Breakpoint) =>
-        dispatch(removeLogpoint(cx, breakpoint))
-      }
-      onRemoveBreakpoints={(cx: Context, source: Source) =>
-        dispatch(removeLogpointsInSource(cx, source))
-      }
+      onRemoveBreakpoint={(cx, breakpoint) => dispatch(removeLogpoint(cx, breakpoint))}
+      onRemoveBreakpoints={(cx, source) => dispatch(removeLogpointsInSource(cx, source))}
     />
   );
 }

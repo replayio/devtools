@@ -11,12 +11,8 @@ import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
 import { isConsole } from "../utils/preview";
-import {
-  getPreview,
-  isSelectedFrameVisible,
-  getSelectedSource,
-  getSelectedFrame,
-} from "../selectors";
+import { getPreview, isSelectedFrameVisible, getSelectedFrame } from "../selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 
 type $FixTypeLater = any;
 

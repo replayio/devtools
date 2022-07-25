@@ -4,9 +4,7 @@
 
 import type { UIState } from "ui/state";
 import type { UIThunkAction } from "ui/actions";
-import type { ThunkExtraArgs } from "ui/utils/thunk";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import type { Source } from "../../reducers/sources";
 import type { AppDispatch } from "ui/setup/store";
 import type { ASTLocation, PendingBreakpoint, SourceLocation } from "../../reducers/types";
 

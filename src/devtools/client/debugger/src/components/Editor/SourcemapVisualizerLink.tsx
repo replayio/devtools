@@ -5,16 +5,15 @@ import { useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSourceWithContent } from "../../reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 export default function SourcemapVisualizerLink() {
-  const selectedSource = useAppSelector(getSelectedSourceWithContent);
+  const selectedSource = useAppSelector(getSelectedSource);
   const alternateSource = useAppSelector(getAlternateSource);
-  if (!selectedSource) {
+  if (!selectedSource || !alternateSource) {
     return null;
   }
 
-  // @ts-ignore possible undefined mismatch
   const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
   if (!href) {
     return null;

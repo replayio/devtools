@@ -10,12 +10,13 @@ import { getBreakpointsList, getRequestedBreakpointsList } from "./breakpoints";
 import { sortSelectedBreakpoints } from "../utils/breakpoint";
 import { Breakpoint } from "../reducers/types";
 import { UIState } from "ui/state";
+import { getSelectedLocation } from "ui/reducers/sources";
 
 /*
  * Finds the breakpoints, which appear in the selected source.
  */
 export const getVisibleBreakpoints = createSelector(
-  (state: UIState) => state.sources.selectedLocation?.sourceId,
+  (state: UIState) => state.experimentalSources.selectedLocation?.sourceId,
   getBreakpointsList,
   (selectedSourceId, breakpoints) => {
     if (!selectedSourceId) {
@@ -30,7 +31,7 @@ export const getVisibleBreakpoints = createSelector(
  * Finds the requested breakpoints, which appear in the selected source.
  */
 export const getVisibleRequestedBreakpoints = createSelector(
-  (state: UIState) => state.sources.selectedLocation?.sourceId,
+  (state: UIState) => getSelectedLocation(state)?.sourceId,
   getRequestedBreakpointsList,
   (selectedSourceId, breakpoints) => {
     if (!selectedSourceId) {
@@ -48,7 +49,7 @@ export const getVisibleRequestedBreakpoints = createSelector(
 export const getFirstVisibleBreakpoints = createSelector(
   getVisibleBreakpoints,
   getVisibleRequestedBreakpoints,
-  (state: UIState) => state.sources.selectedLocation?.sourceId,
+  (state: UIState) => getSelectedLocation(state)?.sourceId,
   (breakpoints, requestedBreakpoints, selectedSource) => {
     if (!breakpoints || !selectedSource) {
       return [];

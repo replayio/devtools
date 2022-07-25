@@ -13,10 +13,14 @@ import type { UIState } from "ui/state";
 import { createSelector } from "reselect";
 
 import { isSimilarTab } from "../utils/tabs";
-import { makeShallowQuery, memoizeResourceShallow } from "../utils/resource";
-
-import { getSource, getSpecificSourceByURL, getSources, resourceAsSourceBase } from "./sources";
-import type { Source } from "./sources";
+import {
+  getSourceDetails,
+  getSourceByUrl,
+  getSourceDetailsEntities,
+  getSelectedLocation,
+  SourceDetails,
+  MiniSource,
+} from "ui/reducers/sources";
 
 export interface Tab {
   sourceId: string | null;
@@ -58,7 +62,7 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
     case "ADD_SOURCES":
       return addVisibleTabs(state, action.sources);
 
-    case "SET_SELECTED_LOCATION": {
+    case "sources/selectLocation": {
       return addSelectedSource(state, action.source);
     }
 
@@ -77,13 +81,13 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
  * @static
  */
 export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
-  const selectedLocation = state.sources.selectedLocation;
+  const selectedLocation = getSelectedLocation(state);
   const availableTabs = state.tabs.tabs;
   if (!selectedLocation) {
     return "";
   }
 
-  const selectedTab = getSource(state, selectedLocation.sourceId);
+  const selectedTab = getSourceDetails(state, selectedLocation.sourceId);
   if (!selectedTab) {
     return "";
   }
@@ -91,12 +95,7 @@ export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url!));
 
   if (matchingTab) {
-    const sources = state.sources.sources;
-    if (!sources) {
-      return "";
-    }
-
-    const selectedSource = getSpecificSourceByURL(state, selectedTab.url!);
+    const selectedSource = getSourceByUrl(state, selectedTab.url!);
 
     if (selectedSource) {
       return selectedSource.id;
@@ -112,7 +111,7 @@ export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   const availableTab = availableTabs[newSelectedTabIndex];
 
   if (availableTab) {
-    const tabSource = getSpecificSourceByURL(state, availableTab.url);
+    const tabSource = getSourceByUrl(state, availableTab.url);
 
     if (tabSource) {
       return tabSource.id;
@@ -122,15 +121,15 @@ export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   return "";
 }
 
-function matchesSource(tab: Tab, source: Source) {
+function matchesSource(tab: Tab, source: MiniSource) {
   return tab.sourceId === source.id || matchesUrl(tab, source);
 }
 
-function matchesUrl(tab: Tab, source: Source) {
+function matchesUrl(tab: Tab, source: MiniSource) {
   return tab.url === source.url;
 }
 
-function addSelectedSource(state: TabsState, source: Source) {
+function addSelectedSource(state: TabsState, source: MiniSource) {
   if (
     state.tabs
       .filter(({ sourceId }) => sourceId)
@@ -146,7 +145,7 @@ function addSelectedSource(state: TabsState, source: Source) {
   });
 }
 
-function addVisibleTabs(state: TabsState, sources: Source[]) {
+function addVisibleTabs(state: TabsState, sources: MiniSource[]) {
   const tabCount = state.tabs.filter(({ sourceId }) => sourceId).length;
   const tabs = state.tabs
     .map(tab => {
@@ -165,13 +164,13 @@ function addVisibleTabs(state: TabsState, sources: Source[]) {
   return { tabs };
 }
 
-function removeSourceFromTabList(state: TabsState, { source }: { source: Source }) {
+function removeSourceFromTabList(state: TabsState, { source }: { source: MiniSource }) {
   const { tabs } = state;
   const newTabs = tabs.filter(tab => !matchesSource(tab, source));
   return { tabs: newTabs };
 }
 
-function removeSourcesFromTabList(state: TabsState, { sources }: { sources: Source[] }) {
+function removeSourcesFromTabList(state: TabsState, { sources }: { sources: MiniSource[] }) {
   const { tabs } = state;
 
   const newTabs = sources.reduce(
@@ -247,17 +246,13 @@ export const getSourceTabs = createSelector(
   ({ tabs }) => tabs.filter(tab => tab.sourceId)
 );
 
-export const getSourcesForTabs = (state: UIState) => {
-  const tabs = getSourceTabs(state);
-  const sources = getSources(state);
-  return querySourcesForTabs(sources, tabs);
-};
-
-const querySourcesForTabs = makeShallowQuery({
-  filter: (_, tabs: Tab[]) => tabs.map(({ sourceId }) => sourceId!),
-  map: resourceAsSourceBase,
-  reduce: items => items,
-});
+export const getSourcesForTabs = createSelector(
+  getSourceTabs,
+  getSourceDetailsEntities,
+  (tabs, detailsEntities) => {
+    return tabs.map(tab => detailsEntities[tab.sourceId!]!).filter(Boolean);
+  }
+);
 
 export function getTabExists(state: UIState, sourceId: string) {
   return !!getSourceTabs(state).find(tab => tab.sourceId == sourceId);

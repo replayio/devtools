@@ -6,14 +6,16 @@ import {
   PayloadAction,
 } from "@reduxjs/toolkit";
 import { Location, newSource, SourceKind } from "@replayio/protocol";
-// import { getSelectedSourceId } from "devtools/client/debugger/src/selectors";
+
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
 import type { SourcesMap } from "devtools/client/debugger/src/utils/sources-tree";
+import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+// TODO Move prefs out of reducers and load this separately
+import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 
 export interface SourceDetails {
@@ -30,20 +32,31 @@ export interface SourceDetails {
   // TODO stableId: string;
 }
 
+/**
+ * Both `Source` and `SourceDetails` have `{id, url?}`,
+ * and we usually only need those fields in string manipulation functions.
+ */
+export interface MiniSource {
+  id: string;
+  url?: string;
+}
+
 export enum LoadingStatus {
   LOADING = "loading",
   LOADED = "loaded",
   ERRORED = "errored",
 }
 
+export interface SourceContentValue {
+  contentType: string;
+  type: string;
+  value: string;
+}
+
 export interface SourceContent {
   id: string;
   status: LoadingStatus;
-  value?: {
-    contentType: string;
-    type: string;
-    value: string;
-  };
+  value?: SourceContentValue;
 }
 
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
@@ -51,18 +64,26 @@ const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => sour
 const contentsAdapter = createEntityAdapter<SourceContent>();
 
 export const sourceSelectors = sourcesAdapter.getSelectors();
-export const contentsSelectors = contentsAdapter.getSelectors(
+
+export const { selectById: getSourceContentsEntry } = contentsAdapter.getSelectors(
   (state: UIState) => state.experimentalSources.contents
 );
-export const { selectAll: getAllSourceDetails, selectById: getSourceDetails } =
-  sourceDetailsAdapter.getSelectors((state: UIState) => state.experimentalSources.sourceDetails);
+
+export const {
+  selectAll: getAllSourceDetails,
+  selectById: getSourceDetails,
+  selectEntities: getSourceDetailsEntities,
+} = sourceDetailsAdapter.getSelectors((state: UIState) => state.experimentalSources.sourceDetails);
 
 export interface SourcesState {
   allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
   sources: EntityState<newSource>;
   contents: EntityState<SourceContent>;
-  selectedLocationHistory: Partial<Location>[];
+  selectedLocation: PartialLocation | null;
+  selectedLocationHistory: PartialLocation[];
+  selectedLocationHasScrolled: boolean;
+  persistedSelectedLocation?: PartialLocation;
   sourcesByUrl: { [url: string]: string[] };
 }
 
@@ -71,7 +92,11 @@ const initialState: SourcesState = {
   sourceDetails: sourceDetailsAdapter.getInitialState(),
   sources: sourcesAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
+  selectedLocation: null,
   selectedLocationHistory: [],
+  selectedLocationHasScrolled: false,
+  // TODO Move prefs out of reducers and load this separately
+  persistedSelectedLocation: prefs.pendingSelectedLocation as PartialLocation | undefined,
   sourcesByUrl: {},
 };
 
@@ -131,15 +156,29 @@ const sourcesSlice = createSlice({
         status: LoadingStatus.ERRORED,
       });
     },
-    selectLocation: (state, action: PayloadAction<Partial<Location>>) => {
+    selectLocation: (state, action: PayloadAction<PartialLocation>) => {
+      state.selectedLocationHasScrolled = false;
+      state.selectedLocation = action.payload;
       state.selectedLocationHistory.unshift(action.payload);
+      state.persistedSelectedLocation = action.payload;
     },
+    clearSelectedLocation: state => {
+      state.selectedLocationHasScrolled = false;
+      state.selectedLocation = null;
+      state.persistedSelectedLocation = undefined;
+    },
+  },
+  extraReducers: builder => {
+    builder.addCase("debuggerUI/setViewport", state => {
+      state.selectedLocationHasScrolled = true;
+    });
   },
 });
 
 export const {
   addSources,
   allSourcesReceived,
+  clearSelectedLocation,
   selectLocation,
   sourceLoading,
   sourceLoaded,
@@ -148,14 +187,14 @@ export const {
 
 export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState, { ThreadFront }) => {
-    const existing = contentsSelectors.selectById(getState(), sourceId);
+    const existing = getSourceContentsEntry(getState(), sourceId);
     if (existing?.status === LoadingStatus.LOADING) {
       // in flight - resolve this thunk's promise when it completes
       // TODO Replace this with RTK Query!
       return dispatch(
         listenForCondition(() => {
           // Check the status of this source after every action
-          const status = contentsSelectors.selectById(getState(), sourceId)?.status;
+          const status = getSourceContentsEntry(getState(), sourceId)?.status;
           return status === LoadingStatus.LOADED;
         })
       );
@@ -183,8 +222,7 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Prom
 
 export const getSourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesReceived;
 
-export const getSelectedLocation = (state: UIState) =>
-  state.experimentalSources.selectedLocationHistory[0];
+export const getSelectedLocation = (state: UIState) => state.experimentalSources.selectedLocation;
 
 export const getSelectedSourceId = (state: UIState) => {
   const location = getSelectedLocation(state);
@@ -216,10 +254,12 @@ export const getTextAtLocation = (state: UIState, location: Location) => {
   if (!content) {
     return null;
   }
-  // TODO Rework selectors
-  return "";
-  // return getTextAtPosition(content, location);
+  return getTextAtPosition(content, location);
 };
+
+export const getSelectedLocationHasScrolled = (state: UIState) =>
+  state.experimentalSources.selectedLocationHasScrolled;
+
 // This is useful if you are displaying a bunch of sources and want them to
 // ensure they all have unique names, even though some of them might have been
 // loaded from the same URL. If that's the case, and either of the original URLs
@@ -242,6 +282,19 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   }
 };
 
+export function getGeneratedSourceByURL(state: UIState, url: string) {
+  const sourceForUrl = getSourceByUrl(state, url);
+  if (sourceForUrl) {
+    // TODO Should this be using `state.urls` instead and finding the first item?
+    const canonicalSource = getSourceDetails(state, sourceForUrl.canonicalId);
+    const firstGenerated = canonicalSource?.generated[0];
+    if (firstGenerated) {
+      return getSourceDetails(state, firstGenerated);
+    }
+  }
+}
+
+/*
 export const getAllSourceDetailsAsSourceMap = createSelector(
   (state: UIState) => state.experimentalSources.sourceDetails.entities,
   sourcesEntities => {
@@ -258,7 +311,7 @@ export const convertSourceDetailsToSource = (sd: SourceDetails) => {
   const source: Source = {
     id: sd.id,
     url: sd.url,
-    isOriginal: sd.id === sd.canonicalId,
+    isOriginal: isOriginalSource(sd),
     isPrettyPrinted: sd.id.startsWith("pp"),
     // TODO Implement blackboxing
     isBlackBoxed: false,
@@ -267,6 +320,31 @@ export const convertSourceDetailsToSource = (sd: SourceDetails) => {
 
   return source;
 };
+*/
+
+export const getSourceContentsLoaded = (state: UIState, sourceId: string) => {
+  const entry = getSourceContentsEntry(state, sourceId);
+  return entry && isFulfilled(entry);
+};
+
+export const isFulfilled = (item?: { status: LoadingStatus }) => {
+  return item?.status === LoadingStatus.LOADED;
+};
+
+export const isOriginalSource = (sd: SourceDetails) => {
+  return sd.canonicalId === sd.id;
+};
+
+export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
+  if (!source || !source.url) {
+    return false;
+  }
+
+  return state.experimentalSources.sourcesByUrl[source.url]?.length > 0;
+}
+
+export const getPreviousPersistedLocation = (state: UIState) =>
+  state.experimentalSources.persistedSelectedLocation;
 
 /*
 export const getStableLocationForLocation = (

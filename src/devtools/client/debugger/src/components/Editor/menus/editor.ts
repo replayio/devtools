@@ -11,13 +11,13 @@ import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
 import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
 import { getSourcemapVisualizerURL } from "../../../utils/sourceVisualizations";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
+import type { SourceDetails } from "ui/reducers/sources";
 
 type EditorActions = ReturnType<typeof editorItemActions>;
 
 // menu items
 
-const copySourceUri2Item = (selectedSource: Source) => ({
+const copySourceUri2Item = (selectedSource: SourceDetails) => ({
   id: "node-menu-copy-source-url",
   label: "Copy source URI",
   accesskey: "u",
@@ -25,7 +25,11 @@ const copySourceUri2Item = (selectedSource: Source) => ({
   click: () => copyToTheClipboard(getRawSourceURL(selectedSource.url)),
 });
 
-const showSourceMenuItem = (cx: Context, selectedSource: Source, editorActions: EditorActions) => ({
+const showSourceMenuItem = (
+  cx: Context,
+  selectedSource: SourceDetails,
+  editorActions: EditorActions
+) => ({
   id: "node-menu-show-source",
   label: "Reveal in tree",
   accesskey: "r",
@@ -44,10 +48,15 @@ const blackBoxMenuItem = (cx: Context, selectedSource: Source, editorActions: Ed
 });
 */
 
-const sourceMapItem = (cx: Context, selectedSource: Source, alternateSource: Source | null) => ({
+const sourceMapItem = (
+  cx: Context,
+  selectedSource: SourceDetails,
+  alternateSource: SourceDetails | null
+) => ({
   id: "node-menu-source-map",
   label: "Visualize source map",
-  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
+  // TODO Re-enable blackboxing
+  accesskey: /*selectedSource.isBlackBoxed ? "U" : */ "B",
   disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
   click: () => {
     const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
@@ -65,8 +74,8 @@ export function editorMenuItems({
 }: {
   cx: Context;
   editorActions: EditorActions;
-  selectedSource: Source;
-  alternateSource: Source | null;
+  selectedSource: SourceDetails;
+  alternateSource: SourceDetails | null;
 }) {
   const items = [];
 

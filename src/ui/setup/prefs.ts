@@ -108,6 +108,13 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     );
 
     updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
+
+    updateDebuggerPrefs(
+      state,
+      oldState,
+      "pendingSelectedLocation",
+      state => state.experimentalSources.selectedLocationHistory[0]
+    );
   }
 
   if (state.pendingBreakpoints && oldState.pendingBreakpoints) {

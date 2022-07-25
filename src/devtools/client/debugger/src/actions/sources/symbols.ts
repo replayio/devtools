@@ -4,7 +4,6 @@
 
 import { selectors } from "ui/reducers";
 import type { AppDispatch } from "ui/setup/store";
-import type { Source } from "../../reducers/sources";
 import { PROMISE } from "ui/setup/redux/middleware/promise";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { experimentalLoadSourceText } from "ui/reducers/sources";

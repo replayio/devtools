@@ -5,6 +5,7 @@ import type { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
+import type { MiniSource, SourceDetails } from "ui/reducers/sources";
 import type { UIState } from "ui/state";
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -18,15 +19,14 @@ import {
   removeBreakpoints as removeBreakpointsAction,
 } from "../../reducers/breakpoints";
 import { setBreakpoint } from "../../reducers/breakpoints";
-import { Source } from "../../reducers/sources";
 import { PrefixBadge } from "../../reducers/types";
 import {
   getBreakpointsList,
-  getSelectedSource,
   getBreakpointAtLocation,
   getFirstBreakpointPosition,
   getSymbols,
 } from "../../selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { isLogpoint } from "../../utils/breakpoint";
@@ -81,7 +81,7 @@ export function removeBreakpoint(
 
 export function removeBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: MiniSource
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
@@ -108,7 +108,7 @@ export function removeBreakpointsInSource(
  */
 export function disableBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: SourceDetails
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     const breakpoints = getBreakpointsForSource(getState(), source.id);
@@ -128,7 +128,7 @@ export function disableBreakpointsInSource(
  */
 export function enableBreakpointsInSource(
   cx: Context,
-  source: Source
+  source: SourceDetails
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState) => {
     trackEvent("breakpoints.remove_all_in_source");
@@ -192,9 +192,9 @@ export function toggleBreakpointAtLine(cx: Context, line: number): UIThunkAction
     return dispatch(
       addBreakpoint(cx, {
         sourceId: selectedSource.id,
-        // @ts-ignore location field mismatches
-        sourceUrl: selectedSource.url,
+        sourceUrl: selectedSource.url!,
         line,
+        column: 0,
       })
     );
   };
@@ -317,7 +317,7 @@ export function setBreakpointPrefixBadge(
   };
 }
 
-function getLogValue(source: Source, state: UIState, location: Location) {
+function getLogValue(source: SourceDetails, state: UIState, location: Location) {
   const file = getFilename(source);
   const symbols = getSymbols(state, source);
   const { line, column } = location;

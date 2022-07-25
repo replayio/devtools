@@ -8,7 +8,7 @@ import { getToolboxLayout } from "ui/reducers/layout";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
-import { getSelectedSource } from "../../reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 import { waitForEditor } from "../../utils/editor/create-editor";
 
 import ObjectPreviewSuspenseCacheAdapter from "../SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";

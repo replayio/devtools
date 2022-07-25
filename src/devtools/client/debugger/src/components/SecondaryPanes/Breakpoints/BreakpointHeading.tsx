@@ -9,18 +9,19 @@ import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import actions from "../../../actions";
 import { getTruncatedFileName, getSourceQueryString, getFileURL } from "../../../utils/source";
-import { getHasSiblingOfSameName, getContext } from "../../../selectors";
+import { getContext } from "../../../selectors";
 import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
-import type { Breakpoint, Source } from "../../../reducers/types";
+import type { Breakpoint } from "../../../reducers/types";
+import { SourceDetails, getHasSiblingOfSameName, MiniSource } from "ui/reducers/sources";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 type BHExtraProps = {
-  source: Source;
+  source: SourceDetails;
   breakpoint: Breakpoint;
-  onRemoveBreakpoints: (cx: Context, source: Source) => void;
+  onRemoveBreakpoints: (cx: Context, source: MiniSource) => void;
 };
 
 const mapStateToProps = (state: UIState, { source }: BHExtraProps) => ({
@@ -44,7 +45,7 @@ class BreakpointHeading extends PureComponent<BreakpointsProps> {
 
   getLabel() {
     const { breakpoint, source, hasSiblingOfSameName } = this.props;
-    const { column, line } = breakpoint.location;
+    const { column, line } = breakpoint?.location ?? {};
 
     const columnVal = features.columnBreakpoints && column ? `:${column}` : "";
     const location = `:${line}${columnVal}`;

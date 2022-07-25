@@ -10,7 +10,7 @@ import { setHoveredLineNumberLocation } from "ui/reducers/app";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
-import { getSelectedSource } from "../../reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
 import { fetchHitCounts, getHitCountsForSource } from "ui/reducers/hitCounts";

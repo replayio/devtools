@@ -7,10 +7,10 @@
 import { createParentMap } from "./utils";
 import flattenDeep from "lodash/flattenDeep";
 
-import type { Source } from "../../reducers/sources";
 import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import { SourceDetails } from "ui/reducers/sources";
 
-function findSourceItem(sourceTree: TreeDirectory, source: Source) {
+function findSourceItem(sourceTree: TreeDirectory, source: SourceDetails) {
   function _traverse(subtree: TreeNode) {
     if (subtree.type === "source") {
       if (subtree.contents.url === source.url) {
@@ -61,7 +61,7 @@ function getAncestors(sourceTree: TreeDirectory, item: TreeNode | null) {
   }
 }
 
-export function getDirectories(source: Source, sourceTree: TreeDirectory) {
+export function getDirectories(source: SourceDetails, sourceTree: TreeDirectory) {
   const item = findSourceItem(sourceTree, source);
   const ancestors = getAncestors(sourceTree, item);
   return ancestors || [sourceTree];

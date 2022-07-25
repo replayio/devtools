@@ -6,6 +6,7 @@ import { UIState } from "ui/state";
 import { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { getSelectedSource } from "ui/reducers/sources";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { toggleQuickOpen, closeQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
@@ -210,7 +211,7 @@ function KeyboardShortcuts({
 const connector = connect(
   (state: UIState) => ({
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-    selectedSource: selectors.getSelectedSource(state),
+    selectedSource: getSelectedSource(state),
     toolboxLayout: selectors.getToolboxLayout(state),
     viewMode: selectors.getViewMode(state),
   }),

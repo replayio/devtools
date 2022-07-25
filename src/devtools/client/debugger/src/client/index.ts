@@ -54,6 +54,7 @@ async function setupDebugger() {
     }
   });
   await store.dispatch(actions.newQueuedSources(sourceInfos));
+
   store.dispatch(addSources(sources));
 
   store.dispatch(allSourcesReceived());

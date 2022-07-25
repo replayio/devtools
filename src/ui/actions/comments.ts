@@ -3,7 +3,7 @@ import { selectLocation } from "devtools/client/debugger/src/actions/sources/sel
 import { setSymbols } from "devtools/client/debugger/src/actions/sources/symbols";
 import { getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { getTextAtLocation } from "devtools/client/debugger/src/reducers/sources";
+import { getTextAtLocation } from "ui/reducers/sources";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
 import {
   waitForEditor,
@@ -156,7 +156,7 @@ export function createLabels(
     const closestFunction = findClosestFunction(symbols, sourceLocation);
     const primary = closestFunction?.name || `${filename}:${line}`;
 
-    let snippet = getTextAtLocation(state, sourceId, sourceLocation) || "";
+    let snippet = getTextAtLocation(state, sourceLocation) || "";
     if (!snippet) {
       const sourceContent = await ThreadFront.getSourceContents(sourceId);
       const lineText = sourceContent.contents.split("\n")[line - 1];

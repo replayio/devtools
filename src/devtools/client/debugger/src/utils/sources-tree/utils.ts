@@ -6,12 +6,12 @@
 
 import { parse } from "../url";
 
-import type { Source } from "../../reducers/sources";
 import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import { SourceDetails } from "ui/reducers/sources";
 
 // Additional TS types ported from Mozilla Flow types:
 // https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/utils/sources-tree
-export type SourcesMap = Record<string, Source>;
+export type SourcesMap = Record<string, SourceDetails>;
 
 export function nodeHasChildren(item: TreeNode) {
   return item.type == "directory" && Array.isArray(item.contents);
@@ -91,7 +91,7 @@ export function createDirectoryNode(
   };
 }
 
-export function createSourceNode(name: string, path: string, contents: Source): TreeSource {
+export function createSourceNode(name: string, path: string, contents: SourceDetails): TreeSource {
   return {
     type: "source",
     name,

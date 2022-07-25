@@ -6,7 +6,8 @@ import type { UIThunkAction } from "ui/actions";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { Pause } from "protocol/thread/pause";
 
-import { getSelectedFrame, getThreadContext, getSelectedLocation } from "../../selectors";
+import { getSelectedFrame, getThreadContext } from "../../selectors";
+import { getSelectedLocation } from "ui/reducers/sources";
 
 import { fetchScopes } from "./fetchScopes";
 import { setFramePositions } from "./setFramePositions";

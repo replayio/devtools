@@ -27,6 +27,7 @@ import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpo
 
 import type { Breakpoint } from "./types";
 import { FocusRegion } from "ui/state/timeline";
+import { getSelectedLocation } from "ui/reducers/sources";
 export type { Breakpoint } from "./types";
 
 export enum AnalysisStatus {
@@ -354,7 +355,7 @@ export function getBreakpointsDisabled(state: UIState) {
 
 export const getBreakpointsForSelectedSource = createSelector(
   getBreakpointsList,
-  (state: UIState) => state.sources.selectedLocation?.sourceId,
+  (state: UIState) => getSelectedLocation(state)?.sourceId,
   (breakpoints, sourceId) => {
     if (!sourceId) {
       return [];

@@ -12,22 +12,24 @@ import { basename } from "../utils/path";
 import debounce from "lodash/debounce";
 import actions from "../actions";
 import {
-  getSourceList,
   getQuickOpenEnabled,
   getQuickOpenQuery,
   getQuickOpenType,
   getQuickOpenProject,
-  getSelectedSource,
-  getSourceContent,
-  getSourcesLoading,
   getSymbols,
   getTabs,
-  getDisplayedSources,
   isSymbolsLoading,
   getContext,
   getShowOnlyOpenSources,
   getSourcesForTabs,
 } from "../selectors";
+import {
+  getAllSourceDetails,
+  getSelectedSource,
+  getSourcesLoading,
+  getSourceContentsLoaded,
+  getSourceDetailsEntities,
+} from "ui/reducers/sources";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { memoizeLast } from "../utils/memoizeLast";
@@ -43,7 +45,6 @@ import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
-import { getSourceCount } from "../reducers/sources";
 
 const maxResults = 100;
 
@@ -493,24 +494,25 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 function mapStateToProps(state: UIState) {
   const selectedSource = getSelectedSource(state)!;
   const tabs = getTabs(state);
+  const sourceList = getAllSourceDetails(state);
 
   return {
     cx: getContext(state),
-    displayedSources: getDisplayedSources(state),
+    displayedSources: getSourceDetailsEntities(state),
     enabled: getQuickOpenEnabled(state),
-    globalFunctions: getGlobalFunctions(state),
+    globalFunctions: getGlobalFunctions(state) || [],
     globalFunctionsLoading: isGlobalFunctionsLoading(state),
     project: getQuickOpenProject(state),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),
     selectedContentLoaded: selectedSource
-      ? !!getSourceContent(state, selectedSource.id)
+      ? getSourceContentsLoaded(state, selectedSource.id)
       : undefined,
     selectedSource,
     showOnlyOpenSources: getShowOnlyOpenSources(state),
-    sourceCount: getSourceCount(state),
-    sourceList: getSourceList(state),
+    sourceList,
     sourcesForTabs: getSourcesForTabs(state),
+    sourceCount: sourceList.length,
     sourcesLoading: getSourcesLoading(state),
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),

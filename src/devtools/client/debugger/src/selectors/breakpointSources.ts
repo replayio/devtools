@@ -7,11 +7,9 @@ import uniq from "lodash/uniq";
 import { createSelector } from "reselect";
 import type { UIState } from "ui/state";
 
-import { resourceAsSourceBase, Source } from "../reducers/sources";
-import { getSources } from "../reducers/sources";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 import type { Breakpoint } from "../reducers/types";
 import { isBreakable, isLogpoint, sortSelectedBreakpoints } from "../utils/breakpoint";
-import { makeShallowQuery, memoizeResourceShallow } from "../utils/resource";
 import { getFilename } from "../utils/source";
 
 import { getBreakpointsList } from "./breakpoints";
@@ -20,6 +18,21 @@ function getBreakpointsForSource(sourceId: string, breakpoints: Breakpoint[]) {
   return sortSelectedBreakpoints(breakpoints).filter(bp => bp.location.sourceId == sourceId);
 }
 
+export const findBreakpointSources = createSelector(
+  getBreakpointsList,
+  getSourceDetailsEntities,
+  (breakpoints, detailsEntities) => {
+    const uniqueSourceIds = uniq(breakpoints.map(bp => bp.location.sourceId));
+    const breakpointSources = uniqueSourceIds
+      .map(sourceId => detailsEntities[sourceId]!)
+      .filter(Boolean);
+    // TODO Filter by blackboxed too
+    const filtered = breakpointSources;
+    return sortBy(filtered, source => getFilename(source));
+  }
+);
+
+/*
 export const findBreakpointSources = (state: UIState) => {
   const breakpoints = getBreakpointsList(state);
   const sources = getSources(state);
@@ -35,6 +48,7 @@ const queryBreakpointSources = makeShallowQuery({
     return sortBy(filtered, source => getFilename(source));
   },
 });
+*/
 
 export const getBreakpointSources = createSelector(
   getBreakpointsList,

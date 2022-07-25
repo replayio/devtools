@@ -5,7 +5,7 @@ import {
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 import type { UIThunkAction } from "ui/actions";
 
-import { getSources } from "../reducers/sources";
+import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 import { formatProjectFunctions } from "../utils/quick-open";
 
 export function loadGlobalFunctions(): UIThunkAction {
@@ -19,10 +19,10 @@ export function loadGlobalFunctions(): UIThunkAction {
 
     await ThreadFront.ensureAllSources();
 
-    const sourceById = getSources(getState()).values;
+    const sourceById = getSourceDetailsEntities(getState());
     // Empty query to grab all of the functions, which we can easily filter later.
     const query = "";
-    const sourceIds = getSourceIDsToSearch(sourceById);
+    const sourceIds = getSourceIDsToSearch(sourceById as Record<string, SourceDetails>);
 
     const globalFns: any[] = [];
 

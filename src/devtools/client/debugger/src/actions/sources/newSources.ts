@@ -17,21 +17,19 @@ import { makeSourceId } from "../../client/create";
 import { setRequestedBreakpoint } from "../../reducers/breakpoints";
 import type { Context } from "../../reducers/pause";
 import { SourceActor } from "../../reducers/source-actors";
-import type { Source } from "../../reducers/sources";
 import {
   getBlackBoxList,
-  getSource,
-  getSourceFromId,
   hasSourceActor,
-  getPendingSelectedLocation,
   getPendingBreakpointsForSource,
   getContext,
 } from "../../selectors";
+
+import { getSourceDetails, SourceDetails } from "ui/reducers/sources";
 import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
-import { experimentalLoadSourceText } from "ui/reducers/sources";
+import { experimentalLoadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
 
 interface SourceData {
   source: {
@@ -56,12 +54,12 @@ interface SourceInfo {
 
 // If a request has been made to show this source, go ahead and
 // select it.
-function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
+function checkSelectedSource(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
-    const pendingLocation = getPendingSelectedLocation(state);
+    const persistedLocation = getPreviousPersistedLocation(state);
 
-    const pendingUrl = pendingLocation?.url || pendingLocation?.sourceUrl;
+    const pendingUrl = persistedLocation?.sourceUrl;
     if (!pendingUrl) {
       return;
     }
@@ -74,8 +72,8 @@ function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
       const { selectLocation } = await import("../sources");
       await dispatch(
         selectLocation(cx, {
-          column: pendingLocation.column,
-          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
+          column: persistedLocation.column,
+          line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
           sourceId: source.id,
         })
       );
@@ -86,7 +84,7 @@ function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     // source may have been modified by selectLocation
-    const source = getSource(getState(), sourceId);
+    const source = getSourceDetails(getState(), sourceId);
     if (!source) {
       return;
     }
@@ -121,7 +119,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   };
 }
 
-function restoreBlackBoxedSources(cx: Context, sources: Source[]): UIThunkAction {
+function restoreBlackBoxedSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
   return async dispatch => {
     const tabs = getBlackBoxList();
     if (tabs.length == 0) {
@@ -160,20 +158,27 @@ export function newQueuedSources(sourceInfo: SourceInfo[]): UIThunkAction<Promis
   };
 }
 
-export function newOriginalSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
+// TODO Delete this!
+export function newOriginalSource(sourceInfo: SourceData): UIThunkAction<Promise<SourceDetails>> {
   return async dispatch => {
     const sources = await dispatch(newOriginalSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
+
+// TODO Delete this!
+export function newOriginalSources(
+  sourceInfo: SourceData[]
+): UIThunkAction<Promise<SourceDetails[]>> {
   return async (dispatch, getState) => {
     const state = getState();
     const seen = new Set();
-    const sources: Source[] = [];
+    const sources: SourceDetails[] = [];
 
+    // TODO Rewrite "check pending" handling
+    /*
     for (const { id, url } of sourceInfo) {
-      if (seen.has(id) || getSource(state, id!)) {
+      if (seen.has(id) || getSourceDetails(state, id!)) {
         continue;
       }
 
@@ -201,20 +206,26 @@ export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Prom
     for (const source of sources) {
       dispatch(checkPendingBreakpoints(cx, source.id));
     }
+    */
 
     return sources;
   };
 }
 
-export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
+export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promise<SourceDetails>> {
   return async dispatch => {
     const sources = await dispatch(newGeneratedSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
+export function newGeneratedSources(
+  sourceInfo: SourceData[]
+): UIThunkAction<Promise<SourceDetails[]>> {
   return async (dispatch, getState, { ThreadFront }) => {
     const resultIds: string[] = [];
+
+    // TODO Rewrite "check pending" handling
+    /*
     const newSourcesObj: Record<string, Source> = {};
     const newSourceActors: SourceActor[] = [];
 
@@ -237,7 +248,7 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
         url = undefined;
       }
 
-      if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
+      if (!getSourceDetails(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
           extensionName: source.extensionName,
           id: newId,
@@ -282,18 +293,21 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
     for (const { source } of newSourceActors) {
       dispatch(checkPendingBreakpoints(cx, source));
     }
+    */
 
-    return resultIds.map(id => getSourceFromId(getState(), id));
+    return resultIds.map(id => getSourceDetails(getState(), id)!);
   };
 }
 
+/*
 function addSources(cx: Context, sources: Source[]): UIThunkAction {
   return dispatch => {
     dispatch({ cx, sources, type: "ADD_SOURCES" });
   };
 }
+*/
 
-function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
+function checkNewSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
   return async (dispatch, getState) => {
     for (const source of sources) {
       dispatch(checkSelectedSource(cx, source));

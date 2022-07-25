@@ -15,10 +15,9 @@ import type { UIThunkAction } from "ui/actions";
 import type { clientCommands } from "devtools/client/debugger/src/client/commands";
 import type { SourceRange } from "devtools/client/debugger/src/client/commands";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import type { Source, SourceWithContent } from "../../reducers/sources";
-import { getSourceActorsForSource } from "../../selectors";
 
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import { SourceDetails } from "ui/reducers/sources";
 
 async function blackboxActors(
   state: UIState,

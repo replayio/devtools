@@ -9,11 +9,11 @@ export { onTokenMouseOver } from "./token-events";
 export { onLineMouseOver } from "./line-events";
 
 import { SourceLocation } from "graphql";
+import { SourceDetails } from "ui/reducers/sources";
 import { SearchQueryModifiers } from "../build-query";
 import { createEditor } from "./create-editor";
 import type { SourceEditor, EditorWithDoc } from "./source-editor";
 import { findNext, findPrev } from "./source-search";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
 
 let editor: SourceEditor | null;
 
@@ -207,7 +207,7 @@ export function lineAtHeight({ codeMirror }: ObjWithEditor, event: MouseEvent) {
 
 export function getSourceLocationFromMouseEvent(
   { codeMirror }: ObjWithEditor,
-  source: Source,
+  source: SourceDetails,
   e: MouseEvent
 ) {
   const { line, ch } = codeMirror!.coordsChar({

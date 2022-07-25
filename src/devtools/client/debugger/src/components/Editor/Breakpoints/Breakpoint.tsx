@@ -15,7 +15,7 @@ import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
 import type { Breakpoint as BreakpointType } from "../../../reducers/types";
-import type { SelectedSource } from "../../../selectors";
+import type { SourceDetails } from "ui/reducers/sources";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
@@ -32,7 +32,7 @@ type BreakpointProps = PropsFromRedux & {
   breakpoint: BreakpointType;
   editor: $FixTypeLater;
   cx: Context;
-  selectedSource: SelectedSource;
+  selectedSource: SourceDetails;
 };
 
 class Breakpoint extends PureComponent<BreakpointProps> {

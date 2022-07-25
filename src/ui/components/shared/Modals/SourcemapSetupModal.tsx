@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { getSelectedSourceWithContent } from "devtools/client/debugger/src/selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
@@ -44,7 +44,7 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state)!,
+    selectedSource: getSelectedSource(state)!,
   }),
   { hideModal: actions.hideModal }
 );

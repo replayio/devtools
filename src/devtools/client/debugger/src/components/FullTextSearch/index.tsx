@@ -10,13 +10,9 @@ import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { trackEvent } from "ui/utils/telemetry";
 import { UIState } from "ui/state";
 
+import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 import actions from "../../actions";
-import {
-  getContext,
-  getSources,
-  getFullTextSearchQuery,
-  getFullTextSearchFocus,
-} from "../../selectors";
+import { getContext, getFullTextSearchQuery, getFullTextSearchFocus } from "../../selectors";
 
 import { getEditor } from "../../utils/editor";
 
@@ -33,7 +29,7 @@ function sanitizeQuery(query: string) {
 
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
-  sourcesById: getSources(state).values,
+  sourcesById: getSourceDetailsEntities(state),
   query: getFullTextSearchQuery(state),
   focused: getFullTextSearchFocus(state),
 });
@@ -114,7 +110,12 @@ export class FullTextSearch extends Component<PropsFromRedux, FTSState> {
     setFullTextQuery(sanitizedQuery);
     this.setState({ focusedItem: null });
     if (sanitizedQuery && query !== this.state.query && sanitizedQuery.length >= 3) {
-      search(sanitizedQuery, sourcesById, updateResults, includeNodeModules);
+      search(
+        sanitizedQuery,
+        sourcesById as Record<string, SourceDetails>,
+        updateResults,
+        includeNodeModules
+      );
       return sanitizedQuery;
     }
 

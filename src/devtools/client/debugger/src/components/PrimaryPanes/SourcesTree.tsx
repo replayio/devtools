@@ -14,13 +14,17 @@ import type { UIState } from "ui/state";
 // Selectors
 import {
   getShownSource,
-  getSelectedSource,
-  getSourcesLoading,
   getExpandedState,
-  getDisplayedSources,
   getFocusedSourceItem,
   getContext,
 } from "../../selectors";
+
+import {
+  getSelectedSource,
+  getSourcesLoading,
+  SourceDetails,
+  getSourceDetailsEntities,
+} from "ui/reducers/sources";
 
 // Actions
 import actions from "../../actions";
@@ -37,11 +41,11 @@ import {
   getSourceFromNode,
   nodeHasChildren,
   updateTree,
+  SourcesMap,
 } from "../../utils/sources-tree";
 import { parse } from "../../utils/url";
 import { trackEvent } from "ui/utils/telemetry";
 import { TreeDirectory, TreeNode, TreeSource } from "../../utils/sources-tree/types";
-import { Source } from "../../reducers/sources";
 
 type $FixTypeLater = any;
 
@@ -53,7 +57,11 @@ function shouldAutoExpand(depth: number, item: TreeNode) {
   return item.name === "";
 }
 
-function findSource(sources: Record<string, Source>, itemPath: string, source: Source) {
+function findSource(
+  sources: Record<string, SourceDetails>,
+  itemPath: string,
+  source: SourceDetails
+) {
   if (source) {
     return sources[source.id];
   }
@@ -63,7 +71,7 @@ function findSource(sources: Record<string, Source>, itemPath: string, source: S
 const mapStateToProps = (state: UIState) => {
   const selectedSource = getSelectedSource(state);
   const shownSource = getShownSource(state);
-  const sources = getDisplayedSources(state);
+  const sources = getSourceDetailsEntities(state) as Record<string, SourceDetails>;
 
   return {
     cx: getContext(state),
@@ -99,7 +107,7 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
     const { sources } = this.props;
 
     const state = createTree({
-      sources,
+      sources: sources as SourcesMap,
     }) as STState;
 
     if (props.shownSource) {
@@ -192,7 +200,9 @@ class SourcesTree extends Component<PropsFromRedux, STState> {
 
   isEmpty() {
     const { sourceTree } = this.state;
-    // @ts-expect-error single/array mismatch
+    if (!Array.isArray(sourceTree.contents)) {
+      return true;
+    }
     return sourceTree.contents.length === 0;
   }
 

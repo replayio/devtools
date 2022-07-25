@@ -4,7 +4,7 @@
 
 import type { UIState } from "ui/state";
 
-import { getSelectedLocation } from "../reducers/sources";
+import { getSelectedLocation } from "ui/reducers/sources";
 
 import { getSelectedFrame } from "./pause";
 

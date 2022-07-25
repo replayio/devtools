@@ -2,7 +2,7 @@ import { useContext, useState, useEffect } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { getSourceList, getSourcesLoading } from "devtools/client/debugger/src/selectors";
+import { getAllSourceDetails, getSourcesLoading } from "ui/reducers/sources";
 import { SourceLocation, SearchSourceContentsMatch } from "@replayio/protocol";
 
 export type CypressResult = {
@@ -13,7 +13,7 @@ export type CypressResult = {
 export function useFetchCypressSpec() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
-  const sourceList = useAppSelector(getSourceList);
+  const sourceList = useAppSelector(getAllSourceDetails);
   const sourcesLoading = useAppSelector(getSourcesLoading);
   const [results, setResults] = useState<CypressResult[] | null>(null);
 

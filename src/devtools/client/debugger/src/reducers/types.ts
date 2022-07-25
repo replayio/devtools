@@ -221,43 +221,6 @@ export type XScopeVariables = {
 };
 
 /**
- * Frame
- * @memberof types
- * @static
- */
-export type Frame = {
-  id: FrameId;
-  thread: string;
-  displayName: string;
-  location: SourceLocation;
-  generatedLocation: SourceLocation;
-  source: Source | null | undefined;
-  scope?: Scope;
-  // FIXME Define this type more clearly
-  this: Record<string, any>;
-  framework?: string;
-  isOriginal?: boolean;
-  originalDisplayName?: string;
-  originalVariables?: XScopeVariables;
-  library?: string;
-  index: number;
-  asyncCause: null | string;
-  state: "on-stack" | "suspended" | "dead";
-};
-export type ChromeFrame = {
-  id: FrameId;
-  displayName: string;
-  scopeChain: any;
-  generatedLocation: SourceLocation;
-  location: SourceLocation | null | undefined;
-};
-export type OriginalFrame = {
-  displayName: string;
-  variables?: Record<string, any>;
-  location?: SourceLocation;
-};
-
-/**
  * ContextMenuItem
  *
  * @memberof types
@@ -266,7 +229,7 @@ export type OriginalFrame = {
 export type ContextMenuItem = {
   id: string;
   label: string;
-  accesskey: string;
+  accesskey?: string;
   disabled: boolean;
   click: (...args: Array<any>) => any;
 };
@@ -319,24 +282,6 @@ export type LoadedObject = {
   value: any;
 };
 
-/**
- * Pause
- * @memberof types
- * @static
- */
-export type Pause = {
-  thread: string;
-  frame: Frame;
-  frames: Frame[];
-  why: Why;
-  loadedObjects?: LoadedObject[];
-};
-
-/**
- * Expression
- * @memberof types
- * @static
- */
 export type Expression = {
   input: string;
   value: Record<string, any>;
@@ -373,6 +318,8 @@ export type Grip = {
   message?: string;
   name?: string;
 };
+
+/*
 export type TextSourceContent = {
   type: "text";
   value: string;
@@ -384,6 +331,7 @@ export type WasmSourceContent = {
     binary: Record<string, any>;
   };
 };
+*/
 
 /**
  * Source
@@ -391,6 +339,7 @@ export type WasmSourceContent = {
  * @memberof types
  * @static
  */
+/*
 export type Source = {
   readonly id: SourceId;
   readonly url: URL;
@@ -401,6 +350,7 @@ export type Source = {
   readonly isExtension: boolean;
   readonly isOriginal: boolean;
 };
+*/
 
 /**
  * Script

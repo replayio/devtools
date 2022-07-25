@@ -9,7 +9,7 @@ import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";
 import { WiredFrame } from "protocol/thread/pause";
 import { createSelector } from "reselect";
-import { getSources } from "devtools/client/debugger/src/reducers/sources";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
@@ -126,12 +126,16 @@ export const getFocusedRequests = (state: UIState) => {
   return filterToFocusRegion(requests, focusRegion);
 };
 
-export const getFormattedFrames = createSelector(getFrames, getSources, (frames, sources) => {
-  return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {
-    // @ts-ignore WiredFrame vs SelectedFrame mismatch
-    return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) };
-  }, {});
-});
+export const getFormattedFrames = createSelector(
+  getFrames,
+  getSourceDetailsEntities,
+  (frames, sources) => {
+    return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {
+      // @ts-ignore WiredFrame vs SelectedFrame mismatch
+      return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) };
+    }, {});
+  }
+);
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;

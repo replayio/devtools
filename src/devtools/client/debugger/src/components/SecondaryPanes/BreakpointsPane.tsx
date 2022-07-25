@@ -1,7 +1,7 @@
 import React from "react";
+import { MiniSource } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { removeBreakpoint, removeBreakpointsInSource } from "../../actions/breakpoints/breakpoints";
-import { Source } from "../../reducers/types";
 import { Breakpoint, Context } from "../../selectors";
 import { getBreakpointSources } from "../../selectors/breakpointSources";
 import Breakpoints from "./Breakpoints";
@@ -19,9 +19,7 @@ export default function BreakpointsPane() {
       onRemoveBreakpoint={(cx: Context, breakpoint: Breakpoint) =>
         dispatch(removeBreakpoint(cx, breakpoint))
       }
-      onRemoveBreakpoints={(cx: Context, source: Source) =>
-        dispatch(removeBreakpointsInSource(cx, source))
-      }
+      onRemoveBreakpoints={(cx, source) => dispatch(removeBreakpointsInSource(cx, source))}
     />
   );
 }

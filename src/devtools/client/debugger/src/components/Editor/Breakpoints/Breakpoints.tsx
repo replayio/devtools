@@ -9,10 +9,8 @@ import type { UIState } from "ui/state";
 import type { Context } from "../../../reducers/pause";
 import Breakpoint from "./Breakpoint";
 
-import {
-  getSelectedSource,
-  getFirstVisibleBreakpoints,
-} from "devtools/client/debugger/src/selectors";
+import { getFirstVisibleBreakpoints } from "devtools/client/debugger/src/selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 
 const connector = connect((state: UIState) => ({
@@ -34,7 +32,8 @@ class Breakpoints extends Component<BreakpointsProps> {
   render() {
     const { cx, breakpoints, selectedSource, editor } = this.props;
 
-    if (!selectedSource || !breakpoints || selectedSource.isBlackBoxed) {
+    // TODO Fix blackboxing
+    if (!selectedSource || !breakpoints /*|| selectedSource.isBlackBoxed*/) {
       return null;
     }
 

@@ -17,8 +17,6 @@ import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
 import {
   getFirstBreakpointPosition,
   getSymbols,
-  getSource,
-  getSourceContent,
   getRequestedBreakpointLocations,
 } from "../../selectors";
 import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
@@ -28,7 +26,7 @@ import {
   fetchPossibleBreakpointsForSource,
   getPossibleBreakpointsForSource,
 } from "ui/reducers/possibleBreakpoints";
-import { getSourceDetails } from "ui/reducers/sources";
+import { getSourceDetails, getSourceContent } from "ui/reducers/sources";
 import { Location } from "@replayio/protocol";
 
 function _setBreakpoint(breakpoint: Breakpoint): UIThunkAction {
@@ -119,7 +117,7 @@ export function addBreakpoint(
       return;
     }
 
-    const source = getSource(getState(), location.sourceId);
+    const source = getSourceDetails(getState(), location.sourceId);
     if (!source) {
       return;
     }

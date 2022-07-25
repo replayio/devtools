@@ -6,13 +6,8 @@ import { UIThunkAction } from "ui/actions";
 import type { Context } from "../reducers/pause";
 
 import { closeActiveSearch, clearHighlightLineRange } from "../reducers/ui";
-import {
-  getSelectedSourceWithContent,
-  getFileSearchModifiers,
-  getFileSearchQuery,
-  getFileSearchResults,
-} from "../selectors";
-import { isFulfilled } from "../utils/async-value";
+import { getFileSearchModifiers, getFileSearchQuery, getFileSearchResults } from "../selectors";
+import { getSelectedSourceWithContent, isFulfilled } from "ui/reducers/sources";
 
 import {
   clearSearch,
@@ -29,7 +24,7 @@ type $FixTypeLater = any;
 export function doSearch(cx: Context, query: string, editor: $FixTypeLater): UIThunkAction {
   return (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
-    if (!selectedSource || !selectedSource.content) {
+    if (!selectedSource || !selectedSource.value) {
       return;
     }
 
@@ -46,7 +41,7 @@ export function doSearchForHighlight(
 ): UIThunkAction {
   return async (dispatch, getState) => {
     const selectedSource = getSelectedSourceWithContent(getState());
-    if (!selectedSource || !selectedSource.content) {
+    if (!selectedSource || !selectedSource.value) {
       return;
     }
     dispatch(searchContentsForHighlight(query, editor, line, ch));
@@ -106,13 +101,13 @@ export function searchContents(
     if (
       !editor ||
       !selectedSource ||
-      !selectedSource.content ||
-      !isFulfilled(selectedSource.content) ||
+      !selectedSource.value ||
+      !isFulfilled(selectedSource) ||
       !modifiers
     ) {
       return;
     }
-    const selectedContent = selectedSource.content.value;
+    const selectedContent = selectedSource.value;
 
     const ctx = { ed: editor, cm: editor.codeMirror };
 
@@ -121,7 +116,7 @@ export function searchContents(
       return;
     }
 
-    const text = selectedContent!.value;
+    const text = selectedContent.value;
     const matches = await getMatches(query, text, modifiers);
 
     const res = find(ctx, query, true, modifiers, focusFirstResult);
@@ -145,7 +140,7 @@ export function searchContentsForHighlight(
     const modifiers = getFileSearchModifiers(getState());
     const selectedSource = getSelectedSourceWithContent(getState());
 
-    if (!query || !editor || !selectedSource || !selectedSource.content || !modifiers) {
+    if (!query || !editor || !selectedSource || !selectedSource.value || !modifiers) {
       return;
     }
 

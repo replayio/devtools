@@ -8,10 +8,8 @@ import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import type { SymbolDeclarations } from "../reducers/ast";
 import type { SourceActor } from "../reducers/source-actors";
-import type { Source, SourceWithContent } from "../reducers/sources";
-import type { SourceContent, SourceDetails } from "ui/reducers/sources";
+import { LoadingStatus, SourceContent, MiniSource } from "ui/reducers/sources";
 
-import { isFulfilled } from "./async-value";
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";
 import { parse as parseURL } from "./url";
@@ -33,7 +31,7 @@ const javascriptLikeExtensions = ["marko", "es6", "vue", "jsm"];
 
 const IGNORED_URLS = ["debugger eval code", "XStringBundle"];
 
-function getPath(source: Source) {
+function getPath(source: MiniSource) {
   const { path } = getURL(source);
   let lastIndex = path.lastIndexOf("/");
   let nextToLastIndex = path.lastIndexOf("/", lastIndex - 1);
@@ -50,7 +48,7 @@ function getPath(source: Source) {
   return result;
 }
 
-export function shouldBlackbox(source: Source) {
+export function shouldBlackbox(source: MiniSource) {
   if (!source) {
     return false;
   }
@@ -67,7 +65,7 @@ export function shouldBlackbox(source: Source) {
  * javascript files.
  *
  */
-export function isJavaScript(source: Source, content: SourceContent["value"]) {
+export function isJavaScript(source: MiniSource, content: SourceContent["value"]) {
   const extension = getFileExtension(source).toLowerCase();
   const contentType = content?.contentType;
   return (
@@ -76,7 +74,7 @@ export function isJavaScript(source: Source, content: SourceContent["value"]) {
   );
 }
 
-export function isPretty(source: { url?: string }) {
+export function isPretty(source: MiniSource) {
   return isPrettyURL(source.url);
 }
 
@@ -84,7 +82,7 @@ export function isPrettyURL(url?: string) {
   return url ? url.endsWith(":formatted") : false;
 }
 
-export function isBowerComponent(source: Source) {
+export function isBowerComponent(source: MiniSource) {
   if (!source?.url) {
     return false;
   }
@@ -93,7 +91,7 @@ export function isBowerComponent(source: Source) {
   return url.includes("bower_components");
 }
 
-export function isNodeModule(source?: Source) {
+export function isNodeModule(source?: MiniSource) {
   if (!source?.url) {
     return false;
   }
@@ -109,7 +107,7 @@ export function getPrettySourceURL(url?: string) {
   return `${url}:formatted`;
 }
 
-export function getFileExtension(source: Source) {
+export function getFileExtension(source: MiniSource) {
   const { path } = getURL(source);
   if (!path) {
     return "";
@@ -119,11 +117,11 @@ export function getFileExtension(source: Source) {
   return lastIndex !== -1 ? path.slice(lastIndex + 1) : "";
 }
 
-export function isNotJavaScript(source: Source) {
+export function isNotJavaScript(source: MiniSource) {
   return ["css", "svg", "png"].includes(getFileExtension(source));
 }
 
-export function isInvalidUrl(url: UrlResult, source: Source) {
+export function isInvalidUrl(url: UrlResult, source: MiniSource) {
   return (
     !source.url ||
     !url.group ||
@@ -159,7 +157,10 @@ export function getFormattedSourceId(id: string) {
  * Gets a readable filename from a source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
  */
-export function getFilename(source: Source, rawSourceURL = getRawSourceURL(source.url)) {
+export function getFilename(
+  source: { id: string; url?: string },
+  rawSourceURL = getRawSourceURL(source.url)
+) {
   const { id } = source;
   if (!rawSourceURL) {
     return getFormattedSourceId(id);
@@ -172,14 +173,14 @@ export function getFilename(source: Source, rawSourceURL = getRawSourceURL(sourc
 /**
  * Provides a middle-trunated filename
  */
-export function getTruncatedFileName(source: Source, querystring = "", length = 30) {
+export function getTruncatedFileName(source: MiniSource, querystring = "", length = 30) {
   return truncateMiddleText(`${getFilename(source)}${querystring}`, length);
 }
 
 /* Gets path for files with same filename for editor tabs, breakpoints, etc.
  * Pass the source, and list of other sources
  */
-export function getDisplayPath(mySource: Source, sources: Source[]) {
+export function getDisplayPath(mySource: MiniSource, sources: MiniSource[]) {
   const rawSourceURL = getRawSourceURL(mySource.url);
   const filename = getFilename(mySource, rawSourceURL);
 
@@ -229,7 +230,7 @@ export function getDisplayPath(mySource: Source, sources: Source[]) {
  * Gets a readable source URL for display purposes.
  * If the source does not have a URL, the source ID will be returned instead.
  */
-export function getFileURL(source: Source, truncate = true) {
+export function getFileURL(source: MiniSource, truncate = true) {
   const { url, id } = source;
   if (!url) {
     return getFormattedSourceId(id);
@@ -281,7 +282,7 @@ export function getSourceLineCount(content: SourceContent["value"]) {
 
 // eslint-disable-next-line complexity
 export function getMode(
-  source: Source,
+  source: MiniSource,
   content: SourceContent["value"],
   symbols: SymbolDeclarations
 ) {
@@ -374,8 +375,8 @@ type SourceContentObject = {
 // Cache line-split source file text
 const sourceContentToLines = new WeakMap<SourceContentObject, string[]>();
 
-export const getLineText = (asyncContent: SourceWithContent["content"], line: number) => {
-  if (!asyncContent || !isFulfilled(asyncContent)) {
+export const getLineText = (asyncContent?: SourceContent, line: number = 0) => {
+  if (!asyncContent || asyncContent.status !== LoadingStatus.LOADED) {
     return "";
   }
 
@@ -399,8 +400,8 @@ export const getLineText = (asyncContent: SourceWithContent["content"], line: nu
 };
 
 export function getTextAtPosition(
-  asyncContent: SourceWithContent["content"],
-  location: { column?: number; line?: number }
+  asyncContent?: SourceContent,
+  location: { column?: number; line?: number } = {}
 ) {
   const { column, line = 0 } = location;
 
@@ -408,7 +409,7 @@ export function getTextAtPosition(
   return lineText.slice(column, column! + 100).trim();
 }
 
-export function getSourceClassnames(source?: Source) {
+export function getSourceClassnames(source?: MiniSource & { isBlackBoxed?: boolean }) {
   // Conditionals should be ordered by priority of icon!
   const defaultClassName = "file";
 
@@ -425,16 +426,12 @@ export function getSourceClassnames(source?: Source) {
   if (source.isBlackBoxed) {
     return "blackBox";
   }
-
-  if (isUrlExtension(source.url)) {
-    return "extension";
-  }
   */
 
   return sourceTypes[getFileExtension(source) as keyof typeof sourceTypes] || defaultClassName;
 }
 
-export function getRelativeUrl(source: Source, root: string) {
+export function getRelativeUrl(source: MiniSource, root: string) {
   const { group, path } = getURL(source);
   if (!root) {
     return path;
@@ -445,7 +442,7 @@ export function getRelativeUrl(source: Source, root: string) {
   return url.slice(url.indexOf(root) + root.length + 1);
 }
 
-export function underRoot(source: Source, root: string) {
+export function underRoot(source: MiniSource, root: string) {
   if (source.url && source.url.includes("chrome://")) {
     const { group, path } = getURL(source);
     return (group + path).includes(root);
@@ -454,27 +451,12 @@ export function underRoot(source: Source, root: string) {
   return source.url && source.url.includes(root);
 }
 
-export function getSourceQueryString(source?: Source) {
+export function getSourceQueryString(source?: MiniSource) {
   if (!source) {
     return;
   }
 
   return parseURL(getRawSourceURL(source.url)).search;
-}
-
-export function isUrlExtension(url: string) {
-  return url.includes("moz-extension:") || url.includes("chrome-extension");
-}
-
-export function isExtensionDirectoryPath(url: string) {
-  if (isUrlExtension(url)) {
-    const urlArr = url.replace(/\/+/g, "/").split("/");
-    let extensionIndex = urlArr.indexOf("moz-extension:");
-    if (extensionIndex === -1) {
-      extensionIndex = urlArr.indexOf("chrome-extension:");
-    }
-    return !urlArr[extensionIndex + 2];
-  }
 }
 
 export function getPlainUrl(url: string) {

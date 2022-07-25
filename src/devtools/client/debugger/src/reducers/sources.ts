@@ -27,6 +27,8 @@ import { getPrettySourceURL, getPlainUrl, getTextAtPosition } from "../utils/sou
 import { hasSourceActor, getSourceActor, getSourceActors, SourceActor } from "./source-actors";
 import { SourceLocation } from "./types";
 
+// export type Source = never;
+/*
 export interface SourceContentValue {
   contentType: string;
   type: string;
@@ -53,9 +55,11 @@ export interface Source {
 }
 
 export type SourceResources = ResourceState<Source>;
+*/
 
 // Several types TBD here
 export interface SourcesState {
+  /*
   sources: SourceResources;
   urls: Record<string, ResourceId[]>;
   plainUrls: Record<string, string[]>;
@@ -70,6 +74,7 @@ export interface SourcesState {
   chromeAndExtensionsEnabled: boolean;
   focusedItem: unknown;
   sourcesLoading: boolean;
+  */
 }
 
 export interface HitCount {
@@ -96,32 +101,10 @@ export function initialSourcesState(): SourcesState {
   };
 }
 
-interface AddBreakpointPositionsAction extends Action<"ADD_BREAKPOINT_POSITIONS"> {
-  source: Source;
-  positions: Record<string, Location & { sourceUrl: string }[]>;
-}
-
-interface InsertSourceActorsAction extends Action<"INSERT_SOURCE_ACTORS"> {
-  items: SourceActor[];
-}
-
-interface RemoveSourceActorsAction extends Action<"Remove_SOURCE_ACTORS"> {
-  items: SourceActor[];
-}
-
-interface SourceTextLoadedAction extends Action<"LOAD_SOURCE_TEXT"> {
-  sourceId: string;
-  epoch: number;
-  status: "start" | "error";
-  error?: unknown;
-  value: {
-    text: string;
-    contentType: string;
-  };
-}
-
 function update(state = initialSourcesState(), action: AnyAction) {
+  /*
   let location = null;
+
 
   switch (action.type) {
     case "ADD_SOURCE":
@@ -209,9 +192,12 @@ function update(state = initialSourcesState(), action: AnyAction) {
     case "sources/allSourcesReceived":
       return { ...state, sourcesLoading: false };
   }
+  */
 
   return state;
 }
+
+/*
 
 export const resourceAsSourceBase = memoizeResourceShallow(
   ({ content, ...source }: Source) => source
@@ -224,11 +210,15 @@ const resourceAsSourceWithContent = memoizeResourceShallow(({ content, ...source
 }));
 
 export type SourceWithContent = ReturnType<typeof resourceAsSourceWithContent>;
+*/
+
 /*
+
  * Add sources to the sources store
  * - Add the source to the sources store
  * - Add the source URL to the urls map
  */
+/*
 function addSources(state: SourcesState, sources: Source[]) {
   state = {
     ...state,
@@ -280,12 +270,14 @@ function insertSourceActors(state: SourcesState, action: InsertSourceActorsActio
 
   return state;
 }
+*/
 
 /*
  * Update sources when the worker list changes.
  * - filter source actor lists so that missing threads no longer appear
  * - NOTE: we do not remove sources for destroyed threads
  */
+/*
 function removeSourceActors(state: SourcesState, action: RemoveSourceActorsAction) {
   const { items } = action;
 
@@ -303,10 +295,11 @@ function removeSourceActors(state: SourcesState, action: RemoveSourceActorsActio
 
   return state;
 }
-
+*/
 /*
  * Update a source's loaded text content.
  */
+/*
 function updateLoadedState(state: SourcesState, action: SourceTextLoadedAction) {
   const { sourceId } = action;
 
@@ -339,11 +332,13 @@ function updateLoadedState(state: SourcesState, action: SourceTextLoadedAction) 
     ]),
   };
 }
+*/
 
 /*
  * Update a source when its state changes
  * e.g. the text was loaded, it was blackboxed
  */
+/*
 function updateBlackboxFlag(state: SourcesState, sourceId: string, isBlackBoxed: boolean) {
   // If there is no existing version of the source, it means that we probably
   // ended up here as a result of an async action, and the sources were cleared
@@ -365,6 +360,7 @@ function updateBlackboxFlag(state: SourcesState, sourceId: string, isBlackBoxed:
   };
 }
 
+
 function updateBlackBoxList(url: string, isBlackBoxed: boolean) {
   const tabs = getBlackBoxList();
   const i = tabs.indexOf(url);
@@ -378,7 +374,7 @@ function updateBlackBoxList(url: string, isBlackBoxed: boolean) {
   // @ts-expect-error Check on actual prefs usage here
   prefs.tabsBlackBoxed = tabs;
 }
-
+*/
 export function getBlackBoxList(): string[] {
   // @ts-expect-error Check on actual prefs usage here
   return prefs.tabsBlackBoxed || [];
@@ -394,6 +390,7 @@ export function getBlackBoxList(): string[] {
 // pick off the piece of state we're interested in. It's impossible
 // (right now) to type those wrapped functions.
 
+/*
 const getSourcesState = (state: UIState) => state.sources;
 
 export function getSourceThreads(state: UIState, source: Source) {
@@ -690,5 +687,6 @@ export function getTextAtLocation(
 export function getSourcesLoading(state: UIState) {
   return state.sources.sourcesLoading;
 }
+*/
 
 export default update;

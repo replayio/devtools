@@ -7,7 +7,7 @@
 import { parse } from "../url";
 import { getUnicodeHostname, getUnicodeUrlPath } from "devtools/client/shared/unicode-url";
 
-import type { Source } from "../../reducers/sources";
+import type { MiniSource } from "ui/reducers/sources";
 
 export function getFilenameFromURL(url: string) {
   const { pathname } = parse(url);
@@ -37,7 +37,7 @@ export interface ParsedUrl {
 
 const def: ParsedUrl = { path: "", group: "", filename: "" };
 
-export function getURL(source: Source, defaultDomain = "") {
+export function getURL(source: MiniSource, defaultDomain = "") {
   const { url } = source;
   if (!url) {
     return def;

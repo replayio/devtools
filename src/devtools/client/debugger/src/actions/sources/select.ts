@@ -19,7 +19,6 @@ import { trackEvent } from "ui/utils/telemetry";
 
 import type { Context } from "../../reducers/pause";
 import { getFrames, getSelectedFrameId } from "../../reducers/pause";
-import type { Source } from "../../reducers/sources";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
@@ -30,37 +29,20 @@ import {
   getSourceByUrl,
   SourceDetails,
   selectLocation as setSelectedLocation,
+  clearSelectedLocation,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { loadSourceText } from "./loadSourceText";
 import { setSymbols } from "./symbols";
 
-type PartialLocation = Parameters<typeof createLocation>[0];
+export type PartialLocation = Parameters<typeof createLocation>[0];
 
 interface PendingSelectedLocationOptions {
   line: number;
   column: number;
 }
-
-export const setPendingSelectedLocation = (
-  cx: Context,
-  url: string,
-  options?: PendingSelectedLocationOptions
-) => ({
-  type: "SET_PENDING_SELECTED_LOCATION",
-  cx,
-  url,
-  line: options ? options.line : null,
-  column: options ? options.column : null,
-});
-
-export const clearSelectedLocation = (cx: Context) => ({
-  type: "CLEAR_SELECTED_LOCATION",
-  cx,
-});
 
 /**
  * Deterministically select a source that has a given URL. This will
@@ -77,11 +59,11 @@ export function selectSourceURL(
   cx: Context,
   url: string,
   options: PendingSelectedLocationOptions
-): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
+): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState) => {
     const source = getSourceByUrl(getState(), url);
     if (!source) {
-      return dispatch(setPendingSelectedLocation(cx, url, options));
+      return;
     }
 
     const sourceId = source.id;
@@ -111,7 +93,7 @@ export function selectSource(
 export function deselectSource(): UIThunkAction {
   return (dispatch, getState) => {
     const cx = getThreadContext(getState());
-    dispatch(clearSelectedLocation(cx));
+    dispatch(clearSelectedLocation());
   };
 }
 
@@ -135,7 +117,7 @@ export function selectLocation(
   cx: Context,
   location: PartialLocation,
   openSourcesTab = true
-): UIThunkAction<Promise<{ type: string; cx: Context } | undefined>> {
+): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState, { client, ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
@@ -165,7 +147,7 @@ export function selectLocation(
     }
     if (!source) {
       // If there is no source we deselect the current selected source
-      return dispatch(clearSelectedLocation(cx));
+      return dispatch(clearSelectedLocation());
     }
 
     const activeSearch = getActiveSearch(getState());

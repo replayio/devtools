@@ -24,23 +24,18 @@ import {
   isPretty,
   shouldBlackbox,
 } from "../../utils/source";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
 import { getTabMenuItems } from "../../utils/tabs";
 
-import {
-  getSelectedSource,
-  getActiveSearch,
-  getSourcesForTabs,
-  getHasSiblingOfSameName,
-  getContext,
-} from "../../selectors";
+import { getActiveSearch, getSourcesForTabs, getContext } from "../../selectors";
+
+import { getSelectedSource, getHasSiblingOfSameName, SourceDetails } from "ui/reducers/sources";
 
 import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
 
 interface TabProps {
-  source: Source;
+  source: SourceDetails;
   onDragOver: React.DragEventHandler<HTMLDivElement>;
   onDragStart: React.DragEventHandler<HTMLDivElement>;
   onDragEnd: React.DragEventHandler<HTMLDivElement>;
