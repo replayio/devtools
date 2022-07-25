@@ -3,7 +3,7 @@ import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
 import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
-import { NamedValue as ProtocolNamedValue, SessionId } from "@replayio/protocol";
+import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
