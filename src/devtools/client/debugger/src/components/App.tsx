@@ -5,45 +5,51 @@
 import React, { Component, useEffect, useState, useRef } from "react";
 import PropTypes from "prop-types";
 
-import { connect } from "react-redux";
-import { features } from "../utils/prefs";
-import { prefs } from "../../../../../ui/utils/prefs";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 import actions from "../actions";
 import { setUnexpectedError } from "ui/actions/errors";
 import A11yIntention from "./A11yIntention";
-import { ShortcutsModal } from "./ShortcutsModal";
-import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
-
-import {
-  getActiveSearch,
-  getPaneCollapse,
-  getQuickOpenEnabled,
-  getSelectedSource,
-} from "../selectors";
 
 import { getSelectedPanel } from "ui/reducers/layout";
-import { getToolboxLayout } from "ui/reducers/layout";
 import { useGetUserSettings } from "ui/hooks/settings";
 
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import { EditorPane } from "./Editor/EditorPane";
 
-class Debugger extends Component {
+const mapStateToProps = (state: UIState) => ({
+  selectedPanel: getSelectedPanel(state),
+});
+
+const connector = connect(mapStateToProps, {
+  refreshCodeMirror: actions.refreshCodeMirror,
+  setUnexpectedError,
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type DebuggerProps = PropsFromRedux & { wrapper: HTMLDivElement };
+
+class Debugger extends Component<DebuggerProps> {
+  shortcuts = new KeyShortcuts({ window, target: this.props.wrapper });
+
   getChildContext = () => {
+    // @ts-expect-error L10n must be a global?
     return { shortcuts: this.shortcuts, l10n: L10N };
   };
 
-  constructor(props) {
-    super(props);
-    this.shortcuts = new KeyShortcuts({ window, target: props.wrapper });
-  }
+  childContextTypes = {
+    globalShortcuts: PropTypes.object,
+    shortcuts: PropTypes.object,
+    l10n: PropTypes.object,
+  };
 
   componentDidMount() {
     this.props.refreshCodeMirror();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: DebuggerProps) {
     const { selectedPanel, refreshCodeMirror } = this.props;
 
     // Only refresh CodeMirror when moving from a non-debugger panel to the debugger panel. Otherwise,
@@ -73,14 +79,8 @@ class Debugger extends Component {
   }
 }
 
-Debugger.childContextTypes = {
-  globalShortcuts: PropTypes.object,
-  shortcuts: PropTypes.object,
-  l10n: PropTypes.object,
-};
-
-function DebuggerLoader(props) {
-  const wrapperNode = useRef();
+function DebuggerLoader(props: any) {
+  const wrapperNode = useRef<HTMLDivElement>(null);
   const { loading: loadingSettings } = useGetUserSettings();
   return (
     <div className="debugger" ref={wrapperNode}>
@@ -89,14 +89,4 @@ function DebuggerLoader(props) {
   );
 }
 
-const mapStateToProps = state => ({
-  selectedPanel: getSelectedPanel(state),
-  selectedSource: getSelectedSource(state),
-  toolboxLayout: getToolboxLayout(state),
-  startPanelCollapsed: getPaneCollapse(state),
-});
-
-export default connect(mapStateToProps, {
-  refreshCodeMirror: actions.refreshCodeMirror,
-  setUnexpectedError,
-})(DebuggerLoader);
+export default connector(DebuggerLoader);

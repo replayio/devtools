@@ -15,17 +15,11 @@ import {
 import { isFulfilled } from "../utils/async-value";
 
 import {
-  // @ts-expect-error
   clearSearch,
-  // @ts-expect-error
   find,
-  // @ts-expect-error
   findNext,
-  // @ts-expect-error
   findPrev,
-  // @ts-expect-error
   removeOverlay,
-  // @ts-expect-error
   searchSourceForHighlight,
 } from "../utils/editor";
 import { getMatches } from "../workers/search";
@@ -180,6 +174,7 @@ export function traverseResults(cx: Context, rev: boolean, editor: $FixTypeLater
     if (modifiers) {
       const matchedLocations = matches || [];
       const findArgs = [ctx, query, true, modifiers];
+      // @ts-expect-error ignore args spreading
       const results = rev ? findPrev(...findArgs) : findNext(...findArgs);
 
       if (!results) {

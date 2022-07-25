@@ -399,7 +399,6 @@ export type Source = {
   readonly relativeUrl: URL;
   readonly extensionName: string | null | undefined;
   readonly isExtension: boolean;
-  readonly isWasm: boolean;
   readonly isOriginal: boolean;
 };
 

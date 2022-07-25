@@ -3,18 +3,19 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-
+import type { Editor } from "codemirror";
+import type { SourceEditor as SE, CodeMirror as CM } from "./source-editor";
 import { assert } from "protocol/utils";
 import { features, prefs } from "../prefs";
 
-let editorWaiter;
-let SourceEditor;
-let CodeMirror;
+let editorWaiter: Promise<typeof SE>;
+let SourceEditor: typeof SE;
+let CodeMirror: typeof CM;
 
 export async function waitForEditor() {
   if (!editorWaiter) {
     editorWaiter = import("./source-editor").then(imported => {
-      SourceEditor = imported.default;
+      SourceEditor = imported.SourceEditor;
       CodeMirror = imported.CodeMirror;
       return SourceEditor;
     });
@@ -29,8 +30,12 @@ export function getCodeMirror() {
 
 export function createEditor() {
   assert(SourceEditor, "CodeMirror must have been loaded");
-  const gutters = ["breakpoints", "CodeMirror-linenumbers"];
+  const gutters: (string | { className: string; style?: string })[] = [
+    "breakpoints",
+    "CodeMirror-linenumbers",
+  ];
 
+  // @ts-expect-error why is this pref field not recognized?
   if (features.hitCounts) {
     gutters.push({ className: "hit-markers", style: "width: 22px;" });
   }

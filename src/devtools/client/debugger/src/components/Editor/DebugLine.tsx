@@ -4,6 +4,10 @@
 
 //
 import { PureComponent } from "react";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
+
 import {
   toEditorLine,
   toEditorColumn,
@@ -14,11 +18,21 @@ import {
 } from "../../utils/editor";
 import { isException } from "../../utils/pause";
 import { getIndentation } from "../../utils/indentation";
-import { connect } from "react-redux";
 import { getPauseReason, getDebugLineLocation } from "../../selectors";
 
-export class DebugLine extends PureComponent {
-  debugExpression;
+const mapStateToProps = (state: UIState) => {
+  return {
+    location: getDebugLineLocation(state),
+    why: getPauseReason(state),
+  };
+};
+
+const connector = connect(mapStateToProps);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export class DebugLine extends PureComponent<PropsFromRedux> {
+  debugExpression: any;
 
   componentDidMount() {
     const { why, location } = this.props;
@@ -30,7 +44,7 @@ export class DebugLine extends PureComponent {
     this.clearDebugLine(why, location);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: PropsFromRedux) {
     const { why, location } = this.props;
 
     startOperation();
@@ -39,7 +53,7 @@ export class DebugLine extends PureComponent {
     endOperation();
   }
 
-  setDebugLine(why, location) {
+  setDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
     if (!location) {
       return;
     }
@@ -51,6 +65,7 @@ export class DebugLine extends PureComponent {
 
     const line = toEditorLine(location.line);
     let { markTextClass, lineClass } = this.getTextClasses(why);
+    // @ts-expect-error method doesn't exist on Doc
     doc.addLineClass(line, "line", lineClass);
 
     const lineText = doc.getLine(line);
@@ -59,6 +74,7 @@ export class DebugLine extends PureComponent {
 
     // If component updates because user clicks on
     // another source tab, codeMirror will be null.
+    // @ts-expect-error doc.cm doesn't exist
     const columnEnd = doc.cm ? getTokenEnd(doc.cm, line, column) : null;
 
     if (columnEnd === null) {
@@ -67,12 +83,12 @@ export class DebugLine extends PureComponent {
 
     this.debugExpression = doc.markText(
       { ch: column, line },
-      { ch: columnEnd, line },
+      { ch: columnEnd!, line },
       { className: markTextClass }
     );
   }
 
-  clearDebugLine(why, location) {
+  clearDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
     if (!location) {
       return;
     }
@@ -87,10 +103,11 @@ export class DebugLine extends PureComponent {
       return;
     }
     const { lineClass } = this.getTextClasses(why);
+    // @ts-expect-error method doesn't exist on Doc
     doc.removeLineClass(line, "line", lineClass);
   }
 
-  getTextClasses(why) {
+  getTextClasses(why: PropsFromRedux["why"]) {
     if (why && isException(why)) {
       return {
         markTextClass: "debug-expression-error",
@@ -106,11 +123,4 @@ export class DebugLine extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    location: getDebugLineLocation(state),
-    why: getPauseReason(state),
-  };
-};
-
-export default connect(mapStateToProps)(DebugLine);
+export default connector(DebugLine);

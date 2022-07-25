@@ -2,18 +2,24 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 export * from "./source-documents";
 export * from "./source-search";
 export * from "../ui";
 export { onTokenMouseOver } from "./token-events";
 export { onLineMouseOver } from "./line-events";
 
+import { SourceLocation } from "graphql";
+import { SearchQueryModifiers } from "../build-query";
 import { createEditor } from "./create-editor";
+import type { SourceEditor, EditorWithDoc } from "./source-editor";
 import { findNext, findPrev } from "./source-search";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
 
-let editor;
+let editor: SourceEditor | null;
+
+type $FixTypeLater = any;
+
+type ObjWithEditor = { codeMirror: EditorWithDoc };
 
 export function getEditor() {
   if (editor) {
@@ -50,7 +56,13 @@ export function endOperation() {
   codeMirror.endOperation();
 }
 
-export function traverseResults(e, ctx, query, dir, modifiers) {
+export function traverseResults(
+  e: KeyboardEvent,
+  ctx: $FixTypeLater,
+  query: string,
+  dir: "next" | "prev",
+  modifiers: SearchQueryModifiers
+) {
   e.stopPropagation();
   e.preventDefault();
 
@@ -61,15 +73,15 @@ export function traverseResults(e, ctx, query, dir, modifiers) {
   }
 }
 
-export function toEditorLine(lineOrOffset) {
+export function toEditorLine(lineOrOffset?: number) {
   return lineOrOffset ? lineOrOffset - 1 : 1;
 }
 
-export function fromEditorLine(line) {
+export function fromEditorLine(line: number) {
   return line + 1;
 }
 
-export function toEditorColumn(lineText, column) {
+export function toEditorColumn(lineText: string, column: number) {
   if (!lineText) {
     return 0;
   }
@@ -86,7 +98,7 @@ export function toEditorColumn(lineText, column) {
   return unitOffset;
 }
 
-export function fromEditorColumn(lineText, column) {
+export function fromEditorColumn(lineText: string, column: number) {
   let pointOffset = 0;
   let unitOffset = 0;
   for (const c of lineText) {
@@ -99,7 +111,7 @@ export function fromEditorColumn(lineText, column) {
   return pointOffset;
 }
 
-export function scrollToColumn(codeMirror, line, column) {
+export function scrollToColumn(codeMirror: EditorWithDoc, line: number, column: number) {
   const { top, left } = codeMirror.charCoords({ line, ch: column }, "local");
 
   if (!isVisible(codeMirror, top, left)) {
@@ -111,14 +123,15 @@ export function scrollToColumn(codeMirror, line, column) {
   }
 }
 
-function isVisible(codeMirror, top, left) {
-  function withinBounds(x, min, max) {
+function isVisible(codeMirror: EditorWithDoc, top: number, left: number) {
+  function withinBounds(x: number, min: number, max: number) {
     return x >= min && x <= max;
   }
 
   const scrollArea = codeMirror.getScrollInfo();
   const charWidth = codeMirror.defaultCharWidth();
   const fontHeight = codeMirror.defaultTextHeight();
+  // @ts-expect-error scroll fields not in Doc ?
   const { scrollTop, scrollLeft } = codeMirror.doc;
 
   const inXView = withinBounds(
@@ -133,7 +146,7 @@ function isVisible(codeMirror, top, left) {
 }
 
 export function getLocationsInViewport(
-  { codeMirror },
+  { codeMirror }: ObjWithEditor,
   // Offset represents an allowance of characters or lines offscreen to improve
   // perceived performance of column breakpoint rendering
   offsetHorizontalCharacters = 100
@@ -147,6 +160,7 @@ export function getLocationsInViewport(
   }
   const charWidth = codeMirror.defaultCharWidth();
   const scrollArea = codeMirror.getScrollInfo();
+  // @ts-expect-error scroll fields not in Doc ?
   const { scrollLeft } = codeMirror.doc;
 
   const leftColumn = Math.floor(
@@ -174,21 +188,29 @@ export function getLocationsInViewport(
   };
 }
 
-export function markText({ codeMirror }, className, { start, end }) {
-  return codeMirror.markText(
+export function markText(
+  { codeMirror }: ObjWithEditor,
+  className: string,
+  { start, end }: { start: SourceLocation; end: SourceLocation }
+) {
+  return codeMirror!.markText(
     { ch: start.column, line: start.line },
     { ch: end.column, line: end.line },
     { className }
   );
 }
 
-export function lineAtHeight({ codeMirror }, event) {
-  const editorLine = codeMirror.lineAtHeight(event.clientY);
+export function lineAtHeight({ codeMirror }: ObjWithEditor, event: MouseEvent) {
+  const editorLine = codeMirror!.lineAtHeight(event.clientY);
   return fromEditorLine(editorLine);
 }
 
-export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
-  const { line, ch } = codeMirror.coordsChar({
+export function getSourceLocationFromMouseEvent(
+  { codeMirror }: ObjWithEditor,
+  source: Source,
+  e: MouseEvent
+) {
+  const { line, ch } = codeMirror!.coordsChar({
     left: e.clientX,
     top: e.clientY,
   });
@@ -203,35 +225,36 @@ export function getSourceLocationFromMouseEvent({ codeMirror }, source, e) {
   };
 }
 
-export function forEachLine(codeMirror, iter) {
+export function forEachLine(codeMirror: EditorWithDoc, iter: $FixTypeLater) {
   codeMirror.operation(() => {
+    // @ts-expect-error iter doesn't exist
     codeMirror.doc.iter(0, codeMirror.lineCount(), iter);
   });
 }
 
-export function removeLineClass(codeMirror, line, className) {
+export function removeLineClass(codeMirror: EditorWithDoc, line: number, className: string) {
   codeMirror.removeLineClass(line, "line", className);
 }
 
-export function clearLineClass(codeMirror, className) {
-  forEachLine(codeMirror, line => {
+export function clearLineClass(codeMirror: EditorWithDoc, className: string) {
+  forEachLine(codeMirror, (line: number) => {
     removeLineClass(codeMirror, line, className);
   });
 }
 
-export function getTextForLine(codeMirror, line) {
+export function getTextForLine(codeMirror: EditorWithDoc, line: number) {
   return codeMirror.getLine(line - 1).trim();
 }
 
-export function getCursorLine(codeMirror) {
+export function getCursorLine(codeMirror: EditorWithDoc) {
   return codeMirror.getCursor().line;
 }
 
-export function getCursorColumn(codeMirror) {
+export function getCursorColumn(codeMirror: EditorWithDoc) {
   return codeMirror.getCursor().ch;
 }
 
-export function getTokenEnd(codeMirror, line, column) {
+export function getTokenEnd(codeMirror: EditorWithDoc, line: number, column: number) {
   const token = codeMirror.getTokenAt({
     line,
     ch: column,
@@ -241,6 +264,6 @@ export function getTokenEnd(codeMirror, line, column) {
   return tokenString === "{" || tokenString === "[" ? null : token.end;
 }
 
-export function inBreakpointPanel(e) {
-  return e.relatedTarget.closest?.(".breakpoint-panel");
+export function inBreakpointPanel(e: React.MouseEvent<HTMLDivElement>) {
+  return (e.relatedTarget as HTMLElement).closest?.(".breakpoint-panel");
 }

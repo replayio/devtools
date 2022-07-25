@@ -11,9 +11,8 @@
 
 import { UIThunkAction } from "ui/actions";
 import type { Context } from "../reducers/pause";
-import type { Source } from "../reducers/types";
+import type { Source, SourceWithContent } from "../reducers/sources";
 
-// @ts-expect-error
 import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
@@ -52,7 +51,7 @@ export function moveTabBySourceId(sourceId: string, tabIndex: number) {
  * @memberof actions/tabs
  * @static
  */
-export function closeTab(cx: Context, source: Source): UIThunkAction {
+export function closeTab(cx: Context, source: Source | SourceWithContent): UIThunkAction {
   return (dispatch, getState, { client }) => {
     removeDocument(source.id);
 

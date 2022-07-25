@@ -12,7 +12,7 @@ function getFilePath(item) {
 export function FullTextResults({ results, onItemSelect, focusedItem, onFocus }) {
   const { status, matchesBySource } = results;
   if (!results.query) {
-    return;
+    return null;
   }
 
   if (!matchesBySource.length) {

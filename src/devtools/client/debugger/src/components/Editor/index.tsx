@@ -3,17 +3,19 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-
 import debounce from "lodash/debounce";
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { bindActionCreators } from "redux";
+import { bindActionCreators, Dispatch } from "redux";
 import { isFirefox } from "ui/utils/environment";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import classnames from "classnames";
 
+import type { UIState } from "ui/state";
+
+import type { SourceEditor } from "../../utils/editor/source-editor";
 import { getIndentation } from "../../utils/indentation";
 
 import actions from "../../actions";
@@ -64,16 +66,57 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
+import { SourceContent } from "../../reducers/sources";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
 
-class Editor extends PureComponent {
-  $editorWrapper;
-  constructor(props) {
-    super(props);
+const mapStateToProps = (state: UIState) => {
+  const selectedSource = selectors.getSelectedSourceWithContent(state);
 
-    this.shortcuts = new KeyShortcuts({ window, target: document });
+  return {
+    cx: selectors.getThreadContext(state),
+    contextMenu: getContextMenu(state),
+    selectedLocation: selectors.getSelectedLocation(state),
+    selectedSource,
+    searchOn: selectors.getActiveSearch(state) === "file",
+    symbols: selectors.getSymbols(state, selectedSource as any),
+    selectedFrame: selectors.getSelectedFrame(state),
+    mode: selectors.getViewMode(state),
+  };
+};
+
+const mapDispatchToProps = (dispatch: Dispatch) => ({
+  ...bindActionCreators(
+    {
+      addBreakpointAtLine: actions.addBreakpointAtLine,
+      closeContextMenu,
+      closeTab: actions.closeTab,
+      openContextMenu,
+      toggleBlackBox: actions.toggleBlackBox,
+      traverseResults: actions.traverseResults,
+      updateCursorPosition: actions.updateCursorPosition,
+      updateViewport: actions.updateViewport,
+    },
+    dispatch
+  ),
+});
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+interface EditorState {
+  highlightedLineRange: any;
+  editor: SourceEditor | null;
+  contextMenu: any;
+}
+
+class Editor extends PureComponent<PropsFromRedux, EditorState> {
+  shortcuts = new KeyShortcuts({ window, target: document });
+  $editorWrapper: any;
+
+  constructor(props: PropsFromRedux) {
+    super(props);
 
     this.state = {
       highlightedLineRange: null,
@@ -92,11 +135,11 @@ class Editor extends PureComponent {
     return { shortcuts: this.shortcuts };
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
     this.updateEditor(nextProps);
   }
 
-  updateEditor(props) {
+  updateEditor(props: PropsFromRedux) {
     let editor = this.state.editor;
 
     if (!this.state.editor && props.selectedSource) {
@@ -104,30 +147,32 @@ class Editor extends PureComponent {
     }
 
     startOperation();
-    this.setText(props, editor);
-    this.scrollToLocation(props, editor);
+    this.setText(props, editor!);
+    this.scrollToLocation(props, editor!);
     endOperation();
 
     if (this.props.selectedSource != props.selectedSource) {
       this.props.updateViewport();
-      resizeBreakpointGutter(editor.codeMirror);
-      resizeToggleButton(editor.codeMirror);
+      resizeBreakpointGutter(editor!.codeMirror);
+      resizeToggleButton(editor!.codeMirror);
     }
   }
 
   setupEditor() {
-    const editor = getEditor();
+    const editor: SourceEditor = getEditor();
 
     // disables the default search shortcuts
+    // @ts-expect-error initShortcuts doesn't exist
     editor._initShortcuts = () => {};
     const node = ReactDOM.findDOMNode(this);
     if (node instanceof HTMLElement) {
-      editor.appendToLocalElement(node.querySelector(".editor-mount"));
+      editor.appendToLocalElement(node.querySelector(".editor-mount")!);
     }
 
     const { codeMirror } = editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
+    // @ts-expect-error event doesn't exist?
     codeMirror.on("gutterClick", this.onGutterClick);
 
     // Set code editor wrapper to be focusable
@@ -153,7 +198,7 @@ class Editor extends PureComponent {
     return editor;
   }
 
-  onClosePress = e => {
+  onClosePress = (e: React.MouseEvent) => {
     const { cx, selectedSource } = this.props;
     if (selectedSource) {
       e.preventDefault();
@@ -176,7 +221,7 @@ class Editor extends PureComponent {
   }
 
   getCurrentLine() {
-    const { codeMirror } = this.state.editor;
+    const { codeMirror } = this.state.editor!;
     const { selectedSource } = this.props;
     if (!selectedSource) {
       return;
@@ -188,8 +233,8 @@ class Editor extends PureComponent {
 
   onEditorScroll = debounce(this.props.updateViewport, 75);
 
-  onKeyDown(e) {
-    const { codeMirror } = this.state.editor;
+  onKeyDown(e: KeyboardEvent) {
+    const { codeMirror } = this.state.editor!;
     const { key, target } = e;
     const codeWrapper = codeMirror.getWrapperElement();
     const textArea = codeWrapper.querySelector("textArea");
@@ -205,7 +250,7 @@ class Editor extends PureComponent {
     } else if (key === "Enter" && target == codeWrapper) {
       e.preventDefault();
       // Focus into editor's text area
-      textArea.focus();
+      (textArea as HTMLElement)!.focus();
     }
   }
 
@@ -215,7 +260,7 @@ class Editor extends PureComponent {
    * split console. Restore it here, but preventDefault if and only if there
    * is a multiselection.
    */
-  onEscape = e => {
+  onEscape = (e: React.KeyboardEvent) => {
     if (!this.state.editor) {
       return;
     }
@@ -227,7 +272,7 @@ class Editor extends PureComponent {
     }
   };
 
-  openMenu(event) {
+  openMenu(event: MouseEvent) {
     event.stopPropagation();
     event.preventDefault();
 
@@ -244,7 +289,7 @@ class Editor extends PureComponent {
       return;
     }
 
-    if (target.getAttribute("id") === "columnmarker") {
+    if ((target as HTMLElement).getAttribute("id") === "columnmarker") {
       return;
     }
 
@@ -255,9 +300,13 @@ class Editor extends PureComponent {
     this.setState({ contextMenu: null });
   };
 
-  onGutterClick = (cm, line, gutter, ev) => {
+  onGutterClick = (cm: any, line: number, gutter: any, ev: MouseEvent) => {
     const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
-    const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, ev);
+    const sourceLocation = getSourceLocationFromMouseEvent(
+      this.state.editor!,
+      selectedSource as any,
+      ev
+    );
 
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
@@ -277,32 +326,32 @@ class Editor extends PureComponent {
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
     // e.g., the blank gutter space caused by adding a CodeMirror widget.
-    if (![...ev.target.classList].includes("CodeMirror-linenumber")) {
+    if (![...(ev.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
       return;
     }
 
     return addBreakpointAtLine(cx, sourceLine);
   };
 
-  onGutterContextMenu = event => {
+  onGutterContextMenu = (event: MouseEvent) => {
     return this.openMenu(event);
   };
 
-  onClick(e) {
-    const { cx, selectedSource, updateCursorPosition, jumpToMappedLocation } = this.props;
+  onClick(e: MouseEvent) {
+    const { cx, selectedSource, updateCursorPosition } = this.props;
 
     if (selectedSource) {
-      const sourceLocation = getSourceLocationFromMouseEvent(this.state.editor, selectedSource, e);
-
-      if (e.metaKey && e.altKey) {
-        jumpToMappedLocation(cx, sourceLocation);
-      }
+      const sourceLocation = getSourceLocationFromMouseEvent(
+        this.state.editor!,
+        selectedSource as any,
+        e
+      );
 
       updateCursorPosition(sourceLocation);
     }
   }
 
-  shouldScrollToLocation(nextProps, editor) {
+  shouldScrollToLocation(nextProps: PropsFromRedux, editor: SourceEditor) {
     const { selectedLocation, selectedSource } = this.props;
     if (
       !editor ||
@@ -322,12 +371,12 @@ class Editor extends PureComponent {
     return isFirstLoad || locationChanged || symbolsChanged;
   }
 
-  scrollToLocation(nextProps, editor) {
+  scrollToLocation(nextProps: PropsFromRedux, editor: SourceEditor) {
     const { selectedLocation, selectedSource } = nextProps;
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
       const line = toEditorLine(selectedLocation.line);
-      let column;
+      let column: number | undefined;
 
       if (selectedSource && hasDocument(selectedSource.id)) {
         const doc = getDocument(selectedSource.id);
@@ -336,11 +385,11 @@ class Editor extends PureComponent {
         column = Math.max(column, getIndentation(lineText));
       }
 
-      scrollToColumn(editor.codeMirror, line, column);
+      scrollToColumn(editor.codeMirror, line, column!);
     }
   }
 
-  setText(props, editor) {
+  setText(props: PropsFromRedux, editor: SourceEditor) {
     const { selectedSource, symbols } = props;
     if (!editor) {
       return;
@@ -355,7 +404,9 @@ class Editor extends PureComponent {
       return showLoading(editor);
     }
 
+    // @ts-expect-error stupid AsyncValue mismatches
     if (selectedSource.content.state === "rejected") {
+      // @ts-expect-error stupid AsyncValue mismatches
       let { value } = selectedSource.content;
       if (typeof value !== "string") {
         value = "Unexpected source error";
@@ -364,7 +415,12 @@ class Editor extends PureComponent {
       return this.showErrorMessage(value);
     }
 
-    return showSourceText(editor, selectedSource, selectedSource.content.value, symbols);
+    return showSourceText(
+      editor,
+      selectedSource,
+      (selectedSource.content as SourceContent).value as any,
+      symbols as any
+    );
   }
 
   clearEditor() {
@@ -376,7 +432,7 @@ class Editor extends PureComponent {
     clearEditor(editor);
   }
 
-  showErrorMessage(msg) {
+  showErrorMessage(msg: string) {
     const { editor } = this.state;
     if (!editor) {
       return;
@@ -464,40 +520,9 @@ class Editor extends PureComponent {
   }
 }
 
+// @ts-expect-error context shenanigans
 Editor.childContextTypes = {
   shortcuts: PropTypes.object,
 };
 
-const mapStateToProps = state => {
-  const selectedSource = selectors.getSelectedSourceWithContent(state);
-
-  return {
-    cx: selectors.getThreadContext(state),
-    contextMenu: getContextMenu(state),
-    selectedLocation: selectors.getSelectedLocation(state),
-    selectedSource,
-    searchOn: selectors.getActiveSearch(state) === "file",
-    symbols: selectors.getSymbols(state, selectedSource),
-    selectedFrame: selectors.getSelectedFrame(state),
-    mode: selectors.getViewMode(state),
-  };
-};
-
-const mapDispatchToProps = dispatch => ({
-  ...bindActionCreators(
-    {
-      addBreakpointAtLine: actions.addBreakpointAtLine,
-      closeContextMenu,
-      closeTab: actions.closeTab,
-      jumpToMappedLocation: actions.jumpToMappedLocation,
-      openContextMenu,
-      toggleBlackBox: actions.toggleBlackBox,
-      traverseResults: actions.traverseResults,
-      updateCursorPosition: actions.updateCursorPosition,
-      updateViewport: actions.updateViewport,
-    },
-    dispatch
-  ),
-});
-
-export default connect(mapStateToProps, mapDispatchToProps)(Editor);
+export default connector(Editor);

@@ -5,7 +5,7 @@
 //
 
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 
 import { showMenu, buildMenu } from "devtools/shared/contextmenu";
 
@@ -13,6 +13,7 @@ import SourceIcon from "../shared/SourceIcon";
 import { CloseButton } from "../shared/Button";
 import { copyToTheClipboard } from "../../utils/clipboard";
 
+import { UIState } from "ui/state";
 import { actions } from "ui/actions";
 
 import {
@@ -23,6 +24,7 @@ import {
   isPretty,
   shouldBlackbox,
 } from "../../utils/source";
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
 import { getTabMenuItems } from "../../utils/tabs";
 
 import {
@@ -37,14 +39,53 @@ import classnames from "classnames";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
 
-class Tab extends PureComponent {
-  onTabContextMenu = (event, tab) => {
+interface TabProps {
+  source: Source;
+  onDragOver: React.DragEventHandler<HTMLDivElement>;
+  onDragStart: React.DragEventHandler<HTMLDivElement>;
+  onDragEnd: React.DragEventHandler<HTMLDivElement>;
+}
+
+const mapStateToProps = (state: UIState, { source }: TabProps) => {
+  const selectedSource = getSelectedSource(state);
+
+  return {
+    cx: getContext(state),
+    tabSources: getSourcesForTabs(state),
+    selectedSource,
+    activeSearch: getActiveSearch(state),
+    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+  };
+};
+
+const connector = connect(
+  mapStateToProps,
+  {
+    selectSource: actions.selectSource,
+    copyToClipboard: actions.copyToClipboard,
+    closeTab: actions.closeTab,
+    closeTabs: actions.closeTabs,
+    showSource: actions.showSource,
+    ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
+    toggleBlackBox: actions.toggleBlackBox,
+  },
+  null,
+  {
+    forwardRef: true,
+  }
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+type FinalTabProps = PropsFromRedux & TabProps;
+
+class Tab extends PureComponent<FinalTabProps> {
+  onTabContextMenu = (event: React.MouseEvent, tab: string) => {
     event.preventDefault();
     event.stopPropagation();
     this.showContextMenu(event, tab);
   };
 
-  showContextMenu(e, tab) {
+  showContextMenu(e: React.MouseEvent, tab: string) {
     const {
       cx,
       closeTab,
@@ -62,8 +103,8 @@ class Tab extends PureComponent {
     const tabCount = tabSources.length;
     const otherTabs = tabSources.filter(t => t.id !== tab);
     const sourceTab = tabSources.find(t => t.id == tab);
-    const tabURLs = tabSources.map(t => t.url);
-    const otherTabURLs = otherTabs.map(t => t.url);
+    const tabURLs = tabSources.map(t => t.url!);
+    const otherTabURLs = otherTabs.map(t => t.url!);
 
     if (!sourceTab || !selectedSource) {
       return;
@@ -94,7 +135,7 @@ class Tab extends PureComponent {
               tabURLs.filter((t, i) => i > tabIndex)
             );
           },
-          disabled: tabCount === 1 || tabSources.some((t, i) => t === tab && tabCount - 1 === i),
+          disabled: tabCount === 1 || tabSources.some((t, i) => t.id === tab && tabCount - 1 === i),
         },
       },
       {
@@ -142,6 +183,7 @@ class Tab extends PureComponent {
   }
 
   isSourceSearchEnabled() {
+    // @ts-expect-error activeSearch possible values mismatch
     return this.props.activeSearch === "source";
   }
 
@@ -162,13 +204,13 @@ class Tab extends PureComponent {
     const active = selectedSource && sourceId == selectedSource.id && !this.isSourceSearchEnabled();
     const isPrettyCode = isPretty(source);
 
-    function onClickClose(e) {
+    function onClickClose(e: React.MouseEvent) {
       e.stopPropagation();
       trackEvent("tabs.close");
       closeTab(cx, source);
     }
 
-    function handleTabClick(e) {
+    function handleTabClick(e: React.MouseEvent) {
       e.preventDefault();
       e.stopPropagation();
       trackEvent("tabs.select");
@@ -196,39 +238,15 @@ class Tab extends PureComponent {
         onContextMenu={e => this.onTabContextMenu(e, sourceId)}
         title={getFileURL(source, false)}
       >
-        <SourceIcon source={source} shouldHide={icon => ["file", "javascript"].includes(icon)} />
+        <SourceIcon
+          source={source}
+          shouldHide={(icon: string) => ["file", "javascript"].includes(icon)}
+        />
         <div className="filename">{getTruncatedFileName(source, query)}</div>
-        <CloseButton handleClick={onClickClose} tooltip={"Close tab"} />
+        <CloseButton buttonClass="" handleClick={onClickClose} tooltip={"Close tab"} />
       </Redacted>
     );
   }
 }
 
-const mapStateToProps = (state, { source }) => {
-  const selectedSource = getSelectedSource(state);
-
-  return {
-    cx: getContext(state),
-    tabSources: getSourcesForTabs(state),
-    selectedSource,
-    activeSearch: getActiveSearch(state),
-    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-  };
-};
-
-export default connect(
-  mapStateToProps,
-  {
-    selectSource: actions.selectSource,
-    copyToClipboard: actions.copyToClipboard,
-    closeTab: actions.closeTab,
-    closeTabs: actions.closeTabs,
-    showSource: actions.showSource,
-    ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
-    toggleBlackBox: actions.toggleBlackBox,
-  },
-  null,
-  {
-    forwardRef: true,
-  }
-)(Tab);
+export default connector(Tab);

@@ -166,6 +166,7 @@ export function createLabels(
     if (snippet) {
       await waitForEditor();
       const CodeMirror = getCodeMirror();
+      // @ts-expect-error runMode doesn't exist on CodeMirror
       CodeMirror.runMode(snippet, "javascript", (text: string, className: string | null) => {
         const openingTag = className ? `<span class="cm-${className}">` : "<span>";
         secondary += `${openingTag}${escapeHtml(text)}</span>`;

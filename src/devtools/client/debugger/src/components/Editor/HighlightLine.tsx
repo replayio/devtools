@@ -2,12 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { Location } from "@replayio/protocol";
 import { Component } from "react";
+import { connect, ConnectedProps } from "react-redux";
+
 import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
-import { connect } from "react-redux";
+import { UIState } from "ui/state";
+import type { SourceWithContent } from "devtools/client/debugger/src/reducers/sources";
+
 import {
   getVisibleSelectedFrame,
   getSelectedLocation,
@@ -15,7 +19,9 @@ import {
   getPauseCommand,
 } from "../../selectors";
 
-function isDebugLine(selectedFrame, selectedLocation) {
+type TempFrame = NonNullable<ReturnType<typeof getVisibleSelectedFrame>>;
+
+function isDebugLine(selectedFrame: TempFrame | null, selectedLocation: Location) {
   if (!selectedFrame) {
     return;
   }
@@ -26,7 +32,7 @@ function isDebugLine(selectedFrame, selectedLocation) {
   );
 }
 
-function isDocumentReady(selectedSource, selectedLocation) {
+function isDocumentReady(selectedSource: SourceWithContent | null, selectedLocation: Location) {
   return (
     selectedLocation &&
     selectedSource &&
@@ -35,16 +41,33 @@ function isDocumentReady(selectedSource, selectedLocation) {
   );
 }
 
-export class HighlightLine extends Component {
-  isStepping = false;
-  previousEditorLine = null;
+const mapState = (state: UIState) => {
+  const selectedLocation = getSelectedLocation(state);
 
-  shouldComponentUpdate(nextProps) {
+  if (!selectedLocation) {
+    throw new Error("must have selected location");
+  }
+  return {
+    pauseCommand: getPauseCommand(state),
+    selectedFrame: getVisibleSelectedFrame(state),
+    selectedLocation,
+    selectedSource: getSelectedSourceWithContent(state),
+  };
+};
+
+const connector = connect(mapState);
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export class HighlightLine extends Component<PropsFromRedux> {
+  isStepping = false;
+  previousEditorLine: number | null = null;
+
+  shouldComponentUpdate(nextProps: PropsFromRedux) {
     const { selectedLocation, selectedSource } = nextProps;
     return this.shouldSetHighlightLine(selectedLocation, selectedSource);
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: PropsFromRedux) {
     this.completeHighlightLine(prevProps);
   }
 
@@ -52,7 +75,7 @@ export class HighlightLine extends Component {
     this.completeHighlightLine(null);
   }
 
-  shouldSetHighlightLine(selectedLocation, selectedSource) {
+  shouldSetHighlightLine(selectedLocation: Location, selectedSource: SourceWithContent | null) {
     const { line } = selectedLocation;
     const editorLine = toEditorLine(line);
 
@@ -67,7 +90,7 @@ export class HighlightLine extends Component {
     return true;
   }
 
-  completeHighlightLine(prevProps) {
+  completeHighlightLine(prevProps: PropsFromRedux | null) {
     const { pauseCommand, selectedLocation, selectedFrame, selectedSource } = this.props;
     if (pauseCommand) {
       this.isStepping = true;
@@ -81,7 +104,11 @@ export class HighlightLine extends Component {
     endOperation();
   }
 
-  setHighlightLine(selectedLocation, selectedFrame, selectedSource) {
+  setHighlightLine(
+    selectedLocation: Location,
+    selectedFrame: TempFrame | null,
+    selectedSource: SourceWithContent | null
+  ) {
     const { sourceId, line } = selectedLocation;
     if (!this.shouldSetHighlightLine(selectedLocation, selectedSource)) {
       return;
@@ -96,11 +123,12 @@ export class HighlightLine extends Component {
     }
 
     const doc = getDocument(sourceId);
+    // @ts-expect-error method doesn't exist
     doc.addLineClass(editorLine, "line", "highlight-line");
     this.resetHighlightLine(doc, editorLine);
   }
 
-  resetHighlightLine(doc, editorLine) {
+  resetHighlightLine(doc: any, editorLine: number) {
     const editorWrapper = document.querySelector(".editor-wrapper");
 
     if (editorWrapper === null) {
@@ -115,7 +143,7 @@ export class HighlightLine extends Component {
     setTimeout(() => doc && doc.removeLineClass(editorLine, "line", "highlight-line"), duration);
   }
 
-  clearHighlightLine(selectedLocation, selectedSource) {
+  clearHighlightLine(selectedLocation: Location, selectedSource: SourceWithContent | null) {
     if (!isDocumentReady(selectedSource, selectedLocation)) {
       return;
     }
@@ -123,6 +151,7 @@ export class HighlightLine extends Component {
     const { line, sourceId } = selectedLocation;
     const editorLine = toEditorLine(line);
     const doc = getDocument(sourceId);
+    // @ts-expect-error method doesn't exist
     doc.removeLineClass(editorLine, "line", "highlight-line");
   }
 
@@ -131,7 +160,7 @@ export class HighlightLine extends Component {
   }
 }
 
-export default connect(state => {
+export default connect((state: UIState) => {
   const selectedLocation = getSelectedLocation(state);
 
   if (!selectedLocation) {

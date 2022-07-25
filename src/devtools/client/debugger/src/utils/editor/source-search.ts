@@ -2,24 +2,43 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import buildQuery, { SearchQueryModifiers } from "../build-query";
+import { EditorWithDoc } from "./source-editor";
 
-import buildQuery from "../build-query";
+interface CharLocation {
+  line: number;
+  ch: number;
+}
+
+type $FixTypeLater = any;
 
 /**
  * @memberof utils/source-search
  * @static
  */
-function getSearchCursor(cm, query, pos, modifiers) {
+function getSearchCursor(
+  cm: $FixTypeLater,
+  query: string,
+  pos: CharLocation | null,
+  modifiers: SearchQueryModifiers
+) {
   const regexQuery = buildQuery(query, modifiers, { isGlobal: true });
   return cm.getSearchCursor(regexQuery, pos);
+}
+
+interface SearchStateType {
+  posFrom: CharLocation | null;
+  posTo: CharLocation | null;
+  query: string | null;
+  overlay: $FixTypeLater | null;
+  results: $FixTypeLater[];
 }
 
 /**
  * @memberof utils/source-search
  * @static
  */
-function SearchState() {
+function SearchState(this: SearchStateType) {
   this.posFrom = this.posTo = this.query = null;
   this.overlay = null;
   this.results = [];
@@ -29,12 +48,13 @@ function SearchState() {
  * @memberof utils/source-search
  * @static
  */
-function getSearchState(cm, query) {
+function getSearchState(cm: $FixTypeLater): SearchStateType {
+  // @ts-expect-error weird "new" error
   const state = cm.state.search || (cm.state.search = new SearchState());
   return state;
 }
 
-function isWhitespace(query) {
+function isWhitespace(query: string) {
   return !query.match(/\S/);
 }
 
@@ -52,7 +72,7 @@ function isWhitespace(query) {
  * @memberof utils/source-search
  * @static
  */
-function searchOverlay(query, modifiers) {
+function searchOverlay(query: string, modifiers: SearchQueryModifiers) {
   const regexQuery = buildQuery(query, modifiers, {
     ignoreSpaces: true,
     // regex must be global for the overlay
@@ -60,7 +80,7 @@ function searchOverlay(query, modifiers) {
   });
 
   return {
-    token: function (stream, state) {
+    token: function (stream: $FixTypeLater) {
       // set the last index to be the current stream position
       // this acts as an offset
       regexQuery.lastIndex = stream.pos;
@@ -86,13 +106,18 @@ function searchOverlay(query, modifiers) {
  * @memberof utils/source-search
  * @static
  */
-function updateOverlay(cm, state, query, modifiers) {
+function updateOverlay(
+  cm: $FixTypeLater,
+  state: SearchStateType,
+  query: string,
+  modifiers: SearchQueryModifiers
+) {
   cm.removeOverlay(state.overlay);
   state.overlay = searchOverlay(query, modifiers);
   cm.addOverlay(state.overlay, { opaque: false });
 }
 
-function updateCursor(cm, state, keepSelection) {
+function updateCursor(cm: $FixTypeLater, state: SearchStateType, keepSelection: boolean) {
   state.posTo = cm.getCursor("anchor");
   state.posFrom = cm.getCursor("head");
 
@@ -102,8 +127,8 @@ function updateCursor(cm, state, keepSelection) {
   }
 }
 
-export function getMatchIndex(count, currentIndex, rev) {
-  if (!rev) {
+export function getMatchIndex(count: number, currentIndex: number, reverse: boolean) {
+  if (!reverse) {
     if (currentIndex == count - 1) {
       return 0;
     }
@@ -126,7 +151,14 @@ export function getMatchIndex(count, currentIndex, rev) {
  * @memberof utils/source-search
  * @static
  */
-function doSearch(ctx, rev, query, keepSelection, modifiers, focusFirstResult = true) {
+function doSearch(
+  ctx: $FixTypeLater,
+  reverse: boolean,
+  query: string,
+  keepSelection: boolean,
+  modifiers: SearchQueryModifiers,
+  focusFirstResult: boolean = true
+) {
   const { cm, ed } = ctx;
   if (!cm) {
     return;
@@ -139,18 +171,18 @@ function doSearch(ctx, rev, query, keepSelection, modifiers, focusFirstResult = 
       return;
     }
 
-    const state = getSearchState(cm, query);
+    const state = getSearchState(cm);
     const isNewQuery = state.query !== query;
     state.query = query;
 
     updateOverlay(cm, state, query, modifiers);
     updateCursor(cm, state, keepSelection);
-    const searchLocation = searchNext(ctx, rev, query, isNewQuery, modifiers);
+    const searchLocation = searchNext(ctx, reverse, query, isNewQuery, modifiers);
 
     // We don't want to jump the editor
     // when we're selecting text
     if (!cm.state.selectingText && searchLocation && focusFirstResult) {
-      ed.alignLine(searchLocation.from.line, "center");
+      ed.alignLine(searchLocation.from!.line, "center");
       cm.setSelection(searchLocation.from, searchLocation.to);
     }
 
@@ -158,29 +190,37 @@ function doSearch(ctx, rev, query, keepSelection, modifiers, focusFirstResult = 
   });
 }
 
-export function searchSourceForHighlight(ctx, rev, query, keepSelection, modifiers, line, ch) {
+export function searchSourceForHighlight(
+  ctx: $FixTypeLater,
+  reverse: boolean,
+  query: string,
+  keepSelection: boolean,
+  modifiers: SearchQueryModifiers,
+  line: number,
+  ch: number
+) {
   const { cm } = ctx;
   if (!cm) {
     return;
   }
 
   return cm.operation(function () {
-    const state = getSearchState(cm, query);
+    const state = getSearchState(cm);
     const isNewQuery = state.query !== query;
     state.query = query;
 
     updateOverlay(cm, state, query, modifiers);
     updateCursor(cm, state, keepSelection);
-    findNextOnLine(ctx, rev, query, isNewQuery, modifiers, line, ch);
+    findNextOnLine(ctx, reverse, query, isNewQuery, modifiers, line, ch);
   });
 }
 
-function getCursorPos(newQuery, rev, state) {
+function getCursorPos(newQuery: boolean, reverse: boolean, state: SearchStateType) {
   if (newQuery) {
-    return rev ? state.posFrom : state.posTo;
+    return reverse ? state.posFrom : state.posTo;
   }
 
-  return rev ? state.posTo : state.posFrom;
+  return reverse ? state.posTo : state.posFrom;
 }
 
 /**
@@ -189,12 +229,18 @@ function getCursorPos(newQuery, rev, state) {
  * @memberof utils/source-search
  * @static
  */
-function searchNext(ctx, rev, query, newQuery, modifiers) {
+function searchNext(
+  ctx: $FixTypeLater,
+  reverse: boolean,
+  query: string,
+  newQuery: boolean,
+  modifiers: SearchQueryModifiers
+) {
   const { cm } = ctx;
-  let nextMatch;
+  let nextMatch: { from: CharLocation | null; to: CharLocation | null } | undefined;
   cm.operation(function () {
-    const state = getSearchState(cm, query);
-    const pos = getCursorPos(newQuery, rev, state);
+    const state = getSearchState(cm);
+    const pos = getCursorPos(newQuery, reverse, state);
 
     if (!state.query) {
       return;
@@ -202,11 +248,11 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
 
     let cursor = getSearchCursor(cm, state.query, pos, modifiers);
 
-    const location = rev ? { line: cm.lastLine(), ch: null } : { line: cm.firstLine(), ch: 0 };
+    const location = reverse ? { line: cm.lastLine(), ch: null } : { line: cm.firstLine(), ch: 0 };
 
-    if (!cursor.find(rev) && state.query) {
-      cursor = getSearchCursor(cm, state.query, location, modifiers);
-      if (!cursor.find(rev)) {
+    if (!cursor.find(reverse) && state.query) {
+      cursor = getSearchCursor(cm, state.query, location as CharLocation, modifiers);
+      if (!cursor.find(reverse)) {
         return;
       }
     }
@@ -217,15 +263,23 @@ function searchNext(ctx, rev, query, newQuery, modifiers) {
   return nextMatch;
 }
 
-function findNextOnLine(ctx, rev, query, newQuery, modifiers, line, ch) {
+function findNextOnLine(
+  ctx: $FixTypeLater,
+  reverse: boolean,
+  query: string,
+  newQuery: boolean,
+  modifiers: SearchQueryModifiers,
+  line: number,
+  ch: number
+) {
   const { cm, ed } = ctx;
   cm.operation(function () {
     const pos = { line: line - 1, ch };
     let cursor = getSearchCursor(cm, query, pos, modifiers);
 
-    if (!cursor.find(rev) && query) {
+    if (!cursor.find(reverse) && query) {
       cursor = getSearchCursor(cm, query, pos, modifiers);
-      if (!cursor.find(rev)) {
+      if (!cursor.find(reverse)) {
         return;
       }
     }
@@ -245,8 +299,8 @@ function findNextOnLine(ctx, rev, query, newQuery, modifiers, line, ch) {
  * @memberof utils/source-search
  * @static
  */
-export function removeOverlay(ctx, query) {
-  const state = getSearchState(ctx.cm, query);
+export function removeOverlay(ctx: $FixTypeLater, query: string) {
+  const state = getSearchState(ctx.cm);
   ctx.cm.removeOverlay(state.overlay);
   const { line, ch } = ctx.cm.getCursor();
   ctx.cm.doc.setSelection({ line, ch }, { line, ch }, { scroll: false });
@@ -258,8 +312,8 @@ export function removeOverlay(ctx, query) {
  * @memberof utils/source-search
  * @static
  */
-export function clearSearch(cm, query) {
-  const state = getSearchState(cm, query);
+export function clearSearch(cm: EditorWithDoc, query: string) {
+  const state = getSearchState(cm);
 
   state.results = [];
 
@@ -276,7 +330,13 @@ export function clearSearch(cm, query) {
  * @memberof utils/source-search
  * @static
  */
-export function find(ctx, query, keepSelection, modifiers, focusFirstResult) {
+export function find(
+  ctx: $FixTypeLater,
+  query: string,
+  keepSelection: boolean,
+  modifiers: SearchQueryModifiers,
+  focusFirstResult: boolean
+) {
   clearSearch(ctx.cm, query);
   return doSearch(ctx, false, query, keepSelection, modifiers, focusFirstResult);
 }
@@ -287,7 +347,12 @@ export function find(ctx, query, keepSelection, modifiers, focusFirstResult) {
  * @memberof utils/source-search
  * @static
  */
-export function findNext(ctx, query, keepSelection, modifiers) {
+export function findNext(
+  ctx: $FixTypeLater,
+  query: string,
+  keepSelection: boolean,
+  modifiers: SearchQueryModifiers
+) {
   return doSearch(ctx, false, query, keepSelection, modifiers);
 }
 
@@ -297,7 +362,12 @@ export function findNext(ctx, query, keepSelection, modifiers) {
  * @memberof utils/source-search
  * @static
  */
-export function findPrev(ctx, query, keepSelection, modifiers) {
+export function findPrev(
+  ctx: $FixTypeLater,
+  query: string,
+  keepSelection: boolean,
+  modifiers: SearchQueryModifiers
+) {
   return doSearch(ctx, true, query, keepSelection, modifiers);
 }
 

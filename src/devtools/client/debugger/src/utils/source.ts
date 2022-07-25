@@ -75,7 +75,7 @@ export function isJavaScript(source: Source, content: SourceContent["value"]) {
   );
 }
 
-export function isPretty(source: Source) {
+export function isPretty(source: { url?: string }) {
   return isPrettyURL(source.url);
 }
 

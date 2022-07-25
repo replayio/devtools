@@ -98,6 +98,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const doc = getDocument(sourceId);
 
     resizeBreakpointGutter(editor.codeMirror);
+    // @ts-expect-error method doesn't exist on Doc
     doc.setGutterMarker(line, "breakpoints", this.makeMarker());
 
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
@@ -124,8 +125,11 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     const selectedLocation = breakpoint.location;
     const line = toEditorLine(selectedLocation.line);
 
+    // @ts-expect-error method doesn't exist on Doc
     doc.setGutterMarker(line, "breakpoints", null);
+    // @ts-expect-error method doesn't exist on Doc
     doc.removeLineClass(line, "line", "new-breakpoint");
+    // @ts-expect-error method doesn't exist on Doc
     doc.removeLineClass(line, "line", "breakpoint-disabled");
   }
 

@@ -11,11 +11,11 @@ import escapeRegExp from "lodash/escapeRegExp";
  * @memberof utils/source-search
  * @static
  */
-function ignoreWhiteSpace(str) {
+function ignoreWhiteSpace(str: string) {
   return /^\s{0,2}$/.test(str) ? "(?!\\s*.*)" : str;
 }
 
-function wholeMatch(query, wholeWord) {
+function wholeMatch(query: string, wholeWord?: boolean) {
   if (query === "" || !wholeWord) {
     return query;
   }
@@ -23,7 +23,7 @@ function wholeMatch(query, wholeWord) {
   return `\\b${query}\\b`;
 }
 
-function buildFlags(caseSensitive, isGlobal) {
+function buildFlags(caseSensitive?: boolean, isGlobal?: boolean) {
   if (caseSensitive && isGlobal) {
     return "g";
   }
@@ -37,9 +37,15 @@ function buildFlags(caseSensitive, isGlobal) {
   }
 }
 
+export interface SearchQueryModifiers {
+  caseSensitive?: boolean;
+  regexMatch?: boolean;
+  wholeWord?: boolean;
+}
+
 export default function buildQuery(
-  originalQuery,
-  modifiers,
+  originalQuery: string,
+  modifiers: SearchQueryModifiers,
   { isGlobal = false, ignoreSpaces = false }
 ) {
   const { caseSensitive, regexMatch, wholeWord } = modifiers;

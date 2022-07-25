@@ -2,7 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-export const CodeMirror = require("codemirror");
+// export const CodeMirror = require("codemirror");
+import type { Editor, Doc, DocOrEditor } from "codemirror";
+import { default as CodeMirror } from "codemirror";
 
 require("codemirror/mode/javascript/javascript");
 require("codemirror/mode/htmlmixed/htmlmixed");
@@ -16,25 +18,32 @@ require("codemirror/addon/runmode/runmode");
 require("codemirror/addon/selection/active-line");
 require("codemirror/addon/edit/matchbrackets");
 
+export { CodeMirror };
+
+export type EditorWithDoc = Editor & { doc: Doc };
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;
 
-export default class Editor {
-  opts;
-  editor;
+type $FixTypeLater = any;
 
-  constructor(opts) {
+export class SourceEditor {
+  opts: $FixTypeLater;
+  // @ts-expect-error  created later
+  editor: EditorWithDoc;
+
+  constructor(opts: $FixTypeLater) {
     this.opts = opts;
   }
 
-  appendToLocalElement(node) {
-    this.editor = CodeMirror(node, this.opts);
+  appendToLocalElement(node: HTMLElement) {
+    this.editor = CodeMirror(node, this.opts) as EditorWithDoc;
   }
 
   destroy() {
     // Unlink the current document.
     if (this.editor.doc) {
+      // @ts-expect-error cm doesn't exist
       this.editor.doc.cm = null;
     }
   }
@@ -51,7 +60,7 @@ export default class Editor {
     this.editor.focus();
   }
 
-  setText(str) {
+  setText(str: string) {
     this.editor.setValue(str);
   }
 
@@ -63,12 +72,12 @@ export default class Editor {
     return this.editor.getSelection();
   }
 
-  setCursor({ line, ch }, align) {
+  setCursor({ line, ch }: { line: number; ch: number }, align: string) {
     this.alignLine(line, align);
     this.editor.setCursor({ line: line, ch: ch });
   }
 
-  setMode(value) {
+  setMode(value: string | CodeMirror.ModeSpec<CodeMirror.ModeSpecOptions>) {
     this.editor.setOption("mode", value);
   }
 
@@ -76,7 +85,7 @@ export default class Editor {
    * Replaces the current document with a new source document
    * @memberof utils/source-editor
    */
-  replaceDocument(doc) {
+  replaceDocument(doc: Doc) {
     this.editor.swapDoc(doc);
   }
 
@@ -95,7 +104,7 @@ export default class Editor {
    * bottom.
    * @memberof utils/source-editor
    */
-  alignLine(line, align = "top") {
+  alignLine(line: number, align = "top") {
     const cm = this.editor;
     const editorClientRect = cm.getWrapperElement().getBoundingClientRect();
 
@@ -131,8 +140,10 @@ export default class Editor {
    * Scrolls the view such that the given line number is the first visible line.
    * @memberof utils/source-editor
    */
-  setFirstVisibleLine(line) {
+  setFirstVisibleLine(line: number) {
     const { top } = this.editor.charCoords({ line, ch: 0 }, "local");
     this.editor.scrollTo(0, top);
   }
 }
+
+export default SourceEditor;

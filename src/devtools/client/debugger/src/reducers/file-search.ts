@@ -14,7 +14,7 @@ import type { UIState } from "ui/state";
 
 import { prefs } from "../utils/prefs";
 
-type Modifiers = {
+export type Modifiers = {
   caseSensitive: boolean;
   wholeWord: boolean;
   regexMatch: boolean;
