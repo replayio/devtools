@@ -133,7 +133,11 @@ export function formatShortcutResults() {
   ];
 }
 
-export function formatSources(sources: SourceDetails[], tabUrls: Set<string>) {
+export function formatSources(
+  sources: SourceDetails[],
+  sourcesById: Record<string, SourceDetails>,
+  tabUrls: Set<string>
+) {
   const formattedSources = [];
   const sourceURLs = new Set();
 
@@ -145,8 +149,12 @@ export function formatSources(sources: SourceDetails[], tabUrls: Set<string>) {
     }
 
     if (!!source.url && !isPrettyPrintedSource(source) && !sourceURLs.has(source.url)) {
-      formattedSources.push(formatSourcesForList(source, tabUrls));
-      sourceURLs.add(source.url);
+      const canonicalSource = sourcesById[source.canonicalId];
+
+      const sourceToShow = canonicalSource ?? source;
+
+      formattedSources.push(formatSourcesForList(sourceToShow, tabUrls));
+      sourceURLs.add(sourceToShow.url);
     }
   }
 
