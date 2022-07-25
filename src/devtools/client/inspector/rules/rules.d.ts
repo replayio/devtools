@@ -1,6 +1,6 @@
 import { ReactElement } from "react";
 import { UIStore } from "ui/actions";
-import CSSProperties from "../css-properties";
+const CSSProperties = require("third-party/css/css-properties");
 import { Inspector } from "../inspector";
 
 declare class RulesView {

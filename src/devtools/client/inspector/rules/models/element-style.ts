@@ -10,7 +10,7 @@ import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
-import CSSProperties from "../../css-properties";
+const CSSProperties = require("third-party/css/css-properties");
 import RulesView from "../rules";
 import TextProperty, { ComputedProperty } from "./text-property";
 
