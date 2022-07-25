@@ -31,6 +31,7 @@ const pausesById = new Map<PauseId, Pause>();
 
 export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
+// Connect the new Object Inspector's ObjectPreview Suspsense cache to Pause data loaded by the legacy devtools.
 type PauseDataHandler = (pauseId: PauseId, pauseData: PauseData) => void;
 const pauseDataHandlers: PauseDataHandler[] = [];
 export function addPauseDataListener(handler: PauseDataHandler) {
@@ -167,6 +168,7 @@ export class Pause {
     this.createWaiter = (async () => {
       const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
 
+      // Connect the new Object Inspector's ObjectPreview Suspsense cache to Pause data loaded by the legacy devtools.
       pauseDataHandlers.forEach(handler => handler(pauseId, data));
 
       await this.ThreadFront.ensureAllSources();
