@@ -133,7 +133,7 @@ function findSource(url: string) {
     return url;
   }
 
-  const sources = dbgSelectors.getSourceList();
+  const sources = dbgSelectors.getAllSourceDetails();
   return sources.find(s => (s.url || "").includes(url));
 }
 
@@ -142,7 +142,7 @@ function waitForSource(url: string) {
 }
 
 function countSources(url: string) {
-  const sources = dbgSelectors.getSourceList();
+  const sources = dbgSelectors.getAllSourceDetails();
   return sources.filter(s => (s.url || "").includes(url)).length;
 }
 
@@ -264,7 +264,7 @@ function waitForSelectedSource(url?: string) {
   return waitUntil(
     () => {
       const source = getSelectedSourceWithContent()! || {};
-      if (!source.content) {
+      if (!source.value) {
         return false;
       }
 
@@ -398,6 +398,8 @@ async function waitForScopeValue(name: string, value: string) {
 }
 
 async function toggleBlackboxSelectedSource() {
+  // TODO Re-enable blackboxing
+  /*
   const { getSelectedSource } = dbgSelectors;
   const blackboxed = getSelectedSource()!.isBlackBoxed;
   dbgActions.toggleBlackBox(getContext(), getSelectedSource()!);
@@ -405,6 +407,7 @@ async function toggleBlackboxSelectedSource() {
     waitingFor: "source to be blackboxed",
   });
   await ThreadFront.waitForInvalidateCommandsToFinish();
+  */
 }
 
 function findMessages(text: string, extraSelector = "") {

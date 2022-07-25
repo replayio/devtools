@@ -299,34 +299,6 @@ export function getGeneratedSourceByURL(state: UIState, url: string) {
   }
 }
 
-/*
-export const getAllSourceDetailsAsSourceMap = createSelector(
-  (state: UIState) => state.experimentalSources.sourceDetails.entities,
-  sourcesEntities => {
-    const sourcesMap: SourcesMap = {};
-    for (let [id, sourceDetails] of Object.entries(sourcesEntities)) {
-      sourcesMap[id] = convertSourceDetailsToSource(sourceDetails!);
-    }
-
-    return sourcesMap;
-  }
-);
-
-export const convertSourceDetailsToSource = (sd: SourceDetails) => {
-  const source: Source = {
-    id: sd.id,
-    url: sd.url,
-    isOriginal: isOriginalSource(sd),
-    isPrettyPrinted: sd.id.startsWith("pp"),
-    // TODO Implement blackboxing
-    isBlackBoxed: false,
-    isExtension: false,
-  };
-
-  return source;
-};
-*/
-
 export const getSourceContentsLoaded = (state: UIState, sourceId: string) => {
   const entry = getSourceContentsEntry(state, sourceId);
   return entry && isFulfilled(entry);
@@ -372,5 +344,28 @@ export const getStableLocationForLocation = (
   };
 };
 */
+
+export const selectors = {
+  getAllSourceDetails,
+  getSourceDetails,
+  getSourceDetailsEntities,
+  getSourceContentsEntry,
+  getSourcesLoading,
+  getSelectedLocation,
+  getSelectedSourceId,
+  getSelectedSource,
+  getSourcesById,
+  getCorrespondingSourceIds,
+  getSourceByUrl,
+  getSourceContent,
+  getSelectedSourceWithContent,
+  getTextAtLocation,
+  getSelectedLocationHasScrolled,
+  getUniqueUrlForSource,
+  getGeneratedSourceByURL,
+  getSourceContentsLoaded,
+  getHasSiblingOfSameName,
+  getPreviousPersistedLocation,
+};
 
 export default sourcesSlice.reducer;
