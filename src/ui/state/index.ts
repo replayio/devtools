@@ -65,7 +65,6 @@ export interface UIState {
   rules: RulesState;
   sourceActors: SourceActorsState;
   sourceTree: SourceTreeState;
-  sources: SourcesState;
   tabs: TabsState;
   threads: ThreadsState;
   timeline: TimelineState;

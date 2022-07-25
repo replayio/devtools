@@ -99,13 +99,7 @@ const sanitizeStateForDevtools = <S>(state: S) => {
 
   // Use Immer to simplify nested immutable updates when making a copy of the state
   const sanitizedState = customImmer.produce(state, (draft: any) => {
-    sanitizeContents(draft.sources?.focusedItem?.contents);
     sanitizeContents(draft.sourceTree?.focusedItem?.contents);
-
-    if (draft.sources) {
-      // This is a large lookup table of source string related values
-      draft.sources.sources = OMITTED;
-    }
 
     if (draft.experimentalSources) {
       Object.values(draft.experimentalSources.contents.entities).forEach((contentsItem: any) => {
@@ -165,6 +159,7 @@ const reduxDevToolsOptions: ReduxDevToolsOptions = {
     "protocolMessages/errorReceived",
     "protocolMessages/requestSent",
     "app/setHoveredLineNumberLocation",
+    "app/durationSeen",
     "timeline/setPlaybackPrecachedTime",
   ],
 };
