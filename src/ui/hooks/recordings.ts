@@ -483,7 +483,10 @@ export function useIsOwner() {
 
 export function useGetPersonalRecordings(
   filter: string
-): { recordings: null; loading: true } | { recordings: Recording[]; loading: false } {
+):
+  | { error: null; recordings: null; loading: true }
+  | { error: ApolloError; recordings: null; loading: false }
+  | { error: null; recordings: Recording[]; loading: false } {
   const { data, error, loading } = useQuery<GetMyRecordings, GetMyRecordingsVariables>(
     GET_MY_RECORDINGS,
     {
@@ -493,18 +496,19 @@ export function useGetPersonalRecordings(
   );
 
   if (loading) {
-    return { recordings: null, loading };
+    return { error: null, recordings: null, loading };
   }
 
   if (error) {
     console.error("Failed to fetch recordings:", error);
+    return { error, recordings: null, loading };
   }
 
   let recordings: Recording[] = [];
   if (data?.viewer) {
     recordings = data.viewer.recordings.edges.map(({ node }) => convertRecording(node)!);
   }
-  return { recordings, loading };
+  return { error: null, recordings, loading };
 }
 
 export function useGetWorkspaceRecordings(

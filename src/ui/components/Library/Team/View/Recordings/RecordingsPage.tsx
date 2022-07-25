@@ -24,7 +24,7 @@ function MyRecordingsPage({ team }: { team: typeof MY_LIBRARY_TEAM }) {
 
   if (loading || !recordings) {
     return (
-      <div className="flex flex-col flex-grow p-4 overflow-hidden">
+      <div className="flex flex-grow flex-col overflow-hidden p-4">
         <LibrarySpinner />
       </div>
     );
