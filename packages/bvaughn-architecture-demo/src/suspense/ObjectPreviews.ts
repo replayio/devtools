@@ -57,7 +57,7 @@ export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
   const objectMap = getOrCreateObjectWithPreviewMap(pauseId).objectMap;
   const object = objectMap.get(objectId);
   if (!object) {
-    throw Error(`Could not find object with id "${objectId}"`);
+    throw new ObjectPreviewError(`Could not find object with id "${objectId}"`);
   }
   return object;
 }
@@ -168,3 +168,5 @@ async function fetchObjectWithPreview(
     wakeable.reject(error);
   }
 }
+
+export class ObjectPreviewError extends Error {}
