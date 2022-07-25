@@ -4,6 +4,7 @@
 
 "use strict";
 
+import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import * as messagesActions from "devtools/client/webconsole/actions/messages";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -31,6 +32,8 @@ type EvaluationResponse = {
   topLevelAwaitRejected?: boolean;
 };
 type EvaluationResponseResult = any;
+
+export type EvaluationEventPayload = Omit<TerminalExpression, "type">;
 
 async function dispatchExpression(
   dispatch: ThunkDispatch<UIState, ThunkExtraArgs, UIAction>,
@@ -114,6 +117,19 @@ export function evaluateExpression(expression: string): UIThunkAction {
         forConsoleMessage: true,
       });
       response.evalId = evalId;
+
+      // This block of code connects the old JSTerm component and its Redux state
+      // to the new Console which reads data from React Context and Suspense.
+      // This is a temporary bridge between the old and new code.
+      const data: EvaluationEventPayload = {
+        expression,
+        frameId: frameId || null,
+        id: evalId,
+        point: pause.point!,
+        pauseId: pause.pauseId!,
+        time: pause.time!,
+      };
+      ThreadFront.emit("evaluation", data);
 
       return dispatch(onExpressionEvaluated(response));
     } catch (err: any) {

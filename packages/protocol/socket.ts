@@ -268,6 +268,21 @@ export function addEventListener<M extends EventMethods>(
       gEventListeners.set(event, data => {
         const callbacks = gEventToCallbacksMap.get(event)!;
         callbacks.forEach(callback => {
+          if (event === "Console.newMessage") {
+            // HACK (FE-337)
+            //
+            // The legacy app converts newMessage data to WiredMessages.
+            // Part of this conversion involves mapping argument values to ValueFronts,
+            // which mutate the underlying newMessage objects (in place) when fetching remote data.
+            //
+            // The new Console which uses Suspense to load remote data.
+            // The ValueFront mutations change the structure of the newMessage object though, making it more difficult to work with.
+            //
+            // Long term we should remove ValueFronts; mutating data like this is bad because it's hard to track and often unexpected.
+            // For now we can work around it by cloning the newMessage data before passing it to callbacks.
+            data = JSON.parse(JSON.stringify(data));
+          }
+
           callback(data);
         });
       });

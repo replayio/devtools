@@ -5,10 +5,15 @@
 import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
+import { isLogpoint } from "../utils/breakpoint";
 
 export const getBreakpointsList = createSelector(
   (state: UIState) => state.breakpoints.breakpoints,
   breakpoints => Object.values(breakpoints)
+);
+
+export const getLogPointsList = createSelector(getBreakpointsList, breakpoints =>
+  breakpoints.filter(point => isLogpoint(point))
 );
 
 export const getRequestedBreakpointLocations = (state: UIState) =>

@@ -16,6 +16,7 @@ export type ExperimentalUserSettings = {
 
 export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
+  enableNewConsole: boolean;
   enableNewObjectInspector: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
