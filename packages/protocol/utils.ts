@@ -77,8 +77,8 @@ export function binarySearch(start: number, end: number, callback: (mid: number)
   return start;
 }
 
-function NotAllowed() {
-  console.error("Not allowed");
+function NotAllowed(reason = "") {
+  console.trace(`Not allowed${reason ? ` (${reason})` : ""}`);
 }
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
@@ -89,22 +89,28 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   //  NotAllowed();
   //},
   //set() { NotAllowed(); },
-  get() {
+  get(target, p) {
+    if (
+      ["Symbol(immer-state)", "Symbol(immer-draftable)", "isReactComponent"].includes(p.toString())
+    ) {
+      return;
+    }
+    NotAllowed("target: " + p.toString());
     return undefined;
   },
-  apply() {
-    NotAllowed();
+  apply(target, thisArg) {
+    NotAllowed("apply: " + thisArg.toString());
   },
   construct() {
-    NotAllowed();
+    NotAllowed("construct");
     return {};
   },
-  getOwnPropertyDescriptor() {
-    NotAllowed();
+  getOwnPropertyDescriptor(target, p) {
+    NotAllowed("gOPD: " + p.toString());
     return undefined;
   },
-  ownKeys() {
-    NotAllowed();
+  ownKeys(target) {
+    NotAllowed("ownKeys: " + target);
     return [];
   },
   isExtensible() {
