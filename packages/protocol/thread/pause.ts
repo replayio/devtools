@@ -31,6 +31,18 @@ const pausesById = new Map<PauseId, Pause>();
 
 export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
+type PauseDataHandler = (pauseId: PauseId, pauseData: PauseData) => void;
+const pauseDataHandlers: PauseDataHandler[] = [];
+export function addPauseDataListener(handler: PauseDataHandler) {
+  pauseDataHandlers.push(handler);
+}
+export function removePauseDataListener(handler: PauseDataHandler) {
+  const index = pauseDataHandlers.indexOf(handler);
+  if (index >= 0) {
+    pauseDataHandlers.splice(index, 1);
+  }
+}
+
 export type WiredObject = Omit<ObjectDescription, "preview"> & {
   preview?: WiredObjectPreview;
 };
@@ -154,6 +166,9 @@ export class Pause {
     assert(!this.pauseId, "pauseId already set");
     this.createWaiter = (async () => {
       const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
+
+      pauseDataHandlers.forEach(handler => handler(pauseId, data));
+
       await this.ThreadFront.ensureAllSources();
       this._setPauseId(pauseId);
       this.point = point;

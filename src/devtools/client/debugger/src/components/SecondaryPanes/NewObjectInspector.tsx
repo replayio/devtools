@@ -2,13 +2,11 @@ import Inspector from "@bvaughn/components/inspector";
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
 import "@bvaughn/pages/variables.css";
-import { ObjectPreviewError, preCacheObjects } from "@bvaughn/src/suspense/ObjectPreviews";
 import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue, SessionId } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
-import { client } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { Component, PropsWithChildren, ReactNode, Suspense, useMemo } from "react";
+import { ReactNode, Suspense, useMemo } from "react";
 
 export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
   const pause = ThreadFront.currentPause;
@@ -56,68 +54,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
 
   return (
     <div className="preview-popup">
-      <Suspense fallback={<Loader />}>
-        <ErrorBoundary>{children}</ErrorBoundary>
-      </Suspense>
+      <Suspense fallback={<Loader />}>{children}</Suspense>
     </div>
   );
-}
-
-type ErrorBoundaryState = {
-  error: Error | null;
-};
-
-class ErrorBoundary extends Component<PropsWithChildren, ErrorBoundaryState> {
-  state: ErrorBoundaryState = {
-    error: null,
-  };
-
-  async loadPauseData(sessionId: SessionId) {
-    const pause = ThreadFront.currentPause;
-    if (pause) {
-      const { pauseId, point } = pause;
-      if (pauseId && point) {
-        const { data } = await client.Session.createPause({ point }, sessionId);
-        if (data.objects) {
-          preCacheObjects(pauseId, data.objects);
-          this.setState({ error: null });
-        }
-      }
-    }
-  }
-
-  componentDidCatch(error: Error) {
-    // const canRecover = error.message.includes('Could not find object with id');
-    // @ts-ignore
-    const canRecover = error instanceof ObjectPreviewError;
-    if (canRecover) {
-      const sessionId = ThreadFront.sessionId;
-      if (sessionId) {
-        this.loadPauseData(sessionId);
-      }
-    }
-  }
-
-  static getDerivedStateFromError(error: Error) {
-    return {
-      error,
-    };
-  }
-
-  render() {
-    const { children } = this.props;
-    const { error } = this.state;
-
-    if (error != null) {
-      // @ts-ignore
-      const canRecover = error instanceof ObjectPreviewError;
-      if (canRecover) {
-        return null;
-      } else {
-        return <pre>{error.message}</pre>;
-      }
-    } else {
-      return children;
-    }
-  }
 }
