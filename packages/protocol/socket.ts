@@ -231,7 +231,9 @@ function flushQueuedMessages() {
   gSocketOpen = true;
 }
 
-const gEventListeners = new Map<string, (ev: any) => void>();
+// TODO Once removeEventListener has a different signature, we can combine these maps.
+const gEventListeners = new Map<string, (event: any) => void>();
+let gEventToCallbacksMap: Map<string, Function[]> = new Map();
 
 export function addEventListener<M extends EventMethods>(
   event: M,
@@ -246,9 +248,7 @@ export function addEventListener<M extends EventMethods>(
         handler({ analysisId, points });
       }
     });
-    return;
-  }
-  if (event === "Analysis.analysisResult") {
+  } else if (event === "Analysis.analysisResult") {
     gEventListeners.set(event, ({ analysisId, results }: analysisResult) => {
       const callbacks = gAnalysisCallbacks.get(analysisId);
       if (callbacks) {
@@ -257,16 +257,32 @@ export function addEventListener<M extends EventMethods>(
         handler({ analysisId, results });
       }
     });
-    return;
+  } else {
+    if (!gEventToCallbacksMap.has(event)) {
+      gEventToCallbacksMap.set(event, []);
+    }
+
+    gEventToCallbacksMap.get(event)!.push(handler);
+
+    if (!gEventListeners.has(event)) {
+      gEventListeners.set(event, data => {
+        const callbacks = gEventToCallbacksMap.get(event)!;
+        callbacks.forEach(callback => {
+          callback(data);
+        });
+      });
+    }
   }
-  if (gEventListeners.has(event)) {
-    throw new Error("Duplicate event listener: " + event);
-  }
-  gEventListeners.set(event, handler);
 }
 
+// TODO This method should have the same signature as addEventListener.
+// It should only remove a specific event handler.
 export function removeEventListener<M extends EventMethods>(event: M) {
   gEventListeners.delete(event);
+
+  if (gEventToCallbacksMap.has(event)) {
+    gEventToCallbacksMap.delete(event);
+  }
 }
 
 export const client = new ProtocolClient({
