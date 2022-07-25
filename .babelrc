@@ -1,0 +1,15 @@
+{
+  "presets": [
+    [
+      "next/babel",
+      {
+        "preset-env": {
+          "targets": {
+            "chrome": "95"
+          }
+        }
+      }
+    ]
+  ],
+  "plugins": ["@babel/plugin-transform-react-display-name"]
+}
