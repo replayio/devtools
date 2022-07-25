@@ -12,7 +12,13 @@ import { UIState } from "ui/state";
 import { parseQuickOpenQuery } from "../utils/quick-open";
 
 // Ref: `MODIFIERS` and `parseQuickOpenQuery` in `../utils/quick-open.js`
-type SearchTypes = "sources" | "gotoSource" | "functions" | "variables" | "goto" | "shortcuts";
+export type SearchTypes =
+  | "sources"
+  | "gotoSource"
+  | "functions"
+  | "variables"
+  | "goto"
+  | "shortcuts";
 
 export interface QuickOpenState {
   enabled: boolean;

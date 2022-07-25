@@ -20,6 +20,7 @@ import {
   getSelectedLocation,
   SourceDetails,
   MiniSource,
+  locationSelected,
 } from "ui/reducers/sources";
 
 export interface Tab {
@@ -62,8 +63,8 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
     case "ADD_SOURCES":
       return addVisibleTabs(state, action.sources);
 
-    case "sources/selectLocation": {
-      return addSelectedSource(state, action.source);
+    case locationSelected.match(action): {
+      return addSelectedSource(state, action.payload.source);
     }
 
     default:

@@ -2,28 +2,30 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { FunctionMatch } from "@replayio/protocol";
+
 import { endTruncateStr } from "./utils";
 import { memoizeLast } from "./memoizeLast";
-import {
-  isPretty,
-  getTruncatedFileName,
-  getSourceClassnames,
-  getSourceQueryString,
-} from "./source";
+import { getTruncatedFileName, getSourceClassnames, getSourceQueryString } from "./source";
 
-export const MODIFIERS = {
+import { SourceDetails, isPrettyPrintedSource } from "ui/reducers/sources";
+import { SymbolDeclarations, FunctionDeclaration } from "../reducers/ast";
+import { Dictionary } from "@reduxjs/toolkit";
+import { SearchTypes } from "../reducers/quick-open";
+
+export const MODIFIERS: Record<string, SearchTypes> = {
   "@": "functions",
   "#": "variables",
   ":": "goto",
   "?": "shortcuts",
 };
 
-export function parseQuickOpenQuery(query) {
+export function parseQuickOpenQuery(query: string): SearchTypes {
   const startsWithModifier =
     query[0] === "@" || query[0] === "#" || query[0] === ":" || query[0] === "?";
 
   if (startsWithModifier) {
-    const modifier = query[0];
+    const modifier = query[0] as keyof typeof MODIFIERS;
     return MODIFIERS[modifier];
   }
 
@@ -36,7 +38,7 @@ export function parseQuickOpenQuery(query) {
   return "sources";
 }
 
-export function parseLineColumn(query) {
+export function parseLineColumn(query: string) {
   const [, line, column] = query.split(":");
   const lineNumber = parseInt(line, 10);
   const columnNumber = parseInt(column, 10);
@@ -48,16 +50,16 @@ export function parseLineColumn(query) {
   }
 }
 
-export function formatSourcesForList(source, tabUrls) {
+export function formatSourcesForList(source: SourceDetails, tabUrls: Set<string>) {
   const title = getTruncatedFileName(source);
-  const relativeUrlWithQuery = `${source.relativeUrl}${getSourceQueryString(source) || ""}`;
+  const relativeUrlWithQuery = `${source.url}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
   const value = relativeUrlWithQuery;
   return {
     value,
     title,
     subtitle,
-    icon: tabUrls.has(source.url)
+    icon: tabUrls.has(source.url!)
       ? "tab result-item-icon"
       : `result-item-icon ${getSourceClassnames(source)}`,
     id: source.id,
@@ -65,7 +67,7 @@ export function formatSourcesForList(source, tabUrls) {
   };
 }
 
-export function formatSymbol(symbol) {
+export function formatSymbol(symbol: FunctionDeclaration) {
   return {
     id: `${symbol.name}:${symbol.location.start.line}`,
     title: symbol.name,
@@ -75,7 +77,10 @@ export function formatSymbol(symbol) {
   };
 }
 
-export function formatProjectFunctions(functions, displayedSources) {
+export function formatProjectFunctions(
+  functions: FunctionMatch[],
+  displayedSources: Dictionary<SourceDetails>
+) {
   const sourceFunctions = functions
     .map(({ name, loc }) => {
       const source = displayedSources[loc.sourceId];
@@ -98,7 +103,7 @@ export function formatProjectFunctions(functions, displayedSources) {
   return sourceFunctions;
 }
 
-export const formatSymbols = memoizeLast(symbols => {
+export const formatSymbols = memoizeLast((symbols: SymbolDeclarations | null) => {
   if (!symbols?.functions || symbols.loading) {
     return { functions: [] };
   }
@@ -128,7 +133,7 @@ export function formatShortcutResults() {
   ];
 }
 
-export function formatSources(sources, tabUrls) {
+export function formatSources(sources: SourceDetails[], tabUrls: Set<string>) {
   const formattedSources = [];
   const sourceURLs = new Set();
 
@@ -139,7 +144,7 @@ export function formatSources(sources, tabUrls) {
       continue;
     }
 
-    if (!!source.relativeUrl && !isPretty(source) && !sourceURLs.has(source.url)) {
+    if (!!source.url && !isPrettyPrintedSource(source) && !sourceURLs.has(source.url)) {
       formattedSources.push(formatSourcesForList(source, tabUrls));
       sourceURLs.add(source.url);
     }

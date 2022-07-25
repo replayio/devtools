@@ -28,7 +28,7 @@ import {
   getSourceDetails,
   getSourceByUrl,
   SourceDetails,
-  selectLocation as setSelectedLocation,
+  locationSelected,
   clearSelectedLocation,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
@@ -159,7 +159,7 @@ export function selectLocation(
       dispatch(addTab(source));
     }
 
-    dispatch(setSelectedLocation(location));
+    dispatch(locationSelected({ location, source }));
     const layout = getToolboxLayout(getState());
 
     // Yank the user to the editor tab in case the debugger/editor is tucked in

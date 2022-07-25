@@ -156,11 +156,16 @@ const sourcesSlice = createSlice({
         status: LoadingStatus.ERRORED,
       });
     },
-    selectLocation: (state, action: PayloadAction<PartialLocation>) => {
+    locationSelected: (
+      state,
+      action: PayloadAction<{ location: PartialLocation; source: SourceDetails }>
+    ) => {
+      // Source is used by the tabs reducer
+      const { location } = action.payload;
       state.selectedLocationHasScrolled = false;
-      state.selectedLocation = action.payload;
-      state.selectedLocationHistory.unshift(action.payload);
-      state.persistedSelectedLocation = action.payload;
+      state.selectedLocation = location;
+      state.selectedLocationHistory.unshift(location);
+      state.persistedSelectedLocation = location;
     },
     clearSelectedLocation: state => {
       state.selectedLocationHasScrolled = false;
@@ -179,7 +184,7 @@ export const {
   addSources,
   allSourcesReceived,
   clearSelectedLocation,
-  selectLocation,
+  locationSelected,
   sourceLoading,
   sourceLoaded,
   sourceErrored,
@@ -333,6 +338,10 @@ export const isFulfilled = (item?: { status: LoadingStatus }) => {
 
 export const isOriginalSource = (sd: SourceDetails) => {
   return sd.canonicalId === sd.id;
+};
+
+export const isPrettyPrintedSource = (sd: SourceDetails) => {
+  return !!sd.prettyPrintedFrom;
 };
 
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {

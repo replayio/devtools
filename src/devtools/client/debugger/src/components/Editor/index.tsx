@@ -40,6 +40,7 @@ import {
   getSelectedSource,
   getSelectedLocation,
   getSelectedSourceWithContent,
+  LoadingStatus,
 } from "ui/reducers/sources";
 
 import {
@@ -415,10 +416,8 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
       return showLoading(editor);
     }
 
-    // @ts-expect-error stupid AsyncValue mismatches
-    if (selectedSource.content.state === "rejected") {
-      // @ts-expect-error stupid AsyncValue mismatches
-      let { value } = selectedSource.content;
+    if (selectedSourceContent.status === LoadingStatus.ERRORED) {
+      let { value } = selectedSourceContent.value;
       if (typeof value !== "string") {
         value = "Unexpected source error";
       }
