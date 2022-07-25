@@ -1,9 +1,8 @@
-import React, { FC, useContext } from "react";
+import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
+import React, { FC, ReactNode, useContext } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
-import hooks from "ui/hooks";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
-import { useFeature } from "ui/hooks/settings";
 
 import NodePicker from "../NodePicker";
 import { selectors } from "../../reducers";
@@ -70,7 +69,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   isNode,
 }) => {
   return (
-    <div className="flex flex-row items-center overflow-hidden panel-buttons theme-tab-font-size">
+    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
       {!isNode && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
       {!isNode && <PanelButton panel="inspector">Elements</PanelButton>}
@@ -102,8 +101,8 @@ function InspectorPanel() {
       <WaitForReduxSlice
         slice="inspector"
         loading={
-          <div className="flex justify-center w-full m-auto align-center">
-            <div className="relative flex flex-col items-center p-8 py-4 rounded-lg w-96 bg-white/75">
+          <div className="align-center m-auto flex w-full justify-center">
+            <div className="relative flex w-96 flex-col items-center rounded-lg bg-white/75 p-8 py-4">
               <ReplayLogo wide size="lg" />
               <div>Inspector is loading...</div>
             </div>
@@ -129,7 +128,6 @@ export default function SecondaryToolbox() {
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const dispatch = useAppDispatch();
-  const { userSettings } = hooks.useGetUserSettings();
   const isNode = recordingTarget === "node";
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
@@ -147,20 +145,36 @@ export default function SecondaryToolbox() {
           hasReduxAnnotations={hasReduxAnnotations}
           toolboxLayout={toolboxLayout}
         />
-        <div className="flex secondary-toolbox-right-buttons-container">
+        <div className="secondary-toolbox-right-buttons-container flex">
           <PanelButtonsScrollOverflowGradient />
           <ShowVideoButton />
           <ToolboxOptions />
         </div>
       </header>
-      <Redacted className="text-xs secondary-toolbox-content bg-chrome">
-        {selectedPanel === "network" && <NetworkMonitor />}
-        {selectedPanel === "console" ? <ConsolePanel /> : null}
-        {selectedPanel === "inspector" ? <InspectorPanel /> : null}
-        {selectedPanel === "react-components" ? <ReactDevtoolsPanel /> : null}
-        {selectedPanel === "redux-devtools" ? <ReduxDevToolsPanel /> : null}
-        {toolboxLayout !== "ide" && selectedPanel === "debugger" ? <EditorPane /> : null}
+      <Redacted className="secondary-toolbox-content bg-chrome text-xs">
+        <Panel isActive={selectedPanel === "network"}>
+          <NetworkMonitor />
+        </Panel>
+        <Panel isActive={selectedPanel === "console"}>
+          <ConsolePanel />
+        </Panel>
+        <Panel isActive={selectedPanel === "inspector"}>
+          <InspectorPanel />
+        </Panel>
+        <Panel isActive={selectedPanel === "react-components"}>
+          <ReactDevtoolsPanel />
+        </Panel>
+        <Panel isActive={selectedPanel === "redux-devtools"}>
+          <ReduxDevToolsPanel />
+        </Panel>
+        <Panel isActive={toolboxLayout !== "ide" && selectedPanel === "debugger"}>
+          <EditorPane />
+        </Panel>
       </Redacted>
     </div>
   );
+}
+
+function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
+  return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
 }
