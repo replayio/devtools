@@ -18,6 +18,7 @@ import { useGetUserSettings } from "ui/hooks/settings";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import { EditorPane } from "./Editor/EditorPane";
+import ObjectPreviewSuspenseCacheAdapter from "./SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 
 const mapStateToProps = (state: UIState) => ({
   selectedPanel: getSelectedPanel(state),
@@ -73,6 +74,7 @@ class Debugger extends Component<DebuggerProps> {
       <>
         <A11yIntention>
           <EditorPane />
+          <ObjectPreviewSuspenseCacheAdapter />
         </A11yIntention>
       </>
     );
