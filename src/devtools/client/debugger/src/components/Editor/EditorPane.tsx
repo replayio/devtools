@@ -1,22 +1,22 @@
 import classNames from "classnames";
 import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import Editor from "./index";
-import EditorTabs from "./Tabs";
-import EditorFooter from "./Footer";
-
-import WelcomeBox from "../WelcomeBox";
-
-import { Redacted } from "ui/components/Redacted";
-
-import { waitForEditor } from "../../utils/editor/create-editor";
 import { setUnexpectedError } from "ui/actions/errors";
 import { ReplayUpdatedError } from "ui/components/ErrorBoundary";
+import { Redacted } from "ui/components/Redacted";
 import { useFeature } from "ui/hooks/settings";
 import { getToolboxLayout } from "ui/reducers/layout";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import useWidthObserver from "ui/utils/useWidthObserver";
 
 import { getSelectedSource } from "../../reducers/sources";
+import { waitForEditor } from "../../utils/editor/create-editor";
+
+import ObjectPreviewSuspenseCacheAdapter from "../SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
+import WelcomeBox from "../WelcomeBox";
+
+import Editor from "./index";
+import EditorTabs from "./Tabs";
+import EditorFooter from "./Footer";
 
 export const EditorPane = () => {
   const [loadingEditor, setLoadingEditor] = useState(true);
@@ -70,6 +70,7 @@ export const EditorPane = () => {
           <WelcomeBox />
         )}
         {selectedSource && <EditorFooter />}
+        <ObjectPreviewSuspenseCacheAdapter />
       </div>
     </div>
   );
