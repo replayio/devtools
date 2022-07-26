@@ -47,7 +47,7 @@ export const ResponsiveTabs = ({
     // check if maybe we don't need a dropdown at all
     let totalTabsWidth = 0;
     for (const tab of tabsRef.current) {
-      totalTabsWidth += tab.clientWidth;
+      totalTabsWidth += tab?.clientWidth ?? 0;
     }
 
     if (totalTabsWidth <= containerWidth) {

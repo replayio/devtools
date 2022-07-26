@@ -26,6 +26,8 @@ import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
 import { getRecordingTarget } from "ui/reducers/app";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
+import NewConsoleRoot from "./NewConsole";
+import { useFeature } from "ui/hooks/settings";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -86,10 +88,11 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 };
 
 function ConsolePanel() {
+  const { value: enableNewConsole } = useFeature("enableNewConsole");
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        <WebConsoleApp />
+        {enableNewConsole ? <NewConsoleRoot /> : <WebConsoleApp />}
       </div>
     </div>
   );

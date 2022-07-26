@@ -112,7 +112,7 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
-type ThreadFrontEvent = "currentPause" | "paused" | "resumed";
+type ThreadFrontEvent = "currentPause" | "evaluation" | "paused" | "resumed";
 
 declare global {
   interface Window {
@@ -345,7 +345,15 @@ class _ThreadFront {
     }
   }
 
+  _accessToken: string | null = null;
+
+  getAccessToken(): string | null {
+    return this._accessToken;
+  }
+
   setAccessToken(accessToken: string) {
+    this._accessToken = accessToken;
+
     return client.Authentication.setAccessToken({ accessToken });
   }
 
@@ -728,6 +736,7 @@ class _ThreadFront {
   }) {
     const pause = await this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
+
     const rv = await pause.evaluate(frameId, text, pure);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);

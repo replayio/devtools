@@ -420,6 +420,10 @@ export function getLastExpandedScopes(state: UIState) {
   return state.pause.lastExpandedScopes;
 }
 
+export function getPauseId(state: UIState) {
+  return state.pause.id;
+}
+
 export function getPausePreviewLocation(state: UIState) {
   return state.pause.pausePreviewLocation;
 }
