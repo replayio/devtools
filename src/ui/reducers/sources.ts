@@ -113,16 +113,16 @@ const sourcesSlice = createSlice({
       state.allSourcesReceived = true;
       const sources = sourceSelectors.selectAll(state.sources);
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
-      const sourcesByUrl: Record<string, string[]> = {};
+      state.sourcesByUrl = {};
       sources.forEach(source => {
         if (!source.url) {
           return;
         }
 
-        if (!sourcesByUrl[source.url]) {
-          sourcesByUrl[source.url] = [];
+        if (!state.sourcesByUrl[source.url]) {
+          state.sourcesByUrl[source.url] = [];
         }
-        sourcesByUrl[source.url].push(source.sourceId);
+        state.sourcesByUrl[source.url].push(source.sourceId);
       });
     },
     sourceLoading: (state, action: PayloadAction<string>) => {
@@ -244,7 +244,11 @@ export const getCorrespondingSourceIds = (state: UIState, id: string) => {
   return getSourceDetails(state, id)?.correspondingSourceIds;
 };
 export const getSourceByUrl = (state: UIState, url: string) => {
-  const id = state.experimentalSources.sourcesByUrl[url][0];
+  const urlEntries = state.experimentalSources.sourcesByUrl[url] ?? [];
+  const id = urlEntries[0];
+  if (!id) {
+    return undefined;
+  }
   return getSourceDetails(state, id);
 };
 export const getSourceContent = (state: UIState, id: string) => {
