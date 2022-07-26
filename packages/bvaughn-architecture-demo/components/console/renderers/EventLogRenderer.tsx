@@ -90,6 +90,7 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
         {isHovered && (
           <MessageHoverButton
             executionPoint={eventLog.point}
+            location={location}
             pauseId={eventLog.pauseId}
             showAddCommentButton={false}
             targetRef={ref}
