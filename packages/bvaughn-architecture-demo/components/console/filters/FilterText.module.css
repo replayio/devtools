@@ -11,5 +11,4 @@
 .Input:focus {
   background-color: var(--background-color-contrast-1);
   border-color: var(--color-brand);
-  border-top-right-radius: 0.5rem;
 }

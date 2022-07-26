@@ -175,21 +175,11 @@ export function protocolValueToClientValue(
     // You have to detect them by the absence of an explicit "value" key–
     // Meaning they won't have "value", "bigint", "symbol", or "unserializableNumber" keys.
     // This is pretty awkward to work with and I wish the protocol would change.
-    const keys = Object.keys(protocolValue).filter(key => key !== "name" && key !== "flags");
+    const keys = Object.keys(protocolValue).filter(
+      key => key !== "name" && key !== "name" && key !== "isSymbol"
+    );
     if (keys.length === 0) {
       return { name, preview: "undefined", type: "undefined" };
-    }
-  }
-
-  // (BAC-1986) Additional edge case where an Object Property is a symbol but has no corresponding object value.
-  // Apparently this scenario means that the property key itself is a symbol and the value is undefined.
-  if (isProtocolProperty(protocolValue)) {
-    if (protocolValue.isSymbol === true) {
-      return {
-        name,
-        preview: "undefined",
-        type: "symbol",
-      };
     }
   }
 

@@ -1,10 +1,12 @@
 import Icon from "@bvaughn/components/Icon";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
+import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { ExecutionPoint, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
 import {
+  MouseEvent,
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
@@ -19,12 +21,14 @@ import styles from "./MessageHoverButton.module.css";
 
 export default function MessageHoverButton({
   executionPoint,
+  location,
   pauseId,
   showAddCommentButton,
   targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
+  location: Location | null;
   pauseId: PauseId;
   showAddCommentButton: boolean;
   targetRef: RefObject<HTMLDivElement | null>;
@@ -33,6 +37,7 @@ export default function MessageHoverButton({
   const ref = useRef<HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
+  const { inspectFunctionDefinition } = useContext(InspectorContext);
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
@@ -86,11 +91,22 @@ export default function MessageHoverButton({
       );
     }
   } else {
+    const onClick = (event: MouseEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      update(time, executionPoint, pauseId);
+
+      if (inspectFunctionDefinition !== null && location !== null) {
+        inspectFunctionDefinition([location]);
+      }
+    };
+
     button = (
       <button
         className={styles.ConsoleMessageHoverButton}
         data-test-id="ConsoleMessageHoverButton"
-        onClick={() => update(time, executionPoint, pauseId)}
+        onClick={onClick}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         ref={ref}

@@ -17,7 +17,7 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
-import { ExecutionPoint } from "@replayio/protocol";
+import { ExecutionPoint, Location } from "@replayio/protocol";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
 // Renders PointInstances with enableLogging=true.
@@ -88,6 +88,7 @@ function LogPointRenderer({
       <MessageHoverButtonWithWithPause
         executionPoint={logPointInstance.timeStampedHitPoint.point}
         isHovered={isHovered}
+        location={logPointInstance.point.location}
         targetRef={ref}
         time={logPointInstance.timeStampedHitPoint.time}
       />
@@ -98,11 +99,13 @@ function LogPointRenderer({
 function MessageHoverButtonWithWithPause({
   executionPoint,
   isHovered,
+  location,
   targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
   isHovered: boolean;
+  location: Location;
   targetRef: React.RefObject<HTMLDivElement>;
   time: number;
 }) {
@@ -119,6 +122,7 @@ function MessageHoverButtonWithWithPause({
   return (
     <MessageHoverButton
       executionPoint={executionPoint}
+      location={location}
       pauseId={pauseId}
       showAddCommentButton={false}
       targetRef={targetRef}

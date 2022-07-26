@@ -19,6 +19,7 @@
   align-items: center;
   gap: 1ch;
   flex: 1 1 auto;
+  word-break: break-word;
 }
 
 .Count {
