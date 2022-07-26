@@ -182,11 +182,12 @@ export function protocolValueToClientValue(
   }
 
   // (BAC-1986) Additional edge case where an Object Property is a symbol but has no corresponding object value.
+  // Apparently this scenario means that the property key itself is a symbol and the value is undefined.
   if (isProtocolProperty(protocolValue)) {
     if (protocolValue.isSymbol === true) {
       return {
         name,
-        preview: `${(protocolValue as ProtocolProperty).name}`,
+        preview: "undefined",
         type: "symbol",
       };
     }
