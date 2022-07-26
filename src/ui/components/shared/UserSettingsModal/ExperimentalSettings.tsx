@@ -19,14 +19,9 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "New Console",
-    description: "View and inspect logs with the new console",
-    key: "enableNewConsole",
-  },
-  {
-    label: "New Object Inspector",
-    description: "Preview objects with the new inspector",
-    key: "enableNewObjectInspector",
+    label: "New component architecture",
+    description: "Enable the console and inspector UIs",
+    key: "enableNewComponentArchitecture",
   },
   {
     label: "Resolve recording",
@@ -72,11 +67,8 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: enableNewConsole, update: updateEnableNewConsole } =
-    useFeature("enableNewConsole");
-  const { value: enableNewObjectInspector, update: updateEnableNewObjectInspector } = useFeature(
-    "enableNewObjectInspector"
-  );
+  const { value: enableNewComponentArchitecture, update: updateEnableNewComponentArchitecture } =
+    useFeature("enableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
 
@@ -85,10 +77,8 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key === "enableNewConsole") {
-      updateEnableNewConsole(!enableNewConsole);
-    } else if (key === "enableNewObjectInspector") {
-      updateEnableNewObjectInspector(!enableNewObjectInspector);
+    } else if (key === "enableNewComponentArchitecture") {
+      updateEnableNewComponentArchitecture(!enableNewComponentArchitecture);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     }
@@ -98,8 +88,7 @@ export default function ExperimentalSettings({}) {
     enableColumnBreakpoints,
     enableResolveRecording,
     hitCounts,
-    enableNewConsole,
-    enableNewObjectInspector,
+    enableNewComponentArchitecture,
   };
 
   const settings = { ...userSettings, ...localSettings };

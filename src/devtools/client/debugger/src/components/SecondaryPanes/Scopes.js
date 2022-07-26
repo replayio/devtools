@@ -155,11 +155,11 @@ class Scopes extends PureComponent {
       s.path = `scope${selectedFrame?.id}.${i}`;
     });
 
-    const enableNewObjectInspector = prefsService.getBoolPref(
-      "devtools.features.enableNewObjectInspector"
+    const enableNewComponentArchitecture = prefsService.getBoolPref(
+      "devtools.features.enableNewComponentArchitecture"
     );
     let objectInspector = null;
-    if (enableNewObjectInspector) {
+    if (enableNewComponentArchitecture) {
       objectInspector = <NewObjectInspector roots={scopes} />;
     } else {
       objectInspector = (

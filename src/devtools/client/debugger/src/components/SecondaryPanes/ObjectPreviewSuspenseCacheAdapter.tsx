@@ -8,10 +8,10 @@ import { useFeature } from "ui/hooks/settings";
 // This avoids requiring the new Object Inspector to load redundant data,
 // and also prevents potential runtime errors because of how the protocolValueToClientValue() utility works.
 export default function ObjectPreviewSuspenseCacheAdapter() {
-  const enableNewObjectInspector = useFeature("enableNewObjectInspector");
+  const enableNewComponentArchitecture = useFeature("enableNewComponentArchitecture");
 
   useEffect(() => {
-    if (!enableNewObjectInspector) {
+    if (!enableNewComponentArchitecture) {
       return;
     }
 
@@ -26,7 +26,7 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
     return () => {
       removePauseDataListener(handler);
     };
-  }, [enableNewObjectInspector]);
+  }, [enableNewComponentArchitecture]);
 
   return null;
 }

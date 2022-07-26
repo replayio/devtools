@@ -122,10 +122,10 @@ export class Popup extends Component {
       preview: { root },
     } = this.props;
 
-    const enableNewObjectInspector = prefsService.getBoolPref(
-      "devtools.features.enableNewObjectInspector"
+    const enableNewComponentArchitecture = prefsService.getBoolPref(
+      "devtools.features.enableNewComponentArchitecture"
     );
-    if (enableNewObjectInspector) {
+    if (enableNewComponentArchitecture) {
       return <NewObjectInspector />;
     } else {
       if (root.type === "value") {
