@@ -23,8 +23,7 @@ pref("devtools.hitCounts", "hide-counts");
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.enableNewConsole", false);
-pref("devtools.features.enableNewObjectInspector", false);
+pref("devtools.features.enableNewComponentArchitecture", false);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.originalClassNames", false);
@@ -57,8 +56,7 @@ export const features = new PrefsHelper("devtools.features", {
   commentAttachments: ["Bool", "commentAttachments"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
-  enableNewConsole: ["Bool", "enableNewConsole"],
-  enableNewObjectInspector: ["Bool", "enableNewObjectInspector"],
+  enableNewComponentArchitecture: ["Bool", "enableNewComponentArchitecture"],
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],

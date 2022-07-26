@@ -88,11 +88,11 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 };
 
 function ConsolePanel() {
-  const { value: enableNewConsole } = useFeature("enableNewConsole");
+  const { value: enableNewComponentArchitecture } = useFeature("enableNewComponentArchitecture");
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        {enableNewConsole ? <NewConsoleRoot /> : <WebConsoleApp />}
+        {enableNewComponentArchitecture ? <NewConsoleRoot /> : <WebConsoleApp />}
       </div>
     </div>
   );
