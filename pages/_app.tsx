@@ -1,7 +1,6 @@
 import "../src/test-prep";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import ObjectPreviewSuspenseCacheAdapter from "devtools/client/debugger/src/components/SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
 import { useRouter } from "next/router";
@@ -214,7 +213,6 @@ function Routing({ Component, pageProps }: AppProps) {
           </React.Suspense>
         </ErrorBoundary>
       </_App>
-      <ObjectPreviewSuspenseCacheAdapter />
     </Provider>
   );
 }
