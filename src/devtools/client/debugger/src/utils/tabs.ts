@@ -1,4 +1,3 @@
-import { TablePropGetter } from "react-table";
 import type { Tab } from "../reducers/tabs";
 
 export function getTabMenuItems() {

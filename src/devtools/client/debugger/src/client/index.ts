@@ -53,7 +53,9 @@ async function setupDebugger() {
       });
     }
   });
-  await store.dispatch(actions.newQueuedSources(sourceInfos));
+
+  // TODO Finish removing the legacy sources handling
+  // await store.dispatch(actions.newQueuedSources(sourceInfos));
 
   store.dispatch(addSources(sources));
 

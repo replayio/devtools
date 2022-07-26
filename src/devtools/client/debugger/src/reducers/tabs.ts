@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import { AnyAction, createAction } from "@reduxjs/toolkit";
 import type { UIState } from "ui/state";
 
 /**
@@ -34,6 +34,8 @@ export interface TabsState {
   tabs: Tab[];
 }
 
+export const tabsRestored = createAction<SourceDetails[]>("tabs/tabsRestored");
+
 export const EMPTY_TABS: Tab[] = [];
 
 function initialTabState() {
@@ -63,7 +65,10 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
     case "ADD_SOURCES":
       return addVisibleTabs(state, action.sources);
 
-    case locationSelected.match(action): {
+    case tabsRestored.type:
+      return addVisibleTabs(state, action.payload);
+
+    case locationSelected.type: {
       return addSelectedSource(state, action.payload.source);
     }
 

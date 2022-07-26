@@ -2,6 +2,7 @@ import {
   createEntityAdapter,
   createSelector,
   createSlice,
+  Dictionary,
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
@@ -12,7 +13,6 @@ import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
-import type { SourcesMap } from "devtools/client/debugger/src/utils/sources-tree";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 // TODO Move prefs out of reducers and load this separately
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -327,6 +327,27 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
 
   return state.experimentalSources.sourcesByUrl[source.url]?.length > 0;
 }
+
+export const getCanonicalSourceFromEntities = (
+  detailsEntities: Dictionary<SourceDetails>,
+  sd: SourceDetails
+) => {
+  const canonicalSource = detailsEntities[sd.canonicalId];
+  return canonicalSource ?? sd;
+};
+
+export const getCanonicalSource = (state: UIState, sd: SourceDetails) => {
+  return getCanonicalSourceFromEntities(state.experimentalSources.sourceDetails.entities, sd);
+};
+
+export const getCanonicalSourceForUrl = (state: UIState, url: string) => {
+  const sd = getSourceByUrl(state, url);
+  if (!sd) {
+    return undefined;
+  }
+
+  return getCanonicalSource(state, sd);
+};
 
 export const getPreviousPersistedLocation = (state: UIState) =>
   state.experimentalSources.persistedSelectedLocation;

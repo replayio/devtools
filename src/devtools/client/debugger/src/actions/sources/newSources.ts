@@ -23,13 +23,25 @@ import {
   getPendingBreakpointsForSource,
   getContext,
 } from "../../selectors";
+import { getTabs, tabsRestored } from "devtools/client/debugger/src/reducers/tabs";
+import { getPendingBreakpointList } from "devtools/client/debugger/src/reducers/pending-breakpoints";
 
-import { getSourceDetails, SourceDetails } from "ui/reducers/sources";
+import {
+  getSourceDetails,
+  allSourcesReceived,
+  SourceDetails,
+  getAllSourceDetails,
+  getSourceDetailsEntities,
+  getSourceByUrl,
+  getCanonicalSource,
+  getCanonicalSourceForUrl,
+} from "ui/reducers/sources";
 import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
 import { experimentalLoadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
 
 interface SourceData {
   source: {
@@ -206,8 +218,7 @@ export function newOriginalSources(
     for (const source of sources) {
       dispatch(checkPendingBreakpoints(cx, source.id));
     }
-    */
-
+*/
     return sources;
   };
 }
@@ -294,7 +305,6 @@ export function newGeneratedSources(
       dispatch(checkPendingBreakpoints(cx, source));
     }
     */
-
     return resultIds.map(id => getSourceDetails(getState(), id)!);
   };
 }
@@ -317,3 +327,69 @@ function checkNewSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
     return sources;
   };
 }
+
+// Delay adding these until the store is created
+export const setupSourcesListeners = (startAppListening: AppStartListening) => {
+  // When sources are received, we want to check for an existing
+  // selected location, and open that automatically.
+  // Also, we
+  startAppListening({
+    actionCreator: allSourcesReceived,
+    effect: async (action, listenerApi) => {
+      const { dispatch, getState } = listenerApi;
+      const state = getState();
+
+      const tabs = getTabs(state);
+      const persistedLocation = getPreviousPersistedLocation(state);
+
+      const sources = getAllSourceDetails(state);
+      const cx = getContext(state);
+
+      // Tabs are persisted with just a URL, but no `sourceId` because
+      // those may change across sessions. Figure out the sources per URL.
+      const canonicalTabSources = tabs
+        .map(tab => getCanonicalSourceForUrl(state, tab.url)!)
+        .filter(Boolean);
+
+      // Now that we know what sources _were_ open, update the tabs data
+      // so that the sources are associated with each tab
+      dispatch(tabsRestored(canonicalTabSources));
+
+      let canonicalSelectedSource: SourceDetails | null = null;
+
+      // There may have been a location persisted from the last time the user
+      // had this recording open. If so, we want to try to restore that open
+      // file and line.
+      if (persistedLocation) {
+        if (persistedLocation.sourceUrl) {
+          canonicalSelectedSource = getCanonicalSourceForUrl(state, persistedLocation.sourceUrl)!;
+        } else if (persistedLocation.sourceId) {
+          const startingSource = getSourceDetails(state, persistedLocation.sourceId)!;
+          canonicalSelectedSource = getCanonicalSource(state, startingSource);
+        }
+
+        if (canonicalSelectedSource) {
+          const { selectLocation } = await import("../sources");
+
+          await dispatch(
+            selectLocation(cx, {
+              column: persistedLocation.column,
+              line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
+              sourceId: canonicalSelectedSource.id,
+              sourceUrl: canonicalSelectedSource.url,
+            })
+          );
+        }
+      }
+
+      // TODO Re-enable blackboxing - this is a no-op for now
+      dispatch(restoreBlackBoxedSources(cx, sources));
+
+      // There may have been some breakpoints / print statements persisted as well.
+      // Reload those if possible.
+      for (const source of canonicalTabSources) {
+        dispatch(checkPendingBreakpoints(cx, source.id));
+      }
+    },
+  });
+};
