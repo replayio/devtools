@@ -4,6 +4,9 @@ import { addPauseDataListener, removePauseDataListener } from "protocol/thread/p
 import { useEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 
+// Connects legacy PauseData to the new Object Inspector Suspense cache.
+// This avoids requiring the new Object Inspector to load redundant data,
+// and also prevents potential runtime errors because of how the protocolValueToClientValue() utility works.
 export default function ObjectPreviewSuspenseCacheAdapter() {
   const enableNewObjectInspector = useFeature("enableNewObjectInspector");
 
@@ -18,6 +21,7 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
         preCacheObjects(pauseId, objects);
       }
     };
+
     addPauseDataListener(handler);
     return () => {
       removePauseDataListener(handler);
