@@ -11,7 +11,7 @@ import { Immer, enableMapSet } from "immer";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
-import { ThunkExtraArgs } from "ui/utils/thunk";
+import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 import LogRocket from "ui/utils/logrocket";
 import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 import appReducer from "ui/reducers/app";
@@ -52,7 +52,6 @@ let reducers = {
   protocolMessages: protocolMessages,
   tabs: tabsReducer,
 } as unknown as UIStateReducers;
-let extraThunkArgs = {} as ThunkExtraArgs;
 
 // Immer auto-freezes state by default. However, this does take some time, and also we are
 // apparently currently mutating state in ManagedTree.js, so that throws an error if frozen.

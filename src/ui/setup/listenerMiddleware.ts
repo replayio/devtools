@@ -5,14 +5,17 @@ import type { UIThunkAction } from "ui/actions";
 
 import type { AppDispatch } from "./store";
 import type { UIState } from "ui/state";
+import { extraThunkArgs, ThunkExtraArgs } from "ui/utils/thunk";
 
-export const listenerMiddleware = createListenerMiddleware();
+export const listenerMiddleware = createListenerMiddleware({
+  extra: extraThunkArgs,
+});
 
-export type AppStartListening = TypedStartListening<UIState, AppDispatch>;
+export type AppStartListening = TypedStartListening<UIState, AppDispatch, ThunkExtraArgs>;
 
 export const startAppListening = listenerMiddleware.startListening as AppStartListening;
 
-export const addAppListener = addListener as TypedAddListener<UIState, AppDispatch>;
+export const addAppListener = addListener as TypedAddListener<UIState, AppDispatch, ThunkExtraArgs>;
 
 /**
  * A hacky but useful utility to add a one-shot RTK listener that
