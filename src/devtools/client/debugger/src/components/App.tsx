@@ -34,12 +34,7 @@ type DebuggerProps = PropsFromRedux & { wrapper: HTMLDivElement };
 class Debugger extends Component<DebuggerProps> {
   shortcuts = new KeyShortcuts({ window, target: this.props.wrapper });
 
-  getChildContext = () => {
-    // @ts-expect-error L10n must be a global?
-    return { shortcuts: this.shortcuts, l10n: L10N };
-  };
-
-  childContextTypes = {
+  static childContextTypes = {
     globalShortcuts: PropTypes.object,
     shortcuts: PropTypes.object,
     l10n: PropTypes.object,

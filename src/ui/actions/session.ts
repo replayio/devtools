@@ -38,6 +38,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { setUnexpectedError, setExpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
+import { Action } from "redux";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -165,31 +166,51 @@ export function createSocket(
 
       const loadPoint = new URL(window.location.href).searchParams.get("point") || undefined;
 
+      const queuedActions: Array<Action | UIThunkAction> = [];
+      let flushTimeoutId: NodeJS.Timeout | null = null;
+
+      function flushQueuedActions() {
+        flushTimeoutId = null;
+
+        const actions = queuedActions.splice(0);
+        actions.forEach(action => dispatch(action));
+      }
+
+      // WebSocket messages may be sent by a component that Suspends during render.
+      // Dispatching these Redux actions after a tick avoids potentially scheduling a React update while another component is rendering.
+      function queueAction(action: Action | UIThunkAction) {
+        queuedActions.push(action);
+
+        if (flushTimeoutId === null) {
+          flushTimeoutId = setTimeout(flushQueuedActions, 0);
+        }
+      }
+
       const sessionId = await createSession(recordingId, loadPoint, experimentalSettings, {
         onEvent: (event: ProtocolEvent) => {
           if (features.logProtocolEvents) {
-            dispatch(eventReceived({ ...event, recordedAt: window.performance.now() }));
+            queueAction(eventReceived({ ...event, recordedAt: window.performance.now() }));
           }
         },
         onRequest: (request: CommandRequest) => {
           if (features.logProtocol) {
-            dispatch(requestSent({ ...request, recordedAt: window.performance.now() }));
+            queueAction(requestSent({ ...request, recordedAt: window.performance.now() }));
           }
         },
         onResponse: (response: CommandResponse) => {
           if (features.logProtocol) {
-            dispatch(responseReceived({ ...response, recordedAt: window.performance.now() }));
+            queueAction(responseReceived({ ...response, recordedAt: window.performance.now() }));
           }
         },
         onResponseError: (error: CommandResponse) => {
           if (features.logProtocol) {
-            dispatch(errorReceived({ ...error, recordedAt: window.performance.now() }));
+            queueAction(errorReceived({ ...error, recordedAt: window.performance.now() }));
           }
         },
         onSocketError: (evt: Event, initial: boolean) => {
           console.error("Socket Error", evt);
           if (initial) {
-            dispatch(
+            queueAction(
               setUnexpectedError({
                 action: "refresh",
                 content:
@@ -199,7 +220,7 @@ export function createSocket(
               })
             );
           } else {
-            dispatch(
+            queueAction(
               setUnexpectedError({
                 action: "refresh",
                 content: "The socket has closed due to an error. Please refresh the page.",
@@ -211,7 +232,7 @@ export function createSocket(
         },
         onSocketClose: (willClose: boolean) => {
           if (!willClose) {
-            dispatch(setUnexpectedError(getDisconnectionError(), true));
+            queueAction(setUnexpectedError(getDisconnectionError(), true));
           }
         },
       });
