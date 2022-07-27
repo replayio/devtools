@@ -2,22 +2,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import type { Source } from "devtools/client/debugger/src/reducers/sources";
 import React, { PureComponent } from "react";
 import ReactDOM from "react-dom";
 import { connect, ConnectedProps } from "react-redux";
-
 import type { UIState } from "ui/state";
-
-import Tab from "./Tab";
-
-import { getSelectedSource, getSourcesForTabs, getIsPaused, getContext } from "../../selectors";
-import { isPretty } from "../../utils/source";
-import actions from "../../actions";
 import { trackEvent } from "ui/utils/telemetry";
-import CommandPaletteButton from "./CommandPaletteButton";
 import { getToolboxLayout } from "ui/reducers/layout";
 
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
+import actions from "../../actions";
+import { openQuickOpen as openQuickOpenAction } from "../../actions/quick-open";
+import { getSelectedSource, getSourcesForTabs, getIsPaused } from "../../selectors";
+import { isPretty } from "../../utils/source";
+
+import CommandPaletteButton from "./CommandPaletteButton";
+import Tab from "./Tab";
 
 const mapStateToProps = (state: UIState) => ({
   selectedSource: getSelectedSource(state),
@@ -28,6 +27,7 @@ const mapStateToProps = (state: UIState) => ({
 
 const connector = connect(mapStateToProps, {
   moveTabBySourceId: actions.moveTabBySourceId,
+  openQuickOpen: openQuickOpenAction,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -151,27 +151,38 @@ class Tabs extends PureComponent<PropsFromRedux> {
   };
 
   renderTabs() {
-    const { tabSources, toolboxLayout } = this.props;
+    const { openQuickOpen, tabSources, toolboxLayout } = this.props;
 
     return (
-      <div className="source-tabs tab" ref="sourceTabs">
-        {toolboxLayout == "ide" && <CommandPaletteButton />}
-        {tabSources.map((source, index) => {
-          return (
-            <Tab
-              onDragStart={_ => this.onTabDragStart(source, index)}
-              onDragOver={e => {
-                this.onTabDragOver(e, source, index);
-                e.preventDefault();
-              }}
-              onDragEnd={this.onTabDragEnd}
-              key={index}
-              source={source}
-              ref={`tab_${source.id}`}
-            />
-          );
-        })}
-      </div>
+      <>
+        <div className="source-tabs tab" ref="sourceTabs">
+          {toolboxLayout == "ide" && <CommandPaletteButton />}
+          {tabSources.map((source, index) => {
+            return (
+              <Tab
+                onDragStart={_ => this.onTabDragStart(source, index)}
+                onDragOver={e => {
+                  this.onTabDragOver(e, source, index);
+                  e.preventDefault();
+                }}
+                onDragEnd={this.onTabDragEnd}
+                key={index}
+                source={source}
+                ref={`tab_${source.id}`}
+              />
+            );
+          })}
+        </div>
+        {tabSources.length > 1 && (
+          <button
+            className="source-drop-down-button"
+            onClick={() => openQuickOpen("", false, true)}
+            title="Show opened files"
+          >
+            ⋯
+          </button>
+        )}
+      </>
     );
   }
 

@@ -22,17 +22,25 @@ export type QuickOpenActions = ReturnType<
 // Re-export for now to avoid altering other files
 export { setQuickOpenQuery, closeQuickOpen };
 
-export function openQuickOpen(query = "", project = false): UIThunkAction {
+export function openQuickOpen(
+  query = "",
+  project = false,
+  showOnlyOpenSources = false
+): UIThunkAction {
   return dispatch => {
     if (project) {
       dispatch(loadGlobalFunctions());
     }
 
-    return dispatch(openQuickOpenAction({ query, project }));
+    return dispatch(openQuickOpenAction({ query, project, showOnlyOpenSources }));
   };
 }
 
-export function toggleQuickOpen(query = "", project = false): UIThunkAction {
+export function toggleQuickOpen(
+  query = "",
+  project = false,
+  showOnlyOpenSources = false
+): UIThunkAction {
   return (dispatch, getState) => {
     const quickOpenEnabled = getQuickOpenEnabled(getState());
 
@@ -41,6 +49,6 @@ export function toggleQuickOpen(query = "", project = false): UIThunkAction {
       return;
     }
 
-    dispatch(openQuickOpen(query, project));
+    dispatch(openQuickOpen(query, project, showOnlyOpenSources));
   };
 }
