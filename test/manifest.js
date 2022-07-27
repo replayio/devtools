@@ -325,6 +325,7 @@ module.exports = [
     example: "node/spawn.js",
     script: "node_spawn-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "b95e9c4a-0154-47ac-aa58-75c5086841d4",
   },
   {
     example: "node/run_worker.js",

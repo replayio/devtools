@@ -6,6 +6,7 @@ const _ = require("lodash");
 
 const { recordNode } = require("./recordNode");
 const { elapsedTime, waitUntilMessage } = require("./utils");
+const manifest = require("../manifest");
 
 async function recordToCloud(state, browserName, exampleUrl) {
   console.log(`Recording Example:`, exampleUrl, browserName);
@@ -122,7 +123,11 @@ async function recordExample(state, example, target) {
 async function getExample(state, example, target) {
   // Recording ID to load in the viewer. If not set, we will record the example
   // in the browser before stopping and switching to the viewer.
-  let exampleRecordingId = state.shouldRecordExamples ? null : state.exampleRecordings[example];
+
+  let exampleRecordingId =
+    manifest[example].preRecordedRecordingId || state.shouldRecordExamples
+      ? null
+      : state.exampleRecordings[example];
 
   if (!exampleRecordingId) {
     switch (target) {
