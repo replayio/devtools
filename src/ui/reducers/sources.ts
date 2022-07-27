@@ -83,7 +83,7 @@ export interface SourcesState {
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;
-  persistedSelectedLocation?: PartialLocation;
+  persistedSelectedLocation: PartialLocation | null;
   sourcesByUrl: { [url: string]: string[] };
 }
 
@@ -96,7 +96,7 @@ const initialState: SourcesState = {
   selectedLocationHistory: [],
   selectedLocationHasScrolled: false,
   // TODO Move prefs out of reducers and load this separately
-  persistedSelectedLocation: prefs.pendingSelectedLocation as PartialLocation | undefined,
+  persistedSelectedLocation: (prefs.pendingSelectedLocation as PartialLocation) || null,
   sourcesByUrl: {},
 };
 
@@ -170,7 +170,7 @@ const sourcesSlice = createSlice({
     clearSelectedLocation: state => {
       state.selectedLocationHasScrolled = false;
       state.selectedLocation = null;
-      state.persistedSelectedLocation = undefined;
+      state.persistedSelectedLocation = null;
     },
   },
   extraReducers: builder => {
@@ -352,6 +352,56 @@ export const getCanonicalSourceForUrl = (state: UIState, url: string) => {
   return getCanonicalSource(state, sd);
 };
 
+/**
+ * Smartly look up a single source for display purposes, starting from
+ * the first source's ID, and going through various "corresponding",
+ * "canonical", and "pretty-printed" versions.
+ * This is loosely similar to `ThreadFront._chooseSourceId()`, but hopefully
+ * shorter and simpler while giving mostly equivalent results.
+ */
+export const getSourceToDisplay = (
+  sourceEntities: Dictionary<SourceDetails>,
+  startingSourceId: string
+) => {
+  const startingSource = sourceEntities[startingSourceId];
+  if (!startingSource) {
+    return;
+  }
+
+  // We should guarantee that there is _always_ at _least_ one
+  // corresponding source ID, that it always includes this source
+  // itself, and worst case it's _only_ this source.
+  const firstCorrespondingSource = sourceEntities[startingSource.correspondingSourceIds[0]];
+
+  if (!firstCorrespondingSource) {
+    return;
+  }
+
+  // We then look up the "canonical" version of this source.
+  const canonicalSource = sourceEntities[firstCorrespondingSource.canonicalId]!;
+  // It's possible there may be a pretty-printed version that would
+  // be a better choice for display. Use that if available.
+  if (canonicalSource.prettyPrinted) {
+    return sourceEntities[canonicalSource.prettyPrinted]!;
+  }
+
+  // otherwise show the canonical version
+  return canonicalSource;
+};
+
+export const getSourceToDisplayById = (state: UIState, startingSourceId: string) => {
+  const sourceEntities = getSourceDetailsEntities(state);
+  return getSourceToDisplay(sourceEntities, startingSourceId);
+};
+
+export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
+  const initialSourceForUrl = getSourceByUrl(state, url);
+  if (!initialSourceForUrl) {
+    return;
+  }
+  return getSourceToDisplayById(state, initialSourceForUrl.id);
+};
+
 export const getPreviousPersistedLocation = (state: UIState) =>
   state.experimentalSources.persistedSelectedLocation;
 
@@ -396,6 +446,8 @@ export const selectors = {
   getPreviousPersistedLocation,
   getCanonicalSource,
   getCanonicalSourceForUrl,
+  getSourceToDisplayById,
+  getSourceToDisplayForUrl,
 };
 
 export default sourcesSlice.reducer;

@@ -8,7 +8,7 @@ import { endTruncateStr } from "./utils";
 import { memoizeLast } from "./memoizeLast";
 import { getTruncatedFileName, getSourceClassnames, getSourceQueryString } from "./source";
 
-import { SourceDetails, isPrettyPrintedSource } from "ui/reducers/sources";
+import { SourceDetails, isPrettyPrintedSource, getSourceToDisplay } from "ui/reducers/sources";
 import { SymbolDeclarations, FunctionDeclaration } from "../reducers/ast";
 import { Dictionary } from "@reduxjs/toolkit";
 import { SearchTypes } from "../reducers/quick-open";
@@ -141,20 +141,22 @@ export function formatSources(
   const formattedSources = [];
   const sourceURLs = new Set();
 
-  for (let i = 0; i < sources.length; ++i) {
-    const source = sources[i];
-
+  for (let source of sources) {
     if (!source.url || source.url.includes("webpack-internal") || source.url.includes(".css")) {
       continue;
     }
 
-    if (!!source.url && !isPrettyPrintedSource(source) && !sourceURLs.has(source.url)) {
-      const canonicalSource = sourcesById[source.canonicalId];
+    if (source.url) {
+      // Smartly look up a single source to show in the list,
+      // starting from this source's ID and going through various
+      // "corresponding", "canonical", and "pretty-printed" versions.
+      const sourceToShow = getSourceToDisplay(sourcesById, source.id);
 
-      const sourceToShow = canonicalSource ?? source;
-
-      formattedSources.push(formatSourcesForList(sourceToShow, tabUrls));
-      sourceURLs.add(sourceToShow.url);
+      // Only show a single entry per file URL
+      if (sourceToShow?.url && !sourceURLs.has(sourceToShow.url)) {
+        formattedSources.push(formatSourcesForList(sourceToShow, tabUrls));
+        sourceURLs.add(sourceToShow.url);
+      }
     }
   }
 

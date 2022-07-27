@@ -116,12 +116,8 @@ export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   const newSelectedTabIndex = Math.min(leftNeighborIndex, lastAvailbleTabIndex);
   const availableTab = availableTabs[newSelectedTabIndex];
 
-  if (availableTab) {
-    const tabSource = getSourceByUrl(state, availableTab.url);
-
-    if (tabSource) {
-      return tabSource.id;
-    }
+  if (availableTab?.sourceId) {
+    return availableTab.sourceId;
   }
 
   return "";

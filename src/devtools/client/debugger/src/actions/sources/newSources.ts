@@ -33,8 +33,8 @@ import {
   getAllSourceDetails,
   getSourceDetailsEntities,
   getSourceByUrl,
-  getCanonicalSource,
-  getCanonicalSourceForUrl,
+  getSourceToDisplayForUrl,
+  getSourceToDisplayById,
 } from "ui/reducers/sources";
 import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
@@ -349,35 +349,34 @@ export const setupSourcesListeners = (startAppListening: AppStartListening) => {
       // Tabs are persisted with just a URL, but no `sourceId` because
       // those may change across sessions. Figure out the sources per URL.
       const canonicalTabSources = tabs
-        .map(tab => getCanonicalSourceForUrl(state, tab.url)!)
+        .map(tab => getSourceToDisplayForUrl(state, tab.url)!)
         .filter(Boolean);
 
       // Now that we know what sources _were_ open, update the tabs data
       // so that the sources are associated with each tab
       dispatch(tabsRestored(canonicalTabSources));
 
-      let canonicalSelectedSource: SourceDetails | null = null;
+      let selectedSourceToDisplay: SourceDetails | null = null;
 
       // There may have been a location persisted from the last time the user
       // had this recording open. If so, we want to try to restore that open
       // file and line.
       if (persistedLocation) {
         if (persistedLocation.sourceUrl) {
-          canonicalSelectedSource = getCanonicalSourceForUrl(state, persistedLocation.sourceUrl)!;
+          selectedSourceToDisplay = getSourceToDisplayForUrl(state, persistedLocation.sourceUrl)!;
         } else if (persistedLocation.sourceId) {
-          const startingSource = getSourceDetails(state, persistedLocation.sourceId)!;
-          canonicalSelectedSource = getCanonicalSource(state, startingSource);
+          selectedSourceToDisplay = getSourceToDisplayById(state, persistedLocation.sourceId)!;
         }
 
-        if (canonicalSelectedSource) {
+        if (selectedSourceToDisplay) {
           const { selectLocation } = await import("../sources");
 
           await dispatch(
             selectLocation(cx, {
               column: persistedLocation.column,
               line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
-              sourceId: canonicalSelectedSource.id,
-              sourceUrl: canonicalSelectedSource.url,
+              sourceId: selectedSourceToDisplay.id,
+              sourceUrl: selectedSourceToDisplay.url,
             })
           );
         }
