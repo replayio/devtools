@@ -77,9 +77,19 @@ export function binarySearch(start: number, end: number, callback: (mid: number)
   return start;
 }
 
-function NotAllowed() {
-  console.error("Not allowed");
+function NotAllowed(reason = "") {
+  console.trace(`Not allowed${reason ? ` (${reason})` : ""}`);
 }
+
+// These field lookups can occur in local development.
+// Even if the object _is_ expired and we want to deny access,
+// there's no point in warning about these.
+const KNOWN_IGNORABLE_OBJECT_FIELD_CHECKS = [
+  "Symbol(immer-state)",
+  "Symbol(immer-draftable)",
+  "isReactComponent",
+  "@@toStringTag",
+];
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   // getPrototypeOf() {
@@ -89,22 +99,26 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   //  NotAllowed();
   //},
   //set() { NotAllowed(); },
-  get() {
+  get(target, p) {
+    if (KNOWN_IGNORABLE_OBJECT_FIELD_CHECKS.includes(p.toString())) {
+      return;
+    }
+    NotAllowed("target: " + p.toString());
     return undefined;
   },
-  apply() {
-    NotAllowed();
+  apply(target, thisArg) {
+    NotAllowed("apply: " + thisArg.toString());
   },
   construct() {
-    NotAllowed();
+    NotAllowed("construct");
     return {};
   },
-  getOwnPropertyDescriptor() {
-    NotAllowed();
+  getOwnPropertyDescriptor(target, p) {
+    NotAllowed("gOPD: " + p.toString());
     return undefined;
   },
-  ownKeys() {
-    NotAllowed();
+  ownKeys(target) {
+    NotAllowed("ownKeys: " + target);
     return [];
   },
   isExtensible() {

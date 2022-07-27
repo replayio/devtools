@@ -16,9 +16,10 @@ import {
 import { createTreeNodeMatcher, findNodeInContents } from "./treeOrder";
 import { getURL } from "./getURL";
 
-import type { Source } from "../../reducers/sources";
+// import type { Source } from "../../reducers/sources";
 import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
 import type { ParsedUrl } from "./getURL";
+import { SourceDetails } from "ui/reducers/sources";
 
 function createNodeInTree(part: string, path: string, tree: TreeDirectory, index: number) {
   const node = createDirectoryNode(part, path, []);
@@ -44,7 +45,7 @@ function findOrCreateNode(
   index: number,
   url: TreeNode,
   debuggeeHost: string,
-  source: Source
+  source: SourceDetails
 ) {
   const addedPartIsFile = partIsFile(index, parts, url);
 
@@ -81,7 +82,12 @@ function findOrCreateNode(
  * walk the source tree to the final node for a given url,
  * adding new nodes along the way
  */
-function traverseTree(url: ParsedUrl, tree: TreeDirectory, debuggeeHost: string, source: Source) {
+function traverseTree(
+  url: ParsedUrl,
+  tree: TreeDirectory,
+  debuggeeHost: string,
+  source: SourceDetails
+) {
   const parts = url.path.replace(/\/$/, "").split("/");
   parts[0] = url.group;
 
@@ -108,7 +114,7 @@ function traverseTree(url: ParsedUrl, tree: TreeDirectory, debuggeeHost: string,
 /*
  * Add a source file to a directory node in the tree
  */
-function addSourceToNode(node: TreeDirectory, url: ParsedUrl, source: Source) {
+function addSourceToNode(node: TreeDirectory, url: ParsedUrl, source: SourceDetails) {
   const isFile = !isPathDirectory(url.path);
 
   // @ts-expect-error intentional error check apparently
@@ -121,6 +127,7 @@ function addSourceToNode(node: TreeDirectory, url: ParsedUrl, source: Source) {
   if (isFile) {
     // @ts-expect-error this is intentional
     node.type = "source";
+    // This is old and weird, but the `return source` was here already
     return source;
   }
 
@@ -152,7 +159,7 @@ function addSourceToNode(node: TreeDirectory, url: ParsedUrl, source: Source) {
  * @memberof utils/sources-tree
  * @static
  */
-export function addToTree(tree: TreeDirectory, source: Source, debuggeeHost?: string) {
+export function addToTree(tree: TreeDirectory, source: SourceDetails, debuggeeHost?: string) {
   const url = getURL(source, debuggeeHost);
 
   if (isInvalidUrl(url, source)) {
@@ -161,6 +168,7 @@ export function addToTree(tree: TreeDirectory, source: Source, debuggeeHost?: st
 
   const finalNode = traverseTree(url, tree, debuggeeHost!, source);
 
+  // TODO This does weird mutations and changing of node types, rework this
   // @ts-expect-error intentional
   finalNode.contents = addSourceToNode(finalNode, url, source);
 }

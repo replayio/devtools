@@ -9,8 +9,8 @@ import type { UIState } from "ui/state";
 import { prefs } from "../utils/prefs";
 
 import { closeQuickOpen } from "./quick-open";
-import type { Source } from "./sources";
 import type { Range } from "./types";
+import { SourceDetails } from "ui/reducers/sources";
 
 export type ActiveSearchType = "project" | "file";
 
@@ -27,7 +27,7 @@ export interface UISliceState {
   activeSearch?: ActiveSearchType | null;
   fullTextSearchQuery: string;
   fullTextSearchFocus: boolean;
-  shownSource?: Source | null;
+  shownSource?: SourceDetails | null;
   startPanelCollapsed: boolean;
   endPanelCollapsed: boolean;
   sourcesCollapsed: boolean;
@@ -62,7 +62,7 @@ const uiSlice = createSlice({
     toggleFrameworkGrouping(state, action: PayloadAction<boolean>) {
       state.frameworkGroupingOn = action.payload;
     },
-    setShownSource(state, action: PayloadAction<Source | null>) {
+    setShownSource(state, action: PayloadAction<SourceDetails | null>) {
       state.shownSource = action.payload;
     },
     toggleStartPanel(state) {

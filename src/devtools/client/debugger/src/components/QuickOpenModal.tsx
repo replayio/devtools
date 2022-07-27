@@ -12,22 +12,25 @@ import { basename } from "../utils/path";
 import debounce from "lodash/debounce";
 import actions from "../actions";
 import {
-  getSourceList,
   getQuickOpenEnabled,
   getQuickOpenQuery,
   getQuickOpenType,
   getQuickOpenProject,
-  getSelectedSource,
-  getSourceContent,
-  getSourcesLoading,
   getSymbols,
   getTabs,
-  getDisplayedSources,
   isSymbolsLoading,
   getContext,
   getShowOnlyOpenSources,
   getSourcesForTabs,
 } from "../selectors";
+import {
+  getAllSourceDetails,
+  getSelectedSource,
+  getSourcesLoading,
+  getSourceContentsLoaded,
+  getSourceDetailsEntities,
+  SourceDetails,
+} from "ui/reducers/sources";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import { memoizeLast } from "../utils/memoizeLast";
@@ -43,7 +46,6 @@ import SearchInput from "./shared/SearchInput";
 import ResultList from "./shared/ResultList";
 import { trackEvent } from "ui/utils/telemetry";
 import { getGlobalFunctions, isGlobalFunctionsLoading } from "../reducers/ast";
-import { getSourceCount } from "../reducers/sources";
 
 const maxResults = 100;
 
@@ -63,7 +65,6 @@ function filter(values: SearchResult[], query: string) {
       })
     : values;
 }
-
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface SearchResult {
@@ -87,7 +88,11 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
     this.state = {
       results: props.showOnlyOpenSources
-        ? this.formatSources(props.sourcesForTabs, props.tabs)
+        ? this.formatSources(
+            props.sourcesForTabs,
+            props.displayedSources as Record<string, SourceDetails>,
+            props.tabs
+          )
         : null,
       selectedIndex: 0,
     };
@@ -136,21 +141,36 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   };
 
   formatSources = memoizeLast(
-    (sourceList: PropsFromRedux["sourceList"], tabs: { url: string }[]) => {
+    (
+      sourceList: PropsFromRedux["sourceList"],
+      sourcesById: Record<string, SourceDetails>,
+      tabs: { url: string }[]
+    ) => {
       const tabUrls = new Set(tabs.map(tab => tab.url));
-      return formatSources(sourceList, tabUrls);
+      return formatSources(sourceList, sourcesById, tabUrls);
     }
   );
 
   searchSources = (query: string) => {
-    const { sourceList, tabs, showOnlyOpenSources, sourcesForTabs, sourcesLoading } = this.props;
+    const {
+      sourceList,
+      tabs,
+      showOnlyOpenSources,
+      sourcesForTabs,
+      displayedSources,
+      sourcesLoading,
+    } = this.props;
 
     if (sourcesLoading) {
       return null;
     }
 
     const targetSourceList = showOnlyOpenSources ? sourcesForTabs : sourceList;
-    const sources = this.formatSources(targetSourceList, tabs);
+    const sources = this.formatSources(
+      targetSourceList,
+      displayedSources as Record<string, SourceDetails>,
+      tabs
+    );
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
@@ -162,13 +182,14 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   }
 
   searchFunctions(query: string) {
-    let fns = this.getFunctions();
+    let fns = this.getFunctions() as SearchResult[];
 
     if (query === "@" || query === "#") {
       return this.setResults(fns);
     }
-    fns = filter(fns, query.slice(1));
-    return this.setResults(fns);
+
+    const filteredFns = filter(fns, query.slice(1));
+    return this.setResults(filteredFns);
   }
 
   searchShortcuts = (query: string) => {
@@ -181,18 +202,21 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   };
 
   showTopSources = () => {
-    const { sourceList, tabs } = this.props;
+    const { sourceList, tabs, displayedSources } = this.props;
     const tabUrls = new Set(tabs.map(tab => tab.url));
 
     if (tabs.length > 0) {
       this.setResults(
         formatSources(
           sourceList.filter(source => !!source.url && tabUrls.has(source.url)),
+          displayedSources as Record<string, SourceDetails>,
           tabUrls
         )
       );
     } else {
-      this.setResults(formatSources(sourceList, tabUrls));
+      this.setResults(
+        formatSources(sourceList, displayedSources as Record<string, SourceDetails>, tabUrls)
+      );
     }
   };
 
@@ -493,26 +517,29 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 function mapStateToProps(state: UIState) {
   const selectedSource = getSelectedSource(state)!;
   const tabs = getTabs(state);
+  const sourceList = getAllSourceDetails(state);
+  const symbols = getSymbols(state, selectedSource);
 
   return {
     cx: getContext(state),
-    displayedSources: getDisplayedSources(state),
+    displayedSources: getSourceDetailsEntities(state),
     enabled: getQuickOpenEnabled(state),
-    globalFunctions: getGlobalFunctions(state),
+    globalFunctions: getGlobalFunctions(state) || [],
     globalFunctionsLoading: isGlobalFunctionsLoading(state),
     project: getQuickOpenProject(state),
     query: getQuickOpenQuery(state),
     searchType: getQuickOpenType(state),
     selectedContentLoaded: selectedSource
-      ? !!getSourceContent(state, selectedSource.id)
+      ? getSourceContentsLoaded(state, selectedSource.id)
       : undefined,
     selectedSource,
     showOnlyOpenSources: getShowOnlyOpenSources(state),
-    sourceCount: getSourceCount(state),
-    sourceList: getSourceList(state),
+    sourceList,
     sourcesForTabs: getSourcesForTabs(state),
+    sourceCount: sourceList.length,
     sourcesLoading: getSourcesLoading(state),
-    symbols: formatSymbols(getSymbols(state, selectedSource)),
+    // @ts-expect-error weird {loading} type mismatch
+    symbols: formatSymbols(symbols),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     tabs,
     viewMode: getViewMode(state),

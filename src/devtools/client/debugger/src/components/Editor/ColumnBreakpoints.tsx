@@ -7,7 +7,8 @@
 import React, { Component } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
-import { getSelectedSource, getVisibleColumnBreakpoints, getContext } from "../../selectors";
+import { getVisibleColumnBreakpoints, getContext } from "../../selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import { getLocationKey } from "../../utils/breakpoint";
@@ -32,7 +33,8 @@ class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
   render() {
     const { cx, editor, columnBreakpoints, selectedSource } = this.props;
 
-    if (!selectedSource || selectedSource.isBlackBoxed || columnBreakpoints.length === 0) {
+    // TODO Re-enable blackboxing
+    if (!selectedSource /*|| selectedSource.isBlackBoxed*/ || columnBreakpoints.length === 0) {
       return null;
     }
 

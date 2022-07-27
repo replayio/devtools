@@ -5,14 +5,14 @@ import { trackEvent } from "ui/utils/telemetry";
 import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import { getLogpointsForSource } from "../../reducers/breakpoints";
 import { removeRequestedBreakpoint } from "../../reducers/breakpoints";
-import { Source } from "../../reducers/sources";
+import type { MiniSource } from "ui/reducers/sources";
 import { getRequestedBreakpointLocations } from "../../selectors/breakpoints";
 import { isBreakable } from "../../utils/breakpoint";
 
 import { _addBreakpointAtLine } from "./breakpoints";
 import { _removeBreakpoint, removeBreakpointOption } from "./modify";
 
-export function removeLogpointsInSource(cx: Context, source: Source): UIThunkAction {
+export function removeLogpointsInSource(cx: Context, source: MiniSource): UIThunkAction {
   return async (dispatch, getState) => {
     const breakpoints = getLogpointsForSource(getState(), source.id);
     for (const breakpoint of breakpoints) {

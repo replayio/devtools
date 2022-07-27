@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { Location } from "@replayio/protocol";
 import { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
@@ -10,33 +9,39 @@ import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
 import { getDocument, hasDocument } from "../../utils/editor/source-documents";
 
 import { UIState } from "ui/state";
-import type { SourceWithContent } from "devtools/client/debugger/src/reducers/sources";
+import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+
+import { getVisibleSelectedFrame, getPauseCommand } from "../../selectors";
 
 import {
-  getVisibleSelectedFrame,
   getSelectedLocation,
   getSelectedSourceWithContent,
-  getPauseCommand,
-} from "../../selectors";
+  SourceDetails,
+  SourceContent,
+} from "ui/reducers/sources";
 
 type TempFrame = NonNullable<ReturnType<typeof getVisibleSelectedFrame>>;
 
-function isDebugLine(selectedFrame: TempFrame | null, selectedLocation: Location) {
+function isDebugLine(selectedFrame?: TempFrame | null, selectedLocation?: PartialLocation) {
   if (!selectedFrame) {
     return;
   }
 
   return (
+    selectedLocation &&
     selectedFrame.location.sourceId == selectedLocation.sourceId &&
     selectedFrame.location.line == selectedLocation.line
   );
 }
 
-function isDocumentReady(selectedSource: SourceWithContent | null, selectedLocation: Location) {
+function isDocumentReady(
+  selectedSource?: SourceContent | null,
+  selectedLocation?: PartialLocation
+) {
   return (
     selectedLocation &&
     selectedSource &&
-    selectedSource.content &&
+    selectedSource.value &&
     hasDocument(selectedLocation.sourceId)
   );
 }
@@ -75,7 +80,7 @@ export class HighlightLine extends Component<PropsFromRedux> {
     this.completeHighlightLine(null);
   }
 
-  shouldSetHighlightLine(selectedLocation: Location, selectedSource: SourceWithContent | null) {
+  shouldSetHighlightLine(selectedLocation: PartialLocation, selectedSource?: SourceContent | null) {
     const { line } = selectedLocation;
     const editorLine = toEditorLine(line);
 
@@ -105,10 +110,13 @@ export class HighlightLine extends Component<PropsFromRedux> {
   }
 
   setHighlightLine(
-    selectedLocation: Location,
-    selectedFrame: TempFrame | null,
-    selectedSource: SourceWithContent | null
+    selectedLocation?: PartialLocation,
+    selectedFrame?: TempFrame | null,
+    selectedSource?: SourceContent | null
   ) {
+    if (!selectedLocation) {
+      return;
+    }
     const { sourceId, line } = selectedLocation;
     if (!this.shouldSetHighlightLine(selectedLocation, selectedSource)) {
       return;
@@ -118,7 +126,7 @@ export class HighlightLine extends Component<PropsFromRedux> {
     const editorLine = toEditorLine(line);
     this.previousEditorLine = editorLine;
 
-    if (!line || isDebugLine(selectedFrame, selectedLocation)) {
+    if (!line || isDebugLine(selectedFrame!, selectedLocation)) {
       return;
     }
 
@@ -143,12 +151,12 @@ export class HighlightLine extends Component<PropsFromRedux> {
     setTimeout(() => doc && doc.removeLineClass(editorLine, "line", "highlight-line"), duration);
   }
 
-  clearHighlightLine(selectedLocation: Location, selectedSource: SourceWithContent | null) {
+  clearHighlightLine(selectedLocation?: PartialLocation, selectedSource?: SourceContent | null) {
     if (!isDocumentReady(selectedSource, selectedLocation)) {
       return;
     }
 
-    const { line, sourceId } = selectedLocation;
+    const { line, sourceId } = selectedLocation!;
     const editorLine = toEditorLine(line);
     const doc = getDocument(sourceId);
     // @ts-expect-error method doesn't exist

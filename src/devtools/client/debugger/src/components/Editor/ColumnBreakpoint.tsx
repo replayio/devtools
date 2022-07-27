@@ -16,7 +16,7 @@ import Panel from "./Breakpoints/Panel/Panel";
 import { features } from "ui/utils/prefs";
 import { isLogpoint } from "../../utils/breakpoint";
 import { Breakpoint } from "../../reducers/types";
-import type { SelectedSource } from "../../selectors";
+import type { SourceDetails } from "ui/reducers/sources";
 
 const breakpointButton = document.createElement("button");
 breakpointButton.innerHTML =
@@ -65,7 +65,7 @@ type CBProps = PropsFromRedux & {
   cx: Context;
   columnBreakpoint: ColumnBreakpointType;
   editor: $FixTypeLater;
-  source: SelectedSource;
+  source: SourceDetails;
   insertAt: number;
 };
 

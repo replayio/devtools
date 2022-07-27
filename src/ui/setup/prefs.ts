@@ -108,6 +108,14 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     );
 
     updateDebuggerPrefs(state, oldState, "sourcesCollapsed", state => state.ui.sourcesCollapsed);
+
+    updateDebuggerPrefs(
+      state,
+      oldState,
+      "pendingSelectedLocation",
+      // TS types say `null` isn't acceptable to persist, but it seems to work at runtime
+      state => state.experimentalSources.persistedSelectedLocation as any
+    );
   }
 
   if (state.pendingBreakpoints && oldState.pendingBreakpoints) {

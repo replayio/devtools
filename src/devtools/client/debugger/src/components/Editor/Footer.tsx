@@ -2,7 +2,7 @@ import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react
 import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
-import { getSelectedSourceWithContent } from "../../selectors";
+import { getSelectedSource } from "ui/reducers/sources";
 
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
@@ -21,7 +21,7 @@ type ScrollPosition = {
 const LOCAL_STORAGE_KEY = "SourceFooter.scrollPosition";
 
 function SourceFooter() {
-  const selectedSource = useAppSelector(getSelectedSourceWithContent);
+  const selectedSource = useAppSelector(getSelectedSource);
   const [cursorPosition, setCursorPosition] = useState<CursorPosition>({
     line: 0,
     column: 0,

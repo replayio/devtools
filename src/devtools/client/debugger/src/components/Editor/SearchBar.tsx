@@ -15,13 +15,12 @@ import AccessibleImage from "../shared/AccessibleImage";
 import actions from "../../actions";
 import {
   getActiveSearch,
-  getSelectedSource,
-  getSourceContent,
   getFileSearchQuery,
   getFileSearchModifiers,
   getFileSearchResults,
   getContext,
 } from "../../selectors";
+import { getSelectedSource, getSourceContent, isFulfilled } from "ui/reducers/sources";
 
 import { removeOverlay } from "../../utils/editor";
 
@@ -100,7 +99,9 @@ const mapStateToProps = (state: UIState) => {
     cx: getContext(state),
     searchOn: getActiveSearch(state) === "file",
     selectedSource,
-    selectedContentLoaded: selectedSource ? !!getSourceContent(state, selectedSource.id) : false,
+    selectedContentLoaded: selectedSource
+      ? isFulfilled(getSourceContent(state, selectedSource.id))
+      : false,
     query: getFileSearchQuery(state),
     modifiers: getFileSearchModifiers(state),
     searchResults: getFileSearchResults(state),

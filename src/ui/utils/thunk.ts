@@ -5,3 +5,5 @@ export interface ThunkExtraArgs {
   client: typeof clientCommands;
   ThreadFront: typeof ThreadFront;
 }
+
+export const extraThunkArgs = {} as ThunkExtraArgs;

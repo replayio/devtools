@@ -15,10 +15,9 @@ import type { UIThunkAction } from "ui/actions";
 import type { clientCommands } from "devtools/client/debugger/src/client/commands";
 import type { SourceRange } from "devtools/client/debugger/src/client/commands";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import type { Source, SourceWithContent } from "../../reducers/sources";
-import { getSourceActorsForSource } from "../../selectors";
 
 import { PROMISE } from "ui/setup/redux/middleware/promise";
+import { SourceDetails } from "ui/reducers/sources";
 
 async function blackboxActors(
   state: UIState,
@@ -27,14 +26,19 @@ async function blackboxActors(
   isBlackBoxed: boolean,
   range?: Partial<SourceRange>
 ) {
+  // TODO Rework blackboxing to actually do something again
+  /*
   for (const actor of getSourceActorsForSource(state, sourceId)) {
     await client.blackBox(actor, isBlackBoxed, range);
   }
+  */
   return { isBlackBoxed: !isBlackBoxed };
 }
 
-export function toggleBlackBox(cx: Context, source: Source | SourceWithContent): UIThunkAction {
+export function toggleBlackBox(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState, { client }) => {
+    // TODO Re-enable blackboxing
+    /*
     const { isBlackBoxed } = source;
 
     if (!isBlackBoxed) {
@@ -47,5 +51,6 @@ export function toggleBlackBox(cx: Context, source: Source | SourceWithContent):
       source,
       [PROMISE]: blackboxActors(getState(), client, source.id, isBlackBoxed),
     });
+    */
   };
 }

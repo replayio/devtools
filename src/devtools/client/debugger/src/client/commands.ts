@@ -297,6 +297,8 @@ async function blackBox(
   isBlackBoxed: boolean,
   range?: Partial<SourceRange>
 ) {
+  // TODO Re-enable blackboxing
+  /*
   const begin = range ? range.start : undefined;
   const end = range ? range.end : undefined;
   if (isBlackBoxed) {
@@ -304,6 +306,7 @@ async function blackBox(
   } else {
     await ThreadFront.blackbox(sourceActor.actor, begin, end);
   }
+  */
 }
 
 function interrupt(thread: any) {

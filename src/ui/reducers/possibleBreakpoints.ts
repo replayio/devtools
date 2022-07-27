@@ -14,6 +14,7 @@ import {
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { getSelectedLocation } from "./sources";
 
 export enum LoadingStatus {
   LOADING = "loading",
@@ -120,7 +121,7 @@ export const getPossibleBreakpointsForSource = (state: UIState, sourceId: string
 };
 
 export const getPossibleBreakpointsForSelectedSource = (state: UIState): Location[] => {
-  const sourceId = state.sources.selectedLocation?.sourceId;
+  const sourceId = getSelectedLocation(state)?.sourceId;
   if (!sourceId) {
     return [];
   }
@@ -138,7 +139,7 @@ export const computeBreakableLines = (possibleBreakpoints: Location[]) => {
 const NO_BREAKABLE_LINES: number[] = [];
 
 export const getBreakableLinesForSelectedSource = (state: UIState) => {
-  const sourceId = state.sources.selectedLocation?.sourceId;
+  const sourceId = getSelectedLocation(state)?.sourceId;
   if (!sourceId) {
     return NO_BREAKABLE_LINES;
   }

@@ -6,12 +6,11 @@ import groupBy from "lodash/groupBy";
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 
 import { sliceCodePoints } from "ui/utils/codePointString";
-
-import { Source } from "../../reducers/sources";
+import { SourceDetails } from "ui/reducers/sources";
 
 type $FixTypeLater = any;
 
-const formatSourceMatches = (source: Source, matches: SearchSourceContentsMatch[]) => ({
+const formatSourceMatches = (source: SourceDetails, matches: SearchSourceContentsMatch[]) => ({
   type: "RESULT",
   sourceId: source.id,
   filepath: source.url,
@@ -38,7 +37,7 @@ const formatSourceMatches = (source: Source, matches: SearchSourceContentsMatch[
 
 const formatMatchesBySource = (
   matches: SearchSourceContentsMatch[],
-  sourcesById: Record<string, Source>
+  sourcesById: Record<string, SourceDetails>
 ) => {
   const resultsBySource = groupBy(matches, res => res.location.sourceId);
   const filteredResults = Object.entries(resultsBySource)
@@ -50,7 +49,7 @@ const formatMatchesBySource = (
 
 export async function search(
   query: string,
-  sourcesById: Record<string, Source>,
+  sourcesById: Record<string, SourceDetails>,
   updateResults: (cb: (prevResults: $FixTypeLater) => any) => any,
   includeNodeModules: boolean
 ) {

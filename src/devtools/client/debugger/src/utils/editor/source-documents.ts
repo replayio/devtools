@@ -6,11 +6,7 @@ import type { Doc } from "codemirror";
 
 import { getMode } from "../source";
 import type { SourceEditor } from "./source-editor";
-import type {
-  SourceWithContent,
-  SourceContentValue,
-  Source,
-} from "devtools/client/debugger/src/reducers/sources";
+import type { SourceDetails, SourceContent, SourceContentValue } from "ui/reducers/sources";
 
 import { isMinified } from "../isMinified";
 import { SymbolDeclarations } from "../../selectors";
@@ -37,7 +33,7 @@ export function clearDocuments() {
   sourceDocs = {};
 }
 
-export function updateDocument(editor: SourceEditor, source?: SourceWithContent) {
+export function updateDocument(editor: SourceEditor, source?: SourceContent) {
   if (!source) {
     return;
   }
@@ -92,7 +88,7 @@ function setEditorText(editor: SourceEditor, sourceId: string, content: SourceCo
 
 function setMode(
   editor: SourceEditor,
-  source: SourceWithContent,
+  source: SourceContent,
   content: SourceContentValue,
   symbols: SymbolDeclarations
 ) {
@@ -101,7 +97,7 @@ function setMode(
     return;
   }
 
-  const mode = getMode(source as Source, content, symbols);
+  const mode = getMode(source, content, symbols);
   const currentMode = editor.codeMirror.getOption("mode");
   // @ts-expect-error currentMode.name doesn't exist
   if (!currentMode || currentMode.name != mode.name) {
@@ -115,7 +111,7 @@ function setMode(
  */
 export function showSourceText(
   editor: SourceEditor,
-  source: SourceWithContent,
+  source: SourceContent,
   content: SourceContentValue,
   symbols: SymbolDeclarations
 ) {

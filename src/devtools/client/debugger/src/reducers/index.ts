@@ -26,7 +26,6 @@ import eventListenerBreakpoints from "./event-listeners";
 
 export default {
   sourceActors,
-  sources,
   breakpoints,
   pendingBreakpoints,
   asyncRequests,

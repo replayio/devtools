@@ -1,4 +1,6 @@
 import { MouseEvent, sessionError, TimeStampedPoint, uploadedData } from "@replayio/protocol";
+import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
+
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
@@ -42,12 +44,14 @@ import {
 } from "protocol/graphics";
 
 import { extendStore, AppStore } from "../store";
+import { startAppListening } from "../listenerMiddleware";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
+import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
 import { UnexpectedError } from "ui/state/app";
-import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
+
 import { UIState } from "ui/state";
 
 const { setupApp, setupTimeline } = actions;
@@ -175,8 +179,12 @@ export default async function DevTools(store: AppStore) {
     ThreadFront: ThreadFront,
   };
 
-  extendStore(store, initialState, reducers, extraThunkArgs);
-  extendStore(store, {}, inspectorReducers, {});
+  // Add all these new slice reducers and some related state in a single call,
+  // which avoids weirdness in local dev with the Redux DevTools not passing in
+  // state from earlier if there's multiple `extendStore` calls
+  extendStore(store, initialState, { ...reducers, ...inspectorReducers }, extraThunkArgs);
+
+  setupSourcesListeners(startAppListening);
 
   dbgClient.bootstrap(store);
 

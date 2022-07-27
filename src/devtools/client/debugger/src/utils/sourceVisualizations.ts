@@ -3,24 +3,24 @@ import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 
-import type { Source } from "../reducers/sources";
+import { SourceDetails, isOriginalSource } from "ui/reducers/sources";
 
 import { isNodeModule, isBowerComponent } from "./source";
 
 export function getSourceIDsToSearch(
-  sourcesById: Record<string, Source>,
+  sourcesById: Record<string, SourceDetails>,
   includeNodeModules: boolean = false
 ) {
   const sourceIds = [];
   for (const sourceId in sourcesById) {
-    if (ThreadFront.isMinifiedSource(sourceId)) {
+    const source = sourcesById[sourceId];
+    if (source.canonicalId !== source.id) {
       continue;
     }
     const correspondingSourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
     if (correspondingSourceId !== sourceId) {
       continue;
     }
-    const source = sourcesById[sourceId];
     if (isBowerComponent(source)) {
       continue;
     }
@@ -31,18 +31,22 @@ export function getSourceIDsToSearch(
   }
   return sortBy(sourceIds, sourceId => {
     const source = sourcesById[sourceId];
-    return [source.isOriginal ? 0 : 1, source.url];
+    const isOriginal = isOriginalSource(source);
+    return [isOriginal ? 0 : 1, source.url];
   });
 }
 
-function getSourceToVisualize(selectedSource: Source, alternateSource: Source | null) {
+function getSourceToVisualize(
+  selectedSource: SourceDetails,
+  alternateSource: SourceDetails | null
+) {
   if (!selectedSource) {
     return undefined;
   }
-  if (selectedSource.isOriginal) {
+  if (isOriginalSource(selectedSource)) {
     return selectedSource.id;
   }
-  if (alternateSource?.isOriginal) {
+  if (alternateSource && isOriginalSource(alternateSource)) {
     return alternateSource.id;
   }
   const { sourceId } = getUniqueAlternateSourceId(selectedSource.id);
@@ -50,8 +54,8 @@ function getSourceToVisualize(selectedSource: Source, alternateSource: Source | 
 }
 
 export function getSourcemapVisualizerURL(
-  selectedSource: Source,
-  alternateSource: Source | null
+  selectedSource: SourceDetails,
+  alternateSource: SourceDetails | null
 ): string | null {
   const sourceId = getSourceToVisualize(selectedSource, alternateSource);
   if (!sourceId) {

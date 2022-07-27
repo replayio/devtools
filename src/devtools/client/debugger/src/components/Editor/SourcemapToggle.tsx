@@ -7,7 +7,7 @@ import { UIState } from "ui/state";
 
 import actions from "../../actions";
 import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSourceWithContent } from "../../reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
 
 import Toggle from "./Toggle";
@@ -59,7 +59,7 @@ export function SourcemapToggle({
 
 const connector = connect(
   (state: UIState) => ({
-    selectedSource: getSelectedSourceWithContent(state)!,
+    selectedSource: getSelectedSource(state)!,
     alternateSource: getAlternateSource(state),
   }),
   {

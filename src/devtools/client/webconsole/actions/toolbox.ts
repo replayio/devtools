@@ -11,11 +11,8 @@ import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
 import { isRegionLoaded } from "ui/reducers/app";
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { showSource } from "devtools/client/debugger/src/actions/ui";
-import {
-  getSourceByActorId,
-  getSourceByURL,
-  getContext,
-} from "devtools/client/debugger/src/selectors";
+import { getContext } from "devtools/client/debugger/src/selectors";
+import { getSourceDetails, getSourceByUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
 import { SourceLocation } from "@replayio/protocol";
 type $FixTypeLater = any;
@@ -50,7 +47,7 @@ export function unHighlightDomElement(): UIThunkAction {
 
 export function openLink(url: string): UIThunkAction {
   return (dispatch, getState) => {
-    const source = getSourceByURL(getState(), url);
+    const source = getSourceByUrl(getState(), url);
     if (source?.id) {
       dispatch(openSourceLink(source.id));
     } else {
@@ -109,8 +106,8 @@ export function onViewSourceInDebugger(
   return async (dispatch, getState) => {
     const cx = getContext(getState());
     const source = frame.sourceId
-      ? getSourceByActorId(getState(), frame.sourceId)
-      : getSourceByURL(getState(), frame.url!);
+      ? getSourceDetails(getState(), frame.sourceId)
+      : getSourceByUrl(getState(), frame.url!);
     if (source) {
       dispatch(showSource(cx, source.id, openSourcesTab));
       await dispatch(

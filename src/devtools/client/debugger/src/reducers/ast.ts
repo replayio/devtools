@@ -22,7 +22,7 @@ type ClassDeclaration = SymbolDeclaration & {
   };
 };
 
-type FunctionDeclaration = SymbolDeclaration & {
+export type FunctionDeclaration = SymbolDeclaration & {
   parameterNames: string[];
   klass: string | null;
   identifier: Object;
@@ -69,7 +69,7 @@ export type SymbolDeclarations = {
 type Symbol = { loading: boolean } | SymbolDeclarations;
 
 export interface ASTState {
-  globalFunctions: unknown[] | null;
+  globalFunctions: FunctionDeclaration[] | null;
   loadingGlobalFunctions: boolean;
   // dead
   projectSymbolsLoading: null;

@@ -37,6 +37,13 @@ import { KeyModifiersContext } from "ui/components/KeyModifiers";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import {
+  getSelectedSource,
+  getSelectedLocation,
+  getSelectedSourceWithContent,
+  LoadingStatus,
+} from "ui/reducers/sources";
+
+import {
   showSourceText,
   showLoading,
   showErrorMessage,
@@ -66,19 +73,20 @@ import { getContextMenu } from "ui/reducers/contextMenus";
 
 import { selectors } from "ui/reducers";
 import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
-import { SourceContent } from "../../reducers/sources";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
 
 const mapStateToProps = (state: UIState) => {
-  const selectedSource = selectors.getSelectedSourceWithContent(state);
+  const selectedSource = getSelectedSource(state);
+  const selectedSourceContent = getSelectedSourceWithContent(state);
 
   return {
     cx: selectors.getThreadContext(state),
     contextMenu: getContextMenu(state),
-    selectedLocation: selectors.getSelectedLocation(state),
+    selectedLocation: getSelectedLocation(state),
     selectedSource,
+    selectedSourceContent,
     searchOn: selectors.getActiveSearch(state) === "file",
     symbols: selectors.getSymbols(state, selectedSource as any),
     selectedFrame: selectors.getSelectedFrame(state),
@@ -314,9 +322,12 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     }
 
     // if user clicks gutter to set breakpoint on blackboxed source, un-blackbox the source.
+    // TODO Re-enable blackboxing
+    /*
     if (selectedSource && selectedSource.isBlackBoxed) {
       toggleBlackBox(cx, selectedSource);
     }
+    */
 
     if (typeof line !== "number") {
       return;
@@ -352,19 +363,20 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   }
 
   shouldScrollToLocation(nextProps: PropsFromRedux, editor: SourceEditor) {
-    const { selectedLocation, selectedSource } = this.props;
+    const { selectedLocation, selectedSourceContent } = this.props;
     if (
       !editor ||
-      !nextProps.selectedSource ||
+      !nextProps.selectedSourceContent ||
       !nextProps.selectedLocation ||
       !nextProps.selectedLocation.line ||
-      !nextProps.selectedSource.content
+      !nextProps.selectedSourceContent.value
     ) {
       return false;
     }
 
     const isFirstLoad =
-      (!selectedSource || !selectedSource.content) && nextProps.selectedSource.content;
+      (!selectedSourceContent || !selectedSourceContent.value) &&
+      nextProps.selectedSourceContent.value;
     const locationChanged = selectedLocation !== nextProps.selectedLocation;
     const symbolsChanged = nextProps.symbols != this.props.symbols;
 
@@ -381,7 +393,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
       if (selectedSource && hasDocument(selectedSource.id)) {
         const doc = getDocument(selectedSource.id);
         const lineText = doc.getLine(line);
-        column = toEditorColumn(lineText, selectedLocation.column);
+        column = toEditorColumn(lineText, selectedLocation.column || 0);
         column = Math.max(column, getIndentation(lineText));
       }
 
@@ -390,24 +402,22 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   }
 
   setText(props: PropsFromRedux, editor: SourceEditor) {
-    const { selectedSource, symbols } = props;
+    const { selectedSourceContent, symbols } = props;
     if (!editor) {
       return;
     }
 
     // check if we previously had a selected source
-    if (!selectedSource) {
+    if (!selectedSourceContent) {
       return this.clearEditor();
     }
 
-    if (!selectedSource.content) {
+    if (!selectedSourceContent.value) {
       return showLoading(editor);
     }
 
-    // @ts-expect-error stupid AsyncValue mismatches
-    if (selectedSource.content.state === "rejected") {
-      // @ts-expect-error stupid AsyncValue mismatches
-      let { value } = selectedSource.content;
+    if (selectedSourceContent.status === LoadingStatus.ERRORED) {
+      let { value } = selectedSourceContent.value;
       if (typeof value !== "string") {
         value = "Unexpected source error";
       }
@@ -417,8 +427,8 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
     return showSourceText(
       editor,
-      selectedSource,
-      (selectedSource.content as SourceContent).value as any,
+      selectedSourceContent,
+      selectedSourceContent.value,
       symbols as any
     );
   }
@@ -506,7 +516,10 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return (
       <div
         className={classnames("editor-wrapper", {
+          // TODO Re-enable blackboxing
+          /*
           blackboxed: selectedSource && selectedSource.isBlackBoxed,
+          */
           showLineHits: true,
         })}
         ref={c => (this.$editorWrapper = c)}

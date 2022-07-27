@@ -8,8 +8,8 @@ import { parse } from "../url";
 
 import { nodeHasChildren } from "./utils";
 
-import type { Source } from "../../reducers/sources";
 import type { TreeNode, TreeSource, TreeDirectory, ParentMap } from "./types";
+import { SourceDetails } from "ui/reducers/sources";
 
 /*
  * Gets domain from url (without www prefix)
@@ -100,7 +100,7 @@ export function createTreeNodeMatcher(
   part: string,
   isDir: boolean,
   debuggeeHost?: string,
-  source?: Source,
+  source?: SourceDetails,
   sortByUrl?: boolean
 ) {
   return (node: TreeNode) => {

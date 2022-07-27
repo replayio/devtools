@@ -3,10 +3,10 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIState } from "ui/state";
+import type { Dictionary } from "@reduxjs/toolkit";
 import type { SelectedFrame } from "../reducers/pause";
 
-import type { SourceResources, Source } from "../reducers/sources";
-import { getSources, getSelectedSource, getSourceInSources } from "../reducers/sources";
+import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 import { getFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
 import get from "lodash/get";
@@ -16,12 +16,12 @@ function getLocation(frame: SelectedFrame) {
   return frame.location;
 }
 
-function getSourceForFrame(sources: SourceResources, frame: SelectedFrame) {
+function getSourceForFrame(sources: Dictionary<SourceDetails>, frame: SelectedFrame) {
   const sourceId = getLocation(frame).sourceId;
-  return getSourceInSources(sources, sourceId);
+  return sources[sourceId]!;
 }
 
-function appendSource(sources: SourceResources, frame: SelectedFrame) {
+function appendSource(sources: Dictionary<SourceDetails>, frame: SelectedFrame) {
   return {
     ...frame,
     location: getLocation(frame),
@@ -32,13 +32,13 @@ function appendSource(sources: SourceResources, frame: SelectedFrame) {
 // eslint-disable-next-line
 export const getCallStackFrames = createSelector(
   getFrames,
-  getSources,
-  // Inlined to infer correct types
+  getSourceDetailsEntities,
   (frames, sources) => {
     if (!frames) {
       return null;
     }
 
+    // TODO re-enable blackboxing
     const formattedFrames = frames
       .filter(frame => getSourceForFrame(sources, frame))
       .map(frame => appendSource(sources, frame))

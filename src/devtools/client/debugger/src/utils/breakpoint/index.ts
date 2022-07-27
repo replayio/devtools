@@ -7,7 +7,7 @@ import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
 
 import type { SourceActor } from "../../reducers/source-actors";
-import { getSource, getSourceActorsForSource } from "../../reducers/sources";
+import { getSourceDetails } from "ui/reducers/sources";
 import type {
   Breakpoint,
   PendingBreakpoint,
@@ -65,18 +65,16 @@ export function makePendingLocationId(
 }
 
 export function makeBreakpointLocation(state: UIState, location: SourceLocation): SourceLocation {
-  const source = getSource(state, location.sourceId);
+  const source = getSourceDetails(state, location.sourceId);
   if (!source) {
     throw new Error("no source");
   }
 
   let sourceUrl;
-  let sourceId: string;
+  let sourceId = source.id;
 
   if (source.url) {
     sourceUrl = source.url;
-  } else {
-    sourceId = getSourceActorsForSource(state, source.id)[0].id;
   }
 
   return {

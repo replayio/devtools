@@ -2,7 +2,7 @@ import { useMemo, useLayoutEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { getSelectedSourceId } from "../../selectors";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { useStringPref } from "ui/hooks/settings";
 
 import styles from "./LineHitCounts.module.css";

@@ -10,31 +10,25 @@ import classnames from "classnames";
 
 import { showMenu } from "devtools/shared/contextmenu";
 import type { UIState } from "ui/state";
-import type { Source } from "devtools/client/debugger/src/reducers/sources";
+import type { ContextMenuItem } from "../../reducers/types";
+import type { SourceDetails } from "ui/reducers/sources";
 
 import SourceIcon from "../shared/SourceIcon";
 import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
 
+import { getContext } from "../../selectors";
 import {
-  getGeneratedSourceByURL,
   getHasSiblingOfSameName,
-  hasPrettySource as checkHasPrettySource,
-  getContext,
-  getExtensionNameBySourceUrl,
   getSourceContent,
-} from "../../selectors";
+  getGeneratedSourceByURL,
+  isFulfilled,
+} from "ui/reducers/sources";
 import actions from "../../actions";
 
-import {
-  getSourceQueryString,
-  isUrlExtension,
-  isExtensionDirectoryPath,
-  shouldBlackbox,
-} from "../../utils/source";
+import { getSourceQueryString, shouldBlackbox } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
-import { isFulfilled } from "../../utils/async-value";
 
 type $FixTypeLater = any;
 
@@ -46,7 +40,7 @@ interface STIProps {
   expanded: boolean;
   focusItem: (item: $FixTypeLater) => void;
   selectItem: (item: $FixTypeLater) => void;
-  source: Source;
+  source: SourceDetails;
   debuggeeUrl: string;
   setExpanded: (item: $FixTypeLater, a: boolean, b: boolean) => void;
 }
@@ -57,16 +51,12 @@ const mapStateToProps = (state: UIState, props: STIProps) => {
     cx: getContext(state),
     hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-    hasPrettySource: source ? checkHasPrettySource(state, source.id) : false,
     sourceContent: source ? getSourceContentValue(state, source) : null,
-    extensionName:
-      (isUrlExtension(item.name) && getExtensionNameBySourceUrl(state, item.name)) || null,
   };
 };
 
 const connector = connect(mapStateToProps, {
   toggleBlackBox: actions.toggleBlackBox,
-  loadSourceText: actions.loadSourceText,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -96,14 +86,14 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     event.stopPropagation();
     event.preventDefault();
 
-    const menuOptions = [];
+    const menuOptions: ContextMenuItem[] = [];
 
     if (!isDirectory(item)) {
       // Flow requires some extra handling to ensure the value of contents.
       const { contents } = item;
 
       if (!Array.isArray(contents)) {
-        const copySourceUri2 = {
+        const copySourceUri2: ContextMenuItem = {
           id: "node-menu-copy-source",
           label: copySourceUri2Label,
           accesskey: copySourceUri2Key,
@@ -113,14 +103,16 @@ class SourceTreeItem extends Component<FinalSTIProps> {
 
         const { cx, source } = this.props;
         if (source) {
+          // TODO Re-enable blackboxing
+          /*
           const blackBoxMenuItem = {
             id: "node-menu-blackbox",
             label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
             accesskey: source.isBlackBoxed ? "U" : "B",
             disabled: !shouldBlackbox(source),
             click: () => this.props.toggleBlackBox(cx, source),
-          };
-          menuOptions.push(copySourceUri2, blackBoxMenuItem);
+          };*/
+          menuOptions.push(copySourceUri2);
         }
       }
     }
@@ -132,7 +124,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     showMenu(event, menuOptions);
   };
 
-  addCollapseExpandAllOptions = (menuOptions: $FixTypeLater[], item: $FixTypeLater) => {
+  addCollapseExpandAllOptions = (menuOptions: ContextMenuItem[], item: $FixTypeLater) => {
     const { setExpanded } = this.props;
 
     menuOptions.push({
@@ -160,14 +152,12 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   renderIcon(item: $FixTypeLater, depth: number) {
-    const { source, hasPrettySource } = this.props;
+    const { source } = this.props;
 
     if (item.name === "webpack://") {
       return <AccessibleImage className="webpack" />;
     } else if (item.name === "ng://") {
       return <AccessibleImage className="angular" />;
-    } else if (isExtensionDirectoryPath(item.path)) {
-      return <AccessibleImage className="extension" />;
     }
 
     if (isDirectory(item)) {
@@ -178,13 +168,12 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       return <AccessibleImage className="folder" />;
     }
 
+    // TODO Re-enable blackboxing
+    /*
     if (source && source.isBlackBoxed) {
       return <AccessibleImage className="blackBox" />;
     }
-
-    if (hasPrettySource) {
-      return <AccessibleImage className="prettyPrint" />;
-    }
+    */
 
     if (source) {
       return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;
@@ -194,11 +183,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   renderItemName(depth: number) {
-    const { item, extensionName } = this.props;
-
-    if (isExtensionDirectory(depth, extensionName)) {
-      return extensionName;
-    }
+    const { item } = this.props;
 
     switch (item.name) {
       case "ng://":
@@ -211,11 +196,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   renderItemTooltip() {
-    const { item, depth, extensionName } = this.props;
-
-    if (isExtensionDirectory(depth, extensionName)) {
-      return item.name;
-    }
+    const { item, depth } = this.props;
 
     return item.type === "source" ? unescape(item.contents.url) : getPathWithoutThread(item.path);
   }
@@ -254,7 +235,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 }
 
-function getHasMatchingGeneratedSource(state: UIState, source?: Source) {
+function getHasMatchingGeneratedSource(state: UIState, source?: SourceDetails) {
   if (!source) {
     return false;
   }
@@ -262,13 +243,9 @@ function getHasMatchingGeneratedSource(state: UIState, source?: Source) {
   return !!getGeneratedSourceByURL(state, source.url!);
 }
 
-function getSourceContentValue(state: UIState, source: Source) {
+function getSourceContentValue(state: UIState, source: SourceDetails) {
   const content = getSourceContent(state, source.id);
   return content && isFulfilled(content) ? content.value : null;
-}
-
-function isExtensionDirectory(depth: number, extensionName: string | null) {
-  return extensionName && (depth === 1 || depth === 0);
 }
 
 export default connector(SourceTreeItem);

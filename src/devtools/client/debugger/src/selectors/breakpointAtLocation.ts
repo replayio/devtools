@@ -4,13 +4,12 @@
 
 import type { UIState } from "ui/state";
 
-import type { Source } from "../reducers/sources";
 import type { Breakpoint, Position } from "../reducers/types";
 
-import { getSelectedSource } from "../reducers/sources";
+import { getSelectedSource, MiniSource } from "ui/reducers/sources";
 import { getBreakpointsList } from "./breakpoints";
 
-function getBreakpointsForSource(state: UIState, selectedSource: Source) {
+function getBreakpointsForSource(state: UIState, selectedSource: MiniSource) {
   const breakpoints = getBreakpointsList(state);
 
   return breakpoints.filter(bp => {

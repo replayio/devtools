@@ -17,21 +17,31 @@ import { makeSourceId } from "../../client/create";
 import { setRequestedBreakpoint } from "../../reducers/breakpoints";
 import type { Context } from "../../reducers/pause";
 import { SourceActor } from "../../reducers/source-actors";
-import type { Source } from "../../reducers/sources";
 import {
   getBlackBoxList,
-  getSource,
-  getSourceFromId,
   hasSourceActor,
-  getPendingSelectedLocation,
   getPendingBreakpointsForSource,
   getContext,
 } from "../../selectors";
+import { getTabs, tabsRestored } from "devtools/client/debugger/src/reducers/tabs";
+import { getPendingBreakpointList } from "devtools/client/debugger/src/reducers/pending-breakpoints";
+
+import {
+  getSourceDetails,
+  allSourcesReceived,
+  SourceDetails,
+  getAllSourceDetails,
+  getSourceDetailsEntities,
+  getSourceByUrl,
+  getSourceToDisplayForUrl,
+  getSourceToDisplayById,
+} from "ui/reducers/sources";
 import { getRawSourceURL } from "../../utils/source";
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
-import { loadSourceText } from "./loadSourceText";
+import { experimentalLoadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
 
 interface SourceData {
   source: {
@@ -56,12 +66,12 @@ interface SourceInfo {
 
 // If a request has been made to show this source, go ahead and
 // select it.
-function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
+function checkSelectedSource(cx: Context, source: SourceDetails): UIThunkAction {
   return async (dispatch, getState) => {
     const state = getState();
-    const pendingLocation = getPendingSelectedLocation(state);
+    const persistedLocation = getPreviousPersistedLocation(state);
 
-    const pendingUrl = pendingLocation?.url || pendingLocation?.sourceUrl;
+    const pendingUrl = persistedLocation?.sourceUrl;
     if (!pendingUrl) {
       return;
     }
@@ -74,8 +84,8 @@ function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
       const { selectLocation } = await import("../sources");
       await dispatch(
         selectLocation(cx, {
-          column: pendingLocation.column,
-          line: typeof pendingLocation.line === "number" ? pendingLocation.line : 0,
+          column: persistedLocation.column,
+          line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
           sourceId: source.id,
         })
       );
@@ -86,7 +96,7 @@ function checkSelectedSource(cx: Context, source: Source): UIThunkAction {
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     // source may have been modified by selectLocation
-    const source = getSource(getState(), sourceId);
+    const source = getSourceDetails(getState(), sourceId);
     if (!source) {
       return;
     }
@@ -108,8 +118,10 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
     }
 
     // load the source text if there is a pending breakpoint for it
-    await dispatch(loadSourceText({ cx, source }));
-    await dispatch(fetchPossibleBreakpointsForSource(source.id));
+    const textPromise = dispatch(experimentalLoadSourceText(source.id));
+    const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
+
+    await Promise.all([textPromise, possibleBreakpointsPromise]);
 
     await Promise.all(
       pendingBreakpoints.map(bp => {
@@ -119,20 +131,24 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   };
 }
 
-function restoreBlackBoxedSources(cx: Context, sources: Source[]): UIThunkAction {
+function restoreBlackBoxedSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
   return async dispatch => {
     const tabs = getBlackBoxList();
     if (tabs.length == 0) {
       return;
     }
+    // TODO Re-enable blackboxing
+    /*
     for (const source of sources) {
       if (tabs.includes(source.url!) && !source.isBlackBoxed) {
         dispatch(toggleBlackBox(cx, source));
       }
     }
+    */
   };
 }
 
+// TODO Delete this!
 export function newQueuedSources(sourceInfo: SourceInfo[]): UIThunkAction<Promise<void>> {
   return async dispatch => {
     const generated: SourceData[] = [];
@@ -154,20 +170,27 @@ export function newQueuedSources(sourceInfo: SourceInfo[]): UIThunkAction<Promis
   };
 }
 
-export function newOriginalSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
+// TODO Delete this!
+export function newOriginalSource(sourceInfo: SourceData): UIThunkAction<Promise<SourceDetails>> {
   return async dispatch => {
     const sources = await dispatch(newOriginalSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
+
+// TODO Delete this!
+export function newOriginalSources(
+  sourceInfo: SourceData[]
+): UIThunkAction<Promise<SourceDetails[]>> {
   return async (dispatch, getState) => {
     const state = getState();
     const seen = new Set();
-    const sources: Source[] = [];
+    const sources: SourceDetails[] = [];
 
+    // TODO Rewrite "check pending" handling
+    /*
     for (const { id, url } of sourceInfo) {
-      if (seen.has(id) || getSource(state, id!)) {
+      if (seen.has(id) || getSourceDetails(state, id!)) {
         continue;
       }
 
@@ -195,20 +218,25 @@ export function newOriginalSources(sourceInfo: SourceData[]): UIThunkAction<Prom
     for (const source of sources) {
       dispatch(checkPendingBreakpoints(cx, source.id));
     }
-
+*/
     return sources;
   };
 }
 
-export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promise<Source>> {
+export function newGeneratedSource(sourceInfo: SourceData): UIThunkAction<Promise<SourceDetails>> {
   return async dispatch => {
     const sources = await dispatch(newGeneratedSources([sourceInfo]));
     return sources[0];
   };
 }
-export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Promise<Source[]>> {
+export function newGeneratedSources(
+  sourceInfo: SourceData[]
+): UIThunkAction<Promise<SourceDetails[]>> {
   return async (dispatch, getState, { ThreadFront }) => {
     const resultIds: string[] = [];
+
+    // TODO Rewrite "check pending" handling
+    /*
     const newSourcesObj: Record<string, Source> = {};
     const newSourceActors: SourceActor[] = [];
 
@@ -231,7 +259,7 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
         url = undefined;
       }
 
-      if (!getSource(getState(), newId) && !newSourcesObj[newId]) {
+      if (!getSourceDetails(getState(), newId) && !newSourcesObj[newId]) {
         newSourcesObj[newId] = {
           extensionName: source.extensionName,
           id: newId,
@@ -276,18 +304,20 @@ export function newGeneratedSources(sourceInfo: SourceData[]): UIThunkAction<Pro
     for (const { source } of newSourceActors) {
       dispatch(checkPendingBreakpoints(cx, source));
     }
-
-    return resultIds.map(id => getSourceFromId(getState(), id));
+    */
+    return resultIds.map(id => getSourceDetails(getState(), id)!);
   };
 }
 
+/*
 function addSources(cx: Context, sources: Source[]): UIThunkAction {
   return dispatch => {
     dispatch({ cx, sources, type: "ADD_SOURCES" });
   };
 }
+*/
 
-function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
+function checkNewSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
   return async (dispatch, getState) => {
     for (const source of sources) {
       dispatch(checkSelectedSource(cx, source));
@@ -297,3 +327,69 @@ function checkNewSources(cx: Context, sources: Source[]): UIThunkAction {
     return sources;
   };
 }
+
+// Delay adding these until the store is created
+export const setupSourcesListeners = (startAppListening: AppStartListening) => {
+  // When sources are received, we need to:
+  // - Update any persisted tabs to give them the correct source IDs for their URLs
+  // - Check for an existing selected location, and open that automatically
+  // - Restore any breakpoints that the user had set last time
+  startAppListening({
+    actionCreator: allSourcesReceived,
+    effect: async (action, listenerApi) => {
+      const { dispatch, getState } = listenerApi;
+      const state = getState();
+
+      const tabs = getTabs(state);
+      const persistedLocation = getPreviousPersistedLocation(state);
+
+      const sources = getAllSourceDetails(state);
+      const cx = getContext(state);
+
+      // Tabs are persisted with just a URL, but no `sourceId` because
+      // those may change across sessions. Figure out the sources per URL.
+      const canonicalTabSources = tabs
+        .map(tab => getSourceToDisplayForUrl(state, tab.url)!)
+        .filter(Boolean);
+
+      // Now that we know what sources _were_ open, update the tabs data
+      // so that the sources are associated with each tab
+      dispatch(tabsRestored(canonicalTabSources));
+
+      let selectedSourceToDisplay: SourceDetails | null = null;
+
+      // There may have been a location persisted from the last time the user
+      // had this recording open. If so, we want to try to restore that open
+      // file and line.
+      if (persistedLocation) {
+        if (persistedLocation.sourceUrl) {
+          selectedSourceToDisplay = getSourceToDisplayForUrl(state, persistedLocation.sourceUrl)!;
+        } else if (persistedLocation.sourceId) {
+          selectedSourceToDisplay = getSourceToDisplayById(state, persistedLocation.sourceId)!;
+        }
+
+        if (selectedSourceToDisplay) {
+          const { selectLocation } = await import("../sources");
+
+          await dispatch(
+            selectLocation(cx, {
+              column: persistedLocation.column,
+              line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
+              sourceId: selectedSourceToDisplay.id,
+              sourceUrl: selectedSourceToDisplay.url,
+            })
+          );
+        }
+      }
+
+      // TODO Re-enable blackboxing - this is a no-op for now
+      dispatch(restoreBlackBoxedSources(cx, sources));
+
+      // There may have been some breakpoints / print statements persisted as well.
+      // Reload those if possible.
+      for (const source of canonicalTabSources) {
+        dispatch(checkPendingBreakpoints(cx, source.id));
+      }
+    },
+  });
+};

@@ -10,20 +10,13 @@ import { showMenu } from "devtools/shared/contextmenu";
 
 import type { UIState } from "ui/state";
 import type { AppDispatch } from "ui/setup/store";
-import type { Source, SourceWithContent } from "devtools/client/debugger/src/reducers/sources";
-import { isPretty } from "../../utils/source";
-import {
-  getPrettySource,
-  getIsPaused,
-  getThreadContext,
-  isSourceWithMap,
-  getAlternateSource,
-} from "../../selectors";
+import { getIsPaused, getThreadContext, getAlternateSource } from "../../selectors";
+import { SourceContent, SourceDetails } from "ui/reducers/sources";
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
 interface EditorMenuProps {
-  selectedSource: SourceWithContent;
+  selectedSource: SourceDetails;
   clearContextMenu: () => void;
   contextMenu?: () => void;
   editor: any;
@@ -33,11 +26,6 @@ const mapStateToProps = (state: UIState, props: EditorMenuProps) => ({
   cx: getThreadContext(state),
   isPaused: getIsPaused(state),
   alternateSource: getAlternateSource(state),
-  hasMappedLocation:
-    (props.selectedSource.isOriginal ||
-      isSourceWithMap(state, props.selectedSource.id) ||
-      isPretty(props.selectedSource)) &&
-    !getPrettySource(state, props.selectedSource.id),
 });
 
 const connector = connect(mapStateToProps, dispatch => ({
@@ -63,9 +51,8 @@ class EditorMenu extends Component<FinalEMProps> {
       editorMenuItems({
         cx,
         editorActions,
-        // @ts-expect-error Source/SourceWithContent mismatch  but will be changed shortly
         selectedSource,
-        alternateSource,
+        alternateSource: alternateSource || null,
       })
     );
   }
