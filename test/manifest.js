@@ -54,6 +54,7 @@ module.exports = [
     example: "node/control_flow.js",
     script: "node_control_flow.js",
     targets: ["node"],
+    preRecordedRecordingId: "052bd569-243f-441e-863b-62a98f437e41",
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -96,6 +97,7 @@ module.exports = [
     example: "node/async.js",
     script: "node_stepping-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "7273ad84-cf2c-40db-b855-5f1cbb92b1bf",
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -149,11 +151,13 @@ module.exports = [
     example: "node/basic.js",
     script: "node_console-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "0a98dd16-7ae2-4ef0-b6b2-6f75e7b0a819",
   },
   {
     example: "node/error.js",
     script: "node_console-02.js",
     targets: ["node"],
+    preRecordedRecordingId: "aadb6e3d-a8fc-4916-90a2-40a409ca2e94",
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -191,11 +195,13 @@ module.exports = [
     example: "node/basic.js",
     script: "node_logpoint-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "ba058b85-655b-4acc-a456-a880c6a9deae",
   },
   {
     example: "node/exceptions.js",
     script: "node_logpoint-02.js",
     targets: ["node"],
+    preRecordedRecordingId: "617840a2-531d-427b-a518-a93436c5ad03",
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -228,6 +234,7 @@ module.exports = [
     example: "node/objects.js",
     script: "node_object_preview-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "e04863a1-1197-4259-9a4d-754f054a6269",
   },
 
   //////////////////////////////////////////////////////////////////////////////
@@ -331,6 +338,7 @@ module.exports = [
     example: "node/run_worker.js",
     script: "node_worker-01.js",
     targets: ["node"],
+    preRecordedRecordingId: "d427c1c6-6163-42bd-b105-49bf93dbc7d2",
   },
   {
     // Disabled because we can't record the example
