@@ -330,9 +330,10 @@ function checkNewSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
 
 // Delay adding these until the store is created
 export const setupSourcesListeners = (startAppListening: AppStartListening) => {
-  // When sources are received, we want to check for an existing
-  // selected location, and open that automatically.
-  // Also, we
+  // When sources are received, we need to:
+  // - Update any persisted tabs to give them the correct source IDs for their URLs
+  // - Check for an existing selected location, and open that automatically
+  // - Restore any breakpoints that the user had set last time
   startAppListening({
     actionCreator: allSourcesReceived,
     effect: async (action, listenerApi) => {

@@ -81,6 +81,16 @@ function NotAllowed(reason = "") {
   console.trace(`Not allowed${reason ? ` (${reason})` : ""}`);
 }
 
+// These field lookups can occur in local development.
+// Even if the object _is_ expired and we want to deny access,
+// there's no point in warning about these.
+const KNOWN_IGNORABLE_OBJECT_FIELD_CHECKS = [
+  "Symbol(immer-state)",
+  "Symbol(immer-draftable)",
+  "isReactComponent",
+  "@@toStringTag",
+];
+
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   // getPrototypeOf() {
   //   NotAllowed();
@@ -90,9 +100,7 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
   //},
   //set() { NotAllowed(); },
   get(target, p) {
-    if (
-      ["Symbol(immer-state)", "Symbol(immer-draftable)", "isReactComponent"].includes(p.toString())
-    ) {
+    if (KNOWN_IGNORABLE_OBJECT_FIELD_CHECKS.includes(p.toString())) {
       return;
     }
     NotAllowed("target: " + p.toString());

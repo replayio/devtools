@@ -283,7 +283,6 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
     // But I'm not sure we're actually *removing* query strings in the first
     // place yet!
     // TODO @jcmorrow - actually remove query strings, then add them back here.
-    // presence
     const queryString = "";
     return sourceDetails.url + queryString;
   } else {
@@ -333,6 +332,9 @@ export const getCanonicalSourceFromEntities = (
   sd: SourceDetails
 ) => {
   const canonicalSource = detailsEntities[sd.canonicalId];
+  if (!canonicalSource) {
+    console.error("Could not find canonical source for alternate source: ", sd);
+  }
   return canonicalSource ?? sd;
 };
 
@@ -343,6 +345,7 @@ export const getCanonicalSource = (state: UIState, sd: SourceDetails) => {
 export const getCanonicalSourceForUrl = (state: UIState, url: string) => {
   const sd = getSourceByUrl(state, url);
   if (!sd) {
+    console.error("Could not find source for URL: ", url);
     return undefined;
   }
 
