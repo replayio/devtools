@@ -17,6 +17,7 @@ import {
 import React, {
   KeyboardEvent,
   PropsWithChildren,
+  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -39,6 +40,7 @@ import {
 import { EvaluationEventPayload } from "devtools/client/webconsole/actions/input";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { Pause, ThreadFront, ValueFront } from "protocol/thread";
+import { seek } from "ui/actions/timeline";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
 import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
@@ -46,9 +48,9 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { displayedBeginForFocusRegion, displayedEndForFocusRegion } from "ui/utils/timeline";
 
+import ReplayLogo from "../shared/ReplayLogo";
+
 import styles from "./NewConsole.module.css";
-import { seek } from "ui/actions/timeline";
-import number from "devtools/packages/devtools-reps/reps/number";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -71,19 +73,21 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <SessionContext.Provider value={sessionContext}>
-      <TimelineContextAdapter>
-        <InspectorContextReduxAdapter>
-          <TerminalContextReduxAdapter>
-            <FocusContextReduxAdapter>
-              <PointsContextReduxAdapter>
-                <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
-              </PointsContextReduxAdapter>
-            </FocusContextReduxAdapter>
-          </TerminalContextReduxAdapter>
-        </InspectorContextReduxAdapter>
-      </TimelineContextAdapter>
-    </SessionContext.Provider>
+    <Suspense fallback={<Loader />}>
+      <SessionContext.Provider value={sessionContext}>
+        <TimelineContextAdapter>
+          <InspectorContextReduxAdapter>
+            <TerminalContextReduxAdapter>
+              <FocusContextReduxAdapter>
+                <PointsContextReduxAdapter>
+                  <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
+                </PointsContextReduxAdapter>
+              </FocusContextReduxAdapter>
+            </TerminalContextReduxAdapter>
+          </InspectorContextReduxAdapter>
+        </TimelineContextAdapter>
+      </SessionContext.Provider>
+    </Suspense>
   );
 }
 
@@ -385,4 +389,12 @@ function focusRegionToRange(focusRegion: FocusRegion | null): Range | null {
   }
 
   return [displayedBeginForFocusRegion(focusRegion), displayedEndForFocusRegion(focusRegion)];
+}
+
+function Loader() {
+  return (
+    <div className={styles.Loader}>
+      <ReplayLogo size="md" color="gray" />
+    </div>
+  );
 }
