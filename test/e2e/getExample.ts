@@ -5,6 +5,7 @@ import config from "./config";
 import { recordNodeExample } from "./recordNode";
 import { recordPlaywright, uploadLastRecording } from "./recordPlaywright";
 import { waitUntilMessage } from "./utils";
+const manifest = require("../manifest");
 
 const exampleFile = path.resolve(__dirname, "../../test/example-recordings.json");
 
@@ -12,9 +13,15 @@ export async function getExampleRecordingId(
   example: string,
   isNodeExample = false
 ): Promise<string | undefined> {
+  let entry = manifest.find(
+    (entry: { example: string; preRecordedRecordingId?: string }) => entry.example === example
+  );
+
   // Recording ID to load in the viewer. If not set, we will record the example
   // in the browser or node before stopping and switching to the viewer.
-  let exampleRecordingId = config.useExampleFile ? readExampleFile()[example] : undefined;
+  let exampleRecordingId =
+    entry.preRecordedRecordingId ||
+    (config.useExampleFile ? readExampleFile()[example] : undefined);
 
   if (!exampleRecordingId) {
     if (isNodeExample) {
