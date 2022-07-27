@@ -18,6 +18,7 @@ export interface QuickOpenState {
   enabled: boolean;
   query: string;
   searchType: SearchTypes;
+  showOnlyOpenSources: boolean;
   project: boolean;
 }
 
@@ -25,6 +26,7 @@ export const initialQuickOpenState: QuickOpenState = {
   enabled: false,
   query: "",
   searchType: "sources",
+  showOnlyOpenSources: false,
   project: false,
 };
 
@@ -32,12 +34,16 @@ const quickOpenSlice = createSlice({
   name: "quickOpen",
   initialState: initialQuickOpenState,
   reducers: {
-    openQuickOpen(state, action: PayloadAction<{ query: string; project: boolean }>) {
-      const { query, project } = action.payload;
+    openQuickOpen(
+      state,
+      action: PayloadAction<{ query: string; project: boolean; showOnlyOpenSources?: boolean }>
+    ) {
+      const { project, query, showOnlyOpenSources } = action.payload;
       state.enabled = true;
       state.project = project;
       state.query = query;
       state.searchType = parseQuickOpenQuery(query);
+      state.showOnlyOpenSources = showOnlyOpenSources === true;
     },
     closeQuickOpen(state) {
       return initialQuickOpenState;
@@ -50,7 +56,7 @@ const quickOpenSlice = createSlice({
   },
 });
 
-export const { openQuickOpen, closeQuickOpen, setQuickOpenQuery } = quickOpenSlice.actions;
+export const { closeQuickOpen, openQuickOpen, setQuickOpenQuery } = quickOpenSlice.actions;
 
 export default quickOpenSlice.reducer;
 
@@ -59,6 +65,10 @@ export function getQuickOpenEnabled(state: UIState) {
 }
 export function getQuickOpenProject(state: UIState) {
   return state.quickOpen.project;
+}
+
+export function getShowOnlyOpenSources(state: UIState) {
+  return state.quickOpen.showOnlyOpenSources;
 }
 
 export function getQuickOpenQuery(state: UIState) {

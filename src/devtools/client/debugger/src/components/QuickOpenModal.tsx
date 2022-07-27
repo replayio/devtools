@@ -25,6 +25,8 @@ import {
   getDisplayedSources,
   isSymbolsLoading,
   getContext,
+  getShowOnlyOpenSources,
+  getSourcesForTabs,
 } from "../selectors";
 import { setViewMode } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
@@ -53,11 +55,13 @@ type $FixTypeLater = any;
 function filter(values: SearchResult[], query: string) {
   const preparedQuery = fuzzyAldrin.prepareQuery(query);
 
-  return fuzzyAldrin.filter(values, query, {
-    key: "value",
-    maxResults,
-    preparedQuery,
-  });
+  return query
+    ? fuzzyAldrin.filter(values, query, {
+        key: "value",
+        maxResults,
+        preparedQuery,
+      })
+    : values;
 }
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -80,7 +84,13 @@ interface QOMState {
 export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   constructor(props: PropsFromRedux) {
     super(props);
-    this.state = { results: null, selectedIndex: 0 };
+
+    this.state = {
+      results: props.showOnlyOpenSources
+        ? this.formatSources(props.sourcesForTabs, props.tabs)
+        : null,
+      selectedIndex: 0,
+    };
   }
 
   setResults(results: SearchResult[]) {
@@ -133,13 +143,14 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   );
 
   searchSources = (query: string) => {
-    const { sourceList, tabs, sourcesLoading } = this.props;
+    const { sourceList, tabs, showOnlyOpenSources, sourcesForTabs, sourcesLoading } = this.props;
 
     if (sourcesLoading) {
       return null;
     }
 
-    const sources = this.formatSources(sourceList, tabs);
+    const targetSourceList = showOnlyOpenSources ? sourcesForTabs : sourceList;
+    const sources = this.formatSources(targetSourceList, tabs);
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
@@ -496,8 +507,10 @@ function mapStateToProps(state: UIState) {
       ? !!getSourceContent(state, selectedSource.id)
       : undefined,
     selectedSource,
+    showOnlyOpenSources: getShowOnlyOpenSources(state),
     sourceCount: getSourceCount(state),
     sourceList: getSourceList(state),
+    sourcesForTabs: getSourcesForTabs(state),
     sourcesLoading: getSourcesLoading(state),
     symbols: formatSymbols(getSymbols(state, selectedSource)),
     symbolsLoading: isSymbolsLoading(state, selectedSource),

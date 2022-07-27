@@ -28,6 +28,7 @@
   align-self: flex-start;
   align-items: flex-start;
   display: flex;
+  padding-right: 2rem;
 }
 
 .source-header::-webkit-scrollbar {
@@ -135,4 +136,21 @@
 .source-tab .close-btn:focus {
   color: var(--theme-selection-color);
   background-color: var(--primary-accent);
+}
+
+.source-drop-down-button {
+  position: absolute;
+  right: 0;
+  width: 2rem;
+  background-color: var(--tab-bgcolor);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: var(--editor-header-height);
+  font-size: var(--theme-tab-font-size);
+  cursor: pointer;
+}
+.source-drop-down-button:hover {
+  background-color: var(--tab-hover-bgcolor);
+  color: var(--tab-hover-color);
 }
