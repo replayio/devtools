@@ -39,11 +39,14 @@ const protocolMessagesSlice = createSlice({
       state.events.push(cloneDeep(action.payload));
     },
     responseReceived(state, action: PayloadAction<CommandResponse & Recorded>) {
-      const clonedResponse = cloneDeep(action.payload);
+      // Pre-freeze a copy of the top object, so that Immer doesn't recurse.
+      // This avoids errors with `ValueFront` and other object types being frozen,
+      // and then mutated by other app code later, but also avoids a costly
+      // deep clone of the entire message structure here.
+      const frozenMessage = Object.freeze({ ...action.payload });
+      state.idToResponseMap[frozenMessage.id] = frozenMessage;
 
-      state.idToResponseMap[clonedResponse.id] = clonedResponse;
-
-      const request = state.idToRequestMap[action.payload.id];
+      const request = state.idToRequestMap[frozenMessage.id];
       if (request) {
         request.pending = false;
       }
