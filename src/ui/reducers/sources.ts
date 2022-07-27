@@ -394,6 +394,8 @@ export const selectors = {
   getSourceContentsLoaded,
   getHasSiblingOfSameName,
   getPreviousPersistedLocation,
+  getCanonicalSource,
+  getCanonicalSourceForUrl,
 };
 
 export default sourcesSlice.reducer;
