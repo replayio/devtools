@@ -438,8 +438,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   }
 
   render() {
-    const { enabled, query, showOnlyOpenSources, sourcesLoading, sourcesForTabs, tabs } =
-      this.props;
+    const { enabled, query, sourcesLoading } = this.props;
     const { selectedIndex, results } = this.state;
 
     if (!enabled) {
