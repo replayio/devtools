@@ -40,10 +40,10 @@ import {
 import { EvaluationEventPayload } from "devtools/client/webconsole/actions/input";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { Pause, ThreadFront, ValueFront } from "protocol/thread";
-import { seek } from "ui/actions/timeline";
+import { seek, setFocusRegion } from "ui/actions/timeline";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
-import { getCurrentTime, getFocusRegion } from "ui/reducers/timeline";
+import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { displayedBeginForFocusRegion, displayedEndForFocusRegion } from "ui/utils/timeline";
@@ -56,20 +56,23 @@ import styles from "./NewConsole.module.css";
 export default function NewConsoleRoot() {
   const recordingId = useGetRecordingId();
 
+  const duration = useAppSelector(getRecordingDuration)!;
+
   const sessionContext = useMemo<SessionContextType>(
     () => ({
       accessToken: ThreadFront.getAccessToken(),
       recordingId,
       sessionId: ThreadFront.sessionId!,
 
+      // Duration info is primarily used by the focus editor (not imported yet)
+      // but Console message context menu also allows refining the focus, which uses it.
+      duration,
+      endPoint: null as any,
+
       // Current user info is only used by the new Comments UI (which isn't included yet)
       currentUserInfo: null as any,
-
-      // Duration info is only used by the focus editor (not imported yet)
-      duration: null as any,
-      endPoint: null as any,
     }),
-    [recordingId]
+    [duration, recordingId]
   );
 
   return (
@@ -123,6 +126,7 @@ function JSTermWrapper() {
 
 // Adapter that reads focus region (from Redux) and passes it to the FocusContext.
 function FocusContextReduxAdapter({ children }: PropsWithChildren) {
+  const dispatch = useAppDispatch();
   const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
 
@@ -155,17 +159,30 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
     };
   }, [focusRegion, loadedRegions]);
 
+  const update = useCallback(
+    (value: Range | null, debounce: boolean) => {
+      dispatch(
+        setFocusRegion(
+          value !== null
+            ? {
+                beginTime: value[0],
+                endTime: value[1],
+              }
+            : null
+        )
+      );
+    },
+    [dispatch]
+  );
+
   const context = useMemo(
     () => ({
       isTransitionPending: isPending,
       range: focusRegionToRange(deferredFocusRegion),
       rangeForDisplay: focusRegionToRange(focusRegion),
-
-      // This context adapter is read-only.
-      // Focus is set by the legacy Timeline component.
-      update: () => {},
+      update,
     }),
-    [deferredFocusRegion, isPending, focusRegion]
+    [deferredFocusRegion, isPending, focusRegion, update]
   );
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;

@@ -111,3 +111,19 @@
   gap: 0.5ch;
   color: var(--color-error);
 }
+
+.ColorBadge,
+.UnicornBadge {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 1rem;
+  border-radius: 1rem;
+}
+.ColorBadge {
+  background-color: var(--badge-color);
+}
+.UnicornBadge {
+  background-image: url(../../../public/unicorn.svg) !important;
+  background-size: auto 100%;
+}

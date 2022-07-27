@@ -5,16 +5,18 @@ import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/Inspec
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { useMemo, useRef, useState } from "react";
+import { MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
+import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
+import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
-import MessageHoverButton from "../MessageHoverButton";
 
 function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocused: boolean }) {
+  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -60,6 +62,11 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
     />
   ));
 
+  const showContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    show(eventLog, { x: event.pageX, y: event.pageY });
+  };
+
   const primaryContent = (
     <div
       className={
@@ -83,6 +90,7 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
         className={className}
         data-test-name="Message"
         role="listitem"
+        onContextMenu={showContextMenu}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
