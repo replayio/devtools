@@ -99,18 +99,21 @@
   color: var(--color-error);
 }
 
-.ColorBadge,
+.ColorBadge {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex: 0 0 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--badge-color);
+  margin: 0.25rem;
+}
 .UnicornBadge {
   display: inline-block;
   width: 1rem;
   height: 1rem;
   flex: 0 0 1rem;
   border-radius: 1rem;
-}
-.ColorBadge {
-  background-color: var(--badge-color);
-}
-.UnicornBadge {
   background-image: url(../../../public/unicorn.svg) !important;
   background-size: auto 100%;
 }
