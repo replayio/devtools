@@ -1,4 +1,5 @@
 import { Location, SameLineSourceLocations } from "@replayio/protocol";
+import uniq from "lodash/uniq";
 // eslint-disable-next-line
 import { client } from "protocol/socket";
 import { ThreadFront } from "./thread";
@@ -22,7 +23,7 @@ export const sameLineSourceLocationsToLocationList = (
   sourceId: string
 ): Location[] => {
   return sameLineLocations.flatMap(lineLocations => {
-    return lineLocations.columns.map(column => {
+    return uniq(lineLocations.columns).map(column => {
       return {
         line: lineLocations.line,
         column,
