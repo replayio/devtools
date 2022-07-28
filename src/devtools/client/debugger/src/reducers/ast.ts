@@ -15,7 +15,7 @@ type SymbolDeclaration = {
   generatedLocation?: AstPosition;
 };
 
-type ClassDeclaration = SymbolDeclaration & {
+export type ClassDeclaration = SymbolDeclaration & {
   parent?: {
     name: string;
     location: AstLocation;

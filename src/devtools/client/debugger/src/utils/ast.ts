@@ -3,14 +3,22 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 // Check whether location A starts after location B
-export function positionAfter(a, b) {
+import type { SourceLocation } from "@replayio/protocol";
+import { SymbolDeclarations, ClassDeclaration, FunctionDeclaration } from "../reducers/ast";
+
+export interface PositionRange {
+  start: SourceLocation;
+  end: SourceLocation;
+}
+
+export function positionAfter(a: PositionRange, b: PositionRange) {
   return (
     a.start.line > b.start.line ||
     (a.start.line === b.start.line && a.start.column > b.start.column)
   );
 }
 
-export function containsPosition(a, b) {
+export function containsPosition(a: PositionRange, b: SourceLocation) {
   const bColumn = b.column || 0;
   const startsBefore =
     a.start.line < b.line || (a.start.line === b.line && a.start.column <= bColumn);
@@ -19,7 +27,10 @@ export function containsPosition(a, b) {
   return startsBefore && endsAfter;
 }
 
-function findClosestofSymbol(declarations, location) {
+function findClosestofSymbol(
+  declarations: (FunctionDeclaration | ClassDeclaration)[],
+  location: SourceLocation
+) {
   if (!declarations) {
     return null;
   }
@@ -52,10 +63,10 @@ function findClosestofSymbol(declarations, location) {
     }
 
     return currNode;
-  }, null);
+  }, null as (FunctionDeclaration | ClassDeclaration) | null);
 }
 
-export function findClosestFunction(symbols, location) {
+export function findClosestFunction(symbols: SymbolDeclarations, location: SourceLocation) {
   if (!symbols || symbols.loading) {
     return null;
   }
@@ -63,7 +74,7 @@ export function findClosestFunction(symbols, location) {
   return findClosestofSymbol(symbols.functions, location);
 }
 
-export function findClosestClass(symbols, location) {
+export function findClosestClass(symbols: SymbolDeclarations, location: SourceLocation) {
   if (!symbols || symbols.loading) {
     return null;
   }
@@ -71,9 +82,12 @@ export function findClosestClass(symbols, location) {
   return findClosestofSymbol(symbols.classes, location);
 }
 
-export function findClosestEnclosedSymbol(symbols, location) {
-  let classes = [];
-  let functions = [];
+export function findClosestEnclosedSymbol(
+  symbols: SymbolDeclarations | null,
+  location: SourceLocation
+) {
+  let classes: SymbolDeclarations["classes"] = [];
+  let functions: SymbolDeclarations["functions"] = [];
 
   if (symbols && !symbols.loading) {
     ({ classes, functions } = symbols);

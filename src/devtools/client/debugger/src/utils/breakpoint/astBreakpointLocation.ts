@@ -3,10 +3,11 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-
+import type { SourceDetails } from "ui/reducers/sources";
+import { SymbolDeclarations } from "../../selectors";
 import { findClosestFunction } from "../ast";
 
-export function getASTLocation(source, symbols, location) {
+export function getASTLocation(source: SourceDetails, symbols: SymbolDeclarations, location) {
   if (!symbols || symbols.loading) {
     return { name: undefined, offset: location, index: 0 };
   }
@@ -25,7 +26,7 @@ export function getASTLocation(source, symbols, location) {
   return { name: undefined, offset: location, index: 0 };
 }
 
-export function findFunctionByName(symbols, name, index) {
+export function findFunctionByName(symbols: SymbolDeclarations, name: string, index: number) {
   if (symbols.loading) {
     return null;
   }
