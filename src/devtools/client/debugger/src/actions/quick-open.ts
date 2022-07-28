@@ -4,7 +4,7 @@
 
 import { UIThunkAction } from "ui/actions";
 
-import { loadGlobalFunctions } from "./ast";
+import { fetchGlobalFunctions } from "../reducers/ast";
 import {
   openQuickOpen as openQuickOpenAction,
   setQuickOpenQuery,
@@ -29,7 +29,7 @@ export function openQuickOpen(
 ): UIThunkAction {
   return dispatch => {
     if (project) {
-      dispatch(loadGlobalFunctions());
+      dispatch(fetchGlobalFunctions());
     }
 
     return dispatch(openQuickOpenAction({ query, project, showOnlyOpenSources }));

@@ -4,7 +4,13 @@
 
 // Check whether location A starts after location B
 import type { SourceLocation } from "@replayio/protocol";
-import { SymbolDeclarations, ClassDeclaration, FunctionDeclaration } from "../reducers/ast";
+import {
+  SymbolDeclarations,
+  ClassDeclaration,
+  FunctionDeclaration,
+  SymbolEntry,
+} from "../reducers/ast";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export interface PositionRange {
   start: SourceLocation;
@@ -66,31 +72,31 @@ function findClosestofSymbol(
   }, null as (FunctionDeclaration | ClassDeclaration) | null);
 }
 
-export function findClosestFunction(symbols: SymbolDeclarations, location: SourceLocation) {
-  if (!symbols || symbols.loading) {
+export function findClosestFunction(symbolsEntry: SymbolEntry, location: SourceLocation) {
+  if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
   }
 
-  return findClosestofSymbol(symbols.functions, location);
+  return findClosestofSymbol(symbolsEntry.symbols!.functions, location);
 }
 
-export function findClosestClass(symbols: SymbolDeclarations, location: SourceLocation) {
-  if (!symbols || symbols.loading) {
+export function findClosestClass(symbolsEntry: SymbolEntry, location: SourceLocation) {
+  if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
   }
 
-  return findClosestofSymbol(symbols.classes, location);
+  return findClosestofSymbol(symbolsEntry.symbols!.classes, location);
 }
 
 export function findClosestEnclosedSymbol(
-  symbols: SymbolDeclarations | null,
+  symbolsEntry: SymbolEntry | null,
   location: SourceLocation
 ) {
-  let classes: SymbolDeclarations["classes"] = [];
-  let functions: SymbolDeclarations["functions"] = [];
+  let classes: ClassDeclaration[] = [];
+  let functions: FunctionDeclaration[] = [];
 
-  if (symbols && !symbols.loading) {
-    ({ classes, functions } = symbols);
+  if (symbolsEntry && symbolsEntry.status === LoadingStatus.LOADED) {
+    ({ classes, functions } = symbolsEntry.symbols!);
   }
 
   return findClosestofSymbol([...functions, ...classes], location);

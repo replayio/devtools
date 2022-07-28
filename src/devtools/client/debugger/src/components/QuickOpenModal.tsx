@@ -40,6 +40,7 @@ import {
   parseLineColumn,
   formatShortcutResults,
   formatSources,
+  SearchResult,
 } from "../utils/quick-open";
 import Modal from "./shared/Modal";
 import SearchInput from "./shared/SearchInput";
@@ -66,16 +67,6 @@ function filter(values: SearchResult[], query: string) {
     : values;
 }
 type PropsFromRedux = ConnectedProps<typeof connector>;
-
-interface SearchResult {
-  id: string;
-  value: string;
-  title: string;
-  location?: $FixTypeLater;
-  icon?: string;
-  url?: string;
-  subtitle?: string;
-}
 
 interface QOMState {
   results: SearchResult[] | null;
@@ -303,7 +294,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
     if (this.isFunctionQuery() && !project) {
       return highlightLineRange({
         ...(item.location != null
-          ? { end: item.location.end.line, start: item.location.start.line }
+          ? { end: item.location.end!.line, start: item.location.start.line }
           : {}),
         sourceId: selectedSource.id,
       });
@@ -538,7 +529,6 @@ function mapStateToProps(state: UIState) {
     sourcesForTabs: getSourcesForTabs(state),
     sourceCount: sourceList.length,
     sourcesLoading: getSourcesLoading(state),
-    // @ts-expect-error weird {loading} type mismatch
     symbols: formatSymbols(symbols),
     symbolsLoading: isSymbolsLoading(state, selectedSource),
     tabs,

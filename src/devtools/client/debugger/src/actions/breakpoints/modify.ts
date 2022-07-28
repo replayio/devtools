@@ -123,7 +123,7 @@ export function addBreakpoint(
     }
 
     const symbols = getSymbols(getState(), source);
-    const astLocation = getASTLocation(source, symbols, location);
+    const astLocation = getASTLocation(symbols, location);
 
     const originalContent = getSourceContent(getState(), source.id);
     const originalText = getTextAtPosition(originalContent, location);

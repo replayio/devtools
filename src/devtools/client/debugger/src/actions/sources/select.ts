@@ -35,7 +35,7 @@ import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { setSymbols } from "./symbols";
+import { fetchSymbolsForSource } from "../../reducers/ast";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -168,6 +168,8 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
+    // This adds the source's text to the client-side parser, which is a necessary step
+    // before we can ask the parser to return symbols in `fetchSymbolsForSource`.
     const textPromise = dispatch(experimentalLoadSourceText(source.id));
     const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
 
@@ -185,7 +187,7 @@ export function selectLocation(
       return;
     }
 
-    dispatch(setSymbols({ cx, source: loadedSource }));
+    dispatch(fetchSymbolsForSource(loadedSource.id));
 
     // If a new source is selected update the file search results
     const newSource = getSelectedSource(getState());

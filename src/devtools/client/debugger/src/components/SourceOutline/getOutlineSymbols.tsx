@@ -1,10 +1,18 @@
 import { fuzzySearch } from "../../utils/function";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
-import { SourceSymbols, ClassSymbol, FunctionSymbol } from "../../types";
 import { HitCount } from "../../reducers/sources";
+import { FunctionDeclaration, ClassDeclaration, SymbolEntry } from "../../reducers/ast";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
-function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCount[] | null) {
+export type FunctionDeclarationHits = FunctionDeclaration & {
+  hits?: number;
+};
+
+function addHitCountsToFunctions(
+  functions: FunctionDeclaration[],
+  hitCounts: HitCount[] | null
+): FunctionDeclarationHits[] {
   if (!hitCounts) {
     return functions;
   }
@@ -28,15 +36,15 @@ function addHitCountsToFunctions(functions: FunctionSymbol[], hitCounts: HitCoun
 }
 
 export function getOutlineSymbols(
-  symbols: null | SourceSymbols,
+  symbolsEntry: null | SymbolEntry,
   filter: string,
   hitCounts: HitCount[] | null
 ) {
-  if (!symbols || symbols.loading) {
+  if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
   }
 
-  let { classes, functions } = symbols;
+  let { classes, functions } = symbolsEntry.symbols!;
   functions = addHitCountsToFunctions(functions, hitCounts);
   const classNames = new Set(classes.map(s => s.name));
   const functionsByName = keyBy(functions, "name");
@@ -47,7 +55,7 @@ export function getOutlineSymbols(
 
   const functionsByClass = groupBy(filteredFunctions, func => func.klass || "");
 
-  return classes.reduce((funcs: Array<ClassSymbol | FunctionSymbol>, classSymbol) => {
+  return classes.reduce((funcs: Array<ClassDeclaration | FunctionDeclaration>, classSymbol) => {
     const classFuncs = functionsByClass[classSymbol.name];
     if (classFuncs?.length > 0) {
       funcs.push(functionsByName[classSymbol.name] || classSymbol, ...classFuncs);

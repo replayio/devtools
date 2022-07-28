@@ -8,7 +8,6 @@ import { findClosestEnclosedSymbol } from "../../utils/ast";
 import { SourceOutlineClass } from "./SourceOutlineClass";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
 import { getOutlineSymbols } from "./getOutlineSymbols";
-import { FunctionSymbol, ClassSymbol } from "../../types";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
@@ -16,8 +15,10 @@ import { actions } from "ui/actions";
 import { UIState } from "ui/state";
 import { getSelectedSource } from "ui/reducers/sources";
 import Spinner from "ui/components/shared/Spinner";
-import { isFunctionSymbol } from "./isFunctionSymbol";
+import { isFunctionDeclaration } from "./isFunctionSymbol";
+import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
 import { fetchHitCounts, getHitCountsForSource } from "ui/reducers/hitCounts";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export function SourceOutline({
   cx,
@@ -29,11 +30,12 @@ export function SourceOutline({
 }: PropsFromRedux) {
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
-    // @ts-expect-error symbols args mismatch
     () => getOutlineSymbols(symbols, filter, hitCounts),
     [symbols, filter, hitCounts]
   );
-  const [focusedSymbol, setFocusedSymbol] = useState<ClassSymbol | FunctionSymbol | null>(null);
+  const [focusedSymbol, setFocusedSymbol] = useState<ClassDeclaration | FunctionDeclaration | null>(
+    null
+  );
   const listRef = useRef<any>();
 
   const closestSymbolIndex = useMemo(() => {
@@ -64,7 +66,7 @@ export function SourceOutline({
   }, [closestSymbolIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleSelectSymbol = useCallback(
-    (symbol: ClassSymbol | FunctionSymbol) => {
+    (symbol: ClassDeclaration | FunctionDeclaration) => {
       selectLocation(cx, {
         sourceId: selectedSource!.id,
         sourceUrl: selectedSource!.url!,
@@ -85,7 +87,7 @@ export function SourceOutline({
       }
       return (
         <div style={style}>
-          {isFunctionSymbol(symbol) ? (
+          {isFunctionDeclaration(symbol) ? (
             <SourceOutlineFunction
               isFocused={isFocused}
               func={symbol}
@@ -112,7 +114,7 @@ export function SourceOutline({
     );
   }
 
-  if (!symbols || symbols.loading) {
+  if (!symbols || symbols.status === LoadingStatus.LOADING) {
     return (
       <div className="flex justify-center p-4">
         <Spinner className="h-4 w-4 animate-spin text-gray-500" />

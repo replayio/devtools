@@ -1,17 +1,17 @@
 import React from "react";
 import classnames from "classnames";
-import { isFunctionSymbol } from "./isFunctionSymbol";
-import { ClassSymbol, FunctionSymbol } from "devtools/client/debugger/src/types";
+import { isFunctionDeclaration } from "./isFunctionSymbol";
 import { SourceOutlineFunction } from "./SourceOutlineFunction";
+import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
 
 export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
   klass,
   isFocused,
   onSelect,
 }: {
-  klass: ClassSymbol;
+  klass: ClassDeclaration;
   isFocused: boolean;
-  onSelect: (klass: ClassSymbol | FunctionSymbol) => void;
+  onSelect: (klass: ClassDeclaration | FunctionDeclaration) => void;
 }) {
   return (
     <li className="outline-list__class  mb-2" key={klass.name}>
@@ -19,7 +19,7 @@ export const SourceOutlineClass = React.memo(function OutlineClassFunctions({
         className={classnames("cursor-pointer", { focused: isFocused })}
         onClick={() => onSelect(klass)}
       >
-        {isFunctionSymbol(klass) ? (
+        {isFunctionDeclaration(klass) ? (
           <SourceOutlineFunction func={klass} isFocused={false} />
         ) : (
           <div>

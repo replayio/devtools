@@ -2,12 +2,19 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk, createEntityAdapter, EntityState } from "@reduxjs/toolkit";
 
 import { UIState } from "ui/state";
+import { ThunkExtraArgs } from "ui/utils/thunk";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { MiniSource, getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 
-type AstPosition = { line: number; column: number };
-type AstLocation = { end: AstPosition; start: AstPosition };
+import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
+
+import { formatProjectFunctions, SearchResult } from "../utils/quick-open";
+
+export type AstPosition = { line: number; column: number };
+export type AstLocation = { end: AstPosition; start: AstPosition };
 
 type SymbolDeclaration = {
   name: string;
@@ -63,108 +70,143 @@ export type SymbolDeclarations = {
   hasJsx: boolean;
   hasTypes: boolean;
   framework?: string;
-  loading: false;
 };
 
-type Symbol = { loading: boolean } | SymbolDeclarations;
+export interface SymbolEntry {
+  id: string;
+  symbols: SymbolDeclarations | null;
+  status: LoadingStatus;
+}
+
+const symbolsAdapter = createEntityAdapter<SymbolEntry>();
+
+export const { selectById: getSymbolEntryForSource } = symbolsAdapter.getSelectors(
+  (state: UIState) => state.ast.symbols
+);
 
 export interface ASTState {
-  globalFunctions: FunctionDeclaration[] | null;
-  loadingGlobalFunctions: boolean;
-  // dead
-  projectSymbolsLoading: null;
-  symbols: Record<string, Symbol>;
+  /** A list of _all_ functions found anywhere in the sources.
+   * Stored as pre-formatted search results used by the QuickOpenModal, and
+   * fetched when the QOM is opened in "Project" mode with CTRL-O
+   * */
+  globalFunctions: SearchResult[] | null;
+  globalFunctionsStatus: LoadingStatus;
+  /** Symbol data parsed from a given source file locally by our Babel parser */
+  symbols: EntityState<SymbolEntry>;
 }
 
-export function initialASTState(): ASTState {
-  return {
-    symbols: {},
-    projectSymbolsLoading: null,
-    globalFunctions: null,
-    loadingGlobalFunctions: false,
-  };
-}
+const initialState: ASTState = {
+  symbols: symbolsAdapter.getInitialState(),
+  globalFunctions: null,
+  globalFunctionsStatus: LoadingStatus.IDLE,
+};
 
-function update(state = initialASTState(), action: AnyAction) {
-  switch (action.type) {
-    case "SET_SYMBOLS": {
-      const { sourceId } = action;
-      if (action.status === "start") {
-        return {
-          ...state,
-          symbols: { ...state.symbols, [sourceId]: { loading: true } },
-        };
-      }
+export const fetchSymbolsForSource = createAsyncThunk<
+  SymbolDeclarations,
+  string,
+  { state: UIState; extra: ThunkExtraArgs }
+>(
+  "ast/fetchSymbolsForSource",
+  async sourceId => {
+    const { parser } = await import("devtools/client/debugger/src/utils/bootstrap");
 
-      const value = action.value;
-      return {
-        ...state,
-        symbols: { ...state.symbols, [sourceId]: value },
-      };
-    }
+    const symbols = (await parser.getSymbols(sourceId)) as SymbolDeclarations;
+    return symbols;
+  },
+  {
+    condition(arg, thunkApi) {
+      const entry = getSymbols(thunkApi.getState(), { id: arg });
 
-    case "LOADING_GLOBAL_FUNCTIONS": {
-      return {
-        ...state,
-        loadingGlobalFunctions: true,
-      };
-    }
-
-    case "SET_GLOBAL_FUNCTIONS": {
-      return {
-        ...state,
-        loadingGlobalFunctions: false,
-        globalFunctions: action.globalFns,
-      };
-    }
-
-    case "RESUME": {
-      return { ...state };
-    }
-
-    default: {
-      return state;
-    }
+      // TODO Hypothetically a race condition here if we're LOADING, as the thunk
+      // will resolve now but the data isn't ready yet.
+      // This is handled over in `syncBreakpoint`, since `selectLocation` is unlikely
+      // to have that issue.
+      // Note that switching to RTK Query should eliminate this, because its thunks
+      // return promises that resolve once the data is actually available.
+      const isPendingOrFulfilled =
+        !!entry &&
+        [LoadingStatus.LOADING, LoadingStatus.LOADED].includes(entry.status as LoadingStatus);
+      return !isPendingOrFulfilled;
+    },
+    dispatchConditionRejection: false,
   }
-}
+);
 
-interface PartialSource {
-  id: string;
-}
+export const fetchGlobalFunctions = createAsyncThunk<
+  SearchResult[],
+  void,
+  { state: UIState; extra: ThunkExtraArgs }
+>("ast/fetchGlobalFunctions", async (_, thunkApi) => {
+  const { ThreadFront } = thunkApi.extra;
 
-export function getSymbols(state: UIState, source?: PartialSource) {
+  await ThreadFront.ensureAllSources();
+
+  const sourceById = getSourceDetailsEntities(thunkApi.getState());
+  // Empty query to grab all of the functions, which we can easily filter later.
+  const query = "";
+  const sourceIds = getSourceIDsToSearch(sourceById as Record<string, SourceDetails>);
+
+  const globalFns: SearchResult[] = [];
+
+  await ThreadFront.searchFunctions({ query, sourceIds }, matches => {
+    globalFns.push(...formatProjectFunctions(matches, sourceById));
+  });
+
+  return globalFns;
+});
+
+const astSlice = createSlice({
+  name: "ast",
+  initialState,
+  // Could actually be a `createReducer` but oh well
+  reducers: {},
+  extraReducers: builder => {
+    builder
+      .addCase(fetchSymbolsForSource.pending, (state, action) => {
+        symbolsAdapter.addOne(state.symbols, {
+          id: action.meta.arg,
+          symbols: null,
+          status: LoadingStatus.LOADING,
+        });
+      })
+      .addCase(fetchSymbolsForSource.fulfilled, (state, action) => {
+        symbolsAdapter.updateOne(state.symbols, {
+          id: action.meta.arg,
+          changes: { symbols: action.payload, status: LoadingStatus.LOADED },
+        });
+      })
+      .addCase(fetchGlobalFunctions.pending, state => {
+        state.globalFunctionsStatus = LoadingStatus.LOADING;
+      })
+      .addCase(fetchGlobalFunctions.fulfilled, (state, action) => {
+        state.globalFunctions = action.payload;
+        state.globalFunctionsStatus = LoadingStatus.LOADED;
+      });
+  },
+});
+
+export function getSymbols(state: UIState, source?: MiniSource) {
   if (!source) {
     return null;
   }
-
-  return state.ast.symbols[source.id] || null;
+  return getSymbolEntryForSource(state, source.id) || null;
 }
 
-export function hasSymbols(state: UIState, source?: PartialSource) {
-  const symbols = getSymbols(state, source);
-
-  if (!symbols) {
+export function isSymbolsLoading(state: UIState, source?: MiniSource) {
+  const symbolsEntry = getSymbols(state, source);
+  if (!symbolsEntry) {
     return false;
   }
 
-  return !symbols.loading;
-}
-
-export function isSymbolsLoading(state: UIState, source?: PartialSource) {
-  const symbols = getSymbols(state, source);
-  if (!symbols) {
-    return false;
-  }
-
-  return symbols.loading;
+  return symbolsEntry.status === LoadingStatus.LOADING;
 }
 
 export function isGlobalFunctionsLoading(state: UIState) {
-  return state.ast.loadingGlobalFunctions;
+  return state.ast.globalFunctionsStatus == LoadingStatus.LOADING;
 }
 
 export function getGlobalFunctions(state: UIState) {
   return state.ast.globalFunctions;
 }
 
-export default update;
+export default astSlice.reducer;

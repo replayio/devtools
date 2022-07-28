@@ -1,7 +1,6 @@
 import { RecordingId } from "@replayio/protocol";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
-import { setSymbols } from "devtools/client/debugger/src/actions/sources/symbols";
-import { getSymbols } from "devtools/client/debugger/src/reducers/ast";
+import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getTextAtLocation } from "ui/reducers/sources";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
@@ -150,10 +149,12 @@ export function createLabels(
 
     let symbols = getSymbols(state, { id: sourceId });
     if (!symbols) {
-      // @ts-expect-error really only need source.id here
-      symbols = await dispatch(setSymbols({ source: { id: sourceId } }));
+      await dispatch(fetchSymbolsForSource(sourceId));
+      // TODO Technically a small race condition here if the symbols were already loading,
+      // but given where `createLabels` is called I'm not going to worry about it
+      symbols = getSymbols(state, { id: sourceId });
     }
-    const closestFunction = findClosestFunction(symbols, sourceLocation);
+    const closestFunction = findClosestFunction(symbols!, sourceLocation);
     const primary = closestFunction?.name || `${filename}:${line}`;
 
     let snippet = getTextAtLocation(state, sourceLocation) || "";
