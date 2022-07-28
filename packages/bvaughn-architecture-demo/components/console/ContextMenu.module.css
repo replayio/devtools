@@ -1,0 +1,41 @@
+.ContextMenu {
+  position: absolute;
+  flex-direction: column;
+  display: flex;
+  background-color: var(--background-color-default);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.ContextMenuItem {
+  background-color: var(--background-color-contrast-3);
+  color: var(--color-default);
+  padding: 0.5rem 1rem;
+  user-select: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+.ContextMenuItem:hover {
+  background-color: var(--background-color-default);
+}
+
+.ColorBadge,
+.ColorBadgeClear,
+.UnicornBadge {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 1rem;
+}
+.ColorBadge {
+  background-color: var(--badge-color);
+}
+.ColorBadgeClear {
+  border: 0.25rem solid var(--background-color-contrast-5);
+}
+.UnicornBadge {
+  background-image: url(../../public/unicorn.svg) !important;
+  background-size: auto 100%;
+}

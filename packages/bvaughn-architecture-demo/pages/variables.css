@@ -55,6 +55,17 @@
     --value-type-html-tag: #75bffe;
     --value-type-html-tag-bracket: #e6e9ec;
     --value-type-html-text: #d7d7db;
+
+    --badge-green-color: #69e261;
+    --badge-green-contrast-color: #050;
+    --badge-orange-color: #ff9a19;
+    --badge-orange-contrast-color: #fff;
+    --badge-purple-color: #cc81ff;
+    --badge-purple-contrast-color: #fff;
+    --badge-unicorn-color: #e110b3;
+    --badge-unicorn-contrast-color: #fff;
+    --badge-yellow-color: #fee608;
+    --badge-yellow-contrast-color: rgb(99, 79, 5);
   }
 }
 
@@ -115,5 +126,16 @@
     --value-type-html-tag: #0074e8;
     --value-type-html-tag-bracket: #0c0c0d;
     --value-type-html-text: #0c0c0d;
+
+    --badge-green-color: #73cc6d;
+    --badge-green-contrast-color: #fff;
+    --badge-orange-color: #da7c04;
+    --badge-orange-contrast-color: #fff;
+    --badge-purple-color: #a973cd;
+    --badge-purple-contrast-color: #fff;
+    --badge-unicorn-color: #ff6ddf;
+    --badge-unicorn-contrast-color: #fff;
+    --badge-yellow-color: #e4cd00;
+    --badge-yellow-contrast-color: rgb(99, 79, 5);
   }
 }

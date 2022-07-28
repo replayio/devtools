@@ -4,21 +4,22 @@ import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
+import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { useMemo, useRef, useState } from "react";
+import { ExecutionPoint, Location } from "@replayio/protocol";
+import { MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
-import { ExecutionPoint, Location } from "@replayio/protocol";
-import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
 // Renders PointInstances with enableLogging=true.
 function LogPointRenderer({
@@ -28,6 +29,7 @@ function LogPointRenderer({
   isFocused: boolean;
   logPointInstance: PointInstance;
 }) {
+  const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -51,6 +53,11 @@ function LogPointRenderer({
     className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
+  const showContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    show(logPointInstance, { x: event.pageX, y: event.pageY });
+  };
+
   const primaryContent = (
     <div
       className={
@@ -63,6 +70,7 @@ function LogPointRenderer({
         </span>
       )}
       <div className={styles.LogContents}>
+        {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
         <Suspense fallback={<Loader />}>
           <AnalyzedContent logPointInstance={logPointInstance} />
         </Suspense>
@@ -81,6 +89,7 @@ function LogPointRenderer({
       className={className}
       data-test-name="Message"
       role="listitem"
+      onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -174,6 +183,24 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
       {children}
     </InspectableTimestampedPointContext.Provider>
   );
+}
+
+function BadgeRenderer({ badge }: { badge: Badge }) {
+  switch (badge) {
+    case "unicorn":
+      return <div className={styles.UnicornBadge} />;
+      break;
+    default:
+      return (
+        <div
+          className={styles.ColorBadge}
+          style={{
+            // @ts-ignore
+            "--badge-color": `var(--badge-${badge}-color)`,
+          }}
+        />
+      );
+  }
 }
 
 export default memo(LogPointRenderer) as typeof LogPointRenderer;

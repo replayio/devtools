@@ -12,8 +12,10 @@ import {
 // The new console uses a numeric id but the legacy console uses a string.
 export type PointId = number | string;
 
+export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
+
 export type Point = {
-  badge: string | null;
+  badge: Badge | null;
   condition: string | null;
   content: string;
   enableBreaking: boolean;

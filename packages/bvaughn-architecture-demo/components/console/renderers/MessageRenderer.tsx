@@ -5,12 +5,14 @@ import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { Message as ProtocolMessage, Value as ProtocolValue } from "@replayio/protocol";
-import { useMemo, useRef, useState } from "react";
+import { Value as ProtocolValue } from "@replayio/protocol";
+import { MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
+import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import MessageStackRenderer from "../MessageStackRenderer";
 import Source from "../Source";
@@ -24,6 +26,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
 
   const [isHovered, setIsHovered] = useState(false);
 
+  const { show } = useContext(ConsoleContextMenuContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
@@ -75,6 +78,11 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
 
+  const showContextMenu = (event: MouseEvent) => {
+    event.preventDefault();
+    show(message, { x: event.pageX, y: event.pageY });
+  };
+
   const logContents = (
     <div className={styles.LogContents}>
       {icon}
@@ -94,6 +102,7 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
         className={className}
         data-test-name="Message"
         role="listitem"
+        onContextMenu={showContextMenu}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
