@@ -7,6 +7,7 @@ import { getCorrespondingSourceIds, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
 import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export interface HitCount {
   location: Location;
@@ -24,12 +25,6 @@ export type HitCountsState = {
   aggregateHitCounts: EntityState<SourceHitCounts>;
   hitCounts: EntityState<SourceHitCounts>;
 };
-
-export enum LoadingStatus {
-  LOADING = "loading",
-  LOADED = "loaded",
-  ERRORED = "errored",
-}
 
 const hitCountsAdapter = createEntityAdapter<SourceHitCounts>();
 const aggregateHitCountsAdapter = createEntityAdapter<SourceHitCounts>();
