@@ -198,13 +198,16 @@ export function LoggablesContextRoot({
   useLayoutEffect(() => {
     const list = messageListRef.current;
     if (list !== null) {
-      list.childNodes.forEach((node: ChildNode, index: number) => {
+      list.childNodes.forEach((node: ChildNode) => {
         const element = node as HTMLElement;
-        const textContent = element.textContent?.toLocaleLowerCase();
-        const matches = textContent?.includes(filterByLowerCaseText);
 
-        // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
-        element.style.display = matches ? "inherit" : "none";
+        if (element.hasAttribute("data-search-index")) {
+          const textContent = element.textContent?.toLocaleLowerCase();
+          const matches = textContent?.includes(filterByLowerCaseText);
+
+          // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+          element.style.display = matches ? "inherit" : "none";
+        }
       });
     }
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);

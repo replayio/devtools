@@ -3,7 +3,6 @@ import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
@@ -23,9 +22,11 @@ import styles from "./shared.module.css";
 
 // Renders PointInstances with enableLogging=true.
 function LogPointRenderer({
+  index,
   isFocused,
   logPointInstance,
 }: {
+  index: number;
   isFocused: boolean;
   logPointInstance: PointInstance;
 }) {
@@ -36,8 +37,6 @@ function LogPointRenderer({
 
   const [isHovered, setIsHovered] = useState(false);
 
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
-
   useLayoutEffect(() => {
     if (isFocused) {
       ref.current?.scrollIntoView({ block: "nearest" });
@@ -47,10 +46,6 @@ function LogPointRenderer({
   let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
-  }
-
-  if (currentExecutionPoint === logPointInstance.timeStampedHitPoint.point) {
-    className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
   const showContextMenu = (event: MouseEvent) => {
@@ -87,11 +82,12 @@ function LogPointRenderer({
     <div
       ref={ref}
       className={className}
+      data-search-index={index}
       data-test-name="Message"
-      role="listitem"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      role="listitem"
     >
       {primaryContent}
       <MessageHoverButtonWithWithPause

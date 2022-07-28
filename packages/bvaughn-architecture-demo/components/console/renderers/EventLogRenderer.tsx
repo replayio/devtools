@@ -2,7 +2,6 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { MouseEvent, useMemo, useRef, useState } from "react";
@@ -15,15 +14,21 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
-function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocused: boolean }) {
+function EventLogRenderer({
+  eventLog,
+  index,
+  isFocused,
+}: {
+  eventLog: EventLog;
+  index: number;
+  isFocused: boolean;
+}) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
-
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const { point, pauseId, time, values } = eventLog;
 
@@ -44,10 +49,6 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
   let className = styles.Row;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
-  }
-
-  if (currentExecutionPoint === point) {
-    className = `${className} ${styles.CurrentlyPausedAt}`;
   }
 
   const location = eventLog.location[0];
@@ -88,6 +89,7 @@ function EventLogRenderer({ eventLog, isFocused }: { eventLog: EventLog; isFocus
       <div
         ref={ref}
         className={className}
+        data-search-index={index}
         data-test-name="Message"
         role="listitem"
         onContextMenu={showContextMenu}
