@@ -8,7 +8,8 @@ import { getUnicodeUrl } from "devtools/client/shared/unicode-url";
 
 import type { SymbolDeclarations } from "../reducers/ast";
 import type { SourceActor } from "../reducers/source-actors";
-import { LoadingStatus, SourceContent, MiniSource } from "ui/reducers/sources";
+import { SourceContent, MiniSource } from "ui/reducers/sources";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import { getURL } from "./sources-tree/getURL";
 import { truncateMiddleText } from "./text";

@@ -13,6 +13,7 @@ import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 // TODO Move prefs out of reducers and load this separately
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -39,12 +40,6 @@ export interface SourceDetails {
 export interface MiniSource {
   id: string;
   url?: string;
-}
-
-export enum LoadingStatus {
-  LOADING = "loading",
-  LOADED = "loaded",
-  ERRORED = "errored",
 }
 
 export interface SourceContentValue {
