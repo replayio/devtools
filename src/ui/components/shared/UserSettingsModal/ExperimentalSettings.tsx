@@ -28,10 +28,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
   },
+
   {
-    label: "Inline hit counts",
-    description: "Show line hit counts in the source view",
-    key: "hitCounts",
+    label: "Recording Cache",
+    description: "Cache requests so that recordings load faster over time",
+    key: "queryCache",
   },
 ];
 
@@ -71,6 +72,7 @@ export default function ExperimentalSettings({}) {
     useFeature("enableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
+  const { value: queryCache, update: updateQueryCache } = useFeature("enableQueryCache");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -79,8 +81,8 @@ export default function ExperimentalSettings({}) {
       updateEnableResolveRecording(!enableResolveRecording);
     } else if (key === "enableNewComponentArchitecture") {
       updateEnableNewComponentArchitecture(!enableNewComponentArchitecture);
-    } else if (key === "hitCounts") {
-      updateHitCounts(!hitCounts);
+    } else if (key === "queryCache") {
+      updateQueryCache(!queryCache);
     }
   };
 
@@ -89,6 +91,7 @@ export default function ExperimentalSettings({}) {
     enableResolveRecording,
     hitCounts,
     enableNewComponentArchitecture,
+    queryCache,
   };
 
   const settings = { ...userSettings, ...localSettings };

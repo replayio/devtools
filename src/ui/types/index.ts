@@ -12,6 +12,7 @@ export type ExperimentalUserSettings = {
   enableEventLink: boolean;
   enableTeams: boolean;
   enableLargeText: boolean;
+  queryCache: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
