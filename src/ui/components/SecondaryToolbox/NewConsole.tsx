@@ -8,7 +8,11 @@ import NewConsole from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
-import { Point, PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import {
+  Point,
+  PointId,
+  PointsContext,
+} from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import {
   TimelineContext,
@@ -51,6 +55,7 @@ import { displayedBeginForFocusRegion, displayedEndForFocusRegion } from "ui/uti
 import ReplayLogo from "../shared/ReplayLogo";
 
 import styles from "./NewConsole.module.css";
+import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -266,6 +271,8 @@ function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
 
 // Adapter that reads log points (from Redux) and passes them to the PointsContext.
 function PointsContextReduxAdapter({ children }: PropsWithChildren) {
+  const dispatch = useAppDispatch();
+
   const logpoints = useAppSelector(getLogPointsList);
 
   // Convert to the Point[] format required by the new Console.
@@ -293,6 +300,20 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
     });
   }, [points]);
 
+  // Limited edit functionality for this context: setting logpoint badge.
+  const editPoint = useCallback(
+    (id: PointId, partialPoint: Partial<Point>) => {
+      const { badge, ...rest } = partialPoint;
+      if (badge !== undefined && Object.keys(rest).length === 0) {
+        const breakpoint = logpoints.find(logpoint => logpoint.id === id);
+        if (breakpoint) {
+          dispatch(setBreakpointPrefixBadge(breakpoint, badge || undefined));
+        }
+      }
+    },
+    [dispatch, logpoints]
+  );
+
   const context = useMemo(
     () => ({
       isPending,
@@ -303,9 +324,9 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
       // Log points are added by the legacy source Editor component.
       addPoint: () => {},
       deletePoint: () => {},
-      editPoint: () => {},
+      editPoint,
     }),
-    [deferredPoints, isPending, points]
+    [deferredPoints, editPoint, isPending, points]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;

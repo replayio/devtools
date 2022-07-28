@@ -78,32 +78,21 @@ export function LoggablesContextRoot({
       return messages;
     } else {
       return messages.filter((message: ProtocolMessage) => {
-        switch (message.source) {
-          case "ConsoleAPI": {
-            switch (message.level) {
-              case "warning": {
-                if (!showWarnings) {
-                  return false;
-                }
-                break;
-              }
-              case "error": {
-                if (!showErrors) {
-                  return false;
-                }
-                break;
-              }
-              default: {
-                if (!showLogs) {
-                  return false;
-                }
-                break;
-              }
+        switch (message.level) {
+          case "warning": {
+            if (!showWarnings) {
+              return false;
             }
             break;
           }
-          case "PageError": {
-            if (!showExceptions) {
+          case "error": {
+            if (!showErrors) {
+              return false;
+            }
+            break;
+          }
+          default: {
+            if (!showLogs) {
               return false;
             }
             break;
@@ -116,6 +105,10 @@ export function LoggablesContextRoot({
             const sourceId = frame.location?.[0].sourceId;
             const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
             if (source) {
+              const value =
+                source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
+              if (!value) {
+              }
               return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
             }
             return false;
@@ -128,7 +121,9 @@ export function LoggablesContextRoot({
         return true;
       });
     }
-  }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
+  }, [messages, showErrors, showLogs, showNodeModules, showWarnings]);
+
+  // TODO (FE-469) Support showExceptions and Analysis.addExceptionPoints
 
   // Trim eventLogs and logPoints by focusRange.
   // Messages will have already been filtered from the backend.
@@ -198,13 +193,16 @@ export function LoggablesContextRoot({
   useLayoutEffect(() => {
     const list = messageListRef.current;
     if (list !== null) {
-      list.childNodes.forEach((node: ChildNode, index: number) => {
+      list.childNodes.forEach((node: ChildNode) => {
         const element = node as HTMLElement;
-        const textContent = element.textContent?.toLocaleLowerCase();
-        const matches = textContent?.includes(filterByLowerCaseText);
 
-        // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
-        element.style.display = matches ? "inherit" : "none";
+        if (element.hasAttribute("data-search-index")) {
+          const textContent = element.textContent?.toLocaleLowerCase();
+          const matches = textContent?.includes(filterByLowerCaseText);
+
+          // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+          element.style.display = matches ? "inherit" : "none";
+        }
       });
     }
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);

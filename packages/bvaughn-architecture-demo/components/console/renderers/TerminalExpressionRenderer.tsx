@@ -6,7 +6,6 @@ import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedEx
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -29,15 +28,16 @@ import MessageHoverButton from "../MessageHoverButton";
 import styles from "./shared.module.css";
 
 function TerminalExpressionRenderer({
+  index,
   isFocused,
   terminalExpression,
 }: {
+  index: number;
   isFocused: boolean;
   terminalExpression: TerminalExpression;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -53,9 +53,6 @@ function TerminalExpressionRenderer({
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
-  if (currentExecutionPoint === terminalExpression.point) {
-    className = `${className} ${styles.CurrentlyPausedAt}`;
-  }
 
   const showContextMenu = (event: MouseEvent) => {
     event.preventDefault();
@@ -65,6 +62,7 @@ function TerminalExpressionRenderer({
   return (
     <div
       className={className}
+      data-search-index={index}
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}

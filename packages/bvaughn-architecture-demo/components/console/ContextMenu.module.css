@@ -2,13 +2,12 @@
   position: absolute;
   flex-direction: column;
   display: flex;
-  background-color: var(--background-color-default);
   border-radius: 0.5rem;
   overflow: hidden;
 }
 
 .ContextMenuItem {
-  background-color: var(--background-color-contrast-3);
+  background-color: var(--context-menu-background-color);
   color: var(--color-default);
   padding: 0.5rem 1rem;
   user-select: none;
@@ -18,7 +17,7 @@
   gap: 1ch;
 }
 .ContextMenuItem:hover {
-  background-color: var(--background-color-default);
+  background-color: var(--context-menu-background-color-hover);
 }
 
 .ColorBadge,

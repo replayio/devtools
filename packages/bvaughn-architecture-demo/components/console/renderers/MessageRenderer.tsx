@@ -4,7 +4,6 @@ import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
@@ -19,15 +18,24 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
+const EMPTY_ARRAY: any[] = [];
+
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
-function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: ProtocolMessage }) {
+function MessageRenderer({
+  index,
+  isFocused,
+  message,
+}: {
+  index: number;
+  isFocused: boolean;
+  message: ProtocolMessage;
+}) {
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
 
   const { show } = useContext(ConsoleContextMenuContext);
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
   const context = useMemo(
@@ -44,6 +52,10 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     }
   }, [isFocused]);
 
+  const frames = message.data.frames || EMPTY_ARRAY;
+  const frame = frames.length > 0 ? frames[frames.length - 1] : null;
+  const location = frame ? frame.location[0] : null;
+
   let className = styles.Row;
   let icon = null;
   let showExpandable = false;
@@ -51,18 +63,18 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
     case "error": {
       className = styles.ErrorRow;
       icon = <Icon className={styles.ErrorIcon} type="error" />;
-      showExpandable = true;
+      showExpandable = frames.length > 0;
       break;
     }
     case "trace": {
       className = styles.TraceRow;
-      showExpandable = true;
+      showExpandable = frames.length > 0;
       break;
     }
     case "warning": {
       className = styles.WarningRow;
       icon = <Icon className={styles.WarningIcon} type="warning" />;
-      showExpandable = true;
+      showExpandable = frames.length > 0;
       break;
     }
   }
@@ -70,13 +82,6 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
-
-  if (currentExecutionPoint === message.point.point) {
-    className = `${className} ${styles.CurrentlyPausedAt}`;
-  }
-
-  const frame = message.data.frames ? message.data.frames[message.data.frames.length - 1] : null;
-  const location = frame ? frame.location[0] : null;
 
   const showContextMenu = (event: MouseEvent) => {
     event.preventDefault();
@@ -100,11 +105,12 @@ function MessageRenderer({ isFocused, message }: { isFocused: boolean; message: 
       <div
         ref={ref}
         className={className}
+        data-search-index={index}
         data-test-name="Message"
-        role="listitem"
         onContextMenu={showContextMenu}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
+        role="listitem"
       >
         <div
           className={
