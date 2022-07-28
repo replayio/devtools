@@ -307,7 +307,7 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
       if (badge !== undefined && Object.keys(rest).length === 0) {
         const breakpoint = logpoints.find(logpoint => logpoint.id === id);
         if (breakpoint) {
-          dispatch(setBreakpointPrefixBadge(breakpoint, badge));
+          dispatch(setBreakpointPrefixBadge(breakpoint, badge || undefined));
         }
       }
     },

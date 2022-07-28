@@ -18,7 +18,7 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
-const EMPTY_ARRAY = [];
+const EMPTY_ARRAY: any[] = [];
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
@@ -52,7 +52,7 @@ function MessageRenderer({
     }
   }, [isFocused]);
 
-  const frames = message.data.frames || (EMPTY_ARRAY as any[]);
+  const frames = message.data.frames || EMPTY_ARRAY;
   const frame = frames.length > 0 ? frames[frames.length - 1] : null;
   const location = frame ? frame.location[0] : null;
 
