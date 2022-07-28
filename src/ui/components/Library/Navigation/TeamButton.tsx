@@ -9,7 +9,6 @@ import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
 import Icon from "ui/components/shared/Icon";
-import { FOCUSABLE_SELECTOR } from "@testing-library/user-event/dist/types/utils";
 
 
 export function TeamButton({
