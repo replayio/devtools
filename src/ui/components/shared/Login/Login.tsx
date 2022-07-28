@@ -15,6 +15,7 @@ const isOSX = Services.appinfo.OS === "Darwin";
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
+import { useRouter } from "next/router";
 
 enum LoginReferrer {
   default = "default",
