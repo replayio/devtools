@@ -8,6 +8,9 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+import Icon from "ui/components/shared/Icon";
+import { FOCUSABLE_SELECTOR } from "@testing-library/user-event/dist/types/utils";
+
 
 export function TeamButton({
   label,
@@ -47,8 +50,18 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-          {label} {isTest && "(test)"}
+        <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+        
+        {
+          isTest == false ? 
+        (  
+          <Icon filename="other" size="medium" className="mr-1 bg-iconColor" />
+        ) 
+        : 
+          <Icon filename="tests" size="medium" className="mr-1 bg-iconColor" />
+        }
+
+        { label }
         </span>
         {isNew ? (
           <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
@@ -71,7 +84,7 @@ export function SettingsButton() {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
+      className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
     >
       settings
     </button>
