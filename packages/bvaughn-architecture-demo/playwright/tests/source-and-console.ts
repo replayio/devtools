@@ -109,3 +109,7 @@ test("should include log points when filtering data", async ({ page }) => {
   await page.fill("[data-test-id=ConsoleFilterInput]", "zzz");
   await takeScreenshot(page, messages, "log-point-not-in-search-results");
 });
+
+// TODO Add test for log point badge colors
+// TODO Add context menu test for setting focus range
+// TODO Add context menu test for setting log point badge colors

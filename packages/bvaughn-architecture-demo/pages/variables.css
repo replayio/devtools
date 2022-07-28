@@ -26,6 +26,9 @@
 
     --collapsible-toggle-color: #9ba0a5;
 
+    --context-menu-background-color: var(--background-color-contrast-3);
+    --context-menu-background-color-hover: var(--background-color-default);
+
     --object-inspector-go-to-definition-icon-color: #dddddd;
     --object-inspector-go-to-definition-icon-color-hover: #ffffff;
     --object-inspector-prototype-color: #939395;
@@ -96,6 +99,9 @@
     --color-warning: #6c5914;
 
     --collapsible-toggle-color: #868688;
+
+    --context-menu-background-color: var(--background-color-default);
+    --context-menu-background-color-hover: var(--background-color-contrast-1);
 
     --object-inspector-go-to-definition-icon-color: #222222;
     --object-inspector-go-to-definition-icon-color-hover: #000000;
