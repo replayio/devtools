@@ -1,13 +1,18 @@
+import type { Location } from "@replayio/protocol";
 import { fuzzySearch } from "../../utils/function";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
-import { HitCount } from "../../reducers/sources";
 import { FunctionDeclaration, ClassDeclaration, SymbolEntry } from "../../reducers/ast";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export type FunctionDeclarationHits = FunctionDeclaration & {
   hits?: number;
 };
+
+export interface HitCount {
+  location: Location;
+  hits: number;
+}
 
 function addHitCountsToFunctions(
   functions: FunctionDeclaration[],

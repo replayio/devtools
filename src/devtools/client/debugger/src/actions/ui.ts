@@ -5,7 +5,6 @@
 //
 
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-// @ts-ignore no definition
 import { getCodeMirror } from "devtools/client/debugger/src/utils/editor";
 import type { UIThunkAction } from "ui/actions";
 import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
@@ -33,9 +32,7 @@ import {
   getSelectedLocationHasScrolled,
   SourceDetails,
 } from "ui/reducers/sources";
-import { isFulfilled } from "../utils/async-value";
 import { copyToTheClipboard } from "../utils/clipboard";
-// @ts-ignore no definition
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
 
@@ -139,8 +136,8 @@ export function updateViewport(): UIThunkAction {
 export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
-    if (content && isFulfilled(content) && content.value!.type === "text") {
-      copyToTheClipboard(content.value!.value);
+    if (content?.value?.type === "text") {
+      copyToTheClipboard(content.value.value);
     }
   };
 }

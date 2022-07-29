@@ -7,7 +7,6 @@ import type { UIState } from "ui/state";
 export type { UrlLocation } from "../reducers/pause";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
-export * from "../reducers/sources";
 export * from "../reducers/tabs";
 export * from "../reducers/event-listeners";
 export * from "../reducers/pause";
@@ -19,13 +18,6 @@ export * from "../reducers/file-search";
 export * from "../reducers/ast";
 export * from "../reducers/source-tree";
 export * from "../reducers/preview";
-
-export {
-  getSourceActor,
-  hasSourceActor,
-  getSourceActors,
-  getSourceActorsForThread,
-} from "../reducers/source-actors";
 
 export * from "../reducers/quick-open";
 

@@ -21,10 +21,10 @@ import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thr
 import { WiredNamedValue } from "protocol/thread/pause";
 
 import { SelectedFrame } from "../reducers/pause";
-import type { SourceActor } from "../reducers/source-actors";
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
 
-import { createFrame, makeSourceId } from "./create";
+import { createFrame } from "./create";
+import { MiniSource } from "ui/reducers/sources";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -43,17 +43,10 @@ interface BreakpointDetails {
 let currentThreadFront: any;
 let currentTarget: any;
 let devToolsClient: any;
-let sourceActors: Record<string, string> = {};
 let breakpoints: Record<string, BreakpointDetails> = {};
 
 function setupCommands() {
-  sourceActors = {};
   breakpoints = {};
-}
-
-function releaseActor() {
-  // Object fronts are always thread scoped in the replay viewer.
-  return;
 }
 
 function resume(point: string, loadedRegions: loadedRegions) {
@@ -78,20 +71,6 @@ function rewind(point: string, loadedRegions: loadedRegions) {
 
 function reverseStepOver(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.reverseStepOver(point, loadedRegions);
-}
-
-async function sourceContents({ actor }: { actor: string }) {
-  const threadFront = ThreadFront;
-  const { contents, contentType } = await threadFront.getSourceContents(actor);
-  return { source: contents, contentType };
-}
-
-function setXHRBreakpoint(path: any, method: any) {
-  return currentThreadFront.setXHRBreakpoint(path, method);
-}
-
-function removeXHRBreakpoint(path: any, method: any) {
-  return currentThreadFront.removeXHRBreakpoint(path, method);
 }
 
 function addWatchpoint(object: any, property: any, label: any, watchpointType: any) {}
@@ -292,19 +271,15 @@ export interface SourceRange {
   end: ProtocolSourceLocation;
 }
 
-async function blackBox(
-  sourceActor: SourceActor,
-  isBlackBoxed: boolean,
-  range?: Partial<SourceRange>
-) {
+async function blackBox(source: MiniSource, isBlackBoxed: boolean, range?: Partial<SourceRange>) {
   // TODO Re-enable blackboxing
   /*
   const begin = range ? range.start : undefined;
   const end = range ? range.end : undefined;
   if (isBlackBoxed) {
-    await ThreadFront.unblackbox(sourceActor.actor, begin, end);
+    await ThreadFront.unblackbox(source.id, begin, end);
   } else {
-    await ThreadFront.blackbox(sourceActor.actor, begin, end);
+    await ThreadFront.blackbox(source.id, begin, end);
   }
   */
 }
@@ -335,16 +310,12 @@ function pauseGrip(func: Function) {
   // @ts-expect-error this function doesn't appear to exist
   return ThreadFront.pauseGrip(func);
 }
-function registerSourceActor(sourceActorId: string, sourceId: string) {
-  sourceActors[sourceActorId] = sourceId;
-}
 
 export function prepareSourcePayload(source: {
-  actor: string;
+  sourceId: string;
   url?: string;
   sourceMapURL?: string;
 }) {
-  clientCommands.registerSourceActor(source.actor, makeSourceId(source, false));
   return { thread: ThreadFront.actor, source };
 }
 
@@ -373,13 +344,6 @@ async function checkIfAlreadyPaused() {
   }
 }
 
-function getSourceForActor(actor: string) {
-  if (!sourceActors[actor]) {
-    throw new Error(`Unknown source actor: ${actor}`);
-  }
-  return sourceActors[actor];
-}
-
 function getFrontByID(actorID: string) {
   return devToolsClient.getFrontByID(actorID);
 }
@@ -395,7 +359,6 @@ function pickExecutionPoints(count: any, options: any) {
 const clientCommands = {
   autocomplete,
   blackBox,
-  releaseActor,
   interrupt,
   pauseGrip,
   resume,
@@ -404,12 +367,8 @@ const clientCommands = {
   stepOver,
   rewind,
   reverseStepOver,
-  sourceContents,
-  getSourceForActor,
   hasBreakpoint,
   setBreakpoint,
-  setXHRBreakpoint,
-  removeXHRBreakpoint,
   addWatchpoint,
   removeWatchpoint,
   removeBreakpoint,
@@ -425,7 +384,6 @@ const clientCommands = {
   logExceptions,
   fetchSources,
   checkIfAlreadyPaused,
-  registerSourceActor,
   fetchEventTypePoints,
   setEventListenerBreakpoints,
   getFrontByID,

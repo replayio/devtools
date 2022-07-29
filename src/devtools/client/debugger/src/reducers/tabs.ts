@@ -59,12 +59,6 @@ function update(state: TabsState = initialTabState(), action: AnyAction) {
     case "CLOSE_TABS":
       return removeSourcesFromTabList(state, action as any);
 
-    case "ADD_SOURCE":
-      return addVisibleTabs(state, [action.source]);
-
-    case "ADD_SOURCES":
-      return addVisibleTabs(state, action.sources);
-
     case tabsRestored.type:
       return addVisibleTabs(state, action.payload);
 

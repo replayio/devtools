@@ -10,12 +10,11 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     return null;
   }
 
-  const { clientCommands } = await import("./commands");
   const { ThreadFront } = await import("protocol/thread");
 
   const { sourceId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
   const location = {
-    sourceId: clientCommands.getSourceForActor(sourceId),
+    sourceId,
     line,
     column,
   };
@@ -24,7 +23,7 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
   const alternate = await ThreadFront.getAlternateLocation(frame.location);
   if (alternate) {
     alternateLocation = {
-      sourceId: clientCommands.getSourceForActor(alternate.sourceId),
+      sourceId: alternate.sourceId,
       line: alternate.line,
       column: alternate.column,
     };
@@ -45,10 +44,6 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     asyncCause: asyncIndex && index == 0 ? "async" : undefined,
     state: "on-stack",
   };
-}
-
-export function makeSourceId(source, isServiceWorker) {
-  return source.actor;
 }
 
 export function createPause(packet) {
