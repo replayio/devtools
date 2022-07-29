@@ -8,10 +8,16 @@
 .ErrorRow {
   background-color: var(--background-color-error);
   color: var(--color-error);
+
+  --color-default: var(--color-error);
+  --value-type-string: var(--color-error);
 }
 .WarningRow {
   background-color: var(--background-color-warning);
   color: var(--color-warning);
+
+  --color-default: var(--color-warning);
+  --value-type-string: var(--color-warning);
 }
 
 .EagerEvaluationIcon,
