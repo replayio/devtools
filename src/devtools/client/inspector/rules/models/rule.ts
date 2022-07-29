@@ -9,7 +9,7 @@ import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
-const CSSProperties = require("third-party/css/css-properties");
+import CSSProperties from "third-party/css/css-properties";
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
 import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";

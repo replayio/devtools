@@ -1,7 +1,7 @@
 import { Action, ThunkAction } from "@reduxjs/toolkit";
 import ElementStyle from "../../rules/models/element-style";
 import { ComputedPropertyState, MatchedSelectorState } from "../state";
-const CSSProperties = require("third-party/css/css-properties");
+import CSSProperties from "third-party/css/css-properties";
 
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
