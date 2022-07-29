@@ -32,7 +32,6 @@ import {
   getSelectedLocationHasScrolled,
   SourceDetails,
 } from "ui/reducers/sources";
-import { isFulfilled } from "../utils/async-value";
 import { copyToTheClipboard } from "../utils/clipboard";
 import { getEditor, getLocationsInViewport } from "../utils/editor";
 import { resizeBreakpointGutter } from "../utils/ui";
@@ -137,8 +136,8 @@ export function updateViewport(): UIThunkAction {
 export function copyToClipboard(source: SourceDetails): UIThunkAction {
   return (dispatch, getState) => {
     const content = getSourceContent(getState(), source.id);
-    if (content && isFulfilled(content) && content.value!.type === "text") {
-      copyToTheClipboard(content.value!.value);
+    if (content?.value?.type === "text") {
+      copyToTheClipboard(content.value.value);
     }
   };
 }

@@ -9,7 +9,11 @@ import path from "path";
 
 import { makeMockSourceAndContent } from "../../../../utils/test-mockup";
 import { setSource } from "../../sources";
-import * as asyncValue from "../../../../utils/async-value";
+
+// Formerly part of `async-value`. Should be removed when we redo these helpers.
+function fulfilled(value) {
+  return { state: "fulfilled", value };
+}
 
 export function getFixture(name, type = "js") {
   return fs.readFileSync(path.join(__dirname, `../fixtures/${name}.${type}`), "utf8");
@@ -54,7 +58,7 @@ export function populateSource(name, type) {
   });
   return {
     ...source,
-    content: asyncValue.fulfilled(content),
+    content: fulfilled(content),
   };
 }
 
@@ -77,6 +81,6 @@ export function populateOriginalSource(name, type) {
   });
   return {
     ...source,
-    content: asyncValue.fulfilled(content),
+    content: fulfilled(content),
   };
 }
