@@ -26,12 +26,11 @@ module.exports = {
   webpackFinal: async (config, { configType }) => {
     config.resolve.alias = {
       ...config.resolve.alias,
-      components: require("path").resolve(__dirname, "../packages/components/index.ts"),
-      icons: require("path").resolve(__dirname, "../packages/icons/index.tsx"),
-      "@recordreplay/accordion": require("path").resolve(
-        __dirname,
-        "../packages/accordion/index.tsx"
-      ),
+      components: path.resolve(__dirname, "../packages/components/index.ts"),
+      icons: path.resolve(__dirname, "../packages/icons/index.tsx"),
+      "@recordreplay/accordion": path.resolve(__dirname, "../packages/accordion/index.tsx"),
+      "third-party": path.resolve(__dirname, "../packages/third-party"),
+      "packages/third-party": path.resolve(__dirname, "../packages/third-party"),
     };
 
     config.resolve.modules = [

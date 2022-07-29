@@ -11,7 +11,7 @@
 
 "use strict";
 
-const { getCSSLexer } = require("devtools/shared/css/lexer");
+const { getCSSLexer } = require("./lexer");
 
 const SELECTOR_ATTRIBUTE = (module.exports.SELECTOR_ATTRIBUTE = 1);
 const SELECTOR_ELEMENT = (module.exports.SELECTOR_ELEMENT = 2);

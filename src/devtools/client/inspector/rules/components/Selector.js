@@ -7,14 +7,13 @@
 const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { editableItem } = require("devtools/client/shared/inplace-editor");
-const { PSEUDO_CLASSES } = require("devtools/shared/css/constants");
+const { PSEUDO_CLASSES } = require("packages/third-party/css/constants");
 const {
   parsePseudoClassesAndAttributes,
   SELECTOR_ATTRIBUTE,
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
-} = require("devtools/shared/css/parsing-utils");
+} = require("packages/third-party/css/parsing-utils");
 import { ELEMENT_STYLE } from "shared/constants";
 
 const Types = require("devtools/client/inspector/rules/types");

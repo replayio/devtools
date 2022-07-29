@@ -14,7 +14,7 @@ import BoxModel from "devtools/client/inspector/boxmodel/box-model";
 import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 import Selection from "devtools/client/framework/selection";
 
-import CSSProperties from "./css-properties";
+import CSSProperties from "third-party/css/css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";

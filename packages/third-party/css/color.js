@@ -1,3 +1,4 @@
+/* eslint-disable sort-vars */
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
@@ -5,10 +6,10 @@
 "use strict";
 
 const Services = require("devtools/shared/services");
-const { getCSSLexer } = require("devtools/shared/css/lexer");
-const { cssColors } = require("devtools/shared/css/color-db");
+const { getCSSLexer } = require("./lexer");
+const { cssColors } = require("./color-db");
 
-const { CSS_ANGLEUNIT } = require("devtools/shared/css/constants");
+const { CSS_ANGLEUNIT } = require("./constants");
 
 const COLOR_UNIT_PREF = "devtools.defaultColorUnit";
 

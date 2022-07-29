@@ -2,15 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-interface Property {
-  isInherited: boolean;
-  values: string[];
-  supports: string[];
-  subproperties: string[];
-}
-
 // Produced by logging the output of generateCssProperties() in actors/css-properties.js
-const properties: Record<string, Property | undefined> = {
+const properties = {
   "align-content": {
     isInherited: false,
     values: [
@@ -7436,12 +7429,12 @@ const FIRST_CHAR = ["[_a-z]", NON_ASCII, ESCAPE].join("|");
 const TRAILING_CHAR = ["[_a-z0-9-]", NON_ASCII, ESCAPE].join("|");
 const IS_VARIABLE_TOKEN = new RegExp(`^--(${FIRST_CHAR})(${TRAILING_CHAR})*$`, "i");
 
-function isCssVariable(input: string) {
+function isCssVariable(input) {
   return !!input.match(IS_VARIABLE_TOKEN);
 }
 
 const CSSProperties = {
-  supportsType(property: string, type: string) {
+  supportsType(property, type) {
     return properties[property]?.supports.includes(type) || false;
   },
 
@@ -7449,25 +7442,25 @@ const CSSProperties = {
     return true;
   },
 
-  getSubproperties(name: string) {
+  getSubproperties(name) {
     // Custom Property Names (aka CSS Variables) are case-sensitive; do not lowercase.
     name = name.startsWith("--") ? name : name.toLowerCase();
     if (this.isKnown(name)) {
       if (properties[name]?.subproperties) {
-        return properties[name]!.subproperties;
+        return properties[name].subproperties;
       }
       return [name];
     }
     return [];
   },
 
-  isKnown(property: string) {
+  isKnown(property) {
     // Custom Property Names (aka CSS Variables) are case-sensitive; do not lowercase.
     property = property.startsWith("--") ? property : property.toLowerCase();
     return !!properties[property] || isCssVariable(property);
   },
 
-  isInherited(property: string) {
+  isInherited(property) {
     return properties[property]?.isInherited || isCssVariable(property);
   },
 };

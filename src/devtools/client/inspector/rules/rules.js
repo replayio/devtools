@@ -6,7 +6,7 @@
 
 const Services = require("devtools/shared/services");
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
-const { OutputParser } = require("devtools/client/shared/output-parser");
+const { OutputParser } = require("packages/third-party/css/output-parser");
 const EventEmitter = require("devtools/shared/event-emitter");
 const ClassList = require("devtools/client/inspector/rules/models/class-list").default;
 const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
