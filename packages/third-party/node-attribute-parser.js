@@ -341,8 +341,8 @@ function getAttribute(attributes, attributeName) {
 function splitBy(value, splitChar) {
   const data = [];
 
-  let i = 0,
-    buffer = "";
+  let buffer = "",
+    i = 0;
   while (i <= value.length) {
     if (i === value.length && buffer) {
       data.push({ value: buffer });
