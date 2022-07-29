@@ -2,14 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 /**
  * Redux actions for the sources state
  * @module actions/sources
  */
 
-import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";

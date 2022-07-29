@@ -46,16 +46,13 @@ async function setupDebugger() {
       sourceInfos.push({
         type: "generated",
         data: prepareSourcePayload({
-          actor: sourceId,
+          sourceId,
           url,
           sourceMapURL,
         }),
       });
     }
   });
-
-  // TODO Finish removing the legacy sources handling
-  // await store.dispatch(actions.newQueuedSources(sourceInfos));
 
   store.dispatch(addSources(sources));
 

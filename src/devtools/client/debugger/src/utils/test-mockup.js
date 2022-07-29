@@ -11,8 +11,7 @@
  * literals.
  */
 
-import * as asyncValue from "./async-value";
-
+// TODO These should be reworked to match our current sources structure
 function makeMockSource(url = "url", id = "source") {
   return {
     id,
@@ -25,21 +24,6 @@ function makeMockSource(url = "url", id = "source") {
     extensionName: null,
     isExtension: false,
     isOriginal: id.includes("originalSource"),
-  };
-}
-
-function makeMockSourceWithContent(url, id, contentType = "text/javascript", text = "") {
-  const source = makeMockSource(url, id);
-
-  return {
-    ...source,
-    content: text
-      ? asyncValue.fulfilled({
-          type: "text",
-          value: text,
-          contentType,
-        })
-      : null,
   };
 }
 
@@ -151,7 +135,6 @@ const mockthreadcx = {
 
 export {
   makeMockSource,
-  makeMockSourceWithContent,
   makeMockSourceAndContent,
   makeMockScope,
   mockScopeAddVariable,

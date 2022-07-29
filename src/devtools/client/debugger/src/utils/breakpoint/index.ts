@@ -6,13 +6,11 @@ import type { Location } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import type { UIState } from "ui/state";
 
-import type { SourceActor } from "../../reducers/source-actors";
 import { getSourceDetails } from "ui/reducers/sources";
 import type {
   Breakpoint,
   PendingBreakpoint,
   SourceLocation,
-  SourceActorLocation,
   PendingLocation,
 } from "../../reducers/types";
 import assert from "../assert";
@@ -83,21 +81,6 @@ export function makeBreakpointLocation(state: UIState, location: SourceLocation)
     sourceUrl,
     sourceId: sourceId!,
   };
-}
-
-export function makeSourceActorLocation(sourceActor: SourceActor, location: Location) {
-  return {
-    sourceActor,
-    line: location.line,
-    column: location.column,
-  };
-}
-
-// The ID for a BreakpointActor is derived from its location in its SourceActor.
-export function makeBreakpointActorId(location: SourceActorLocation) {
-  const { sourceActor, line, column } = location;
-  const columnString = column || "";
-  return `${sourceActor}:${line}:${columnString}`;
 }
 
 export function assertPendingBreakpoint(pendingBreakpoint: PendingBreakpoint) {

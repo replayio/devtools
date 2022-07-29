@@ -3,11 +3,8 @@
 // https://hg.mozilla.org/mozilla-central/file/fd9f980e368173439465e38f6257557500f45c02/devtools/client/debugger/src/types.js
 // Converted with: https://flow-to-ts.netlify.app
 
-import type { SourceActor } from "./source-actors";
 import type { CallDeclaration } from "./ast";
 import { Location } from "@replayio/protocol";
-
-export type SourceActorId = string;
 
 export type SearchModifiers = {
   caseSensitive: boolean;
@@ -71,12 +68,6 @@ export type GeneratedSourceData = {
   // object. We may want to consider avoiding that eventually.
   id?: string;
 };
-export type SourceActorLocation = {
-  readonly sourceActor: SourceActorId;
-  readonly line: number;
-  readonly column?: number;
-};
-
 /**
  * Source File Location
  *
@@ -114,15 +105,12 @@ export type PendingLocation = {
   readonly column: number;
   readonly sourceUrl: string;
 };
-// Type of location used when setting breakpoints in the server. Exactly one of
-// { sourceUrl, sourceId } must be specified. Soon this will replace
-// SourceLocation and PendingLocation, and SourceActorLocation will be removed
-// (bug 1524374).
+
 export type BreakpointLocation = {
   readonly line: number;
   readonly column?: number;
   readonly sourceUrl?: string;
-  readonly sourceId?: SourceActorId;
+  readonly sourceId?: string;
 };
 export type ASTLocation = {
   readonly name: string | null | undefined;
@@ -159,10 +147,6 @@ export type BreakpointOptions = {
   shouldPause?: boolean;
   prefixBadge?: PrefixBadge;
 };
-export type BreakpointActor = {
-  readonly actor: ActorId;
-  readonly source: SourceActor;
-};
 
 /**
  * XHR Breakpoint
@@ -175,17 +159,6 @@ export type XHRBreakpoint = {
   readonly loading: boolean;
   readonly disabled: boolean;
   readonly text: string;
-};
-
-/**
- * Breakpoint Result is the return from an add/modify Breakpoint request
- *
- * @memberof types
- * @static
- */
-export type BreakpointResult = {
-  id: ActorId;
-  actualLocation: SourceActorLocation;
 };
 
 /**
