@@ -5,6 +5,10 @@
   gap: 0.5ch;
 }
 
+.HeaderWrapper {
+  display: flex;
+}
+
 .Category {
   overflow: hidden;
   text-overflow: ellipsis;

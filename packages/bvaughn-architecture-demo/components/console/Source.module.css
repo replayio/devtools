@@ -3,4 +3,5 @@
   text-decoration: underline;
   flex-shrink: 1;
   text-align: right;
+  color: var(--color-default);
 }

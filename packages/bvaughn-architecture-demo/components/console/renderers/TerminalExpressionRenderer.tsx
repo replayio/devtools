@@ -60,7 +60,7 @@ function TerminalExpressionRenderer({
   };
 
   return (
-    <div
+    <span
       className={className}
       data-search-index={index}
       data-test-name="Message"
@@ -70,7 +70,7 @@ function TerminalExpressionRenderer({
       ref={ref}
       role="listitem"
     >
-      <div
+      <span
         className={
           showTimestamps
             ? styles.TerminalPrimaryRowWithTimestamps
@@ -80,19 +80,19 @@ function TerminalExpressionRenderer({
         {showTimestamps && (
           <span className={styles.TimeStamp}>{formatTimestamp(terminalExpression.time, true)}</span>
         )}
-        <div className={styles.TerminalLogContents}>
-          <div className={styles.LogContents}>
+        <span className={styles.TerminalLogContents}>
+          <span className={styles.LogContents}>
             <Icon className={styles.PromptIcon} type="prompt" />
             <SyntaxHighlightedExpression expression={terminalExpression.expression} />
-          </div>
-          <div className={styles.LogContents}>
+          </span>
+          <span className={styles.LogContents}>
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
             <Suspense fallback={<Loader />}>
               <EvaluatedContent terminalExpression={terminalExpression} />
             </Suspense>
-          </div>
-        </div>
-      </div>
+          </span>
+        </span>
+      </span>
 
       {isHovered && (
         <MessageHoverButton
@@ -104,7 +104,7 @@ function TerminalExpressionRenderer({
           time={terminalExpression.time}
         />
       )}
-    </div>
+    </span>
   );
 }
 
@@ -160,10 +160,10 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
 
   // Assume the evaluation failed (even if not explicitly)
   return (
-    <div className={styles.Exception}>
+    <span className={styles.Exception}>
       <Icon className={styles.ErrorIcon} type="error" />
       The expression could not be evaluated.
-    </div>
+    </span>
   );
 }
 

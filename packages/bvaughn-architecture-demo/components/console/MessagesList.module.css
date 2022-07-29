@@ -6,6 +6,10 @@
   overflow-x: hidden;
   font-family: Menlo, Consolas, monospace;
   font-size: var(--font-size-regular);
+
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 .ContainerPending {
   opacity: 0.5;

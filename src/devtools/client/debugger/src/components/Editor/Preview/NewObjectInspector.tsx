@@ -10,6 +10,8 @@ import { useAppSelector } from "ui/setup/hooks";
 
 import { getPreview } from "../../../selectors";
 
+import styles from "./NewObjectInspector.module.css";
+
 export default function NewObjectInspector() {
   const preview = useAppSelector(getPreview);
   const pause = ThreadFront.currentPause;
@@ -31,7 +33,7 @@ export default function NewObjectInspector() {
   }
 
   return (
-    <div className="preview-popup">
+    <div className={`${styles.Popup} preview-popup`}>
       <Suspense fallback={<Loader />}>
         <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
       </Suspense>

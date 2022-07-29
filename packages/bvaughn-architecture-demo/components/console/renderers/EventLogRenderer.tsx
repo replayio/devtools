@@ -54,13 +54,16 @@ function EventLogRenderer({
   const location = eventLog.location[0];
 
   const contents = values.map((value, index) => (
-    <KeyValueRenderer
-      key={index}
-      isNested={false}
-      layout="horizontal"
-      pauseId={pauseId}
-      protocolValue={value}
-    />
+    <>
+      <KeyValueRenderer
+        key={index}
+        isNested={false}
+        layout="horizontal"
+        pauseId={pauseId}
+        protocolValue={value}
+      />
+      {index < values.length - 1 && " "}
+    </>
   ));
 
   const showContextMenu = (event: MouseEvent) => {
@@ -69,24 +72,17 @@ function EventLogRenderer({
   };
 
   const primaryContent = (
-    <div
-      className={
-        showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
-      }
-    >
+    <>
       {showTimestamps && (
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)}</span>
       )}
-      <div className={styles.LogContents}>{contents}</div>
-      <Suspense fallback={<Loader />}>
-        <div className={styles.Source}>{location && <Source location={location} />}</div>
-      </Suspense>
-    </div>
+      <span className={styles.LogContents}>{contents}</span>
+    </>
   );
 
   return (
     <InspectableTimestampedPointContext.Provider value={context}>
-      <div
+      <span
         ref={ref}
         className={className}
         data-search-index={index}
@@ -96,6 +92,9 @@ function EventLogRenderer({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
+        <span className={styles.Source}>
+          <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+        </span>
         {primaryContent}
         {isHovered && (
           <MessageHoverButton
@@ -107,7 +106,7 @@ function EventLogRenderer({
             time={eventLog.time}
           />
         )}
-      </div>
+      </span>
     </InspectableTimestampedPointContext.Provider>
   );
 }

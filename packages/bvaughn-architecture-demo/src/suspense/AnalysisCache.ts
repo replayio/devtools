@@ -28,19 +28,7 @@ function getKey(location: Location, timeStampedPoint: TimeStampedPoint, code: st
   return `${location.sourceId}:${location.line}:${location.column}:${timeStampedPoint.time}:${code}`;
 }
 
-export function getCachedAnalysis(
-  location: Location,
-  timeStampedPoint: TimeStampedPoint,
-  code: string
-): AnalysisResult | null {
-  const key = getKey(location, timeStampedPoint, code);
-  const record = locationAndTimeToValueMap.get(key);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    return null;
-  }
-}
+// TODO (FE-469) Add a special case for exceptions?
 
 export function runAnalysis(
   client: ReplayClientInterface,

@@ -53,33 +53,26 @@ function LogPointRenderer({
     show(logPointInstance, { x: event.pageX, y: event.pageY });
   };
 
+  const location = logPointInstance.point.location;
+
   const primaryContent = (
-    <div
-      className={
-        showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
-      }
-    >
+    <>
       {showTimestamps && (
         <span className={styles.TimeStamp}>
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}
         </span>
       )}
-      <div className={styles.LogContents}>
+      <span className={styles.LogContents}>
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
         <Suspense fallback={<Loader />}>
           <AnalyzedContent logPointInstance={logPointInstance} />
         </Suspense>
-      </div>
-      <Suspense fallback={<Loader />}>
-        <div className={styles.Source}>
-          {location && <Source location={logPointInstance.point.location} />}
-        </div>
-      </Suspense>
-    </div>
+      </span>
+    </>
   );
 
   return (
-    <div
+    <span
       ref={ref}
       className={className}
       data-search-index={index}
@@ -89,6 +82,9 @@ function LogPointRenderer({
       onMouseLeave={() => setIsHovered(false)}
       role="listitem"
     >
+      <span className={styles.Source}>
+        <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+      </span>
       {primaryContent}
       <MessageHoverButtonWithWithPause
         executionPoint={logPointInstance.timeStampedHitPoint.point}
@@ -97,7 +93,7 @@ function LogPointRenderer({
         targetRef={ref}
         time={logPointInstance.timeStampedHitPoint.time}
       />
-    </div>
+    </span>
   );
 }
 
@@ -158,20 +154,26 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 
   const children = isRemote
     ? values.map((value, index) => (
-        <KeyValueRenderer
-          key={index}
-          isNested={false}
-          layout="horizontal"
-          pauseId={pauseId!}
-          protocolValue={value}
-        />
+        <>
+          <KeyValueRenderer
+            key={index}
+            isNested={false}
+            layout="horizontal"
+            pauseId={pauseId!}
+            protocolValue={value}
+          />
+          {index < values.length - 1 && " "}
+        </>
       ))
     : values.map((value, index) => (
-        <ClientValueValueRenderer
-          key={index}
-          clientValue={primitiveToClientValue(value)}
-          isNested={false}
-        />
+        <>
+          <ClientValueValueRenderer
+            key={index}
+            clientValue={primitiveToClientValue(value)}
+            isNested={false}
+          />
+          {index < values.length - 1 && " "}
+        </>
       ));
 
   return (
@@ -184,11 +186,11 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 function BadgeRenderer({ badge }: { badge: Badge }) {
   switch (badge) {
     case "unicorn":
-      return <div className={styles.UnicornBadge} />;
+      return <span className={styles.UnicornBadge} />;
       break;
     default:
       return (
-        <div
+        <span
           className={styles.ColorBadge}
           style={{
             // @ts-ignore

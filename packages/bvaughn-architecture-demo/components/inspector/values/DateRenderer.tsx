@@ -14,5 +14,5 @@ export default function DateRenderer({ object }: ObjectPreviewRendererProps) {
     dateTimeDisplay = new Date(dateTime).toString();
   }
 
-  return <div className={styles.Date}>{dateTimeDisplay || "Date"}</div>;
+  return <span className={styles.Date}>{dateTimeDisplay || "Date"}</span>;
 }

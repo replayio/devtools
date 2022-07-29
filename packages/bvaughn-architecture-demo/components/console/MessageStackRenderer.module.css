@@ -1,6 +1,6 @@
 .StackGrid {
   display: inline-grid;
-  grid-template-columns: auto 100%;
+  grid-template-columns: max-content max-content 1fr;
   grid-column-gap: 1ch;
 }
 
@@ -9,6 +9,14 @@
   display: flex;
   width: 100%;
   gap: 1ch;
+}
+
+.SourceColumn {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: pre;
+  direction: rtl;
+  text-align: left;
 }
 
 .Source {

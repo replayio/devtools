@@ -27,7 +27,7 @@ testSetup(async function regeneratorFunction({ page }) {
     hasText: "This is an error",
   });
   let keyValue = errorListItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
-  keyValue.click();
+  await keyValue.click();
 
   const children = errorListItem.locator("[data-test-name=ExpandableChildren]");
   const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
@@ -114,26 +114,27 @@ test("should display toggleable stack for traces", async ({ page }) => {
 test("should expand and inspect arrays", async ({ page }) => {
   await page.goto(URL);
 
-  const listItem = page.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
-  await takeScreenshot(page, listItem, "array-collapsed");
+  const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
+  await takeScreenshot(page, listItem, "array-collapsed", 1);
 
-  const keyValue = listItem.locator("[data-test-name=Expandable]", { hasText: "Array" });
+  const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
+  const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "Array" });
   await keyValue.click();
-  await takeScreenshot(page, listItem, "array-expanded");
+  await takeScreenshot(page, listItem, "array-expanded", 1);
 });
 
 test("should expand and inspect objects", async ({ page }) => {
   await page.goto(URL);
 
-  const listItem = page.locator("[data-test-name=Expandable]", { hasText: "This is an error" });
+  const listItem = page.locator("[data-test-name=Message]", { hasText: "This is an error" });
   await takeScreenshot(page, listItem, "object-collapsed");
 
-  const keyValue = listItem.locator("[data-test-name=Expandable]", { hasText: "foo" });
+  const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is an error" });
+  const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "foo" });
   await keyValue.click();
   await takeScreenshot(page, listItem, "object-expanded");
 
-  const children = listItem.locator("[data-test-name=ExpandableChildren]");
-  const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
+  const nestedKeyValue = keyValue.locator("[data-test-name=Expandable]", { hasText: "foo" });
   await nestedKeyValue.click();
   await takeScreenshot(page, listItem, "nested-object-expanded");
 });
@@ -434,3 +435,5 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
+
+// TODO (FE-469) Add test for Exceptions

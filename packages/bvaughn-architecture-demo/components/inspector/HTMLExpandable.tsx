@@ -38,8 +38,8 @@ export default function HTMLExpandable({
   };
 
   return (
-    <div className={isOpen ? styles.Expanded : styles.Collapsed} data-test-name="Expandable">
-      <div
+    <span className={isOpen ? styles.Expanded : styles.Collapsed} data-test-name="Expandable">
+      <span
         className={styles.PreviewRow}
         onClick={toggle}
         role="button"
@@ -59,10 +59,10 @@ export default function HTMLExpandable({
           showChildrenIndicator={!isOpen}
           showOpeningTag={true}
         />
-      </div>
+      </span>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
-        <div className={styles.Children} data-test-name="ExpandableChildren">
+        <span className={styles.Children} data-test-name="ExpandableChildren">
           <Suspense fallback={<Loader />}>
             <HTMLChildrenRenderer object={object} pauseId={pauseId} />
           </Suspense>
@@ -75,8 +75,8 @@ export default function HTMLExpandable({
             showChildrenIndicator={false}
             showOpeningTag={false}
           />
-        </div>
+        </span>
       </LazyOffscreen>
-    </div>
+    </span>
   );
 }

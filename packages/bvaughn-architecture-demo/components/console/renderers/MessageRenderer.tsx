@@ -88,21 +88,31 @@ function MessageRenderer({
     show(message, { x: event.pageX, y: event.pageY });
   };
 
+  const argumentValues = message.argumentValues || EMPTY_ARRAY;
+
   const logContents = (
-    <div className={styles.LogContents}>
-      {icon}
-      {message.text && <span className={styles.MessageText}>{message.text}</span>}
-      <Suspense fallback={<Loader />}>
-        {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-          <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
-        ))}
-      </Suspense>
-    </div>
+    <>
+      {showTimestamps && (
+        <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
+      )}
+      <span className={styles.LogContents}>
+        {icon}
+        {message.text && <span className={styles.MessageText}>{message.text}</span>}
+        <Suspense fallback={<Loader />}>
+          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+            <>
+              <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
+              {index < argumentValues.length - 1 && " "}
+            </>
+          ))}
+        </Suspense>
+      </span>
+    </>
   );
 
   return (
     <InspectableTimestampedPointContext.Provider value={context}>
-      <div
+      <span
         ref={ref}
         className={className}
         data-search-index={index}
@@ -112,27 +122,19 @@ function MessageRenderer({
         onMouseLeave={() => setIsHovered(false)}
         role="listitem"
       >
-        <div
-          className={
-            showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
-          }
-        >
-          {showTimestamps && (
-            <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
-          )}
-          {showExpandable ? (
-            <Expandable
-              children={<MessageStackRenderer message={message} />}
-              className={styles.Expandable}
-              header={logContents}
-            />
-          ) : (
-            logContents
-          )}
-          <Suspense fallback={<Loader />}>
-            <div className={styles.Source}>{location && <Source location={location} />}</div>
-          </Suspense>
-        </div>
+        <span className={styles.Source}>
+          <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+        </span>
+        {showExpandable ? (
+          <Expandable
+            children={<MessageStackRenderer message={message} />}
+            className={styles.Expandable}
+            header={logContents}
+            useBlockLayoutWhenExpanded={false}
+          />
+        ) : (
+          logContents
+        )}
 
         {isHovered && (
           <MessageHoverButton
@@ -144,7 +146,7 @@ function MessageRenderer({
             time={message.point.time}
           />
         )}
-      </div>
+      </span>
     </InspectableTimestampedPointContext.Provider>
   );
 }
