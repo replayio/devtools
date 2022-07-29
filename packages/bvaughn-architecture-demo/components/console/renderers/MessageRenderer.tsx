@@ -89,13 +89,25 @@ function MessageRenderer({
   };
 
   const logContents = (
-    <div className={styles.LogContents}>
-      {icon}
-      {message.text && <span className={styles.MessageText}>{message.text}</span>}
+    <div
+      className={
+        showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
+      }
+    >
+      {showTimestamps && (
+        <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
+      )}
+      <div className={styles.LogContents}>
+        {icon}
+        {message.text && <span className={styles.MessageText}>{message.text}</span>}
+        <Suspense fallback={<Loader />}>
+          {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
+            <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
+          ))}
+        </Suspense>
+      </div>
       <Suspense fallback={<Loader />}>
-        {message.argumentValues?.map((argumentValue: ProtocolValue, index: number) => (
-          <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
-        ))}
+        <div className={styles.Source}>{location && <Source location={location} />}</div>
       </Suspense>
     </div>
   );
@@ -112,27 +124,15 @@ function MessageRenderer({
         onMouseLeave={() => setIsHovered(false)}
         role="listitem"
       >
-        <div
-          className={
-            showTimestamps ? styles.PrimaryRowWithTimestamps : styles.PrimaryRowWithoutTimestamps
-          }
-        >
-          {showTimestamps && (
-            <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
-          )}
-          {showExpandable ? (
-            <Expandable
-              children={<MessageStackRenderer message={message} />}
-              className={styles.Expandable}
-              header={logContents}
-            />
-          ) : (
-            logContents
-          )}
-          <Suspense fallback={<Loader />}>
-            <div className={styles.Source}>{location && <Source location={location} />}</div>
-          </Suspense>
-        </div>
+        {showExpandable ? (
+          <Expandable
+            children={<MessageStackRenderer message={message} />}
+            className={styles.Expandable}
+            header={logContents}
+          />
+        ) : (
+          logContents
+        )}
 
         {isHovered && (
           <MessageHoverButton

@@ -46,10 +46,10 @@
   grid-column-gap: 1ch;
 }
 .PrimaryRowWithTimestamps {
-  grid-template-columns: min-content auto auto;
+  grid-template-columns: min-content 1fr 1fr;
 }
 .PrimaryRowWithoutTimestamps {
-  grid-template-columns: auto auto;
+  grid-template-columns: 1fr 1fr;
 }
 .TerminalPrimaryRowWithTimestamps {
   grid-template-columns: min-content auto;
@@ -68,9 +68,12 @@
 
 .Source {
   flex: 1 1 100%;
-  text-align: right;
   opacity: 0.75;
+  text-overflow: ellipsis;
   overflow: hidden;
+  white-space: pre;
+  direction: rtl;
+  text-align: right;
 }
 .Source:hover {
   opacity: 1;
@@ -116,4 +119,8 @@
   border-radius: 1rem;
   background-image: url(../../../public/unicorn.svg) !important;
   background-size: auto 100%;
+}
+
+.Expandable {
+  width: 100%;
 }

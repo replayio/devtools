@@ -31,9 +31,11 @@ export default function Source({
     }
   };
 
+  const sourceString = `${fileName}:${location.line}`;
+
   return (
-    <span className={`${styles.Source} ${className}`} onClick={openSource}>
-      {fileName}:{location.line}
+    <span className={`${styles.Source} ${className}`} onClick={openSource} title={sourceString}>
+      {sourceString}
     </span>
   );
 }
