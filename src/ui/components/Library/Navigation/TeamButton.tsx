@@ -40,6 +40,8 @@ export function TeamButton({
     trackEvent("team_change", { workspaceId: id });
   };
 
+  
+
   return (
     <Link href={url}>
       <a
@@ -49,18 +51,11 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden whitespace-pre overflow-ellipsis">
-        
-        {
-          isTest == false ? 
-        (  
-          <Icon filename="other" size="medium" className="mr-1 bg-iconColor" />
-        ) 
-        : 
-          <Icon filename="tests" size="medium" className="mr-1 bg-iconColor" />
-        }
-
+        <span className="overflow-hidden whitespace-pre overflow-ellipsis">        
+        <div className="flex">        
+        <LibraryIcon teamType={isTest ? ("tests") : ("team")} />  
         { label }
+        </div>
         </span>
         {isNew ? (
           <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
@@ -69,6 +64,12 @@ export function TeamButton({
       </a>
     </Link>
   );
+}
+
+export function LibraryIcon(teamType: string) {
+  return (
+    <Icon filename={teamType.teamType} size="medium" className="mr-1 bg-gray-200" />
+  )
 }
 
 export function SettingsButton() {
