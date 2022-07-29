@@ -17,7 +17,7 @@ export function isMinified(source) {
     return false;
   }
 
-  let text = source.content.value.value;
+  let text = source.value.value;
 
   let lineEndIndex = 0;
   let lineStartIndex = 0;
