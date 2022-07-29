@@ -18,7 +18,9 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
     const handler = (pauseId: PauseId, pauseData: PauseData) => {
       const { objects } = pauseData;
       if (objects) {
-        preCacheObjects(pauseId, objects);
+        // Be sure to clone object data before pre-caching it.
+        // Otherwise ValueFronts might deeply mutate it and change its structure.
+        preCacheObjects(pauseId, JSON.parse(JSON.stringify(objects)));
       }
     };
 

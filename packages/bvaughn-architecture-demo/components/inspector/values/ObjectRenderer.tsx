@@ -23,7 +23,7 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
   return (
     <>
       {className !== "Object" ? className : null}
-      <div className={styles.ObjectPropertyList}>
+      <span className={styles.ObjectPropertyList}>
         {"{"}
         {slice.map((property, index) => (
           <span key={index} className={styles.Value}>
@@ -44,7 +44,7 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
           </>
         )}
         {"}"}
-      </div>
+      </span>
     </>
   );
 }

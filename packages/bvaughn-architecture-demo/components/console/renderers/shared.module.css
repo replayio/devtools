@@ -28,6 +28,7 @@
   height: 1rem;
   flex: 0 0 1rem;
   display: inline-block;
+  vertical-align: top;
 }
 .EagerEvaluationIcon {
   color: var(--color-dim);
@@ -52,10 +53,10 @@
   grid-column-gap: 1ch;
 }
 .PrimaryRowWithTimestamps {
-  grid-template-columns: min-content 1fr 1fr;
+  grid-template-columns: min-content 1fr minmax(auto, max-content);
 }
 .PrimaryRowWithoutTimestamps {
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr minmax(auto, max-content);
 }
 .TerminalPrimaryRowWithTimestamps {
   grid-template-columns: min-content auto;
@@ -65,21 +66,20 @@
 }
 
 .LogContents {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: 0.5ch;
   flex: 1 1 100%;
+  display: inline;
 }
 
 .Source {
-  flex: 1 1 100%;
+  float: right;
+  max-width: 50%;
   opacity: 0.75;
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: pre;
   direction: rtl;
   text-align: right;
+  margin-left: 1ch;
 }
 .Source:hover {
   opacity: 1;

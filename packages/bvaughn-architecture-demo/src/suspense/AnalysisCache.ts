@@ -28,6 +28,8 @@ function getKey(location: Location, timeStampedPoint: TimeStampedPoint, code: st
   return `${location.sourceId}:${location.line}:${location.column}:${timeStampedPoint.time}:${code}`;
 }
 
+// TODO (FE-469) Add a special case for exceptions?
+
 export function runAnalysis(
   client: ReplayClientInterface,
   location: Location,

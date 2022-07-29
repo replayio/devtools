@@ -69,6 +69,7 @@ export default function EventCategory({
     return (
       <Expandable
         children={eventsList}
+        headerClassName={styles.HeaderWrapper}
         header={
           <div
             className={styles.Header}

@@ -10,6 +10,7 @@
 .Symbol,
 .Undefined {
   display: inline;
+  vertical-align: top;
 }
 .BigInt {
   color: var(--value-type-bigint);
@@ -53,7 +54,7 @@
   padding: 0;
   border: none;
   cursor: pointer;
-  vertical-align: middle;
+  vertical-align: top;
 }
 
 .Icon {

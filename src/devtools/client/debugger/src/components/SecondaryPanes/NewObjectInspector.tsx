@@ -8,6 +8,8 @@ import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
 
+import styles from "./NewObjectInspector.module.css";
+
 export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
   const pause = ThreadFront.currentPause;
 
@@ -53,7 +55,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
   }, [pause, roots]);
 
   return (
-    <div className="preview-popup">
+    <div className={`${styles.Popup} preview-popup`}>
       <Suspense fallback={<Loader />}>{children}</Suspense>
     </div>
   );
