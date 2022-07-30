@@ -2,8 +2,14 @@ import type { Location } from "@replayio/protocol";
 import { fuzzySearch } from "../../utils/function";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
-import { FunctionDeclaration, ClassDeclaration, SymbolEntry } from "../../reducers/ast";
+import {
+  FunctionDeclaration,
+  ClassDeclaration,
+  SymbolEntry,
+  AstLocation,
+} from "../../reducers/ast";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { HitCountsByLine } from "ui/reducers/hitCounts";
 
 export type FunctionDeclarationHits = FunctionDeclaration & {
   hits?: number;
@@ -14,28 +20,36 @@ export interface HitCount {
   hits: number;
 }
 
+function getClosestHitCount(
+  hitCountsByLine: HitCountsByLine,
+  location: AstLocation
+): HitCount | undefined {
+  const { start, end } = location;
+  const multiline = end.line > start.line;
+  if (multiline) {
+    for (let line = start.line; line <= end.line; line++) {
+      const hitCount = hitCountsByLine[line]?.[0];
+      if (hitCount) {
+        return hitCount;
+      }
+    }
+  } else {
+    const hitCounts = hitCountsByLine[start.line];
+    const hitCount = hitCounts?.find(hitCount => hitCount.location.column! >= start.column);
+    return hitCount;
+  }
+}
+
 function addHitCountsToFunctions(
   functions: FunctionDeclaration[],
-  hitCounts: HitCount[] | null
+  hitCountsByLine: HitCountsByLine | null
 ): FunctionDeclarationHits[] {
-  if (!hitCounts) {
+  if (!hitCountsByLine) {
     return functions;
   }
 
   return functions.map(functionSymbol => {
-    const { start, end } = functionSymbol.location;
-
-    const multiline = end.line > start.line;
-
-    const hitCount = hitCounts?.find(hitCount => {
-      if (multiline) {
-        // for multi-line functions, we return the first hit count after the declaration
-        return hitCount.location.line > start.line && hitCount.location.line <= end.line;
-      }
-      // for single-line functions, we return the first hit count after the start column
-      return hitCount.location.line === end.line && hitCount.location.column! >= start.column;
-    });
-
+    const hitCount = getClosestHitCount(hitCountsByLine, functionSymbol.location);
     return { ...functionSymbol, hits: hitCount?.hits };
   });
 }
@@ -43,7 +57,7 @@ function addHitCountsToFunctions(
 export function getOutlineSymbols(
   symbolsEntry: null | SymbolEntry,
   filter: string,
-  hitCounts: HitCount[] | null
+  hitCounts: HitCountsByLine | null
 ) {
   if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;
