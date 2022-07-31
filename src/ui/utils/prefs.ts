@@ -32,7 +32,7 @@ pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.disableUnHitLines", false);
-pref("devtools.features.enableQueryCache", false);
+pref("devtools.features.enableQueryCache", true);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
