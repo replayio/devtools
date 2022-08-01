@@ -7,7 +7,6 @@ import {
   isPointInstance,
   isProtocolMessage,
   isTerminalExpression,
-  isUncaughtException,
 } from "@bvaughn/src/utils/loggables";
 import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -20,7 +19,6 @@ import EventLogRenderer from "./renderers/EventLogRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
-import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import { SearchContext } from "./SearchContext";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
@@ -115,15 +113,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
           index={index}
           isFocused={loggable === currentSearchResult}
           terminalExpression={loggable}
-        />
-      );
-    } else if (isUncaughtException(loggable)) {
-      listItems.push(
-        <UncaughtExceptionRenderer
-          key={index}
-          index={index}
-          isFocused={loggable === currentSearchResult}
-          uncaughtException={loggable}
         />
       );
     } else {

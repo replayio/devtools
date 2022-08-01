@@ -14,7 +14,7 @@ export default function FilterToggles() {
   const client = useContext(ReplayClientContext);
   const {
     showErrors,
-    showExceptionsForDisplay: showExceptions,
+    showExceptions,
     showLogs,
     showNodeModules,
     showTimestamps,
@@ -25,6 +25,7 @@ export default function FilterToggles() {
   const { messages } = getMessages(client, focusRange);
   const counts = useMemo(() => {
     let errors = 0;
+    let exceptions = 0;
     let logs = 0;
     let warnings = 0;
 
@@ -36,7 +37,14 @@ export default function FilterToggles() {
           logs++;
           break;
         case "error":
-          errors++;
+          switch (message.source) {
+            case "ConsoleAPI":
+              errors++;
+              break;
+            case "PageError":
+              exceptions++;
+              break;
+          }
           break;
         case "warning":
           warnings++;
@@ -44,13 +52,14 @@ export default function FilterToggles() {
       }
     });
 
-    return { errors, logs, warnings };
+    return { errors, exceptions, logs, warnings };
   }, [messages]);
 
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
         checked={showExceptions}
+        count={counts.exceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}
       />

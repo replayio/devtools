@@ -1,7 +1,6 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { ExecutionPoint } from "@replayio/protocol";
@@ -22,10 +21,6 @@ export function isTerminalExpression(loggable: Loggable): loggable is TerminalEx
   return loggable.type === "TerminalExpression";
 }
 
-export function isUncaughtException(loggable: Loggable): loggable is UncaughtException {
-  return loggable.type === "UncaughtException";
-}
-
 export function getLoggableExecutionPoint(loggable: Loggable): ExecutionPoint {
   if (isEventLog(loggable)) {
     return loggable.point;
@@ -34,8 +29,6 @@ export function getLoggableExecutionPoint(loggable: Loggable): ExecutionPoint {
   } else if (isProtocolMessage(loggable)) {
     return loggable.point.point;
   } else if (isTerminalExpression(loggable)) {
-    return loggable.point;
-  } else if (isUncaughtException(loggable)) {
     return loggable.point;
   } else {
     throw Error("Unsupported loggable type");
@@ -50,8 +43,6 @@ export function getLoggableTime(loggable: Loggable): number {
   } else if (isProtocolMessage(loggable)) {
     return loggable.point.time;
   } else if (isTerminalExpression(loggable)) {
-    return loggable.time;
-  } else if (isUncaughtException(loggable)) {
     return loggable.time;
   } else {
     throw Error("Unsupported loggable type");

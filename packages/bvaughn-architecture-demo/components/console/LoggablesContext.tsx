@@ -1,7 +1,6 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { getExceptions, UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
 import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
@@ -22,12 +21,7 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import useFocusRange from "./hooks/useFocusRange";
 
-export type Loggable =
-  | EventLog
-  | PointInstance
-  | ProtocolMessage
-  | TerminalExpression
-  | UncaughtException;
+export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
 export const LoggablesContext = createContext<Loggable[]>(null as any);
 
@@ -36,8 +30,6 @@ export const LoggablesContext = createContext<Loggable[]>(null as any);
 // * Messages logged to the Replay Console terminal while viewing a recording.
 // * Log points (e.g. break points with logging behavior enabled).
 // * Events (e.g. "click") that have been toggled on by the user.
-
-const EMPTY_ARRAY: any[] = [];
 
 export function LoggablesContextRoot({
   children,
@@ -94,8 +86,19 @@ export function LoggablesContextRoot({
             break;
           }
           case "error": {
-            if (!showErrors) {
-              return false;
+            switch (message.source) {
+              case "ConsoleAPI": {
+                if (!showErrors) {
+                  return false;
+                }
+                break;
+              }
+              case "PageError": {
+                if (!showExceptions) {
+                  return false;
+                }
+                break;
+              }
             }
             break;
           }
@@ -129,13 +132,7 @@ export function LoggablesContextRoot({
         return true;
       });
     }
-  }, [messages, showErrors, showLogs, showNodeModules, showWarnings]);
-
-  // We may suspend based on this value, so let's this value changes at sync priority,
-  let exceptions: UncaughtException[] = EMPTY_ARRAY;
-  if (showExceptions) {
-    exceptions = getExceptions(client);
-  }
+  }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
   // Trim eventLogs and logPoints by focusRange.
   // Messages will have already been filtered from the backend.
@@ -190,20 +187,13 @@ export function LoggablesContextRoot({
 
   const sortedLoggables = useMemo<Loggable[]>(() => {
     const loggables: Loggable[] = [
-      ...exceptions,
       ...focusedEventLogs,
       ...pointInstances,
       ...preFilteredMessages,
       ...sortedTerminalExpressions,
     ];
     return loggables.sort(loggableSort);
-  }, [
-    exceptions,
-    focusedEventLogs,
-    pointInstances,
-    preFilteredMessages,
-    sortedTerminalExpressions,
-  ]);
+  }, [focusedEventLogs, pointInstances, preFilteredMessages, sortedTerminalExpressions]);
 
   const filterByLowerCaseText = filterByText.toLocaleLowerCase();
 
