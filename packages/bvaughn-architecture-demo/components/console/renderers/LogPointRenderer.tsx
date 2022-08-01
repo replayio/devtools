@@ -55,6 +55,7 @@ function LogPointRenderer({
 
   const location = logPointInstance.point.location;
 
+  // TODO Reset AnalyzedContent with key={code} to improve edit experience.
   const primaryContent = (
     <>
       {showTimestamps && (
@@ -137,12 +138,14 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 
   const { point, timeStampedHitPoint } = logPointInstance;
 
-  const { isRemote, pauseId, values } = runAnalysis(
-    client,
-    point.location,
-    timeStampedHitPoint,
-    point.content
-  );
+  const analysisResults = runAnalysis(client, point.location, point.content);
+
+  const entry = analysisResults(timeStampedHitPoint);
+  if (entry === null) {
+    throw Error(`No analysis results found for ${timeStampedHitPoint}`);
+  }
+
+  const { isRemote, pauseId, values } = entry;
 
   const context = useMemo(
     () => ({
