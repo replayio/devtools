@@ -73,7 +73,7 @@ function EventLogRenderer({
   const primaryContent = (
     <>
       {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)}</span>
+        <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
       <span className={styles.LogContents}>{contents}</span>
     </>
@@ -81,7 +81,7 @@ function EventLogRenderer({
 
   return (
     <InspectableTimestampedPointContext.Provider value={context}>
-      <span
+      <div
         ref={ref}
         className={className}
         data-search-index={index}
@@ -105,7 +105,7 @@ function EventLogRenderer({
             time={eventLog.time}
           />
         )}
-      </span>
+      </div>
     </InspectableTimestampedPointContext.Provider>
   );
 }

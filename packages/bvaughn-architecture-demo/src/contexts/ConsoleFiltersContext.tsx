@@ -28,20 +28,16 @@ export type EventTypes = {
 
 export type ConsoleFiltersContextType = Toggles & {
   // Event types toggles to display in the UI.
-  // This value is updated at React's default, higher priority.
+  // The "display" value is updated at React's default, higher priority.
+  // The other value is updated at a lower, transition priority.
+  eventTypes: EventTypes;
   eventTypesForDisplay: EventTypes;
 
-  // Event types toggles to fetch for display in the console.
-  // This value is updated at a lower, transition priority.
-  eventTypes: EventTypes;
-
   // Filter text to display in the UI.
-  // This value is updated at React's default, higher priority.
-  filterByDisplayText: string;
-
-  // Text to filter console messages by.
-  // This value is updated at a lower, transition priority.
+  // The "display" value is updated at React's default, higher priority.
+  // The other value is updated at a lower, transition priority.
   filterByText: string;
+  filterByDisplayText: string;
 
   // Filter by text is about to be updated as part of a transition;
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
@@ -67,9 +63,9 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
     showErrors: true,
     showExceptions: true,
     showLogs: true,
-    showNodeModules: true,
+    showNodeModules: false,
     showTimestamps: false,
-    showWarnings: true,
+    showWarnings: false,
   });
 
   // Filter input changes quickly while a user types, but re-filtering can be slow.

@@ -1,10 +1,11 @@
 import { test, expect } from "@playwright/test";
 
 import {
-  hideProtocolMessages,
   hideSearchInput,
   seekToMessage,
   showSearchInput,
+  toggleProtocolMessage,
+  toggleProtocolMessages,
 } from "./utils/console";
 import { getBaseURL, getElementCount, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
@@ -13,6 +14,8 @@ const URL = `${getBaseURL()}/tests/console?${getURLFlags()}`;
 
 testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
+
+  await toggleProtocolMessages(page, true);
 
   // Exploring Message values
   const warningListItem = page.locator("[data-test-name=Expandable]", {
@@ -67,6 +70,8 @@ testSetup(async function regeneratorFunction({ page }) {
 test("should display list of messages", async ({ page }) => {
   await page.goto(URL);
 
+  await toggleProtocolMessages(page, true);
+
   const list = page.locator("[data-test-name=Messages]");
   await expect(list).toContainText("This is a log");
   await expect(list).toContainText("This is a warning");
@@ -92,6 +97,8 @@ test("should display toggleable stack for errors", async ({ page }) => {
 test("should display toggleable stack for warnings", async ({ page }) => {
   await page.goto(URL);
 
+  await toggleProtocolMessage(page, "warnings", true);
+
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
   await takeScreenshot(page, listItem, "warning-stack-collapsed");
 
@@ -111,8 +118,25 @@ test("should display toggleable stack for traces", async ({ page }) => {
   await takeScreenshot(page, listItem, "trace-stack-expanded");
 });
 
+test("should display toggleable stack for exceptions", async ({ page }) => {
+  await page.goto(URL);
+
+  await toggleProtocolMessage(page, "exceptions", true);
+
+  const listItem = page.locator("[data-test-name=Message]", {
+    hasText: "Another uncaught exception",
+  });
+  await takeScreenshot(page, listItem, "uncaught-exception-stack-collapsed");
+
+  const toggle = page.locator("[role=button]", { hasText: "Another uncaught exception" });
+  await toggle.click();
+  await takeScreenshot(page, listItem, "uncaught-exception-stack-expanded");
+});
+
 test("should expand and inspect arrays", async ({ page }) => {
   await page.goto(URL);
+
+  await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
   await takeScreenshot(page, listItem, "array-collapsed", 1);
@@ -203,6 +227,8 @@ test("should show and hide search input when Enter and Escape are typed", async 
 
 test("should be searchable", async ({ page }) => {
   await page.goto(URL);
+
+  await toggleProtocolMessages(page, true);
 
   await showSearchInput(page);
 
@@ -366,7 +392,7 @@ test("should evaluate and render local terminal expressions", async ({ page }) =
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
   await page.keyboard.press("Enter");
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, firstListItem, "local-terminal-expression-valid");
@@ -381,7 +407,7 @@ test("should evaluate and render invalid local terminal expressions", async ({ p
   await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
@@ -393,7 +419,7 @@ test("should evaluate and render global terminal expressions", async ({ page }) 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
   await page.keyboard.press("Enter");
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
 
   const firstListItem = await page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, firstListItem, "global-terminal-expression-valid");
@@ -405,7 +431,7 @@ test("should evaluate and render invalid global terminal expressions", async ({ 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "+/!");
   await page.keyboard.press("Enter");
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
   const firstListItem = await page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, firstListItem, "global-terminal-expression-invalid");
 });
@@ -416,7 +442,7 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   let firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
 
   // Add some expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
@@ -435,5 +461,3 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
-
-// TODO (FE-469) Add test for Exceptions

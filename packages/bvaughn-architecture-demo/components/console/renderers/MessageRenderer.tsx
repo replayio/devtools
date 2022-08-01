@@ -6,15 +6,15 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { Value as ProtocolValue } from "@replayio/protocol";
+import { Frame, Value as ProtocolValue } from "@replayio/protocol";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
-import MessageStackRenderer from "../MessageStackRenderer";
 import Source from "../Source";
+import StackRenderer from "../StackRenderer";
 
 import styles from "./shared.module.css";
 
@@ -93,7 +93,7 @@ function MessageRenderer({
   const logContents = (
     <>
       {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)}</span>
+        <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)} </span>
       )}
       <span className={styles.LogContents}>
         {icon}
@@ -112,7 +112,7 @@ function MessageRenderer({
 
   return (
     <InspectableTimestampedPointContext.Provider value={context}>
-      <span
+      <div
         ref={ref}
         className={className}
         data-search-index={index}
@@ -125,9 +125,9 @@ function MessageRenderer({
         <span className={styles.Source}>
           <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
         </span>
-        {showExpandable ? (
+        {frame != null && message.stack != null && showExpandable ? (
           <Expandable
-            children={<MessageStackRenderer message={message} />}
+            children={<StackRenderer frames={frames} stack={message.stack} />}
             className={styles.Expandable}
             header={logContents}
             useBlockLayoutWhenExpanded={false}
@@ -146,7 +146,7 @@ function MessageRenderer({
             time={message.point.time}
           />
         )}
-      </span>
+      </div>
     </InspectableTimestampedPointContext.Provider>
   );
 }

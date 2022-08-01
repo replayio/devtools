@@ -7,7 +7,7 @@ import {
   isPointInstance,
   isProtocolMessage,
   isTerminalExpression,
-} from "@bvaughn/src/utils/console";
+} from "@bvaughn/src/utils/loggables";
 import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "../Icon";

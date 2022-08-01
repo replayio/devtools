@@ -86,8 +86,19 @@ export function LoggablesContextRoot({
             break;
           }
           case "error": {
-            if (!showErrors) {
-              return false;
+            switch (message.source) {
+              case "ConsoleAPI": {
+                if (!showErrors) {
+                  return false;
+                }
+                break;
+              }
+              case "PageError": {
+                if (!showExceptions) {
+                  return false;
+                }
+                break;
+              }
             }
             break;
           }
@@ -121,9 +132,7 @@ export function LoggablesContextRoot({
         return true;
       });
     }
-  }, [messages, showErrors, showLogs, showNodeModules, showWarnings]);
-
-  // TODO (FE-469) Support showExceptions and Analysis.addExceptionPoints
+  }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
   // Trim eventLogs and logPoints by focusRange.
   // Messages will have already been filtered from the backend.

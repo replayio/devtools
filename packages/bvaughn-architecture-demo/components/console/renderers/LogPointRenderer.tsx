@@ -63,7 +63,7 @@ function LogPointRenderer({
     <>
       {showTimestamps && (
         <span className={styles.TimeStamp}>
-          {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}
+          {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}{" "}
         </span>
       )}
       <span className={styles.LogContents}>
@@ -76,7 +76,7 @@ function LogPointRenderer({
   );
 
   return (
-    <span
+    <div
       ref={ref}
       className={className}
       data-search-index={index}
@@ -97,7 +97,7 @@ function LogPointRenderer({
         targetRef={ref}
         time={logPointInstance.timeStampedHitPoint.time}
       />
-    </span>
+    </div>
   );
 }
 

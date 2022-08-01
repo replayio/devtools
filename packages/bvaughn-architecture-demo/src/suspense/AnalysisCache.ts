@@ -1,4 +1,12 @@
-import { ExecutionPoint, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  Frame,
+  Location,
+  Object,
+  PauseId,
+  Scope,
+  TimeStampedPoint,
+} from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -19,7 +27,7 @@ type AnalysisResult = {
 type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
 
 type RemoteAnalysisResult = {
-  data: { objects: Object[] };
+  data: { frames: Frame[]; objects: Object[]; scopes: Scope[] };
   location: Location;
   pauseId: PauseId;
   point: ExecutionPoint;
@@ -34,7 +42,6 @@ function getKey(location: Location, code: string): string {
 }
 
 // TODO (FE-469) Add focus region awareness to analysis.
-// TODO (FE-469) Add a special case for exceptions?
 
 export function runAnalysis(
   client: ReplayClientInterface,
