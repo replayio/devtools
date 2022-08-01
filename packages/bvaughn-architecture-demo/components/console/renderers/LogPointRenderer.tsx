@@ -9,7 +9,7 @@ import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { ExecutionPoint, Location } from "@replayio/protocol";
-import { MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -55,7 +55,10 @@ function LogPointRenderer({
 
   const location = logPointInstance.point.location;
 
-  // TODO Reset AnalyzedContent with key={code} to improve edit experience.
+  // Note the Suspense key below is set to the log point expression's content/code.
+  // This causes the Suspense boundary to immediately show a fallback state when content is edited,
+  // rather than the default React behavior of updating in the background.
+  // While that behavior is good for most scenarios, it makes log point edits feel sluggish.
   const primaryContent = (
     <>
       {showTimestamps && (
@@ -65,7 +68,7 @@ function LogPointRenderer({
       )}
       <span className={styles.LogContents}>
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
-        <Suspense fallback={<Loader />}>
+        <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
           <AnalyzedContent logPointInstance={logPointInstance} />
         </Suspense>
       </span>
@@ -157,26 +160,21 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 
   const children = isRemote
     ? values.map((value, index) => (
-        <>
+        <Fragment key={index}>
           <KeyValueRenderer
-            key={index}
             isNested={false}
             layout="horizontal"
             pauseId={pauseId!}
             protocolValue={value}
           />
           {index < values.length - 1 && " "}
-        </>
+        </Fragment>
       ))
     : values.map((value, index) => (
-        <>
-          <ClientValueValueRenderer
-            key={index}
-            clientValue={primitiveToClientValue(value)}
-            isNested={false}
-          />
+        <Fragment key={index}>
+          <ClientValueValueRenderer clientValue={primitiveToClientValue(value)} isNested={false} />
           {index < values.length - 1 && " "}
-        </>
+        </Fragment>
       ));
 
   return (

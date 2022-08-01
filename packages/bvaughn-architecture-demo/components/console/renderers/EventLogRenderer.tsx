@@ -4,7 +4,7 @@ import Loader from "@bvaughn/components/Loader";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
@@ -54,16 +54,15 @@ function EventLogRenderer({
   const location = eventLog.location[0];
 
   const contents = values.map((value, index) => (
-    <>
+    <Fragment key={index}>
       <KeyValueRenderer
-        key={index}
         isNested={false}
         layout="horizontal"
         pauseId={pauseId}
         protocolValue={value}
       />
       {index < values.length - 1 && " "}
-    </>
+    </Fragment>
   ));
 
   const showContextMenu = (event: MouseEvent) => {
