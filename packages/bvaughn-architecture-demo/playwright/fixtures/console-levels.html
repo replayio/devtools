@@ -14,6 +14,10 @@
 
     <script type="text/javascript">
       function foo() {
+        setTimeout(() => {
+          throw Error("Another uncaught exception");
+        }, 100);
+
         console.log("This is a log");
         bar();
       }
@@ -26,6 +30,8 @@
       function baz() {
         console.error("This is an error", { foo, number: 123, string: "abc" });
         console.trace("This is a trace");
+
+        throw Error("Uncaught exception");
       }
 
       const button = document.querySelector("button");
