@@ -55,7 +55,10 @@ function LogPointRenderer({
 
   const location = logPointInstance.point.location;
 
-  // TODO Reset AnalyzedContent with key={code} to improve edit experience.
+  // Note the Suspense key below is set to the log point expression's content/code.
+  // This causes the Suspense boundary to immediately show a fallback state when content is edited,
+  // rather than the default React behavior of updating in the background.
+  // While that behavior is good for most scenarios, it makes log point edits feel sluggish.
   const primaryContent = (
     <>
       {showTimestamps && (
@@ -65,7 +68,7 @@ function LogPointRenderer({
       )}
       <span className={styles.LogContents}>
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
-        <Suspense fallback={<Loader />}>
+        <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
           <AnalyzedContent logPointInstance={logPointInstance} />
         </Suspense>
       </span>
