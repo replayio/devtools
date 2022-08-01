@@ -6,6 +6,8 @@ import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
+import type { UIState } from "ui/state";
+
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useAppSelector } from "ui/setup/hooks";
 import { RulesState, RuleState } from "../state/rules";
@@ -26,6 +28,8 @@ type RulesAppProps = {
   showSelectorEditor: Function;
 };
 
+const NO_RULES_AVAILABLE: RuleState[] = [];
+
 export const RulesApp: FC<RulesAppProps> = ({
   showContextMenu,
   onToggleDeclaration,
@@ -35,9 +39,7 @@ export const RulesApp: FC<RulesAppProps> = ({
   showDeclarationNameEditor,
   showSelectorEditor,
 }) => {
-  const { rules } = useAppSelector((state: { rules: RulesState }) => ({
-    rules: state.rules.rules || [],
-  }));
+  const rules = useAppSelector(state => state.rules.rules ?? NO_RULES_AVAILABLE);
 
   const [rulesQuery, setRulesQuery] = useState("");
 
