@@ -7,7 +7,7 @@ import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/Inspec
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { MouseEvent, useMemo, useRef, useState } from "react";
+import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
@@ -100,10 +100,10 @@ function MessageRenderer({
         {message.text && <span className={styles.MessageText}>{message.text}</span>}
         <Suspense fallback={<Loader />}>
           {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-            <>
-              <Inspector key={index} pauseId={message.pauseId} protocolValue={argumentValue} />
+            <Fragment key={index}>
+              <Inspector pauseId={message.pauseId} protocolValue={argumentValue} />
               {index < argumentValues.length - 1 && " "}
-            </>
+            </Fragment>
           ))}
         </Suspense>
       </span>
