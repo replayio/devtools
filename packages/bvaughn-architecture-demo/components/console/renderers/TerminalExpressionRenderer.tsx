@@ -60,7 +60,7 @@ function TerminalExpressionRenderer({
   };
 
   return (
-    <span
+    <div
       className={className}
       data-search-index={index}
       data-test-name="Message"
@@ -78,7 +78,9 @@ function TerminalExpressionRenderer({
         }
       >
         {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(terminalExpression.time, true)}</span>
+          <span className={styles.TimeStamp}>
+            {formatTimestamp(terminalExpression.time, true)}{" "}
+          </span>
         )}
         <span className={styles.TerminalLogContents}>
           <span className={styles.LogContents}>
@@ -104,7 +106,7 @@ function TerminalExpressionRenderer({
           time={terminalExpression.time}
         />
       )}
-    </span>
+    </div>
   );
 }
 

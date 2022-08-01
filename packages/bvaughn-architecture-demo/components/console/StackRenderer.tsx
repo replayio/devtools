@@ -1,17 +1,15 @@
 import Loader from "@bvaughn/components/Loader";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
-import { Frame, FrameId, Message as ProtocolMessage } from "@replayio/protocol";
+import { CallStack, Frame, FrameId } from "@replayio/protocol";
 import React, { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import styles from "./MessageStackRenderer.module.css";
+import styles from "./StackRenderer.module.css";
 import Source from "./Source";
 
 // This is a crappy approximation of the console; the UI isn't meant to be the focus of this branch.
 // It would be nice to re-implement the whole Console UI though and re-write all of the legacy object inspector code.
-function MessageStackRenderer({ message }: { message: ProtocolMessage }) {
-  const frames = message.data.frames;
-  const stack = message.stack;
+function StackRenderer({ frames, stack }: { frames: Frame[]; stack: CallStack }) {
   if (frames == null || stack == null) {
     return null;
   }
@@ -52,4 +50,4 @@ function StackFrameRenderer({ frameId, frames }: { frameId: FrameId; frames: Fra
   }
 }
 
-export default memo(MessageStackRenderer);
+export default memo(StackRenderer);

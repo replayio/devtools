@@ -1,8 +1,32 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
+import { UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
+import { EventLog } from "@bvaughn/src/suspense/EventsCache";
+import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { ExecutionPoint } from "@replayio/protocol";
-import { isEventLog, isPointInstance, isProtocolMessage, isTerminalExpression } from "./console";
 
-export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
+export function isEventLog(loggable: Loggable): loggable is EventLog {
+  return loggable.type === "EventLog";
+}
+
+export function isPointInstance(loggable: Loggable): loggable is PointInstance {
+  return loggable.type === "PointInstance";
+}
+
+export function isProtocolMessage(loggable: Loggable): loggable is ProtocolMessage {
+  return loggable.type === "ProtocolMessage";
+}
+
+export function isTerminalExpression(loggable: Loggable): loggable is TerminalExpression {
+  return loggable.type === "TerminalExpression";
+}
+
+export function isUncaughtException(loggable: Loggable): loggable is UncaughtException {
+  return loggable.type === "UncaughtException";
+}
+
+export function getLoggableExecutionPoint(loggable: Loggable): ExecutionPoint {
   if (isEventLog(loggable)) {
     return loggable.point;
   } else if (isPointInstance(loggable)) {
@@ -11,12 +35,14 @@ export function getExecutionPointForSort(loggable: Loggable): ExecutionPoint {
     return loggable.point.point;
   } else if (isTerminalExpression(loggable)) {
     return loggable.point;
+  } else if (isUncaughtException(loggable)) {
+    return loggable.point;
   } else {
     throw Error("Unsupported loggable type");
   }
 }
 
-export function getTimeForSort(loggable: Loggable): number {
+export function getLoggableTime(loggable: Loggable): number {
   if (isEventLog(loggable)) {
     return loggable.time;
   } else if (isPointInstance(loggable)) {
@@ -25,14 +51,16 @@ export function getTimeForSort(loggable: Loggable): number {
     return loggable.point.time;
   } else if (isTerminalExpression(loggable)) {
     return loggable.time;
+  } else if (isUncaughtException(loggable)) {
+    return loggable.time;
   } else {
     throw Error("Unsupported loggable type");
   }
 }
 
 export function loggableSort(a: Loggable, b: Loggable): number {
-  const aPoint = getExecutionPointForSort(a);
-  const bPoint = getExecutionPointForSort(b);
+  const aPoint = getLoggableExecutionPoint(a);
+  const bPoint = getLoggableExecutionPoint(b);
 
   // Terminal messages may be logged at the same point/time as other loggables.
   // If this happens, TerminalExpressions should always come last.

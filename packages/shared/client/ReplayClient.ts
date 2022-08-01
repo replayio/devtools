@@ -311,15 +311,24 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
-    return new Promise<Result[]>((resolve, reject) => {
-      analysisManager.runAnalysis(analysisParams, {
+    return new Promise<Result[]>(async (resolve, reject) => {
+      let resultReceived = false;
+
+      await analysisManager.runAnalysis(analysisParams, {
         onAnalysisError: (errorMessage: string) => {
           reject(errorMessage);
         },
         onAnalysisResult: analysisEntries => {
+          resultReceived = true;
           resolve(analysisEntries.map(entry => entry.value));
         },
       });
+
+      if (!resultReceived) {
+        // No result was returned.
+        // This might happen when e.g.e exceptions are being queried for a recording with no exceptions.
+        resolve([]);
+      }
     });
   }
 }

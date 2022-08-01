@@ -14,7 +14,7 @@ export default function FilterToggles() {
   const client = useContext(ReplayClientContext);
   const {
     showErrors,
-    showExceptions,
+    showExceptionsForDisplay: showExceptions,
     showLogs,
     showNodeModules,
     showTimestamps,

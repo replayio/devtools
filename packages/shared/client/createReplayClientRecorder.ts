@@ -49,6 +49,10 @@ export default function createReplayClientRecorder(
   const proxyReplayClient = new Proxy(replayClient, {
     get(target: any, prop: string) {
       return (...args: any[]) => {
+        if (typeof prop === "symbol" && (prop as Symbol).toString().includes("Symbol.iterator")) {
+          return undefined;
+        }
+
         const result = target[prop](...args);
 
         if (prop === "initialize") {
