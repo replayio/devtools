@@ -7,7 +7,6 @@ import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
 import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
 import {
   MouseEvent,
-  RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
   useRef,
@@ -22,14 +21,12 @@ export default function MessageHoverButton({
   location,
   pauseId,
   showAddCommentButton,
-  targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
   location: Location | null;
   pauseId: PauseId;
   showAddCommentButton: boolean;
-  targetRef: RefObject<HTMLDivElement | null>;
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
