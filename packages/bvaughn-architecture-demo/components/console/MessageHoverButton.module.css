@@ -1,18 +1,18 @@
 .AddCommentButton,
 .ConsoleMessageHoverButton {
   position: absolute;
-  left: 0;
-  top: 0.125rem;
-  border-top-right-radius: 0.25rem;
-  border-bottom-right-radius: 0.25rem;
+  right: 0;
+  top: 0.25rem;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
   outline: none;
   border: none;
-  padding: 0.125rem 0.25rem;
+  padding: 0.125rem;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 0.25ch;
   white-space: nowrap;
-  gap: 0.5ch;
   cursor: pointer;
 }
 
@@ -34,5 +34,6 @@
 }
 
 .Label {
-  margin-right: 0.5ch;
+  line-height: 1rem;
+  margin-left: 0.5ch;
 }
