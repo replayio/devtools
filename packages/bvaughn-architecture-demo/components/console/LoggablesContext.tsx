@@ -141,7 +141,7 @@ export function LoggablesContextRoot({
       return eventLogs;
     } else {
       return eventLogs.filter(
-        eventLog => eventLog.time >= focusRange.begin.time && eventLog.time <= focusRange.end.time
+        eventLog => eventLog.point >= focusRange.begin && eventLog.point <= focusRange.end
       );
     }
   }, [eventLogs, focusRange]);
@@ -156,7 +156,7 @@ export function LoggablesContextRoot({
           hitPoints.forEach(hitPoint => {
             if (
               focusRange === null ||
-              (hitPoint.time >= focusRange.begin.time && hitPoint.time <= focusRange.end.time)
+              (hitPoint.point >= focusRange.begin && hitPoint.point <= focusRange.end)
             ) {
               pointInstances.push({
                 point,
@@ -179,8 +179,7 @@ export function LoggablesContextRoot({
     } else {
       return terminalExpressions.filter(
         terminalExpression =>
-          terminalExpression.time >= focusRange.begin.time &&
-          terminalExpression.time <= focusRange.end.time
+          terminalExpression.point >= focusRange.begin && terminalExpression.point <= focusRange.end
       );
     }
   }, [focusRange, terminalExpressions]);

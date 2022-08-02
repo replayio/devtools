@@ -15,6 +15,7 @@ import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
+import useFocusRange from "../hooks/useFocusRange";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
@@ -138,17 +139,11 @@ function MessageHoverButtonWithWithPause({
 
 function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
   const client = useContext(ReplayClientContext);
+  const focusRange = useFocusRange();
 
   const { point, timeStampedHitPoint } = logPointInstance;
 
-  const analysisResults = runAnalysis(client, point.location, point.content);
-
-  const entry = analysisResults(timeStampedHitPoint);
-  if (entry === null) {
-    throw Error(`No analysis results found for ${timeStampedHitPoint}`);
-  }
-
-  const { isRemote, pauseId, values } = entry;
+  const analysisResults = runAnalysis(client, focusRange, point.location, point.content);
 
   const context = useMemo(
     () => ({
@@ -157,6 +152,15 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     }),
     [timeStampedHitPoint]
   );
+
+  const entry = analysisResults(timeStampedHitPoint);
+  if (entry === null) {
+    console.error(`No analysis results found for execution point "${timeStampedHitPoint.point}"`);
+
+    return <span className={styles.AnalysisError}>Analysis error</span>;
+  }
+
+  const { isRemote, pauseId, values } = entry;
 
   const children = isRemote
     ? values.map((value, index) => (
@@ -188,7 +192,6 @@ function BadgeRenderer({ badge }: { badge: Badge }) {
   switch (badge) {
     case "unicorn":
       return <span className={styles.UnicornBadge} />;
-      break;
     default:
       return (
         <span

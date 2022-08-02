@@ -22,6 +22,7 @@ import {
   TimeStampedPointRange,
   ExecutionPoint,
   createPauseResult,
+  PointRange,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -56,14 +57,17 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
-  findMessages(focusRange: TimeStampedPointRange | null): Promise<{
+  findMessages(focusRange: PointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
-  getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]>;
+  getHitPointsForLocation(
+    focusRange: PointRange | null,
+    location: Location
+  ): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,

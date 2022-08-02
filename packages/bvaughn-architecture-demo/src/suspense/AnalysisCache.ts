@@ -4,6 +4,7 @@ import {
   Location,
   Object,
   PauseId,
+  PointRange,
   Scope,
   TimeStampedPoint,
 } from "@replayio/protocol";
@@ -37,18 +38,21 @@ type RemoteAnalysisResult = {
 
 const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map();
 
-function getKey(location: Location, code: string): string {
-  return `${location.sourceId}:${location.line}:${location.column}:${code}`;
-}
+// TODO (FE-469) Filter in-memory if the range gets smaller (and we haven't overflowed)
+// Currently we re-run the analysis which seems wasteful.
 
-// TODO (FE-469) Add focus region awareness to analysis.
+function getKey(focusRange: PointRange | null, location: Location, code: string): string {
+  const rangeString = focusRange ? `${focusRange.begin}-${focusRange.end}` : "-";
+  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}`;
+}
 
 export function runAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
   code: string
 ): AnalysisResults {
-  const key = getKey(location, code);
+  const key = getKey(focusRange, location, code);
 
   let record = locationAndTimeToValueMap.get(key);
   if (record == null) {
@@ -61,7 +65,7 @@ export function runAnalysis(
 
     locationAndTimeToValueMap.set(key, record);
 
-    runLocalOrRemoteAnalysis(client, location, code, record, wakeable);
+    runLocalOrRemoteAnalysis(client, focusRange, location, code, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -73,6 +77,7 @@ export function runAnalysis(
 
 async function runLocalOrRemoteAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
   code: string,
   record: Record<AnalysisResults>,
@@ -87,7 +92,7 @@ async function runLocalOrRemoteAnalysis(
     wakeable.resolve(analysisResults);
   } catch (error) {
     try {
-      const analysisResults = await runRemoteAnalysis(client, location, code);
+      const analysisResults = await runRemoteAnalysis(client, focusRange, location, code);
 
       record.status = STATUS_RESOLVED;
       record.value = analysisResults;
@@ -144,6 +149,7 @@ export async function runLocalAnalysis(code: string): Promise<AnalysisResults> {
 
 export async function runRemoteAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
   code: string
 ): Promise<AnalysisResults> {
@@ -151,6 +157,7 @@ export async function runRemoteAnalysis(
     effectful: false,
     locations: [{ location }],
     mapper: createMapperForAnalysis(code),
+    range: focusRange || undefined,
   });
 
   if (results.length === 0) {

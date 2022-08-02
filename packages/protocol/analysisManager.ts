@@ -110,6 +110,7 @@ class AnalysisManager {
         mapper: params.mapper,
         reducer: params.reducer,
         effectful: params.effectful,
+        range: params.range,
       },
       sessionId
     );

@@ -130,3 +130,7 @@
 .Expandable {
   width: 100%;
 }
+
+.AnalysisError {
+  color: var(--color-error);
+}

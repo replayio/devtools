@@ -3,7 +3,7 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { PointRange } from "@replayio/protocol";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 
@@ -51,25 +51,17 @@ export function formatTimestamp(ms: number, showHighPrecision: boolean = false) 
   }
 }
 
-export function isRangeEqual(
-  prevRange: TimeStampedPointRange | null,
-  nextRange: TimeStampedPointRange | null
-): boolean {
+export function isRangeEqual(prevRange: PointRange | null, nextRange: PointRange | null): boolean {
   if (prevRange === null && nextRange === null) {
     return true;
   } else if (prevRange !== null && nextRange !== null) {
-    return (
-      nextRange.begin.time === prevRange.begin.time && nextRange.end.time === prevRange.end.time
-    );
+    return nextRange.begin === prevRange.begin && nextRange.end === prevRange.end;
   } else {
     return false;
   }
 }
 
-export function isRangeSubset(
-  prevRange: TimeStampedPointRange | null,
-  nextRange: TimeStampedPointRange | null
-): boolean {
+export function isRangeSubset(prevRange: PointRange | null, nextRange: PointRange | null): boolean {
   if (prevRange === null && nextRange === null) {
     return true;
   } else if (prevRange === null) {
@@ -81,6 +73,6 @@ export function isRangeSubset(
     // No matter what the previous range was, the new one is not a subset.
     return false;
   } else {
-    return nextRange.begin.time >= prevRange.begin.time && nextRange.end.time <= prevRange.end.time;
+    return nextRange.begin >= prevRange.begin && nextRange.end <= prevRange.end;
   }
 }

@@ -1,6 +1,7 @@
 import {
   ExecutionPoint,
   Location,
+  PointRange,
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
@@ -45,7 +46,7 @@ export function getClosestPointForTime(
 export function getHitPointsForLocation(
   client: ReplayClientInterface,
   location: Location,
-  focusRange: TimeStampedPointRange | null
+  focusRange: PointRange | null
 ): TimeStampedPoint[] {
   const key = `${location.sourceId}:${location.line}:${location.column}`;
   let record = locationToHitPointsMap.get(key);
@@ -59,7 +60,7 @@ export function getHitPointsForLocation(
 
     locationToHitPointsMap.set(key, record);
 
-    fetchHitPointsForLocation(client, location, record, wakeable);
+    fetchHitPointsForLocation(client, focusRange, location, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -92,12 +93,13 @@ async function fetchClosestPointForTime(
 
 async function fetchHitPointsForLocation(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
   record: Record<TimeStampedPoint[]>,
   wakeable: Wakeable<TimeStampedPoint[]>
 ) {
   try {
-    const executionPoints = await client.getHitPointsForLocation(location);
+    const executionPoints = await client.getHitPointsForLocation(focusRange, location);
 
     record.status = STATUS_RESOLVED;
     record.value = executionPoints;
@@ -114,20 +116,20 @@ async function fetchHitPointsForLocation(
 function getFilteredLogPoints(
   location: Location,
   logPoints: TimeStampedPoint[],
-  focusRange: TimeStampedPointRange | null
+  focusRange: PointRange | null
 ): TimeStampedPoint[] {
   if (focusRange == null) {
     return logPoints;
   } else {
-    const key = `${location.sourceId}:${location.line}:${location.column}:${focusRange.begin.time}:${focusRange.end.time}`;
+    const key = `${location.sourceId}:${location.line}:${location.column}:${focusRange.begin}:${focusRange.end}`;
     if (!focusRangeToLogPointsMap.has(key)) {
-      const focusBeginTime = focusRange!.begin!.time;
-      const focusEndTime = focusRange!.end!.time;
+      const focusBeginPoint = focusRange!.begin;
+      const focusEndPoint = focusRange!.end;
 
       focusRangeToLogPointsMap.set(
         key,
         logPoints.filter(
-          logPoint => logPoint.time >= focusBeginTime && logPoint.time <= focusEndTime
+          logPoint => logPoint.point >= focusBeginPoint && logPoint.point <= focusEndPoint
         )
       );
     }
