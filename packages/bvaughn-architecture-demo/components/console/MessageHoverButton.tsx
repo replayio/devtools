@@ -10,12 +10,10 @@ import {
   RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
-  useLayoutEffect,
   useRef,
   useState,
   useTransition,
 } from "react";
-import { createPortal } from "react-dom";
 
 import styles from "./MessageHoverButton.module.css";
 
@@ -46,17 +44,6 @@ export default function MessageHoverButton({
   const [isPending, startTransition] = useTransition();
 
   const isCurrentlyPausedAt = currentExecutionPoint === executionPoint;
-
-  useLayoutEffect(() => {
-    const button = ref.current;
-    const target = targetRef.current;
-    if (button && target) {
-      const buttonRect = button.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      button.style.left = `${targetRect.left - buttonRect.width / 2}px`;
-      button.style.top = `${targetRect.top}px`;
-    }
-  }, [targetRef]);
 
   let button = null;
   if (isCurrentlyPausedAt) {
@@ -130,5 +117,5 @@ export default function MessageHoverButton({
     );
   }
 
-  return button !== null ? createPortal(button, document.body) : null;
+  return button;
 }
