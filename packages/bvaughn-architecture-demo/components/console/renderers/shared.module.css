@@ -3,6 +3,7 @@
 .TraceRow,
 .WarningRow {
   padding: 0.5rem;
+  padding-left: 1.5rem;
   border-bottom: 1px solid var(--background-color-contrast-1);
   position: relative;
 }
