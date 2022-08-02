@@ -101,7 +101,6 @@ function EventLogRenderer({
             location={location}
             pauseId={eventLog.pauseId}
             showAddCommentButton={false}
-            targetRef={ref}
             time={eventLog.time}
           />
         )}

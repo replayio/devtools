@@ -111,15 +111,17 @@ function Toggle({
   label: string;
   onChange: (checked: boolean) => void;
 }) {
+  const id = `FilterToggle-${camelCase(label)}`;
   return (
     <div className={styles.Filter}>
-      <label className={styles.Label} data-test-id={`FilterToggle-${camelCase(label)}`}>
-        <input
-          className={styles.Checkbox}
-          checked={checked}
-          onChange={event => onChange(event.currentTarget.checked)}
-          type="checkbox"
-        />
+      <input
+        className={styles.Checkbox}
+        checked={checked}
+        id={id}
+        onChange={event => onChange(event.currentTarget.checked)}
+        type="checkbox"
+      />
+      <label className={styles.Label} data-test-id={id} htmlFor={id} title={label}>
         {label}
       </label>
       {count !== null && count > 0 && <div className={styles.Count}>{count}</div>}

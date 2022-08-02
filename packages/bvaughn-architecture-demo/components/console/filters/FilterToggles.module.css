@@ -15,11 +15,10 @@
 }
 
 .Label {
-  display: flex;
-  align-items: center;
-  gap: 1ch;
   flex: 1 1 auto;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .Count {
@@ -30,6 +29,7 @@
 
 .Checkbox {
   margin: 0;
+  margin-right: 0.5ch;
 }
 
 .Divider {

@@ -142,7 +142,6 @@ function MessageRenderer({
             location={location}
             pauseId={message.pauseId}
             showAddCommentButton={true}
-            targetRef={ref}
             time={message.point.time}
           />
         )}

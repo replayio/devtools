@@ -95,7 +95,6 @@ function LogPointRenderer({
         executionPoint={logPointInstance.timeStampedHitPoint.point}
         isHovered={isHovered}
         location={logPointInstance.point.location}
-        targetRef={ref}
         time={logPointInstance.timeStampedHitPoint.time}
       />
     </div>
@@ -106,13 +105,11 @@ function MessageHoverButtonWithWithPause({
   executionPoint,
   isHovered,
   location,
-  targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
   isHovered: boolean;
   location: Location;
-  targetRef: React.RefObject<HTMLDivElement>;
   time: number;
 }) {
   const client = useContext(ReplayClientContext);
@@ -131,7 +128,6 @@ function MessageHoverButtonWithWithPause({
       location={location}
       pauseId={pauseId}
       showAddCommentButton={false}
-      targetRef={targetRef}
       time={time}
     />
   );
@@ -191,7 +187,11 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 function BadgeRenderer({ badge }: { badge: Badge }) {
   switch (badge) {
     case "unicorn":
-      return <span className={styles.UnicornBadge} />;
+      return (
+        <span className={styles.UnicornBadge}>
+          <span className={styles.Unicorn} />
+        </span>
+      );
     default:
       return (
         <span

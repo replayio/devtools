@@ -102,7 +102,6 @@ function TerminalExpressionRenderer({
           location={null}
           pauseId={terminalExpression.pauseId}
           showAddCommentButton={false}
-          targetRef={ref}
           time={terminalExpression.time}
         />
       )}
