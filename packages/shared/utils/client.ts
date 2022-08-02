@@ -1,4 +1,3 @@
-import isEqual from "lodash/isEqual";
 import { ThreadFront } from "protocol/thread";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
@@ -46,7 +45,10 @@ export function findMatch(
         return false;
       } else {
         for (let index = 0; index < args.length; index++) {
-          if (!isEqual(args[index], logEntry.args[index])) {
+          // We use JSON.stringify to compare values rather than a method like lodash/isEqual
+          // because params with undefined values will be stripped during JSON.stringify/JSON.parse.
+          // This is the most straightforward way to account for that difference.
+          if (JSON.stringify(args[index]) !== JSON.stringify(logEntry.args[index])) {
             return false;
           }
         }
