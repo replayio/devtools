@@ -187,7 +187,11 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 function BadgeRenderer({ badge }: { badge: Badge }) {
   switch (badge) {
     case "unicorn":
-      return <span className={styles.UnicornBadge} />;
+      return (
+        <span className={styles.UnicornBadge}>
+          <span className={styles.Unicorn} />
+        </span>
+      );
     default:
       return (
         <span
