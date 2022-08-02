@@ -3,8 +3,7 @@
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: local("Material Icons"), local("MaterialIcons-Regular"),
-    url(/fonts/material_icons/MaterialIcons-Regular.woff2) format("woff2"),
+  src: url(/fonts/material_icons/MaterialIcons-Regular.woff2) format("woff2"),
     url(/fonts/material_icons/MaterialIcons-Regular.ttf) format("truetype");
 }
 
