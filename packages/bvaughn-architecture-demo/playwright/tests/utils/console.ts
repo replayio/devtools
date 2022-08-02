@@ -39,7 +39,7 @@ export async function toggleProtocolMessages(page: Page, on: boolean) {
 export async function toggleProtocolMessage(page: Page, name: ToggleName, on: boolean) {
   const isEnabled = await page.evaluate(
     name => {
-      const input = document.querySelector(`[data-test-id="FilterToggle-${name}"] input`);
+      const input = document.querySelector(`[id="FilterToggle-${name}"]`);
       return input ? (input as HTMLInputElement).checked : false;
     },
     [name]
