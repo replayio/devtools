@@ -14,11 +14,11 @@ import {
   SourceId,
   SearchSourceContentsMatch,
   TimeStampedPoint,
-  TimeStampedPointRange,
   Result as EvaluationResult,
   FrameId,
   ExecutionPoint,
   createPauseResult,
+  PointRange,
 } from "@replayio/protocol";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
@@ -120,7 +120,7 @@ export class ReplayClient implements ReplayClientInterface {
     return sessionId;
   }
 
-  async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
+  async findMessages(focusRange: PointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }> {
@@ -128,7 +128,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     if (focusRange !== null) {
       const response = await client.Console.findMessagesInRange(
-        { range: { begin: focusRange.begin.point, end: focusRange.end.point } },
+        { range: { begin: focusRange.begin, end: focusRange.end } },
         sessionId
       );
 
@@ -204,13 +204,17 @@ export class ReplayClient implements ReplayClientInterface {
     return count;
   }
 
-  async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
+  async getHitPointsForLocation(
+    focusRange: PointRange | null,
+    location: Location
+  ): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
     await analysisManager.runAnalysis(
       {
         effectful: false,
         locations: [{ location }],
         mapper: "",
+        range: focusRange || undefined,
       },
       {
         onAnalysisError: (errorMessage: string) => {
@@ -312,23 +316,17 @@ export class ReplayClient implements ReplayClientInterface {
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
     return new Promise<Result[]>(async (resolve, reject) => {
-      let resultReceived = false;
+      const results: Result[] = [];
 
       await analysisManager.runAnalysis(analysisParams, {
         onAnalysisError: (errorMessage: string) => {
           reject(errorMessage);
         },
         onAnalysisResult: analysisEntries => {
-          resultReceived = true;
-          resolve(analysisEntries.map(entry => entry.value));
+          results.push(...analysisEntries.map(entry => entry.value));
         },
       });
-
-      if (!resultReceived) {
-        // No result was returned.
-        // This might happen when e.g.e exceptions are being queried for a recording with no exceptions.
-        resolve([]);
-      }
+      resolve(results);
     });
   }
 }

@@ -1,15 +1,17 @@
 .AddCommentButton,
 .ConsoleMessageHoverButton {
+  padding: 0 0.125rem;
   position: absolute;
-  border-radius: 0.5rem;
+  right: 0.25rem;
+  top: 0.25rem;
+  height: 1.5rem;
+  border-radius: 0.25rem;
   outline: none;
   border: none;
-  padding: 0.25rem;
   display: flex;
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  gap: 0.5ch;
   cursor: pointer;
 }
 
@@ -30,6 +32,20 @@
   display: inline-block;
 }
 
+.Label,
+.LabelHovered {
+  line-height: 1rem;
+  transition: padding 100ms ease-in-out;
+  transition: all 250ms ease-in-out;
+  overflow: hidden;
+}
 .Label {
-  margin-right: 0.5ch;
+  max-width: 0;
+  padding: 0;
+  opacity: 0;
+}
+.LabelHovered {
+  max-width: 13ch;
+  padding: 0 0.5ch;
+  opacity: 1;
 }

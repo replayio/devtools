@@ -2,8 +2,9 @@
 .ErrorRow,
 .TraceRow,
 .WarningRow {
-  padding: 0.5rem 1rem;
+  padding: 0.5rem;
   border-bottom: 1px solid var(--background-color-contrast-1);
+  position: relative;
 }
 .ErrorRow {
   background-color: var(--background-color-error);
@@ -129,4 +130,8 @@
 
 .Expandable {
   width: 100%;
+}
+
+.AnalysisError {
+  color: var(--color-error);
 }

@@ -1,15 +1,15 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { PointRange } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-export default function useFocusRange(): TimeStampedPointRange | null {
+export default function useFocusRange(): PointRange | null {
   const replayClient = useContext(ReplayClientContext);
   const { range } = useContext(FocusContext);
 
-  const focusRange = useMemo<TimeStampedPointRange | null>(() => {
+  const focusRange = useMemo<PointRange | null>(() => {
     if (range !== null) {
       const [beginTime, endTime] = range;
 
@@ -21,14 +21,8 @@ export default function useFocusRange(): TimeStampedPointRange | null {
       );
 
       return {
-        begin: {
-          point: beginPoint,
-          time: beginTime,
-        },
-        end: {
-          point: endPoint,
-          time: endTime,
-        },
+        begin: beginPoint,
+        end: endPoint,
       };
     }
 
