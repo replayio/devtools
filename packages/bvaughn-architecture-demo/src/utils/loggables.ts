@@ -68,5 +68,5 @@ export function loggableSort(a: Loggable, b: Loggable): number {
     }
   }
 
-  return aPoint.localeCompare(bPoint);
+  return aPoint.localeCompare(bPoint, undefined, { numeric: true });
 }
