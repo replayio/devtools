@@ -72,8 +72,8 @@ export default function MessageHoverButton({
           onMouseLeave={() => setIsHovered(false)}
           ref={ref}
         >
-          {isHovered && <span className={styles.Label}> Add comment </span>}
           <Icon className={styles.AddCommentButtonIcon} type="comment" />
+          <span className={isHovered ? styles.LabelHovered : styles.Label}> Add comment </span>
         </button>
       );
     }
@@ -103,7 +103,6 @@ export default function MessageHoverButton({
         onMouseLeave={() => setIsHovered(false)}
         ref={ref}
       >
-        {isHovered && <span className={styles.Label}> {label} </span>}
         <Icon
           className={styles.ConsoleMessageHoverButtonIcon}
           type={
@@ -112,6 +111,7 @@ export default function MessageHoverButton({
               : "rewind"
           }
         />
+        <span className={isHovered ? styles.LabelHovered : styles.Label}> {label} </span>
       </button>
     );
   }

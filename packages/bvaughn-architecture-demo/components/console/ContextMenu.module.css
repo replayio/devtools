@@ -4,6 +4,7 @@
   display: flex;
   border-radius: 0.5rem;
   overflow: hidden;
+  white-space: nowrap;
 }
 
 .ContextMenuItem {
