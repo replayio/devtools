@@ -228,6 +228,8 @@ function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
         if (pauseId) {
           let pause = Pause.getById(pauseId);
           if (!pause) {
+            // Pre-cache Pause data (required by legacy app code) before calling seek().
+            // The new Console doesn't load this data but the old one requires it.
             pause = new Pause(ThreadFront);
             pause.instantiate(pauseId, executionPoint, time, false);
             await pause.ensureLoaded();
@@ -395,7 +397,15 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   const executionPoint = useAppSelector(getCurrentPoint);
 
   const update = useCallback(
-    (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+    async (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+      if (!Pause.getById(pauseId)) {
+        // Pre-cache Pause data (required by legacy app code) before calling seek().
+        // The new Console doesn't load this data but the old one requires it.
+        const pause = new Pause(ThreadFront);
+        pause.instantiate(pauseId, executionPoint, time, false);
+        await pause.ensureLoaded();
+      }
+
       dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId));
     },
     [dispatch]
