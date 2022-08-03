@@ -12,6 +12,7 @@ import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
+import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
 import React, {
   Suspense,
   useContext,
@@ -54,6 +55,8 @@ export default function HomePage() {
   const setPanelTransition = (panel: string) => {
     startTransition(() => setPanel(panel));
   };
+
+  usePreferredColorScheme();
 
   const content = (
     <Initializer>

@@ -7,6 +7,7 @@ import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
+import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { createReplayClientForPlaywrightTesting } from "shared/utils/client";
 import { getFlag } from "shared/utils/url";
@@ -14,6 +15,8 @@ import { getFlag } from "shared/utils/url";
 import styles from "./styles.module.css";
 
 export default function SourceAndConsole() {
+  usePreferredColorScheme();
+
   return (
     <ReplayClientContext.Provider value={replayClient}>
       <Initializer accessToken={ACCESS_TOKEN} recordingId={RECORDING_ID}>
