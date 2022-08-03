@@ -45,7 +45,7 @@ export interface UIState {
   consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
   eventListenerBreakpoints: EventListenersState;
-  experimentalSources: NewSourcesState;
+  sources: NewSourcesState;
   fileSearch: FileSearchState;
   hitCounts: HitCountsState;
   inspector: InspectorState;
