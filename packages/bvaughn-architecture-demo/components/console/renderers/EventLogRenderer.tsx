@@ -100,7 +100,7 @@ function EventLogRenderer({
             executionPoint={eventLog.point}
             location={location}
             pauseId={eventLog.pauseId}
-            showAddCommentButton={false}
+            showAddCommentButton={true}
             time={eventLog.time}
           />
         )}
