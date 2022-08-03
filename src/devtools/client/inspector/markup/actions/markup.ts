@@ -1,9 +1,8 @@
 import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
 import { NodeFront } from "protocol/thread/node";
-import Selection, { SelectionReason } from "devtools/client/framework/selection";
+import { SelectionReason } from "devtools/client/framework/selection";
 import { NodeInfo } from "../state/markup";
-import { UIThunkAction } from "ui/actions";
 import {
   getNodeInfo,
   getParentNodeId,
@@ -11,6 +10,11 @@ import {
   isNodeExpanded,
 } from "../selectors/markup";
 import { UIState } from "ui/state";
+import { isInspectorSelected } from "ui/reducers/app";
+import type { UIStore, UIThunkAction } from "ui/actions";
+
+import { ThreadFront as ThreadFrontType } from "protocol/thread";
+
 import Highlighter from "highlighter/highlighter";
 const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
 const { features } = require("devtools/client/inspector/prefs");
@@ -46,6 +50,10 @@ export type MarkupAction =
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
+export function setupMarkup(store: UIStore, ThreadFront: typeof ThreadFrontType) {
+  ThreadFront.on("paused", () => store.dispatch(paused()));
+}
+
 /**
  * Clears the tree
  */
@@ -56,6 +64,18 @@ export function reset(): ResetAction {
   rootNodeWaiter = defer();
   return {
     type: "RESET",
+  };
+}
+
+export function paused(): UIThunkAction {
+  return async (dispatch, getState) => {
+    // TODO: we'll want to als dispatch paused if the inspector is selected later
+    // and be intelligent enough not to re-fetch the markup if it's already loaded
+    if (!isInspectorSelected(getState())) {
+      return;
+    }
+
+    await dispatch(newRoot());
   };
 }
 
@@ -74,14 +94,13 @@ export function newRoot(): UIThunkAction {
     if (ThreadFront.currentPause !== pause) {
       return;
     }
-    dispatch({
-      type: "NEW_ROOT",
-      rootNode,
-    });
+    dispatch({ type: "NEW_ROOT", rootNode });
     if (rootNodeWaiter) {
       rootNodeWaiter.resolve();
       rootNodeWaiter = undefined;
     }
+
+    await dispatch(selectionChanged(rootNodeFront, true, true));
   };
 }
 
@@ -186,6 +205,8 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
         return;
       }
       dispatch(updateChildrenLoading(nodeId, false));
+
+      window.gSelection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
     }
   };
 }
@@ -197,12 +218,13 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
  * while their children are loaded.
  */
 export function selectionChanged(
-  selection: Selection,
+  selectedNode: NodeFront,
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
-  return async dispatch => {
-    const selectedNode = selection.nodeFront;
+  return async (dispatch, getState) => {
+    const hasSelectionChanged = () => selectedNode.objectId() !== getSelectedNodeId(getState());
+
     if (!selectedNode) {
       dispatch(updateSelectedNode(null));
       return;
@@ -211,7 +233,7 @@ export function selectionChanged(
     if (rootNodeWaiter) {
       await rootNodeWaiter.promise;
     }
-    if (selection.nodeFront !== selectedNode) {
+    if (hasSelectionChanged()) {
       return;
     }
 
@@ -228,7 +250,7 @@ export function selectionChanged(
     // expand each ancestor, loading its children if necessary
     for (const ancestor of ancestors) {
       await dispatch(expandNode(ancestor.objectId(), shouldScrollIntoView));
-      if (selection.nodeFront !== selectedNode) {
+      if (hasSelectionChanged()) {
         return;
       }
     }
@@ -420,6 +442,26 @@ export function onPageDownKey(): UIThunkAction {
       nextNodeId = getNextNodeId(state, nextNodeId);
     }
     dispatch(selectNode(nextNodeId, "keyboard"));
+  };
+}
+
+export function highlightNode(nodeId: string): UIThunkAction {
+  return async (dispatch, getState, { ThreadFront }) => {
+    const hoveredNodeId = getHoveredNodeId(getState());
+    if (hoveredNodeId !== nodeId) {
+      dispatch(setHoveredNode(nodeId));
+      Highlighter.highlight(ThreadFront.currentPause.getNodeFront(nodeId));
+    }
+  };
+}
+
+export function unhighlightNode(): UIThunkAction {
+  return async (dispatch, getState) => {
+    const hoveredNodeId = getHoveredNodeId(getState());
+    if (hoveredNodeId) {
+      dispatch(setHoveredNode(null));
+      Highlighter.unhighlight();
+    }
   };
 }
 

@@ -21,12 +21,10 @@ import TextNode from "./TextNode";
 import classnames from "classnames";
 import { setActiveTab } from "../../actions";
 
+import { selectNode, highlightNode, unhighlightNode } from "../actions/markup";
+
 interface NodeProps {
   nodeId: string;
-  onSelectNode: (nodeId: string) => void;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-  onMouseEnterNode: (nodeId: string) => void;
-  onMouseLeaveNode: (nodeId: string) => void;
 }
 
 class _Node extends PureComponent<NodeProps & PropsFromRedux> {
@@ -35,15 +33,19 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
 
     this.onExpanderToggle = this.onExpanderToggle.bind(this);
     this.onSelectNodeClick = this.onSelectNodeClick.bind(this);
-    this.onMouseEnter = this.onMouseEnter.bind(this);
-    this.onMouseLeave = this.onMouseLeave.bind(this);
+
     this.scrollIntoView = this.scrollIntoView.bind(this);
   }
 
   onExpanderToggle(event: MouseEvent) {
     event.stopPropagation();
     const { node } = this.props;
-    this.props.onToggleNodeExpanded(node.id, node.isExpanded);
+
+    if (node.isExpanded) {
+      this.props.collapseNode();
+    } else {
+      this.props.expandNode();
+    }
   }
 
   onSelectNodeClick(event: MouseEvent) {
@@ -59,13 +61,13 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
     this.props.onSelectNode(node.id);
   }
 
-  onMouseEnter() {
-    this.props.onMouseEnterNode(this.props.node.id);
-  }
+  onMouseEnter = () => {
+    this.props.highlightNode(this.props.node.id);
+  };
 
-  onMouseLeave() {
-    this.props.onMouseLeaveNode(this.props.node.id);
-  }
+  onMouseLeave = () => {
+    this.props.unHighlightNode(this.props.node.id);
+  };
 
   scrollIntoView(el: HTMLElement | null) {
     if (!el) {
@@ -104,9 +106,9 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
             key={nodeId}
             nodeId={nodeId}
             onSelectNode={this.props.onSelectNode}
-            onToggleNodeExpanded={this.props.onToggleNodeExpanded}
-            onMouseEnterNode={this.props.onMouseEnterNode}
-            onMouseLeaveNode={this.props.onMouseLeaveNode}
+            onToggleNodeExpanded={this.onExpanderToggle}
+            onMouseEnterNode={this.onMouseEnter}
+            onMouseLeaveNode={this.onMouseLeave}
           />
         ))}
       </ul>
@@ -139,7 +141,7 @@ class _Node extends PureComponent<NodeProps & PropsFromRedux> {
   }
 
   renderComponent() {
-    const { node, onToggleNodeExpanded } = this.props;
+    const { node } = this.props;
 
     let component = null;
     if (node.type === ELEMENT_NODE) {
@@ -233,6 +235,11 @@ const mapStateToProps = (state: UIState, { nodeId }: NodeProps) => ({
 });
 const connector = connect(mapStateToProps, {
   setActiveTab,
+  onSelectNode: selectNode,
+  expandNode,
+  collapseNode,
+  highlightNode,
+  unhighlightNode,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const Node = connector(_Node);

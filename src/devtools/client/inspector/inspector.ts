@@ -19,6 +19,15 @@ import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
 
+const selection = new Selection();
+window.gSelection = selection;
+
+declare global {
+  interface Window {
+    gSelection: typeof selection;
+  }
+}
+
 type InspectorEvent =
   | "ready" // Fired when the inspector panel is opened for the first time and ready to use
   | "new-root" // Fired after a new root (navigation to a new page) event was fired by the walker, and taken into account by the inspector (after the markup view has been reloaded)
@@ -60,7 +69,8 @@ export class Inspector {
   constructor() {
     EventEmitter.decorate(this);
 
-    this.selection = new Selection();
+    this.selection = selection;
+
     this.panelDoc = window.document;
     this.panelWin = window;
     (this.panelWin as any).inspector = this;
@@ -68,7 +78,6 @@ export class Inspector {
 
     this.highlighter = Highlighter;
 
-    this.markup = new MarkupView(this);
     this.rules = new RulesView(this, window);
     this.boxModel = new BoxModel(this, window);
   }

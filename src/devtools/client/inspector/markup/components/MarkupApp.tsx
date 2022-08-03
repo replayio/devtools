@@ -7,12 +7,7 @@ import Nodes from "./Nodes";
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 
-export interface MarkupProps {
-  onSelectNode: (nodeId: string) => void;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-  onMouseEnterNode: (nodeId: string) => void;
-  onMouseLeaveNode: (nodeId: string) => void;
-}
+export interface MarkupProps {}
 
 function setupLegacyComponents(inspector: Inspector) {
   const searchbox = new MarkupSearchbox(inspector);
