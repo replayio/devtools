@@ -139,29 +139,9 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
 
   useEffect(() => {
-    if (focusRegion === null) {
-      return;
-    }
-
-    const updateFocusRegionOnceLoaded = () => {
-      const focusBegin = displayedBeginForFocusRegion(focusRegion);
-      const focusEnd = displayedEndForFocusRegion(focusRegion);
-      const isLoaded = loadedRegions?.loaded?.some(region => {
-        return region.begin.time <= focusBegin && region.end.time >= focusEnd;
-      });
-      if (isLoaded) {
-        startTransition(() => {
-          setDeferredFocusRegion(focusRegion);
-        });
-      } else {
-        timeoutId = setTimeout(updateFocusRegionOnceLoaded, 250);
-      }
-    };
-
-    let timeoutId = setTimeout(updateFocusRegionOnceLoaded, 250);
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    startTransition(() => {
+      setDeferredFocusRegion(focusRegion);
+    });
   }, [focusRegion, loadedRegions]);
 
   const update = useCallback(

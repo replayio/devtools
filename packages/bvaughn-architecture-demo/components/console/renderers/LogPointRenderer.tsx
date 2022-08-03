@@ -4,6 +4,7 @@ import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
@@ -20,6 +21,7 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
+import { isPointInRegions } from "@bvaughn/../shared/utils/time";
 
 // Renders PointInstances with enableLogging=true.
 function LogPointRenderer({
@@ -114,11 +116,14 @@ function MessageHoverButtonWithWithPause({
 }) {
   const client = useContext(ReplayClientContext);
 
+  const loadedRegions = useLoadedRegions(client);
+  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
+
   // Events don't have pause IDs, just execution points.
   // So we need to load the nearest one before we can seek to it.
-  const pauseId = getClosestPointForTime(client, time);
+  const pauseId = isLoaded ? getClosestPointForTime(client, time) : null;
 
-  if (!isHovered) {
+  if (pauseId === null || !isHovered) {
     return null;
   }
 

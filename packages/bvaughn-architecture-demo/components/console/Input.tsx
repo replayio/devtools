@@ -1,5 +1,7 @@
+import { isPointInRegions } from "@bvaughn/../shared/utils/time";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { getPauseData, getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { FrameId } from "@replayio/protocol";
@@ -15,22 +17,9 @@ export default function Input() {
   const client = useContext(ReplayClientContext);
   const [searchState, searchActions] = useContext(SearchContext);
   const { addMessage } = useContext(TerminalContext);
-  const { executionPoint, pauseId: explicitPuaseId, time } = useContext(TimelineContext);
+  const { executionPoint, pauseId: explicitPauseId, time } = useContext(TimelineContext);
 
-  // If we are not currently paused at an explicit point, find the nearest point and pause there.
-  let pauseId = explicitPuaseId;
-  let frameId: FrameId | null = null;
-  if (pauseId === null) {
-    const executionPoint = getClosestPointForTime(client, time);
-    const pauseData = getPauseForExecutionPoint(client, executionPoint);
-
-    frameId = pauseData.stack?.[0] ?? null;
-    pauseId = pauseData.pauseId;
-  } else {
-    const pauseData = getPauseData(client, pauseId);
-
-    frameId = pauseData.frames?.[0]?.frameId ?? null;
-  }
+  const loadedRegions = useLoadedRegions(client);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -42,6 +31,27 @@ export default function Input() {
 
     searchStateVisibleRef.current = searchState.visible;
   }, [searchState.visible]);
+
+  // If we are not currently paused at an explicit point, find the nearest point and pause there.
+  let pauseId = explicitPauseId;
+  let frameId: FrameId | null = null;
+  if (pauseId === null) {
+    const isLoaded =
+      loadedRegions !== null &&
+      executionPoint !== null &&
+      isPointInRegions(executionPoint, loadedRegions.loaded);
+    if (isLoaded) {
+      const executionPoint = getClosestPointForTime(client, time);
+      const pauseData = getPauseForExecutionPoint(client, executionPoint);
+
+      frameId = pauseData.stack?.[0] ?? null;
+      pauseId = pauseData.pauseId;
+    }
+  } else {
+    const pauseData = getPauseData(client, pauseId);
+
+    frameId = pauseData.frames?.[0]?.frameId ?? null;
+  }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
@@ -82,6 +92,7 @@ export default function Input() {
       <input
         className={styles.Input}
         data-test-id="ConsoleTerminalInput"
+        disabled={pauseId === null}
         onKeyDown={onKeyDown}
         ref={ref}
         type="text"
