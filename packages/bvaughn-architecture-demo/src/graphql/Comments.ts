@@ -109,10 +109,7 @@ export async function addComment(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
   recordingId: RecordingId,
-  config: Partial<AddCommentInput> & {
-    // TODO Our generated GraphQL type should contain this field.
-    isPublished: boolean;
-  }
+  config: Partial<AddCommentInput>
 ) {
   await graphQLClient.send(
     {

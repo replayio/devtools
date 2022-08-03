@@ -3,7 +3,12 @@ import { Message, PointRange } from "@replayio/protocol";
 import { ReplayClientInterface } from "../../../shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
-import { isRangeEqual, isRangeSubset } from "../utils/time";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+  isRangeEqual,
+  isRangeSubset,
+} from "../utils/time";
 
 import { preCacheObjects } from "./ObjectPreviews";
 import { Wakeable } from "./types";
@@ -113,10 +118,10 @@ export function getMessages(
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages!.filter(message => {
         const point = message.point.point;
-        if (point < begin) {
+        if (isExecutionPointsLessThan(point, begin)) {
           lastFilteredCountBefore++;
           return false;
-        } else if (point > end) {
+        } else if (isExecutionPointsGreaterThan(point, end)) {
           lastFilteredCountAfter++;
           return false;
         } else {

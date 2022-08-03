@@ -3,9 +3,31 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
-import { PointRange } from "@replayio/protocol";
+import { ExecutionPoint, PointRange } from "@replayio/protocol";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
+
+export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
+  return a.localeCompare(b, undefined, { numeric: true });
+}
+
+export function isExecutionPointsGreaterThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
+  return compareExecutionPoints(a, b) > 0;
+}
+
+export function isExecutionPointsLessThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
+  return compareExecutionPoints(a, b) < 0;
+}
+
+export function isExecutionPointsWithinRange(
+  point: ExecutionPoint,
+  beginPoint: ExecutionPoint,
+  endPoint: ExecutionPoint
+): boolean {
+  return !(
+    isExecutionPointsLessThan(point, beginPoint) || isExecutionPointsGreaterThan(point, endPoint)
+  );
+}
 
 export function formatDuration(ms: number) {
   return prettyMilliseconds(ms, { millisecondsDecimalDigits: 1 });
