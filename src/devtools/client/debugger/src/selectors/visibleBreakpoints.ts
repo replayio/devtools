@@ -16,7 +16,7 @@ import { getSelectedLocation } from "ui/reducers/sources";
  * Finds the breakpoints, which appear in the selected source.
  */
 export const getVisibleBreakpoints = createSelector(
-  (state: UIState) => state.experimentalSources.selectedLocation?.sourceId,
+  (state: UIState) => state.sources.selectedLocation?.sourceId,
   getBreakpointsList,
   (selectedSourceId, breakpoints) => {
     if (!selectedSourceId) {

@@ -114,7 +114,7 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
       oldState,
       "pendingSelectedLocation",
       // TS types say `null` isn't acceptable to persist, but it seems to work at runtime
-      state => state.experimentalSources.persistedSelectedLocation as any
+      state => state.sources.persistedSelectedLocation as any
     );
   }
 

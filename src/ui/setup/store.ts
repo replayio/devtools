@@ -44,7 +44,7 @@ type ReduxDevToolsOptions = Exclude<
 // slice reducers we know will be added, to get the right state type.
 let reducers = {
   app: appReducer,
-  experimentalSources: sources,
+  sources: sources,
   hitCounts: hitCounts,
   layout: layoutReducer,
   messages: messagesReducer,
@@ -100,8 +100,8 @@ const sanitizeStateForDevtools = <S>(state: S) => {
   const sanitizedState = customImmer.produce(state, (draft: any) => {
     sanitizeContents(draft.sourceTree?.focusedItem?.contents);
 
-    if (draft.experimentalSources) {
-      Object.values(draft.experimentalSources.contents.entities).forEach((contentsItem: any) => {
+    if (draft.sources) {
+      Object.values(draft.sources.contents.entities).forEach((contentsItem: any) => {
         if (contentsItem.value) {
           contentsItem.value.value = OMITTED;
         }

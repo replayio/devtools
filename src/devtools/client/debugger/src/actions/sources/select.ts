@@ -20,7 +20,7 @@ import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
 import {
-  experimentalLoadSourceText,
+  loadSourceText,
   getSelectedSource,
   getSourceDetails,
   getSourceByUrl,
@@ -167,7 +167,7 @@ export function selectLocation(
 
     // This adds the source's text to the client-side parser, which is a necessary step
     // before we can ask the parser to return symbols in `fetchSymbolsForSource`.
-    const textPromise = dispatch(experimentalLoadSourceText(source.id));
+    const textPromise = dispatch(loadSourceText(source.id));
     const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
 
     await Promise.all([textPromise, possibleBreakpointsPromise]);
