@@ -184,7 +184,7 @@ export const {
   sourceErrored,
 } = sourcesSlice.actions;
 
-export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
+export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState, { ThreadFront }) => {
     const existing = getSourceContentsEntry(getState(), sourceId);
     if (existing?.status === LoadingStatus.LOADING) {

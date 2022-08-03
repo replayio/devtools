@@ -28,39 +28,10 @@ import {
 import { syncBreakpoint } from "../breakpoints";
 
 import { toggleBlackBox } from "./blackbox";
-import { experimentalLoadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
+import { loadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 
 import { prefs } from "../../utils/prefs";
-
-// If a request has been made to show this source, go ahead and
-// select it.
-function checkSelectedSource(cx: Context, source: SourceDetails): UIThunkAction {
-  return async (dispatch, getState) => {
-    const state = getState();
-    const persistedLocation = getPreviousPersistedLocation(state);
-
-    const pendingUrl = persistedLocation?.sourceUrl;
-    if (!pendingUrl) {
-      return;
-    }
-
-    if (!source || !source.url) {
-      return;
-    }
-
-    if (pendingUrl === source.url) {
-      const { selectLocation } = await import("../sources");
-      await dispatch(
-        selectLocation(cx, {
-          column: persistedLocation.column,
-          line: typeof persistedLocation.line === "number" ? persistedLocation.line : 0,
-          sourceId: source.id,
-        })
-      );
-    }
-  };
-}
 
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
@@ -87,7 +58,7 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
     }
 
     // load the source text if there is a pending breakpoint for it
-    const textPromise = dispatch(experimentalLoadSourceText(source.id));
+    const textPromise = dispatch(loadSourceText(source.id));
     const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
 
     await Promise.all([textPromise, possibleBreakpointsPromise]);
