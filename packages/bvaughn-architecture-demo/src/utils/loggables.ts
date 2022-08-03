@@ -4,6 +4,7 @@ import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { ExecutionPoint } from "@replayio/protocol";
+import { compareExecutionPoints } from "./time";
 
 export function isEventLog(loggable: Loggable): loggable is EventLog {
   return loggable.type === "EventLog";
@@ -68,5 +69,5 @@ export function loggableSort(a: Loggable, b: Loggable): number {
     }
   }
 
-  return aPoint.localeCompare(bPoint, undefined, { numeric: true });
+  return compareExecutionPoints(aPoint, bPoint);
 }

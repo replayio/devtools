@@ -7,6 +7,7 @@ import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
 import { loggableSort } from "@bvaughn/src/utils/loggables";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
+import { isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { EventHandlerType } from "@replayio/protocol";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import {
@@ -140,8 +141,8 @@ export function LoggablesContextRoot({
     if (focusRange === null) {
       return eventLogs;
     } else {
-      return eventLogs.filter(
-        eventLog => eventLog.point >= focusRange.begin && eventLog.point <= focusRange.end
+      return eventLogs.filter(eventLog =>
+        isExecutionPointsWithinRange(eventLog.point, focusRange.begin, focusRange.end)
       );
     }
   }, [eventLogs, focusRange]);
@@ -156,7 +157,7 @@ export function LoggablesContextRoot({
           hitPoints.forEach(hitPoint => {
             if (
               focusRange === null ||
-              (hitPoint.point >= focusRange.begin && hitPoint.point <= focusRange.end)
+              isExecutionPointsWithinRange(hitPoint.point, focusRange.begin, focusRange.end)
             ) {
               pointInstances.push({
                 point,
@@ -177,9 +178,8 @@ export function LoggablesContextRoot({
     if (focusRange === null) {
       return terminalExpressions;
     } else {
-      return terminalExpressions.filter(
-        terminalExpression =>
-          terminalExpression.point >= focusRange.begin && terminalExpression.point <= focusRange.end
+      return terminalExpressions.filter(terminalExpression =>
+        isExecutionPointsWithinRange(terminalExpression.point, focusRange.begin, focusRange.end)
       );
     }
   }, [focusRange, terminalExpressions]);
