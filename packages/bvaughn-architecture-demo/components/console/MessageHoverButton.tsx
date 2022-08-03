@@ -52,6 +52,7 @@ export default function MessageHoverButton({
             hasFrames: true,
             isPublished: false,
             point: executionPoint,
+            sourceLocation: location,
             time,
           });
 

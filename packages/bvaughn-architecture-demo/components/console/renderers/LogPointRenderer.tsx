@@ -127,7 +127,7 @@ function MessageHoverButtonWithWithPause({
       executionPoint={executionPoint}
       location={location}
       pauseId={pauseId}
-      showAddCommentButton={false}
+      showAddCommentButton={true}
       time={time}
     />
   );
