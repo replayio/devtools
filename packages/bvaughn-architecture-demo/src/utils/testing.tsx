@@ -110,7 +110,7 @@ export async function renderFocused(
   };
 
   const timelineContext: TimelineContextType = {
-    executionPoint: null,
+    executionPoint: "0",
     isPending: false,
     pauseId: null,
     time: 0,

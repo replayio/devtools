@@ -23,12 +23,10 @@ export default function createPlayer<T>(entries: Entry[]): T {
             }
 
             console.error(
-              `Could not find matching method call for method "${prop}" with args ${JSON.stringify(
-                args
-              )}`
+              `Could not find matching prop for "${prop}" with args ${JSON.stringify(args)}`
             );
 
-            throw Error(`Could not find matching method call for method "${prop}"`);
+            throw Error(`Could not find matching prop for "${prop}"`);
           }
         };
       },

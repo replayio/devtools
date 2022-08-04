@@ -2,7 +2,7 @@ export type Entry = {
   args: any[] | null;
   isAsync: boolean;
   isGetter: boolean;
-  method: string;
+  prop: string;
   result: any;
   thennable: any | null;
 };

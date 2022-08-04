@@ -29,7 +29,7 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
   const entries: Entry[] = [];
 
   function recordEntry(prop: string, args: any[] | null, returnValue: any) {
-    // If this method has already been called with these params, store the latest value.
+    // If this prop has already been called with these params, store the latest value.
     const prevEntry = findMatch(entries, prop, args);
     let entry: Entry;
     if (prevEntry) {
@@ -39,7 +39,7 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
         args: sanitizeArgs(prop, args),
         isAsync: false,
         isGetter: args === null,
-        method: prop,
+        prop,
 
         // This gets filled in below
         result: null,

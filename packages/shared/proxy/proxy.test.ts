@@ -230,7 +230,7 @@ describe("proxy", () => {
           ],
           "isAsync": false,
           "isGetter": false,
-          "method": "process",
+          "prop": "process",
           "result": Object {
             "bar": 2,
             "baz": 3,
@@ -282,7 +282,7 @@ describe("proxy", () => {
           ],
           "isAsync": false,
           "isGetter": false,
-          "method": "process",
+          "prop": "process",
           "result": Object {
             "bar": 2,
             "baz": "sanitized",
@@ -328,7 +328,7 @@ describe("proxy", () => {
           "args": null,
           "isAsync": false,
           "isGetter": true,
-          "method": "value",
+          "prop": "value",
           "result": Object {
             "bar": 2,
             "baz": "sanitized",
@@ -380,7 +380,7 @@ describe("proxy", () => {
           ],
           "isAsync": true,
           "isGetter": false,
-          "method": "asyncMethod",
+          "prop": "asyncMethod",
           "result": Object {
             "bar": 2,
             "baz": "sanitized",

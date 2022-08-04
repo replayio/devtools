@@ -1,9 +1,9 @@
 import { Entry } from "./types";
 
-export function findMatch(entries: Entry[], methodName: string, args: any[] | null): Entry | null {
+export function findMatch(entries: Entry[], prop: string, args: any[] | null): Entry | null {
   return (
     entries.find(entry => {
-      if (entry.method !== methodName) {
+      if (entry.prop !== prop) {
         return false;
       } else if ((args === null) !== (entry.args === null) || entry.args?.length !== args?.length) {
         return false;

@@ -364,7 +364,7 @@ function TerminalContextReduxAdapter({ children }: PropsWithChildren) {
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.
 function TimelineContextAdapter({ children }: PropsWithChildren) {
   const [state, setState] = useState<Omit<TimelineContextType, "isPending" | "update">>({
-    executionPoint: null,
+    executionPoint: "0",
     pauseId: null,
     time: 0,
   });
@@ -374,7 +374,7 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
   const pauseId = useAppSelector(getPauseId);
   const time = useAppSelector(getCurrentTime);
-  const executionPoint = useAppSelector(getCurrentPoint);
+  const executionPoint = useAppSelector(getCurrentPoint) || "0";
 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
