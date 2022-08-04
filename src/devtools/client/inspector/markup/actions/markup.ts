@@ -461,7 +461,7 @@ export function highlightNode(nodeId: string): UIThunkAction {
 
 export function unhighlightNode(nodeId: string): UIThunkAction {
   return async (dispatch, getState) => {
-    if (hoveredNodeId && nodeId !== hoveredNodeId) {
+    if (hoveredNodeId && nodeId === hoveredNodeId) {
       hoveredNodeId = null;
       Highlighter.unhighlight();
     }
