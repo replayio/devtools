@@ -34,7 +34,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
                 "absolute inset-y-0 right-0 flex items-center pr-3"
               )}
             >
-              <CheckIcon className="h-4 w-4" aria-hidden="true" />
+              <CheckIcon className="w-4 h-4" aria-hidden="true" />
             </span>
           ) : null}
         </>
@@ -64,10 +64,10 @@ export default function SelectMenu({
         <>
           {label ? <Listbox.Label className="block font-medium">label</Listbox.Label> : null}
           <div className={`relative ${className || ""}`}>
-            <Listbox.Button className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-chrome py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
+            <Listbox.Button className="relative w-full cursor-default rounded-md border border-textFieldBorder bg-themeBase-95 py-1.5 pl-2.5 pr-8 text-left shadow-sm focus:border-primaryAccentHover focus:outline-none focus:ring-1 focus:ring-primaryAccent">
               <span className="block truncate">{selectedName}</span>
               <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-1.5">
-                <SelectorIcon className="h-4 w-4 text-textFieldBorder" aria-hidden="true" />
+                <SelectorIcon className="w-4 h-4 text-textFieldBorder" aria-hidden="true" />
               </span>
             </Listbox.Button>
             <Transition
@@ -79,7 +79,7 @@ export default function SelectMenu({
             >
               <Listbox.Options
                 static
-                className="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-md bg-chrome py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none"
+                className="absolute z-10 w-full py-1 mt-1 overflow-auto rounded-md shadow-lg max-h-48 bg-chrome ring-1 ring-black ring-opacity-5 focus:outline-none"
               >
                 {options.map(({ name, id }) => (
                   <Option name={name} id={id} key={id} />

@@ -11,10 +11,11 @@ export function RecordingsError() {
   if (filter) {
     msg = (
       <>
-        <div>No recordings found</div>
-        <PrimaryButton color="blue" onClick={() => setAppliedText("")}>
-          Clear filters
-        </PrimaryButton>
+        <div>No results found.  
+          <span onClick={() => setAppliedText("")} className="pl-2 underline cursor-pointer">
+            Show all replays?
+          </span>
+        </div>
       </>
     );
   } else if (isReplayBrowser()) {
@@ -25,9 +26,11 @@ export function RecordingsError() {
 
   return (
     <section
-      className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg ${styles.recordingsBackground}`}
+      className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg h-3/4 ${styles.recordingsBackground}`}
     >
+      <div className="p-6 m-24 text-bodyColor">
       {msg}
+      </div>
     </section>
   );
 }

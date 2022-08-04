@@ -37,9 +37,10 @@ function ViewerHeaderActions({
   }
 
   return (
-    <SecondaryButton className={styles.editButton} color="blue" onClick={() => setIsEditing(true)}>
-      Edit
-    </SecondaryButton>
+
+    <>    
+        {recordings.length != 0 ? <><SecondaryButton className={styles.editButton} color="blue" onClick={() => setIsEditing(true)}>Edit</SecondaryButton></> : <></>}
+    </>
   );
 }
 
