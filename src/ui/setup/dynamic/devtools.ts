@@ -47,6 +47,7 @@ import { extendStore, AppStore } from "../store";
 import { startAppListening } from "../listenerMiddleware";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
+import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -185,6 +186,7 @@ export default async function DevTools(store: AppStore) {
   extendStore(store, initialState, { ...reducers, ...inspectorReducers }, extraThunkArgs);
 
   setupSourcesListeners(startAppListening);
+  setupMarkup(store, startAppListening);
 
   dbgClient.bootstrap(store);
 

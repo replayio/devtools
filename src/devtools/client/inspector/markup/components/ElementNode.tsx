@@ -42,7 +42,7 @@ class ElementNode extends PureComponent<ElementNodeProps> {
 
   renderAttributes() {
     const { node } = this.props;
-    const attributes = node.attributes.sort(compareAttributeNames);
+    const attributes = node.attributes.slice().sort(compareAttributeNames);
 
     return (
       <span>

@@ -1,88 +1,119 @@
-import { Action } from "redux";
 import { assert, defer, Deferred } from "protocol/utils";
-import { NodeFront } from "protocol/thread/node";
+import type { NodeFront } from "protocol/thread/node";
 import { SelectionReason } from "devtools/client/framework/selection";
-import { NodeInfo } from "../state/markup";
+import { selection } from "devtools/client/framework/selection";
+
+import { UIState } from "ui/state";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
+import { isInspectorSelected } from "ui/reducers/app";
+import type { UIStore, UIThunkAction } from "ui/actions";
+
+import {
+  resetMarkup,
+  childrenAdded,
+  newRootAdded,
+  nodeSelected,
+  updateChildrenLoading,
+  updateNodeExpanded,
+  updateScrollIntoViewNode,
+  NodeInfo,
+} from "../reducers/markup";
+
 import {
   getNodeInfo,
   getParentNodeId,
   getSelectedNodeId,
   isNodeExpanded,
 } from "../selectors/markup";
-import { UIState } from "ui/state";
-import { isInspectorSelected } from "ui/reducers/app";
-import type { UIStore, UIThunkAction } from "ui/actions";
-
-import { ThreadFront as ThreadFrontType } from "protocol/thread";
 
 import Highlighter from "highlighter/highlighter";
-const { DOCUMENT_TYPE_NODE, TEXT_NODE } = require("devtools/shared/dom-node-constants");
-const { features } = require("devtools/client/inspector/prefs");
-
-export type ResetAction = Action<"RESET">;
-export type NewRootAction = Action<"NEW_ROOT"> & { rootNode: NodeInfo };
-export type AddChildrenAction = Action<"ADD_CHILDREN"> & {
-  parentNodeId: string;
-  children: NodeInfo[];
-};
-export type UpdateNodeExpandedAction = Action<"UPDATE_NODE_EXPANDED"> & {
-  nodeId: string;
-  isExpanded: boolean;
-};
-export type UpdateChildrenLoadingAction = Action<"UPDATE_CHILDREN_LOADING"> & {
-  nodeId: string;
-  isLoadingChildren: boolean;
-};
-export type UpdateSelectedNodeAction = Action<"UPDATE_SELECTED_NODE"> & {
-  selectedNode: string | null;
-};
-export type UpdateScrollIntoViewNodeAction = Action<"UPDATE_SCROLL_INTO_VIEW_NODE"> & {
-  scrollIntoViewNode: string;
-};
-export type MarkupAction =
-  | ResetAction
-  | NewRootAction
-  | AddChildrenAction
-  | UpdateNodeExpandedAction
-  | UpdateChildrenLoadingAction
-  | UpdateSelectedNodeAction
-  | UpdateScrollIntoViewNodeAction;
+import { DOCUMENT_TYPE_NODE, TEXT_NODE } from "devtools/shared/dom-node-constants";
+import { features } from "devtools/client/inspector/prefs";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
-export function setupMarkup(store: UIStore, ThreadFront: typeof ThreadFrontType) {
-  ThreadFront.on("paused", () => store.dispatch(paused()));
+export function setupMarkup(store: UIStore, startAppListening: AppStartListening) {
+  // Any time a new node is selected in the "Markup" panel, check to see if the "Elements" panel is
+  // actually visible. If so, update our selection in Redux, including expanding ancestor nodes.
+  selection.on("new-node-front", (nodeFront: NodeFront, reason: string) => {
+    if (!isInspectorSelected(store.getState()) || !selection.isNode()) {
+      return;
+    }
+
+    store.dispatch(selectionChanged(reason === "navigateaway", reason !== "markup"));
+  });
+
+  // Any time the app is paused, clear out all fetched DOM nodes, and reload the "Markup" panel.
+  startAppListening({
+    type: "PAUSED",
+    effect: async (action, listenerApi) => {
+      const { condition, dispatch, getState, cancelActiveListeners, extra } = listenerApi;
+      const { ThreadFront } = extra;
+
+      cancelActiveListeners();
+
+      // every time we pause, clear the existing DOM node info
+      dispatch(reset());
+
+      async function loadNewDocument() {
+        await ThreadFront.ensureAllSources();
+
+        // Clear selection if pauses have differed
+        const pause = ThreadFront.getCurrentPause();
+        if (selection.nodeFront && selection.nodeFront.pause !== pause) {
+          selection.setNodeFront(null);
+        }
+
+        await dispatch(newRoot());
+        if (ThreadFront.currentPause !== pause) {
+          return;
+        }
+
+        if (selection.nodeFront) {
+          dispatch(selectionChanged(false));
+        } else {
+          const rootNode = await ThreadFront.getRootDOMNode();
+
+          if (!rootNode) {
+            return;
+          }
+
+          const defaultNode = await rootNode.querySelector("body");
+          if (defaultNode && !selection.nodeFront && ThreadFront.currentPause === pause) {
+            selection.setNodeFront(defaultNode, { reason: "navigateaway" });
+          }
+        }
+      }
+
+      // If the "Elements" panel is already selected, go ahead and fetch markup data now.
+      // Otherwise, wait until the next time it _is_ selected.
+      if (isInspectorSelected(getState())) {
+        await loadNewDocument();
+      } else {
+        await condition((action, currState) => {
+          return isInspectorSelected(currState);
+        });
+        await loadNewDocument();
+      }
+    },
+  });
 }
 
 /**
  * Clears the tree
  */
-export function reset(): ResetAction {
+export function reset() {
   if (rootNodeWaiter) {
     rootNodeWaiter.resolve();
   }
   rootNodeWaiter = defer();
-  return {
-    type: "RESET",
-  };
-}
-
-export function paused(): UIThunkAction {
-  return async (dispatch, getState) => {
-    // TODO: we'll want to als dispatch paused if the inspector is selected later
-    // and be intelligent enough not to re-fetch the markup if it's already loaded
-    if (!isInspectorSelected(getState())) {
-      return;
-    }
-
-    await dispatch(newRoot());
-  };
+  return resetMarkup();
 }
 
 /**
  * Clears the tree and adds the new root node.
  */
-export function newRoot(): UIThunkAction {
+export function newRoot(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
     const pause = ThreadFront.currentPause;
     assert(pause, "no current pause");
@@ -94,20 +125,21 @@ export function newRoot(): UIThunkAction {
     if (ThreadFront.currentPause !== pause) {
       return;
     }
-    dispatch({ type: "NEW_ROOT", rootNode });
+    dispatch(newRootAdded(rootNode));
     if (rootNodeWaiter) {
       rootNodeWaiter.resolve();
       rootNodeWaiter = undefined;
     }
-
-    await dispatch(selectionChanged(rootNodeFront, true, true));
   };
 }
 
 /**
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
-export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): UIThunkAction {
+export function addChildren(
+  parentFront: NodeFront,
+  childFronts: NodeFront[]
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
     if (!features.showWhitespaceNodes) {
       childFronts = childFronts.filter(
@@ -120,54 +152,25 @@ export function addChildren(parentFront: NodeFront, childFronts: NodeFront[]): U
       return;
     }
 
-    dispatch({
-      type: "ADD_CHILDREN",
-      parentNodeId: parentFront.objectId(),
-      children,
-    });
+    dispatch(childrenAdded({ parentNodeId: parentFront.objectId(), children }));
   };
 }
 
-/**
- * Updates the expanded state for a given node. If isExpanded is true,
- * all child nodes must already be in the tree. Use expandNode() otherwise.
- */
-export function updateNodeExpanded(nodeId: string, isExpanded: boolean): UpdateNodeExpandedAction {
-  return {
-    type: "UPDATE_NODE_EXPANDED",
-    nodeId,
-    isExpanded,
-  };
+export function collapseNode(nodeId: string) {
+  return updateNodeExpanded({ nodeId, isExpanded: false });
 }
 
-export function updateChildrenLoading(
-  nodeId: string,
-  isLoadingChildren: boolean
-): UpdateChildrenLoadingAction {
-  return {
-    type: "UPDATE_CHILDREN_LOADING",
-    nodeId,
-    isLoadingChildren,
-  };
-}
+export function toggleNodeExpanded(nodeId: string, isExpanded: boolean): UIThunkAction {
+  return (dispatch, getState, { ThreadFront }) => {
+    assert(ThreadFront.currentPause, "no current pause");
 
-/**
- * Updates the selected node to display in the markup tree.
- */
-export function updateSelectedNode(selectedNode: string | null): UpdateSelectedNodeAction {
-  return {
-    type: "UPDATE_SELECTED_NODE",
-    selectedNode,
-  };
-}
+    if (isExpanded) {
+      dispatch(collapseNode(nodeId));
+    } else {
+      dispatch(expandNode(nodeId));
+    }
 
-/**
- * Set the node that should be scrolled into view
- */
-export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoViewNodeAction {
-  return {
-    type: "UPDATE_SCROLL_INTO_VIEW_NODE",
-    scrollIntoViewNode,
+    selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
   };
 }
 
@@ -175,22 +178,24 @@ export function scrollIntoView(scrollIntoViewNode: string): UpdateScrollIntoView
  * Expand the given node after ensuring its child nodes are loaded and added to the tree.
  * If shouldScrollIntoView is true, the node is scrolled into view if its children need to be loaded.
  */
-export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThunkAction {
+export function expandNode(
+  nodeId: string,
+  shouldScrollIntoView = false
+): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    const tree = getState().markup.tree;
-    const node = tree[nodeId];
+    const node = getNodeInfo(getState(), nodeId);
     assert(node, "node not found in markup state");
 
     if (node.isExpanded && !node.isLoadingChildren) {
       return;
     }
 
-    dispatch(updateNodeExpanded(nodeId, true));
+    dispatch(updateNodeExpanded({ nodeId, isExpanded: true }));
 
     if (node.hasChildren && node.children.length === 0) {
-      dispatch(updateChildrenLoading(nodeId, true));
+      dispatch(updateChildrenLoading({ nodeId, isLoadingChildren: true }));
       if (shouldScrollIntoView) {
-        dispatch(scrollIntoView(node.id));
+        dispatch(updateScrollIntoViewNode(node.id));
       }
 
       const pause = ThreadFront.currentPause;
@@ -204,9 +209,7 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
       if (ThreadFront.currentPause !== pause) {
         return;
       }
-      dispatch(updateChildrenLoading(nodeId, false));
-
-      window.gSelection?.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
+      dispatch(updateChildrenLoading({ nodeId, isLoadingChildren: false }));
     }
   };
 }
@@ -218,26 +221,25 @@ export function expandNode(nodeId: string, shouldScrollIntoView = false): UIThun
  * while their children are loaded.
  */
 export function selectionChanged(
-  selectedNode: NodeFront,
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
   return async (dispatch, getState) => {
-    const hasSelectionChanged = () => selectedNode.objectId() !== getSelectedNodeId(getState());
+    const selectedNode = selection.nodeFront;
 
     if (!selectedNode) {
-      dispatch(updateSelectedNode(null));
+      dispatch(nodeSelected(null));
       return;
     }
 
     if (rootNodeWaiter) {
       await rootNodeWaiter.promise;
     }
-    if (hasSelectionChanged()) {
+    if (selection.nodeFront !== selectedNode) {
       return;
     }
 
-    dispatch(updateSelectedNode(selectedNode.objectId()));
+    dispatch(nodeSelected(selectedNode.objectId()));
 
     // collect the selected node's ancestors in top-down order
     let ancestors = [];
@@ -250,13 +252,13 @@ export function selectionChanged(
     // expand each ancestor, loading its children if necessary
     for (const ancestor of ancestors) {
       await dispatch(expandNode(ancestor.objectId(), shouldScrollIntoView));
-      if (hasSelectionChanged()) {
+      if (selection.nodeFront !== selectedNode) {
         return;
       }
     }
 
     if (shouldScrollIntoView) {
-      dispatch(scrollIntoView(selectedNode.objectId()));
+      dispatch(updateScrollIntoViewNode(selectedNode.objectId()));
     }
   };
 }
@@ -350,7 +352,7 @@ export function onLeftKey(): UIThunkAction {
     }
 
     if (isNodeExpanded(state, selectedNodeId)) {
-      dispatch(updateNodeExpanded(selectedNodeId, false));
+      dispatch(updateNodeExpanded({ nodeId: selectedNodeId, isExpanded: false }));
     } else {
       const parentNodeId = getParentNodeId(state, selectedNodeId);
       if (parentNodeId != null) {
@@ -445,21 +447,22 @@ export function onPageDownKey(): UIThunkAction {
   };
 }
 
+// This doesn't even need to be in Redux
+let hoveredNodeId: string | null = null;
+
 export function highlightNode(nodeId: string): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const hoveredNodeId = getHoveredNodeId(getState());
     if (hoveredNodeId !== nodeId) {
-      dispatch(setHoveredNode(nodeId));
-      Highlighter.highlight(ThreadFront.currentPause.getNodeFront(nodeId));
+      hoveredNodeId = nodeId;
+      Highlighter.highlight(ThreadFront.currentPause!.getNodeFront(nodeId));
     }
   };
 }
 
-export function unhighlightNode(): UIThunkAction {
+export function unhighlightNode(nodeId: string): UIThunkAction {
   return async (dispatch, getState) => {
-    const hoveredNodeId = getHoveredNodeId(getState());
-    if (hoveredNodeId) {
-      dispatch(setHoveredNode(null));
+    if (hoveredNodeId && nodeId !== hoveredNodeId) {
+      hoveredNodeId = null;
       Highlighter.unhighlight();
     }
   };
