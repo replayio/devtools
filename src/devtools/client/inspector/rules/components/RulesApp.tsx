@@ -6,76 +6,21 @@ import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
-import type { UIState } from "ui/state";
-
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useAppSelector } from "ui/setup/hooks";
-import { RulesState, RuleState } from "../state/rules";
+import { RuleState } from "../state/rules";
 import { RuleInheritance } from "../models/rule";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
 type InheritedRule = RuleState & { inheritance: RuleInheritance };
 
-type RulesAppProps = {
-  onToggleDeclaration: Function;
-  onToggleSelectorHighlighter: Function;
-  rules: RuleState[];
-  showContextMenu: Function;
-  showDeclarationNameEditor: Function;
-  showDeclarationValueEditor: Function;
-  showNewDeclarationEditor: Function;
-  showSelectorEditor: Function;
-};
-
 const NO_RULES_AVAILABLE: RuleState[] = [];
 
-export const RulesApp: FC<RulesAppProps> = ({
-  showContextMenu,
-  onToggleDeclaration,
-  showDeclarationValueEditor,
-  showNewDeclarationEditor,
-  onToggleSelectorHighlighter,
-  showDeclarationNameEditor,
-  showSelectorEditor,
-}) => {
+export const RulesApp: FC = ({}) => {
   const rules = useAppSelector(state => state.rules.rules ?? NO_RULES_AVAILABLE);
 
   const [rulesQuery, setRulesQuery] = useState("");
-
-  const ruleProps = useMemo(
-    () => ({
-      onToggleDeclaration,
-      onToggleSelectorHighlighter,
-      showDeclarationNameEditor,
-      showDeclarationValueEditor,
-      showNewDeclarationEditor,
-      showSelectorEditor,
-    }),
-    [
-      onToggleDeclaration,
-      onToggleSelectorHighlighter,
-      showDeclarationNameEditor,
-      showDeclarationValueEditor,
-      showNewDeclarationEditor,
-      showSelectorEditor,
-    ]
-  );
-
-  const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (
-      event.currentTarget.closest("input[type=text]") ||
-      event.currentTarget.closest("input:not([type])") ||
-      event.currentTarget.closest("textarea")
-    ) {
-      return;
-    }
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    showContextMenu(event);
-  };
 
   const renderInheritedRules = useCallback(
     (rules: InheritedRule[]) => {
@@ -94,26 +39,19 @@ export const RulesApp: FC<RulesAppProps> = ({
           );
         }
 
-        output.push(
-          <Rule
-            key={`${inheritedNodeId}|${rule.id}`}
-            rule={rule}
-            {...ruleProps}
-            query={rulesQuery}
-          />
-        );
+        output.push(<Rule key={`${inheritedNodeId}|${rule.id}`} rule={rule} query={rulesQuery} />);
       }
 
       return output;
     },
-    [rulesQuery, ruleProps]
+    [rulesQuery]
   );
 
   const renderStyleRules = useCallback(
     (rules: RuleState[]) => {
-      return <Rules {...ruleProps} query={rulesQuery} rules={rules} />;
+      return <Rules query={rulesQuery} rules={rules} />;
     },
-    [rulesQuery, ruleProps]
+    [rulesQuery]
   );
 
   const renderPseudoElementRules = useCallback(
@@ -122,7 +60,6 @@ export const RulesApp: FC<RulesAppProps> = ({
       const componentProps: FCProps<typeof Rules> = {
         rules,
         query: rulesQuery,
-        ...ruleProps,
       };
 
       const items = [
@@ -145,7 +82,7 @@ export const RulesApp: FC<RulesAppProps> = ({
         </>
       );
     },
-    [ruleProps, rulesQuery]
+    [rulesQuery]
   );
 
   const rulesElements = useMemo(() => {
@@ -199,7 +136,7 @@ export const RulesApp: FC<RulesAppProps> = ({
     <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
       <Toolbar rulesQuery={rulesQuery} onRulesQueryChange={setRulesQuery} />
       <div id="ruleview-container" className="ruleview">
-        <div id="ruleview-container-focusable" onContextMenu={onContextMenu} tabIndex={-1}>
+        <div id="ruleview-container-focusable" tabIndex={-1}>
           {rules ? (
             rulesElements
           ) : (

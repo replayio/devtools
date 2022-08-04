@@ -7,13 +7,11 @@ import React, { FC } from "react";
 import { RuleState } from "../state/rules";
 
 type RuleProps = {
-  showSelectorEditor: Function;
   query: string;
   rule: RuleState;
 };
 
 export const Rule: FC<RuleProps> = ({
-  showSelectorEditor,
   query,
   rule: { id, declarations, sourceLink, selector, type, isUserAgentStyle, isUnmatched },
 }) => {
@@ -33,7 +31,7 @@ export const Rule: FC<RuleProps> = ({
       />
       <div className="ruleview-code">
         <div>
-          <Selector {...{ id, isUserAgentStyle, selector, showSelectorEditor, type, query }} />
+          <Selector {...{ id, isUserAgentStyle, selector, type, query }} />
           <span className="ruleview-ruleopen">{" {"}</span>
         </div>
         <Declarations declarations={declarations} query={query} />

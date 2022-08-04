@@ -24,7 +24,6 @@ export default class Selector extends PureComponent {
       id: PropTypes.string.isRequired,
       isUserAgentStyle: PropTypes.bool.isRequired,
       selector: PropTypes.shape(Types.selector).isRequired,
-      showSelectorEditor: PropTypes.func.isRequired,
       type: PropTypes.number.isRequired,
       query: PropTypes.string.isRequired,
     };
@@ -44,17 +43,6 @@ export default class Selector extends PureComponent {
       // Selector is not editable.
       return;
     }
-
-    /*
-    editableItem(
-      {
-        element: this.selectorRef.current,
-      },
-      element => {
-        this.props.showSelectorEditor(element, this.props.id);
-      }
-    );
-    */
   }
 
   renderSelector() {

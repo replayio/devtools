@@ -4,12 +4,6 @@ import { RuleState } from "../state/rules";
 
 type RulesProps = {
   rules: RuleState[];
-  onToggleDeclaration: Function;
-  onToggleSelectorHighlighter: Function;
-  showDeclarationNameEditor: Function;
-  showDeclarationValueEditor: Function;
-  showNewDeclarationEditor: Function;
-  showSelectorEditor: Function;
   query: string;
   children?: React.ReactNode;
 };

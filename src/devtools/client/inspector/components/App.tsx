@@ -56,7 +56,7 @@ const InspectorApp: FC = () => {
   const activePanel: ReactNode = useMemo(() => {
     switch (activeTab) {
       case "ruleview": {
-        return <RulesApp {...inspector.rules.getRulesProps()} />;
+        return <RulesApp />;
       }
       case "computedview": {
         return <ComputedApp />;

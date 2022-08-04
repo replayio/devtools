@@ -29,6 +29,14 @@ export interface ComputedPropertyInfo {
   value: string;
 }
 
+let dummyElement: HTMLElement;
+function getDummyElement() {
+  if (!dummyElement) {
+    dummyElement = document.createElement("div");
+  }
+  return dummyElement;
+}
+
 /**
  * TextProperty is responsible for the following:
  *   Manages a single property from the authoredText attribute of the
@@ -163,8 +171,7 @@ export default class TextProperty {
     // This is a bit funky.  To get the list of computed properties
     // for this text property, we'll set the property on a dummy element
     // and see what the computed style looks like.
-    const dummyElement = this.elementStyle.ruleView.dummyElement;
-    const dummyStyle = dummyElement.style;
+    const dummyStyle = getDummyElement().style;
     dummyStyle.cssText = "";
     dummyStyle.setProperty(this.name, this.value, this.priority);
 
