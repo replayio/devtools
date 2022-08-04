@@ -14,6 +14,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import useFocusRange from "../hooks/useFocusRange";
@@ -21,7 +22,6 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
-import { isPointInRegions } from "@bvaughn/../shared/utils/time";
 
 // Renders PointInstances with enableLogging=true.
 function LogPointRenderer({

@@ -1,4 +1,3 @@
-import { isTimeInRegions } from "@bvaughn/../shared/utils/time";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
@@ -6,6 +5,7 @@ import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { PointRange } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isTimeInRegions } from "shared/utils/time";
 
 export default function useFocusRange(): PointRange | null {
   const replayClient = useContext(ReplayClientContext);

@@ -1,4 +1,3 @@
-import { isPointInRegions } from "@bvaughn/../shared/utils/time";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
@@ -7,6 +6,7 @@ import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { FrameId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isPointInRegions } from "shared/utils/time";
 
 import Icon from "../Icon";
 
