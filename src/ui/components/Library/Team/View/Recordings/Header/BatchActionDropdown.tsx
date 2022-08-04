@@ -13,17 +13,21 @@ import { Recording } from "ui/types";
 import { useIsPublicEnabled } from "ui/utils/org";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 
-const getConfirmOptions = (count: number) => {
+const getConfirmOptions = (
+  count: number,
+  firstTitle: string | null | undefined = "this replay"
+) => {
   if (count === 1) {
     return {
       message: "Delete replay?",
-      description: `This action will permanently delete this replay.`,
+      description: `This action will permanently delete ${firstTitle}.`,
       acceptLabel: "Delete replay",
     };
   }
+
   return {
     message: `Delete ${count} replays?`,
-    description: `This action will permanently delete ${count} replays`,
+    description: `This action will permanently delete ${count} replays.`,
     acceptLabel: "Delete replays",
   };
 };
@@ -65,13 +69,19 @@ export default function BatchActionDropdown({
   };
 
   const deleteSelectedIds = () => {
-    confirmDestructive(getConfirmOptions(selectedIds.length)).then(confirmed => {
-      if (confirmed) {
-        selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
-        setSelectedIds([]);
+    const firstSelectedRecordingTitle = recordings.find(
+      recording => selectedIds[0] === recording.id
+    )?.title;
+
+    confirmDestructive(getConfirmOptions(selectedIds.length, firstSelectedRecordingTitle)).then(
+      confirmed => {
+        if (confirmed) {
+          selectedIds.forEach(recordingId => deleteRecording(recordingId, currentWorkspaceId));
+          setSelectedIds([]);
+        }
+        setExpanded(false);
       }
-      setExpanded(false);
-    });
+    );
   };
 
   const updateRecordings = (targetWorkspaceId: WorkspaceId | null) => {
