@@ -1,6 +1,6 @@
 import { MouseEvent, sessionError, TimeStampedPoint, uploadedData } from "@replayio/protocol";
-import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
-
+import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
+import debounce from "lodash/debounce";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
@@ -243,9 +243,18 @@ export default async function DevTools(store: AppStore) {
   setPlaybackStatusCallback((stalled: boolean) => {
     store.dispatch(setPlaybackStalled(stalled));
   });
-  setPointsReceivedCallback((points: TimeStampedPoint[]) => {
+
+  let points: TimeStampedPoint[] = [];
+  const onPointsReceived = debounce(() => {
     store.dispatch(pointsReceived(points));
+    points = [];
+  }, 1_000);
+
+  setPointsReceivedCallback(newPoints => {
+    points.push(...newPoints);
+    onPointsReceived();
   });
+
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
   });

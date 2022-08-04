@@ -118,6 +118,7 @@ const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
 
 function onPaints(paints: PaintPoint[]) {
   if (typeof onPointsReceived === "function") {
+    // Jason - batch
     onPointsReceived(paints);
   }
 
@@ -155,6 +156,7 @@ function onPaints(paints: PaintPoint[]) {
 
 function onMouseEvents(events: MouseEvent[]) {
   if (typeof onPointsReceived === "function") {
+    // Jason - batch
     onPointsReceived(events);
   }
 
