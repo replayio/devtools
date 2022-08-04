@@ -12,6 +12,7 @@ const {
   VIEW_NODE_IMAGE_URL_TYPE,
   VIEW_NODE_LOCATION_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
+import { selection } from "devtools/client/framework/selection";
 
 const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
 const { LocalizationHelper } = require("devtools/shared/l10n");
@@ -214,7 +215,7 @@ StyleInspectorMenu.prototype = {
         this._onAddNewRule();
       },
       visible: this.isRuleView,
-      disabled: !this.isRuleView || this.inspector.selection.isAnonymousNode(),
+      disabled: !this.isRuleView || selection.isAnonymousNode(),
     });
     menu.append(menuitemAddRule);
 

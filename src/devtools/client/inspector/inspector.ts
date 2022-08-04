@@ -9,24 +9,14 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
-import MarkupView from "devtools/client/inspector/markup/markup";
 import BoxModel from "devtools/client/inspector/boxmodel/box-model";
 import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
-import Selection from "devtools/client/framework/selection";
+import { selection, Selection } from "devtools/client/framework/selection";
 
 import CSSProperties from "third-party/css/css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
-
-const selection = new Selection();
-window.gSelection = selection;
-
-declare global {
-  interface Window {
-    gSelection: typeof selection;
-  }
-}
 
 type InspectorEvent =
   | "ready" // Fired when the inspector panel is opened for the first time and ready to use
@@ -52,7 +42,6 @@ export class Inspector {
   store: UIStore | null;
   highlighter: typeof Highlighter;
 
-  markup: MarkupView;
   rules: RulesView;
   boxModel: BoxModel;
   selection: Selection;

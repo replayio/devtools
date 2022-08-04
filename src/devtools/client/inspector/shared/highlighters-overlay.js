@@ -10,6 +10,7 @@ const {
   VIEW_NODE_VALUE_TYPE,
   VIEW_NODE_SHAPE_POINT_TYPE,
 } = require("devtools/client/inspector/shared/node-types");
+import { selection } from "devtools/client/framework/selection";
 
 const DEFAULT_HIGHLIGHTER_COLOR = "#9400FF";
 const SUBGRID_PARENT_ALPHA = 0.5;
@@ -325,7 +326,7 @@ class HighlightersOverlay {
 
     if (type) {
       this.hoveredHighlighterShown = type;
-      const node = this.inspector.selection.nodeFront;
+      const node = selection.nodeFront;
       this._getHighlighter(type)
         .then(highlighter => highlighter.show(node))
         .then(shown => {

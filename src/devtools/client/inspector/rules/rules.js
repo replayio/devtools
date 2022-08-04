@@ -14,6 +14,7 @@ const StyleInspectorMenu = require("devtools/client/inspector/shared/style-inspe
 const { advanceValidate } = require("devtools/client/inspector/shared/utils");
 const AutocompletePopup = require("devtools/client/shared/autocomplete-popup");
 const { InplaceEditor } = require("devtools/client/shared/inplace-editor");
+import { selection } from "devtools/client/framework/selection";
 
 const {
   updateClasses,
@@ -34,7 +35,6 @@ class RulesView {
     this.cssProperties = inspector.cssProperties;
     this.doc = window.document;
     this.inspector = inspector;
-    this.selection = inspector.selection;
     this.store = inspector.store;
     this.isNewRulesView = true;
 
@@ -57,8 +57,8 @@ class RulesView {
     this.updateRules = this.updateRules.bind(this);
 
     // this.inspector.sidebar.on("select", this.onSelection);
-    this.selection.on("detached-front", this.onSelection);
-    this.selection.on("new-node-front", this.onSelection);
+    selection.on("detached-front", this.onSelection);
+    selection.on("new-node-front", this.onSelection);
 
     EventEmitter.decorate(this);
 
@@ -83,8 +83,8 @@ class RulesView {
 
   destroy() {
     this.inspector.sidebar.off("select", this.onSelection);
-    this.selection.off("detached-front", this.onSelection);
-    this.selection.off("new-node-front", this.onSelection);
+    selection.off("detached-front", this.onSelection);
+    selection.off("new-node-front", this.onSelection);
 
     if (this._autocompletePopup) {
       this._autocompletePopup.destroy();
@@ -118,7 +118,6 @@ class RulesView {
     this.inspector = null;
     this.outputParser = null;
     this.pageStyle = null;
-    this.selection = null;
     this.showUserAgentStyles = null;
     this.store = null;
   }
@@ -279,12 +278,12 @@ class RulesView {
       return;
     }
 
-    if (!this.selection.isConnected() || !this.selection.isElementNode()) {
+    if (!selection.isConnected() || !selection.isElementNode()) {
       this.update();
       return;
     }
 
-    this.update(this.selection.nodeFront);
+    this.update(selection.nodeFront);
   }
 
   /**
@@ -351,7 +350,7 @@ class RulesView {
     if (selector !== this.highlighters.selectorHighlighterShown) {
       this.store.dispatch(updateHighlightedSelector(selector));
 
-      await highlighter.show(this.selection.nodeFront, {
+      await highlighter.show(selection.nodeFront, {
         hideInfoBar: true,
         hideGuides: true,
         selector,
