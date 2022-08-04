@@ -15,6 +15,7 @@ import {
 } from "react";
 
 import styles from "./MessageHoverButton.module.css";
+import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
 
 export default function MessageHoverButton({
   executionPoint,
@@ -88,7 +89,8 @@ export default function MessageHoverButton({
     };
 
     const label =
-      currentExecutionPoint === null || executionPoint > currentExecutionPoint
+      currentExecutionPoint === null ||
+      isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
         ? "Fast-forward"
         : "Rewind";
 
@@ -104,7 +106,8 @@ export default function MessageHoverButton({
         <Icon
           className={styles.ConsoleMessageHoverButtonIcon}
           type={
-            currentExecutionPoint === null || executionPoint > currentExecutionPoint
+            currentExecutionPoint === null ||
+            isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
               ? "fast-forward"
               : "rewind"
           }

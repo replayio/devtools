@@ -3,6 +3,7 @@ import {
   EventHandlerType,
   FrameId,
   KeyboardEvent,
+  loadedRegions as LoadedRegions,
   Location,
   Message,
   MouseEvent,
@@ -19,7 +20,6 @@ import {
   SourceId,
   SourceLocation,
   TimeStampedPoint,
-  TimeStampedPointRange,
   ExecutionPoint,
   createPauseResult,
   PointRange,
@@ -49,7 +49,11 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+export type ReplayClientEvents = "loadedRegionsChange";
+
 export interface ReplayClientInterface {
+  get loadedRegions(): LoadedRegions | null;
+  addEventListener(type: ReplayClientEvents, handler: Function): void;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
@@ -79,10 +83,11 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  removeEventListener(type: ReplayClientEvents, handler: Function): void;
+  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
   searchSources(
     opts: { query: string; sourceIds?: string[] },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void>;
-  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
-  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
 }

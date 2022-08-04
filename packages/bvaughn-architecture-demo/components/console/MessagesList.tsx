@@ -20,6 +20,7 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import { SearchContext } from "./SearchContext";
+import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -38,12 +39,12 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
   // This looking finds the best place to render the indicator.
   const currentTimeIndicatorPlacement = useMemo<CurrentTimeIndicatorPlacement>(() => {
-    if (currentExecutionPoint === null) {
+    if (currentExecutionPoint === "0") {
       return "begin";
     }
     const nearestLoggable = loggables.find(loggable => {
       const executionPoint = getLoggableExecutionPoint(loggable);
-      if (executionPoint >= currentExecutionPoint) {
+      if (!isExecutionPointsLessThan(executionPoint, currentExecutionPoint)) {
         return true;
       }
     });

@@ -1,7 +1,8 @@
 const config = {
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
-  retries: process.env.CI ? 2 : 0,
+  retries: 3,
+  snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
     launchOptions: {
@@ -15,7 +16,6 @@ const config = {
       height: 600,
     },
   },
-  snapshotDir: "./snapshots",
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
 };
