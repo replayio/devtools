@@ -122,7 +122,7 @@ function UiPreferences() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="mr-4 space-y-4">
       <div className="text-lg">Appearance</div>
       <div className="flex flex-row justify-between">
         <div>Theme</div>
