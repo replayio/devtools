@@ -1,9 +1,14 @@
 import createPlayer from "./createPlayer";
 import createRecorder from "./createRecorder";
+import { Entry } from "./types";
 
 describe("proxy", () => {
   async function waitForPromisesToFlush() {
     await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  function serialize(entries: Entry[]): Entry[] {
+    return JSON.parse(JSON.stringify(entries));
   }
 
   test("should record and replay a series of requests", () => {
@@ -26,7 +31,7 @@ describe("proxy", () => {
     expect(entries).toHaveLength(3);
     expect(onEntriesChanged).toHaveBeenCalledTimes(3);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
 
     // Any order should be supported.
     expect(player.divideByTwo(4)).toBe(2);
@@ -61,7 +66,7 @@ describe("proxy", () => {
 
     expect(entries).toHaveLength(2);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(await player.multiplyByTwo(2)).toBe(4);
     expect(await player.multiplyByTwo(3)).toBe(6);
   });
@@ -96,7 +101,7 @@ describe("proxy", () => {
     expect(await b).toBe("second");
     expect(await c).toBe("third");
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     // Only the most recent value should be returned.
     expect(await player.asyncMethod()).toBe("third");
   });
@@ -114,7 +119,7 @@ describe("proxy", () => {
 
     expect(entries).toHaveLength(2);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(await player.multiplyByTwo(2)).toBe(4);
     expect(await player.multiplyByTwo(3)).toBe(6);
   });
@@ -139,7 +144,7 @@ describe("proxy", () => {
 
     expect(entries).toHaveLength(3);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.foo).toBe(111);
     expect(player.bar).toBe(222);
     expect(player.getBaz()).toBe(333);
@@ -160,7 +165,7 @@ describe("proxy", () => {
 
     expect(entries).toHaveLength(2);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.stringify([123, true, "abc"])).toBe('[123,true,"abc"]');
     expect(player.stringify({ foo: "abc", bar: 123, baz: { qux: true } })).toBe(
       '{"foo":"abc","bar":123,"baz":{"qux":true}}'
@@ -180,7 +185,7 @@ describe("proxy", () => {
 
     expect(entries).toHaveLength(2);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.process({ foo: undefined, bar: 123 })).toEqual({ foo: undefined, bar: 123 });
     expect(player.process({ foo: null, bar: 123 })).toEqual({ foo: null, bar: 123 });
   });
@@ -236,7 +241,7 @@ describe("proxy", () => {
       ]
     `);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.process(objectSanitizedArg)).toEqual(object);
   });
 
@@ -288,7 +293,7 @@ describe("proxy", () => {
       ]
     `);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.process(object)).toEqual(objectSanitizedResult);
   });
 
@@ -334,7 +339,7 @@ describe("proxy", () => {
       ]
     `);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(player.value).toEqual(objectSanitizedResult);
   });
 
@@ -386,7 +391,7 @@ describe("proxy", () => {
       ]
     `);
 
-    const player = createPlayer<Target>(entries);
+    const player = createPlayer<Target>(serialize(entries));
     expect(await player.asyncMethod(object)).toEqual(objectSanitizedResult);
   });
 
@@ -409,7 +414,7 @@ describe("proxy", () => {
       pendingCount--;
     });
 
-    const [recorder, entries] = createRecorder(new Target(), {
+    const [recorder] = createRecorder(new Target(), {
       onAsyncRequestPending,
       onAsyncRequestResolved,
     });
@@ -438,6 +443,74 @@ describe("proxy", () => {
     expect(onAsyncRequestPending).toHaveBeenCalledTimes(3);
     expect(onAsyncRequestResolved).toHaveBeenCalledTimes(3);
     expect(pendingCount).toBe(0);
+  });
+
+  test("should support functions (e.g. addEventListener)", () => {
+    class Target {
+      private _handlers: Map<string, Set<Function>> = new Map();
+      addEventListener(type: string, handler: Function) {
+        if (!this._handlers.has(type)) {
+          this._handlers.set(type, new Set());
+        }
+        this._handlers.get(type)!.add(handler);
+      }
+      emit(type: string, ...data: any) {
+        const set = this._handlers.get(type);
+        if (set) {
+          set.forEach(handler => handler(...data));
+        }
+      }
+      removeEventListener(type: string, handler: Function) {
+        const set = this._handlers.get(type);
+        if (set) {
+          set.delete(handler);
+        }
+      }
+    }
+
+    const handlerA = jest.fn();
+    const handlerB = jest.fn();
+
+    const [recorder, entries] = createRecorder(new Target());
+    recorder.addEventListener("change", handlerA);
+    recorder.addEventListener("change", handlerB);
+
+    expect(handlerA).not.toHaveBeenCalled();
+    expect(handlerB).not.toHaveBeenCalled();
+
+    recorder.emit("change", 111);
+
+    expect(handlerA).toHaveBeenCalledTimes(1);
+    expect(handlerA).toHaveBeenCalledTimes(1);
+    expect(handlerB).toHaveBeenLastCalledWith(111);
+    expect(handlerB).toHaveBeenLastCalledWith(111);
+
+    recorder.emit("change", 222);
+
+    expect(handlerA).toHaveBeenCalledTimes(2);
+    expect(handlerA).toHaveBeenCalledTimes(2);
+    expect(handlerB).toHaveBeenLastCalledWith(222);
+    expect(handlerB).toHaveBeenLastCalledWith(222);
+
+    recorder.removeEventListener("change", handlerA);
+    recorder.removeEventListener("change", handlerB);
+
+    recorder.emit("change", 333);
+
+    expect(handlerA).toHaveBeenCalledTimes(2);
+    expect(handlerA).toHaveBeenCalledTimes(2);
+
+    // Function instances might not be the same between recorder and player.
+    // Note that this further breaks event listener functionality.
+    const newHandler = jest.fn();
+
+    const player = createPlayer<Target>(serialize(entries));
+    player.addEventListener("change", newHandler);
+
+    player.emit("change", 333);
+
+    // Events won't actually be emitted.
+    expect(newHandler).not.toHaveBeenCalled();
   });
 
   // TODO Add a test case for Symbol.Iterator

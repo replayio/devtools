@@ -13,6 +13,11 @@ export function findMatch(entries: Entry[], methodName: string, args: any[] | nu
           // because params with undefined values will be stripped during JSON.stringify/JSON.parse.
           // This is the most straightforward way to account for that difference.
           if (JSON.stringify(args[index]) !== JSON.stringify(entry.args[index])) {
+            if (typeof args[index] === "function" && entry.args[index] == null) {
+              // Don't compare function instances because they can't be serialized.
+              continue;
+            }
+
             return false;
           }
         }
