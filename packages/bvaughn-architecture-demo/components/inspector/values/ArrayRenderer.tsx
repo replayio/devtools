@@ -11,7 +11,11 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Array (3) ["foo", bar, 123]
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
+export default function ArrayRenderer({
+  executionPoint,
+  object,
+  pauseId,
+}: ObjectPreviewRendererProps) {
   const properties = filterNonEnumerableProperties(object.preview?.properties ?? []);
   const showOverflowMarker =
     object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
@@ -29,7 +33,12 @@ export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRenderer
         {" ["}
         {slice.map((property, index) => (
           <span key={index} className={styles.Value}>
-            <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property} />
+            <ValueRenderer
+              executionPoint={executionPoint}
+              isNested={true}
+              pauseId={pauseId}
+              protocolValue={property}
+            />
             {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
           </span>
         ))}

@@ -129,6 +129,7 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
   if (exception) {
     children = (
       <KeyValueRenderer
+        executionPoint={terminalExpression.point}
         isNested={false}
         layout="horizontal"
         pauseId={pauseId}
@@ -143,6 +144,7 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
       />
     ) : (
       <KeyValueRenderer
+        executionPoint={terminalExpression.point}
         isNested={false}
         layout="horizontal"
         pauseId={pauseId}

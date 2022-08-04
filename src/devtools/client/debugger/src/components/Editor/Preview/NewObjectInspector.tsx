@@ -15,6 +15,7 @@ import styles from "./NewObjectInspector.module.css";
 export default function NewObjectInspector() {
   const preview = useAppSelector(getPreview);
   const pause = ThreadFront.currentPause;
+  const executionPoint = ThreadFront.currentPoint;
 
   // HACK
   // The new Object Inspector does not consume ValueFronts.
@@ -35,7 +36,11 @@ export default function NewObjectInspector() {
   return (
     <div className={`${styles.Popup} preview-popup`}>
       <Suspense fallback={<Loader />}>
-        <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+        <Inspector
+          executionPoint={executionPoint}
+          pauseId={pause.pauseId!}
+          protocolValue={protocolValue}
+        />{" "}
       </Suspense>
     </div>
   );

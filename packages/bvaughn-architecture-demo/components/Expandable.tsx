@@ -10,6 +10,7 @@ export default function Expandable({
   children,
   className = "",
   defaultOpen = false,
+  disabled = false,
   header,
   headerClassName = "",
   useBlockLayoutWhenExpanded = true,
@@ -17,6 +18,7 @@ export default function Expandable({
   children: ReactNode;
   className?: string;
   defaultOpen?: boolean;
+  disabled?: boolean;
   header: ReactNode;
   headerClassName?: string;
   useBlockLayoutWhenExpanded?: boolean;
@@ -24,11 +26,19 @@ export default function Expandable({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const onClick = (event: MouseEvent) => {
+    if (disabled) {
+      return;
+    }
+
     event.stopPropagation();
     setIsOpen(!isOpen);
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
+    if (disabled) {
+      return;
+    }
+
     switch (event.key) {
       case "Enter":
       case " ":
@@ -42,7 +52,7 @@ export default function Expandable({
     <span
       className={`${
         isOpen && useBlockLayoutWhenExpanded ? styles.Block : styles.Inline
-      } ${className}`}
+      } ${className} ${disabled ? styles.Disabled : ""}`}
       data-test-name="Expandable"
       onClick={onClick}
       onKeyDown={onKeyDown}

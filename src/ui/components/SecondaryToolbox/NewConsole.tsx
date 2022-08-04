@@ -135,6 +135,8 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const loadedRegions = useAppSelector(getLoadedRegions);
   const focusRegion = useAppSelector(getFocusRegion);
 
+  console.log("Focus", focusRegion, loadedRegions);
+
   const [isPending, startTransition] = useTransition();
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
 
