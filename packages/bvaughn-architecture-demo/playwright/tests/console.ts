@@ -461,5 +461,3 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
-
-

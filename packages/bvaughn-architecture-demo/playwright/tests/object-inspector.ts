@@ -1,7 +1,5 @@
 import { Page, test } from "@playwright/test";
 
-
-
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
