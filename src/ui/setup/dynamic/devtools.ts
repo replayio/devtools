@@ -188,7 +188,7 @@ export default async function DevTools(store: AppStore) {
   setupSourcesListeners(startAppListening);
   setupMarkup(store, startAppListening);
 
-  dbgClient.bootstrap(store);
+  dbgClient.bootstrap(store, ThreadFront);
 
   const socket = initSocket(dispatchUrl);
   if (typeof window !== "undefined") {

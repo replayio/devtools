@@ -2,19 +2,16 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { newSource } from "@replayio/protocol";
-import { ThreadFront } from "protocol/thread";
-import { bindActionCreators } from "redux";
+import { newSource, Frame } from "@replayio/protocol";
+import type { ThreadFront as TF } from "protocol/thread";
 import type { UIStore } from "ui/actions";
 import { addSources, allSourcesReceived } from "ui/reducers/sources";
 
-import actions from "../actions";
 import { initialBreakpointsState } from "../reducers/breakpoints";
-import * as selectors from "../selectors";
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 
 import { setupCommands, clientCommands, prepareSourcePayload } from "./commands";
-import { setupEvents } from "./events";
+import { resumed, paused } from "../actions/pause";
 
 export async function loadInitialState() {
   // @ts-expect-error missing `pendingBreakpoints` field
@@ -26,13 +23,11 @@ export async function loadInitialState() {
     breakpoints,
   };
 }
-
-let boundActions: typeof actions;
 let store: UIStore;
 
 type $FixTypeLater = any;
 
-async function setupDebugger() {
+async function setupDebugger(ThreadFront: typeof TF) {
   const sourceInfos: $FixTypeLater[] = [];
   const sources: newSource[] = [];
   await ThreadFront.findSources(newSource => {
@@ -59,17 +54,19 @@ async function setupDebugger() {
   store.dispatch(allSourcesReceived());
 }
 
-export function bootstrap(_store: UIStore) {
+export function bootstrap(_store: UIStore, ThreadFront: typeof TF) {
   store = _store;
-  boundActions = bindActionCreators(actions, store.dispatch);
 
-  setupDebugger();
+  setupDebugger(ThreadFront);
 
   verifyPrefSchema();
   setupCommands();
-  setupEvents({ actions: boundActions });
-}
 
-export function onConnect() {
-  return { store, actions: boundActions, selectors, client: clientCommands };
+  ThreadFront.on(
+    "paused",
+    ({ point, time, frame }: { point: string; hasFrames: boolean; time: number; frame: Frame }) => {
+      store.dispatch(paused({ executionPoint: point, time, frame }));
+    }
+  );
+  ThreadFront.on("resumed", () => store.dispatch(resumed()));
 }
