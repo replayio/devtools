@@ -30,7 +30,7 @@ function DeleteOption({
     onOptionClick();
 
     confirmDestructive({
-      message: "Delete replay?",
+      message: `Delete ${recording.title}?`,
       description:
         "This action will permanently delete this replay. \n\nAre you sure you want to proceed?",
       acceptLabel: "Delete replay",
