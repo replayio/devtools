@@ -4,6 +4,7 @@ import { UIState } from "ui/state";
 import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
+import { getNodeInfo } from "../selectors/markup";
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 
@@ -58,7 +59,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
         <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {<Nodes {...inspector.markup.getMarkupProps()} />}
+              {<Nodes />}
             </div>
           </div>
           {isMarkupEmpty ? <LoadingProgressBar /> : null}
@@ -78,7 +79,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
 }
 
 const connector = connect((state: UIState) => ({
-  markupRootNode: state.markup.tree[state.markup.rootNode!],
+  markupRootNode: getNodeInfo(state, state.markup.rootNode!),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

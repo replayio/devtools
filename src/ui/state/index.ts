@@ -10,7 +10,7 @@ import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/state";
-import { MarkupState } from "devtools/client/inspector/markup/state/markup";
+import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
 import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
 import { RulesState } from "devtools/client/inspector/rules/state/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";

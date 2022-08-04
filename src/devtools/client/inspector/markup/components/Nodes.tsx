@@ -44,12 +44,7 @@ function Nodes(props: MarkupProps & PropsFromRedux) {
   return (
     <ul aria-dropeffect="none" role="tree" tabIndex={0} ref={ref}>
       {node.children.map(nodeId => (
-        <Node
-          key={nodeId}
-          nodeId={nodeId}
-          onMouseEnterNode={props.onMouseEnterNode}
-          onMouseLeaveNode={props.onMouseLeaveNode}
-        />
+        <Node key={nodeId} nodeId={nodeId} />
       ))}
     </ul>
   );

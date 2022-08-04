@@ -405,4 +405,4 @@ class HighlightersOverlay {
   }
 }
 
-module.exports = HighlightersOverlay;
+export default HighlightersOverlay;
