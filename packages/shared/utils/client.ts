@@ -31,30 +31,3 @@ export function createReplayClientForPlaywrightTesting(encoded: string): ReplayC
     return createReplayClientPlayer(decoded);
   }
 }
-
-export function findMatch(
-  logEntries: LogEntry[],
-  methodName: string,
-  args: any[]
-): LogEntry | null {
-  return (
-    logEntries.find(logEntry => {
-      if (logEntry.method !== methodName) {
-        return false;
-      } else if (logEntry.args.length !== args.length) {
-        return false;
-      } else {
-        for (let index = 0; index < args.length; index++) {
-          // We use JSON.stringify to compare values rather than a method like lodash/isEqual
-          // because params with undefined values will be stripped during JSON.stringify/JSON.parse.
-          // This is the most straightforward way to account for that difference.
-          if (JSON.stringify(args[index]) !== JSON.stringify(logEntry.args[index])) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    }) || null
-  );
-}
