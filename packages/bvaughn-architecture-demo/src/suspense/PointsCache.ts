@@ -8,6 +8,7 @@ import {
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
+import { isExecutionPointsWithinRange } from "../utils/time";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
@@ -128,8 +129,8 @@ function getFilteredLogPoints(
 
       focusRangeToLogPointsMap.set(
         key,
-        logPoints.filter(
-          logPoint => logPoint.point >= focusBeginPoint && logPoint.point <= focusEndPoint
+        logPoints.filter(logPoint =>
+          isExecutionPointsWithinRange(logPoint.point, focusBeginPoint, focusEndPoint)
         )
       );
     }

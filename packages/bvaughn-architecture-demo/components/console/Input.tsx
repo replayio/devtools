@@ -37,9 +37,7 @@ export default function Input() {
   let frameId: FrameId | null = null;
   if (pauseId === null) {
     const isLoaded =
-      loadedRegions !== null &&
-      executionPoint !== null &&
-      isPointInRegions(executionPoint, loadedRegions.loaded);
+      loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
     if (isLoaded) {
       const executionPoint = getClosestPointForTime(client, time);
       const pauseData = getPauseForExecutionPoint(client, executionPoint);
