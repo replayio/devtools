@@ -20,6 +20,7 @@ const {
 } = require("devtools/client/inspector/shared/node-types");
 
 const { HTMLTooltip } = require("devtools/client/shared/widgets/tooltip/HTMLTooltip");
+import { selection } from "devtools/client/framework/selection";
 
 const PREF_IMAGE_TOOLTIP_SIZE = "devtools.inspector.imagePreviewTooltipSize";
 
@@ -43,7 +44,7 @@ function TooltipsOverlay(view) {
   this._instances = new Map();
 
   this._onNewSelection = this._onNewSelection.bind(this);
-  this.view.inspector.selection.on("new-node-front", this._onNewSelection);
+  selection.on("new-node-front", this._onNewSelection);
 
   this.addToView();
 }
@@ -245,7 +246,7 @@ TooltipsOverlay.prototype = {
 
     if (type === TOOLTIP_FONTFAMILY_TYPE) {
       const font = nodeInfo.value.value;
-      const nodeFront = inspector.selection.nodeFront;
+      const nodeFront = selection.nodeFront;
       await this._setFontPreviewTooltip(font, nodeFront);
 
       if (nodeInfo.type === VIEW_NODE_FONT_TYPE) {
@@ -412,7 +413,7 @@ TooltipsOverlay.prototype = {
   destroy: function () {
     this.removeFromView();
 
-    this.view.inspector.selection.off("new-node-front", this._onNewSelection);
+    selection.off("new-node-front", this._onNewSelection);
     this.view = null;
 
     this._isDestroyed = true;

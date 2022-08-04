@@ -8,6 +8,7 @@ const { updateLayout } = require("devtools/client/inspector/boxmodel/actions/box
 
 const Highlighter = require("highlighter/highlighter").default;
 import { getSelectedPanel } from "ui/reducers/layout";
+import { selection } from "devtools/client/framework/selection";
 
 const NUMERIC = /^-?[\d\.]+$/;
 
@@ -33,7 +34,7 @@ function BoxModel(inspector, window) {
   this.onShowRulePreviewTooltip = this.onShowRulePreviewTooltip.bind(this);
   this.onSidebarSelect = this.onSidebarSelect.bind(this);
 
-  this.inspector.selection.on("new-node-front", this.onNewSelection);
+  selection.on("new-node-front", this.onNewSelection);
   // this.inspector.sidebar.on("select", this.onSidebarSelect);
 
   this.onNewSelection();
@@ -45,7 +46,7 @@ BoxModel.prototype = {
    * and cleans up references.
    */
   destroy() {
-    this.inspector.selection.off("new-node-front", this.onNewSelection);
+    selection.off("new-node-front", this.onNewSelection);
     // this.inspector.sidebar.off("select", this.onSidebarSelect);
 
     if (this._tooltip) {
@@ -92,11 +93,7 @@ BoxModel.prototype = {
    * be displayed in the view.
    */
   isPanelVisibleAndNodeValid() {
-    return (
-      this.isPanelVisible() &&
-      this.inspector.selection.isConnected() &&
-      this.inspector.selection.isElementNode()
-    );
+    return this.isPanelVisible() && selection.isConnected() && selection.isElementNode();
   },
 
   /**
@@ -115,13 +112,13 @@ BoxModel.prototype = {
       if (
         !this.inspector ||
         // !this.isPanelVisible() ||
-        !this.inspector.selection.isConnected() ||
-        !this.inspector.selection.isElementNode()
+        !selection.isConnected() ||
+        !selection.isElementNode()
       ) {
         return null;
       }
 
-      const { nodeFront } = this.inspector.selection;
+      const { nodeFront } = selection;
       const bounds = await nodeFront.getBoundingClientRect();
       const style = await nodeFront.getComputedStyle();
 
@@ -305,7 +302,7 @@ BoxModel.prototype = {
       return;
     }
 
-    const { nodeFront } = this.inspector.selection;
+    const { nodeFront } = selection;
     Highlighter.highlight(nodeFront, options);
   },
 

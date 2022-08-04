@@ -70,7 +70,7 @@ const InspectorApp: FC = () => {
         return <LayoutApp {...layoutProps} />;
       }
       case "eventsview": {
-        return <EventListenersApp selection={inspector.selection} />;
+        return <EventListenersApp />;
       }
     }
     assert(

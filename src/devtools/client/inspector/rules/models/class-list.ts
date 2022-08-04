@@ -6,6 +6,7 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { Inspector } from "../../inspector";
 const EventEmitter = require("devtools/shared/event-emitter");
+import { selection } from "devtools/client/framework/selection";
 
 export interface ClassInfo {
   name: string;
@@ -74,7 +75,6 @@ export default class ClassList {
    * since that's the only type this model can work with.)
    */
   get currentNode() {
-    const selection = this.inspector.selection;
     if (!selection) {
       return null;
     }

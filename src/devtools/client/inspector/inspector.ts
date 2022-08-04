@@ -9,10 +9,9 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
-import MarkupView from "devtools/client/inspector/markup/markup";
 import BoxModel from "devtools/client/inspector/boxmodel/box-model";
 import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
-import Selection from "devtools/client/framework/selection";
+import { selection, Selection } from "devtools/client/framework/selection";
 
 import CSSProperties from "third-party/css/css-properties";
 import RulesView from "./rules/rules";
@@ -43,7 +42,6 @@ export class Inspector {
   store: UIStore | null;
   highlighter: typeof Highlighter;
 
-  markup: MarkupView;
   rules: RulesView;
   boxModel: BoxModel;
   selection: Selection;
@@ -60,7 +58,8 @@ export class Inspector {
   constructor() {
     EventEmitter.decorate(this);
 
-    this.selection = new Selection();
+    this.selection = selection;
+
     this.panelDoc = window.document;
     this.panelWin = window;
     (this.panelWin as any).inspector = this;
@@ -68,7 +67,6 @@ export class Inspector {
 
     this.highlighter = Highlighter;
 
-    this.markup = new MarkupView(this);
     this.rules = new RulesView(this, window);
     this.boxModel = new BoxModel(this, window);
   }
