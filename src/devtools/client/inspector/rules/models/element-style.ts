@@ -73,12 +73,6 @@ export default class ElementStyle {
     this.showUserAgentStyles = showUserAgentStyles;
     this.rules = [];
     this.variablesMap = new Map<string, Map<string, string>>();
-
-    // We don't want to overwrite this.store.userProperties so we only create it
-    // if it doesn't already exist.
-    if (!("userProperties" in this.store)) {
-      this.store.userProperties = new UserProperties();
-    }
   }
 
   get unusedCssEnabled() {

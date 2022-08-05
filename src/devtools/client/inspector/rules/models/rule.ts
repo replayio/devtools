@@ -68,7 +68,6 @@ export default class Rule {
   isUnmatched: boolean;
   inherited: NodeFront | null;
   mediaText: string;
-  inspector: Inspector;
   store: UIStore;
   textProps: TextProperty[];
 
@@ -97,7 +96,6 @@ export default class Rule {
     this.inherited = options.inherited || null;
 
     this.mediaText = "";
-    this.inspector = this.elementStyle.ruleView.inspector;
     this.store = this.elementStyle.ruleView.store;
 
     // Populate the text properties with the style's current authoredText
@@ -310,12 +308,11 @@ export default class Rule {
       // rewriting to work properly.  So, compute the "invisible"
       // property here.
       const invisible = this.inherited && !CSSProperties.isInherited(name);
-      assert(store.userProperties, "store.userProperties not set");
-      const value = store.userProperties.getProperty(this.domRule, name, prop.value);
+
       const textProp = new TextProperty(
         this,
         name,
-        value,
+        prop.value,
         prop.priority ? "important" : undefined,
         !("commentOffsets" in prop),
         invisible

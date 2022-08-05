@@ -35,9 +35,7 @@ export type UIThunkAction<TReturn = void> = ThunkAction<
   AnyAction
 >;
 
-export type UIStore = AppStore & {
-  userProperties?: UserProperties;
-};
+export type UIStore = AppStore;
 
 const { initialAppState, ...actualAppActions } = appActions;
 

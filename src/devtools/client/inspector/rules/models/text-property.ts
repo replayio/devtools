@@ -77,7 +77,6 @@ export default class TextProperty {
   elementStyle: ElementStyle;
   computed: ComputedProperty[] | undefined;
   overridden?: boolean;
-  userProperties?: UserProperties;
 
   /**
    * @param {Rule} rule
@@ -113,7 +112,6 @@ export default class TextProperty {
     this.enabled = !!enabled;
     this.invisible = invisible;
     this.elementStyle = this.rule.elementStyle;
-    this.userProperties = this.elementStyle.store.userProperties;
 
     this.updateComputed();
   }
@@ -145,8 +143,7 @@ export default class TextProperty {
    * otherwise.
    */
   get isPropertyChanged() {
-    assert(this.userProperties, "TextProperty.userProperties not set");
-    return this.userProperties.contains(this.rule.domRule, this.name);
+    return false;
   }
 
   /**
