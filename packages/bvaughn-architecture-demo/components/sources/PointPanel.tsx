@@ -1,11 +1,11 @@
 import Icon from "@bvaughn/components/Icon";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import useFocusRange from "../console/hooks/useFocusRange";
 import Loader from "../Loader";
 
 import styles from "./PointPanel.module.css";
@@ -88,7 +88,8 @@ export default function PointPanel({ className, point }: { className: string; po
 
 function HitPointsWarning({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
+
   const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
 
   if (hitPoints.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
@@ -105,7 +106,8 @@ function HitPointsWarning({ point }: { point: Point }) {
 
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
+
   const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
 
   if (hitPoints.length === 0) {

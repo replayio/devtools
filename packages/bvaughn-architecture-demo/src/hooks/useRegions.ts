@@ -1,6 +1,8 @@
 import { loadedRegions as LoadedRegions } from "@replayio/protocol";
-import { useSyncExternalStore } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import { ReplayClientInterface } from "shared/client/types";
+
+import { preCacheExecutionPointForTime } from "../suspense/PointsCache";
 
 export default function useLoadedRegions(client: ReplayClientInterface): LoadedRegions | null {
   const loadedRegions = useSyncExternalStore<LoadedRegions | null>(
@@ -17,5 +19,16 @@ export default function useLoadedRegions(client: ReplayClientInterface): LoadedR
       return client.loadedRegions;
     }
   );
+
+  // Pre-cache loaded region points for faster lookup later.
+  useEffect(() => {
+    if (loadedRegions != null) {
+      loadedRegions.loaded.forEach(({ begin, end }) => {
+        preCacheExecutionPointForTime(begin);
+        preCacheExecutionPointForTime(end);
+      });
+    }
+  }, [loadedRegions]);
+
   return loadedRegions;
 }

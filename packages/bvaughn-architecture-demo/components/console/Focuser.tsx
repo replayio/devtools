@@ -9,8 +9,8 @@ export default function Focuser() {
   const { duration } = useContext(SessionContext);
   const { rangeForDisplay: range, update } = useContext(FocusContext);
 
-  const start = range === null ? 0 : range[0] / duration;
-  const end = range === null ? 1 : range[1] / duration;
+  const start = range === null ? 0 : range.begin.time / duration;
+  const end = range === null ? 1 : range.end.time / duration;
 
   const toggleFocus = () => {
     if (range === null) {

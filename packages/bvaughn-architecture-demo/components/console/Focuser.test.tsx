@@ -22,8 +22,26 @@ describe("Focuser", () => {
   it("should render the current focus region", async () => {
     await renderFocused(<Focuser />, {
       focusContext: {
-        range: [0, 30_000],
-        rangeForDisplay: [0, 30_000],
+        range: {
+          begin: {
+            point: "0",
+            time: 0,
+          },
+          end: {
+            time: 30_000,
+            point: "30000",
+          },
+        },
+        rangeForDisplay: {
+          begin: {
+            point: "0",
+            time: 0,
+          },
+          end: {
+            time: 30_000,
+            point: "30000",
+          },
+        },
       },
       sessionContext: {
         duration: 60_000,
