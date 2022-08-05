@@ -1,4 +1,4 @@
-import { Message, PointRange } from "@replayio/protocol";
+import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 
@@ -22,13 +22,13 @@ export type ProtocolMessage = Message & {
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
 
 let inFlightWakeable: Wakeable<ProtocolMessage[]> | null = null;
-let inFlightPointRange: PointRange | null = null;
+let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
-let lastFetchedPointRange: PointRange | null = null;
+let lastFetchedFocusRange: TimeStampedPointRange | null = null;
 let lastFetchedMessages: ProtocolMessage[] | null = null;
 
-let lastFilteredPointRange: PointRange | null = null;
+let lastFilteredFocusRange: TimeStampedPointRange | null = null;
 let lastFilteredMessages: ProtocolMessage[] | null = null;
 let lastFilteredCountAfter: number = 0;
 let lastFilteredCountBefore: number = 0;
@@ -46,9 +46,9 @@ type getMessagesResponse = {
 // This method is Suspense friend; it is meant to be called from a React component during render.
 export function getMessages(
   client: ReplayClientInterface,
-  pointRange: PointRange | null
+  focusRange: TimeStampedPointRange | null
 ): getMessagesResponse {
-  if (pointRange !== null && pointRange.begin === pointRange.end) {
+  if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
     // Edge case scenario handling.
     // The backend throws if both points in a range are the same.
     // Arguably it should handle this more gracefully by just returning an empty array but...
@@ -63,7 +63,7 @@ export function getMessages(
   if (inFlightWakeable !== null) {
     // If we're already fetching this data, rethrow the same Wakeable (for Suspense reasons).
     // We check equality here rather than subset because it's possible a larger range might overflow.
-    if (isRangeEqual(inFlightPointRange, pointRange)) {
+    if (isRangeEqual(inFlightFocusRange, focusRange)) {
       throw inFlightWakeable;
     }
   }
@@ -73,7 +73,7 @@ export function getMessages(
   if (lastFetchedMessages === null) {
     // We have not yet fetched it at all.
     shouldFetch = true;
-  } else if (lastFetchDidOverflow && !isRangeEqual(lastFetchedPointRange, pointRange)) {
+  } else if (lastFetchDidOverflow && !isRangeEqual(lastFetchedFocusRange, focusRange)) {
     // The most recent time we fetched it "overflowed" (too many messages to send them all),
     // and we're trying to fetch a different region.
     //
@@ -85,17 +85,17 @@ export function getMessages(
     //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
     //    (unless our fetches have overflowed at some point).
     shouldFetch = true;
-  } else if (!isRangeSubset(lastFetchedPointRange, pointRange)) {
+  } else if (!isRangeSubset(lastFetchedFocusRange, focusRange)) {
     // The new focus region is outside of the most recent region we fetched messages for.
     shouldFetch = true;
   }
 
   if (shouldFetch) {
-    inFlightPointRange = pointRange;
+    inFlightFocusRange = focusRange;
 
     const wakeable = (inFlightWakeable = createWakeable());
 
-    fetchMessages(client, pointRange, wakeable);
+    fetchMessages(client, focusRange, wakeable);
 
     throw inFlightWakeable;
   }
@@ -103,25 +103,25 @@ export function getMessages(
   // At this point, messages have been fetched but we may still need to filter them.
   // For performance reasons (both in this function and on things that consume the filtered list)
   // it's best if we memoize this operation (by comparing ranges) to avoid recreating the filtered array.
-  if (lastFilteredMessages === null || !isRangeEqual(lastFilteredPointRange, pointRange)) {
-    if (pointRange === null) {
-      lastFilteredPointRange = null;
+  if (lastFilteredMessages === null || !isRangeEqual(lastFilteredFocusRange, focusRange)) {
+    if (focusRange === null) {
+      lastFilteredFocusRange = null;
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages;
     } else {
-      const begin = pointRange.begin;
-      const end = pointRange.end;
+      const beginPoint = focusRange.begin.point;
+      const endPoint = focusRange.end.point;
 
-      lastFilteredPointRange = pointRange;
+      lastFilteredFocusRange = focusRange;
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages!.filter(message => {
         const point = message.point.point;
-        if (isExecutionPointsLessThan(point, begin)) {
+        if (isExecutionPointsLessThan(point, beginPoint)) {
           lastFilteredCountBefore++;
           return false;
-        } else if (isExecutionPointsGreaterThan(point, end)) {
+        } else if (isExecutionPointsGreaterThan(point, endPoint)) {
           lastFilteredCountAfter++;
           return false;
         } else {
@@ -135,8 +135,8 @@ export function getMessages(
   // is when we are trimming from the complete set of messages (aka no focus region).
   // Otherwise even if we do trim some messages locally, the number isn't meaningful.
   return {
-    countAfter: lastFetchedPointRange === null ? lastFilteredCountAfter : -1,
-    countBefore: lastFetchedPointRange === null ? lastFilteredCountBefore : -1,
+    countAfter: lastFetchedFocusRange === null ? lastFilteredCountAfter : -1,
+    countBefore: lastFetchedFocusRange === null ? lastFilteredCountBefore : -1,
     didOverflow: lastFetchDidOverflow,
     messages: lastFilteredMessages!,
   };
@@ -144,11 +144,11 @@ export function getMessages(
 
 async function fetchMessages(
   client: ReplayClientInterface,
-  pointRange: PointRange | null,
+  focusRange: TimeStampedPointRange | null,
   wakeable: Wakeable<ProtocolMessage[]>
 ) {
   try {
-    const { messages, overflow } = await client.findMessages(pointRange);
+    const { messages, overflow } = await client.findMessages(focusRange);
 
     const protocolMessage: ProtocolMessage[] = messages.map(message => ({
       ...message,
@@ -166,7 +166,7 @@ async function fetchMessages(
       inFlightWakeable = null;
 
       lastFetchDidOverflow = overflow;
-      lastFetchedPointRange = pointRange;
+      lastFetchedFocusRange = focusRange;
       lastFetchedMessages = protocolMessage;
 
       // Pre-cache ObjectPreview data for this Message (PauseId).
@@ -181,19 +181,19 @@ async function fetchMessages(
 
     wakeable.resolve(protocolMessage);
   } catch (error) {
-    inFlightPointRange = null;
+    inFlightFocusRange = null;
     inFlightWakeable = null;
 
-    console.error("getMessage() Error for range", printPointRange(pointRange), error);
+    console.error("getMessage() Error for range", printPointRange(focusRange), error);
 
     wakeable.reject(error);
   }
 }
 
-function printPointRange(pointRange: PointRange | null): string {
-  if (pointRange === null) {
+function printPointRange(focusRange: TimeStampedPointRange | null): string {
+  if (focusRange === null) {
     return "null";
   } else {
-    return `${pointRange.begin}:${pointRange.end}`;
+    return `${focusRange.begin.time}:${focusRange.end.time} (${focusRange.begin.point}:${focusRange.end.point})`;
   }
 }

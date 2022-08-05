@@ -1,6 +1,8 @@
 import {
   ContentType,
+  createPauseResult,
   EventHandlerType,
+  ExecutionPoint,
   FrameId,
   KeyboardEvent,
   loadedRegions as LoadedRegions,
@@ -20,9 +22,8 @@ import {
   SourceId,
   SourceLocation,
   TimeStampedPoint,
-  ExecutionPoint,
-  createPauseResult,
-  PointRange,
+  TimeStampedPointRange,
+  TimeRange,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -61,7 +62,7 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
-  findMessages(focusRange: PointRange | null): Promise<{
+  findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;
@@ -69,7 +70,7 @@ export interface ReplayClientInterface {
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
-    focusRange: PointRange | null,
+    focusRange: TimeStampedPointRange | null,
     location: Location
   ): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
@@ -84,6 +85,7 @@ export interface ReplayClientInterface {
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
   searchSources(

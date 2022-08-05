@@ -1,20 +1,23 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
+import { TimeStampedPointRange } from "@replayio/protocol";
 import React, { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./Focuser.module.css";
 
 export default function Focuser() {
   const { duration } = useContext(SessionContext);
-  const { rangeForDisplay: range, update } = useContext(FocusContext);
+  const { rangeForDisplay, update } = useContext(FocusContext);
 
-  const start = range === null ? 0 : range[0] / duration;
-  const end = range === null ? 1 : range[1] / duration;
+  const begin = rangeForDisplay === null ? 0 : rangeForDisplay.begin.time / duration;
+  const end = rangeForDisplay === null ? 1 : rangeForDisplay.end.time / duration;
 
   const toggleFocus = () => {
-    if (range === null) {
-      update([start * duration, end * duration], false);
+    if (rangeForDisplay === null) {
+      update([begin * duration, end * duration], false);
     } else {
       update(null, false);
     }
@@ -25,34 +28,37 @@ export default function Focuser() {
   };
 
   return (
-    <div className={range === null ? styles.FocusRegionRowOff : styles.FocusRegionRowOn}>
+    <div className={rangeForDisplay === null ? styles.FocusRegionRowOff : styles.FocusRegionRowOn}>
       <button className={styles.FocusToggleButton} onClick={toggleFocus}>
-        Focus {range === null ? "off" : "on"}
+        Focus {rangeForDisplay === null ? "off" : "on"}
       </button>
       <RangeSlider
+        begin={begin}
         duration={duration}
         enabled={focus !== null}
         end={end}
         onChange={onSliderChange}
-        start={start}
       />
     </div>
   );
 }
 
 function RangeSlider({
+  begin,
   duration,
   enabled,
   end,
   onChange,
-  start,
 }: {
+  begin: number;
   duration: number;
   enabled: boolean;
   end: number;
-  onChange: (start: number, end: number) => void;
-  start: number;
+  onChange: (begin: number, end: number) => void;
 }) {
+  const client = useContext(ReplayClientContext);
+  const loadedRegions = useLoadedRegions(client);
+
   const ref = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
 
   return (
@@ -62,16 +68,30 @@ function RangeSlider({
           className={styles.RangeTrackUnfocused}
           style={{
             left: 0,
-            width: `${start * 100}%`,
+            width: `${begin * 100}%`,
           }}
         />
-        <div
-          className={styles.RangeTrackFocused}
-          style={{
-            left: `${start * 100}%`,
-            width: `${(end - start) * 100}%`,
-          }}
-        />
+
+        <div className={styles.Regions}>
+          <RegionRanges
+            className={styles.LoadingRegions}
+            duration={duration}
+            ranges={loadedRegions?.loading ?? null}
+          />
+          <RegionRanges
+            className={styles.LoadedRegions}
+            duration={duration}
+            ranges={loadedRegions?.loaded ?? null}
+          />
+          <div
+            className={styles.RangeTrackFocused}
+            style={{
+              left: `${begin * 100}%`,
+              width: `${(end - begin) * 100}%`,
+            }}
+          />
+        </div>
+
         <div
           className={styles.RangeTrackUnfocused}
           style={{
@@ -80,8 +100,6 @@ function RangeSlider({
           }}
         />
 
-        <div className={styles.FocusedRange} />
-
         <SliderThumb
           className={styles.RangeStartThumb}
           enabled={enabled}
@@ -89,22 +107,56 @@ function RangeSlider({
           minimumValue={0}
           onChange={newStart => onChange(newStart, end)}
           parentRef={ref}
-          value={start}
+          value={begin}
         />
         <SliderThumb
           className={styles.RangeEndThumb}
           enabled={enabled}
           maximumValue={1}
-          minimumValue={start}
-          onChange={newEnd => onChange(start, newEnd)}
+          minimumValue={begin}
+          onChange={newEnd => onChange(begin, newEnd)}
           parentRef={ref}
           value={end}
         />
       </div>
       <div className={styles.FocusTimeStamps}>
-        {formatTimestamp(start * duration)} – {formatTimestamp(end * duration)}
+        {formatTimestamp(begin * duration)} – {formatTimestamp(end * duration)}
       </div>
     </>
+  );
+}
+
+function RegionRanges({
+  className,
+  duration,
+  ranges,
+}: {
+  className: string;
+  duration: number;
+  ranges: TimeStampedPointRange[] | null;
+}) {
+  return (
+    <div className={styles.RegionRanges}>
+      {ranges?.map((range, index) => (
+        <RegionRange key={index} className={className} duration={duration} range={range} />
+      ))}
+    </div>
+  );
+}
+
+function RegionRange({
+  className,
+  duration,
+  range,
+}: {
+  className: string;
+  duration: number;
+  range: TimeStampedPointRange;
+}) {
+  const left = range.begin.time / duration;
+  const width = (range.end.time - range.begin.time) / duration;
+  return (
+    <div className={className} style={{ left: `${left * 100}%`, width: `${width * 100}%` }}></div>
   );
 }
 

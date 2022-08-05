@@ -68,6 +68,13 @@
   --badge-unicorn-contrast-color: #fff;
   --badge-yellow-color: #fee608;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
+
+  --focus-mode-active-background-color: var(--background-color-contrast-4);
+  --focus-mode-thumb-color: var(--background-color-contrast-3);
+  --region-focused-color: var(--background-color-contrast-5);
+  --region-unfocused-color: var(--background-color-contrast-3);
+  --region-loaded-color: #939395;
+  --region-loading-color: #69e261;
 }
 
 :root.theme-light {
@@ -140,4 +147,11 @@
   --badge-unicorn-contrast-color: #fff;
   --badge-yellow-color: #e4cd00;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
+
+  --focus-mode-active-background-color: var(--background-color-contrast-2);
+  --focus-mode-thumb-color: var(--background-color-contrast-5);
+  --region-focused-color: var(--background-color-contrast-5);
+  --region-unfocused-color: var(--background-color-contrast-1);
+  --region-loaded-color: #ff0000;
+  --region-loading-color: #73cc6d;
 }

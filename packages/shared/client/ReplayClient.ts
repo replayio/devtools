@@ -13,13 +13,14 @@ import {
   PauseData,
   PauseId,
   PointDescription,
-  PointRange,
+  TimeRange,
+  TimeStampedPoint,
+  TimeStampedPointRange,
   RecordingId,
   Result as EvaluationResult,
   SearchSourceContentsMatch,
   SessionId,
   SourceId,
-  TimeStampedPoint,
 } from "@replayio/protocol";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
@@ -141,7 +142,7 @@ export class ReplayClient implements ReplayClientInterface {
     return sessionId;
   }
 
-  async findMessages(focusRange: PointRange | null): Promise<{
+  async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }> {
@@ -149,7 +150,7 @@ export class ReplayClient implements ReplayClientInterface {
 
     if (focusRange !== null) {
       const response = await client.Console.findMessagesInRange(
-        { range: { begin: focusRange.begin, end: focusRange.end } },
+        { range: { begin: focusRange.begin.point, end: focusRange.end.point } },
         sessionId
       );
 
@@ -226,7 +227,7 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getHitPointsForLocation(
-    focusRange: PointRange | null,
+    focusRange: TimeStampedPointRange | null,
     location: Location
   ): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
@@ -235,7 +236,9 @@ export class ReplayClient implements ReplayClientInterface {
         effectful: false,
         locations: [{ location }],
         mapper: "",
-        range: focusRange || undefined,
+        range: focusRange
+          ? { begin: focusRange.begin.point, end: focusRange.end.point }
+          : undefined,
       },
       {
         onAnalysisError: (errorMessage: string) => {
@@ -326,6 +329,19 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async loadRegion(range: TimeRange, duration: number): Promise<void> {
+    client.Session.unloadRegion({ region: { begin: 0, end: range.begin } }, ThreadFront.sessionId!);
+    client.Session.unloadRegion(
+      { region: { begin: range.end, end: duration } },
+      ThreadFront.sessionId!
+    );
+
+    await client.Session.loadRegion(
+      { region: { begin: range.begin, end: range.end } },
+      ThreadFront.sessionId!
+    );
   }
 
   removeEventListener(type: ReplayClientEvents, handler: Function): void {
