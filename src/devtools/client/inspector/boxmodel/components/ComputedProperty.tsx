@@ -4,107 +4,26 @@
 
 "use strict";
 
-const { PureComponent } = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
+import React from "react";
 
-const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
-const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
-
-class ComputedProperty extends PureComponent {
-  static get propTypes() {
-    return {
-      name: PropTypes.string.isRequired,
-      onHideBoxModelHighlighter: PropTypes.func,
-      onShowBoxModelHighlighterForNode: PropTypes.func,
-      referenceElement: PropTypes.object,
-      referenceElementType: PropTypes.string,
-      setSelectedNode: PropTypes.func,
-      value: PropTypes.string,
-    };
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.onFocus = this.onFocus.bind(this);
-    this.renderReferenceElementPreview = this.renderReferenceElementPreview.bind(this);
-  }
-
-  onFocus() {
-    this.container.focus();
-  }
-
-  renderReferenceElementPreview() {
-    const {
-      onShowBoxModelHighlighterForNode,
-      onHideBoxModelHighlighter,
-      referenceElement,
-      referenceElementType,
-      setSelectedNode,
-    } = this.props;
-
-    if (!referenceElement) {
-      return null;
-    }
-
-    return dom.div(
-      { className: "reference-element" },
-      dom.span(
-        {
-          className: "reference-element-type",
-          title: "Offset parent of the selected element",
-        },
-        referenceElementType
-      ),
-      getNodeRep(referenceElement, {
-        onInspectIconClick: () => setSelectedNode(referenceElement, { reason: "box-model" }),
-        onDOMNodeMouseOver: () => onShowBoxModelHighlighterForNode(referenceElement),
-        onDOMNodeMouseOut: () => onHideBoxModelHighlighter(),
-      })
-    );
-  }
-
-  render() {
-    const { name, value } = this.props;
-
-    return dom.div(
-      {
-        className: "computed-property-view",
-        "data-property-name": name,
-        tabIndex: "0",
-        ref: container => {
-          this.container = container;
-        },
-      },
-      dom.div(
-        { className: "computed-property-name-container" },
-        dom.div(
-          {
-            className: "computed-property-name theme-fg-color3",
-            tabIndex: "",
-            title: name,
-            onClick: this.onFocus,
-          },
-          name
-        )
-      ),
-      dom.div(
-        { className: "computed-property-value-container" },
-        dom.div(
-          {
-            className: "computed-property-value theme-fg-color1",
-            dir: "ltr",
-            tabIndex: "",
-            onClick: this.onFocus,
-          },
-          value
-        ),
-        this.renderReferenceElementPreview()
-      )
-    );
-  }
+interface CPProps {
+  name: string;
+  value: string;
 }
 
-module.exports = ComputedProperty;
+export function ComputedProperty({ name, value }: CPProps) {
+  return (
+    <div className="computed-property-view" data-property-name={name} tabIndex={0}>
+      <div className="computed-property-name-container">
+        <div className="computed-property-name theme-fg-color3" title={name}>
+          {name}
+        </div>
+      </div>
+      <div className="computed-property-value-container">
+        <div className="computed-property-value theme-fg-color1" dir="ltr">
+          {value}
+        </div>
+      </div>
+    </div>
+  );
+}

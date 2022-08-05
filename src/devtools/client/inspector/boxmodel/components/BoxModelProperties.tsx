@@ -4,124 +4,49 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
+import React, { useState } from "react";
+import { ComputedProperty } from "./ComputedProperty";
 
-const ComputedProperty = require("devtools/client/inspector/boxmodel/components/ComputedProperty");
-const Types = require("devtools/client/inspector/boxmodel/types");
+import type { Layout } from "../reducers/box-model";
 
-const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
-const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
-
-class BoxModelProperties extends React.PureComponent {
-  static get propTypes() {
-    return {
-      boxModel: PropTypes.shape(Types.boxModel).isRequired,
-      onHideBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
-      setSelectedNode: PropTypes.func.isRequired,
-    };
-  }
-
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      isOpen: true,
-    };
-
-    this.getReferenceElement = this.getReferenceElement.bind(this);
-    this.onToggleExpander = this.onToggleExpander.bind(this);
-  }
-
-  /**
-   * Various properties can display a reference element. E.g. position displays an offset
-   * parent if its value is other than fixed or static. Or z-index displays a stacking
-   * context, etc.
-   * This returns the right element if there needs to be one, and one was passed in the
-   * props.
-   *
-   * @return {Object} An object with 2 properties:
-   * - referenceElement {NodeFront}
-   * - referenceElementType {String}
-   */
-  getReferenceElement(propertyName) {
-    const value = this.props.boxModel.layout[propertyName];
-
-    if (
-      propertyName === "position" &&
-      value !== "static" &&
-      value !== "fixed" &&
-      this.props.boxModel.offsetParent
-    ) {
-      return {
-        referenceElement: this.props.boxModel.offsetParent,
-        referenceElementType: "offset",
-      };
-    }
-
-    return {};
-  }
-
-  onToggleExpander(event) {
-    this.setState({
-      isOpen: !this.state.isOpen,
-    });
-    event.stopPropagation();
-  }
-
-  render() {
-    const {
-      boxModel,
-      onHideBoxModelHighlighter,
-      onShowBoxModelHighlighterForNode,
-      setSelectedNode,
-    } = this.props;
-    const { layout } = boxModel;
-
-    const layoutInfo = ["box-sizing", "display", "float", "line-height", "position", "z-index"];
-
-    const properties = layoutInfo.map(info => {
-      const { referenceElement, referenceElementType } = this.getReferenceElement(info);
-
-      return React.createElement(ComputedProperty, {
-        key: info,
-        name: info,
-        onHideBoxModelHighlighter,
-        onShowBoxModelHighlighterForNode,
-        referenceElement,
-        referenceElementType,
-        setSelectedNode,
-        value: layout[info],
-      });
-    });
-
-    return dom.div(
-      { className: "layout-properties" },
-      dom.div(
-        {
-          className: "layout-properties-header",
-          onDoubleClick: this.onToggleExpander,
-        },
-        dom.span({
-          className: "layout-properties-expander theme-twisty",
-          open: this.state.isOpen,
-          onClick: this.onToggleExpander,
-        }),
-        "Box Model Properties"
-      ),
-      dom.div(
-        {
-          className: "layout-properties-wrapper devtools-monospace",
-          hidden: !this.state.isOpen,
-          tabIndex: 0,
-        },
-        properties
-      )
-    );
-  }
+interface BMProps {
+  layout: Layout;
 }
 
-module.exports = BoxModelProperties;
+const layoutInfo = [
+  "box-sizing",
+  "display",
+  "float",
+  "line-height",
+  "position",
+  "z-index",
+] as const;
+
+export function BoxModelProperties({ layout }: BMProps) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  const onToggleExpander = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    setIsOpen(!isOpen);
+  };
+
+  const properties = layoutInfo.map(info => {
+    return <ComputedProperty key={info} name={info} value={layout[info]} />;
+  });
+
+  return (
+    <div className="layout-properties">
+      <div className="layout-properties-header" onDoubleClick={onToggleExpander}>
+        <span
+          className="layout-properties-expander theme-twisty"
+          onClick={onToggleExpander}
+          style={{ transform: isOpen ? "none" : undefined }}
+        ></span>
+        Box Model Properties
+      </div>
+      <div className="layout-properties-wrapper devtools-monospace" hidden={!isOpen} tabIndex={0}>
+        {properties}
+      </div>
+    </div>
+  );
+}

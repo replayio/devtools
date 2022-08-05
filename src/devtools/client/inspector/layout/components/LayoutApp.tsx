@@ -2,48 +2,31 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import React from "react";
+import { connect, ConnectedProps } from "react-redux";
+
+import type { UIState } from "ui/state";
 
 const Services = require("devtools/shared/services");
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
-const { connect } = require("react-redux");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const Accordion = require("devtools/client/shared/components/Accordion");
-const BoxModel = require("devtools/client/inspector/boxmodel/components/BoxModel");
-
-const BoxModelTypes = require("devtools/client/inspector/boxmodel/types");
-
-const BOXMODEL_STRINGS_URI = "devtools/client/locales/boxmodel.properties";
-const BOXMODEL_L10N = new LocalizationHelper(BOXMODEL_STRINGS_URI);
-
-const LAYOUT_STRINGS_URI = "devtools/client/locales/layout.properties";
-const LAYOUT_L10N = new LocalizationHelper(LAYOUT_STRINGS_URI);
-
+import { BoxModel } from "../../boxmodel/components/BoxModel";
 const BOXMODEL_OPENED_PREF = "devtools.layout.boxmodel.opened";
 
-class LayoutApp extends React.PureComponent {
-  static get propTypes() {
-    return {
-      boxModel: PropTypes.shape(BoxModelTypes.boxModel).isRequired,
-      onHideBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowBoxModelEditor: PropTypes.func.isRequired,
-      onShowBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
-      setSelectedNode: PropTypes.func.isRequired,
-      showBoxModelProperties: PropTypes.bool.isRequired,
-    };
-  }
+const mapStateToProps = (state: UIState) => ({
+  boxModel: state.boxModel,
+});
 
-  constructor(props) {
-    super(props);
-    this.containerRef = React.createRef();
+const connector = connect(mapStateToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>;
 
-    this.scrollToTop = this.scrollToTop.bind(this);
-  }
+interface LayoutAppProps {
+  showBoxModelProperties: boolean;
+}
 
+type FinalLAProps = PropsFromRedux & LayoutAppProps;
+
+class LayoutApp extends React.PureComponent<FinalLAProps> {
   getBoxModelSection() {
     return {
       component: BoxModel,
@@ -52,54 +35,23 @@ class LayoutApp extends React.PureComponent {
       header: "Box Model",
       id: "layout-section-boxmodel",
       opened: Services.prefs.getBoolPref(BOXMODEL_OPENED_PREF),
-      onToggle: opened => {
+      onToggle: (opened: boolean) => {
         Services.prefs.setBoolPref(BOXMODEL_OPENED_PREF, opened);
       },
     };
   }
 
-  getGridSection() {
-    return {
-      component: Grid,
-      componentProps: this.props,
-      contentClassName: "layout-content",
-      header: "Grid",
-      id: "layout-grid-section",
-      opened: Services.prefs.getBoolPref(GRID_OPENED_PREF),
-      onToggle: opened => {
-        Services.prefs.setBoolPref(GRID_OPENED_PREF, opened);
-      },
-    };
-  }
-
-  /**
-   * Scrolls to the top of the layout container.
-   */
-  scrollToTop() {
-    this.containerRef.current.scrollTop = 0;
-  }
-
   render() {
     const items = [this.getBoxModelSection()];
-    return dom.div(
-      { className: "layout-container", ref: this.containerRef },
-      dom.div(
-        {
-          className: "h-full overflow-y-auto",
-        },
-        React.createElement(Accordion, {
-          items,
-          style: {
-            overflow: "auto",
-          },
-        })
-      )
+
+    return (
+      <div className="layout-container">
+        <div className="h-full overflow-y-auto">
+          <Accordion items={items} style={{ overflow: "auto" }} />
+        </div>
+      </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
-  boxModel: state.boxModel,
-});
-
-module.exports = connect(mapStateToProps)(LayoutApp);
+export default connector(LayoutApp);

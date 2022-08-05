@@ -34,7 +34,7 @@ type ObjectFromList<T extends ReadonlyArray<string>, V = string> = {
   [K in T extends ReadonlyArray<infer U> ? U : never]: V;
 };
 
-type LayoutNumericFields = ObjectFromList<typeof LAYOUT_NUMERIC_FIELDS>;
+export type LayoutNumericFields = ObjectFromList<typeof LAYOUT_NUMERIC_FIELDS>;
 
 export type Layout = LayoutNumericFields & {
   width: number;

@@ -4,88 +4,41 @@
 
 "use strict";
 
-const React = require("react");
-const dom = require("react-dom-factories");
-const PropTypes = require("prop-types");
+import React from "react";
+import { BoxModelMain } from "./BoxModelMain";
+import { BoxModelProperties } from "./BoxModelProperties";
 
-const BoxModelInfo = require("devtools/client/inspector/boxmodel/components/BoxModelInfo");
-const BoxModelMain = require("devtools/client/inspector/boxmodel/components/BoxModelMain");
-const BoxModelProperties = require("devtools/client/inspector/boxmodel/components/BoxModelProperties");
+import type { Layout } from "../reducers/box-model";
 
-const Types = require("devtools/client/inspector/boxmodel/types");
+function BoxModelInfo({ layout }: { layout: Layout }) {
+  const { height = "-", position, width = "-" } = layout;
 
-class BoxModel extends React.PureComponent {
-  static get propTypes() {
-    return {
-      boxModel: PropTypes.shape(Types.boxModel).isRequired,
-      onHideBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowBoxModelEditor: PropTypes.func.isRequired,
-      onShowBoxModelHighlighter: PropTypes.func.isRequired,
-      onShowBoxModelHighlighterForNode: PropTypes.func.isRequired,
-      onShowRulePreviewTooltip: PropTypes.func.isRequired,
-      showBoxModelProperties: PropTypes.bool.isRequired,
-      setSelectedNode: PropTypes.func.isRequired,
-    };
-  }
-
-  constructor(props) {
-    super(props);
-    this.onKeyDown = this.onKeyDown.bind(this);
-  }
-
-  onKeyDown(event) {
-    const { target } = event;
-
-    if (target == this.boxModelContainer) {
-      this.boxModelMain.onKeyDown(event);
-    }
-  }
-
-  render() {
-    const {
-      boxModel,
-      onHideBoxModelHighlighter,
-      onShowBoxModelEditor,
-      onShowBoxModelHighlighter,
-      onShowBoxModelHighlighterForNode,
-      onShowRulePreviewTooltip,
-      setSelectedNode,
-      showBoxModelProperties,
-    } = this.props;
-
-    return dom.div(
-      {
-        className: "boxmodel-container",
-        tabIndex: 0,
-        ref: div => {
-          this.boxModelContainer = div;
-        },
-        onKeyDown: this.onKeyDown,
-      },
-      React.createElement(BoxModelMain, {
-        boxModel,
-        boxModelContainer: this.boxModelContainer,
-        ref: boxModelMain => {
-          this.boxModelMain = boxModelMain;
-        },
-        onHideBoxModelHighlighter,
-        onShowBoxModelEditor,
-        onShowBoxModelHighlighter,
-        onShowRulePreviewTooltip,
-      }),
-      React.createElement(BoxModelInfo, {
-        boxModel,
-      }),
-      showBoxModelProperties
-        ? React.createElement(BoxModelProperties, {
-            boxModel,
-            setSelectedNode,
-            onHideBoxModelHighlighter,
-            onShowBoxModelHighlighterForNode,
-          })
-        : null
-    );
-  }
+  const dimensions = `${width}\u00D7${height}`;
+  return (
+    <div className="boxmodel-info">
+      <span className="boxmodel-element-size">{dimensions}</span>
+      <section className="boxmodel-position-group">
+        <span className="boxmodel-element-position">{position}</span>
+      </section>
+    </div>
+  );
 }
 
-module.exports = BoxModel;
+interface BMProps {
+  boxModel: { layout: Layout };
+  showBoxModelProperties: boolean;
+}
+
+export function BoxModel({ boxModel, showBoxModelProperties }: BMProps) {
+  const { layout } = boxModel;
+
+  const boxModelProperties = showBoxModelProperties ? <BoxModelProperties layout={layout} /> : null;
+
+  return (
+    <div className="boxmodel-container" tabIndex={0}>
+      <BoxModelMain layout={layout} />
+      <BoxModelInfo layout={layout} />
+      {boxModelProperties}
+    </div>
+  );
+}
