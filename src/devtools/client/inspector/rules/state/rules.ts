@@ -25,7 +25,7 @@ export interface DeclarationState {
   /** The declaration's property name. */
   name: string;
   /** The declaration's parsed property value. */
-  parsedValue: string;
+  parsedValue: (string | { type: string; value: string })[];
   /** The declaration's priority (either "important" or an empty string). */
   priority: Priority;
   /** The CSS rule id that is associated with this CSS declaration. */

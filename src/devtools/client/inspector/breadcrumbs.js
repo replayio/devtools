@@ -325,8 +325,8 @@ ArrowScrollBox.prototype = {
  */
 export function HTMLBreadcrumbs(inspector) {
   this.inspector = inspector;
-  this.win = this.inspector.panelWin;
-  this.doc = this.inspector.panelDoc;
+  this.win = window;
+  this.doc = window.document;
   this._init();
 }
 

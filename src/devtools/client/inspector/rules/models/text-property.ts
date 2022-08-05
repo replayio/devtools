@@ -8,6 +8,7 @@ const { escapeCSSComment } = require("packages/third-party/css/parsing-utils");
 import Rule from "./rule";
 import ElementStyle from "./element-style";
 import CSSProperties from "third-party/css/css-properties";
+const { OutputParser } = require("packages/third-party/css/output-parser");
 import UserProperties from "./user-properties";
 import { assert } from "protocol/utils";
 
@@ -37,6 +38,25 @@ function getDummyElement() {
   return dummyElement;
 }
 
+interface OutputParserClass {
+  parseCssProperty: (
+    name: string,
+    value: string,
+    options: {
+      baseURI?: string | null;
+    }
+  ) => (string | { type: string; value: string })[];
+}
+
+let outputParser: OutputParserClass;
+
+function getOutputParser() {
+  if (!outputParser) {
+    outputParser = new OutputParser(window.document, CSSProperties);
+  }
+  return outputParser;
+}
+
 /**
  * TextProperty is responsible for the following:
  *   Manages a single property from the authoredText attribute of the
@@ -55,12 +75,8 @@ export default class TextProperty {
   enabled: boolean;
   invisible: boolean | null;
   elementStyle: ElementStyle;
-  cssProperties: typeof CSSProperties;
-  outputParser: any;
-  panelDoc: Document | null;
   computed: ComputedProperty[] | undefined;
   overridden?: boolean;
-  userProperties?: UserProperties;
 
   /**
    * @param {Rule} rule
@@ -96,10 +112,6 @@ export default class TextProperty {
     this.enabled = !!enabled;
     this.invisible = invisible;
     this.elementStyle = this.rule.elementStyle;
-    this.cssProperties = this.elementStyle.ruleView.cssProperties;
-    this.outputParser = this.elementStyle.ruleView.outputParser;
-    this.panelDoc = this.elementStyle.ruleView.inspector.panelDoc;
-    this.userProperties = this.elementStyle.store.userProperties;
 
     this.updateComputed();
   }
@@ -121,7 +133,7 @@ export default class TextProperty {
    * @return {Boolean} true if the declaration name is known, false otherwise.
    */
   get isKnownProperty() {
-    return this.cssProperties.isKnown(this.name);
+    return CSSProperties.isKnown(this.name);
   }
 
   /**
@@ -131,8 +143,7 @@ export default class TextProperty {
    * otherwise.
    */
   get isPropertyChanged() {
-    assert(this.userProperties, "TextProperty.userProperties not set");
-    return this.userProperties.contains(this.rule.domRule, this.name);
+    return false;
   }
 
   /**
@@ -145,7 +156,7 @@ export default class TextProperty {
       value += " !" + this.priority;
     }
 
-    return this.outputParser.parseCssProperty(this.name, value, {
+    return getOutputParser().parseCssProperty(this.name, value, {
       baseURI: this.rule.ruleHref,
     });
   }
@@ -180,7 +191,7 @@ export default class TextProperty {
     // Manually get all the properties that are set when setting a value on
     // this.name and check the computed style on dummyElement for each one.
     // If we just read dummyStyle, it would skip properties when value === "".
-    const subProps = this.cssProperties.getSubproperties(this.name);
+    const subProps = CSSProperties.getSubproperties(this.name);
 
     for (const prop of subProps) {
       this.computed.push({

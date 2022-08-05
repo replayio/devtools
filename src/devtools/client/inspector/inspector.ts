@@ -9,10 +9,8 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
-import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 import { selection, Selection } from "devtools/client/framework/selection";
 
-import CSSProperties from "third-party/css/css-properties";
 import RulesView from "./rules/rules";
 
 import Highlighter from "highlighter/highlighter";
@@ -36,8 +34,6 @@ type InspectorEvent =
  * (computed view, rule view, font view and animation inspector).
  */
 export class Inspector {
-  panelDoc: Document | null;
-  panelWin: Window | null;
   store: UIStore | null;
   highlighter: typeof Highlighter;
 
@@ -58,9 +54,7 @@ export class Inspector {
 
     this.selection = selection;
 
-    this.panelDoc = window.document;
-    this.panelWin = window;
-    (this.panelWin as any).inspector = this;
+    (window as any).inspector = this;
     this.store = (window as any).app.store;
 
     this.highlighter = Highlighter;
@@ -70,18 +64,6 @@ export class Inspector {
 
   getHighlighter() {
     return Highlighter;
-  }
-
-  get highlighters() {
-    if (!this._highlighters) {
-      this._highlighters = new HighlightersOverlay(this);
-    }
-
-    return this._highlighters;
-  }
-
-  get cssProperties() {
-    return CSSProperties;
   }
 
   get selectionCssSelector() {
@@ -102,9 +84,7 @@ export class Inspector {
       this._highlighters = null;
     }
 
-    this.panelDoc = null;
-    (this.panelWin as any).inspector = null;
-    this.panelWin = null;
+    (window as any).inspector = null;
     this.store = null;
   }
 
