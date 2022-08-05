@@ -20,6 +20,8 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import { SearchContext } from "./SearchContext";
+import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
+import { isPointInRegions } from "shared/utils/time";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -33,6 +35,8 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
+  const loadedRegions = useLoadedRegions(replayClient);
 
   // The Console should render a line indicating the current execution point.
   // This point might match multiple logs– or it might be between logs, or after the last log, etc.
@@ -79,44 +83,49 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       listItems.push(currentTimeIndicator);
     }
 
-    if (isEventLog(loggable)) {
-      listItems.push(
-        <EventLogRenderer
-          key={index}
-          index={index}
-          isFocused={loggable === currentSearchResult}
-          eventLog={loggable}
-        />
-      );
-    } else if (isPointInstance(loggable)) {
-      listItems.push(
-        <LogPointRenderer
-          key={index}
-          index={index}
-          isFocused={loggable === currentSearchResult}
-          logPointInstance={loggable}
-        />
-      );
-    } else if (isProtocolMessage(loggable)) {
-      listItems.push(
-        <MessageRenderer
-          key={index}
-          index={index}
-          isFocused={loggable === currentSearchResult}
-          message={loggable}
-        />
-      );
-    } else if (isTerminalExpression(loggable)) {
-      listItems.push(
-        <TerminalExpressionRenderer
-          key={index}
-          index={index}
-          isFocused={loggable === currentSearchResult}
-          terminalExpression={loggable}
-        />
-      );
-    } else {
-      throw Error("Unsupported loggable type");
+    const isLoaded =
+      loadedRegions !== null &&
+      isPointInRegions(getLoggableExecutionPoint(loggable), loadedRegions.loaded);
+    if (isLoaded) {
+      if (isEventLog(loggable)) {
+        listItems.push(
+          <EventLogRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            eventLog={loggable}
+          />
+        );
+      } else if (isPointInstance(loggable)) {
+        listItems.push(
+          <LogPointRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            logPointInstance={loggable}
+          />
+        );
+      } else if (isProtocolMessage(loggable)) {
+        listItems.push(
+          <MessageRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            message={loggable}
+          />
+        );
+      } else if (isTerminalExpression(loggable)) {
+        listItems.push(
+          <TerminalExpressionRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            terminalExpression={loggable}
+          />
+        );
+      } else {
+        throw Error("Unsupported loggable type");
+      }
     }
   });
   if (currentTimeIndicatorPlacement === "end") {
