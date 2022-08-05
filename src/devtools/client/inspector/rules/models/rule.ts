@@ -68,7 +68,6 @@ export default class Rule {
   isUnmatched: boolean;
   inherited: NodeFront | null;
   mediaText: string;
-  cssProperties: typeof CSSProperties;
   inspector: Inspector;
   store: UIStore;
   textProps: TextProperty[];
@@ -98,8 +97,7 @@ export default class Rule {
     this.inherited = options.inherited || null;
     // this.keyframes = options.keyframes || null;
 
-    this.mediaText = /* this.domRule && this.domRule.mediaText ? this.domRule.mediaText : */ "";
-    this.cssProperties = this.elementStyle.ruleView.cssProperties;
+    this.mediaText = "";
     this.inspector = this.elementStyle.ruleView.inspector;
     this.store = this.elementStyle.ruleView.store;
 
@@ -625,17 +623,14 @@ export default class Rule {
     const store = this.elementStyle.store;
 
     assert(this.domRule.style, "domRule.style not set");
-    const properties = parseNamedDeclarations(
-      this.cssProperties.isKnown,
-      this.domRule.style.cssText
-    );
+    const properties = parseNamedDeclarations(CSSProperties.isKnown, this.domRule.style.cssText);
     for (const prop of properties) {
       const name = prop.name;
       // In an inherited rule, we only show inherited properties.
       // However, we must keep all properties in order for rule
       // rewriting to work properly.  So, compute the "invisible"
       // property here.
-      const invisible = this.inherited && !this.cssProperties.isInherited(name);
+      const invisible = this.inherited && !CSSProperties.isInherited(name);
       assert(store.userProperties, "store.userProperties not set");
       const value = store.userProperties.getProperty(this.domRule, name, prop.value);
       const textProp = new TextProperty(

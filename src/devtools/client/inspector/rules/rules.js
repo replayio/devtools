@@ -5,7 +5,6 @@
 "use strict";
 
 const Services = require("devtools/shared/services");
-const { OutputParser } = require("packages/third-party/css/output-parser");
 const EventEmitter = require("devtools/shared/event-emitter");
 const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
 import { selection } from "devtools/client/framework/selection";
@@ -21,13 +20,10 @@ const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
 class RulesView {
   constructor(inspector, window) {
-    this.cssProperties = inspector.cssProperties;
     this.doc = window.document;
     this.inspector = inspector;
     this.store = inspector.store;
-    this.isNewRulesView = true;
 
-    this.outputParser = new OutputParser(this.doc, this.cssProperties);
     this.showUserAgentStyles = Services.prefs.getBoolPref(PREF_UA_STYLES);
 
     // this.inspector.sidebar.on("select", this.onSelection);

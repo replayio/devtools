@@ -10,11 +10,8 @@ import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
-import CSSProperties from "third-party/css/css-properties";
 import RulesView from "../rules";
 import TextProperty, { ComputedProperty } from "./text-property";
-
-// const { promiseWarn } = require("devtools/client/inspector/shared/utils");
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";
@@ -41,7 +38,6 @@ export default class ElementStyle {
   pseudoElements: string[];
   showUserAgentStyles: boolean;
   rules: Rule[] | null;
-  cssProperties: typeof CSSProperties;
   variablesMap: Map<string, Map<string, string>>;
   destroyed?: boolean;
 
@@ -76,7 +72,6 @@ export default class ElementStyle {
     this.pseudoElements = [];
     this.showUserAgentStyles = showUserAgentStyles;
     this.rules = [];
-    this.cssProperties = this.ruleView.cssProperties;
     this.variablesMap = new Map<string, Map<string, string>>();
 
     // We don't want to overwrite this.store.userProperties so we only create it
