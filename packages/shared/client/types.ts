@@ -23,6 +23,7 @@ import {
   SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
+  TimeRange,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -84,6 +85,7 @@ export interface ReplayClientInterface {
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
   searchSources(

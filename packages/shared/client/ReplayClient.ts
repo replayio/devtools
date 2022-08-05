@@ -13,6 +13,7 @@ import {
   PauseData,
   PauseId,
   PointDescription,
+  TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
   RecordingId,
@@ -328,6 +329,19 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async loadRegion(range: TimeRange, duration: number): Promise<void> {
+    client.Session.unloadRegion({ region: { begin: 0, end: range.begin } }, ThreadFront.sessionId!);
+    client.Session.unloadRegion(
+      { region: { begin: range.end, end: duration } },
+      ThreadFront.sessionId!
+    );
+
+    await client.Session.loadRegion(
+      { region: { begin: range.begin, end: range.end } },
+      ThreadFront.sessionId!
+    );
   }
 
   removeEventListener(type: ReplayClientEvents, handler: Function): void {

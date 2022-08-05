@@ -190,6 +190,7 @@ const MockReplayClient = {
   })),
   getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
   initialize: jest.fn().mockImplementation(async () => {}),
+  loadRegion: jest.fn().mockImplementation(async () => {}),
   removeEventListener: jest.fn(),
   runAnalysis: jest.fn().mockImplementation(async () => []),
   searchSources: jest.fn().mockImplementation(async () => []),

@@ -9,15 +9,30 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import styles from "./Focuser.module.css";
 
 export default function Focuser() {
+  const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
-  const { rangeForDisplay: range, update } = useContext(FocusContext);
+  const { rangeForDisplay, range: rangeToLoad, update } = useContext(FocusContext);
 
-  const start = range === null ? 0 : range.begin.time / duration;
-  const end = range === null ? 1 : range.end.time / duration;
+  const begin = rangeForDisplay === null ? 0 : rangeForDisplay.begin.time / duration;
+  const end = rangeForDisplay === null ? 1 : rangeForDisplay.end.time / duration;
+
+  useEffect(() => {
+    if (rangeToLoad === null) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      client.loadRegion({ begin: rangeToLoad.begin.time, end: rangeToLoad.end.time }, duration);
+    }, 250);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [client, duration, rangeToLoad]);
 
   const toggleFocus = () => {
-    if (range === null) {
-      update([start * duration, end * duration], false);
+    if (rangeForDisplay === null) {
+      update([begin * duration, end * duration], false);
     } else {
       update(null, false);
     }
@@ -28,33 +43,33 @@ export default function Focuser() {
   };
 
   return (
-    <div className={range === null ? styles.FocusRegionRowOff : styles.FocusRegionRowOn}>
+    <div className={rangeForDisplay === null ? styles.FocusRegionRowOff : styles.FocusRegionRowOn}>
       <button className={styles.FocusToggleButton} onClick={toggleFocus}>
-        Focus {range === null ? "off" : "on"}
+        Focus {rangeForDisplay === null ? "off" : "on"}
       </button>
       <RangeSlider
+        begin={begin}
         duration={duration}
         enabled={focus !== null}
         end={end}
         onChange={onSliderChange}
-        start={start}
       />
     </div>
   );
 }
 
 function RangeSlider({
+  begin,
   duration,
   enabled,
   end,
   onChange,
-  start,
 }: {
+  begin: number;
   duration: number;
   enabled: boolean;
   end: number;
-  onChange: (start: number, end: number) => void;
-  start: number;
+  onChange: (begin: number, end: number) => void;
 }) {
   const client = useContext(ReplayClientContext);
   const loadedRegions = useLoadedRegions(client);
@@ -68,7 +83,7 @@ function RangeSlider({
           className={styles.RangeTrackUnfocused}
           style={{
             left: 0,
-            width: `${start * 100}%`,
+            width: `${begin * 100}%`,
           }}
         />
 
@@ -86,8 +101,8 @@ function RangeSlider({
           <div
             className={styles.RangeTrackFocused}
             style={{
-              left: `${start * 100}%`,
-              width: `${(end - start) * 100}%`,
+              left: `${begin * 100}%`,
+              width: `${(end - begin) * 100}%`,
             }}
           />
         </div>
@@ -107,20 +122,20 @@ function RangeSlider({
           minimumValue={0}
           onChange={newStart => onChange(newStart, end)}
           parentRef={ref}
-          value={start}
+          value={begin}
         />
         <SliderThumb
           className={styles.RangeEndThumb}
           enabled={enabled}
           maximumValue={1}
-          minimumValue={start}
-          onChange={newEnd => onChange(start, newEnd)}
+          minimumValue={begin}
+          onChange={newEnd => onChange(begin, newEnd)}
           parentRef={ref}
           value={end}
         />
       </div>
       <div className={styles.FocusTimeStamps}>
-        {formatTimestamp(start * duration)} – {formatTimestamp(end * duration)}
+        {formatTimestamp(begin * duration)} – {formatTimestamp(end * duration)}
       </div>
     </>
   );
