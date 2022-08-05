@@ -250,7 +250,6 @@ This is effectively state management logic.  It tries to tie together the "curre
   - Subscribes to `selection` events: `"new-node-front"` (a different node was selected) and `"detached-front"` (dead - not used in this codebase now)
 - Getters:
   - Several getters that create singleton instances of `AutocompletePopup`, `ClassList`, `StyleInspectorMenu`
-  - `dummyElement`: used by `text-property.ts` to determine how some styles get interpreted
   - `highlighters`
 - Methods:
   - `getRulesProps()`: returns a ton of class methods like `onAddClass`, `onToggleClassPanelExpanded`, `showSelectorEditor`, etc. Odds are most of these are irrelevant in Replay.

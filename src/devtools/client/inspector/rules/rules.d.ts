@@ -10,7 +10,6 @@ declare class RulesView {
   inspector: Inspector;
   store: UIStore;
   outputParser: any;
-  readonly dummyElement: HTMLDivElement;
   getRulesProps(): any;
 }
 export = RulesView;
