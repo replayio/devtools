@@ -151,34 +151,16 @@ export class BoxModelMain extends React.PureComponent<BMMProps> {
     const { layout } = this.props;
     let { height, width } = layout;
 
-    const borderTop = this.getBorderOrPaddingValue("border-top-width");
-    const borderRight = this.getBorderOrPaddingValue("border-right-width");
-    const borderBottom = this.getBorderOrPaddingValue("border-bottom-width");
-    const borderLeft = this.getBorderOrPaddingValue("border-left-width");
-    const borderValues = [borderTop, borderRight, borderBottom, borderLeft];
+    const sides = ["top", "right", "bottom", "left"] as const;
 
-    const paddingTop = this.getBorderOrPaddingValue("padding-top");
-    const paddingRight = this.getBorderOrPaddingValue("padding-right");
-    const paddingBottom = this.getBorderOrPaddingValue("padding-bottom");
-    const paddingLeft = this.getBorderOrPaddingValue("padding-left");
-    const paddingValues = [paddingTop, paddingRight, paddingBottom, paddingLeft];
+    const borderValues = sides.map(side => this.getBorderOrPaddingValue(`border-${side}-width`));
+    const paddingValues = sides.map(side => this.getBorderOrPaddingValue(`padding-${side}`));
+    const positionValues = sides.map(side => this.getPositionValue(side));
+    const marginValues = sides.map(side => this.getMarginValue(`margin-${side}`, side));
 
     const displayPosition = this.getDisplayPosition();
-    const positionTop = this.getPositionValue("top");
-    const positionRight = this.getPositionValue("right");
-    const positionBottom = this.getPositionValue("bottom");
-    const positionLeft = this.getPositionValue("left");
-    const positionValues = [positionTop, positionRight, positionBottom, positionLeft];
-
-    const marginTop = this.getMarginValue("margin-top", "top");
-    const marginRight = this.getMarginValue("margin-right", "right");
-    const marginBottom = this.getMarginValue("margin-bottom", "bottom");
-    const marginLeft = this.getMarginValue("margin-left", "left");
-    const marginValues = [marginTop, marginRight, marginBottom, marginLeft];
 
     const renderValueLabels = (values: (number | string)[], boxName: string) => {
-      const sides = ["top", "right", "bottom", "left"] as const;
-
       return sides.map((side, i) => {
         const property = `${boxName}-${side}`;
         return (
