@@ -2,6 +2,7 @@ import ClientValueValueRenderer from "@bvaughn/components/inspector/values/Clien
 import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
@@ -17,7 +18,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
-import useFocusRange from "../hooks/useFocusRange";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
@@ -140,11 +140,15 @@ function MessageHoverButtonWithWithPause({
 
 function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance }) {
   const client = useContext(ReplayClientContext);
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
 
   const { point, timeStampedHitPoint } = logPointInstance;
 
-  const analysisResults = runAnalysis(client, focusRange, point.location, point.content);
+  const pointRange = focusRange
+    ? { begin: focusRange.begin.point, end: focusRange.end.point }
+    : null;
+
+  const analysisResults = runAnalysis(client, pointRange, point.location, point.content);
 
   const context = useMemo(
     () => ({

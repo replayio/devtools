@@ -50,7 +50,11 @@ import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
 import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
-import { displayedBeginForFocusRegion, displayedEndForFocusRegion } from "ui/utils/timeline";
+import {
+  displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
+  rangeForFocusRegion,
+} from "ui/utils/timeline";
 
 import ReplayLogo from "../shared/ReplayLogo";
 
@@ -162,15 +166,14 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
     [dispatch]
   );
 
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    return {
       isTransitionPending: isPending,
-      range: focusRegionToRange(deferredFocusRegion),
-      rangeForDisplay: focusRegionToRange(focusRegion),
+      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
+      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
-    }),
-    [deferredFocusRegion, isPending, focusRegion, update]
-  );
+    };
+  }, [deferredFocusRegion, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
@@ -411,14 +414,6 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   );
 
   return <TimelineContext.Provider value={context}>{children}</TimelineContext.Provider>;
-}
-
-function focusRegionToRange(focusRegion: FocusRegion | null): Range | null {
-  if (focusRegion === null) {
-    return null;
-  }
-
-  return [displayedBeginForFocusRegion(focusRegion), displayedEndForFocusRegion(focusRegion)];
 }
 
 function Loader() {

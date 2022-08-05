@@ -1,4 +1,5 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
@@ -19,8 +20,6 @@ import {
   useMemo,
 } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
-import useFocusRange from "./hooks/useFocusRange";
 
 export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
@@ -51,7 +50,7 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
 
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -142,7 +141,7 @@ export function LoggablesContextRoot({
       return eventLogs;
     } else {
       return eventLogs.filter(eventLog =>
-        isExecutionPointsWithinRange(eventLog.point, focusRange.begin, focusRange.end)
+        isExecutionPointsWithinRange(eventLog.point, focusRange.begin.point, focusRange.end.point)
       );
     }
   }, [eventLogs, focusRange]);
@@ -157,7 +156,11 @@ export function LoggablesContextRoot({
           hitPoints.forEach(hitPoint => {
             if (
               focusRange === null ||
-              isExecutionPointsWithinRange(hitPoint.point, focusRange.begin, focusRange.end)
+              isExecutionPointsWithinRange(
+                hitPoint.point,
+                focusRange.begin.point,
+                focusRange.end.point
+              )
             ) {
               pointInstances.push({
                 point,
@@ -179,7 +182,11 @@ export function LoggablesContextRoot({
       return terminalExpressions;
     } else {
       return terminalExpressions.filter(terminalExpression =>
-        isExecutionPointsWithinRange(terminalExpression.point, focusRange.begin, focusRange.end)
+        isExecutionPointsWithinRange(
+          terminalExpression.point,
+          focusRange.begin.point,
+          focusRange.end.point
+        )
       );
     }
   }, [focusRange, terminalExpressions]);

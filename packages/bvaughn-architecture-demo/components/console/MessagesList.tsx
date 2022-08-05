@@ -8,11 +8,11 @@ import {
   isProtocolMessage,
   isTerminalExpression,
 } from "@bvaughn/src/utils/loggables";
+import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "../Icon";
 
-import useFocusRange from "./hooks/useFocusRange";
 import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
 import EventLogRenderer from "./renderers/EventLogRenderer";
@@ -20,7 +20,6 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import { SearchContext } from "./SearchContext";
-import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -51,7 +50,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     return nearestLoggable || "end";
   }, [currentExecutionPoint, loggables]);
 
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
 
   // TRICKY
   // Message filtering is done client-side, but overflow/counts are server-side so it comes from Suspense.

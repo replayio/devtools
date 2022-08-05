@@ -1,5 +1,6 @@
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
@@ -7,10 +8,9 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
-import useFocusRange from "../hooks/useFocusRange";
 
 export default function FilterToggles() {
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
   const client = useContext(ReplayClientContext);
   const {
     showErrors,
