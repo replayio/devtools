@@ -9,7 +9,7 @@ import { prefs } from "./prefs";
 import { TelemetryUser, trackTiming } from "./telemetry";
 import { CanonicalRequestType } from "ui/components/NetworkMonitor/utils";
 import { WorkspaceId, WorkspaceUuid } from "ui/state/app";
-import { InspectorActiveTab } from "devtools/client/inspector/state";
+import { InspectorActiveTab } from "devtools/client/inspector/reducers";
 import { decodeWorkspaceId } from "./workspace";
 import { Input } from "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/PanelSummary";
 

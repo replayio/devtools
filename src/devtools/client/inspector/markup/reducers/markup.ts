@@ -1,4 +1,6 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
+// Side-effectful import - needed to initialize these prefs
+import "devtools/client/inspector/prefs";
 const Services = require("devtools/shared/services");
 
 const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
