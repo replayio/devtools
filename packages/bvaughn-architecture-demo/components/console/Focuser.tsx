@@ -9,26 +9,11 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import styles from "./Focuser.module.css";
 
 export default function Focuser() {
-  const client = useContext(ReplayClientContext);
   const { duration } = useContext(SessionContext);
-  const { rangeForDisplay, range: rangeToLoad, update } = useContext(FocusContext);
+  const { rangeForDisplay, update } = useContext(FocusContext);
 
   const begin = rangeForDisplay === null ? 0 : rangeForDisplay.begin.time / duration;
   const end = rangeForDisplay === null ? 1 : rangeForDisplay.end.time / duration;
-
-  useEffect(() => {
-    if (rangeToLoad === null) {
-      return;
-    }
-
-    const timeoutId = setTimeout(() => {
-      client.loadRegion({ begin: rangeToLoad.begin.time, end: rangeToLoad.end.time }, duration);
-    }, 250);
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [client, duration, rangeToLoad]);
 
   const toggleFocus = () => {
     if (rangeForDisplay === null) {

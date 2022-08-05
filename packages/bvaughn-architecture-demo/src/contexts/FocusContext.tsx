@@ -19,6 +19,8 @@ import {
 } from "../suspense/PointsCache";
 import { Range } from "../types";
 
+import { SessionContext } from "./SessionContext";
+
 const FOCUS_DEBOUNCE_DURATION = 250;
 
 export type FocusContextType = {
@@ -34,6 +36,7 @@ export const FocusContext = createContext<FocusContextType>(null as any);
 
 export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
   const client = useContext(ReplayClientContext);
+  const { duration } = useContext(SessionContext);
   const loadedRegions = useLoadedRegions(client);
 
   // Changing the focus range may cause us to suspend (while fetching new info from the backend).
@@ -58,6 +61,22 @@ export function FocusContextRoot({ children }: PropsWithChildren<{}>) {
     FOCUS_DEBOUNCE_DURATION
   );
 
+  // Refine the loaded ranges based on the focus window.
+  useEffect(() => {
+    if (range === null) {
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      client.loadRegion({ begin: range.begin.time, end: range.end.time }, duration);
+    }, FOCUS_DEBOUNCE_DURATION);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [client, duration, range]);
+
+  // Feed loaded regions into the time-to-execution-point cache in case we need them later.
   useEffect(() => {
     if (loadedRegions != null) {
       loadedRegions.loaded.forEach(({ begin, end }) => {
