@@ -64,7 +64,6 @@ const InspectorApp: FC = () => {
       case "layoutview": {
         const layoutProps = {
           ...inspector.getCommonComponentProps(),
-          ...inspector.boxModel.getComponentProps(),
           showBoxModelProperties: true,
         };
         return <LayoutApp {...layoutProps} />;
