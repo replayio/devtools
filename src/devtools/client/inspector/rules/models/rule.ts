@@ -68,7 +68,6 @@ export default class Rule {
   isUnmatched: boolean;
   inherited: NodeFront | null;
   mediaText: string;
-  store: UIStore;
   textProps: TextProperty[];
 
   private _inheritedSource?: string;
@@ -96,10 +95,8 @@ export default class Rule {
     this.inherited = options.inherited || null;
 
     this.mediaText = "";
-    this.store = this.elementStyle.ruleView.store;
 
-    // Populate the text properties with the style's current authoredText
-    // value, and add in any disabled properties from the store.
+    // Populate the text properties with the style's current authoredText value
     this.textProps = this._getTextProperties();
 
     this.getUniqueSelector = this.getUniqueSelector.bind(this);
@@ -297,7 +294,6 @@ export default class Rule {
    */
   _getTextProperties() {
     const textProps = [];
-    const store = this.elementStyle.store;
 
     assert(this.domRule.style, "domRule.style not set");
     const properties = parseNamedDeclarations(CSSProperties.isKnown, this.domRule.style.cssText);

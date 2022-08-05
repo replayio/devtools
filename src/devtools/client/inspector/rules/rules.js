@@ -10,7 +10,6 @@ const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
 import { selection } from "devtools/client/framework/selection";
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
 
-const { updateClasses } = require("devtools/client/inspector/rules/actions/class-list");
 const { updateRules } = require("devtools/client/inspector/rules/actions/rules");
 const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
 
@@ -33,19 +32,6 @@ class RulesView {
     EventEmitter.decorate(this);
 
     this.onSelection();
-  }
-
-  /**
-   * Get the current target the toolbox is debugging.
-   *
-   * @return {Target}
-   */
-  get currentTarget() {
-    return this.inspector.currentTarget;
-  }
-
-  get view() {
-    return this;
   }
 
   /**
@@ -97,9 +83,6 @@ class RulesView {
     }
 
     if (!element) {
-      // this.store.dispatch(disableAllPseudoClasses());
-      // this.store.dispatch(updateAddRuleEnabled(false));
-      // this.store.dispatch(updateClasses([]));
       this.store.dispatch(updateRules([]));
       return;
     }
@@ -118,13 +101,6 @@ class RulesView {
   };
 
   /**
-   * Updates the class list panel with the current list of CSS classes.
-   */
-  updateClassList() {
-    this.store.dispatch(updateClasses(this.classList.currentClasses));
-  }
-
-  /**
    * Updates the list of rules for the selected element. This should be called after
    * ElementStyle is initialized or if the list of rules for the selected element needs
    * to be refresh (e.g. when print media simulation is toggled).
@@ -137,10 +113,6 @@ class RulesView {
 
     await this.elementStyle.populate();
 
-    // const isAddRuleEnabled = this.selection.isElementNode() && !this.selection.isAnonymousNode();
-    // this.store.dispatch(updateAddRuleEnabled(isAddRuleEnabled));
-    // this.store.dispatch(setPseudoClassLocks(this.elementStyle.element.pseudoClassLocks));
-    // this.updateClassList();
     this.updateRules();
   }
 
