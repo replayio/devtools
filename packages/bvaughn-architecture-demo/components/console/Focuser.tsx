@@ -1,7 +1,10 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
+import { TimeStampedPointRange } from "@replayio/protocol";
 import React, { MutableRefObject, useContext, useEffect, useRef, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import styles from "./Focuser.module.css";
 
@@ -53,6 +56,9 @@ function RangeSlider({
   onChange: (start: number, end: number) => void;
   start: number;
 }) {
+  const client = useContext(ReplayClientContext);
+  const loadedRegions = useLoadedRegions(client);
+
   const ref = useRef<HTMLDivElement>(null) as MutableRefObject<HTMLDivElement>;
 
   return (
@@ -65,13 +71,27 @@ function RangeSlider({
             width: `${start * 100}%`,
           }}
         />
-        <div
-          className={styles.RangeTrackFocused}
-          style={{
-            left: `${start * 100}%`,
-            width: `${(end - start) * 100}%`,
-          }}
-        />
+
+        <div className={styles.Regions}>
+          <RegionRanges
+            className={styles.LoadingRegions}
+            duration={duration}
+            ranges={loadedRegions?.loading ?? null}
+          />
+          <RegionRanges
+            className={styles.LoadedRegions}
+            duration={duration}
+            ranges={loadedRegions?.loaded ?? null}
+          />
+          <div
+            className={styles.RangeTrackFocused}
+            style={{
+              left: `${start * 100}%`,
+              width: `${(end - start) * 100}%`,
+            }}
+          />
+        </div>
+
         <div
           className={styles.RangeTrackUnfocused}
           style={{
@@ -79,8 +99,6 @@ function RangeSlider({
             width: `${(1 - end) * 100}%`,
           }}
         />
-
-        <div className={styles.FocusedRange} />
 
         <SliderThumb
           className={styles.RangeStartThumb}
@@ -105,6 +123,40 @@ function RangeSlider({
         {formatTimestamp(start * duration)} – {formatTimestamp(end * duration)}
       </div>
     </>
+  );
+}
+
+function RegionRanges({
+  className,
+  duration,
+  ranges,
+}: {
+  className: string;
+  duration: number;
+  ranges: TimeStampedPointRange[] | null;
+}) {
+  return (
+    <div className={styles.RegionRanges}>
+      {ranges?.map((range, index) => (
+        <RegionRange key={index} className={className} duration={duration} range={range} />
+      ))}
+    </div>
+  );
+}
+
+function RegionRange({
+  className,
+  duration,
+  range,
+}: {
+  className: string;
+  duration: number;
+  range: TimeStampedPointRange;
+}) {
+  const left = range.begin.time / duration;
+  const width = (range.end.time - range.begin.time) / duration;
+  return (
+    <div className={className} style={{ left: `${left * 100}%`, width: `${width * 100}%` }}></div>
   );
 }
 
