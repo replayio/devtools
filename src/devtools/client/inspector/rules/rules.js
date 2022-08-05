@@ -5,7 +5,7 @@
 "use strict";
 
 const Services = require("devtools/shared/services");
-const EventEmitter = require("devtools/shared/event-emitter");
+
 const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
 import { selection } from "devtools/client/framework/selection";
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
@@ -18,18 +18,12 @@ import { getSelectedPanel } from "ui/reducers/layout";
 const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
 
 class RulesView {
-  constructor(inspector, window) {
-    this.doc = window.document;
-    this.inspector = inspector;
+  constructor(inspector) {
     this.store = inspector.store;
 
     this.showUserAgentStyles = Services.prefs.getBoolPref(PREF_UA_STYLES);
 
-    // this.inspector.sidebar.on("select", this.onSelection);
-    selection.on("detached-front", this.onSelection);
     selection.on("new-node-front", this.onSelection);
-
-    EventEmitter.decorate(this);
 
     this.onSelection();
   }

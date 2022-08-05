@@ -9,7 +9,6 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
-import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 import { selection, Selection } from "devtools/client/framework/selection";
 
 import RulesView from "./rules/rules";
@@ -65,14 +64,6 @@ export class Inspector {
 
   getHighlighter() {
     return Highlighter;
-  }
-
-  get highlighters() {
-    if (!this._highlighters) {
-      this._highlighters = new HighlightersOverlay(this);
-    }
-
-    return this._highlighters;
   }
 
   get selectionCssSelector() {
