@@ -9,7 +9,6 @@ import { NodeFront } from "protocol/thread/node";
 import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 
-import BoxModel from "devtools/client/inspector/boxmodel/box-model";
 import HighlightersOverlay from "devtools/client/inspector/shared/highlighters-overlay";
 import { selection, Selection } from "devtools/client/framework/selection";
 
@@ -43,7 +42,6 @@ export class Inspector {
   highlighter: typeof Highlighter;
 
   rules: RulesView;
-  boxModel: BoxModel;
   selection: Selection;
 
   private _highlighters?: any;
@@ -68,7 +66,6 @@ export class Inspector {
     this.highlighter = Highlighter;
 
     this.rules = new RulesView(this, window);
-    this.boxModel = new BoxModel(this, window);
   }
 
   getHighlighter() {
