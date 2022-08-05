@@ -10,11 +10,7 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Map (3) { foo -> "abc", bar -> 123, baz -> Map, … }
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function MapRenderer({
-  executionPoint,
-  object,
-  pauseId,
-}: ObjectPreviewRendererProps) {
+export default function MapRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
   const { containerEntries = [], containerEntryCount = 0, overflow = false } = object.preview || {};
   const showOverflowMarker = overflow || containerEntries.length > MAX_PROPERTIES_TO_PREVIEW;
 
@@ -37,12 +33,7 @@ export default function MapRenderer({
                   <span className={styles.Separator}> → </span>
                 </>
               )}
-              <ValueRenderer
-                executionPoint={executionPoint}
-                isNested={true}
-                pauseId={pauseId}
-                protocolValue={value}
-              />
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
               {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
             </span>
           ))}

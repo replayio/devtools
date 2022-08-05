@@ -1,5 +1,4 @@
 import {
-  ExecutionPoint,
   Object as ProtocolObject,
   PauseId as ProtocolPauseId,
   Value as ProtocolValue,
@@ -22,15 +21,11 @@ export type RenderChildrenFunction = () => ReactNode;
 // This behavior is different enough to warrant a custom implementation (rather than using <Expandable>).
 export default function HTMLExpandable({
   before = null,
-  disabled = false,
-  executionPoint,
   object,
   pauseId,
   protocolValue,
 }: {
   before?: ReactNode;
-  disabled?: boolean;
-  executionPoint: ExecutionPoint;
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
   protocolValue: ProtocolValue;
@@ -38,21 +33,12 @@ export default function HTMLExpandable({
   const [isOpen, setIsOpen] = useState(false);
 
   const toggle = (event: React.MouseEvent) => {
-    if (disabled) {
-      return;
-    }
-
     event.stopPropagation();
     setIsOpen(!isOpen);
   };
 
   return (
-    <span
-      className={`${isOpen ? styles.Expanded : styles.Collapsed} ${
-        disabled ? styles.Disabled : ""
-      }`}
-      data-test-name="Expandable"
-    >
+    <span className={isOpen ? styles.Expanded : styles.Collapsed} data-test-name="Expandable">
       <span
         className={styles.PreviewRow}
         onClick={toggle}
@@ -66,7 +52,6 @@ export default function HTMLExpandable({
         {before}
 
         <HTMLElementRenderer
-          executionPoint={executionPoint}
           pauseId={pauseId}
           object={object}
           protocolValue={protocolValue}
@@ -79,15 +64,10 @@ export default function HTMLExpandable({
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
         <span className={styles.Children} data-test-name="ExpandableChildren">
           <Suspense fallback={<Loader />}>
-            <HTMLChildrenRenderer
-              executionPoint={executionPoint}
-              object={object}
-              pauseId={pauseId}
-            />
+            <HTMLChildrenRenderer object={object} pauseId={pauseId} />
           </Suspense>
 
           <HTMLElementRenderer
-            executionPoint={executionPoint}
             pauseId={pauseId}
             object={object}
             protocolValue={protocolValue}

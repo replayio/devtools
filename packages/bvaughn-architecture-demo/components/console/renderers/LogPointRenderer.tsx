@@ -171,7 +171,6 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     ? values.map((value, index) => (
         <Fragment key={index}>
           <KeyValueRenderer
-            executionPoint={logPointInstance.timeStampedHitPoint.point}
             isNested={false}
             layout="horizontal"
             pauseId={pauseId!}

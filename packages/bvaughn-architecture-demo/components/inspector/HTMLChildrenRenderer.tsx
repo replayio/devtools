@@ -1,5 +1,4 @@
 import {
-  ExecutionPoint,
   Object as ProtocolObject,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
@@ -19,11 +18,9 @@ import KeyValueRenderer from "./KeyValueRenderer";
 //            Text in a text node...
 //         </li>
 export default function HTMLChildrenRenderer({
-  executionPoint,
   object,
   pauseId,
 }: {
-  executionPoint: ExecutionPoint;
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
 }) {
@@ -35,23 +32,16 @@ export default function HTMLChildrenRenderer({
   return (
     <>
       {childNodes.map((objectId: ProtocolObjectId, index: number) => (
-        <HTMLChildRenderer
-          key={index}
-          executionPoint={executionPoint}
-          objectId={objectId}
-          pauseId={pauseId}
-        />
+        <HTMLChildRenderer key={index} objectId={objectId} pauseId={pauseId} />
       ))}
     </>
   );
 }
 
 function HTMLChildRenderer({
-  executionPoint,
   objectId,
   pauseId,
 }: {
-  executionPoint: ExecutionPoint;
   objectId: ProtocolObjectId;
   pauseId: ProtocolPauseId;
 }) {
@@ -68,7 +58,6 @@ function HTMLChildRenderer({
 
   return (
     <KeyValueRenderer
-      executionPoint={executionPoint}
       isNested={true}
       layout="vertical"
       pauseId={pauseId}

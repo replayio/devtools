@@ -1,4 +1,4 @@
-import { ExecutionPoint, PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { FC, memo, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -23,13 +23,11 @@ import { ObjectPreviewRendererProps } from "./values/types";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default memo(function ValueRenderer({
-  executionPoint,
   isNested,
   layout = "horizontal",
   pauseId,
   protocolValue,
 }: {
-  executionPoint: ExecutionPoint;
   isNested: boolean;
   layout?: "horizontal" | "vertical";
   pauseId: PauseId;
@@ -81,12 +79,7 @@ export default memo(function ValueRenderer({
     }
 
     return (
-      <ObjectPreviewRenderer
-        executionPoint={executionPoint}
-        object={object}
-        pauseId={pauseId}
-        protocolValue={protocolValue}
-      />
+      <ObjectPreviewRenderer object={object} pauseId={pauseId} protocolValue={protocolValue} />
     );
   }
 

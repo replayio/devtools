@@ -11,11 +11,7 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Object { foo: "abc", bar: 123, … }
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ObjectRenderer({
-  executionPoint,
-  object,
-  pauseId,
-}: ObjectPreviewRendererProps) {
+export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
   const { className, preview } = object;
 
   const properties = filterNonEnumerableProperties(preview?.properties ?? []);
@@ -33,7 +29,6 @@ export default function ObjectRenderer({
           <span key={index} className={styles.Value}>
             <KeyValueRenderer
               enableInspection={false}
-              executionPoint={executionPoint}
               isNested={true}
               layout="horizontal"
               pauseId={pauseId}

@@ -3,7 +3,6 @@ import Loader from "@bvaughn/components/Loader";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import {
   ContainerEntry as ProtocolContainerEntry,
-  ExecutionPoint,
   Object as ProtocolObject,
   PauseId,
   PauseId as ProtocolPauseId,
@@ -24,11 +23,9 @@ const PROPERTY_BUCKET_SIZE = 100;
 //
 // https://static.replay.io/protocol/tot/Pause/#type-Property
 export default function PropertiesRenderer({
-  executionPoint,
   object,
   pauseId,
 }: {
-  executionPoint: ExecutionPoint;
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
 }) {
@@ -82,11 +79,7 @@ export default function PropertiesRenderer({
 
   return (
     <>
-      <EntriesRenderer
-        containerEntries={containerEntries}
-        executionPoint={executionPoint}
-        pauseId={pauseId}
-      />
+      <EntriesRenderer containerEntries={containerEntries} pauseId={pauseId} />
 
       {buckets.map((bucket, index) => (
         <Expandable
@@ -96,7 +89,6 @@ export default function PropertiesRenderer({
               {bucket.properties.map((property, index) => (
                 <KeyValueRenderer
                   key={`property-${index}`}
-                  executionPoint={executionPoint}
                   isNested={true}
                   layout="vertical"
                   pauseId={pauseId}
@@ -113,7 +105,6 @@ export default function PropertiesRenderer({
         {properties.map((property, index) => (
           <KeyValueRenderer
             key={`property-${index}`}
-            executionPoint={executionPoint}
             isNested={true}
             layout="vertical"
             pauseId={pauseId}
@@ -124,13 +115,7 @@ export default function PropertiesRenderer({
 
       {prototype != null && (
         <Expandable
-          children={
-            <PropertiesRenderer
-              executionPoint={executionPoint}
-              object={prototype}
-              pauseId={pauseId}
-            />
-          }
+          children={<PropertiesRenderer object={prototype} pauseId={pauseId} />}
           header={
             <span className={styles.Prototype}>
               <span className={styles.PrototypeName}>[[Prototype]]: </span>
@@ -145,15 +130,10 @@ export default function PropertiesRenderer({
 
 type EntriesRendererProps = {
   containerEntries: ProtocolContainerEntry[];
-  executionPoint: ExecutionPoint;
   pauseId: PauseId;
 };
 
-function ContainerEntriesRenderer({
-  containerEntries,
-  executionPoint,
-  pauseId,
-}: EntriesRendererProps) {
+function ContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
     return null;
   }
@@ -162,28 +142,19 @@ function ContainerEntriesRenderer({
     <Expandable
       defaultOpen={true}
       children={
-        <ContainerEntriesChildrenRenderer
-          containerEntries={containerEntries}
-          executionPoint={executionPoint}
-          pauseId={pauseId}
-        />
+        <ContainerEntriesChildrenRenderer containerEntries={containerEntries} pauseId={pauseId} />
       }
       header={<span className={styles.BucketLabel}>[[Entries]]</span>}
     />
   );
 }
 
-function ContainerEntriesChildrenRenderer({
-  containerEntries,
-  executionPoint,
-  pauseId,
-}: EntriesRendererProps) {
+function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
     <Suspense fallback={<Loader />}>
       {containerEntries.map(({ key, value }, index) => (
         <KeyValueRenderer
           key={index}
-          executionPoint={executionPoint}
           isNested={true}
           layout="vertical"
           pauseId={pauseId}
@@ -199,18 +170,13 @@ function ContainerEntriesChildrenRenderer({
 //   ▼ <index>: {"<key>" -> <value>}
 //        key: "<key>"
 //        key: <value>
-function MapContainerEntriesRenderer({
-  containerEntries,
-  executionPoint,
-  pauseId,
-}: EntriesRendererProps) {
+function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
     <Expandable
       defaultOpen={true}
       children={
         <MapContainerEntriesChildrenRenderer
           containerEntries={containerEntries}
-          executionPoint={executionPoint}
           pauseId={pauseId}
         />
       }
@@ -219,11 +185,7 @@ function MapContainerEntriesRenderer({
   );
 }
 
-function MapContainerEntriesChildrenRenderer({
-  containerEntries,
-  executionPoint,
-  pauseId,
-}: EntriesRendererProps) {
+function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
     return <span className={styles.NoEntries}>No properties</span>;
   }
@@ -242,7 +204,6 @@ function MapContainerEntriesChildrenRenderer({
                     <span className={styles.Separator}>: </span>
                   </>
                 }
-                executionPoint={executionPoint}
                 isNested={true}
                 layout="vertical"
                 pauseId={pauseId}
@@ -255,7 +216,6 @@ function MapContainerEntriesChildrenRenderer({
                     <span className={styles.Separator}>: </span>
                   </>
                 }
-                executionPoint={executionPoint}
                 isNested={true}
                 layout="vertical"
                 pauseId={pauseId}
@@ -266,19 +226,9 @@ function MapContainerEntriesChildrenRenderer({
           header={
             <>
               <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer
-                executionPoint={executionPoint}
-                isNested={true}
-                pauseId={pauseId}
-                protocolValue={key!}
-              />
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
               &nbsp;{"→"}&nbsp;
-              <ValueRenderer
-                executionPoint={executionPoint}
-                isNested={true}
-                pauseId={pauseId}
-                protocolValue={value}
-              />
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>
           }
@@ -292,18 +242,13 @@ function MapContainerEntriesChildrenRenderer({
 // Unlike the other property lists, Set entries are formatted like:
 //   ▼ <index>: <value>
 //        key: <value>
-function SetContainerEntriesRenderer({
-  containerEntries,
-  executionPoint,
-  pauseId,
-}: EntriesRendererProps) {
+function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   return (
     <Expandable
       defaultOpen={true}
       children={
         <SetContainerEntriesChildrenRenderer
           containerEntries={containerEntries}
-          executionPoint={executionPoint}
           pauseId={pauseId}
         />
       }
@@ -312,11 +257,7 @@ function SetContainerEntriesRenderer({
   );
 }
 
-function SetContainerEntriesChildrenRenderer({
-  executionPoint,
-  containerEntries,
-  pauseId,
-}: EntriesRendererProps) {
+function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
     return <span className={styles.NoEntries}>No properties</span>;
   }
@@ -334,7 +275,6 @@ function SetContainerEntriesChildrenRenderer({
                   <span className={styles.Separator}>: </span>
                 </>
               }
-              executionPoint={executionPoint}
               isNested={true}
               layout="vertical"
               pauseId={pauseId}
@@ -344,12 +284,7 @@ function SetContainerEntriesChildrenRenderer({
           header={
             <>
               <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer
-                executionPoint={executionPoint}
-                isNested={true}
-                pauseId={pauseId}
-                protocolValue={value}
-              />
+              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>
           }

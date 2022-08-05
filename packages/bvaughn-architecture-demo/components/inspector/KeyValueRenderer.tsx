@@ -1,17 +1,10 @@
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
-import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
-import {
-  ExecutionPoint,
-  Object as ProtocolObject,
-  PauseId,
-  Value as ProtocolValue,
-} from "@replayio/protocol";
+import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
 import { ReactNode, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
 
 import HTMLExpandable from "./HTMLExpandable";
 import styles from "./KeyValueRenderer.module.css";
@@ -31,7 +24,6 @@ import ValueRenderer from "./ValueRenderer";
 export default function KeyValueRenderer({
   before = null,
   enableInspection = true,
-  executionPoint,
   isNested = false,
   layout = "horizontal",
   pauseId,
@@ -39,7 +31,6 @@ export default function KeyValueRenderer({
 }: {
   before?: ReactNode;
   enableInspection?: boolean;
-  executionPoint: ExecutionPoint;
   isNested: boolean;
   layout: "horizontal" | "vertical";
   pauseId: PauseId;
@@ -47,9 +38,6 @@ export default function KeyValueRenderer({
 }) {
   const client = useContext(ReplayClientContext);
   const clientValue = useClientValue(protocolValue, pauseId);
-
-  const loadedRegions = useLoadedRegions(client);
-  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
 
   const { objectId, name, type } = clientValue;
 
@@ -101,8 +89,6 @@ export default function KeyValueRenderer({
                       ) : null}
                     </>
                   }
-                  disabled={!isLoaded}
-                  executionPoint={executionPoint}
                   object={objectWithPreview!}
                   pauseId={pauseId}
                   protocolValue={protocolValue}
@@ -146,7 +132,6 @@ export default function KeyValueRenderer({
         </>
       ) : null}
       <ValueRenderer
-        executionPoint={executionPoint}
         isNested={isNested}
         layout={layout}
         pauseId={pauseId}
@@ -160,14 +145,9 @@ export default function KeyValueRenderer({
       <Expandable
         children={
           <Suspense fallback={<Loader />}>
-            <PropertiesRenderer
-              executionPoint={executionPoint}
-              object={objectWithPreview!}
-              pauseId={pauseId}
-            />
+            <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
           </Suspense>
         }
-        disabled={!isLoaded}
         header={header}
       />
     );

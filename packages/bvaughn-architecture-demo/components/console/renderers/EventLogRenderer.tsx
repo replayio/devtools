@@ -56,7 +56,6 @@ function EventLogRenderer({
   const contents = values.map((value, index) => (
     <Fragment key={index}>
       <KeyValueRenderer
-        executionPoint={eventLog.point}
         isNested={false}
         layout="horizontal"
         pauseId={pauseId}

@@ -13,10 +13,6 @@
   min-height: 1rem;
 }
 
-.Disabled {
-  opacity: 0.5;
-}
-
 .ArrowContainer {
   width: 0.75rem;
   height: 1rem;

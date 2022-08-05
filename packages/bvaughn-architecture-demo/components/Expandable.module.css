@@ -5,10 +5,6 @@
   display: inline;
 }
 
-.Disabled {
-  opacity: 0.5;
-}
-
 .ToggleButton {
   min-height: 1rem;
 }

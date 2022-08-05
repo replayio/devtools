@@ -12,7 +12,6 @@ import styles from "./NewObjectInspector.module.css";
 
 export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
   const pause = ThreadFront.currentPause;
-  const executionPoint = ThreadFront.currentPoint;
 
   // HACK
   // The new Object Inspector does not consume ValueFronts.
@@ -36,12 +35,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
               key={index}
               header={root.name}
               children={protocolValues.map((protocolValue, index) => (
-                <Inspector
-                  executionPoint={executionPoint}
-                  key={index}
-                  pauseId={pause.pauseId!}
-                  protocolValue={protocolValue}
-                />
+                <Inspector key={index} pauseId={pause.pauseId!} protocolValue={protocolValue} />
               ))}
             />
           );
@@ -50,12 +44,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
         case "value": {
           const protocolValue = clientValueToProtocolNamedValue(root);
           children.push(
-            <Inspector
-              executionPoint={executionPoint}
-              key={index}
-              pauseId={pause.pauseId!}
-              protocolValue={protocolValue}
-            />
+            <Inspector key={index} pauseId={pause.pauseId!} protocolValue={protocolValue} />
           );
           break;
         }
@@ -63,7 +52,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
     });
 
     return children;
-  }, [executionPoint, pause, roots]);
+  }, [pause, roots]);
 
   return (
     <div className={`${styles.Popup} preview-popup`}>
