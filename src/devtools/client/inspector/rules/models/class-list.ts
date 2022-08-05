@@ -60,8 +60,7 @@ export default class ClassList {
     // this.onMutations = this.onMutations.bind(this);
     // this.inspector.on("markupmutation", this.onMutations);
 
-    assert(this.inspector.panelDoc, "inspector.panelDoc not set");
-    this.classListProxyNode = this.inspector.panelDoc.createElement("div");
+    this.classListProxyNode = document.createElement("div");
   }
 
   destroy() {

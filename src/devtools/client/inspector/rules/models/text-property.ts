@@ -57,7 +57,6 @@ export default class TextProperty {
   elementStyle: ElementStyle;
   cssProperties: typeof CSSProperties;
   outputParser: any;
-  panelDoc: Document | null;
   computed: ComputedProperty[] | undefined;
   overridden?: boolean;
   userProperties?: UserProperties;
@@ -98,7 +97,6 @@ export default class TextProperty {
     this.elementStyle = this.rule.elementStyle;
     this.cssProperties = this.elementStyle.ruleView.cssProperties;
     this.outputParser = this.elementStyle.ruleView.outputParser;
-    this.panelDoc = this.elementStyle.ruleView.inspector.panelDoc;
     this.userProperties = this.elementStyle.store.userProperties;
 
     this.updateComputed();
