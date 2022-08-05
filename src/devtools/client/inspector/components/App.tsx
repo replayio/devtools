@@ -15,7 +15,7 @@ import { UIState } from "ui/state";
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
-import { InspectorActiveTab } from "../state";
+import { InspectorActiveTab } from "../reducers";
 import { Inspector } from "../inspector";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
