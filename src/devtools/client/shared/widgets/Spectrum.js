@@ -289,7 +289,7 @@ class Spectrum {
    */
   updateContrastLabel(isLargeText) {
     if (!isLargeText) {
-      this.contrastLabel.textContent = L10N.getStr("accessibility.contrast.ratio.label");
+      this.contrastLabel.textContent = "Contrast:";
       return;
     }
 

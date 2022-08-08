@@ -67,11 +67,7 @@ export default class MarkupSearchbox {
     let str = "";
     if (!clear) {
       if (result) {
-        str = INSPECTOR_L10N.getFormatStr(
-          "inspector.searchResultsCount2",
-          result.resultsIndex + 1,
-          result.resultsLength
-        );
+        str = `${result.resultsIndex + 1} of ${result.resultsLength}`;
       } else {
         str = "No matches";
       }

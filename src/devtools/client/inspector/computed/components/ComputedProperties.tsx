@@ -59,7 +59,6 @@ function ComputedProperties(props: PropsFromRedux) {
           id="computed-no-results"
           className="devtools-sidepanel-no-result"
           hidden={!allPropertiesHidden}
-          data-localization="content=inspector.noProperties"
         >
           No CSS properties found.
         </div>

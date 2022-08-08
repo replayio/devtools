@@ -66,7 +66,7 @@ export const RulesApp: FC = ({}) => {
         {
           component: Rules,
           componentProps,
-          header: getStr("rule.pseudoElement"),
+          header: "Pseudo-elements",
           id: "rules-section-pseudoelement",
           opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
           onToggle: (opened: boolean) => {
@@ -78,7 +78,7 @@ export const RulesApp: FC = ({}) => {
       return (
         <>
           <Accordion items={items} />
-          <div className="ruleview-header">{getStr("rule.selectedElement")}</div>
+          <div className="ruleview-header">This Element</div>
         </>
       );
     },
@@ -87,7 +87,7 @@ export const RulesApp: FC = ({}) => {
 
   const rulesElements = useMemo(() => {
     if (!rulesQuery && rules.length === 0) {
-      return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
+      return <div className="devtools-sidepanel-no-result">No element selected.</div>;
     }
 
     const nonEmptyRules = rules.filter(rule =>
@@ -140,7 +140,7 @@ export const RulesApp: FC = ({}) => {
           {rules ? (
             rulesElements
           ) : (
-            <div className="devtools-sidepanel-no-result">{getStr("rule.notAvailable")}</div>
+            <div className="devtools-sidepanel-no-result">Rules not available.</div>
           )}
         </div>
       </div>

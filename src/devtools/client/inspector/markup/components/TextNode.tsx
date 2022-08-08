@@ -28,10 +28,10 @@ class TextNode extends PureComponent<TextNodeProps> {
           tabIndex={-1}
           title={
             isWhiteSpace
-              ? getFormatStr(
-                  "markupView.whitespaceOnly",
-                  value.replace(/\n/g, "⏎").replace(/\t/g, "⇥").replace(/ /g, "◦")
-                )
+              ? `Whitespace-only text node: ${value
+                  .replace(/\n/g, "⏎")
+                  .replace(/\t/g, "⇥")
+                  .replace(/ /g, "◦")}`
               : ""
           }
           data-label="whitespace"
