@@ -15,13 +15,9 @@ const { setComputedProperties } = require("devtools/client/inspector/computed/ac
 
 import { getSelectedPanel } from "ui/reducers/layout";
 
-const PREF_UA_STYLES = "devtools.inspector.showUserAgentStyles";
-
 class RulesView {
   constructor(inspector) {
     this.store = inspector.store;
-
-    this.showUserAgentStyles = Services.prefs.getBoolPref(PREF_UA_STYLES);
 
     selection.on("new-node-front", this.onSelection);
 
@@ -81,14 +77,7 @@ class RulesView {
       return;
     }
 
-    this.pageStyle = undefined;
-    this.elementStyle = new ElementStyle(
-      element,
-      this,
-      {},
-      this.pageStyle,
-      this.showUserAgentStyles
-    );
+    this.elementStyle = new ElementStyle(element);
     this.elementStyle.onChanged = this.updateRules;
 
     await this.updateElementStyle();

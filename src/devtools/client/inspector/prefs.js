@@ -15,7 +15,6 @@ pref("layout.css.backdrop-filter.enabled", false);
 pref("devtools.gridinspector.maxHighlighters", 3);
 pref("devtools.markup.collapseAttributes", true);
 pref("devtools.markup.collapseAttributeLength", 120);
-pref("devtools.inspector.showUserAgentStyles", false);
 pref("devtools.layout.boxmodel.highlightProperty", false);
 pref("devtools.layout.boxmodel.opened", true);
 pref("dom.input_events.beforeinput.enabled", false);

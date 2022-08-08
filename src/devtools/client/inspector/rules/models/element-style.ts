@@ -32,11 +32,7 @@ const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
  */
 export default class ElementStyle {
   element: NodeFront;
-  ruleView: RulesView;
-  store: UIStore;
-  pageStyle: undefined;
   pseudoElements: string[];
-  showUserAgentStyles: boolean;
   rules: Rule[] | null;
   variablesMap: Map<string, Map<string, string>>;
   destroyed?: boolean;
@@ -46,31 +42,10 @@ export default class ElementStyle {
   /**
    * @param  {NodeFront} element
    *         The element whose style we are viewing.
-   * @param  {CssRuleView} ruleView
-   *         The instance of the rule-view panel.
-   * @param  {Object} store
-   *         The ElementStyle can use this object to store metadata
-   *         that might outlast the rule view, particularly the current
-   *         set of disabled properties.
-   * @param  {PageStyleFront} pageStyle
-   *         Front for the page style actor that will be providing
-   *         the style information.
-   * @param  {Boolean} showUserAgentStyles
-   *         Should user agent styles be inspected?
    */
-  constructor(
-    element: NodeFront,
-    ruleView: RulesView,
-    store: UIStore,
-    pageStyle: undefined,
-    showUserAgentStyles: boolean
-  ) {
+  constructor(element: NodeFront) {
     this.element = element;
-    this.ruleView = ruleView;
-    this.store = store || {};
-    this.pageStyle = pageStyle;
     this.pseudoElements = [];
-    this.showUserAgentStyles = showUserAgentStyles;
     this.rules = [];
     this.variablesMap = new Map<string, Map<string, string>>();
   }
