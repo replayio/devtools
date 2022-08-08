@@ -154,7 +154,7 @@ function KeyboardShortcuts({
 
       // Should be ignored when an editable element is focused
       "Shift+C": addComment,
-      "Shift+T": toggleTheme,
+      "Alt+Shift+T": toggleTheme,
       "Shift+F": toggleEditFocusMode,
 
       // Quick Open-related toggles
