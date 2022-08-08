@@ -32,7 +32,6 @@ pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
 pref("devtools.features.hitCounts", true);
 pref("devtools.features.disableUnHitLines", false);
-pref("devtools.features.enableQueryCache", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -65,7 +64,6 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
-  enableQueryCache: ["Bool", "enableQueryCache"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
