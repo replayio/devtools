@@ -78,9 +78,9 @@ const rulesSlice = createSlice({
   initialState,
   reducers: {
     rulesUpdated: {
-      prepare(rules: Rule[]) {
+      prepare(rules: Rule[] | null) {
         return {
-          payload: rules.map(rule => getRuleState(rule)),
+          payload: rules?.map(rule => getRuleState(rule)) ?? [],
         };
       },
       reducer(state, action: PayloadAction<RuleState[]>) {

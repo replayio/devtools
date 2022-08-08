@@ -4,13 +4,10 @@
 
 const Services = require("devtools/shared/services");
 import Rule from "devtools/client/inspector/rules/models/rule";
-import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import { NodeFront } from "protocol/thread/node";
 import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
-import { UIStore } from "ui/actions";
-import RulesView from "../rules";
 import TextProperty, { ComputedProperty } from "./text-property";
 
 var NON_ASCII = "[^\\x00-\\x7F]";

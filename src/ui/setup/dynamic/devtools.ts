@@ -49,6 +49,7 @@ import * as inspectorReducers from "devtools/client/inspector/reducers";
 import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sources";
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
+import { setupRules } from "devtools/client/inspector/rules/actions/rules";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -228,6 +229,7 @@ export default async function DevTools(store: AppStore) {
   setupExceptions(store);
   setupReactDevTools(store);
   setupBoxModel(store);
+  setupRules(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
