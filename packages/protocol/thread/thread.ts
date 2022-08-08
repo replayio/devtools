@@ -29,7 +29,7 @@ import {
   SourceLocation,
   TimeStamp,
   unprocessedRegions,
-  loadedRegions,
+  loadedRegions as LoadedRegions,
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
@@ -38,7 +38,6 @@ import {
   responseBodyData,
   requestBodyData,
   findAnnotationsResult,
-  getHitCountsParameters,
   Frame,
   PointRange,
   TimeRange,
@@ -126,6 +125,7 @@ export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void
   repaintAfterEvaluationsExperimentalFlag = value;
 }
 
+type LoadedRegionListener = (loadedRegions: LoadedRegions) => void;
 class _ThreadFront {
   // When replaying there is only a single thread currently. Use this thread ID
   // everywhere needed throughout the devtools client.
@@ -296,17 +296,32 @@ class _ThreadFront {
     await client.Session.ensureProcessed({ level }, sessionId);
   }
 
-  async listenForLoadChanges(listenerCallback: (params: loadedRegions) => void) {
-    // This is a placeholder which logs loading changes to the console.
-    const sessionId = await this.waitForSession();
+  private _listeningForLoadChanges: boolean = false;
+  private _loadedRegionsListeners: LoadedRegionListener[] = [];
+  private _mostRecentLoadedRegions: LoadedRegions | null = null;
 
-    client.Session.addLoadedRegionsListener(parameters => {
-      if (parameters.loading) {
+  async listenForLoadChanges(listener: LoadedRegionListener) {
+    this._loadedRegionsListeners.push(listener);
+
+    if (!this._listeningForLoadChanges) {
+      this._listeningForLoadChanges = true;
+
+      const sessionId = await this.waitForSession();
+
+      client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
+        this._mostRecentLoadedRegions = loadedRegions;
+
         this.loadingHasBegun.resolve();
+
+        this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
+      });
+
+      client.Session.listenForLoadChanges({}, sessionId);
+    } else {
+      if (this._mostRecentLoadedRegions !== null) {
+        listener(this._mostRecentLoadedRegions);
       }
-      listenerCallback(parameters);
-    });
-    client.Session.listenForLoadChanges({}, sessionId);
+    }
   }
 
   async getAnnotationKinds(): Promise<string[]> {
@@ -811,7 +826,7 @@ class _ThreadFront {
   private async _resumeOperation(
     command: FindTargetCommand,
     selectedPoint: ExecutionPoint,
-    loadedRegions: loadedRegions
+    loadedRegions: LoadedRegions
   ) {
     // Don't allow resumes until we've finished loading and did the initial
     // warp to the endpoint.
@@ -856,22 +871,22 @@ class _ThreadFront {
     }
   }
 
-  rewind(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  rewind(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
   }
-  resume(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  resume(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
   }
-  reverseStepOver(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  reverseStepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
   }
-  stepOver(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  stepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
   }
-  stepIn(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  stepIn(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
   }
-  stepOut(point: ExecutionPoint, loadedRegions: loadedRegions) {
+  stepOut(point: ExecutionPoint, loadedRegions: LoadedRegions) {
     this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
   }
 
