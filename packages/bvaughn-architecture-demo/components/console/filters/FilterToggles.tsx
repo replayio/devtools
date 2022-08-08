@@ -5,6 +5,7 @@ import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import Checkbox from "ui/components/shared/Forms/Checkbox";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -114,12 +115,11 @@ function Toggle({
   const id = `FilterToggle-${camelCase(label)}`;
   return (
     <div className={styles.Filter}>
-      <input
-        className={styles.Checkbox}
+      <Checkbox
+        className="mr-1"
         checked={checked}
         id={id}
-        onChange={event => onChange(event.currentTarget.checked)}
-        type="checkbox"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
       />
       <label className={styles.Label} data-test-id={id} htmlFor={id} title={label}>
         {label}

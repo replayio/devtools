@@ -31,7 +31,7 @@ export default function ConsoleRoot({
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isFilterOpen, setIsFilterOpen] = useState(true);
   const messageListRef = useRef<HTMLElement>(null);
 
   return (
@@ -42,20 +42,24 @@ export default function ConsoleRoot({
             messageListRef={messageListRef}
             showSearchInputByDefault={showSearchInputByDefault}
           >
-            <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
-              <div className={styles.TopRow}>
+            <div
+              className={styles.ConsoleRoot}
+              data-filter-open={isFilterOpen}
+              data-test-id="ConsoleRoot"
+            >
+              <div className={styles.ConsoleActions}>
                 <button
                   className={styles.MenuToggleButton}
                   data-test-id="ConsoleMenuToggleButton"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
+                  onClick={() => setIsFilterOpen(!isFilterOpen)}
+                  title={isFilterOpen ? "Close filter menu" : "Open filter menu"}
                 >
                   <Icon
                     className={styles.MenuToggleButtonIcon}
-                    type={isMenuOpen ? "menu-open" : "menu-closed"}
+                    type={isFilterOpen ? "menu-open" : "menu-closed"}
                   />
                 </button>
-                <FilterText />
+
                 {consoleEvaluations.length > 0 && (
                   <button
                     className={styles.DeleteTerminalExpressionButton}
@@ -67,23 +71,27 @@ export default function ConsoleRoot({
                   </button>
                 )}
               </div>
-              <div className={styles.BottomRow}>
-                <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-                  <div className={styles.FilterColumn}>
-                    <FilterToggles />
-                  </div>
-                </Offscreen>
-                <div className={styles.MessageColumn}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<Loader />}>
-                      <MessagesList ref={messageListRef} />
-                    </Suspense>
-                  </ErrorBoundary>
 
-                  {terminalInput}
+              <FilterText />
 
-                  <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
+              <div className={styles.Divider} />
+
+              <Offscreen mode={isFilterOpen ? "visible" : "hidden"}>
+                <div className={styles.FilterColumn}>
+                  <FilterToggles />
                 </div>
+              </Offscreen>
+
+              <div className={styles.MessageColumn}>
+                <ErrorBoundary>
+                  <Suspense fallback={<Loader />}>
+                    <MessagesList ref={messageListRef} />
+                  </Suspense>
+                </ErrorBoundary>
+
+                {terminalInput}
+
+                <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
               </div>
 
               <ContextMenu />

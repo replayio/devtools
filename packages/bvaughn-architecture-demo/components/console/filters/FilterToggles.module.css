@@ -3,7 +3,7 @@
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 0.5rem;
   word-break: initial;
 }
 
@@ -29,7 +29,9 @@
 
 .Checkbox {
   margin: 0;
-  margin-right: 0.5ch;
+  margin-right: 0.3rem;
+  border-radius: 0.25rem;
+  color: var(--primary-accent);
 }
 
 .Divider {
