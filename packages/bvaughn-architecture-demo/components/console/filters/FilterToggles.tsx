@@ -5,7 +5,7 @@ import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import Checkbox from "ui/components/shared/Forms/Checkbox";
+import Checkbox from "../../../../../src/ui/components/shared/Forms/Checkbox";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
