@@ -64,7 +64,7 @@
   flex-direction: column;
 }
 
-[data-filter-open="true"] .MessageColumn {
+[data-menu-open="true"] .MessageColumn {
   grid-column: 2;
 }
 

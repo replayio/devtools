@@ -44,7 +44,7 @@ export default function ConsoleRoot({
           >
             <div
               className={styles.ConsoleRoot}
-              data-filter-open={isMenuOpen}
+              data-menu-open={isMenuOpen}
               data-test-id="ConsoleRoot"
             >
               <div className={styles.ConsoleActions}>
