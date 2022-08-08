@@ -38,7 +38,6 @@ import {
   responseBodyData,
   requestBodyData,
   findAnnotationsResult,
-  getHitCountsParameters,
   Frame,
   PointRange,
   TimeRange,
@@ -312,9 +311,7 @@ class _ThreadFront {
       client.Session.addLoadedRegionsListener((loadedRegions: LoadedRegions) => {
         this._mostRecentLoadedRegions = loadedRegions;
 
-        if (loadedRegions.loading) {
-          this.loadingHasBegun.resolve();
-        }
+        this.loadingHasBegun.resolve();
 
         this._loadedRegionsListeners.forEach(callback => callback(loadedRegions));
       });
