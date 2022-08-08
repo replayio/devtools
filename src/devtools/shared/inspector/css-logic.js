@@ -119,7 +119,7 @@ const shortSourceCache = new Map();
 exports.shortSource = function (sheet) {
   // Use a string like "inline" if there is no source href
   if (!sheet || !sheet.href) {
-    return exports.l10n("rule.sourceInline");
+    return "inline";
   }
 
   if (shortSourceCache.has(sheet.href)) {

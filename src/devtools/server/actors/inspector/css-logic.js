@@ -961,7 +961,7 @@ function CssRule(cssSheet, domRule, element) {
   } else if (element) {
     this._selectors = [new CssSelector(this, "@element.style", 0)];
     this.line = -1;
-    this.source = l10n("rule.sourceElement");
+    this.source = "element";
     this.href = "#";
     this.authorRule = true;
     this.userRule = false;

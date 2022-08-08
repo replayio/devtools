@@ -69,7 +69,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
             id="inspector-breadcrumbs"
             className="breadcrumbs-widget-container"
             role="toolbar"
-            data-localization="aria-label=inspector.breadcrumbs.label"
+            aria-label="Breadcrumbs"
             tabIndex={0}
           ></div>
         </div>

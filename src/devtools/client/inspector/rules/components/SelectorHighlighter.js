@@ -65,7 +65,7 @@ class SelectorHighlighter extends PureComponent {
         "ruleview-selectorhighlighter" +
         (highlightedSelector && highlightedSelector === uniqueSelector ? " highlighted" : ""),
       onClick: this.onToggleHighlighterClick,
-      title: getStr("rule.selectorHighlighter.tooltip"),
+      title: "Highlight all elements matching this selector",
     });
   }
 }

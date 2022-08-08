@@ -186,9 +186,7 @@ export default class Rule {
   }
 
   get selectorText() {
-    return this.domRule.selectors
-      ? this.domRule.selectors.join(", ")
-      : CssLogic.l10n("rule.sourceElement");
+    return this.domRule.selectors ? this.domRule.selectors.join(", ") : "element";
   }
 
   /**
@@ -240,7 +238,7 @@ export default class Rule {
    */
   getSourceText(url: string | null | undefined) {
     if (this.isSystem) {
-      return `${STYLE_INSPECTOR_L10N.getStr("rule.userAgentStyles")} ${this.title}`;
+      return `(user agent) ${this.title}`;
     }
 
     let sourceText = url;
