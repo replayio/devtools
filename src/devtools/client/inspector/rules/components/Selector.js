@@ -7,13 +7,13 @@
 const { createRef, PureComponent } = require("react");
 const dom = require("react-dom-factories");
 const PropTypes = require("prop-types");
-const { PSEUDO_CLASSES } = require("packages/third-party/css/constants");
+const { PSEUDO_CLASSES } = require("third-party/css/constants");
 const {
   parsePseudoClassesAndAttributes,
   SELECTOR_ATTRIBUTE,
   SELECTOR_ELEMENT,
   SELECTOR_PSEUDO_CLASS,
-} = require("packages/third-party/css/parsing-utils");
+} = require("third-party/css/parsing-utils");
 import { ELEMENT_STYLE } from "shared/constants";
 
 const Types = require("devtools/client/inspector/rules/types");
