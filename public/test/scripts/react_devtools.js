@@ -71,7 +71,7 @@ Test.describe(`Test React DevTools.`, async () => {
 
   await Test.app.actions.seekToTime(0);
   await Test.waitUntil(
-    () => document.querySelector(".secondary-toolbox-content").textContent === "Mounting your React application...Try picking a different point on the timeline.",
+    () => document.querySelector(".secondary-toolbox-content").textContent.includes("Try picking a different point on the timeline"),
     { waitingFor: 'ReactDevTools to say "Try picking a different point"' },
   );
 });
