@@ -31,7 +31,7 @@ export default function ConsoleRoot({
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
-  const [isFilterOpen, setIsFilterOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(true);
   const messageListRef = useRef<HTMLElement>(null);
 
   return (
@@ -44,19 +44,19 @@ export default function ConsoleRoot({
           >
             <div
               className={styles.ConsoleRoot}
-              data-filter-open={isFilterOpen}
+              data-filter-open={isMenuOpen}
               data-test-id="ConsoleRoot"
             >
               <div className={styles.ConsoleActions}>
                 <button
                   className={styles.MenuToggleButton}
                   data-test-id="ConsoleMenuToggleButton"
-                  onClick={() => setIsFilterOpen(!isFilterOpen)}
-                  title={isFilterOpen ? "Close filter menu" : "Open filter menu"}
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
                 >
                   <Icon
                     className={styles.MenuToggleButtonIcon}
-                    type={isFilterOpen ? "menu-open" : "menu-closed"}
+                    type={isMenuOpen ? "menu-open" : "menu-closed"}
                   />
                 </button>
 
@@ -76,7 +76,7 @@ export default function ConsoleRoot({
 
               <div className={styles.Divider} />
 
-              <Offscreen mode={isFilterOpen ? "visible" : "hidden"}>
+              <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
                 <div className={styles.FilterColumn}>
                   <FilterToggles />
                 </div>
