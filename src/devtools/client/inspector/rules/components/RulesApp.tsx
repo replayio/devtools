@@ -8,7 +8,7 @@ import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useAppSelector } from "ui/setup/hooks";
-import { RuleState } from "../state/rules";
+import { RuleState } from "../reducers/rules";
 import { RuleInheritance } from "../models/rule";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";

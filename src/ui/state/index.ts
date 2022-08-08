@@ -11,7 +11,7 @@ import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/reducers";
 import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
 import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
-import { RulesState } from "devtools/client/inspector/rules/state/rules";
+import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/selectors";

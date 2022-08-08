@@ -10,7 +10,7 @@ const { getNodeInfo } = require("devtools/client/inspector/rules/utils/utils");
 import { selection } from "devtools/client/framework/selection";
 const ElementStyle = require("devtools/client/inspector/rules/models/element-style").default;
 
-const { updateRules } = require("devtools/client/inspector/rules/actions/rules");
+const { rulesUpdated } = require("devtools/client/inspector/rules/reducers/rules");
 const { setComputedProperties } = require("devtools/client/inspector/computed/actions");
 
 import { getSelectedPanel } from "ui/reducers/layout";
@@ -77,7 +77,7 @@ class RulesView {
     }
 
     if (!element) {
-      this.store.dispatch(updateRules([]));
+      this.store.dispatch(rulesUpdated([]));
       return;
     }
 
@@ -115,7 +115,7 @@ class RulesView {
    * the update() function, and from the ElementStyle's onChange() handler.
    */
   updateRules() {
-    this.store.dispatch(updateRules(this.elementStyle.rules));
+    this.store.dispatch(rulesUpdated(this.elementStyle.rules));
     this.store.dispatch(setComputedProperties(this.elementStyle));
   }
 }

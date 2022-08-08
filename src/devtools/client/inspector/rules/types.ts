@@ -188,7 +188,6 @@ export const rule = {
 };
 
 export const rules = {
-  isAddRuleEnabled: PropTypes.bool.isRequired,
   highlightedSelector: PropTypes.string.isRequired,
   rules: PropTypes.arrayOf(PropTypes.shape(rule)),
 };
