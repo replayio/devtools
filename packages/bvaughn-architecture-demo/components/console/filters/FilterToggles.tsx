@@ -5,7 +5,7 @@ import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import Checkbox from "../../../../../src/ui/components/shared/Forms/Checkbox";
+import { Checkbox } from "../../../../components";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -116,15 +116,13 @@ function Toggle({
   return (
     <div className={styles.Filter}>
       <Checkbox
-        className="mr-1"
+        data-test-id={id}
+        label={label}
+        secondaryLabel={count !== null && count > 0 && count}
         checked={checked}
         id={id}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
       />
-      <label className={styles.Label} data-test-id={id} htmlFor={id} title={label}>
-        {label}
-      </label>
-      {count !== null && count > 0 && <div className={styles.Count}>{count}</div>}
     </div>
   );
 }
