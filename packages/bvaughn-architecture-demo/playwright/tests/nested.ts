@@ -28,9 +28,7 @@ async function inspectAndTakeScreenshotOf(page: Page, partialText: string, scree
   await takeScreenshot(page, keyValue, screenshotName);
 }
 
-test("should render nested, recursive values (as ellipses) without crashing", async ({
-  page,
-}) => {
+test("should render nested, recursive values (as ellipses) without crashing", async ({ page }) => {
   await page.goto(URL);
 
   await toggleProtocolMessages(page, true);
