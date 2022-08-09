@@ -10,13 +10,11 @@ import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 import { assert } from "protocol/utils";
 import React, { FC, ReactNode, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 
 import { ResponsiveTabs } from "../../shared/components/ResponsiveTabs";
 import { setActiveTab } from "../actions";
 import { EventListenersApp } from "../event-listeners/EventListenersApp";
 import { InspectorActiveTab } from "../reducers";
-import { Inspector } from "../inspector";
 
 const INSPECTOR_TAB_TITLES: Record<InspectorActiveTab, string> = {
   ruleview: "Rules",
@@ -32,26 +30,17 @@ const availableTabs: readonly InspectorActiveTab[] = [
   "eventsview",
 ] as const;
 
-declare global {
-  interface Window {
-    gInspector: Inspector;
-  }
-}
-window.gInspector = new Inspector();
-
 const InspectorApp: FC = () => {
   const dispatch = useAppDispatch();
   const activeTab = useAppSelector(state => state.inspector.activeTab);
-
-  const inspector = window.gInspector;
 
   const onSplitboxResize = (width: number) => {
     prefs.splitSidebarSize = width;
   };
 
   const markupView: JSX.Element | undefined = useMemo(() => {
-    return <MarkupApp inspector={inspector} />;
-  }, [inspector]);
+    return <MarkupApp />;
+  }, []);
 
   const activePanel: ReactNode = useMemo(() => {
     switch (activeTab) {
@@ -62,11 +51,7 @@ const InspectorApp: FC = () => {
         return <ComputedApp />;
       }
       case "layoutview": {
-        const layoutProps = {
-          ...inspector.getCommonComponentProps(),
-          showBoxModelProperties: true,
-        };
-        return <LayoutApp {...layoutProps} />;
+        return <LayoutApp showBoxModelProperties={true} />;
       }
       case "eventsview": {
         return <EventListenersApp />;
@@ -76,7 +61,7 @@ const InspectorApp: FC = () => {
       false,
       "This code should be unreachable (handle all cases within the switch statement)."
     );
-  }, [inspector, activeTab]);
+  }, [activeTab]);
 
   return (
     <div

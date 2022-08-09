@@ -5,7 +5,7 @@ import CSSProperties from "third-party/css/css-properties";
 
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
-const { OutputParser } = require("packages/third-party/css/output-parser");
+const { OutputParser } = require("third-party/css/output-parser");
 
 type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
   properties: ComputedPropertyState[];

@@ -143,15 +143,9 @@ const appSlice = createSlice({
         };
       },
     },
-    setEventsForType(
-      state,
-      action: PayloadAction<{
-        events: ReplayEvent[];
-        eventType: EventKind;
-      }>
-    ) {
-      const { events, eventType } = action.payload;
-      state.events[eventType] = events;
+    loadReceivedEvents(state, action: PayloadAction<Record<EventKind, ReplayEvent[]>>) {
+      // Load multiple event types into state at once
+      Object.assign(state.events, action.payload);
     },
     setHoveredLineNumberLocation(state, action: PayloadAction<Location | null>) {
       state.hoveredLineNumberLocation = action.payload;
@@ -195,7 +189,7 @@ export const {
   setCurrentPoint,
   setDefaultSettingsTab,
   setDisplayedLoadingProgress,
-  setEventsForType,
+  loadReceivedEvents,
   setExpectedError,
   setHoveredLineNumberLocation,
   setIsNodePickerActive,

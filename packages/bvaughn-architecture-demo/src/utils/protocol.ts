@@ -176,7 +176,7 @@ export function protocolValueToClientValue(
     // Meaning they won't have "value", "bigint", "symbol", or "unserializableNumber" keys.
     // This is pretty awkward to work with and I wish the protocol would change.
     const keys = Object.keys(protocolValue).filter(
-      key => key !== "name" && key !== "name" && key !== "isSymbol"
+      key => key !== "flags" && key !== "name" && key !== "isSymbol"
     );
     if (keys.length === 0) {
       return { name, preview: "undefined", type: "undefined" };

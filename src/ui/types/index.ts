@@ -16,10 +16,11 @@ export type ExperimentalUserSettings = {
 
 export type LocalExperimentalUserSettings = {
   enableColumnBreakpoints: boolean;
+  enableLargeText: boolean;
   enableNewComponentArchitecture: boolean;
   enableResolveRecording: boolean;
   hitCounts: boolean;
-  enableLargeText: boolean;
+  profileWorkerThreads: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {

@@ -6,8 +6,7 @@
 
 const dom = require("react-dom-factories");
 
-const { l10n } = require("devtools/client/webconsole/utils/messages");
-const messageToggleDetails = l10n.getStr("messageToggleDetails");
+const messageToggleDetails = "Show/hide message details.";
 
 function CollapseButton(props) {
   const { open, onClick, title = messageToggleDetails } = props;

@@ -11,7 +11,6 @@ import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 import CSSProperties from "third-party/css/css-properties";
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
-import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
 const Services = require("devtools/shared/services");
 
@@ -186,9 +185,7 @@ export default class Rule {
   }
 
   get selectorText() {
-    return this.domRule.selectors
-      ? this.domRule.selectors.join(", ")
-      : CssLogic.l10n("rule.sourceElement");
+    return this.domRule.selectors ? this.domRule.selectors.join(", ") : "element";
   }
 
   /**
@@ -240,7 +237,7 @@ export default class Rule {
    */
   getSourceText(url: string | null | undefined) {
     if (this.isSystem) {
-      return `${STYLE_INSPECTOR_L10N.getStr("rule.userAgentStyles")} ${this.title}`;
+      return `(user agent) ${this.title}`;
     }
 
     let sourceText = url;
@@ -265,13 +262,6 @@ export default class Rule {
     if (this.domRule.selectors) {
       // This is a style rule with a selector.
       selector = this.domRule.selectors.join(", ");
-      // } else if (this.inherited) {
-      //   // This is an inline style from an inherited rule. Need to resolve the unique
-      //   // selector from the node which rule this is inherited from.
-      //   selector = await this.inherited.getUniqueSelector();
-      // } else {
-      //   // This is an inline style from the current node.
-      // selector = this.inspector.selectionCssSelector;
     }
 
     return selector;

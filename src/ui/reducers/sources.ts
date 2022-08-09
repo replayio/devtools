@@ -54,10 +54,7 @@ export interface SourceContent {
 }
 
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
-const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => source.sourceId });
 const contentsAdapter = createEntityAdapter<SourceContent>();
-
-export const sourceSelectors = sourcesAdapter.getSelectors();
 
 export const { selectById: getSourceContentsEntry } = contentsAdapter.getSelectors(
   (state: UIState) => state.sources.contents
@@ -67,24 +64,23 @@ export const {
   selectAll: getAllSourceDetails,
   selectById: getSourceDetails,
   selectEntities: getSourceDetailsEntities,
+  selectTotal: getSourceDetailsCount,
 } = sourceDetailsAdapter.getSelectors((state: UIState) => state.sources.sourceDetails);
 
 export interface SourcesState {
   allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
-  sources: EntityState<newSource>;
   contents: EntityState<SourceContent>;
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;
   persistedSelectedLocation: PartialLocation | null;
-  sourcesByUrl: { [url: string]: string[] };
+  sourcesByUrl: Record<string, string[]>;
 }
 
 const initialState: SourcesState = {
   allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
-  sources: sourcesAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
   selectedLocation: null,
   selectedLocationHistory: [],
@@ -98,26 +94,25 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
-    addSources: (state, action: PayloadAction<newSource[]>) => {
-      // Store the raw protocol information. Once we have recieved all sources
-      // we will iterate over this and build it into the shape we want.
-      sourcesAdapter.addMany(state.sources, action.payload);
-    },
-    allSourcesReceived: state => {
+    allSourcesReceived: (state, action: PayloadAction<newSource[]>) => {
+      const sources = action.payload;
       state.allSourcesReceived = true;
-      const sources = sourceSelectors.selectAll(state.sources);
+
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
-      state.sourcesByUrl = {};
-      sources.forEach(source => {
+
+      const sourcesByUrl: Record<string, string[]> = {};
+
+      for (let source of sources) {
         if (!source.url) {
-          return;
+          continue;
         }
 
-        if (!state.sourcesByUrl[source.url]) {
-          state.sourcesByUrl[source.url] = [];
+        if (!sourcesByUrl[source.url]) {
+          sourcesByUrl[source.url] = [];
         }
-        state.sourcesByUrl[source.url].push(source.sourceId);
-      });
+        sourcesByUrl[source.url].push(source.sourceId);
+      }
+      state.sourcesByUrl = sourcesByUrl;
     },
     sourceLoading: (state, action: PayloadAction<string>) => {
       contentsAdapter.upsertOne(state.contents, {
@@ -175,7 +170,6 @@ const sourcesSlice = createSlice({
 });
 
 export const {
-  addSources,
   allSourcesReceived,
   clearSelectedLocation,
   locationSelected,
@@ -421,6 +415,7 @@ export const selectors = {
   getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
+  getSourceDetailsCount,
   getSourceContentsEntry,
   getSourcesLoading,
   getSelectedLocation,

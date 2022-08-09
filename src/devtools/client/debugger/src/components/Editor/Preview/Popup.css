@@ -4,11 +4,12 @@
 
 .popover .preview-popup {
   background: var(--theme-base-100);
-  width: 350px;
+  width: 400px;
   border: 1px solid var(--theme-splitter-color);
   padding: 10px;
   height: auto;
   overflow: auto;
+  max-height: 400px;
   box-shadow: 1px 2px 3px var(--popup-shadow-color);
   font-size: var(--theme-code-font-size);
 }

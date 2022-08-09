@@ -33,6 +33,7 @@ export interface ReplaySession {
   viewMode: ViewMode;
   showVideoPanel: boolean;
   toolboxLayout: ToolboxLayout;
+  localNags: string[];
 }
 
 export function registerStoreObserver(
@@ -125,8 +126,13 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
   maybeUpdateReplaySessions(state);
 };
 
+let replaySessions: ReplaySessions;
 async function getReplaySessions() {
-  return await asyncStore.replaySessions;
+  if (replaySessions) {
+    return replaySessions;
+  }
+  replaySessions = await asyncStore.replaySessions;
+  return replaySessions;
 }
 
 export async function getReplaySession(recordingId: RecordingId) {

@@ -5,7 +5,7 @@
 import { newSource, Frame } from "@replayio/protocol";
 import type { ThreadFront as TF } from "protocol/thread";
 import type { UIStore } from "ui/actions";
-import { addSources, allSourcesReceived } from "ui/reducers/sources";
+import { allSourcesReceived } from "ui/reducers/sources";
 
 import { initialBreakpointsState } from "../reducers/breakpoints";
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
@@ -49,9 +49,7 @@ async function setupDebugger(ThreadFront: typeof TF) {
     }
   });
 
-  store.dispatch(addSources(sources));
-
-  store.dispatch(allSourcesReceived());
+  store.dispatch(allSourcesReceived(sources));
 }
 
 export function bootstrap(_store: UIStore, ThreadFront: typeof TF) {

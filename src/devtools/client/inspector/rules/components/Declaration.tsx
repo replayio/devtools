@@ -1,8 +1,7 @@
 import React, { FC, useState } from "react";
 const DeclarationValue = require("../../rules/components/DeclarationValue");
-import { DeclarationState } from "../state/rules";
+import { DeclarationState } from "../reducers/rules";
 import classnames from "classnames";
-import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 
 type DeclarationProps = {
   declaration: DeclarationState;
@@ -52,15 +51,6 @@ export const Declaration: FC<DeclarationProps> = ({ declaration, query }) => {
     </ul>
   );
 
-  // unused
-  // const overriddenFilter =
-  //   !declaration.isDeclarationValid || !declaration.isOverridden ? null : (
-  //     <div
-  //       className="ruleview-overridden-rule-filter"
-  //       title={getStr("rule.filterProperty.title")}
-  //     ></div>
-  //   );
-
   const overriddenComputedProperties = declaration.computedProperties.filter(
     prop => prop.isOverridden
   );
@@ -88,9 +78,7 @@ export const Declaration: FC<DeclarationProps> = ({ declaration, query }) => {
   const warning = declaration.isDeclarationValid ? null : (
     <div
       className="ruleview-warning"
-      title={
-        declaration.isNameValid ? getStr("rule.warningName.title") : getStr("rule.warning.title")
-      }
+      title={declaration.isNameValid ? "Invalid property name" : "Invalid property value"}
     ></div>
   );
 

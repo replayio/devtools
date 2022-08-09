@@ -9,31 +9,34 @@ import useAuth0 from "ui/utils/useAuth0";
 import AppErrors from "./shared/Error";
 import LoginModal from "./shared/LoginModal";
 import RenameReplayModal from "./shared/Modals/RenameReplayModal";
-import SharingModal from "./shared/SharingModal";
-import LaunchBrowserModal from "./shared/LaunchBrowserModal";
-import NewWorkspaceModal from "./shared/NewWorkspaceModal";
-import WorkspaceSettingsModal from "./shared/WorkspaceSettingsModal";
-import UserSettingsModal from "./shared/UserSettingsModal";
-import OnboardingModal from "./shared/OnboardingModal/index";
 import * as selectors from "ui/reducers/app";
 import { getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { UIState } from "ui/state";
 import { Nag, useGetUserInfo } from "ui/hooks/users";
 
 import LoadingScreen from "./shared/LoadingScreen";
-import FirstReplayModal from "./shared/FirstReplayModal";
 import TOSScreen, { LATEST_TOS_VERSION } from "./TOSScreen";
-import SingleInviteModal from "./shared/OnboardingModal/SingleInviteModal";
 import { ConfirmRenderer } from "./shared/Confirm";
 import PrivacyModal from "./shared/PrivacyModal";
 import LoomModal from "./shared/LoomModal";
 import NewAttachment from "./shared/NewAttachment";
-import DownloadReplayPromptModal from "./shared/OnboardingModal/DownloadReplayPromptModal";
 import QuickOpenModal from "devtools/client/debugger/src/components/QuickOpenModal";
 import hooks from "ui/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { trackEvent } from "ui/utils/telemetry";
-import SourcemapSetupModal from "./shared/Modals/SourcemapSetupModal";
+
+const LaunchBrowserModal = React.lazy(() => import("./shared/LaunchBrowserModal"));
+const NewWorkspaceModal = React.lazy(() => import("./shared/NewWorkspaceModal"));
+const WorkspaceSettingsModal = React.lazy(() => import("./shared/WorkspaceSettingsModal"));
+const UserSettingsModal = React.lazy(() => import("./shared/UserSettingsModal"));
+const SharingModal = React.lazy(() => import("./shared/SharingModal"));
+const OnboardingModal = React.lazy(() => import("./shared/OnboardingModal/index"));
+const DownloadReplayPromptModal = React.lazy(
+  () => import("./shared/OnboardingModal/DownloadReplayPromptModal")
+);
+const SourcemapSetupModal = React.lazy(() => import("./shared/Modals/SourcemapSetupModal"));
+const SingleInviteModal = React.lazy(() => import("./shared/OnboardingModal/SingleInviteModal"));
+const FirstReplayModal = React.lazy(() => import("./shared/FirstReplayModal"));
 
 function AppModal({ hideModal, modal }: { hideModal: () => void; modal: ModalType }) {
   const loadingFinished = useAppSelector(selectors.getLoadingFinished);
@@ -163,7 +166,11 @@ function App({ children, hideModal, modal, quickOpenEnabled }: AppProps) {
   return (
     <div id="app-container">
       {children}
-      {modal ? <AppModal hideModal={hideModal} modal={modal} /> : null}
+      {modal ? (
+        <React.Suspense>
+          <AppModal hideModal={hideModal} modal={modal} />
+        </React.Suspense>
+      ) : null}
       {quickOpenEnabled === true && <QuickOpenModal />}
       <ConfirmRenderer />
       <AppErrors />

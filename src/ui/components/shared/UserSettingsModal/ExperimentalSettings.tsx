@@ -33,6 +33,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Show line hit counts in the source view",
     key: "hitCounts",
   },
+  {
+    label: "Profile Source Worker",
+    description:
+      "Record a performance profile of the source worker and send it to Replay to help diagnose performance issues",
+    key: "profileWorkerThreads",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -71,6 +77,8 @@ export default function ExperimentalSettings({}) {
     useFeature("enableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
+  const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
+    useFeature("profileWorkerThreads");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -81,14 +89,17 @@ export default function ExperimentalSettings({}) {
       updateEnableNewComponentArchitecture(!enableNewComponentArchitecture);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
+    } else if (key === "profileWorkerThreads") {
+      updateProfileWorkerThreads(!profileWorkerThreads);
     }
   };
 
   const localSettings = {
     enableColumnBreakpoints,
+    enableNewComponentArchitecture,
     enableResolveRecording,
     hitCounts,
-    enableNewComponentArchitecture,
+    profileWorkerThreads,
   };
 
   const settings = { ...userSettings, ...localSettings };

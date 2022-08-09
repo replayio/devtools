@@ -1,12 +1,8 @@
-import { Inspector } from "../inspector";
-
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
 const { LocalizationHelper } = require("devtools/shared/l10n");
-const INSPECTOR_L10N = new LocalizationHelper("devtools/client/locales/inspector.properties");
 
 export default class MarkupSearchbox {
-  private inspector: Inspector;
   private markupPanel!: HTMLElement;
   private searchBox!: HTMLElement;
   private searchResultsContainer!: HTMLElement;
@@ -14,13 +10,9 @@ export default class MarkupSearchbox {
   private _search: any;
   private searchboxShortcuts: any;
 
-  constructor(inspector: Inspector) {
-    this.inspector = inspector;
-  }
-
   get search() {
     if (!this._search) {
-      this._search = new InspectorSearch(this.inspector, this.searchBox);
+      this._search = new InspectorSearch(this.searchBox);
     }
 
     return this._search;
@@ -67,11 +59,7 @@ export default class MarkupSearchbox {
     let str = "";
     if (!clear) {
       if (result) {
-        str = INSPECTOR_L10N.getFormatStr(
-          "inspector.searchResultsCount2",
-          result.resultsIndex + 1,
-          result.resultsLength
-        );
+        str = `${result.resultsIndex + 1} of ${result.resultsLength}`;
       } else {
         str = "No matches";
       }
