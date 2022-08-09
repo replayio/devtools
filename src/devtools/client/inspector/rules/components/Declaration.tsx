@@ -1,8 +1,7 @@
 import React, { FC, useState } from "react";
 const DeclarationValue = require("../../rules/components/DeclarationValue");
-import { DeclarationState } from "../state/rules";
+import { DeclarationState } from "../reducers/rules";
 import classnames from "classnames";
-import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 
 type DeclarationProps = {
   declaration: DeclarationState;

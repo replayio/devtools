@@ -4,7 +4,7 @@ import Selector from "devtools/client/inspector/rules/components/Selector";
 import { SourceLink } from "devtools/client/inspector/rules/components/SourceLink";
 import React, { FC } from "react";
 
-import { RuleState } from "../state/rules";
+import { RuleState } from "../reducers/rules";
 
 type RuleProps = {
   query: string;

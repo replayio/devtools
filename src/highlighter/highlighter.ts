@@ -76,4 +76,6 @@ class Highlighter {
   }
 }
 
-export default new Highlighter();
+const highlighter = new Highlighter();
+
+export default highlighter;

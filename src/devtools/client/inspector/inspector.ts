@@ -11,8 +11,6 @@ import { UIStore } from "ui/actions";
 
 import { selection, Selection } from "devtools/client/framework/selection";
 
-import RulesView from "./rules/rules";
-
 import Highlighter from "highlighter/highlighter";
 
 type InspectorEvent =
@@ -37,7 +35,6 @@ export class Inspector {
   store: UIStore | null;
   highlighter: typeof Highlighter;
 
-  rules: RulesView;
   selection: Selection;
 
   private _highlighters?: any;
@@ -58,8 +55,6 @@ export class Inspector {
     this.store = (window as any).app.store;
 
     this.highlighter = Highlighter;
-
-    this.rules = new RulesView(this, window);
   }
 
   getHighlighter() {
@@ -97,20 +92,6 @@ export class Inspector {
 
     return {
       setSelectedNode: this.selection.setNodeFront,
-      onShowBoxModelHighlighterForNode: this.onShowBoxModelHighlighterForNode,
     };
   }
-
-  /**
-   * Shows the box-model highlighter on the element corresponding to the provided
-   * NodeFront.
-   *
-   * @param  {NodeFront} nodeFront
-   *         The node to highlight.
-   * @param  {Object} options
-   *         Options passed to the highlighter actor.
-   */
-  onShowBoxModelHighlighterForNode = (nodeFront: NodeFront, options: any) => {
-    // nodeFront.highlighterFront.highlight(nodeFront, options);
-  };
 }

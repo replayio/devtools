@@ -4,13 +4,11 @@
 
 const { generateUUID } = require("devtools/shared/generate-uuid");
 const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
-const { escapeCSSComment } = require("packages/third-party/css/parsing-utils");
+const { escapeCSSComment } = require("third-party/css/parsing-utils");
 import Rule from "./rule";
 import ElementStyle from "./element-style";
 import CSSProperties from "third-party/css/css-properties";
-const { OutputParser } = require("packages/third-party/css/output-parser");
-import UserProperties from "./user-properties";
-import { assert } from "protocol/utils";
+const { OutputParser } = require("third-party/css/output-parser");
 
 export type Priority = "" | "important" | undefined;
 
