@@ -67,6 +67,7 @@ export const {
   selectAll: getAllSourceDetails,
   selectById: getSourceDetails,
   selectEntities: getSourceDetailsEntities,
+  selectTotal: getSourceDetailsCount,
 } = sourceDetailsAdapter.getSelectors((state: UIState) => state.sources.sourceDetails);
 
 export interface SourcesState {
@@ -78,7 +79,7 @@ export interface SourcesState {
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;
   persistedSelectedLocation: PartialLocation | null;
-  sourcesByUrl: { [url: string]: string[] };
+  sourcesByUrl: Record<string, string[]>;
 }
 
 const initialState: SourcesState = {
@@ -105,19 +106,23 @@ const sourcesSlice = createSlice({
     },
     allSourcesReceived: state => {
       state.allSourcesReceived = true;
-      const sources = sourceSelectors.selectAll(state.sources);
+      const sources = state.sources.ids.map(id => state.sources.entities[id]!);
+
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
-      state.sourcesByUrl = {};
-      sources.forEach(source => {
+
+      const sourcesByUrl: Record<string, string[]> = {};
+
+      for (let source of sources) {
         if (!source.url) {
-          return;
+          continue;
         }
 
-        if (!state.sourcesByUrl[source.url]) {
-          state.sourcesByUrl[source.url] = [];
+        if (!sourcesByUrl[source.url]) {
+          sourcesByUrl[source.url] = [];
         }
-        state.sourcesByUrl[source.url].push(source.sourceId);
-      });
+        sourcesByUrl[source.url].push(source.sourceId);
+      }
+      state.sourcesByUrl = sourcesByUrl;
     },
     sourceLoading: (state, action: PayloadAction<string>) => {
       contentsAdapter.upsertOne(state.contents, {
@@ -421,6 +426,7 @@ export const selectors = {
   getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
+  getSourceDetailsCount,
   getSourceContentsEntry,
   getSourcesLoading,
   getSelectedLocation,

@@ -24,6 +24,7 @@ import {
   getSourcesLoading,
   SourceDetails,
   getSourceDetailsEntities,
+  getSourceDetailsCount,
 } from "ui/reducers/sources";
 
 // Actions
@@ -81,7 +82,7 @@ const mapStateToProps = (state: UIState) => {
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
     sources: sources,
-    sourceCount: Object.values(sources).length,
+    sourceCount: getSourceDetailsCount(state),
   };
 };
 
