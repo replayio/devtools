@@ -33,7 +33,7 @@ function Title({ recording }: { recording: Recording }) {
   const path = JSON.stringify(recording.metadata?.test?.path || []);
 
   return (
-    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
+    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-col flex-grow py-2 overflow-hidden">
         <Link href={`/team/${teamId}/results?q=test-path:${path}`}>
           <a
