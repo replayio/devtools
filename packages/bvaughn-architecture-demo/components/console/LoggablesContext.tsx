@@ -21,6 +21,8 @@ import {
 } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import { isFirefoxInternalMessage } from "./utils/messages";
+
 export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
 export const LoggablesContext = createContext<Loggable[]>(null as any);
@@ -74,64 +76,63 @@ export function LoggablesContextRoot({
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
-    if (showErrors && showLogs && showNodeModules && showWarnings) {
-      return messages;
-    } else {
-      return messages.filter((message: ProtocolMessage) => {
-        switch (message.level) {
-          case "warning": {
-            if (!showWarnings) {
-              return false;
-            }
-            break;
-          }
-          case "error": {
-            switch (message.source) {
-              case "ConsoleAPI": {
-                if (!showErrors) {
-                  return false;
-                }
-                break;
-              }
-              case "PageError": {
-                if (!showExceptions) {
-                  return false;
-                }
-                break;
-              }
-            }
-            break;
-          }
-          default: {
-            if (!showLogs) {
-              return false;
-            }
-            break;
-          }
-        }
+    return messages.filter((message: ProtocolMessage) => {
+      if (isFirefoxInternalMessage(message)) {
+        return false;
+      }
 
-        // TODO This seems expensive; can we cache the message-to-node-modules relationship?
-        if (!showNodeModules) {
-          const isNodeModules = message.data.frames?.some(frame => {
-            const sourceId = frame.location?.[0].sourceId;
-            const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
-            if (source) {
-              const value =
-                source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
-              if (!value) {
-              }
-              return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
-            }
-            return false;
-          });
-          if (isNodeModules) {
+      switch (message.level) {
+        case "warning": {
+          if (!showWarnings) {
             return false;
           }
+          break;
         }
+        case "error": {
+          switch (message.source) {
+            case "ConsoleAPI": {
+              if (!showErrors) {
+                return false;
+              }
+              break;
+            }
+            case "PageError": {
+              if (!showExceptions) {
+                return false;
+              }
+              break;
+            }
+          }
+          break;
+        }
+        default: {
+          if (!showLogs) {
+            return false;
+          }
+          break;
+        }
+      }
 
-        return true;
-      });
-    }
+      // TODO This seems expensive; can we cache the message-to-node-modules relationship?
+      if (!showNodeModules) {
+        const isNodeModules = message.data.frames?.some(frame => {
+          const sourceId = frame.location?.[0].sourceId;
+          const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
+          if (source) {
+            const value = source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
+            if (!value) {
+            }
+            return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
+          }
+          return false;
+        });
+        if (isNodeModules) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
   // Trim eventLogs and logPoints by focusRange.

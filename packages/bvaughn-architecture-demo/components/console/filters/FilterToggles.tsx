@@ -5,6 +5,7 @@ import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { isFirefoxInternalMessage } from "../utils/messages";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -30,6 +31,10 @@ export default function FilterToggles() {
     let warnings = 0;
 
     messages.forEach(message => {
+      if (isFirefoxInternalMessage(message)) {
+        return;
+      }
+
       switch (message.level) {
         case "assert":
         case "info":
