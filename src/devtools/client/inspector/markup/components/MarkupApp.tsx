@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
 import { getNodeInfo } from "../selectors/markup";

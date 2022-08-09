@@ -11,7 +11,6 @@ import { assert } from "protocol/utils";
 import { UIStore } from "ui/actions";
 import CSSProperties from "third-party/css/css-properties";
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
-import { Inspector } from "../../inspector";
 import ElementStyle from "./element-style";
 const Services = require("devtools/shared/services");
 
