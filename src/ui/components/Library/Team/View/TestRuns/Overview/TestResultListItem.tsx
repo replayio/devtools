@@ -17,8 +17,8 @@ function ViewReplay({ recordingId, passed }: { recordingId: string; passed: bool
           outlined
           className={
             passed
-              ? "text-green-500 group-hover:text-green-700"
-              : "text-red-500 group-hover:text-red-700"
+              ? "text-green-500 group-hover:text-green-400"
+              : "text-red-500 group-hover:text-red-400"
           }
         >
           {passed ? "play_circle_filled" : "play_circle" }          
