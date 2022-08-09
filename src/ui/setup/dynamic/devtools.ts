@@ -27,7 +27,7 @@ import { bindActionCreators } from "redux";
 import { actions, UIStore } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
-import app, { setEventsForType, setVideoUrl } from "ui/reducers/app";
+import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
@@ -227,7 +227,7 @@ export default async function DevTools(store: AppStore) {
   setupNetwork(store, ThreadFront);
   setupLogpoints(store);
   setupExceptions(store);
-  setupReactDevTools(store);
+  setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);
 
@@ -235,7 +235,7 @@ export default async function DevTools(store: AppStore) {
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
 
   setMouseDownEventsCallback(
-    // We seem to get duplicate mousedown events each time.
+    // We seem to get duplicate mousedown events each time, like ["a"], ["a"], ["a", "b"], ["a", "b"], etc.
     // Debounce the callback so we only dispatch the last set.
     debounce((events: MouseEvent[]) => {
       if (!events.length) {
@@ -244,7 +244,7 @@ export default async function DevTools(store: AppStore) {
       }
 
       //
-      store.dispatch(setEventsForType({ events: [...events], eventType: "mousedown" }));
+      store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
     }, 1_000)
   );
   setPausedonPausedAtTimeCallback((time: number) => {
@@ -254,7 +254,10 @@ export default async function DevTools(store: AppStore) {
     store.dispatch(setPlaybackStalled(stalled));
   });
 
+  // Points come in piecemeal over time. Cut down the number of dispatches by
+  // storing incoming points and debouncing the dispatch considerably.
   let points: TimeStampedPoint[] = [];
+
   const onPointsReceived = debounce(() => {
     store.dispatch(pointsReceived(points));
     points = [];
