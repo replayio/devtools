@@ -43,7 +43,6 @@ const CLASSES = new WeakMap<NodeFront, ClassInfo[]>();
  *        The current inspector instance.
  */
 export default class ClassList {
-  inspector: Inspector;
   classListProxyNode: HTMLDivElement;
 
   // added by EventEmitter.decorate(this)
@@ -55,17 +54,10 @@ export default class ClassList {
   constructor(inspector: Inspector) {
     EventEmitter.decorate(this);
 
-    this.inspector = inspector;
-
-    // this.onMutations = this.onMutations.bind(this);
-    // this.inspector.on("markupmutation", this.onMutations);
-
     this.classListProxyNode = document.createElement("div");
   }
 
   destroy() {
-    // this.inspector.off("markupmutation", this.onMutations);
-    this.inspector = null as any;
     this.classListProxyNode = null as any;
   }
 

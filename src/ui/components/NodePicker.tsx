@@ -39,10 +39,6 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     window.gNodePicker = this;
   }
 
-  getHighlighter() {
-    return Highlighter;
-  }
-
   async clickNodePickerButton() {
     const { loadMouseTargets } = this.props;
     const { nodePickerActive } = this.state;
@@ -108,9 +104,9 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     this.lastPickerPosition = pos;
     const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (this.lastPickerPosition == pos && nodeBounds) {
-      this.getHighlighter().highlight(nodeBounds);
+      Highlighter.highlight(nodeBounds);
     } else {
-      this.getHighlighter().unhighlight();
+      Highlighter.unhighlight();
     }
   };
 
@@ -128,13 +124,15 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 
     const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (nodeBounds) {
-      this.getHighlighter().highlight(nodeBounds);
+      Highlighter.highlight(nodeBounds);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
-      if (node && this.getHighlighter().currentNode == nodeBounds) {
-        window.gInspector.selection.setNodeFront(node);
+      if (node && Highlighter.currentNode == nodeBounds) {
+        await import("devtools/client/inspector/components/App");
+        const { selection } = await import("devtools/client/framework/selection");
+        selection.setNodeFront(node);
       }
     } else {
-      this.getHighlighter().unhighlight();
+      Highlighter.unhighlight();
     }
   }
 

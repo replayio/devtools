@@ -14,7 +14,7 @@ import { showSource } from "devtools/client/debugger/src/actions/ui";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { getSourceDetails, getSourceByUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
-import { SourceLocation } from "@replayio/protocol";
+
 type $FixTypeLater = any;
 
 export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
@@ -23,11 +23,11 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
       return;
     }
 
-    // HACK This is ugly, but we lazy-load the component and also try to use `window.gInspector` in places.
-    // So, ensure it's loaded, _then_ use this global
+    // HACK This is ugly, but we lazy-load the component.
+    // So, ensure it's loaded, _then_ highlight things.
     await import("devtools/client/inspector/components/App");
 
-    const highlighter = window.gInspector.getHighlighter();
+    const { highlighter } = await import("highlighter/highlighter");
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
       highlighter.highlight(nodeFront);
@@ -38,7 +38,8 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 export function unHighlightDomElement(): UIThunkAction {
   return async () => {
     await import("devtools/client/inspector/components/App");
-    const highlighter = window.gInspector.getHighlighter();
+    const { highlighter } = await import("highlighter/highlighter");
+
     if (highlighter) {
       highlighter.unhighlight();
     }
@@ -72,7 +73,8 @@ export function openNodeInInspector(
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
     await import("devtools/client/inspector/components/App");
-    await window.gInspector.selection.setNodeFront(nodeFront, {
+    const { selection } = await import("devtools/client/framework/selection");
+    await selection.setNodeFront(nodeFront, {
       reason,
     });
   };

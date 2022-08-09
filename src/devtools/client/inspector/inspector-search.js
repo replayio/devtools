@@ -26,8 +26,7 @@ import { selection } from "devtools/client/framework/selection";
  * - search-cleared: when the search box is emptied
  * - search-result: when a search is made and a result is selected
  */
-function InspectorSearch(inspector, input) {
-  this.inspector = inspector;
+function InspectorSearch(input) {
   this.searchBox = input;
   this._lastSearched = null;
   this._lastSearchedResults = null;

@@ -268,10 +268,11 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
       Highlighter.highlight(nodeFront, 1000);
-      // HACK This is ugly, but we lazy-load the component and also try to use `window.gInspector` in places.
+      // HACK This is ugly, but we lazy-load the component.
       // So, ensure it's loaded, _then_ use this global
       await import("devtools/client/inspector/components/App");
-      window.gInspector.selection.setNodeFront(nodeFront, { reason });
+      const { selection } = await import("devtools/client/framework/selection");
+      selection.setNodeFront(nodeFront, { reason });
     }
   };
 }

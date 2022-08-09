@@ -263,13 +263,6 @@ export default class Rule {
     if (this.domRule.selectors) {
       // This is a style rule with a selector.
       selector = this.domRule.selectors.join(", ");
-      // } else if (this.inherited) {
-      //   // This is an inline style from an inherited rule. Need to resolve the unique
-      //   // selector from the node which rule this is inherited from.
-      //   selector = await this.inherited.getUniqueSelector();
-      // } else {
-      //   // This is an inline style from the current node.
-      // selector = this.inspector.selectionCssSelector;
     }
 
     return selector;
