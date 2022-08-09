@@ -234,9 +234,19 @@ export default async function DevTools(store: AppStore) {
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
 
-  setMouseDownEventsCallback((events: MouseEvent[]) => {
-    store.dispatch(setEventsForType({ events: [...events], eventType: "mousedown" }));
-  });
+  setMouseDownEventsCallback(
+    // We seem to get duplicate mousedown events each time.
+    // Debounce the callback so we only dispatch the last set.
+    debounce((events: MouseEvent[]) => {
+      if (!events.length) {
+        // No reason to dispatch when there's 0 events
+        return;
+      }
+
+      //
+      store.dispatch(setEventsForType({ events: [...events], eventType: "mousedown" }));
+    }, 1_000)
+  );
   setPausedonPausedAtTimeCallback((time: number) => {
     store.dispatch(precacheScreenshots(time));
   });
