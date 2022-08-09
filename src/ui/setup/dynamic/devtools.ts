@@ -1,6 +1,6 @@
 import { MouseEvent, sessionError, TimeStampedPoint, uploadedData } from "@replayio/protocol";
-import { ActionCreatorWithoutPayload, ActionCreatorWithPayload } from "@reduxjs/toolkit";
-
+import { ActionCreatorWithoutPayload } from "@reduxjs/toolkit";
+import debounce from "lodash/debounce";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
@@ -27,7 +27,7 @@ import { bindActionCreators } from "redux";
 import { actions, UIStore } from "ui/actions";
 import { setupReactDevTools } from "ui/actions/reactDevTools";
 import { selectors } from "ui/reducers";
-import app, { setEventsForType, setVideoUrl } from "ui/reducers/app";
+import app, { loadReceivedEvents, setVideoUrl } from "ui/reducers/app";
 import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
@@ -227,25 +227,47 @@ export default async function DevTools(store: AppStore) {
   setupNetwork(store, ThreadFront);
   setupLogpoints(store);
   setupExceptions(store);
-  setupReactDevTools(store);
+  setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).
 
-  setMouseDownEventsCallback((events: MouseEvent[]) => {
-    store.dispatch(setEventsForType({ events: [...events], eventType: "mousedown" }));
-  });
+  setMouseDownEventsCallback(
+    // We seem to get duplicate mousedown events each time, like ["a"], ["a"], ["a", "b"], ["a", "b"], etc.
+    // Debounce the callback so we only dispatch the last set.
+    debounce((events: MouseEvent[]) => {
+      if (!events.length) {
+        // No reason to dispatch when there's 0 events
+        return;
+      }
+
+      //
+      store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
+    }, 1_000)
+  );
   setPausedonPausedAtTimeCallback((time: number) => {
     store.dispatch(precacheScreenshots(time));
   });
   setPlaybackStatusCallback((stalled: boolean) => {
     store.dispatch(setPlaybackStalled(stalled));
   });
-  setPointsReceivedCallback((points: TimeStampedPoint[]) => {
+
+  // Points come in piecemeal over time. Cut down the number of dispatches by
+  // storing incoming points and debouncing the dispatch considerably.
+  let points: TimeStampedPoint[] = [];
+
+  const onPointsReceived = debounce(() => {
     store.dispatch(pointsReceived(points));
+    points = [];
+  }, 1_000);
+
+  setPointsReceivedCallback(newPoints => {
+    points.push(...newPoints);
+    onPointsReceived();
   });
+
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
   });
