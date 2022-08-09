@@ -3,6 +3,5 @@
   padding: 0 0.25rem;
   border-radius: 0.25rem;
   font-size: var(--font-size-small);
-  color: var(--color-dim);
-  background-color: var(--background-color-contrast-3);
+  background-color: var(--color-secondary-background);
 }
