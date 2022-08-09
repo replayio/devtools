@@ -3,7 +3,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { Event } from "@bvaughn/src/suspense/EventsCache";
 import { useContext } from "react";
 
-import { Checkbox } from "../../../../components";
+import { Checkbox } from "../../Checkbox";
 
 import styles from "./EventType.module.css";
 
