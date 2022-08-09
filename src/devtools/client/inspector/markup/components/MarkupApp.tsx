@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
 import { getNodeInfo } from "../selectors/markup";
@@ -10,18 +9,18 @@ const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").de
 
 export interface MarkupProps {}
 
-function setupLegacyComponents(inspector: Inspector) {
-  const searchbox = new MarkupSearchbox(inspector);
+function setupLegacyComponents() {
+  const searchbox = new MarkupSearchbox();
   searchbox.setupSearchBox();
-  new HTMLBreadcrumbs(inspector);
+  new HTMLBreadcrumbs();
 }
 
-type PropsFromParent = { inspector: Inspector };
+type PropsFromParent = {};
 
-function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromParent) {
+function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
   const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
 
-  useEffect(() => setupLegacyComponents(inspector), [inspector]);
+  useEffect(() => setupLegacyComponents(), []);
 
   return (
     <div className="devtools-inspector-tab-panel">

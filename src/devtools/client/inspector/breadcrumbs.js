@@ -9,6 +9,7 @@ const flags = require("devtools/shared/flags");
 const ELLIPSIS = "...";
 const EventEmitter = require("devtools/shared/event-emitter");
 import { selection } from "devtools/client/framework/selection";
+import Highlighter from "highlighter/highlighter";
 
 const MAX_LABEL_LENGTH = 40;
 
@@ -321,20 +322,14 @@ ArrowScrollBox.prototype = {
  *   else select the node;
  * - If the selected node is the last node displayed, append its first (if any).
  *
- * @param {InspectorPanel} inspector The inspector hosting this widget.
  */
-export function HTMLBreadcrumbs(inspector) {
-  this.inspector = inspector;
+export function HTMLBreadcrumbs() {
   this.win = window;
   this.doc = window.document;
   this._init();
 }
 
 HTMLBreadcrumbs.prototype = {
-  get walker() {
-    return this.inspector.walker;
-  },
-
   _init: function () {
     this.outer = this.doc.getElementById("inspector-breadcrumbs");
     this.arrowScrollBox = new ArrowScrollBox(this.win, this.outer);
@@ -376,9 +371,6 @@ HTMLBreadcrumbs.prototype = {
     this.updateWithMutations = this.updateWithMutations.bind(this);
     this.updateSelectors = this.updateSelectors.bind(this);
     selection.on("new-node-front", this.update);
-    selection.on("pseudoclass", this.updateSelectors);
-    selection.on("attribute-changed", this.updateSelectors);
-    this.inspector.on("markupmutation", this.updateWithMutations);
     this.update();
   },
 
@@ -545,7 +537,7 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event.
    */
   handleMouseOut: function (event) {
-    this.inspector.highlighter.unhighlight();
+    Highlighter.unhighlight();
   },
 
   /**
@@ -590,9 +582,6 @@ HTMLBreadcrumbs.prototype = {
    */
   destroy: function () {
     selection.off("new-node-front", this.update);
-    selection.off("pseudoclass", this.updateSelectors);
-    selection.off("attribute-changed", this.updateSelectors);
-    this.inspector.off("markupmutation", this.updateWithMutations);
 
     this.container.removeEventListener("click", this, true);
     this.container.removeEventListener("mouseover", this, true);
@@ -696,7 +685,7 @@ HTMLBreadcrumbs.prototype = {
     };
 
     button.onBreadcrumbsHover = () => {
-      this.inspector.highlighter.highlight(node);
+      Highlighter.highlight(node);
     };
 
     return button;
@@ -872,10 +861,6 @@ HTMLBreadcrumbs.prototype = {
     if (!selection.isElementNode() && !selection.isShadowRootNode()) {
       // no selection
       this.setCursor(-1);
-      if (trimmed) {
-        // Since something changed, notify the interested parties.
-        this.inspector.emit("breadcrumbs-updated", selection.nodeFront);
-      }
       return;
     }
 
@@ -904,16 +889,12 @@ HTMLBreadcrumbs.prototype = {
       this.setCursor(idx);
     }
 
-    // const doneUpdating = this.inspector.updating("breadcrumbs");
-
     this.updateSelectors();
 
     // Make sure the selected node and its neighbours are visible.
     setTimeout(() => {
       try {
         this.scroll();
-        this.inspector.emit("breadcrumbs-updated", selection.nodeFront);
-        // doneUpdating();
       } catch (e) {
         // Only log this as an error if we haven't been destroyed in the meantime.
         if (!this.isDestroyed) {
