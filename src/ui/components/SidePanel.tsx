@@ -34,7 +34,7 @@ export default function SidePanel() {
     },
   ];
 
-  if (!!cypressResults) {
+  if (cypressResults && cypressResults.length > 0) {
     items.push({
       header: "Cypress",
       buttons: null,
