@@ -93,6 +93,7 @@ export async function renderFocused(
     isTransitionPending: false,
     showErrors: true,
     showExceptions: true,
+    showExceptionsForDisplay: true,
     showLogs: true,
     showNodeModules: true,
     showTimestamps: false,
