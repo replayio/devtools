@@ -1,8 +1,5 @@
 import { EntityId } from "@reduxjs/toolkit";
 import { newSource, SourceKind } from "@replayio/protocol";
-import groupBy from "lodash/groupBy";
-import omit from "lodash/omit";
-import keyBy from "lodash/keyBy";
 import { SourceDetails } from "ui/reducers/sources";
 import newGraph from "./graph";
 
@@ -12,13 +9,15 @@ const fullSourceDetails = (
     kind: SourceKind;
   }
 ): SourceDetails => {
-  return {
-    canonicalId: attributes.id,
-    correspondingSourceIds: [],
-    generated: [],
-    generatedFrom: [],
-    ...attributes,
-  };
+  return Object.assign(
+    {
+      canonicalId: attributes.id,
+      correspondingSourceIds: [],
+      generated: [],
+      generatedFrom: [],
+    },
+    attributes
+  );
 };
 
 export const keyForSource = (source: newSource): string => {
@@ -28,10 +27,11 @@ export const keyForSource = (source: newSource): string => {
 export const newSourcesToCompleteSourceDetails = (
   newSources: newSource[]
 ): Record<EntityId, SourceDetails> => {
-  const newSourcesById = keyBy(newSources, s => s.sourceId);
   const prettyPrinted = newGraph();
   const canonical = newGraph();
   const corresponding: Record<string, string[]> = {};
+  const newSourcesById: Record<string, newSource> = {};
+  const byKind = {} as Record<SourceKind, newSource[]>;
 
   // Canonical links can go across multiple links
   const findCanonicalId = (id: string) => {
@@ -47,33 +47,47 @@ export const newSourcesToCompleteSourceDetails = (
   };
 
   const generated = newGraph();
-  newSources.forEach((source: newSource) => {
+
+  // We'll iterate through the whole list once, and perform three setup operations per source:
+  // 1) Creating a normalized lookup table by source ID
+  // 2) Grouping sources by kind
+  // 3) Connected nodes based on generated source IDs
+  for (let source of newSources) {
+    // start by adding this source to the lookup table
+    newSourcesById[source.sourceId] = source;
+
+    // Also group by kind
+    if (!byKind[source.kind]) {
+      byKind[source.kind] = [];
+    }
+
+    byKind[source.kind].push(source);
+
     // We handle pretty-printed (pp) files and their generated links a little
     // differently. Because Replay makes the pp sources, their structure is
     // predictable. All pp sources will have one generatedSourceId, and it will
     // be the minified source.
     if (source.kind === "prettyPrinted") {
-      return;
+      continue;
     }
 
-    source.generatedSourceIds?.map(generatedId => {
+    for (let generatedId of source.generatedSourceIds || []) {
+      // source.generatedSourceIds?.map(generatedId => {
       generated.connectNode(source.sourceId, generatedId);
-    });
-  });
+    }
+  }
 
-  // Sources are processed by kind. So first we go through the whole list once
-  // just to group things properly.
-  const byKind = groupBy(newSources, source => source.kind);
+  // Sources are processed by kind
 
   const inlineScripts = byKind["inlineScript"] || [];
-  inlineScripts.forEach(source => {
+  for (let source of inlineScripts) {
     canonical.connectNode(source.sourceId, generated.to(source.sourceId)![0]);
-  });
+  }
 
   const sourceMapped = byKind["sourceMapped"] || [];
-  sourceMapped.forEach(source => {
+  for (let source of sourceMapped) {
     canonical.connectNode(generated.from(source.sourceId)![0], source.sourceId);
-  });
+  }
 
   // TODO @jcmorrow: remove this once we include the contentHash with prettyPrinted sources
   const contentHashForSource = (source: newSource) => {
@@ -86,36 +100,40 @@ export const newSourcesToCompleteSourceDetails = (
     return `${source.kind}:${source.url!}:${contentHashForSource(source)}`;
   };
 
-  newSources.forEach(source => {
+  for (let source of newSources) {
     const key = keyForSource(source);
     if (corresponding[key] === undefined) {
       corresponding[key] = [];
     }
     corresponding[key].push(source.sourceId);
-  });
+  }
 
   const returnValue: Record<EntityId, SourceDetails> = {};
 
   const prettyPrintedSources = byKind["prettyPrinted"] || [];
-  prettyPrintedSources.forEach(source => {
+
+  for (let source of prettyPrintedSources) {
     const nonPrettyPrintedVersionId = source.generatedSourceIds![0];
     prettyPrinted.connectNode(nonPrettyPrintedVersionId, source.sourceId);
     canonical.connectNode(source.sourceId, nonPrettyPrintedVersionId);
-  });
+  }
 
-  newSources.forEach(source => {
-    returnValue[source.sourceId] = fullSourceDetails({
-      ...omit(source, "sourceId", "generatedSourceIds"),
-      contentHash: contentHashForSource(source),
-      correspondingSourceIds: corresponding[keyForSource(source)],
-      id: source.sourceId,
-      prettyPrinted: prettyPrinted.from(source.sourceId)?.[0],
-      prettyPrintedFrom: prettyPrinted.to(source.sourceId)?.[0],
-      generated: generated.from(source.sourceId) || [],
-      generatedFrom: generated.to(source.sourceId) || [],
-      canonicalId: findCanonicalId(source.sourceId),
-    });
-  });
+  for (let source of newSources) {
+    const { sourceId, generatedSourceIds, ...remainingFields } = source;
+
+    returnValue[sourceId] = fullSourceDetails(
+      Object.assign(remainingFields, {
+        contentHash: contentHashForSource(source),
+        correspondingSourceIds: corresponding[keyForSource(source)],
+        id: sourceId,
+        prettyPrinted: prettyPrinted.from(sourceId)?.[0],
+        prettyPrintedFrom: prettyPrinted.to(source.sourceId)?.[0],
+        generated: generated.from(sourceId) || [],
+        generatedFrom: generated.to(sourceId) || [],
+        canonicalId: findCanonicalId(sourceId),
+      })
+    );
+  }
 
   return returnValue;
 };
