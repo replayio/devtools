@@ -3,23 +3,6 @@ import { newSource, SourceKind } from "@replayio/protocol";
 import { SourceDetails } from "ui/reducers/sources";
 import newGraph from "./graph";
 
-const fullSourceDetails = (
-  attributes: Partial<SourceDetails> & {
-    id: string;
-    kind: SourceKind;
-  }
-): SourceDetails => {
-  return Object.assign(
-    {
-      canonicalId: attributes.id,
-      correspondingSourceIds: [],
-      generated: [],
-      generatedFrom: [],
-    },
-    attributes
-  );
-};
-
 export const keyForSource = (source: newSource): string => {
   return `${source.url!}:${source.contentHash}`;
 };
@@ -121,18 +104,16 @@ export const newSourcesToCompleteSourceDetails = (
   for (let source of newSources) {
     const { sourceId, generatedSourceIds, ...remainingFields } = source;
 
-    returnValue[sourceId] = fullSourceDetails(
-      Object.assign(remainingFields, {
-        contentHash: contentHashForSource(source),
-        correspondingSourceIds: corresponding[keyForSource(source)],
-        id: sourceId,
-        prettyPrinted: prettyPrinted.from(sourceId)?.[0],
-        prettyPrintedFrom: prettyPrinted.to(source.sourceId)?.[0],
-        generated: generated.from(sourceId) || [],
-        generatedFrom: generated.to(sourceId) || [],
-        canonicalId: findCanonicalId(sourceId),
-      })
-    );
+    returnValue[sourceId] = Object.assign(remainingFields, {
+      contentHash: contentHashForSource(source),
+      correspondingSourceIds: corresponding[keyForSource(source)] || [],
+      id: sourceId,
+      prettyPrinted: prettyPrinted.from(sourceId)?.[0],
+      prettyPrintedFrom: prettyPrinted.to(source.sourceId)?.[0],
+      generated: generated.from(sourceId) || [],
+      generatedFrom: generated.to(sourceId) || [],
+      canonicalId: findCanonicalId(sourceId),
+    });
   }
 
   return returnValue;
