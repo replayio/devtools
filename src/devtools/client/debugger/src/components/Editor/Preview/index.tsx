@@ -114,7 +114,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
           <PreviewHighlight expression={preview.expression} target={preview.target} />
         )}
         {!selecting && preview?.resultGrip && (
-          <Popup preview={preview} editor={this.props.editor} editorRef={this.props.editorRef} />
+          <Popup preview={preview} editorRef={this.props.editorRef} />
         )}
       </>
     );
