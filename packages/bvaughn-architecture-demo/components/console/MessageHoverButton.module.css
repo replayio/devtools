@@ -1,11 +1,13 @@
 .AddCommentButton,
 .ConsoleMessageHoverButton {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
   padding: 0 0.125rem;
   position: absolute;
   left: 0.25rem;
   top: 0.25rem;
   height: 1.5rem;
-  border-radius: 0.25rem;
+  border-radius: 3rem;
   outline: none;
   border: none;
   display: flex;
@@ -29,6 +31,7 @@
 .ConsoleMessageHoverButtonIcon {
   width: 1.25rem;
   height: 1.25rem;
+  padding: 0.0625rem;
   display: inline-block;
 }
 
