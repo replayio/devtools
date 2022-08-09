@@ -1,4 +1,4 @@
-import { ReactNode, unstable_Offscreen as Offscreen, useEffect, useRef } from "react";
+import { ReactNode, unstable_Offscreen as Offscreen } from "react";
 
 // Wrapper around the Offscreen API that defers rendering the Offscreen tree initially,
 // until it's been explicitly marked as "visible".
@@ -12,18 +12,5 @@ export default function LazyOffscreen({
   children: ReactNode;
   mode: "hidden" | "visible";
 }) {
-  const hasBeenVisibleRef = useRef(false);
-  const hasBeenVisible = hasBeenVisibleRef.current;
-
-  useEffect(() => {
-    if (mode === "visible") {
-      hasBeenVisibleRef.current = true;
-    }
-  });
-
-  if (mode === "hidden" && !hasBeenVisible) {
-    return null;
-  }
-
   return <Offscreen children={children} mode={mode} />;
 }
