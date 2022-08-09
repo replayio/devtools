@@ -23,10 +23,6 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
       return;
     }
 
-    // HACK This is ugly, but we lazy-load the component.
-    // So, ensure it's loaded, _then_ highlight things.
-    await import("devtools/client/inspector/components/App");
-
     const { highlighter } = await import("highlighter/highlighter");
     const nodeFront = grip.getNodeFront();
     if (highlighter && nodeFront) {
@@ -37,7 +33,6 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 
 export function unHighlightDomElement(): UIThunkAction {
   return async () => {
-    await import("devtools/client/inspector/components/App");
     const { highlighter } = await import("highlighter/highlighter");
 
     if (highlighter) {
@@ -72,7 +67,6 @@ export function openNodeInInspector(
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
-    await import("devtools/client/inspector/components/App");
     const { selection } = await import("devtools/client/framework/selection");
     await selection.setNodeFront(nodeFront, {
       reason,

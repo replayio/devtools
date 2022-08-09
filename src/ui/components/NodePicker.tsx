@@ -127,7 +127,6 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
       Highlighter.highlight(nodeBounds);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
       if (node && Highlighter.currentNode == nodeBounds) {
-        await import("devtools/client/inspector/components/App");
         const { selection } = await import("devtools/client/framework/selection");
         selection.setNodeFront(node);
       }
