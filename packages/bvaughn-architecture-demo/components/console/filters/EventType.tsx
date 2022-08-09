@@ -3,7 +3,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { Event } from "@bvaughn/src/suspense/EventsCache";
 import { useContext } from "react";
 
-import { Checkbox } from "../../Checkbox";
+import { Badge, Checkbox } from "design";
 
 import styles from "./EventType.module.css";
 
@@ -36,7 +36,7 @@ export default function EventType({
         )}
         <span>{event.label}</span>
       </span>
-      <span className={styles.Count}>{event.count}</span>
+      <Badge label={event.count} />
     </label>
   );
 }

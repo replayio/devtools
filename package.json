@@ -57,6 +57,7 @@
     "cookie": "^0.4.2",
     "d3-interpolate": "^3.0.1",
     "date-fns": "^2.28.0",
+    "design": "workspace:*",
     "devtools-sprintf-js": "^1.0.3",
     "dotenv": "^16.0.0",
     "escape-html": "^1.0.3",

@@ -1,5 +1,7 @@
+import * as React from "react";
 import classNames from "classnames";
-import React from "react";
+
+import { Badge } from "./Badge";
 
 import styles from "./Checkbox.module.css";
 
@@ -31,7 +33,7 @@ export function Checkbox({
     <label className={classNames(styles.Label, className)} {...props}>
       <input {...checkboxProps} className={styles.Input} />
       <span>{label}</span>
-      {secondaryLabel ? <span className={styles.SecondaryLabel}>{secondaryLabel}</span> : null}
+      {secondaryLabel ? <Badge label={secondaryLabel} /> : null}
     </label>
   ) : (
     <input {...checkboxProps} {...props} className={classNames(styles.Input, className)} />
