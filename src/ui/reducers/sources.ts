@@ -54,10 +54,7 @@ export interface SourceContent {
 }
 
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
-const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => source.sourceId });
 const contentsAdapter = createEntityAdapter<SourceContent>();
-
-export const sourceSelectors = sourcesAdapter.getSelectors();
 
 export const { selectById: getSourceContentsEntry } = contentsAdapter.getSelectors(
   (state: UIState) => state.sources.contents
@@ -73,7 +70,6 @@ export const {
 export interface SourcesState {
   allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
-  sources: EntityState<newSource>;
   contents: EntityState<SourceContent>;
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
@@ -85,7 +81,6 @@ export interface SourcesState {
 const initialState: SourcesState = {
   allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
-  sources: sourcesAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
   selectedLocation: null,
   selectedLocationHistory: [],
@@ -99,14 +94,9 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
-    addSources: (state, action: PayloadAction<newSource[]>) => {
-      // Store the raw protocol information. Once we have recieved all sources
-      // we will iterate over this and build it into the shape we want.
-      sourcesAdapter.addMany(state.sources, action.payload);
-    },
-    allSourcesReceived: state => {
+    allSourcesReceived: (state, action: PayloadAction<newSource[]>) => {
+      const sources = action.payload;
       state.allSourcesReceived = true;
-      const sources = state.sources.ids.map(id => state.sources.entities[id]!);
 
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
 
@@ -180,7 +170,6 @@ const sourcesSlice = createSlice({
 });
 
 export const {
-  addSources,
   allSourcesReceived,
   clearSelectedLocation,
   locationSelected,
