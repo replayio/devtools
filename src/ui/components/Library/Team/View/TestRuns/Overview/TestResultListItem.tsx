@@ -21,7 +21,7 @@ function ViewReplay({ recordingId, passed }: { recordingId: string; passed: bool
               : "text-red-500 group-hover:text-red-700"
           }
         >
-          play_circle
+          {passed ? "play_circle_filled" : "play_circle" }          
         </MaterialIcon>
       </a>
     </Link>

@@ -24,7 +24,7 @@ function Status({ test }: { test: TestMetadata }) {
       className={
         test.result === "passed"
           ? "text-green-500 group-hover:text-green-700"
-          : "text-red-500 group-hover:text-red-700"
+          : "text-red-500 bg-red-500 group-hover:text-red-700"
       }
     >
       play_circle
