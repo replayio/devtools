@@ -179,5 +179,6 @@ export default function SecondaryToolbox() {
 }
 
 function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
-  return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
+  // return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
+  return isActive ? children : (null as any);
 }
