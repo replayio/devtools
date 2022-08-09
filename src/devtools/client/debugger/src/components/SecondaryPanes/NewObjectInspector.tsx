@@ -1,4 +1,5 @@
 import Inspector from "@bvaughn/components/inspector";
+import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
 import "@bvaughn/pages/variables.css";
@@ -56,7 +57,9 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
 
   return (
     <div className={`${styles.Popup} preview-popup`}>
-      <Suspense fallback={<Loader />}>{children}</Suspense>
+      <ErrorBoundary>
+        <Suspense fallback={<Loader />}>{children}</Suspense>
+      </ErrorBoundary>
     </div>
   );
 }
