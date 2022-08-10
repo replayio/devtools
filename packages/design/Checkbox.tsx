@@ -1,11 +1,9 @@
 import * as React from "react";
 import classNames from "classnames";
 
-import { Badge } from "./Badge";
-
 import styles from "./Checkbox.module.css";
 
-export type CheckboxProps = { label?: React.ReactNode; secondaryLabel?: React.ReactNode } & Pick<
+export type CheckboxProps = { label?: React.ReactNode; addon?: React.ReactNode } & Pick<
   React.HTMLProps<HTMLInputElement>,
   "id" | "checked" | "className" | "disabled" | "onChange" | "title"
 >;
@@ -16,11 +14,13 @@ export function Checkbox({
   className,
   disabled,
   label,
-  secondaryLabel,
+  addon,
   onChange,
   title,
   ...props
 }: CheckboxProps) {
+  const generatedId = React.useId();
+  const parsedId = id || generatedId;
   const checkboxProps = {
     disabled,
     id,
@@ -30,11 +30,13 @@ export function Checkbox({
   };
 
   return label ? (
-    <label className={classNames(styles.Label, className)} {...props}>
-      <input {...checkboxProps} className={styles.Input} />
-      <span>{label}</span>
-      {secondaryLabel ? <Badge label={secondaryLabel} /> : null}
-    </label>
+    <div className={classNames(styles.Container, className)} {...props}>
+      <input {...checkboxProps} id={parsedId} className={styles.Input} />
+      <label htmlFor={parsedId} className={styles.Label}>
+        {label}
+      </label>
+      {addon}
+    </div>
   ) : (
     <input {...checkboxProps} {...props} className={classNames(styles.Input, className)} />
   );

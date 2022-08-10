@@ -5,7 +5,7 @@ import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Checkbox } from "design";
+import { Badge, Checkbox } from "design";
 
 import { isFirefoxInternalMessage } from "../utils/messages";
 
@@ -124,7 +124,7 @@ function Toggle({
       <Checkbox
         data-test-id={id}
         label={label}
-        secondaryLabel={count !== null && count > 0 && count}
+        addon={count !== null && count > 0 && <Badge label={count} />}
         checked={checked}
         id={id}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}

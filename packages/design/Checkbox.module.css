@@ -1,3 +1,12 @@
+.Container {
+  flex: 1;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-column-gap: 0.25rem;
+  align-items: center;
+  user-select: none;
+}
+
 .Input {
   appearance: none;
   width: 1rem;
@@ -18,10 +27,11 @@
 }
 
 .Label {
-  flex: 1;
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-column-gap: 0.25rem;
-  align-items: center;
-  user-select: none;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
