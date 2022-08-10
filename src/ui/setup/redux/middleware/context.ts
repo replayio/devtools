@@ -3,10 +3,13 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
+import type { UIState } from "ui/state";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { AnyAction, Middleware } from "@reduxjs/toolkit";
 
 import { validateContext } from "devtools/client/debugger/src/utils/context";
 
-function validateActionContext(getState, cx, action) {
+function validateActionContext(getState: () => UIState, cx: Context, action: AnyAction) {
   // Watch for other actions which are unaffected by thread changes.
 
   try {
@@ -18,17 +21,19 @@ function validateActionContext(getState, cx, action) {
   }
 }
 
+export const getContextFromAction = (action: AnyAction): Context | null => {
+  return action.cx ?? action.meta?.cx ?? action.payload?.cx ?? action?.meta?.arg?.cx ?? null;
+};
+
 // Middleware which looks for actions that have a cx property and ignores
 // them if the context is no longer valid.
-function context(storeApi) {
+export const context: Middleware = storeApi => {
   return next => action => {
-    const cx = action.cx ?? action.meta?.cx ?? null;
+    const cx = getContextFromAction(action);
     if (cx) {
       validateActionContext(storeApi.getState, cx, action);
     }
 
     return next(action);
   };
-}
-
-export { context };
+};
