@@ -21,6 +21,7 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
+import classNames from "classnames";
 
 export default function ConsoleRoot({
   showSearchInputByDefault = true,
@@ -43,8 +44,7 @@ export default function ConsoleRoot({
             showSearchInputByDefault={showSearchInputByDefault}
           >
             <div
-              className={styles.ConsoleRoot}
-              data-menu-open={isMenuOpen}
+              className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
               data-test-id="ConsoleRoot"
             >
               <div className={styles.ConsoleActions}>

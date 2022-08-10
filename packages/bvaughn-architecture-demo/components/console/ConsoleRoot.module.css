@@ -64,7 +64,7 @@
   flex-direction: column;
 }
 
-[data-menu-open="true"] .MessageColumn {
+.ConsoleRootOpen .MessageColumn {
   grid-column: 2;
 }
 

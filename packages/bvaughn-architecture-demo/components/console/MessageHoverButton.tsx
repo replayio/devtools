@@ -72,10 +72,7 @@ export default function MessageHoverButton({
           ref={ref}
         >
           <Icon className={styles.AddCommentButtonIcon} type="comment" />
-          <span className={isHovered ? styles.LabelHovered : styles.Label}>
-            {" "}
-            Add comment &nbsp;
-          </span>
+          <span className={isHovered ? styles.LabelHovered : styles.Label}> Add comment </span>
         </button>
       );
     }
@@ -115,7 +112,7 @@ export default function MessageHoverButton({
               : "rewind"
           }
         />
-        <span className={isHovered ? styles.LabelHovered : styles.Label}> {label} &nbsp;</span>
+        <span className={isHovered ? styles.LabelHovered : styles.Label}> {label} </span>
       </button>
     );
   }
