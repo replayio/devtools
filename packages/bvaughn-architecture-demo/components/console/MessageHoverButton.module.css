@@ -1,6 +1,6 @@
 .AddCommentButton,
 .ConsoleMessageHoverButton {
-  font-family: "Inter", sans-serif;
+  font-family: sans-serif;
   font-weight: 600;
   padding: 0 0.125rem;
   position: absolute;
