@@ -17,6 +17,7 @@
     "baseUrl": ".",
     "paths": {
       "@bvaughn/*": ["./*"],
+      "design/*": ["../design/*"],
       "protocol/*": ["../protocol/*"],
       "shared/*": ["../shared/*"]
     }
@@ -25,10 +26,14 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "../../node_modules/design/**/*.ts",
+    "../../node_modules/design/**/*.tsx",
     "../../node_modules/protocol/**/*.ts",
     "../../node_modules/protocol/**/*.tsx",
     "../../node_modules/shared/**/*.ts",
     "../../node_modules/shared/**/*.tsx",
+    "../design/**/*.ts,tsx",
+    "../design/**/*.tsx",
     "../protocol/**/*.ts,tsx",
     "../protocol/**/*.tsx",
     "../shared/**/*.ts",

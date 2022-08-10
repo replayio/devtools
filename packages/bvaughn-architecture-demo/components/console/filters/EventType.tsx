@@ -3,6 +3,8 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { Event } from "@bvaughn/src/suspense/EventsCache";
 import { useContext } from "react";
 
+import { Badge, Checkbox } from "design";
+
 import styles from "./EventType.module.css";
 
 export default function EventType({
@@ -24,13 +26,7 @@ export default function EventType({
       className={disabled ? styles.EventTypeDisabled : styles.EventType}
       data-test-id={`EventTypes-${event.type}`}
     >
-      <input
-        className={styles.Checkbox}
-        disabled={disabled}
-        type="checkbox"
-        checked={checked}
-        onChange={toggle}
-      />
+      <Checkbox disabled={disabled} checked={checked} onChange={toggle} />
       <span className={styles.Label}>
         {categoryLabel && (
           <>
@@ -40,7 +36,7 @@ export default function EventType({
         )}
         <span>{event.label}</span>
       </span>
-      <span className={styles.Count}>{event.count}</span>
+      <Badge label={event.count} />
     </label>
   );
 }

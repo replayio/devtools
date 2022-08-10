@@ -1,5 +1,7 @@
 .ConsoleRoot {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto 1fr;
   flex-direction: column;
   flex: 1 1 auto;
   overflow: hidden;
@@ -9,25 +11,16 @@
   word-break: break-all;
 }
 
-.TopRow,
-.BottomRow {
+.ConsoleActions {
+  grid-column: 1;
   display: flex;
-  flex-direction: row;
-  flex: 1 1 auto;
-  overflow: hidden;
-  background-color: var(--background-color-contrast-2);
-}
-.TopRow {
-  flex: 0 0 auto;
-  align-items: center;
-  border-bottom: 1px solid var(--background-color-default);
+  justify-content: space-between;
 }
 
 .MenuToggleButton,
 .DeleteTerminalExpressionButton {
-  width: 3rem;
+  width: 2rem;
   height: 2rem;
-  flex: 0 0 3rem;
   padding: 0;
   background: none;
   outline: none;
@@ -42,8 +35,8 @@
   border-color: var(--color-brand);
 }
 
-.DeleteTerminalExpressionIcon,
-.MenuToggleButtonIcon {
+.MenuToggleButtonIcon,
+.DeleteTerminalExpressionIcon {
   width: 3rem;
   height: 2rem;
   padding: 0.25rem;
@@ -51,19 +44,28 @@
   display: inline-block;
 }
 
+.Divider {
+  grid-column: 1 / -1;
+  height: 1px;
+  background-color: var(--background-color-default);
+}
+
 .FilterColumn {
-  flex: 0 0 25%;
+  grid-column: 1;
   overflow: auto;
   height: 100%;
   border-right: 1px solid var(--background-color-default);
 }
 
 .MessageColumn {
-  flex: 1 1 100%;
-  height: 100%;
+  grid-column: 1 / -1;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+}
+
+.ConsoleRootOpen .MessageColumn {
+  grid-column: 2;
 }
 
 .Row {

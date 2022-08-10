@@ -1,10 +1,10 @@
-import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { CategoryCounts, getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
 import React, { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Badge, Checkbox } from "design";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
@@ -77,16 +77,13 @@ function Toggle({
   const id = `FilterToggle-${camelCase(label)}`;
   return (
     <div className={styles.Filter}>
-      <input
-        className={styles.Checkbox}
+      <Checkbox
+        data-test-id={id}
+        label={label}
         checked={checked}
         id={id}
-        onChange={event => onChange(event.currentTarget.checked)}
-        type="checkbox"
+        onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
       />
-      <label className={styles.Label} data-test-id={id} htmlFor={id} title={label}>
-        {label}
-      </label>
       {category && (
         <Suspense fallback={null}>
           <ToggleCategoryCount category={category} />
@@ -103,5 +100,5 @@ function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
   const { categoryCounts } = getMessages(client, focusRange);
   const count = categoryCounts[category];
 
-  return count === 0 ? null : <div className={styles.Count}>{count}</div>;
+  return count === 0 ? null : <Badge label={count} />;
 }

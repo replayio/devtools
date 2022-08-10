@@ -21,6 +21,7 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
+import classNames from "classnames";
 
 export default function ConsoleRoot({
   showSearchInputByDefault = true,
@@ -37,8 +38,11 @@ export default function ConsoleRoot({
   return (
     <ConsoleContextMenuContextRoot>
       <ConsoleFiltersContextRoot>
-        <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
-          <div className={styles.TopRow}>
+        <div
+          className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
+          data-test-id="ConsoleRoot"
+        >
+          <div className={styles.ConsoleActions}>
             <button
               className={styles.MenuToggleButton}
               data-test-id="ConsoleMenuToggleButton"
@@ -50,7 +54,7 @@ export default function ConsoleRoot({
                 type={isMenuOpen ? "menu-open" : "menu-closed"}
               />
             </button>
-            <FilterText />
+
             {consoleEvaluations.length > 0 && (
               <button
                 className={styles.DeleteTerminalExpressionButton}
@@ -62,39 +66,41 @@ export default function ConsoleRoot({
               </button>
             )}
           </div>
-          <div className={styles.BottomRow}>
-            <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-              <div className={styles.FilterColumn}>
-                <Suspense fallback={<Loader />}>
-                  <FilterToggles />
-                </Suspense>
+
+          <FilterText />
+
+          <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+            <div className={styles.FilterColumn}>
+              <Suspense fallback={<Loader />}>
+                <FilterToggles />
+              </Suspense>
+            </div>
+          </Offscreen>
+
+          <Suspense
+            fallback={
+              <div className={styles.Loader}>
+                <Loader />
               </div>
-            </Offscreen>
-            <Suspense
-              fallback={
-                <div className={styles.Loader}>
-                  <Loader />
+            }
+          >
+            <LoggablesContextRoot messageListRef={messageListRef}>
+              <SearchContextRoot
+                messageListRef={messageListRef}
+                showSearchInputByDefault={showSearchInputByDefault}
+              >
+                <div className={styles.MessageColumn}>
+                  <ErrorBoundary>
+                    <MessagesList ref={messageListRef} />
+                  </ErrorBoundary>
+
+                  {terminalInput}
+
+                  <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
                 </div>
-              }
-            >
-              <LoggablesContextRoot messageListRef={messageListRef}>
-                <SearchContextRoot
-                  messageListRef={messageListRef}
-                  showSearchInputByDefault={showSearchInputByDefault}
-                >
-                  <div className={styles.MessageColumn}>
-                    <ErrorBoundary>
-                      <MessagesList ref={messageListRef} />
-                    </ErrorBoundary>
-
-                    {terminalInput}
-
-                    <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
-                  </div>
-                </SearchContextRoot>
-              </LoggablesContextRoot>
-            </Suspense>
-          </div>
+              </SearchContextRoot>
+            </LoggablesContextRoot>
+          </Suspense>
 
           <ContextMenu />
         </div>

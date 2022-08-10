@@ -3,6 +3,7 @@
   display: grid;
   grid-template-columns: min-content auto min-content;
   gap: 0.5ch;
+  align-items: center;
 }
 .EventTypeDisabled {
   opacity: 0.5;
@@ -19,11 +20,6 @@
 }
 
 .CategoryPrefix {
-  color: var(--color-dim);
-}
-
-.Count {
-  font-size: var(--font-size-small);
   color: var(--color-dim);
 }
 
