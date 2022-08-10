@@ -42,28 +42,30 @@ export default function ConsoleRoot({
           className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
           data-test-id="ConsoleRoot"
         >
-          <button
-            className={styles.MenuToggleButton}
-            data-test-id="ConsoleMenuToggleButton"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-          >
-            <Icon
-              className={styles.MenuToggleButtonIcon}
-              type={isMenuOpen ? "menu-open" : "menu-closed"}
-            />
-          </button>
-
-          {consoleEvaluations.length > 0 && (
+          <div className={styles.ConsoleActions}>
             <button
-              className={styles.DeleteTerminalExpressionButton}
-              data-test-id="ClearConsoleEvaluationsButton"
-              onClick={clearConsoleEvaluations}
-              title="Clear console evaluations"
+              className={styles.MenuToggleButton}
+              data-test-id="ConsoleMenuToggleButton"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
             >
-              <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
+              <Icon
+                className={styles.MenuToggleButtonIcon}
+                type={isMenuOpen ? "menu-open" : "menu-closed"}
+              />
             </button>
-          )}
+
+            {consoleEvaluations.length > 0 && (
+              <button
+                className={styles.DeleteTerminalExpressionButton}
+                data-test-id="ClearConsoleEvaluationsButton"
+                onClick={clearConsoleEvaluations}
+                title="Clear console evaluations"
+              >
+                <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
+              </button>
+            )}
+          </div>
 
           <FilterText />
 
