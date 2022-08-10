@@ -20,7 +20,6 @@ import styles from "./shared.module.css";
 
 const EMPTY_ARRAY: any[] = [];
 
-// Renders PointInstances with enableLogging=true.
 function UncaughtExceptionRenderer({
   index,
   isFocused,
@@ -33,6 +32,10 @@ function UncaughtExceptionRenderer({
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
+  const location = Array.isArray(uncaughtException.location)
+    ? uncaughtException.location[0]
+    : uncaughtException.location;
+
   const ref = useRef<HTMLDivElement>(null);
 
   const [isHovered, setIsHovered] = useState(false);
@@ -43,7 +46,7 @@ function UncaughtExceptionRenderer({
     }
   }, [isFocused]);
 
-  let className = styles.Row;
+  let className = styles.ErrorRow;
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
@@ -87,9 +90,7 @@ function UncaughtExceptionRenderer({
       role="listitem"
     >
       <span className={styles.Source}>
-        <Suspense fallback={<Loader />}>
-          {location && <Source location={uncaughtException.location} />}
-        </Suspense>
+        <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
       </span>
       {showExpandable ? (
         <Expandable
@@ -104,7 +105,7 @@ function UncaughtExceptionRenderer({
       <MessageHoverButtonWithWithPause
         executionPoint={uncaughtException.point}
         isHovered={isHovered}
-        location={uncaughtException.location}
+        location={location}
         time={uncaughtException.time}
       />
     </div>

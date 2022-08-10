@@ -29,7 +29,7 @@ type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | 
 
 type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: Object[]; scopes: Scope[] };
-  location: Location;
+  location: Location | Location[];
   pauseId: PauseId;
   point: ExecutionPoint;
   time: number;
@@ -298,18 +298,34 @@ const EXCEPTIONS_MAPPER = `
   }
 
   function getTopFrame() {
-    const { data, frame } = sendCommand("Pause.getTopFrame");
-    addPauseData(data);
-    return finalData.frames.find(f => f.frameId == frame);
+    const { data, frame: frameId } = sendCommand("Pause.getTopFrame");
+
+    return (data.frames || []).find((f) => f.frameId == frameId);
   }
 
   const { pauseId, point, time } = input;
   const { frameId, location } = getTopFrame();
-  const { data: exceptionData, exception } = sendCommand("Pause.getExceptionValue");
-  addPauseData(exceptionData);
+  const {
+    data: { objects, scopes },
+    exception,
+  } = sendCommand("Pause.getExceptionValue");
+  const {
+    data: { frames },
+  } = sendCommand("Pause.getAllFrames");
 
-  return [{
-    key: time,
-    value: { data: finalData, location, pauseId, point, time, values: [exception] },
-  }];
+  addPauseData({ frames, objects, scopes });
+
+  return [
+    {
+      key: time,
+      value: {
+        data: finalData,
+        location,
+        pauseId,
+        point,
+        time,
+        values: [exception],
+      },
+    },
+  ];
 `;

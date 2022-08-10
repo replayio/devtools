@@ -22,8 +22,6 @@ import {
 } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import { isFirefoxInternalMessage } from "./utils/messages";
-
 export type Loggable =
   | EventLog
   | PointInstance
@@ -85,10 +83,6 @@ export function LoggablesContextRoot({
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
     return messages.filter((message: ProtocolMessage) => {
-      if (isFirefoxInternalMessage(message)) {
-        return false;
-      }
-
       switch (message.level) {
         case "warning": {
           if (!showWarnings) {
