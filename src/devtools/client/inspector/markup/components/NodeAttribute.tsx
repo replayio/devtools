@@ -2,10 +2,10 @@ import { Attr } from "@replayio/protocol";
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { NodeInfo } from "../state/markup";
+import { NodeInfo } from "../reducers/markup";
 
 const { truncateString } = require("devtools/shared/inspector/utils");
-const { parseAttribute } = require("devtools/client/shared/node-attribute-parser");
+const { parseAttribute } = require("third-party/node-attribute-parser");
 
 const COLLAPSE_DATA_URL_REGEX = /^data.+base64/;
 const COLLAPSE_DATA_URL_LENGTH = 60;

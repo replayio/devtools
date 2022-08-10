@@ -3,5 +3,3 @@ export * from "./Column";
 export * from "./Icon";
 export * from "./PrefixBadgePicker";
 export * from "./Row";
-
-export * from "./types";

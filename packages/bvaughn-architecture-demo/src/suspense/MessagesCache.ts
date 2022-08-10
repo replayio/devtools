@@ -3,13 +3,33 @@ import { Message, TimeStampedPointRange } from "@replayio/protocol";
 import { ReplayClientInterface } from "../../../shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
-import { formatTimestamp, isRangeEqual, isRangeSubset } from "../utils/time";
+import {
+  isExecutionPointsGreaterThan,
+  isExecutionPointsLessThan,
+  isRangeEqual,
+  isRangeSubset,
+} from "../utils/time";
 
 import { preCacheObjects } from "./ObjectPreviews";
 import { Wakeable } from "./types";
 
 export type ProtocolMessage = Message & {
   type: "ProtocolMessage";
+};
+
+export type CategoryCounts = {
+  errors: number;
+  exceptions: number; // TODO Remove this
+  logs: number;
+  warnings: number;
+};
+
+type MessageData = {
+  categoryCounts: CategoryCounts;
+  countAfter: number;
+  countBefore: number;
+  didOverflow: boolean;
+  messages: ProtocolMessage[];
 };
 
 // TODO Should I use React's Suspense cache APIs here?
@@ -23,26 +43,20 @@ let lastFetchDidOverflow: boolean = false;
 let lastFetchedFocusRange: TimeStampedPointRange | null = null;
 let lastFetchedMessages: ProtocolMessage[] | null = null;
 
-let lastFilteredFocusRange: TimeStampedPointRange | null = null;
-let lastFilteredMessages: ProtocolMessage[] | null = null;
+let lastFilteredCategoryCounts: CategoryCounts | null = null;
 let lastFilteredCountAfter: number = 0;
 let lastFilteredCountBefore: number = 0;
-
-type getMessagesResponse = {
-  countAfter: number;
-  countBefore: number;
-  didOverflow: boolean;
-  messages: ProtocolMessage[];
-};
+let lastFilteredFocusRange: TimeStampedPointRange | null = null;
+let lastFilteredMessages: ProtocolMessage[] | null = null;
 
 // Synchronously returns an array of filtered Messages,
 // or throws a Wakeable to be resolved once messages have been fetched.
 //
-// This method is Suspense friend; it is meant to be called from a React component during render.
+// This method is Suspense friendly; it is meant to be called from a React component during render.
 export function getMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null
-): getMessagesResponse {
+): MessageData {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
     // Edge case scenario handling.
     // The backend throws if both points in a range are the same.
@@ -52,6 +66,12 @@ export function getMessages(
       countBefore: -1,
       didOverflow: false,
       messages: [],
+      categoryCounts: {
+        errors: 0,
+        exceptions: 0,
+        logs: 0,
+        warnings: 0,
+      },
     };
   }
 
@@ -95,6 +115,9 @@ export function getMessages(
     throw inFlightWakeable;
   }
 
+  // TODO Filter Firefox internal messages?
+  // import { isFirefoxInternalMessage } from "../utils/messages";
+
   // At this point, messages have been fetched but we may still need to filter them.
   // For performance reasons (both in this function and on things that consume the filtered list)
   // it's best if we memoize this operation (by comparing ranges) to avoid recreating the filtered array.
@@ -105,18 +128,18 @@ export function getMessages(
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages;
     } else {
-      const begin = focusRange.begin.time;
-      const end = focusRange.end.time;
+      const beginPoint = focusRange.begin.point;
+      const endPoint = focusRange.end.point;
 
       lastFilteredFocusRange = focusRange;
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages!.filter(message => {
-        const time = message.point.time;
-        if (time < begin) {
+        const point = message.point.point;
+        if (isExecutionPointsLessThan(point, beginPoint)) {
           lastFilteredCountBefore++;
           return false;
-        } else if (time > end) {
+        } else if (isExecutionPointsGreaterThan(point, endPoint)) {
           lastFilteredCountAfter++;
           return false;
         } else {
@@ -124,12 +147,51 @@ export function getMessages(
         }
       });
     }
+
+    let errors = 0;
+    let exceptions = 0; // TODO Remove this
+    let logs = 0;
+    let warnings = 0;
+
+    lastFilteredMessages!.forEach(message => {
+      switch (message.level) {
+        case "assert":
+        case "info":
+        case "trace":
+          logs++;
+          break;
+        case "error":
+          // TODO Remove this switch
+          switch (message.source) {
+            case "ConsoleAPI": {
+              errors++;
+              break;
+            }
+            case "PageError": {
+              exceptions++;
+              break;
+            }
+          }
+          break;
+        case "warning":
+          warnings++;
+          break;
+      }
+    });
+
+    lastFilteredCategoryCounts = {
+      errors,
+      exceptions,
+      logs,
+      warnings,
+    };
   }
 
   // Note that the only time when it's safe for us to specify the number of trimmed messages
   // is when we are trimming from the complete set of messages (aka no focus region).
   // Otherwise even if we do trim some messages locally, the number isn't meaningful.
   return {
+    categoryCounts: lastFilteredCategoryCounts!,
     countAfter: lastFetchedFocusRange === null ? lastFilteredCountAfter : -1,
     countBefore: lastFetchedFocusRange === null ? lastFilteredCountBefore : -1,
     didOverflow: lastFetchDidOverflow,
@@ -179,18 +241,16 @@ async function fetchMessages(
     inFlightFocusRange = null;
     inFlightWakeable = null;
 
-    console.error("getMessage() Error for range", printFocusRange(focusRange), error);
+    console.error("getMessage() Error for range", printPointRange(focusRange), error);
 
     wakeable.reject(error);
   }
 }
 
-function printFocusRange(focusRange: TimeStampedPointRange | null): string {
+function printPointRange(focusRange: TimeStampedPointRange | null): string {
   if (focusRange === null) {
     return "null";
   } else {
-    return `${formatTimestamp(focusRange.begin.time)} - ${formatTimestamp(focusRange.end.time)} (${
-      focusRange.begin.point
-    }:${focusRange.end.point})`;
+    return `${focusRange.begin.time}:${focusRange.end.time} (${focusRange.begin.point}:${focusRange.end.point})`;
   }
 }

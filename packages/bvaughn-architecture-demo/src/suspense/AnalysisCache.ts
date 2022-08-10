@@ -1,8 +1,17 @@
-import { ExecutionPoint, Location, Object, PauseId, TimeStampedPoint } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  Frame,
+  Location,
+  Object,
+  PauseId,
+  PointRange,
+  Scope,
+  TimeStampedPoint,
+} from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
-import { preCacheObject } from "./ObjectPreviews";
+import { preCacheObjects } from "./ObjectPreviews";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
@@ -16,43 +25,38 @@ type AnalysisResult = {
   values: Value[];
 };
 
+type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
+
 type RemoteAnalysisResult = {
-  data: { objects: Object[] };
+  data: { frames: Frame[]; objects: Object[]; scopes: Scope[] };
+  location: Location;
   pauseId: PauseId;
+  point: ExecutionPoint;
+  time: number;
   values: Array<{ value?: any; object?: string }>;
 };
 
-const locationAndTimeToValueMap: Map<string, Record<AnalysisResult>> = new Map();
+const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map();
 
-function getKey(location: Location, timeStampedPoint: TimeStampedPoint, code: string): string {
-  return `${location.sourceId}:${location.line}:${location.column}:${timeStampedPoint.time}:${code}`;
-}
+// TODO (FE-469) Filter in-memory if the range gets smaller (and we haven't overflowed)
+// Currently we re-run the analysis which seems wasteful.
 
-export function getCachedAnalysis(
-  location: Location,
-  timeStampedPoint: TimeStampedPoint,
-  code: string
-): AnalysisResult | null {
-  const key = getKey(location, timeStampedPoint, code);
-  const record = locationAndTimeToValueMap.get(key);
-  if (record?.status === STATUS_RESOLVED) {
-    return record.value;
-  } else {
-    return null;
-  }
+function getKey(focusRange: PointRange | null, location: Location, code: string): string {
+  const rangeString = focusRange ? `${focusRange.begin}-${focusRange.end}` : "-";
+  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}`;
 }
 
 export function runAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
-  timeStampedPoint: TimeStampedPoint,
   code: string
-): AnalysisResult {
-  const key = getKey(location, timeStampedPoint, code);
+): AnalysisResults {
+  const key = getKey(focusRange, location, code);
 
   let record = locationAndTimeToValueMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<AnalysisResult>();
+    const wakeable = createWakeable<AnalysisResults>();
 
     record = {
       status: STATUS_PENDING,
@@ -61,7 +65,7 @@ export function runAnalysis(
 
     locationAndTimeToValueMap.set(key, record);
 
-    runLocalOrRemoteAnalysis(client, location, timeStampedPoint, code, record, wakeable);
+    runLocalOrRemoteAnalysis(client, focusRange, location, code, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -73,43 +77,27 @@ export function runAnalysis(
 
 async function runLocalOrRemoteAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
-  timeStampedPoint: TimeStampedPoint,
   code: string,
-  record: Record<AnalysisResult>,
-  wakeable: Wakeable<AnalysisResult>
+  record: Record<AnalysisResults>,
+  wakeable: Wakeable<AnalysisResults>
 ) {
   try {
-    const values = await runLocalAnalysis(code);
-
-    const analysisResult: AnalysisResult = {
-      executionPoint: timeStampedPoint.point,
-      isRemote: false,
-      pauseId: null,
-      time: timeStampedPoint.time,
-      values,
-    };
+    const analysisResults = await runLocalAnalysis(code);
 
     record.status = STATUS_RESOLVED;
-    record.value = analysisResult;
+    record.value = analysisResults;
 
-    wakeable.resolve(analysisResult);
+    wakeable.resolve(analysisResults);
   } catch (error) {
     try {
-      const { pauseId, values } = await runRemoteAnalysis(client, location, timeStampedPoint, code);
-
-      const analysisResult: AnalysisResult = {
-        executionPoint: timeStampedPoint.point,
-        isRemote: true,
-        pauseId,
-        time: timeStampedPoint.time,
-        values,
-      };
+      const analysisResults = await runRemoteAnalysis(client, focusRange, location, code);
 
       record.status = STATUS_RESOLVED;
-      record.value = analysisResult;
+      record.value = analysisResults;
 
-      wakeable.resolve(analysisResult);
+      wakeable.resolve(analysisResults);
     } catch (error) {
       record.status = STATUS_REJECTED;
       record.value = error;
@@ -119,7 +107,7 @@ async function runLocalOrRemoteAnalysis(
   }
 }
 
-export async function runLocalAnalysis(code: string): Promise<any> {
+export async function runLocalAnalysis(code: string): Promise<AnalysisResults> {
   return new Promise((resolve, reject) => {
     if (code === "location") {
       reject();
@@ -135,7 +123,16 @@ export async function runLocalAnalysis(code: string): Promise<any> {
     const objectURL = URL.createObjectURL(blob);
     const worker = new Worker(objectURL);
     worker.addEventListener("message", event => {
-      resolve(event.data);
+      const values = event.data;
+      const analysisResults: AnalysisResults = (timeStampedPoint: TimeStampedPoint) => ({
+        executionPoint: timeStampedPoint.point,
+        isRemote: false,
+        pauseId: null,
+        time: timeStampedPoint.time,
+        values,
+      });
+
+      resolve(analysisResults);
       clearTimeout(timeoutID);
     });
     worker.addEventListener("error", event => {
@@ -152,31 +149,41 @@ export async function runLocalAnalysis(code: string): Promise<any> {
 
 export async function runRemoteAnalysis(
   client: ReplayClientInterface,
+  focusRange: PointRange | null,
   location: Location,
-  timeStampedPoint: TimeStampedPoint,
   code: string
-): Promise<{ pauseId: PauseId; values: Value[] }> {
+): Promise<AnalysisResults> {
   const results = await client.runAnalysis<RemoteAnalysisResult>({
     effectful: false,
     locations: [{ location }],
-    points: [timeStampedPoint.point],
     mapper: createMapperForAnalysis(code),
+    range: focusRange || undefined,
   });
 
   if (results.length === 0) {
     throw new Error("No results returned from analysis");
   }
 
-  const result = results[0];
-  const objects = result.data.objects;
-  const pauseId = result.pauseId;
-  const values = result.values;
+  const resultsMap = new Map();
+  results.forEach(result => {
+    const objects = result.data.objects;
+    if (objects) {
+      // This will avoid us having to turn around and request them again when rendering the logs.
+      preCacheObjects(result.pauseId, objects);
+    }
 
-  // Pre-cache object previews that came back with our new analysis data.
-  // This will avoid us having to turn around and request them again when rendering the logs.
-  objects.forEach(object => preCacheObject(pauseId, object));
+    resultsMap.set(result.point, {
+      executionPoint: result.point,
+      isRemote: true,
+      pauseId: result.pauseId,
+      time: result.time,
+      values: result.values,
+    });
+  });
 
-  return { pauseId, values };
+  return (timeStampedPoint: TimeStampedPoint) => {
+    return resultsMap.get(timeStampedPoint.point) || null;
+  };
 }
 
 function createMapperForAnalysis(code: string): string {
@@ -230,7 +237,7 @@ function createMapperForAnalysis(code: string): string {
     return [
       {
         key: point,
-        value: { time, pauseId, location, values, data: finalData },
+        value: { time, pauseId, point, location, values, data: finalData },
       },
     ];
   `;

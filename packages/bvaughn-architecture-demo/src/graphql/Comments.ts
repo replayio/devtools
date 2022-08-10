@@ -1,6 +1,7 @@
 import { RecordingId } from "@replayio/protocol";
 
 import { GetComments } from "./generated/GetComments";
+import { AddCommentInput } from "./generated/globalTypes";
 import { GraphQLClientInterface } from "./GraphQLClient";
 import { Comment, CommentPosition } from "./types";
 
@@ -108,13 +109,7 @@ export async function addComment(
   graphQLClient: GraphQLClientInterface,
   accessToken: string,
   recordingId: RecordingId,
-  config: {
-    content: string;
-    hasFrames: boolean;
-    isPublished: boolean;
-    point: string;
-    time: number;
-  }
+  config: Partial<AddCommentInput>
 ) {
   await graphQLClient.send(
     {

@@ -6,10 +6,11 @@ import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
 import Selection from "devtools/client/framework/selection";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
+import { selection } from "devtools/client/framework/selection";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
-export const EventListenersApp = ({ selection }: { selection: Selection }) => {
+export const EventListenersApp = () => {
   const selectedNode = useRef<NodeFront | null>(null);
   const [listeners, setListeners] = useState<AnyListener[]>([]);
   const dispatch = useAppDispatch();
@@ -42,7 +43,7 @@ export const EventListenersApp = ({ selection }: { selection: Selection }) => {
       selection.off("new-node-front", handler);
       selection.off("detached-front", handler);
     };
-  }, [selection]);
+  }, []);
 
   const groupedSortedListeners: [string, AnyListener[]][] = useMemo(() => {
     // group listenerss by event type

@@ -10,10 +10,11 @@ export default function ErrorRenderer({ object }: ObjectPreviewRendererProps) {
   const messageProperty = object?.preview?.properties?.find(
     property => property.name === "message"
   );
+
   return (
-    <div className={styles.Error}>
+    <span className={styles.Error}>
       {object.className}
       {messageProperty ? `: ${messageProperty.value}` : ""}
-    </div>
+    </span>
   );
 }

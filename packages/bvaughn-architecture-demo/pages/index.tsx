@@ -12,7 +12,15 @@ import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
-import React, { Suspense, useContext, useMemo, useState, useTransition } from "react";
+import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
+import React, {
+  Suspense,
+  useContext,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+  useTransition,
+} from "react";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { hasFlag } from "shared/utils/url";
@@ -29,15 +37,26 @@ export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
+  // TODO wat
+  const recordFlag = useSyncExternalStore(
+    () => () => {},
+    () => new URL(window.location.href).searchParams.has("record"),
+    () => false
+  );
+
   // Used to record mock data for e2e tests when a URL parameter is present:
   const client = useContext(ReplayClientContext);
-  const replayClientRecorder = useMemo(() => createReplayClientRecorder(client), [client]);
+  const replayClientRecorder = useMemo(() => {
+    return recordFlag ? createReplayClientRecorder(client) : client;
+  }, [client, recordFlag]);
   const [panel, setPanel] = useState("sources");
   const [isPending, startTransition] = useTransition();
 
   const setPanelTransition = (panel: string) => {
     startTransition(() => setPanel(panel));
   };
+
+  usePreferredColorScheme();
 
   const content = (
     <Initializer>
@@ -64,11 +83,15 @@ export default function HomePage() {
                     </button>
                   </div>
                   <div className={styles.CommentsContainer}>
-                    {panel == "comments" && <CommentList />}
-                    {panel == "sources" && <SourceExplorer />}
+                    <Suspense fallback={<Loader />}>
+                      {panel == "comments" && <CommentList />}
+                      {panel == "sources" && <SourceExplorer />}
+                    </Suspense>
                   </div>
                   <div className={styles.SourcesContainer}>
-                    <Sources />
+                    <Suspense fallback={<Loader />}>
+                      <Sources />
+                    </Suspense>
                   </div>
                   <div className={styles.ConsoleContainer}>
                     <TerminalContextRoot>
@@ -84,7 +107,9 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className={styles.Row}>
-                  <Focuser />
+                  <Suspense fallback={<Loader />}>
+                    <Focuser />
+                  </Suspense>
                 </div>
               </div>
             </FocusContextRoot>

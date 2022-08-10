@@ -7,7 +7,7 @@ const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
 
-const withTM = transpileModules(["bvaughn-architecture-demo"]);
+const withTM = transpileModules(["bvaughn-architecture-demo", "design"]);
 
 /**
  * @type {Pick<

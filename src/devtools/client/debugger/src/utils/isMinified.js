@@ -2,10 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import { isFulfilled } from "./async-value";
-
 // Used to detect minification for automatic pretty printing
 const SAMPLE_SIZE = 50;
 const INDENT_COUNT_THRESHOLD = 5;
@@ -17,11 +13,11 @@ export function isMinified(source) {
     return _minifiedCache.get(source.id);
   }
 
-  if (!source.content || !isFulfilled(source.content) || source.content.value.type !== "text") {
+  if (source?.value?.type !== "text") {
     return false;
   }
 
-  let text = source.content.value.value;
+  let text = source.value.value;
 
   let lineEndIndex = 0;
   let lineStartIndex = 0;

@@ -3,9 +3,31 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
+
+export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
+  return a.localeCompare(b, undefined, { numeric: true });
+}
+
+export function isExecutionPointsGreaterThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
+  return compareExecutionPoints(a, b) > 0;
+}
+
+export function isExecutionPointsLessThan(a: ExecutionPoint, b: ExecutionPoint): boolean {
+  return compareExecutionPoints(a, b) < 0;
+}
+
+export function isExecutionPointsWithinRange(
+  point: ExecutionPoint,
+  beginPoint: ExecutionPoint,
+  endPoint: ExecutionPoint
+): boolean {
+  return !(
+    isExecutionPointsLessThan(point, beginPoint) || isExecutionPointsGreaterThan(point, endPoint)
+  );
+}
 
 export function formatDuration(ms: number) {
   return prettyMilliseconds(ms, { millisecondsDecimalDigits: 1 });
@@ -59,7 +81,7 @@ export function isRangeEqual(
     return true;
   } else if (prevRange !== null && nextRange !== null) {
     return (
-      nextRange.begin.time === prevRange.begin.time && nextRange.end.time === prevRange.end.time
+      nextRange.begin.point === prevRange.begin.point && nextRange.end.point === prevRange.end.point
     );
   } else {
     return false;
@@ -81,6 +103,9 @@ export function isRangeSubset(
     // No matter what the previous range was, the new one is not a subset.
     return false;
   } else {
-    return nextRange.begin.time >= prevRange.begin.time && nextRange.end.time <= prevRange.end.time;
+    return (
+      !isExecutionPointsLessThan(prevRange.begin.point, nextRange.begin.point) &&
+      !isExecutionPointsGreaterThan(prevRange.end.point, nextRange.end.point)
+    );
   }
 }

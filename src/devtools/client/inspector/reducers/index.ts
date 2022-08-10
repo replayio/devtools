@@ -5,16 +5,26 @@
 "use strict";
 
 import { InspectorAction } from "../actions";
-import { initialInspectorState, InspectorState } from "../state";
 const { prefs } = require("devtools/client/inspector/prefs");
 
-export const boxModel = require("devtools/client/inspector/boxmodel/reducers/box-model");
-export const changes = require("devtools/client/inspector/changes/reducers/changes");
+import boxModel from "devtools/client/inspector/boxmodel/reducers/box-model";
 import classList from "devtools/client/inspector/rules/reducers/class-list";
 import markup from "devtools/client/inspector/markup/reducers/markup";
 import rules from "devtools/client/inspector/rules/reducers/rules";
 import computed from "devtools/client/inspector/computed/reducers";
-export { classList, markup, rules, computed };
+export { classList, markup, rules, computed, boxModel };
+
+export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
+
+export interface InspectorState {
+  activeTab: InspectorActiveTab;
+}
+
+export function initialInspectorState(): InspectorState {
+  return {
+    activeTab: prefs.activeTab,
+  };
+}
 
 export function inspector(
   state: InspectorState = initialInspectorState(),

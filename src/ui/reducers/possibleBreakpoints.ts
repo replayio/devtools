@@ -14,13 +14,8 @@ import {
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { getSelectedLocation } from "./sources";
-
-export enum LoadingStatus {
-  LOADING = "loading",
-  LOADED = "loaded",
-  ERRORED = "errored",
-}
 
 export interface PossibleBreakpoints {
   error?: string;

@@ -89,6 +89,7 @@ const KNOWN_IGNORABLE_OBJECT_FIELD_CHECKS = [
   "Symbol(immer-draftable)",
   "isReactComponent",
   "@@toStringTag",
+  "splice",
 ];
 
 export const DisallowEverythingProxyHandler: ProxyHandler<object> = {

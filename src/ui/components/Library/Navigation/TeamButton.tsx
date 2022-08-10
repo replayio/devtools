@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { MouseEvent } from "react";
 import { setModal } from "ui/actions/app";
+import { MY_LIBRARY } from "ui/components/UploadScreen/libraryConstants";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
@@ -25,7 +26,7 @@ export function TeamButton({
   const basePath = `/team/${id}`;
   const url = `${basePath}/${isTest ? "runs" : "recordings"}`;
   const isSelected = router.asPath.includes(basePath);
-  const showSettingsButton = id && isSelected && !isNew;
+  const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
 
   const onClick = () => {

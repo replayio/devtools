@@ -2,16 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { FunctionMatch } from "@replayio/protocol";
+import type { FunctionMatch, Location } from "@replayio/protocol";
 
 import { endTruncateStr } from "./utils";
 import { memoizeLast } from "./memoizeLast";
 import { getTruncatedFileName, getSourceClassnames, getSourceQueryString } from "./source";
 
 import { SourceDetails, isPrettyPrintedSource, getSourceToDisplay } from "ui/reducers/sources";
-import { SymbolDeclarations, FunctionDeclaration } from "../reducers/ast";
+import { SymbolDeclarations, FunctionDeclaration, SymbolEntry } from "../reducers/ast";
 import { Dictionary } from "@reduxjs/toolkit";
 import { SearchTypes } from "../reducers/quick-open";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export const MODIFIERS: Record<string, SearchTypes> = {
   "@": "functions",
@@ -19,6 +20,16 @@ export const MODIFIERS: Record<string, SearchTypes> = {
   ":": "goto",
   "?": "shortcuts",
 };
+
+export interface SearchResult {
+  id: string;
+  value: string;
+  title: string;
+  location?: { start: Location; end?: Location };
+  icon?: string;
+  url?: string;
+  subtitle?: string | number;
+}
 
 export function parseQuickOpenQuery(query: string): SearchTypes {
   const startsWithModifier =
@@ -103,13 +114,15 @@ export function formatProjectFunctions(
   return sourceFunctions;
 }
 
-export const formatSymbols = memoizeLast((symbols: SymbolDeclarations | null) => {
-  if (!symbols?.functions || symbols.loading) {
-    return { functions: [] };
+const NO_FUNCTIONS_FOUND = { functions: [] };
+
+export const formatSymbols = memoizeLast((symbolsEntry: SymbolEntry | null) => {
+  if (symbolsEntry?.status !== LoadingStatus.LOADED || !symbolsEntry?.symbols!.functions) {
+    return NO_FUNCTIONS_FOUND;
   }
 
   return {
-    functions: symbols.functions.map(formatSymbol),
+    functions: symbolsEntry.symbols!.functions.map(formatSymbol),
   };
 });
 

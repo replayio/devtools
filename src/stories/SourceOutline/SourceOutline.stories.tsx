@@ -5,6 +5,7 @@ import { SourceOutline } from "devtools/client/debugger/src/components/SourceOut
 import symbols from "../fixtures/symbols";
 import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
 import "devtools/client/debugger/src/components/shared/PreviewFunction.css";
+import { SymbolDeclarations } from "devtools/client/debugger/src/reducers/ast";
 
 export default {
   title: "Soure Outline/Outline",
@@ -31,5 +32,9 @@ Basic.args = {
     id: "pp123",
     url: "pretty-source.js",
   },
-  symbols,
+  symbols: {
+    id: "some-source-id",
+    status: "loaded" as any,
+    symbols: symbols as unknown as SymbolDeclarations,
+  },
 };

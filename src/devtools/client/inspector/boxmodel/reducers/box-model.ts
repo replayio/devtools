@@ -2,38 +2,65 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import type { AnyAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const {
-  UPDATE_LAYOUT,
-  UPDATE_OFFSET_PARENT,
-} = require("devtools/client/inspector/boxmodel/actions/index");
+export const LAYOUT_NUMERIC_FIELDS = [
+  "position",
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  "border-top-width",
+  "border-right-width",
+  "border-bottom-width",
+  "border-left-width",
+  "z-index",
+  "box-sizing",
+  "display",
+  "float",
+  "line-height",
+] as const;
+
+// https://stackoverflow.com/a/67942573/62937
+type ObjectFromList<T extends ReadonlyArray<string>, V = string> = {
+  [K in T extends ReadonlyArray<infer U> ? U : never]: V;
+};
+
+export type LayoutNumericFields = ObjectFromList<typeof LAYOUT_NUMERIC_FIELDS>;
+
+export type Layout = LayoutNumericFields & {
+  width: number;
+  height: number;
+  autoMargins?: Record<string, number>;
+};
 
 export interface BoxModelState {
-  layout: Record<string, unknown>;
-  offsetParent: unknown | null;
+  layout: Layout;
 }
 
-const INITIAL_BOX_MODEL: BoxModelState = {
-  layout: {},
-  offsetParent: null,
+const initialState: BoxModelState = {
+  // Some component code tries to read values right away
+  layout: {} as Layout,
 };
 
-module.exports = function (state = INITIAL_BOX_MODEL, action: AnyAction) {
-  switch (action.type) {
-    case UPDATE_LAYOUT: {
-      return {
-        ...state,
-        layout: action.layout,
-      };
-    }
-    case UPDATE_OFFSET_PARENT: {
-      return {
-        ...state,
-        offsetParent: action.offsetParent,
-      };
-    }
-    default:
-      return state;
-  }
-};
+const boxModelSlice = createSlice({
+  name: "boxModel",
+  initialState,
+  reducers: {
+    layoutUpdated(state, action: PayloadAction<Layout>) {
+      state.layout = action.payload;
+    },
+  },
+});
+
+export const { layoutUpdated } = boxModelSlice.actions;
+
+export default boxModelSlice.reducer;

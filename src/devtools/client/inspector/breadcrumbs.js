@@ -8,6 +8,8 @@ const promise = Promise;
 const flags = require("devtools/shared/flags");
 const ELLIPSIS = "...";
 const EventEmitter = require("devtools/shared/event-emitter");
+import { selection } from "devtools/client/framework/selection";
+import Highlighter from "highlighter/highlighter";
 
 const MAX_LABEL_LENGTH = 40;
 
@@ -17,7 +19,7 @@ const SCROLL_REPEAT_MS = 100;
 // Some margin may be required for visible element detection.
 const SCROLL_MARGIN = 1;
 
-const SHADOW_ROOT_TAGNAME = "#shadow-root";
+export const SHADOW_ROOT_TAGNAME = "#shadow-root";
 
 /**
  * Component to replicate functionality of XUL arrowscrollbox
@@ -320,24 +322,14 @@ ArrowScrollBox.prototype = {
  *   else select the node;
  * - If the selected node is the last node displayed, append its first (if any).
  *
- * @param {InspectorPanel} inspector The inspector hosting this widget.
  */
-function HTMLBreadcrumbs(inspector) {
-  this.inspector = inspector;
-  this.selection = this.inspector.selection;
-  this.win = this.inspector.panelWin;
-  this.doc = this.inspector.panelDoc;
+export function HTMLBreadcrumbs() {
+  this.win = window;
+  this.doc = window.document;
   this._init();
 }
 
-exports.HTMLBreadcrumbs = HTMLBreadcrumbs;
-exports.SHADOW_ROOT_TAGNAME = SHADOW_ROOT_TAGNAME;
-
 HTMLBreadcrumbs.prototype = {
-  get walker() {
-    return this.inspector.walker;
-  },
-
   _init: function () {
     this.outer = this.doc.getElementById("inspector-breadcrumbs");
     this.arrowScrollBox = new ArrowScrollBox(this.win, this.outer);
@@ -378,10 +370,7 @@ HTMLBreadcrumbs.prototype = {
     this.update = this.update.bind(this);
     this.updateWithMutations = this.updateWithMutations.bind(this);
     this.updateSelectors = this.updateSelectors.bind(this);
-    this.selection.on("new-node-front", this.update);
-    this.selection.on("pseudoclass", this.updateSelectors);
-    this.selection.on("attribute-changed", this.updateSelectors);
-    this.inspector.on("markupmutation", this.updateWithMutations);
+    selection.on("new-node-front", this.update);
     this.update();
   },
 
@@ -548,7 +537,7 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event.
    */
   handleMouseOut: function (event) {
-    this.inspector.highlighter.unhighlight();
+    Highlighter.unhighlight();
   },
 
   /**
@@ -560,7 +549,7 @@ HTMLBreadcrumbs.prototype = {
    *        Original event that triggered the shortcut.
    */
   handleShortcut: function (event) {
-    if (!this.selection.isElementNode()) {
+    if (!selection.isElementNode()) {
       return;
     }
 
@@ -582,7 +571,7 @@ HTMLBreadcrumbs.prototype = {
       }
 
       this.outer.setAttribute("aria-activedescendant", currentnode.button.id);
-      return this.selection.setNodeFront(currentnode.node, {
+      return selection.setNodeFront(currentnode.node, {
         reason: "breadcrumbs",
       });
     });
@@ -592,10 +581,7 @@ HTMLBreadcrumbs.prototype = {
    * Remove nodes and clean up.
    */
   destroy: function () {
-    this.selection.off("new-node-front", this.update);
-    this.selection.off("pseudoclass", this.updateSelectors);
-    this.selection.off("attribute-changed", this.updateSelectors);
-    this.inspector.off("markupmutation", this.updateWithMutations);
+    selection.off("new-node-front", this.update);
 
     this.container.removeEventListener("click", this, true);
     this.container.removeEventListener("mouseover", this, true);
@@ -695,11 +681,11 @@ HTMLBreadcrumbs.prototype = {
     };
 
     button.onBreadcrumbsClick = () => {
-      this.selection.setNodeFront(node, { reason: "breadcrumbs" });
+      selection.setNodeFront(node, { reason: "breadcrumbs" });
     };
 
     button.onBreadcrumbsHover = () => {
-      this.inspector.highlighter.highlight(node);
+      Highlighter.highlight(node);
     };
 
     return button;
@@ -848,7 +834,7 @@ HTMLBreadcrumbs.prototype = {
       return;
     }
 
-    if (!this.selection.isConnected()) {
+    if (!selection.isConnected()) {
       // remove all the crumbs
       this.cutAfter(-1);
       return;
@@ -872,17 +858,13 @@ HTMLBreadcrumbs.prototype = {
       }
     }
 
-    if (!this.selection.isElementNode() && !this.selection.isShadowRootNode()) {
+    if (!selection.isElementNode() && !selection.isShadowRootNode()) {
       // no selection
       this.setCursor(-1);
-      if (trimmed) {
-        // Since something changed, notify the interested parties.
-        this.inspector.emit("breadcrumbs-updated", this.selection.nodeFront);
-      }
       return;
     }
 
-    let idx = this.indexOf(this.selection.nodeFront);
+    let idx = this.indexOf(selection.nodeFront);
 
     // Is the node already displayed in the breadcrumbs?
     // (and there are no mutations that need re-display of the crumbs)
@@ -894,20 +876,18 @@ HTMLBreadcrumbs.prototype = {
       if (this.nodeHierarchy.length > 0) {
         // No. We drop all the element that are not direct ancestors
         // of the selection
-        const parent = this.selection.nodeFront.parentNode();
+        const parent = selection.nodeFront.parentNode();
         const ancestorIdx = this.getCommonAncestor(parent);
         this.cutAfter(ancestorIdx);
       }
       // we append the missing button between the end of the breadcrumbs display
       // and the current node.
-      this.expand(this.selection.nodeFront);
+      this.expand(selection.nodeFront);
 
       // we select the current node button
-      idx = this.indexOf(this.selection.nodeFront);
+      idx = this.indexOf(selection.nodeFront);
       this.setCursor(idx);
     }
-
-    // const doneUpdating = this.inspector.updating("breadcrumbs");
 
     this.updateSelectors();
 
@@ -915,8 +895,6 @@ HTMLBreadcrumbs.prototype = {
     setTimeout(() => {
       try {
         this.scroll();
-        this.inspector.emit("breadcrumbs-updated", this.selection.nodeFront);
-        // doneUpdating();
       } catch (e) {
         // Only log this as an error if we haven't been destroyed in the meantime.
         if (!this.isDestroyed) {

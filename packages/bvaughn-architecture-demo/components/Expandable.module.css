@@ -1,12 +1,11 @@
-.Expandable {
-  display: inline-flex;
-  flex-direction: column;
+.Block {
+  display: inline-block;
+}
+.Inline {
+  display: inline;
 }
 
 .ToggleButton {
-  color: var(--value-type-object);
-  display: flex;
-  align-items: flex-start;
   min-height: 1rem;
 }
 
@@ -24,7 +23,7 @@
   height: 1rem;
   margin-right: 0.5ch;
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: top;
 }
 .ArrowExpanded {
   transform: rotate(90deg);

@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import { Declaration } from "devtools/client/inspector/rules/components/Declaration";
-import { DeclarationState } from "../state/rules";
+import { DeclarationState } from "../reducers/rules";
 
 type DeclarationsProps = {
   declarations: DeclarationState[];

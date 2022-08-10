@@ -1,6 +1,5 @@
 import {
   createEntityAdapter,
-  createSelector,
   createSlice,
   Dictionary,
   EntityState,
@@ -13,6 +12,7 @@ import { UIState } from "ui/state";
 import { newSourcesToCompleteSourceDetails } from "ui/utils/sources";
 import { parser } from "devtools/client/debugger/src/utils/bootstrap";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 import type { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 // TODO Move prefs out of reducers and load this separately
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
@@ -41,12 +41,6 @@ export interface MiniSource {
   url?: string;
 }
 
-export enum LoadingStatus {
-  LOADING = "loading",
-  LOADED = "loaded",
-  ERRORED = "errored",
-}
-
 export interface SourceContentValue {
   contentType: string;
   type: string;
@@ -60,37 +54,33 @@ export interface SourceContent {
 }
 
 const sourceDetailsAdapter = createEntityAdapter<SourceDetails>();
-const sourcesAdapter = createEntityAdapter<newSource>({ selectId: source => source.sourceId });
 const contentsAdapter = createEntityAdapter<SourceContent>();
 
-export const sourceSelectors = sourcesAdapter.getSelectors();
-
 export const { selectById: getSourceContentsEntry } = contentsAdapter.getSelectors(
-  (state: UIState) => state.experimentalSources.contents
+  (state: UIState) => state.sources.contents
 );
 
 export const {
   selectAll: getAllSourceDetails,
   selectById: getSourceDetails,
   selectEntities: getSourceDetailsEntities,
-} = sourceDetailsAdapter.getSelectors((state: UIState) => state.experimentalSources.sourceDetails);
+  selectTotal: getSourceDetailsCount,
+} = sourceDetailsAdapter.getSelectors((state: UIState) => state.sources.sourceDetails);
 
 export interface SourcesState {
   allSourcesReceived: boolean;
   sourceDetails: EntityState<SourceDetails>;
-  sources: EntityState<newSource>;
   contents: EntityState<SourceContent>;
   selectedLocation: PartialLocation | null;
   selectedLocationHistory: PartialLocation[];
   selectedLocationHasScrolled: boolean;
   persistedSelectedLocation: PartialLocation | null;
-  sourcesByUrl: { [url: string]: string[] };
+  sourcesByUrl: Record<string, string[]>;
 }
 
 const initialState: SourcesState = {
   allSourcesReceived: false,
   sourceDetails: sourceDetailsAdapter.getInitialState(),
-  sources: sourcesAdapter.getInitialState(),
   contents: contentsAdapter.getInitialState(),
   selectedLocation: null,
   selectedLocationHistory: [],
@@ -104,26 +94,25 @@ const sourcesSlice = createSlice({
   name: "sources",
   initialState,
   reducers: {
-    addSources: (state, action: PayloadAction<newSource[]>) => {
-      // Store the raw protocol information. Once we have recieved all sources
-      // we will iterate over this and build it into the shape we want.
-      sourcesAdapter.addMany(state.sources, action.payload);
-    },
-    allSourcesReceived: state => {
+    allSourcesReceived: (state, action: PayloadAction<newSource[]>) => {
+      const sources = action.payload;
       state.allSourcesReceived = true;
-      const sources = sourceSelectors.selectAll(state.sources);
+
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
-      state.sourcesByUrl = {};
-      sources.forEach(source => {
+
+      const sourcesByUrl: Record<string, string[]> = {};
+
+      for (let source of sources) {
         if (!source.url) {
-          return;
+          continue;
         }
 
-        if (!state.sourcesByUrl[source.url]) {
-          state.sourcesByUrl[source.url] = [];
+        if (!sourcesByUrl[source.url]) {
+          sourcesByUrl[source.url] = [];
         }
-        state.sourcesByUrl[source.url].push(source.sourceId);
-      });
+        sourcesByUrl[source.url].push(source.sourceId);
+      }
+      state.sourcesByUrl = sourcesByUrl;
     },
     sourceLoading: (state, action: PayloadAction<string>) => {
       contentsAdapter.upsertOne(state.contents, {
@@ -181,7 +170,6 @@ const sourcesSlice = createSlice({
 });
 
 export const {
-  addSources,
   allSourcesReceived,
   clearSelectedLocation,
   locationSelected,
@@ -190,7 +178,7 @@ export const {
   sourceErrored,
 } = sourcesSlice.actions;
 
-export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
+export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
   return async (dispatch, getState, { ThreadFront }) => {
     const existing = getSourceContentsEntry(getState(), sourceId);
     if (existing?.status === LoadingStatus.LOADING) {
@@ -225,9 +213,9 @@ export const experimentalLoadSourceText = (sourceId: string): UIThunkAction<Prom
   };
 };
 
-export const getSourcesLoading = (state: UIState) => !state.experimentalSources.allSourcesReceived;
+export const getSourcesLoading = (state: UIState) => !state.sources.allSourcesReceived;
 
-export const getSelectedLocation = (state: UIState) => state.experimentalSources.selectedLocation;
+export const getSelectedLocation = (state: UIState) => state.sources.selectedLocation;
 
 export const getSelectedSourceId = (state: UIState) => {
   const location = getSelectedLocation(state);
@@ -244,7 +232,7 @@ export const getCorrespondingSourceIds = (state: UIState, id: string) => {
   return getSourceDetails(state, id)?.correspondingSourceIds;
 };
 export const getSourceByUrl = (state: UIState, url: string) => {
-  const urlEntries = state.experimentalSources.sourcesByUrl[url] ?? [];
+  const urlEntries = state.sources.sourcesByUrl[url] ?? [];
   const id = urlEntries[0];
   if (!id) {
     return undefined;
@@ -252,7 +240,7 @@ export const getSourceByUrl = (state: UIState, url: string) => {
   return getSourceDetails(state, id);
 };
 export const getSourceContent = (state: UIState, id: string) => {
-  return state.experimentalSources.contents.entities[id];
+  return state.sources.contents.entities[id];
 };
 export const getSelectedSourceWithContent = (state: UIState) => {
   const selectedSourceId = getSelectedSourceId(state);
@@ -267,7 +255,7 @@ export const getTextAtLocation = (state: UIState, location: Location) => {
 };
 
 export const getSelectedLocationHasScrolled = (state: UIState) =>
-  state.experimentalSources.selectedLocationHasScrolled;
+  state.sources.selectedLocationHasScrolled;
 
 // This is useful if you are displaying a bunch of sources and want them to
 // ensure they all have unique names, even though some of them might have been
@@ -278,7 +266,7 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   if (!sourceDetails || !sourceDetails.url) {
     return null;
   }
-  if (state.experimentalSources.sourcesByUrl[sourceDetails.url].length > 1) {
+  if (state.sources.sourcesByUrl[sourceDetails.url].length > 1) {
     // I was going to put the query string back here...
     // But I'm not sure we're actually *removing* query strings in the first
     // place yet!
@@ -324,7 +312,7 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
     return false;
   }
 
-  return state.experimentalSources.sourcesByUrl[source.url]?.length > 0;
+  return state.sources.sourcesByUrl[source.url]?.length > 0;
 }
 
 export const getCanonicalSourceFromEntities = (
@@ -339,7 +327,7 @@ export const getCanonicalSourceFromEntities = (
 };
 
 export const getCanonicalSource = (state: UIState, sd: SourceDetails) => {
-  return getCanonicalSourceFromEntities(state.experimentalSources.sourceDetails.entities, sd);
+  return getCanonicalSourceFromEntities(state.sources.sourceDetails.entities, sd);
 };
 
 export const getCanonicalSourceForUrl = (state: UIState, url: string) => {
@@ -403,7 +391,7 @@ export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
 };
 
 export const getPreviousPersistedLocation = (state: UIState) =>
-  state.experimentalSources.persistedSelectedLocation;
+  state.sources.persistedSelectedLocation;
 
 /*
 export const getStableLocationForLocation = (
@@ -427,6 +415,7 @@ export const selectors = {
   getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
+  getSourceDetailsCount,
   getSourceContentsEntry,
   getSourcesLoading,
   getSelectedLocation,

@@ -13,7 +13,6 @@ import { UIState } from "ui/state";
 import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
-import { MarkupAction } from "devtools/client/inspector/markup/actions/markup";
 import UserProperties from "devtools/client/inspector/rules/models/user-properties";
 import * as consoleActions from "devtools/client/webconsole/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
@@ -25,7 +24,6 @@ type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
 export type UIAction =
   | DebuggerAction
   | LayoutAction
-  | MarkupAction
   | NetworkAction
   | ReactDevToolsAction
   | QuickOpenActions;
@@ -37,9 +35,7 @@ export type UIThunkAction<TReturn = void> = ThunkAction<
   AnyAction
 >;
 
-export type UIStore = AppStore & {
-  userProperties?: UserProperties;
-};
+export type UIStore = AppStore;
 
 const { initialAppState, ...actualAppActions } = appActions;
 

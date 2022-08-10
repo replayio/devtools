@@ -110,7 +110,7 @@ export async function renderFocused(
   };
 
   const timelineContext: TimelineContextType = {
-    executionPoint: null,
+    executionPoint: "0",
     isPending: false,
     pauseId: null,
     time: 0,
@@ -161,6 +161,10 @@ export function setupWindow(): void {
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
 const MockReplayClient = {
+  get loadedRegions() {
+    return null;
+  },
+  addEventListener: jest.fn(),
   configure: jest.fn().mockImplementation(async () => {}),
   createPause: jest.fn().mockImplementation(async () => ({
     frames: [],
@@ -185,7 +189,9 @@ const MockReplayClient = {
     contentType: "text/javascript",
   })),
   getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
-  searchSources: jest.fn().mockImplementation(async () => []),
   initialize: jest.fn().mockImplementation(async () => {}),
+  loadRegion: jest.fn().mockImplementation(async () => {}),
+  removeEventListener: jest.fn(),
   runAnalysis: jest.fn().mockImplementation(async () => []),
+  searchSources: jest.fn().mockImplementation(async () => []),
 };

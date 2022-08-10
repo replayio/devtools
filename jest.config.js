@@ -18,6 +18,7 @@ module.exports = {
     "^toolkit/(.*)": "<rootDir>/src/toolkit/$1",
     "^test/(.*)": "<rootDir>/src/test/$1",
     "^ui/(.*)": "<rootDir>/src/ui/$1",
+    "^third-party/(.*)": "<rootDir>/packages/third-party/$1",
 
     // Handle CSS imports (with CSS modules)
     // https://jestjs.io/docs/webpack#mocking-css-modules

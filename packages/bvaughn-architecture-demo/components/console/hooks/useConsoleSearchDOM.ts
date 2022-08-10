@@ -17,13 +17,14 @@ function search(
   const needle = query.toLocaleLowerCase();
 
   const list = listRef.current!;
-  list.childNodes.forEach((node: ChildNode, index: number) => {
+  list.childNodes.forEach((node: ChildNode) => {
     const element = node as HTMLElement;
 
     // HACK Must be compatible with the style used by <LoggablesContextRoot>
-    if (element.style.display != "none") {
+    if (element.hasAttribute("data-search-index") && element.style.display != "none") {
       const textContent = element.textContent?.toLocaleLowerCase();
       if (textContent?.includes(needle)) {
+        const index = parseInt(element.getAttribute("data-search-index")!, 10);
         const loggable = loggables[index];
         results.push(loggable);
       }

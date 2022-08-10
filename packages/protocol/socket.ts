@@ -91,6 +91,7 @@ if (typeof window !== "undefined") {
 export type ExperimentalSettings = {
   listenForMetrics: boolean;
   disableCache?: boolean;
+  profileWorkerThreads?: boolean;
 };
 
 type SessionCallbacks = {
@@ -290,13 +291,38 @@ export function addEventListener<M extends EventMethods>(
   }
 }
 
-// TODO This method should have the same signature as addEventListener.
-// It should only remove a specific event handler.
-export function removeEventListener<M extends EventMethods>(event: M) {
-  gEventListeners.delete(event);
+export function removeEventListener<M extends EventMethods>(
+  event: M,
+  handler?: (params: EventParams<M>) => void
+) {
+  switch (event) {
+    case "Analysis.analysisPoints":
+    case "Analysis.analysisResult": {
+      gEventListeners.delete(event);
+      break;
+    }
+    default: {
+      if (handler != null) {
+        const handlers = gEventToCallbacksMap.get(event);
+        if (handlers != null) {
+          const index = handlers.indexOf(handler);
+          if (index >= 0) {
+            handlers.splice(index, 1);
+          }
+        }
 
-  if (gEventToCallbacksMap.has(event)) {
-    gEventToCallbacksMap.delete(event);
+        if (handlers == null || handlers.length === 0) {
+          gEventListeners.delete(event);
+        }
+      } else {
+        gEventListeners.delete(event);
+
+        if (gEventToCallbacksMap.has(event)) {
+          gEventToCallbacksMap.delete(event);
+        }
+      }
+      break;
+    }
   }
 }
 

@@ -40,8 +40,8 @@ import {
   getSelectedSource,
   getSelectedLocation,
   getSelectedSourceWithContent,
-  LoadingStatus,
 } from "ui/reducers/sources";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import {
   showSourceText,

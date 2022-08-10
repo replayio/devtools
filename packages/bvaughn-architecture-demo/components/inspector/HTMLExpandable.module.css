@@ -3,7 +3,7 @@
   flex-direction: column;
 }
 .Collapsed {
-  display: flex;
+  display: inline-flex;
   flex-direction: row;
 }
 
@@ -27,7 +27,7 @@
   transform-origin: 0.5rem 0.5rem;
   transition: transform 200ms;
   display: inline-block;
-  vertical-align: middle;
+  vertical-align: top;
 }
 .ArrowExpanded {
   transform: rotate(90deg);

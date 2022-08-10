@@ -9,7 +9,7 @@ import {
 } from "react";
 
 export type TimelineContextType = {
-  executionPoint: ExecutionPoint | null;
+  executionPoint: ExecutionPoint;
   isPending: boolean;
   pauseId: PauseId | null;
   time: number;
@@ -19,7 +19,7 @@ export type TimelineContextType = {
 export const TimelineContext = createContext<TimelineContextType>(null as any);
 
 export function TimelineContextRoot({ children }: PropsWithChildren<{}>) {
-  const [executionPoint, setExecutionPoint] = useState<ExecutionPoint | null>(null);
+  const [executionPoint, setExecutionPoint] = useState<ExecutionPoint>("0");
   const [pauseId, setPauseId] = useState<PauseId | null>(null);
   const [time, setTime] = useState<number>(0);
 

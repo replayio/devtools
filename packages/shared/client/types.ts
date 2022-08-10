@@ -1,8 +1,11 @@
 import {
   ContentType,
+  createPauseResult,
   EventHandlerType,
+  ExecutionPoint,
   FrameId,
   KeyboardEvent,
+  loadedRegions as LoadedRegions,
   Location,
   Message,
   MouseEvent,
@@ -20,8 +23,7 @@ import {
   SourceLocation,
   TimeStampedPoint,
   TimeStampedPointRange,
-  ExecutionPoint,
-  createPauseResult,
+  TimeRange,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -48,7 +50,11 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+export type ReplayClientEvents = "loadedRegionsChange";
+
 export interface ReplayClientInterface {
+  get loadedRegions(): LoadedRegions | null;
+  addEventListener(type: ReplayClientEvents, handler: Function): void;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(
@@ -63,7 +69,10 @@ export interface ReplayClientInterface {
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
-  getHitPointsForLocation(location: Location): Promise<TimeStampedPoint[]>;
+  getHitPointsForLocation(
+    focusRange: TimeStampedPointRange | null,
+    location: Location
+  ): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
@@ -75,10 +84,12 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
+  loadRegion(range: TimeRange, duration: number): Promise<void>;
+  removeEventListener(type: ReplayClientEvents, handler: Function): void;
+  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
   searchSources(
     opts: { query: string; sourceIds?: string[] },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void>;
-  initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
-  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
 }

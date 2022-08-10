@@ -1,4 +1,5 @@
 import Inspector from "@bvaughn/components/inspector";
+import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
 import "@bvaughn/pages/variables.css";
@@ -7,6 +8,8 @@ import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
+
+import styles from "./NewObjectInspector.module.css";
 
 export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
   const pause = ThreadFront.currentPause;
@@ -53,8 +56,10 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
   }, [pause, roots]);
 
   return (
-    <div className="preview-popup">
-      <Suspense fallback={<Loader />}>{children}</Suspense>
+    <div className={`${styles.Popup} preview-popup`}>
+      <ErrorBoundary>
+        <Suspense fallback={<Loader />}>{children}</Suspense>
+      </ErrorBoundary>
     </div>
   );
 }

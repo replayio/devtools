@@ -8,7 +8,11 @@ import NewConsole from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
-import { Point, PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import {
+  Point,
+  PointId,
+  PointsContext,
+} from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import {
   TimelineContext,
@@ -17,7 +21,6 @@ import {
 import React, {
   KeyboardEvent,
   PropsWithChildren,
-  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -46,11 +49,16 @@ import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
 import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
-import { displayedBeginForFocusRegion, displayedEndForFocusRegion } from "ui/utils/timeline";
+import {
+  displayedBeginForFocusRegion,
+  displayedEndForFocusRegion,
+  rangeForFocusRegion,
+} from "ui/utils/timeline";
 
 import ReplayLogo from "../shared/ReplayLogo";
 
 import styles from "./NewConsole.module.css";
+import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -76,21 +84,19 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <Suspense fallback={<Loader />}>
-      <SessionContext.Provider value={sessionContext}>
-        <TimelineContextAdapter>
-          <InspectorContextReduxAdapter>
-            <TerminalContextReduxAdapter>
-              <FocusContextReduxAdapter>
-                <PointsContextReduxAdapter>
-                  <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
-                </PointsContextReduxAdapter>
-              </FocusContextReduxAdapter>
-            </TerminalContextReduxAdapter>
-          </InspectorContextReduxAdapter>
-        </TimelineContextAdapter>
-      </SessionContext.Provider>
-    </Suspense>
+    <SessionContext.Provider value={sessionContext}>
+      <TimelineContextAdapter>
+        <InspectorContextReduxAdapter>
+          <TerminalContextReduxAdapter>
+            <FocusContextReduxAdapter>
+              <PointsContextReduxAdapter>
+                <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
+              </PointsContextReduxAdapter>
+            </FocusContextReduxAdapter>
+          </TerminalContextReduxAdapter>
+        </InspectorContextReduxAdapter>
+      </TimelineContextAdapter>
+    </SessionContext.Provider>
   );
 }
 
@@ -134,29 +140,9 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
 
   useEffect(() => {
-    if (focusRegion === null) {
-      return;
-    }
-
-    const updateFocusRegionOnceLoaded = () => {
-      const focusBegin = displayedBeginForFocusRegion(focusRegion);
-      const focusEnd = displayedEndForFocusRegion(focusRegion);
-      const isLoaded = loadedRegions?.loaded?.some(region => {
-        return region.begin.time <= focusBegin && region.end.time >= focusEnd;
-      });
-      if (isLoaded) {
-        startTransition(() => {
-          setDeferredFocusRegion(focusRegion);
-        });
-      } else {
-        timeoutId = setTimeout(updateFocusRegionOnceLoaded, 250);
-      }
-    };
-
-    let timeoutId = setTimeout(updateFocusRegionOnceLoaded, 250);
-    return () => {
-      clearTimeout(timeoutId);
-    };
+    startTransition(() => {
+      setDeferredFocusRegion(focusRegion);
+    });
   }, [focusRegion, loadedRegions]);
 
   const update = useCallback(
@@ -175,15 +161,14 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
     [dispatch]
   );
 
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    return {
       isTransitionPending: isPending,
-      range: focusRegionToRange(deferredFocusRegion),
-      rangeForDisplay: focusRegionToRange(focusRegion),
+      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
+      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
       update,
-    }),
-    [deferredFocusRegion, isPending, focusRegion, update]
-  );
+    };
+  }, [deferredFocusRegion, isPending, focusRegion, update]);
 
   return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
 }
@@ -223,6 +208,8 @@ function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
         if (pauseId) {
           let pause = Pause.getById(pauseId);
           if (!pause) {
+            // Pre-cache Pause data (required by legacy app code) before calling seek().
+            // The new Console doesn't load this data but the old one requires it.
             pause = new Pause(ThreadFront);
             pause.instantiate(pauseId, executionPoint, time, false);
             await pause.ensureLoaded();
@@ -266,6 +253,8 @@ function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
 
 // Adapter that reads log points (from Redux) and passes them to the PointsContext.
 function PointsContextReduxAdapter({ children }: PropsWithChildren) {
+  const dispatch = useAppDispatch();
+
   const logpoints = useAppSelector(getLogPointsList);
 
   // Convert to the Point[] format required by the new Console.
@@ -293,6 +282,20 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
     });
   }, [points]);
 
+  // Limited edit functionality for this context: setting logpoint badge.
+  const editPoint = useCallback(
+    (id: PointId, partialPoint: Partial<Point>) => {
+      const { badge, ...rest } = partialPoint;
+      if (badge !== undefined && Object.keys(rest).length === 0) {
+        const breakpoint = logpoints.find(logpoint => logpoint.id === id);
+        if (breakpoint) {
+          dispatch(setBreakpointPrefixBadge(breakpoint, badge || undefined));
+        }
+      }
+    },
+    [dispatch, logpoints]
+  );
+
   const context = useMemo(
     () => ({
       isPending,
@@ -303,9 +306,9 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
       // Log points are added by the legacy source Editor component.
       addPoint: () => {},
       deletePoint: () => {},
-      editPoint: () => {},
+      editPoint,
     }),
-    [deferredPoints, isPending, points]
+    [deferredPoints, editPoint, isPending, points]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
@@ -361,7 +364,7 @@ function TerminalContextReduxAdapter({ children }: PropsWithChildren) {
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.
 function TimelineContextAdapter({ children }: PropsWithChildren) {
   const [state, setState] = useState<Omit<TimelineContextType, "isPending" | "update">>({
-    executionPoint: null,
+    executionPoint: "0",
     pauseId: null,
     time: 0,
   });
@@ -371,10 +374,18 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   const dispatch = useAppDispatch();
   const pauseId = useAppSelector(getPauseId);
   const time = useAppSelector(getCurrentTime);
-  const executionPoint = useAppSelector(getCurrentPoint);
+  const executionPoint = useAppSelector(getCurrentPoint) || "0";
 
   const update = useCallback(
-    (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+    async (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+      if (!Pause.getById(pauseId)) {
+        // Pre-cache Pause data (required by legacy app code) before calling seek().
+        // The new Console doesn't load this data but the old one requires it.
+        const pause = new Pause(ThreadFront);
+        pause.instantiate(pauseId, executionPoint, time, false);
+        await pause.ensureLoaded();
+      }
+
       dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId));
     },
     [dispatch]
@@ -398,14 +409,6 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   );
 
   return <TimelineContext.Provider value={context}>{children}</TimelineContext.Provider>;
-}
-
-function focusRegionToRange(focusRegion: FocusRegion | null): Range | null {
-  if (focusRegion === null) {
-    return null;
-  }
-
-  return [displayedBeginForFocusRegion(focusRegion), displayedEndForFocusRegion(focusRegion)];
 }
 
 function Loader() {

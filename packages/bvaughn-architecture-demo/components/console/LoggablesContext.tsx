@@ -1,4 +1,5 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
@@ -7,6 +8,7 @@ import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
 import { loggableSort } from "@bvaughn/src/utils/loggables";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
+import { isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { EventHandlerType } from "@replayio/protocol";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import {
@@ -19,7 +21,7 @@ import {
 } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useFocusRange from "./hooks/useFocusRange";
+import { isFirefoxInternalMessage } from "./utils/messages";
 
 export type Loggable = EventLog | PointInstance | ProtocolMessage | TerminalExpression;
 
@@ -50,7 +52,7 @@ export function LoggablesContextRoot({
     showWarnings,
   } = useContext(ConsoleFiltersContext);
 
-  const focusRange = useFocusRange();
+  const { range: focusRange } = useContext(FocusContext);
 
   // Find the set of event type handlers we should be displaying in the console.
   const eventTypesToLoad = useMemo<EventHandlerType[]>(() => {
@@ -74,60 +76,63 @@ export function LoggablesContextRoot({
 
   // Pre-filter in-focus messages by non text based search criteria.
   const preFilteredMessages = useMemo<ProtocolMessage[]>(() => {
-    if (showErrors && showLogs && showNodeModules && showWarnings) {
-      return messages;
-    } else {
-      return messages.filter((message: ProtocolMessage) => {
-        switch (message.source) {
-          case "ConsoleAPI": {
-            switch (message.level) {
-              case "warning": {
-                if (!showWarnings) {
-                  return false;
-                }
-                break;
-              }
-              case "error": {
-                if (!showErrors) {
-                  return false;
-                }
-                break;
-              }
-              default: {
-                if (!showLogs) {
-                  return false;
-                }
-                break;
-              }
-            }
-            break;
-          }
-          case "PageError": {
-            if (!showExceptions) {
-              return false;
-            }
-            break;
-          }
-        }
+    return messages.filter((message: ProtocolMessage) => {
+      if (isFirefoxInternalMessage(message)) {
+        return false;
+      }
 
-        // TODO This seems expensive; can we cache the message-to-node-modules relationship?
-        if (!showNodeModules) {
-          const isNodeModules = message.data.frames?.some(frame => {
-            const sourceId = frame.location?.[0].sourceId;
-            const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
-            if (source) {
-              return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
-            }
-            return false;
-          });
-          if (isNodeModules) {
+      switch (message.level) {
+        case "warning": {
+          if (!showWarnings) {
             return false;
           }
+          break;
         }
+        case "error": {
+          switch (message.source) {
+            case "ConsoleAPI": {
+              if (!showErrors) {
+                return false;
+              }
+              break;
+            }
+            case "PageError": {
+              if (!showExceptions) {
+                return false;
+              }
+              break;
+            }
+          }
+          break;
+        }
+        default: {
+          if (!showLogs) {
+            return false;
+          }
+          break;
+        }
+      }
 
-        return true;
-      });
-    }
+      // TODO This seems expensive; can we cache the message-to-node-modules relationship?
+      if (!showNodeModules) {
+        const isNodeModules = message.data.frames?.some(frame => {
+          const sourceId = frame.location?.[0].sourceId;
+          const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
+          if (source) {
+            const value = source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
+            if (!value) {
+            }
+            return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
+          }
+          return false;
+        });
+        if (isNodeModules) {
+          return false;
+        }
+      }
+
+      return true;
+    });
   }, [messages, showErrors, showExceptions, showLogs, showNodeModules, showWarnings]);
 
   // Trim eventLogs and logPoints by focusRange.
@@ -136,8 +141,8 @@ export function LoggablesContextRoot({
     if (focusRange === null) {
       return eventLogs;
     } else {
-      return eventLogs.filter(
-        eventLog => eventLog.time >= focusRange.begin.time && eventLog.time <= focusRange.end.time
+      return eventLogs.filter(eventLog =>
+        isExecutionPointsWithinRange(eventLog.point, focusRange.begin.point, focusRange.end.point)
       );
     }
   }, [eventLogs, focusRange]);
@@ -152,7 +157,11 @@ export function LoggablesContextRoot({
           hitPoints.forEach(hitPoint => {
             if (
               focusRange === null ||
-              (hitPoint.time >= focusRange.begin.time && hitPoint.time <= focusRange.end.time)
+              isExecutionPointsWithinRange(
+                hitPoint.point,
+                focusRange.begin.point,
+                focusRange.end.point
+              )
             ) {
               pointInstances.push({
                 point,
@@ -173,10 +182,12 @@ export function LoggablesContextRoot({
     if (focusRange === null) {
       return terminalExpressions;
     } else {
-      return terminalExpressions.filter(
-        terminalExpression =>
-          terminalExpression.time >= focusRange.begin.time &&
-          terminalExpression.time <= focusRange.end.time
+      return terminalExpressions.filter(terminalExpression =>
+        isExecutionPointsWithinRange(
+          terminalExpression.point,
+          focusRange.begin.point,
+          focusRange.end.point
+        )
       );
     }
   }, [focusRange, terminalExpressions]);
@@ -198,13 +209,16 @@ export function LoggablesContextRoot({
   useLayoutEffect(() => {
     const list = messageListRef.current;
     if (list !== null) {
-      list.childNodes.forEach((node: ChildNode, index: number) => {
+      list.childNodes.forEach((node: ChildNode) => {
         const element = node as HTMLElement;
-        const textContent = element.textContent?.toLocaleLowerCase();
-        const matches = textContent?.includes(filterByLowerCaseText);
 
-        // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
-        element.style.display = matches ? "inherit" : "none";
+        if (element.hasAttribute("data-search-index")) {
+          const textContent = element.textContent?.toLocaleLowerCase();
+          const matches = textContent?.includes(filterByLowerCaseText);
+
+          // HACK Style must be compatible with the visibility check in useConsoleSearchDOM()
+          element.style.display = matches ? "inherit" : "none";
+        }
       });
     }
   }, [filterByLowerCaseText, messageListRef, sortedLoggables]);

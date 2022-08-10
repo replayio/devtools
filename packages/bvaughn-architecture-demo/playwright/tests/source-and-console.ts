@@ -1,6 +1,6 @@
 import { Page, test } from "@playwright/test";
 
-import { hideProtocolMessages } from "./utils/console";
+import { toggleProtocolMessages } from "./utils/console";
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
@@ -12,7 +12,7 @@ testSetup(async function regeneratorFunction({ page }) {
 
   await fillLogPointText(page, 12, "printError");
 
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
 
   const message = page.locator("[data-test-name=Message]").first();
   const keyValue = message.locator("[data-test-name=Expandable]");
@@ -51,7 +51,7 @@ test("should not allow saving invalid log point values", async ({ page }) => {
 
 test("should support log points that only require local analysis", async ({ page }) => {
   await openSourceTab(page);
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
   await addLogPoint(page, 12);
 
   const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
@@ -63,7 +63,7 @@ test("should support log points that only require local analysis", async ({ page
 
 test("should support log points that require remote analysis", async ({ page }) => {
   await openSourceTab(page);
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "printError");
 
@@ -81,7 +81,7 @@ test("should support log points that require remote analysis", async ({ page }) 
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await openSourceTab(page);
-  await hideProtocolMessages(page);
+  await toggleProtocolMessages(page, false);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "z");
 
@@ -109,3 +109,7 @@ test("should include log points when filtering data", async ({ page }) => {
   await page.fill("[data-test-id=ConsoleFilterInput]", "zzz");
   await takeScreenshot(page, messages, "log-point-not-in-search-results");
 });
+
+// TODO Add test for log point badge colors
+// TODO Add context menu test for setting focus range
+// TODO Add context menu test for setting log point badge colors

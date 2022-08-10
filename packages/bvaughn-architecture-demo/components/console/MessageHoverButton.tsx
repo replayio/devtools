@@ -7,31 +7,27 @@ import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
 import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
 import {
   MouseEvent,
-  RefObject,
   unstable_useCacheRefresh as useCacheRefresh,
   useContext,
-  useLayoutEffect,
   useRef,
   useState,
   useTransition,
 } from "react";
-import { createPortal } from "react-dom";
 
 import styles from "./MessageHoverButton.module.css";
+import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
 
 export default function MessageHoverButton({
   executionPoint,
   location,
   pauseId,
   showAddCommentButton,
-  targetRef,
   time,
 }: {
   executionPoint: ExecutionPoint;
   location: Location | null;
   pauseId: PauseId;
   showAddCommentButton: boolean;
-  targetRef: RefObject<HTMLDivElement | null>;
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
@@ -47,17 +43,6 @@ export default function MessageHoverButton({
 
   const isCurrentlyPausedAt = currentExecutionPoint === executionPoint;
 
-  useLayoutEffect(() => {
-    const button = ref.current;
-    const target = targetRef.current;
-    if (button && target) {
-      const buttonRect = button.getBoundingClientRect();
-      const targetRect = target.getBoundingClientRect();
-      button.style.left = `${targetRect.left - buttonRect.width / 2}px`;
-      button.style.top = `${targetRect.top}px`;
-    }
-  }, [targetRef]);
-
   let button = null;
   if (isCurrentlyPausedAt) {
     if (showAddCommentButton && accessToken) {
@@ -68,6 +53,7 @@ export default function MessageHoverButton({
             hasFrames: true,
             isPublished: false,
             point: executionPoint,
+            sourceLocation: location,
             time,
           });
 
@@ -86,7 +72,7 @@ export default function MessageHoverButton({
           ref={ref}
         >
           <Icon className={styles.AddCommentButtonIcon} type="comment" />
-          {isHovered && <span className={styles.Label}>Add comment</span>}
+          <span className={isHovered ? styles.LabelHovered : styles.Label}> Add comment </span>
         </button>
       );
     }
@@ -102,6 +88,12 @@ export default function MessageHoverButton({
       }
     };
 
+    const label =
+      currentExecutionPoint === null ||
+      isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
+        ? "Fast-forward"
+        : "Rewind";
+
     button = (
       <button
         className={styles.ConsoleMessageHoverButton}
@@ -114,21 +106,16 @@ export default function MessageHoverButton({
         <Icon
           className={styles.ConsoleMessageHoverButtonIcon}
           type={
-            currentExecutionPoint === null || executionPoint > currentExecutionPoint
+            currentExecutionPoint === null ||
+            isExecutionPointsGreaterThan(executionPoint, currentExecutionPoint)
               ? "fast-forward"
               : "rewind"
           }
         />
-        {isHovered && (
-          <span className={styles.Label}>
-            {currentExecutionPoint === null || executionPoint > currentExecutionPoint
-              ? "Fast-forward"
-              : "Rewind"}
-          </span>
-        )}
+        <span className={isHovered ? styles.LabelHovered : styles.Label}> {label} </span>
       </button>
     );
   }
 
-  return button !== null ? createPortal(button, document.body) : null;
+  return button;
 }

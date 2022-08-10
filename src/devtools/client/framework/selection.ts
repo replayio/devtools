@@ -4,7 +4,7 @@
 
 import EventEmitter from "devtools/shared/event-emitter";
 import nodeConstants from "devtools/shared/dom-node-constants";
-import { NodeFront } from "protocol/thread/node";
+import type { NodeFront } from "protocol/thread/node";
 
 export type SelectionReason =
   | "navigateaway"
@@ -59,7 +59,7 @@ type SelectionEvent =
  *   isDocumentFragmentNode()
  *   isNotationNode()
  */
-class Selection {
+export class Selection {
   private _nodeFront: NodeFront | undefined | null;
   private _isSlotted: boolean;
   reason: SelectionReason | undefined;
@@ -230,5 +230,7 @@ class Selection {
   off!: (name: SelectionEvent, handler: (...args: any[]) => void) => void;
   emit!: (name: SelectionEvent, ...args: any[]) => void;
 }
+
+export const selection = new Selection();
 
 export default Selection;

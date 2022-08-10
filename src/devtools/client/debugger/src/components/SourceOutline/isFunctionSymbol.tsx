@@ -1,5 +1,7 @@
-import { FunctionSymbol, ClassSymbol } from "../../types";
+import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
 
-export function isFunctionSymbol(symbol: FunctionSymbol | ClassSymbol): symbol is FunctionSymbol {
+export function isFunctionDeclaration(
+  symbol: FunctionDeclaration | ClassDeclaration
+): symbol is FunctionDeclaration {
   return "parameterNames" in symbol;
 }

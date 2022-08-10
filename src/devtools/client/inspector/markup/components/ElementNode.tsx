@@ -1,6 +1,6 @@
 import { Attr } from "@replayio/protocol";
 import React, { PureComponent, MouseEvent } from "react";
-import { NodeInfo } from "../state/markup";
+import { NodeInfo } from "../reducers/markup";
 
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
@@ -42,7 +42,7 @@ class ElementNode extends PureComponent<ElementNodeProps> {
 
   renderAttributes() {
     const { node } = this.props;
-    const attributes = node.attributes.sort(compareAttributeNames);
+    const attributes = node.attributes.slice().sort(compareAttributeNames);
 
     return (
       <span>

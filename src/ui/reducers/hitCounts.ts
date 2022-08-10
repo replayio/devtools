@@ -7,11 +7,15 @@ import { getCorrespondingSourceIds, getSourceDetails } from "./sources";
 import { getFocusRegion } from "./timeline";
 import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread/hitCounts";
 import { listenForCondition } from "ui/setup/listenerMiddleware";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { createSelector } from "reselect";
 
 export interface HitCount {
   location: Location;
   hits: number;
 }
+
+export type HitCountsByLine = Record<number, HitCount[]>;
 
 export interface SourceHitCounts {
   error?: string;
@@ -24,12 +28,6 @@ export type HitCountsState = {
   aggregateHitCounts: EntityState<SourceHitCounts>;
   hitCounts: EntityState<SourceHitCounts>;
 };
-
-export enum LoadingStatus {
-  LOADING = "loading",
-  LOADED = "loaded",
-  ERRORED = "errored",
-}
 
 const hitCountsAdapter = createEntityAdapter<SourceHitCounts>();
 const aggregateHitCountsAdapter = createEntityAdapter<SourceHitCounts>();
@@ -188,5 +186,20 @@ export const getHitCountsForSource = (state: UIState, sourceId: string) => {
   const cacheKey = removeLineNumbersFromCacheKey(getCacheKeyForSourceHitCounts(state, sourceId, 0));
   return aggregateHitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
 };
+
+export const getHitCountsForSourceByLine = createSelector(getHitCountsForSource, hitCounts => {
+  if (!hitCounts) {
+    return null;
+  }
+  const hitCountsByLine: HitCountsByLine = {};
+  for (const hitCount of hitCounts) {
+    const line = hitCount.location.line;
+    if (!hitCountsByLine[line]) {
+      hitCountsByLine[line] = [];
+    }
+    hitCountsByLine[line].push(hitCount);
+  }
+  return hitCountsByLine;
+});
 
 export default hitCountsSlice.reducer;

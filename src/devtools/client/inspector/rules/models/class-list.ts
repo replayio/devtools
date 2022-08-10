@@ -3,9 +3,8 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { NodeFront } from "protocol/thread/node";
-import { assert } from "protocol/utils";
-import { Inspector } from "../../inspector";
 const EventEmitter = require("devtools/shared/event-emitter");
+import { selection } from "devtools/client/framework/selection";
 
 export interface ClassInfo {
   name: string;
@@ -38,11 +37,8 @@ const CLASSES = new WeakMap<NodeFront, ClassInfo[]>();
  * the DOM.
  * It can also be used to enable/disable a given class, or add classes.
  *
- * @param {Inspector} inspector
- *        The current inspector instance.
  */
 export default class ClassList {
-  inspector: Inspector;
   classListProxyNode: HTMLDivElement;
 
   // added by EventEmitter.decorate(this)
@@ -51,21 +47,13 @@ export default class ClassList {
   off!: (name: string, handler: (value?: any) => void) => void;
   emit!: (name: string, value?: any) => void;
 
-  constructor(inspector: Inspector) {
+  constructor() {
     EventEmitter.decorate(this);
 
-    this.inspector = inspector;
-
-    // this.onMutations = this.onMutations.bind(this);
-    // this.inspector.on("markupmutation", this.onMutations);
-
-    assert(this.inspector.panelDoc, "inspector.panelDoc not set");
-    this.classListProxyNode = this.inspector.panelDoc.createElement("div");
+    this.classListProxyNode = document.createElement("div");
   }
 
   destroy() {
-    // this.inspector.off("markupmutation", this.onMutations);
-    this.inspector = null as any;
     this.classListProxyNode = null as any;
   }
 
@@ -74,7 +62,6 @@ export default class ClassList {
    * since that's the only type this model can work with.)
    */
   get currentNode() {
-    const selection = this.inspector.selection;
     if (!selection) {
       return null;
     }

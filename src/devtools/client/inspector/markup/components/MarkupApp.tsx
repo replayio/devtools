@@ -1,31 +1,26 @@
 import React, { useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import { Inspector } from "../../inspector";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
+import { getNodeInfo } from "../selectors/markup";
 const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 
-export interface MarkupProps {
-  onSelectNode: (nodeId: string) => void;
-  onToggleNodeExpanded: (nodeId: string, isExpanded: boolean) => void;
-  onMouseEnterNode: (nodeId: string) => void;
-  onMouseLeaveNode: (nodeId: string) => void;
-}
+export interface MarkupProps {}
 
-function setupLegacyComponents(inspector: Inspector) {
-  const searchbox = new MarkupSearchbox(inspector);
+function setupLegacyComponents() {
+  const searchbox = new MarkupSearchbox();
   searchbox.setupSearchBox();
-  new HTMLBreadcrumbs(inspector);
+  new HTMLBreadcrumbs();
 }
 
-type PropsFromParent = { inspector: Inspector };
+type PropsFromParent = {};
 
-function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromParent) {
+function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
   const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
 
-  useEffect(() => setupLegacyComponents(inspector), [inspector]);
+  useEffect(() => setupLegacyComponents(), []);
 
   return (
     <div className="devtools-inspector-tab-panel">
@@ -63,7 +58,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
         <div id="markup-box" className="devtools-monospace bg-bodyBgcolor">
           <div id="markup-root-wrapper" role="presentation">
             <div id="markup-root" role="presentation">
-              {<Nodes {...inspector.markup.getMarkupProps()} />}
+              {<Nodes />}
             </div>
           </div>
           {isMarkupEmpty ? <LoadingProgressBar /> : null}
@@ -73,7 +68,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
             id="inspector-breadcrumbs"
             className="breadcrumbs-widget-container"
             role="toolbar"
-            data-localization="aria-label=inspector.breadcrumbs.label"
+            aria-label="Breadcrumbs"
             tabIndex={0}
           ></div>
         </div>
@@ -83,7 +78,7 @@ function MarkupApp({ inspector, markupRootNode }: PropsFromRedux & PropsFromPare
 }
 
 const connector = connect((state: UIState) => ({
-  markupRootNode: state.markup.tree[state.markup.rootNode!],
+  markupRootNode: getNodeInfo(state, state.markup.rootNode!),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

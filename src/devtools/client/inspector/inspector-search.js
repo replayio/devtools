@@ -10,6 +10,7 @@ const { KeyCodes } = require("devtools/client/shared/keycodes");
 const EventEmitter = require("devtools/shared/event-emitter");
 const Services = require("devtools/shared/services");
 const { ThreadFront } = require("protocol/thread");
+import { selection } from "devtools/client/framework/selection";
 
 /**
  * Converts any input field into a document search box.
@@ -25,8 +26,7 @@ const { ThreadFront } = require("protocol/thread");
  * - search-cleared: when the search box is emptied
  * - search-result: when a search is made and a result is selected
  */
-function InspectorSearch(inspector, input) {
-  this.inspector = inspector;
+function InspectorSearch(input) {
   this.searchBox = input;
   this._lastSearched = null;
   this._lastSearchedResults = null;
@@ -89,7 +89,7 @@ InspectorSearch.prototype = {
     }
 
     if (nodes.length) {
-      const currentNode = this.inspector.selection.nodeFront;
+      const currentNode = selection.nodeFront;
       const currentIndex = currentNode ? nodes.indexOf(currentNode) : -1;
       let index;
       if (currentIndex == -1) {
@@ -101,7 +101,7 @@ InspectorSearch.prototype = {
       }
 
       const node = nodes[index];
-      this.inspector.selection.setNodeFront(node, {
+      selection.setNodeFront(node, {
         reason: "inspectorsearch",
       });
       searchContainer.classList.remove("devtools-searchbox-no-match");

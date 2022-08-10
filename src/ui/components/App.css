@@ -113,6 +113,11 @@ h2 {
   width: 0px;
 }
 
+.devtools-inspector-tab-panel {
+  width: 100%;
+  height: 100%;
+}
+
 @import url("devtools/client/themes/variables.css");
 @import url("devtools/client/themes/webconsole.css");
 @import url("devtools/client/themes/components-frame.css");

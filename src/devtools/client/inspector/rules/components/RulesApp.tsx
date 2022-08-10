@@ -8,72 +8,19 @@ import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
 import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useAppSelector } from "ui/setup/hooks";
-import { RulesState, RuleState } from "../state/rules";
+import { RuleState } from "../reducers/rules";
 import { RuleInheritance } from "../models/rule";
 
 const SHOW_PSEUDO_ELEMENTS_PREF = "devtools.inspector.show_pseudo_elements";
 
 type InheritedRule = RuleState & { inheritance: RuleInheritance };
 
-type RulesAppProps = {
-  onToggleDeclaration: Function;
-  onToggleSelectorHighlighter: Function;
-  rules: RuleState[];
-  showContextMenu: Function;
-  showDeclarationNameEditor: Function;
-  showDeclarationValueEditor: Function;
-  showNewDeclarationEditor: Function;
-  showSelectorEditor: Function;
-};
+const NO_RULES_AVAILABLE: RuleState[] = [];
 
-export const RulesApp: FC<RulesAppProps> = ({
-  showContextMenu,
-  onToggleDeclaration,
-  showDeclarationValueEditor,
-  showNewDeclarationEditor,
-  onToggleSelectorHighlighter,
-  showDeclarationNameEditor,
-  showSelectorEditor,
-}) => {
-  const { rules } = useAppSelector((state: { rules: RulesState }) => ({
-    rules: state.rules.rules || [],
-  }));
+export const RulesApp: FC = ({}) => {
+  const rules = useAppSelector(state => state.rules.rules ?? NO_RULES_AVAILABLE);
 
   const [rulesQuery, setRulesQuery] = useState("");
-
-  const ruleProps = useMemo(
-    () => ({
-      onToggleDeclaration,
-      onToggleSelectorHighlighter,
-      showDeclarationNameEditor,
-      showDeclarationValueEditor,
-      showNewDeclarationEditor,
-      showSelectorEditor,
-    }),
-    [
-      onToggleDeclaration,
-      onToggleSelectorHighlighter,
-      showDeclarationNameEditor,
-      showDeclarationValueEditor,
-      showNewDeclarationEditor,
-      showSelectorEditor,
-    ]
-  );
-
-  const onContextMenu = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (
-      event.currentTarget.closest("input[type=text]") ||
-      event.currentTarget.closest("input:not([type])") ||
-      event.currentTarget.closest("textarea")
-    ) {
-      return;
-    }
-
-    event.stopPropagation();
-    event.preventDefault();
-
-    showContextMenu(event);
-  };
 
   const renderInheritedRules = useCallback(
     (rules: InheritedRule[]) => {
@@ -92,26 +39,19 @@ export const RulesApp: FC<RulesAppProps> = ({
           );
         }
 
-        output.push(
-          <Rule
-            key={`${inheritedNodeId}|${rule.id}`}
-            rule={rule}
-            {...ruleProps}
-            query={rulesQuery}
-          />
-        );
+        output.push(<Rule key={`${inheritedNodeId}|${rule.id}`} rule={rule} query={rulesQuery} />);
       }
 
       return output;
     },
-    [rulesQuery, ruleProps]
+    [rulesQuery]
   );
 
   const renderStyleRules = useCallback(
     (rules: RuleState[]) => {
-      return <Rules {...ruleProps} query={rulesQuery} rules={rules} />;
+      return <Rules query={rulesQuery} rules={rules} />;
     },
-    [rulesQuery, ruleProps]
+    [rulesQuery]
   );
 
   const renderPseudoElementRules = useCallback(
@@ -120,14 +60,13 @@ export const RulesApp: FC<RulesAppProps> = ({
       const componentProps: FCProps<typeof Rules> = {
         rules,
         query: rulesQuery,
-        ...ruleProps,
       };
 
       const items = [
         {
           component: Rules,
           componentProps,
-          header: getStr("rule.pseudoElement"),
+          header: "Pseudo-elements",
           id: "rules-section-pseudoelement",
           opened: Services.prefs.getBoolPref(SHOW_PSEUDO_ELEMENTS_PREF),
           onToggle: (opened: boolean) => {
@@ -139,16 +78,16 @@ export const RulesApp: FC<RulesAppProps> = ({
       return (
         <>
           <Accordion items={items} />
-          <div className="ruleview-header">{getStr("rule.selectedElement")}</div>
+          <div className="ruleview-header">This Element</div>
         </>
       );
     },
-    [ruleProps, rulesQuery]
+    [rulesQuery]
   );
 
   const rulesElements = useMemo(() => {
     if (!rulesQuery && rules.length === 0) {
-      return <div className="devtools-sidepanel-no-result">{getStr("rule.empty")}</div>;
+      return <div className="devtools-sidepanel-no-result">No element selected.</div>;
     }
 
     const nonEmptyRules = rules.filter(rule =>
@@ -197,11 +136,11 @@ export const RulesApp: FC<RulesAppProps> = ({
     <div id="sidebar-panel-ruleview" className="theme-sidebar inspector-tabpanel">
       <Toolbar rulesQuery={rulesQuery} onRulesQueryChange={setRulesQuery} />
       <div id="ruleview-container" className="ruleview">
-        <div id="ruleview-container-focusable" onContextMenu={onContextMenu} tabIndex={-1}>
+        <div id="ruleview-container-focusable" tabIndex={-1}>
           {rules ? (
             rulesElements
           ) : (
-            <div className="devtools-sidepanel-no-result">{getStr("rule.notAvailable")}</div>
+            <div className="devtools-sidepanel-no-result">Rules not available.</div>
           )}
         </div>
       </div>

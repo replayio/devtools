@@ -2,7 +2,7 @@ import React from "react";
 import classnames from "classnames";
 import { Redacted } from "ui/components/Redacted";
 import PreviewFunction from "../shared/PreviewFunction";
-import { FunctionSymbol } from "../../types";
+import { FunctionDeclarationHits } from "./getOutlineSymbols";
 
 export const SourceOutlineFunction = React.memo(function OutlineFunction({
   isFocused,
@@ -10,8 +10,8 @@ export const SourceOutlineFunction = React.memo(function OutlineFunction({
   onSelect,
 }: {
   isFocused: boolean;
-  func: FunctionSymbol;
-  onSelect?: (func: FunctionSymbol) => void;
+  func: FunctionDeclarationHits;
+  onSelect?: (func: FunctionDeclarationHits) => void;
 }) {
   return (
     <li

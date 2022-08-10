@@ -1,12 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 import { getElementCount } from "./general";
 
-export async function hideProtocolMessages(page: Page) {
-  await page.click('[data-test-id="FilterToggle-exceptions"]');
-  await page.click('[data-test-id="FilterToggle-errors"]');
-  await page.click('[data-test-id="FilterToggle-logs"]');
-  await page.click('[data-test-id="FilterToggle-warnings"]');
-}
+type ToggleName = "errors" | "exceptions" | "logs" | "warnings";
 
 export async function hideSearchInput(page: Page) {
   const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
@@ -31,5 +26,26 @@ export async function showSearchInput(page: Page) {
     await page.keyboard.down("Meta");
     await page.keyboard.type("f");
     await page.keyboard.up("Meta");
+  }
+}
+
+export async function toggleProtocolMessages(page: Page, on: boolean) {
+  await toggleProtocolMessage(page, "errors", on);
+  await toggleProtocolMessage(page, "exceptions", on);
+  await toggleProtocolMessage(page, "logs", on);
+  await toggleProtocolMessage(page, "warnings", on);
+}
+
+export async function toggleProtocolMessage(page: Page, name: ToggleName, on: boolean) {
+  const isEnabled = await page.evaluate(
+    name => {
+      const input = document.querySelector(`[id="FilterToggle-${name}"]`);
+      return input ? (input as HTMLInputElement).checked : false;
+    },
+    [name]
+  );
+
+  if ((isEnabled && !on) || (!isEnabled && on)) {
+    await page.click(`[data-test-id="FilterToggle-${name}"]`);
   }
 }

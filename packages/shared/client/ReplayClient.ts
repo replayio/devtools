@@ -1,6 +1,10 @@
 import {
   ContentType,
+  createPauseResult,
+  ExecutionPoint,
   EventHandlerType,
+  FrameId,
+  loadedRegions as LoadedRegions,
   Location,
   Message,
   newSource as Source,
@@ -9,31 +13,34 @@ import {
   PauseData,
   PauseId,
   PointDescription,
-  RecordingId,
-  SessionId,
-  SourceId,
-  SearchSourceContentsMatch,
+  TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
+  RecordingId,
   Result as EvaluationResult,
-  FrameId,
-  ExecutionPoint,
-  createPauseResult,
+  SearchSourceContentsMatch,
+  SessionId,
+  SourceId,
 } from "@replayio/protocol";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
+import { isPointInRegions } from "shared/utils/time";
 
-import { ColumnHits, LineHits, ReplayClientInterface } from "./types";
+import { ColumnHits, LineHits, ReplayClientEvents, ReplayClientInterface } from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
 
+type WaitUntilLoadedCallbacks = () => boolean;
+
 export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;
+  private _eventHandlers: Map<ReplayClientEvents, Function[]> = new Map();
+  private _loadedRegions: LoadedRegions | null = null;
   private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
@@ -41,6 +48,8 @@ export class ReplayClient implements ReplayClientInterface {
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
+
+    threadFront.listenForLoadChanges(this._onLoadChanges);
 
     analysisManager.init();
   }
@@ -58,6 +67,19 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   configure(sessionId: string): void {
     this._sessionId = sessionId;
+  }
+
+  get loadedRegions(): LoadedRegions | null {
+    return this._loadedRegions;
+  }
+
+  addEventListener(type: ReplayClientEvents, handler: Function): void {
+    if (!this._eventHandlers.has(type)) {
+      this._eventHandlers.set(type, []);
+    }
+
+    const handlers = this._eventHandlers.get(type)!;
+    handlers.push(handler);
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
@@ -204,13 +226,19 @@ export class ReplayClient implements ReplayClientInterface {
     return count;
   }
 
-  async getHitPointsForLocation(location: Location): Promise<PointDescription[]> {
+  async getHitPointsForLocation(
+    focusRange: TimeStampedPointRange | null,
+    location: Location
+  ): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
     await analysisManager.runAnalysis(
       {
         effectful: false,
         locations: [{ location }],
         mapper: "",
+        range: focusRange
+          ? { begin: focusRange.begin.point, end: focusRange.end.point }
+          : undefined,
       },
       {
         onAnalysisError: (errorMessage: string) => {
@@ -303,6 +331,29 @@ export class ReplayClient implements ReplayClientInterface {
     return hitCounts;
   }
 
+  async loadRegion(range: TimeRange, duration: number): Promise<void> {
+    client.Session.unloadRegion({ region: { begin: 0, end: range.begin } }, ThreadFront.sessionId!);
+    client.Session.unloadRegion(
+      { region: { begin: range.end, end: duration } },
+      ThreadFront.sessionId!
+    );
+
+    await client.Session.loadRegion(
+      { region: { begin: range.begin, end: range.end } },
+      ThreadFront.sessionId!
+    );
+  }
+
+  removeEventListener(type: ReplayClientEvents, handler: Function): void {
+    if (this._eventHandlers.has(type)) {
+      const handlers = this._eventHandlers.get(type)!;
+      const index = handlers.indexOf(handler);
+      if (index >= 0) {
+        handlers.splice(index, 1);
+      }
+    }
+  }
+
   async searchSources(
     opts: { query: string; sourceIds?: string[] },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
@@ -311,17 +362,29 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
-    return new Promise<Result[]>((resolve, reject) => {
-      analysisManager.runAnalysis(analysisParams, {
+    return new Promise<Result[]>(async (resolve, reject) => {
+      const results: Result[] = [];
+
+      await analysisManager.runAnalysis(analysisParams, {
         onAnalysisError: (errorMessage: string) => {
           reject(errorMessage);
         },
         onAnalysisResult: analysisEntries => {
-          resolve(analysisEntries.map(entry => entry.value));
+          results.push(...analysisEntries.map(entry => entry.value));
         },
       });
+      resolve(results);
     });
   }
+
+  _onLoadChanges = (loadedRegions: LoadedRegions) => {
+    this._loadedRegions = loadedRegions;
+
+    const handlers = this._eventHandlers.get("loadedRegionsChange");
+    if (handlers) {
+      handlers.forEach(handler => handler());
+    }
+  };
 }
 
 function waitForOpenConnection(

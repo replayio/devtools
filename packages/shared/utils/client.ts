@@ -1,4 +1,3 @@
-import isEqual from "lodash/isEqual";
 import { ThreadFront } from "protocol/thread";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
@@ -31,28 +30,4 @@ export function createReplayClientForPlaywrightTesting(encoded: string): ReplayC
     const decoded = decode(encoded);
     return createReplayClientPlayer(decoded);
   }
-}
-
-export function findMatch(
-  logEntries: LogEntry[],
-  methodName: string,
-  args: any[]
-): LogEntry | null {
-  return (
-    logEntries.find(logEntry => {
-      if (logEntry.method !== methodName) {
-        return false;
-      } else if (logEntry.args.length !== args.length) {
-        return false;
-      } else {
-        for (let index = 0; index < args.length; index++) {
-          if (!isEqual(args[index], logEntry.args[index])) {
-            return false;
-          }
-        }
-      }
-
-      return true;
-    }) || null
-  );
 }

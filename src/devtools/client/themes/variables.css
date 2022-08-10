@@ -414,7 +414,7 @@
   --body-color: var(--grey-30);
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
-  --modal-bgcolor: rgba(0, 0, 0, 0.98);
+  --modal-bgcolor: var(--theme-base-90);
   --modal-border: #222;
   --tab-bgcolor-alt-subtle: var(--theme-base-95); /* info, events */
   --tab-bgcolor: var(--theme-base-100); /* bg tabs */

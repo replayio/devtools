@@ -2,7 +2,7 @@ import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { Badge, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import useModalDismissSignal from "@bvaughn/src/hooks/useModalDismissSignal";
-import { getLoggableTime, isPointInstance } from "@bvaughn/src/utils/console";
+import { getLoggableTime, isPointInstance } from "@bvaughn/src/utils/loggables";
 import { useContext, useRef } from "react";
 
 import { ConsoleContextMenuContext, Coordinates } from "./ConsoleContextMenuContext";
@@ -32,7 +32,7 @@ function ContextMenu({
     hide();
 
     const begin = getLoggableTime(loggable);
-    const end = rangeForDisplay !== null ? rangeForDisplay[1] : duration;
+    const end = rangeForDisplay !== null ? rangeForDisplay.end.time : duration;
 
     update([begin, end], true);
   };
@@ -41,7 +41,7 @@ function ContextMenu({
     hide();
 
     const end = getLoggableTime(loggable);
-    const begin = rangeForDisplay !== null ? rangeForDisplay[0] : 0;
+    const begin = rangeForDisplay !== null ? rangeForDisplay.begin.time : 0;
 
     update([begin, end], true);
   };

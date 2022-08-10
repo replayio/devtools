@@ -187,7 +187,7 @@ function MapContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
 
 function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
-    return <div className={styles.NoEntries}>No properties</div>;
+    return <span className={styles.NoEntries}>No properties</span>;
   }
 
   return (
@@ -259,7 +259,7 @@ function SetContainerEntriesRenderer({ containerEntries, pauseId }: EntriesRende
 
 function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: EntriesRendererProps) {
   if (containerEntries.length === 0) {
-    return <div className={styles.NoEntries}>No properties</div>;
+    return <span className={styles.NoEntries}>No properties</span>;
   }
 
   return (

@@ -5,6 +5,10 @@
   gap: 0.5ch;
 }
 
+.HeaderWrapper {
+  display: flex;
+}
+
 .Category {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -16,9 +20,4 @@
   flex-direction: column;
   margin-top: 0.25rem;
   gap: 0.5rem;
-}
-
-.Count {
-  font-size: var(--font-size-small);
-  color: var(--color-dim);
 }

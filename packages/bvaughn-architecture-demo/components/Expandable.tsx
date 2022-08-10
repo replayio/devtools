@@ -11,11 +11,15 @@ export default function Expandable({
   className = "",
   defaultOpen = false,
   header,
+  headerClassName = "",
+  useBlockLayoutWhenExpanded = true,
 }: {
   children: ReactNode;
   className?: string;
   defaultOpen?: boolean;
   header: ReactNode;
+  headerClassName?: string;
+  useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
@@ -35,26 +39,31 @@ export default function Expandable({
   };
 
   return (
-    <div className={`${styles.Expandable} ${className}`} data-test-name="Expandable">
-      <div
-        className={styles.ToggleButton}
+    <span
+      className={`${
+        isOpen && useBlockLayoutWhenExpanded ? styles.Block : styles.Inline
+      } ${className}`}
+      data-test-name="Expandable"
+      onClick={onClick}
+      onKeyDown={onKeyDown}
+      role="button"
+      tabIndex={0}
+    >
+      <span
+        className={`${styles.ToggleButton} ${headerClassName}`}
         data-test-name="ExpandablePreview"
-        onClick={onClick}
-        onKeyDown={onKeyDown}
-        role="button"
-        tabIndex={0}
       >
         <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
         </span>
         {header}
-      </div>
+      </span>
 
       <LazyOffscreen mode={isOpen ? "visible" : "hidden"}>
-        <div className={styles.Children} data-test-name="ExpandableChildren">
+        <span className={styles.Children} data-test-name="ExpandableChildren">
           {children}
-        </div>
+        </span>
       </LazyOffscreen>
-    </div>
+    </span>
   );
 }

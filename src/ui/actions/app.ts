@@ -1,7 +1,8 @@
+import { createEntityAdapter } from "@reduxjs/toolkit";
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@replayio/protocol";
 import * as selectors from "ui/reducers/app";
-import { Canvas, ReplayEvent, ReplayNavigationEvent } from "ui/state/app";
+import { Canvas, ReplayEvent, ReplayNavigationEvent, EventKind } from "ui/state/app";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
 import tokenManager from "ui/utils/tokenManager";
@@ -17,7 +18,7 @@ import { CommandKey } from "ui/components/CommandPalette/CommandPalette";
 import { openQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
-import { shallowEqual } from "devtools/client/debugger/src/utils/resource/compare";
+import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { isTest, getTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";
@@ -35,7 +36,7 @@ import {
   updateTheme,
   setSessionId,
   setModal,
-  setEventsForType,
+  loadReceivedEvents,
   setIsNodePickerActive,
   setCanvas as setCanvasAction,
 } from "../reducers/app";
@@ -65,7 +66,9 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
-    ThreadFront.findKeyboardEvents(({ events }) => onKeyboardEvents(events, store));
+    ThreadFront.findKeyboardEvents(({ events }) => onKeyboardEvents(events, store)).then(() => {
+      store.dispatch(loadReceivedKeyboardEvents());
+    });
     ThreadFront.findNavigationEvents(({ events }) =>
       onNavigationEvents(events as ReplayNavigationEvent[], store)
     );
@@ -133,20 +136,26 @@ async function setupTests() {
   }
 }
 
+const allKeyboardEvents: KeyboardEvent[] = [];
+
 function onKeyboardEvents(events: KeyboardEvent[], store: UIStore) {
-  const groupedEvents = groupBy(events, event => event.kind);
+  allKeyboardEvents.push(...events);
+}
 
-  Object.entries(groupedEvents).map(([eventType, kindEvents]) => {
-    const keyboardEvents = [
-      ...selectors.getEventsForType(store.getState(), eventType),
-      ...kindEvents,
-    ];
-    keyboardEvents.sort((a: ReplayEvent, b: ReplayEvent) =>
-      compareBigInt(BigInt(a.point), BigInt(b.point))
-    );
+function loadReceivedKeyboardEvents(): UIThunkAction {
+  return dispatch => {
+    const groupedEvents = groupBy(allKeyboardEvents, event => event.kind) as Record<
+      EventKind,
+      ReplayEvent[]
+    >;
 
-    store.dispatch(setEventsForType({ events: keyboardEvents, eventType }));
-  });
+    for (let key of Object.keys(groupedEvents)) {
+      groupedEvents[key].sort((a: ReplayEvent, b: ReplayEvent) =>
+        compareBigInt(BigInt(a.point), BigInt(b.point))
+      );
+    }
+    dispatch(loadReceivedEvents(groupedEvents));
+  };
 }
 
 function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
@@ -157,7 +166,7 @@ function onNavigationEvents(events: ReplayNavigationEvent[], store: UIStore) {
   ];
   newNavEvents.sort((a, b) => compareBigInt(BigInt(a.point), BigInt(b.point)));
 
-  store.dispatch(setEventsForType({ events: newNavEvents, eventType: "navigation" }));
+  store.dispatch(loadReceivedEvents({ navigation: newNavEvents }));
 }
 
 export function toggleTheme(): UIThunkAction {

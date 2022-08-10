@@ -76,7 +76,7 @@ export default function KeyValueRenderer({
           // Children that are text nodes will be rendered inline, as part of the value/preview.
           if (htmlElementChildren.length > 0) {
             return (
-              <div className={classNames(styles.KeyValue)}>
+              <span className={classNames(styles.KeyValue)}>
                 <HTMLExpandable
                   before={
                     <>
@@ -93,7 +93,7 @@ export default function KeyValueRenderer({
                   pauseId={pauseId}
                   protocolValue={protocolValue}
                 />
-              </div>
+              </span>
             );
           } else {
             showExpandableView = false;
@@ -117,7 +117,7 @@ export default function KeyValueRenderer({
   }
 
   const header = (
-    <div
+    <span
       className={classNames(
         styles.KeyValue,
         !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
@@ -137,7 +137,7 @@ export default function KeyValueRenderer({
         pauseId={pauseId}
         protocolValue={protocolValue}
       />
-    </div>
+    </span>
   );
 
   if (showExpandableView) {

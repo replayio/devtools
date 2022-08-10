@@ -6,9 +6,6 @@ const { sprintf } = require("devtools-sprintf-js");
 const { parse } = require("properties-parser");
 
 const bundles = {
-  "devtools/client/locales/toolbox.properties": parse(
-    require("devtools/client/locales/en-us/toolbox.properties").default
-  ),
   "devtools/client/locales/debugger.properties": parse(
     require("devtools/client/locales/en-us/debugger.properties").default
   ),
@@ -18,18 +15,12 @@ const bundles = {
   "devtools/client/locales/components.properties": parse(
     require("devtools/client/locales/en-us/components.properties").default
   ),
-  "devtools/client/locales/sourceeditor.properties": parse(
-    require("devtools/client/locales/en-us/sourceeditor.properties").default
-  ),
   "intl.properties": parse(require("toolkit/locales/en-US/chrome/global/intl.properties").default),
   "devtools/client/locales/inspector.properties": parse(
     require("devtools/client/locales/en-us/inspector.properties").default
   ),
   "devtools/client/locales/layout.properties": parse(
     require("devtools/client/locales/en-us/layout.properties").default
-  ),
-  "devtools/client/locales/boxmodel.properties": parse(
-    require("devtools/client/locales/en-us/boxmodel.properties").default
   ),
   "devtools/client/locales/shared.properties": parse(
     require("devtools/client/locales/en-us/shared.properties").default
@@ -39,9 +30,6 @@ const bundles = {
   ),
   "devtools/client/locales/accessibility.properties": parse(
     require("devtools/client/locales/en-us/accessibility.properties").default
-  ),
-  "devtools/shared/locales/accessibility.properties": parse(
-    require("devtools/shared/locales/en-US/accessibility.properties").default
   ),
 };
 

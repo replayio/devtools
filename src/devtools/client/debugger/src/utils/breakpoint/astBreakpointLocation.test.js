@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { getASTLocation } from "./astBreakpointLocation.js";
+import { getASTLocation } from "./astBreakpointLocation";
 import {
   populateSource,
   populateOriginalSource,
@@ -17,7 +17,7 @@ async function setup({ file, location, functionName, original }) {
 
   const symbols = getSymbols(source.id);
 
-  const astLocation = getASTLocation(source, symbols, location);
+  const astLocation = getASTLocation({ status: "loaded", symbols }, location);
   expect(astLocation.name).toBe(functionName);
   expect(astLocation).toMatchSnapshot();
 }

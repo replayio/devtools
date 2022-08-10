@@ -33,6 +33,7 @@ export interface ReplaySession {
   viewMode: ViewMode;
   showVideoPanel: boolean;
   toolboxLayout: ToolboxLayout;
+  localNags: string[];
 }
 
 export function registerStoreObserver(
@@ -114,7 +115,7 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
       oldState,
       "pendingSelectedLocation",
       // TS types say `null` isn't acceptable to persist, but it seems to work at runtime
-      state => state.experimentalSources.persistedSelectedLocation as any
+      state => state.sources.persistedSelectedLocation as any
     );
   }
 
@@ -125,8 +126,13 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
   maybeUpdateReplaySessions(state);
 };
 
+let replaySessions: ReplaySessions;
 async function getReplaySessions() {
-  return await asyncStore.replaySessions;
+  if (replaySessions) {
+    return replaySessions;
+  }
+  replaySessions = await asyncStore.replaySessions;
+  return replaySessions;
 }
 
 export async function getReplaySession(recordingId: RecordingId) {

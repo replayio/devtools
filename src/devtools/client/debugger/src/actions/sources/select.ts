@@ -2,14 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
 /**
  * Redux actions for the sources state
  * @module actions/sources
  */
 
-import { Location } from "@replayio/protocol";
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
@@ -23,7 +20,7 @@ import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
 import {
-  experimentalLoadSourceText,
+  loadSourceText,
   getSelectedSource,
   getSourceDetails,
   getSourceByUrl,
@@ -35,7 +32,7 @@ import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
-import { setSymbols } from "./symbols";
+import { fetchSymbolsForSource } from "../../reducers/ast";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -168,7 +165,9 @@ export function selectLocation(
       dispatch(setSelectedPanel("debugger"));
     }
 
-    const textPromise = dispatch(experimentalLoadSourceText(source.id));
+    // This adds the source's text to the client-side parser, which is a necessary step
+    // before we can ask the parser to return symbols in `fetchSymbolsForSource`.
+    const textPromise = dispatch(loadSourceText(source.id));
     const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
 
     await Promise.all([textPromise, possibleBreakpointsPromise]);
@@ -185,7 +184,7 @@ export function selectLocation(
       return;
     }
 
-    dispatch(setSymbols({ cx, source: loadedSource }));
+    dispatch(fetchSymbolsForSource(loadedSource.id));
 
     // If a new source is selected update the file search results
     const newSource = getSelectedSource(getState());

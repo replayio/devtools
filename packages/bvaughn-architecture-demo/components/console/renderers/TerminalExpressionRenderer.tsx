@@ -6,7 +6,6 @@ import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedEx
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -29,15 +28,16 @@ import MessageHoverButton from "../MessageHoverButton";
 import styles from "./shared.module.css";
 
 function TerminalExpressionRenderer({
+  index,
   isFocused,
   terminalExpression,
 }: {
+  index: number;
   isFocused: boolean;
   terminalExpression: TerminalExpression;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
-  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -53,9 +53,6 @@ function TerminalExpressionRenderer({
   if (isFocused) {
     className = `${className} ${styles.Focused}`;
   }
-  if (currentExecutionPoint === terminalExpression.point) {
-    className = `${className} ${styles.CurrentlyPausedAt}`;
-  }
 
   const showContextMenu = (event: MouseEvent) => {
     event.preventDefault();
@@ -65,6 +62,7 @@ function TerminalExpressionRenderer({
   return (
     <div
       className={className}
+      data-search-index={index}
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}
@@ -72,7 +70,7 @@ function TerminalExpressionRenderer({
       ref={ref}
       role="listitem"
     >
-      <div
+      <span
         className={
           showTimestamps
             ? styles.TerminalPrimaryRowWithTimestamps
@@ -80,21 +78,23 @@ function TerminalExpressionRenderer({
         }
       >
         {showTimestamps && (
-          <span className={styles.TimeStamp}>{formatTimestamp(terminalExpression.time, true)}</span>
+          <span className={styles.TimeStamp}>
+            {formatTimestamp(terminalExpression.time, true)}{" "}
+          </span>
         )}
-        <div className={styles.TerminalLogContents}>
-          <div className={styles.LogContents}>
+        <span className={styles.TerminalLogContents}>
+          <span className={styles.LogContents}>
             <Icon className={styles.PromptIcon} type="prompt" />
             <SyntaxHighlightedExpression expression={terminalExpression.expression} />
-          </div>
-          <div className={styles.LogContents}>
+          </span>
+          <span className={styles.LogContents}>
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
             <Suspense fallback={<Loader />}>
               <EvaluatedContent terminalExpression={terminalExpression} />
             </Suspense>
-          </div>
-        </div>
-      </div>
+          </span>
+        </span>
+      </span>
 
       {isHovered && (
         <MessageHoverButton
@@ -102,7 +102,6 @@ function TerminalExpressionRenderer({
           location={null}
           pauseId={terminalExpression.pauseId}
           showAddCommentButton={false}
-          targetRef={ref}
           time={terminalExpression.time}
         />
       )}
@@ -162,10 +161,10 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
 
   // Assume the evaluation failed (even if not explicitly)
   return (
-    <div className={styles.Exception}>
+    <span className={styles.Exception}>
       <Icon className={styles.ErrorIcon} type="error" />
       The expression could not be evaluated.
-    </div>
+    </span>
   );
 }
 

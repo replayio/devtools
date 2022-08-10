@@ -1,15 +1,9 @@
 import React from "react";
 import { Rule } from "devtools/client/inspector/rules/components/Rule";
-import { RuleState } from "../state/rules";
+import { RuleState } from "../reducers/rules";
 
 type RulesProps = {
   rules: RuleState[];
-  onToggleDeclaration: Function;
-  onToggleSelectorHighlighter: Function;
-  showDeclarationNameEditor: Function;
-  showDeclarationValueEditor: Function;
-  showNewDeclarationEditor: Function;
-  showSelectorEditor: Function;
   query: string;
   children?: React.ReactNode;
 };

@@ -18,6 +18,7 @@ export interface PreviewState {
         previewId: string;
         expression: string;
         target: $FixTypeLater;
+        cursorPos: any;
         resultGrip: any;
         root: ValueItem;
       })
