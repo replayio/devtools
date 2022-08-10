@@ -96,7 +96,7 @@ export function deselectSource(): UIThunkAction {
 
 export function addTab(source: SourceDetails) {
   const { url, id: sourceId } = source;
-  const isOriginal = source.canonicalId === sourceId;
+  const isOriginal = source.isSourceMapped;
 
   return {
     type: "ADD_TAB",

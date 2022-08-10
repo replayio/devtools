@@ -14,10 +14,10 @@ export function getSourceIDsToSearch(
   const sourceIds = [];
   for (const sourceId in sourcesById) {
     const source = sourcesById[sourceId];
-    if (source.canonicalId !== source.id) {
+    if (source.prettyPrinted) {
       continue;
     }
-    const correspondingSourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+    const correspondingSourceId = source.correspondingSourceIds[0];
     if (correspondingSourceId !== sourceId) {
       continue;
     }

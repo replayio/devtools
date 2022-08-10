@@ -21,7 +21,6 @@ import { getContext } from "../../selectors";
 import {
   getHasSiblingOfSameName,
   getSourceContent,
-  getGeneratedSourceByURL,
   isFulfilled,
 } from "ui/reducers/sources";
 
@@ -48,7 +47,6 @@ const mapStateToProps = (state: UIState, props: STIProps) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
-    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
     sourceContent: source ? getSourceContentValue(state, source) : null,
   };
@@ -183,7 +181,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   render() {
-    const { item, depth, source, focused, hasMatchingGeneratedSource, hasSiblingOfSameName } =
+    const { item, depth, source, focused, hasSiblingOfSameName } =
       this.props;
 
     const suffix = null;
@@ -214,14 +212,6 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       </div>
     );
   }
-}
-
-function getHasMatchingGeneratedSource(state: UIState, source?: SourceDetails) {
-  if (!source) {
-    return false;
-  }
-
-  return !!getGeneratedSourceByURL(state, source.url!);
 }
 
 function getSourceContentValue(state: UIState, source: SourceDetails) {

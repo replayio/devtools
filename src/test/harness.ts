@@ -136,12 +136,7 @@ function findSource(url: string) {
   const sources = dbgSelectors.getAllSourceDetails();
   const firstSourceMatchingUrl = sources.find(s => (s.url || "").includes(url));
   if (firstSourceMatchingUrl) {
-    const canonicalSource = dbgSelectors.getCanonicalSourceForUrl(firstSourceMatchingUrl.url!);
-    if (canonicalSource?.prettyPrinted) {
-      const prettyPrintedSource = dbgSelectors.getSourceDetails(canonicalSource.prettyPrinted);
-      return prettyPrintedSource;
-    }
-    return canonicalSource;
+    return dbgSelectors.getSourceDetails(firstSourceMatchingUrl.correspondingSourceIds[0]);
   }
 }
 
