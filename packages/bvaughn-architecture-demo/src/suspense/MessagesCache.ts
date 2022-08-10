@@ -19,6 +19,7 @@ export type ProtocolMessage = Message & {
 
 export type CategoryCounts = {
   errors: number;
+  exceptions: number; // TODO Remove this
   logs: number;
   warnings: number;
 };
@@ -67,6 +68,7 @@ export function getMessages(
       messages: [],
       categoryCounts: {
         errors: 0,
+        exceptions: 0,
         logs: 0,
         warnings: 0,
       },
@@ -147,6 +149,7 @@ export function getMessages(
     }
 
     let errors = 0;
+    let exceptions = 0; // TODO Remove this
     let logs = 0;
     let warnings = 0;
 
@@ -158,7 +161,17 @@ export function getMessages(
           logs++;
           break;
         case "error":
-          errors++;
+          // TODO Remove this switch
+          switch (message.source) {
+            case "ConsoleAPI": {
+              errors++;
+              break;
+            }
+            case "PageError": {
+              exceptions++;
+              break;
+            }
+          }
           break;
         case "warning":
           warnings++;
@@ -168,6 +181,7 @@ export function getMessages(
 
     lastFilteredCategoryCounts = {
       errors,
+      exceptions,
       logs,
       warnings,
     };

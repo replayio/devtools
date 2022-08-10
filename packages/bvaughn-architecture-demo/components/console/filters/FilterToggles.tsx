@@ -23,6 +23,7 @@ export default function FilterToggles() {
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
+        category="exceptions"
         checked={showExceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}
