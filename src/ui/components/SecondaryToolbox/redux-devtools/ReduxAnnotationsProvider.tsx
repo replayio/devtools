@@ -16,6 +16,8 @@ export const ReduxAnnotationsProvider = ({ children }: RAPProps) => {
   const isStrictEffectsSecondRenderRef = useRef(false);
 
   useEffect(() => {
+    // TODO Re-enable Redux DevTools annotations handling
+    /*
     // React will double-run effects in dev. Avoid trying to subscribe twice,
     // as `socket.ts` throws errors if you call `getAnnotations()` more than once.
     if (isStrictEffectsSecondRenderRef.current) {
@@ -33,6 +35,7 @@ export const ReduxAnnotationsProvider = ({ children }: RAPProps) => {
         );
       }
     }, "redux-devtools-bridge");
+    */
   }, [dispatch]);
 
   return (

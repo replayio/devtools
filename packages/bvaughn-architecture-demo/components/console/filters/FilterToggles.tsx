@@ -1,20 +1,15 @@
-import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
+import { CategoryCounts, getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
-import React, { Suspense, useContext, useMemo } from "react";
+import React, { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge, Checkbox } from "design";
-
-import { isFirefoxInternalMessage } from "../utils/messages";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
 
 export default function FilterToggles() {
-  const { range: focusRange } = useContext(FocusContext);
-  const client = useContext(ReplayClientContext);
   const {
     showErrors,
     showExceptions,
@@ -25,73 +20,34 @@ export default function FilterToggles() {
     update,
   } = useContext(ConsoleFiltersContext);
 
-  const { messages } = getMessages(client, focusRange);
-  const counts = useMemo(() => {
-    let errors = 0;
-    let exceptions = 0;
-    let logs = 0;
-    let warnings = 0;
-
-    messages.forEach(message => {
-      if (isFirefoxInternalMessage(message)) {
-        return;
-      }
-
-      switch (message.level) {
-        case "assert":
-        case "info":
-        case "trace":
-          logs++;
-          break;
-        case "error":
-          switch (message.source) {
-            case "ConsoleAPI":
-              errors++;
-              break;
-            case "PageError":
-              exceptions++;
-              break;
-          }
-          break;
-        case "warning":
-          warnings++;
-          break;
-      }
-    });
-
-    return { errors, exceptions, logs, warnings };
-  }, [messages]);
-
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
+        category="exceptions"
         checked={showExceptions}
-        count={counts.exceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}
       />
       <Toggle
+        category="logs"
         checked={showLogs}
-        count={counts.logs}
         label="Logs"
         onChange={showLogs => update({ showLogs })}
       />
       <Toggle
+        category="warnings"
         checked={showWarnings}
-        count={counts.warnings}
         label="Warnings"
         onChange={showWarnings => update({ showWarnings })}
       />
       <Toggle
+        category="errors"
         checked={showErrors}
-        count={counts.errors}
         label="Errors"
         onChange={showErrors => update({ showErrors })}
       />
       <hr className={styles.Divider} />
-      <Suspense fallback={<Loader />}>
-        <EventsList />
-      </Suspense>
+      <EventsList />
       <hr className={styles.Divider} />
       <Toggle
         checked={!showNodeModules}
@@ -109,12 +65,12 @@ export default function FilterToggles() {
 
 function Toggle({
   checked,
-  count = null,
+  category = null,
   label,
   onChange,
 }: {
   checked: boolean;
-  count?: number | null;
+  category?: keyof CategoryCounts | null;
   label: string;
   onChange: (checked: boolean) => void;
 }) {
@@ -124,11 +80,25 @@ function Toggle({
       <Checkbox
         data-test-id={id}
         label={label}
-        addon={count !== null && count > 0 && <Badge label={count} />}
         checked={checked}
         id={id}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
       />
+      {category && (
+        <Suspense fallback={null}>
+          <ToggleCategoryCount category={category} />
+        </Suspense>
+      )}
     </div>
   );
+}
+
+function ToggleCategoryCount({ category }: { category: keyof CategoryCounts }) {
+  const { range: focusRange } = useContext(FocusContext);
+  const client = useContext(ReplayClientContext);
+
+  const { categoryCounts } = getMessages(client, focusRange);
+  const count = categoryCounts[category];
+
+  return count === 0 ? null : <Badge label={count} />;
 }

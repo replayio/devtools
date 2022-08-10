@@ -83,11 +83,15 @@ export default function HomePage() {
                     </button>
                   </div>
                   <div className={styles.CommentsContainer}>
-                    {panel == "comments" && <CommentList />}
-                    {panel == "sources" && <SourceExplorer />}
+                    <Suspense fallback={<Loader />}>
+                      {panel == "comments" && <CommentList />}
+                      {panel == "sources" && <SourceExplorer />}
+                    </Suspense>
                   </div>
                   <div className={styles.SourcesContainer}>
-                    <Sources />
+                    <Suspense fallback={<Loader />}>
+                      <Sources />
+                    </Suspense>
                   </div>
                   <div className={styles.ConsoleContainer}>
                     <TerminalContextRoot>
@@ -103,7 +107,9 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className={styles.Row}>
-                  <Focuser />
+                  <Suspense fallback={<Loader />}>
+                    <Focuser />
+                  </Suspense>
                 </div>
               </div>
             </FocusContextRoot>
