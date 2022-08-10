@@ -40,6 +40,10 @@ export const ReduxDevToolsPanel = () => {
   }, []);
 
   useLayoutEffect(() => {
+    // TODO Re-enable Redux DevTools annotations handling
+    return;
+
+    /*
     if (!rootRef.current) {
       return;
     }
@@ -66,16 +70,21 @@ export const ReduxDevToolsPanel = () => {
         setCurrentRDTTheme(updatedRDTTheme);
       }
     });
+    */
   }, [ReduxDevToolsAppRoot, appTheme, currentRDTTheme]);
 
   useLayoutEffect(() => {
+    // TODO Re-enable Redux DevTools annotations handling
+    return;
+
+    /*
     if (!rootRef.current) {
       return;
     }
 
     const rootComponent = rootRef.current;
     const store = rootComponent.store!;
-
+*/
     /*
 
      The Redux DevTools UI has its own Redux store with its own reducers.
@@ -95,6 +104,7 @@ export const ReduxDevToolsPanel = () => {
 
     */
 
+    /*
     const allInstanceIds: string[] = ["default"];
 
     reduxAnnotations.forEach(annotation => {
@@ -137,6 +147,7 @@ export const ReduxDevToolsPanel = () => {
         store.dispatch(annotation.action);
       });
     });
+    */
   }, [ReduxDevToolsAppRoot, reduxAnnotations]);
 
   if (!ReduxDevToolsAppRoot) {
