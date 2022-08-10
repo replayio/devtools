@@ -21,7 +21,6 @@ import {
 import React, {
   KeyboardEvent,
   PropsWithChildren,
-  Suspense,
   useCallback,
   useContext,
   useEffect,
@@ -85,21 +84,19 @@ export default function NewConsoleRoot() {
   );
 
   return (
-    <Suspense fallback={<Loader />}>
-      <SessionContext.Provider value={sessionContext}>
-        <TimelineContextAdapter>
-          <InspectorContextReduxAdapter>
-            <TerminalContextReduxAdapter>
-              <FocusContextReduxAdapter>
-                <PointsContextReduxAdapter>
-                  <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
-                </PointsContextReduxAdapter>
-              </FocusContextReduxAdapter>
-            </TerminalContextReduxAdapter>
-          </InspectorContextReduxAdapter>
-        </TimelineContextAdapter>
-      </SessionContext.Provider>
-    </Suspense>
+    <SessionContext.Provider value={sessionContext}>
+      <TimelineContextAdapter>
+        <InspectorContextReduxAdapter>
+          <TerminalContextReduxAdapter>
+            <FocusContextReduxAdapter>
+              <PointsContextReduxAdapter>
+                <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
+              </PointsContextReduxAdapter>
+            </FocusContextReduxAdapter>
+          </TerminalContextReduxAdapter>
+        </InspectorContextReduxAdapter>
+      </TimelineContextAdapter>
+    </SessionContext.Provider>
   );
 }
 

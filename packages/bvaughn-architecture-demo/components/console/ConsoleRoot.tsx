@@ -37,59 +37,67 @@ export default function ConsoleRoot({
   return (
     <ConsoleContextMenuContextRoot>
       <ConsoleFiltersContextRoot>
-        <LoggablesContextRoot messageListRef={messageListRef}>
-          <SearchContextRoot
-            messageListRef={messageListRef}
-            showSearchInputByDefault={showSearchInputByDefault}
-          >
-            <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
-              <div className={styles.TopRow}>
-                <button
-                  className={styles.MenuToggleButton}
-                  data-test-id="ConsoleMenuToggleButton"
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-                >
-                  <Icon
-                    className={styles.MenuToggleButtonIcon}
-                    type={isMenuOpen ? "menu-open" : "menu-closed"}
-                  />
-                </button>
-                <FilterText />
-                {consoleEvaluations.length > 0 && (
-                  <button
-                    className={styles.DeleteTerminalExpressionButton}
-                    data-test-id="ClearConsoleEvaluationsButton"
-                    onClick={clearConsoleEvaluations}
-                    title="Clear console evaluations"
-                  >
-                    <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
-                  </button>
-                )}
+        <div className={styles.ConsoleRoot} data-test-id="ConsoleRoot">
+          <div className={styles.TopRow}>
+            <button
+              className={styles.MenuToggleButton}
+              data-test-id="ConsoleMenuToggleButton"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
+            >
+              <Icon
+                className={styles.MenuToggleButtonIcon}
+                type={isMenuOpen ? "menu-open" : "menu-closed"}
+              />
+            </button>
+            <FilterText />
+            {consoleEvaluations.length > 0 && (
+              <button
+                className={styles.DeleteTerminalExpressionButton}
+                data-test-id="ClearConsoleEvaluationsButton"
+                onClick={clearConsoleEvaluations}
+                title="Clear console evaluations"
+              >
+                <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
+              </button>
+            )}
+          </div>
+          <div className={styles.BottomRow}>
+            <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+              <div className={styles.FilterColumn}>
+                <Suspense fallback={<Loader />}>
+                  <FilterToggles />
+                </Suspense>
               </div>
-              <div className={styles.BottomRow}>
-                <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-                  <div className={styles.FilterColumn}>
-                    <FilterToggles />
-                  </div>
-                </Offscreen>
-                <div className={styles.MessageColumn}>
-                  <ErrorBoundary>
-                    <Suspense fallback={<Loader />}>
-                      <MessagesList ref={messageListRef} />
-                    </Suspense>
-                  </ErrorBoundary>
-
-                  {terminalInput}
-
-                  <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
+            </Offscreen>
+            <Suspense
+              fallback={
+                <div className={styles.Loader}>
+                  <Loader />
                 </div>
-              </div>
+              }
+            >
+              <LoggablesContextRoot messageListRef={messageListRef}>
+                <SearchContextRoot
+                  messageListRef={messageListRef}
+                  showSearchInputByDefault={showSearchInputByDefault}
+                >
+                  <div className={styles.MessageColumn}>
+                    <ErrorBoundary>
+                      <MessagesList ref={messageListRef} />
+                    </ErrorBoundary>
 
-              <ContextMenu />
-            </div>
-          </SearchContextRoot>
-        </LoggablesContextRoot>
+                    {terminalInput}
+
+                    <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
+                  </div>
+                </SearchContextRoot>
+              </LoggablesContextRoot>
+            </Suspense>
+          </div>
+
+          <ContextMenu />
+        </div>
       </ConsoleFiltersContextRoot>
     </ConsoleContextMenuContextRoot>
   );
