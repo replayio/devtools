@@ -63,8 +63,8 @@ export function TeamButton({
   );
 }
 
-export function LibraryIcon(teamType: string) {
-  return <Icon filename={teamType.teamType} size="medium" className="mr-1 bg-gray-200" />;
+export function LibraryIcon({ teamType }: { teamType: string }) {
+  return <Icon filename={teamType} size="medium" className="mr-1 bg-gray-200" />;
 }
 
 export function SettingsButton() {
