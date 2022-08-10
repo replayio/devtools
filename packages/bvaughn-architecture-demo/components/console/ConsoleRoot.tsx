@@ -76,7 +76,13 @@ export default function ConsoleRoot({
               </Offscreen>
               <div className={styles.MessageColumn}>
                 <ErrorBoundary>
-                  <Suspense fallback={<Loader />}>
+                  <Suspense
+                    fallback={
+                      <div className={styles.Loader}>
+                        <Loader />
+                      </div>
+                    }
+                  >
                     <LoggablesContextRoot messageListRef={messageListRef}>
                       <MessagesList ref={messageListRef} />
                     </LoggablesContextRoot>

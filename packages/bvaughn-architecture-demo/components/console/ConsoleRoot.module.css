@@ -73,3 +73,8 @@
   min-height: 2rem;
   flex: 0 0 auto;
 }
+
+.Loader {
+  flex: 1;
+  padding: 0.5rem;
+}

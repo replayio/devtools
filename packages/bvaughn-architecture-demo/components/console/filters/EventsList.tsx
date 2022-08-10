@@ -1,14 +1,13 @@
+import Loader from "@bvaughn/components/Loader";
 import { getEventCategoryCounts } from "@bvaughn/src/suspense/EventsCache";
 import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
-import { ChangeEvent, useContext, useMemo, useState, useTransition } from "react";
+import { ChangeEvent, Suspense, useContext, useMemo, useState, useTransition } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import EventCategory from "./EventCategory";
 import styles from "./EventsList.module.css";
 
 export default function EventsList() {
-  const client = useContext(ReplayClientContext);
-
   const [filterByDisplayText, setFilterByDisplayText] = useState("");
   const [filterByText, setFilterByText] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -20,6 +19,33 @@ export default function EventsList() {
       setFilterByText(newFilterByText);
     });
   };
+
+  return (
+    <div className={styles.EventsList}>
+      <input
+        className={styles.FilterInput}
+        data-test-id="EventTypeFilterInput"
+        onChange={onFilterTextChange}
+        placeholder="Filter by event type"
+        type="text"
+        value={filterByDisplayText}
+      />
+
+      <Suspense fallback={<Loader />}>
+        <EventsListCategories filterByText={filterByText} isPending={isPending} />
+      </Suspense>
+    </div>
+  );
+}
+
+function EventsListCategories({
+  filterByText,
+  isPending,
+}: {
+  filterByText: string;
+  isPending: boolean;
+}) {
+  const client = useContext(ReplayClientContext);
 
   const eventCategoryCounts = getEventCategoryCounts(client);
 
@@ -45,35 +71,27 @@ export default function EventsList() {
   }, [eventCategoryCounts]);
 
   return (
-    <div className={styles.EventsList}>
-      <input
-        className={styles.FilterInput}
-        data-test-id="EventTypeFilterInput"
-        onChange={onFilterTextChange}
-        placeholder="Filter by event type"
-        type="text"
-        value={filterByDisplayText}
-      />
-
+    <>
       <div className={styles.Header}>Common Events</div>
-      {commonEventCategories.map(eventCategory => (
-        <EventCategory
-          key={eventCategory.category}
-          disabled={isPending}
-          eventCategory={eventCategory}
-          filterByText={filterByText}
-        />
-      ))}
-
+      {commonEventCategories &&
+        commonEventCategories.map(eventCategory => (
+          <EventCategory
+            key={eventCategory.category}
+            disabled={isPending}
+            eventCategory={eventCategory}
+            filterByText={filterByText}
+          />
+        ))}
       <div className={styles.Header}>Other Events</div>
-      {otherEventCategories.map(eventCategory => (
-        <EventCategory
-          key={eventCategory.category}
-          disabled={isPending}
-          eventCategory={eventCategory}
-          filterByText={filterByText}
-        />
-      ))}
-    </div>
+      {otherEventCategories &&
+        otherEventCategories.map(eventCategory => (
+          <EventCategory
+            key={eventCategory.category}
+            disabled={isPending}
+            eventCategory={eventCategory}
+            filterByText={filterByText}
+          />
+        ))}
+    </>
   );
 }

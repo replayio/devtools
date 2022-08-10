@@ -46,9 +46,7 @@ export default function FilterToggles() {
         onChange={showErrors => update({ showErrors })}
       />
       <hr className={styles.Divider} />
-      <Suspense fallback={<Loader />}>
-        <EventsList />
-      </Suspense>
+      <EventsList />
       <hr className={styles.Divider} />
       <Toggle
         checked={!showNodeModules}
