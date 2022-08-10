@@ -73,25 +73,23 @@ function EventsListCategories({
   return (
     <>
       <div className={styles.Header}>Common Events</div>
-      {commonEventCategories &&
-        commonEventCategories.map(eventCategory => (
-          <EventCategory
-            key={eventCategory.category}
-            disabled={isPending}
-            eventCategory={eventCategory}
-            filterByText={filterByText}
-          />
-        ))}
+      {commonEventCategories.map(eventCategory => (
+        <EventCategory
+          key={eventCategory.category}
+          disabled={isPending}
+          eventCategory={eventCategory}
+          filterByText={filterByText}
+        />
+      ))}
       <div className={styles.Header}>Other Events</div>
-      {otherEventCategories &&
-        otherEventCategories.map(eventCategory => (
-          <EventCategory
-            key={eventCategory.category}
-            disabled={isPending}
-            eventCategory={eventCategory}
-            filterByText={filterByText}
-          />
-        ))}
+      {otherEventCategories.map(eventCategory => (
+        <EventCategory
+          key={eventCategory.category}
+          disabled={isPending}
+          eventCategory={eventCategory}
+          filterByText={filterByText}
+        />
+      ))}
     </>
   );
 }
