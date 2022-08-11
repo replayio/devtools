@@ -1,5 +1,5 @@
 import type { Meta } from "@storybook/react";
-import { Icon } from "components";
+import { Icon } from "design";
 import type { IconNames } from "icons";
 import { iconMap } from "icons";
 import { useState } from "react";

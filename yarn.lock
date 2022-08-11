@@ -3777,17 +3777,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/icons@workspace:packages/icons":
-  version: 0.0.0-use.local
-  resolution: "@replayio/icons@workspace:packages/icons"
-  dependencies:
-    case-anything: ^2.1.10
-    figma-tools: ^0.4.0
-    svg-to-jsx: ^1.0.4
-    svgo: ^2.8.0
-  languageName: unknown
-  linkType: soft
-
 "@replayio/playwright@npm:^0.2.1":
   version: 0.2.10
   resolution: "@replayio/playwright@npm:0.2.10"
@@ -10985,6 +10974,7 @@ __metadata:
   resolution: "design@workspace:packages/design"
   dependencies:
     classnames: "*"
+    icons: "workspace:*"
     react: "*"
   languageName: unknown
   linkType: soft
@@ -14309,6 +14299,17 @@ __metadata:
   checksum: 4f5bf4b055089754924babebaa23c17845937bcca6aee95d5d015f8fa1e6814279002bd6a9e541e3fac2cd02519fc76305396727066c57c8e21a7e73e7a12137
   languageName: node
   linkType: hard
+
+"icons@workspace:*, icons@workspace:packages/icons":
+  version: 0.0.0-use.local
+  resolution: "icons@workspace:packages/icons"
+  dependencies:
+    case-anything: ^2.1.10
+    figma-tools: ^0.4.0
+    svg-to-jsx: ^1.0.4
+    svgo: ^2.8.0
+  languageName: unknown
+  linkType: soft
 
 "iconv-lite@npm:0.4.19":
   version: 0.4.19

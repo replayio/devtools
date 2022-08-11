@@ -1,9 +1,10 @@
 {
-  "name": "@replayio/icons",
+  "name": "icons",
   "private": true,
   "version": "0.0.0",
   "main": "index.js",
   "scripts": {
+    "dev": "yarn build --watch",
     "build": "node scripts/icons.js --fetch"
   },
   "dependencies": {

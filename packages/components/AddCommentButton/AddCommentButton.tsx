@@ -4,8 +4,7 @@ import classNames from "classnames";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 import styled from "styled-components";
-
-import { Icon } from "../Icon";
+import { Icon } from "design";
 
 interface AddCommentButtonProps {
   /** Changes the button state to reflect the current active comment is paused on a hit. */
