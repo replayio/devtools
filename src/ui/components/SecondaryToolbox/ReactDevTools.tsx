@@ -1,11 +1,9 @@
 import { ExecutionPoint, ObjectId } from "@replayio/protocol";
 import React from "react";
 import { useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppSelector } from "ui/setup/hooks";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
-import { UIState } from "ui/state";
 import { Annotation } from "ui/state/reactDevTools";
 import { getCurrentPoint, getTheme } from "ui/reducers/app";
 import {
@@ -266,15 +264,14 @@ async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: F
   }
 }
 
-function ReactDevtoolsPanel({
-  annotations,
-  currentPoint,
-  setIsNodePickerActive,
-  setIsNodePickerInitializing,
-  setHasReactComponents,
-  protocolCheckFailed,
-  reactInitPoint,
-}: PropsFromRedux) {
+export default function ReactDevtoolsPanel() {
+  const annotations = useAppSelector(getAnnotations);
+  const currentPoint = useAppSelector(getCurrentPoint);
+  const protocolCheckFailed = useAppSelector(getProtocolCheckFailed);
+  const reactInitPoint = useAppSelector(getReactInitPoint);
+
+  const dispatch = useAppDispatch();
+
   const theme = useAppSelector(getTheme);
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
@@ -295,23 +292,23 @@ function ReactDevtoolsPanel({
   }
 
   function enablePicker(opts: NodePickerOpts) {
-    setIsNodePickerActive(true);
-    setIsNodePickerInitializing(false);
+    dispatch(setIsNodePickerActive(true));
+    dispatch(setIsNodePickerInitializing(false));
     NodePicker.enable(opts);
   }
   function initializePicker() {
-    setIsNodePickerActive(false);
-    setIsNodePickerInitializing(true);
+    dispatch(setIsNodePickerActive(false));
+    dispatch(setIsNodePickerInitializing(true));
   }
   function disablePicker() {
     NodePicker.disable();
-    setIsNodePickerActive(false);
-    setIsNodePickerInitializing(false);
+    dispatch(setIsNodePickerActive(false));
+    dispatch(setIsNodePickerInitializing(false));
   }
 
   function onShutdown() {
     sendTelemetryEvent("react-devtools-shutdown");
-    setHasReactComponents(false);
+    dispatch(setHasReactComponents(false));
   }
 
   if (protocolCheckFailed) {
@@ -374,15 +371,3 @@ function ReactDevtoolsPanel({
     />
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    annotations: getAnnotations(state),
-    currentPoint: getCurrentPoint(state),
-    protocolCheckFailed: getProtocolCheckFailed(state),
-    reactInitPoint: getReactInitPoint(state),
-  }),
-  { setIsNodePickerActive, setIsNodePickerInitializing, setHasReactComponents }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ReactDevtoolsPanel);
