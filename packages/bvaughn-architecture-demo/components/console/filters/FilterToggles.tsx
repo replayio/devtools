@@ -12,7 +12,7 @@ import styles from "./FilterToggles.module.css";
 export default function FilterToggles() {
   const {
     showErrors,
-    showExceptions,
+    showExceptionsForDisplay: showExceptions,
     showLogs,
     showNodeModules,
     showTimestamps,
@@ -23,7 +23,6 @@ export default function FilterToggles() {
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
-        category="exceptions"
         checked={showExceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}

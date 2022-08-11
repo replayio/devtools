@@ -1,6 +1,7 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
+import { isFirefoxInternalMessage } from "../utils/messages";
 
 import { createWakeable } from "../utils/suspense";
 import {
@@ -19,7 +20,6 @@ export type ProtocolMessage = Message & {
 
 export type CategoryCounts = {
   errors: number;
-  exceptions: number; // TODO Remove this
   logs: number;
   warnings: number;
 };
@@ -68,7 +68,6 @@ export function getMessages(
       messages: [],
       categoryCounts: {
         errors: 0,
-        exceptions: 0,
         logs: 0,
         warnings: 0,
       },
@@ -115,8 +114,7 @@ export function getMessages(
     throw inFlightWakeable;
   }
 
-  // TODO Filter Firefox internal messages?
-  // import { isFirefoxInternalMessage } from "../utils/messages";
+  // TODO (FE-533) Filter Firefox internal browser exceptions (see isFirefoxInternalMessage)
 
   // At this point, messages have been fetched but we may still need to filter them.
   // For performance reasons (both in this function and on things that consume the filtered list)
@@ -126,7 +124,14 @@ export function getMessages(
       lastFilteredFocusRange = null;
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
-      lastFilteredMessages = lastFetchedMessages;
+
+      // HACK
+      // Even if we aren't focused, the frontend needs to filter out Firefox internal messages.
+      // This is something the runtime should probably do.
+      // See BAC-2063
+      lastFilteredMessages = lastFetchedMessages!.filter(
+        message => !isFirefoxInternalMessage(message)
+      );
     } else {
       const beginPoint = focusRange.begin.point;
       const endPoint = focusRange.end.point;
@@ -135,6 +140,11 @@ export function getMessages(
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages!.filter(message => {
+        // HACK See BAC-2063
+        if (isFirefoxInternalMessage(message)) {
+          return false;
+        }
+
         const point = message.point.point;
         if (isExecutionPointsLessThan(point, beginPoint)) {
           lastFilteredCountBefore++;
@@ -149,7 +159,6 @@ export function getMessages(
     }
 
     let errors = 0;
-    let exceptions = 0; // TODO Remove this
     let logs = 0;
     let warnings = 0;
 
@@ -161,17 +170,7 @@ export function getMessages(
           logs++;
           break;
         case "error":
-          // TODO Remove this switch
-          switch (message.source) {
-            case "ConsoleAPI": {
-              errors++;
-              break;
-            }
-            case "PageError": {
-              exceptions++;
-              break;
-            }
-          }
+          errors++;
           break;
         case "warning":
           warnings++;
@@ -181,7 +180,6 @@ export function getMessages(
 
     lastFilteredCategoryCounts = {
       errors,
-      exceptions,
       logs,
       warnings,
     };

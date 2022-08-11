@@ -9,6 +9,8 @@ const URL = `${getBaseURL()}/tests/nested?${getURLFlags()}`;
 testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
 
+  await toggleProtocolMessages(page, true);
+
   await inspect(page, "Function(recursive)");
 });
 

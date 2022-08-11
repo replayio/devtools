@@ -15,7 +15,6 @@ import { SessionContext } from "./SessionContext";
 // Various boolean flags to types of console messages or attributes to show/hide.
 export type Toggles = {
   showErrors: boolean;
-  showExceptions: boolean;
   showLogs: boolean;
   showNodeModules: boolean;
   showTimestamps: boolean;
@@ -43,6 +42,12 @@ export type ConsoleFiltersContextType = Toggles & {
   // UI that consumes the focus for Suspense purposes may wish want reflect the temporary pending state.
   isTransitionPending: boolean;
 
+  // Run analysis to collect uncaught Exceptions.
+  // The "display" value is updated at React's default, higher priority.
+  // The other value is updated at a lower, transition priority.
+  showExceptions: boolean;
+  showExceptionsForDisplay: boolean;
+
   update: (
     values: Partial<
       Omit<
@@ -58,10 +63,9 @@ export const ConsoleFiltersContext = createContext<ConsoleFiltersContextType>(nu
 export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId } = useContext(SessionContext);
 
-  const localStorageKey = `Replay:Toggles:${recordingId}`;
-  const [toggles, setToggles] = useLocalStorage<Toggles>(localStorageKey, {
+  const togglesLocalStorageKey = `Replay:Toggles:${recordingId}`;
+  const [toggles, setToggles] = useLocalStorage<Toggles>(togglesLocalStorageKey, {
     showErrors: true,
-    showExceptions: true,
     showLogs: true,
     showNodeModules: false,
     showTimestamps: false,
@@ -77,21 +81,44 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
   const [eventTypes, setEventTypes] = useState<EventTypes>({});
   const [deferredEventTypes, setDeferredEventTypes] = useState<EventTypes>({});
 
+  const showExceptionsLocalStorageKey = `Replay:showExceptions:${recordingId}`;
+  const [showExceptions, setShowExceptions] = useLocalStorage<boolean>(
+    showExceptionsLocalStorageKey,
+    false
+  );
+  const [deferredShowExceptions, setDeferredShowExceptions] = useState<boolean>(showExceptions);
+
   const update = useCallback(
     (
       values: Partial<
         Omit<
           ConsoleFiltersContextType,
-          "eventTypesForDisplay" | "filterByDisplayText" | "isTransitionPending" | "update"
+          | "eventTypesForDisplay"
+          | "filterByDisplayText"
+          | "isTransitionPending"
+          | "showExceptionsForDisplay"
+          | "update"
         >
       >
     ) => {
-      const { eventTypes: newEventTypes, filterByText: newFilterByText, ...newToggles } = values;
+      const {
+        eventTypes: newEventTypes,
+        filterByText: newFilterByText,
+        showExceptions: newShowExceptions,
+        ...newToggles
+      } = values;
 
       setToggles(prevToggles => ({
         ...prevToggles,
         ...newToggles,
       }));
+
+      if (newShowExceptions != null) {
+        setShowExceptions(newShowExceptions);
+        startTransition(() => {
+          setDeferredShowExceptions(newShowExceptions);
+        });
+      }
 
       if (newEventTypes != null) {
         setEventTypes(prevEventTypes => ({
@@ -113,7 +140,7 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
         });
       }
     },
-    [setToggles]
+    [setShowExceptions, setToggles]
   );
 
   // Using a deferred values enables the filter input to update quickly,
@@ -128,14 +155,18 @@ export function ConsoleFiltersContextRoot({ children }: PropsWithChildren<{}>) {
       filterByDisplayText: filterByText,
       filterByText: deferredFilterByText,
       isTransitionPending,
+      showExceptions: deferredShowExceptions,
+      showExceptionsForDisplay: showExceptions,
       update,
     }),
     [
       deferredEventTypes,
       deferredFilterByText,
+      deferredShowExceptions,
       eventTypes,
       filterByText,
       isTransitionPending,
+      showExceptions,
       toggles,
       update,
     ]

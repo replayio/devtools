@@ -8,6 +8,7 @@ const URL = `${getBaseURL()}/tests/source-and-console?${getURLFlags()}`;
 
 testSetup(async function regeneratorFunction({ page }) {
   await openSourceTab(page);
+
   await addLogPoint(page, 12);
 
   await fillLogPointText(page, 12, "printError");
@@ -110,6 +111,19 @@ test("should include log points when filtering data", async ({ page }) => {
   await takeScreenshot(page, messages, "log-point-not-in-search-results");
 });
 
-// TODO Add test for log point badge colors
-// TODO Add context menu test for setting focus range
-// TODO Add context menu test for setting log point badge colors
+test("should support custom badge styles for log points", async ({ page }) => {
+  await openSourceTab(page);
+  await addLogPoint(page, 12);
+
+  await toggleProtocolMessages(page, false);
+
+  const message = page.locator("[data-test-name=Message]");
+
+  await message.click({ button: "right" });
+  await page.click("[data-test-id=ConsoleContextMenu-Badge-yellow]");
+  await takeScreenshot(page, message, "log-point-message-with-yellow-badge");
+
+  await message.click({ button: "right" });
+  await page.click("[data-test-id=ConsoleContextMenu-Badge-unicorn]");
+  await takeScreenshot(page, message, "log-point-message-with-unicorn-badge");
+});

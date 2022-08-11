@@ -6,7 +6,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { Frame, Value as ProtocolValue } from "@replayio/protocol";
+import { Value as ProtocolValue } from "@replayio/protocol";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
@@ -91,23 +91,17 @@ function MessageRenderer({
   const argumentValues = message.argumentValues || EMPTY_ARRAY;
 
   const logContents = (
-    <>
-      {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)} </span>
-      )}
-      <span className={styles.LogContents}>
-        {icon}
-        {message.text && <span className={styles.MessageText}>{message.text}</span>}
-        <Suspense fallback={<Loader />}>
-          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-            <Fragment key={index}>
-              <Inspector pauseId={message.pauseId} protocolValue={argumentValue} />
-              {index < argumentValues.length - 1 && " "}
-            </Fragment>
-          ))}
-        </Suspense>
-      </span>
-    </>
+    <span className={styles.LogContents}>
+      {message.text && <span className={styles.MessageText}>{message.text}</span>}
+      <Suspense fallback={<Loader />}>
+        {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+          <Fragment key={index}>
+            <Inspector pauseId={message.pauseId} protocolValue={argumentValue} />
+            {index < argumentValues.length - 1 && " "}
+          </Fragment>
+        ))}
+      </Suspense>
+    </span>
   );
 
   return (
@@ -122,6 +116,10 @@ function MessageRenderer({
         onMouseLeave={() => setIsHovered(false)}
         role="listitem"
       >
+        {showTimestamps && (
+          <span className={styles.TimeStamp}>{formatTimestamp(message.point.time, true)} </span>
+        )}
+        {icon}
         <span className={styles.Source}>
           <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
         </span>
