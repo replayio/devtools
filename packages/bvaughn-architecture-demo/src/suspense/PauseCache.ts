@@ -6,6 +6,7 @@ import {
   PauseId,
   Result,
 } from "@replayio/protocol";
+import { captureException } from "@sentry/browser";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -15,6 +16,7 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 
 const evaluationResultsMap: Map<ExecutionPoint, Record<Result>> = new Map();
 const executionPointToPauseMap: Map<ExecutionPoint, Record<createPauseResult>> = new Map();
+const executionPointToPauseIdSetMap: Map<ExecutionPoint, Set<PauseId>> = new Map();
 const pauseIdToPauseDataMap: Map<PauseId, Record<PauseData>> = new Map();
 
 export function evaluate(
@@ -164,11 +166,33 @@ async function fetchPauseId(
     record.status = STATUS_RESOLVED;
     record.value = pause;
 
+    trackExecutionPointPauseIds(executionPoint, pause.pauseId);
+
     wakeable.resolve(record.value);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;
 
     wakeable.reject(error);
+  }
+}
+
+// TODO Hook into e2e tests to assert 0-1 pause id per point
+export function trackExecutionPointPauseIds(
+  executionPoint: ExecutionPoint,
+  pauseId: PauseId
+): void {
+  const set = executionPointToPauseIdSetMap.get(executionPoint);
+  if (set == null) {
+    executionPointToPauseIdSetMap.set(executionPoint, new Set([pauseId]));
+  } else {
+    set.add(pauseId);
+
+    const pauseIds = Array.from(set).join(", ");
+    const error = new Error(`Point (${executionPoint}) has multiple pause ids (${pauseIds})`);
+
+    captureException(error);
+
+    console.error(error);
   }
 }

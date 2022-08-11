@@ -32,7 +32,11 @@ const pausesById = new Map<PauseId, Pause>();
 export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
 // Allow the new Object Inspector's Suspense cache to observe Pause data and pre-cache it.
-type PauseDataHandler = (pauseId: PauseId, pauseData: PauseData) => void;
+type PauseDataHandler = (
+  pauseId: PauseId,
+  executionPoint: ExecutionPoint,
+  pauseData: PauseData
+) => void;
 const pauseDataHandlers: PauseDataHandler[] = [];
 export function addPauseDataListener(handler: PauseDataHandler): void {
   pauseDataHandlers.push(handler);
@@ -168,7 +172,7 @@ export class Pause {
     this.createWaiter = (async () => {
       const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
 
-      pauseDataHandlers.forEach(handler => handler(pauseId, data));
+      pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
 
       await this.ThreadFront.ensureAllSources();
       this._setPauseId(pauseId);
@@ -192,6 +196,9 @@ export class Pause {
   ) {
     assert(!this.createWaiter, "createWaiter already set");
     assert(!this.pauseId, "pauseId already set");
+
+    pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
+
     this.createWaiter = Promise.resolve();
     this._setPauseId(pauseId);
     this.point = point;

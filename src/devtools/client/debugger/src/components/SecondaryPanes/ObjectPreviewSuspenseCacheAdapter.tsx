@@ -1,5 +1,6 @@
 import { preCacheObjects } from "@bvaughn/src/suspense/ObjectPreviews";
-import { PauseData, PauseId } from "@replayio/protocol";
+import { trackExecutionPointPauseIds } from "@bvaughn/src/suspense/PauseCache";
+import { ExecutionPoint, PauseData, PauseId } from "@replayio/protocol";
 import { addPauseDataListener, removePauseDataListener } from "protocol/thread/pause";
 import { useEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
@@ -15,13 +16,15 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
       return;
     }
 
-    const handler = (pauseId: PauseId, pauseData: PauseData) => {
+    const handler = (pauseId: PauseId, executionPoint: ExecutionPoint, pauseData: PauseData) => {
       const { objects } = pauseData;
       if (objects) {
         // Be sure to clone object data before pre-caching it.
         // Otherwise ValueFronts might deeply mutate it and change its structure.
         preCacheObjects(pauseId, JSON.parse(JSON.stringify(objects)));
       }
+
+      trackExecutionPointPauseIds(executionPoint, pauseId);
     };
 
     addPauseDataListener(handler);
