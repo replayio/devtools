@@ -328,7 +328,7 @@ test("should be filterable on complex content", async ({ page }) => {
   await takeScreenshot(page, consoleRoot, "filtered-complex-object-preview");
 });
 
-test.only("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
+test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
   await page.goto(URL);
 
   await toggleProtocolMessages(page, false);
