@@ -113,7 +113,6 @@ export async function renderFocused(
   const timelineContext: TimelineContextType = {
     executionPoint: "0",
     isPending: false,
-    pauseId: null,
     time: 0,
     update: jest.fn(),
     ...options?.timelineContext,

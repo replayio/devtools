@@ -1,9 +1,9 @@
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
-import { getPauseData, getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
+import { getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
 import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
-import { FrameId } from "@replayio/protocol";
+import { FrameId, PauseId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isPointInRegions } from "shared/utils/time";
@@ -17,7 +17,7 @@ export default function Input() {
   const client = useContext(ReplayClientContext);
   const [searchState, searchActions] = useContext(SearchContext);
   const { addMessage } = useContext(TerminalContext);
-  const { executionPoint, pauseId: explicitPauseId, time } = useContext(TimelineContext);
+  const { executionPoint, time } = useContext(TimelineContext);
 
   const loadedRegions = useLoadedRegions(client);
 
@@ -33,22 +33,16 @@ export default function Input() {
   }, [searchState.visible]);
 
   // If we are not currently paused at an explicit point, find the nearest point and pause there.
-  let pauseId = explicitPauseId;
+  let pauseId: PauseId | null = null;
   let frameId: FrameId | null = null;
-  if (pauseId === null) {
-    const isLoaded =
-      loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
-    if (isLoaded) {
-      const executionPoint = getClosestPointForTime(client, time);
-      const pauseData = getPauseForExecutionPoint(client, executionPoint);
+  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
+  if (isLoaded) {
+    const executionPoint = getClosestPointForTime(client, time);
 
-      frameId = pauseData.stack?.[0] ?? null;
-      pauseId = pauseData.pauseId;
-    }
-  } else {
-    const pauseData = getPauseData(client, pauseId);
+    const pause = getPauseForExecutionPoint(client, executionPoint);
 
-    frameId = pauseData.frames?.[0]?.frameId ?? null;
+    frameId = pause.data.frames?.[0]?.frameId ?? null;
+    pauseId = pause.pauseId;
   }
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {

@@ -100,7 +100,6 @@ function TerminalExpressionRenderer({
         <MessageHoverButton
           executionPoint={terminalExpression.point}
           location={null}
-          pauseId={terminalExpression.pauseId}
           showAddCommentButton={false}
           time={terminalExpression.time}
         />

@@ -99,7 +99,6 @@ function EventLogRenderer({
           <MessageHoverButton
             executionPoint={eventLog.point}
             location={location}
-            pauseId={eventLog.pauseId}
             showAddCommentButton={true}
             time={eventLog.time}
           />

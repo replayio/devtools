@@ -59,6 +59,8 @@ import ReplayLogo from "../shared/ReplayLogo";
 
 import styles from "./NewConsole.module.css";
 import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
+import { getPauseIdForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -363,9 +365,10 @@ function TerminalContextReduxAdapter({ children }: PropsWithChildren) {
 
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.
 function TimelineContextAdapter({ children }: PropsWithChildren) {
+  const client = useContext(ReplayClientContext);
+
   const [state, setState] = useState<Omit<TimelineContextType, "isPending" | "update">>({
     executionPoint: "0",
-    pauseId: null,
     time: 0,
   });
 
@@ -377,7 +380,9 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   const executionPoint = useAppSelector(getCurrentPoint) || "0";
 
   const update = useCallback(
-    async (time: number, executionPoint: ExecutionPoint, pauseId: PauseId) => {
+    async (time: number, executionPoint: ExecutionPoint) => {
+      const pauseId = getPauseIdForExecutionPoint(client, executionPoint);
+
       if (!Pause.getById(pauseId)) {
         // Pre-cache Pause data (required by legacy app code) before calling seek().
         // The new Console doesn't load this data but the old one requires it.
@@ -388,16 +393,14 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
 
       dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId));
     },
-    [dispatch]
+    [client, dispatch]
   );
 
   useLayoutEffect(() => {
-    if (pauseId) {
-      startTransition(() => {
-        setState({ executionPoint, time, pauseId });
-      });
-    }
-  }, [executionPoint, pauseId, time]);
+    startTransition(() => {
+      setState({ executionPoint, time });
+    });
+  }, [executionPoint, time]);
 
   const context = useMemo<TimelineContextType>(
     () => ({

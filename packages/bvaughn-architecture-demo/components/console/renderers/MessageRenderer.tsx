@@ -138,7 +138,6 @@ function MessageRenderer({
           <MessageHoverButton
             executionPoint={message.point.point}
             location={location}
-            pauseId={message.pauseId}
             showAddCommentButton={true}
             time={message.point.time}
           />

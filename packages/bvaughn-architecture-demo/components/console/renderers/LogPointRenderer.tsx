@@ -5,17 +5,13 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
-import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
-import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
-import { ExecutionPoint, Location } from "@replayio/protocol";
 import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
@@ -93,48 +89,15 @@ function LogPointRenderer({
         <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
       </span>
       {primaryContent}
-      <MessageHoverButtonWithWithPause
-        executionPoint={logPointInstance.timeStampedHitPoint.point}
-        isHovered={isHovered}
-        location={logPointInstance.point.location}
-        time={logPointInstance.timeStampedHitPoint.time}
-      />
+      {isHovered && (
+        <MessageHoverButton
+          executionPoint={logPointInstance.timeStampedHitPoint.point}
+          location={logPointInstance.point.location}
+          showAddCommentButton={true}
+          time={logPointInstance.timeStampedHitPoint.time}
+        />
+      )}
     </div>
-  );
-}
-
-function MessageHoverButtonWithWithPause({
-  executionPoint,
-  isHovered,
-  location,
-  time,
-}: {
-  executionPoint: ExecutionPoint;
-  isHovered: boolean;
-  location: Location;
-  time: number;
-}) {
-  const client = useContext(ReplayClientContext);
-
-  const loadedRegions = useLoadedRegions(client);
-  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
-
-  // Events don't have pause IDs, just execution points.
-  // So we need to load the nearest one before we can seek to it.
-  const pauseId = isLoaded ? getClosestPointForTime(client, time) : null;
-
-  if (pauseId === null || !isHovered) {
-    return null;
-  }
-
-  return (
-    <MessageHoverButton
-      executionPoint={executionPoint}
-      location={location}
-      pauseId={pauseId}
-      showAddCommentButton={true}
-      time={time}
-    />
   );
 }
 
