@@ -194,17 +194,19 @@ export function trackExecutionPointPauseIds(
   executionPoint: ExecutionPoint,
   pauseId: PauseId
 ): void {
-  const set = executionPointToPauseIdSetMap.get(executionPoint);
+  let set = executionPointToPauseIdSetMap.get(executionPoint);
   if (set == null) {
     executionPointToPauseIdSetMap.set(executionPoint, new Set([pauseId]));
   } else {
     set.add(pauseId);
 
-    const pauseIds = Array.from(set).join(", ");
-    const error = new Error(`Point (${executionPoint}) has multiple pause ids (${pauseIds})`);
+    if (set.size > 1) {
+      const pauseIds = Array.from(set).join(", ");
+      const error = new Error(`Point (${executionPoint}) has multiple pause ids (${pauseIds})`);
 
-    captureException(error);
+      captureException(error);
 
-    console.error(error);
+      console.error(error);
+    }
   }
 }
