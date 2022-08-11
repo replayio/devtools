@@ -24,8 +24,6 @@ Test.describe(`Test React DevTools.`, async () => {
   await Test.warpToMessage("Added an entry");
 
   await Test.selectReactDevTools();
-  // TODO (466) Clicking a second time flushes the pending update; this should be unnecessary.
-  await Test.selectReactDevTools();
   await Test.waitUntil(() => getComponents().length === 4, {
     waitingFor: "There to be 4 components in ReactDevTools",
   });
@@ -49,8 +47,6 @@ Test.describe(`Test React DevTools.`, async () => {
   await Test.selectConsole();
   await Test.warpToMessage("Removed an entry");
 
-  await Test.selectReactDevTools();
-  // TODO (466) Clicking a second time flushes the pending update; this should be unnecessary.
   await Test.selectReactDevTools();
   await Test.waitUntil(() => getComponents().length === 3, {
     waitingFor: "There to be 3 components in ReactDevTools",
