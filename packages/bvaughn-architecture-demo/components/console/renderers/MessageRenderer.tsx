@@ -89,10 +89,8 @@ function MessageRenderer({
   };
 
   const argumentValues = message.argumentValues || EMPTY_ARRAY;
-
-  const logContents = (
-    <span className={styles.LogContents}>
-      {message.text && <span className={styles.MessageText}>{message.text}</span>}
+  const primaryContent =
+    argumentValues.length > 0 ? (
       <Suspense fallback={<Loader />}>
         {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
           <Fragment key={index}>
@@ -101,6 +99,14 @@ function MessageRenderer({
           </Fragment>
         ))}
       </Suspense>
+    ) : (
+      " "
+    );
+
+  const logContents = (
+    <span className={styles.LogContents}>
+      {message.text && <span className={styles.MessageText}>{message.text}</span>}
+      {primaryContent}
     </span>
   );
 

@@ -59,18 +59,21 @@ function UncaughtExceptionRenderer({
   const showExpandable = frames.length > 0;
 
   const argumentValues = uncaughtException.values || EMPTY_ARRAY;
-  const primaryContent = (
-    <span className={styles.LogContents}>
-      <Suspense fallback={<Loader />}>
-        {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-          <Fragment key={index}>
-            <Inspector pauseId={uncaughtException.pauseId} protocolValue={argumentValue} />
-            {index < argumentValues.length - 1 && " "}
-          </Fragment>
-        ))}
-      </Suspense>
-    </span>
-  );
+  const primaryContent =
+    argumentValues.length > 0 ? (
+      <span className={styles.LogContents}>
+        <Suspense fallback={<Loader />}>
+          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+            <Fragment key={index}>
+              <Inspector pauseId={uncaughtException.pauseId} protocolValue={argumentValue} />
+              {index < argumentValues.length - 1 && " "}
+            </Fragment>
+          ))}
+        </Suspense>
+      </span>
+    ) : (
+      " "
+    );
 
   return (
     <div

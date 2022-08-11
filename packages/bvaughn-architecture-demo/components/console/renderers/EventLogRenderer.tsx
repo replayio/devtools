@@ -53,17 +53,20 @@ function EventLogRenderer({
 
   const location = eventLog.location[0];
 
-  const contents = values.map((value, index) => (
-    <Fragment key={index}>
-      <KeyValueRenderer
-        isNested={false}
-        layout="horizontal"
-        pauseId={pauseId}
-        protocolValue={value}
-      />
-      {index < values.length - 1 && " "}
-    </Fragment>
-  ));
+  const content =
+    values.length > 0
+      ? values.map((value, index) => (
+          <Fragment key={index}>
+            <KeyValueRenderer
+              isNested={false}
+              layout="horizontal"
+              pauseId={pauseId}
+              protocolValue={value}
+            />
+            {index < values.length - 1 && " "}
+          </Fragment>
+        ))
+      : " ";
 
   const showContextMenu = (event: MouseEvent) => {
     event.preventDefault();
@@ -75,7 +78,7 @@ function EventLogRenderer({
       {showTimestamps && (
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
-      <span className={styles.LogContents}>{contents}</span>
+      <span className={styles.LogContents}>{content}</span>
     </>
   );
 
