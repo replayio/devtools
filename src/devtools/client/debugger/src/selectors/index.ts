@@ -4,7 +4,6 @@
 
 //
 import type { UIState } from "ui/state";
-export type { UrlLocation } from "../reducers/pause";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 export * from "../reducers/tabs";
@@ -30,6 +29,3 @@ export { getBreakpointSources, getLogpointSources } from "./breakpointSources";
 export * from "./visibleColumnBreakpoints";
 export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
 export * from "./debugLine";
-
-// TODO These declarations are still masking some usages
-export declare function getContext(state: UIState): Context;

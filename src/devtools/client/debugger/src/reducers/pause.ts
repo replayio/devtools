@@ -2,65 +2,64 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-/* eslint complexity: ["error", 35]*/
-
-/**
- * Pause reducer
- * @module reducers/pause
- */
-
-import type { Action } from "@reduxjs/toolkit";
-import type { AnyAction } from "@reduxjs/toolkit";
-import type { Location, Scope } from "@replayio/protocol";
+import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
+import type { Location, TimeStampedPoint, ScopeType } from "@replayio/protocol";
 import type { UIState } from "ui/state";
+
+import { WiredNamedValue } from "protocol/thread/pause";
+import type { ThreadFront, ValueFront } from "protocol/thread";
 
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
-import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import { getSelectedSource, getSourceDetails, SourceDetails } from "ui/reducers/sources";
 
+import { ThunkExtraArgs } from "ui/utils/thunk";
+import { getContextFromAction } from "ui/setup/redux/middleware/context";
+import { createFrame } from "devtools/client/debugger/src/client/create";
+
 export interface Context {
+  navigateCounter: number;
+}
+
+export interface ThreadContext {
   isPaused: boolean;
   navigateCounter: number;
   pauseCounter: number;
 }
 
-export interface UrlLocation extends Location {
-  sourceUrl: string;
-}
-
-export interface SelectedFrame {
+export interface PauseFrame {
   id: string;
-  alternateLocation?: UrlLocation;
-  generatedLocation?: UrlLocation;
-  displayName: string;
   protocolId: string;
   asyncIndex: number;
-  location: UrlLocation;
+  displayName: string;
+  location: Location;
+  alternateLocation?: Location;
+  this?: ValueFront;
+  source: null;
+  index: number;
+  asyncCause?: "async";
+  state: "on-stack";
 }
 
 // TBD
-interface UnknownPositions {
-  point: string;
-}
+type UnknownPosition = TimeStampedPoint & { location: Location };
 
 interface ScopeDetails {
   pending: boolean;
   originalScopesUnavailable: boolean;
-  scope: Scope;
+  scope?: ConvertedScope;
 }
 
 export interface PauseState {
   cx: { navigateCounter: number };
   id: string | undefined;
-  threadcx: Context;
+  threadcx: ThreadContext;
   pauseErrored: boolean;
   pauseLoading: boolean;
   pausePreviewLocation: Location | null;
-  frames: SelectedFrame[] | null;
+  frames: PauseFrame[] | null;
   framesLoading: boolean;
   framesErrored: boolean;
   frameScopes: Record<string, ScopeDetails>;
@@ -71,36 +70,17 @@ export interface PauseState {
   command: string | null;
   lastCommand: string | null;
   previousLocation: Location | null;
-  expandedScopes: Set<string>;
-  lastExpandedScopes: [];
   shouldLogExceptions: boolean;
-  replayFramePositions?: { positions: UnknownPositions[]; unexecuted: unknown } | null;
+  replayFramePositions?: { positions: UnknownPosition[] } | null;
 }
 
-function createPauseState(): PauseState {
-  return {
-    pauseErrored: false,
-    pauseLoading: false,
-    cx: {
-      navigateCounter: 0,
-    },
-    threadcx: {
-      navigateCounter: 0,
-      isPaused: false,
-      pauseCounter: 0,
-    },
-    id: undefined,
-    pausePreviewLocation: null,
-    ...resumedPauseState,
-    isWaitingOnBreak: false,
-    command: null,
-    lastCommand: null,
-    previousLocation: null,
-    expandedScopes: new Set(),
-    lastExpandedScopes: [],
-    shouldLogExceptions: prefs.logExceptions as boolean,
-  };
-}
+export type ValidCommand =
+  | "stepIn"
+  | "stepOut"
+  | "stepOver"
+  | "resume"
+  | "rewind"
+  | "reverseStepOver";
 
 const resumedPauseState = {
   frames: null,
@@ -112,71 +92,192 @@ const resumedPauseState = {
   why: null,
 };
 
-interface CommandAction extends Action<"COMMAND"> {
-  command: string;
+const initialState: PauseState = {
+  pauseErrored: false,
+  pauseLoading: false,
+  cx: {
+    navigateCounter: 0,
+  },
+  threadcx: {
+    navigateCounter: 0,
+    isPaused: false,
+    pauseCounter: 0,
+  },
+  id: undefined,
+  pausePreviewLocation: null,
+  ...resumedPauseState,
+  isWaitingOnBreak: false,
+  command: null,
+  lastCommand: null,
+  previousLocation: null,
+  shouldLogExceptions: prefs.logExceptions as boolean,
+};
+
+export const executeCommandOperation = createAsyncThunk<
+  void,
+  { cx: Context; command: ValidCommand },
+  { state: UIState; extra: ThunkExtraArgs }
+>("pause/executeCommand", async ({ cx, command }, thunkApi) => {
+  const { extra, getState } = thunkApi;
+  const { ThreadFront } = extra;
+  const state = getState();
+  const loadedRegions = getLoadedRegions(state)!;
+  const nextPoint = getResumePoint(state, command)!;
+
+  await ThreadFront[command](nextPoint, loadedRegions);
+});
+
+// Isn't this a lovely type lookup?
+type ProtocolScope = Awaited<ReturnType<typeof ThreadFront["getScopes"]>>["scopes"][number];
+
+interface ConvertedScope {
+  actor: string;
+  parent: ConvertedScope | null;
+  bindings: WiredNamedValue[] | undefined;
+  object: ValueFront | undefined;
+  functionName: string | undefined;
+  type: ScopeType;
+  scopeKind: string;
 }
 
-function update(state = createPauseState(), action: AnyAction) {
-  if (action.cx && action.cx.pauseCounter !== state.threadcx.pauseCounter) {
-    return state;
+function convertScope(protocolScope: ProtocolScope): ConvertedScope {
+  const { scopeId, type, functionLexical, object, functionName, bindings } = protocolScope;
+
+  return {
+    actor: scopeId,
+    parent: null,
+    bindings,
+    object,
+    functionName,
+    type,
+    scopeKind: functionLexical ? "function lexical" : "",
+  };
+}
+
+export const fetchScopes = createAsyncThunk<
+  { scopes: ConvertedScope; originalScopesUnavailable: boolean; frameId: string },
+  { cx: Context },
+  { state: UIState; extra: ThunkExtraArgs }
+>(
+  "pause/fetchScopes",
+  async (arg, thunkApi) => {
+    const { extra, getState } = thunkApi;
+    const { ThreadFront } = extra;
+
+    const frame = getSelectedFrame(getState())!;
+
+    const { scopes, originalScopesUnavailable } = await ThreadFront.getScopes(
+      frame.asyncIndex,
+      frame.protocolId
+    );
+    const converted = scopes.map(convertScope);
+    for (let i = 0; i + 1 < converted.length; i++) {
+      converted[i].parent = converted[i + 1];
+    }
+    return { scopes: converted[0], originalScopesUnavailable, frameId: frame.id };
+  },
+  {
+    condition: (arg, { getState }) => {
+      const frame = getSelectedFrame(getState());
+      if (!frame || getFrameScope(getState(), frame.id)) {
+        return false;
+      }
+    },
+    dispatchConditionRejection: false,
   }
-  switch (action.type) {
-    case "PAUSE_REQUESTED_AT": {
-      return {
-        ...state,
+);
+
+export const fetchFrames = createAsyncThunk<
+  PauseFrame[],
+  { cx: Context; pauseId: string },
+  { state: UIState; extra: ThunkExtraArgs }
+>("pause/fetchFrames", async ({ cx, pauseId }, thunkApi) => {
+  const frames = (await thunkApi.extra.ThreadFront.getFrames()) ?? [];
+  const resultFrames = await Promise.all(frames.map((frame, i) => createFrame(frame, i)));
+  // TS says there could be nulls, but not seeing them in practice
+  return resultFrames as PauseFrame[];
+});
+
+export const fetchAsyncFrames = createAsyncThunk<
+  PauseFrame[],
+  { cx: Context },
+  { state: UIState; extra: ThunkExtraArgs }
+>(
+  "pause/fetchAsyncFrames",
+  async ({ cx }, thunkApi) => {
+    const { ThreadFront } = thunkApi.extra;
+    let asyncFrames: PauseFrame[] = [];
+
+    // How many times to fetch an async set of parent frames.
+    const MaxAsyncFrames = 5;
+
+    for (let asyncIndex = 0; asyncIndex < MaxAsyncFrames; asyncIndex++) {
+      const frames = await ThreadFront.loadAsyncParentFrames();
+
+      if (!frames.length) {
+        break;
+      }
+      const wiredFrames = await Promise.all(
+        frames.map((frame, i) => createFrame(frame, i, asyncIndex))
+      );
+      asyncFrames = asyncFrames.concat(wiredFrames as PauseFrame[]);
+    }
+
+    if (!asyncFrames.length) {
+      // Skip dispatching an action, there's no data
+      return thunkApi.rejectWithValue("No async frames");
+    }
+
+    return asyncFrames;
+  },
+  {
+    dispatchConditionRejection: false,
+  }
+);
+
+const pauseSlice = createSlice({
+  name: "pause",
+  initialState,
+  reducers: {
+    pauseRequestedAt(state) {
+      Object.assign(state, {
         pauseErrored: false,
         pauseLoading: true,
         framesLoading: true,
         framesErrored: false,
-        threadcx: {
-          ...state.threadcx,
-          pauseCounter: state.threadcx.pauseCounter + 1,
-          isPaused: true,
-        },
-      };
-    }
-    case "PAUSED": {
-      const { id, frame, why, executionPoint } = action;
-      return {
-        ...state,
+      });
+
+      state.threadcx.pauseCounter++;
+      state.threadcx.isPaused = true;
+    },
+    paused(
+      state,
+      action: PayloadAction<{
+        id: string;
+        frame?: PauseFrame;
+        why?: string;
+        executionPoint: string;
+        // used by the legacy Messages reducer
+        time?: number;
+      }>
+    ) {
+      const { id, frame, why, executionPoint } = action.payload;
+      Object.assign(state, {
         pauseErrored: false,
         pauseLoading: false,
         id,
         isWaitingOnBreak: false,
-        selectedFrameId: frame ? frame.id : undefined,
-        frames: frame ? [frame] : undefined,
-        frameScopes: { ...resumedPauseState.frameScopes },
+        frameScopes: resumedPauseState.frameScopes,
         why,
         executionPoint,
-      };
-    }
+      });
 
-    case "FETCHED_FRAMES": {
-      const { frames } = action;
-      const selectedFrameId = frames && frames.length ? frames[0].id : undefined;
-      return {
-        ...state,
-        frames,
-        selectedFrameId,
-        framesLoading: false,
-        framesErrored: false,
-      };
-    }
-
-    case "FAILED_TO_FETCH_FRAMES": {
-      return {
-        ...state,
-        frames: null,
-        selectedFrameId: null,
-        framesLoading: false,
-        framesErrored: true,
-      };
-    }
-
-    case "FAILED_TO_CREATE_PAUSE": {
-      const { executionPoint } = action;
-      return {
-        ...state,
+      state.selectedFrameId = frame ? frame.id : null;
+      state.frames = frame ? [frame] : null;
+    },
+    pauseCreationFailed(state, action: PayloadAction<string>) {
+      const executionPoint = action.payload;
+      Object.assign(state, {
         pauseErrored: true,
         pauseLoading: false,
         id: undefined,
@@ -185,129 +286,129 @@ function update(state = createPauseState(), action: AnyAction) {
         frames: undefined,
         frameScopes: {},
         executionPoint,
-        threadcx: {
-          ...state.threadcx,
-          pauseCounter: state.threadcx.pauseCounter + 1,
-          isPaused: false,
-        },
-      };
-    }
+      });
 
-    case "ADD_ASYNC_FRAMES": {
-      const { asyncFrames } = action;
-      return { ...state, frames: [...state.frames!, ...asyncFrames] };
-    }
+      state.threadcx.pauseCounter++;
+      state.threadcx.isPaused = false;
+    },
+    previewLocationUpdated(state, action: PayloadAction<Location>) {
+      state.pausePreviewLocation = action.payload;
+    },
+    previewLocationCleared(state) {
+      state.pausePreviewLocation = null;
+    },
+    framePositionsLoaded(state, action: PayloadAction<UnknownPosition[]>) {
+      state.replayFramePositions = { positions: action.payload };
+    },
+    framePositionsCleared(state) {
+      state.replayFramePositions = null;
+    },
+    frameSelected(state, action: PayloadAction<{ cx: Context; frameId: string }>) {
+      state.selectedFrameId = action.payload.frameId;
+    },
+    logExceptionsUpdated(state, action: PayloadAction<boolean>) {
+      state.shouldLogExceptions = action.payload;
+      // TODO This is bad, move prefs out of reducers
+      prefs.logExceptions = action.payload;
+    },
+    resumed(state) {
+      Object.assign(state, resumedPauseState);
+      state.threadcx.pauseCounter++;
+      state.threadcx.isPaused = false;
+    },
+    expressionEvaluated(state) {
+      state.command = "expression";
+    },
+  },
+  extraReducers: builder => {
+    builder
+      .addCase(executeCommandOperation.pending, (state, action) => {
+        const { command } = action.meta.arg;
 
-    case "SET_PREVIEW_PAUSED_LOCATION": {
-      return { ...state, pausePreviewLocation: action.location };
-    }
+        state.command = command;
+        state.lastCommand = command;
+        state.threadcx.pauseCounter++;
+        state.threadcx.isPaused = false;
+        state.previousLocation = getPauseLocation(state as PauseState, command);
 
-    case "CLEAR_PREVIEW_PAUSED_LOCATION": {
-      return { ...state, pausePreviewLocation: null };
-    }
-
-    case "ADD_SCOPES": {
-      const { frame, status, value } = action;
-      const selectedFrameId = frame.id;
-
-      const frameScopes = {
-        ...state.frameScopes,
-        [selectedFrameId]: {
-          pending: status !== "done",
-          originalScopesUnavailable: !!value?.originalScopesUnavailable,
-          scope: value?.scopes,
-        },
-      };
-
-      return { ...state, frameScopes };
-    }
-
-    case "SET_FRAME_POSITIONS": {
-      const { positions, unexecuted } = action;
-      return { ...state, replayFramePositions: { positions, unexecuted } };
-    }
-
-    case "CLEAR_FRAME_POSITIONS": {
-      return { ...state, replayFramePositions: null };
-    }
-
-    case "BREAK_ON_NEXT":
-      return { ...state, isWaitingOnBreak: true };
-
-    case "SELECT_FRAME":
-      return { ...state, selectedFrameId: action.frame.id };
-
-    case "CONNECT":
-      return {
-        ...createPauseState(),
-      };
-
-    case "LOG_EXCEPTIONS": {
-      const { shouldLogExceptions } = action;
-
-      prefs.logExceptions = shouldLogExceptions;
-
-      return {
-        ...state,
-        shouldLogExceptions,
-      };
-    }
-
-    case "COMMAND":
-      if (action.status === "start") {
-        return {
-          ...state,
-          ...resumedPauseState,
-          command: action.command,
-          lastCommand: action.command,
-          threadcx: {
-            ...state.threadcx,
-            pauseCounter: state.threadcx.pauseCounter + 1,
-            isPaused: false,
-          },
-          previousLocation: getPauseLocation(state, action as CommandAction),
+        if (command == "resume" || command == "rewind") {
+          // TODO This logic seems at odds with the existing
+          // "fetch if no positions" in the `command` thunk
+          // also clear out positions
+          state.replayFramePositions = null;
+        }
+      })
+      .addCase(executeCommandOperation.fulfilled, (state, action) => {
+        state.command = null;
+      })
+      .addCase(fetchFrames.fulfilled, (state, action) => {
+        const frames = action.payload;
+        // Keep Immer from recursing into `ValueFront`s
+        Object.freeze(frames);
+        const selectedFrameId = frames[0]?.id;
+        state.frames = frames;
+        state.selectedFrameId = selectedFrameId;
+        state.framesLoading = false;
+        state.framesErrored = false;
+      })
+      .addCase(fetchFrames.rejected, state => {
+        state.frames = null;
+        state.selectedFrameId = null;
+        state.framesLoading = false;
+        state.framesErrored = true;
+      })
+      .addCase(fetchAsyncFrames.fulfilled, (state, action) => {
+        const existingFrames = state.frames ?? [];
+        state.frames = existingFrames.concat(action.payload);
+      })
+      .addCase(fetchScopes.pending, (state, action) => {
+        const { selectedFrameId } = state;
+        state.frameScopes[selectedFrameId!] = {
+          pending: true,
+          originalScopesUnavailable: true,
+          scope: undefined,
         };
-      }
-      return { ...state, command: null };
+      })
+      .addCase(fetchScopes.fulfilled, (state, action) => {
+        const { frameId, ...scopesFields } = action.payload;
 
-    case "RESUME": {
-      return {
-        ...state,
-        ...resumedPauseState,
-        threadcx: {
-          ...state.threadcx,
-          pauseCounter: state.threadcx.pauseCounter + 1,
-          isPaused: false,
-        },
-        expandedScopes: new Set(),
-        lastExpandedScopes: [state.expandedScopes],
-      };
-    }
+        // Keep Immer from recursing into `ValueFront`s
+        if (scopesFields?.scopes) {
+          Object.freeze(scopesFields.scopes);
+        }
 
-    case "EVALUATE_EXPRESSION":
-      return { ...state, command: action.status === "start" ? "expression" : null };
+        state.frameScopes[frameId] = {
+          pending: false,
+          originalScopesUnavailable: !!scopesFields.originalScopesUnavailable,
+          scope: scopesFields.scopes,
+        };
+      });
+  },
+});
 
-    case "SET_EXPANDED_SCOPE": {
-      const { path, expanded } = action;
-      const expandedScopes = new Set(state.expandedScopes);
-      if (expanded) {
-        expandedScopes.add(path);
-      } else {
-        expandedScopes.delete(path);
-      }
-      return { ...state, expandedScopes };
-    }
-  }
+export const {
+  expressionEvaluated,
+  framePositionsCleared,
+  framePositionsLoaded,
+  logExceptionsUpdated,
+  frameSelected,
+  pauseCreationFailed,
+  pauseRequestedAt,
+  paused,
+  previewLocationCleared,
+  previewLocationUpdated,
+  resumed,
+} = pauseSlice.actions;
 
-  return state;
-}
+// Copied to avoid import
+const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 
-function getPauseLocation(state: PauseState, action: CommandAction) {
+function getPauseLocation(state: PauseState, command: string) {
   const { frames, previousLocation } = state;
 
   // NOTE: We store the previous location so that we ensure that we
   // do not stop at the same location twice when we step over.
-  if (action.command !== "stepOver") {
+  if (command !== "stepOver") {
     return null;
   }
 
@@ -316,10 +417,7 @@ function getPauseLocation(state: PauseState, action: CommandAction) {
     return previousLocation;
   }
 
-  return {
-    location: frame.location,
-    generatedLocation: frame.generatedLocation,
-  };
+  return frame.location;
 }
 
 // Selectors
@@ -369,6 +467,7 @@ export function getShouldLogExceptions(state: UIState) {
 }
 
 export function getFrames(state: UIState) {
+  const f = state.pause.frames;
   const { frames, framesLoading } = state.pause;
   return framesLoading ? null : frames;
 }
@@ -415,10 +514,6 @@ export function getExecutionPoint(state: UIState) {
   return state.pause.executionPoint;
 }
 
-export function getLastExpandedScopes(state: UIState) {
-  return state.pause.lastExpandedScopes;
-}
-
 export function getPauseId(state: UIState) {
   return state.pause.id;
 }
@@ -440,7 +535,7 @@ export function getResumePoint(state: UIState, type: string) {
   }
 
   if (type == "stepOver" || type == "resume" || type == "stepIn" || type == "stepUp") {
-    return find(framePoints, p => compareNumericStrings(p, executionPoint!) > 0);
+    return framePoints.find(p => compareNumericStrings(p, executionPoint!) > 0);
   }
 }
 
@@ -478,4 +573,14 @@ export function getAlternateSource(state: UIState) {
   return getSourceDetails(state, alternateSourceId);
 }
 
-export default update;
+const pauseWrapperReducer = (state: PauseState, action: AnyAction) => {
+  const cx = getContextFromAction(action);
+  // Ignore actions if the pause counter is different, which indicates
+  // that the user did something else before a response returned
+  if (cx && cx.pauseCounter !== state.threadcx.pauseCounter) {
+    return state;
+  }
+  return pauseSlice.reducer(state, action);
+};
+
+export default pauseWrapperReducer;

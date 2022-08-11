@@ -6,11 +6,12 @@ import type { UIThunkAction } from "ui/actions";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 import { selectLocation } from "../sources";
-import { fetchScopes } from "./fetchScopes";
+import { fetchScopes, frameSelected } from "../../reducers/pause";
 import { setFramePositions } from "./setFramePositions";
 import { SourceLocation } from "../../reducers/types";
 
 interface TempFrame {
+  id: string;
   asyncIndex: number;
   protocolId: string;
   state: string;
@@ -29,17 +30,13 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
       return dispatch(selectLocation(cx, frame.location));
     }
 
-    dispatch({
-      type: "SELECT_FRAME",
-      cx,
-      frame,
-    });
+    dispatch(frameSelected({ cx, frameId: frame.id }));
 
     client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
 
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
 
-    dispatch(fetchScopes(cx));
+    dispatch(fetchScopes({ cx }));
   };
 }

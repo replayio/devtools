@@ -18,9 +18,7 @@ import {
   removeLogpoint,
 } from "ui/actions/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
-import { WiredNamedValue } from "protocol/thread/pause";
 
-import { SelectedFrame } from "../reducers/pause";
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
 
 import { createFrame } from "./create";
@@ -46,30 +44,6 @@ let breakpoints: Record<string, BreakpointDetails> = {};
 
 function setupCommands() {
   breakpoints = {};
-}
-
-function resume(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.resume(point, loadedRegions);
-}
-
-function stepIn(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.stepIn(point, loadedRegions);
-}
-
-function stepOver(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.stepOver(point, loadedRegions);
-}
-
-function stepOut(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.stepOut(point, loadedRegions);
-}
-
-function rewind(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.rewind(point, loadedRegions);
-}
-
-function reverseStepOver(point: string, loadedRegions: loadedRegions) {
-  return ThreadFront.reverseStepOver(point, loadedRegions);
 }
 
 // Get the string key to use for a breakpoint location.
@@ -196,45 +170,6 @@ async function loadAsyncParentFrames(asyncIndex?: number) {
   return Promise.all(frames.map((frame, i) => createFrame(frame, i, asyncIndex)));
 }
 
-// Isn't this a lovely type lookup?
-type ProtocolScope = Awaited<ReturnType<typeof ThreadFront["getScopes"]>>["scopes"][number];
-
-interface ConvertedScope {
-  actor: string;
-  parent: ConvertedScope | null;
-  bindings: WiredNamedValue[] | undefined;
-  object: ValueFront | undefined;
-  functionName: string | undefined;
-  type: ScopeType;
-  scopeKind: string;
-}
-
-function convertScope(protocolScope: ProtocolScope): ConvertedScope {
-  const { scopeId, type, functionLexical, object, functionName, bindings } = protocolScope;
-
-  return {
-    actor: scopeId,
-    parent: null,
-    bindings,
-    object,
-    functionName,
-    type,
-    scopeKind: functionLexical ? "function lexical" : "",
-  };
-}
-
-async function getFrameScopes(frame: SelectedFrame) {
-  const { scopes, originalScopesUnavailable } = await ThreadFront.getScopes(
-    frame.asyncIndex,
-    frame.protocolId
-  );
-  const converted = scopes.map(convertScope);
-  for (let i = 0; i + 1 < converted.length; i++) {
-    converted[i].parent = converted[i + 1];
-  }
-  return { scopes: converted[0], originalScopesUnavailable };
-}
-
 export interface SourceRange {
   start: ProtocolSourceLocation;
   end: ProtocolSourceLocation;
@@ -255,7 +190,7 @@ async function blackBox(source: MiniSource, isBlackBoxed: boolean, range?: Parti
 
 let gExceptionLogpointGroupId: string | null;
 
-function logExceptions(shouldLog: boolean) {
+function setShouldLogExceptions(shouldLog: boolean) {
   if (gExceptionLogpointGroupId) {
     removeLogpoint(gExceptionLogpointGroupId);
   }
@@ -295,21 +230,14 @@ function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
 const clientCommands = {
   autocomplete,
   blackBox,
-  resume,
-  stepIn,
-  stepOut,
-  stepOver,
-  rewind,
-  reverseStepOver,
   hasBreakpoint,
   setBreakpoint,
   removeBreakpoint,
   runAnalysis,
   evaluate,
-  getFrameScopes,
   getFrames,
   loadAsyncParentFrames,
-  logExceptions,
+  setShouldLogExceptions,
   fetchSources,
   fetchEventTypePoints,
   fetchAncestorFramePositions,

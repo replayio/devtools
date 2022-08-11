@@ -24,7 +24,6 @@ import {
   getFrameScope,
   getPauseReason,
   getThreadContext,
-  getLastExpandedScopes,
   getFramesLoading,
 } from "../../selectors";
 import { getScopes } from "../../utils/pause/scopes";
@@ -89,16 +88,10 @@ class Scopes extends PureComponent {
       openElementInInspector,
       highlightDomElement,
       unHighlightDomElement,
-      setExpandedScope,
-      expandedScopes,
       selectedFrame,
       originalScopesUnavailable,
     } = this.props;
     const { scopes } = this.state;
-
-    function initiallyExpanded(item) {
-      return expandedScopes.some(path => path == getScopeItemPath(item));
-    }
 
     scopes.forEach((s, i) => {
       s.path = `scope${selectedFrame?.id}.${i}`;
@@ -123,11 +116,6 @@ class Scopes extends PureComponent {
           onInspectIconClick={grip => openElementInInspector(grip)}
           onDOMNodeMouseOver={grip => highlightDomElement(grip)}
           onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
-          setExpanded={(path, expand) => {
-            trackEvent("scopes.set_expanded");
-            setExpandedScope(cx, path, expand);
-          }}
-          initiallyExpanded={initiallyExpanded}
           renderItemActions={this.renderWatchpointButton}
         />
       );
@@ -204,7 +192,6 @@ const mapStateToProps = state => {
   return {
     currentTime: getCurrentTime(state),
     cx,
-    expandedScopes: getLastExpandedScopes(state),
     isCurrentTimeInLoadedRegion: isCurrentTimeInLoadedRegion(state),
     frameScopes: scope,
     isErrored: pauseErrored,
@@ -221,6 +208,5 @@ export default connect(mapStateToProps, {
   openElementInInspector: actions.openNodeInInspector,
   highlightDomElement,
   unHighlightDomElement,
-  setExpandedScope: actions.setExpandedScope,
   removeWatchpoint: actions.removeWatchpoint,
 })(Scopes);

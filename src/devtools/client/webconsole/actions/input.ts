@@ -15,7 +15,8 @@ import { UIAction, UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 
-const { EVALUATE_EXPRESSION } = require("devtools/client/webconsole/constants");
+import { expressionEvaluated } from "devtools/client/debugger/src/reducers/pause";
+
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
 const { ConsoleCommand, PaywallMessage } = require("devtools/client/webconsole/types");
 
@@ -53,7 +54,7 @@ async function dispatchExpression(
       }),
     ])
   );
-  dispatch({ type: EVALUATE_EXPRESSION, expression });
+  dispatch(expressionEvaluated());
 
   return evalId;
 }

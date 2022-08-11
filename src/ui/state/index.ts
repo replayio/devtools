@@ -14,7 +14,7 @@ import { ClassListState } from "devtools/client/inspector/rules/state/class-list
 import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { MessageState } from "devtools/client/webconsole/reducers/messages";
-import { PauseState } from "devtools/client/debugger/src/selectors";
+import { PauseState } from "devtools/client/debugger/src/reducers/pause";
 import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import type { SourceTreeState } from "devtools/client/debugger/src/reducers/source-tree";

@@ -26,6 +26,8 @@ import {
   isNodeExpanded,
 } from "../selectors/markup";
 
+import { paused } from "devtools/client/debugger/src/reducers/pause";
+
 import Highlighter from "highlighter/highlighter";
 import { DOCUMENT_TYPE_NODE, TEXT_NODE } from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
@@ -45,7 +47,7 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
 
   // Any time the app is paused, clear out all fetched DOM nodes, and reload the "Markup" panel.
   startAppListening({
-    type: "PAUSED",
+    actionCreator: paused,
     effect: async (action, listenerApi) => {
       const { condition, dispatch, getState, cancelActiveListeners, extra } = listenerApi;
       const { ThreadFront } = extra;

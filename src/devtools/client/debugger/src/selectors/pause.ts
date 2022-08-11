@@ -12,7 +12,7 @@ export function getSelectedFrame(state: UIState) {
     return null;
   }
 
-  return frames.find(frame => frame.id == selectedFrameId) || null;
+  return frames!.find(frame => frame.id == selectedFrameId) || null;
 }
 
 export const getVisibleSelectedFrame = createSelector(getSelectedFrame, selectedFrame => {

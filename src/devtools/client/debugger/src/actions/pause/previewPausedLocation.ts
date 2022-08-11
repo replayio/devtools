@@ -4,28 +4,19 @@
 
 import type { UIThunkAction } from "ui/actions";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import { SourceLocation } from "../../reducers/types";
+import { Location } from "@replayio/protocol";
+import { previewLocationUpdated } from "../../reducers/pause";
 
 import { selectLocation } from "../sources";
 import { getContext } from "../../selectors";
 
 //sets pause preview location for frame timeline scrubber
-export function setPreviewPausedLocation(location: SourceLocation): UIThunkAction {
+export function setPreviewPausedLocation(location: Location): UIThunkAction {
   return (dispatch, getState) => {
     const cx = getContext(getState());
 
     dispatch(selectLocation(cx, location));
 
-    dispatch({
-      type: "SET_PREVIEW_PAUSED_LOCATION",
-      location,
-    });
-  };
-}
-
-//clears pause location that is set by the frame timeline scrubber
-export function clearPreviewPausedLocation() {
-  return {
-    type: "CLEAR_PREVIEW_PAUSED_LOCATION",
+    dispatch(previewLocationUpdated(location));
   };
 }

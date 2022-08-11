@@ -5,6 +5,7 @@
 import zip from "lodash/zip";
 import type { UIThunkAction } from "ui/actions";
 
+import { framePositionsLoaded } from "../../reducers/pause";
 import { getSelectedFrame } from "../../selectors";
 
 type $FixTypeLater = any;
@@ -35,17 +36,13 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
 
     const combinedPositions = zip(positions, locations).map(([position, location]) => {
       const { point, time } = position!;
-      return { point, time, location };
+      return { point, time, location: location! };
     });
 
     if (frame != getSelectedFrame(getState())) {
       return;
     }
 
-    dispatch({
-      type: "SET_FRAME_POSITIONS",
-      positions: combinedPositions,
-      unexecuted: [],
-    });
+    dispatch(framePositionsLoaded(combinedPositions));
   };
 }
