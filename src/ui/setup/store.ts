@@ -19,7 +19,6 @@ import layoutReducer from "ui/reducers/layout";
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
 import { messages as messagesReducer } from "devtools/client/webconsole/reducers/messages";
 
-import { promise } from "ui/setup/redux/middleware/promise";
 import { context } from "ui/setup/redux/middleware/context";
 import hitCounts from "ui/reducers/hitCounts";
 import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
@@ -185,10 +184,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
         },
       }).prepend(listenerMiddleware.middleware);
 
-      let updatedMiddlewareArray = originalMiddlewareArray.concat([
-        promise,
-        context,
-      ] as UIStateMiddleware[]);
+      let updatedMiddlewareArray = originalMiddlewareArray.concat([context] as UIStateMiddleware[]);
 
       const telemetryMiddleware = skipTelemetry()
         ? isDevelopment()

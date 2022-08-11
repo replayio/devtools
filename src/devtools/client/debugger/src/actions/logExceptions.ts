@@ -6,7 +6,6 @@ import type { UIStore } from "ui/actions";
 import { UIThunkAction } from "ui/actions";
 
 import { exceptionLogpointErrorCleared } from "devtools/client/webconsole/reducers/messages";
-import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 import { clientCommands } from "../client/commands";
 import { getShouldLogExceptions, logExceptionsUpdated } from "../reducers/pause";
