@@ -8,6 +8,7 @@ const URL = `${getBaseURL()}/tests/source-and-console?${getURLFlags()}`;
 
 testSetup(async function regeneratorFunction({ page }) {
   await openSourceTab(page);
+
   await addLogPoint(page, 12);
 
   await fillLogPointText(page, 12, "printError");
@@ -111,5 +112,3 @@ test("should include log points when filtering data", async ({ page }) => {
 });
 
 // TODO Add test for log point badge colors
-// TODO Add context menu test for setting focus range
-// TODO Add context menu test for setting log point badge colors

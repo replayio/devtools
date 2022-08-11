@@ -1,7 +1,13 @@
 import { Locator, Page } from "@playwright/test";
 import { getElementCount } from "./general";
 
-type ToggleName = "errors" | "exceptions" | "logs" | "warnings";
+type ToggleName =
+  | "errors"
+  | "exceptions"
+  | "hideNodeModules"
+  | "logs"
+  | "showTimestamps"
+  | "warnings";
 
 export async function hideSearchInput(page: Page) {
   const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
