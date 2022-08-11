@@ -113,6 +113,8 @@
 
 .ColorBadge,
 .UnicornBadge {
+  position: absolute;
+  left: 0.25rem;
   display: inline-block;
   width: 0.5rem;
   height: 0.5rem;
@@ -120,11 +122,12 @@
   margin: 0 0.25rem;
 }
 .ColorBadge {
+  top: 0.75rem;
   border-radius: 0.5rem;
   background-color: var(--badge-color);
 }
 .UnicornBadge {
-  position: relative;
+  top: 0.5rem;
   overflow: visible;
 }
 .Unicorn {
