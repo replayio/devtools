@@ -91,6 +91,7 @@
   color: var(--color-dim);
   font-size: var(--font-size-small);
   word-break: initial;
+  float: left;
 }
 
 .MessageText {

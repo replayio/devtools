@@ -1,3 +1,4 @@
+import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
@@ -61,21 +62,16 @@ function UncaughtExceptionRenderer({
 
   const argumentValues = uncaughtException.values || EMPTY_ARRAY;
   const primaryContent = (
-    <>
-      {showTimestamps && (
-        <span className={styles.TimeStamp}>{formatTimestamp(uncaughtException.time, true)} </span>
-      )}
-      <span className={styles.LogContents}>
-        <Suspense fallback={<Loader />}>
-          {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
-            <Fragment key={index}>
-              <Inspector pauseId={uncaughtException.pauseId} protocolValue={argumentValue} />
-              {index < argumentValues.length - 1 && " "}
-            </Fragment>
-          ))}
-        </Suspense>
-      </span>
-    </>
+    <span className={styles.LogContents}>
+      <Suspense fallback={<Loader />}>
+        {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
+          <Fragment key={index}>
+            <Inspector pauseId={uncaughtException.pauseId} protocolValue={argumentValue} />
+            {index < argumentValues.length - 1 && " "}
+          </Fragment>
+        ))}
+      </Suspense>
+    </span>
   );
 
   return (
@@ -89,6 +85,10 @@ function UncaughtExceptionRenderer({
       onMouseLeave={() => setIsHovered(false)}
       role="listitem"
     >
+      {showTimestamps && (
+        <span className={styles.TimeStamp}>{formatTimestamp(uncaughtException.time, true)} </span>
+      )}
+      <Icon className={styles.ErrorIcon} type="error" />
       <span className={styles.Source}>
         <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
       </span>
