@@ -92,13 +92,15 @@
 }
 
 :root.theme-light {
-  --background-color-contrast-1: #d0d5dc;
+  --background-color-contrast-1: #e2e4e7;
   --background-color-contrast-2: #ffffff;
   --background-color-contrast-3: #82888c;
   --background-color-contrast-4: #223344;
   --background-color-contrast-5: #081121;
   --background-color-default: #e1e6ed;
-  --background-color-error: #ffd3d3;
+  --background-color-error: #ffeeee;
+  --border-color-error: #f8d7d7;
+
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-warning: #fffac8;
