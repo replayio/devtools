@@ -234,14 +234,6 @@ export const getSourcesById = (state: UIState, ids: string[]) => {
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
   return getSourceDetails(state, id)?.correspondingSourceIds;
 };
-export const getSourceByUrl = (state: UIState, url: string) => {
-  const urlEntries = state.sources.sourcesByUrl[url] ?? [];
-  const id = urlEntries[0];
-  if (!id) {
-    return undefined;
-  }
-  return getSourceDetails(state, id);
-};
 export const getSourceContent = (state: UIState, id: string) => {
   return state.sources.contents.entities[id];
 };
@@ -420,7 +412,6 @@ export const selectors = {
   getSelectedSource,
   getSourcesById,
   getCorrespondingSourceIds,
-  getSourceByUrl,
   getSourceContent,
   getSelectedSourceWithContent,
   getTextAtLocation,

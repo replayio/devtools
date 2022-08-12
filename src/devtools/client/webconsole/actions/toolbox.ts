@@ -12,7 +12,7 @@ import { isRegionLoaded } from "ui/reducers/app";
 import { selectSource } from "devtools/client/debugger/src/actions/sources";
 import { showSource } from "devtools/client/debugger/src/actions/ui";
 import { getContext } from "devtools/client/debugger/src/selectors";
-import { getSourceDetails, getSourceByUrl } from "ui/reducers/sources";
+import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
 
 type $FixTypeLater = any;
@@ -43,7 +43,7 @@ export function unHighlightDomElement(): UIThunkAction {
 
 export function openLink(url: string): UIThunkAction {
   return (dispatch, getState) => {
-    const source = getSourceByUrl(getState(), url);
+    const source = getSourceToDisplayForUrl(getState(), url);
     if (source?.id) {
       dispatch(openSourceLink(source.id));
     } else {
@@ -103,7 +103,7 @@ export function onViewSourceInDebugger(
     const cx = getContext(getState());
     const source = frame.sourceId
       ? getSourceDetails(getState(), frame.sourceId)
-      : getSourceByUrl(getState(), frame.url!);
+      : getSourceToDisplayForUrl(getState(), frame.url!);
     if (source) {
       dispatch(showSource(cx, source.id, openSourcesTab));
       await dispatch(

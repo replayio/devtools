@@ -16,7 +16,12 @@ import { removeDocument } from "../utils/editor";
 import { selectSource } from "./sources";
 
 import { getSourceTabs, getNewSelectedSourceId } from "../selectors";
-import { getSourceByUrl, isOriginalSource, MiniSource, SourceDetails } from "ui/reducers/sources";
+import {
+  getSourceToDisplayForUrl,
+  isOriginalSource,
+  MiniSource,
+  SourceDetails,
+} from "ui/reducers/sources";
 
 export function updateTab(source: SourceDetails, framework: string) {
   const { url, id: sourceId } = source;
@@ -69,10 +74,10 @@ export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
  */
 export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
   return (dispatch, getState) => {
-    const sources = urls.map(url => getSourceByUrl(getState(), url)!).filter(Boolean);
+    const sources = urls.map(url => getSourceToDisplayForUrl(getState(), url)!).filter(Boolean);
 
     const tabs = getSourceTabs(getState());
-    sources.map(source => removeDocument(source.id));
+    sources.forEach(source => removeDocument(source.id));
     dispatch({ type: "CLOSE_TABS", sources });
 
     const sourceId = getNewSelectedSourceId(getState(), tabs);

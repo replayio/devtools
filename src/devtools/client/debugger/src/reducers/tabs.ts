@@ -15,12 +15,12 @@ import { createSelector } from "reselect";
 import { isSimilarTab } from "../utils/tabs";
 import {
   getSourceDetails,
-  getSourceByUrl,
   getSourceDetailsEntities,
   getSelectedLocation,
   SourceDetails,
   MiniSource,
   locationSelected,
+  getSourceIdToDisplayForUrl,
 } from "ui/reducers/sources";
 
 export interface Tab {
@@ -95,10 +95,10 @@ export function getNewSelectedSourceId(state: UIState, tabList: Tab[]) {
   const matchingTab = availableTabs.find(tab => isSimilarTab(tab, selectedTab.url!));
 
   if (matchingTab) {
-    const selectedSource = getSourceByUrl(state, selectedTab.url!);
+    const selectedSourceId = getSourceIdToDisplayForUrl(state, selectedTab.url!);
 
-    if (selectedSource) {
-      return selectedSource.id;
+    if (selectedSourceId) {
+      return selectedSourceId;
     }
 
     return "";

@@ -23,10 +23,10 @@ import {
   loadSourceText,
   getSelectedSource,
   getSourceDetails,
-  getSourceByUrl,
   SourceDetails,
   locationSelected,
   clearSelectedLocation,
+  getSourceIdToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
@@ -58,12 +58,11 @@ export function selectSourceURL(
   options: PendingSelectedLocationOptions
 ): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState) => {
-    const source = getSourceByUrl(getState(), url);
-    if (!source) {
+    const sourceId = getSourceIdToDisplayForUrl(getState(), url);
+    if (!sourceId) {
       return;
     }
 
-    const sourceId = source.id;
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectLocation(cx, location));
   };
