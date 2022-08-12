@@ -16,7 +16,7 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 
 const evaluationResultsMap: Map<ExecutionPoint, Record<Result>> = new Map();
 const executionPointToPauseMap: Map<ExecutionPoint, Record<createPauseResult>> = new Map();
-const executionPointToPauseIdSetMap: Map<ExecutionPoint, Set<PauseId>> = new Map();
+const executionPointToPauseIdMap: Map<ExecutionPoint, PauseId> = new Map();
 const pauseIdToPauseDataMap: Map<PauseId, Record<PauseData>> = new Map();
 
 export function evaluate(
@@ -69,12 +69,8 @@ export function getPauseIdForExecutionPoint(
   client: ReplayClientInterface,
   executionPoint: ExecutionPoint
 ): PauseId {
-  const pauseIds = executionPointToPauseIdSetMap.get(executionPoint);
-  if (pauseIds != null && pauseIds.size > 0) {
-    return Array.from(pauseIds)[0];
-  }
-
-  return getPauseForExecutionPoint(client, executionPoint).pauseId;
+  const pauseId = executionPointToPauseIdMap.get(executionPoint);
+  return pauseId || getPauseForExecutionPoint(client, executionPoint).pauseId;
 }
 
 export function getPauseForExecutionPoint(
@@ -189,24 +185,21 @@ async function fetchPauseId(
   }
 }
 
-// TODO Hook into e2e tests to assert 0-1 pause id per point
 export function trackExecutionPointPauseIds(
   executionPoint: ExecutionPoint,
-  pauseId: PauseId
+  newPauseId: PauseId
 ): void {
-  let set = executionPointToPauseIdSetMap.get(executionPoint);
-  if (set == null) {
-    executionPointToPauseIdSetMap.set(executionPoint, new Set([pauseId]));
-  } else {
-    set.add(pauseId);
+  const firstPauseId = executionPointToPauseIdMap.get(executionPoint);
+  if (firstPauseId == null) {
+    executionPointToPauseIdMap.set(executionPoint, newPauseId);
+  } else if (firstPauseId !== newPauseId) {
+    const error = new Error(
+      `Point (${executionPoint}) has multiple pause ids (${firstPauseId}, ${newPauseId})`
+    );
 
-    if (set.size > 1) {
-      const pauseIds = Array.from(set).join(", ");
-      const error = new Error(`Point (${executionPoint}) has multiple pause ids (${pauseIds})`);
+    // TODO Hook this up so that it fails our e2e tests if called.
+    captureException(error);
 
-      captureException(error);
-
-      console.error(error);
-    }
+    console.error(error);
   }
 }
