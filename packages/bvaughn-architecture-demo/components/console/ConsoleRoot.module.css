@@ -46,6 +46,7 @@
 
 .Divider {
   grid-column: 1 / -1;
+  grid-row: 2;
   height: 1px;
   background-color: var(--background-color-default);
 }

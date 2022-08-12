@@ -2,15 +2,18 @@
 .ErrorRow,
 .TraceRow,
 .WarningRow {
-  padding: 0.5rem 0.1rem;
+  margin-top: -1px;
+  padding: 0.25rem 0.1rem;
   padding-left: 1.5rem;
+  border-top: 1px solid var(--background-color-contrast-1);
   border-bottom: 1px solid var(--background-color-contrast-1);
   position: relative;
 }
 .ErrorRow {
   background-color: var(--background-color-error);
   color: var(--color-error);
-  border-bottom: 1px solid var(--border-color-error);
+  border-color: var(--border-color-error);
+  z-index: 5;
 
   --color-default: var(--color-error);
   --value-type-string: var(--color-error);
@@ -23,6 +26,10 @@
   --value-type-string: var(--color-warning);
 }
 
+.Row:last-child {
+  border-bottom: 0;
+}
+
 .EagerEvaluationIcon,
 .ErrorIcon,
 .PromptIcon,
@@ -32,6 +39,8 @@
   flex: 0 0 1rem;
   display: inline-block;
   vertical-align: top;
+  position: absolute;
+  left: 0.25rem;
 }
 .EagerEvaluationIcon {
   color: var(--color-dim);

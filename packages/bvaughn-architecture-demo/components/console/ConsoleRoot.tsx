@@ -67,6 +67,8 @@ export default function ConsoleRoot({
             )}
           </div>
 
+          <div className={styles.Divider} />
+
           <FilterText />
 
           <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
