@@ -6,8 +6,8 @@ import { getExceptions, UncaughtException } from "@bvaughn/src/suspense/Analysis
 import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
 import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
-import { getSourceIfAlreadyLoaded } from "@bvaughn/src/suspense/SourcesCache";
 import { loggableSort } from "@bvaughn/src/utils/loggables";
+import { isInNodeModules } from "@bvaughn/src/utils/messages";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { EventHandlerType } from "@replayio/protocol";
@@ -106,18 +106,7 @@ export function LoggablesContextRoot({
 
       // TODO This seems expensive; can we cache the message-to-node-modules relationship?
       if (!showNodeModules) {
-        const isNodeModules = message.data.frames?.some(frame => {
-          const sourceId = frame.location?.[0].sourceId;
-          const source = sourceId ? getSourceIfAlreadyLoaded(sourceId) : null;
-          if (source) {
-            const value = source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
-            if (!value) {
-            }
-            return source.url?.includes("node_modules") || source.url?.includes("unpkg.com");
-          }
-          return false;
-        });
-        if (isNodeModules) {
+        if (isInNodeModules(message)) {
           return false;
         }
       }
