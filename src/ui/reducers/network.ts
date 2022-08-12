@@ -131,7 +131,7 @@ export const getFormattedFrames = createSelector(
   getSourceDetailsEntities,
   (frames, sources) => {
     return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {
-      // @ts-ignore WiredFrame vs SelectedFrame mismatch
+      // @ts-ignore WiredFrame vs PauseFrame mismatch
       return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) };
     }, {});
   }

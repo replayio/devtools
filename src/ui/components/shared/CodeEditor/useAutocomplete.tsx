@@ -11,7 +11,7 @@ import uniq from "lodash/uniq";
 import { useAppSelector } from "ui/setup/hooks";
 import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
 import { UIState } from "ui/state";
-import { getSelectedFrame, SelectedFrame } from "devtools/client/debugger/src/selectors";
+import { getSelectedFrame, PauseFrame } from "devtools/client/debugger/src/selectors";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
 
 // turns an async getMatches function into a hook
@@ -56,7 +56,7 @@ function useGetScopeMatches(expression: string) {
 
 async function getEvalMatches(
   expression: string,
-  frame: SelectedFrame | null
+  frame: PauseFrame | null
 ): Promise<string[] | null> {
   if (!frame) {
     return null;

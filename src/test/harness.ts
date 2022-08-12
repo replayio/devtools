@@ -664,7 +664,6 @@ async function checkFrames(count: number) {
 
 async function selectFrame(index: number) {
   const frames = dbgSelectors.getFrames()!;
-  // @ts-expect-error TempFrame vs SelectedFrame mismatch
   await dbgActions.selectFrame(getThreadContext(), frames[index]);
 }
 

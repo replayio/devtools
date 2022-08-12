@@ -6,14 +6,13 @@ import type { UIStore } from "ui/actions";
 import { UIThunkAction } from "ui/actions";
 
 import { exceptionLogpointErrorCleared } from "devtools/client/webconsole/reducers/messages";
-import { PROMISE } from "ui/setup/redux/middleware/promise";
 
 import { clientCommands } from "../client/commands";
-import { getShouldLogExceptions } from "../reducers/pause";
+import { getShouldLogExceptions, logExceptionsUpdated } from "../reducers/pause";
 
 export function setupExceptions(store: UIStore) {
   if (getShouldLogExceptions(store.getState())) {
-    clientCommands.logExceptions(true);
+    clientCommands.setShouldLogExceptions(true);
   }
 }
 
@@ -26,10 +25,7 @@ export function logExceptions(shouldLogExceptions: boolean): UIThunkAction {
   return (dispatch, getState, { client }) => {
     dispatch(exceptionLogpointErrorCleared());
 
-    return dispatch({
-      [PROMISE]: client.logExceptions(shouldLogExceptions),
-      shouldLogExceptions,
-      type: "LOG_EXCEPTIONS",
-    });
+    client.setShouldLogExceptions(shouldLogExceptions);
+    dispatch(logExceptionsUpdated(shouldLogExceptions));
   };
 }

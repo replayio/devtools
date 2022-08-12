@@ -64,6 +64,7 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
+import { framePositionsCleared } from "devtools/client/debugger/src/reducers/pause";
 
 import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
@@ -227,7 +228,7 @@ export function seek(
 ): UIThunkAction<boolean> {
   return (dispatch, getState, { ThreadFront }) => {
     const pause = pauseId !== undefined ? Pause.getById(pauseId) : undefined;
-    dispatch({ type: "CLEAR_FRAME_POSITIONS" });
+    dispatch(framePositionsCleared());
     if (pause) {
       ThreadFront.timeWarpToPause(pause);
     } else {

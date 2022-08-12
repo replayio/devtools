@@ -3,38 +3,26 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
-
-import { getResumePoint, getFramePositions } from "../../selectors";
-import { getLoadedRegions } from "ui/reducers/app";
-import { PROMISE } from "ui/setup/redux/middleware/promise";
+import type { ThreadContext, ValidCommand } from "devtools/client/debugger/src/reducers/pause";
+import { executeCommandOperation } from "devtools/client/debugger/src/reducers/pause";
+import { getFramePositions } from "../../selectors/pause";
 
 import { setFramePositions } from "./setFramePositions";
 
-type ValidCommand = "stepIn" | "stepOut" | "stepOver" | "resume" | "rewind" | "reverseStepOver";
-
-export function command(cx: Context, type: ValidCommand): UIThunkAction {
-  return async (dispatch, getState, { client }) => {
+export function command(cx: ThreadContext, type: ValidCommand): UIThunkAction {
+  return async (dispatch, getState) => {
     if (!type) {
       return;
     }
     if (!getFramePositions(getState())) {
       await dispatch(setFramePositions());
     }
-    const nextPoint = getResumePoint(getState(), type)!;
-    if (type == "resume" || type == "rewind") {
-      dispatch({ type: "CLEAR_FRAME_POSITIONS" });
-    }
-    return dispatch({
-      type: "COMMAND",
-      command: type,
-      cx,
-      [PROMISE]: client[type](nextPoint, getLoadedRegions(getState())!),
-    });
+
+    dispatch(executeCommandOperation({ cx, command: type }));
   };
 }
 
-export function stepIn(cx: Context): UIThunkAction {
+export function stepIn(cx: ThreadContext): UIThunkAction {
   return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepIn"));
@@ -42,7 +30,7 @@ export function stepIn(cx: Context): UIThunkAction {
   };
 }
 
-export function stepOver(cx: Context): UIThunkAction {
+export function stepOver(cx: ThreadContext): UIThunkAction {
   return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOver"));
@@ -50,7 +38,7 @@ export function stepOver(cx: Context): UIThunkAction {
   };
 }
 
-export function reverseStepOver(cx: Context): UIThunkAction {
+export function reverseStepOver(cx: ThreadContext): UIThunkAction {
   return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "reverseStepOver"));
@@ -58,7 +46,7 @@ export function reverseStepOver(cx: Context): UIThunkAction {
   };
 }
 
-export function stepOut(cx: Context): UIThunkAction {
+export function stepOut(cx: ThreadContext): UIThunkAction {
   return dispatch => {
     if (cx.isPaused) {
       return dispatch(command(cx, "stepOut"));
@@ -66,10 +54,10 @@ export function stepOut(cx: Context): UIThunkAction {
   };
 }
 
-export function resume(cx: Context): UIThunkAction {
+export function resume(cx: ThreadContext): UIThunkAction {
   return dispatch => dispatch(command(cx, "resume"));
 }
 
-export function rewind(cx: Context): UIThunkAction {
+export function rewind(cx: ThreadContext): UIThunkAction {
   return dispatch => dispatch(command(cx, "rewind"));
 }

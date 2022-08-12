@@ -19,6 +19,7 @@ import { getSourceNames } from "devtools/client/shared/source-utils";
 
 import { assert, compareNumericStrings } from "protocol/utils";
 import { FocusRegion } from "ui/state/timeline";
+import { paused } from "devtools/client/debugger/src/reducers/pause";
 
 type MessageId = string;
 type Command = string;
@@ -89,7 +90,7 @@ export interface Message {
   request?: MessageRequest;
   lastExecutionPoint: {
     point: ExecutionPoint;
-    time: number;
+    time?: number;
     messageCount: number;
   };
 }
@@ -146,7 +147,7 @@ export interface MessageState {
   removedLogpointIds: MessageId[];
   /** Any execution point we are currently paused at, when replaying. */
   pausedExecutionPoint: string | null;
-  pausedExecutionPointTime: number;
+  pausedExecutionPointTime?: number;
   /** Whether any messages with execution points have been seen. */
   hasExecutionPoints: boolean;
   lastMessageId: MessageId | null;
@@ -203,13 +204,6 @@ export const syncInitialMessageState = (overrides: Partial<MessageState> = {}): 
     )
   );
 };
-
-// Dispatched manually elsewhere in the codebase, so typed here for reference
-interface PausedAction extends AnyAction {
-  type: "PAUSED";
-  executionPoint: string;
-  time: number;
-}
 
 const messagesSlice = createSlice({
   name: "messages",
@@ -306,18 +300,19 @@ const messagesSlice = createSlice({
   },
   extraReducers: builder => {
     // Dispatched from `actions/paused.js`
-    builder.addCase("PAUSED", (state, action: PausedAction) => {
+    builder.addCase(paused, (state, action) => {
+      const { executionPoint, time } = action.payload;
       if (
         state.pausedExecutionPoint &&
-        action.executionPoint &&
-        pointEquals(state.pausedExecutionPoint, action.executionPoint) &&
-        state.pausedExecutionPointTime == action.time
+        executionPoint &&
+        pointEquals(state.pausedExecutionPoint, executionPoint) &&
+        state.pausedExecutionPointTime == time
       ) {
         return;
       }
 
-      state.pausedExecutionPoint = action.executionPoint;
-      state.pausedExecutionPointTime = action.time;
+      state.pausedExecutionPoint = executionPoint;
+      state.pausedExecutionPointTime = time;
     });
   },
 });
@@ -775,7 +770,7 @@ export function ensureExecutionPoint(state: MessageState, newMessage: Message) {
   // after the last visible message in the group without an execution point when sorting.
   let messageCount = 1,
     point: ExecutionPoint | string = { checkpoint: 0, progress: 0 },
-    time = 0;
+    time: number | undefined = 0;
   if (state.pausedExecutionPoint) {
     // @ts-ignore string/obj mismatch
     point = getPausePoint(newMessage, state);

@@ -4,7 +4,7 @@
 
 import type { UIState } from "ui/state";
 import type { Dictionary } from "@reduxjs/toolkit";
-import type { SelectedFrame } from "../reducers/pause";
+import type { PauseFrame } from "../reducers/pause";
 
 import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 import { getFrames } from "../reducers/pause";
@@ -12,16 +12,16 @@ import { annotateFrames } from "../utils/pause/frames";
 import get from "lodash/get";
 import { createSelector } from "reselect";
 
-function getLocation(frame: SelectedFrame) {
+function getLocation(frame: PauseFrame) {
   return frame.location;
 }
 
-function getSourceForFrame(sources: Dictionary<SourceDetails>, frame: SelectedFrame) {
+function getSourceForFrame(sources: Dictionary<SourceDetails>, frame: PauseFrame) {
   const sourceId = getLocation(frame).sourceId;
   return sources[sourceId]!;
 }
 
-function appendSource(sources: Dictionary<SourceDetails>, frame: SelectedFrame) {
+function appendSource(sources: Dictionary<SourceDetails>, frame: PauseFrame) {
   return {
     ...frame,
     location: getLocation(frame),

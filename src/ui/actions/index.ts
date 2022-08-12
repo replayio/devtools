@@ -19,14 +19,7 @@ import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-ope
 import { NetworkAction } from "./network";
 import { LayoutAction } from "./layout";
 
-type DebuggerAction = Action<"RESUME" | "CLEAR_FRAME_POSITIONS">;
-
-export type UIAction =
-  | DebuggerAction
-  | LayoutAction
-  | NetworkAction
-  | ReactDevToolsAction
-  | QuickOpenActions;
+export type UIAction = LayoutAction | NetworkAction | ReactDevToolsAction | QuickOpenActions;
 
 export type UIThunkAction<TReturn = void> = ThunkAction<
   TReturn,

@@ -188,6 +188,6 @@ export default connect(
   {
     seek: actions.seek,
     setPreviewPausedLocation: actions.setPreviewPausedLocation,
-    clearPreviewPausedLocation: actions.clearPreviewPausedLocation,
+    clearPreviewPausedLocation: actions.previewLocationCleared,
   }
 )(FrameTimeline);
