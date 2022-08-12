@@ -5,7 +5,7 @@
 //
 
 import { getAvailableEventBreakpoints } from "devtools/server/actors/utils/event-breakpoints";
-import { setEventLogpoints } from "ui/actions/logpoint";
+import { setEventLogpoints, fetchEventTypePoints } from "ui/actions/logpoint";
 import remove from "lodash/remove";
 import uniq from "lodash/uniq";
 import type { UIThunkAction } from "ui/actions";
@@ -104,7 +104,7 @@ export function getEventListenerBreakpointTypes(): UIThunkAction<Promise<void>> 
     const categories = getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
-    const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+    const eventTypePoints = await fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
 
     dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };

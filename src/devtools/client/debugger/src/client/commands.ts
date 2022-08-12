@@ -9,19 +9,15 @@ import {
   loadedRegions,
 } from "@replayio/protocol";
 import {
-  fetchEventTypePoints,
   setLogpoint,
   setLogpointByURL,
   newLogGroupId,
-  setEventLogpoints,
   setExceptionLogpoint,
   removeLogpoint,
 } from "ui/actions/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
-
-import { createFrame } from "./create";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -37,7 +33,6 @@ interface BreakpointDetails {
   options: FinalBreakpointOptions;
 }
 
-let currentThreadFront: any;
 let currentTarget: any;
 let breakpoints: Record<string, BreakpointDetails> = {};
 
@@ -66,10 +61,6 @@ async function maybeClearLogpoint(location: SourceLocation) {
   if (bp && bp.options.logGroupId) {
     removeLogpoint(bp.options.logGroupId);
   }
-}
-
-function hasBreakpoint(location: SourceLocation) {
-  return !!breakpoints[locationKey(location)];
 }
 
 function setBreakpoint(location: SourceLocation, options: InitialBreakpointOptions) {
@@ -159,16 +150,6 @@ async function autocomplete(input: any, cursor: any, frameId: any) {
   });
 }
 
-async function getFrames() {
-  const frames = (await ThreadFront.getFrames()) ?? [];
-  return Promise.all(frames.map((frame, i) => createFrame(frame, i)));
-}
-
-async function loadAsyncParentFrames(asyncIndex?: number) {
-  const frames = await ThreadFront.loadAsyncParentFrames();
-  return Promise.all(frames.map((frame, i) => createFrame(frame, i, asyncIndex)));
-}
-
 export interface SourceRange {
   start: ProtocolSourceLocation;
   end: ProtocolSourceLocation;
@@ -196,35 +177,17 @@ export function prepareSourcePayload(source: {
   return { thread: ThreadFront.actor, source };
 }
 
-async function getSources(client: any) {
-  const { sources } = await client.getSources();
-
-  return sources.map((source: any) => prepareSourcePayload(source));
-}
-
-// Fetch the sources for all the targets
-async function fetchSources() {
-  let sources = await getSources(ThreadFront);
-
-  return sources;
-}
-
 function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }
 
 const clientCommands = {
   autocomplete,
-  hasBreakpoint,
   setBreakpoint,
   removeBreakpoint,
   runAnalysis,
   evaluate,
-  getFrames,
-  loadAsyncParentFrames,
   setShouldLogExceptions,
-  fetchSources,
-  fetchEventTypePoints,
   fetchAncestorFramePositions,
 };
 
