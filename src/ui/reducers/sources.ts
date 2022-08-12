@@ -357,6 +357,9 @@ export const getSourcesToDisplayByUrl = createSelector(
   (sourceIdsByUrl, sourceDetailsById) => {
     const sourcesToDisplay: Dictionary<SourceDetails> = {};
     for (const url in sourceIdsByUrl) {
+      if (sourcesToDisplay[url]) {
+        continue;
+      }
       let sourceId = getPreferredSourceId(sourceDetailsById, sourceIdsByUrl[url])!;
       sourceId = sourceDetailsById[sourceId]!.correspondingSourceIds[0];
       sourcesToDisplay[url] = sourceDetailsById[sourceId];

@@ -23,8 +23,8 @@ import {
   getSelectedSource,
   getSourcesLoading,
   SourceDetails,
-  getSourceDetailsEntities,
   getSourceDetailsCount,
+  getSourcesToDisplayByUrl,
 } from "ui/reducers/sources";
 
 // Actions
@@ -72,7 +72,7 @@ function findSource(
 const mapStateToProps = (state: UIState) => {
   const selectedSource = getSelectedSource(state);
   const shownSource = getShownSource(state);
-  const sources = getSourceDetailsEntities(state) as Record<string, SourceDetails>;
+  const sources = getSourcesToDisplayByUrl(state) as Record<string, SourceDetails>;
 
   return {
     cx: getContext(state),
@@ -81,7 +81,7 @@ const mapStateToProps = (state: UIState) => {
     selectedSource: selectedSource,
     expanded: getExpandedState(state),
     focused: getFocusedSourceItem(state),
-    sources: sources,
+    sources,
     sourceCount: getSourceDetailsCount(state),
   };
 };
