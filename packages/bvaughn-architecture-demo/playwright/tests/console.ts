@@ -44,7 +44,7 @@ testSetup(async function regeneratorFunction({ page }) {
 
   // Load Pause data for local expressions
   await toggleProtocolMessages(page, false);
-  await toggleProtocolMessage(page, 'logs', true);
+  await toggleProtocolMessage(page, "logs", true);
   const firstListItem = await page.locator("[data-test-name=Message]", {
     hasText: "This is a log",
   });
@@ -96,7 +96,7 @@ test("should display list of messages", async ({ page }) => {
 test("should display toggleable stack for errors", async ({ page }) => {
   await setup(page);
 
-  await toggleProtocolMessage(page, 'errors', true);
+  await toggleProtocolMessage(page, "errors", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is an error" });
   await takeScreenshot(page, listItem, "error-stack-collapsed");
@@ -122,7 +122,7 @@ test("should display toggleable stack for warnings", async ({ page }) => {
 test("should display toggleable stack for traces", async ({ page }) => {
   await setup(page);
 
-  await toggleProtocolMessage(page, 'logs', true);
+  await toggleProtocolMessage(page, "logs", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a trace" });
   await takeScreenshot(page, listItem, "trace-stack-collapsed");
