@@ -26,29 +26,9 @@ export const findBreakpointSources = createSelector(
     const breakpointSources = uniqueSourceIds
       .map(sourceId => detailsEntities[sourceId]!)
       .filter(Boolean);
-    // TODO Filter by blackboxed too
-    const filtered = breakpointSources;
-    return sortBy(filtered, source => getFilename(source));
+    return sortBy(breakpointSources, source => getFilename(source));
   }
 );
-
-/*
-export const findBreakpointSources = (state: UIState) => {
-  const breakpoints = getBreakpointsList(state);
-  const sources = getSources(state);
-  return queryBreakpointSources(sources, { breakpoints });
-};
-
-const queryBreakpointSources = makeShallowQuery({
-  filter: (_, { breakpoints }: { breakpoints: Breakpoint[] }) =>
-    uniq(breakpoints.map(bp => bp.location.sourceId)),
-  map: resourceAsSourceBase,
-  reduce: sources => {
-    const filtered = sources.filter(source => source && !source.isBlackBoxed);
-    return sortBy(filtered, source => getFilename(source));
-  },
-});
-*/
 
 export const getBreakpointSources = createSelector(
   getBreakpointsList,

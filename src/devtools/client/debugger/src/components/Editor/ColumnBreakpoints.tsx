@@ -33,8 +33,7 @@ class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
   render() {
     const { cx, editor, columnBreakpoints, selectedSource } = this.props;
 
-    // TODO Re-enable blackboxing
-    if (!selectedSource /*|| selectedSource.isBlackBoxed*/ || columnBreakpoints.length === 0) {
+    if (!selectedSource || columnBreakpoints.length === 0) {
       return null;
     }
 

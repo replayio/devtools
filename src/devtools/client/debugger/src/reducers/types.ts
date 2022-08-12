@@ -292,39 +292,6 @@ export type Grip = {
   name?: string;
 };
 
-/*
-export type TextSourceContent = {
-  type: "text";
-  value: string;
-  contentType: string | void;
-};
-export type WasmSourceContent = {
-  type: "wasm";
-  value: {
-    binary: Record<string, any>;
-  };
-};
-*/
-
-/**
- * Source
- *
- * @memberof types
- * @static
- */
-/*
-export type Source = {
-  readonly id: SourceId;
-  readonly url: URL;
-  readonly isBlackBoxed: boolean;
-  readonly isPrettyPrinted: boolean;
-  readonly relativeUrl: URL;
-  readonly extensionName: string | null | undefined;
-  readonly isExtension: boolean;
-  readonly isOriginal: boolean;
-};
-*/
-
 /**
  * Script
  * This describes scripts which are sent to the debug server to be eval'd

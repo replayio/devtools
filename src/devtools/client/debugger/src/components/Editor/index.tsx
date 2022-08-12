@@ -101,7 +101,6 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
       closeContextMenu,
       closeTab: actions.closeTab,
       openContextMenu,
-      toggleBlackBox: actions.toggleBlackBox,
       traverseResults: actions.traverseResults,
       updateCursorPosition: actions.updateCursorPosition,
       updateViewport: actions.updateViewport,
@@ -309,7 +308,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   };
 
   onGutterClick = (cm: any, line: number, gutter: any, ev: MouseEvent) => {
-    const { cx, selectedSource, addBreakpointAtLine, toggleBlackBox } = this.props;
+    const { cx, selectedSource, addBreakpointAtLine } = this.props;
     const sourceLocation = getSourceLocationFromMouseEvent(
       this.state.editor!,
       selectedSource as any,
@@ -320,14 +319,6 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
       return;
     }
-
-    // if user clicks gutter to set breakpoint on blackboxed source, un-blackbox the source.
-    // TODO Re-enable blackboxing
-    /*
-    if (selectedSource && selectedSource.isBlackBoxed) {
-      toggleBlackBox(cx, selectedSource);
-    }
-    */
 
     if (typeof line !== "number") {
       return;
@@ -516,10 +507,6 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return (
       <div
         className={classnames("editor-wrapper", {
-          // TODO Re-enable blackboxing
-          /*
-          blackboxed: selectedSource && selectedSource.isBlackBoxed,
-          */
           showLineHits: true,
         })}
         ref={c => (this.$editorWrapper = c)}

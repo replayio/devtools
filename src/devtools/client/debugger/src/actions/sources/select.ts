@@ -115,18 +115,12 @@ export function selectLocation(
   location: PartialLocation,
   openSourcesTab = true
 ): UIThunkAction<Promise<unknown>> {
-  return async (dispatch, getState, { client, ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
     if (getViewMode(getState()) == "non-dev") {
       dispatch(setViewMode("dev"));
-    }
-
-    if (!client) {
-      // No connection, do nothing. This happens when the debugger is
-      // shut down too fast and it tries to display a default source.
-      return;
     }
 
     let source = getSourceDetails(getState(), location.sourceId);

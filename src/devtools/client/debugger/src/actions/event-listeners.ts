@@ -5,7 +5,7 @@
 //
 
 import { getAvailableEventBreakpoints } from "devtools/server/actors/utils/event-breakpoints";
-import { setEventLogpoints } from "ui/actions/logpoint";
+import { setEventLogpoints, fetchEventTypePoints } from "ui/actions/logpoint";
 import remove from "lodash/remove";
 import uniq from "lodash/uniq";
 import type { UIThunkAction } from "ui/actions";
@@ -38,14 +38,14 @@ export async function setupEventListeners(store: UIStore) {
 }
 
 function updateEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
+  return async dispatch => {
     dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
     await setEventLogpoints(newEvents);
   };
 }
 
 function setEventListeners(newEvents: string[]): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
+  return async () => {
     await setEventLogpoints(newEvents);
   };
 }
@@ -100,11 +100,11 @@ export function removeEventListenerExpanded(category: string): UIThunkAction {
 }
 
 export function getEventListenerBreakpointTypes(): UIThunkAction<Promise<void>> {
-  return async (dispatch, _, { client }) => {
+  return async dispatch => {
     const categories = getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
-    const eventTypePoints = await client.fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
+    const eventTypePoints = await fetchEventTypePoints(INITIAL_EVENT_BREAKPOINTS);
 
     dispatch({ type: "RECEIVE_EVENT_LISTENER_POINTS", eventTypePoints });
   };

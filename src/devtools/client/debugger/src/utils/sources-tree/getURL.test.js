@@ -13,7 +13,6 @@ function createMockSource(props) {
         id: "server1.conn13.child1/39",
         url: "",
         sourceMapURL: "",
-        isBlackBoxed: false,
         isPrettyPrinted: false,
       },
       props

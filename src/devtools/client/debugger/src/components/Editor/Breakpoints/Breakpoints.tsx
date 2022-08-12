@@ -32,8 +32,7 @@ class Breakpoints extends Component<BreakpointsProps> {
   render() {
     const { cx, breakpoints, selectedSource, editor } = this.props;
 
-    // TODO Fix blackboxing
-    if (!selectedSource || !breakpoints /*|| selectedSource.isBlackBoxed*/) {
+    if (!selectedSource || !breakpoints) {
       return null;
     }
 

@@ -64,21 +64,8 @@ export default class FrameComponent extends Component {
   }
 
   onContextMenu(event) {
-    const {
-      frame,
-      copyStackTrace,
-      toggleFrameworkGrouping,
-      toggleBlackBox,
-      frameworkGroupingOn,
-      cx,
-    } = this.props;
-    FrameMenu(
-      frame,
-      frameworkGroupingOn,
-      { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox },
-      event,
-      cx
-    );
+    const { frame, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
+    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event, cx);
   }
 
   onMouseDown(e, frame) {

@@ -7,9 +7,6 @@ import { showMenu } from "devtools/shared/contextmenu";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import kebabCase from "lodash/kebabCase";
 
-const blackboxString = "blackboxContextItem.blackbox";
-const unblackboxString = "blackboxContextItem.unblackbox";
-
 function formatMenuElement(labelString, click, disabled = false) {
   const label = L10N.getStr(labelString);
   const accesskey = L10N.getStr(`${labelString}.accesskey`);
@@ -37,12 +34,6 @@ function toggleFrameworkGroupingElement(toggleFrameworkGrouping, frameworkGroupi
   return formatMenuElement(actionType, () => toggleFrameworkGrouping());
 }
 
-function blackBoxSource(cx, source, toggleBlackBox) {
-  const toggleBlackBoxString = source.isBlackBoxed ? unblackboxString : blackboxString;
-
-  return formatMenuElement(toggleBlackBoxString, () => toggleBlackBox(cx, source));
-}
-
 export default function FrameMenu(frame, frameworkGroupingOn, callbacks, event, cx) {
   event.stopPropagation();
   event.preventDefault();
@@ -59,7 +50,6 @@ export default function FrameMenu(frame, frameworkGroupingOn, callbacks, event, 
   if (source) {
     const copySourceUri2 = copySourceElement(source.url);
     menuOptions.push(copySourceUri2);
-    menuOptions.push(blackBoxSource(cx, source, callbacks.toggleBlackBox));
   }
 
   const copyStackTraceItem = copyStackTraceElement(callbacks.copyStackTrace);

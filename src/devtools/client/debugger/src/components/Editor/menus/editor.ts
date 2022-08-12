@@ -9,7 +9,7 @@ import type { AppDispatch } from "ui/setup/store";
 
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
-import { getRawSourceURL, shouldBlackbox } from "../../../utils/source";
+import { getRawSourceURL } from "../../../utils/source";
 import { getSourcemapVisualizerURL } from "../../../utils/sourceVisualizations";
 import type { SourceDetails } from "ui/reducers/sources";
 
@@ -37,17 +37,6 @@ const showSourceMenuItem = (
   click: () => editorActions.showSource(cx, selectedSource.id),
 });
 
-// TODO Re-enable blackboxing
-/*
-const blackBoxMenuItem = (cx: Context, selectedSource: Source, editorActions: EditorActions) => ({
-  id: "node-menu-blackbox",
-  label: selectedSource.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
-  accesskey: selectedSource.isBlackBoxed ? "U" : "B",
-  disabled: !shouldBlackbox(selectedSource),
-  click: () => editorActions.toggleBlackBox(cx, selectedSource),
-});
-*/
-
 const sourceMapItem = (
   cx: Context,
   selectedSource: SourceDetails,
@@ -55,8 +44,7 @@ const sourceMapItem = (
 ) => ({
   id: "node-menu-source-map",
   label: "Visualize source map",
-  // TODO Re-enable blackboxing
-  accesskey: /*selectedSource.isBlackBoxed ? "U" : */ "B",
+  accesskey: "B",
   disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
   click: () => {
     const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
@@ -83,8 +71,6 @@ export function editorMenuItems({
     copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    // TODO Re-enable blackboxing
-    // blackBoxMenuItem(cx, selectedSource, editorActions),
     sourceMapItem(cx, selectedSource, alternateSource)
   );
 
@@ -96,7 +82,6 @@ export function editorItemActions(dispatch: AppDispatch) {
     {
       flashLineRange: actions.flashLineRange,
       showSource: actions.showSource,
-      toggleBlackBox: actions.toggleBlackBox,
     },
     dispatch
   );

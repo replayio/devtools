@@ -12,7 +12,6 @@ import FrameMenu from "./FrameMenu";
 import AccessibleImage from "../../shared/AccessibleImage";
 import FrameComponent from "./Frame";
 
-import actions from "../../../actions";
 import Badge from "../../shared/Badge";
 import FrameIndent from "./FrameIndent";
 
@@ -47,22 +46,9 @@ export default class Group extends Component {
   }
 
   onContextMenu(event) {
-    const {
-      group,
-      copyStackTrace,
-      toggleFrameworkGrouping,
-      toggleBlackBox,
-      frameworkGroupingOn,
-      cx,
-    } = this.props;
+    const { group, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
     const frame = group[0];
-    FrameMenu(
-      frame,
-      frameworkGroupingOn,
-      { copyStackTrace, toggleFrameworkGrouping, toggleBlackBox },
-      event,
-      cx
-    );
+    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event, cx);
   }
 
   toggleFrames = event => {
@@ -79,7 +65,6 @@ export default class Group extends Component {
       selectedFrame,
       toggleFrameworkGrouping,
       frameworkGroupingOn,
-      toggleBlackBox,
       copyStackTrace,
       displayFullUrl,
       getFrameTitle,
@@ -110,7 +95,6 @@ export default class Group extends Component {
               selectFrame={selectFrame}
               selectLocation={selectLocation}
               shouldMapDisplayName={false}
-              toggleBlackBox={toggleBlackBox}
               toggleFrameworkGrouping={toggleFrameworkGrouping}
               displayFullUrl={displayFullUrl}
               getFrameTitle={getFrameTitle}

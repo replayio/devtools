@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { SourceLocation } from "@replayio/protocol";
+import type { ThreadFront as TF } from "protocol/thread";
 import { ValueItem } from "devtools/packages/devtools-reps";
 import { createPrimitiveValueFront } from "protocol/thread";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
@@ -45,6 +46,30 @@ export function updatePreview(
   };
 }
 
+export interface EvaluateOptions {
+  asyncIndex?: number;
+  frameId?: string;
+}
+
+async function evaluate(
+  ThreadFront: typeof TF,
+  source: string,
+  { asyncIndex, frameId }: EvaluateOptions = {}
+) {
+  const { returned, exception, failed } = await ThreadFront.evaluate({
+    asyncIndex,
+    frameId,
+    text: source,
+  });
+  if (failed) {
+    return { exception: createPrimitiveValueFront("Evaluation failed") };
+  }
+  if (returned) {
+    return { result: returned };
+  }
+  return { exception };
+}
+
 export function setPreview(
   cx: Context,
   expression: string,
@@ -53,7 +78,7 @@ export function setPreview(
   cursorPos: DOMRect,
   target: HTMLElement
 ): UIThunkAction {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     dispatch({
       type: "START_PREVIEW",
       value: {
@@ -79,7 +104,7 @@ export function setPreview(
       return;
     }
 
-    let { result } = await client.evaluate(expression, {
+    let { result } = await evaluate(ThreadFront, expression, {
       asyncIndex: selectedFrame.asyncIndex,
       frameId: selectedFrame.protocolId,
     });
