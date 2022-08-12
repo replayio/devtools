@@ -23,11 +23,11 @@ function Status({ test }: { test: TestMetadata }) {
       outlined
       className={
         test.result === "passed"
-          ? "text-green-500 group-hover:text-green-700"
+          ? "text-green-500 group-hover:text-green-400"
           : "text-red-500 group-hover:text-red-700"
       }
     >
-      play_circle
+      {test.result === "passed" ? "play_circle_filled" : "play_circle" } 
     </MaterialIcon>
   );
 }
@@ -71,7 +71,7 @@ export default function TestResultRow({ recording }: { recording: Recording }) {
       target="_blank"
     >
       <div
-        className={`flex flex-row items-center px-3 py-3 space-x-3 border-b overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
+        className={`flex flex-row items-center px-3 py-3 space-x-3 border-b border-b-chrome overflow-hidden rounded-sm cursor-pointer ${styles.libraryRow}`}
       >
         <Status test={recording.metadata.test} />
         <div className="flex flex-col flex-grow space-y-2">

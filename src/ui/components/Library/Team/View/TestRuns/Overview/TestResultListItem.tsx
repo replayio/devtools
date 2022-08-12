@@ -7,23 +7,30 @@ import styles from "../../../../Library.module.css";
 
 function ViewReplay({ passed }: { passed: boolean }) {
   return (
-    <MaterialIcon
-      iconSize="2xl"
-      outlined
-      className={
-        passed
-          ? "text-green-500 group-hover:text-green-700"
-          : "text-red-500 group-hover:text-red-700"
-      }
-    >
-      play_circle
-    </MaterialIcon>
+    <Link href={`/recording/${recordingId}`}>
+      <a
+        className="flex items-center justify-center p-2 transition cursor-pointer group"
+        onClick={e => e.stopPropagation()}
+      >
+        <MaterialIcon
+          iconSize="2xl"
+          outlined
+          className={
+            passed
+              ? "text-green-500 group-hover:text-green-400"
+              : "text-red-500 group-hover:text-red-400"
+          }
+        >
+          {passed ? "play_circle_filled" : "play_circle" }          
+        </MaterialIcon>
+      </a>
+    </Link>
   );
 }
 
 function Title({ recording }: { recording: Recording }) {
   return (
-    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden">
+    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden hover:cursor-pointer">
       <div className="flex flex-col flex-grow py-2 overflow-hidden">
         {recording.metadata?.test?.title}
         <div className="text-xs text-gray-500">{recording.metadata?.test?.file}</div>
