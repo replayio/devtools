@@ -184,3 +184,17 @@ but without a background color so we can use hover effects
 .icon.chevron {
   -webkit-mask-image: url(/icons/chevron.svg);
 }
+
+/* library */
+
+.icon.library {
+  -webkit-mask-image: url(/icons/library.svg);
+}
+
+.icon.team {
+  -webkit-mask-image: url(/icons/team.svg);
+}
+
+.icon.tests {
+  -webkit-mask-image: url(/icons/tests.svg);
+}

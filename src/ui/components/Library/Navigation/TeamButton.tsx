@@ -9,6 +9,7 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+import Icon from "ui/components/shared/Icon";
 
 export function TeamButton({
   label,
@@ -49,7 +50,10 @@ export function TeamButton({
         onClick={onClick}
       >
         <span className="overflow-hidden whitespace-pre overflow-ellipsis">
-          {label} {isTest && "(test)"}
+          <div className="flex">
+            <LibraryIcon teamType={isTest ? "tests" : "team"} />
+            {label}
+          </div>
         </span>
         {isNew ? (
           <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
@@ -58,6 +62,10 @@ export function TeamButton({
       </a>
     </Link>
   );
+}
+
+export function LibraryIcon({ teamType }: { teamType: string }) {
+  return <Icon filename={teamType} size="medium" className="mr-1 bg-gray-200" />;
 }
 
 export function SettingsButton() {
