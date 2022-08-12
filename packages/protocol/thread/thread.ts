@@ -169,6 +169,10 @@ class _ThreadFront {
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
 
+  // TODO [hbenl] this is a temporary hack to give ThreadFront access to the sources
+  // stored in redux. Eventually this should be removed together with all the
+  // methods using these selectors and the callers of these methods should use the
+  // selectors directly instead.
   sourcesSelectors: BoundSelectors | undefined;
 
   // Source IDs for generated sources which should be preferred over any
@@ -450,8 +454,8 @@ class _ThreadFront {
   }
 
   async getSourceURL(sourceId: SourceId) {
-    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
-    return info?.url;
+    await this.ensureAllSources();
+    return this.getSourceURLRaw(sourceId);
   }
 
   getSourceIdsForURL(url: string) {
