@@ -411,7 +411,7 @@ test("should evaluate terminal expressions at an execution point", async ({ page
   await toggleProtocolMessages(page, false);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
+  await takeScreenshot(page, firstListItem, "terminal-expression-at-execution-point");
 });
 
 test("should evaluate terminal expressions without an execution point", async ({ page }) => {
