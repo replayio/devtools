@@ -132,19 +132,6 @@ async function autocomplete(input: any, cursor: any, frameId: any) {
   });
 }
 
-export interface SourceRange {
-  start: ProtocolSourceLocation;
-  end: ProtocolSourceLocation;
-}
-
-export function prepareSourcePayload(source: {
-  sourceId: string;
-  url?: string;
-  sourceMapURL?: string;
-}) {
-  return { thread: ThreadFront.actor, source };
-}
-
 function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
 }

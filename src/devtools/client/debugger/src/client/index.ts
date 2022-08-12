@@ -10,7 +10,7 @@ import { allSourcesReceived } from "ui/reducers/sources";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 
-import { setupCommands, clientCommands, prepareSourcePayload } from "./commands";
+import { setupCommands } from "./commands";
 import { resumed, paused } from "../actions/pause";
 
 export async function loadInitialState() {
@@ -40,11 +40,14 @@ async function setupDebugger(ThreadFront: typeof TF) {
       const { sourceId, url, sourceMapURL } = newSource;
       sourceInfos.push({
         type: "generated",
-        data: prepareSourcePayload({
-          sourceId,
-          url,
-          sourceMapURL,
-        }),
+        data: {
+          thread: ThreadFront.actor,
+          source: {
+            sourceId,
+            url,
+            sourceMapURL,
+          },
+        },
       });
     }
   });
