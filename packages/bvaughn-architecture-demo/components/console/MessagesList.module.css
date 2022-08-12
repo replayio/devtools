@@ -4,7 +4,7 @@
   position: relative;
   overflow-y: auto;
   overflow-x: hidden;
-  font-family: Menlo, Consolas, monospace;
+  font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
 
   word-break: break-word;

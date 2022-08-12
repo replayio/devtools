@@ -96,7 +96,7 @@
   border: 2px solid var(--background-color-contrast-2);
   color: var(--color-default);
   border-radius: 0.25rem;
-  font-family: sans-serif;
+  font-family: var(--font-family-default);
 }
 .Input:focus {
   border: 2px solid var(--color-brand);
