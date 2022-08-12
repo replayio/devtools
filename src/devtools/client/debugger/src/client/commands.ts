@@ -98,45 +98,9 @@ function removeBreakpoint(location: SourceLocation) {
   return ThreadFront.removeBreakpointByURL(sourceUrl!, line, column!);
 }
 
-export interface EvaluateOptions {
-  asyncIndex?: number;
-  frameId?: string;
-}
-
-async function evaluate(source: string, { asyncIndex, frameId }: EvaluateOptions = {}) {
-  const { returned, exception, failed } = await ThreadFront.evaluate({
-    asyncIndex,
-    frameId,
-    text: source,
-  });
-  if (failed) {
-    return { exception: createPrimitiveValueFront("Evaluation failed") };
-  }
-  if (returned) {
-    return { result: returned };
-  }
-  return { exception };
-}
-
-async function autocomplete(input: any, cursor: any, frameId: any) {
-  if (!currentTarget || !input) {
-    return {};
-  }
-  const consoleFront = await currentTarget.getFront("console");
-  if (!consoleFront) {
-    return {};
-  }
-
-  return new Promise(resolve => {
-    consoleFront.autocomplete(input, cursor, (result: any) => resolve(result), frameId);
-  });
-}
-
 const clientCommands = {
-  autocomplete,
   setBreakpoint,
   removeBreakpoint,
-  evaluate,
 };
 
 export { setupCommands, clientCommands };
