@@ -3,6 +3,5 @@
   height: 2px;
   background-color: var(--color-current);
   position: absolute;
-  transform: translateY(-1.5px);
   z-index: 5;
 }
