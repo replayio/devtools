@@ -1,6 +1,6 @@
 .ConsoleRoot {
   display: grid;
-  grid-template-columns: minmax(auto, 12rem) 2fr;
+  grid-template-columns: auto 2fr;
   grid-template-rows: auto 1fr;
   flex-direction: column;
   flex: 1 1 auto;
@@ -55,6 +55,7 @@
   grid-column: 1;
   overflow: auto;
   height: 100%;
+  max-width: 12rem;
   border-right: 1px solid var(--background-color-default);
 }
 
