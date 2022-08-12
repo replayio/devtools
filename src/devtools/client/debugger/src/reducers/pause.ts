@@ -209,9 +209,13 @@ export const fetchAsyncFrames = createAsyncThunk<
     let asyncFrames: PauseFrame[] = [];
 
     // How many times to fetch an async set of parent frames.
-    const MaxAsyncFrames = 5;
+    const MAX_ASYNC_FRAME_GROUPS = 5;
 
-    for (let asyncIndex = 0; asyncIndex < MaxAsyncFrames; asyncIndex++) {
+    // We'll fetch up to 5 groups of async frames.
+    // The existing group of sync frames are considered to be group 0,
+    // so the first group of async frames is group 1.
+    // These are used to generate frame IDs, such as `"2:3"` (third frame in group 2)
+    for (let asyncIndex = 1; asyncIndex <= MAX_ASYNC_FRAME_GROUPS; asyncIndex++) {
       const frames = await ThreadFront.loadAsyncParentFrames();
 
       if (!frames.length) {
@@ -220,6 +224,7 @@ export const fetchAsyncFrames = createAsyncThunk<
       const wiredFrames = await Promise.all(
         frames.map((frame, i) => createFrame(frame, i, asyncIndex))
       );
+
       asyncFrames = asyncFrames.concat(wiredFrames as PauseFrame[]);
     }
 
