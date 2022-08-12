@@ -24,6 +24,7 @@ import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import { SearchContext } from "./SearchContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { isPointInRegions } from "shared/utils/time";
+import CurrentTimeIndicator from "./CurrentTimeIndicator";
 
 type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 
@@ -73,9 +74,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       ? searchState.results[searchState.index]
       : null;
 
-  const currentTimeIndicator = (
-    <div key="CurrentTimeIndicator" className={styles.CurrentTimeIndicator} />
-  );
+  const currentTimeIndicator = <CurrentTimeIndicator key="CurrentTimeIndicator" />;
   const listItems: ReactNode[] = [];
   if (currentTimeIndicatorPlacement === "begin") {
     listItems.push(currentTimeIndicator);

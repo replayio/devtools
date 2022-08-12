@@ -41,7 +41,7 @@ function UncaughtExceptionRenderer({
 
   useLayoutEffect(() => {
     if (isFocused) {
-      ref.current?.scrollIntoView({ block: "nearest" });
+      ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   }, [isFocused]);
 
