@@ -73,8 +73,8 @@ async function setup(page: Page, toggleState: boolean = false) {
   await page.goto(URL);
 
   await toggleProtocolMessages(page, toggleState);
-  await toggleProtocolMessage(page, "hideNodeModules", false);
-  await toggleProtocolMessage(page, "showTimestamps", false);
+  await toggleProtocolMessage(page, "nodeModules", true);
+  await toggleProtocolMessage(page, "timestamps", false);
 }
 
 test("should display list of messages", async ({ page }) => {
@@ -85,11 +85,11 @@ test("should display list of messages", async ({ page }) => {
   await expect(list).toContainText("This is a warning");
   await expect(list).toContainText("This is an error");
   await expect(list).toContainText("Uncaught exception");
-  await toggleProtocolMessage(page, "showTimestamps", false);
+  await toggleProtocolMessage(page, "timestamps", false);
 
   await takeScreenshot(page, list, "message-list");
 
-  await toggleProtocolMessage(page, "showTimestamps", true);
+  await toggleProtocolMessage(page, "timestamps", true);
   await takeScreenshot(page, list, "message-list-with-timestamps");
 });
 
@@ -300,7 +300,7 @@ test("should log events in the console", async ({ page }) => {
     .first();
   await takeScreenshot(page, listItem, "event-types-mouse-click");
 
-  await toggleProtocolMessage(page, "showTimestamps", true);
+  await toggleProtocolMessage(page, "timestamps", true);
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps");
 
   const keyValue = listItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
@@ -345,12 +345,12 @@ test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
   await setup(page);
 
   await toggleProtocolMessage(page, "warnings", true);
-  await toggleProtocolMessage(page, "hideNodeModules", false);
+  await toggleProtocolMessage(page, "nodeModules", true);
 
   const list = page.locator("[data-test-name=Messages]");
   await takeScreenshot(page, list, "filtered-all-warnings");
 
-  await toggleProtocolMessage(page, "hideNodeModules", true);
+  await toggleProtocolMessage(page, "nodeModules", false);
   await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
 });
 
@@ -375,8 +375,8 @@ test("should remember filter toggle preferences between reloads", async ({ page 
 
   // Toggle everything off and screenshot
   await toggleProtocolMessages(page, false);
-  await toggleProtocolMessage(page, "hideNodeModules", false);
-  await toggleProtocolMessage(page, "showTimestamps", false);
+  await toggleProtocolMessage(page, "nodeModules", false);
+  await toggleProtocolMessage(page, "timestamps", false);
   let filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, filters, "initial-side-filter-values");
 
@@ -387,8 +387,8 @@ test("should remember filter toggle preferences between reloads", async ({ page 
 
   // Toggle everything on and screenshot
   await toggleProtocolMessages(page, true);
-  await toggleProtocolMessage(page, "hideNodeModules", true);
-  await toggleProtocolMessage(page, "showTimestamps", true);
+  await toggleProtocolMessage(page, "nodeModules", true);
+  await toggleProtocolMessage(page, "timestamps", true);
   await takeScreenshot(page, filters, "updated-side-filter-values");
 
   // Reload and verify screenshot unchanged

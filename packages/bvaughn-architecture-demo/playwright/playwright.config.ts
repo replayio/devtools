@@ -1,13 +1,12 @@
 const config = {
   forbidOnly: !!process.env.CI,
   reporter: process.env.CI ? "github" : "list",
-  retries: 3,
+  retries: 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
     launchOptions: {
-      // Useful for visual debugging
-      slowMo: 500,
+      slowMo: process.env.VISUAL_DEBUG ? 500 : 5,
     },
     trace: "on-first-retry",
     video: process.env.RECORD_VIDEO ? "on" : "off",
