@@ -416,8 +416,8 @@ export function setLogpointByURL(
   text: string,
   condition: string
 ) {
-  const sourceIds = ThreadFront.getChosenSourceIdsForUrl(url).map(({ sourceId }) => sourceId);
-  if (sourceIds.length === 0) {
+  const sourceIds = ThreadFront.getSourceToDisplayForUrl(url)?.correspondingSourceIds;
+  if (!sourceIds || sourceIds.length === 0) {
     return;
   }
   const locations = sourceIds.map(sourceId => ({ sourceId, line, column }));

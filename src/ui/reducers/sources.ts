@@ -19,6 +19,7 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
+import { UiState } from "devtools/client/webconsole/reducers/ui";
 
 export interface SourceDetails {
   isSourceMapped: boolean;
@@ -355,8 +356,12 @@ export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
   return sourceIdToDisplay ? getSourceDetails(state, sourceIdToDisplay) : undefined;
 };
 
+export function getSourceIdsByUrl(state: UIState) {
+  return state.sources.sourcesByUrl;
+}
+
 export const getSourcesToDisplayByUrl = createSelector(
-  [(state: UIState) => state.sources.sourcesByUrl, getSourceDetailsEntities],
+  [getSourceIdsByUrl, getSourceDetailsEntities],
   (sourceIdsByUrl, sourceDetailsById) => {
     const sourcesToDisplay: Dictionary<SourceDetails> = {};
     for (const url in sourceIdsByUrl) {
@@ -428,6 +433,7 @@ export const selectors = {
   getSourceIdToDisplayById,
   getSourceToDisplayForUrl,
   getSourceIdToDisplayForUrl,
+  getSourceIdsByUrl,
   getSourcesToDisplayByUrl,
 };
 

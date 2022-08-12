@@ -26,6 +26,9 @@ import type { LayoutState } from "ui/state/layout";
 import { getLocalReplaySessionPrefs } from "ui/setup/prefs";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
+import { selectors as sourcesSelectors } from "ui/reducers/sources";
+import { bindSelectors } from "./dynamic/devtools";
+import { ThreadFront } from "protocol/thread";
 
 declare global {
   interface Window {
@@ -127,6 +130,8 @@ export async function bootstrapApp() {
   if (typeof window === "undefined") {
     return store;
   }
+
+  ThreadFront.sourcesSelectors = bindSelectors(store, sourcesSelectors);
 
   setupTelemetry();
   setupDOMHelpers();

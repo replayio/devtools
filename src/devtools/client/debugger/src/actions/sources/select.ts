@@ -131,8 +131,7 @@ export function selectLocation(
     // use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       await ThreadFront.ensureAllSources();
-      let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
-      sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+      const sourceId = ThreadFront.getSourceToDisplayForUrl(location.sourceUrl)!.id;
       source = getSourceDetails(getState(), sourceId);
       location = { ...location, sourceId };
     }

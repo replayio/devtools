@@ -46,11 +46,16 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
+import {
+  getAlternateSourceId,
+  getPreferredSourceId,
+} from "ui/reducers/sources";
+import { BoundSelectors } from "ui/setup/dynamic/devtools";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
 import { client } from "../socket";
-import { defer, assert, EventEmitter, ArrayMap } from "../utils";
+import { defer, assert, EventEmitter } from "../utils";
 
 import { Pause } from "./pause";
 import { ValueFront } from "./value";
@@ -157,29 +162,14 @@ class _ThreadFront {
   // Waiter which resolves when there is at least one loading region
   loadingHasBegun = defer<void>();
 
-  // Map sourceId to info about the source.
-  sources = new Map<string, Source>();
-
-  alternateSourceIds: Map<SourceId, Set<SourceId>> = new Map();
-
   private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
   private fnSearchWaiters: Map<string, (params: FunctionMatch[]) => void> = new Map();
-
-  // Resolve hooks for promises waiting on a source ID to be known.
-  sourceWaiters = new ArrayMap<string, () => void>();
 
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
 
-  // Map URL to sourceId[].
-  urlSources = new ArrayMap<string, SourceId>();
-
-  // Map each preferred or alternate sourceId to the sourceIds of identical sources
-  private correspondingSourceIds = new Map<SourceId, SourceId[]>();
-
-  // Map sourceId to sourceId[], reversing the generatedSourceIds map.
-  originalSources = new ArrayMap<SourceId, SourceId>();
+  sourcesSelectors: BoundSelectors | undefined;
 
   // Source IDs for generated sources which should be preferred over any
   // original source.
@@ -187,8 +177,6 @@ class _ThreadFront {
 
   // Map sourceId to breakpoint positions.
   breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();
-
-  onSource: ((source: newSource) => void) | undefined;
 
   mappedLocations = new MappedLocationCache();
 
@@ -401,30 +389,19 @@ class _ThreadFront {
 
   async findSources(onSource: (source: newSource) => void) {
     const sessionId = await this.waitForSession();
-    this.onSource = onSource;
 
+    const allSources: newSource[] = [];
     client.Debugger.findSources({}, sessionId).then(() => {
       this.hasAllSources = true;
-      this.groupSourceIds();
       this.allSourcesWaiter.resolve();
     });
     client.Debugger.addNewSourceListener(source => {
-      let { sourceId, kind, url, generatedSourceIds, contentHash } = source;
-      this.sources.set(sourceId, { contentHash, generatedSourceIds, kind, url });
-      if (url) {
-        this.urlSources.add(url, sourceId);
-      }
-      for (const generatedId of generatedSourceIds || []) {
-        this.originalSources.add(generatedId, sourceId);
-      }
-      const waiters = this.sourceWaiters.map.get(sourceId);
-      (waiters || []).forEach(resolve => resolve());
-      this.sourceWaiters.map.delete(sourceId);
+      allSources.push(source);
     });
 
     await this.ensureAllSources();
-    for (const [sourceId, source] of this.sources) {
-      onSource({ sourceId, ...source });
+    for (const source of allSources) {
+      onSource(source);
     }
   }
 
@@ -459,17 +436,8 @@ class _ThreadFront {
   }
 
   getSourceKind(sourceId: SourceId) {
-    const info = this.sources.get(sourceId);
+    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
     return info ? info.kind : null;
-  }
-
-  async ensureSource(sourceId: SourceId) {
-    if (!this.sources.has(sourceId)) {
-      const { promise, resolve } = defer<void>();
-      this.sourceWaiters.add(sourceId, resolve as () => void);
-      await promise;
-    }
-    return this.sources.get(sourceId)!;
   }
 
   async ensureAllSources() {
@@ -477,41 +445,41 @@ class _ThreadFront {
   }
 
   getSourceURLRaw(sourceId: SourceId) {
-    const info = this.sources.get(sourceId);
+    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
     return info && info.url;
   }
 
   async getSourceURL(sourceId: SourceId) {
-    const info = await this.ensureSource(sourceId);
-    return info.url;
+    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
+    return info?.url;
   }
 
   getSourceIdsForURL(url: string) {
     // Ignore IDs which are generated versions of another ID with the same URL.
     // This happens with inline sources for HTML pages, in which case we only
     // want the ID for the HTML itself.
-    const ids = this.urlSources.map.get(url) || [];
-    return ids.filter(id => {
-      const originalIds = this.originalSources.map.get(id);
-      return (originalIds || []).every(originalId => !ids.includes(originalId));
+    const sourceIds = this.sourcesSelectors!.getSourceIdsByUrl()[url] || [];
+    return sourceIds.filter(sourceId => {
+      const originalIds = this.sourcesSelectors!.getSourceDetails(sourceId)?.generatedFrom;
+      return (originalIds || []).every(originalId => !sourceIds.includes(originalId));
     });
   }
 
   getGeneratedSourceIdsForURL(url: string) {
     // Ignore IDs which are original versions of another ID with the same URL.
-    const ids = this.urlSources.map.get(url) || [];
-    return ids.filter(id => {
-      const generatedIds = this.sources.get(id)?.generatedSourceIds;
-      return (generatedIds || []).every(generatedId => !ids.includes(generatedId));
+    const sourceIds = this.sourcesSelectors!.getSourceIdsByUrl()[url] || [];
+    return sourceIds.filter(sourceId => {
+      const generatedIds = this.sourcesSelectors!.getSourceDetails(sourceId)?.generated;
+      return (generatedIds || []).every(generatedId => !sourceIds.includes(generatedId));
     });
   }
 
   getGeneratedSourceIds(originalSourceId: SourceId) {
-    return this.sources.get(originalSourceId)?.generatedSourceIds;
+    return this.sourcesSelectors!.getSourceDetails(originalSourceId)?.generated;
   }
 
   getOriginalSourceIds(generatedSourceId: SourceId) {
-    return this.originalSources.map.get(generatedSourceId);
+    return this.sourcesSelectors!.getSourceDetails(generatedSourceId)?.generatedFrom;
   }
 
   async getSourceContents(sourceId: SourceId) {
@@ -598,13 +566,9 @@ class _ThreadFront {
   }
 
   setBreakpointByURL(url: string, line: number, column: number, condition?: string) {
-    const sources = this.getSourceIdsForURL(url);
-    if (!sources) {
-      return;
-    }
-    const sourceIds = this._chooseSourceIdList(sources);
+    const sourceIds = this.getSourceToDisplayForUrl(url)?.correspondingSourceIds || [];
     return Promise.all(
-      sourceIds.map(({ sourceId }) => this.setBreakpoint(sourceId, line, column, condition))
+      sourceIds.map(sourceId => this.setBreakpoint(sourceId, line, column, condition))
     );
   }
 
@@ -627,14 +591,8 @@ class _ThreadFront {
   }
 
   removeBreakpointByURL(url: string, line: number, column: number) {
-    const sources = this.getSourceIdsForURL(url);
-    if (!sources) {
-      return;
-    }
-    const sourceIds = this._chooseSourceIdList(sources);
-    return Promise.all(
-      sourceIds.map(({ sourceId }) => this.removeBreakpoint(sourceId, line, column))
-    );
+    const sourceIds = this.getSourceToDisplayForUrl(url)?.correspondingSourceIds || [];
+    return Promise.all(sourceIds.map(sourceId => this.removeBreakpoint(sourceId, line, column)));
   }
 
   ensurePause(point: ExecutionPoint, time: number) {
@@ -1021,7 +979,10 @@ class _ThreadFront {
   }
 
   getPreferredLocationRaw(locations: MappedLocation) {
-    const { sourceId } = this._chooseSourceId(locations.map(l => l.sourceId));
+    const sourceId = getPreferredSourceId(
+      this.sourcesSelectors!.getSourceDetailsEntities(),
+      locations.map(l => l.sourceId)
+    );
     const preferredLocation = locations.find(l => l.sourceId == sourceId);
     assert(preferredLocation, "no preferred location found");
     assert(
@@ -1067,8 +1028,11 @@ class _ThreadFront {
   }
 
   async getAlternateLocation(locations: MappedLocation) {
-    await Promise.all(locations.map(({ sourceId }) => this.ensureSource(sourceId)));
-    const { alternateId } = this._chooseSourceId(locations.map(l => l.sourceId));
+    await this.ensureAllSources();
+    const alternateId = getAlternateSourceId(
+      this.sourcesSelectors!.getSourceDetailsEntities(),
+      locations.map(l => l.sourceId)
+    );
     if (alternateId) {
       return locations.find(l => l.sourceId == alternateId);
     }
@@ -1087,150 +1051,17 @@ class _ThreadFront {
     });
   }
 
-  // Get the source which should be used in the devtools from an array of
-  // sources representing the same location. If the chosen source is an
-  // original or generated source and there is an alternative which users
-  // can switch to, also returns that alternative.
-  private _chooseSourceId(sourceIds: SourceId[]) {
-    const fallbackSourceId = sourceIds[0];
-
-    // Ignore inline sources if we have an HTML source containing them.
-    if (sourceIds.some(id => this.getSourceKind(id) == "html")) {
-      sourceIds = sourceIds.filter(id => this.getSourceKind(id) != "inlineScript");
-    }
-
-    // Ignore minified sources.
-    sourceIds = sourceIds.filter(id => !this.isMinifiedSource(id));
-
-    // Determine the base generated/original ID to use for the source.
-    let generatedId, originalId;
-    for (const id of sourceIds) {
-      const info = this.sources.get(id);
-      if (!info) {
-        // Sources haven't finished loading, bail out and return this one.
-        return { sourceId: id };
-      }
-      // Determine the kind of this source, or its minified version.
-      let kind = info.kind;
-      if (kind == "prettyPrinted") {
-        const minifiedInfo = info.generatedSourceIds
-          ? this.sources.get(info.generatedSourceIds[0])
-          : undefined;
-        if (!minifiedInfo) {
-          return { sourceId: id };
-        }
-        kind = minifiedInfo.kind;
-        assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
-      }
-      if (kind == "sourceMapped") {
-        originalId = id;
-      } else {
-        assert(!generatedId, "there should be no generatedId");
-        generatedId = id;
-      }
-    }
-
-    if (!generatedId) {
-      assert(originalId, "there should be an originalId");
-      // backend issues like #1310 may cause a situation where there is no originalId,
-      // in this case it's better to return some sourceId instead of undefined
-      return { sourceId: originalId || fallbackSourceId };
-    }
-
-    if (!originalId) {
-      return { sourceId: generatedId };
-    }
-
-    // Prefer original sources over generated sources, except when overridden
-    // through user action.
-    if (this.preferredGeneratedSources.has(generatedId)) {
-      return { sourceId: generatedId, alternateId: originalId };
-    }
-    return { sourceId: originalId, alternateId: generatedId };
-  }
-
-  // Get the set of chosen sources from a list of source IDs which might
-  // represent different generated locations.
-  private _chooseSourceIdList(sourceIds: SourceId[]) {
-    const groups = this._groupSourceIds(sourceIds);
-    return groups.map(ids => this._chooseSourceId(ids));
-  }
-
-  // Group together a set of source IDs according to whether they are generated
-  // or original versions of each other.
-  private _groupSourceIds(sourceIds: SourceId[]) {
-    const groups = [];
-    while (sourceIds.length) {
-      const id = sourceIds[0];
-      const group = [...this.getAlternateSourceIds(id)].filter(id => sourceIds.includes(id));
-      groups.push(group);
-      sourceIds = sourceIds.filter(id => !group.includes(id));
-    }
-    return groups;
-  }
-
-  // Get all original/generated IDs which can represent a location in sourceId.
-  getAlternateSourceIds(sourceId: SourceId) {
-    if (this.alternateSourceIds.has(sourceId)) {
-      return this.alternateSourceIds.get(sourceId)!;
-    }
-
-    const rv = new Set<SourceId>();
-    let currentSourceId = sourceId;
-    const worklist = [currentSourceId];
-
-    while (worklist.length) {
-      currentSourceId = worklist.pop()!;
-      if (rv.has(currentSourceId)) {
-        continue;
-      }
-      rv.add(currentSourceId);
-      const sources = this.sources.get(currentSourceId);
-      assert(sources, "no sources found for sourceId");
-
-      const { generatedSourceIds } = sources;
-      (generatedSourceIds || []).forEach(id => worklist.push(id));
-
-      const originalSourceIds = this.originalSources.map.get(currentSourceId);
-      (originalSourceIds || []).forEach(id => worklist.push(id));
-    }
-
-    if (this.hasAllSources) {
-      this.alternateSourceIds.set(sourceId, rv);
-    }
-    return rv;
-  }
-
   // Return whether sourceId is minified and has a pretty printed alternate.
   isMinifiedSource(sourceId: SourceId) {
-    return !!this.getPrettyPrintedSourceId(sourceId);
+    return !!this.sourcesSelectors!.getSourceDetails(sourceId)?.prettyPrinted;
   }
 
   getPrettyPrintedSourceId(sourceId: SourceId) {
-    const originalIds = this.originalSources.map.get(sourceId) || [];
-    return originalIds.find(id => {
-      const info = this.sources.get(id);
-      return info && info.kind == "prettyPrinted";
-    });
+    return this.sourcesSelectors!.getSourceDetails(sourceId)?.prettyPrinted;
   }
 
   isSourceMappedSource(sourceId: SourceId) {
-    const info = this.sources.get(sourceId);
-    if (!info) {
-      return false;
-    }
-    let kind = info.kind;
-    if (kind == "prettyPrinted") {
-      const minifiedInfo = info.generatedSourceIds
-        ? this.sources.get(info.generatedSourceIds[0])
-        : undefined;
-      if (!minifiedInfo) {
-        return false;
-      }
-      kind = minifiedInfo.kind;
-      assert(kind != "prettyPrinted", "source kind must not be prettyPrinted");
-    }
-    return kind == "sourceMapped";
+    return this.sourcesSelectors!.getSourceDetails(sourceId)?.isSourceMapped || false;
   }
 
   preferSource(sourceId: SourceId, value: boolean) {
@@ -1257,74 +1088,17 @@ class _ThreadFront {
     return this.getPreferredLocation(mappedLocation);
   }
 
-  // Get the chosen (i.e. preferred and alternate) sources for the given URL.
-  getChosenSourceIdsForUrl(url: string) {
-    return this._chooseSourceIdList(this.getSourceIdsForURL(url));
+  getSourcesToDisplayByUrl() {
+    return this.sourcesSelectors!.getSourcesToDisplayByUrl();
   }
 
-  // Try to group identical sources together and save the result in `correspondingSourceIds`
-  private groupSourceIds() {
-    for (const [sourceId, source] of this.sources.entries()) {
-      if (!source.url) {
-        this.correspondingSourceIds.set(sourceId, [sourceId]);
-        continue;
-      }
-      if (this.correspondingSourceIds.has(sourceId)) {
-        continue;
-      }
-
-      const groups = this.getChosenSourceIdsForUrl(source.url);
-      assert(groups.length > 0, "no chosen sourceIds found for URL");
-      const sourceIdGroups = this.groupByContentHash(groups.map(group => group.sourceId));
-      for (const sourceIdGroup of sourceIdGroups.values()) {
-        for (const sourceId of sourceIdGroup) {
-          this.correspondingSourceIds.set(sourceId, sourceIdGroup);
-        }
-      }
-      const alternateIdGroups = this.groupByContentHash(
-        groups
-          .map(group => group.alternateId)
-          .filter((alternateId): alternateId is SourceId => !!alternateId)
-      );
-      for (const alternateIdGroup of alternateIdGroups.values()) {
-        for (const alternateId of alternateIdGroup) {
-          this.correspondingSourceIds.set(alternateId, alternateIdGroup);
-        }
-      }
-
-      if (!this.correspondingSourceIds.has(sourceId)) {
-        this.correspondingSourceIds.set(sourceId, [sourceId]);
-      }
-    }
-  }
-
-  private groupByContentHash(sourceIds: SourceId[]): Map<string, SourceId[]> {
-    const sourceIdsByHash = new ArrayMap<string, SourceId>();
-    for (const sourceId of sourceIds) {
-      const source = this.sources.get(sourceId);
-      assert(source, "no source found for sourceId");
-      let hash = source?.contentHash || "";
-      // source.contentHash is not set for pretty-printed sources, we use
-      // the contentHash of the minified version instead
-      if (source.kind === "prettyPrinted") {
-        assert(
-          source.generatedSourceIds?.length === 1,
-          "a pretty-printed source should have exactly one generated source"
-        );
-        const minifiedSource = this.sources.get(source.generatedSourceIds?.[0]);
-        assert(minifiedSource?.contentHash, "no contentHash found for minified source");
-        hash = "minified:" + minifiedSource?.contentHash;
-      } else {
-        assert(hash, "no contentHash found for source that is not pretty-printed");
-      }
-      sourceIdsByHash.add(hash, sourceId);
-    }
-    return sourceIdsByHash.map;
+  getSourceToDisplayForUrl(url: string) {
+    return this.sourcesSelectors!.getSourceToDisplayForUrl(url);
   }
 
   getCorrespondingSourceIds(sourceId: SourceId) {
     assert(this.hasAllSources, "not all sources have been loaded yet");
-    return this.correspondingSourceIds.get(sourceId) || [sourceId];
+    return this.sourcesSelectors!.getSourceDetails(sourceId)?.correspondingSourceIds || [sourceId];
   }
 
   // Replace the sourceId in a location with the first corresponding sourceId

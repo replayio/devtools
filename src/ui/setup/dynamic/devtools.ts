@@ -289,13 +289,13 @@ type SelectorWithoutStateArg<T extends ReduxSelectorFunction> = (
 // When we "bind" the selectors, we automatically pass in `state` as the first arg.
 // Create TS types that reflect that by removing the first arg from the type signature,
 // but still expect any other parameters.
-type BoundSelectors = {
+export type BoundSelectors = {
   [key in keyof ObjectOfJustSelectorsHopefully]: SelectorWithoutStateArg<
     ObjectOfJustSelectorsHopefully[key]
   >;
 };
 
-function bindSelectors(store: UIStore, selectors: ObjectOfJustSelectorsHopefully) {
+export function bindSelectors(store: UIStore, selectors: Partial<ObjectOfJustSelectorsHopefully>) {
   // NOTE: While the object is named `selectors`, our use of `export * from someSlice`
   // has caused a lot of action creators to be in the object as well.
   // Additionally, the "binding" of passing in `state` automatically messes up the TS types here.
