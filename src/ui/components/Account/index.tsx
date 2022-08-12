@@ -29,5 +29,5 @@ export default function Account() {
     return <Login returnToPath={window.location.pathname + window.location.search} />;
   }
 
-  return <LoadingScreen fallbackMessage="Loading accounts details..." />;
+  return <LoadingScreen fallbackMessage="Loading account details..." />;
 }
