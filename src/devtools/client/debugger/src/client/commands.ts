@@ -42,7 +42,6 @@ interface BreakpointDetails {
 
 let currentThreadFront: any;
 let currentTarget: any;
-let devToolsClient: any;
 let breakpoints: Record<string, BreakpointDetails> = {};
 
 function setupCommands() {
@@ -72,10 +71,6 @@ function rewind(point: string, loadedRegions: loadedRegions) {
 function reverseStepOver(point: string, loadedRegions: loadedRegions) {
   return ThreadFront.reverseStepOver(point, loadedRegions);
 }
-
-function addWatchpoint(object: any, property: any, label: any, watchpointType: any) {}
-
-async function removeWatchpoint(object: any, property: any) {}
 
 // Get the string key to use for a breakpoint location.
 // See also duplicate code in breakpoint-actor-map.js :(
@@ -162,10 +157,6 @@ export interface EvaluateOptions {
   frameId?: string;
 }
 
-async function evaluateExpressions(sources: string[], options: EvaluateOptions) {
-  return Promise.all(sources.map(source => evaluate(source, options)));
-}
-
 async function evaluate(source: string, { asyncIndex, frameId }: EvaluateOptions = {}) {
   const { returned, exception, failed } = await ThreadFront.evaluate({
     asyncIndex,
@@ -192,28 +183,6 @@ async function autocomplete(input: any, cursor: any, frameId: any) {
 
   return new Promise(resolve => {
     consoleFront.autocomplete(input, cursor, (result: any) => resolve(result), frameId);
-  });
-}
-
-function navigate(url: string) {
-  return currentTarget.navigateTo({ url });
-}
-
-function reload() {
-  return currentTarget.reload();
-}
-
-function getProperties(grip: any) {
-  // @ts-expect-error This function doesn't appear to exist
-  const objClient = ThreadFront.pauseGrip(grip);
-
-  return objClient.getPrototypeAndProperties().then((resp: any) => {
-    const { ownProperties, safeGetterValues } = resp;
-    for (const name in safeGetterValues) {
-      const { enumerable, writable, getterValue } = safeGetterValues[name];
-      ownProperties[name] = { enumerable, writable, value: getterValue };
-    }
-    return resp;
   });
 }
 
@@ -284,14 +253,6 @@ async function blackBox(source: MiniSource, isBlackBoxed: boolean, range?: Parti
   */
 }
 
-function interrupt(thread: any) {
-  // @ts-expect-error this function doesn't appear to exist
-  return ThreadFront.interrupt();
-}
-function setEventListenerBreakpoints(ids: string[]) {
-  setEventLogpoints(ids);
-}
-
 let gExceptionLogpointGroupId: string | null;
 
 function logExceptions(shouldLog: boolean) {
@@ -304,11 +265,6 @@ function logExceptions(shouldLog: boolean) {
   } else {
     gExceptionLogpointGroupId = null;
   }
-}
-
-function pauseGrip(func: Function) {
-  // @ts-expect-error this function doesn't appear to exist
-  return ThreadFront.pauseGrip(func);
 }
 
 export function prepareSourcePayload(source: {
@@ -332,35 +288,13 @@ async function fetchSources() {
   return sources;
 }
 
-// Check if any of the targets were paused before we opened
-// the debugger. If one is paused. Fake a `pause` RDP event
-// by directly calling the client event listener.
-async function checkIfAlreadyPaused() {
-  // @ts-expect-error this function has got to actually be dead
-  const pausedPacket = ThreadFront.getLastPausePacket();
-  if (pausedPacket) {
-    // @ts-expect-error ditto
-    clientEvents.paused(ThreadFront, pausedPacket);
-  }
-}
-
-function getFrontByID(actorID: string) {
-  return devToolsClient.getFrontByID(actorID);
-}
-
 function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
   return ThreadFront.getFrameSteps(asyncIndex, frameId);
-}
-
-function pickExecutionPoints(count: any, options: any) {
-  return currentThreadFront.pickExecutionPoints(count, options);
 }
 
 const clientCommands = {
   autocomplete,
   blackBox,
-  interrupt,
-  pauseGrip,
   resume,
   stepIn,
   stepOut,
@@ -369,26 +303,16 @@ const clientCommands = {
   reverseStepOver,
   hasBreakpoint,
   setBreakpoint,
-  addWatchpoint,
-  removeWatchpoint,
   removeBreakpoint,
   runAnalysis,
   evaluate,
-  evaluateExpressions,
-  navigate,
-  reload,
-  getProperties,
   getFrameScopes,
   getFrames,
   loadAsyncParentFrames,
   logExceptions,
   fetchSources,
-  checkIfAlreadyPaused,
   fetchEventTypePoints,
-  setEventListenerBreakpoints,
-  getFrontByID,
   fetchAncestorFramePositions,
-  pickExecutionPoints,
 };
 
 export { setupCommands, clientCommands };

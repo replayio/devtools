@@ -3,7 +3,6 @@ import {
   EditorWithAutocomplete,
   Keys,
 } from "ui/components/shared/CodeEditor/EditorWithAutocomplete";
-import { useFeature } from "ui/hooks/settings";
 
 export function PanelInput({
   autofocus,
@@ -32,7 +31,7 @@ export function PanelInput({
   const options = { minLeft: 24, autofocus, isArgument: true };
 
   return (
-    <div className="w-full jsterm-input-container">
+    <div className="jsterm-input-container w-full">
       <EditorWithAutocomplete
         onEditorMount={() => {}}
         onPreviewAvailable={() => {}}
