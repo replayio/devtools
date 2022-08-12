@@ -31,6 +31,8 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-warning: #fce2a1;
+  --border-color-error: #7a4242;
+  --border-color-warning: #6f5920;
 
   --color-primary-background: var(--background-color-contrast-1);
   --color-secondary-background: var(--background-color-contrast-3);
@@ -100,6 +102,7 @@
   --background-color-default: #e9e9e9;
   --background-color-error: #ffeeee;
   --border-color-error: #f8d7d7;
+  --border-color-warning: #fce2a1;
 
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;

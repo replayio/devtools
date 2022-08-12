@@ -21,6 +21,7 @@
 .WarningRow {
   background-color: var(--background-color-warning);
   color: var(--color-warning);
+  border-color: var(--border-color-warning);
 
   --color-default: var(--color-warning);
   --value-type-string: var(--color-warning);
