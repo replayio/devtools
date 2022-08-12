@@ -17,7 +17,7 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
       return;
     }
 
-    const positions = await client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
+    const positions = await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
     if (positions.length === 0) {
       return;
     }

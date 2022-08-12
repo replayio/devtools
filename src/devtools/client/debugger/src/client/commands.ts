@@ -132,16 +132,11 @@ async function autocomplete(input: any, cursor: any, frameId: any) {
   });
 }
 
-function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
-  return ThreadFront.getFrameSteps(asyncIndex, frameId);
-}
-
 const clientCommands = {
   autocomplete,
   setBreakpoint,
   removeBreakpoint,
   evaluate,
-  fetchAncestorFramePositions,
 };
 
 export { setupCommands, clientCommands };

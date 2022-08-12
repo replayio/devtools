@@ -23,7 +23,7 @@ interface TempFrame {
  * @static
  */
 export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
-  return async (dispatch, getState, { client }) => {
+  return async (dispatch, getState, { client, ThreadFront }) => {
     // Frames that aren't on-stack do not support evalling and may not
     // have live inspectable scopes, so we do not allow selecting them.
     if (frame.state !== "on-stack") {
@@ -32,7 +32,7 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
 
     dispatch(frameSelected({ cx, frameId: frame.id }));
 
-    client.fetchAncestorFramePositions(frame.asyncIndex, frame.protocolId);
+    await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
 
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
