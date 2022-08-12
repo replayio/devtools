@@ -72,11 +72,16 @@ function ContextMenu({
       </div>
       {isPointInstance(loggable) && (
         <div className={styles.ContextMenuItem}>
-          <div className={styles.UnicornBadge} onClick={() => setBadge("unicorn")} />
+          <div
+            className={styles.UnicornBadge}
+            data-test-id="ConsoleContextMenu-Badge-unicorn"
+            onClick={() => setBadge("unicorn")}
+          />
           {BADGES.map(badge => (
             <div
               key={badge}
               className={styles.ColorBadge}
+              data-test-id={`ConsoleContextMenu-Badge-${badge}`}
               onClick={() => setBadge(badge)}
               style={{
                 // @ts-ignore

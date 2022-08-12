@@ -1,0 +1,7 @@
+.Root {
+  display: inline-block;
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
+  font-size: var(--font-size-small);
+  background-color: var(--color-secondary-background);
+}

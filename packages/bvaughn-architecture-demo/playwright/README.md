@@ -37,6 +37,8 @@ Note that the value passed for `HOST` varies by operating system:
 - Mac OS: "host.docker.internal"
 - Linux (GitHub CI): "172.17.0.1"
 
+If this is your first time running tests locally, you can install Earthly [here](https://earthly.dev/get-earthly).
+
 ## Authoring tests
 
 If you're writing new tests, it may be easier to run this command locally:

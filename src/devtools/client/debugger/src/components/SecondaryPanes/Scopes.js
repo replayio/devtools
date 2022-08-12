@@ -63,57 +63,6 @@ class Scopes extends PureComponent {
     }
   }
 
-  onContextMenu = (event, item) => {
-    const { addWatchpoint, removeWatchpoint } = this.props;
-
-    if (!features.watchpoints || !item.parent || !item.contents.configurable) {
-      return;
-    }
-
-    if (!item.contents || item.contents.watchpoint) {
-      const removeWatchpointLabel = "Remove watchpoint";
-
-      const removeWatchpointItem = {
-        id: "node-menu-remove-watchpoint",
-        label: removeWatchpointLabel,
-        disabled: false,
-        click: () => removeWatchpoint(item),
-      };
-
-      const menuItems = [removeWatchpointItem];
-      return showMenu(event, menuItems);
-    }
-
-    const addSetWatchpointLabel = "Property set";
-    const addGetWatchpointLabel = "Property get";
-    const watchpointsSubmenuLabel = "Break on…";
-
-    const addSetWatchpointItem = {
-      id: "node-menu-add-set-watchpoint",
-      label: addSetWatchpointLabel,
-      disabled: false,
-      click: () => addWatchpoint(item, "set"),
-    };
-
-    const addGetWatchpointItem = {
-      id: "node-menu-add-get-watchpoint",
-      label: addGetWatchpointLabel,
-      disabled: false,
-      click: () => addWatchpoint(item, "get"),
-    };
-
-    const watchpointsSubmenuItem = {
-      id: "node-menu-watchpoints",
-      label: watchpointsSubmenuLabel,
-      disabled: false,
-      click: () => addWatchpoint(item, "set"),
-      submenu: [addSetWatchpointItem, addGetWatchpointItem],
-    };
-
-    const menuItems = [watchpointsSubmenuItem];
-    showMenu(event, menuItems);
-  };
-
   renderWatchpointButton = item => {
     return null;
 
@@ -174,7 +123,6 @@ class Scopes extends PureComponent {
           onInspectIconClick={grip => openElementInInspector(grip)}
           onDOMNodeMouseOver={grip => highlightDomElement(grip)}
           onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
-          onContextMenu={this.onContextMenu}
           setExpanded={(path, expand) => {
             trackEvent("scopes.set_expanded");
             setExpandedScope(cx, path, expand);
@@ -274,6 +222,5 @@ export default connect(mapStateToProps, {
   highlightDomElement,
   unHighlightDomElement,
   setExpandedScope: actions.setExpandedScope,
-  addWatchpoint: actions.addWatchpoint,
   removeWatchpoint: actions.removeWatchpoint,
 })(Scopes);

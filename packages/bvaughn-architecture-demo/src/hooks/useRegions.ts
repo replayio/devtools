@@ -4,7 +4,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { preCacheExecutionPointForTime } from "../suspense/PointsCache";
 
-export default function useLoadedRegions(client: ReplayClientInterface): LoadedRegions | null {
+export default function useRegions(client: ReplayClientInterface): LoadedRegions | null {
   const loadedRegions = useSyncExternalStore<LoadedRegions | null>(
     function subscribe(onStoreChange: () => void) {
       client.addEventListener("loadedRegionsChange", onStoreChange);

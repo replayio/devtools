@@ -116,7 +116,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
     content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
   },
   [SessionError.InactivityTimeout]: {
-    content: "Replays disconnect after 15 minutes to reduce server load.",
+    content: "This replay timed out to reduce server load.",
     message: "Ready when you are!",
   },
 };

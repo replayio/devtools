@@ -3,11 +3,13 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { MouseEvent } from "react";
 import { setModal } from "ui/actions/app";
+import { MY_LIBRARY } from "ui/components/UploadScreen/libraryConstants";
 import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
 import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+import Icon from "ui/components/shared/Icon";
 
 export function TeamButton({
   label,
@@ -24,7 +26,7 @@ export function TeamButton({
   const basePath = `/team/${id}`;
   const url = `${basePath}/${isTest ? "runs" : "recordings"}`;
   const isSelected = router.asPath.includes(basePath);
-  const showSettingsButton = id && isSelected && !isNew;
+  const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
 
   const onClick = () => {
@@ -47,8 +49,11 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
-          {label} {isTest && "(test)"}
+        <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+          <div className="flex">
+            <LibraryIcon teamType={isTest ? "tests" : "team"} />
+            {label}
+          </div>
         </span>
         {isNew ? (
           <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
@@ -57,6 +62,10 @@ export function TeamButton({
       </a>
     </Link>
   );
+}
+
+export function LibraryIcon({ teamType }: { teamType: string }) {
+  return <Icon filename={teamType} size="medium" className="mr-1 bg-gray-200" />;
 }
 
 export function SettingsButton() {
@@ -71,7 +80,7 @@ export function SettingsButton() {
   return (
     <button
       onClick={onClick}
-      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
+      className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
     >
       settings
     </button>

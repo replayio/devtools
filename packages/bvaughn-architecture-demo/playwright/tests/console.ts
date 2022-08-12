@@ -76,10 +76,12 @@ test("should display list of messages", async ({ page }) => {
   await expect(list).toContainText("This is a log");
   await expect(list).toContainText("This is a warning");
   await expect(list).toContainText("This is an error");
+  await expect(list).toContainText("Uncaught exception");
+  await toggleProtocolMessage(page, "showTimestamps", false);
 
   await takeScreenshot(page, list, "message-list");
 
-  await page.click("[data-test-id=FilterToggle-showTimestamps]");
+  await toggleProtocolMessage(page, "showTimestamps", true);
   await takeScreenshot(page, list, "message-list-with-timestamps");
 });
 
@@ -97,6 +99,7 @@ test("should display toggleable stack for errors", async ({ page }) => {
 test("should display toggleable stack for warnings", async ({ page }) => {
   await page.goto(URL);
 
+  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
@@ -121,6 +124,7 @@ test("should display toggleable stack for traces", async ({ page }) => {
 test("should display toggleable stack for exceptions", async ({ page }) => {
   await page.goto(URL);
 
+  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "exceptions", true);
 
   const listItem = page.locator("[data-test-name=Message]", {
@@ -136,6 +140,7 @@ test("should display toggleable stack for exceptions", async ({ page }) => {
 test("should expand and inspect arrays", async ({ page }) => {
   await page.goto(URL);
 
+  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
@@ -270,6 +275,7 @@ test("should be filterable", async ({ page }) => {
 
 test("should log events in the console", async ({ page }) => {
   await page.goto(URL);
+  await toggleProtocolMessage(page, "showTimestamps", false);
 
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
@@ -281,7 +287,7 @@ test("should log events in the console", async ({ page }) => {
     .first();
   await takeScreenshot(page, listItem, "event-types-mouse-click");
 
-  await page.click("[data-test-id=FilterToggle-showTimestamps]");
+  await toggleProtocolMessage(page, "showTimestamps", true);
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps");
 
   const keyValue = listItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
@@ -325,14 +331,14 @@ test("should be filterable on complex content", async ({ page }) => {
 test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
   await page.goto(URL);
 
-  await page.click("[data-test-id=FilterToggle-errors]");
-  await page.click("[data-test-id=FilterToggle-exceptions]");
-  await page.click("[data-test-id=FilterToggle-logs]");
+  await toggleProtocolMessages(page, false);
+  await toggleProtocolMessage(page, "warnings", true);
+  await toggleProtocolMessage(page, "hideNodeModules", false);
 
   const list = page.locator("[data-test-name=Messages]");
   await takeScreenshot(page, list, "filtered-all-warnings");
 
-  await page.click("[data-test-id=FilterToggle-hideNodeModules]");
+  await toggleProtocolMessage(page, "hideNodeModules", true);
   await takeScreenshot(page, list, "filtered-all-warnings-no-node-modules");
 });
 
@@ -356,10 +362,9 @@ test("should remember filter toggle preferences between reloads", async ({ page 
   await page.goto(URL);
 
   // Toggle everything off and screenshot
-  await page.click("[data-test-id=FilterToggle-errors]");
-  await page.click("[data-test-id=FilterToggle-exceptions]");
-  await page.click("[data-test-id=FilterToggle-logs]");
-  await page.click("[data-test-id=FilterToggle-warnings]");
+  await toggleProtocolMessages(page, false);
+  await toggleProtocolMessage(page, "hideNodeModules", false);
+  await toggleProtocolMessage(page, "showTimestamps", false);
   let filters = page.locator("[data-test-id=ConsoleFilterToggles]");
   await takeScreenshot(page, filters, "initial-side-filter-values");
 
@@ -369,12 +374,9 @@ test("should remember filter toggle preferences between reloads", async ({ page 
   await takeScreenshot(page, filters, "initial-side-filter-values");
 
   // Toggle everything on and screenshot
-  await page.click("[data-test-id=FilterToggle-errors]");
-  await page.click("[data-test-id=FilterToggle-exceptions]");
-  await page.click("[data-test-id=FilterToggle-logs]");
-  await page.click("[data-test-id=FilterToggle-warnings]");
-  await page.click("[data-test-id=FilterToggle-hideNodeModules]");
-  await page.click("[data-test-id=FilterToggle-showTimestamps]");
+  await toggleProtocolMessages(page, true);
+  await toggleProtocolMessage(page, "hideNodeModules", true);
+  await toggleProtocolMessage(page, "showTimestamps", true);
   await takeScreenshot(page, filters, "updated-side-filter-values");
 
   // Reload and verify screenshot unchanged
@@ -461,3 +463,6 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
+
+// TODO Add context menu test for setting focus range
+// TODO Add context menu test for setting log point badge colors

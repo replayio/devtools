@@ -1,6 +1,7 @@
 module.exports = {
   moduleNameMapper: {
     "^@bvaughn/(.*)": "<rootDir>/$1",
+    "^design/(.*)": "<rootDir>/../design/$1",
     "^protocol/(.*)": "<rootDir>/../protocol/$1",
     "^shared/(.*)": "<rootDir>/../shared/$1",
 

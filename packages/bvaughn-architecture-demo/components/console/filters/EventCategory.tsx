@@ -1,5 +1,6 @@
 import Expandable from "@bvaughn/components/Expandable";
 import type { EventCategory as EventCategoryType } from "@bvaughn/src/suspense/EventsCache";
+import { Badge } from "design";
 import { useMemo } from "react";
 
 import styles from "./EventCategory.module.css";
@@ -76,7 +77,7 @@ export default function EventCategory({
             data-test-id={`EventCategoryHeader-${eventCategory.category}`}
           >
             <span className={styles.Category}>{eventCategory.category}</span>
-            <span className={styles.Count}>{totalHitCount}</span>
+            <Badge label={totalHitCount} />
           </div>
         }
       />
