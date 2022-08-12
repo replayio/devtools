@@ -7,12 +7,27 @@ import { UIThunkAction } from "ui/actions";
 
 import { exceptionLogpointErrorCleared } from "devtools/client/webconsole/reducers/messages";
 
-import { clientCommands } from "../client/commands";
+import { removeLogpoint, setExceptionLogpoint, newLogGroupId } from "ui/actions/logpoint";
+
 import { getShouldLogExceptions, logExceptionsUpdated } from "../reducers/pause";
+
+let gExceptionLogpointGroupId: string | null;
+
+function setShouldLogExceptions(shouldLog: boolean) {
+  if (gExceptionLogpointGroupId) {
+    removeLogpoint(gExceptionLogpointGroupId);
+  }
+  if (shouldLog) {
+    gExceptionLogpointGroupId = newLogGroupId();
+    setExceptionLogpoint(gExceptionLogpointGroupId);
+  } else {
+    gExceptionLogpointGroupId = null;
+  }
+}
 
 export function setupExceptions(store: UIStore) {
   if (getShouldLogExceptions(store.getState())) {
-    clientCommands.setShouldLogExceptions(true);
+    setShouldLogExceptions(true);
   }
 }
 
@@ -25,7 +40,7 @@ export function logExceptions(shouldLogExceptions: boolean): UIThunkAction {
   return (dispatch, getState, { client }) => {
     dispatch(exceptionLogpointErrorCleared());
 
-    client.setShouldLogExceptions(shouldLogExceptions);
+    setShouldLogExceptions(shouldLogExceptions);
     dispatch(logExceptionsUpdated(shouldLogExceptions));
   };
 }

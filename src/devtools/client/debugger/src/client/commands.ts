@@ -8,13 +8,7 @@ import {
   SourceLocation as ProtocolSourceLocation,
   loadedRegions,
 } from "@replayio/protocol";
-import {
-  setLogpoint,
-  setLogpointByURL,
-  newLogGroupId,
-  setExceptionLogpoint,
-  removeLogpoint,
-} from "ui/actions/logpoint";
+import { setLogpoint, setLogpointByURL, newLogGroupId, removeLogpoint } from "ui/actions/logpoint";
 import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
 
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
@@ -143,20 +137,6 @@ export interface SourceRange {
   end: ProtocolSourceLocation;
 }
 
-let gExceptionLogpointGroupId: string | null;
-
-function setShouldLogExceptions(shouldLog: boolean) {
-  if (gExceptionLogpointGroupId) {
-    removeLogpoint(gExceptionLogpointGroupId);
-  }
-  if (shouldLog) {
-    gExceptionLogpointGroupId = newLogGroupId();
-    setExceptionLogpoint(gExceptionLogpointGroupId);
-  } else {
-    gExceptionLogpointGroupId = null;
-  }
-}
-
 export function prepareSourcePayload(source: {
   sourceId: string;
   url?: string;
@@ -174,7 +154,6 @@ const clientCommands = {
   setBreakpoint,
   removeBreakpoint,
   evaluate,
-  setShouldLogExceptions,
   fetchAncestorFramePositions,
 };
 
