@@ -37,10 +37,12 @@ export interface PauseFrame {
   location: Location;
   alternateLocation?: Location;
   this?: ValueFront;
-  source: null;
+  source: SourceDetails | null;
   index: number;
   asyncCause?: "async";
   state: "on-stack";
+  // Possibly added later client-side
+  library?: string;
 }
 
 // TBD

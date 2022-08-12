@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 // eslint-disable-next-line max-len
 import { getFilename } from "../../source";
@@ -15,7 +15,7 @@ const arrayProperty = /\[(.*?)\]$/;
 const functionProperty = /([\w\d]+)[\/\.<]*?$/;
 const annonymousProperty = /([\w\d]+)\(\^\)$/;
 
-export function simplifyDisplayName(displayName) {
+export function simplifyDisplayName(displayName?: string) {
   // if the display name has a space it has already been mapped
   if (!displayName || /\s/.exec(displayName)) {
     return displayName;
@@ -33,7 +33,7 @@ export function simplifyDisplayName(displayName) {
   return displayName;
 }
 
-const displayNameMap = {
+const displayNameMap: Record<string, Record<string, string>> = {
   Babel: {
     tryCatch: "Async",
   },
@@ -59,17 +59,18 @@ const displayNameMap = {
   },
 };
 
-function mapDisplayNames(frame, library) {
+function mapDisplayNames(frame: PauseFrame, library: keyof typeof displayNameMap) {
   const { displayName } = frame;
   return (displayNameMap[library] && displayNameMap[library][displayName]) || displayName;
 }
 
-function getFrameDisplayName(frame) {
+function getFrameDisplayName(frame: PauseFrame) {
+  // @ts-expect-error these fields really no longer exist on `frame`
   const { displayName, originalDisplayName, userDisplayName, name } = frame;
   return originalDisplayName || userDisplayName || displayName || name;
 }
 
-export function formatDisplayName(frame, { shouldMapDisplayName = true } = {}, l10n) {
+export function formatDisplayName(frame: PauseFrame, { shouldMapDisplayName = true } = {}) {
   const { library } = frame;
   let displayName = getFrameDisplayName(frame);
   if (library && shouldMapDisplayName) {
@@ -79,8 +80,8 @@ export function formatDisplayName(frame, { shouldMapDisplayName = true } = {}, l
   return simplifyDisplayName(displayName) || "<anonymous>";
 }
 
-export function formatCopyName(frame, l10n) {
-  const displayName = formatDisplayName(frame, undefined, l10n);
+export function formatCopyName(frame: PauseFrame) {
+  const displayName = formatDisplayName(frame, undefined);
   if (!frame.source) {
     throw new Error("no frame source");
   }

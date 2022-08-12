@@ -9,7 +9,6 @@ import type { PauseFrame } from "../reducers/pause";
 import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 import { getFrames } from "../reducers/pause";
 import { annotateFrames } from "../utils/pause/frames";
-import get from "lodash/get";
 import { createSelector } from "reselect";
 
 function getLocation(frame: PauseFrame) {
@@ -29,22 +28,24 @@ function appendSource(sources: Dictionary<SourceDetails>, frame: PauseFrame) {
   };
 }
 
-// eslint-disable-next-line
+// But re-exported because it's used elsewhere
+export const formatCallStackFrames = (
+  frames: PauseFrame[] | null,
+  sources: Dictionary<SourceDetails>
+) => {
+  if (!frames) {
+    return null;
+  }
+
+  const formattedFrames = frames
+    .filter(frame => getSourceForFrame(sources, frame))
+    .map(frame => appendSource(sources, frame));
+
+  return annotateFrames(formattedFrames);
+};
+
 export const getCallStackFrames = createSelector(
   getFrames,
   getSourceDetailsEntities,
-  (frames, sources) => {
-    if (!frames) {
-      return null;
-    }
-
-    const formattedFrames = frames
-      .filter(frame => getSourceForFrame(sources, frame))
-      .map(frame => appendSource(sources, frame));
-
-    return annotateFrames(formattedFrames);
-  }
+  formatCallStackFrames
 );
-
-// But re-exported because it's used elsewhere
-export const formatCallStackFrames = getCallStackFrames.resultFunc;
