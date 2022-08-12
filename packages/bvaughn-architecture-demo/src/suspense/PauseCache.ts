@@ -6,6 +6,7 @@ import {
   PauseId,
   Result,
 } from "@replayio/protocol";
+import { captureException } from "@sentry/browser";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -15,6 +16,7 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 
 const evaluationResultsMap: Map<ExecutionPoint, Record<Result>> = new Map();
 const executionPointToPauseMap: Map<ExecutionPoint, Record<createPauseResult>> = new Map();
+const executionPointToPauseIdMap: Map<ExecutionPoint, PauseId> = new Map();
 const pauseIdToPauseDataMap: Map<PauseId, Record<PauseData>> = new Map();
 
 export function evaluate(
@@ -61,6 +63,10 @@ export function getPauseData(client: ReplayClientInterface, pauseId: PauseId) {
   } else {
     throw record!.value;
   }
+}
+
+export function getCachedPauseIdForExecutionPoint(executionPoint: ExecutionPoint): PauseId | null {
+  return executionPointToPauseIdMap.get(executionPoint) || null;
 }
 
 export function getPauseForExecutionPoint(
@@ -164,11 +170,32 @@ async function fetchPauseId(
     record.status = STATUS_RESOLVED;
     record.value = pause;
 
+    trackExecutionPointPauseIds(executionPoint, pause.pauseId);
+
     wakeable.resolve(record.value);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;
 
     wakeable.reject(error);
+  }
+}
+
+export function trackExecutionPointPauseIds(
+  executionPoint: ExecutionPoint,
+  newPauseId: PauseId
+): void {
+  const firstPauseId = executionPointToPauseIdMap.get(executionPoint);
+  if (firstPauseId == null) {
+    executionPointToPauseIdMap.set(executionPoint, newPauseId);
+  } else if (firstPauseId !== newPauseId) {
+    const error = new Error(
+      `Point (${executionPoint}) has multiple pause ids (${firstPauseId}, ${newPauseId})`
+    );
+
+    // TODO Hook this up so that it fails our e2e tests if called.
+    captureException(error);
+
+    console.error(error);
   }
 }

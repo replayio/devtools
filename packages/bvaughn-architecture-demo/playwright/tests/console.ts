@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 
 import {
   hideSearchInput,
@@ -39,10 +39,12 @@ testSetup(async function regeneratorFunction({ page }) {
   // Global terminal expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
   await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/!");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
 
   // Load Pause data for local expressions
+  await toggleProtocolMessages(page, false);
+  await toggleProtocolMessage(page, "logs", true);
   const firstListItem = await page.locator("[data-test-name=Message]", {
     hasText: "This is a log",
   });
@@ -57,9 +59,9 @@ testSetup(async function regeneratorFunction({ page }) {
   await seekToMessage(page, lastListItem);
 
   // Event type data
+  await toggleProtocolMessages(page, false);
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
-
   const eventTypeListItem = page.locator("[data-test-name=Expandable]", {
     hasText: "MouseEvent",
   });
@@ -67,10 +69,16 @@ testSetup(async function regeneratorFunction({ page }) {
   await keyValue.click();
 });
 
-test("should display list of messages", async ({ page }) => {
+async function setup(page: Page, toggleState: boolean = false) {
   await page.goto(URL);
 
-  await toggleProtocolMessages(page, true);
+  await toggleProtocolMessages(page, toggleState);
+  await toggleProtocolMessage(page, "hideNodeModules", false);
+  await toggleProtocolMessage(page, "showTimestamps", false);
+}
+
+test("should display list of messages", async ({ page }) => {
+  await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
   await expect(list).toContainText("This is a log");
@@ -86,7 +94,9 @@ test("should display list of messages", async ({ page }) => {
 });
 
 test("should display toggleable stack for errors", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
+
+  await toggleProtocolMessage(page, "errors", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is an error" });
   await takeScreenshot(page, listItem, "error-stack-collapsed");
@@ -97,9 +107,8 @@ test("should display toggleable stack for errors", async ({ page }) => {
 });
 
 test("should display toggleable stack for warnings", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
-  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
@@ -111,7 +120,9 @@ test("should display toggleable stack for warnings", async ({ page }) => {
 });
 
 test("should display toggleable stack for traces", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
+
+  await toggleProtocolMessage(page, "logs", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a trace" });
   await takeScreenshot(page, listItem, "trace-stack-collapsed");
@@ -122,9 +133,8 @@ test("should display toggleable stack for traces", async ({ page }) => {
 });
 
 test("should display toggleable stack for exceptions", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
-  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "exceptions", true);
 
   const listItem = page.locator("[data-test-name=Message]", {
@@ -138,9 +148,8 @@ test("should display toggleable stack for exceptions", async ({ page }) => {
 });
 
 test("should expand and inspect arrays", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
-  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "warnings", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a warning" });
@@ -153,7 +162,9 @@ test("should expand and inspect arrays", async ({ page }) => {
 });
 
 test("should expand and inspect objects", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
+
+  await toggleProtocolMessage(page, "errors", true);
 
   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is an error" });
   await takeScreenshot(page, listItem, "object-collapsed");
@@ -169,7 +180,9 @@ test("should expand and inspect objects", async ({ page }) => {
 });
 
 test("should support seeking to a message execution point", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
+
+  await toggleProtocolMessage(page, "logs", true);
 
   const list = page.locator("[data-test-name=Messages]");
 
@@ -188,28 +201,31 @@ test("should support seeking to a message execution point", async ({ page }) => 
   await takeScreenshot(page, list, "message-list-seek-to-first-message");
 });
 
-test("should show an add-comment button for the current message", async ({ page }) => {
-  await page.goto(URL);
-
-  const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a log" });
-  await takeScreenshot(page, listItem, "list-item");
-
-  await listItem.hover();
-  await takeScreenshot(page, listItem, "list-item-hovered");
-
-  const fastForwardButton = page.locator("[data-test-id=ConsoleMessageHoverButton]");
-  await fastForwardButton.hover();
-  await takeScreenshot(page, listItem, "fast-forward-button-hovered");
-
-  await fastForwardButton.click();
-  await takeScreenshot(page, listItem, "add-comment-button-hovered");
-
-  await listItem.hover();
-  await takeScreenshot(page, listItem, "list-item-current");
-});
+// This test doesn't work currently because the "add comment" button is disabled when there's no accessToken.
+// test("should show an add-comment button for the current message", async ({ page }) => {
+//   await setup(page);
+//
+//   await toggleProtocolMessage(page, "logs", true);
+//
+//   const listItem = page.locator("[data-test-name=Message]", { hasText: "This is a log" });
+//   await takeScreenshot(page, listItem, "list-item");
+//
+//   await listItem.hover();
+//   await takeScreenshot(page, listItem, "list-item-hovered");
+//
+//   const fastForwardButton = page.locator("[data-test-id=ConsoleMessageHoverButton]");
+//   await fastForwardButton.hover();
+//   await takeScreenshot(page, listItem, "fast-forward-button-hovered");
+//
+//   await fastForwardButton.click();
+//   await takeScreenshot(page, listItem, "add-comment-button-hovered");
+//
+//   await listItem.hover();
+//   await takeScreenshot(page, listItem, "list-item-current");
+// });
 
 test("should show and hide search input when Enter and Escape are typed", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
   // Search should be hidden
   let searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
@@ -231,9 +247,7 @@ test("should show and hide search input when Enter and Escape are typed", async 
 });
 
 test("should be searchable", async ({ page }) => {
-  await page.goto(URL);
-
-  await toggleProtocolMessages(page, true);
+  await setup(page, true);
 
   await showSearchInput(page);
 
@@ -260,7 +274,7 @@ test("should be searchable", async ({ page }) => {
 });
 
 test("should be filterable", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page, true);
 
   await page.fill("[data-test-id=ConsoleFilterInput]", " an ");
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
@@ -274,8 +288,7 @@ test("should be filterable", async ({ page }) => {
 });
 
 test("should log events in the console", async ({ page }) => {
-  await page.goto(URL);
-  await toggleProtocolMessage(page, "showTimestamps", false);
+  await setup(page);
 
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
@@ -304,7 +317,7 @@ test("should log events in the console", async ({ page }) => {
 });
 
 test("should be searchable on complex content", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page, true);
 
   await showSearchInput(page);
 
@@ -318,7 +331,7 @@ test("should be searchable on complex content", async ({ page }) => {
 });
 
 test("should be filterable on complex content", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page, true);
 
   await page.fill("[data-test-id=ConsoleFilterInput]", "Array(3) [1, 2, 3]");
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
@@ -329,9 +342,8 @@ test("should be filterable on complex content", async ({ page }) => {
 });
 
 test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
-  await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "warnings", true);
   await toggleProtocolMessage(page, "hideNodeModules", false);
 
@@ -343,7 +355,7 @@ test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
 });
 
 test("should be able to toggle side filter menu open and closed", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "filters-side-menu-open");
@@ -359,7 +371,7 @@ test("should be able to toggle side filter menu open and closed", async ({ page 
 });
 
 test("should remember filter toggle preferences between reloads", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
 
   // Toggle everything off and screenshot
   await toggleProtocolMessages(page, false);
@@ -385,8 +397,10 @@ test("should remember filter toggle preferences between reloads", async ({ page 
   await takeScreenshot(page, filters, "updated-side-filter-values");
 });
 
-test("should evaluate and render local terminal expressions", async ({ page }) => {
-  await page.goto(URL);
+test("should evaluate terminal expressions at an execution point", async ({ page }) => {
+  await setup(page);
+
+  await toggleProtocolMessage(page, "logs", true);
 
   let firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);
@@ -397,26 +411,11 @@ test("should evaluate and render local terminal expressions", async ({ page }) =
   await toggleProtocolMessages(page, false);
 
   firstListItem = await page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, firstListItem, "local-terminal-expression-valid");
+  await takeScreenshot(page, firstListItem, "terminal-expression-at-execution-point");
 });
 
-test("should evaluate and render invalid local terminal expressions", async ({ page }) => {
-  await page.goto(URL);
-
-  let firstListItem = await page.locator("[data-test-name=Message]").first();
-  await seekToMessage(page, firstListItem);
-
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
-  await page.keyboard.press("Enter");
-
-  await toggleProtocolMessages(page, false);
-
-  firstListItem = await page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, firstListItem, "local-terminal-expression-invalid");
-});
-
-test("should evaluate and render global terminal expressions", async ({ page }) => {
-  await page.goto(URL);
+test("should evaluate terminal expressions without an execution point", async ({ page }) => {
+  await setup(page);
 
   await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
   await page.keyboard.press("Enter");
@@ -427,10 +426,10 @@ test("should evaluate and render global terminal expressions", async ({ page }) 
   await takeScreenshot(page, firstListItem, "global-terminal-expression-valid");
 });
 
-test("should evaluate and render invalid global terminal expressions", async ({ page }) => {
-  await page.goto(URL);
+test("should evaluate and render invalid terminal expressions", async ({ page }) => {
+  await setup(page);
 
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/!");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
   await page.keyboard.press("Enter");
 
   await toggleProtocolMessages(page, false);
@@ -439,7 +438,9 @@ test("should evaluate and render invalid global terminal expressions", async ({ 
 });
 
 test("should show a button to clear terminal expressions", async ({ page }) => {
-  await page.goto(URL);
+  await setup(page);
+
+  await toggleProtocolMessage(page, "logs", true);
 
   let firstListItem = await page.locator("[data-test-name=Message]").first();
   await seekToMessage(page, firstListItem);

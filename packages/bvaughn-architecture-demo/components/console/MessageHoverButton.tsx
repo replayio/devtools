@@ -4,7 +4,7 @@ import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
-import { ExecutionPoint, Location, PauseId } from "@replayio/protocol";
+import { ExecutionPoint, Location } from "@replayio/protocol";
 import {
   MouseEvent,
   unstable_useCacheRefresh as useCacheRefresh,
@@ -20,13 +20,11 @@ import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
 export default function MessageHoverButton({
   executionPoint,
   location,
-  pauseId,
   showAddCommentButton,
   time,
 }: {
   executionPoint: ExecutionPoint;
   location: Location | null;
-  pauseId: PauseId;
   showAddCommentButton: boolean;
   time: number;
 }) {
@@ -81,7 +79,7 @@ export default function MessageHoverButton({
       event.preventDefault();
       event.stopPropagation();
 
-      update(time, executionPoint, pauseId);
+      update(time, executionPoint);
 
       if (inspectFunctionDefinition !== null && location !== null) {
         inspectFunctionDefinition([location]);

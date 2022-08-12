@@ -1,3 +1,4 @@
+import { RecordingId } from "@replayio/protocol";
 import { useContext } from "react";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import { Recording } from "ui/types";
@@ -5,11 +6,11 @@ import { TeamContext } from "../../../TeamContextRoot";
 import Link from "next/link";
 import styles from "../../../../Library.module.css";
 
-function ViewReplay({ passed }: { passed: boolean }) {
+function ViewReplay({ passed, recordingId }: { passed: boolean; recordingId: RecordingId }) {
   return (
     <Link href={`/recording/${recordingId}`}>
       <a
-        className="flex items-center justify-center p-2 transition cursor-pointer group"
+        className="group flex cursor-pointer items-center justify-center p-2 transition"
         onClick={e => e.stopPropagation()}
       >
         <MaterialIcon
@@ -21,7 +22,7 @@ function ViewReplay({ passed }: { passed: boolean }) {
               : "text-red-500 group-hover:text-red-400"
           }
         >
-          {passed ? "play_circle_filled" : "play_circle" }          
+          {passed ? "play_circle_filled" : "play_circle"}
         </MaterialIcon>
       </a>
     </Link>
@@ -30,8 +31,8 @@ function ViewReplay({ passed }: { passed: boolean }) {
 
 function Title({ recording }: { recording: Recording }) {
   return (
-    <div className="flex flex-row items-center flex-grow space-x-2 overflow-hidden hover:cursor-pointer">
-      <div className="flex flex-col flex-grow py-2 overflow-hidden">
+    <div className="flex flex-grow flex-row items-center space-x-2 overflow-hidden hover:cursor-pointer">
+      <div className="flex flex-grow flex-col overflow-hidden py-2">
         {recording.metadata?.test?.title}
         <div className="text-xs text-gray-500">{recording.metadata?.test?.file}</div>
       </div>
@@ -45,7 +46,7 @@ function Comments({ recording }: { recording: Recording }) {
     return null;
   }
   return (
-    <div className="flex flex-row space-x-1 text-gray-600 align-items-center">
+    <div className="align-items-center flex flex-row space-x-1 text-gray-600">
       <img src="/images/comment-outline.svg" className="w-3" />
       <span>{numComments}</span>
     </div>
@@ -58,7 +59,7 @@ function FilterByTestButton({ recording }: { recording: Recording }) {
 
   return (
     <Link href={`/team/${teamId}/results?q=test-path:${path}`}>
-      <a className="p-2 overflow-hidden text-left whitespace-pre opacity-0 max-w-min overflow-ellipsis hover:underline group-hover:opacity-100 hover:bg-gray-200">
+      <a className="max-w-min overflow-hidden overflow-ellipsis whitespace-pre p-2 text-left opacity-0 hover:bg-gray-200 hover:underline group-hover:opacity-100">
         <MaterialIcon>filter_alt</MaterialIcon>
       </a>
     </Link>
@@ -72,15 +73,15 @@ export function TestResultListItem({ recording }: { recording: Recording }) {
 
   return (
     <div
-      className={`flex flex-row grow group items-center px-2 transition duration-150 ${styles.libraryRow}`}
+      className={`group flex grow flex-row items-center px-2 transition duration-150 ${styles.libraryRow}`}
     >
       <Link href={`/recording/${recordingId}`}>
         <a
-          className="flex items-center justify-center flex-grow p-2 space-x-2 transition cursor-pointer group"
+          className="group flex flex-grow cursor-pointer items-center justify-center space-x-2 p-2 transition"
           target="_blank"
           rel="noopener noreferrer"
         >
-          <ViewReplay passed={passed} />
+          <ViewReplay passed={passed} recordingId={recordingId} />
           <Title recording={recording} />
         </a>
       </Link>
