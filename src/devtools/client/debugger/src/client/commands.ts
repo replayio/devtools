@@ -104,18 +104,6 @@ function removeBreakpoint(location: SourceLocation) {
   return ThreadFront.removeBreakpointByURL(sourceUrl!, line, column!);
 }
 
-function runAnalysis(location: SourceLocation, options: InitialBreakpointOptions) {
-  const finalOptions = maybeGenerateLogGroupId(options);
-  const { condition, logValue, logGroupId } = finalOptions;
-  const { line, column, sourceUrl, sourceId } = location;
-
-  if (sourceId) {
-    setLogpoint(logGroupId!, { sourceId, line, column: column! }, logValue!, condition!);
-  } else {
-    setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue!, condition!);
-  }
-}
-
 export interface EvaluateOptions {
   asyncIndex?: number;
   frameId?: string;
@@ -185,7 +173,6 @@ const clientCommands = {
   autocomplete,
   setBreakpoint,
   removeBreakpoint,
-  runAnalysis,
   evaluate,
   setShouldLogExceptions,
   fetchAncestorFramePositions,

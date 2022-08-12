@@ -154,29 +154,6 @@ export function addBreakpoint(
   };
 }
 
-export function runAnalysis(
-  cx: Context,
-  initialLocation: Location,
-  options: Breakpoint["options"]
-): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
-    const location = getFirstBreakpointPosition(getState(), initialLocation);
-
-    if (!location) {
-      return;
-    }
-
-    // Don't run the analysis if we already have the analysis points for that
-    // location.
-    const analysisPoints = getAnalysisPointsForLocation(getState(), location, options.condition);
-    if (analysisPoints) {
-      return;
-    }
-
-    client.runAnalysis(location, options);
-  };
-}
-
 export function _removeBreakpoint(
   cx: Context,
   initialBreakpoint: Breakpoint

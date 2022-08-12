@@ -37,7 +37,6 @@ import {
   addBreakpoint,
   enableBreakpoint,
   disableBreakpoint,
-  runAnalysis,
 } from "./modify";
 
 export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
