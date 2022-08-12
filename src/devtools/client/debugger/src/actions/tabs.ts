@@ -52,7 +52,7 @@ export function moveTabBySourceId(sourceId: string, tabIndex: number) {
  * @static
  */
 export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
-  return (dispatch, getState, { client }) => {
+  return (dispatch, getState) => {
     removeDocument(source.id);
 
     const tabs = getSourceTabs(getState());
@@ -68,7 +68,7 @@ export function closeTab(cx: Context, source: MiniSource): UIThunkAction {
  * @static
  */
 export function closeTabs(cx: Context, urls: string[]): UIThunkAction {
-  return (dispatch, getState, { client }) => {
+  return (dispatch, getState) => {
     const sources = urls.map(url => getSourceByUrl(getState(), url)!).filter(Boolean);
 
     const tabs = getSourceTabs(getState());

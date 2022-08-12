@@ -2,16 +2,10 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-import {
-  ScopeType,
-  SourceLocation as ProtocolSourceLocation,
-  loadedRegions,
-} from "@replayio/protocol";
 import { setLogpoint, setLogpointByURL, newLogGroupId, removeLogpoint } from "ui/actions/logpoint";
-import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thread";
+import type { ThreadFront as TF } from "protocol/thread";
 
-import type { BreakpointOptions, SourceLocation } from "../reducers/types";
+import type { BreakpointOptions, SourceLocation } from "../../reducers/types";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -27,12 +21,7 @@ interface BreakpointDetails {
   options: FinalBreakpointOptions;
 }
 
-let currentTarget: any;
 let breakpoints: Record<string, BreakpointDetails> = {};
-
-function setupCommands() {
-  breakpoints = {};
-}
 
 // Get the string key to use for a breakpoint location.
 // See also duplicate code in breakpoint-actor-map.js :(
@@ -57,7 +46,11 @@ async function maybeClearLogpoint(location: SourceLocation) {
   }
 }
 
-function setBreakpoint(location: SourceLocation, options: InitialBreakpointOptions) {
+export function _internalSetBreakpoint(
+  ThreadFront: typeof TF,
+  location: SourceLocation,
+  options: InitialBreakpointOptions
+) {
   maybeClearLogpoint(location);
   const finalOptions = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options: finalOptions };
@@ -87,7 +80,7 @@ function setBreakpoint(location: SourceLocation, options: InitialBreakpointOptio
   return Promise.all(promises);
 }
 
-function removeBreakpoint(location: SourceLocation) {
+export function _internalRemoveBreakpoint(ThreadFront: typeof TF, location: SourceLocation) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
 
@@ -97,10 +90,3 @@ function removeBreakpoint(location: SourceLocation) {
   }
   return ThreadFront.removeBreakpointByURL(sourceUrl!, line, column!);
 }
-
-const clientCommands = {
-  setBreakpoint,
-  removeBreakpoint,
-};
-
-export { setupCommands, clientCommands };

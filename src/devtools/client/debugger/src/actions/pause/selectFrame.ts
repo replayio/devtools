@@ -23,7 +23,7 @@ interface TempFrame {
  * @static
  */
 export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
-  return async (dispatch, getState, { client, ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     // Frames that aren't on-stack do not support evalling and may not
     // have live inspectable scopes, so we do not allow selecting them.
     if (frame.state !== "on-stack") {

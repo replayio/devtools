@@ -11,7 +11,7 @@ import { getSelectedFrame } from "../../selectors";
 type $FixTypeLater = any;
 
 export function setFramePositions(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client, ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront }) => {
     const frame = getSelectedFrame(getState());
     if (!frame) {
       return;

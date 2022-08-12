@@ -7,7 +7,6 @@ import "devtools/client/inspector/prefs";
 import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
 import { setupExceptions } from "devtools/client/debugger/src/actions/logExceptions";
 import * as dbgClient from "devtools/client/debugger/src/client";
-import { clientCommands } from "devtools/client/debugger/src/client/commands";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
@@ -178,7 +177,6 @@ export default async function DevTools(store: AppStore) {
   bootstrapWorkers();
 
   const extraThunkArgs: ThunkExtraArgs = {
-    client: clientCommands,
     ThreadFront: ThreadFront,
   };
 

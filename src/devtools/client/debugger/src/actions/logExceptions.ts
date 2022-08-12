@@ -37,7 +37,7 @@ export function setupExceptions(store: UIStore) {
  * @static
  */
 export function logExceptions(shouldLogExceptions: boolean): UIThunkAction {
-  return (dispatch, getState, { client }) => {
+  return dispatch => {
     dispatch(exceptionLogpointErrorCleared());
 
     setShouldLogExceptions(shouldLogExceptions);

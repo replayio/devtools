@@ -10,7 +10,6 @@ import { allSourcesReceived } from "ui/reducers/sources";
 import { initialBreakpointsState } from "../reducers/breakpoints";
 import { asyncStore, verifyPrefSchema } from "../utils/prefs";
 
-import { setupCommands } from "./commands";
 import { resumed, paused } from "../actions/pause";
 
 export async function loadInitialState() {
@@ -61,7 +60,6 @@ export function bootstrap(_store: UIStore, ThreadFront: typeof TF) {
   setupDebugger(ThreadFront);
 
   verifyPrefSchema();
-  setupCommands();
 
   ThreadFront.on(
     "paused",

@@ -38,14 +38,14 @@ export async function setupEventListeners(store: UIStore) {
 }
 
 function updateEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
+  return async dispatch => {
     dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
     await setEventLogpoints(newEvents);
   };
 }
 
 function setEventListeners(newEvents: string[]): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { client }) => {
+  return async () => {
     await setEventLogpoints(newEvents);
   };
 }
@@ -100,7 +100,7 @@ export function removeEventListenerExpanded(category: string): UIThunkAction {
 }
 
 export function getEventListenerBreakpointTypes(): UIThunkAction<Promise<void>> {
-  return async (dispatch, _, { client }) => {
+  return async dispatch => {
     const categories = getAvailableEventBreakpoints();
     dispatch({ type: "RECEIVE_EVENT_LISTENER_TYPES", categories });
 
