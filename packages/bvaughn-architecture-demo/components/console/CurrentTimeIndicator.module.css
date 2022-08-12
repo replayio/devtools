@@ -1,0 +1,5 @@
+.CurrentTimeIndicator {
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-current);
+}
