@@ -5,6 +5,7 @@
 //
 
 import { getAvailableEventBreakpoints } from "devtools/server/actors/utils/event-breakpoints";
+import { setEventLogpoints } from "ui/actions/logpoint";
 import remove from "lodash/remove";
 import uniq from "lodash/uniq";
 import type { UIThunkAction } from "ui/actions";
@@ -39,13 +40,13 @@ export async function setupEventListeners(store: UIStore) {
 function updateEventListeners(newEvents: $FixTypeLater[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
     dispatch({ type: "UPDATE_EVENT_LISTENERS", active: newEvents });
-    await client.setEventListenerBreakpoints(newEvents);
+    await setEventLogpoints(newEvents);
   };
 }
 
 function setEventListeners(newEvents: string[]): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { client }) => {
-    await client.setEventListenerBreakpoints(newEvents);
+    await setEventLogpoints(newEvents);
   };
 }
 

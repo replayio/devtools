@@ -14,14 +14,14 @@
 
 .FilterInput {
   width: 100%;
-  height: 2rem;
-  padding: 0 0.5ch;
+  height: 1.5rem;
+  padding: 0 0.25rem;
+  border-radius: 0.25rem;
   background: none;
   border: 2px solid transparent;
   outline: none;
   background-color: var(--background-color-default);
   color: var(--color-default);
-  font-family: Menlo, Consolas, monospace;
   font-size: var(--font-size-regular);
 }
 .FilterInput:focus {

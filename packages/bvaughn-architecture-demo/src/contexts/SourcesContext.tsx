@@ -1,12 +1,5 @@
 import { SourceId } from "@replayio/protocol";
-import {
-  createContext,
-  PropsWithChildren,
-  useCallback,
-  useMemo,
-  useReducer,
-  useState,
-} from "react";
+import { createContext, PropsWithChildren, useCallback, useMemo, useReducer } from "react";
 
 type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;

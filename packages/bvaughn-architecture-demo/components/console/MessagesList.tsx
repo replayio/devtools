@@ -7,6 +7,7 @@ import {
   isPointInstance,
   isProtocolMessage,
   isTerminalExpression,
+  isUncaughtException,
 } from "@bvaughn/src/utils/loggables";
 import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
@@ -19,6 +20,7 @@ import EventLogRenderer from "./renderers/EventLogRenderer";
 import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
+import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
 import { SearchContext } from "./SearchContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { isPointInRegions } from "shared/utils/time";
@@ -121,6 +123,15 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             terminalExpression={loggable}
+          />
+        );
+      } else if (isUncaughtException(loggable)) {
+        listItems.push(
+          <UncaughtExceptionRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            uncaughtException={loggable}
           />
         );
       } else {

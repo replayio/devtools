@@ -1,6 +1,7 @@
 import { Message, TimeStampedPointRange } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
+import { isFirefoxInternalMessage } from "../utils/messages";
 
 import { createWakeable } from "../utils/suspense";
 import {
@@ -17,6 +18,20 @@ export type ProtocolMessage = Message & {
   type: "ProtocolMessage";
 };
 
+export type CategoryCounts = {
+  errors: number;
+  logs: number;
+  warnings: number;
+};
+
+type MessageData = {
+  categoryCounts: CategoryCounts;
+  countAfter: number;
+  countBefore: number;
+  didOverflow: boolean;
+  messages: ProtocolMessage[];
+};
+
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,
 // but could this cause problems if React wants to render a high-priority update while a lower one is suspended?
@@ -28,26 +43,20 @@ let lastFetchDidOverflow: boolean = false;
 let lastFetchedFocusRange: TimeStampedPointRange | null = null;
 let lastFetchedMessages: ProtocolMessage[] | null = null;
 
-let lastFilteredFocusRange: TimeStampedPointRange | null = null;
-let lastFilteredMessages: ProtocolMessage[] | null = null;
+let lastFilteredCategoryCounts: CategoryCounts | null = null;
 let lastFilteredCountAfter: number = 0;
 let lastFilteredCountBefore: number = 0;
-
-type getMessagesResponse = {
-  countAfter: number;
-  countBefore: number;
-  didOverflow: boolean;
-  messages: ProtocolMessage[];
-};
+let lastFilteredFocusRange: TimeStampedPointRange | null = null;
+let lastFilteredMessages: ProtocolMessage[] | null = null;
 
 // Synchronously returns an array of filtered Messages,
 // or throws a Wakeable to be resolved once messages have been fetched.
 //
-// This method is Suspense friend; it is meant to be called from a React component during render.
+// This method is Suspense friendly; it is meant to be called from a React component during render.
 export function getMessages(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null
-): getMessagesResponse {
+): MessageData {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
     // Edge case scenario handling.
     // The backend throws if both points in a range are the same.
@@ -57,6 +66,11 @@ export function getMessages(
       countBefore: -1,
       didOverflow: false,
       messages: [],
+      categoryCounts: {
+        errors: 0,
+        logs: 0,
+        warnings: 0,
+      },
     };
   }
 
@@ -100,6 +114,8 @@ export function getMessages(
     throw inFlightWakeable;
   }
 
+  // TODO (FE-533) Filter Firefox internal browser exceptions (see isFirefoxInternalMessage)
+
   // At this point, messages have been fetched but we may still need to filter them.
   // For performance reasons (both in this function and on things that consume the filtered list)
   // it's best if we memoize this operation (by comparing ranges) to avoid recreating the filtered array.
@@ -108,7 +124,14 @@ export function getMessages(
       lastFilteredFocusRange = null;
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
-      lastFilteredMessages = lastFetchedMessages;
+
+      // HACK
+      // Even if we aren't focused, the frontend needs to filter out Firefox internal messages.
+      // This is something the runtime should probably do.
+      // See BAC-2063
+      lastFilteredMessages = lastFetchedMessages!.filter(
+        message => !isFirefoxInternalMessage(message)
+      );
     } else {
       const beginPoint = focusRange.begin.point;
       const endPoint = focusRange.end.point;
@@ -117,6 +140,11 @@ export function getMessages(
       lastFilteredCountAfter = 0;
       lastFilteredCountBefore = 0;
       lastFilteredMessages = lastFetchedMessages!.filter(message => {
+        // HACK See BAC-2063
+        if (isFirefoxInternalMessage(message)) {
+          return false;
+        }
+
         const point = message.point.point;
         if (isExecutionPointsLessThan(point, beginPoint)) {
           lastFilteredCountBefore++;
@@ -129,12 +157,39 @@ export function getMessages(
         }
       });
     }
+
+    let errors = 0;
+    let logs = 0;
+    let warnings = 0;
+
+    lastFilteredMessages!.forEach(message => {
+      switch (message.level) {
+        case "assert":
+        case "info":
+        case "trace":
+          logs++;
+          break;
+        case "error":
+          errors++;
+          break;
+        case "warning":
+          warnings++;
+          break;
+      }
+    });
+
+    lastFilteredCategoryCounts = {
+      errors,
+      logs,
+      warnings,
+    };
   }
 
   // Note that the only time when it's safe for us to specify the number of trimmed messages
   // is when we are trimming from the complete set of messages (aka no focus region).
   // Otherwise even if we do trim some messages locally, the number isn't meaningful.
   return {
+    categoryCounts: lastFilteredCategoryCounts!,
     countAfter: lastFetchedFocusRange === null ? lastFilteredCountAfter : -1,
     countBefore: lastFetchedFocusRange === null ? lastFilteredCountBefore : -1,
     didOverflow: lastFetchDidOverflow,
