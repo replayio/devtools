@@ -4,6 +4,7 @@
 
 import React, { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { Dictionary } from "@reduxjs/toolkit";
 import fuzzyAldrin from "fuzzaldrin-plus";
 
 import type { UIState } from "ui/state";
@@ -28,7 +29,7 @@ import {
   getSelectedSource,
   getSourcesLoading,
   getSourceContentsLoaded,
-  getSourceDetailsEntities,
+  getSourcesToDisplayByUrl,
   SourceDetails,
 } from "ui/reducers/sources";
 import { setViewMode } from "ui/actions/layout";
@@ -79,11 +80,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
     this.state = {
       results: props.showOnlyOpenSources
-        ? this.formatSources(
-            props.sourcesForTabs,
-            props.displayedSources as Record<string, SourceDetails>,
-            props.tabs
-          )
+        ? this.formatSources(props.sourcesToDisplayByUrl, props.tabs, false)
         : null,
       selectedIndex: 0,
     };
@@ -133,35 +130,23 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
 
   formatSources = memoizeLast(
     (
-      sourceList: PropsFromRedux["sourceList"],
-      sourcesById: Record<string, SourceDetails>,
-      tabs: { url: string }[]
+      sourcesToDisplayByUrl: Dictionary<SourceDetails>,
+      tabs: { url: string }[],
+      onlySourcesInTabs: boolean
     ) => {
       const tabUrls = new Set(tabs.map(tab => tab.url));
-      return formatSources(sourceList, sourcesById, tabUrls);
+      return formatSources(sourcesToDisplayByUrl, tabUrls, onlySourcesInTabs);
     }
   );
 
   searchSources = (query: string) => {
-    const {
-      sourceList,
-      tabs,
-      showOnlyOpenSources,
-      sourcesForTabs,
-      displayedSources,
-      sourcesLoading,
-    } = this.props;
+    const { tabs, showOnlyOpenSources, sourcesLoading, sourcesToDisplayByUrl } = this.props;
 
     if (sourcesLoading) {
       return null;
     }
 
-    const targetSourceList = showOnlyOpenSources ? sourcesForTabs : sourceList;
-    const sources = this.formatSources(
-      targetSourceList,
-      displayedSources as Record<string, SourceDetails>,
-      tabs
-    );
+    const sources = this.formatSources(sourcesToDisplayByUrl, tabs, showOnlyOpenSources);
     const results = query == "" ? sources : filter(sources, this.dropGoto(query));
     return this.setResults(results);
   };
@@ -193,22 +178,9 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
   };
 
   showTopSources = () => {
-    const { sourceList, tabs, displayedSources } = this.props;
+    const { tabs, sourcesToDisplayByUrl } = this.props;
     const tabUrls = new Set(tabs.map(tab => tab.url));
-
-    if (tabs.length > 0) {
-      this.setResults(
-        formatSources(
-          sourceList.filter(source => !!source.url && tabUrls.has(source.url)),
-          displayedSources as Record<string, SourceDetails>,
-          tabUrls
-        )
-      );
-    } else {
-      this.setResults(
-        formatSources(sourceList, displayedSources as Record<string, SourceDetails>, tabUrls)
-      );
-    }
+    this.setResults(formatSources(sourcesToDisplayByUrl, tabUrls, tabs.length > 0));
   };
 
   getDebounceMs = () => {
@@ -513,7 +485,7 @@ function mapStateToProps(state: UIState) {
 
   return {
     cx: getContext(state),
-    displayedSources: getSourceDetailsEntities(state),
+    sourcesToDisplayByUrl: getSourcesToDisplayByUrl(state),
     enabled: getQuickOpenEnabled(state),
     globalFunctions: getGlobalFunctions(state) || [],
     globalFunctionsLoading: isGlobalFunctionsLoading(state),
@@ -525,7 +497,6 @@ function mapStateToProps(state: UIState) {
       : undefined,
     selectedSource,
     showOnlyOpenSources: getShowOnlyOpenSources(state),
-    sourceList,
     sourcesForTabs: getSourcesForTabs(state),
     sourceCount: sourceList.length,
     sourcesLoading: getSourcesLoading(state),

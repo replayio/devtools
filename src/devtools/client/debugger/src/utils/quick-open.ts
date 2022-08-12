@@ -61,7 +61,7 @@ export function parseLineColumn(query: string) {
   }
 }
 
-export function formatSourcesForList(source: SourceDetails, tabUrls: Set<string>) {
+function formatSourceForList(source: SourceDetails, tabUrls: Set<string>) {
   const title = getTruncatedFileName(source);
   const relativeUrlWithQuery = `${source.url}${getSourceQueryString(source) || ""}`;
   const subtitle = endTruncateStr(relativeUrlWithQuery, 100);
@@ -147,25 +147,21 @@ export function formatShortcutResults() {
 }
 
 export function formatSources(
-  sources: SourceDetails[],
-  sourcesById: Record<string, SourceDetails>,
-  tabUrls: Set<string>
+  sourcesToDisplayByUrl: Dictionary<SourceDetails>,
+  tabUrls: Set<string>,
+  onlySourcesInTabs: boolean,
 ) {
   const formattedSources = [];
-  const sourceURLs = new Set();
 
-  for (let source of sources) {
-    if (!source.url || source.url.includes("webpack-internal") || source.url.includes(".css")) {
+  for (const url in sourcesToDisplayByUrl) {
+    if (onlySourcesInTabs && !tabUrls.has(url)) {
       continue;
     }
-
-    const sourceToShow = sourcesById[sourcesById[source.id].correspondingSourceIds[0]];
-
-    // Only show a single entry per file URL
-    if (sourceToShow?.url && !sourceURLs.has(sourceToShow.url)) {
-      formattedSources.push(formatSourcesForList(sourceToShow, tabUrls));
-      sourceURLs.add(sourceToShow.url);
+    if (url.includes("webpack-internal") || url.includes(".css")) {
+      continue;
     }
+    const sourceToDisplay = sourcesToDisplayByUrl[url]!;
+    formattedSources.push(formatSourceForList(sourceToDisplay, tabUrls));
   }
 
   return formattedSources;

@@ -133,10 +133,11 @@ function findSource(url: string) {
     return url;
   }
 
-  const sources = dbgSelectors.getAllSourceDetails();
-  const firstSourceMatchingUrl = sources.find(s => (s.url || "").includes(url));
-  if (firstSourceMatchingUrl) {
-    return dbgSelectors.getSourceDetails(firstSourceMatchingUrl.correspondingSourceIds[0]);
+  const sourcesByUrl = dbgSelectors.getSourcesToDisplayByUrl();
+  for (const sourceUrl in sourcesByUrl) {
+    if (sourceUrl.includes(url)) {
+      return sourcesByUrl[sourceUrl];
+    }
   }
 }
 

@@ -1,5 +1,6 @@
 import {
   createEntityAdapter,
+  createSelector,
   createSlice,
   Dictionary,
   EntityState,
@@ -296,24 +297,39 @@ export const isPrettyPrintedSource = (sd: SourceDetails) => {
   return !!sd.prettyPrintedFrom;
 };
 
-export function getBestSourceMappedSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
+export function getBestSourceMappedSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[]
+) {
   return sourceIds.find(sourceId => {
     const source = sourcesById[sourceId];
     assert(source, `unknown source ${sourceId}`);
-    return source.isSourceMapped && !source.generatedFrom.some(originalId => sourceIds.includes(originalId));
+    return (
+      source.isSourceMapped &&
+      !source.generatedFrom.some(originalId => sourceIds.includes(originalId))
+    );
   });
 }
 
-export function getBestNonSourceMappedSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
+export function getBestNonSourceMappedSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[]
+) {
   return sourceIds.find(sourceId => {
     const source = sourcesById[sourceId];
     assert(source, `unknown source ${sourceId}`);
-    return !source.isSourceMapped && !source.generatedFrom.some(originalId => sourceIds.includes(originalId));
+    return (
+      !source.isSourceMapped &&
+      !source.generatedFrom.some(originalId => sourceIds.includes(originalId))
+    );
   });
 }
 
 export function getPreferredSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
-  return getBestSourceMappedSourceId(sourcesById, sourceIds) || getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+  return (
+    getBestSourceMappedSourceId(sourcesById, sourceIds) ||
+    getBestNonSourceMappedSourceId(sourcesById, sourceIds)
+  );
 }
 
 export function getAlternateSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
@@ -332,12 +348,25 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
 
 export function getSourceIdToDisplayById(state: UIState, sourceId: string) {
   return getCorrespondingSourceIds(state, sourceId)![0];
-};
+}
 
 export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
   const sourceIdToDisplay = getSourceIdToDisplayById(state, sourceId);
   return sourceIdToDisplay ? getSourceDetails(state, sourceIdToDisplay) : undefined;
 };
+
+export const getSourcesToDisplayByUrl = createSelector(
+  [(state: UIState) => state.sources.sourcesByUrl, getSourceDetailsEntities],
+  (sourceIdsByUrl, sourceDetailsById) => {
+    const sourcesToDisplay: Dictionary<SourceDetails> = {};
+    for (const url in sourceIdsByUrl) {
+      let sourceId = getPreferredSourceId(sourceDetailsById, sourceIdsByUrl[url])!;
+      sourceId = sourceDetailsById[sourceId]!.correspondingSourceIds[0];
+      sourcesToDisplay[url] = sourceDetailsById[sourceId];
+    }
+    return sourcesToDisplay;
+  }
+);
 
 export function getSourceIdToDisplayForUrl(state: UIState, url: string) {
   const sourceIds = state.sources.sourcesByUrl[url];
@@ -346,7 +375,7 @@ export function getSourceIdToDisplayForUrl(state: UIState, url: string) {
   }
   const preferred = getPreferredSourceId(state.sources.sourceDetails.entities, sourceIds)!;
   return getCorrespondingSourceIds(state, preferred)![0];
-};
+}
 
 export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
   const sourceId = getSourceIdToDisplayForUrl(state, url);
@@ -399,6 +428,7 @@ export const selectors = {
   getSourceIdToDisplayById,
   getSourceToDisplayForUrl,
   getSourceIdToDisplayForUrl,
+  getSourcesToDisplayByUrl,
 };
 
 export default sourcesSlice.reducer;
