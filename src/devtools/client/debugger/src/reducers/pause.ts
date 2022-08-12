@@ -130,7 +130,7 @@ export const executeCommandOperation = createAsyncThunk<
 // Isn't this a lovely type lookup?
 type ProtocolScope = Awaited<ReturnType<typeof ThreadFront["getScopes"]>>["scopes"][number];
 
-interface ConvertedScope {
+export interface ConvertedScope {
   actor: string;
   parent: ConvertedScope | null;
   bindings: WiredNamedValue[] | undefined;
@@ -485,7 +485,7 @@ export function getFramesErrored(state: UIState) {
   return state.pause.framesErrored;
 }
 
-export function getFrameScope(state: UIState, frameId: string) {
+export function getFrameScope(state: UIState, frameId?: string) {
   if (!frameId) {
     return null;
   }
