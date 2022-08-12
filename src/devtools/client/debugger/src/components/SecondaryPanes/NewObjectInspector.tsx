@@ -56,10 +56,10 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
   }, [pause, roots]);
 
   return (
-    <div className={`${styles.Popup} preview-popup`}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <div className={`${styles.Popup} preview-popup`}>
         <Suspense fallback={<Loader />}>{children}</Suspense>
-      </ErrorBoundary>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }

@@ -53,8 +53,6 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 
-import ReplayLogo from "../shared/ReplayLogo";
-
 import styles from "./NewConsole.module.css";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
@@ -416,12 +414,4 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   );
 
   return <TimelineContext.Provider value={context}>{children}</TimelineContext.Provider>;
-}
-
-function Loader() {
-  return (
-    <div className={styles.Loader}>
-      <ReplayLogo size="md" color="gray" />
-    </div>
-  );
 }
