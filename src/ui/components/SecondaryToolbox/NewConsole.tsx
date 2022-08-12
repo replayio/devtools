@@ -33,8 +33,10 @@ import {
   SessionContext,
   SessionContextType,
 } from "bvaughn-architecture-demo/src/contexts/SessionContext";
+import { getCachedPauseIdForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
 import { Range } from "bvaughn-architecture-demo/src/types";
-import { getLogPointsList, getPauseId } from "devtools/client/debugger/src/selectors";
+import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
+import { getLogPointsList } from "devtools/client/debugger/src/selectors";
 import {
   messagesClearEvaluations,
   onViewSourceInDebugger,
@@ -49,18 +51,11 @@ import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
 import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
-import {
-  displayedBeginForFocusRegion,
-  displayedEndForFocusRegion,
-  rangeForFocusRegion,
-} from "ui/utils/timeline";
+import { rangeForFocusRegion } from "ui/utils/timeline";
 
 import ReplayLogo from "../shared/ReplayLogo";
 
 import styles from "./NewConsole.module.css";
-import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
-import { getPauseIdForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -148,7 +143,7 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
   }, [focusRegion, loadedRegions]);
 
   const update = useCallback(
-    (value: Range | null, debounce: boolean) => {
+    (value: Range | null, _: boolean) => {
       dispatch(
         setFocusRegion(
           value !== null
@@ -365,8 +360,6 @@ function TerminalContextReduxAdapter({ children }: PropsWithChildren) {
 
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.
 function TimelineContextAdapter({ children }: PropsWithChildren) {
-  const client = useContext(ReplayClientContext);
-
   const [state, setState] = useState<Omit<TimelineContextType, "isPending" | "update">>({
     executionPoint: "0",
     time: 0,
@@ -375,25 +368,36 @@ function TimelineContextAdapter({ children }: PropsWithChildren) {
   const [isPending, startTransition] = useTransition();
 
   const dispatch = useAppDispatch();
-  const pauseId = useAppSelector(getPauseId);
   const time = useAppSelector(getCurrentTime);
   const executionPoint = useAppSelector(getCurrentPoint) || "0";
 
   const update = useCallback(
     async (time: number, executionPoint: ExecutionPoint) => {
-      const pauseId = getPauseIdForExecutionPoint(client, executionPoint);
+      let pauseId: PauseId | null = null;
 
-      if (!Pause.getById(pauseId)) {
-        // Pre-cache Pause data (required by legacy app code) before calling seek().
-        // The new Console doesn't load this data but the old one requires it.
+      // Pre-cache Pause data (required by legacy app code) before calling seek().
+      // The new Console doesn't load this data but the old one requires it.
+      const cachedPauseId = getCachedPauseIdForExecutionPoint(executionPoint);
+      if (cachedPauseId != null) {
+        pauseId = cachedPauseId;
+
+        const cachedPause = Pause.getById(cachedPauseId);
+        if (!cachedPause) {
+          const newPause = new Pause(ThreadFront);
+          newPause.instantiate(cachedPauseId, executionPoint, time, false);
+          await newPause.ensureLoaded();
+        }
+      } else {
         const pause = new Pause(ThreadFront);
-        pause.instantiate(pauseId, executionPoint, time, false);
+        pause.create(executionPoint, time);
         await pause.ensureLoaded();
+
+        pauseId = pause.pauseId;
       }
 
-      dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId));
+      dispatch(seek(executionPoint, time, false /* hasFrames */, pauseId!));
     },
-    [client, dispatch]
+    [dispatch]
   );
 
   useLayoutEffect(() => {

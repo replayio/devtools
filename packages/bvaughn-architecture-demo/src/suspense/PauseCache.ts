@@ -65,12 +65,8 @@ export function getPauseData(client: ReplayClientInterface, pauseId: PauseId) {
   }
 }
 
-export function getPauseIdForExecutionPoint(
-  client: ReplayClientInterface,
-  executionPoint: ExecutionPoint
-): PauseId {
-  const pauseId = executionPointToPauseIdMap.get(executionPoint);
-  return pauseId || getPauseForExecutionPoint(client, executionPoint).pauseId;
+export function getCachedPauseIdForExecutionPoint(executionPoint: ExecutionPoint): PauseId | null {
+  return executionPointToPauseIdMap.get(executionPoint) || null;
 }
 
 export function getPauseForExecutionPoint(
