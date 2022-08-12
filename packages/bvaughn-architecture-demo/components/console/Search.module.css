@@ -24,7 +24,7 @@
   background-color: var(--background-color-default);
   color: var(--color-default);
 
-  font-family: Menlo, Consolas, monospace;
+  font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
 }
 .Input:focus {

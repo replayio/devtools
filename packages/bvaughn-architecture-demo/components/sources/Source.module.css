@@ -70,7 +70,7 @@
 .LineWithHits,
 .LineWithoutHits {
   white-space: pre-wrap;
-  font-family: Menlo, Consolas, monospace;
+  font-family: var(--font-family-monospace);
   font-size: var(--font-size-regular);
   display: flex;
   flex-direction: row;

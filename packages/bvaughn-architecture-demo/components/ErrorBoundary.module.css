@@ -1,6 +1,24 @@
 .Error {
+  padding: 0.5rem;
+  text-align: center;
   background-color: var(--background-color-error);
+  color: var(--color-default);
+}
+
+.Logo {
+  height: 3rem;
   color: var(--color-error);
-  padding: 1rem;
-  margin: 0;
+  margin-bottom: 1rem;
+  display: inline-block;
+}
+
+.Header {
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-large);
+  margin-bottom: 0.5rem;
+}
+
+.Message {
+  font-family: var(--font-family-default);
+  font-size: var(--font-size-regular);
 }

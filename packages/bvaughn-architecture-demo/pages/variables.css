@@ -1,3 +1,12 @@
+:root {
+  --font-family-default: sans-serif;
+  --font-family-monospace: Menlo, Consolas, monospace;
+
+  --font-size-large: 16px;
+  --font-size-regular: 12px;
+  --font-size-small: 10px;
+}
+
 :root.theme-dark {
   --background-color-contrast-1: #0e1119;
   --background-color-contrast-2: #192230;

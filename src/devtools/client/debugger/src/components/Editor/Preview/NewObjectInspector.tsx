@@ -34,12 +34,12 @@ export default function NewObjectInspector() {
   }
 
   return (
-    <div className={`${styles.Popup} preview-popup`}>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <div className={`${styles.Popup} preview-popup`}>
         <Suspense fallback={<Loader />}>
           <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
         </Suspense>
-      </ErrorBoundary>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
