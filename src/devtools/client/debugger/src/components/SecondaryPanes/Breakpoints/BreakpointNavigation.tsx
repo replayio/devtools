@@ -1,7 +1,6 @@
 import classnames from "classnames";
 import { PointDescription } from "@replayio/protocol";
 import { connect, ConnectedProps } from "react-redux";
-import find from "lodash/find";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import React, { useEffect } from "react";
@@ -67,7 +66,7 @@ function BreakpointNavigation({
 
   if (executionPoint && !error && points.length > 0) {
     prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = find(points, p => compareNumericStrings(p.point, executionPoint) > 0);
+    next = points.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   useEffect(() => {

@@ -15,7 +15,6 @@ import { Nag } from "ui/hooks/users";
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
-import find from "lodash/find";
 import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
@@ -114,7 +113,7 @@ function QuickActions({
 
   if (points && !error && executionPoint) {
     prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = find(points, p => compareNumericStrings(p.point, executionPoint) > 0);
+    next = points.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   const onContinueToNext = () => {
