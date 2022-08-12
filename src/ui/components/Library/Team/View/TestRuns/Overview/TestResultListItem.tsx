@@ -8,16 +8,16 @@ import styles from "../../../../Library.module.css";
 function ViewReplay({ passed }: { passed: boolean }) {
   return (
     <MaterialIcon
-    iconSize="2xl"
-    outlined
-    className={
-    passed
-        ? "text-green-500 group-hover:text-green-400"
-        : "text-red-500 group-hover:text-red-400"
-    }
->
-    {passed ? "play_circle_filled" : "play_circle" }          
-</MaterialIcon>
+      iconSize="2xl"
+      outlined
+      className={
+        passed
+          ? "text-green-500 group-hover:text-green-400"
+          : "text-red-500 group-hover:text-red-400"
+      }
+    >
+      {passed ? "play_circle_filled" : "play_circle"}
+    </MaterialIcon>
   );
 }
 

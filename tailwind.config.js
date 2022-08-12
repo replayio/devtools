@@ -72,8 +72,8 @@ module.exports = {
         "ew-resize": "ew-resize",
       },
       borderWidth: {
-        '3': '2.5px',
-      }
+        3: "2.5px",
+      },
     },
   },
   plugins: [require("@tailwindcss/forms")],
