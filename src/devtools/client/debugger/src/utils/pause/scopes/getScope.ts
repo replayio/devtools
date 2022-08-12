@@ -6,14 +6,12 @@
 
 import { getBindingVariables } from "./getVariables";
 import { getFramePopVariables, getThisVariable } from "./utils";
-import { simplifyDisplayName } from "../../pause/frames";
+import { simplifyDisplayName } from "../frames";
 import { ValueItem, ContainerItem } from "devtools/packages/devtools-reps";
 
-function getScopeTitle(type, scope) {
-  if (type === "block" && scope.block && scope.block.displayName) {
-    return scope.block.displayName;
-  }
+import type { ConvertedScope, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
+function getScopeTitle(type: string, scope: ConvertedScope) {
   if (type === "function") {
     const name = scope.functionName;
     if (name) {
@@ -25,7 +23,13 @@ function getScopeTitle(type, scope) {
   return "Block";
 }
 
-export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
+export function getScope(
+  scope: ConvertedScope,
+  selectedFrame: PauseFrame,
+  frameScopes: ConvertedScope,
+  why: string | null,
+  scopeIndex: number
+) {
   const { type, actor } = scope;
 
   const isLocalScope = scope.actor === frameScopes.actor;
@@ -46,6 +50,7 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
         // The presence of "this" means we're rendering a "this" binding
         // generated from mapScopes and this can override the binding
         // provided by the current frame.
+        // @ts-expect-error `this` doesn't exist in a `bindings` array
         thisDesc_ = bindings.this ? bindings.this.value : null;
       }
 
@@ -58,7 +63,7 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
 
     if (vars && vars.length) {
       const title = getScopeTitle(type, scope) || "";
-      vars.sort((a, b) => a.name.localeCompare(b.name));
+      vars.sort((a, b) => a.name!.localeCompare(b.name!));
       return new ContainerItem({
         name: title,
         path: key,
@@ -84,13 +89,18 @@ export function getScope(scope, selectedFrame, frameScopes, why, scopeIndex) {
   return null;
 }
 
-export function mergeScopes(scope, parentScope, item, parentItem) {
+export function mergeScopes(
+  scope: ConvertedScope,
+  parentScope: ConvertedScope,
+  item: ContainerItem | ValueItem,
+  parentItem: ContainerItem | ValueItem
+) {
   if (scope.scopeKind == "function lexical" && parentScope.type == "function") {
     const contents = item.getChildren().concat(parentItem.getChildren());
-    contents.sort((a, b) => a.name.localeCompare(b.name));
+    contents.sort((a, b) => a.name!.localeCompare(b.name!));
 
     return new ContainerItem({
-      name: parentItem.name,
+      name: parentItem.name!,
       path: parentItem.path,
       contents,
     });
