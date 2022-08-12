@@ -98,12 +98,7 @@ class Tabs extends PureComponent<PropsFromRedux> {
     if (isPretty(source)) {
       return "prettyPrint";
     }
-    // TODO Re-enable blackboxing
-    /*
-    if (source.isBlackBoxed) {
-      return "blackBox";
-    }
-    */
+
     return "file";
   }
 

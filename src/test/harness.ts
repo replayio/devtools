@@ -405,19 +405,6 @@ async function waitForScopeValue(name: string, value: string) {
   );
 }
 
-async function toggleBlackboxSelectedSource() {
-  // TODO Re-enable blackboxing
-  /*
-  const { getSelectedSource } = dbgSelectors;
-  const blackboxed = getSelectedSource()!.isBlackBoxed;
-  dbgActions.toggleBlackBox(getContext(), getSelectedSource()!);
-  await waitUntil(() => getSelectedSource()!.isBlackBoxed != blackboxed, {
-    waitingFor: "source to be blackboxed",
-  });
-  await ThreadFront.waitForInvalidateCommandsToFinish();
-  */
-}
-
 function findMessages(text: string, extraSelector = "") {
   const messages = document.querySelectorAll<HTMLElement>(
     `.webconsole-output .message${extraSelector}`
@@ -964,7 +951,6 @@ const testCommands = {
   waitForLoadedScopes,
   checkEvaluateInTopFrame,
   waitForScopeValue,
-  toggleBlackboxSelectedSource,
   findMessages,
   getAllMessages,
   checkAllMessages,

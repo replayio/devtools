@@ -22,7 +22,6 @@ import {
   getSourceQueryString,
   getTruncatedFileName,
   isPretty,
-  shouldBlackbox,
 } from "../../utils/source";
 import { getTabMenuItems } from "../../utils/tabs";
 
@@ -62,7 +61,6 @@ const connector = connect(
     closeTabs: actions.closeTabs,
     showSource: actions.showSource,
     ensureSourcesIsVisible: actions.ensureSourcesIsVisible,
-    toggleBlackBox: actions.toggleBlackBox,
   },
   null,
   {
@@ -88,7 +86,6 @@ class Tab extends PureComponent<FinalTabProps> {
       copyToClipboard,
       tabSources,
       showSource,
-      toggleBlackBox,
       selectedSource,
       source,
       ensureSourcesIsVisible,
@@ -164,17 +161,6 @@ class Tab extends PureComponent<FinalTabProps> {
           },
         },
       },
-      // TODO Re-enable blackboxing
-      /*
-      {
-        item: {
-          ...tabMenuItems.toggleBlackBox,
-          label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
-          disabled: !shouldBlackbox(source),
-          click: () => toggleBlackBox(cx, source),
-        },
-      },
-      */
     ];
 
     showMenu(e, buildMenu(items));

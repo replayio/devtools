@@ -34,7 +34,6 @@ pref("devtools.debugger.start-panel-collapsed", false);
 pref("devtools.debugger.end-panel-collapsed", false);
 pref("devtools.debugger.start-panel-size", 300);
 pref("devtools.debugger.end-panel-size", 300);
-pref("devtools.debugger.tabsBlackBoxed", "[]");
 pref("devtools.debugger.ui.editor-wrapping", false);
 pref("devtools.debugger.ui.framework-grouping-on", true);
 pref("devtools.debugger.pending-selected-location", "{}");
@@ -59,7 +58,6 @@ pref("devtools.debugger.features.component-pane", false);
 pref("devtools.debugger.features.autocomplete-expressions", false);
 pref("devtools.debugger.features.map-expression-bindings", true);
 pref("devtools.debugger.features.map-await-expression", true);
-pref("devtools.debugger.features.original-blackbox", true);
 pref("devtools.debugger.features.log-points", true);
 pref("devtools.debugger.features.overlay-step-buttons", true);
 pref("devtools.debugger.features.watchpoints", true);
@@ -152,7 +150,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   mapExpressionBindings: ["Bool", "map-expression-bindings"],
   mapAwaitExpression: ["Bool", "map-await-expression"],
   componentPane: ["Bool", "component-pane"],
-  originalBlackbox: ["Bool", "original-blackbox"],
   logPoints: ["Bool", "log-points"],
   commandClick: ["Bool", "command-click"],
   showOverlay: ["Bool", "overlay"],
@@ -164,7 +161,6 @@ export const features = new PrefsHelper("devtools.debugger.features", {
 
 export const asyncStore = asyncStoreHelper("debugger", {
   pendingBreakpoints: ["pending-breakpoints", {}],
-  tabsBlackBoxed: ["tabsBlackBoxed", []],
 });
 
 export function resetSchemaVersion() {

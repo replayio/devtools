@@ -48,18 +48,6 @@ function getPath(source: MiniSource) {
   return result;
 }
 
-export function shouldBlackbox(source: MiniSource) {
-  if (!source) {
-    return false;
-  }
-
-  if (!source.url) {
-    return false;
-  }
-
-  return true;
-}
-
 /**
  * Returns true if the specified url and/or content type are specific to
  * javascript files.
@@ -405,7 +393,7 @@ export function getTextAtPosition(
   return lineText.slice(column, column! + 100).trim();
 }
 
-export function getSourceClassnames(source?: MiniSource & { isBlackBoxed?: boolean }) {
+export function getSourceClassnames(source?: MiniSource) {
   // Conditionals should be ordered by priority of icon!
   const defaultClassName = "file";
 
@@ -416,13 +404,6 @@ export function getSourceClassnames(source?: MiniSource & { isBlackBoxed?: boole
   if (isPretty(source)) {
     return "prettyPrint";
   }
-
-  // TODO Re-enable blackboxing
-  /*
-  if (source.isBlackBoxed) {
-    return "blackBox";
-  }
-  */
 
   return sourceTypes[getFileExtension(source) as keyof typeof sourceTypes] || defaultClassName;
 }

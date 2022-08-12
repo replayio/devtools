@@ -44,15 +44,6 @@ export function getTabMenuItems() {
       accesskey: "u",
       disabled: false,
     },
-    // TODO Re-enable blackboxing
-    /*
-    toggleBlackBox: {
-      id: "node-menu-blackbox",
-      label: "Blackbox source",
-      accesskey: "B",
-      disabled: false,
-    },
-    */
     prettyPrint: {
       id: "node-menu-pretty-print",
       label: "Pretty print source",

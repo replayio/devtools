@@ -27,7 +27,6 @@ import {
 } from "ui/reducers/sources";
 import { syncBreakpoint } from "../breakpoints";
 
-import { toggleBlackBox } from "./blackbox";
 import { loadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 
@@ -68,28 +67,6 @@ function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
         return dispatch(syncBreakpoint(cx, sourceId, bp));
       })
     );
-  };
-}
-
-export function getBlackBoxList(): string[] {
-  // @ts-expect-error Check on actual prefs usage here
-  return prefs.tabsBlackBoxed || [];
-}
-
-function restoreBlackBoxedSources(cx: Context, sources: SourceDetails[]): UIThunkAction {
-  return async dispatch => {
-    const tabs = getBlackBoxList();
-    if (tabs.length == 0) {
-      return;
-    }
-    // TODO Re-enable blackboxing
-    /*
-    for (const source of sources) {
-      if (tabs.includes(source.url!) && !source.isBlackBoxed) {
-        dispatch(toggleBlackBox(cx, source));
-      }
-    }
-    */
   };
 }
 
@@ -146,9 +123,6 @@ export const setupSourcesListeners = (startAppListening: AppStartListening) => {
           );
         }
       }
-
-      // TODO Re-enable blackboxing - this is a no-op for now
-      dispatch(restoreBlackBoxedSources(cx, sources));
 
       // There may have been some breakpoints / print statements persisted as well.
       // Reload those if possible.

@@ -16,7 +16,6 @@ function makeMockSource(url = "url", id = "source") {
   return {
     id,
     url,
-    isBlackBoxed: false,
     isPrettyPrinted: false,
     relativeUrl: url,
     introductionUrl: null,

@@ -24,9 +24,8 @@ import {
   getGeneratedSourceByURL,
   isFulfilled,
 } from "ui/reducers/sources";
-import actions from "../../actions";
 
-import { getSourceQueryString, shouldBlackbox } from "../../utils/source";
+import { getSourceQueryString } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
 import { copyToTheClipboard } from "../../utils/clipboard";
 
@@ -55,9 +54,7 @@ const mapStateToProps = (state: UIState, props: STIProps) => {
   };
 };
 
-const connector = connect(mapStateToProps, {
-  toggleBlackBox: actions.toggleBlackBox,
-});
+const connector = connect(mapStateToProps);
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type FinalSTIProps = PropsFromRedux & STIProps;
@@ -101,17 +98,8 @@ class SourceTreeItem extends Component<FinalSTIProps> {
           click: () => copyToTheClipboard(contents.url),
         };
 
-        const { cx, source } = this.props;
+        const { source } = this.props;
         if (source) {
-          // TODO Re-enable blackboxing
-          /*
-          const blackBoxMenuItem = {
-            id: "node-menu-blackbox",
-            label: source.isBlackBoxed ? "Unblackbox source" : "Blackbox source",
-            accesskey: source.isBlackBoxed ? "U" : "B",
-            disabled: !shouldBlackbox(source),
-            click: () => this.props.toggleBlackBox(cx, source),
-          };*/
           menuOptions.push(copySourceUri2);
         }
       }
@@ -167,13 +155,6 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       }
       return <AccessibleImage className="folder" />;
     }
-
-    // TODO Re-enable blackboxing
-    /*
-    if (source && source.isBlackBoxed) {
-      return <AccessibleImage className="blackBox" />;
-    }
-    */
 
     if (source) {
       return <SourceIcon source={source} shouldHide={(icon: string) => icon === "extension"} />;

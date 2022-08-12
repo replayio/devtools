@@ -53,7 +53,6 @@ class Frames extends PureComponent {
       cx,
       selectFrame,
       selectedFrame,
-      toggleBlackBox,
       frameworkGroupingOn,
       displayFullUrl,
       getFrameTitle,
@@ -78,7 +77,6 @@ class Frames extends PureComponent {
               frameworkGroupingOn={frameworkGroupingOn}
               selectFrame={selectFrame}
               selectedFrame={selectedFrame}
-              toggleBlackBox={toggleBlackBox}
               key={String(frameOrGroup.id)}
               displayFullUrl={displayFullUrl}
               getFrameTitle={getFrameTitle}
@@ -94,7 +92,6 @@ class Frames extends PureComponent {
               frameworkGroupingOn={frameworkGroupingOn}
               selectFrame={selectFrame}
               selectedFrame={selectedFrame}
-              toggleBlackBox={toggleBlackBox}
               key={frameOrGroup[0].id}
               displayFullUrl={displayFullUrl}
               getFrameTitle={getFrameTitle}
@@ -189,7 +186,6 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
   enterFocusMode: enterFocusModeAction,
   selectFrame: actions.selectFrame,
-  toggleBlackBox: actions.toggleBlackBox,
   toggleFrameworkGrouping: actions.toggleFrameworkGrouping,
 })(Frames);
 

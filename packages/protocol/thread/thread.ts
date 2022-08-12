@@ -895,20 +895,6 @@ class _ThreadFront {
     return this._findResumeTarget(point, client.Debugger.findResumeTarget);
   }
 
-  blackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
-    return this._invalidateResumeTargets(async () => {
-      assert(this.sessionId, "no sessionId");
-      await client.Debugger.blackboxSource({ sourceId, begin, end }, this.sessionId);
-    });
-  }
-
-  unblackbox(sourceId: SourceId, begin?: SourceLocation, end?: SourceLocation) {
-    return this._invalidateResumeTargets(async () => {
-      assert(this.sessionId, "no sessionId");
-      await client.Debugger.unblackboxSource({ sourceId, begin, end }, this.sessionId);
-    });
-  }
-
   getEndpoint() {
     return client.Session.getEndpoint({}, ThreadFront.sessionId!);
   }

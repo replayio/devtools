@@ -22,7 +22,6 @@ import { ThreadFront, createPrimitiveValueFront, ValueFront } from "protocol/thr
 import type { BreakpointOptions, SourceLocation } from "../reducers/types";
 
 import { createFrame } from "./create";
-import { MiniSource } from "ui/reducers/sources";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -175,19 +174,6 @@ export interface SourceRange {
   end: ProtocolSourceLocation;
 }
 
-async function blackBox(source: MiniSource, isBlackBoxed: boolean, range?: Partial<SourceRange>) {
-  // TODO Re-enable blackboxing
-  /*
-  const begin = range ? range.start : undefined;
-  const end = range ? range.end : undefined;
-  if (isBlackBoxed) {
-    await ThreadFront.unblackbox(source.id, begin, end);
-  } else {
-    await ThreadFront.blackbox(source.id, begin, end);
-  }
-  */
-}
-
 let gExceptionLogpointGroupId: string | null;
 
 function setShouldLogExceptions(shouldLog: boolean) {
@@ -229,7 +215,6 @@ function fetchAncestorFramePositions(asyncIndex: number, frameId: string) {
 
 const clientCommands = {
   autocomplete,
-  blackBox,
   hasBreakpoint,
   setBreakpoint,
   removeBreakpoint,

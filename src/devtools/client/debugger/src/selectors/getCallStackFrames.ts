@@ -38,11 +38,9 @@ export const getCallStackFrames = createSelector(
       return null;
     }
 
-    // TODO re-enable blackboxing
     const formattedFrames = frames
       .filter(frame => getSourceForFrame(sources, frame))
-      .map(frame => appendSource(sources, frame))
-      .filter(frame => !get(frame, "source.isBlackBoxed"));
+      .map(frame => appendSource(sources, frame));
 
     return annotateFrames(formattedFrames);
   }
