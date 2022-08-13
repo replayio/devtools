@@ -1,13 +1,20 @@
 import { Page } from "@playwright/test";
 const exampleRecordings = require("./examples.json");
+import { assert } from "protocol/utils";
+
+type $FixTypeLater = any;
 
 export async function openExample(page: Page, example: string) {
   const recordingId = exampleRecordings[example];
-  await page.goto(`http://localhost:8080/recording/${recordingId}`);
+  await page.goto(`http://localhost:8080/recording/${recordingId}?e2e=1`);
 }
 
 export async function clickDevTools(page: Page) {
   return page.locator("text=DevTools").click();
+}
+
+export async function selectConsole(page: Page) {
+  return page.locator('button:has-text("Console")').click();
 }
 
 export async function togglePausePane(page: Page) {
@@ -31,14 +38,139 @@ export async function checkEvaluateInTopFrame(page: Page, value: string, expecte
 }
 
 export async function waitForConsoleMessage(page: Page, message: string) {
-  await page.waitForSelector(`.message.result .objectBox:has-text("${message}")`);
+  return page.waitForSelector(`.message.result .objectBox:has-text("${message}")`);
+}
+
+export async function warpToMessage(page: Page, text: string, line: number) {
+  await page.waitForSelector(`.webconsole-output .message:has-text("${text}")`);
+
+  const msg = page.locator(`.webconsole-output .message:has-text("${text}")`);
+  await msg.hover();
+  const warpButton = msg.locator(".rewind .button") || msg.locator(".fast-forward");
+
+  await warpButton.hover();
+  await warpButton.click();
+
+  await waitForPaused(page, line);
 }
 
 export async function clearConsoleEvaluations(page: Page) {
   await page.locator("#toolbox-content-console button").nth(1).click();
 }
 
+export async function addEventListenerLogpoints(page: Page, logpoints: string[]) {
+  return page.evaluate(params => app.actions.addEventListenerBreakpoints(params.logpoints), {
+    logpoints,
+  });
+}
+
 // Debugger
+
+export async function addBreakpoint(
+  page: Page,
+  url: string,
+  line: number,
+  column?: number,
+  options?: $FixTypeLater
+) {
+  // const bpCount = dbgSelectors.getBreakpointCount();
+  const bpCount = await page.evaluate(() => window.app.selectors!.getBreakpointCount());
+  if (options) {
+    /*
+    const source = await waitForSource(url);
+    const sourceId = source!.id;
+    await dbgActions.addBreakpoint(
+      getContext(),
+      { sourceId, line, column, sourceUrl: source!.url! },
+      options
+    );
+    */
+  } else {
+    // If there are no options, use the default log value for adding new breakpoints,
+    // as if the user clicked on the line.
+    assert(!column, "column should not bet set if there are no options");
+    await selectSource(page, url);
+
+    await page.evaluate(
+      params => {
+        const cx = app.selectors.getThreadContext();
+        app.actions.addBreakpointAtLine(cx, params.line);
+      },
+      { line }
+    );
+
+    await page.waitForFunction(
+      async params => {
+        const bpCount = window.app.selectors!.getBreakpointCount();
+        if (bpCount !== params.bpCount) {
+          return false;
+        }
+
+        await app.threadFront.waitForInvalidateCommandsToFinish();
+      },
+      { bpCount: bpCount + 1 }
+    );
+  }
+
+  async function selectSource(page: Page, url: string) {
+    await page.waitForFunction(
+      async params => {
+        const source = window.app.selectors!.fuzzyFindSourceByUrl(params.url);
+        if (!source) {
+          return;
+        }
+        const cx = window.app.selectors!.getThreadContext();
+        return window.app.actions!.selectLocation(cx, { sourceId: source.id }, true);
+      },
+      {
+        url,
+      }
+    );
+
+    await waitForSelectedSource(page, url);
+  }
+
+  function waitForSelectedSource(page: Page, url?: string) {
+    return page.waitForFunction(
+      params => {
+        const source = window.app.selectors!.getSelectedSourceWithContent()! || {};
+        if (!source.value) {
+          return false;
+        }
+
+        if (!params.url) {
+          return true;
+        }
+
+        const newSource = app.selectors.fuzzyFindSourceByUrl(params.url)!;
+        if (newSource.id != source.id) {
+          return false;
+        }
+
+        // The hasSymbols check is disabled. Sometimes the parser worker fails for
+        // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
+        // return hasSymbols(source) && getBreakableLines(source.id);
+        return app.selectors.getBreakableLinesForSource(source.id);
+      },
+      {
+        url,
+      }
+    );
+  }
+
+  // await waitUntil(
+  //   () => {
+  //     return dbgSelectors.getBreakpointCount() == bpCount + 1;
+  //   },
+  //   { waitingFor: "breakpoint to be set" }
+  // );
+
+  // await ThreadFront.waitForInvalidateCommandsToFinish();
+}
+
+async function getThreadContext(page: Page) {
+  return page.evaluate(() => window.app.selectors!.getThreadContext());
+}
 
 export async function toggleBreakpoint(page: Page, number: number) {
   await page.locator(`text=${number}`).click();
@@ -50,36 +182,43 @@ export async function rewind(page: Page) {
   await page.evaluate(() => window.app.selectors!.getIsPaused());
 }
 
+export async function resumeToLine(page: Page, line: number) {
+  const cx = await getThreadContext(page);
+  await page.evaluate(params => window.app.actions!.resume(params.cx), { cx: cx });
+
+  await waitForPaused(page, line);
+}
+
 export async function rewindToLine(page: Page, line: number) {
-  const cx = await page.evaluate(() => window.app.selectors!.getThreadContext());
+  const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.rewind(params.cx), { cx: cx });
 
   await waitForPaused(page, line);
 }
 
 export async function stepInToLine(page: Page, line: number) {
-  const cx = await page.evaluate(() => window.app.selectors!.getThreadContext());
+  const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.stepIn(params.cx), { cx: cx });
 
   await waitForPaused(page, line);
 }
 
 export async function stepOutToLine(page: Page, line: number) {
-  const cx = await page.evaluate(() => window.app.selectors!.getThreadContext());
+  const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.stepOut(params.cx), { cx: cx });
 
   await waitForPaused(page, line);
 }
 
 export async function stepOverToLine(page: Page, line: number) {
-  const cx = await page.evaluate(() => window.app.selectors!.getThreadContext());
+  const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.stepOver(params.cx), { cx: cx });
 
   await waitForPaused(page, line);
 }
 
 export async function reverseStepOverToLine(page: Page, line: number) {
-  const cx = await page.evaluate(() => window.app.selectors!.getThreadContext());
+  const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.reverseStepOver(params.cx), { cx: cx });
 
   await waitForPaused(page, line);
