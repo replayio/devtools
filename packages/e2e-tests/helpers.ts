@@ -111,63 +111,61 @@ export async function addBreakpoint(
       { bpCount: bpCount + 1 }
     );
   }
+}
 
-  async function selectSource(page: Page, url: string) {
-    await page.waitForFunction(params => app.selectors.fuzzyFindSourceByUrl(params.url), { url });
+async function selectSource(page: Page, url: string) {
+  await page.waitForFunction(params => app.selectors.fuzzyFindSourceByUrl(params.url), { url });
 
-    await page.waitForFunction(
-      async params => {
-        const source = window.app.selectors!.fuzzyFindSourceByUrl(params.url);
-        if (!source) {
-          return;
-        }
-        const cx = window.app.selectors!.getThreadContext();
-        return window.app.actions!.selectLocation(cx, { sourceId: source.id }, true);
-      },
-      {
-        url,
+  await page.waitForFunction(
+    async params => {
+      const source = window.app.selectors!.fuzzyFindSourceByUrl(params.url);
+      if (!source) {
+        return;
       }
-    );
+      const cx = window.app.selectors!.getThreadContext();
+      return window.app.actions!.selectLocation(cx, { sourceId: source.id }, true);
+    },
+    {
+      url,
+    }
+  );
 
-    await waitForSelectedSource(page, url);
-  }
+  await waitForSelectedSource(page, url);
+}
 
-  function waitForSelectedSource(page: Page, url?: string) {
-    return page.waitForFunction(
-      params => {
-        const source = window.app.selectors!.getSelectedSourceWithContent()! || {};
-        if (!source.value) {
-          return false;
-        }
-
-        if (!params.url) {
-          return true;
-        }
-
-        const newSource = app.selectors.fuzzyFindSourceByUrl(params.url)!;
-        if (newSource.id != source.id) {
-          return false;
-        }
-
-        // The hasSymbols check is disabled. Sometimes the parser worker fails for
-        // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
-        // return hasSymbols(source) && getBreakableLines(source.id);
-        return app.selectors.getBreakableLinesForSource(source.id);
-      },
-      {
-        url,
+function waitForSelectedSource(page: Page, url?: string) {
+  return page.waitForFunction(
+    params => {
+      const source = window.app.selectors!.getSelectedSourceWithContent()! || {};
+      if (!source.value) {
+        return false;
       }
-    );
-  }
 
-  // await waitUntil(
-  //   () => {
-  //     return dbgSelectors.getBreakpointCount() == bpCount + 1;
-  //   },
-  //   { waitingFor: "breakpoint to be set" }
-  // );
+      if (!params.url) {
+        return true;
+      }
 
-  // await ThreadFront.waitForInvalidateCommandsToFinish();
+      const newSource = app.selectors.fuzzyFindSourceByUrl(params.url)!;
+      if (newSource.id != source.id) {
+        return false;
+      }
+
+      // The hasSymbols check is disabled. Sometimes the parser worker fails for
+      // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
+      // return hasSymbols(source) && getBreakableLines(source.id);
+      return app.selectors.getBreakableLinesForSource(source.id);
+    },
+    {
+      url,
+    }
+  );
+}
+
+export async function removeAllBreakpoints(page: Page) {
+  page.evaluate(async () => {
+    await app.actions.removeAllBreakpoints(app.selectors.getThreadContext());
+    await app.threadFront.waitForInvalidateCommandsToFinish();
+  });
 }
 
 async function getThreadContext(page: Page) {

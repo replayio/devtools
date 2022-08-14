@@ -10,7 +10,9 @@ import {
 } from "../helpers";
 
 // Test hitting breakpoints when rewinding past the point where the breakpoint
-test(`script was created.`, async ({ page }) => {
+test(`Test hitting breakpoints when rewinding past the point where the breakpoint.`, async ({
+  page,
+}) => {
   await openExample(page, "doc_rr_basic.html");
   await clickDevTools(page);
 
