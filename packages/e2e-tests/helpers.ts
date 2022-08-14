@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
 const exampleRecordings = require("./examples.json");
 import { assert } from "protocol/utils";
 
@@ -38,7 +38,7 @@ export async function checkEvaluateInTopFrame(page: Page, value: string, expecte
 }
 
 export async function waitForConsoleMessage(page: Page, message: string) {
-  return page.waitForSelector(`.message.result .objectBox:has-text("${message}")`);
+  return page.waitForSelector(`.message:has-text('${message}')`);
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
@@ -52,6 +52,14 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
   await warpButton.click();
 
   await waitForPaused(page, line);
+}
+
+export async function executeInConsole() {}
+
+export async function checkMessageObjectContents() {}
+
+export async function checkJumpIcon(page: Page, message: string) {
+  return page.waitForSelector(`.message:has-text('${message}') .jump-definition`);
 }
 
 export async function clearConsoleEvaluations(page: Page) {

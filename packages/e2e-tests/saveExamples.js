@@ -52,6 +52,15 @@ async function recordExample(example) {
   }
 }
 
+async function publicizeRecording(id) {
+  `mutation PublicizeRecording {
+    update_recordings_by_pk(_set: {is_private: false}, pk_columns: {id: "ce194585-26a0-406a-b6d7-986a969d7376"}) {
+      id
+    }
+  }
+  `;
+}
+
 async function saveRecording(example) {
   console.log(`Saving ${example}`);
   const recordings = replay.listAllRecordings();
