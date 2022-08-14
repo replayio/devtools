@@ -1,3 +1,5 @@
+// Should review when we have chromium examples that are recorded
+
 /*
 Test.describe(`Test stepping in async frames and async call stacks.`, async () => {
     // Because stepping works differently between gecko and chromium, frame timeline
@@ -39,5 +41,4 @@ Test.describe(`Test stepping in async frames and async call stacks.`, async () =
     await Test.stepOutToLine(13);
     await Test.reverseStepOverToLine(12);
   });
-  
-  */
+*/

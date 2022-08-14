@@ -51,6 +51,10 @@ export function getTest() {
 // Return whether we are running one of the tests in our e2e test suite.
 // We will be connected to a live backend and testing debugging features.
 export function isE2ETest() {
+  if (getURL().searchParams.get("e2e")) {
+    return true;
+  }
+
   return getTest() != null;
 }
 

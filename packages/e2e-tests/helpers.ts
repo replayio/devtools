@@ -41,7 +41,7 @@ export async function waitForConsoleMessage(page: Page, message: string) {
   return page.waitForSelector(`.message.result .objectBox:has-text("${message}")`);
 }
 
-export async function warpToMessage(page: Page, text: string, line: number) {
+export async function warpToMessage(page: Page, text: string, line?: number) {
   await page.waitForSelector(`.webconsole-output .message:has-text("${text}")`);
 
   const msg = page.locator(`.webconsole-output .message:has-text("${text}")`);
@@ -113,6 +113,8 @@ export async function addBreakpoint(
   }
 
   async function selectSource(page: Page, url: string) {
+    await page.waitForFunction(params => app.selectors.fuzzyFindSourceByUrl(params.url), { url });
+
     await page.waitForFunction(
       async params => {
         const source = window.app.selectors!.fuzzyFindSourceByUrl(params.url);
@@ -189,11 +191,13 @@ export async function resumeToLine(page: Page, line: number) {
   await waitForPaused(page, line);
 }
 
-export async function rewindToLine(page: Page, line: number) {
+export async function rewindToLine(page: Page, line?: number) {
   const cx = await getThreadContext(page);
   await page.evaluate(params => window.app.actions!.rewind(params.cx), { cx: cx });
 
-  await waitForPaused(page, line);
+  if (line) {
+    await waitForPaused(page, line);
+  }
 }
 
 export async function stepInToLine(page: Page, line: number) {
@@ -224,7 +228,27 @@ export async function reverseStepOverToLine(page: Page, line: number) {
   await waitForPaused(page, line);
 }
 
-export async function waitForPaused(page: Page, line: number) {
+export async function selectFrame(page: Page, index: number) {
+  page.evaluate(
+    params => {
+      const frames = app.selectors.getFrames()!;
+      return app.actions.selectFrame(app.selectors.getThreadContext(), frames[params.index]);
+    },
+    { index }
+  );
+}
+
+export async function waitForFrameTimeline(page: Page, width: string) {
+  await page.waitForFunction(
+    params => {
+      const elem: HTMLElement | null = document.querySelector(".frame-timeline-progress");
+      return elem?.style.width == params.width;
+    },
+    { width }
+  );
+}
+
+export async function waitForPaused(page: Page, line?: number) {
   await page.evaluate(() =>
     window.app.store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" })
   );
@@ -235,15 +259,27 @@ export async function waitForPaused(page: Page, line: number) {
 
   await page.waitForFunction(() => window.app.selectors!.getFrames()!.length > 0);
 
-  await page.waitForFunction(
-    params => {
-      const frame = window.app.selectors!.getVisibleSelectedFrame();
-      return frame?.location?.line === params.line;
-    },
-    { line }
-  );
+  if (line) {
+    await page.waitForFunction(
+      params => {
+        const frame = window.app.selectors!.getVisibleSelectedFrame();
+        return frame?.location?.line === params.line;
+      },
+      { line }
+    );
+  }
 
   page.locator('.scopes-list .tree-node[aria-level="2"]');
+}
+
+export async function checkFrames(page: Page, count: number) {
+  return page.waitForFunction(
+    params => {
+      const frames = app.selectors.getFrames()!;
+      return frames.length == params.count;
+    },
+    { count }
+  );
 }
 
 export async function waitForScopeValue(page: Page, name: string, value: string) {

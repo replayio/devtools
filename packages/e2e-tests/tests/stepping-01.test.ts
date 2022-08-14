@@ -1,5 +1,5 @@
-const { test } = require("@playwright/test");
-const {
+import { test } from "@playwright/test";
+import {
   checkEvaluateInTopFrame,
   openExample,
   rewind,
@@ -9,7 +9,7 @@ const {
   clickDevTools,
   toggleBreakpoint,
   togglePausePane,
-} = require("../helpers");
+} from "../helpers";
 
 test("Test basic step-over/back functionality.", async ({ page }) => {
   await openExample(page, "doc_rr_basic.html");
