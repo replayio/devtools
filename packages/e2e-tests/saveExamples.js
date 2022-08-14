@@ -22,7 +22,7 @@ async function waitUntilMessage(page, message, timeout = 30_000) {
 }
 
 async function recordExample(example) {
-  let browser, context, page;
+  let browser, context, page, succeeded;
   try {
     console.log(`Recording ${example}`);
     browser = await playwright["firefox"].launch({
@@ -38,20 +38,25 @@ async function recordExample(example) {
     await page.goto(`http://localhost:8080/test/examples/${example}`);
     await waitUntilMessage(page, "ExampleFinished");
     console.log(`Recorded ${example}`);
-
-    await saveRecording(example);
+    succeeded = true;
   } catch (e) {
+    succeeded = false;
   } finally {
     await page.close();
     await context.close();
     await browser.close();
+  }
+
+  if (succeeded) {
+    await saveRecording(example);
   }
 }
 
 async function saveRecording(example) {
   console.log(`Saving ${example}`);
   const recordings = replay.listAllRecordings();
-  const lastRecording = recordings[recordings.length - 2];
+  const lastRecording = recordings[recordings.length - 1];
+
   const id = await replay.uploadRecording(lastRecording.id, {
     apiKey: "rwk_90fWQyJdA32Ny8helYNm9gy6vtqJnOXH3JkbYMviyuf",
   });
@@ -70,10 +75,9 @@ async function recordExamples() {
   for (const page of pages) {
     await recordExample(page);
   }
+
+  const examples = fs.readFileSync(`${__dirname}/examples.json`, "utf8");
+  console.log(examples);
 }
 
-// recordExample("doc_control_flow.html");
-// saveRecording("doc_control_flow.html");
-
-//     console.log("ExampleFinished");
 recordExamples();
