@@ -1,119 +1,131 @@
+import { test } from "@playwright/test";
+import {
+  openExample,
+  clickDevTools,
+  rewindToLine,
+  stepOverToLine,
+  stepOutToLine,
+  stepInToLine,
+  addEventListenerLogpoints,
+  addBreakpoint,
+  resumeToLine,
+  selectConsole,
+  warpToMessage,
+} from "../helpers";
+
 // Test the objects produced by console.log() calls and by evaluating various
 test(`expressions in the console after time warping.`, async ({ page }) => {
-  await Test.selectConsole();
+  await selectConsole(page);
 
-  // Several objects currently show up differently in chromium.
-  const target = await Test.getRecordingTarget();
+  await waitForMessage(page, "Array(20) [ 0, 1, 2, 3, 4, 5,");
+  await waitForMessage(page, "Uint8Array(20) [ 0, 1, 2, 3, 4, 5,");
+  await waitForMessage(page, "Set(22) [ {…}, {…}, 0, 1, 2, 3, 4, 5,");
+  await waitForMessage(page, "Map(21) { {…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, 4 → 5,");
+  await waitForMessage(page, "WeakSet(20) [ {…}, {…}, {…},");
+  await waitForMessage(page, "WeakMap(20) { {…} → {…}, {…} → {…},");
+  await waitForMessage(page, "Object { a: 0, a0: 0, a1: 1, a2: 2, a3: 3, a4: 4,");
+  await waitForMessage(page, "/abc/gi");
+  await waitForMessage(page, "Date");
 
-  await Test.waitForMessage("Array(20) [ 0, 1, 2, 3, 4, 5,");
-  await Test.waitForMessage("Uint8Array(20) [ 0, 1, 2, 3, 4, 5,");
-  await Test.waitForMessage("Set(22) [ {…}, {…}, 0, 1, 2, 3, 4, 5,");
-  await Test.waitForMessage("Map(21) { {…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, 4 → 5,");
-  await Test.waitForMessage("WeakSet(20) [ {…}, {…}, {…},");
-  await Test.waitForMessage("WeakMap(20) { {…} → {…}, {…} → {…},");
-  await Test.waitForMessage("Object { a: 0, a0: 0, a1: 1, a2: 2, a3: 3, a4: 4,");
-  await Test.waitForMessage("/abc/gi");
-  await Test.waitForMessage("Date");
+  await waitForMessage(page, 'RangeError: "foo"');
+  await waitForMessage(page, '<div id="foo" class="bar" style="visibility: visible" blahblah="">');
 
-  await Test.waitForMessage('RangeError: "foo"');
-  await Test.waitForMessage(
-    target == "gecko"
-      ? '<div id="foo" class="bar" style="visibility: visible" blahblah="">'
-      : "HTMLDivElement"
-  );
+  msg = await waitForMessage(page, "function bar()");
+  checkJumpIcon(page, msg);
 
-  msg = await Test.waitForMessage("function bar()");
-  Test.checkJumpIcon(msg);
+  await waitForMessage(page, 'Array(6) [ undefined, true, 3, null, "z", 40n ]');
+  await waitForMessage(page, "Proxy {  }");
+  await waitForMessage(page, "Symbol()");
+  await waitForMessage(page, "Symbol(symbol)");
+  await waitForMessage(page, `Object { "Symbol()": 42, "Symbol(symbol)": "Symbol()" }`);
 
-  await Test.waitForMessage('Array(6) [ undefined, true, 3, null, "z", 40n ]');
-  await Test.waitForMessage("Proxy {  }");
-  await Test.waitForMessage("Symbol()");
-  await Test.waitForMessage("Symbol(symbol)");
-  await Test.waitForMessage(`Object { "Symbol()": 42, "Symbol(symbol)": "Symbol()" }`);
-
-  msg = await Test.waitForMessage("Object { _foo: C }");
-  await Test.checkMessageObjectContents(
+  msg = await waitForMessage(page, "Object { _foo: C }");
+  await checkMessageObjectContents(
+    page,
     msg,
     ['foo: C { baz: "baz" }', 'bar: "bar"', 'baz: "baz"'],
     ["foo", "bar"]
   );
 
-  await Test.warpToMessage("Done");
+  await warpToMessage(page, "Done");
 
-  await Test.executeInConsole("Error('helo')");
-  await Test.waitForMessage('Error: "helo"');
+  await executeInConsole(page, "Error('helo')");
+  await waitForMessage(page, 'Error: "helo"');
 
-  // Defining a new function like this doesn't currently work in chromium.
-  if (target == "gecko") {
-    await Test.executeInConsole(`
+  await executeInConsole(
+    page,
+    `
         function f() {
           throw Error("there");
         }
         f();
-      `);
-    // FIXME the first line in this stack isn't right.
-    await Test.waitForMessage('Error: "there"');
-  }
+      `
+  );
+  // FIXME the first line in this stack isn't right.
+  await waitForMessage(page, 'Error: "there"');
 
-  Test.executeInConsole("Array(1, 2, 3)");
-  msg = await Test.waitForMessage("Array(3) [ 1, 2, 3 ]");
-  await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "length: 3"]);
+  executeInConsole(page, "Array(1, 2, 3)");
+  msg = await waitForMessage(page, "Array(3) [ 1, 2, 3 ]");
+  await checkMessageObjectContents(page, msg, ["0: 1", "1: 2", "2: 3", "length: 3"]);
 
-  await Test.executeInConsole("new Uint8Array([1, 2, 3, 4])");
-  msg = await Test.waitForMessage("Uint8Array(4) [ 1, 2, 3, 4 ]");
-  await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "3: 4", "length: 4"]);
+  await executeInConsole(page, "new Uint8Array([1, 2, 3, 4])");
+  msg = await waitForMessage(page, "Uint8Array(4) [ 1, 2, 3, 4 ]");
+  await checkMessageObjectContents(page, msg, ["0: 1", "1: 2", "2: 3", "3: 4", "length: 4"]);
 
-  await Test.executeInConsole(`RegExp("abd", "g")`);
-  msg = await Test.waitForMessage("/abd/g");
+  await executeInConsole(page, `RegExp("abd", "g")`);
+  msg = await waitForMessage(page, "/abd/g");
 
   // RegExp object properties are not currently available in chromium.
-  if (target == "gecko") {
-    await Test.checkMessageObjectContents(msg, ["global: true", `source: "abd"`]);
-  }
 
-  await Test.executeInConsole("new Set([1, 2, 3])");
-  msg = await Test.waitForMessage("Set(3) [ 1, 2, 3 ]");
-  await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "size: 3"], ["<entries>"]);
+  await checkMessageObjectContents(page, msg, ["global: true", `source: "abd"`]);
 
-  await Test.executeInConsole("new Map([[1, {a:1}], [2, {b:2}]])");
-  msg = await Test.waitForMessage("Map { 1 → {…}, 2 → {…} }");
-  await Test.checkMessageObjectContents(
+  await executeInConsole(page, "new Set([1, 2, 3])");
+  msg = await waitForMessage(page, "Set(3) [ 1, 2, 3 ]");
+  await checkMessageObjectContents(page, msg, ["0: 1", "1: 2", "2: 3", "size: 3"], ["<entries>"]);
+
+  await executeInConsole(page, "new Map([[1, {a:1}], [2, {b:2}]])");
+  msg = await waitForMessage(page, "Map { 1 → {…}, 2 → {…} }");
+  await checkMessageObjectContents(
+    page,
     msg,
     ["0: 1 → Object { a: 1 }", "1: 2 → Object { b: 2 }", "size: 2"],
     ["<entries>"]
   );
 
-  await Test.executeInConsole("new WeakSet([{a:1}, {b:2}])");
-  msg = await Test.waitForMessage("WeakSet(2) [ {…}, {…} ]");
-  await Test.checkMessageObjectContents(msg, ["Object { a: 1 }", "Object { b: 2 }"], ["<entries>"]);
+  await executeInConsole(page, "new WeakSet([{a:1}, {b:2}])");
+  msg = await waitForMessage(page, "WeakSet(2) [ {…}, {…} ]");
+  await checkMessageObjectContents(
+    page,
+    msg,
+    ["Object { a: 1 }", "Object { b: 2 }"],
+    ["<entries>"]
+  );
 
-  await Test.executeInConsole("new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
-  msg = await Test.waitForMessage("WeakMap { {…} → {…}, {…} → {…} }");
-  await Test.checkMessageObjectContents(
+  await executeInConsole(page, "new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
+  msg = await waitForMessage(page, "WeakMap { {…} → {…}, {…} → {…} }");
+  await checkMessageObjectContents(
+    page,
     msg,
     ["Object { a: 1 } → Object { b: 1 }", "Object { a: 2 } → Object { b: 2 }"],
     ["<entries>"]
   );
 
-  await Test.executeInConsole("new Promise(() => {})");
-  msg = await Test.waitForMessage("Promise {  }");
+  await executeInConsole(page, "new Promise(() => {})");
+  msg = await waitForMessage(page, "Promise {  }");
 
   // Promise contents aren't currently available in chromium.
-  if (target == "gecko") {
-    await Test.checkMessageObjectContents(msg, ['"pending"'], []);
-  }
 
-  await Test.executeInConsole("Promise.resolve({ a: 1 })");
-  msg = await Test.waitForMessage("Promise {  }");
+  await checkMessageObjectContents(page, msg, ['"pending"'], []);
 
-  if (target == "gecko") {
-    await Test.checkMessageObjectContents(msg, ['"fulfilled"', "a: 1"], ["<value>"]);
-  }
+  await executeInConsole(page, "Promise.resolve({ a: 1 })");
+  msg = await waitForMessage(page, "Promise {  }");
 
-  await Test.executeInConsole("Promise.reject({ a: 1 })");
-  msg = await Test.waitForMessage("Promise {  }");
+  await checkMessageObjectContents(page, msg, ['"fulfilled"', "a: 1"], ["<value>"]);
 
-  await Test.executeInConsole("baz");
-  msg = await Test.waitForMessage("function baz()");
-  Test.checkJumpIcon(msg);
+  await executeInConsole(page, "Promise.reject({ a: 1 })");
+  msg = await waitForMessage(page, "Promise {  }");
+
+  await executeInConsole(page, "baz");
+  msg = await waitForMessage(page, "function baz()");
+  checkJumpIcon(page, msg);
 });
