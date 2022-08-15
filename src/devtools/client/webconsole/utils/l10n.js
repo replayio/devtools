@@ -4,8 +4,10 @@
 
 "use strict";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const helper = new LocalizationHelper("devtools/client/locales/webconsole.properties");
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+function leftFillNum(num, targetLength) {
+  return num.toString().padStart(targetLength, 0);
+}
 
 const l10n = {
   /**
@@ -21,28 +23,9 @@ const l10n = {
     const d = new Date(milliseconds ? milliseconds : null);
     const minutes = d.getMinutes();
     const seconds = d.getSeconds();
-    const parameters = [minutes, seconds];
-    return l10n.getFormatStr("timestampFormat", parameters);
-  },
-
-  /**
-   * Retrieve a localized string formatted with values coming from the given
-   * array.
-   *
-   * @param string name
-   *        The string name you want from the Web Console string bundle.
-   * @param array array
-   *        The array of values you want in the formatted string.
-   * @return string
-   *         The formatted local string.
-   */
-  getFormatStr: function (name, array) {
-    try {
-      return helper.getFormatStr(name, ...array);
-    } catch (ex) {
-      console.error("Failed to format string: " + name);
-      throw ex;
-    }
+    const zeroPaddedMinutes = leftFillNum(minutes, 2);
+    const zeroPaddedSeconds = leftFillNum(seconds, 2);
+    return `${zeroPaddedMinutes}:${zeroPaddedSeconds}`;
   },
 };
 

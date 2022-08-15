@@ -64,9 +64,7 @@ export function showLoading(editor: SourceEditor) {
 }
 
 export function showErrorMessage(editor: SourceEditor, msg: string) {
-  let error;
-  // @ts-expect-error L10N not defined
-  error = L10N.getFormatStr("errorLoadingText3", msg);
+  let error = `Error loading this URI: ${msg}`;
   const doc = editor.createDocument();
   editor.replaceDocument(doc);
   editor.setText(error);

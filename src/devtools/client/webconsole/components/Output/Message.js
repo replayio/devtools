@@ -307,7 +307,7 @@ class Message extends React.Component {
           timestampEl ? " " : null,
           dom.span(
             { className: "message-body devtools-monospace" },
-            l10n.getFormatStr("webconsole.message.componentDidCatch.label", [newBugUrl]),
+            `[DEVTOOLS ERROR] We’re sorry, we couldn’t render the message. This shouldn’t have happened - please file a bug at ${newBugUrl} with the message metadata in the description`,
             dom.button(
               {
                 className: "devtools-button",

@@ -4,9 +4,4 @@
 
 "use strict";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper("devtools/shared/locales/styleinspector.properties");
-
-module.exports = {
-  getFormatStr: (...args) => L10N.getFormatStr(...args),
-};
+module.exports = {};

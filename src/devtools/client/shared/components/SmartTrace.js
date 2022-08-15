@@ -129,7 +129,7 @@ class SmartTrace extends React.Component {
         });
       },
       getFrameTitle: url => {
-        return l10n.getFormatStr("frame.viewsourceindebugger", url);
+        return `View source in Debugger → ${url}`;
       },
       disableFrameTruncate: true,
       disableContextMenu: true,

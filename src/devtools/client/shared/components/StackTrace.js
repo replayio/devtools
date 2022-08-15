@@ -22,10 +22,7 @@ class AsyncFrameClass extends React.Component {
   render() {
     const { asyncCause } = this.props;
 
-    return dom.span(
-      { className: "frame-link-async-cause" },
-      l10n.getFormatStr("stacktrace.asyncStack", asyncCause)
-    );
+    return dom.span({ className: "frame-link-async-cause" }, `(Async: ${asyncCause})`);
   }
 }
 
