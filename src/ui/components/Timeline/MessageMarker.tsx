@@ -1,19 +1,18 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { actions } from "ui/actions";
+import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import Marker from "./Marker";
 
-function MessageMarker({
+export default function MessageMarker({
   message,
-  currentTime,
   isPrimaryHighlighted,
   isSecondaryHighlighted,
-  zoomRegion,
-  overlayWidth,
 }: MessageMarkerProps) {
   const { executionPoint, executionPointTime, frame, pauseId, executionPointHasFrames } = message;
+
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const overlayWidth = useAppSelector(selectors.getTimelineDimensions).width;
 
   return (
     <Marker
@@ -31,17 +30,8 @@ function MessageMarker({
   );
 }
 
-const connector = connect((state: UIState) => ({
-  zoomRegion: selectors.getZoomRegion(state),
-  currentTime: selectors.getCurrentTime(state),
-  overlayWidth: selectors.getTimelineDimensions(state).width,
-}));
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-type MessageMarkerProps = PropsFromRedux & {
+type MessageMarkerProps = {
   message: any;
   isPrimaryHighlighted: boolean;
   isSecondaryHighlighted: boolean;
 };
-
-export default connector(MessageMarker);

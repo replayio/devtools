@@ -1,9 +1,8 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { ChangeEvent, useState } from "react";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
@@ -130,7 +129,6 @@ const settings: Settings<
     settings?: any;
     isAdmin: boolean;
     workspaceId: string;
-    hideModal: PropsFromRedux["hideModal"];
   }
 > = [
   {
@@ -146,13 +144,13 @@ const settings: Settings<
   {
     title: "Team Members",
     icon: "group",
-    component: function TeamMembers({ isAdmin, workspaceId, settings, ...rest }) {
+    component: function TeamMembers({ isAdmin, workspaceId }) {
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-col flex-grow space-y-3">
+        <div className="flex flex-grow flex-col space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm {...rest} members={members} />
+          <WorkspaceForm members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
           <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
@@ -180,7 +178,8 @@ const settings: Settings<
   {
     title: "Delete Team",
     icon: "cancel",
-    component: function DeleteTeam({ hideModal, workspaceId }) {
+    component: function DeleteTeam({ workspaceId }) {
+      const dispatch = useAppDispatch();
       const redirectToTeam = useRedirectToTeam(true);
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
@@ -196,7 +195,7 @@ const settings: Settings<
             deleteWorkspace({
               variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
             });
-            hideModal();
+            dispatch(actions.hideModal());
             updateDefaultWorkspace({ variables: { workspaceId: null } });
             redirectToTeam("me");
           }
@@ -221,23 +220,23 @@ const settings: Settings<
   },
 ];
 
-function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
-  const workspaceId = useGetTeamIdFromRoute();
-  const [selectedTab, setTab] = useState<string>();
-  const { members } = hooks.useGetWorkspaceMembers(workspaceId);
-  const { workspace } = hooks.useGetWorkspace(workspaceId);
-  const { userId: localUserId } = hooks.useGetUserId();
-
-  useEffect(() => {
-    if (view) {
-      const views: Record<string, string> = {
+export default function WorkspaceSettingsModal() {
+  const selectedTab = useAppSelector(state => {
+    const opts = selectors.getModalOptions(state);
+    const view = opts && "view" in opts ? opts.view : null;
+    return (
+      view &&
+      {
         billing: "Billing",
         members: "Team Members",
         api: "API Keys",
-      };
-      setTab(views[view]);
-    }
-  }, [view]);
+      }[view]
+    );
+  });
+  const workspaceId = useGetTeamIdFromRoute();
+  const { members } = hooks.useGetWorkspaceMembers(workspaceId);
+  const { workspace } = hooks.useGetWorkspace(workspaceId);
+  const { userId: localUserId } = hooks.useGetUserId();
 
   if (!(workspaceId && workspace)) {
     return null;
@@ -263,7 +262,7 @@ function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
     <SettingsModal
       hiddenTabs={hiddenTabs}
       tab={tab}
-      panelProps={{ isAdmin, workspaceId, ...rest }}
+      panelProps={{ isAdmin, workspaceId }}
       settings={settings}
       size="lg"
       title={
@@ -276,17 +275,3 @@ function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
     />
   );
 }
-
-const connector = connect(
-  (state: UIState) => {
-    const opts = selectors.getModalOptions(state);
-    const view = opts && "view" in opts ? opts.view : null;
-    return { view };
-  },
-  {
-    hideModal: actions.hideModal,
-  }
-);
-export type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(WorkspaceSettingsModal);

@@ -1,17 +1,13 @@
 import React from "react";
-import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
 import { ReplayEvent } from "ui/state/app";
+import { useAppSelector } from "ui/setup/hooks";
 import Marker from "./Marker";
 
-function EventMarker({
-  event,
-  currentTime,
-  isPrimaryHighlighted,
-  zoomRegion,
-  overlayWidth,
-}: EventMarkerProps) {
+export default function EventMarker({ event, isPrimaryHighlighted }: EventMarkerProps) {
+  const zoomRegion = useAppSelector(selectors.getZoomRegion);
+  const currentTime = useAppSelector(selectors.getCurrentTime);
+  const overlayWidth = useAppSelector(selectors.getTimelineDimensions).width;
   return (
     <Marker
       point={event.point}
@@ -26,16 +22,7 @@ function EventMarker({
   );
 }
 
-const connector = connect((state: UIState) => ({
-  zoomRegion: selectors.getZoomRegion(state),
-  currentTime: selectors.getCurrentTime(state),
-  overlayWidth: selectors.getTimelineDimensions(state).width,
-}));
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-type EventMarkerProps = PropsFromRedux & {
+type EventMarkerProps = {
   event: ReplayEvent;
   isPrimaryHighlighted: boolean;
 };
-
-export default connector(EventMarker);
