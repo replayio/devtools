@@ -20,7 +20,7 @@ interface PropsFromParent {
   focusable?: boolean;
   disableWrap?: boolean;
   inline?: boolean;
-  mode: Symbol;
+  mode?: Symbol;
   activeItem?: Item;
   focusedItem?: Item;
   autoExpandAll?: boolean;

@@ -305,6 +305,7 @@ function bindSelectors(store: UIStore, selectors: ObjectOfJustSelectorsHopefully
   // Additionally, the "binding" of passing in `state` automatically messes up the TS types here.
   // I've attempted to get TS to accept that this is valid.
   return Object.entries(selectors).reduce((bound, [key, originalSelector]) => {
+    // @ts-expect-error
     bound[key as keyof BoundSelectors] = (...args: any[]) =>
       // @ts-expect-error
       originalSelector(store.getState(), ...args);

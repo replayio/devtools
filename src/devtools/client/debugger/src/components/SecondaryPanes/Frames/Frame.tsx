@@ -4,7 +4,6 @@
 
 //
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 
 import classNames from "classnames";
 
@@ -15,13 +14,23 @@ import FrameMenu from "./FrameMenu";
 import FrameIndent from "./FrameIndent";
 import { trackEvent } from "ui/utils/telemetry";
 import { Redacted } from "ui/components/Redacted";
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+import type { CommonFrameComponentProps } from "./index";
 
-function FrameTitle({ frame, options = {}, l10n }) {
-  const displayName = formatDisplayName(frame, options, l10n);
+type FrameNameOptions = Parameters<typeof formatDisplayName>[1];
+
+function FrameTitle({ frame, options = {} }: { frame: PauseFrame; options: FrameNameOptions }) {
+  const displayName = formatDisplayName(frame, options);
   return <span className="title">{displayName}</span>;
 }
 
-function FrameLocation({ frame, displayFullUrl = false }) {
+function FrameLocation({
+  frame,
+  displayFullUrl = false,
+}: {
+  frame: PauseFrame;
+  displayFullUrl?: boolean;
+}) {
   if (!frame.source) {
     return null;
   }
@@ -48,7 +57,14 @@ function FrameLocation({ frame, displayFullUrl = false }) {
 
 FrameLocation.displayName = "FrameLocation";
 
-export default class FrameComponent extends Component {
+type FrameProps = CommonFrameComponentProps & {
+  frame: PauseFrame;
+  hideLocation: boolean;
+  shouldMapDisplayName: boolean;
+  getFrameTitle?: (url: string) => string;
+};
+
+export default class FrameComponent extends Component<FrameProps> {
   static defaultProps = {
     hideLocation: false,
     shouldMapDisplayName: true,
@@ -63,12 +79,12 @@ export default class FrameComponent extends Component {
     return this.props.panel == "debugger";
   }
 
-  onContextMenu(event) {
+  onContextMenu(event: React.MouseEvent) {
     const { frame, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
-    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event, cx);
+    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
   }
 
-  onMouseDown(e, frame) {
+  onMouseDown(e: React.MouseEvent, frame: PauseFrame) {
     if (e.button !== 0) {
       return;
     }
@@ -79,7 +95,7 @@ export default class FrameComponent extends Component {
     this.props.selectFrame(this.props.cx, frame);
   }
 
-  onKeyUp(event, frame, selectedFrame) {
+  onKeyUp(event: React.KeyboardEvent, frame: PauseFrame) {
     if (event.key != "Enter") {
       return;
     }
@@ -98,7 +114,6 @@ export default class FrameComponent extends Component {
       disableContextMenu,
       panel,
     } = this.props;
-    const { l10n } = this.context;
 
     const className = classNames("frame", {
       selected: selectedFrame && selectedFrame.id === frame.id,
@@ -117,9 +132,9 @@ export default class FrameComponent extends Component {
         role="listitem"
         key={frame.id}
         className={className}
-        onMouseDown={e => this.onMouseDown(e, frame, selectedFrame)}
-        onKeyUp={e => this.onKeyUp(e, frame, selectedFrame)}
-        onContextMenu={disableContextMenu ? null : e => this.onContextMenu(e)}
+        onMouseDown={e => this.onMouseDown(e, frame)}
+        onKeyUp={e => this.onKeyUp(e, frame)}
+        onContextMenu={disableContextMenu ? undefined : e => this.onContextMenu(e)}
         tabIndex={0}
         title={title}
       >
@@ -129,7 +144,7 @@ export default class FrameComponent extends Component {
             {this.isDebugger ? (
               <span className="async-label">{frame.asyncCause}</span>
             ) : (
-              l10n.getFormatStr("stacktrace.asyncStack", frame.asyncCause)
+              `(Async: ${frame.asyncCause})`
             )}
             {this.isSelectable && <br className="clipboard-only" />}
           </span>
@@ -138,7 +153,7 @@ export default class FrameComponent extends Component {
         <div
           className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}
         >
-          <FrameTitle frame={frame} options={{ shouldMapDisplayName }} l10n={l10n} />
+          <FrameTitle frame={frame} options={{ shouldMapDisplayName }} />
           {!hideLocation && <span className="clipboard-only"> </span>}
           {!hideLocation && <FrameLocation frame={frame} displayFullUrl={displayFullUrl} />}
           {this.isSelectable && <br className="clipboard-only" />}
@@ -147,6 +162,3 @@ export default class FrameComponent extends Component {
     );
   }
 }
-
-FrameComponent.displayName = "Frame";
-FrameComponent.contextTypes = { l10n: PropTypes.object };

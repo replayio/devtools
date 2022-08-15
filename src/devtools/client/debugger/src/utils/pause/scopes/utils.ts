@@ -42,7 +42,7 @@ export function getFramePopVariables(why: any, path: string) {
   return vars;
 }
 
-export function getThisVariable(this_: ValueFront, path: string) {
+export function getThisVariable(this_?: ValueFront, path?: string) {
   if (!this_) {
     return null;
   }

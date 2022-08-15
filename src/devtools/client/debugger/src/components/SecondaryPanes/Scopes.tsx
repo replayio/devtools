@@ -7,9 +7,9 @@ import {
   unHighlightDomElement,
 } from "devtools/client/webconsole/actions/toolbox";
 import { ObjectInspector } from "devtools/packages/devtools-reps";
-import { showMenu } from "devtools/shared/contextmenu";
+import type { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
@@ -17,8 +17,8 @@ import { getCurrentTime } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 import { formatTimestamp } from "ui/utils/time";
 import { prefs as prefsService } from "devtools/shared/services";
+import type { PauseFrame, ConvertedScope } from "devtools/client/debugger/src/reducers/pause";
 
-import actions from "../../actions";
 import {
   getSelectedFrame,
   getFrameScope,
@@ -26,31 +26,40 @@ import {
   getThreadContext,
   getFramesLoading,
 } from "../../selectors";
+import { openLink, openNodeInInspector } from "devtools/client/webconsole/actions/toolbox";
 import { getScopes } from "../../utils/pause/scopes";
-import { getScopeItemPath } from "../../utils/pause/scopes/utils";
-import { features } from "../../utils/prefs";
 import NewObjectInspector from "./NewObjectInspector";
+import { UIState } from "ui/state";
 
-class Scopes extends PureComponent {
-  constructor(props) {
-    const { why, selectedFrame, frameScopes } = props;
+type StateScopes = (ContainerItem | ValueItem)[] | null;
+interface ScopesState {
+  scopes: StateScopes;
+}
 
-    super(props);
+type Why = PropsFromRedux["why"];
+type SelectedFrame = PropsFromRedux["selectedFrame"];
+type FrameScopes = PropsFromRedux["frameScopes"];
 
-    this.state = { scopes: null };
+class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
+  state = { scopes: null as StateScopes };
+
+  componentDidMount() {
+    const { why, selectedFrame, frameScopes } = this.props;
     this.updateScopes(why, selectedFrame, frameScopes);
   }
 
-  async updateScopes(why, selectedFrame, frameScopes) {
+  async updateScopes(why: Why, selectedFrame: SelectedFrame, frameScopes: FrameScopes) {
     const scopes = getScopes(why, selectedFrame, frameScopes);
     if (scopes) {
-      const scopesToLoad = scopes.filter(scope => scope.type === "value" && !scope.loaded);
-      await Promise.all(scopesToLoad.map(scope => scope.contents.load()));
-      this.setState({ scopes });
+      const scopesToLoad = scopes.filter(
+        scope => scope!.type === "value" && (!scope as any)!.loaded
+      );
+      await Promise.all(scopesToLoad.map(scope => (scope!.contents as any)!.load()));
+      this.setState({ scopes: scopes as StateScopes });
     }
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
     const { cx, selectedFrame, frameScopes } = this.props;
     const isPausedChanged = cx.isPaused !== nextProps.cx.isPaused;
     const selectedFrameChanged = selectedFrame !== nextProps.selectedFrame;
@@ -61,25 +70,6 @@ class Scopes extends PureComponent {
       this.updateScopes(nextProps.why, nextProps.selectedFrame, nextProps.frameScopes);
     }
   }
-
-  renderWatchpointButton = item => {
-    return null;
-
-    const { removeWatchpoint } = this.props;
-
-    if (!item || !item.contents || !item.contents.watchpoint || typeof L10N === "undefined") {
-      return null;
-    }
-
-    const watchpoint = item.contents.watchpoint;
-    return (
-      <button
-        className={`remove-${watchpoint}-watchpoint`}
-        title={"Remove watchpoint"}
-        onClick={() => removeWatchpoint(item)}
-      />
-    );
-  };
 
   renderScopesList() {
     const {
@@ -93,7 +83,9 @@ class Scopes extends PureComponent {
     } = this.props;
     const { scopes } = this.state;
 
-    scopes.forEach((s, i) => {
+    scopes!.forEach((s, i) => {
+      // TODO STOP MUTATING FRONTS!
+      // @ts-expect-error we're mutating these fronts - bad!
       s.path = `scope${selectedFrame?.id}.${i}`;
     });
 
@@ -102,21 +94,14 @@ class Scopes extends PureComponent {
     );
     let objectInspector = null;
     if (enableNewComponentArchitecture) {
-      objectInspector = <NewObjectInspector roots={scopes} />;
+      objectInspector = <NewObjectInspector roots={scopes!} />;
     } else {
       objectInspector = (
         <ObjectInspector
-          roots={scopes}
+          roots={scopes!}
           autoExpandAll={false}
           autoExpandDepth={1}
           disableWrap={true}
-          dimTopLevelWindow={true}
-          openLink={openLink}
-          onDOMNodeClick={grip => openElementInInspector(grip)}
-          onInspectIconClick={grip => openElementInInspector(grip)}
-          onDOMNodeMouseOver={grip => highlightDomElement(grip)}
-          onDOMNodeMouseOut={grip => unHighlightDomElement(grip)}
-          renderItemActions={this.renderWatchpointButton}
         />
       );
     }
@@ -176,7 +161,7 @@ class Scopes extends PureComponent {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state: UIState) => {
   const cx = getThreadContext(state);
   const selectedFrame = getSelectedFrame(state);
   const frameScope = getFrameScope(state, selectedFrame?.id);
@@ -202,11 +187,13 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(mapStateToProps, {
+const connector = connect(mapStateToProps, {
   enterFocusMode: enterFocusModeAction,
-  openLink: actions.openLink,
-  openElementInInspector: actions.openNodeInInspector,
+  openLink,
+  openElementInInspector: openNodeInInspector,
   highlightDomElement,
   unHighlightDomElement,
-  removeWatchpoint: actions.removeWatchpoint,
-})(Scopes);
+});
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(Scopes);

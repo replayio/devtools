@@ -4,14 +4,13 @@
 
 //
 
-import get from "lodash/get";
-import findIndex from "lodash/findIndex";
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 // eslint-disable-next-line max-len
 import { getFrameUrl } from "./getFrameUrl";
 
-function collapseLastFrames(frames) {
-  const index = findIndex(frames, frame => getFrameUrl(frame).match(/webpack\/bootstrap/i));
+function collapseLastFrames(frames: PauseFrame[]) {
+  const index = frames.findIndex(frame => getFrameUrl(frame).match(/webpack\/bootstrap/i));
 
   if (index == -1) {
     return { newFrames: frames, lastGroup: [] };
@@ -22,10 +21,10 @@ function collapseLastFrames(frames) {
   return { newFrames, lastGroup };
 }
 
-export function collapseFrames(frames) {
+export function collapseFrames(frames: PauseFrame[]) {
   // We collapse groups of one so that user frames
   // are not in a group of one
-  function addGroupToList(group, list) {
+  function addGroupToList(group: PauseFrame[] | null, list: (PauseFrame | PauseFrame[])[]) {
     if (!group) {
       return list;
     }
@@ -41,7 +40,7 @@ export function collapseFrames(frames) {
 
   const { newFrames, lastGroup } = collapseLastFrames(frames);
   frames = newFrames;
-  let items = [];
+  let items: (PauseFrame | PauseFrame[])[] = [];
   let currentGroup = null;
   let prev = null;
   for (const frame of frames) {

@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 import { getFrameUrl } from "./getFrameUrl";
 
@@ -121,7 +121,7 @@ const libraryMap = [
   },
 ];
 
-export function getLibraryFromUrl(frame, callStack = []) {
+export function getLibraryFromUrl(frame: PauseFrame, callStack: PauseFrame[] = []) {
   // @TODO each of these fns calls getFrameUrl, just call it once
   // (assuming there's not more complex logic to identify a lib)
   const frameUrl = getFrameUrl(frame);

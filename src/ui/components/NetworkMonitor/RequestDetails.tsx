@@ -19,7 +19,7 @@ import { StackTrace } from "./StackTrace";
 
 interface Detail {
   name: string;
-  value: string | React.ReactChild;
+  value: string | React.ReactNode;
 }
 
 export const RequestDetailsUnavailable = () => {
@@ -27,9 +27,9 @@ export const RequestDetailsUnavailable = () => {
   const closePanel = () => dispatch(hideRequestDetails());
 
   return (
-    <div className="flex flex-col w-full h-full">
+    <div className="flex h-full w-full flex-col">
       <RequestDetailsTabs>
-        <div className="flex justify-end flex-grow">
+        <div className="flex flex-grow justify-end">
           <CloseButton buttonClass="mr-4" handleClick={closePanel} tooltip={"Close tab"} />
         </div>
       </RequestDetailsTabs>
@@ -329,7 +329,7 @@ const RequestDetails = ({
   }
 
   return (
-    <div className="w-full overflow-y-scroll border-l no-scrollbar border-themeBorder bg-bodyBgcolor">
+    <div className="no-scrollbar w-full overflow-y-scroll border-l border-themeBorder bg-bodyBgcolor">
       <RequestDetailsTabs>
         <PanelTabs tabs={tabs} activeTab={activeTab} setActiveTab={setActiveTab} />
         <CloseButton buttonClass="mr-2" handleClick={closePanel} tooltip={"Close tab"} />
