@@ -102,6 +102,10 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
           autoExpandAll={false}
           autoExpandDepth={1}
           disableWrap={true}
+          onDOMNodeClick={(grip: any) => openElementInInspector(grip)}
+          onInspectIconClick={(grip: any) => openElementInInspector(grip)}
+          onDOMNodeMouseOver={(grip: any) => highlightDomElement(grip)}
+          onDOMNodeMouseOut={(grip: any) => unHighlightDomElement()}
         />
       );
     }

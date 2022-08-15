@@ -2,6 +2,7 @@ import classnames from "classnames";
 import { Tree } from "devtools/client/debugger/src/components/shared/tree";
 import { SmartTraceStackFrame } from "devtools/client/shared/components/SmartTrace";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions";
+import { AnyArray } from "immer/dist/internal";
 import { assert } from "protocol/utils";
 import React, { FC, PureComponent, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -30,6 +31,10 @@ interface PropsFromParent {
   onFocus?: (item: Item | undefined) => void;
   rootsChanged?: () => void;
   renderStacktrace?: (stacktrace: SmartTraceStackFrame[]) => ReactNode;
+  onDOMNodeClick?: (grip: any) => void;
+  onInspectIconClick?: (grip: any, e: React.MouseEvent) => void;
+  onDOMNodeMouseOver?: (grip: any) => void;
+  onDOMNodeMouseOut?: (grip: any) => void;
 }
 
 type ObjectInspectorProps = PropsFromRedux & PropsFromParent;
