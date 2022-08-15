@@ -4,7 +4,6 @@
 
 "use strict";
 
-const DevToolsUtils = require("devtools/shared/DevToolsUtils");
 const EventEmitter = require("devtools/shared/event-emitter");
 
 /**
@@ -187,23 +186,6 @@ Menu.prototype._createMenuItems = function (parent) {
       parent.appendChild(menuitem);
     }
   });
-};
-
-Menu.getMenuElementById = function (id, doc) {
-  const menuDoc = DevToolsUtils.getTopWindow(doc.defaultView).document;
-  return menuDoc.getElementById(id);
-};
-
-Menu.setApplicationMenu = () => {
-  throw Error("Not implemented");
-};
-
-Menu.sendActionToFirstResponder = () => {
-  throw Error("Not implemented");
-};
-
-Menu.buildFromTemplate = () => {
-  throw Error("Not implemented");
 };
 
 function applyItemAttributesToNode(item, node) {

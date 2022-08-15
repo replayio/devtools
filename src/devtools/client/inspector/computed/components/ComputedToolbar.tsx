@@ -1,7 +1,7 @@
 import React, { FormEvent, useRef } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
-const { debounce } = require("devtools/shared/debounce");
+import debounce from "lodash/debounce";
 import { setComputedPropertySearch, setShowBrowserStyles } from "../actions";
 
 function ComputedToolbar(props: PropsFromRedux) {

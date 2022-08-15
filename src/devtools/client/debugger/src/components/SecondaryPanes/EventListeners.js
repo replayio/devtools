@@ -10,7 +10,6 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 
 import AccessibleImage from "../shared/AccessibleImage";
-import { prefs } from "ui/utils/prefs";
 import { trackEvent } from "ui/utils/telemetry";
 import Spinner from "ui/components/shared/Spinner";
 import Checkbox from "ui/components/shared/Forms/Checkbox";

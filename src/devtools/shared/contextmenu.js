@@ -10,55 +10,6 @@ function inToolbox() {
   }
 }
 
-function createPopup(doc) {
-  let popup = doc.createElement("menupopup");
-  popup.className = "landing-popup";
-
-  if (popup.openPopupAtScreen) {
-    return popup;
-  }
-
-  function preventDefault(e) {
-    e.preventDefault();
-    e.returnValue = false;
-  }
-
-  let mask = document.querySelector("#contextmenu-mask");
-
-  if (!mask) {
-    mask = doc.createElement("div");
-    mask.id = "contextmenu-mask";
-    document.body.appendChild(mask);
-  }
-
-  mask.onclick = () => popup.hidePopup();
-
-  popup.openPopupAtScreen = function (clientX, clientY) {
-    this.style.setProperty("left", `${clientX}px`);
-    this.style.setProperty("top", `${clientY}px`);
-    mask = document.querySelector("#contextmenu-mask");
-    window.onwheel = preventDefault;
-    mask.classList.add("show");
-    this.dispatchEvent(new Event("popupshown"));
-    this.popupshown;
-  };
-
-  popup.hidePopup = function () {
-    this.remove();
-    mask = document.querySelector("#contextmenu-mask");
-    mask.classList.remove("show");
-    window.onwheel = null;
-  };
-
-  return popup;
-}
-
-/*
-if (!inToolbox()) {
-Menu.prototype.createPopup = createPopup;
-}
-*/
-
 function onShown(menu, popup) {
   popup.childNodes.forEach((menuItemNode, i) => {
     let item = menu.items[i];
