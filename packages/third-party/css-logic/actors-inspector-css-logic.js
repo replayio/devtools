@@ -38,7 +38,7 @@ const {
   shortSource,
   FILTER,
   STATUS,
-} = require("devtools/shared/inspector/css-logic");
+} = require("./shared-inspector-css-logic");
 
 const COMPAREMODE = {
   BOOLEAN: "bool",

@@ -76,9 +76,7 @@ import "devtools/client/debugger/src/components/shared/tree.css";
 import "devtools/client/debugger/src/components/ShortcutsModal.css";
 import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/shared/components/Accordion.css";
-import "devtools/client/shared/components/SidebarToggle.css";
 import "devtools/client/shared/components/splitter/SplitBox.css";
-import "devtools/client/shared/components/tabs/Tabs.css";
 import "devtools/client/themes/accessibility-color-contrast.css";
 import "devtools/client/themes/badge.css";
 import "devtools/client/themes/boxmodel.css";
@@ -123,7 +121,7 @@ import "ui/components/Timeline/MessageMarker.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
-import "ui/utils/sourcemapVisualizer.css";
+import "packages/third-party/sourcemap-visualizer/sourcemapVisualizer.css";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.

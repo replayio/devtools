@@ -14,7 +14,7 @@ const EventEmitter = require("devtools/shared/event-emitter");
 
 const lazyContainer = {
   get CssLogic() {
-    return require("devtools/server/actors/inspector/css-logic").CssLogic;
+    return require("third-party/css-logic/actors-inspector-css-logic").CssLogic;
   },
 };
 
