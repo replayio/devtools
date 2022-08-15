@@ -985,7 +985,8 @@ class _ThreadFront {
   getPreferredLocationRaw(locations: MappedLocation) {
     const sourceId = getPreferredSourceId(
       this.sourcesSelectors!.getSourceDetailsEntities(),
-      locations.map(l => l.sourceId)
+      locations.map(l => l.sourceId),
+      this.preferredGeneratedSources
     );
     const preferredLocation = locations.find(l => l.sourceId == sourceId);
     assert(preferredLocation, "no preferred location found");
@@ -1035,7 +1036,8 @@ class _ThreadFront {
     await this.ensureAllSources();
     const alternateId = getAlternateSourceId(
       this.sourcesSelectors!.getSourceDetailsEntities(),
-      locations.map(l => l.sourceId)
+      locations.map(l => l.sourceId),
+      this.preferredGeneratedSources
     );
     if (alternateId) {
       return locations.find(l => l.sourceId == alternateId);

@@ -318,17 +318,39 @@ export function getBestNonSourceMappedSourceId(
   });
 }
 
-export function getPreferredSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
-  return (
-    getBestSourceMappedSourceId(sourcesById, sourceIds) ||
-    getBestNonSourceMappedSourceId(sourcesById, sourceIds)
-  );
+export function getPreferredSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[],
+  preferredGeneratedSources?: Set<string>
+) {
+  const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
+  const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+  if (!sourceMappedId) {
+    return nonSourceMappedId;
+  }
+  if (!nonSourceMappedId) {
+    return sourceMappedId;
+  }
+  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+    return nonSourceMappedId;
+  }
+  return sourceMappedId;
 }
 
-export function getAlternateSourceId(sourcesById: Dictionary<SourceDetails>, sourceIds: string[]) {
-  if (sourceIds.some(sourceId => sourcesById[sourceId]?.isSourceMapped)) {
-    return getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+export function getAlternateSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[],
+  preferredGeneratedSources?: Set<string>
+) {
+  const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
+  const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+  if (!sourceMappedId || !nonSourceMappedId) {
+    return;
   }
+  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+    return sourceMappedId;
+  }
+  return nonSourceMappedId;
 }
 
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
