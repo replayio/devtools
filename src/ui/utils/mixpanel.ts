@@ -33,6 +33,7 @@ type MixpanelEvent =
   | ["breakpoint.set_log"]
   | ["breakpoint.start_edit", { input: Input; hitsCount: number | null }]
   | ["breakpoint.too_many_points"]
+  | ["call_stack.select_frame"]
   | ["comments.create"]
   | ["comments.delete"]
   | ["comments.focus"]

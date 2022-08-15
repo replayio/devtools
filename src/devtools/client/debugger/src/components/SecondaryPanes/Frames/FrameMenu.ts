@@ -7,9 +7,11 @@ import { showMenu } from "devtools/shared/contextmenu";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import kebabCase from "lodash/kebabCase";
 
-function formatMenuElement(labelString, click, disabled = false) {
-  const label = L10N.getStr(labelString);
-  const accesskey = L10N.getStr(`${labelString}.accesskey`);
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+
+function formatMenuElement(labelString: string, click: () => void, disabled = false) {
+  const label = window.L10N.getStr(labelString);
+  const accesskey = window.L10N.getStr(`${labelString}.accesskey`);
   const id = `node-menu-${kebabCase(label)}`;
   return {
     id,
@@ -20,21 +22,29 @@ function formatMenuElement(labelString, click, disabled = false) {
   };
 }
 
-function copySourceElement(url) {
+function copySourceElement(url: string) {
   return formatMenuElement("copySourceUri2", () => copyToTheClipboard(url));
 }
 
-function copyStackTraceElement(copyStackTrace) {
+function copyStackTraceElement(copyStackTrace: () => void) {
   return formatMenuElement("copyStackTrace", () => copyStackTrace());
 }
 
-function toggleFrameworkGroupingElement(toggleFrameworkGrouping, frameworkGroupingOn) {
+function toggleFrameworkGroupingElement(
+  toggleFrameworkGrouping: () => void,
+  frameworkGroupingOn: boolean
+) {
   const actionType = frameworkGroupingOn ? "framework.disableGrouping" : "framework.enableGrouping";
 
   return formatMenuElement(actionType, () => toggleFrameworkGrouping());
 }
 
-export default function FrameMenu(frame, frameworkGroupingOn, callbacks, event, cx) {
+export default function FrameMenu(
+  frame: PauseFrame,
+  frameworkGroupingOn: boolean,
+  callbacks: { toggleFrameworkGrouping: () => void; copyStackTrace: () => void },
+  event: React.MouseEvent
+) {
   event.stopPropagation();
   event.preventDefault();
 
@@ -48,7 +58,7 @@ export default function FrameMenu(frame, frameworkGroupingOn, callbacks, event, 
 
   const { source } = frame;
   if (source) {
-    const copySourceUri2 = copySourceElement(source.url);
+    const copySourceUri2 = copySourceElement(source.url!);
     menuOptions.push(copySourceUri2);
   }
 

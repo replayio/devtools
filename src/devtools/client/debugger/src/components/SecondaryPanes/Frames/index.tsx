@@ -4,7 +4,7 @@
 
 import PropTypes from "prop-types";
 import React, { PureComponent } from "react";
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
@@ -25,12 +25,21 @@ import {
   getFramesLoading,
   getFramesErrored,
 } from "../../../selectors";
+import { UIState } from "ui/state";
+import type { Context, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
-class Frames extends PureComponent {
+interface FramesProps {
+  frames: PauseFrame[] | null;
+  selectFrame: (cx: Context, frame: PauseFrame) => void;
+  panel: "debugger" | "console" | "webconsole";
+}
+
+type FinalFramesProps = FramesProps & PropsFromRedux;
+
+class Frames extends PureComponent<FinalFramesProps> {
   copyStackTrace = () => {
     const { frames } = this.props;
-    const { l10n } = this.context;
-    const framesToCopy = frames.map(f => formatCopyName(f, l10n)).join("\n");
+    const framesToCopy = frames!.map(f => formatCopyName(f)).join("\n");
     copyToTheClipboard(framesToCopy);
   };
 
@@ -39,7 +48,7 @@ class Frames extends PureComponent {
     toggleFrameworkGrouping(!frameworkGroupingOn);
   };
 
-  collapseFrames(frames) {
+  collapseFrames(frames: PauseFrame[]) {
     const { frameworkGroupingOn } = this.props;
     if (!frameworkGroupingOn) {
       return frames;
@@ -48,14 +57,13 @@ class Frames extends PureComponent {
     return collapseFrames(frames);
   }
 
-  renderFrames(frames) {
+  renderFrames(frames: PauseFrame[]) {
     const {
       cx,
       selectFrame,
       selectedFrame,
       frameworkGroupingOn,
       displayFullUrl,
-      getFrameTitle,
       disableContextMenu,
       panel,
     } = this.props;
@@ -67,39 +75,24 @@ class Frames extends PureComponent {
     // places where we don't want to have those new lines.
     return (
       <div role="list">
-        {framesOrGroups.map(frameOrGroup =>
-          frameOrGroup.id ? (
-            <FrameComponent
-              cx={cx}
-              frame={frameOrGroup}
-              toggleFrameworkGrouping={this.toggleFrameworkGrouping}
-              copyStackTrace={this.copyStackTrace}
-              frameworkGroupingOn={frameworkGroupingOn}
-              selectFrame={selectFrame}
-              selectedFrame={selectedFrame}
-              key={String(frameOrGroup.id)}
-              displayFullUrl={displayFullUrl}
-              getFrameTitle={getFrameTitle}
-              disableContextMenu={disableContextMenu}
-              panel={panel}
-            />
-          ) : (
-            <Group
-              cx={cx}
-              group={frameOrGroup}
-              toggleFrameworkGrouping={this.toggleFrameworkGrouping}
-              copyStackTrace={this.copyStackTrace}
-              frameworkGroupingOn={frameworkGroupingOn}
-              selectFrame={selectFrame}
-              selectedFrame={selectedFrame}
-              key={frameOrGroup[0].id}
-              displayFullUrl={displayFullUrl}
-              getFrameTitle={getFrameTitle}
-              disableContextMenu={disableContextMenu}
-              panel={panel}
-            />
-          )
-        )}
+        {framesOrGroups.map(frameOrGroup => {
+          const commonProps: CommonFrameComponentProps = {
+            cx,
+            toggleFrameworkGrouping: this.toggleFrameworkGrouping,
+            frameworkGroupingOn,
+            selectFrame,
+            selectedFrame,
+            displayFullUrl,
+            disableContextMenu,
+            copyStackTrace: this.copyStackTrace,
+            panel,
+          };
+          if (Array.isArray(frameOrGroup)) {
+            return <Group {...commonProps} group={frameOrGroup} key={frameOrGroup[0].id} />;
+          } else {
+            return <FrameComponent {...commonProps} frame={frameOrGroup} />;
+          }
+        })}
       </div>
     );
   }
@@ -165,9 +158,7 @@ class Frames extends PureComponent {
   }
 }
 
-Frames.contextTypes = { l10n: PropTypes.object };
-
-const mapStateToProps = state => ({
+const mapStateToProps = (state: UIState) => ({
   cx: getThreadContext(state),
   currentTime: getCurrentTime(state),
   disableContextMenu: false,
@@ -183,11 +174,25 @@ const mapStateToProps = state => ({
   showUnloadedRegionError: !isCurrentTimeInLoadedRegion(state),
 });
 
-export default connect(mapStateToProps, {
+const connector = connect(mapStateToProps, {
   enterFocusMode: enterFocusModeAction,
   selectFrame: actions.selectFrame,
   toggleFrameworkGrouping: actions.toggleFrameworkGrouping,
-})(Frames);
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export type CommonFrameComponentProps = Pick<
+  PropsFromRedux,
+  "cx" | "selectedFrame" | "selectFrame" | "disableContextMenu" | "displayFullUrl"
+> & {
+  panel: "console" | "debugger" | "webconsole";
+  frameworkGroupingOn: boolean;
+  copyStackTrace: () => void;
+  toggleFrameworkGrouping: () => void;
+};
+
+export default connector(Frames);
 
 // Export the non-connected component in order to use it outside of the debugger
 // panel (e.g. console, netmonitor, …).

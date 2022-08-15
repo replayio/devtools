@@ -7,6 +7,7 @@ import React, { Component } from "react";
 import classNames from "classnames";
 
 import { getLibraryFromUrl } from "../../../utils/pause/frames";
+import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 import FrameMenu from "./FrameMenu";
 import AccessibleImage from "../../shared/AccessibleImage";
@@ -14,8 +15,9 @@ import FrameComponent from "./Frame";
 
 import Badge from "../../shared/Badge";
 import FrameIndent from "./FrameIndent";
+import type { CommonFrameComponentProps } from "./index";
 
-function FrameLocation({ frame, expanded }) {
+function FrameLocation({ frame, expanded }: { frame: PauseFrame; expanded: boolean }) {
   const library = frame.library || getLibraryFromUrl(frame);
   if (!library) {
     return null;
@@ -31,27 +33,28 @@ function FrameLocation({ frame, expanded }) {
   );
 }
 
-FrameLocation.displayName = "FrameLocation";
+type GroupProps = CommonFrameComponentProps & {
+  group: PauseFrame[];
+};
 
-export default class Group extends Component {
-  toggleFrames;
+interface GroupState {
+  expanded: boolean;
+}
 
-  constructor(...args) {
-    super(...args);
-    this.state = { expanded: false };
-  }
+export default class Group extends Component<GroupProps, GroupState> {
+  state = { expanded: false };
 
   get isSelectable() {
     return this.props.panel == "console";
   }
 
-  onContextMenu(event) {
+  onContextMenu(event: React.MouseEvent) {
     const { group, copyStackTrace, toggleFrameworkGrouping, frameworkGroupingOn, cx } = this.props;
     const frame = group[0];
-    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event, cx);
+    FrameMenu(frame, frameworkGroupingOn, { copyStackTrace, toggleFrameworkGrouping }, event);
   }
 
-  toggleFrames = event => {
+  toggleFrames = (event: React.MouseEvent) => {
     event.stopPropagation();
     this.setState(prevState => ({ expanded: !prevState.expanded }));
   };
@@ -61,13 +64,11 @@ export default class Group extends Component {
       cx,
       group,
       selectFrame,
-      selectLocation,
       selectedFrame,
       toggleFrameworkGrouping,
       frameworkGroupingOn,
       copyStackTrace,
       displayFullUrl,
-      getFrameTitle,
       disableContextMenu,
       panel,
     } = this.props;
@@ -83,26 +84,27 @@ export default class Group extends Component {
           if (this.isSelectable) {
             acc.push(<FrameIndent key={`frame-indent-${i}`} />);
           }
+          const commonProps: CommonFrameComponentProps = {
+            cx,
+            toggleFrameworkGrouping,
+            frameworkGroupingOn,
+            selectFrame,
+            selectedFrame,
+            displayFullUrl,
+            disableContextMenu,
+            copyStackTrace,
+            panel,
+          };
           return acc.concat(
             <FrameComponent
-              cx={cx}
-              copyStackTrace={copyStackTrace}
+              {...commonProps}
               frame={frame}
-              frameworkGroupingOn={frameworkGroupingOn}
-              hideLocation={true}
               key={frame.id}
-              selectedFrame={selectedFrame}
-              selectFrame={selectFrame}
-              selectLocation={selectLocation}
               shouldMapDisplayName={false}
-              toggleFrameworkGrouping={toggleFrameworkGrouping}
               displayFullUrl={displayFullUrl}
-              getFrameTitle={getFrameTitle}
-              disableContextMenu={disableContextMenu}
-              panel={panel}
             />
           );
-        }, [])}
+        }, [] as JSX.Element[])}
       </div>
     );
   }
@@ -140,7 +142,7 @@ export default class Group extends Component {
     return (
       <div
         className={classNames("frames-group", { expanded })}
-        onContextMenu={disableContextMenu ? null : e => this.onContextMenu(e)}
+        onContextMenu={disableContextMenu ? undefined : e => this.onContextMenu(e)}
       >
         {this.renderDescription()}
         {this.renderFrames()}
@@ -148,5 +150,3 @@ export default class Group extends Component {
     );
   }
 }
-
-Group.displayName = "Group";
