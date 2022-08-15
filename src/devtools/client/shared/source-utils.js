@@ -3,9 +3,6 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 "use strict";
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
-const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 const UNKNOWN_SOURCE_STRING = "(unknown)";
 
 // Character codes used in various parsing helper functions.

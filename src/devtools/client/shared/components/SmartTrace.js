@@ -6,10 +6,7 @@
 
 const React = require("react");
 const PropTypes = require("prop-types");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
-const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
-const dbgL10n = new LocalizationHelper("devtools/client/locales/debugger.properties");
 const Frames =
   require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index").Frames;
 const {
@@ -41,11 +38,6 @@ class SmartTrace extends React.Component {
       frozen: false,
     };
   }
-
-  getChildContext() {
-    return { l10n: dbgL10n };
-  }
-
   UNSAFE_componentWillMount() {
     if (!this.props.mapSources) {
       return;
@@ -129,7 +121,7 @@ class SmartTrace extends React.Component {
         });
       },
       getFrameTitle: url => {
-        return l10n.getFormatStr("frame.viewsourceindebugger", url);
+        return `View source in Debugger → ${url}`;
       },
       disableFrameTruncate: true,
       disableContextMenu: true,
@@ -140,9 +132,5 @@ class SmartTrace extends React.Component {
     });
   }
 }
-
-SmartTrace.childContextTypes = {
-  l10n: PropTypes.object,
-};
 
 module.exports = SmartTrace;

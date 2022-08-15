@@ -165,8 +165,6 @@ export default class KeyShortcuts {
    * API.
    **/
   private static parseElectronKey(str: string) {
-    // If a localized string is found but has no value in the properties file,
-    // getStr will return `null`. See Bug 1569572.
     if (typeof str !== "string") {
       console.error("Invalid key passed to parseElectronKey, stacktrace below");
       console.trace();

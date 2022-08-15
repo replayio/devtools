@@ -5,7 +5,6 @@
 //
 
 import React, { Component } from "react";
-import PropTypes from "prop-types";
 
 import times from "lodash/times";
 import zip from "lodash/zip";
@@ -76,5 +75,3 @@ export default class PreviewFunction extends Component {
     );
   }
 }
-
-PreviewFunction.contextTypes = { l10n: PropTypes.object };

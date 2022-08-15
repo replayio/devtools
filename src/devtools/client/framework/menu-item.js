@@ -49,7 +49,6 @@
 function MenuItem({
   accelerator = null,
   accesskey = null,
-  l10nID = null,
   checked = false,
   click = () => {},
   disabled = false,
@@ -63,7 +62,6 @@ function MenuItem({
 } = {}) {
   this.accelerator = accelerator;
   this.accesskey = accesskey;
-  this.l10nID = l10nID;
   this.checked = checked;
   this.click = click;
   this.disabled = disabled;

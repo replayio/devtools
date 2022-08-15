@@ -17,10 +17,7 @@ const {
   parseURL,
   getSourceMappedFile,
 } = require("devtools/client/shared/source-utils");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
-
-const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 
 class Frame extends Component {
   static get propTypes() {
@@ -205,9 +202,9 @@ class Frame extends Component {
     // ordering. See CSS styles for frame-link-source-[inner] and bug 1290056.
     let tooltipMessage;
     if (messageSource && messageSource === MESSAGE_SOURCE.CSS) {
-      tooltipMessage = l10n.getFormatStr("frame.viewsourceinstyleeditor", tooltip);
+      tooltipMessage = `View source in Style Editor → tooltip`;
     } else {
-      tooltipMessage = l10n.getFormatStr("frame.viewsourceindebugger", tooltip);
+      tooltipMessage = `View source in Debugger → ${tooltip}`;
     }
 
     const sourceInnerEl = dom.span(

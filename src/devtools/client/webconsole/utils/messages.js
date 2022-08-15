@@ -4,7 +4,6 @@
 
 "use strict";
 
-const l10n = require("devtools/client/webconsole/utils/l10n");
 /*
 const {
   getUrlDetails,
@@ -171,7 +170,7 @@ function transformNavigationMessagePacket(packet) {
     source: MESSAGE_SOURCE.CONSOLE_API,
     type: MESSAGE_TYPE.NAVIGATION_MARKER,
     level: MESSAGE_LEVEL.LOG,
-    messageText: l10n.getFormatStr("console.navigated", [url]),
+    messageText: [url].toString(),
     timeStamp: Date.now(),
   });
 }
@@ -464,6 +463,5 @@ module.exports = {
   isGroupType,
   isError,
   isBrowserInternalMessage,
-  l10n,
   prepareMessage,
 };

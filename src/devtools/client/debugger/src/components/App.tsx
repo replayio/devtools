@@ -36,11 +36,10 @@ class Debugger extends Component<DebuggerProps> {
 
   static childContextTypes = {
     shortcuts: PropTypes.object,
-    l10n: PropTypes.object,
   };
 
   getChildContext = () => {
-    return { shortcuts: this.shortcuts, l10n: window.L10N };
+    return { shortcuts: this.shortcuts };
   };
 
   componentDidMount() {

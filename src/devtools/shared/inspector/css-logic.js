@@ -17,11 +17,6 @@ const MAX_DATA_URL_LENGTH = 40;
 
 const Services = require("devtools/shared/services");
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const styleInspectorL10N = new LocalizationHelper(
-  "devtools/shared/locales/styleinspector.properties"
-);
-
 /**
  * Special values for filter, in addition to an href these values can be used
  */
@@ -67,15 +62,6 @@ exports.CSSRuleTypeName = {
   14: "@font-feature-values",
   15: "@viewport",
 };
-
-/**
- * Lookup a l10n string in the shared styleinspector string bundle.
- *
- * @param {String} name
- *        The key to lookup.
- * @returns {String} A localized version of the given key.
- */
-exports.l10n = name => styleInspectorL10N.getStr(name);
 
 /**
  * Is the given property sheet an author stylesheet?

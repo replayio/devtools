@@ -7,10 +7,7 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const Frame = require("devtools/client/shared/components/Frame");
-
-const l10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 class AsyncFrameClass extends React.Component {
   static get propTypes() {
@@ -22,10 +19,7 @@ class AsyncFrameClass extends React.Component {
   render() {
     const { asyncCause } = this.props;
 
-    return dom.span(
-      { className: "frame-link-async-cause" },
-      l10n.getFormatStr("stacktrace.asyncStack", asyncCause)
-    );
+    return dom.span({ className: "frame-link-async-cause" }, `(Async: ${asyncCause})`);
   }
 }
 

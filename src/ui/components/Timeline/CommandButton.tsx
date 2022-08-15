@@ -1,9 +1,6 @@
 import React, { MouseEventHandler } from "react";
 import { SVG } from "image/svg";
 import classnames from "classnames";
-const { LocalizationHelper } = require("devtools/shared/l10n");
-
-const L10N = new LocalizationHelper("devtools/client/locales/toolbox.properties");
 
 const images = {
   next: SVG.NextButton,
@@ -11,6 +8,14 @@ const images = {
   pause: SVG.ReplayPause,
   play: SVG.ReplayResume,
   comment: SVG.Comment,
+};
+
+const buttonTitles: Record<keyof typeof images, string> = {
+  next: "Next Frame",
+  previous: "Previous Frame",
+  pause: "Pause",
+  play: "Play Recording",
+  comment: "Add Comment",
 };
 
 interface CommandButtonProps {
@@ -24,7 +29,7 @@ export default function CommandButton({ img, className, onClick, active }: Comma
   const attrs = {
     className: classnames(`command-button`, { active }),
     onClick,
-    title: L10N.getStr(`toolbox.replay.${img}`),
+    title: buttonTitles[img],
   };
 
   const base64 = btoa(images[img]);

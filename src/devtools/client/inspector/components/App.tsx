@@ -64,10 +64,7 @@ const InspectorApp: FC = () => {
   }, [activeTab]);
 
   return (
-    <div
-      className="inspector-responsive-container theme-body inspector"
-      data-localization-bundle="devtools/client/locales/inspector.properties"
-    >
+    <div className="inspector-responsive-container theme-body inspector">
       <div id="inspector-splitter-box">
         <SplitBox
           className="inspector-sidebar-splitter"

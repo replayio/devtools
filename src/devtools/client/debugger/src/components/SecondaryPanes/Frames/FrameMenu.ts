@@ -9,9 +9,7 @@ import kebabCase from "lodash/kebabCase";
 
 import type { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
-function formatMenuElement(labelString: string, click: () => void, disabled = false) {
-  const label = window.L10N.getStr(labelString);
-  const accesskey = window.L10N.getStr(`${labelString}.accesskey`);
+function formatMenuElement(label: string, accesskey: string, click: () => void, disabled = false) {
   const id = `node-menu-${kebabCase(label)}`;
   return {
     id,
@@ -23,20 +21,22 @@ function formatMenuElement(labelString: string, click: () => void, disabled = fa
 }
 
 function copySourceElement(url: string) {
-  return formatMenuElement("copySourceUri2", () => copyToTheClipboard(url));
+  return formatMenuElement("Copy source URI", "u", () => copyToTheClipboard(url));
 }
 
 function copyStackTraceElement(copyStackTrace: () => void) {
-  return formatMenuElement("copyStackTrace", () => copyStackTrace());
+  return formatMenuElement("Copy stack trace", "c", () => copyStackTrace());
 }
 
 function toggleFrameworkGroupingElement(
   toggleFrameworkGrouping: () => void,
   frameworkGroupingOn: boolean
 ) {
-  const actionType = frameworkGroupingOn ? "framework.disableGrouping" : "framework.enableGrouping";
+  const actionType = frameworkGroupingOn
+    ? "Disable framework grouping"
+    : "Enable framework grouping";
 
-  return formatMenuElement(actionType, () => toggleFrameworkGrouping());
+  return formatMenuElement(actionType, "u", () => toggleFrameworkGrouping());
 }
 
 export default function FrameMenu(

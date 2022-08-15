@@ -11,7 +11,6 @@ const { withRouter } = require("next/router");
 const classNames = require("classnames");
 const React = require("react");
 const dom = require("react-dom-factories");
-const { l10n } = require("devtools/client/webconsole/utils/messages");
 const { actions } = require("ui/actions/index");
 const FrameView = require("devtools/client/shared/components/Frame");
 
@@ -22,6 +21,19 @@ const SmartTrace = require("devtools/client/shared/components/SmartTrace");
 const { trackEvent } = require("ui/utils/telemetry");
 const { dismissNag, Nag } = require("ui/hooks/users");
 import { getRecordingId } from "ui/utils/recording";
+
+function leftFillNum(num, targetLength) {
+  return num.toString().padStart(targetLength, 0);
+}
+
+function formatTimestampString(milliseconds) {
+  const d = new Date(milliseconds ? milliseconds : null);
+  const minutes = d.getMinutes();
+  const seconds = d.getSeconds();
+  const zeroPaddedMinutes = leftFillNum(minutes, 2);
+  const zeroPaddedSeconds = leftFillNum(seconds, 2);
+  return `${zeroPaddedMinutes}:${zeroPaddedSeconds}`;
+}
 
 class Message extends React.Component {
   static get propTypes() {
@@ -275,7 +287,7 @@ class Message extends React.Component {
     }
 
     const timestampString = this.props.executionPointTime
-      ? l10n.timestampString(this.props.executionPointTime)
+      ? formatTimestampString(this.props.executionPointTime)
       : "";
 
     return dom.span(
@@ -307,7 +319,7 @@ class Message extends React.Component {
           timestampEl ? " " : null,
           dom.span(
             { className: "message-body devtools-monospace" },
-            l10n.getFormatStr("webconsole.message.componentDidCatch.label", [newBugUrl]),
+            `[DEVTOOLS ERROR] We’re sorry, we couldn’t render the message. This shouldn’t have happened - please file a bug at ${newBugUrl} with the message metadata in the description`,
             dom.button(
               {
                 className: "devtools-button",

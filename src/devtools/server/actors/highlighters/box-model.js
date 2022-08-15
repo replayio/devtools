@@ -10,19 +10,12 @@ const {
   createNode,
   createSVGNode,
   getBindingElementAndPseudo,
-  hasPseudoClassLock,
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
 const { getCurrentZoom } = require("devtools/shared/layout/utils");
-const {
-  getNodeDisplayName,
-  getNodeGridFlexType,
-} = require("devtools/server/actors/inspector/utils");
+const { getNodeDisplayName } = require("devtools/server/actors/inspector/utils");
 const nodeConstants = require("devtools/shared/dom-node-constants");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
-const L10N = new LocalizationHelper(STRINGS_URI);
 const { refreshGraphics } = require("protocol/graphics");
 
 // Note that the order of items in this array is important because it is used
@@ -766,32 +759,15 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       " \u00D7 " +
       parseFloat((height / zoom).toPrecision(6));
 
-    const { grid: gridType, flex: flexType } = getNodeGridFlexType(node);
-    const gridLayoutTextType = this._getLayoutTextType("gridType", gridType);
-    const flexLayoutTextType = this._getLayoutTextType("flexType", flexType);
-
     this.getElement("infobar-tagname").setTextContent(displayName);
     this.getElement("infobar-id").setTextContent(id);
     this.getElement("infobar-classes").setTextContent(classList);
     this.getElement("infobar-pseudo-classes").setTextContent(pseudos);
     this.getElement("infobar-dimensions").setTextContent(dim);
-    this.getElement("infobar-grid-type").setTextContent(gridLayoutTextType);
-    this.getElement("infobar-flex-type").setTextContent(flexLayoutTextType);
+    this.getElement("infobar-grid-type").setTextContent("");
+    this.getElement("infobar-flex-type").setTextContent("");
 
     this._moveInfobar();
-  }
-
-  _getLayoutTextType(layoutTypeKey, { isContainer, isItem }) {
-    if (!isContainer && !isItem) {
-      return "";
-    }
-    if (isContainer && !isItem) {
-      return L10N.getStr(`${layoutTypeKey}.container`);
-    }
-    if (!isContainer && isItem) {
-      return L10N.getStr(`${layoutTypeKey}.item`);
-    }
-    return L10N.getStr(`${layoutTypeKey}.dual`);
   }
 
   _getPseudoClasses(node) {

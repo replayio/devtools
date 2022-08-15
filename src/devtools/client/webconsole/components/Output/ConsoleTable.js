@@ -6,7 +6,6 @@
 const React = require("react");
 const dom = require("react-dom-factories");
 const {
-  l10n,
   getArrayTypeNames,
   getDescriptorValue,
 } = require("devtools/client/webconsole/utils/messages");

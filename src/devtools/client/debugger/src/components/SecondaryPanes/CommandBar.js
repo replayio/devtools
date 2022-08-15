@@ -166,7 +166,7 @@ class CommandBar extends Component {
     const disabled = !hasBreakpoints;
 
     const disabledTooltip = "Resuming is disabled until you add a breakpoint";
-    const tooltip = L10N.getFormatStr("resumeButtonTooltip", formatKey("resume"));
+    const tooltip = `Resume ${formatKey("resume")}`;
 
     return (
       <CommandBarButton

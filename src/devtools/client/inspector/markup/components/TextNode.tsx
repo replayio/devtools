@@ -2,8 +2,6 @@ import { assert } from "protocol/utils";
 import React, { PureComponent } from "react";
 const { COMMENT_NODE } = require("devtools/shared/dom-node-constants");
 
-const { getFormatStr } = require("../utils/l10n");
-
 interface TextNodeProps {
   type: number;
   value: string | undefined;

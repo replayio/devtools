@@ -119,14 +119,9 @@ function SourceFooter() {
   if (selectedSource) {
     const { line, column } = cursorPosition;
 
+    const text = `(${line + 1}, ${column + 1})`;
     // @ts-ignore
-    const text = L10N.getFormatStr("sourceFooter.currentCursorPosition", line + 1, column + 1);
-    // @ts-ignore
-    const title = L10N.getFormatStr(
-      "sourceFooter.currentCursorPosition.tooltip",
-      line + 1,
-      column + 1
-    );
+    const title = `(Line ${line + 1}, column ${column + 1})`;
 
     cursorPositionUI = (
       <div className="cursor-position" title={title}>
