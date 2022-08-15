@@ -6,7 +6,6 @@ import { Rule } from "devtools/client/inspector/rules/components/Rule";
 import { Rules } from "devtools/client/inspector/rules/components/Rules";
 import { Toolbar } from "devtools/client/inspector/rules/components/Toolbar";
 
-import { getStr } from "devtools/client/inspector/rules/utils/l10n";
 import { useAppSelector } from "ui/setup/hooks";
 import { RuleState } from "../reducers/rules";
 import { RuleInheritance } from "../models/rule";

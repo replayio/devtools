@@ -94,8 +94,6 @@ export default function KeyShortcuts({ window, target }) {
  *        https://github.com/electron/electron/blob/master/docs/api/accelerator.md
  */
 KeyShortcuts.parseElectronKey = function (window, str) {
-  // If a localized string is found but has no value in the properties file,
-  // getStr will return `null`. See Bug 1569572.
   if (typeof str !== "string") {
     console.error("Invalid key passed to parseElectronKey, stacktrace below");
     console.trace();

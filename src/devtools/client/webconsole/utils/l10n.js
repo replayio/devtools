@@ -26,23 +26,6 @@ const l10n = {
   },
 
   /**
-   * Retrieve a localized string.
-   *
-   * @param string name
-   *        The string name you want from the Web Console string bundle.
-   * @return string
-   *         The localized string.
-   */
-  getStr: function (name) {
-    try {
-      return helper.getStr(name);
-    } catch (ex) {
-      console.error("Failed to get string: " + name);
-      throw ex;
-    }
-  },
-
-  /**
    * Retrieve a localized string formatted with values coming from the given
    * array.
    *

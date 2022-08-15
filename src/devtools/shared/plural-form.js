@@ -249,12 +249,7 @@ const PluralForm = {
    * @return The plural rule number
    */
   get ruleNum() {
-    try {
-      return parseInt(L10N.getStr("pluralRule"), 10);
-    } catch (e) {
-      // Fallback to English if the pluralRule property is not available.
-      return 1;
-    }
+    return 1;
   },
 };
 
