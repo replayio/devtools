@@ -28,6 +28,10 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
     return null;
   }
 
+  const sortedRecordings = recordings.sort((a, b) =>
+    (a.metadata?.test?.title || 0) > (b.metadata?.test?.title || 0) ? 1 : -1
+  );
+
   return (
     <div className="flex flex-col">
       <div
@@ -47,7 +51,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
           />
         </div>
       </div>
-      {expanded && recordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}
+      {expanded && sortedRecordings.map((r, i) => <TestResultListItem recording={r} key={i} />)}
     </div>
   );
 }
