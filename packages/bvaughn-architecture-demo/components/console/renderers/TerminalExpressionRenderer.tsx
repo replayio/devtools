@@ -63,6 +63,7 @@ function TerminalExpressionRenderer({
     <div
       className={className}
       data-search-index={index}
+      data-test-message-type="terminal-expression"
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}

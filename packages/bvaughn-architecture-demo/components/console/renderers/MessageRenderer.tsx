@@ -59,11 +59,13 @@ function MessageRenderer({
   let className = styles.Row;
   let icon = null;
   let showExpandable = false;
+  let testMessageType = "console-log";
   switch (message.level) {
     case "error": {
       className = styles.ErrorRow;
       icon = <Icon className={styles.ErrorIcon} type="error" />;
       showExpandable = frames.length > 0;
+      testMessageType = "console-error";
       break;
     }
     case "trace": {
@@ -75,6 +77,7 @@ function MessageRenderer({
       className = styles.WarningRow;
       icon = <Icon className={styles.WarningIcon} type="warning" />;
       showExpandable = frames.length > 0;
+      testMessageType = "console-warning";
       break;
     }
   }
@@ -116,6 +119,7 @@ function MessageRenderer({
         ref={ref}
         className={className}
         data-search-index={index}
+        data-test-message-type={testMessageType}
         data-test-name="Message"
         onContextMenu={showContextMenu}
         onMouseEnter={() => setIsHovered(true)}

@@ -1,6 +1,15 @@
 import { Locator, Page } from "@playwright/test";
 import { getElementCount } from "./general";
 
+type MessageType =
+  | "console-error"
+  | "console-log"
+  | "console-warning"
+  | "event"
+  | "exception"
+  | "log-point"
+  | "terminal-expression";
+
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
 
 export async function hideSearchInput(page: Page) {
@@ -8,6 +17,35 @@ export async function hideSearchInput(page: Page) {
   if (count > 0) {
     await page.focus('[data-test-id="ConsoleSearchInput"]');
     await page.keyboard.press("Escape");
+  }
+}
+
+export async function locateMessage<T>(
+  page: Page,
+  messageType: MessageType,
+  partialText?: string
+): Promise<Locator> {
+  const locator = page.locator(
+    `[data-test-name=Message][data-test-message-type="${messageType}"]`,
+    { hasText: partialText }
+  );
+
+  let loop = 0;
+
+  while (true) {
+    const count = await locator.count();
+
+    if (count === 0) {
+      if (loop++ > 25) {
+        throw new Error(
+          `Could not locate message type "${messageType}" with text "${partialText}"`
+        );
+      }
+
+      await new Promise(resolve => setTimeout(resolve, 10));
+    } else {
+      return locator;
+    }
   }
 }
 

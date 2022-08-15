@@ -79,6 +79,7 @@ function LogPointRenderer({
       ref={ref}
       className={className}
       data-search-index={index}
+      data-test-message-type="log-point"
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}

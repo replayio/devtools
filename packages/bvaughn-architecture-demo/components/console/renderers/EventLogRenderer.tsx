@@ -88,6 +88,7 @@ function EventLogRenderer({
         ref={ref}
         className={className}
         data-search-index={index}
+        data-test-message-type="event"
         data-test-name="Message"
         role="listitem"
         onContextMenu={showContextMenu}
