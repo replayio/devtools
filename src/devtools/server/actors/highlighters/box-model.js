@@ -13,7 +13,6 @@ const {
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const { getCurrentZoom } = require("devtools/shared/layout/utils");
 const nodeConstants = require("devtools/shared/dom-node-constants");
 const { refreshGraphics } = require("protocol/graphics");
 
@@ -758,7 +757,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     // We want to display the original `width` and `height`, instead of the ones affected
     // by any zoom. Since the infobar can be displayed also for text nodes, we can't
     // access the computed style for that, and this is why we recalculate them here.
-    const zoom = getCurrentZoom(this.win);
+    const zoom = 1;
     const quad = this._getOuterQuad("border");
 
     if (!quad) {

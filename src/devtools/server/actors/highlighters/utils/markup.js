@@ -4,12 +4,7 @@
 
 "use strict";
 
-const {
-  getCurrentZoom,
-  getWindowDimensions,
-  getViewportDimensions,
-  loadSheet,
-} = require("devtools/shared/layout/utils");
+const { getViewportDimensions } = require("devtools/shared/layout/utils");
 const EventEmitter = require("devtools/shared/event-emitter");
 
 const lazyContainer = {
@@ -511,7 +506,7 @@ module.exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHe
  *         reposition it.
  */
 function moveInfobar(container, bounds, win, options = {}) {
-  const zoom = getCurrentZoom(win);
+  const zoom = 1;
   const viewport = getViewportDimensions(win);
 
   const { computedStyle } = container;

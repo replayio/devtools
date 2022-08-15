@@ -155,7 +155,6 @@ export class Selection {
 
   isAnonymousNode() {
     return false;
-    //return this.isNode() && this.nodeFront.isAnonymous;
   }
 
   isAttributeNode() {

@@ -6,7 +6,6 @@
 
 const DevToolsUtils = require("devtools/shared/DevToolsUtils");
 const EventEmitter = require("devtools/shared/event-emitter");
-const { getCurrentZoom } = require("devtools/shared/layout/utils");
 
 /**
  * A partial implementation of the Menu API provided by electron:
@@ -66,7 +65,7 @@ Menu.prototype.insert = function (pos, menuItem) {
  *        The document that should own the popup.
  */
 Menu.prototype.popupAtTarget = function (target, doc) {
-  const zoom = getCurrentZoom(doc);
+  const zoom = 1;
 
   const rect = target.getBoundingClientRect();
   const defaultView = target.ownerDocument.defaultView;
