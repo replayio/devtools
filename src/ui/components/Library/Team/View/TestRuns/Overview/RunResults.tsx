@@ -29,7 +29,7 @@ function TestStatusGroup({ recordings, label }: { recordings: Recording[]; label
   }
 
   const sortedRecordings = recordings.sort((a, b) =>
-    (a.metadata?.test?.title || 0) > (b.metadata?.test?.title || 0) ? 1 : -1
+    (a.metadata?.test?.file || 0) > (b.metadata?.test?.file || 0) ? 1 : -1
   );
 
   return (
