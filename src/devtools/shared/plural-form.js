@@ -39,9 +39,6 @@
  * Note: Basically, makeGetter returns 2 functions that do "get" and "numForm"
  */
 
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const L10N = new LocalizationHelper("toolkit/locales/intl.properties");
-
 // These are the available plural functions that give the appropriate index
 // based on the plural rule number specified. The first element is the number
 // of plural forms and the second is the function to figure out the index.

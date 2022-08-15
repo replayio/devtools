@@ -16,7 +16,6 @@ import consoleReducers from "devtools/client/webconsole/reducers";
 import { getConsoleInitialState } from "devtools/client/webconsole/store";
 import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
-import { LocalizationHelper } from "devtools/shared/l10n";
 import { Canvas, setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "ui/actions/logpoint";
 import { initSocket, addEventListener } from "protocol/socket";
@@ -60,7 +59,6 @@ const { setupApp, setupTimeline } = actions;
 
 declare global {
   interface Window {
-    L10N: any;
     hasAlreadyBootstrapped: boolean;
   }
   interface AppHelpers {
@@ -130,8 +128,6 @@ export default async function DevTools(store: AppStore) {
   const url = new URL(window.location.href);
   const dispatchUrl = url.searchParams.get("dispatch") || process.env.NEXT_PUBLIC_DISPATCH_URL;
   assert(dispatchUrl, "no dispatchUrl");
-
-  window.L10N = new LocalizationHelper("devtools/client/locales/debugger.properties");
 
   const justSelectors = Object.fromEntries(
     Object.entries(selectors).filter(([key, value]) => {

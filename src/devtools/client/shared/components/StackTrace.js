@@ -7,10 +7,7 @@
 const React = require("react");
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const Frame = require("devtools/client/shared/components/Frame");
-
-const l10n = new LocalizationHelper("devtools/client/locales/webconsole.properties");
 
 class AsyncFrameClass extends React.Component {
   static get propTypes() {

@@ -13,7 +13,7 @@ const dom = require("react-dom-factories");
 const GripMessageBody =
   require("devtools/client/webconsole/components/Output/GripMessageBody").default;
 const ConsoleTable = require("devtools/client/webconsole/components/Output/ConsoleTable");
-const { isGroupType, l10n } = require("devtools/client/webconsole/utils/messages");
+const { isGroupType } = require("devtools/client/webconsole/utils/messages");
 
 const Message = require("devtools/client/webconsole/components/Output/Message");
 

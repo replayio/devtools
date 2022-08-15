@@ -8,15 +8,10 @@ import { NodeFront } from "protocol/thread/node";
 import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
-import { UIStore } from "ui/actions";
 import CSSProperties from "third-party/css/css-properties";
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
 import ElementStyle from "./element-style";
 const Services = require("devtools/shared/services");
-
-const STYLE_INSPECTOR_PROPERTIES = "devtools/shared/locales/styleinspector.properties";
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const STYLE_INSPECTOR_L10N = new LocalizationHelper(STYLE_INSPECTOR_PROPERTIES);
 
 export interface RuleInheritance {
   // The NodeFront object id for the element in which the rule is inherited from.

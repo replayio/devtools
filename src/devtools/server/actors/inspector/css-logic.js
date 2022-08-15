@@ -31,7 +31,6 @@ const nodeConstants = require("devtools/shared/dom-node-constants");
 const {
   getBindingElementAndPseudo,
   getCSSStyleRules,
-  l10n,
   hasVisitedState,
   isAgentStylesheet,
   isAuthorStylesheet,

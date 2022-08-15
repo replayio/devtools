@@ -1,6 +1,5 @@
 const { InspectorSearch } = require("devtools/client/inspector/inspector-search");
 const KeyShortcuts = require("devtools/client/shared/key-shortcuts").default;
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 export default class MarkupSearchbox {
   private markupPanel!: HTMLElement;

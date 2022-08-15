@@ -17,10 +17,7 @@ const {
   parseURL,
   getSourceMappedFile,
 } = require("devtools/client/shared/source-utils");
-const { LocalizationHelper } = require("devtools/shared/l10n");
 const { MESSAGE_SOURCE } = require("devtools/client/webconsole/constants");
-
-const l10n = new LocalizationHelper("devtools/client/locales/components.properties");
 
 class Frame extends Component {
   static get propTypes() {

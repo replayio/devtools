@@ -10,19 +10,12 @@ const {
   createNode,
   createSVGNode,
   getBindingElementAndPseudo,
-  hasPseudoClassLock,
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
 const { getCurrentZoom } = require("devtools/shared/layout/utils");
-const {
-  getNodeDisplayName,
-  getNodeGridFlexType,
-} = require("devtools/server/actors/inspector/utils");
+const { getNodeDisplayName } = require("devtools/server/actors/inspector/utils");
 const nodeConstants = require("devtools/shared/dom-node-constants");
-const { LocalizationHelper } = require("devtools/shared/l10n");
-const STRINGS_URI = "devtools/shared/locales/highlighters.properties";
-const L10N = new LocalizationHelper(STRINGS_URI);
 const { refreshGraphics } = require("protocol/graphics");
 
 // Note that the order of items in this array is important because it is used

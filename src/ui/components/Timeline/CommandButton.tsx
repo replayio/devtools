@@ -1,7 +1,6 @@
 import React, { MouseEventHandler } from "react";
 import { SVG } from "image/svg";
 import classnames from "classnames";
-const { LocalizationHelper } = require("devtools/shared/l10n");
 
 const images = {
   next: SVG.NextButton,
