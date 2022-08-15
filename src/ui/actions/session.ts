@@ -1,5 +1,7 @@
 import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@replayio/protocol";
+import * as Sentry from "@sentry/react";
+
 import { findAutomatedTests } from "ui/actions/find-tests";
 import {
   addEventListener,
@@ -236,6 +238,10 @@ export function createSocket(
             queueAction(setUnexpectedError(getDisconnectionError(), true));
           }
         },
+      });
+
+      Sentry.configureScope(scope => {
+        scope.setExtra("sessionId", sessionId);
       });
 
       if (prefs.listenForMetrics) {
