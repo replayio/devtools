@@ -39,7 +39,7 @@ class Debugger extends Component<DebuggerProps> {
   };
 
   getChildContext = () => {
-    return { shortcuts: this.shortcuts};
+    return { shortcuts: this.shortcuts };
   };
 
   componentDidMount() {

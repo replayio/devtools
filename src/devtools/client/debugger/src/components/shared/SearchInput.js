@@ -81,8 +81,8 @@ class SearchInput extends Component {
     const { handleNext, handlePrev } = this.props;
 
     return [
-      arrowBtn(handlePrev, "arrow-up", classnames("nav-btn", "prev"), "Previous Result"),
-      arrowBtn(handleNext, "arrow-down", classnames("nav-btn", "next"), "Next Result"),
+      arrowBtn(handlePrev, "arrow-up", classnames("nav-btn", "prev"), "Previous result"),
+      arrowBtn(handleNext, "arrow-down", classnames("nav-btn", "next"), "Next result"),
     ];
   }
 
