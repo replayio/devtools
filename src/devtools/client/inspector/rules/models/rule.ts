@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-const CssLogic = require("devtools/shared/inspector/css-logic");
+const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
 import { NodeFront } from "protocol/thread/node";
 import { RuleFront } from "protocol/thread/rule";
