@@ -80,6 +80,7 @@ function UncaughtExceptionRenderer({
       ref={ref}
       className={className}
       data-search-index={index}
+      data-test-message-type="exception"
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}
