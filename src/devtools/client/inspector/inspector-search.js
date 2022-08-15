@@ -5,7 +5,6 @@
 "use strict";
 
 const promise = Promise;
-const { KeyCodes } = require("devtools/client/shared/keycodes");
 
 const EventEmitter = require("devtools/shared/event-emitter");
 const Services = require("devtools/shared/services");

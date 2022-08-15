@@ -5,7 +5,25 @@ import { NodeInfo } from "../reducers/markup";
 import NodeAttribute from "./NodeAttribute";
 import TextNode from "./TextNode";
 
-const { HTML_VOID_ELEMENTS } = require("../constants");
+// Contains only void (without end tag) HTML elements.
+const HTML_VOID_ELEMENTS = [
+  "area",
+  "base",
+  "br",
+  "col",
+  "command",
+  "embed",
+  "hr",
+  "img",
+  "input",
+  "keygen",
+  "link",
+  "meta",
+  "param",
+  "source",
+  "track",
+  "wbr",
+];
 
 // Contains only valid computed display property types of the node to display in the
 // element markup and their respective title tooltip text.

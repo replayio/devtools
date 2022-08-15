@@ -6,8 +6,6 @@
 
 const PropTypes = require("prop-types");
 const dom = require("react-dom-factories");
-const { PluralForm } = require("devtools/shared/plural-form");
-const messageRepeatsTooltip = "#1 repeat;#1 repeats";
 
 MessageRepeat.displayName = "MessageRepeat";
 
@@ -20,7 +18,7 @@ function MessageRepeat(props) {
   return dom.span(
     {
       className: "message-repeats",
-      title: PluralForm.get(repeat, messageRepeatsTooltip).replace("#1", repeat),
+      title: `${repeat} repeat${repeat === 1 ? "" : "s"}`,
     },
     repeat
   );

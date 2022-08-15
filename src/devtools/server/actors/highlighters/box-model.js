@@ -13,10 +13,21 @@ const {
   isNodeValid,
   moveInfobar,
 } = require("devtools/server/actors/highlighters/utils/markup");
-const { getCurrentZoom } = require("devtools/shared/layout/utils");
-const { getNodeDisplayName } = require("devtools/server/actors/inspector/utils");
 const nodeConstants = require("devtools/shared/dom-node-constants");
 const { refreshGraphics } = require("protocol/graphics");
+
+/**
+ * Returns the properly cased version of the node's tag name, which can be
+ * used when displaying said name in the UI.
+ *
+ * @param  {Node} rawNode
+ *         Node for which we want the display name
+ * @return {String}
+ *         Properly cased version of the node tag name
+ */
+const getNodeDisplayName = function (rawNode) {
+  return rawNode.nodeName.toLowerCase();
+};
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -746,7 +757,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     // We want to display the original `width` and `height`, instead of the ones affected
     // by any zoom. Since the infobar can be displayed also for text nodes, we can't
     // access the computed style for that, and this is why we recalculate them here.
-    const zoom = getCurrentZoom(this.win);
+    const zoom = 1;
     const quad = this._getOuterQuad("border");
 
     if (!quad) {

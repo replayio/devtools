@@ -29,7 +29,6 @@ import classnames from "classnames";
 
 import SearchInput from "../shared/SearchInput";
 import debounce from "lodash/debounce";
-import { PluralForm } from "devtools/shared/plural-form";
 
 import type { Modifiers } from "devtools/client/debugger/src/reducers/file-search";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
@@ -299,14 +298,10 @@ class SearchBar extends Component<FinalSBProps, SBState> {
     }
 
     if (index == -1) {
-      const resultsSummaryString = "#1 result;#1 results";
-      return PluralForm.get(count, resultsSummaryString).replace("#1", count);
+      return `${count} result${count === 1 ? "" : "s"}`;
     }
 
-    const searchResultsString = "%d of #1 result;%d of #1 results";
-    return PluralForm.get(count, searchResultsString)
-      .replace("#1", count)
-      .replace("%d", matchIndex + 1);
+    return `${matchIndex + 1} of ${count} result${count === 1 ? "" : "s"}`;
   }
 
   renderSearchModifiers = () => {

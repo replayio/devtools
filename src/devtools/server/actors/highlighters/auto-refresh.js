@@ -6,7 +6,7 @@
 
 const EventEmitter = require("devtools/shared/event-emitter");
 const { isNodeValid } = require("devtools/server/actors/highlighters/utils/markup");
-const { getAdjustedQuads, getWindowDimensions } = require("devtools/shared/layout/utils");
+const { getAdjustedQuads } = require("devtools/shared/layout/utils");
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -71,9 +71,6 @@ function AutoRefreshHighlighter(highlighterEnv) {
 
   this.currentNode = null;
   this.currentQuads = {};
-
-  //this._winDimensions = getWindowDimensions(this.win);
-  //this._scroll = { x: this.win.pageXOffset, y: this.win.pageYOffset };
 
   this.update = this.update.bind(this);
 }

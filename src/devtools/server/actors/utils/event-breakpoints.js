@@ -350,61 +350,6 @@ for (const eventBP of FLAT_EVENTS) {
   }
 }
 
-exports.eventBreakpointForNotification = eventBreakpointForNotification;
-function eventBreakpointForNotification(dbg, notification) {
-  const notificationType = notification.type;
-
-  if (notification.type === "domEvent") {
-    const domEventNotification = DOM_EVENTS[notification.targetType];
-    if (!domEventNotification) {
-      return null;
-    }
-
-    // The 'event' value is a cross-compartment wrapper for the DOM Event object.
-    // While we could use that directly in the main thread as an Xray wrapper,
-    // when debugging workers we can't, because it is an opaque wrapper.
-    // To make things work, we have to always interact with the Event object via
-    // the Debugger.Object interface.
-    const evt = dbg
-      .makeGlobalObjectReference(notification.global)
-      .makeDebuggeeValue(notification.event);
-
-    const eventType = evt.getProperty("type").return;
-    const id = domEventNotification[eventType];
-    if (!id) {
-      return null;
-    }
-    const eventBreakpoint = EVENTS_BY_ID[id];
-
-    if (eventBreakpoint.filter === "media") {
-      const currentTarget = evt.getProperty("currentTarget").return;
-      if (!currentTarget) {
-        return null;
-      }
-
-      const nodeType = currentTarget.getProperty("nodeType").return;
-      const namespaceURI = currentTarget.getProperty("namespaceURI").return;
-      if (nodeType !== 1 /* ELEMENT_NODE */ || namespaceURI !== "http://www.w3.org/1999/xhtml") {
-        return null;
-      }
-
-      const nodeName = currentTarget.getProperty("nodeName").return.toLowerCase();
-      if (nodeName !== "audio" && nodeName !== "video") {
-        return null;
-      }
-    }
-
-    return id;
-  }
-
-  return SIMPLE_EVENTS[notificationType] || null;
-}
-
-exports.makeEventBreakpointMessage = makeEventBreakpointMessage;
-function makeEventBreakpointMessage(id) {
-  return EVENTS_BY_ID[id].message;
-}
-
 exports.getAvailableEventBreakpoints = getAvailableEventBreakpoints;
 function getAvailableEventBreakpoints() {
   const available = [];

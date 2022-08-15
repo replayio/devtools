@@ -22,7 +22,6 @@ import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
 
 import { appinfo } from "devtools/shared/services";
-import isThisHour from "date-fns/isThisHour";
 
 const isMacOS = appinfo.OS === "Darwin";
 
