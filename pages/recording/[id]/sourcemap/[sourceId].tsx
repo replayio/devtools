@@ -9,7 +9,7 @@ import { onUnprocessedRegions, setAppMode } from "ui/actions/app";
 import { getAccessibleRecording } from "ui/actions/session";
 import tokenManager from "ui/utils/tokenManager";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import renderSourcemap from "ui/utils/sourcemapVisualizer";
+import renderSourcemap from "third-party/sourcemap-visualizer/sourcemapVisualizer";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
 

@@ -123,7 +123,7 @@ import "ui/components/Timeline/MessageMarker.css";
 import "ui/components/Timeline/Timeline.css";
 import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
-import "ui/utils/sourcemapVisualizer.css";
+import "packages/third-party/sourcemap-visualizer/sourcemapVisualizer.css";
 
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
