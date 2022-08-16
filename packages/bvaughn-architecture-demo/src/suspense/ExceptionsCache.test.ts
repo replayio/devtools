@@ -24,14 +24,6 @@ describe("ExceptionsCache", () => {
     };
   }
 
-  function toTSP(time: number): TimeStampedPoint {
-    return { time, point: `${time * 1000}` };
-  }
-
-  function toTSPR(beginTime: number, endTime: number): TimeStampedPointRange {
-    return { begin: toTSP(beginTime), end: toTSP(endTime) };
-  }
-
   async function getExceptionsHelper(
     range: TimeStampedPointRange | null
   ): Promise<UncaughtException[]> {
@@ -42,6 +34,14 @@ describe("ExceptionsCache", () => {
 
       return getExceptions(client as any as ReplayClientInterface, range);
     }
+  }
+
+  function toTSP(time: number): TimeStampedPoint {
+    return { time, point: `${time * 1000}` };
+  }
+
+  function toTSPR(beginTime: number, endTime: number): TimeStampedPointRange {
+    return { begin: toTSP(beginTime), end: toTSP(endTime) };
   }
 
   let client: { [key: string]: jest.Mock };
@@ -231,12 +231,12 @@ describe("ExceptionsCache", () => {
     client.runAnalysis.mockImplementation(() => promise1);
     try {
       getExceptions(client as any as ReplayClientInterface, toTSPR(0, 1));
-    } catch (error) {}
+    } catch (promise) {}
 
     client.runAnalysis.mockImplementation(() => promise2);
     try {
       getExceptions(client as any as ReplayClientInterface, toTSPR(2, 3));
-    } catch (error) {}
+    } catch (promise) {}
 
     resolvePromise2();
     await promise2;
@@ -261,6 +261,11 @@ describe("ExceptionsCache", () => {
     getExceptionsHelper(toTSPR(0, 1));
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
+
+    getExceptionsHelper(null);
+    getExceptionsHelper(null);
+
+    expect(client.runAnalysis).toHaveBeenCalledTimes(2);
   });
 
   describe("subscribeForStatus", () => {

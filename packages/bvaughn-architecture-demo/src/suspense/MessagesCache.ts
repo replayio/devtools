@@ -24,13 +24,15 @@ export type CategoryCounts = {
   warnings: number;
 };
 
-type MessageData = {
+export type MessageData = {
   categoryCounts: CategoryCounts;
   countAfter: number;
   countBefore: number;
   didOverflow: boolean;
   messages: ProtocolMessage[];
 };
+
+const EMPTY_ARRAY: any[] = [];
 
 // TODO Should I use React's Suspense cache APIs here?
 // It's tempting to think that I don't need to, because the recording session data is global,
@@ -65,7 +67,7 @@ export function getMessages(
       countAfter: -1,
       countBefore: -1,
       didOverflow: false,
-      messages: [],
+      messages: EMPTY_ARRAY,
       categoryCounts: {
         errors: 0,
         logs: 0,
