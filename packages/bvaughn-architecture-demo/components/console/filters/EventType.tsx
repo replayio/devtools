@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { Event } from "@bvaughn/src/suspense/EventsCache";
-import { useContext } from "react";
+import { MouseEvent, useContext } from "react";
 
 import { Badge, Checkbox } from "design";
 
@@ -21,10 +21,15 @@ export default function EventType({
   const checked = eventTypes[event.type] === true;
   const toggle = () => update({ eventTypes: { [event.type]: !checked } });
 
+  const stopPropagation = (event: MouseEvent) => {
+    event.stopPropagation();
+  };
+
   return (
     <label
       className={disabled ? styles.EventTypeDisabled : styles.EventType}
       data-test-id={`EventTypes-${event.type}`}
+      onClick={stopPropagation}
     >
       <Checkbox disabled={disabled} checked={checked} onChange={toggle} />
       <span className={styles.Label}>
