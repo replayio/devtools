@@ -294,12 +294,12 @@ export function getBestSourceMappedSourceId(
   sourcesById: Dictionary<SourceDetails>,
   sourceIds: string[]
 ) {
+  const sourceIdSet = new Set(sourceIds);
   return sourceIds.find(sourceId => {
     const source = sourcesById[sourceId];
     assert(source, `unknown source ${sourceId}`);
     return (
-      source.isSourceMapped &&
-      !source.generatedFrom.some(originalId => sourceIds.includes(originalId))
+      source.isSourceMapped && !source.generatedFrom.some(originalId => sourceIdSet.has(originalId))
     );
   });
 }
@@ -308,12 +308,13 @@ export function getBestNonSourceMappedSourceId(
   sourcesById: Dictionary<SourceDetails>,
   sourceIds: string[]
 ) {
+  const sourceIdSet = new Set(sourceIds);
   return sourceIds.find(sourceId => {
     const source = sourcesById[sourceId];
     assert(source, `unknown source ${sourceId}`);
     return (
       !source.isSourceMapped &&
-      !source.generatedFrom.some(originalId => sourceIds.includes(originalId))
+      !source.generatedFrom.some(originalId => sourceIdSet.has(originalId))
     );
   });
 }
