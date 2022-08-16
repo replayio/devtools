@@ -56,13 +56,15 @@ export default function MapRenderer({ object, pauseId }: ObjectPreviewRendererPr
       <>
         {object.className}
         <span className={styles.ArrayLength}>({containerEntryCount})</span>
-        <PreviewContext.Provider value={true}>
-          <span className={styles.ObjectPropertyList}>
-            {" {"}
-            {propertiesList || "…"}
-            {"}"}
-          </span>
-        </PreviewContext.Provider>
+        {propertiesList !== null && (
+          <PreviewContext.Provider value={true}>
+            <span className={styles.ObjectPropertyList}>
+              {" {"}
+              {propertiesList || "…"}
+              {"}"}
+            </span>
+          </PreviewContext.Provider>
+        )}
       </>
     );
   }

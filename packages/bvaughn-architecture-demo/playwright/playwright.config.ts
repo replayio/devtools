@@ -17,6 +17,7 @@ const config = {
   },
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
+  timeout: 5000,
 };
 
 if (process.env.VISUAL_DEBUG) {

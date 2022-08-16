@@ -11,7 +11,11 @@ testSetup(async function regeneratorFunction({ page }) {
 
   await toggleProtocolMessages(page, true);
 
+  await inspect(page, "{loopBack");
+  await inspect(page, "Array(3)");
   await inspect(page, "Function(recursive)");
+  await inspect(page, "Map(3)");
+  await inspect(page, "Set(3)");
 });
 
 async function inspect(page: Page, partialText: string) {

@@ -53,9 +53,28 @@ function getOrCreateObjectWithPreviewMap(pauseId: PauseId): ObjectMaps {
 // Does not suspend.
 // This method is safe to call outside of render.
 // The Objects it returns are not guaranteed to contain preview information.
+export function getObject(pauseId: PauseId, objectId: ObjectId): Object | null {
+  const maps = getOrCreateObjectWithPreviewMap(pauseId);
+
+  let record = maps.fullPreviewRecordMap.get(objectId);
+  if (record?.status === STATUS_RESOLVED) {
+    return record.value;
+  }
+
+  record = maps.previewRecordMap.get(objectId);
+  if (record?.status === STATUS_RESOLVED) {
+    return record.value;
+  }
+
+  const object = maps.objectMap.get(objectId);
+  return object || null;
+}
+
+// Does not suspend.
+// This method is safe to call outside of render.
+// The Objects it returns are not guaranteed to contain preview information.
 export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
-  const objectMap = getOrCreateObjectWithPreviewMap(pauseId).objectMap;
-  const object = objectMap.get(objectId);
+  const object = getObject(pauseId, objectId);
   if (!object) {
     throw Error(`Could not find object with id "${objectId}"`);
   }

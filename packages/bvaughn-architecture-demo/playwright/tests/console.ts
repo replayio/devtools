@@ -428,7 +428,6 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   await page.click("[data-test-id=ClearConsoleEvaluationsButton]");
 
   // Verify an empty terminal
-
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
 });
