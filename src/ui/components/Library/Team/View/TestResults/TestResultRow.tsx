@@ -27,7 +27,7 @@ function Status({ test }: { test: TestMetadata }) {
           : "text-red-500 group-hover:text-red-700"
       }
     >
-      {test.result === "passed" ? "play_circle_filled" : "play_circle" } 
+      {test.result === "passed" ? "play_circle_filled" : "play_circle"}
     </MaterialIcon>
   );
 }

@@ -36,7 +36,10 @@ export const newSourcesToCompleteSourceDetails = (
       original.add(generatedSourceId, source.sourceId);
     }
     if (source.kind === "prettyPrinted") {
-      assert(source.generatedSourceIds?.length === 1, "a pretty-printed source should have exactly one generated source");
+      assert(
+        source.generatedSourceIds?.length === 1,
+        "a pretty-printed source should have exactly one generated source"
+      );
       prettyPrinted[source.generatedSourceIds[0]] = source.sourceId;
     }
   }
@@ -50,7 +53,8 @@ export const newSourcesToCompleteSourceDetails = (
       correspondingSourceIds: corresponding.map.get(keyForSource(source)) || [],
       id: sourceId,
       prettyPrinted: prettyPrinted[sourceId],
-      prettyPrintedFrom: source.kind === "prettyPrinted" ? source.generatedSourceIds![0] : undefined,
+      prettyPrintedFrom:
+        source.kind === "prettyPrinted" ? source.generatedSourceIds![0] : undefined,
       generated: source.generatedSourceIds || [],
       generatedFrom: original.map.get(sourceId) || [],
       isSourceMapped: isSourceMapped(source),

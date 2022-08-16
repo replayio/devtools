@@ -149,7 +149,7 @@ export function formatShortcutResults() {
 export function formatSources(
   sourcesToDisplayByUrl: Dictionary<SourceDetails>,
   tabUrls: Set<string>,
-  onlySourcesInTabs: boolean,
+  onlySourcesInTabs: boolean
 ) {
   const formattedSources = [];
 

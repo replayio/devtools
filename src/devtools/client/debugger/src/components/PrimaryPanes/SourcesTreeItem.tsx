@@ -18,11 +18,7 @@ import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
 
 import { getContext } from "../../selectors";
-import {
-  getHasSiblingOfSameName,
-  getSourceContent,
-  isFulfilled,
-} from "ui/reducers/sources";
+import { getHasSiblingOfSameName, getSourceContent, isFulfilled } from "ui/reducers/sources";
 
 import { getSourceQueryString } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
@@ -181,8 +177,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   render() {
-    const { item, depth, source, focused, hasSiblingOfSameName } =
-      this.props;
+    const { item, depth, source, focused, hasSiblingOfSameName } = this.props;
 
     const suffix = null;
 

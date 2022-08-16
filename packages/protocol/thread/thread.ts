@@ -46,10 +46,7 @@ import {
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 import uniqueId from "lodash/uniqueId";
-import {
-  getAlternateSourceId,
-  getPreferredSourceId,
-} from "ui/reducers/sources";
+import { getAlternateSourceId, getPreferredSourceId } from "ui/reducers/sources";
 import { BoundSelectors } from "ui/setup/dynamic/devtools";
 
 import { MappedLocationCache } from "../mapped-location-cache";

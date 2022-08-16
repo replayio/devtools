@@ -1,5 +1,4 @@
 import { ReactNode, useContext } from "react";
-import { PrimaryButton } from "ui/components/shared/Button";
 import { isReplayBrowser } from "ui/utils/environment";
 import styles from "../../../Library.module.css";
 import { FilterContext } from "../FilterContext";
@@ -11,7 +10,8 @@ export function RecordingsError() {
   if (filter) {
     msg = (
       <>
-        <div>No results found.  
+        <div>
+          No results found.
           <span onClick={() => setAppliedText("")} className="pl-2 underline cursor-pointer">
             Show all replays?
           </span>
@@ -28,9 +28,7 @@ export function RecordingsError() {
     <section
       className={`flex flex-grow flex-col items-center justify-center space-y-1 text-lg h-3/4 ${styles.recordingsBackground}`}
     >
-      <div className="p-6 m-24 text-bodyColor">
-      {msg}
-      </div>
+      <div className="p-6 m-24 text-bodyColor">{msg}</div>
     </section>
   );
 }
