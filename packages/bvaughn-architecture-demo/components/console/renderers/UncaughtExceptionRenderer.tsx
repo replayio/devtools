@@ -3,7 +3,7 @@ import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import Expandable from "@bvaughn/components/Expandable";
-import { UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
+import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
 import { Fragment, MouseEvent, useRef, useState } from "react";

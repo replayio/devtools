@@ -25,9 +25,9 @@ type AnalysisResult = {
   values: Value[];
 };
 
-type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
+export type AnalysisResults = (timeStampedPoint: TimeStampedPoint) => AnalysisResult | null;
 
-type RemoteAnalysisResult = {
+export type RemoteAnalysisResult = {
   data: { frames: Frame[]; objects: Object[]; scopes: Scope[] };
   location: Location | Location[];
   pauseId: PauseId;
@@ -36,12 +36,10 @@ type RemoteAnalysisResult = {
   values: Array<{ value?: any; object?: string }>;
 };
 
-export type UncaughtException = RemoteAnalysisResult & {
-  type: "UncaughtException";
-};
-
-let inProgressSourcesWakeable: Wakeable<RemoteAnalysisResult[]> | null = null;
-let exceptions: UncaughtException[] | null = null;
+function getKey(focusRange: PointRange | null, location: Location, code: string): string {
+  const rangeString = focusRange ? `${focusRange.begin}-${focusRange.end}` : "-";
+  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}`;
+}
 
 const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map();
 
@@ -49,47 +47,6 @@ const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map(
 // Currently we re-run the analysis which seems wasteful.
 
 // TODO (FE-469) Add focus region awareness to analysis.
-
-function getKey(focusRange: PointRange | null, location: Location, code: string): string {
-  const rangeString = focusRange ? `${focusRange.begin}-${focusRange.end}` : "-";
-  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}`;
-}
-
-export function getExceptions(client: ReplayClientInterface): UncaughtException[] {
-  if (exceptions !== null) {
-    return exceptions;
-  }
-
-  if (inProgressSourcesWakeable === null) {
-    inProgressSourcesWakeable = createWakeable();
-    fetchExceptions(client);
-  }
-
-  throw inProgressSourcesWakeable;
-}
-
-async function fetchExceptions(client: ReplayClientInterface) {
-  const results = await client.runAnalysis<RemoteAnalysisResult>({
-    effectful: false,
-    exceptionPoints: true,
-    mapper: EXCEPTIONS_MAPPER,
-  });
-
-  // This will avoid us having to turn around and request them again when rendering the logs.
-  results.forEach(result => {
-    if (result.data.objects) {
-      preCacheObjects(result.pauseId, result.data.objects);
-    }
-  });
-
-  exceptions = results.map(result => ({
-    ...result,
-    type: "UncaughtException",
-  }));
-
-  inProgressSourcesWakeable!.resolve(exceptions!);
-  inProgressSourcesWakeable = null;
-}
 
 export function runAnalysis(
   client: ReplayClientInterface,
@@ -287,45 +244,3 @@ function createMapperForAnalysis(code: string): string {
     ];
   `;
 }
-
-const EXCEPTIONS_MAPPER = `
-  const finalData = { frames: [], scopes: [], objects: [] };
-
-  function addPauseData({ frames, scopes, objects }) {
-    finalData.frames.push(...(frames || []));
-    finalData.scopes.push(...(scopes || []));
-    finalData.objects.push(...(objects || []));
-  }
-
-  function getTopFrame() {
-    const { data, frame: frameId } = sendCommand("Pause.getTopFrame");
-
-    return (data.frames || []).find((f) => f.frameId == frameId);
-  }
-
-  const { pauseId, point, time } = input;
-  const { frameId, location } = getTopFrame();
-  const {
-    data: { objects, scopes },
-    exception,
-  } = sendCommand("Pause.getExceptionValue");
-  const {
-    data: { frames },
-  } = sendCommand("Pause.getAllFrames");
-
-  addPauseData({ frames, objects, scopes });
-
-  return [
-    {
-      key: time,
-      value: {
-        data: finalData,
-        location,
-        pauseId,
-        point,
-        time,
-        values: [exception],
-      },
-    },
-  ];
-`;

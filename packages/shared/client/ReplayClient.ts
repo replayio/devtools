@@ -366,22 +366,26 @@ export class ReplayClient implements ReplayClientInterface {
       const results: Result[] = [];
       let resultReceived = false;
 
-      await analysisManager.runAnalysis(analysisParams, {
-        onAnalysisError: (errorMessage: string) => {
-          reject(errorMessage);
-        },
-        onAnalysisResult: analysisEntries => {
-          resultReceived = true;
-          results.push(...analysisEntries.map(entry => entry.value));
-        },
-      });
+      try {
+        await analysisManager.runAnalysis(analysisParams, {
+          onAnalysisError: (errorMessage: string) => {
+            reject(errorMessage);
+          },
+          onAnalysisResult: analysisEntries => {
+            resultReceived = true;
+            results.push(...analysisEntries.map(entry => entry.value));
+          },
+        });
 
-      if (resultReceived) {
-        resolve(results);
-      } else {
-        // No result was returned.
-        // This might happen when e.g. exceptions are being queried for a recording with no exceptions.
-        resolve([]);
+        if (resultReceived) {
+          resolve(results);
+        } else {
+          // No result was returned.
+          // This might happen when e.g. exceptions are being queried for a recording with no exceptions.
+          resolve([]);
+        }
+      } catch (error) {
+        reject(error);
       }
     });
   }

@@ -20,3 +20,9 @@
   border: none;
   background-color: var(--background-color-default);
 }
+
+.ExceptionsErrorIcon {
+  color: var(--color-error);
+  height: 1rem;
+  width: 1rem;
+}

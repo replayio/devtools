@@ -28,7 +28,7 @@ export async function render(
   sessionContext: SessionContextType;
 }> {
   const replayClient: ReplayClientInterface = {
-    ...MockReplayClient,
+    ...createMockReplayClient(),
     ...options?.replayClient,
   };
 
@@ -160,38 +160,40 @@ export function setupWindow(): void {
 
 // This mock client is mostly useless by itself,
 // but its methods can be overridden individually (or observed/inspected) by test code.
-const MockReplayClient = {
-  get loadedRegions() {
-    return null;
-  },
-  addEventListener: jest.fn(),
-  configure: jest.fn().mockImplementation(async () => {}),
-  createPause: jest.fn().mockImplementation(async () => ({
-    frames: [],
-    data: {},
-  })),
-  evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
-  findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
-  findSources: jest.fn().mockImplementation(async () => []),
-  getAllFrames: jest.fn().mockImplementation(async () => []),
-  getEventCountForType: jest.fn().mockImplementation(async () => 0),
-  getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
-  getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
-  getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
-  getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
-  getSessionEndpoint: jest.fn().mockImplementation(async () => ({
-    point: "1000",
-    time: 1000,
-  })),
-  getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
-  getSourceContents: jest.fn().mockImplementation(async () => ({
-    contents: "fake-source-contents",
-    contentType: "text/javascript",
-  })),
-  getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
-  initialize: jest.fn().mockImplementation(async () => {}),
-  loadRegion: jest.fn().mockImplementation(async () => {}),
-  removeEventListener: jest.fn(),
-  runAnalysis: jest.fn().mockImplementation(async () => []),
-  searchSources: jest.fn().mockImplementation(async () => []),
-};
+export function createMockReplayClient() {
+  return {
+    get loadedRegions() {
+      return null;
+    },
+    addEventListener: jest.fn(),
+    configure: jest.fn().mockImplementation(async () => {}),
+    createPause: jest.fn().mockImplementation(async () => ({
+      frames: [],
+      data: {},
+    })),
+    evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
+    findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
+    findSources: jest.fn().mockImplementation(async () => []),
+    getAllFrames: jest.fn().mockImplementation(async () => []),
+    getEventCountForType: jest.fn().mockImplementation(async () => 0),
+    getHitPointsForLocation: jest.fn().mockImplementation(async () => []),
+    getObjectWithPreview: jest.fn().mockImplementation(async () => ({})),
+    getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
+    getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
+    getSessionEndpoint: jest.fn().mockImplementation(async () => ({
+      point: "1000",
+      time: 1000,
+    })),
+    getSessionId: jest.fn().mockImplementation(async () => "fake-session-id"),
+    getSourceContents: jest.fn().mockImplementation(async () => ({
+      contents: "fake-source-contents",
+      contentType: "text/javascript",
+    })),
+    getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
+    initialize: jest.fn().mockImplementation(async () => {}),
+    loadRegion: jest.fn().mockImplementation(async () => {}),
+    removeEventListener: jest.fn(),
+    runAnalysis: jest.fn().mockImplementation(async () => []),
+    searchSources: jest.fn().mockImplementation(async () => []),
+  };
+}
