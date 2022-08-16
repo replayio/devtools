@@ -1,14 +1,17 @@
+import Icon from "@bvaughn/components/Icon";
+import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
+import { getStatus, subscribeForStatus } from "@bvaughn/src/suspense/ExceptionsCache";
+import { isInNodeModules } from "@bvaughn/src/utils/messages";
 import { CategoryCounts, getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
-import React, { ReactNode, Suspense, useContext, useMemo } from "react";
+import React, { ReactNode, Suspense, useContext, useMemo, useSyncExternalStore } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Badge, Checkbox } from "design";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
-import { isInNodeModules } from "@bvaughn/src/utils/messages";
 
 export default function FilterToggles() {
   const {
@@ -21,40 +24,60 @@ export default function FilterToggles() {
     update,
   } = useContext(ConsoleFiltersContext);
 
+  const status = useSyncExternalStore(subscribeForStatus, getStatus, getStatus);
+  let exceptionsBadge = null;
+  switch (status) {
+    case "failed-too-many-points": {
+      if (showExceptions) {
+        exceptionsBadge = (
+          <span title="There are too many exceptions. Please focus to a smaller time range and try again.">
+            <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+          </span>
+        );
+      }
+      break;
+    }
+    case "request-in-progress": {
+      exceptionsBadge = <Icon className={styles.SpinnerIcon} type="spinner" />;
+      break;
+    }
+  }
+
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
+        afterContent={exceptionsBadge}
         checked={showExceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}
       />
       <Toggle
-        checked={showLogs}
-        count={
+        afterContent={
           <Suspense fallback={null}>
             <ToggleCategoryCount category="logs" />
           </Suspense>
         }
+        checked={showLogs}
         label="Logs"
         onChange={showLogs => update({ showLogs })}
       />
       <Toggle
-        checked={showWarnings}
-        count={
+        afterContent={
           <Suspense fallback={null}>
             <ToggleCategoryCount category="warnings" />
           </Suspense>
         }
+        checked={showWarnings}
         label="Warnings"
         onChange={showWarnings => update({ showWarnings })}
       />
       <Toggle
-        checked={showErrors}
-        count={
+        afterContent={
           <Suspense fallback={null}>
             <ToggleCategoryCount category="errors" />
           </Suspense>
         }
+        checked={showErrors}
         label="Errors"
         onChange={showErrors => update({ showErrors })}
       />
@@ -62,8 +85,8 @@ export default function FilterToggles() {
       <EventsList />
       <hr className={styles.Divider} />
       <Toggle
+        afterContent={<NodeModulesCount />}
         checked={showNodeModules}
-        count={<NodeModulesCount />}
         label="Node modules"
         onChange={showNodeModules => update({ showNodeModules })}
       />
@@ -77,13 +100,13 @@ export default function FilterToggles() {
 }
 
 function Toggle({
+  afterContent = null,
   checked,
-  count = null,
   label,
   onChange,
 }: {
+  afterContent?: ReactNode | null;
   checked: boolean;
-  count?: ReactNode | null;
   label: string;
   onChange: (checked: boolean) => void;
 }) {
@@ -97,7 +120,7 @@ function Toggle({
         id={id}
         onChange={(event: React.ChangeEvent<HTMLInputElement>) => onChange(event.target.checked)}
       />
-      {count}
+      {afterContent}
     </div>
   );
 }

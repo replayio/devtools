@@ -3,7 +3,7 @@ import differenceInCalendarDays from "date-fns/differenceInCalendarDays";
 import differenceInWeeks from "date-fns/differenceInWeeks";
 import differenceInMonths from "date-fns/differenceInMonths";
 import differenceInYears from "date-fns/differenceInYears";
-import { ExecutionPoint, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/protocol";
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 
@@ -103,9 +103,9 @@ export function isRangeSubset(
     // No matter what the previous range was, the new one is not a subset.
     return false;
   } else {
-    return (
-      !isExecutionPointsLessThan(prevRange.begin.point, nextRange.begin.point) &&
-      !isExecutionPointsGreaterThan(prevRange.end.point, nextRange.end.point)
+    return !(
+      isExecutionPointsLessThan(nextRange.begin.point, prevRange.begin.point) ||
+      isExecutionPointsGreaterThan(nextRange.end.point, prevRange.end.point)
     );
   }
 }

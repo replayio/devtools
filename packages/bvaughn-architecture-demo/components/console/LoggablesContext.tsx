@@ -2,8 +2,8 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointInstance, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { getExceptions, UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
 import { EventLog, getEventTypeEntryPoints } from "@bvaughn/src/suspense/EventsCache";
+import { getExceptions, UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
 import { getMessages, ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { loggableSort } from "@bvaughn/src/utils/loggables";
@@ -118,7 +118,7 @@ export function LoggablesContextRoot({
   // We may suspend based on this value, so let's this value changes at sync priority,
   let exceptions: UncaughtException[] = EMPTY_ARRAY;
   if (showExceptions) {
-    exceptions = getExceptions(client);
+    exceptions = getExceptions(client, focusRange);
   }
 
   // Trim eventLogs and logPoints by focusRange.

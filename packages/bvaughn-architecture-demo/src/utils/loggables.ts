@@ -1,8 +1,8 @@
 import { Loggable } from "@bvaughn/components/console/LoggablesContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
-import { UncaughtException } from "@bvaughn/src/suspense/AnalysisCache";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
+import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { ExecutionPoint } from "@replayio/protocol";
 import { compareExecutionPoints } from "./time";
