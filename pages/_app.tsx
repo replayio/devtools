@@ -77,6 +77,7 @@ import "devtools/client/debugger/src/components/ShortcutsModal.css";
 import "devtools/client/debugger/src/utils/editor/source-editor.css";
 import "devtools/client/shared/components/Accordion.css";
 import "devtools/client/shared/components/splitter/SplitBox.css";
+import "devtools/client/shared/components/Tabs.css";
 import "devtools/client/themes/accessibility-color-contrast.css";
 import "devtools/client/themes/badge.css";
 import "devtools/client/themes/boxmodel.css";
