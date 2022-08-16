@@ -10,6 +10,8 @@ import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
+import { selectors as sourcesSelectors } from "ui/reducers/sources";
+import { bindSelectors } from "ui/setup/dynamic/devtools";
 
 import {
   createRecordingOwnerUserIdMock,
@@ -89,6 +91,7 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
 
 export async function createTestStore(preloadedState: Partial<UIState> = {}) {
   const store = bootstrapStore(preloadedState);
+  ThreadFront.sourcesSelectors = bindSelectors(store, sourcesSelectors);
   await setupDevtools(store);
 
   return store;

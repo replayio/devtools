@@ -20,7 +20,8 @@ export function basicMessageHandlers(): MockHandlerRecord {
     "Console.findMessages": arg => ({}),
     "Debugger.findSources": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Debugger.newSource", h.bindings.DefaultSource);
-      return {};
+      // TODO wait until after the last Debugger.newSource message
+      return new Promise(resolve => setTimeout(resolve, 100));
     },
     "Debugger.newSource": (params: any, h: MockHandlerHelpers) => {
       h.emitEvent("Debugger.newSource", params);

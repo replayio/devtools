@@ -89,7 +89,7 @@ describe("useConsoleSearch", () => {
     expect(lastCommitedSearchState?.results.map(result => result.id)).toMatchInlineSnapshot(`
       Array [
         "1",
-        "3",
+        "2",
       ]
     `);
 
@@ -100,7 +100,7 @@ describe("useConsoleSearch", () => {
     expect(lastCommitedSearchState?.index).toBe(0);
     expect(lastCommitedSearchState?.results.map(result => result.id)).toMatchInlineSnapshot(`
       Array [
-        "3",
+        "2",
         "4",
       ]
     `);
