@@ -14,6 +14,7 @@ export type UncaughtException = RemoteAnalysisResult & {
 };
 
 type Callback = () => void;
+export type Status = "failed-too-many-points" | "fetched" | "request-in-progress" | "uninitialized";
 
 const EMPTY_ARRAY: any[] = [];
 
@@ -27,22 +28,27 @@ let lastFilteredFocusRange: TimeStampedPointRange | null = null;
 
 const tooManyPointsListeners: Set<Callback> = new Set();
 
-export function didExceptionsFailTooManyPoints(): boolean {
-  return lastFetchDidFailTooManyPoints;
+export function getStatus(): Status {
+  if (inFlightWakeable !== null) {
+    return "request-in-progress";
+  } else if (lastFetchDidFailTooManyPoints) {
+    return "failed-too-many-points";
+  } else if (lastFetchedExceptions !== null) {
+    return "fetched";
+  } else {
+    return "uninitialized";
+  }
 }
 
-export function addTooManyPointsListeners(callback: Callback): Callback {
+export function subscribeForStatus(callback: Callback): Callback {
   tooManyPointsListeners.add(callback);
-  return function unsubscribe() {
+  return function unsubscribeFromStatus() {
     tooManyPointsListeners.delete(callback);
   };
 }
 
-function setFetchDidFailTooManyPoints(value: boolean): void {
-  if (lastFetchDidFailTooManyPoints !== value) {
-    lastFetchDidFailTooManyPoints = value;
-    tooManyPointsListeners.forEach(callback => callback());
-  }
+function notifyStatusSubscribers(): void {
+  tooManyPointsListeners.forEach(callback => callback());
 }
 
 export function getExceptions(
@@ -51,6 +57,11 @@ export function getExceptions(
 ): UncaughtException[] {
   if (focusRange !== null && focusRange.begin.point === focusRange.end.point) {
     // Edge case scenario handling.
+    lastFetchedExceptions = lastFilteredExceptions = EMPTY_ARRAY;
+    lastFetchedFocusRange = lastFilteredFocusRange = focusRange;
+
+    notifyStatusSubscribers();
+
     return EMPTY_ARRAY;
   }
 
@@ -79,6 +90,8 @@ export function getExceptions(
     inFlightWakeable = createWakeable();
 
     fetchExceptions(client);
+
+    notifyStatusSubscribers();
 
     throw inFlightWakeable;
   }
@@ -118,23 +131,21 @@ async function fetchExceptions(client: ReplayClientInterface) {
     });
 
     if (wakeable === inFlightWakeable) {
+      lastFetchDidFailTooManyPoints = false;
       lastFetchedExceptions = results.map(result => ({
         ...result,
         type: "UncaughtException",
       }));
       lastFetchedFocusRange = inFlightFocusRange;
-
-      setFetchDidFailTooManyPoints(false);
     }
 
     // React doesn't use the resolved value.
     wakeable.resolve(null as any);
   } catch (error) {
     if (isTooManyPointsError(error) && wakeable === inFlightWakeable) {
+      lastFetchDidFailTooManyPoints = true;
       lastFetchedExceptions = EMPTY_ARRAY;
       lastFetchedFocusRange = inFlightFocusRange;
-
-      setFetchDidFailTooManyPoints(true);
     } else {
       console.error(error);
     }
@@ -145,6 +156,8 @@ async function fetchExceptions(client: ReplayClientInterface) {
     if (wakeable === inFlightWakeable) {
       inFlightFocusRange = null;
       inFlightWakeable = null;
+
+      notifyStatusSubscribers();
     }
   }
 }

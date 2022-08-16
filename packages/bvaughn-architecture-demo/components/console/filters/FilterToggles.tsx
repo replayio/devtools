@@ -1,10 +1,8 @@
 import Icon from "@bvaughn/components/Icon";
+import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import {
-  addTooManyPointsListeners,
-  didExceptionsFailTooManyPoints,
-} from "@bvaughn/src/suspense/ExceptionsCache";
+import { getStatus, subscribeForStatus } from "@bvaughn/src/suspense/ExceptionsCache";
 import { isInNodeModules } from "@bvaughn/src/utils/messages";
 import { CategoryCounts, getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import camelCase from "lodash/camelCase";
@@ -26,23 +24,29 @@ export default function FilterToggles() {
     update,
   } = useContext(ConsoleFiltersContext);
 
-  const tooManyPoints = useSyncExternalStore(
-    (callback: () => void) => addTooManyPointsListeners(callback),
-    didExceptionsFailTooManyPoints,
-    didExceptionsFailTooManyPoints
-  );
-  const showExceptionsErrorBadge = showExceptions && tooManyPoints;
+  const status = useSyncExternalStore(subscribeForStatus, getStatus, getStatus);
+  let exceptionsBadge = null;
+  switch (status) {
+    case "failed-too-many-points": {
+      if (showExceptions) {
+        exceptionsBadge = (
+          <span title="There are too many exceptions. Please focus to a smaller time range and try again.">
+            <Icon className={styles.ExceptionsErrorIcon} type="warning" />
+          </span>
+        );
+      }
+      break;
+    }
+    case "request-in-progress": {
+      exceptionsBadge = <Icon className={styles.SpinnerIcon} type="spinner" />;
+      break;
+    }
+  }
 
   return (
     <div className={styles.Filters} data-test-id="ConsoleFilterToggles">
       <Toggle
-        afterContent={
-          showExceptionsErrorBadge ? (
-            <span title="There are too many exceptions. Please focus to a smaller time range and try again.">
-              <Icon className={styles.ExceptionsErrorIcon} type="warning" />
-            </span>
-          ) : null
-        }
+        afterContent={exceptionsBadge}
         checked={showExceptions}
         label="Exceptions"
         onChange={showExceptions => update({ showExceptions })}

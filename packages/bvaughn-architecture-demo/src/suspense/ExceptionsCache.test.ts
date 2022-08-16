@@ -3,7 +3,7 @@ import { ReplayClientInterface } from "shared/client/types";
 
 import { createMockReplayClient } from "../utils/testing";
 
-import { UncaughtException } from "./ExceptionsCache";
+import { Status, UncaughtException } from "./ExceptionsCache";
 
 describe("ExceptionsCache", () => {
   function createCE() {
@@ -45,19 +45,21 @@ describe("ExceptionsCache", () => {
   }
 
   let client: { [key: string]: jest.Mock };
-  let didExceptionsFailTooManyPoints: () => boolean;
   let getExceptions: (
     client: ReplayClientInterface,
     range: TimeStampedPointRange | null
   ) => Promise<UncaughtException[]>;
+  let getStatus: () => Status;
+  let subscribeForStatus: (callback: () => {}) => () => {};
 
   beforeEach(() => {
     client = createMockReplayClient() as any;
 
     // Clear and recreate cached data between tests.
     const module = require("./ExceptionsCache");
-    didExceptionsFailTooManyPoints = module.didExceptionsFailTooManyPoints;
     getExceptions = module.getExceptions;
+    getStatus = module.getStatus;
+    subscribeForStatus = module.subscribeForStatus;
   });
 
   afterEach(() => {
@@ -65,12 +67,16 @@ describe("ExceptionsCache", () => {
   });
 
   it("should handle empty range", async () => {
+    expect(getStatus()).toBe("uninitialized");
+
     const exceptions = await getExceptionsHelper(toTSPR(1, 1));
 
     expect(exceptions).toEqual([]);
     expect(exceptions).toBe(await getExceptionsHelper(toTSPR(1, 1)));
 
     expect(client.runAnalysis).not.toHaveBeenCalled();
+
+    expect(getStatus()).toBe("fetched");
   });
 
   it("should handle an empty array of exceptions", async () => {
@@ -82,7 +88,7 @@ describe("ExceptionsCache", () => {
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
 
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
+    expect(getStatus()).toBe("fetched");
   });
 
   it("should reuse cached exceptions when there is no focus range", async () => {
@@ -96,7 +102,7 @@ describe("ExceptionsCache", () => {
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
 
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
+    expect(getStatus()).toBe("fetched");
   });
 
   it("should reuse cached exceptions for the same focus range", async () => {
@@ -109,8 +115,6 @@ describe("ExceptionsCache", () => {
     expect(exceptions).toBe(await getExceptionsHelper(toTSPR(1, 2)));
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
-
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
   });
 
   it("should handle a too many exception points", async () => {
@@ -122,7 +126,7 @@ describe("ExceptionsCache", () => {
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
 
-    expect(didExceptionsFailTooManyPoints()).toBe(true);
+    expect(getStatus()).toBe("failed-too-many-points");
   });
 
   it("should filter within memory if focus range contracts from previously null", async () => {
@@ -137,8 +141,6 @@ describe("ExceptionsCache", () => {
     exceptions = await getExceptionsHelper(toTSPR(1, 2));
     expect(exceptions.map(({ time }) => time)).toEqual([1, 2]);
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
-
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
   });
 
   it("should filter within memory if focus range contracts from previously focused", async () => {
@@ -157,8 +159,6 @@ describe("ExceptionsCache", () => {
     exceptions = await getExceptionsHelper(toTSPR(2, 3));
     expect(exceptions.map(({ time }) => time)).toEqual([2, 3]);
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
-
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
   });
 
   it("should re-request if focus range expands", async () => {
@@ -181,8 +181,6 @@ describe("ExceptionsCache", () => {
     exceptions = await getExceptionsHelper(toTSPR(0, 3));
     expect(exceptions.map(({ time }) => time)).toEqual([0, 1, 2, 3]);
     expect(client.runAnalysis).toHaveBeenCalledTimes(3);
-
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
   });
 
   it("should re-request if focus range expands to null", async () => {
@@ -198,8 +196,6 @@ describe("ExceptionsCache", () => {
     exceptions = await getExceptionsHelper(null);
     expect(exceptions.map(({ time }) => time)).toEqual([0, 1, 2, 3]);
     expect(client.runAnalysis).toHaveBeenCalledTimes(2);
-
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
   });
 
   it("should always re-request if focus region changes after too many points error", async () => {
@@ -207,17 +203,17 @@ describe("ExceptionsCache", () => {
 
     let exceptions = await getExceptionsHelper(toTSPR(0, 3));
     expect(exceptions).toEqual([]);
-    expect(didExceptionsFailTooManyPoints()).toBe(true);
+    expect(getStatus()).toBe("failed-too-many-points");
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
 
     exceptions = await getExceptionsHelper(toTSPR(1, 3));
     expect(exceptions).toEqual([]);
-    expect(didExceptionsFailTooManyPoints()).toBe(true);
+    expect(getStatus()).toBe("failed-too-many-points");
     expect(client.runAnalysis).toHaveBeenCalledTimes(2);
 
     exceptions = await getExceptionsHelper(toTSPR(1, 2));
     expect(exceptions).toEqual([]);
-    expect(didExceptionsFailTooManyPoints()).toBe(true);
+    expect(getStatus()).toBe("failed-too-many-points");
     expect(client.runAnalysis).toHaveBeenCalledTimes(3);
   });
 
@@ -250,22 +246,69 @@ describe("ExceptionsCache", () => {
 
     const exceptions = await getExceptionsHelper(toTSPR(2, 3));
     expect(exceptions.map(({ time }) => time)).toEqual([2, 3]);
-    expect(didExceptionsFailTooManyPoints()).toBe(false);
     expect(client.runAnalysis).toHaveBeenCalledTimes(2);
   });
 
   it("should re-use the in-flight promise if the same focus range is specified", async () => {
-    let resolvePromise: any;
-
-    const promise = new Promise(resolve => {
-      resolvePromise = () => resolve([]);
-    });
+    const promise = new Promise(() => {});
 
     client.runAnalysis.mockImplementation(() => promise);
     getExceptionsHelper(toTSPR(0, 1));
+
+    expect(getStatus()).toBe("request-in-progress");
+
     getExceptionsHelper(toTSPR(0, 1));
     getExceptionsHelper(toTSPR(0, 1));
 
     expect(client.runAnalysis).toHaveBeenCalledTimes(1);
+  });
+
+  describe("subscribeForStatus", () => {
+    let statuses: Status[] = [];
+
+    beforeEach(() => {
+      statuses = [];
+
+      const callback = jest.fn(async () => {
+        statuses.push(getStatus());
+      });
+
+      subscribeForStatus(callback);
+    });
+
+    it("should notify after empty range", async () => {
+      await getExceptionsHelper(toTSPR(1, 1));
+
+      expect(statuses).toEqual(["fetched"]);
+    });
+
+    it("should notify after too many points error", async () => {
+      client.runAnalysis.mockImplementation(() => Promise.reject(createCE()));
+
+      await getExceptionsHelper(toTSPR(0, 1));
+
+      expect(statuses).toEqual(["request-in-progress", "failed-too-many-points"]);
+    });
+
+    it("should notify after success", async () => {
+      client.runAnalysis.mockImplementation(() => Promise.resolve([createUE(1)]));
+
+      await getExceptionsHelper(toTSPR(0, 1));
+
+      expect(statuses).toEqual(["request-in-progress", "fetched"]);
+    });
+
+    it("should unsubscribe", async () => {
+      const callback = jest.fn(() => {
+        throw Error("Unexpected call");
+      });
+
+      const unsubscribe = subscribeForStatus(callback);
+      unsubscribe();
+
+      getExceptionsHelper(toTSPR(0, 1));
+
+      expect(callback).not.toHaveBeenCalled();
+    });
   });
 });

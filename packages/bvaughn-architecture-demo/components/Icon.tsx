@@ -33,6 +33,7 @@ export default function Icon({
     | "search"
     | "share"
     | "source-explorer"
+    | "spinner"
     | "up"
     | "view-function-source"
     | "view-html-element"
@@ -144,6 +145,10 @@ export default function Icon({
     case "source-explorer":
       path =
         "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z";
+      break;
+    case "spinner":
+      path =
+        "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z";
       break;
     case "up":
       path = "M7.41 15.41L12 10.83l4.59 4.58L18 14l-6-6-6 6z";
