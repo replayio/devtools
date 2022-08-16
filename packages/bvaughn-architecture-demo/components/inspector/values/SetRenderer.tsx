@@ -50,13 +50,15 @@ export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererPr
       <>
         {object.className}
         <span className={styles.ArrayLength}>({containerEntryCount})</span>
-        <PreviewContext.Provider value={true}>
-          <span className={styles.ArrayPropertyList}>
-            {" ["}
-            {propertiesList || "…"}
-            {"]"}
-          </span>
-        </PreviewContext.Provider>
+        {propertiesList !== null && (
+          <PreviewContext.Provider value={true}>
+            <span className={styles.ArrayPropertyList}>
+              {" ["}
+              {propertiesList || "…"}
+              {"]"}
+            </span>
+          </PreviewContext.Provider>
+        )}
       </>
     );
   }

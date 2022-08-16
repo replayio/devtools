@@ -1,5 +1,5 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { FC, memo, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -73,7 +73,14 @@ export default memo(function ValueRenderer({
   if (ObjectPreviewRenderer !== null) {
     // Preview can overflow when rendering inline/horizontal mode.
     const noOverflow = layout === "vertical";
-    const object = getObjectWithPreview(client, pauseId, clientValue.objectId!, noOverflow);
+
+    // Avoid loading object preview data for inline layouts because this can be expensive.
+    // The downside is that value renderers won't be able to display as much information (e.g. "Array" rather than "Array(3)")
+    // but this is how the old console works and each value renderer should be able to downgrade like this.
+    const object =
+      getObject(pauseId, clientValue.objectId!) ||
+      getObjectWithPreview(client, pauseId, clientValue.objectId!, noOverflow);
+
     if (object == null) {
       throw Error(`Could not find object with ID "${clientValue.objectId}"`);
     }

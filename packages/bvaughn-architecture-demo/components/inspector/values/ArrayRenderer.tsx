@@ -53,11 +53,13 @@ export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRenderer
       Array
       {length > 0 && <span className={styles.ArrayLength}>({length})</span>}
       <PreviewContext.Provider value={true}>
-        <span className={styles.ArrayPropertyList}>
-          {" ["}
-          {propertiesList || "…"}
-          {"]"}
-        </span>
+        {propertiesList !== null && (
+          <span className={styles.ArrayPropertyList}>
+            {" ["}
+            {propertiesList || "…"}
+            {"]"}
+          </span>
+        )}
       </PreviewContext.Provider>
     </>
   );
