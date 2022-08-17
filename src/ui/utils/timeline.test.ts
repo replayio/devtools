@@ -10,7 +10,7 @@ import {
   overlap,
 } from "./timeline";
 
-const point = (time: number) => ({ time, point: "" });
+const point = (time: number) => ({ time, point: `${time}` });
 const focusRegion = (from: number, to: number): FocusRegion => ({
   begin: point(from),
   beginTime: from,

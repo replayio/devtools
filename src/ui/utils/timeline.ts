@@ -302,11 +302,10 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
     return sortedPoints;
   }
 
-  const beginTime = displayedBeginForFocusRegion(focusRegion);
-  const endTime = displayedEndForFocusRegion(focusRegion);
+  const { begin: beginPoint, end: endPoint } = rangeForFocusRegion(focusRegion);
 
-  const beginIndex = sortedIndexBy(sortedPoints, { time: beginTime, point: "" }, p => p.time);
-  const endIndex = sortedLastIndexBy(sortedPoints, { time: endTime, point: "" }, p => p.time);
+  const beginIndex = sortedIndexBy(sortedPoints, beginPoint, ({ point }) => BigInt(point));
+  const endIndex = sortedLastIndexBy(sortedPoints, endPoint, ({ point }) => BigInt(point));
 
   return sortedPoints.slice(beginIndex, endIndex);
 }
