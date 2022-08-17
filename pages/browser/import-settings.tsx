@@ -35,16 +35,16 @@ export default function ImportSettings() {
               className={getButtonClasses("blue", "primary", "2xl")}
               onClick={launchMigrationWizard}
             >
-              {`Sounds helpful, let's do it`}
+              {`Sounds helpful!`}
             </a>
           </LoginLink>
           <LoginLink>
             <a type="button" className={getButtonClasses("gray", "primary", "2xl")}>
-              Skip
+              Maybe later
             </a>
           </LoginLink>
         </OnboardingActions>
-        <iframe id="migrationFrame" className="h-0 w-0" />
+        <iframe id="migrationFrame" className="w-0 h-0" />
       </OnboardingContentWrapper>
     </OnboardingModalContainer>
   );
