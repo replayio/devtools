@@ -22,7 +22,7 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
       if (objects) {
         // Be sure to clone object data before pre-caching it.
         // Otherwise ValueFronts might deeply mutate it and change its structure.
-        const cloned = JSON.parse(JSON.stringify(objects)).filter(Boolean);
+        const cloned = JSON.parse(JSON.stringify(objects));
         preCacheObjects(pauseId, cloned);
       }
 
