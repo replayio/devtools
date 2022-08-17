@@ -25,7 +25,7 @@ function FunctionRep(props) {
 
   let jumpToDefinitionButton;
   const location = grip.functionLocation();
-  const url = grip.functionLocationURL();
+  const url = location ? props.sourcesById[location.sourceId]?.url : undefined;
   if (onViewSourceInDebugger && url && !IGNORED_SOURCE_URLS.includes(url)) {
     jumpToDefinitionButton = button({
       className: "jump-definition",

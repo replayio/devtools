@@ -47,7 +47,7 @@ export default class PreviewFunction extends Component {
     }
 
     const location = func.functionLocation();
-    const locationURL = func.functionLocationURL();
+    const locationURL = location ? this.props.sourcesById[location.sourceId]?.url : undefined;
 
     if (location && locationURL && !IGNORED_SOURCE_URLS.includes(locationURL)) {
       const lastIndex = locationURL.lastIndexOf("/");

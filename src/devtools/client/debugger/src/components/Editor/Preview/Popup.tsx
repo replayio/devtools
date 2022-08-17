@@ -9,7 +9,6 @@ import type { UIState } from "ui/state";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 
 import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
-import actions from "devtools/client/debugger/src/actions";
 import {
   highlightDomElement,
   unHighlightDomElement,
@@ -20,6 +19,7 @@ import { selectSourceURL } from "devtools/client/debugger/src/actions/sources/se
 import { clearPreview } from "devtools/client/debugger/src/actions/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import { prefs as prefsService } from "devtools/shared/services";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
@@ -52,7 +52,7 @@ export class Popup extends Component<FinalPopupProps> {
   };
 
   renderFunctionPreview() {
-    const { cx, selectSourceURL, preview } = this.props;
+    const { cx, sourcesById, selectSourceURL, preview } = this.props;
     const { resultGrip } = preview!;
 
     if (!resultGrip) {
@@ -60,13 +60,13 @@ export class Popup extends Component<FinalPopupProps> {
     }
 
     const location = resultGrip.functionLocation();
-    const locationURL = resultGrip.functionLocationURL();
+    const locationURL = location ? sourcesById[location.sourceId]?.url : undefined;
 
     return (
       <div
         className="preview-popup"
         onClick={() =>
-          location &&
+          locationURL &&
           selectSourceURL(cx, locationURL, {
             line: location.line,
             column: 0,
@@ -196,9 +196,8 @@ export class Popup extends Component<FinalPopupProps> {
 
 const mapStateToProps = (state: UIState) => ({
   cx: getThreadContext(state),
+  sourcesById: getSourceDetailsEntities(state),
 });
-
-// const { selectSourceURL,  clearPreview } = actions;
 
 const mapDispatchToProps = {
   selectSourceURL,

@@ -4,6 +4,7 @@
 
 import type { ExecutionPoint, Frame } from "@replayio/protocol";
 import * as Sentry from "@sentry/browser";
+import { Dictionary } from "@reduxjs/toolkit";
 import { IdGenerator } from "devtools/client/webconsole/utils/id-generator";
 import {
   prepareMessage,
@@ -33,6 +34,7 @@ import {
   setMessagesLoaded,
 } from "../reducers/messages";
 import { getConsoleOverflow, getLastFetchedForFocusRegion, getMessagesLoaded } from "../selectors";
+import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
@@ -55,6 +57,7 @@ export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontTyp
 function convertStack(
   stack: string[],
   { frames }: { frames?: Frame[] },
+  sourcesById: Dictionary<SourceDetails>,
   ThreadFront: typeof ThreadFrontType
 ) {
   if (!stack) {
@@ -65,7 +68,7 @@ function convertStack(
       const frame = frames!.find(f => f.frameId == frameId)!;
       const location = await ThreadFront.getPreferredLocation(frame.location);
       return {
-        filename: await ThreadFront.getSourceURL(location.sourceId),
+        filename: sourcesById[location.sourceId]?.url,
         sourceId: location.sourceId,
         lineNumber: location.line,
         columnNumber: location.column,
@@ -77,7 +80,9 @@ function convertStack(
 
 export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const stacktrace = await convertStack(msg.stack!, msg.data, ThreadFront);
+    await ThreadFront.ensureAllSources();
+    const sourcesById = getSourceDetailsEntities(getState());
+    const stacktrace = await convertStack(msg.stack!, msg.data, sourcesById, ThreadFront);
     const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, sourceId: msgSourceId, line, column } = msg;
@@ -91,7 +96,7 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
       // If the execution point has a location, use any mappings in that location.
       // The message properties do not reflect any source mapping.
       const location = await ThreadFront.getPreferredLocation(msg.point.frame);
-      url = await ThreadFront.getSourceURL(location.sourceId);
+      url = sourcesById[location.sourceId]?.url;
       line = location.line;
       column = location.column;
     } else {
@@ -108,7 +113,7 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
           line: line!,
           column: column!,
         });
-        url = await ThreadFront.getSourceURL(location.sourceId);
+        url = sourcesById[location.sourceId]?.url;
         line = location.line;
         column = location.column;
       }
@@ -150,9 +155,11 @@ function onLogpointLoading(
   { sourceId, line, column }: { sourceId: string; line: number; column: number }
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
+    await ThreadFront.ensureAllSources();
+    const sourcesById = getSourceDetailsEntities(getState());
     const packet = {
       errorMessage: "Loading…",
-      sourceName: await ThreadFront.getSourceURL(sourceId),
+      sourceName: sourcesById[sourceId]?.url,
       sourceId: sourceId,
       lineNumber: line,
       columnNumber: column,
@@ -177,12 +184,14 @@ function onLogpointResult(
   values?: ValueFront[]
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
+    await ThreadFront.ensureAllSources();
+    const sourcesById = getSourceDetailsEntities(getState());
     if (values) {
       await Promise.all(values.map(loadValue));
     }
     const packet = {
       errorMessage: "",
-      sourceName: await ThreadFront.getSourceURL(sourceId),
+      sourceName: sourcesById[sourceId]?.url,
       sourceId: sourceId,
       lineNumber: line,
       columnNumber: column,

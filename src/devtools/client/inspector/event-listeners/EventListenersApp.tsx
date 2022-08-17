@@ -7,12 +7,15 @@ import { XHTMLNode } from "./XHTMLNode";
 import Selection from "devtools/client/framework/selection";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 import { selection } from "devtools/client/framework/selection";
+import { useAppSelector } from "ui/setup/hooks";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
 export const EventListenersApp = () => {
   const selectedNode = useRef<NodeFront | null>(null);
   const [listeners, setListeners] = useState<AnyListener[]>([]);
+  const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -86,7 +89,7 @@ export const EventListenersApp = () => {
             <ExpandableItem header={eventType}>
               {listeners.map(({ handler, capture }) => {
                 const location = handler.functionLocation();
-                const locationUrl = handler.functionLocationURL();
+                const locationUrl = location ? sourcesById[location.sourceId]?.url : undefined;
                 const functionName = handler.functionName() ?? "";
                 const paramsNames = handler.functionParameterNames() ?? [];
 

@@ -6,6 +6,8 @@
 
 const React = require("react");
 const PropTypes = require("prop-types");
+const { connect } = require("react-redux");
+const { getSourceDetailsEntities, getSourceIdsByUrl } = require("ui/reducers/sources");
 
 const Frames =
   require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index").Frames;
@@ -45,7 +47,12 @@ class SmartTrace extends React.Component {
 
     const mappedStack = this.props.stacktrace.map(async frame => {
       const { lineNumber, columnNumber, filename } = frame;
-      const sourceIds = ThreadFront.getGeneratedSourceIdsForURL(filename);
+      let sourceIds = this.props.sourceIdsByUrl?.[filename] || [];
+      // Ignore IDs which are original versions of another ID with the same URL.
+      sourceIds = sourceIds.filter(sourceId => {
+        const generatedIds = this.props.sourcesById[sourceId]?.generated;
+        return (generatedIds || []).every(generatedId => !sourceIds.includes(generatedId));
+      });
       if (sourceIds.length != 1) {
         return frame;
       }
@@ -59,7 +66,7 @@ class SmartTrace extends React.Component {
         ...frame,
         lineNumber: mapped.line,
         columnNumber: mapped.column,
-        filename: await ThreadFront.getSourceURL(mapped.sourceId),
+        filename: this.props.sourcesById[mapped.sourceId]?.url,
       };
     });
 
@@ -133,4 +140,9 @@ class SmartTrace extends React.Component {
   }
 }
 
-module.exports = SmartTrace;
+const connector = connect(state => ({
+  sourcesById: getSourceDetailsEntities(state),
+  sourceIdsByUrl: getSourceIdsByUrl(state),
+}));
+
+module.exports = connector(SmartTrace);

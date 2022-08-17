@@ -52,6 +52,7 @@ import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducer
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import styles from "./NewConsole.module.css";
 
@@ -170,13 +171,14 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
 function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
+  const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
 
   const inspectFunctionDefinition = useCallback(
     (mappedLocation: MappedLocation) => {
       const location = mappedLocation.length > 0 ? mappedLocation[mappedLocation.length - 1] : null;
       if (location) {
-        const url = ThreadFront.getSourceURLRaw(location.sourceId);
+        const url = sourcesById[location.sourceId]?.url;
         if (url) {
           dispatch(
             onViewSourceInDebugger({
@@ -188,7 +190,7 @@ function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
         }
       }
     },
-    [dispatch]
+    [sourcesById, dispatch]
   );
 
   // TODO (FE-337) Make this function work, then pass it down through the context.

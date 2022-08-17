@@ -455,16 +455,6 @@ class _ThreadFront {
     await this.allSourcesWaiter.promise;
   }
 
-  getSourceURLRaw(sourceId: SourceId) {
-    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
-    return info && info.url;
-  }
-
-  async getSourceURL(sourceId: SourceId) {
-    await this.ensureAllSources();
-    return this.getSourceURLRaw(sourceId);
-  }
-
   getSourceIdsForURL(url: string) {
     // Ignore IDs which are generated versions of another ID with the same URL.
     // This happens with inline sources for HTML pages, in which case we only
@@ -473,15 +463,6 @@ class _ThreadFront {
     return sourceIds.filter(sourceId => {
       const originalIds = this.sourcesSelectors!.getSourceDetails(sourceId)?.generatedFrom;
       return (originalIds || []).every(originalId => !sourceIds.includes(originalId));
-    });
-  }
-
-  getGeneratedSourceIdsForURL(url: string) {
-    // Ignore IDs which are original versions of another ID with the same URL.
-    const sourceIds = this.sourcesSelectors!.getSourceIdsByUrl()[url] || [];
-    return sourceIds.filter(sourceId => {
-      const generatedIds = this.sourcesSelectors!.getSourceDetails(sourceId)?.generated;
-      return (generatedIds || []).every(generatedId => !sourceIds.includes(generatedId));
     });
   }
 
@@ -1002,30 +983,6 @@ class _ThreadFront {
       "location.sourceId should be updated to the first corresponding sourceId"
     );
     return preferredLocation;
-  }
-
-  async getCurrentPauseSourceLocation() {
-    const frame = (await this.currentPause?.getFrames())?.[0];
-    if (!frame) {
-      return;
-    }
-    const { location } = frame;
-    const preferredLocation = await this.getPreferredLocation(location);
-    if (!preferredLocation) {
-      return;
-    }
-
-    const sourceUrl = await this.getSourceURL(preferredLocation.sourceId);
-    if (!sourceUrl) {
-      return;
-    }
-
-    return {
-      sourceUrl,
-      sourceId: preferredLocation.sourceId,
-      line: preferredLocation.line,
-      column: preferredLocation.column,
-    };
   }
 
   // Given an RRP MappedLocation array with locations in different sources

@@ -212,13 +212,6 @@ export class ValueFront {
     }
   }
 
-  functionLocationURL() {
-    const location = this.functionLocation();
-    if (location) {
-      return ThreadFront.getSourceURLRaw(location.sourceId);
-    }
-  }
-
   // When the function came from a logpoint and hasn't had its location
   // mapped yet, this should be used to avoid confusing getPreferredLocation.
   functionLocationFromLogpoint() {
