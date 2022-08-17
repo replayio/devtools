@@ -53,7 +53,7 @@ function Navigation({
   };
 
   return (
-    <div className="items-right text-base">
+    <div className="text-base items-right">
       {/* <div className="flex flex-row items-center space-x-2">
         <input
           type="checkbox"
@@ -61,7 +61,7 @@ function Navigation({
           checked={checked}
           onChange={() => setChecked(!checked)}
         />
-        <label htmlFor="keep-showing" className="select-none text-gray-500">
+        <label htmlFor="keep-showing" className="text-gray-500 select-none">
           Show this on startup
         </label>
       </div> */}
@@ -86,7 +86,7 @@ function OnboardingModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }}>
       <div
-        className="relative flex flex-col justify-between space-y-6 rounded-lg bg-white p-9 text-lg shadow-xl"
+        className="relative flex flex-col justify-between space-y-6 text-lg bg-white rounded-lg shadow-xl p-9"
         style={{ width: "520px" }}
       >
         <SlideContent headerText={header}>{content}</SlideContent>

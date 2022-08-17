@@ -56,14 +56,14 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
       <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
         {displayedRequests.map((c, i) => (
           <div
-            className="hover:bg-theme-base-90 flex items-center justify-between space-x-2 rounded-lg p-2"
+            className="flex items-center justify-between p-2 space-x-2 rounded-lg hover:bg-theme-base-90"
             key={i}
           >
             <div className="flex items-center space-x-2">
-              <div className="w-8 flex-shrink-0 overflow-hidden rounded-full">
+              <div className="flex-shrink-0 w-8 overflow-hidden rounded-full">
                 <AvatarImage src={c.user.picture} />
               </div>
-              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
+              <span className="overflow-hidden whitespace-pre overflow-ellipsis">
                 {c.user.name}
               </span>
             </div>
@@ -85,8 +85,8 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="space-y-4 p-8">
-      <div className="flex w-full flex-col justify-between space-y-3">
+    <section className="p-8 space-y-4">
+      <div className="flex flex-col justify-between w-full space-y-3">
         <div className="w-full space-y-4">
           <div className="space-y-1.5">
             <div className="font-bold">Add People</div>
@@ -130,13 +130,13 @@ function SharingModal({ recording, hideModal }: SharingModalProps) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="sharing-modal relative flex flex-col space-y-0 overflow-hidden rounded-lg bg-white text-sm"
+        className="relative flex flex-col space-y-0 overflow-hidden text-sm rounded-lg sharing-modal"
         style={{ width: "460px" }}
       >
         <CollaboratorsSection recording={recording} />
-        <section className="flex flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor p-8">
+        <section className="flex flex-row items-center justify-between p-8 space-x-2 bg-menuHoverBgcolor">
           <div className="flex flex-row items-start space-x-3 overflow-hidden">
-            <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
+            <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mt-1 font-bold bg-blue-200 rounded-full">
               <MaterialIcon className="text-blue-600" iconSize="xl">
                 people
               </MaterialIcon>

@@ -30,14 +30,15 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "modal-with-border relative m-4 flex flex-col items-center bg-modalBgcolor p-9 text-2xl text-menuColor shadow-md",
+        "relative m-4 flex flex-col items-center bg-black/50 p-9 text-2xl text-white shadow-md rounded-xl",
         overlay ? "max-w-sm space-y-8" : "max-w-3xl space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
       )}
     >
-      {noLogo ? null : <ReplayLogo size={overlay ? "md" : "lg"} wide={overlay} />}
+      <img src="/images/logo-wide-dark.svg" className="w-full h-24" />
+
       {children}
     </div>
   );
@@ -147,12 +148,7 @@ export function OnboardingModalContainer({
 }) {
   return (
     <OnboardingContext.Provider value={{ theme }}>
-      <div
-        className={classNames(
-          "fixed z-50 grid h-full w-full",
-          theme === "dark" ? "bg-black text-white" : "bg-chrome text-black"
-        )}
-      >
+      <div className={classNames("fixed z-50 grid h-full w-full bg-black text-white")}>
         <BubbleBackground />
         <Modal options={{ maskTransparency: "transparent" }} blurMask={false}>
           {children}

@@ -50,19 +50,19 @@ function NewAttachment({ hideModal, modalOptions }: PropsFromRedux) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div className="overflow-hidden rounded-lg bg-white" style={{ width: "600px" }}>
-        <div className="width-full flex h-12 items-center bg-primaryAccent">
-          <div className="img loom ml-3 mr-2" style={{ background: "white" }}></div>
+      <div className="overflow-hidden bg-white rounded-lg" style={{ width: "600px" }}>
+        <div className="flex items-center h-12 width-full bg-primaryAccent">
+          <div className="ml-3 mr-2 img loom" style={{ background: "white" }}></div>
           <div className="text-lg text-white">Add Loom url</div>
         </div>
-        <div className="flex h-12 items-center pr-3">
+        <div className="flex items-center h-12 pr-3">
           <form className="flex w-full" onSubmit={onSubmit}>
             <input
               type="text"
               placeholder="http://loom.com/share"
               onChange={onChange}
               value={url}
-              className="align-center mr-3 h-9 flex-grow border-none text-gray-500 placeholder-gray-300 focus:ring-0"
+              className="flex-grow mr-3 text-gray-500 placeholder-gray-300 border-none align-center h-9 focus:ring-0"
             ></input>
             <button className={`${color} rounded-lg py-1 px-2 text-white`} onClick={onSubmit}>
               Save

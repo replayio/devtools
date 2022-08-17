@@ -14,11 +14,11 @@ export default function TOSScreen() {
   return (
     <BubbleViewportWrapper>
       <div
-        className="relative flex flex-col items-center space-y-6 rounded-lg bg-white p-9 text-base shadow-xl"
+        className="relative flex flex-col items-center space-y-6 text-base bg-white rounded-lg shadow-xl p-9"
         style={{ width: "520px" }}
       >
-        <div className="place-content-center space-y-4">
-          <img className="mx-auto h-12 w-12" src="/images/logo.svg" />
+        <div className="space-y-4 place-content-center">
+          <img className="w-12 h-12 mx-auto" src="/images/logo.svg" />
         </div>
         <div className="text-2xl font-bold">Terms of Use</div>
         <div>
@@ -27,7 +27,7 @@ export default function TOSScreen() {
             href="https://replay.io/tos.html"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primaryAccent underline"
+            className="underline text-primaryAccent"
           >
             Terms of Use
           </a>{" "}
@@ -48,7 +48,7 @@ export default function TOSScreen() {
           Besides these terms, we also publish a{" "}
           <ExternalLink
             href="https://replay.io/privacy.html"
-            className="text-primaryAccent underline"
+            className="underline text-primaryAccent"
           >
             Privacy Policy
           </ExternalLink>{" "}
