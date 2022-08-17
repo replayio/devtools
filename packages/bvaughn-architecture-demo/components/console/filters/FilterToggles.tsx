@@ -85,7 +85,11 @@ export default function FilterToggles() {
       <EventsList />
       <hr className={styles.Divider} />
       <Toggle
-        afterContent={<NodeModulesCount />}
+        afterContent={
+          <Suspense fallback={null}>
+            <NodeModulesCount />
+          </Suspense>
+        }
         checked={showNodeModules}
         label="Node modules"
         onChange={showNodeModules => update({ showNodeModules })}
