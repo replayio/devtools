@@ -205,17 +205,19 @@ export class Pause {
   }
 
   addData(...datas: PauseData[]) {
-    datas.forEach(d => this._addDataObjects(d));
-    datas.forEach(d => this._updateDataFronts(d));
-
     const pauseId = this.pauseId!;
     const point = this.point!;
 
+    // Event handlers must be called before processing the data.
+    // Calling _updateDataFronts() will add ValueFronts and mutate the underlying data.
     if (pauseDataHandlers.length > 0) {
       datas.forEach(data => {
         pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
       });
     }
+
+    datas.forEach(d => this._addDataObjects(d));
+    datas.forEach(d => this._updateDataFronts(d));
   }
 
   ensureLoaded() {

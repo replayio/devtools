@@ -76,7 +76,7 @@ export function getObject(pauseId: PauseId, objectId: ObjectId): Object | null {
 export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
   const object = getObject(pauseId, objectId);
   if (!object) {
-    throw Error(`Could not find object with id "${objectId}"`);
+    throw Error(`Could not find object "${objectId}" at pause "${pauseId}".`);
   }
   return object;
 }
