@@ -144,6 +144,7 @@
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
   --body-color: #38383d;
+  --buttontext-color: pink;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.98);
@@ -412,6 +413,7 @@
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
   --body-color: var(--grey-30);
+  --buttontext-color: pink;
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: var(--theme-base-90);

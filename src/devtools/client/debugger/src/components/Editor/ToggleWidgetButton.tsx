@@ -31,7 +31,7 @@ const QuickActionButton: FC<{
     <button
       className={classNames(
         "toggle-widget",
-        "flex rounded-md p-px leading-3 text-white shadow-lg transition hover:scale-125",
+        "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition hover:scale-125",
         `${disabled ? "bg-gray-600" : "bg-primaryAccent"}`
       )}
       onClick={disabled ? () => {} : onClick}

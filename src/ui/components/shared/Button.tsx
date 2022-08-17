@@ -40,7 +40,7 @@ function getColorCode(color: Colors, num: ColorScale) {
 
 function getTextClass(color: Colors) {
   if (color === "white") {
-    return "text-white";
+    return "text-buttontextColor";
   }
 
   return `text-${getColorCode(color, 700)}`;

@@ -16,6 +16,7 @@ module.exports = {
           60: "var(--theme-base-60)",
         },
         bodyColor: "var(--body-color)",
+        buttontextColor: "var(--buttontext-color)",        
         breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
         breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
         breakpointStatus: "var(--breakpoint-status)",
