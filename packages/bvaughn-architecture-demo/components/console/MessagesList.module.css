@@ -38,6 +38,7 @@
 
 .OverflowLink {
   color: var(--color-error);
+  text-decoration: underline;
 }
 .OverflowLink:hover {
   text-decoration: none;
