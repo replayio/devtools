@@ -8,7 +8,9 @@ export const newSourcesToCompleteSourceDetails = (
 ): Record<EntityId, SourceDetails> => {
   const newSourcesById: Record<string, newSource> = {};
   const corresponding = new ArrayMap<string, string>();
+  // the newSource objects link original to generated sources, here we collect the links in the other direction
   const original = new ArrayMap<string, string>();
+  // same as above, but only for the links from pretty-printed to minified sources
   const prettyPrinted: Record<string, string> = {};
 
   // TODO @jcmorrow: remove this once we include the contentHash with prettyPrinted sources
@@ -23,14 +25,17 @@ export const newSourcesToCompleteSourceDetails = (
       : source.kind === "sourceMapped";
   };
 
+  // sources with the same key will be grouped as corresponding sources
   const keyForSource = (source: newSource): string => {
     return `${source.kind}:${source.url!}:${contentHashForSource(source)}`;
   };
 
-  for (let source of newSources) {
+  // compute newSourcesById
+  for (const source of newSources) {
     newSourcesById[source.sourceId] = source;
   }
-  for (let source of newSources) {
+  // compute corresponding, original and prettyPrinted
+  for (const source of newSources) {
     corresponding.add(keyForSource(source), source.sourceId);
     for (const generatedSourceId of source.generatedSourceIds || []) {
       original.add(generatedSourceId, source.sourceId);
@@ -46,7 +51,7 @@ export const newSourcesToCompleteSourceDetails = (
 
   const returnValue: Record<EntityId, SourceDetails> = {};
 
-  for (let source of newSources) {
+  for (const source of newSources) {
     const { sourceId, generatedSourceIds, ...remainingFields } = source;
     returnValue[sourceId] = Object.assign(remainingFields, {
       contentHash: contentHashForSource(source),
