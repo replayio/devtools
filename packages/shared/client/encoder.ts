@@ -27,7 +27,7 @@ function replacer(_: string, value: any): any {
 }
 
 export function decode(string: string): any {
-  const unsanitized = string.replace(/\\\\/g, "\\").replace(/\\`/g, "`");
+  const unsanitized = string.replace(/\\/g, "\\").replace(/\\`/g, "`");
   return JSON.parse(unsanitized, reviver);
 }
 
