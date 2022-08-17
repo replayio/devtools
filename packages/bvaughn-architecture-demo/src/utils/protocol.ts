@@ -124,11 +124,7 @@ export function protocolValueToClientValue(
     }
 
     if (objectId) {
-      const object = objectId ? getObjectThrows(pauseId, objectId) : null;
-      if (!object) {
-        throw Error(`Could not find object with id "${objectId}"`);
-      }
-
+      const object = getObjectThrows(pauseId, objectId);
       const className = object.className;
 
       let preview: string | undefined;

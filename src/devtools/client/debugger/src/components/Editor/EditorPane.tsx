@@ -11,7 +11,6 @@ import useWidthObserver from "ui/utils/useWidthObserver";
 import { getSelectedSource } from "ui/reducers/sources";
 import { waitForEditor } from "../../utils/editor/create-editor";
 
-import ObjectPreviewSuspenseCacheAdapter from "../SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 import WelcomeBox from "../WelcomeBox";
 
 import Editor from "./index";
@@ -70,7 +69,6 @@ export const EditorPane = () => {
           <WelcomeBox />
         )}
         {selectedSource && <EditorFooter />}
-        <ObjectPreviewSuspenseCacheAdapter />
       </div>
     </div>
   );
