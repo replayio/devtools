@@ -5,10 +5,12 @@
 //
 
 import React, { HTMLProps, PureComponent, ReactNode } from "react";
+import { Dictionary } from "@reduxjs/toolkit";
 import classnames from "classnames";
 import { Item, documentHasSelection } from "../items";
 import { trackEvent } from "ui/utils/telemetry";
 import { DebuggerLocation } from "devtools/client/webconsole/actions";
+import { SourceDetails } from "ui/reducers/sources";
 
 export interface ObjectInspectorItemProps {
   item: Item;
@@ -17,6 +19,7 @@ export interface ObjectInspectorItemProps {
   expanded: boolean;
   arrow: ReactNode;
   mode: Symbol;
+  sourcesById: Dictionary<SourceDetails>,
   setExpanded: (item: Item, expand: boolean) => void;
   dimTopLevelWindow?: boolean;
   onDoubleClick?: (

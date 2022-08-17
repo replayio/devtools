@@ -8,6 +8,7 @@ import React, { FC, PureComponent, ReactNode } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { RedactedSpan } from "ui/components/Redacted";
 import { isRegionLoaded } from "ui/reducers/app";
+import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
@@ -266,6 +267,7 @@ const connector = connect(
     const roots = props.roots instanceof Function ? props.roots() : props.roots;
     return {
       isRegionLoaded: isRegionLoaded(state, findPause(roots)?.time),
+      sourcesById: getSourceDetailsEntities(state),
     };
   },
   { onViewSourceInDebugger }

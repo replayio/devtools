@@ -159,8 +159,8 @@ export class GetterItem {
     if (this.getterFn.hasPreviewOverflow()) {
       return this.name;
     }
-    const url = this.getterFn.functionLocationURL();
     const location = this.getterFn.functionLocation();
+    const url = location ? props.sourcesById[location.sourceId]?.url : undefined;
     if (!url || !location) {
       return this.name;
     }
