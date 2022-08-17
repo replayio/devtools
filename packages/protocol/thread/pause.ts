@@ -172,8 +172,6 @@ export class Pause {
     this.createWaiter = (async () => {
       const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
 
-      pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
-
       await this.ThreadFront.ensureAllSources();
       this._setPauseId(pauseId);
       this.point = point;
@@ -197,8 +195,6 @@ export class Pause {
     assert(!this.createWaiter, "createWaiter already set");
     assert(!this.pauseId, "pauseId already set");
 
-    pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
-
     this.createWaiter = Promise.resolve();
     this._setPauseId(pauseId);
     this.point = point;
@@ -211,6 +207,15 @@ export class Pause {
   addData(...datas: PauseData[]) {
     datas.forEach(d => this._addDataObjects(d));
     datas.forEach(d => this._updateDataFronts(d));
+
+    const pauseId = this.pauseId!;
+    const point = this.point!;
+
+    if (pauseDataHandlers.length > 0) {
+      datas.forEach(data => {
+        pauseDataHandlers.forEach(handler => handler(pauseId, point, data));
+      });
+    }
   }
 
   ensureLoaded() {
