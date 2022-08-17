@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { bindActionCreators } from "@reduxjs/toolkit";
+import { bindActionCreators, Dictionary } from "@reduxjs/toolkit";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { AppDispatch } from "ui/setup/store";
 
@@ -40,14 +40,15 @@ const showSourceMenuItem = (
 const sourceMapItem = (
   cx: Context,
   selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null
+  alternateSource: SourceDetails | null,
+  sourcesById: Dictionary<SourceDetails>
 ) => ({
   id: "node-menu-source-map",
   label: "Visualize source map",
   accesskey: "B",
-  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource),
+  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource, sourcesById),
   click: () => {
-    const href = getSourcemapVisualizerURL(selectedSource, alternateSource);
+    const href = getSourcemapVisualizerURL(selectedSource, alternateSource, sourcesById);
     if (href) {
       window.open(href, "_blank");
     }
@@ -59,11 +60,13 @@ export function editorMenuItems({
   editorActions,
   selectedSource,
   alternateSource,
+  sourcesById,
 }: {
   cx: Context;
   editorActions: EditorActions;
   selectedSource: SourceDetails;
   alternateSource: SourceDetails | null;
+  sourcesById: Dictionary<SourceDetails>;
 }) {
   const items = [];
 
@@ -71,7 +74,7 @@ export function editorMenuItems({
     copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    sourceMapItem(cx, selectedSource, alternateSource)
+    sourceMapItem(cx, selectedSource, alternateSource, sourcesById)
   );
 
   return items;

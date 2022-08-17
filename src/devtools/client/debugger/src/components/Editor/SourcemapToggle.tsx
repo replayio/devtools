@@ -7,7 +7,7 @@ import { UIState } from "ui/state";
 
 import actions from "../../actions";
 import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSource } from "ui/reducers/sources";
+import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
 import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
 
 import Toggle from "./Toggle";
@@ -24,6 +24,7 @@ function SourcemapError({ onClick }: { onClick: () => void }) {
 export function SourcemapToggle({
   selectedSource,
   alternateSource,
+  sourcesById,
   setModal,
   showAlternateSource,
 }: PropsFromRedux) {
@@ -31,7 +32,7 @@ export function SourcemapToggle({
   if (alternateSource) {
     alternateSourceId = alternateSource.id;
   } else {
-    const result = getUniqueAlternateSourceId(selectedSource.id);
+    const result = getUniqueAlternateSourceId(selectedSource, sourcesById);
     alternateSourceId = result.sourceId;
     if (!alternateSourceId && result.why === "not-unique") {
       return null;
@@ -61,6 +62,7 @@ const connector = connect(
   (state: UIState) => ({
     selectedSource: getSelectedSource(state)!,
     alternateSource: getAlternateSource(state),
+    sourcesById: getSourceDetailsEntities(state),
   }),
   {
     showAlternateSource: actions.showAlternateSource,
