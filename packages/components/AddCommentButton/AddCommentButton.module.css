@@ -1,0 +1,36 @@
+.fadeText {
+  white-space: nowrap;
+  /* 100ms duration must match constant in component */
+  transition: all 100ms 40ms ease;
+  transform: scale(0.98);
+  opacity: 0;
+  margin: 0 0.5rem 0 0.25rem;
+}
+
+.addCommentButton {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  line-height: 1rem;
+  font-size: 0.75rem;
+  height: 26px;
+  padding-left: 3px;
+  border-radius: 3rem;
+  color: #fff;
+  overflow: hidden;
+  transition: width 180ms ease-out;
+  width: 26px;
+  background-color: var(--primary-accent);
+}
+
+.addCommentButton svg {
+  flex-shrink: 0;
+}
+
+.addCommentButton.isOpened {
+  width: 122px;
+}
+
+.addCommentButton.pausedOnHit {
+  background-color: var(--secondary-accent);
+}

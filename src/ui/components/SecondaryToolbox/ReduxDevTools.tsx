@@ -34,9 +34,10 @@ export const ReduxDevToolsPanel = () => {
   useLayoutEffect(() => {
     // Code-split and lazy-import the main Redux DevTools `<Root>` component.
     // This saves on bundle size, and also ensures it's only added if needed.
-    import("@redux-devtools/app").then(rdtapp => {
-      setRoot(() => rdtapp.Root);
-    });
+    // TODO Re-enable Redux DevTools integration
+    // import("@redux-devtools/app").then(rdtapp => {
+    //   setRoot(() => rdtapp.Root);
+    // });
   }, []);
 
   useLayoutEffect(() => {

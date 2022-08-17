@@ -8,7 +8,7 @@ import NextApp from "next/app";
 import { setRepaintAfterEvaluationsExperimentalFlag } from "protocol/thread/thread";
 import React, { ReactNode, useEffect, useState } from "react";
 import { Provider } from "react-redux";
-import { Store } from "redux";
+import { Store } from "@reduxjs/toolkit";
 import LoadingScreen from "ui/components/shared/LoadingScreen";
 import ErrorBoundary from "ui/components/ErrorBoundary";
 import _App from "ui/components/App";

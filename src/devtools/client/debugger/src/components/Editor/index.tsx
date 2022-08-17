@@ -7,7 +7,7 @@ import debounce from "lodash/debounce";
 import React, { PureComponent } from "react";
 import PropTypes from "prop-types";
 import ReactDOM from "react-dom";
-import { bindActionCreators, Dispatch } from "redux";
+import { bindActionCreators, Dispatch } from "@reduxjs/toolkit";
 import { isFirefox } from "ui/utils/environment";
 
 import { connect, ConnectedProps } from "react-redux";

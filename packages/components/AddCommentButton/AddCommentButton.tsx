@@ -3,7 +3,7 @@ import { forwardRef, useRef, useState } from "react";
 import classNames from "classnames";
 import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
-import styled from "styled-components";
+import styles from "./AddCommentButton.module.css";
 
 import { Icon } from "../Icon";
 
@@ -37,50 +37,34 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
       setIsHovered(false);
     };
 
+    const buttonClassnames = classNames(
+      "font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
+      styles.addCommentButton,
+      {
+        [styles.isOpened]: isHovered,
+        [styles.pausedOnHit]: isPausedOnHit,
+      },
+      className
+    );
+
     return (
-      <StyledButton
+      <button
         ref={mergedRefs}
         type={type}
         aria-label="Add comment"
         onClick={onClick}
         onMouseEnter={maybeHover}
         onMouseLeave={clearHover}
-        $isOpened={isHovered}
-        $isPausedOnHit={isPausedOnHit}
-        className={classNames(
-          "font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
-          className
-        )}
+        className={buttonClassnames}
       >
         <Icon name="comment-plus" fill="currentColor" />
         <TextFade visible={isHovered}>Add Comment</TextFade>
-      </StyledButton>
+      </button>
     );
   }
 );
 
-const StyledButton = styled.button<{ $isOpened: boolean; $isPausedOnHit: boolean }>(
-  {
-    display: "inline-flex",
-    flexShrink: 0,
-    alignItems: "center",
-    lineHeight: "1rem",
-    fontSize: "0.75rem",
-    height: 26,
-    paddingLeft: 3,
-    borderRadius: "3rem",
-    color: "#fff",
-    overflow: "hidden",
-    transition: "width 180ms ease-out",
-
-    svg: { flexShrink: 0 },
-  },
-  props => ({
-    width: props.$isOpened ? 122 : 26,
-    backgroundColor: props.$isPausedOnHit ? "var(--secondary-accent)" : "var(--primary-accent)",
-  })
-);
-
+// Duration must match `transition` rule in module.css file
 const duration = 100;
 
 const states = {
@@ -91,16 +75,12 @@ const states = {
   unmounted: { display: "none", opacity: 0, transform: "scale(0.98)" },
 };
 
-const StyledText = styled.span({
-  whiteSpace: "nowrap",
-  transition: `all ${duration}ms 40ms ease`,
-  transform: "scale(0.98)",
-  opacity: 0,
-  margin: "0 0.5rem 0 0.25rem",
-});
-
 const TextFade = ({ children, visible }: { children: React.ReactNode; visible: boolean }) => (
   <Transition in={visible} timeout={duration}>
-    {state => <StyledText style={states[state]}>{children}</StyledText>}
+    {state => (
+      <span className={styles.fadeText} style={states[state]}>
+        {children}
+      </span>
+    )}
   </Transition>
 );

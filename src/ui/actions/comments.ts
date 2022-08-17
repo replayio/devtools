@@ -12,7 +12,7 @@ import { getFilenameFromURL } from "devtools/client/debugger/src/utils/sources-t
 import escapeHtml from "escape-html";
 import type { ThreadFront as ThreadFrontType } from "protocol/thread";
 import { waitForTime } from "protocol/utils";
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { AddCommentMutation, ADD_COMMENT_MUTATION } from "ui/hooks/comments/useAddComment";
 import { selectors } from "ui/reducers";

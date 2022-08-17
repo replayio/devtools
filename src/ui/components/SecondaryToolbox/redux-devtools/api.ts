@@ -6,7 +6,7 @@ import {
   UPDATE_STATE,
 } from "@redux-devtools/app";
 import { LiftedState } from "@redux-devtools/instrument";
-import { Action, Dispatch, MiddlewareAPI } from "redux";
+import { Action, Dispatch, MiddlewareAPI } from "@reduxjs/toolkit";
 
 interface TabMessageBase {
   readonly type: string;

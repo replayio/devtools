@@ -1,6 +1,5 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
-import ResizeObserverPolyfill from "resize-observer-polyfill";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
@@ -545,7 +544,7 @@ export function installObserver() {
   const canvas = document.getElementById("video");
   if (canvas) {
     refreshGraphics();
-    const observer = new ResizeObserverPolyfill(() => {
+    const observer = new ResizeObserver(() => {
       refreshGraphics();
     });
     observer.observe(canvas);

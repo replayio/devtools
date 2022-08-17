@@ -1,4 +1,4 @@
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 
 export type ReducerObject<TState, TAction extends Action> = {
   [T in TAction["type"]]: (state: TState, action: TAction & Action<T>) => TState;
