@@ -1,3 +1,4 @@
+import ObjectPreviewSuspenseCacheAdapter from "devtools/client/debugger/src/components/SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
@@ -22,11 +23,9 @@ import { Recording as RecordingInfo } from "ui/types";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";
-import { trackTiming } from "ui/utils/telemetry";
 import useToken from "ui/utils/useToken";
 
 import Upload from "./upload";
-import { UIStore } from "ui/actions";
 
 interface MetadataProps {
   metadata?: {
@@ -185,6 +184,7 @@ function RecordingPage({
     return (
       <>
         {head}
+        <ObjectPreviewSuspenseCacheAdapter />
         <DevTools uploadComplete={uploadComplete} />
       </>
     );
