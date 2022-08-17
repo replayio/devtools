@@ -451,11 +451,6 @@ class _ThreadFront {
     }
   }
 
-  getSourceKind(sourceId: SourceId) {
-    const info = this.sourcesSelectors!.getSourceDetails(sourceId);
-    return info ? info.kind : null;
-  }
-
   async ensureAllSources() {
     await this.allSourcesWaiter.promise;
   }

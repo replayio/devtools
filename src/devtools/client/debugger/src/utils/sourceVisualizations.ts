@@ -1,3 +1,4 @@
+import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
@@ -38,7 +39,8 @@ export function getSourceIDsToSearch(
 
 function getSourceToVisualize(
   selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null
+  alternateSource: SourceDetails | null,
+  sourcesById: Dictionary<SourceDetails>
 ) {
   if (!selectedSource) {
     return undefined;
@@ -49,15 +51,16 @@ function getSourceToVisualize(
   if (alternateSource && isOriginalSource(alternateSource)) {
     return alternateSource.id;
   }
-  const { sourceId } = getUniqueAlternateSourceId(selectedSource.id);
+  const { sourceId } = getUniqueAlternateSourceId(selectedSource, sourcesById);
   return sourceId;
 }
 
 export function getSourcemapVisualizerURL(
   selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null
+  alternateSource: SourceDetails | null,
+  sourcesById: Dictionary<SourceDetails>
 ): string | null {
-  const sourceId = getSourceToVisualize(selectedSource, alternateSource);
+  const sourceId = getSourceToVisualize(selectedSource, alternateSource, sourcesById);
   if (!sourceId) {
     return null;
   }
@@ -76,24 +79,26 @@ export function getSourcemapVisualizerURL(
 // through sourcemaps, because in that case there may be multiple alternate sources.
 // If no unique alternate source could be found, the reason ("no-sourcemap" or "not-unique")
 // is returned.
-export function getUniqueAlternateSourceId(sourceId: string): {
+export function getUniqueAlternateSourceId(source: SourceDetails, sourcesById: Dictionary<SourceDetails>): {
   sourceId?: SourceId;
   why?: "no-sourcemap" | "not-unique";
 } {
-  const generatedSourceIds = ThreadFront.getGeneratedSourceIds(sourceId);
-  const nonPrettyPrintedSourceId =
-    ThreadFront.getSourceKind(sourceId) === "prettyPrinted" ? generatedSourceIds?.[0] : sourceId;
+  const nonPrettyPrintedSourceId = source.prettyPrintedFrom || source.id;
   assert(nonPrettyPrintedSourceId, "couldn't find minified version of pretty-printed source");
+  const nonPrettyPrintedSource = sourcesById[nonPrettyPrintedSourceId];
+  assert(nonPrettyPrintedSource, `couldn't find source ${nonPrettyPrintedSourceId}`);
 
-  if (ThreadFront.getSourceKind(nonPrettyPrintedSourceId) === "sourceMapped") {
-    const generatedSourceId = ThreadFront.getGeneratedSourceIds(nonPrettyPrintedSourceId)?.[0];
+  if (nonPrettyPrintedSource.kind === "sourceMapped") {
+    const generatedSourceId = nonPrettyPrintedSource.generated[0];
     assert(generatedSourceId, "couldn't find generated version of sourcemapped source");
-    const sourceId = ThreadFront.getPrettyPrintedSourceId(generatedSourceId) || generatedSourceId;
+    const generatedSource = sourcesById[generatedSourceId];
+    assert(generatedSource, `couldn't find source ${generatedSourceId}`);
+    const sourceId = generatedSource.prettyPrinted || generatedSourceId;
     return { sourceId };
   }
 
-  const sourcemappedSourceIds = ThreadFront.getOriginalSourceIds(nonPrettyPrintedSourceId)?.filter(
-    sourceId => ThreadFront.getSourceKind(sourceId) === "sourceMapped"
+  const sourcemappedSourceIds = nonPrettyPrintedSource.generatedFrom.filter(
+    sourceId => sourcesById[sourceId]?.kind === "sourceMapped"
   );
   if (!sourcemappedSourceIds?.length) {
     return { why: "no-sourcemap" };
@@ -103,8 +108,10 @@ export function getUniqueAlternateSourceId(sourceId: string): {
   }
 
   let alternateSourceId = sourcemappedSourceIds[0];
-  alternateSourceId = ThreadFront.getPrettyPrintedSourceId(alternateSourceId) || alternateSourceId;
-  alternateSourceId = ThreadFront.getCorrespondingSourceIds(alternateSourceId)[0];
+  alternateSourceId = sourcesById[sourcemappedSourceIds[0]]?.prettyPrinted || alternateSourceId;
+  const alternateSource = sourcesById[alternateSourceId];
+  assert(alternateSource, `couldn't find source ${alternateSourceId}`);
+  alternateSourceId = alternateSource.correspondingSourceIds[0];
 
   return { sourceId: alternateSourceId };
 }
