@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { bindActionCreators } from "redux";
+import { bindActionCreators } from "@reduxjs/toolkit";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { AppDispatch } from "ui/setup/store";
 

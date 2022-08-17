@@ -1,4 +1,4 @@
-import { Reducer } from "redux";
+import { Reducer } from "@reduxjs/toolkit";
 
 export declare const reducers: {
   [slice: string]: Reducer;

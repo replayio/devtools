@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 import { ClassInfo } from "../models/class-list";
 
 type UpdateClassesAction = Action<"UPDATE_CLASSES"> & { classes: ClassInfo[] };

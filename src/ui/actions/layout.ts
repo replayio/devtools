@@ -1,4 +1,4 @@
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 import {
   getLocalNags,
   getSelectedPanel,

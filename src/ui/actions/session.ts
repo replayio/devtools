@@ -38,7 +38,7 @@ import { subscriptionExpired } from "ui/utils/workspace";
 import { setUnexpectedError, setExpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 
 export { setUnexpectedError, setExpectedError };
 

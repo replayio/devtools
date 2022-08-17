@@ -4,7 +4,7 @@ import { StyleSheetFront } from "protocol/thread/styleSheet";
 import { StyleFront } from "protocol/thread/style";
 import { RuleFront } from "protocol/thread/rule";
 import { NodeBoundsFront } from "protocol/thread/bounds";
-import { Dispatch, Middleware } from "redux";
+import { Dispatch, Middleware } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
 import { UIAction } from "ui/actions";
 

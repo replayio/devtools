@@ -1,4 +1,4 @@
-import { Action } from "redux";
+import { Action } from "@reduxjs/toolkit";
 import { trackEvent } from "ui/utils/telemetry";
 import { InspectorActiveTab } from "../reducers";
 
