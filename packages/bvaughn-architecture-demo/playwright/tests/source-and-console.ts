@@ -11,6 +11,7 @@ testSetup(async function regeneratorFunction({ page }) {
 
   await addLogPoint(page, 12);
 
+  await fillLogPointText(page, 12, "z");
   await fillLogPointText(page, 12, "printError");
 
   await toggleProtocolMessages(page, false);
@@ -19,7 +20,9 @@ testSetup(async function regeneratorFunction({ page }) {
   const keyValue = message.locator("[data-test-name=Expandable]");
   await keyValue.click();
 
-  await fillLogPointText(page, 12, "z");
+  await addLogPoint(page, 26);
+  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`);
+  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
 });
 
 async function openSourceTab(page: Page) {
@@ -36,48 +39,65 @@ async function addLogPoint(page: Page, lineNumber: number) {
   await button.click();
 }
 
-async function fillLogPointText(page: Page, lineNumber: number, text: string) {
-  await page.fill(`[data-test-id=PointPanel-${lineNumber}] input`, text);
+async function fillLogPointText(
+  page: Page,
+  lineNumber: number,
+  content: string,
+  condition: string = ""
+) {
+  await page.fill(`[data-test-id=PointPanelInput-${lineNumber}-content]`, content);
+  await page.fill(`[data-test-id=PointPanelInput-${lineNumber}-condition]`, condition);
   await page.keyboard.press("Enter");
 }
 
-test("should not allow saving invalid log point values", async ({ page }) => {
+test.only("should not allow saving log points with invalid content", async ({ page }) => {
   await openSourceTab(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "'1");
 
   const pointPanel = page.locator("[data-test-id=PointPanel-12]");
-  await takeScreenshot(page, pointPanel, "point-panel-invalid");
+  await takeScreenshot(page, pointPanel, "point-panel-invalid-content");
 });
 
-test("should support log points that only require local analysis", async ({ page }) => {
+test.only("should not allow saving log points with invalid conditional", async ({ page }) => {
   await openSourceTab(page);
-  await toggleProtocolMessages(page, false);
   await addLogPoint(page, 12);
+  await fillLogPointText(page, 12, "true", "'1");
 
-  const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
-  await takeScreenshot(page, sourceRoot, "local-analysis-log-point-source");
-
-  const message = page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, message, "local-analysis-log-point-console");
+  const pointPanel = page.locator("[data-test-id=PointPanel-12]");
+  await takeScreenshot(page, pointPanel, "point-panel-invalid-conditional");
 });
 
-test("should support log points that require remote analysis", async ({ page }) => {
+test("should run remote analysis for log points", async ({ page }) => {
   await openSourceTab(page);
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "printError");
 
   const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
-  await takeScreenshot(page, sourceRoot, "remote-analysis-log-point-source");
+  await takeScreenshot(page, sourceRoot, "log-point-analysis-source");
 
   const messages = page.locator("[data-test-name=Messages]");
-  await takeScreenshot(page, messages, "remote-analysis-log-point-console");
+  await takeScreenshot(page, messages, "log-point-analysis-console");
 
   const message = page.locator("[data-test-name=Message]").first();
   const keyValue = message.locator("[data-test-name=Expandable]");
   await keyValue.click();
-  await takeScreenshot(page, message, "remote-analysis-log-point-expanded-console");
+  await takeScreenshot(page, message, "log-point-analysis-expanded-console");
+});
+
+test("should support conditional log points", async ({ page }) => {
+  await openSourceTab(page);
+  await toggleProtocolMessages(page, false);
+  await addLogPoint(page, 26);
+
+  const messages = page.locator("[data-test-name=Messages]");
+
+  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`);
+  await takeScreenshot(page, messages, "log-point-multi-hits-console");
+
+  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+  await takeScreenshot(page, messages, "log-point-multi-hits-with-conditional-console");
 });
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
@@ -87,7 +107,7 @@ test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await fillLogPointText(page, 12, "z");
 
   const message = page.locator("[data-test-name=Message]").first();
-  await takeScreenshot(page, message, "invalid-remote-analysis-log-point-console");
+  await takeScreenshot(page, message, "log-point-invalid-remote-analysis-console");
 });
 
 test("should include log points in search results", async ({ page }) => {
