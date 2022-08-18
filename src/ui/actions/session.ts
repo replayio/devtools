@@ -256,7 +256,7 @@ export function createSocket(
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
 
-      findAutomatedTests();
+      findAutomatedTests(recordingTarget);
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
