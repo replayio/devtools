@@ -6,8 +6,8 @@ import { assert } from "protocol/utils";
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
 import { comparePoints, pointPrecedes } from "protocol/execution-point-utils";
 import { Helpers } from "./logpoint";
-import { Pause, ThreadFront, ValueFront } from "protocol/thread";
-import { WiredMessage } from "protocol/thread/thread";
+import { ThreadFront, ValueFront } from "protocol/thread";
+import { WiredMessage, RecordingTarget } from "protocol/thread/thread";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {
@@ -440,7 +440,11 @@ async function findJestTests() {
 }
 
 // Look for automated tests associated with a recent version of jest.
-export async function findAutomatedTests() {
+export async function findAutomatedTests(recordingTarget: RecordingTarget) {
+  if (recordingTarget !== "node") {
+    return;
+  }
+
   await findJestTests();
 }
 
