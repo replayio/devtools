@@ -393,13 +393,13 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   }
 
   setText(props: PropsFromRedux, editor: SourceEditor) {
-    const { selectedSourceContent, symbols } = props;
+    const { selectedSource, selectedSourceContent, symbols } = props;
     if (!editor) {
       return;
     }
 
     // check if we previously had a selected source
-    if (!selectedSourceContent) {
+    if (!selectedSource || !selectedSourceContent) {
       return this.clearEditor();
     }
 
@@ -416,12 +416,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
       return this.showErrorMessage(value);
     }
 
-    return showSourceText(
-      editor,
-      selectedSourceContent,
-      selectedSourceContent.value,
-      symbols as any
-    );
+    return showSourceText(editor, selectedSource, selectedSourceContent.value, symbols as any);
   }
 
   clearEditor() {
