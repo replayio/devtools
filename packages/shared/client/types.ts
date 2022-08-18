@@ -89,8 +89,8 @@ export interface ReplayClientInterface {
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
-  searchSources(
-    opts: { query: string; sourceIds?: string[] },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
-  ): Promise<void>;
+  searchSources(opts: {
+    query: string;
+    sourceIds?: string[];
+  }): Promise<SearchSourceContentsMatch[]>;
 }

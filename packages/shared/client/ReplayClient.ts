@@ -19,9 +19,11 @@ import {
   RecordingId,
   Result as EvaluationResult,
   SearchSourceContentsMatch,
+  searchSourceContentsMatches,
   SessionId,
   SourceId,
 } from "@replayio/protocol";
+import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -419,11 +421,36 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async searchSources(
-    opts: { query: string; sourceIds?: string[] },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
-  ): Promise<void> {
-    return this._threadFront.searchSources(opts, onMatches);
+  async searchSources({
+    query,
+    sourceIds,
+  }: {
+    query: string;
+    sourceIds?: string[];
+  }): Promise<SearchSourceContentsMatch[]> {
+    const sessionId = this.getSessionIdThrows();
+    const thisSearchUniqueId = uniqueId("search-");
+
+    const results: SearchSourceContentsMatch[] = [];
+
+    const onMatches = ({ searchId, matches }: searchSourceContentsMatches) => {
+      if (searchId === thisSearchUniqueId) {
+        results.push(...matches);
+      }
+    };
+
+    client.Debugger.addSearchSourceContentsMatchesListener(onMatches);
+    try {
+      await client.Debugger.searchSourceContents(
+        { searchId: thisSearchUniqueId, sourceIds, query },
+        sessionId
+      );
+    } catch (err) {
+      return [];
+    } finally {
+      client.Debugger.removeSearchSourceContentsMatchesListener(onMatches);
+    }
+    return results;
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
