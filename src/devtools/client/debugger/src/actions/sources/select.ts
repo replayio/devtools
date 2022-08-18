@@ -23,10 +23,10 @@ import {
   loadSourceText,
   getSelectedSource,
   getSourceDetails,
-  getSourceByUrl,
   SourceDetails,
   locationSelected,
   clearSelectedLocation,
+  getSourceIdToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
@@ -58,12 +58,11 @@ export function selectSourceURL(
   options: PendingSelectedLocationOptions
 ): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState) => {
-    const source = getSourceByUrl(getState(), url);
-    if (!source) {
+    const sourceId = getSourceIdToDisplayForUrl(getState(), url);
+    if (!sourceId) {
       return;
     }
 
-    const sourceId = source.id;
     const location = createLocation({ ...options, sourceId });
     return dispatch(selectLocation(cx, location));
   };
@@ -96,7 +95,7 @@ export function deselectSource(): UIThunkAction {
 
 export function addTab(source: SourceDetails) {
   const { url, id: sourceId } = source;
-  const isOriginal = source.canonicalId === sourceId;
+  const isOriginal = source.isSourceMapped;
 
   return {
     type: "ADD_TAB",
@@ -131,8 +130,7 @@ export function selectLocation(
     // use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       await ThreadFront.ensureAllSources();
-      let sourceId = ThreadFront.getChosenSourceIdsForUrl(location.sourceUrl)[0].sourceId;
-      sourceId = ThreadFront.getCorrespondingSourceIds(sourceId)[0];
+      const sourceId = ThreadFront.getSourceToDisplayForUrl(location.sourceUrl)!.id;
       source = getSourceDetails(getState(), sourceId);
       location = { ...location, sourceId };
     }

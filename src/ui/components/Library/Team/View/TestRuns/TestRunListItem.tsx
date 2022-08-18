@@ -45,7 +45,9 @@ function Attributes({ testRun }: { testRun: TestRun }) {
 function Status({ failCount }: { failCount: number }) {
   return (
     <div className={`flex items-center  ${failCount > 0 ? "text-red-500" : "text-green-500"} `}>
-      <MaterialIcon iconSize="2xl">{`${failCount > 0 ? "highlight_off" : "check_circle"} `}</MaterialIcon>
+      <MaterialIcon iconSize="2xl">{`${
+        failCount > 0 ? "highlight_off" : "check_circle"
+      } `}</MaterialIcon>
     </div>
   );
 }

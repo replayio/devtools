@@ -284,9 +284,10 @@ class JestTestState {
 // Look for a source containing the specified pattern.
 async function findMatchingSourceId(pattern: string): Promise<string | null> {
   await ThreadFront.ensureAllSources();
-  for (const [sourceId, source] of ThreadFront.sources.entries()) {
-    if (source.url?.includes(pattern)) {
-      return sourceId;
+  const sourcesByUrl = ThreadFront.getSourcesToDisplayByUrl();
+  for (const url in sourcesByUrl) {
+    if (url.includes(pattern)) {
+      return sourcesByUrl[url]!.id;
     }
   }
   return null;

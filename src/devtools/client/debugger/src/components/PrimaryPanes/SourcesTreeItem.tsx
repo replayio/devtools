@@ -18,12 +18,7 @@ import AccessibleImage from "../shared/AccessibleImage";
 import { Redacted } from "ui/components/Redacted";
 
 import { getContext } from "../../selectors";
-import {
-  getHasSiblingOfSameName,
-  getSourceContent,
-  getGeneratedSourceByURL,
-  isFulfilled,
-} from "ui/reducers/sources";
+import { getHasSiblingOfSameName, getSourceContent, isFulfilled } from "ui/reducers/sources";
 
 import { getSourceQueryString } from "../../utils/source";
 import { isDirectory, getPathWithoutThread } from "../../utils/sources-tree";
@@ -48,7 +43,6 @@ const mapStateToProps = (state: UIState, props: STIProps) => {
   const { source, item } = props;
   return {
     cx: getContext(state),
-    hasMatchingGeneratedSource: getHasMatchingGeneratedSource(state, source),
     hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
     sourceContent: source ? getSourceContentValue(state, source) : null,
   };
@@ -183,8 +177,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
   }
 
   render() {
-    const { item, depth, source, focused, hasMatchingGeneratedSource, hasSiblingOfSameName } =
-      this.props;
+    const { item, depth, source, focused, hasSiblingOfSameName } = this.props;
 
     const suffix = null;
 
@@ -214,14 +207,6 @@ class SourceTreeItem extends Component<FinalSTIProps> {
       </div>
     );
   }
-}
-
-function getHasMatchingGeneratedSource(state: UIState, source?: SourceDetails) {
-  if (!source) {
-    return false;
-  }
-
-  return !!getGeneratedSourceByURL(state, source.url!);
 }
 
 function getSourceContentValue(state: UIState, source: SourceDetails) {

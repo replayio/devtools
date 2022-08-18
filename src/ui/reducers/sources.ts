@@ -1,5 +1,6 @@
 import {
   createEntityAdapter,
+  createSelector,
   createSlice,
   Dictionary,
   EntityState,
@@ -17,9 +18,11 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 // TODO Move prefs out of reducers and load this separately
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
+import { assert } from "protocol/utils";
+import { UiState } from "devtools/client/webconsole/reducers/ui";
 
 export interface SourceDetails {
-  canonicalId: string;
+  isSourceMapped: boolean;
   contentHash?: string;
   correspondingSourceIds: string[];
   generated: string[];
@@ -231,14 +234,6 @@ export const getSourcesById = (state: UIState, ids: string[]) => {
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
   return getSourceDetails(state, id)?.correspondingSourceIds;
 };
-export const getSourceByUrl = (state: UIState, url: string) => {
-  const urlEntries = state.sources.sourcesByUrl[url] ?? [];
-  const id = urlEntries[0];
-  if (!id) {
-    return undefined;
-  }
-  return getSourceDetails(state, id);
-};
 export const getSourceContent = (state: UIState, id: string) => {
   return state.sources.contents.entities[id];
 };
@@ -278,18 +273,6 @@ export const getUniqueUrlForSource = (state: UIState, sourceId: string) => {
   }
 };
 
-export function getGeneratedSourceByURL(state: UIState, url: string) {
-  const sourceForUrl = getSourceByUrl(state, url);
-  if (sourceForUrl) {
-    // TODO Should this be using `state.urls` instead and finding the first item?
-    const canonicalSource = getSourceDetails(state, sourceForUrl.canonicalId);
-    const firstGenerated = canonicalSource?.generated[0];
-    if (firstGenerated) {
-      return getSourceDetails(state, firstGenerated);
-    }
-  }
-}
-
 export const getSourceContentsLoaded = (state: UIState, sourceId: string) => {
   const entry = getSourceContentsEntry(state, sourceId);
   return entry && isFulfilled(entry);
@@ -300,12 +283,76 @@ export const isFulfilled = (item?: { status: LoadingStatus }) => {
 };
 
 export const isOriginalSource = (sd: SourceDetails) => {
-  return sd.canonicalId === sd.id;
+  return sd.isSourceMapped;
 };
 
 export const isPrettyPrintedSource = (sd: SourceDetails) => {
   return !!sd.prettyPrintedFrom;
 };
+
+export function getBestSourceMappedSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[]
+) {
+  const sourceIdSet = new Set(sourceIds);
+  return sourceIds.find(sourceId => {
+    const source = sourcesById[sourceId];
+    assert(source, `unknown source ${sourceId}`);
+    return (
+      source.isSourceMapped && !source.generatedFrom.some(originalId => sourceIdSet.has(originalId))
+    );
+  });
+}
+
+export function getBestNonSourceMappedSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[]
+) {
+  const sourceIdSet = new Set(sourceIds);
+  return sourceIds.find(sourceId => {
+    const source = sourcesById[sourceId];
+    assert(source, `unknown source ${sourceId}`);
+    return (
+      !source.isSourceMapped &&
+      !source.generatedFrom.some(originalId => sourceIdSet.has(originalId))
+    );
+  });
+}
+
+export function getPreferredSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[],
+  preferredGeneratedSources?: Set<string>
+) {
+  const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
+  const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+  if (!sourceMappedId) {
+    return nonSourceMappedId;
+  }
+  if (!nonSourceMappedId) {
+    return sourceMappedId;
+  }
+  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+    return nonSourceMappedId;
+  }
+  return sourceMappedId;
+}
+
+export function getAlternateSourceId(
+  sourcesById: Dictionary<SourceDetails>,
+  sourceIds: string[],
+  preferredGeneratedSources?: Set<string>
+) {
+  const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
+  const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
+  if (!sourceMappedId || !nonSourceMappedId) {
+    return;
+  }
+  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+    return sourceMappedId;
+  }
+  return nonSourceMappedId;
+}
 
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
   if (!source || !source.url) {
@@ -315,79 +362,47 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
   return state.sources.sourcesByUrl[source.url]?.length > 0;
 }
 
-export const getCanonicalSourceFromEntities = (
-  detailsEntities: Dictionary<SourceDetails>,
-  sd: SourceDetails
-) => {
-  const canonicalSource = detailsEntities[sd.canonicalId];
-  if (!canonicalSource) {
-    console.error("Could not find canonical source for alternate source: ", sd);
+export function getSourceIdToDisplayById(state: UIState, sourceId: string) {
+  return getCorrespondingSourceIds(state, sourceId)![0];
+}
+
+export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
+  const sourceIdToDisplay = getSourceIdToDisplayById(state, sourceId);
+  return sourceIdToDisplay ? getSourceDetails(state, sourceIdToDisplay) : undefined;
+};
+
+export function getSourceIdsByUrl(state: UIState) {
+  return state.sources.sourcesByUrl;
+}
+
+export const getSourcesToDisplayByUrl = createSelector(
+  [getSourceIdsByUrl, getSourceDetailsEntities],
+  (sourceIdsByUrl, sourceDetailsById) => {
+    const sourcesToDisplay: Dictionary<SourceDetails> = {};
+    for (const url in sourceIdsByUrl) {
+      if (sourcesToDisplay[url]) {
+        continue;
+      }
+      let sourceId = getPreferredSourceId(sourceDetailsById, sourceIdsByUrl[url])!;
+      sourceId = sourceDetailsById[sourceId]!.correspondingSourceIds[0];
+      sourcesToDisplay[url] = sourceDetailsById[sourceId];
+    }
+    return sourcesToDisplay;
   }
-  return canonicalSource ?? sd;
-};
+);
 
-export const getCanonicalSource = (state: UIState, sd: SourceDetails) => {
-  return getCanonicalSourceFromEntities(state.sources.sourceDetails.entities, sd);
-};
-
-export const getCanonicalSourceForUrl = (state: UIState, url: string) => {
-  const sd = getSourceByUrl(state, url);
-  if (!sd) {
-    console.error("Could not find source for URL: ", url);
-    return undefined;
-  }
-
-  return getCanonicalSource(state, sd);
-};
-
-/**
- * Smartly look up a single source for display purposes, starting from
- * the first source's ID, and going through various "corresponding",
- * "canonical", and "pretty-printed" versions.
- * This is loosely similar to `ThreadFront._chooseSourceId()`, but hopefully
- * shorter and simpler while giving mostly equivalent results.
- */
-export const getSourceToDisplay = (
-  sourceEntities: Dictionary<SourceDetails>,
-  startingSourceId: string
-) => {
-  const startingSource = sourceEntities[startingSourceId];
-  if (!startingSource) {
+export function getSourceIdToDisplayForUrl(state: UIState, url: string) {
+  const sourceIds = state.sources.sourcesByUrl[url];
+  if (!sourceIds) {
     return;
   }
-
-  // We should guarantee that there is _always_ at _least_ one
-  // corresponding source ID, that it always includes this source
-  // itself, and worst case it's _only_ this source.
-  const firstCorrespondingSource = sourceEntities[startingSource.correspondingSourceIds[0]];
-
-  if (!firstCorrespondingSource) {
-    return;
-  }
-
-  // We then look up the "canonical" version of this source.
-  const canonicalSource = sourceEntities[firstCorrespondingSource.canonicalId]!;
-  // It's possible there may be a pretty-printed version that would
-  // be a better choice for display. Use that if available.
-  if (canonicalSource.prettyPrinted) {
-    return sourceEntities[canonicalSource.prettyPrinted]!;
-  }
-
-  // otherwise show the canonical version
-  return canonicalSource;
-};
-
-export const getSourceToDisplayById = (state: UIState, startingSourceId: string) => {
-  const sourceEntities = getSourceDetailsEntities(state);
-  return getSourceToDisplay(sourceEntities, startingSourceId);
-};
+  const preferred = getPreferredSourceId(state.sources.sourceDetails.entities, sourceIds)!;
+  return getCorrespondingSourceIds(state, preferred)![0];
+}
 
 export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
-  const initialSourceForUrl = getSourceByUrl(state, url);
-  if (!initialSourceForUrl) {
-    return;
-  }
-  return getSourceToDisplayById(state, initialSourceForUrl.id);
+  const sourceId = getSourceIdToDisplayForUrl(state, url);
+  return sourceId ? getSourceDetails(state, sourceId) : undefined;
 };
 
 export const getPreviousPersistedLocation = (state: UIState) =>
@@ -423,20 +438,20 @@ export const selectors = {
   getSelectedSource,
   getSourcesById,
   getCorrespondingSourceIds,
-  getSourceByUrl,
   getSourceContent,
   getSelectedSourceWithContent,
   getTextAtLocation,
   getSelectedLocationHasScrolled,
   getUniqueUrlForSource,
-  getGeneratedSourceByURL,
   getSourceContentsLoaded,
   getHasSiblingOfSameName,
   getPreviousPersistedLocation,
-  getCanonicalSource,
-  getCanonicalSourceForUrl,
   getSourceToDisplayById,
+  getSourceIdToDisplayById,
   getSourceToDisplayForUrl,
+  getSourceIdToDisplayForUrl,
+  getSourceIdsByUrl,
+  getSourcesToDisplayByUrl,
 };
 
 export default sourcesSlice.reducer;

@@ -10,6 +10,12 @@ import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
+import {
+  getAlternateSourceId,
+  getPreferredSourceId,
+  selectors as sourcesSelectors,
+} from "ui/reducers/sources";
+import { bindSelectors } from "ui/setup/dynamic/devtools";
 
 import {
   createRecordingOwnerUserIdMock,
@@ -89,6 +95,22 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
 
 export async function createTestStore(preloadedState: Partial<UIState> = {}) {
   const store = bootstrapStore(preloadedState);
+  const {
+    getSourceDetails,
+    getSourceDetailsEntities,
+    getSourceIdsByUrl,
+    getSourcesToDisplayByUrl,
+    getSourceToDisplayForUrl,
+  } = bindSelectors(store, sourcesSelectors);
+  ThreadFront.sourcesSelectors = {
+    getSourceDetails,
+    getSourceDetailsEntities,
+    getSourceIdsByUrl,
+    getSourcesToDisplayByUrl,
+    getSourceToDisplayForUrl,
+    getPreferredSourceId,
+    getAlternateSourceId,
+  };
   await setupDevtools(store);
 
   return store;

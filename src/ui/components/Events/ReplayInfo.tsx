@@ -104,29 +104,28 @@ function ReplayInfo({ setModal }: PropsFromRedux) {
               </Row>
 
               {isTest ? (
-              <Row>
-                <MaterialIcon>person</MaterialIcon>
-                <div
-                  className="overflow-hidden whitespace-pre overflow-ellipsis"
-                  title={recording.metadata.source?.branch}
-                >
-                  {recording.metadata.source?.trigger?.user}
-                </div>
-              </Row>
+                <Row>
+                  <MaterialIcon>person</MaterialIcon>
+                  <div
+                    className="overflow-hidden whitespace-pre overflow-ellipsis"
+                    title={recording.metadata.source?.branch}
+                  >
+                    {recording.metadata.source?.trigger?.user}
+                  </div>
+                </Row>
               ) : null}
 
               {isTest ? (
-              <Row>
-                <MaterialIcon>fork_right</MaterialIcon>
-                <div
-                  className="overflow-hidden whitespace-pre overflow-ellipsis"
-                  title={recording.metadata.source?.branch}
-                >
-                  {recording.metadata.source?.branch}
-                </div>
-              </Row>
+                <Row>
+                  <MaterialIcon>fork_right</MaterialIcon>
+                  <div
+                    className="overflow-hidden whitespace-pre overflow-ellipsis"
+                    title={recording.metadata.source?.branch}
+                  >
+                    {recording.metadata.source?.branch}
+                  </div>
+                </Row>
               ) : null}
-
             </>
           )}
         </div>

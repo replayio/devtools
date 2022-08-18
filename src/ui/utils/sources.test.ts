@@ -17,7 +17,6 @@ describe("newSourcesToCompleteSourceDetails", () => {
       ])
     ).toEqual({
       "1": {
-        canonicalId: "1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
@@ -26,6 +25,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
         kind: "scriptSource",
         prettyPrinted: undefined,
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.js",
       },
     });
@@ -50,7 +50,6 @@ describe("newSourcesToCompleteSourceDetails", () => {
       ])
     ).toEqual({
       "1": {
-        canonicalId: "o1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
@@ -59,10 +58,10 @@ describe("newSourcesToCompleteSourceDetails", () => {
         kind: "scriptSource",
         prettyPrinted: undefined,
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.js",
       },
       o1: {
-        canonicalId: "o1",
         contentHash: "contentHash#o1",
         correspondingSourceIds: ["o1"],
         generated: ["1"],
@@ -71,6 +70,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
         kind: "sourceMapped",
         prettyPrinted: undefined,
         prettyPrintedFrom: undefined,
+        isSourceMapped: true,
         url: "/index.ts",
       },
     });
@@ -94,27 +94,27 @@ describe("newSourcesToCompleteSourceDetails", () => {
       ])
     ).toEqual({
       "1": {
-        canonicalId: "1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
-        generatedFrom: [],
+        generatedFrom: ["pp1"],
         id: "1",
         kind: "scriptSource",
         prettyPrinted: "pp1",
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.js",
       },
       pp1: {
-        canonicalId: "1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["pp1"],
-        generated: [],
+        generated: ["1"],
         generatedFrom: [],
         id: "pp1",
         kind: "prettyPrinted",
         prettyPrinted: undefined,
         prettyPrintedFrom: "1",
+        isSourceMapped: false,
         url: "/src/index.js",
       },
     });
@@ -151,51 +151,51 @@ describe("newSourcesToCompleteSourceDetails", () => {
       ])
     ).toEqual({
       "1": {
-        canonicalId: "o1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["1"],
         generated: [],
-        generatedFrom: ["o1"],
+        generatedFrom: ["o1", "pp1"],
         id: "1",
         kind: "scriptSource",
         prettyPrinted: "pp1",
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.js",
       },
       o1: {
-        canonicalId: "o1",
         contentHash: "contentHash#o1",
         correspondingSourceIds: ["o1"],
         generated: ["1"],
-        generatedFrom: [],
+        generatedFrom: ["ppo1"],
         id: "o1",
         kind: "sourceMapped",
         prettyPrinted: "ppo1",
         prettyPrintedFrom: undefined,
+        isSourceMapped: true,
         url: "/src/index.ts",
       },
       pp1: {
-        canonicalId: "o1",
         contentHash: "contentHash#1",
         correspondingSourceIds: ["pp1"],
-        generated: [],
+        generated: ["1"],
         generatedFrom: [],
         id: "pp1",
         kind: "prettyPrinted",
         prettyPrinted: undefined,
         prettyPrintedFrom: "1",
+        isSourceMapped: false,
         url: "/src/index.js",
       },
       ppo1: {
-        canonicalId: "o1",
         contentHash: "contentHash#o1",
         correspondingSourceIds: ["ppo1"],
-        generated: [],
+        generated: ["o1"],
         generatedFrom: [],
         id: "ppo1",
         kind: "prettyPrinted",
         prettyPrinted: undefined,
         prettyPrintedFrom: "o1",
+        isSourceMapped: true,
         url: "/src/index.ts",
       },
     });
@@ -220,7 +220,6 @@ describe("newSourcesToCompleteSourceDetails", () => {
       ])
     ).toEqual({
       "2": {
-        canonicalId: "h1",
         contentHash: "contentHash#2",
         correspondingSourceIds: ["2"],
         generated: [],
@@ -229,10 +228,10 @@ describe("newSourcesToCompleteSourceDetails", () => {
         kind: "inlineScript",
         prettyPrinted: undefined,
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.html",
       },
       h1: {
-        canonicalId: "h1",
         contentHash: "contentHash#h1",
         correspondingSourceIds: ["h1"],
         generated: ["2"],
@@ -241,6 +240,7 @@ describe("newSourcesToCompleteSourceDetails", () => {
         kind: "html",
         prettyPrinted: undefined,
         prettyPrintedFrom: undefined,
+        isSourceMapped: false,
         url: "/index.html",
       },
     });
@@ -265,7 +265,6 @@ it("can link corresponding sources", () => {
     ])
   ).toEqual({
     h1: {
-      canonicalId: "h1",
       contentHash: "contentHash",
       correspondingSourceIds: ["h1", "h2"],
       generated: [],
@@ -274,10 +273,10 @@ it("can link corresponding sources", () => {
       kind: "html",
       prettyPrinted: undefined,
       prettyPrintedFrom: undefined,
+      isSourceMapped: false,
       url: "/index.html",
     },
     h2: {
-      canonicalId: "h2",
       contentHash: "contentHash",
       correspondingSourceIds: ["h1", "h2"],
       generated: [],
@@ -286,6 +285,7 @@ it("can link corresponding sources", () => {
       kind: "html",
       prettyPrinted: undefined,
       prettyPrintedFrom: undefined,
+      isSourceMapped: false,
       url: "/index.html",
     },
   });
@@ -321,52 +321,51 @@ it("is not fooled by pretty-printed sources with missing contentHashes", () => {
     ])
   ).toEqual({
     h1: {
-      canonicalId: "h1",
       contentHash: "contentHash#h1",
       correspondingSourceIds: ["h1"],
       generated: [],
-      generatedFrom: [],
+      generatedFrom: ["pph1"],
       id: "h1",
       kind: "html",
       prettyPrinted: "pph1",
       prettyPrintedFrom: undefined,
+      isSourceMapped: false,
       url: "/index.html",
     },
     h2: {
-      canonicalId: "h2",
       contentHash: "contentHash#h2",
       correspondingSourceIds: ["h2"],
       generated: [],
-      generatedFrom: [],
+      generatedFrom: ["pph2"],
       id: "h2",
       kind: "html",
       prettyPrinted: "pph2",
       prettyPrintedFrom: undefined,
+      isSourceMapped: false,
       url: "/index.html",
     },
     pph1: {
-      canonicalId: "h1",
       contentHash: "contentHash#h1",
       correspondingSourceIds: ["pph1"],
-      generated: [],
+      generated: ["h1"],
       generatedFrom: [],
       id: "pph1",
       kind: "prettyPrinted",
       prettyPrinted: undefined,
       prettyPrintedFrom: "h1",
+      isSourceMapped: false,
       url: "/index.html",
     },
     pph2: {
-      canonicalId: "h2",
       contentHash: "contentHash#h2",
       correspondingSourceIds: ["pph2"],
-      generated: [],
+      generated: ["h2"],
       generatedFrom: [],
       id: "pph2",
       kind: "prettyPrinted",
-
       prettyPrinted: undefined,
       prettyPrintedFrom: "h2",
+      isSourceMapped: false,
       url: "/index.html",
     },
   });

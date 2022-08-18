@@ -133,15 +133,11 @@ function findSource(url: string) {
     return url;
   }
 
-  const sources = dbgSelectors.getAllSourceDetails();
-  const firstSourceMatchingUrl = sources.find(s => (s.url || "").includes(url));
-  if (firstSourceMatchingUrl) {
-    const canonicalSource = dbgSelectors.getCanonicalSourceForUrl(firstSourceMatchingUrl.url!);
-    if (canonicalSource?.prettyPrinted) {
-      const prettyPrintedSource = dbgSelectors.getSourceDetails(canonicalSource.prettyPrinted);
-      return prettyPrintedSource;
+  const sourcesByUrl = dbgSelectors.getSourcesToDisplayByUrl();
+  for (const sourceUrl in sourcesByUrl) {
+    if (sourceUrl.includes(url)) {
+      return sourcesByUrl[sourceUrl];
     }
-    return canonicalSource;
   }
 }
 
