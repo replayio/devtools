@@ -18,7 +18,9 @@ export default function CommentButton({ addComment, pausedOnHit }: CommentButton
           "inline-flex items-center rounded-md border border-transparent px-1 text-xs font-medium leading-4 text-buttontextColor shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
         )}
       >
-        <div className="text-base material-icons add-comment-icon text-buttontextColor">add_comment</div>
+        <div className="text-base material-icons add-comment-icon text-buttontextColor">
+          add_comment
+        </div>
       </button>
     );
   }

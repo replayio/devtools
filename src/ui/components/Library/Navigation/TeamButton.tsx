@@ -56,8 +56,8 @@ export function TeamButton({
           </div>
         </span>
         {isNew ? (
-          <div className={"rounded-lg bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
-        ) : null}
+          <div className={"rounded-md bg-primaryAccent px-3 py-0.5 text-xs text-white"}>New</div>
+          ) : null}
         {showSettingsButton ? <SettingsButton /> : null}
       </a>
     </Link>

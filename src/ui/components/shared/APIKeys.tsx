@@ -22,7 +22,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
   return (
     <>
       <div className="flex items-center justify-between space-x-3">
-        <div className="w-0 flex-auto">
+        <div className="flex-auto w-0">
           <div className="flex h-9 w-full items-center rounded-md border border-textFieldBorder bg-themeTextFieldBgcolor px-2.5 text-themeTextFieldColor text-primaryAccent">
             <input
               readOnly
@@ -34,7 +34,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
               <div className="text-primaryAccent">Copied</div>
             ) : (
               <MaterialIcon
-                className="material-icons w-5 cursor-pointer text-primaryAccent hover:text-primaryAccentHover"
+                className="w-5 cursor-pointer material-icons text-primaryAccent hover:text-primaryAccentHover"
                 iconSize="lg"
                 onClick={() => navigator.clipboard.writeText(keyValue!).then(() => setCopied(true))}
               >
@@ -44,7 +44,7 @@ function NewApiKey({ keyValue, onDone }: { keyValue: string; onDone: () => void 
           </div>
         </div>
         <button
-          className="inline-flex h-9 items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-white shadow-sm hover:bg-primaryAccentHover focus:bg-primaryAccentHover focus:outline-none"
+          className="inline-flex h-9 items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-buttontextColor shadow-sm hover:bg-primaryAccentHover focus:bg-primaryAccentHover focus:outline-none"
           onClick={onDone}
         >
           Done
@@ -64,9 +64,9 @@ function ApiKeyList({ apiKeys, onDelete }: { apiKeys: ApiKey[]; onDelete: (id: s
   }
 
   return (
-    <section className="flex flex-auto flex-col">
+    <section className="flex flex-col flex-auto">
       <h3 className="text-base font-semibold uppercase">API Keys</h3>
-      <div className="h-0 flex-auto overflow-auto">
+      <div className="flex-auto h-0 overflow-auto">
         {apiKeys.map(apiKey => {
           const usage =
             typeof apiKey.maxRecordings === "number"
@@ -140,7 +140,7 @@ export default function APIKeys({
   }, [keyValue]);
 
   return (
-    <div className="flex h-0 flex-auto flex-col space-y-8">
+    <div className="flex flex-col flex-auto h-0 space-y-8">
       <label className="setting-item">
         <div className="description">{description}</div>
       </label>
@@ -176,7 +176,7 @@ export default function APIKeys({
                 <button
                   type="submit"
                   disabled={!canSubmit}
-                  className={`inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-white shadow-sm focus:outline-none ${
+                  className={`inline-flex items-center rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium leading-4 text-buttontextColor shadow-sm focus:outline-none ${
                     canSubmit
                       ? "hover:bg-primaryAccentHover focus:bg-primaryAccentHover"
                       : "opacity-60"

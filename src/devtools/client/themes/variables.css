@@ -144,7 +144,7 @@
   /* Core classes (Light) */
   --chrome: var(--theme-base-95); /* bg app */
   --body-color: #38383d;
-  --buttontext-color: pink;
+  --buttontext-color: #F4F8FA;
   --checkbox-border: var(--theme-base-80);
   --checkbox: #fff;
   --modal-bgcolor: rgba(255, 255, 255, 0.98);
@@ -216,6 +216,7 @@
 
   /* To organise (Light) */
   --jellyfish-bgcolor: rgba(255, 255, 255, 0.8);
+  --timejump-text: var(--buttontext-color);
   --theme-console-input-bgcolor: var(--body-bgcolor);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --theme-toggle-handle-bgcolor-hover: #b5eaff;
@@ -413,7 +414,7 @@
   /* Core classes (Dark) */
   --chrome: #081120; /* bg app */
   --body-color: var(--grey-30);
-  --buttontext-color: pink;
+  --buttontext-color: #F4F8FA;
   --checkbox-border: var(--theme-base-90);
   --checkbox: var(--theme-base-80);
   --modal-bgcolor: var(--theme-base-90);
@@ -484,6 +485,7 @@
 
   /* To organise (Dark) */
   --jellyfish-bgcolor: rgba(40, 40, 40, 0.8);
+  --timejump-text: var(--buttontext-color);
   --theme-console-input-bgcolor: var(--theme-base-95);
   --theme-toggle-handle-bgcolor: var(--theme-base-100);
   --theme-toggle-handle-bgcolor-hover: #005f92;

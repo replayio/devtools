@@ -76,7 +76,7 @@ export const RequestRow = ({
                 [styles.rewind]: row.original.triggerPoint.time < currentTime,
               })}
             />
-            <span className={classNames("px-2 text-white", styles.verbose)}>
+            <span className={classNames("px-2 text-timejumpText", styles.verbose)}>
               {row.original.triggerPoint.time > currentTime ? "Fast-forward" : "Rewind"}
             </span>
           </button>
