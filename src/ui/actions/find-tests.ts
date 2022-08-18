@@ -8,6 +8,8 @@ import { comparePoints, pointPrecedes } from "protocol/execution-point-utils";
 import { Helpers } from "./logpoint";
 import { ThreadFront, ValueFront } from "protocol/thread";
 import { WiredMessage, RecordingTarget } from "protocol/thread/thread";
+import { Dictionary } from "@reduxjs/toolkit";
+import { SourceDetails } from "ui/reducers/sources";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {
@@ -282,9 +284,7 @@ class JestTestState {
 }
 
 // Look for a source containing the specified pattern.
-async function findMatchingSourceId(pattern: string): Promise<string | null> {
-  await ThreadFront.ensureAllSources();
-  const sourcesByUrl = ThreadFront.getSourcesToDisplayByUrl();
+async function findMatchingSourceId(pattern: string, sourcesByUrl: Dictionary<SourceDetails>): Promise<string | null> {
   for (const url in sourcesByUrl) {
     if (url.includes(pattern)) {
       return sourcesByUrl[url]!.id;
@@ -310,10 +310,10 @@ async function getBreakpointLocationOnLine(
 }
 
 // Look for places in the recording used to run jest tests.
-async function setupJestTests(): Promise<JestTestState | null> {
+async function setupJestTests(sourcesByUrl: Dictionary<SourceDetails>): Promise<JestTestState | null> {
   // Look for a source containing the callAsyncCircusFn function which is used to
   // run tests using recent versions of Jest.
-  const circusUtilsSourceId = await findMatchingSourceId("jest-circus/build/utils.js");
+  const circusUtilsSourceId = await findMatchingSourceId("jest-circus/build/utils.js", sourcesByUrl);
   if (!circusUtilsSourceId) {
     return null;
   }
@@ -385,8 +385,8 @@ function removeTerminalColors(str: string): string {
   return str.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, "");
 }
 
-async function findJestTests() {
-  const state = await setupJestTests();
+async function findJestTests(sourcesByUrl: Dictionary<SourceDetails>) {
+  const state = await setupJestTests(sourcesByUrl);
   if (!state) {
     return;
   }
@@ -440,12 +440,12 @@ async function findJestTests() {
 }
 
 // Look for automated tests associated with a recent version of jest.
-export async function findAutomatedTests(recordingTarget: RecordingTarget) {
+export async function findAutomatedTests(recordingTarget: RecordingTarget, sourcesByUrl: Dictionary<SourceDetails>) {
   if (recordingTarget !== "node") {
     return;
   }
 
-  await findJestTests();
+  await findJestTests(sourcesByUrl);
 }
 
 export const TestMessageHandlers: {

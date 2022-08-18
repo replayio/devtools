@@ -1058,10 +1058,6 @@ class _ThreadFront {
     return this.getPreferredLocation(mappedLocation);
   }
 
-  getSourcesToDisplayByUrl() {
-    return this.sourcesSelectors!.getSourcesToDisplayByUrl();
-  }
-
   getSourceToDisplayForUrl(url: string) {
     return this.sourcesSelectors!.getSourceToDisplayForUrl(url);
   }

@@ -41,6 +41,7 @@ import { setUnexpectedError, setExpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Action } from "@reduxjs/toolkit";
+import { getSourcesToDisplayByUrl } from "ui/reducers/sources";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -256,7 +257,9 @@ export function createSocket(
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
 
-      findAutomatedTests(recordingTarget);
+      ThreadFront.ensureAllSources().then(() => {
+        findAutomatedTests(recordingTarget, getSourcesToDisplayByUrl(getState()));
+      });
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {
