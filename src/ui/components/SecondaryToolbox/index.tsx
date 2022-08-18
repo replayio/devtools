@@ -24,7 +24,7 @@ import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
-import { getRecordingTarget } from "ui/reducers/app";
+import { getHasGraphics } from "ui/reducers/app";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
 import { useFeature } from "ui/hooks/settings";
@@ -35,7 +35,7 @@ interface PanelButtonsProps {
   hasReactComponents: boolean;
   hasReduxAnnotations: boolean;
   toolboxLayout: ToolboxLayout;
-  isNode: boolean;
+  hasGraphics: boolean;
 }
 
 interface PanelButtonProps {
@@ -68,13 +68,13 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   hasReactComponents,
   hasReduxAnnotations,
   toolboxLayout,
-  isNode,
+  hasGraphics,
 }) => {
   return (
-    <div className="flex flex-row items-center overflow-hidden panel-buttons theme-tab-font-size">
-      {!isNode && <NodePicker />}
+    <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
+      {hasGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {!isNode && <PanelButton panel="inspector">Elements</PanelButton>}
+      {hasGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
@@ -104,8 +104,8 @@ function InspectorPanel() {
       <WaitForReduxSlice
         slice="inspector"
         loading={
-          <div className="flex justify-center w-full m-auto align-center">
-            <div className="relative flex flex-col items-center p-8 py-4 rounded-lg w-96 bg-white/75">
+          <div className="align-center m-auto flex w-full justify-center">
+            <div className="relative flex w-96 flex-col items-center rounded-lg bg-white/75 p-8 py-4">
               <ReplayLogo wide size="lg" />
               <div>Inspector is loading...</div>
             </div>
@@ -126,12 +126,11 @@ function PanelButtonsScrollOverflowGradient() {
 
 export default function SecondaryToolbox() {
   const selectedPanel = useAppSelector(getSelectedPanel);
-  const recordingTarget = useAppSelector(getRecordingTarget);
+  const hasGraphics = useAppSelector(getHasGraphics);
   const hasReactComponents = useAppSelector(selectors.hasReactComponents);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const dispatch = useAppDispatch();
-  const isNode = recordingTarget === "node";
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));
@@ -140,21 +139,21 @@ export default function SecondaryToolbox() {
   const hasReduxAnnotations = reduxAnnotations.length > 0;
 
   return (
-    <div className={classnames(`secondary-toolbox rounded-lg`, { node: isNode })}>
+    <div className={classnames(`secondary-toolbox rounded-lg`, { node: !hasGraphics })}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          isNode={isNode}
+          hasGraphics={hasGraphics}
           hasReactComponents={hasReactComponents}
           hasReduxAnnotations={hasReduxAnnotations}
           toolboxLayout={toolboxLayout}
         />
-        <div className="flex secondary-toolbox-right-buttons-container">
+        <div className="secondary-toolbox-right-buttons-container flex">
           <PanelButtonsScrollOverflowGradient />
           <ShowVideoButton />
           <ToolboxOptions />
         </div>
       </header>
-      <Redacted className="text-xs secondary-toolbox-content bg-chrome">
+      <Redacted className="secondary-toolbox-content bg-chrome text-xs">
         <Panel isActive={selectedPanel === "network"}>
           <NetworkMonitor />
         </Panel>
