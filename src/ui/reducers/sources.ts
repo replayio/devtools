@@ -363,7 +363,8 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
 }
 
 export function getSourceIdToDisplayById(state: UIState, sourceId: string) {
-  return getCorrespondingSourceIds(state, sourceId)![0];
+  const sourceIds = getCorrespondingSourceIds(state, sourceId);
+  return sourceIds && sourceIds.length > 0 ? sourceIds[0] : null;
 }
 
 export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
