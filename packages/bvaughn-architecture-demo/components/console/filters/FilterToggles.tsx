@@ -83,6 +83,7 @@ export default function FilterToggles() {
       />
       <hr className={styles.Divider} />
       <EventsList />
+      <div className={styles.EmptySpaceFiller} />
       <hr className={styles.Divider} />
       <Toggle
         afterContent={
