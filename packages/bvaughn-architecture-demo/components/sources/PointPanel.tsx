@@ -13,20 +13,26 @@ import styles from "./PointPanel.module.css";
 export default function PointPanel({ className, point }: { className: string; point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
+  const [editableCondition, setEditableCondition] = useState(point.condition);
   const [editableContent, setEditableContent] = useState(point.content);
 
   const isContentValid = useMemo(() => validate(editableContent), [editableContent]);
-  const hasContentChanged = editableContent !== point.content;
+  const isConditionValid = useMemo(
+    () => editableCondition === null || validate(editableCondition),
+    [editableCondition]
+  );
+  const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "Enter":
-        if (isContentValid && hasContentChanged) {
-          editPoint(point.id, { content: editableContent });
+        if (isConditionValid && isContentValid && hasChanged) {
+          editPoint(point.id, { condition: editableCondition, content: editableContent });
         }
         break;
       case "Escape":
         setEditableContent(point.content);
+        setEditableCondition(point.condition);
         break;
     }
   };
@@ -44,6 +50,7 @@ export default function PointPanel({ className, point }: { className: string; po
       <div className={styles.Row}>
         <input
           className={styles.Input}
+          data-test-id={`PointPanelInput-${point.location.line}-content`}
           disabled={!point.enableLogging}
           onChange={event => setEditableContent(event.currentTarget.value)}
           onKeyDown={onKeyDown}
@@ -71,11 +78,23 @@ export default function PointPanel({ className, point }: { className: string; po
         </small>
         <button
           className={styles.SaveButton}
-          disabled={!isContentValid || !hasContentChanged}
-          onClick={() => editPoint(point.id, { content: editableContent })}
+          disabled={!isConditionValid || !isContentValid || !hasChanged}
+          onClick={() =>
+            editPoint(point.id, { condition: editableCondition, content: editableContent })
+          }
         >
           <Icon className={styles.SaveButtonIcon} type="save" />
         </button>
+      </div>
+      <div className={styles.Row}>
+        <input
+          className={styles.Input}
+          data-test-id={`PointPanelInput-${point.location.line}-condition`}
+          onChange={event => setEditableCondition(event.currentTarget.value || null)}
+          onKeyDown={onKeyDown}
+          placeholder="Condition..."
+          value={editableCondition || ""}
+        />
       </div>
       <div className={styles.Row}>
         <Suspense fallback={<Loader />}>
@@ -90,7 +109,7 @@ function HitPointsWarning({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+  const hitPoints = getHitPointsForLocation(client, point.location, null, focusRange);
 
   if (hitPoints.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return (
@@ -108,7 +127,7 @@ function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+  const hitPoints = getHitPointsForLocation(client, point.location, null, focusRange);
 
   if (hitPoints.length === 0) {
     return (

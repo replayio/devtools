@@ -257,7 +257,7 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
     () =>
       logpoints.map(logpoint => ({
         badge: logpoint.options.prefixBadge || null,
-        condition: null, // TODO
+        condition: logpoint.options.condition || null,
         content: logpoint.options.logValue!,
         enableBreaking: false,
         enableLogging: true,

@@ -71,7 +71,8 @@ export interface ReplayClientInterface {
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
-    location: Location
+    location: Location,
+    condition: string | null
   ): Promise<TimeStampedPoint[]>;
   getObjectWithPreview(
     objectId: ObjectId,

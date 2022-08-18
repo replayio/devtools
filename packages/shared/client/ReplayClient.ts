@@ -27,7 +27,6 @@ import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
-import { isPointInRegions } from "shared/utils/time";
 
 import { ColumnHits, LineHits, ReplayClientEvents, ReplayClientInterface } from "./types";
 
@@ -228,27 +227,97 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
-    location: Location
+    location: Location,
+    condition: string | null
   ): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
-    await analysisManager.runAnalysis(
-      {
-        effectful: false,
-        locations: [{ location }],
-        mapper: "",
-        range: focusRange
-          ? { begin: focusRange.begin.point, end: focusRange.end.point }
-          : undefined,
-      },
-      {
-        onAnalysisError: (errorMessage: string) => {
-          throw Error(errorMessage);
+
+    // The backend doesn't support filtering hit points by condition, so we fall back to running analysis.
+    // This is less efficient so we only do it if we have a condition.
+    // We should delete this once the backend supports filtering (see BAC-2103).
+    if (condition) {
+      const mapper = `
+        const { point, time } = input;
+        const { frame: frameId } = sendCommand("Pause.getTopFrame");
+    
+        const { result: conditionResult } = sendCommand(
+          "Pause.evaluateInFrame",
+          { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
+        );
+    
+        let result;
+        if (conditionResult.returned) {
+          const { returned } = conditionResult;
+          if ("value" in returned && !returned.value) {
+            result = 0;
+          } else if (!Object.keys(returned).length) {
+            // Undefined.
+            result = 0;
+          } else {
+            result = 1;
+          }
+        } else {
+          result = 1;
+        }
+    
+        return [
+          {
+            key: point,
+            value: {
+              match: result,
+              point,
+              time,
+            },
+          },
+        ];
+      `;
+
+      await analysisManager.runAnalysis(
+        {
+          effectful: false,
+          locations: [{ location }],
+          mapper,
+          range: focusRange
+            ? { begin: focusRange.begin.point, end: focusRange.end.point }
+            : undefined,
         },
-        onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
-          collectedPointDescriptions.push(...pointDescriptions);
+        {
+          onAnalysisError: (errorMessage: string) => {
+            throw Error(errorMessage);
+          },
+          onAnalysisResult: results => {
+            results.forEach(({ value }) => {
+              if (value.match) {
+                collectedPointDescriptions.push({
+                  point: value.point,
+                  time: value.time,
+                });
+              }
+            });
+          },
+        }
+      );
+    } else {
+      await analysisManager.runAnalysis(
+        {
+          effectful: false,
+          locations: [{ location }],
+          mapper: "",
+          range: focusRange
+            ? { begin: focusRange.begin.point, end: focusRange.end.point }
+            : undefined,
         },
-      }
-    );
+        {
+          onAnalysisError: (errorMessage: string) => {
+            throw Error(errorMessage);
+          },
+          onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
+            collectedPointDescriptions.push(...pointDescriptions);
+          },
+        }
+      );
+    }
+
     return collectedPointDescriptions;
   }
 

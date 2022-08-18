@@ -112,7 +112,13 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
     ? { begin: focusRange.begin.point, end: focusRange.end.point }
     : null;
 
-  const analysisResults = runAnalysis(client, pointRange, point.location, point.content);
+  const analysisResults = runAnalysis(
+    client,
+    pointRange,
+    point.location,
+    point.content,
+    point.condition
+  );
 
   const context = useMemo(
     () => ({

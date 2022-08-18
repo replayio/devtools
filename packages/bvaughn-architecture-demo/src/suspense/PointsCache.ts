@@ -70,9 +70,10 @@ function getFilteredLogPoints(
 export function getHitPointsForLocation(
   client: ReplayClientInterface,
   location: Location,
+  condition: string | null,
   focusRange: TimeStampedPointRange | null
 ): TimeStampedPoint[] {
-  const key = `${location.sourceId}:${location.line}:${location.column}`;
+  const key = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
   let record = locationToHitPointsMap.get(key);
   if (record == null) {
     const wakeable = createWakeable<TimeStampedPoint[]>();
@@ -84,7 +85,7 @@ export function getHitPointsForLocation(
 
     locationToHitPointsMap.set(key, record);
 
-    fetchHitPointsForLocation(client, focusRange, location, record, wakeable);
+    fetchHitPointsForLocation(client, focusRange, location, condition, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -121,11 +122,12 @@ async function fetchHitPointsForLocation(
   client: ReplayClientInterface,
   focusRange: TimeStampedPointRange | null,
   location: Location,
+  condition: string | null,
   record: Record<TimeStampedPoint[]>,
   wakeable: Wakeable<TimeStampedPoint[]>
 ) {
   try {
-    const executionPoints = await client.getHitPointsForLocation(focusRange, location);
+    const executionPoints = await client.getHitPointsForLocation(focusRange, location, condition);
 
     record.status = STATUS_RESOLVED;
     record.value = executionPoints;

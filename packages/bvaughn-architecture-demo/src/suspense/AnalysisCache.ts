@@ -36,9 +36,16 @@ export type RemoteAnalysisResult = {
   values: Array<{ value?: any; object?: string }>;
 };
 
-function getKey(focusRange: PointRange | null, location: Location, code: string): string {
+function getKey(
+  focusRange: PointRange | null,
+  location: Location,
+  code: string,
+  condition: string | null
+): string {
   const rangeString = focusRange ? `${focusRange.begin}-${focusRange.end}` : "-";
-  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}`;
+  return `${rangeString}:${location.sourceId}:${location.line}:${location.column}:${code}:${
+    condition || ""
+  }`;
 }
 
 const locationAndTimeToValueMap: Map<string, Record<AnalysisResults>> = new Map();
@@ -50,9 +57,10 @@ export function runAnalysis(
   client: ReplayClientInterface,
   focusRange: PointRange | null,
   location: Location,
-  code: string
+  code: string,
+  condition: string | null
 ): AnalysisResults {
-  const key = getKey(focusRange, location, code);
+  const key = getKey(focusRange, location, code, condition);
 
   let record = locationAndTimeToValueMap.get(key);
   if (record == null) {
@@ -65,7 +73,7 @@ export function runAnalysis(
 
     locationAndTimeToValueMap.set(key, record);
 
-    runLocalOrRemoteAnalysis(client, focusRange, location, code, record, wakeable);
+    runAnalysisHelper(client, focusRange, location, code, condition, record, wakeable);
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -75,11 +83,12 @@ export function runAnalysis(
   }
 }
 
-async function runLocalOrRemoteAnalysis(
+async function runAnalysisHelper(
   client: ReplayClientInterface,
   focusRange: PointRange | null,
   location: Location,
   code: string,
+  condition: string | null,
   record: Record<AnalysisResults>,
   wakeable: Wakeable<AnalysisResults>
 ) {
@@ -87,7 +96,7 @@ async function runLocalOrRemoteAnalysis(
     const results = await client.runAnalysis<RemoteAnalysisResult>({
       effectful: false,
       locations: [{ location }],
-      mapper: createMapperForAnalysis(code),
+      mapper: createMapperForAnalysis(code, condition),
       range: focusRange || undefined,
     });
 
@@ -128,24 +137,47 @@ async function runLocalOrRemoteAnalysis(
   }
 }
 
-function createMapperForAnalysis(code: string): string {
+function createMapperForCondition(condition: string): string {
+  return `
+    const { result: conditionResult } = sendCommand(
+      "Pause.evaluateInFrame",
+      { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
+    );
+    addPauseData(conditionResult.data);
+    if (conditionResult.returned) {
+      const { returned } = conditionResult;
+      if ("value" in returned && !returned.value) {
+        return [];
+      }
+      if (!Object.keys(returned).length) {
+        // Undefined.
+        return [];
+      }
+    }
+  `;
+}
+
+function createMapperForAnalysis(code: string, condition: string | null): string {
   const escapedCode = code.replace(/"/g, '\\"');
   return `
     const finalData = { frames: [], scopes: [], objects: [] };
+    const { point, time, pauseId } = input;
+    const { frameId, functionName, location } = getTopFrame();
+
+    ${condition ? createMapperForCondition(condition) : ""}
+
     function addPauseData({ frames, scopes, objects }) {
       finalData.frames.push(...(frames || []));
       finalData.scopes.push(...(scopes || []));
       finalData.objects.push(...(objects || []));
     }
+
     function getTopFrame() {
       const { frame, data } = sendCommand("Pause.getTopFrame");
       addPauseData(data);
       return finalData.frames.find((f) => f.frameId == frame);
     }
-    
-    const { point, time, pauseId } = input;
-    const { frameId, functionName, location } = getTopFrame();
-    
+
     const bindings = [{ name: "displayName", value: functionName || "" }];
     const { result } = sendCommand("Pause.evaluateInFrame", {
       frameId,
