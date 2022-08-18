@@ -23,7 +23,7 @@ pref("devtools.hitCounts", "hide-counts");
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.enableNewComponentArchitecture", false);
+pref("devtools.features.enableNewComponentArchitecture", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.originalClassNames", false);
