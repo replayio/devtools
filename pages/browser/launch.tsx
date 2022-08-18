@@ -12,8 +12,8 @@ const BrowserLaunch = () => {
           <a
             className="inline-flex items-center h-12 px-4 rounded-md bg-primaryAccent text-buttontextColor"
             href={library}
-          >ˇ
-            Open Replay!
+          >
+            ˇ Open Replay!
           </a>
         </p>
       </LaunchBrowser>
