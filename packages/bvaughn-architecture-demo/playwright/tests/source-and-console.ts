@@ -50,7 +50,7 @@ async function fillLogPointText(
   await page.keyboard.press("Enter");
 }
 
-test.only("should not allow saving log points with invalid content", async ({ page }) => {
+test("should not allow saving log points with invalid content", async ({ page }) => {
   await openSourceTab(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "'1");
@@ -59,7 +59,7 @@ test.only("should not allow saving log points with invalid content", async ({ pa
   await takeScreenshot(page, pointPanel, "point-panel-invalid-content");
 });
 
-test.only("should not allow saving log points with invalid conditional", async ({ page }) => {
+test("should not allow saving log points with invalid conditional", async ({ page }) => {
   await openSourceTab(page);
   await addLogPoint(page, 12);
   await fillLogPointText(page, 12, "true", "'1");
