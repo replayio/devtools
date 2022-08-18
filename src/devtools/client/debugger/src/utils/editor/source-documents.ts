@@ -86,7 +86,7 @@ function setEditorText(editor: SourceEditor, sourceId: string, content: SourceCo
 
 function setMode(
   editor: SourceEditor,
-  source: SourceContent,
+  source: SourceDetails,
   content: SourceContentValue,
   symbols: SymbolDeclarations
 ) {
@@ -109,7 +109,7 @@ function setMode(
  */
 export function showSourceText(
   editor: SourceEditor,
-  source: SourceContent,
+  source: SourceDetails,
   content: SourceContentValue,
   symbols: SymbolDeclarations
 ) {
