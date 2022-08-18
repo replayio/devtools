@@ -232,7 +232,9 @@ export const getSourcesById = (state: UIState, ids: string[]) => {
   return ids.map(id => getSourceDetails(state, id)!);
 };
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
-  return getSourceDetails(state, id)?.correspondingSourceIds;
+  const source = getSourceDetails(state, id);
+  assert(source, `unknown source ${id}`);
+  return source?.correspondingSourceIds || [id];
 };
 export const getSourceContent = (state: UIState, id: string) => {
   return state.sources.contents.entities[id];
@@ -363,7 +365,7 @@ export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {
 }
 
 export function getSourceIdToDisplayById(state: UIState, sourceId: string) {
-  return getCorrespondingSourceIds(state, sourceId)![0];
+  return getCorrespondingSourceIds(state, sourceId)[0];
 }
 
 export const getSourceToDisplayById = (state: UIState, sourceId: string) => {
@@ -397,7 +399,7 @@ export function getSourceIdToDisplayForUrl(state: UIState, url: string) {
     return;
   }
   const preferred = getPreferredSourceId(state.sources.sourceDetails.entities, sourceIds)!;
-  return getCorrespondingSourceIds(state, preferred)![0];
+  return getCorrespondingSourceIds(state, preferred)[0];
 }
 
 export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
