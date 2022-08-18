@@ -1130,7 +1130,7 @@ class _ThreadFront {
 
   getCorrespondingSourceIds(sourceId: SourceId) {
     assert(this.hasAllSources, "not all sources have been loaded yet");
-    return this.sourcesSelectors!.getSourceDetails(sourceId)?.correspondingSourceIds || [sourceId];
+    return this.sourcesSelectors?.getSourceDetails(sourceId)?.correspondingSourceIds || [sourceId];
   }
 
   // Replace the sourceId in a location with the first corresponding sourceId
