@@ -138,7 +138,12 @@ export function LoggablesContextRoot({
 
     points.forEach(point => {
       if (point.enableLogging) {
-        const hitPoints = getHitPointsForLocation(client, point.location, focusRange);
+        const hitPoints = getHitPointsForLocation(
+          client,
+          point.location,
+          point.condition,
+          focusRange
+        );
         if (hitPoints.length < MAX_POINTS_FOR_FULL_ANALYSIS) {
           hitPoints.forEach(hitPoint => {
             if (
