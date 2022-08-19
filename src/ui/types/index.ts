@@ -75,7 +75,9 @@ type PlanKey =
   | "test-beta-v1"
   | "ent-v1"
   | "team-annual-v1"
-  | "org-annual-v1";
+  | "org-annual-v1"
+  | "team-oss-v1"
+  | "team-internal-v1";
 
 export interface Subscription {
   id?: string;
