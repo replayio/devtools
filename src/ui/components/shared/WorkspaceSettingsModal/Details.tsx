@@ -72,7 +72,7 @@ function SubscriptionDetails({
       <PlanDetails subscription={subscription} />
       {isSubscriptionCancelled(subscription) ||
       subscription.billingSchedule === "contract" ||
-      subscription.plan?.key === "beta-v1" ? null : (
+      subscription.seatPrice === 0 ? null : (
         <div className="flex flex-row items-center justify-between border-b border-themeBase-85 py-2">
           <span>Payment Method</span>
           <span className="flex flex-col items-end">

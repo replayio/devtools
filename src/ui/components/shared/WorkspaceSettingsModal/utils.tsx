@@ -54,6 +54,22 @@ export const pricingDetailsForSubscription = (subscription: Subscription): PlanP
         discount: 0,
         trial: isTrial(subscription),
       };
+    case "team-oss-v1":
+      return {
+        billingSchedule: "monthly",
+        displayName: "OSS Team",
+        seatPrice: 0,
+        discount: 0,
+        trial: false,
+      };
+    case "team-internal-v1":
+      return {
+        billingSchedule: "monthly",
+        displayName: "Replay Team",
+        seatPrice: 0,
+        discount: 0,
+        trial: false,
+      };
     case "team-v1":
     case "test-team-v1":
       return {
