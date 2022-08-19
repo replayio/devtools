@@ -242,6 +242,7 @@ class ConsoleOutput extends React.Component<PropsFromRedux, State> {
       <>
         <div
           className="webconsole-output"
+          data-test-id="Messages"
           ref={this.outputNode}
           role="main"
           onContextMenu={this.onContextMenu}

@@ -73,7 +73,7 @@ export function start() {
     () =>
       isFullyLoaded() &&
       dbgSelectors.getViewMode() == "dev" &&
-      document.querySelector(".webconsole-app"),
+      document.querySelector("[data-test-id=ConsoleRoot]"),
     {
       timeout: 1000 * 120,
       waitingFor: "the page to load",
@@ -401,30 +401,40 @@ async function waitForScopeValue(name: string, value: string) {
   );
 }
 
-function findMessages(text: string, extraSelector = "") {
-  const messages = document.querySelectorAll<HTMLElement>(
-    `.webconsole-output .message${extraSelector}`
-  );
+function findMessages(text: string) {
+  const messages = document.querySelectorAll<HTMLElement>(`[data-test-name=Message]`);
   return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
 function getAllMessages(opts?: { ignoreErrors: boolean }) {
   const { ignoreErrors } = opts || {};
-  const messageNodes = document.querySelectorAll(`.webconsole-output .message`);
+  const messageNodes = document.querySelectorAll(
+    `[data-test-name=Messages] [data-test-name=Message]`
+  );
   const messages = [];
   for (const node of messageNodes) {
+    const dataType = node.getAttribute("data-test-message-type");
     let type: string | undefined = "unknown";
-    if (node.classList.contains("logPoint")) {
-      type = "logPoint";
-    } else if (node.classList.contains("console-api")) {
-      type = "console-api";
-    } else if (node.classList.contains("command")) {
-      type = "command";
-    } else if (node.classList.contains("result")) {
-      type = "result";
-    } else if (node.classList.contains("error")) {
-      type = ignoreErrors ? undefined : "error";
+    switch (dataType) {
+      case "console-error":
+      case "console-log":
+      case "console-warning":
+        type = "console-api";
+        break;
+      case "event":
+        break;
+      case "exception":
+        type = ignoreErrors ? undefined : "error";
+        break;
+      case "log-point":
+        type = "logPoint";
+        break;
+      case "terminal-expression":
+        // Contains both "command" and "result" types
+        type = "result";
+        break;
     }
+
     if (type) {
       messages.push({
         type,
@@ -448,27 +458,25 @@ function checkAllMessages(expected: string, opts?: { ignoreErrors: boolean }) {
   );
 }
 
-function waitForMessage(text: string, extraSelector?: string) {
+function waitForMessage(text: string) {
   return waitUntil(
     () => {
-      const messages = findMessages(text, extraSelector);
+      const messages = findMessages(text);
       return messages?.[0];
     },
-    { waitingFor: `a message: ${text} with selector: ${extraSelector}` }
+    { waitingFor: `a message: ${text}` }
   );
 }
 
 async function warpToMessage(text: string) {
   const msg = await waitForMessage(text);
-  const warpButton: HTMLButtonElement | null =
-    msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
+
+  const warpButton: HTMLButtonElement | null = msg.querySelector(
+    "[data-test-id=ConsoleMessageHoverButton]"
+  );
   warpButton!.click();
   await waitForPaused();
   assert(msg.classList.contains("paused"), "classList must contain 'paused'");
-}
-
-function checkPausedMessage(text: string) {
-  return waitForMessage(text, ".paused");
 }
 
 function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
@@ -952,7 +960,6 @@ const testCommands = {
   checkAllMessages,
   waitForMessage,
   warpToMessage,
-  checkPausedMessage,
   waitForMessageCount,
   checkMessageStack,
   checkJumpIcon,

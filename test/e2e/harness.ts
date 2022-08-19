@@ -21,7 +21,7 @@ export default class TestHarness {
       return (
         fullyLoaded &&
         app.selectors.getViewMode() == "dev" &&
-        document.querySelector(".webconsole-app")
+        document.querySelector("[data-test-id=ConsoleRoot]")
       );
     });
   }
@@ -29,7 +29,9 @@ export default class TestHarness {
   waitForMessage(text: string, options?: { timeout?: number }) {
     return this.page.waitForFunction(
       text => {
-        const messages = document.querySelectorAll(".webconsole-output .message");
+        const messages = document.querySelectorAll(
+          "[data-test-name=Messages] [data-test-name=Message]"
+        );
         return [...messages].some(message => (message as HTMLElement).innerText.includes(text));
       },
       text,
