@@ -18,30 +18,30 @@ function AutocompleteAction({
   if (status === "loading") {
     return (
       <button
-        className="inline-flex items-center space-x-1.5 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-white focus:outline-none"
+        className="inline-flex items-center space-x-1.5 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <Spinner className="h-4 w-4 animate-spin text-white" />
+        <Spinner className="w-4 h-4 animate-spin text-buttontextColor" />
         <span>Inviting</span>
       </button>
     );
   } else if (status === "completed") {
     return (
       <button
-        className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-green-600 px-2.5 py-1.5 font-medium text-white focus:outline-none"
+        className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-green-600 px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <CheckCircleIcon className="h-4 w-4 text-white" />
+        <CheckCircleIcon className="w-4 h-4 text-buttontextColor" />
         <span>Invited</span>
       </button>
     );
   } else if (status === "error") {
     return (
       <button
-        className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-red-600 px-2.5 py-1.5 font-medium text-white focus:outline-none"
+        className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-red-600 px-2.5 py-1.5 font-medium text-buttontextColor focus:outline-none"
         disabled
       >
-        <ExclamationCircleIcon className="h-4 w-4 text-white" />
+        <ExclamationCircleIcon className="w-4 h-4 text-buttontextColor" />
         <span>Unknown User</span>
       </button>
     );
@@ -49,10 +49,10 @@ function AutocompleteAction({
 
   return (
     <button
-      className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-white hover:bg-primaryAccentHover focus:outline-none"
+      className="inline-flex items-center space-x-1 rounded-md border border-transparent bg-primaryAccent px-2.5 py-1.5 font-medium text-buttontextColor hover:bg-primaryAccentHover focus:outline-none"
       onClick={handleSubmit}
     >
-      <PaperAirplaneIcon className="h-4 w-4 rotate-90 transform text-white" />
+      <PaperAirplaneIcon className="w-4 h-4 transform rotate-90 text-buttontextColor" />
       <span>Add</span>
     </button>
   );

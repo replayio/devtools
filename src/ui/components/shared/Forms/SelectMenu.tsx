@@ -14,7 +14,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
       key={id}
       className={({ active }) =>
         classnames(
-          active ? "bg-primaryAccent text-white" : "",
+          active ? "bg-primaryAccent text-buttontextColor" : "",
           "relative cursor-default select-none py-1.5 pl-2.5 pr-7"
         )
       }
@@ -30,7 +30,7 @@ function Option({ name, id }: { name: string; id: string | null }) {
           {selected ? (
             <span
               className={classnames(
-                active ? "text-white" : "text-primaryAccent",
+                active ? "text-buttontextColor" : "text-primaryAccent",
                 "absolute inset-y-0 right-0 flex items-center pr-3"
               )}
             >

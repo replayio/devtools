@@ -76,7 +76,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
         disabled={shouldDisableActions}
         value={isSaving ? `Uploading…` : `Save`}
         ref={saveButtonRef}
-        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-white shadow-sm hover:bg-primaryAccentHover focus:border-primaryAccentHover focus:outline-none focus:ring focus:ring-primaryAccentHover"
+        className="mb-8 cursor-pointer rounded-xl bg-primaryAccent py-3.5 px-16 font-bold text-buttontextColor shadow-sm hover:bg-primaryAccentHover focus:border-primaryAccentHover focus:outline-none focus:ring focus:ring-primaryAccentHover"
       />
     </div>
   );

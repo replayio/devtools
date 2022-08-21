@@ -16,6 +16,7 @@ module.exports = {
           60: "var(--theme-base-60)",
         },
         bodyColor: "var(--body-color)",
+        buttontextColor: "var(--buttontext-color)",
         breakpointEditfieldActive: "var(--breakpoint-editfield-active)",
         breakpointEditfieldHover: "var(--breakpoint-editfield-hover)",
         breakpointStatus: "var(--breakpoint-status)",
@@ -58,6 +59,7 @@ module.exports = {
         themeToggleBgcolor: "var(--theme-toggle-bgcolor)",
         themeToggleColor: "var(--theme-toggle-color)",
         themeToolbarPanelIconColor: "var(--theme-toolbar-panel-icon-color)",
+        timejumpText: "var(--timejump-text)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
         lightGrey: "var(--light-grey)",
@@ -72,8 +74,8 @@ module.exports = {
         "ew-resize": "ew-resize",
       },
       borderWidth: {
-        '3': '2.5px',
-      }
+        3: "2.5px",
+      },
     },
   },
   plugins: [require("@tailwindcss/forms")],
