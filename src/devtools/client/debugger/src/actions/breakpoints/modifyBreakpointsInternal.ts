@@ -2,10 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import { UIState } from "ui/state";
 import { setLogpoint, setLogpointByURL, newLogGroupId, removeLogpoint } from "ui/actions/logpoint";
 import type { ThreadFront as TF } from "protocol/thread";
+import { assert } from "protocol/utils";
 
 import type { BreakpointOptions, SourceLocation } from "../../reducers/types";
+import { getCorrespondingSourceIds, getSourceToDisplayForUrl } from "ui/reducers/sources";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -46,11 +49,15 @@ async function maybeClearLogpoint(location: SourceLocation) {
   }
 }
 
-export function _internalSetBreakpoint(
+export async function _internalSetBreakpoint(
   ThreadFront: typeof TF,
+  getState: () => UIState,
   location: SourceLocation,
   options: InitialBreakpointOptions
 ) {
+  await ThreadFront.ensureAllSources();
+  const state = getState();
+
   maybeClearLogpoint(location);
   const finalOptions = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options: finalOptions };
@@ -61,7 +68,10 @@ export function _internalSetBreakpoint(
 
   if (sourceId) {
     if (shouldPause) {
-      promises.push(ThreadFront.setBreakpoint(sourceId, line, column!, condition!));
+      const correspondingSourceIds = getCorrespondingSourceIds(state, sourceId);
+      for (const correspondingSourceId of correspondingSourceIds) {
+        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+      }
     }
     if (logValue) {
       promises.push(
@@ -70,23 +80,43 @@ export function _internalSetBreakpoint(
     }
   } else {
     if (shouldPause) {
-      promises.push(ThreadFront.setBreakpointByURL(sourceUrl!, line, column!, condition!));
+      assert(sourceUrl, "a breakpoint without a sourceId must have a sourceUrl");
+      const source = getSourceToDisplayForUrl(state, sourceUrl);
+      assert(source, `no source found for ${sourceUrl}`);
+      const correspondingSourceIds = getCorrespondingSourceIds(state, source.id);
+      for (const correspondingSourceId of correspondingSourceIds) {
+        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+      }
     }
     if (logValue) {
       promises.push(setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue, condition!));
     }
   }
 
-  return Promise.all(promises);
+  await Promise.all(promises);
 }
 
-export function _internalRemoveBreakpoint(ThreadFront: typeof TF, location: SourceLocation) {
+export async function _internalRemoveBreakpoint(ThreadFront: typeof TF, getState: () => UIState, location: SourceLocation) {
+  await ThreadFront.ensureAllSources();
+  const state = getState();
+
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
 
   const { line, column, sourceUrl, sourceId } = location;
+
   if (sourceId) {
-    return ThreadFront.removeBreakpoint(sourceId, line, column!);
+    const correspondingSourceIds = getCorrespondingSourceIds(state, sourceId);
+    return await Promise.all(correspondingSourceIds.map(correspondingSourceId => 
+      ThreadFront.removeBreakpoint(correspondingSourceId, line, column!)
+    ));
   }
-  return ThreadFront.removeBreakpointByURL(sourceUrl!, line, column!);
+
+  assert(sourceUrl, "a breakpoint without a sourceId must have a sourceUrl");
+  const source = getSourceToDisplayForUrl(state, sourceUrl);
+  assert(source, `no source found for ${sourceUrl}`);
+  const correspondingSourceIds = getCorrespondingSourceIds(state, source.id);
+  await Promise.all(correspondingSourceIds.map(correspondingSourceId =>
+    ThreadFront.removeBreakpoint(correspondingSourceId, line, column!)
+  ));
 }

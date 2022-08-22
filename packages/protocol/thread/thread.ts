@@ -525,25 +525,19 @@ class _ThreadFront {
     return lineLocations;
   }
 
-  async setBreakpoint(initialSourceId: SourceId, line: number, column: number, condition?: string) {
+  async setBreakpoint(sourceId: SourceId, line: number, column: number, condition?: string) {
     try {
       this._invalidateResumeTargets(async () => {
         assert(this.sessionId, "no sessionId");
-        await this.ensureAllSources();
-        const sourceIds = this.getCorrespondingSourceIds(initialSourceId);
-        await Promise.all(
-          sourceIds.map(async sourceId => {
-            await ThreadFront.getBreakpointPositionsCompressed(sourceId);
-            const location = { sourceId, line, column };
-            const { breakpointId } = await client.Debugger.setBreakpoint(
-              { location, condition },
-              this.sessionId!
-            );
-            if (breakpointId) {
-              this.breakpoints.set(breakpointId, { location });
-            }
-          })
+        await ThreadFront.getBreakpointPositionsCompressed(sourceId);
+        const location = { sourceId, line, column };
+        const { breakpointId } = await client.Debugger.setBreakpoint(
+          { location, condition },
+          this.sessionId!
         );
+        if (breakpointId) {
+          this.breakpoints.set(breakpointId, { location });
+        }
       });
     } catch (e) {
       // An error will be generated if the breakpoint location is not valid for
@@ -553,19 +547,10 @@ class _ThreadFront {
     }
   }
 
-  setBreakpointByURL(url: string, line: number, column: number, condition?: string) {
-    const sourceIds = this.getSourceToDisplayForUrl(url)?.correspondingSourceIds || [];
-    return Promise.all(
-      sourceIds.map(sourceId => this.setBreakpoint(sourceId, line, column, condition))
-    );
-  }
-
-  async removeBreakpoint(initialSourceId: SourceId, line: number, column: number) {
-    await this.ensureAllSources();
-    const sourceIds = this.getCorrespondingSourceIds(initialSourceId);
+  async removeBreakpoint(sourceId: SourceId, line: number, column: number) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
       if (
-        sourceIds.includes(location.sourceId) &&
+        sourceId === location.sourceId &&
         location.line == line &&
         location.column == column
       ) {
@@ -576,11 +561,6 @@ class _ThreadFront {
         });
       }
     }
-  }
-
-  removeBreakpointByURL(url: string, line: number, column: number) {
-    const sourceIds = this.getSourceToDisplayForUrl(url)?.correspondingSourceIds || [];
-    return Promise.all(sourceIds.map(sourceId => this.removeBreakpoint(sourceId, line, column)));
   }
 
   ensurePause(point: ExecutionPoint, time: number) {
