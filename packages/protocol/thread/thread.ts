@@ -470,10 +470,6 @@ class _ThreadFront {
     return this.sourcesSelectors!.getSourceDetails(originalSourceId)?.generated;
   }
 
-  getOriginalSourceIds(generatedSourceId: SourceId) {
-    return this.sourcesSelectors!.getSourceDetails(generatedSourceId)?.generatedFrom;
-  }
-
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId, "no sessionId");
     const { contents, contentType } = await client.Debugger.getSourceContents(
@@ -1019,15 +1015,6 @@ class _ThreadFront {
       // Don't return a location if it is an original version of another one of the given locations.
       return !generated.some(generatedId => sourceIds.has(generatedId));
     });
-  }
-
-  // Return whether sourceId is minified and has a pretty printed alternate.
-  isMinifiedSource(sourceId: SourceId) {
-    return !!this.sourcesSelectors!.getSourceDetails(sourceId)?.prettyPrinted;
-  }
-
-  getPrettyPrintedSourceId(sourceId: SourceId) {
-    return this.sourcesSelectors!.getSourceDetails(sourceId)?.prettyPrinted;
   }
 
   isSourceMappedSource(sourceId: SourceId) {
