@@ -9,7 +9,6 @@ export type RenderChildrenFunction = () => ReactNode;
 export default function Expandable({
   children,
   className = "",
-  dataTestName = "Expandable",
   defaultOpen = false,
   header,
   headerClassName = "",
@@ -17,7 +16,6 @@ export default function Expandable({
 }: {
   children: ReactNode;
   className?: string;
-  dataTestName?: string;
   defaultOpen?: boolean;
   header: ReactNode;
   headerClassName?: string;
@@ -45,7 +43,8 @@ export default function Expandable({
       className={`${
         isOpen && useBlockLayoutWhenExpanded ? styles.Block : styles.Inline
       } ${className}`}
-      data-test-name={dataTestName}
+      data-test-name="Expandable"
+      data-test-state={isOpen ? "open" : "closed"}
       onClick={onClick}
       onKeyDown={onKeyDown}
       role="button"

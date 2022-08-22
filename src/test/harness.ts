@@ -254,11 +254,8 @@ function isPaused() {
 }
 
 async function waitForLoadedScopes() {
-  // Since scopes auto-expand, we can assume they are loaded when there is a tree node
-  // with the aria-level attribute equal to "2".
   await waitUntil(
-    () =>
-      document.querySelector("[data-test-name=ScopesList] [data-test-name=InspectorExpandable]"),
+    () => document.querySelector("[data-test-name=ScopesList] [data-test-name=Expandable]"),
     {
       waitingFor: "scopes to be loaded",
     }
@@ -397,7 +394,9 @@ async function waitForScopeValue(name: string, value: string) {
   const expected = value !== undefined ? `${name}\n: \n${value}` : name;
   return waitUntil(
     () => {
-      const nodes = document.querySelectorAll<HTMLElement>(".scopes-pane .object-node");
+      const nodes = document.querySelectorAll<HTMLElement>(
+        "[data-test-name=ScopesList] [data-test-name=Expandable]"
+      );
       return [...nodes].some(node => node.innerText == expected);
     },
     { waitingFor: `scope "${value}" to be present` }
@@ -490,6 +489,7 @@ async function warpToMessage(text: string) {
 
   await waitForPaused();
 
+  // TODO Don't query by global className
   assert(msg.classList.contains("paused"), "classList must contain 'paused'");
 }
 
@@ -554,11 +554,11 @@ async function findMessageExpandableObjectInspector(msg: HTMLElement) {
   );
 }
 
-async function toggleObjectInspectorNode(node: HTMLElement) {
-  const arrow: HTMLElement | null = await waitUntil(() => node.querySelector(".arrow"), {
-    waitingFor: ".arrow to be present",
-  });
-  arrow!.click();
+async function toggleObjectInspectorNode(node: HTMLElement, expand: boolean = true) {
+  const isExpanded = node.getAttribute("data-test-state") === "open";
+  if (isExpanded !== expand) {
+    node.click();
+  }
 }
 
 async function checkMessageObjectContents(
@@ -602,7 +602,9 @@ async function checkMessageObjectContents(
 function findScopeNode(text: string) {
   return waitUntil(
     () => {
-      const nodes = document.querySelectorAll<HTMLElement>(".scopes-list .node");
+      const nodes = document.querySelectorAll<HTMLElement>(
+        "[data-test-name=ScopesList] [data-test-name=ExpandablePreview]"
+      );
       return [...nodes].find(node => node.innerText.includes(text));
     },
     { waitingFor: `scope node "${text}" to be present` }
