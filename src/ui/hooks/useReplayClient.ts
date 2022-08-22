@@ -63,4 +63,6 @@ export default function useReplayClient() {
       }
     };
   }, []);
+
+  return replayClient;
 }

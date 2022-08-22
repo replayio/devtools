@@ -18,12 +18,13 @@ import {
   useGetRawRecordingIdWithSlug,
   useSubscribeRecording,
 } from "ui/hooks/recordings";
-import setup from "ui/setup/dynamic/devtools";
+import setupDevtools from "ui/setup/dynamic/devtools";
 import { Recording as RecordingInfo } from "ui/types";
 import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";
 import useToken from "ui/utils/useToken";
+import useReplayClient from "ui/hooks/useReplayClient";
 
 import Upload from "./upload";
 
@@ -130,6 +131,9 @@ function RecordingPage({
   useSubscribeRecording(recordingId);
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
+
+  const replayClient = useReplayClient();
+
   useEffect(() => {
     if (!store) {
       return;
@@ -143,7 +147,7 @@ function RecordingPage({
     }
 
     async function getRecording() {
-      await setup(store);
+      await setupDevtools(store, replayClient);
       setRecording(await getAccessibleRecording(recordingId));
 
       if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {
@@ -160,6 +164,7 @@ function RecordingPage({
     setExpectedError,
     store,
     token.token,
+    replayClient,
   ]);
   const onUpload = () => {
     startUploadWaitTracking();

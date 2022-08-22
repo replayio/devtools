@@ -28,7 +28,7 @@ import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { compareNumericStrings } from "protocol/utils";
+import { compareNumericStrings, defer } from "protocol/utils";
 
 import { ColumnHits, LineHits, ReplayClientEvents, ReplayClientInterface } from "./types";
 
@@ -46,11 +46,13 @@ export class ReplayClient implements ReplayClientInterface {
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
 
+  private sessionWaiter = defer<SessionId>();
+
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
 
-    threadFront.listenForLoadChanges(this._onLoadChanges);
+    this._threadFront.listenForLoadChanges(this._onLoadChanges);
 
     analysisManager.init();
   }
@@ -68,6 +70,11 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   configure(sessionId: string): void {
     this._sessionId = sessionId;
+    this.sessionWaiter.resolve(sessionId);
+  }
+
+  waitForSession() {
+    return this.sessionWaiter.promise;
   }
 
   get loadedRegions(): LoadedRegions | null {

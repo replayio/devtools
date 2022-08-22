@@ -55,6 +55,7 @@ import { UnexpectedError } from "ui/state/app";
 
 import { UIState } from "ui/state";
 import { setupGetPreferredLocation } from "ui/utils/preferredLocation";
+import { ReplayClientInterface } from "shared/client/types";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -119,7 +120,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   },
 };
 
-export default async function DevTools(store: AppStore) {
+export default async function setupDevtools(store: AppStore, replayClient?: ReplayClientInterface) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -152,6 +153,15 @@ export default async function DevTools(store: AppStore) {
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
 
+  if (!replayClient) {
+    // This _should_ have been passed in from `RecordingPage`.
+    // But, some test code also calls `setupDevtools()`, and those
+    // test files don't call `useReplayClient` anywhere.
+    // Grab the usual instance manually so we can pass it to thunks.
+    const replayClientModule = await import("shared/client/ReplayClientContext");
+    replayClient = replayClientModule.replayClient;
+  }
+
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();
 
@@ -174,7 +184,8 @@ export default async function DevTools(store: AppStore) {
   bootstrapWorkers();
 
   const extraThunkArgs: ThunkExtraArgs = {
-    ThreadFront: ThreadFront,
+    ThreadFront,
+    replayClient,
   };
 
   // Add all these new slice reducers and some related state in a single call,
