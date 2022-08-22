@@ -34,6 +34,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
           children.push(
             <Expandable
               key={index}
+              dataTestName="InspectorExpandable"
               header={root.name}
               children={protocolValues.map((protocolValue, index) => (
                 <Inspector key={index} pauseId={pause.pauseId!} protocolValue={protocolValue} />

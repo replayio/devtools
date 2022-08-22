@@ -111,7 +111,7 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
     }
 
     return (
-      <Redacted className="pane scopes-list">
+      <Redacted className="pane scopes-list" data-test-name="ScopesList">
         {originalScopesUnavailable ? (
           <div className="warning">The variables could not be mapped to their original names</div>
         ) : null}

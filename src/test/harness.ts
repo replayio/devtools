@@ -256,10 +256,13 @@ function isPaused() {
 async function waitForLoadedScopes() {
   // Since scopes auto-expand, we can assume they are loaded when there is a tree node
   // with the aria-level attribute equal to "2".
-  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'));
-  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'), {
-    waitingFor: "scopes to be loaded (via tree node)",
-  });
+  await waitUntil(
+    () =>
+      document.querySelector("[data-test-name=ScopesList] [data-test-name=InspectorExpandable]"),
+    {
+      waitingFor: "scopes to be loaded",
+    }
+  );
 }
 
 function waitForSelectedSource(url?: string) {
@@ -291,7 +294,7 @@ function waitForSelectedSource(url?: string) {
 }
 
 async function waitForPaused(url?: string) {
-  const { getSelectedScope, getFrames } = dbgSelectors;
+  const { getFrames, getSelectedScope } = dbgSelectors;
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
   window.app.store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" });
@@ -471,11 +474,22 @@ function waitForMessage(text: string) {
 async function warpToMessage(text: string) {
   const msg = await waitForMessage(text);
 
-  const warpButton: HTMLButtonElement | null = msg.querySelector(
-    "[data-test-id=ConsoleMessageHoverButton]"
+  dispatchMouseEvent(msg, "mouseover");
+
+  const warpButton: HTMLButtonElement | null = await waitUntil(() =>
+    msg.querySelector("[data-test-id=ConsoleMessageHoverButton]")
   );
-  warpButton!.click();
+
+  if (warpButton === null) {
+    throw Error("Could not find fast-forward/rewind button");
+  }
+
+  warpButton.click();
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
   await waitForPaused();
+
   assert(msg.classList.contains("paused"), "classList must contain 'paused'");
 }
 
@@ -1009,11 +1023,16 @@ const commands = mapValues(testCommands, (command, name) => {
     // @ts-expect-error spreading args is FINE TS!
     let result = command(...args);
     if (isThenable(result)) {
-      return result.then(async result => {
-        const duration = new Date().getTime() - startTime;
-        console.log(`Finished ${name} in ${duration}ms`);
-        return result;
-      });
+      return result.then(
+        async result => {
+          const duration = new Date().getTime() - startTime;
+          console.log(`Finished ${name} in ${duration}ms`);
+          return result;
+        },
+        error => {
+          console.error(`Error for ${name}`, error);
+        }
+      );
     }
     const duration = new Date().getTime() - startTime;
     console.log(`Finished ${name} in ${duration}ms`);
