@@ -17,11 +17,9 @@ import {
 } from "../../reducers/breakpoints";
 import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
 import {
-  getFirstBreakpointPosition,
   getSymbols,
   getRequestedBreakpointLocations,
 } from "../../selectors";
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 import { getTextAtPosition } from "../../utils/source";
 import {
@@ -80,7 +78,7 @@ export function enableBreakpoint(
 
     dispatch(_setBreakpoint({ ...breakpoint, disabled: false }));
 
-    await _internalSetBreakpoint(ThreadFront, breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
   };
 }
 
@@ -149,9 +147,9 @@ export function addBreakpoint(
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
-      await _internalRemoveBreakpoint(ThreadFront, location);
+      await _internalRemoveBreakpoint(ThreadFront, getState, location);
     } else {
-      await _internalSetBreakpoint(ThreadFront, breakpoint.location, breakpoint.options);
+      await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
     }
   };
 }
@@ -170,7 +168,7 @@ export function _removeBreakpoint(
 
     // If the breakpoint is disabled then it is not installed in the server.
     if (!breakpoint.disabled) {
-      await _internalRemoveBreakpoint(ThreadFront, breakpoint.location);
+      await _internalRemoveBreakpoint(ThreadFront, getState, breakpoint.location);
     }
   };
 }
@@ -187,7 +185,7 @@ export function disableBreakpoint(
 
     dispatch(_setBreakpoint({ ...breakpoint, disabled: true }));
 
-    await _internalRemoveBreakpoint(ThreadFront, breakpoint.location);
+    await _internalRemoveBreakpoint(ThreadFront, getState, breakpoint.location);
   };
 }
 
@@ -202,7 +200,7 @@ export function removeBreakpointOption(
 
     dispatch(_setBreakpoint({ ...breakpoint, options: newOptions }));
 
-    await _internalSetBreakpoint(ThreadFront, breakpoint.location, newOptions);
+    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, newOptions);
   };
 }
 
@@ -223,6 +221,6 @@ export function setBreakpointOptions(
 
     dispatch(_setBreakpoint(breakpoint));
 
-    await _internalSetBreakpoint(ThreadFront, breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
   };
 }
