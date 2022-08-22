@@ -54,9 +54,10 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
 
   return (
     <button
-      className={classnames(`${panel}-panel-button relative`, {
+      className={classnames(`relative`, {
         expanded: selectedPanel === panel,
       })}
+      data-test-id={`PanelButton-${panel}`}
       onClick={() => onClick(panel)}
     >
       <div className="label">{children}</div>

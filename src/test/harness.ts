@@ -103,19 +103,19 @@ async function clickElement(selector: string) {
 }
 
 function selectConsole() {
-  return clickElement("button.console-panel-button");
+  return clickElement('[data-test-id="PanelButton-console"]');
 }
 
 async function selectInspector() {
-  await clickElement("button.inspector-panel-button");
-  // ensure that the inspector is fully initialized, including its legacy
-  // components.
+  await clickElement('[data-test-id="PanelButton-inspector"]');
+
   await waitUntil(() => document.querySelector(".inspector ul.children"), {
     waitingFor: "inspector to initialize",
   });
 }
 
-const selectReactDevTools = async () => clickElement("button.react-components-panel-button");
+const selectReactDevTools = async () =>
+  clickElement('[data-test-id="PanelButton-react-components"]');
 const getContext = () => dbgSelectors.getContext();
 const getThreadContext = () => dbgSelectors.getThreadContext();
 
@@ -343,12 +343,15 @@ const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
 
 async function checkEvaluateInTopFrame(text: string, expected: string) {
   selectConsole();
+
   await executeInConsole(text);
 
   await waitUntil(
     () => {
-      const node: HTMLElement | null = document.querySelector(".message.result .objectBox");
-      return node?.innerText == `${expected}`;
+      const messages = document.querySelectorAll<HTMLElement>(
+        '[data-test-name="Message"][data-test-message-type="terminal-expression"] [data-test-name="TerminalExpression-Result"]'
+      );
+      return Array.from(messages).find((node: HTMLElement) => node.innerText === expected);
     },
     { waitingFor: `message with text "${expected}"` }
   );
@@ -359,9 +362,11 @@ async function checkEvaluateInTopFrame(text: string, expected: string) {
 async function clearConsoleEvaluations() {
   const clearButton = await waitUntil(
     () => {
-      const btn: HTMLButtonElement | null = document.querySelector(".devtools-clear-icon");
-      if (btn && !btn.disabled) {
-        return btn;
+      const button: HTMLButtonElement | null = document.querySelector(
+        '[data-test-id="ClearConsoleEvaluationsButton"]'
+      );
+      if (button && !button.disabled) {
+        return button;
       }
     },
     { waitingFor: "clear console evaluations button to be enabled" }
@@ -419,11 +424,7 @@ function getAllMessages(opts?: { ignoreErrors: boolean }) {
     if (type) {
       messages.push({
         type,
-        content: [
-          ...node.querySelectorAll<HTMLElement>(
-            ".objectBox, .objectBox-stackTrace, syntax-highlighted"
-          ),
-        ].map(n => n.innerText),
+        content: [(node as HTMLElement).innerText],
       });
     }
   }
@@ -467,9 +468,6 @@ async function warpToMessage(text: string) {
   await new Promise(resolve => setTimeout(resolve, 1000));
 
   await waitForPaused();
-
-  // TODO Don't query by global className
-  assert(msg.classList.contains("paused"), "classList must contain 'paused'");
 }
 
 function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
@@ -486,23 +484,19 @@ function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
 }
 
 function checkJumpIcon(msg: HTMLElement) {
-  const jumpIcon = msg.querySelector(".jump-definition");
+  const jumpIcon = msg.querySelector('[date-test-name="JumpToDefinitionButton"]');
   assert(jumpIcon, "no jumpIcon");
 }
 
-function findObjectInspectorNode(oi: HTMLElement, nodeLabel: string) {
-  return [...oi.querySelectorAll<HTMLElement>(".tree-node")].find(node => {
-    return node.innerText.replace(/\n/g, "").includes(nodeLabel);
-  });
-}
-
-async function findMessageExpandableObjectInspector(msg: HTMLElement) {
+async function findMessageExpandableObjectInspector(msg: HTMLElement, text: string) {
   return waitUntil(
     () => {
-      const inspectors = msg.querySelectorAll<HTMLElement>(".object-inspector");
-      return [...inspectors].find(oi => oi.querySelector(".arrow"));
+      const nodes = msg.querySelectorAll<HTMLElement>(
+        '[data-test-name="Message"] [data-test-name="Expandable"]'
+      );
+      return Array.from(nodes).find(node => node.innerText.includes(text));
     },
-    { waitingFor: `findMessageExpandableObjectInspector(${msg})` }
+    { waitingFor: `findMessageExpandableObjectInspector(${msg}) with text "${text}"` }
   );
 }
 
@@ -513,42 +507,48 @@ async function toggleObjectInspectorNode(node: HTMLElement, expand: boolean = tr
   }
 }
 
+// TODO BRIAN Re-think this whole function/structure
 async function checkMessageObjectContents(
   msg: HTMLElement,
   expected: string[],
   expandList: string[] = []
 ) {
-  const oi = await findMessageExpandableObjectInspector(msg);
-  await toggleObjectInspectorNode(oi!);
-
   for (const label of expandList) {
-    const labelNode = await waitUntil(() => findObjectInspectorNode(oi!, label)!, {
-      waitingFor: `findObjectInspectorNode(${oi}, ${label})`,
-    })!;
-    const getterButton: HTMLElement | null = labelNode.querySelector(".invoke-getter");
+    const oi = await findMessageExpandableObjectInspector(msg, label);
+    if (oi == null) {
+      throw Error(`Could not find object inspector with label "${label}"`);
+    }
+    await toggleObjectInspectorNode(oi);
+
+    // TODO BRIAN
+    const getterButton: HTMLElement | null = oi.querySelector(".invoke-getter");
     if (getterButton) {
       getterButton.click();
-      await waitUntil(() => labelNode.querySelector(".objectBox"), {
+      // TODO BRIAN
+      await waitUntil(() => oi.querySelector(".objectBox"), {
         waitingFor: "The getter's value is shown",
       });
     }
-    const expandButton: HTMLElement | null = labelNode.querySelector(".arrow");
+
+    // TODO BRIAN
+    const expandButton: HTMLElement | null = oi.querySelector(".arrow");
     if (expandButton) {
       expandButton.click();
     }
-  }
 
-  await waitUntil(
-    () => {
-      const nodes = oi!.querySelectorAll<HTMLElement>(".tree-node");
-      if (nodes && nodes.length > 1) {
-        const properties = [...nodes].map(n => n.textContent);
-        return expected.every(s => properties.find(v => v!.includes(s)));
-      }
-      return null;
-    },
-    { waitingFor: ".tree-node to be present" }
-  );
+    await waitUntil(
+      () => {
+        // TODO BRIAN
+        const nodes = oi.querySelectorAll<HTMLElement>(".tree-node");
+        if (nodes && nodes.length > 1) {
+          const properties = [...nodes].map(n => n.textContent);
+          return expected.every(s => properties.find(v => v!.includes(s)));
+        }
+        return null;
+      },
+      { waitingFor: ".tree-node to be present" }
+    );
+  }
 }
 
 function findScopeNode(text: string) {
