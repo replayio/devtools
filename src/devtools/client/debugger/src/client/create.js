@@ -5,6 +5,8 @@
 //
 // This module converts Firefox specific types to the generic types
 
+import { getPreferredLocation, getAlternateLocation } from "ui/reducers/sources";
+
 export async function createFrame(getState, frame, index = 0, asyncIndex = 0) {
   if (!frame) {
     return null;
