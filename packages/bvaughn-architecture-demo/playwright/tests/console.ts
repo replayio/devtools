@@ -54,7 +54,7 @@ testSetup(async function regeneratorFunction({ page }) {
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
   const eventTypeListItem = await locateMessage(page, "event", "MouseEvent");
-  keyValue = eventTypeListItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
+  keyValue = eventTypeListItem.locator("[data-test-name=KeyValue]", { hasText: "MouseEvent" });
   await keyValue.click();
 });
 
@@ -278,7 +278,7 @@ test("should log events in the console", async ({ page }) => {
   await toggleProtocolMessage(page, "timestamps", true);
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps");
 
-  const keyValue = listItem.locator("[data-test-id=KeyValue]", { hasText: "MouseEvent" });
+  const keyValue = listItem.locator("[data-test-name=KeyValue]", { hasText: "MouseEvent" });
   await keyValue.click();
   await takeScreenshot(page, listItem, "event-types-mouse-click-with-timestamps-expanded");
 
