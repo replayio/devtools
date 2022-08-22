@@ -248,7 +248,7 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return async (dispatch, _getState, { ThreadFront }) => {
+  return async (dispatch, _getState, { replayClient }) => {
     if (targetTime == null) {
       return;
     }
@@ -260,7 +260,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;
     try {
-      const pointNearTime = await ThreadFront.getPointNearTime(targetTime);
+      const pointNearTime = await replayClient.getPointNearTime(targetTime);
       if (Math.abs(pointNearTime.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
         bestPoint = pointNearTime;
       }

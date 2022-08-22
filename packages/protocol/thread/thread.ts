@@ -747,11 +747,6 @@ class _ThreadFront {
     return client.Session.getEndpoint({}, ThreadFront.sessionId!);
   }
 
-  async getPointNearTime(time: number) {
-    const { point } = await client.Session.getPointNearTime({ time }, this.sessionId!);
-    return point;
-  }
-
   async findNetworkRequests(
     onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
     onResponseBodyData: (body: responseBodyData) => void,
