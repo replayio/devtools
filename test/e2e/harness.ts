@@ -1,5 +1,4 @@
 import { Page } from "@recordreplay/playwright";
-import { opt_in_tracking } from "mixpanel-browser";
 
 declare global {
   const app: any;

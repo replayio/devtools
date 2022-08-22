@@ -22,13 +22,6 @@ export function waitForTime(ms: number, waitingFor?: string) {
 const dbgSelectors = window.app.selectors!;
 const dbgActions = window.app.actions!;
 
-function waitForElapsedTime(time: number, ms: number) {
-  const wait = time + ms - Date.now();
-  if (wait > 0) {
-    return waitForTime(wait, `time to reach ${time}`);
-  }
-}
-
 function isLongTimeout() {
   return new URL(window.location.href).searchParams.get("longTimeout");
 }
@@ -148,12 +141,6 @@ function waitForSource(url: string) {
 function countSources(url: string) {
   const sources = dbgSelectors.getAllSourceDetails();
   return sources.filter(s => (s.url || "").includes(url)).length;
-}
-
-function waitForSourceCount(url: string, count: number) {
-  return waitUntil(() => countSources(url) === count, {
-    waitingFor: `${count} source to be present`,
-  });
 }
 
 async function selectSource(url: string) {
@@ -309,11 +296,6 @@ async function waitForPausedNoSource() {
   await waitUntil(() => isPaused(), { waitingFor: "execution to pause" });
 }
 
-function hasFrames() {
-  const frames = dbgSelectors.getFrames();
-  return frames!.length > 0;
-}
-
 function getVisibleSelectedFrameLine() {
   const frame = dbgSelectors.getVisibleSelectedFrame()!;
   return frame && frame.location.line;
@@ -357,10 +339,7 @@ function resumeAndPauseFunctionFactory(
   };
 }
 
-const reverseStepOverAndPause = resumeAndPauseFunctionFactory("reverseStepOver");
 const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
-const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
-const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function checkEvaluateInTopFrame(text: string, expected: string) {
   selectConsole();
@@ -504,33 +483,6 @@ function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
       timeout: defaultWaitTimeout() * timeoutFactor,
     }
   );
-}
-
-async function checkMessageStack(text: string, expectedFrameLines: string[], expand: boolean) {
-  const msgNode = await waitForMessage(text);
-  assert(!msgNode.classList.contains("open"), "classList must contain 'open'");
-
-  if (expand) {
-    const button: HTMLButtonElement | null = await waitUntil(
-      () => msgNode.querySelector(".collapse-button"),
-      {
-        waitingFor: `collapse button to be visible`,
-      }
-    );
-    button!.click();
-  }
-
-  const framesNode: HTMLElement | null = await waitUntil(() => msgNode.querySelector(".frames"), {
-    waitingFor: ".frames to be present",
-  });
-  const frameNodes = Array.from(framesNode!.querySelectorAll<HTMLElement>(".frame"));
-  assert(frameNodes.length == expectedFrameLines.length, "unexpected number of frames");
-
-  for (let i = 0; i < frameNodes.length; i++) {
-    const frameNode = frameNodes[i];
-    const line = frameNode.querySelector(".line")!.textContent;
-    assert(line == expectedFrameLines[i].toString(), "unexpected frame line");
-  }
 }
 
 function checkJumpIcon(msg: HTMLElement) {
@@ -940,78 +892,71 @@ async function getRecordingTarget() {
 }
 
 const testCommands = {
-  selectConsole,
-  selectInspector,
-  selectReactDevTools,
-  assert,
-  waitForTime,
-  waitForElapsedTime,
-  waitUntil,
-  selectSource,
-  addLogpoint,
   addBreakpoint,
-  setBreakpointOptions,
-  disableBreakpoint,
-  removeAllBreakpoints,
-  loadRegion,
-  unloadRegion,
-  waitForPaused,
-  waitForPausedLine,
-  rewindToLine,
-  resumeToLine,
-  reverseStepOverToLine,
-  stepOverToLine,
-  stepInToLine,
-  stepOutToLine,
-  reverseStepOverAndPause,
-  stepOverAndPause,
-  stepInAndPause,
-  stepOutAndPause,
-  hasFrames,
-  waitForLoadedScopes,
-  checkEvaluateInTopFrame,
-  waitForScopeValue,
-  findMessages,
-  getAllMessages,
+  addEventListenerLogpoints,
+  addLogpoint,
+  assert,
   checkAllMessages,
-  waitForMessage,
-  warpToMessage,
-  waitForMessageCount,
-  checkMessageStack,
+  checkAutocompleteMatches,
+  checkAppliedRules,
+  checkComputedStyle,
+  checkEvaluateInTopFrame,
+  checkFrames,
+  checkHighlighterShape,
+  checkHighlighterVisible,
   checkJumpIcon,
   checkMessageObjectContents,
-  toggleObjectInspectorNode,
-  findScopeNode,
-  toggleScopeNode,
-  writeInConsole,
-  executeInConsole,
-  checkAutocompleteMatches,
-  waitForFrameTimeline,
-  checkFrames,
-  selectFrame,
-  addEventListenerLogpoints,
-  toggleExceptionLogging,
-  toggleMappedSources,
-  findMarkupNode,
-  toggleMarkupNode,
-  searchMarkup,
-  waitForSelectedMarkupNode,
-  getMarkupCanvasCoordinate,
-  pickNode,
-  selectMarkupNode,
-  checkComputedStyle,
-  getMatchedSelectors,
-  setLonghandsExpanded,
-  getAppliedRulesJSON,
-  checkAppliedRules,
+  disableBreakpoint,
   dispatchMouseEvent,
   dispatchMouseEventInGraphics,
-  checkHighlighterVisible,
-  checkHighlighterShape,
+  executeInConsole,
+  findMarkupNode,
+  findMessages,
+  findScopeNode,
+  getAllMessages,
+  getAppliedRulesJSON,
+  getMarkupCanvasCoordinate,
+  getMatchedSelectors,
   getMouseTarget,
   getRecordingTarget,
+  loadRegion,
+  pickNode,
+  removeAllBreakpoints,
+  resumeToLine,
+  reverseStepOverToLine,
+  rewindToLine,
+  searchMarkup,
+  selectConsole,
+  selectFrame,
+  selectInspector,
+  selectMarkupNode,
+  selectReactDevTools,
+  selectSource,
+  setBreakpointOptions,
+  setLonghandsExpanded,
+  stepInToLine,
+  stepOutToLine,
+  stepOverAndPause,
+  stepOverToLine,
+  toggleExceptionLogging,
+  toggleMappedSources,
+  toggleMarkupNode,
+  toggleObjectInspectorNode,
+  toggleScopeNode,
+  unloadRegion,
+  waitForFrameTimeline,
+  waitForLoadedScopes,
+  waitForMessage,
+  waitForMessageCount,
+  waitForPaused,
+  waitForPausedLine,
+  waitForScopeValue,
+  waitForSelectedMarkupNode,
   waitForSource,
-  waitForSourceCount,
+  waitForTime,
+  waitUntil,
+  warpToMessage,
+  writeInConsole,
 };
 
 function isThenable(obj: any): obj is Promise<any> {
