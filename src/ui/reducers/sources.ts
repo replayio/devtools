@@ -6,7 +6,7 @@ import {
   EntityState,
   PayloadAction,
 } from "@reduxjs/toolkit";
-import { Location, newSource, SourceKind } from "@replayio/protocol";
+import { Location, MappedLocation, newSource, SourceKind } from "@replayio/protocol";
 
 import { UIThunkAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -340,6 +340,25 @@ export function getPreferredSourceId(
   return sourceMappedId;
 }
 
+export function getPreferredLocation(
+  state: UIState,
+  locations: MappedLocation,
+  preferredGeneratedSources: Set<string>
+) {
+  const sourceId = getPreferredSourceId(
+    getSourceDetailsEntities(state),
+    locations.map(l => l.sourceId),
+    preferredGeneratedSources
+  );
+  const preferredLocation = locations.find(l => l.sourceId == sourceId);
+  assert(preferredLocation, "no preferred location found");
+  assert(
+    preferredLocation.sourceId === getCorrespondingSourceIds(state, preferredLocation.sourceId)[0],
+    "location.sourceId should be updated to the first corresponding sourceId"
+  );
+  return preferredLocation;
+}
+
 export function getAlternateSourceId(
   sourcesById: Dictionary<SourceDetails>,
   sourceIds: string[],
@@ -354,6 +373,22 @@ export function getAlternateSourceId(
     return sourceMappedId;
   }
   return nonSourceMappedId;
+}
+
+export function getAlternateLocation(
+  state: UIState,
+  locations: MappedLocation,
+  preferredGeneratedSources: Set<string>
+) {
+  const alternateId = getAlternateSourceId(
+    getSourceDetailsEntities(state),
+    locations.map(l => l.sourceId),
+    preferredGeneratedSources
+  );
+  if (alternateId) {
+    return locations.find(l => l.sourceId == alternateId);
+  }
+  return null;
 }
 
 export function getHasSiblingOfSameName(state: UIState, source: MiniSource) {

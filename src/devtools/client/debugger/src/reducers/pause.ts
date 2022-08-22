@@ -7,7 +7,7 @@ import type { Location, TimeStampedPoint, ScopeType } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 
 import { WiredNamedValue } from "protocol/thread/pause";
-import type { ThreadFront, ValueFront } from "protocol/thread";
+import { ThreadFront, ValueFront } from "protocol/thread";
 
 import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
@@ -195,7 +195,7 @@ export const fetchFrames = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/fetchFrames", async ({ cx, pauseId }, thunkApi) => {
   const frames = (await thunkApi.extra.ThreadFront.getFrames()) ?? [];
-  const resultFrames = await Promise.all(frames.map((frame, i) => createFrame(frame, i)));
+  const resultFrames = await Promise.all(frames.map((frame, i) => createFrame(thunkApi.getState, frame, i)));
   // TS says there could be nulls, but not seeing them in practice
   return resultFrames as PauseFrame[];
 });
@@ -224,7 +224,7 @@ export const fetchAsyncFrames = createAsyncThunk<
         break;
       }
       const wiredFrames = await Promise.all(
-        frames.map((frame, i) => createFrame(frame, i, asyncIndex))
+        frames.map((frame, i) => createFrame(thunkApi.getState, frame, i, asyncIndex))
       );
 
       asyncFrames = asyncFrames.concat(wiredFrames as PauseFrame[]);

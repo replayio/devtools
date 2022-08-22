@@ -4,11 +4,10 @@
 
 import zip from "lodash/zip";
 import type { UIThunkAction } from "ui/actions";
+import { getPreferredLocation } from "ui/reducers/sources";
 
 import { framePositionsLoaded } from "../../reducers/pause";
 import { getSelectedFrame } from "../../selectors";
-
-type $FixTypeLater = any;
 
 export function setFramePositions(): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
@@ -21,18 +20,18 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
     if (positions.length === 0) {
       return;
     }
-    const { sourceId } = await ThreadFront.getPreferredLocation(positions[0].frame!);
+    await ThreadFront.ensureAllSources();
+    const state = getState();
+    const { sourceId } = getPreferredLocation(state, positions[0].frame!, ThreadFront.preferredGeneratedSources);
 
     if (!sourceId) {
       return;
     }
 
-    const locations = await Promise.all(
-      positions.map(async ({ frame }) => {
-        const { line, column } = await ThreadFront.getPreferredLocation(frame!);
-        return { line, column, sourceId };
-      })
-    );
+    const locations = positions.map(({ frame }) => {
+      const { line, column } = getPreferredLocation(state, frame!, ThreadFront.preferredGeneratedSources);
+      return { line, column, sourceId };
+    });
 
     const combinedPositions = zip(positions, locations).map(([position, location]) => {
       const { point, time } = position!;

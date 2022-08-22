@@ -42,7 +42,7 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getLoadedRegions } from "./app";
 import { rangeForFocusRegion } from "ui/utils/timeline";
-import { getSourceToDisplayForUrl } from "ui/reducers/sources";
+import { getPreferredLocation, getSourceToDisplayForUrl } from "ui/reducers/sources";
 import { UIState } from "ui/state";
 
 const TOO_MANY_HITS_TO_SHOW = 1000;
@@ -73,16 +73,17 @@ export function setupLogpoints(_store: UIStore) {
   analysisManager.init();
 }
 
-function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
+async function showLogpointsLoading(logGroupId: string, points: PointDescription[]) {
   if (!LogpointHandlers.onPointLoading || points.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
     return;
   }
 
-  points.forEach(async ({ point, time, frame }) => {
+  await ThreadFront.ensureAllSources();
+  points.forEach(({ point, time, frame }) => {
     if (!frame) {
       return;
     }
-    const location = await ThreadFront.getPreferredLocation(frame);
+    const location = getPreferredLocation(store.getState(), frame, ThreadFront.preferredGeneratedSources);
     assert(location, "preferred location not found");
     LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
   });
@@ -122,10 +123,11 @@ async function showPrimitiveLogpoints(
     return;
   }
 
+  await ThreadFront.ensureAllSources();
   for (const pointDescription of pointDescriptions) {
     const { point, time, frame } = pointDescription;
     assert(frame, "pointDescription.frame not set");
-    const location = await ThreadFront.getPreferredLocation(frame);
+    const location = getPreferredLocation(store.getState(), frame, ThreadFront.preferredGeneratedSources);
     assert(location, "preferred location not found");
     LogpointHandlers.onResult(logGroupId, point, time, location, undefined, values);
   }
