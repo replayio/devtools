@@ -957,19 +957,6 @@ class _ThreadFront {
     return this.getPreferredLocationRaw(locations);
   }
 
-  async getAlternateLocation(locations: MappedLocation) {
-    await this.ensureAllSources();
-    const alternateId = this.sourcesSelectors!.getAlternateSourceId(
-      this.sourcesSelectors!.getSourceDetailsEntities(),
-      locations.map(l => l.sourceId),
-      this.preferredGeneratedSources
-    );
-    if (alternateId) {
-      return locations.find(l => l.sourceId == alternateId);
-    }
-    return null;
-  }
-
   getGeneratedLocation(locations: MappedLocation) {
     const sourceIds = new Set<SourceId>(locations.map(location => location.sourceId));
     return locations.find(location => {
