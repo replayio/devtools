@@ -213,14 +213,14 @@ export function showAlternateSource(
   newSourceId: string
 ): UIThunkAction<Promise<void>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    if (ThreadFront.isSourceMappedSource(oldSourceId)) {
+    const state = getState();
+    if (getSourceDetails(state, oldSourceId)?.isSourceMapped) {
       ThreadFront.preferSource(newSourceId, true);
     } else {
       ThreadFront.preferSource(oldSourceId, false);
     }
 
     let selectSourceByPausing = false;
-    const state = getState();
     const frames = getFrames(state);
     if (frames) {
       const selectedFrameId = getSelectedFrameId(state);

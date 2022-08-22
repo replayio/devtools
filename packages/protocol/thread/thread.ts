@@ -982,12 +982,7 @@ class _ThreadFront {
     });
   }
 
-  isSourceMappedSource(sourceId: SourceId) {
-    return this.sourcesSelectors!.getSourceDetails(sourceId)?.isSourceMapped || false;
-  }
-
   preferSource(sourceId: SourceId, value: boolean) {
-    assert(!this.isSourceMappedSource(sourceId), "source is not sourceMapped");
     if (value) {
       this.preferredGeneratedSources.add(sourceId);
     } else {
