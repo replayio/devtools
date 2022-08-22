@@ -1,6 +1,10 @@
 import React from "react";
 
-export function FullTextSummary({ results }) {
+import type { FTSState } from "./index";
+
+const numberFormat = new Intl.NumberFormat();
+
+export function FullTextSummary({ results }: { results: FTSState["results"] }) {
   const { status, matchesBySource } = results;
 
   if (status !== "DONE") {
@@ -14,7 +18,7 @@ export function FullTextSummary({ results }) {
 
   return (
     <div className="whitespace-pre pl-2">
-      {new Intl.NumberFormat().format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
+      {numberFormat.format(totalMatches)} result{totalMatches === 1 ? "" : "s"}
     </div>
   );
 }
