@@ -19,9 +19,11 @@ import {
   RecordingId,
   Result as EvaluationResult,
   SearchSourceContentsMatch,
+  searchSourceContentsMatches,
   SessionId,
   SourceId,
 } from "@replayio/protocol";
+import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
@@ -419,11 +421,37 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
+  /**
+   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
+   */
   async searchSources(
-    opts: { query: string; sourceIds?: string[] },
+    {
+      query,
+      sourceIds,
+    }: {
+      query: string;
+      sourceIds?: string[];
+    },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void> {
-    return this._threadFront.searchSources(opts, onMatches);
+    const sessionId = this.getSessionIdThrows();
+    const thisSearchUniqueId = uniqueId("search-");
+
+    const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
+      if (searchId === thisSearchUniqueId) {
+        onMatches(matches);
+      }
+    };
+
+    client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
+    try {
+      await client.Debugger.searchSourceContents(
+        { searchId: thisSearchUniqueId, sourceIds, query },
+        sessionId
+      );
+    } finally {
+      client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
+    }
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {

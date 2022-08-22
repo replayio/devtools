@@ -5,7 +5,16 @@ import { getRelativePathWithoutFile, getURL } from "../../utils/sources-tree";
 import AccessibleImage from "../shared/AccessibleImage";
 import { RedactedSpan, Redacted } from "ui/components/Redacted";
 
-export function FullTextItem({ item, focused, expanded, onSelect }) {
+import { SourceResultEntry, SourceMatchEntry } from "./search";
+
+interface FTIProps {
+  item: SourceResultEntry | SourceMatchEntry;
+  focused: boolean;
+  expanded: boolean;
+  onSelect: (item: SourceMatchEntry) => void;
+}
+
+export function FullTextItem({ item, focused, expanded, onSelect }: FTIProps) {
   if (item.type === "RESULT") {
     const matchesLength = item.matches.length;
     const matches = ` (${matchesLength} match${matchesLength > 1 ? "es" : ""})`;

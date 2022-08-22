@@ -3,15 +3,28 @@ import ManagedTree from "../shared/ManagedTree";
 import { FullTextItem } from "./FullTextItem";
 import { FullTextSummary } from "./FullTextSummary";
 
-function getFilePath(item) {
+import { SourceResultEntry, SourceMatchEntry } from "./search";
+import type { FTSState } from "./index";
+
+type EitherEntry = SourceResultEntry | SourceMatchEntry;
+
+function getFilePath(item: EitherEntry) {
   return item.type === "RESULT"
     ? `${item.sourceId}`
     : `${item.sourceId}-${item.line}-${item.column}`;
 }
 
-export function FullTextResults({ results, onItemSelect, focusedItem, onFocus }) {
+interface FTRProps {
+  results: FTSState["results"];
+  query: string;
+  focusedItem: EitherEntry | null;
+  onItemSelect: (item: SourceMatchEntry) => void;
+  onFocus: (item: EitherEntry) => void;
+}
+
+export function FullTextResults({ results, query, onItemSelect, focusedItem, onFocus }: FTRProps) {
   const { status, matchesBySource } = results;
-  if (!results.query) {
+  if (!query) {
     return null;
   }
 
@@ -26,14 +39,22 @@ export function FullTextResults({ results, onItemSelect, focusedItem, onFocus })
       <div className="h-full overflow-y-auto">
         <ManagedTree
           getRoots={() => matchesBySource}
-          getChildren={file => file.matches || []}
+          getChildren={(resultEntry: SourceResultEntry) => resultEntry.matches || []}
           itemHeight={24}
           autoExpandAll={true}
           autoExpandDepth={1}
           autoExpandNodeChildrenLimit={100}
-          getParent={item => matchesBySource.find(source => source.sourceId === item.sourceId)}
+          getParent={(item: EitherEntry) =>
+            matchesBySource.find(source => source.sourceId === item.sourceId)
+          }
           getPath={getFilePath}
-          renderItem={(item, depth, focused, _, expanded) => (
+          renderItem={(
+            item: EitherEntry,
+            depth: number,
+            focused: boolean,
+            _: any,
+            expanded: boolean
+          ) => (
             <FullTextItem
               item={item}
               focused={focused}

@@ -37,7 +37,7 @@ export interface ParsedUrl {
 
 const def: ParsedUrl = { path: "", group: "", filename: "" };
 
-export function getURL(source: MiniSource, defaultDomain = "") {
+export function getURL(source: { url?: string }, defaultDomain = "") {
   const { url } = source;
   if (!url) {
     return def;
