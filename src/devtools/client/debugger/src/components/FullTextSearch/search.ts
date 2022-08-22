@@ -1,16 +1,34 @@
 import { SearchSourceContentsMatch } from "@replayio/protocol";
 
 import { trackEvent } from "ui/utils/telemetry";
-import { ThreadFront } from "protocol/thread";
 import groupBy from "lodash/groupBy";
 import { getSourceIDsToSearch } from "devtools/client/debugger/src/utils/sourceVisualizations";
 
 import { sliceCodePoints } from "ui/utils/codePointString";
 import { SourceDetails } from "ui/reducers/sources";
+import { ReplayClientInterface } from "shared/client/types";
 
-type $FixTypeLater = any;
+export interface SourceMatchEntry {
+  type: "MATCH";
+  column: number;
+  line: number;
+  sourceId: string;
+  match: string;
+  matchIndex: number;
+  value: string;
+}
 
-const formatSourceMatches = (source: SourceDetails, matches: SearchSourceContentsMatch[]) => ({
+export interface SourceResultEntry {
+  type: "RESULT";
+  sourceId: string;
+  filepath?: string;
+  matches: SourceMatchEntry[];
+}
+
+const formatSourceMatches = (
+  source: SourceDetails,
+  matches: SearchSourceContentsMatch[]
+): SourceResultEntry => ({
   type: "RESULT",
   sourceId: source.id,
   filepath: source.url,
@@ -50,22 +68,16 @@ const formatMatchesBySource = (
 export async function search(
   query: string,
   sourcesById: Record<string, SourceDetails>,
-  updateResults: (cb: (prevResults: $FixTypeLater) => any) => any,
-  includeNodeModules: boolean
+  onMatches: (newResults: SourceResultEntry[]) => void,
+  includeNodeModules: boolean,
+  replayClient: ReplayClientInterface
 ) {
   trackEvent("project_search.search");
 
   const sourceIds = getSourceIDsToSearch(sourcesById, includeNodeModules);
-
-  updateResults(() => ({ status: "LOADING", query, matchesBySource: [] }));
-
-  await ThreadFront.searchSources({ query, sourceIds }, matches => {
-    updateResults(prevResults => {
-      const newMatchesBySource = formatMatchesBySource(matches, sourcesById);
-      const matchesBySource = [...prevResults.matchesBySource, ...newMatchesBySource];
-      return { matchesBySource };
-    });
+  await replayClient.searchSources({ query, sourceIds }, matches => {
+    // Take raw results from the server and reformat
+    const newMatchesBySource = formatMatchesBySource(matches, sourcesById);
+    onMatches(newMatchesBySource);
   });
-
-  updateResults(() => ({ status: "DONE" }));
 }

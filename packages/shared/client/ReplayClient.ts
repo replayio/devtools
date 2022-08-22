@@ -421,36 +421,37 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async searchSources({
-    query,
-    sourceIds,
-  }: {
-    query: string;
-    sourceIds?: string[];
-  }): Promise<SearchSourceContentsMatch[]> {
+  /**
+   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
+   */
+  async searchSources(
+    {
+      query,
+      sourceIds,
+    }: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void> {
     const sessionId = this.getSessionIdThrows();
     const thisSearchUniqueId = uniqueId("search-");
 
-    const results: SearchSourceContentsMatch[] = [];
-
-    const onMatches = ({ searchId, matches }: searchSourceContentsMatches) => {
+    const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
       if (searchId === thisSearchUniqueId) {
-        results.push(...matches);
+        onMatches(matches);
       }
     };
 
-    client.Debugger.addSearchSourceContentsMatchesListener(onMatches);
+    client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
     try {
       await client.Debugger.searchSourceContents(
         { searchId: thisSearchUniqueId, sourceIds, query },
         sessionId
       );
-    } catch (err) {
-      return [];
     } finally {
-      client.Debugger.removeSearchSourceContentsMatchesListener(onMatches);
+      client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
     }
-    return results;
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
