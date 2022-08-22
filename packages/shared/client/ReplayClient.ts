@@ -228,6 +228,12 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  async getAnnotationKinds(): Promise<string[]> {
+    const sessionId = this.getSessionIdThrows();
+    const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
+    return kinds;
+  }
+
   async getEventCountForTypes(eventTypes: string[]): Promise<Record<string, number>> {
     return Object.fromEntries(
       await Promise.all(

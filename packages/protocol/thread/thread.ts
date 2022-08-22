@@ -307,12 +307,6 @@ class _ThreadFront {
     }
   }
 
-  async getAnnotationKinds(): Promise<string[]> {
-    // @ts-ignore
-    const { kinds } = await client.Session.getAnnotationKinds({}, this.sessionId);
-    return kinds;
-  }
-
   async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
     const sessionId = await this.waitForSession();
     if (!kind) {
