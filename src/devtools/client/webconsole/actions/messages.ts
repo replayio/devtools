@@ -34,7 +34,13 @@ import {
   setMessagesLoaded,
 } from "../reducers/messages";
 import { getConsoleOverflow, getLastFetchedForFocusRegion, getMessagesLoaded } from "../selectors";
-import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
+import {
+  getSourceDetails,
+  getSourceDetailsEntities,
+  getSourceIdsByUrl,
+  SourceDetails,
+} from "ui/reducers/sources";
+import { UIState } from "ui/state";
 
 const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
@@ -101,7 +107,7 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
       column = location.column;
     } else {
       if (!msgSourceId) {
-        const ids = ThreadFront.getSourceIdsForURL(url!);
+        const ids = getSourceIdsForURL(url!, getState());
         if (ids.length == 1) {
           msgSourceId = ids[0];
         }
@@ -146,6 +152,17 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
 
     dispatch(dispatchMessageAdd(packet));
   };
+}
+
+function getSourceIdsForURL(url: string, state: UIState) {
+  // Ignore IDs which are generated versions of another ID with the same URL.
+  // This happens with inline sources for HTML pages, in which case we only
+  // want the ID for the HTML itself.
+  const sourceIds = getSourceIdsByUrl(state)[url] || [];
+  return sourceIds.filter(sourceId => {
+    const originalIds = getSourceDetails(state, sourceId)?.generatedFrom;
+    return (originalIds || []).every(originalId => !sourceIds.includes(originalId));
+  });
 }
 
 function onLogpointLoading(
