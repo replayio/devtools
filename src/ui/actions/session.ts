@@ -123,7 +123,7 @@ export function createSocket(
   recordingId: string,
   ThreadFront: typeof ThreadFrontType
 ): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async (dispatch, getState, { replayClient }) => {
     assert(recordingId, "no recordingId");
     try {
       if (ThreadFront.recordingId) {
@@ -258,7 +258,7 @@ export function createSocket(
       dispatch(actions.setRecordingTarget(recordingTarget));
 
       ThreadFront.ensureAllSources().then(() => {
-        findAutomatedTests(recordingTarget, getSourcesToDisplayByUrl(getState()));
+        findAutomatedTests(recordingTarget, getSourcesToDisplayByUrl(getState()), replayClient);
       });
 
       // We don't want to show the non-dev version of the app for node replays.

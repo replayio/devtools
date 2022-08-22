@@ -384,7 +384,12 @@ export class ReplayClient implements ReplayClientInterface {
   async getSourceContents(
     sourceId: SourceId
   ): Promise<{ contents: string; contentType: ContentType }> {
-    return this._threadFront.getSourceContents(sourceId);
+    const sessionId = this.getSessionIdThrows();
+    const { contents, contentType } = await client.Debugger.getSourceContents(
+      { sourceId },
+      sessionId
+    );
+    return { contents, contentType };
   }
 
   async getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {

@@ -196,5 +196,6 @@ export function createMockReplayClient() {
     removeEventListener: jest.fn(),
     runAnalysis: jest.fn().mockImplementation(async () => []),
     searchSources: jest.fn().mockImplementation(async () => []),
+    getAnnotationKinds: jest.fn().mockImplementation(async () => []),
   };
 }

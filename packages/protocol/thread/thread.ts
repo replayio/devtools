@@ -414,14 +414,6 @@ class _ThreadFront {
     await this.allSourcesWaiter.promise;
   }
 
-  async getSourceContents(sourceId: SourceId) {
-    assert(this.sessionId, "no sessionId");
-    const { contents, contentType } = await client.Debugger.getSourceContents(
-      { sourceId },
-      this.sessionId
-    );
-    return { contents, contentType };
-  }
 
   getBreakpointPositionsCompressed(
     sourceId: SourceId,
