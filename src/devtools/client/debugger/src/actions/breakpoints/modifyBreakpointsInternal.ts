@@ -89,7 +89,7 @@ export async function _internalSetBreakpoint(
       }
     }
     if (logValue) {
-      promises.push(setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue, condition!));
+      promises.push(setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue, condition!, state));
     }
   }
 
