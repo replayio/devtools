@@ -455,17 +455,6 @@ class _ThreadFront {
     await this.allSourcesWaiter.promise;
   }
 
-  getSourceIdsForURL(url: string) {
-    // Ignore IDs which are generated versions of another ID with the same URL.
-    // This happens with inline sources for HTML pages, in which case we only
-    // want the ID for the HTML itself.
-    const sourceIds = this.sourcesSelectors!.getSourceIdsByUrl()[url] || [];
-    return sourceIds.filter(sourceId => {
-      const originalIds = this.sourcesSelectors!.getSourceDetails(sourceId)?.generatedFrom;
-      return (originalIds || []).every(originalId => !sourceIds.includes(originalId));
-    });
-  }
-
   getGeneratedSourceIds(originalSourceId: SourceId) {
     return this.sourcesSelectors!.getSourceDetails(originalSourceId)?.generated;
   }
@@ -549,11 +538,7 @@ class _ThreadFront {
 
   async removeBreakpoint(sourceId: SourceId, line: number, column: number) {
     for (const [breakpointId, { location }] of this.breakpoints.entries()) {
-      if (
-        sourceId === location.sourceId &&
-        location.line == line &&
-        location.column == column
-      ) {
+      if (sourceId === location.sourceId && location.line == line && location.column == column) {
         this.breakpoints.delete(breakpointId);
         this._invalidateResumeTargets(async () => {
           assert(this.sessionId, "no sessionId");
