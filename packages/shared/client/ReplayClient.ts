@@ -228,6 +228,16 @@ export class ReplayClient implements ReplayClientInterface {
     return data;
   }
 
+  async getEventCountForTypes(eventTypes: string[]): Promise<Record<string, number>> {
+    return Object.fromEntries(
+      await Promise.all(
+        eventTypes.map(
+          async eventType => [eventType, await this.getEventCountForType(eventType)] as const
+        )
+      )
+    );
+  }
+
   async getEventCountForType(eventType: EventHandlerType): Promise<number> {
     const sessionId = this.getSessionIdThrows();
     const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);

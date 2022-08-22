@@ -68,6 +68,7 @@ export interface ReplayClientInterface {
   }>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
+  getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,

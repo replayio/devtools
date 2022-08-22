@@ -110,8 +110,9 @@ export function getEventListenerBreakpointTypes(): UIThunkAction<Promise<void>> 
   };
 }
 
+// TODO This logic is part of the _old_ console, and can be removed when it goes away
 export function loadAdditionalCounts(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     if (!selectors.isLoadingAdditionalCounts(getState())) {
       return;
     }
@@ -120,10 +121,10 @@ export function loadAdditionalCounts(): UIThunkAction<Promise<void>> {
     const eventBreakpoints = selectors.getEventListenerBreakpointTypes(getState());
     const eventIds = eventBreakpoints.reduce(
       (acc, e) => [...acc, ...e.events.map(event => event.id)],
-      [] as $FixTypeLater[]
+      [] as string[]
     );
 
-    const eventTypeCounts = await ThreadFront.getEventHandlerCounts(eventIds);
+    const eventTypeCounts = await replayClient.getEventCountForTypes(eventIds);
     dispatch({ type: "RECEIVE_EVENT_LISTENER_COUNTS", eventTypeCounts });
   };
 }
