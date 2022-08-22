@@ -5,14 +5,20 @@
 //
 // This module converts Firefox specific types to the generic types
 
-export async function createFrame(frame, index = 0, asyncIndex = 0) {
+export async function createFrame(getState, frame, index = 0, asyncIndex = 0) {
   if (!frame) {
     return null;
   }
 
   const { ThreadFront } = await import("protocol/thread");
+  await ThreadFront.ensureAllSources();
+  const state = getState();
 
-  const { sourceId, line, column } = await ThreadFront.getPreferredLocation(frame.location);
+  const { sourceId, line, column } = getPreferredLocation(
+    state,
+    frame.location,
+    ThreadFront.preferredGeneratedSources
+  );
   const location = {
     sourceId,
     line,
@@ -20,7 +26,11 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
   };
 
   let alternateLocation;
-  const alternate = await ThreadFront.getAlternateLocation(frame.location);
+  const alternate = await getAlternateLocation(
+    state,
+    frame.location,
+    ThreadFront.preferredGeneratedSources
+  );
   if (alternate) {
     alternateLocation = {
       sourceId: alternate.sourceId,
@@ -43,13 +53,5 @@ export async function createFrame(frame, index = 0, asyncIndex = 0) {
     index,
     asyncCause: asyncIndex && index == 0 ? "async" : undefined,
     state: "on-stack",
-  };
-}
-
-export function createPause(packet) {
-  return {
-    ...packet,
-    frame: createFrame(packet.frame),
-    executionPoint: packet.executionPoint,
   };
 }

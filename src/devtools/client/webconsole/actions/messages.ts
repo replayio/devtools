@@ -35,6 +35,7 @@ import {
 } from "../reducers/messages";
 import { getConsoleOverflow, getLastFetchedForFocusRegion, getMessagesLoaded } from "../selectors";
 import {
+  getPreferredLocation,
   getSourceDetails,
   getSourceDetailsEntities,
   getSourceIdsByUrl,
@@ -64,31 +65,31 @@ function convertStack(
   stack: string[],
   { frames }: { frames?: Frame[] },
   sourcesById: Dictionary<SourceDetails>,
-  ThreadFront: typeof ThreadFrontType
+  ThreadFront: typeof ThreadFrontType,
+  state: UIState
 ) {
   if (!stack) {
     return null;
   }
-  return Promise.all(
-    stack.map(async frameId => {
-      const frame = frames!.find(f => f.frameId == frameId)!;
-      const location = await ThreadFront.getPreferredLocation(frame.location);
-      return {
-        filename: sourcesById[location.sourceId]?.url,
-        sourceId: location.sourceId,
-        lineNumber: location.line,
-        columnNumber: location.column,
-        functionName: frame.functionName,
-      };
-    })
-  );
+  return stack.map(frameId => {
+    const frame = frames!.find(f => f.frameId == frameId)!;
+    const location = getPreferredLocation(state, frame.location, ThreadFront.preferredGeneratedSources);
+    return {
+      filename: sourcesById[location.sourceId]?.url,
+      sourceId: location.sourceId,
+      lineNumber: location.line,
+      columnNumber: location.column,
+      functionName: frame.functionName,
+    };
+  });
 }
 
 export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     await ThreadFront.ensureAllSources();
-    const sourcesById = getSourceDetailsEntities(getState());
-    const stacktrace = await convertStack(msg.stack!, msg.data, sourcesById, ThreadFront);
+    const state = getState();
+    const sourcesById = getSourceDetailsEntities(state);
+    const stacktrace = convertStack(msg.stack!, msg.data, sourcesById, ThreadFront, state);
     const sourceId = stacktrace?.[0]?.sourceId;
 
     let { url, sourceId: msgSourceId, line, column } = msg;
@@ -101,7 +102,7 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
     if (msg.point.frame) {
       // If the execution point has a location, use any mappings in that location.
       // The message properties do not reflect any source mapping.
-      const location = await ThreadFront.getPreferredLocation(msg.point.frame);
+      const location = getPreferredLocation(state, msg.point.frame, ThreadFront.preferredGeneratedSources);
       url = sourcesById[location.sourceId]?.url;
       line = location.line;
       column = location.column;
