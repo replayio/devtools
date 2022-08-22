@@ -10,6 +10,7 @@ import times from "lodash/times";
 import zip from "lodash/zip";
 import flatten from "lodash/flatten";
 import { RedactedSpan } from "ui/components/Redacted";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
@@ -46,7 +47,7 @@ export default class PreviewFunction extends Component {
       return null;
     }
 
-    const location = func.functionLocation();
+    const location = getPreferredLocation(func.mappedFunctionLocation());
     const locationURL = location ? this.props.sourcesById[location.sourceId]?.url : undefined;
 
     if (location && locationURL && !IGNORED_SOURCE_URLS.includes(locationURL)) {

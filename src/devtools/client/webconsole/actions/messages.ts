@@ -73,7 +73,11 @@ function convertStack(
   }
   return stack.map(frameId => {
     const frame = frames!.find(f => f.frameId == frameId)!;
-    const location = getPreferredLocation(state, frame.location, ThreadFront.preferredGeneratedSources);
+    const location = getPreferredLocation(
+      state,
+      frame.location,
+      ThreadFront.preferredGeneratedSources
+    );
     return {
       filename: sourcesById[location.sourceId]?.url,
       sourceId: location.sourceId,
@@ -102,7 +106,11 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
     if (msg.point.frame) {
       // If the execution point has a location, use any mappings in that location.
       // The message properties do not reflect any source mapping.
-      const location = getPreferredLocation(state, msg.point.frame, ThreadFront.preferredGeneratedSources);
+      const location = getPreferredLocation(
+        state,
+        msg.point.frame,
+        ThreadFront.preferredGeneratedSources
+      );
       url = sourcesById[location.sourceId]?.url;
       line = location.line;
       column = location.column;
@@ -115,11 +123,15 @@ export function onConsoleMessage(msg: WiredMessage): UIThunkAction {
       }
       if (msgSourceId) {
         // Ask the ThreadFront to map the location we got manually.
-        const location = await ThreadFront.getPreferredMappedLocation({
-          sourceId: msgSourceId,
-          line: line!,
-          column: column!,
-        });
+        const location = getPreferredLocation(
+          state,
+          await ThreadFront.mappedLocations.getMappedLocation({
+            sourceId: msgSourceId,
+            line: line!,
+            column: column!,
+          }),
+          ThreadFront.preferredGeneratedSources
+        );
         url = sourcesById[location.sourceId]?.url;
         line = location.line;
         column = location.column;

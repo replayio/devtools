@@ -340,6 +340,12 @@ export function getPreferredSourceId(
   return sourceMappedId;
 }
 
+// Given an RRP MappedLocation array with locations in different sources
+// representing the same generated location (i.e. a generated location plus
+// all the corresponding locations in original or pretty printed sources etc.),
+// choose the location which we should be using within the devtools. Normally
+// this is the most original location, except when preferSource has been used
+// to prefer a generated source instead.
 export function getPreferredLocation(
   state: UIState,
   locations: MappedLocation,

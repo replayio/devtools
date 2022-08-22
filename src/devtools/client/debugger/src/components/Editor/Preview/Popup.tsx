@@ -25,6 +25,7 @@ import Popover from "../../shared/Popover";
 import PreviewFunction from "../../shared/PreviewFunction";
 
 import NewObjectInspector from "./NewObjectInspector";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
 
 type $FixTypeLater = any;
 
@@ -59,13 +60,14 @@ export class Popup extends Component<FinalPopupProps> {
       return null;
     }
 
-    const location = resultGrip.functionLocation();
+    const location = getPreferredLocation(resultGrip.mappedFunctionLocation());
     const locationURL = location ? sourcesById[location.sourceId]?.url : undefined;
 
     return (
       <div
         className="preview-popup"
         onClick={() =>
+          location &&
           locationURL &&
           selectSourceURL(cx, locationURL, {
             line: location.line,

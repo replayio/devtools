@@ -102,7 +102,11 @@ function showLogpointsResult(logGroupId: string, result: AnalysisEntry[]) {
       await ThreadFront.ensureAllSources();
       const pause = ThreadFront.instantiatePause(pauseId, point, time, /* hasFrames */ true, data);
       const valueFronts = values.map((v: any) => new ValueFront(pause, v));
-      const mappedLocation = await ThreadFront.getPreferredMappedLocation(location[0]);
+      const mappedLocation = getPreferredLocation(
+        store.getState(),
+        await ThreadFront.mappedLocations.getMappedLocation(location[0]),
+        ThreadFront.preferredGeneratedSources
+      );
       assert(mappedLocation, "preferred mapped location not found");
       LogpointHandlers.onResult!(logGroupId, point, time, mappedLocation, pause, valueFronts);
 
