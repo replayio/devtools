@@ -931,32 +931,6 @@ class _ThreadFront {
     return pause.getFrameSteps(frameId);
   }
 
-  getPreferredLocationRaw(locations: MappedLocation) {
-    const sourceId = this.sourcesSelectors!.getPreferredSourceId(
-      this.sourcesSelectors!.getSourceDetailsEntities(),
-      locations.map(l => l.sourceId),
-      this.preferredGeneratedSources
-    );
-    const preferredLocation = locations.find(l => l.sourceId == sourceId);
-    assert(preferredLocation, "no preferred location found");
-    assert(
-      preferredLocation.sourceId === this.getCorrespondingSourceIds(preferredLocation.sourceId)[0],
-      "location.sourceId should be updated to the first corresponding sourceId"
-    );
-    return preferredLocation;
-  }
-
-  // Given an RRP MappedLocation array with locations in different sources
-  // representing the same generated location (i.e. a generated location plus
-  // all the corresponding locations in original or pretty printed sources etc.),
-  // choose the location which we should be using within the devtools. Normally
-  // this is the most original location, except when preferSource has been used
-  // to prefer a generated source instead.
-  async getPreferredLocation(locations: MappedLocation) {
-    await this.ensureAllSources();
-    return this.getPreferredLocationRaw(locations);
-  }
-
   getGeneratedLocation(locations: MappedLocation) {
     const sourceIds = new Set<SourceId>(locations.map(location => location.sourceId));
     return locations.find(location => {
@@ -981,15 +955,6 @@ class _ThreadFront {
     return location.some(({ sourceId }) => {
       return this.preferredGeneratedSources.has(sourceId);
     });
-  }
-
-  // Given a location in a generated source, get the preferred location to use.
-  // This has to query the server to get the original / pretty printed locations
-  // corresponding to this generated location, so getPreferredLocation is
-  // better to use when possible.
-  async getPreferredMappedLocation(location: Location) {
-    const mappedLocation = await this.mappedLocations.getMappedLocation(location);
-    return this.getPreferredLocation(mappedLocation);
   }
 
   getCorrespondingSourceIds(sourceId: SourceId) {

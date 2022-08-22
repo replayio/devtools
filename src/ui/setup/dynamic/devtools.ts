@@ -54,6 +54,7 @@ import { precacheScreenshots } from "ui/actions/timeline";
 import { UnexpectedError } from "ui/state/app";
 
 import { UIState } from "ui/state";
+import { setupGetPreferredLocation } from "ui/utils/preferredLocation";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -224,6 +225,7 @@ export default async function DevTools(store: AppStore) {
   setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);
+  setupGetPreferredLocation(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
   // TODO We should revisit this as part of a larger architectural redesign (#6932).

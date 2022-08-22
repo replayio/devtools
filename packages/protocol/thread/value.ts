@@ -205,11 +205,8 @@ export class ValueFront {
     return this._object!.preview!.functionParameterNames;
   }
 
-  functionLocation() {
-    const location = this._object!.preview!.functionLocation;
-    if (location) {
-      return ThreadFront.getPreferredLocationRaw(location);
-    }
+  mappedFunctionLocation() {
+    return this._object?.preview?.functionLocation;
   }
 
   // When the function came from a logpoint and hasn't had its location

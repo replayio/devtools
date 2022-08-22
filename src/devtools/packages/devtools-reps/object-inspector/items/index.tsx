@@ -1,6 +1,7 @@
 import { ValueFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import Spinner from "ui/components/shared/Spinner";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
 
 import { MODE } from "../../reps/constants";
 import ErrorRep from "../../reps/error";
@@ -159,7 +160,7 @@ export class GetterItem {
     if (this.getterFn.hasPreviewOverflow()) {
       return this.name;
     }
-    const location = this.getterFn.functionLocation();
+    const location = getPreferredLocation(this.getterFn.mappedFunctionLocation());
     const url = location ? props.sourcesById[location.sourceId]?.url : undefined;
     if (!url || !location) {
       return this.name;

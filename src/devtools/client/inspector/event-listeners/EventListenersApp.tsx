@@ -4,11 +4,11 @@ import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useAppDispatch } from "ui/setup/hooks";
 import { ExpandableItem } from "./ExpandableItem";
 import { XHTMLNode } from "./XHTMLNode";
-import Selection from "devtools/client/framework/selection";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 import { selection } from "devtools/client/framework/selection";
 import { useAppSelector } from "ui/setup/hooks";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
 
 type AnyListener = WiredEventListener | FrameworkEventListener;
 
@@ -88,7 +88,7 @@ export const EventListenersApp = () => {
           <div key={eventType} className="devtools-monospace">
             <ExpandableItem header={eventType}>
               {listeners.map(({ handler, capture }) => {
-                const location = handler.functionLocation();
+                const location = getPreferredLocation(handler.mappedFunctionLocation());
                 const locationUrl = location ? sourcesById[location.sourceId]?.url : undefined;
                 const functionName = handler.functionName() ?? "";
                 const paramsNames = handler.functionParameterNames() ?? [];

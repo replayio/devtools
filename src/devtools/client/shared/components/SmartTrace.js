@@ -8,6 +8,7 @@ const React = require("react");
 const PropTypes = require("prop-types");
 const { connect } = require("react-redux");
 const { getSourceDetailsEntities, getSourceIdsByUrl } = require("ui/reducers/sources");
+const { getPreferredLocation } = require("ui/utils/preferredLocation");
 
 const Frames =
   require("devtools/client/debugger/src/components/SecondaryPanes/Frames/index").Frames;
@@ -61,7 +62,9 @@ class SmartTrace extends React.Component {
         line: lineNumber,
         column: columnNumber,
       };
-      const mapped = await ThreadFront.getPreferredMappedLocation(location);
+      const mapped = getPreferredLocation(
+        await ThreadFront.mappedLocations.getMappedLocation(location)
+      );
       return {
         ...frame,
         lineNumber: mapped.line,

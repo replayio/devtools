@@ -9,6 +9,7 @@ const { button, span } = require("react-dom-factories");
 // Reps
 const { getGripType, isGrip, cropString, wrapRender } = require("./rep-utils");
 const { MODE } = require("./constants");
+const { getPreferredLocation } = require("ui/utils/preferredLocation");
 
 const IGNORED_SOURCE_URLS = ["debugger eval code"];
 
@@ -24,7 +25,7 @@ function FunctionRep(props) {
   const { object: grip, onViewSourceInDebugger } = props;
 
   let jumpToDefinitionButton;
-  const location = grip.functionLocation();
+  const location = getPreferredLocation(grip.mappedFunctionLocation());
   const url = location ? props.sourcesById[location.sourceId]?.url : undefined;
   if (onViewSourceInDebugger && url && !IGNORED_SOURCE_URLS.includes(url)) {
     jumpToDefinitionButton = button({
