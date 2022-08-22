@@ -145,6 +145,7 @@ export class ReplayClient implements ReplayClientInterface {
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
     this._sessionId = sessionId;
+    this.sessionWaiter.resolve(sessionId);
     this._threadFront.setSessionId(sessionId);
 
     return sessionId;
@@ -370,7 +371,8 @@ export class ReplayClient implements ReplayClientInterface {
     return this._recordingId;
   }
 
-  async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
+  async getSessionEndpoint(): Promise<TimeStampedPoint> {
+    const sessionId = this.getSessionIdThrows();
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
   }

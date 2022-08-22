@@ -287,7 +287,7 @@ export const messageOpen = messageOpened;
 export const messageClose = messageClosed;
 
 export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const state = getState();
     const didOverflow = getConsoleOverflow(state);
     const lastFetchedForFocusRegion = getLastFetchedForFocusRegion(state);
@@ -316,11 +316,9 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
 
     dispatch(clearMessages());
 
-    const sessionEndpoint = await ThreadFront.getEndpoint();
+    const sessionEndpoint = await replayClient.getSessionEndpoint();
     const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).begin.point : "0";
-    const end = focusRegion
-      ? (focusRegion as UnsafeFocusRegion).end.point
-      : sessionEndpoint.endpoint.point;
+    const end = focusRegion ? (focusRegion as UnsafeFocusRegion).end.point : sessionEndpoint.point;
 
     const { messages, overflow } = await ThreadFront.findMessagesInRange({ begin, end });
 

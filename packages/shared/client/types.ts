@@ -83,7 +83,7 @@ export interface ReplayClientInterface {
   ): Promise<PauseData>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getRecordingId(): RecordingId | null;
-  getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
+  getSessionEndpoint(): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;

@@ -743,10 +743,6 @@ class _ThreadFront {
     return this._findResumeTarget(point, client.Debugger.findResumeTarget);
   }
 
-  getEndpoint() {
-    return client.Session.getEndpoint({}, ThreadFront.sessionId!);
-  }
-
   async findNetworkRequests(
     onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
     onResponseBodyData: (body: responseBodyData) => void,

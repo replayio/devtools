@@ -49,7 +49,7 @@ export default function Initializer({
         }
 
         const sessionId = await client.initialize(activeRecordingId, activeAccessToken);
-        const endpoint = await client.getSessionEndpoint(sessionId);
+        const endpoint = await client.getSessionEndpoint();
 
         // The demo doesn't use these directly, but the client throws if they aren't loaded.
         const sources = await client.findSources();
