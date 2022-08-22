@@ -27,6 +27,7 @@ import {
   locationSelected,
   clearSelectedLocation,
   getSourceIdToDisplayForUrl,
+  getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
@@ -130,8 +131,9 @@ export function selectLocation(
     // use the preferred source for the location's URL.
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       await ThreadFront.ensureAllSources();
-      const sourceId = ThreadFront.getSourceToDisplayForUrl(location.sourceUrl)!.id;
-      source = getSourceDetails(getState(), sourceId);
+      const state = getState();
+      const sourceId = getSourceToDisplayForUrl(state, location.sourceUrl)!.id;
+      source = getSourceDetails(state, sourceId);
       location = { ...location, sourceId };
     }
     if (!source) {

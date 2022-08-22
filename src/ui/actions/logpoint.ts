@@ -42,6 +42,8 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getLoadedRegions } from "./app";
 import { rangeForFocusRegion } from "ui/utils/timeline";
+import { getSourceToDisplayForUrl } from "ui/reducers/sources";
+import { UIState } from "ui/state";
 
 const TOO_MANY_HITS_TO_SHOW = 1000;
 
@@ -414,9 +416,10 @@ export function setLogpointByURL(
   line: number,
   column: number,
   text: string,
-  condition: string
+  condition: string,
+  state: UIState
 ) {
-  const sourceIds = ThreadFront.getSourceToDisplayForUrl(url)?.correspondingSourceIds;
+  const sourceIds = getSourceToDisplayForUrl(state, url)?.correspondingSourceIds;
   if (!sourceIds || sourceIds.length === 0) {
     return;
   }

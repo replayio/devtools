@@ -1010,10 +1010,6 @@ class _ThreadFront {
     return this.getPreferredLocation(mappedLocation);
   }
 
-  getSourceToDisplayForUrl(url: string) {
-    return this.sourcesSelectors!.getSourceToDisplayForUrl(url);
-  }
-
   getCorrespondingSourceIds(sourceId: SourceId) {
     assert(this.hasAllSources, "not all sources have been loaded yet");
     return this.sourcesSelectors?.getSourceDetails(sourceId)?.correspondingSourceIds || [sourceId];
