@@ -49,7 +49,7 @@ export function SourcemapToggle({
   return (
     <label className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
       <Toggle
-        enabled={ThreadFront.isSourceMappedSource(selectedSource.id)}
+        enabled={!!sourcesById[selectedSource.id]?.isSourceMapped}
         setEnabled={setEnabled}
         disabled={!alternateSourceId}
       />
