@@ -3,7 +3,7 @@ Test.describe(`showing console objects in node.`, async () => {
 
   await Test.waitForMessage("Array(20) [0, 1, 2, 3, 4,");
   await Test.waitForMessage("Uint8Array(20) [0, 1, 2, 3, 4,");
-  await Test.waitForMessage("Set(22) [{…}, {…}, 0, 1, 2, 3, 4,");
+  await Test.waitForMessage("Set(22) [{…}, {…}, 0, 1, 2,");
   await Test.waitForMessage("Map(21) {{…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4,");
   await Test.waitForMessage("WeakSet(20) [{…}, {…}, {…},");
   await Test.waitForMessage("WeakMap(20) {{…} → {…}, {…} → {…},");
