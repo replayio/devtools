@@ -521,6 +521,24 @@ export class ReplayClient implements ReplayClientInterface {
       handlers.forEach(handler => handler());
     }
   };
+
+  /** This method does not return the actual body content directly. Instead, the
+   * backend sends it separately, and it's received by an event handler that
+   * was added in `devtools/client/webconsole/actions/network.ts`
+   */
+  async getResponseBody(requestId: string) {
+    const sessionId = this.getSessionIdThrows();
+    client.Network.getResponseBody({ id: requestId, range: { end: 5e9 } }, sessionId);
+  }
+
+  /** This method does not return the actual body content directly. Instead, the
+   * backend sends it separately, and it's received by an event handler that
+   * was added in `devtools/client/webconsole/actions/network.ts`
+   */
+  async getRequestBody(requestId: string) {
+    const sessionId = this.getSessionIdThrows();
+    client.Network.getRequestBody({ id: requestId, range: { end: 5e9 } }, sessionId);
+  }
 }
 
 function waitForOpenConnection(

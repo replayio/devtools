@@ -747,20 +747,6 @@ class _ThreadFront {
     client.Network.findRequests({}, sessionId);
   }
 
-  fetchResponseBody(requestId: string) {
-    return client.Network.getResponseBody(
-      { id: requestId, range: { end: 5e9 } },
-      ThreadFront.sessionId!
-    );
-  }
-
-  fetchRequestBody(requestId: string) {
-    return client.Network.getRequestBody(
-      { id: requestId, range: { end: 5e9 } },
-      ThreadFront.sessionId!
-    );
-  }
-
   findMessagesInRange(range: PointRange) {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
   }

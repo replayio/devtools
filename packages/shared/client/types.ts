@@ -24,6 +24,8 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   TimeRange,
+  getResponseBodyResult,
+  getRequestBodyResult,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -98,4 +100,6 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void>;
+  getResponseBody(requestId: string): Promise<void>;
+  getRequestBody(requestId: string): Promise<void>;
 }

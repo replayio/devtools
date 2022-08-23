@@ -91,7 +91,7 @@ export function hideRequestDetails() {
 }
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const state = getState();
     const request = getRequestById(state, requestId);
     const loadedRegions = getLoadedRegions(state);
@@ -123,11 +123,20 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
       payload: { frames: formattedFrames, point: timeStampedPoint.point },
     });
 
+    /*
+    These API calls don't directly return anything. Instead:
+
+    - on app setup, `webconsole/actions/network.ts` does a search for network requests and their sub-pieces, and also subscribes to future network requests
+    - in this thunk, we conditionally call `getResponse/RequestBody()`
+    - that API call _by itself_ doesn't return anything...
+    - but when the server sends back data, it triggers those event handlers/callbacks to add the data to Redux
+  */
+
     if (requestSummary.hasResponseBody) {
-      ThreadFront.fetchResponseBody(requestId);
+      replayClient.getResponseBody(requestId);
     }
     if (requestSummary.hasRequestBody) {
-      ThreadFront.fetchRequestBody(requestId);
+      replayClient.getRequestBody(requestId);
     }
   };
 }
