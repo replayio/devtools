@@ -479,7 +479,7 @@ class _ThreadFront {
     try {
       this._invalidateResumeTargets(async () => {
         assert(this.sessionId, "no sessionId");
-        await ThreadFront.getBreakpointPositionsCompressed(sourceId);
+        await this.getBreakpointPositionsCompressed(sourceId);
         const location = { sourceId, line, column };
         const { breakpointId } = await client.Debugger.setBreakpoint(
           { location, condition },
