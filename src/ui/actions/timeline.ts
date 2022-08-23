@@ -663,7 +663,7 @@ const shouldRerunAnalysisForBreakpoint = (
 };
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
     const zoomTime = getZoomRegion(state);
@@ -672,7 +672,7 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    ThreadFront.loadRegion(
+    replayClient.loadRegion(
       {
         begin: displayedBeginForFocusRegion(focusRegion),
         end: displayedEndForFocusRegion(focusRegion),

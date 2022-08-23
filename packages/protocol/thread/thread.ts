@@ -490,19 +490,6 @@ class _ThreadFront {
       : this.getCurrentPause();
   }
 
-  async loadRegion(region: TimeRange, endTime: number) {
-    client.Session.unloadRegion(
-      { region: { begin: 0, end: region.begin } },
-      ThreadFront.sessionId!
-    );
-    client.Session.unloadRegion(
-      { region: { begin: region.end, end: endTime } },
-      ThreadFront.sessionId!
-    );
-
-    await client.Session.loadRegion({ region }, ThreadFront.sessionId!);
-  }
-
   async loadAsyncParentFrames() {
     await this.getCurrentPause().ensureLoaded();
     const basePause = this.lastAsyncPause();
