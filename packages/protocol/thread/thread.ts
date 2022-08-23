@@ -125,37 +125,6 @@ export function setRepaintAfterEvaluationsExperimentalFlag(value: boolean): void
   repaintAfterEvaluationsExperimentalFlag = value;
 }
 
-interface SourcesSelectors {
-  getSourceDetails(sourceId: SourceId): SourceDetails | undefined;
-  getSourceDetailsEntities(): Record<SourceId, SourceDetails | undefined>;
-  getSourceIdsByUrl(): Record<string, SourceId[] | undefined>;
-  getSourcesToDisplayByUrl(): Record<string, SourceDetails | undefined>;
-  getSourceToDisplayForUrl(url: string): SourceDetails | undefined;
-  getPreferredSourceId(
-    sourcesById: Record<SourceId, SourceDetails | undefined>,
-    sourceIds: string[],
-    preferredGeneratedSources?: Set<string>
-  ): SourceId | undefined;
-  getAlternateSourceId(
-    sourcesById: Record<SourceId, SourceDetails | undefined>,
-    sourceIds: string[],
-    preferredGeneratedSources?: Set<string>
-  ): SourceId | undefined;
-}
-
-interface SourceDetails {
-  isSourceMapped: boolean;
-  contentHash?: string;
-  correspondingSourceIds: string[];
-  generated: string[];
-  generatedFrom: string[];
-  id: string;
-  kind: SourceKind;
-  prettyPrinted?: string;
-  prettyPrintedFrom?: string;
-  url?: string;
-}
-
 type LoadedRegionListener = (loadedRegions: LoadedRegions) => void;
 class _ThreadFront {
   // When replaying there is only a single thread currently. Use this thread ID
@@ -195,11 +164,7 @@ class _ThreadFront {
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
 
-  // TODO [hbenl] this is a temporary hack to give ThreadFront access to the sources
-  // stored in redux. Eventually this should be removed together with all the
-  // methods using these selectors and the callers of these methods should use the
-  // selectors directly instead.
-  sourcesSelectors: SourcesSelectors | undefined;
+  getCorrespondingSourceIds = (sourceId: SourceId) => [sourceId];
 
   // Source IDs for generated sources which should be preferred over any
   // original source.
@@ -939,11 +904,6 @@ class _ThreadFront {
     return location.some(({ sourceId }) => {
       return this.preferredGeneratedSources.has(sourceId);
     });
-  }
-
-  getCorrespondingSourceIds(sourceId: SourceId) {
-    assert(this.hasAllSources, "not all sources have been loaded yet");
-    return this.sourcesSelectors?.getSourceDetails(sourceId)?.correspondingSourceIds || [sourceId];
   }
 
   // Replace the sourceId in a location with the first corresponding sourceId
