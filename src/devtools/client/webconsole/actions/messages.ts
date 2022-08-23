@@ -316,7 +316,7 @@ export function refetchMessages(focusRegion: FocusRegion | null): UIThunkAction 
 
     dispatch(clearMessages());
 
-    const sessionEndpoint = await replayClient.getSessionEndpoint();
+    const sessionEndpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
     const begin = focusRegion ? (focusRegion as UnsafeFocusRegion).begin.point : "0";
     const end = focusRegion ? (focusRegion as UnsafeFocusRegion).end.point : sessionEndpoint.point;
 

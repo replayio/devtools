@@ -91,7 +91,7 @@ export function hideRequestDetails() {
 }
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront, replayClient }) => {
+  return async (dispatch, getState, { ThreadFront, protocolClient }) => {
     const state = getState();
     const request = getRequestById(state, requestId);
     const loadedRegions = getLoadedRegions(state);
@@ -123,6 +123,8 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
       payload: { frames: formattedFrames, point: timeStampedPoint.point },
     });
 
+    const sessionId = getState().app.sessionId!;
+
     /*
     These API calls don't directly return anything. Instead:
 
@@ -133,10 +135,10 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   */
 
     if (requestSummary.hasResponseBody) {
-      replayClient.getResponseBody(requestId);
+      protocolClient.Network.getResponseBody({ id: requestId, range: { end: 5e9 } }, sessionId);
     }
     if (requestSummary.hasRequestBody) {
-      replayClient.getRequestBody(requestId);
+      protocolClient.Network.getRequestBody({ id: requestId, range: { end: 5e9 } }, sessionId);
     }
   };
 }

@@ -67,10 +67,12 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
+  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;
+  findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getAnnotationKinds(): Promise<string[]>;
@@ -88,7 +90,7 @@ export interface ReplayClientInterface {
   ): Promise<PauseData>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getRecordingId(): RecordingId | null;
-  getSessionEndpoint(): Promise<TimeStampedPoint>;
+  getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
@@ -96,13 +98,6 @@ export interface ReplayClientInterface {
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
-  searchSources(
-    opts: {
-      query: string;
-      sourceIds?: string[];
-    },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
-  ): Promise<void>;
   searchFunctions(
     opts: {
       query: string;
@@ -110,8 +105,11 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: FunctionMatch[]) => void
   ): Promise<void>;
-  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
-  findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
-  getResponseBody(requestId: string): Promise<void>;
-  getRequestBody(requestId: string): Promise<void>;
+  searchSources(
+    opts: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void>;
 }

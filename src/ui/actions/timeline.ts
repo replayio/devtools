@@ -100,7 +100,7 @@ export async function setupTimeline(store: UIStore) {
 
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const endpoint = await replayClient.getSessionEndpoint();
+    const endpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 

@@ -155,6 +155,13 @@ export class ReplayClient implements ReplayClientInterface {
     return sessionId;
   }
 
+  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addKeyboardEventsListener(onKeyboardEvents);
+    await client.Session.findKeyboardEvents({}, sessionId!);
+    client.Session.removeKeyboardEventsListener(onKeyboardEvents);
+  }
+
   async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
@@ -215,6 +222,13 @@ export class ReplayClient implements ReplayClientInterface {
         overflow: response.overflow == true,
       };
     }
+  }
+
+  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addNavigationEventsListener(onNavigationEvents);
+    await client.Session.findNavigationEvents({}, sessionId!);
+    client.Session.removeNavigationEventsListener(onNavigationEvents);
   }
 
   async findSources(): Promise<Source[]> {
@@ -375,8 +389,7 @@ export class ReplayClient implements ReplayClientInterface {
     return this._recordingId;
   }
 
-  async getSessionEndpoint(): Promise<TimeStampedPoint> {
-    const sessionId = this.getSessionIdThrows();
+  async getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint> {
     const { endpoint } = await client.Session.getEndpoint({}, sessionId);
     return endpoint;
   }
@@ -458,39 +471,6 @@ export class ReplayClient implements ReplayClientInterface {
   /**
    * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
    */
-  async searchSources(
-    {
-      query,
-      sourceIds,
-    }: {
-      query: string;
-      sourceIds?: string[];
-    },
-    onMatches: (matches: SearchSourceContentsMatch[]) => void
-  ): Promise<void> {
-    const sessionId = this.getSessionIdThrows();
-    const thisSearchUniqueId = uniqueId("search-sources-");
-
-    const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
-      if (searchId === thisSearchUniqueId) {
-        onMatches(matches);
-      }
-    };
-
-    client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
-    try {
-      await client.Debugger.searchSourceContents(
-        { searchId: thisSearchUniqueId, sourceIds, query },
-        sessionId
-      );
-    } finally {
-      client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
-    }
-  }
-
-  /**
-   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
-   */
   async searchFunctions(
     {
       query,
@@ -521,18 +501,37 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+  /**
+   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
+   */
+  async searchSources(
+    {
+      query,
+      sourceIds,
+    }: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: SearchSourceContentsMatch[]) => void
+  ): Promise<void> {
     const sessionId = this.getSessionIdThrows();
-    client.Session.addKeyboardEventsListener(onKeyboardEvents);
-    await client.Session.findKeyboardEvents({}, sessionId!);
-    client.Session.removeKeyboardEventsListener(onKeyboardEvents);
-  }
+    const thisSearchUniqueId = uniqueId("search-sources-");
 
-  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
-    const sessionId = this.getSessionIdThrows();
-    client.Session.addNavigationEventsListener(onNavigationEvents);
-    await client.Session.findNavigationEvents({}, sessionId!);
-    client.Session.removeNavigationEventsListener(onNavigationEvents);
+    const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
+      if (searchId === thisSearchUniqueId) {
+        onMatches(matches);
+      }
+    };
+
+    client.Debugger.addSearchSourceContentsMatchesListener(matchesListener);
+    try {
+      await client.Debugger.searchSourceContents(
+        { searchId: thisSearchUniqueId, sourceIds, query },
+        sessionId
+      );
+    } finally {
+      client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
+    }
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
@@ -572,24 +571,6 @@ export class ReplayClient implements ReplayClientInterface {
       handlers.forEach(handler => handler());
     }
   };
-
-  /** This method does not return the actual body content directly. Instead, the
-   * backend sends it separately, and it's received by an event handler that
-   * was added in `devtools/client/webconsole/actions/network.ts`
-   */
-  async getResponseBody(requestId: string) {
-    const sessionId = this.getSessionIdThrows();
-    client.Network.getResponseBody({ id: requestId, range: { end: 5e9 } }, sessionId);
-  }
-
-  /** This method does not return the actual body content directly. Instead, the
-   * backend sends it separately, and it's received by an event handler that
-   * was added in `devtools/client/webconsole/actions/network.ts`
-   */
-  async getRequestBody(requestId: string) {
-    const sessionId = this.getSessionIdThrows();
-    client.Network.getRequestBody({ id: requestId, range: { end: 5e9 } }, sessionId);
-  }
 }
 
 function waitForOpenConnection(

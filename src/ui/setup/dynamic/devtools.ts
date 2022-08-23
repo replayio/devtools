@@ -18,7 +18,8 @@ import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { Canvas, setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "ui/actions/logpoint";
-import { initSocket, addEventListener } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -186,6 +187,7 @@ export default async function setupDevtools(store: AppStore, replayClient?: Repl
   const extraThunkArgs: ThunkExtraArgs = {
     ThreadFront,
     replayClient,
+    protocolClient,
   };
 
   // Add all these new slice reducers and some related state in a single call,
