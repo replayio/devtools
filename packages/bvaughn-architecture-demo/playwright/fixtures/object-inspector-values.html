@@ -182,6 +182,18 @@
         [false, "false"],
         [0, "zero"],
       ]);
+      const mapWithComplexKeys = new Map([
+        [{ foo: "bar" }, "object"],
+        [[1, 2, 3], "array"],
+        [new Set([1, 2, 3]), "Set"],
+        [
+          new Map([
+            ["one", 123],
+            ["two", true],
+          ]),
+          "map",
+        ],
+      ]);
       const weakMap = new WeakMap([
         [regex, "abc"],
         [map, 123],
@@ -267,6 +279,7 @@
         weakMap,
         overflowingMap,
         mapWithFalsyKeys,
+        mapWithComplexKeys,
         emptySet,
         simpleSet: set,
         weakSet,
