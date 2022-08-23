@@ -233,7 +233,9 @@ export const getSourcesById = (state: UIState, ids: string[]) => {
 };
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
   const source = getSourceDetails(state, id);
-  assert(source, `unknown source ${id}`);
+  // TODO [hbenl] disabled for now because the sources we receive from the backend
+  // are incomplete for node recordings, see RUN-508
+  // assert(source, `unknown source ${id}`);
   return source?.correspondingSourceIds || [id];
 };
 export const getSourceContent = (state: UIState, id: string) => {
