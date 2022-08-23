@@ -51,13 +51,10 @@ async function maybeClearLogpoint(location: SourceLocation) {
 
 export async function _internalSetBreakpoint(
   ThreadFront: typeof TF,
-  getState: () => UIState,
+  state: UIState,
   location: SourceLocation,
   options: InitialBreakpointOptions
 ) {
-  await ThreadFront.ensureAllSources();
-  const state = getState();
-
   maybeClearLogpoint(location);
   const finalOptions = maybeGenerateLogGroupId(options);
   breakpoints[locationKey(location)] = { location, options: finalOptions };
@@ -96,10 +93,7 @@ export async function _internalSetBreakpoint(
   await Promise.all(promises);
 }
 
-export async function _internalRemoveBreakpoint(ThreadFront: typeof TF, getState: () => UIState, location: SourceLocation) {
-  await ThreadFront.ensureAllSources();
-  const state = getState();
-
+export async function _internalRemoveBreakpoint(ThreadFront: typeof TF, state: UIState, location: SourceLocation) {
   maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
 

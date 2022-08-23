@@ -76,9 +76,11 @@ export function enableBreakpoint(
       return;
     }
 
+    await ThreadFront.ensureAllSources();
+
     dispatch(_setBreakpoint({ ...breakpoint, disabled: false }));
 
-    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, breakpoint.options);
   };
 }
 
@@ -105,6 +107,8 @@ export function addBreakpoint(
     }
     let location = { sourceId, line, column, sourceUrl };
 
+    await ThreadFront.ensureAllSources();
+
     dispatch(setRequestedBreakpoint(location));
 
     // check if the user deleted the requested breakpoint in the meantime
@@ -117,18 +121,19 @@ export function addBreakpoint(
       return;
     }
 
-    const source = getSourceDetails(getState(), location.sourceId);
+    const state = getState();
+    const source = getSourceDetails(state, location.sourceId);
     if (!source) {
       return;
     }
 
-    const symbols = getSymbols(getState(), source);
+    const symbols = getSymbols(state, source);
     const astLocation = getASTLocation(symbols, location);
 
-    const originalContent = getSourceContent(getState(), source.id);
+    const originalContent = getSourceContent(state, source.id);
     const originalText = getTextAtPosition(originalContent, location);
 
-    const content = getSourceContent(getState(), source.id);
+    const content = getSourceContent(state, source.id);
     const text = getTextAtPosition(content, location);
 
     const id = getLocationKey(location);
@@ -147,9 +152,9 @@ export function addBreakpoint(
     if (disabled) {
       // If we just clobbered an enabled breakpoint with a disabled one, we need
       // to remove any installed breakpoint in the server.
-      await _internalRemoveBreakpoint(ThreadFront, getState, location);
+      await _internalRemoveBreakpoint(ThreadFront, state, location);
     } else {
-      await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
+      await _internalSetBreakpoint(ThreadFront, state, breakpoint.location, breakpoint.options);
     }
   };
 }
@@ -164,11 +169,13 @@ export function _removeBreakpoint(
       return;
     }
 
+    await ThreadFront.ensureAllSources();
+
     dispatch(removeBreakpoint(breakpoint.location, ThreadFront.recordingId!, cx));
 
     // If the breakpoint is disabled then it is not installed in the server.
     if (!breakpoint.disabled) {
-      await _internalRemoveBreakpoint(ThreadFront, getState, breakpoint.location);
+      await _internalRemoveBreakpoint(ThreadFront, getState(), breakpoint.location);
     }
   };
 }
@@ -183,9 +190,11 @@ export function disableBreakpoint(
       return;
     }
 
+    await ThreadFront.ensureAllSources();
+
     dispatch(_setBreakpoint({ ...breakpoint, disabled: true }));
 
-    await _internalRemoveBreakpoint(ThreadFront, getState, breakpoint.location);
+    await _internalRemoveBreakpoint(ThreadFront, getState(), breakpoint.location);
   };
 }
 
@@ -198,9 +207,11 @@ export function removeBreakpointOption(
     const newOptions = { ...breakpoint.options };
     delete newOptions[option];
 
+    await ThreadFront.ensureAllSources();
+
     dispatch(_setBreakpoint({ ...breakpoint, options: newOptions }));
 
-    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, newOptions);
+    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, newOptions);
   };
 }
 
@@ -215,12 +226,14 @@ export function setBreakpointOptions(
       return dispatch(addBreakpoint(cx, location, options));
     }
 
+    await ThreadFront.ensureAllSources();
+
     // Note: setting a breakpoint's options implicitly enables it.
     breakpoint = { ...breakpoint, disabled: false, options };
     trackEvent("breakpoint.edit");
 
     dispatch(_setBreakpoint(breakpoint));
 
-    await _internalSetBreakpoint(ThreadFront, getState, breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, breakpoint.options);
   };
 }
