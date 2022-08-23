@@ -37,12 +37,8 @@ async function takeScreenshotOfMessages(page: Page, screenshotName: string) {
 testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
 
-  await inspectAndTakeScreenshotOf(page, "simpleArray", "render-and-inspect-array");
-  await inspectAndTakeScreenshotOf(
-    page,
-    "280bigUint64Array",
-    "render-and-inspect-big-uint-64-array"
-  );
+  await inspectAndTakeScreenshotOf(page, "arrayLength", "render-and-inspect-array");
+  await inspectAndTakeScreenshotOf(page, "bigUint64Array", "render-and-inspect-big-uint-64-array");
   await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
   await inspectAndTakeScreenshotOf(
     page,
@@ -53,6 +49,11 @@ testSetup(async function regeneratorFunction({ page }) {
   await inspectAndTakeScreenshotOf(page, "regex", "render-and-inspect-regex");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
   await inspectAndTakeScreenshotOf(page, "simpleObject", "render-and-inspect-object");
+  await inspectAndTakeScreenshotOf(
+    page,
+    "mapWithFalsyKeys",
+    "render-and-inspect-map-with-falsy-keys"
+  );
 });
 
 test("should render simple values", async ({ page }) => {
@@ -80,12 +81,8 @@ test("should render and inspect arrays", async ({ page }) => {
   filterByText(page, "array");
 
   await takeScreenshotOfMessages(page, "render-arrays");
-  await inspectAndTakeScreenshotOf(page, "simpleArray", "render-and-inspect-array");
-  await inspectAndTakeScreenshotOf(
-    page,
-    "280bigUint64Array",
-    "render-and-inspect-big-uint-64-array"
-  );
+  await inspectAndTakeScreenshotOf(page, "arrayLength", "render-and-inspect-array");
+  await inspectAndTakeScreenshotOf(page, "bigUint64Array", "render-and-inspect-big-uint-64-array");
 });
 
 test("should render dates", async ({ page }) => {
@@ -133,6 +130,11 @@ test("should render and inspect maps", async ({ page }) => {
 
   await takeScreenshotOfMessages(page, "render-empty-maps");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
+  await inspectAndTakeScreenshotOf(
+    page,
+    "mapWithFalsyKeys",
+    "render-and-inspect-map-with-falsy-keys"
+  );
 });
 
 test("should render and inspect regular expressions", async ({ page }) => {
