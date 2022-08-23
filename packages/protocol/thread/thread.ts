@@ -45,7 +45,6 @@ import {
   PauseData,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
-import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
@@ -157,9 +156,6 @@ class _ThreadFront {
   // Waiter which resolves when there is at least one loading region
   loadingHasBegun = defer<void>();
 
-  private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
-  private fnSearchWaiters: Map<string, (params: FunctionMatch[]) => void> = new Map();
-
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
@@ -206,22 +202,6 @@ class _ThreadFront {
   emit!: (name: ThreadFrontEvent, value?: any) => void;
 
   constructor() {
-    client.Debugger.addSearchSourceContentsMatchesListener(
-      ({ searchId, matches }: { searchId: string; matches: SearchSourceContentsMatch[] }) => {
-        const searchWaiter = this.searchWaiters?.get(searchId);
-        if (searchWaiter) {
-          searchWaiter(matches);
-        }
-      }
-    );
-    client.Debugger.addFunctionsMatchesListener(
-      ({ searchId, matches }: { searchId: string; matches: FunctionMatch[] }) => {
-        const searchWaiter = this.fnSearchWaiters?.get(searchId);
-        if (searchWaiter) {
-          searchWaiter(matches);
-        }
-      }
-    );
     client.Session.addAnnotationsListener(({ annotations }: { annotations: Annotation[] }) => {
       const byKind = groupBy(annotations, "kind");
       Object.keys(byKind).forEach(kind => {
@@ -394,26 +374,9 @@ class _ThreadFront {
     }
   }
 
-  async searchFunctions(
-    { query, sourceIds }: { query: string; sourceIds?: string[] },
-    onMatches: (matches: FunctionMatch[]) => void
-  ) {
-    const sessionId = await this.waitForSession();
-    const searchId = uniqueId("fn-search-");
-    this.fnSearchWaiters.set(searchId, onMatches);
-
-    try {
-      // await client.Debugger.searchFunctions({ searchId, query }, sessionId);
-      await client.Debugger.searchFunctions({ searchId, query, sourceIds }, sessionId);
-    } finally {
-      this.fnSearchWaiters.delete(searchId);
-    }
-  }
-
   async ensureAllSources() {
     await this.allSourcesWaiter.promise;
   }
-
 
   getBreakpointPositionsCompressed(
     sourceId: SourceId,

@@ -22,6 +22,8 @@ import {
   searchSourceContentsMatches,
   SessionId,
   SourceId,
+  functionsMatches,
+  FunctionMatch,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
@@ -465,7 +467,7 @@ export class ReplayClient implements ReplayClientInterface {
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void> {
     const sessionId = this.getSessionIdThrows();
-    const thisSearchUniqueId = uniqueId("search-");
+    const thisSearchUniqueId = uniqueId("search-sources-");
 
     const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
       if (searchId === thisSearchUniqueId) {
@@ -481,6 +483,39 @@ export class ReplayClient implements ReplayClientInterface {
       );
     } finally {
       client.Debugger.removeSearchSourceContentsMatchesListener(matchesListener);
+    }
+  }
+
+  /**
+   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
+   */
+  async searchFunctions(
+    {
+      query,
+      sourceIds,
+    }: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: FunctionMatch[]) => void
+  ): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+    const thisSearchUniqueId = uniqueId("search-fns-");
+
+    const matchesListener = ({ searchId, matches }: functionsMatches) => {
+      if (searchId === thisSearchUniqueId) {
+        onMatches(matches);
+      }
+    };
+
+    client.Debugger.addFunctionsMatchesListener(matchesListener);
+    try {
+      await client.Debugger.searchFunctions(
+        { searchId: thisSearchUniqueId, sourceIds, query },
+        sessionId
+      );
+    } finally {
+      client.Debugger.removeFunctionsMatchesListener(matchesListener);
     }
   }
 

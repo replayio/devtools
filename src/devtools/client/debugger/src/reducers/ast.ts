@@ -137,7 +137,7 @@ export const fetchGlobalFunctions = createAsyncThunk<
   void,
   { state: UIState; extra: ThunkExtraArgs }
 >("ast/fetchGlobalFunctions", async (_, thunkApi) => {
-  const { ThreadFront } = thunkApi.extra;
+  const { ThreadFront, replayClient } = thunkApi.extra;
 
   await ThreadFront.ensureAllSources();
 
@@ -148,7 +148,7 @@ export const fetchGlobalFunctions = createAsyncThunk<
 
   const globalFns: SearchResult[] = [];
 
-  await ThreadFront.searchFunctions({ query, sourceIds }, matches => {
+  await replayClient.searchFunctions({ query, sourceIds }, matches => {
     globalFns.push(...formatProjectFunctions(matches, sourceById));
   });
 

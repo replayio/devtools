@@ -195,7 +195,10 @@ export function createMockReplayClient() {
     loadRegion: jest.fn().mockImplementation(async () => {}),
     removeEventListener: jest.fn(),
     runAnalysis: jest.fn().mockImplementation(async () => []),
-    searchSources: jest.fn().mockImplementation(async () => []),
+    searchSources: jest.fn().mockImplementation(async () => {}),
+    searchFunctions: jest.fn().mockImplementation(async () => {}),
     getAnnotationKinds: jest.fn().mockImplementation(async () => []),
+    getResponseBody: jest.fn(),
+    getRequestBody: jest.fn(),
   };
 }
