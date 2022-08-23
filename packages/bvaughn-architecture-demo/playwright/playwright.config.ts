@@ -6,7 +6,7 @@ const config = {
   use: {
     browserName: "chromium",
     launchOptions: {
-      slowMo: process.env.VISUAL_DEBUG ? 500 : 25,
+      slowMo: process.env.VISUAL_DEBUG ? 500 : 50,
     },
     trace: "on-first-retry",
     video: process.env.RECORD_VIDEO ? "on" : "off",
