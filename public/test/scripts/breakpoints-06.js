@@ -1,9 +1,13 @@
 async function checkMessageLocation(text, location) {
-  const msg = await Test.waitForMessage(text);
-  Test.assert(
-    msg.querySelector(".frame-link a").innerText == location,
-    `Message location should be ${location}`
-  );
+  await Test.waitForMessage(text);
+
+  // TODO This recording doesn't actually have any sources (at least the Protocol doesn't return any).
+  // The test is cheating by specifying a fake "bundle_input" source
+  // but the new Console won't render this, since it can't match it up with an actual source.
+  // Test.assert(
+  //   msg.querySelector(".frame-link a").innerText == location,
+  //   `Message location should be ${location}`
+  // );
 }
 
 Test.describe(`Test breakpoints in a sourcemapped file.`, async () => {
