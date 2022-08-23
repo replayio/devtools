@@ -131,6 +131,17 @@ export function protocolValueToClientValue(
       let type: ValueType = "object";
       switch (className) {
         case "Array":
+        case "BigInt64Array":
+        case "BigUint64Array":
+        case "Float32Array":
+        case "Float64Array":
+        case "Int8Array":
+        case "Int16Array":
+        case "Int32Array":
+        case "Uint8Array":
+        case "Uint8ClampedArray":
+        case "Uint16Array":
+        case "Uint32Array":
           type = "array";
           break;
         case "Date":
