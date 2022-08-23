@@ -24,6 +24,8 @@ import {
   SourceId,
   functionsMatches,
   FunctionMatch,
+  keyboardEvents,
+  navigationEvents,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
@@ -517,6 +519,20 @@ export class ReplayClient implements ReplayClientInterface {
     } finally {
       client.Debugger.removeFunctionsMatchesListener(matchesListener);
     }
+  }
+
+  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addKeyboardEventsListener(onKeyboardEvents);
+    await client.Session.findKeyboardEvents({}, sessionId!);
+    client.Session.removeKeyboardEventsListener(onKeyboardEvents);
+  }
+
+  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addNavigationEventsListener(onNavigationEvents);
+    await client.Session.findNavigationEvents({}, sessionId!);
+    client.Session.removeNavigationEventsListener(onNavigationEvents);
   }
 
   async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {

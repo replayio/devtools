@@ -27,6 +27,8 @@ import {
   getResponseBodyResult,
   getRequestBodyResult,
   FunctionMatch,
+  keyboardEvents,
+  navigationEvents,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -108,6 +110,8 @@ export interface ReplayClientInterface {
     },
     onMatches: (matches: FunctionMatch[]) => void
   ): Promise<void>;
+  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
+  findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   getResponseBody(requestId: string): Promise<void>;
   getRequestBody(requestId: string): Promise<void>;
 }

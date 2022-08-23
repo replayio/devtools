@@ -200,5 +200,7 @@ export function createMockReplayClient() {
     getAnnotationKinds: jest.fn().mockImplementation(async () => []),
     getResponseBody: jest.fn(),
     getRequestBody: jest.fn(),
+    findKeyboardEvents: jest.fn().mockImplementation(async () => []),
+    findNavigationEvents: jest.fn().mockImplementation(async () => []),
   };
 }

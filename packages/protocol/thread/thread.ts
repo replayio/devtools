@@ -14,10 +14,8 @@ import {
   FrameId,
   Location,
   MappedLocation,
-  keyboardEvents,
   Message,
   missingRegions,
-  navigationEvents,
   newSource,
   ObjectId,
   PauseDescription,
@@ -33,14 +31,11 @@ import {
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
-  SearchSourceContentsMatch,
-  FunctionMatch,
   responseBodyData,
   requestBodyData,
   findAnnotationsResult,
   Frame,
   PointRange,
-  TimeRange,
   PauseId,
   PauseData,
 } from "@replayio/protocol";
@@ -699,16 +694,6 @@ class _ThreadFront {
 
   findMessagesInRange(range: PointRange) {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
-  }
-
-  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
-    client.Session.addKeyboardEventsListener(onKeyboardEvents);
-    return client.Session.findKeyboardEvents({}, this.sessionId!);
-  }
-
-  findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
-    client.Session.addNavigationEventsListener(onNavigationEvents);
-    return client.Session.findNavigationEvents({}, this.sessionId!);
   }
 
   async findConsoleMessages(
