@@ -1,8 +1,19 @@
 {
   "name": "design",
+  "private": true,
   "version": "0.0.0",
+  "sideEffects": false,
+  "scripts": {
+    "icons": "node scripts/icons.js --fetch"
+  },
   "dependencies": {
     "classnames": "*",
     "react": "*"
+  },
+  "devDependencies": {
+    "case-anything": "^2.1.10",
+    "figma-tools": "^0.4.0",
+    "svgo": "^2.8.0",
+    "svgson": "^5.2.1"
   }
 }

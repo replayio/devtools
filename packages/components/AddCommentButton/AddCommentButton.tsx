@@ -5,7 +5,7 @@ import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 import styles from "./AddCommentButton.module.css";
 
-import { Icon } from "../Icon";
+import { Icon } from "design/Icon";
 
 interface AddCommentButtonProps {
   /** Changes the button state to reflect the current active comment is paused on a hit. */
@@ -57,7 +57,7 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         onMouseLeave={clearHover}
         className={buttonClassnames}
       >
-        <Icon name="comment-plus" fill="currentColor" />
+        <Icon name="comment-plus" className="p-0.5" />
         <TextFade visible={isHovered}>Add Comment</TextFade>
       </button>
     );
