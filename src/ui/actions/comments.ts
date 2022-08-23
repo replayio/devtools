@@ -2,7 +2,11 @@ import { RecordingId } from "@replayio/protocol";
 import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { getPreferredSourceId, getSourceDetailsEntities, getTextAtLocation, SourceDetails } from "ui/reducers/sources";
+import {
+  getPreferredSourceId,
+  getSourceDetailsEntities,
+  getTextAtLocation,
+} from "ui/reducers/sources";
 import { findClosestFunction } from "devtools/client/debugger/src/utils/ast";
 import {
   waitForEditor,
@@ -81,7 +85,8 @@ export function createFrameComment(
 
     // Only try to generate a sourceLocation if there's a corresponding breakpoint for this frame comment.
     const sourceLocation = breakpoint
-      ? breakpoint.location || (await getCurrentPauseSourceLocationWithTimeout(ThreadFront, getState))
+      ? breakpoint.location ||
+        (await getCurrentPauseSourceLocationWithTimeout(ThreadFront, getState))
       : null;
 
     dispatch(
@@ -94,7 +99,10 @@ export function createFrameComment(
   };
 }
 
-function getCurrentPauseSourceLocationWithTimeout(ThreadFront: typeof ThreadFrontType, getState: () => UIState) {
+function getCurrentPauseSourceLocationWithTimeout(
+  ThreadFront: typeof ThreadFrontType,
+  getState: () => UIState
+) {
   return Promise.race([getCurrentPauseSourceLocation(ThreadFront, getState), waitForTime(1000)]);
 }
 
@@ -191,7 +199,10 @@ export function seekToComment(item: Comment | Reply): UIThunkAction {
   };
 }
 
-async function getCurrentPauseSourceLocation(ThreadFront: typeof ThreadFrontType, getState: () => UIState) {
+async function getCurrentPauseSourceLocation(
+  ThreadFront: typeof ThreadFrontType,
+  getState: () => UIState
+) {
   const frame = (await ThreadFront.currentPause?.getFrames())?.[0];
   if (!frame) {
     return;

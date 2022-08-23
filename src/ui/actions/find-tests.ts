@@ -284,7 +284,10 @@ class JestTestState {
 }
 
 // Look for a source containing the specified pattern.
-async function findMatchingSourceId(pattern: string, sourcesByUrl: Dictionary<SourceDetails>): Promise<string | null> {
+async function findMatchingSourceId(
+  pattern: string,
+  sourcesByUrl: Dictionary<SourceDetails>
+): Promise<string | null> {
   for (const url in sourcesByUrl) {
     if (url.includes(pattern)) {
       return sourcesByUrl[url]!.id;
@@ -310,10 +313,15 @@ async function getBreakpointLocationOnLine(
 }
 
 // Look for places in the recording used to run jest tests.
-async function setupJestTests(sourcesByUrl: Dictionary<SourceDetails>): Promise<JestTestState | null> {
+async function setupJestTests(
+  sourcesByUrl: Dictionary<SourceDetails>
+): Promise<JestTestState | null> {
   // Look for a source containing the callAsyncCircusFn function which is used to
   // run tests using recent versions of Jest.
-  const circusUtilsSourceId = await findMatchingSourceId("jest-circus/build/utils.js", sourcesByUrl);
+  const circusUtilsSourceId = await findMatchingSourceId(
+    "jest-circus/build/utils.js",
+    sourcesByUrl
+  );
   if (!circusUtilsSourceId) {
     return null;
   }
@@ -440,7 +448,10 @@ async function findJestTests(sourcesByUrl: Dictionary<SourceDetails>) {
 }
 
 // Look for automated tests associated with a recent version of jest.
-export async function findAutomatedTests(recordingTarget: RecordingTarget, sourcesByUrl: Dictionary<SourceDetails>) {
+export async function findAutomatedTests(
+  recordingTarget: RecordingTarget,
+  sourcesByUrl: Dictionary<SourceDetails>
+) {
   if (recordingTarget !== "node") {
     return;
   }

@@ -45,7 +45,14 @@ class EditorMenu extends Component<FinalEMProps> {
   }
 
   showMenu(props: FinalEMProps) {
-    const { cx, selectedSource, editorActions, alternateSource, sourcesById, contextMenu: event } = props;
+    const {
+      cx,
+      selectedSource,
+      editorActions,
+      alternateSource,
+      sourcesById,
+      contextMenu: event,
+    } = props;
 
     showMenu(
       event,
@@ -54,7 +61,7 @@ class EditorMenu extends Component<FinalEMProps> {
         editorActions,
         selectedSource,
         alternateSource: alternateSource || null,
-        sourcesById
+        sourcesById,
       })
     );
   }

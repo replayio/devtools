@@ -83,7 +83,11 @@ async function showLogpointsLoading(logGroupId: string, points: PointDescription
     if (!frame) {
       return;
     }
-    const location = getPreferredLocation(store.getState(), frame, ThreadFront.preferredGeneratedSources);
+    const location = getPreferredLocation(
+      store.getState(),
+      frame,
+      ThreadFront.preferredGeneratedSources
+    );
     assert(location, "preferred location not found");
     LogpointHandlers.onPointLoading!(logGroupId, point, time, location);
   });
@@ -131,7 +135,11 @@ async function showPrimitiveLogpoints(
   for (const pointDescription of pointDescriptions) {
     const { point, time, frame } = pointDescription;
     assert(frame, "pointDescription.frame not set");
-    const location = getPreferredLocation(store.getState(), frame, ThreadFront.preferredGeneratedSources);
+    const location = getPreferredLocation(
+      store.getState(),
+      frame,
+      ThreadFront.preferredGeneratedSources
+    );
     assert(location, "preferred location not found");
     LogpointHandlers.onResult(logGroupId, point, time, location, undefined, values);
   }
