@@ -224,9 +224,6 @@ class _ThreadFront {
   // Resolve hooks for promises waiting for pending invalidate commands to finish. wai
   invalidateCommandWaiters: (() => void)[] = [];
 
-  // Pauses for each point we have stopped or might stop at.
-  allPauses = new Map<ExecutionPoint, Pause>();
-
   // Map breakpointId to information about the breakpoint, for all installed breakpoints.
   breakpoints = new Map<BreakpointId, { location: Location }>();
 
@@ -613,13 +610,12 @@ class _ThreadFront {
 
   ensurePause(point: ExecutionPoint, time: number) {
     assert(this.sessionId, "no sessionId");
-    let pause = this.allPauses.get(point);
+    let pause = Pause.getByPoint(point);
     if (pause) {
       return pause;
     }
     pause = new Pause(this);
     pause.create(point, time);
-    this.allPauses.set(point, pause);
     return pause;
   }
 
@@ -637,13 +633,12 @@ class _ThreadFront {
     hasFrames: boolean,
     data: PauseData = {}
   ) {
-    let pause = this.allPauses.get(point);
+    let pause = Pause.getByPoint(point);
     if (pause) {
       return pause;
     }
     pause = new Pause(this);
     pause.instantiate(pauseId, point, time, hasFrames, data);
-    this.allPauses.set(point, pause);
     return pause;
   }
 

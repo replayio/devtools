@@ -28,6 +28,7 @@ import type { ThreadFront as ThreadFrontType } from "./thread";
 import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
+const pausesByPoint = new Map<ExecutionPoint, Pause>();
 
 export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
@@ -157,8 +158,12 @@ export class Pause {
     EventEmitter.decorate<any, PauseEvent>(this);
   }
 
-  static getById(pauseId: PauseId) {
-    return pausesById.get(pauseId);
+  static getById(pauseId: PauseId): Pause | null {
+    return pausesById.get(pauseId) || null;
+  }
+
+  static getByPoint(point: ExecutionPoint): Pause | null {
+    return pausesByPoint.get(point) || null;
   }
 
   private _setPauseId(pauseId: PauseId) {
@@ -182,6 +187,7 @@ export class Pause {
         this.stack = stack.map(id => this.frames.get(id)!);
       }
       pausesById.set(pauseId, this);
+      pausesByPoint.set(point, this);
     })();
   }
 
@@ -202,6 +208,7 @@ export class Pause {
     this.hasFrames = hasFrames;
     this.addData(data);
     pausesById.set(pauseId, this);
+    pausesByPoint.set(point, this);
   }
 
   addData(...datas: PauseData[]) {
