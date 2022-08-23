@@ -16,12 +16,17 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
   const isWithinPreview = useContext(PreviewContext);
 
-  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []);
+  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []).filter(
+    property => property.name !== "length"
+  );
+
   const showOverflowMarker =
     object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
 
-  const getterValue = object.preview?.getterValues?.find(({ name }) => name === "length");
-  const length = getterValue?.value || 0;
+  const lengthValue =
+    object.preview?.properties?.find(({ name }) => name === "length") ||
+    object.preview?.getterValues?.find(({ name }) => name === "length");
+  const length = lengthValue?.value || 0;
 
   const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
 
@@ -50,7 +55,7 @@ export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRenderer
 
   return (
     <>
-      Array
+      {object.className}
       {length > 0 && <span className={styles.ArrayLength}>({length})</span>}
       <PreviewContext.Provider value={true}>
         {propertiesList !== null && (

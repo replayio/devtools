@@ -95,7 +95,9 @@
       }
 
       const emptyArray = [];
-      const array = [1, 2, 3];
+      const array4 = [1, 2, 3, 4];
+      const array5 = [1, 2, 3, 4, 5];
+      const array6 = [1, 2, 3, 4, 5, 6];
       const overflowingArray = [
         "a",
         "b",
@@ -174,6 +176,12 @@
         ["three", true],
         ["four", new Map()],
       ]);
+      const mapWithFalsyKeys = new Map([
+        [null, "null"],
+        [undefined, "undefined"],
+        [false, "false"],
+        [0, "zero"],
+      ]);
       const weakMap = new WeakMap([
         [regex, "abc"],
         [map, 123],
@@ -231,7 +239,9 @@
 
         // Various array types
         emptyArray,
-        simpleArray: array,
+        arrayLength4: array4,
+        arrayLength5: array5,
+        arrayLength6: array6,
         arrayWithObjects,
         overflowingArray,
         arrayOfHtmlElements,
@@ -256,6 +266,7 @@
         simpleMap: map,
         weakMap,
         overflowingMap,
+        mapWithFalsyKeys,
         emptySet,
         simpleSet: set,
         weakSet,
