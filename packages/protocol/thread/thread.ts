@@ -455,10 +455,6 @@ class _ThreadFront {
     await this.allSourcesWaiter.promise;
   }
 
-  getGeneratedSourceIds(originalSourceId: SourceId) {
-    return this.sourcesSelectors!.getSourceDetails(originalSourceId)?.generated;
-  }
-
   async getSourceContents(sourceId: SourceId) {
     assert(this.sessionId, "no sessionId");
     const { contents, contentType } = await client.Debugger.getSourceContents(
@@ -929,18 +925,6 @@ class _ThreadFront {
   async getFrameSteps(asyncIndex: number, frameId: FrameId) {
     const pause = await this.pauseForAsyncIndex(asyncIndex);
     return pause.getFrameSteps(frameId);
-  }
-
-  getGeneratedLocation(locations: MappedLocation) {
-    const sourceIds = new Set<SourceId>(locations.map(location => location.sourceId));
-    return locations.find(location => {
-      const generated = this.getGeneratedSourceIds(location.sourceId);
-      if (!generated) {
-        return true;
-      }
-      // Don't return a location if it is an original version of another one of the given locations.
-      return !generated.some(generatedId => sourceIds.has(generatedId));
-    });
   }
 
   preferSource(sourceId: SourceId, value: boolean) {

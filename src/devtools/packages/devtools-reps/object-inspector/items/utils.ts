@@ -26,9 +26,6 @@ export function isValueLoaded(value: ValueFront): boolean {
  */
 export async function loadValue(value: ValueFront) {
   await value.loadIfNecessary();
-  if (features.originalClassNames) {
-    await value.mapClassName();
-  }
 }
 
 export function shouldRenderRootsInReps(roots: Item[]): boolean {

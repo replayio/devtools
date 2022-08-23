@@ -348,40 +348,6 @@ export class ValueFront {
     }
   }
 
-  async mapClassName() {
-    if (this.originalClassName === undefined) {
-      this.originalClassName = (await this.getOriginalClassName()) || "";
-    }
-  }
-
-  private async getOriginalClassName() {
-    const generatedClassName = this.className();
-    if (!generatedClassName || generatedClassName === "Object") {
-      return;
-    }
-    await this.loadIfNecessary();
-    const proto = this.previewPrototypeValue();
-    if (!proto) {
-      return;
-    }
-    await proto.loadIfNecessary();
-    const constr = proto.previewValueMap().get("constructor");
-    if (!constr) {
-      return;
-    }
-    await constr.loadIfNecessary();
-    const locations = constr._object?.preview?.functionLocation;
-    if (!locations) {
-      return;
-    }
-    const generatedLocation = ThreadFront.getGeneratedLocation(locations);
-    if (!generatedLocation) {
-      return;
-    }
-    const scopeMap = await ThreadFront.getScopeMap(generatedLocation);
-    return scopeMap[generatedClassName];
-  }
-
   /**
    * walks down this object's prototype chain up to maxDepth levels
    * and calls visitFn on this object and the visited prototypes
