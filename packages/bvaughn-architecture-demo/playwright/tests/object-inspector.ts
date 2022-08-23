@@ -38,6 +38,7 @@ testSetup(async function regeneratorFunction({ page }) {
   await page.goto(URL);
 
   await inspectAndTakeScreenshotOf(page, "simpleArray", "render-and-inspect-array");
+  await inspectAndTakeScreenshotOf(page, "280bigUint64Array", "render-and-inspect-big-uint-64-array");
   await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
   await inspectAndTakeScreenshotOf(
     page,
@@ -76,6 +77,7 @@ test("should render and inspect arrays", async ({ page }) => {
 
   await takeScreenshotOfMessages(page, "render-arrays");
   await inspectAndTakeScreenshotOf(page, "simpleArray", "render-and-inspect-array");
+  await inspectAndTakeScreenshotOf(page, "280bigUint64Array", "render-and-inspect-big-uint-64-array");
 });
 
 test("should render dates", async ({ page }) => {
