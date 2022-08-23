@@ -54,6 +54,11 @@ testSetup(async function regeneratorFunction({ page }) {
     "mapWithFalsyKeys",
     "render-and-inspect-map-with-falsy-keys"
   );
+  await inspectAndTakeScreenshotOf(
+    page,
+    "mapWithComplexKeys",
+    "render-and-inspect-map-with-complex-keys"
+  );
 });
 
 test("should render simple values", async ({ page }) => {
@@ -134,6 +139,11 @@ test("should render and inspect maps", async ({ page }) => {
     page,
     "mapWithFalsyKeys",
     "render-and-inspect-map-with-falsy-keys"
+  );
+  await inspectAndTakeScreenshotOf(
+    page,
+    "mapWithComplexKeys",
+    "render-and-inspect-map-with-complex-keys"
   );
 });
 

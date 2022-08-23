@@ -5,6 +5,7 @@ import ValueRenderer from "../ValueRenderer";
 
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
+import KeyValueRenderer from "../KeyValueRenderer";
 
 const MAX_PROPERTIES_TO_PREVIEW = 5;
 
@@ -25,37 +26,26 @@ export default function MapRenderer({ object, pauseId }: ObjectPreviewRendererPr
   } else {
     let propertiesList: ReactNode[] | null = null;
     if (!isWithinPreview) {
-      propertiesList = slice.map(({ key, value }, index) => {
-        let keyToDisplay = "";
-        if (key != null && key.hasOwnProperty("value") != null) {
-          switch (key.value) {
-            case false:
-              keyToDisplay = "false";
-              break;
-            case null:
-              keyToDisplay = "null";
-              break;
-            case undefined:
-              keyToDisplay = "undefined";
-              break;
-            default:
-              keyToDisplay = key.value;
-              break;
-          }
-        }
-        return (
-          <span key={index} className={styles.Value}>
-            {keyToDisplay !== "" && (
-              <>
-                <span className={styles.MapKey}>{keyToDisplay}</span>
-                <span className={styles.Separator}> → </span>
-              </>
-            )}
-            <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
-            {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
-          </span>
-        );
-      });
+      propertiesList = slice.map(({ key, value }, index) => (
+        <span key={index} className={styles.Value}>
+          {key != null && (
+            <>
+              <span className={styles.MapKey}>
+                <KeyValueRenderer
+                  enableInspection={false}
+                  isNested={true}
+                  layout="horizontal"
+                  pauseId={pauseId}
+                  protocolValue={key}
+                />
+              </span>
+              <span className={styles.Separator}> → </span>
+            </>
+          )}
+          <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+          {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
+        </span>
+      ));
 
       if (showOverflowMarker) {
         propertiesList.push(
