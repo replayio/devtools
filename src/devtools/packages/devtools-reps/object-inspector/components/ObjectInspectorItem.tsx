@@ -19,7 +19,7 @@ export interface ObjectInspectorItemProps {
   expanded: boolean;
   arrow: ReactNode;
   mode: Symbol;
-  sourcesById: Dictionary<SourceDetails>,
+  sourcesById: Dictionary<SourceDetails>;
   setExpanded: (item: Item, expand: boolean) => void;
   dimTopLevelWindow?: boolean;
   onDoubleClick?: (

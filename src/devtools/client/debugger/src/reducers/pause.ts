@@ -195,7 +195,9 @@ export const fetchFrames = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/fetchFrames", async ({ cx, pauseId }, thunkApi) => {
   const frames = (await thunkApi.extra.ThreadFront.getFrames()) ?? [];
-  const resultFrames = await Promise.all(frames.map((frame, i) => createFrame(thunkApi.getState, frame, i)));
+  const resultFrames = await Promise.all(
+    frames.map((frame, i) => createFrame(thunkApi.getState, frame, i))
+  );
   // TS says there could be nulls, but not seeing them in practice
   return resultFrames as PauseFrame[];
 });

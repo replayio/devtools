@@ -79,7 +79,10 @@ export function getSourcemapVisualizerURL(
 // through sourcemaps, because in that case there may be multiple alternate sources.
 // If no unique alternate source could be found, the reason ("no-sourcemap" or "not-unique")
 // is returned.
-export function getUniqueAlternateSourceId(source: SourceDetails, sourcesById: Dictionary<SourceDetails>): {
+export function getUniqueAlternateSourceId(
+  source: SourceDetails,
+  sourcesById: Dictionary<SourceDetails>
+): {
   sourceId?: SourceId;
   why?: "no-sourcemap" | "not-unique";
 } {

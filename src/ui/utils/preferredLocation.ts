@@ -10,8 +10,10 @@ import { getPreferredLocation as getPreferredLocationSelector } from "ui/reducer
 let store: UIStore;
 
 export function getPreferredLocation(location: MappedLocation | undefined) {
-  return location &&
-  getPreferredLocationSelector(store.getState(), location, ThreadFront.preferredGeneratedSources);
+  return (
+    location &&
+    getPreferredLocationSelector(store.getState(), location, ThreadFront.preferredGeneratedSources)
+  );
 }
 
 export function setupGetPreferredLocation(_store: UIStore) {

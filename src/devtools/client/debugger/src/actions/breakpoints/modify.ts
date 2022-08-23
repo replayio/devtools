@@ -16,10 +16,7 @@ import {
   getBreakpoint,
 } from "../../reducers/breakpoints";
 import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
-import {
-  getSymbols,
-  getRequestedBreakpointLocations,
-} from "../../selectors";
+import { getSymbols, getRequestedBreakpointLocations } from "../../selectors";
 import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
 import { getTextAtPosition } from "../../utils/source";
 import {
