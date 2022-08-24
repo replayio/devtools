@@ -54,7 +54,7 @@ function now(): number {
   return Date.now();
 }
 
-export function setupApp(
+export async function setupApp(
   store: UIStore,
   ThreadFront: typeof ThreadFrontType,
   replayClient: ReplayClientInterface
@@ -65,7 +65,7 @@ export function setupApp(
         ThreadFront.setAccessToken(token);
       }
     });
-    tokenManager.getToken();
+    await tokenManager.getToken();
   }
 
   ThreadFront.waitForSession().then(sessionId => {
