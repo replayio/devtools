@@ -175,7 +175,6 @@ export const fetchHitCounts = (sourceId: string, lineNumber: number): UIThunkAct
       dispatch(hitCountsReceived({ id: cacheKey, hitCounts }));
     } catch (e) {
       dispatch(hitCountsFailed({ id: cacheKey, error: String(e) }));
-      throw e;
     }
   };
 };
@@ -184,7 +183,18 @@ export const { hitCountsRequested, hitCountsReceived, hitCountsFailed } = hitCou
 
 export const getHitCountsForSource = (state: UIState, sourceId: string) => {
   const cacheKey = removeLineNumbersFromCacheKey(getCacheKeyForSourceHitCounts(state, sourceId, 0));
-  return aggregateHitCountsSelectors.selectById(state, cacheKey)?.hitCounts || null;
+  const aggregatedEntry = aggregateHitCountsSelectors.selectById(state, cacheKey);
+  return aggregatedEntry?.hitCounts || null;
+};
+
+export const getHitCountsStatusForSourceByLine = (
+  state: UIState,
+  sourceId: string,
+  line: number
+) => {
+  const cacheKey = getCacheKeyForSourceHitCounts(state, sourceId, line);
+  const statusEntry = hitCountsSelectors.selectById(state, cacheKey);
+  return statusEntry?.status || null;
 };
 
 export const getHitCountsForSourceByLine = createSelector(getHitCountsForSource, hitCounts => {
