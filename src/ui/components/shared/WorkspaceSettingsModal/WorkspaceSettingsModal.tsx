@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useState, useMemo } from "react";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
 import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
@@ -28,9 +28,11 @@ export function WorkspaceMembers({
   members: WorkspaceUser[];
   isAdmin: boolean;
 }) {
-  const sortedMembers = members.sort(
-    (a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending)
-  );
+  const sortedMembers = useMemo(() => {
+    return members
+      .slice()
+      .sort((a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending));
+  }, [members]);
 
   const canLeave = members.length > 1;
   const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
@@ -61,7 +63,7 @@ type WorkspaceFormProps = {
   members?: WorkspaceUser[];
 };
 
-function WorkspaceForm({ members }: WorkspaceFormProps) {
+function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
   const workspaceId = useGetTeamIdFromRoute();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -71,7 +73,7 @@ function WorkspaceForm({ members }: WorkspaceFormProps) {
     setIsLoading(false);
   });
 
-  const memberEmails = (members || []).filter(m => m.email).map(m => m.email!);
+  const memberEmails = members.filter(m => m.email).map(m => m.email!);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -220,18 +222,17 @@ const settings: Settings<
   },
 ];
 
+const tabNameForView = {
+  billing: "Billing",
+  members: "Team Members",
+  api: "API Keys",
+} as const;
+
 export default function WorkspaceSettingsModal() {
   const selectedTab = useAppSelector(state => {
     const opts = selectors.getModalOptions(state);
     const view = opts && "view" in opts ? opts.view : null;
-    return (
-      view &&
-      {
-        billing: "Billing",
-        members: "Team Members",
-        api: "API Keys",
-      }[view]
-    );
+    return view && tabNameForView[view as keyof typeof tabNameForView];
   });
   const workspaceId = useGetTeamIdFromRoute();
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);

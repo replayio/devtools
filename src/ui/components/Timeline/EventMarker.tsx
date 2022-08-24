@@ -4,6 +4,7 @@ import { ReplayEvent } from "ui/state/app";
 import { useAppSelector } from "ui/setup/hooks";
 import Marker from "./Marker";
 
+// TODO This component doesn't appear to be used right now?
 export default function EventMarker({ event, isPrimaryHighlighted }: EventMarkerProps) {
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
   const currentTime = useAppSelector(selectors.getCurrentTime);
