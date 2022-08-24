@@ -190,7 +190,7 @@ const baseNextConfig = {
       include: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
       loader: "file-loader",
       options: {
-        name: "icon-sprite.[hash:8].svg",
+        name: "icon-sprite.[contenthash].svg",
         publicPath: `/_next/static/images/`,
         outputPath: "static/images",
       },
