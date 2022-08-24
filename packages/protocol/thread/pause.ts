@@ -395,12 +395,13 @@ export class Pause {
     return { scopes: scopeChain, originalScopesUnavailable };
   }
 
-  sendMessage<P, R>(
+  async sendMessage<P, R>(
     method: (parameters: P, sessionId?: SessionId, pauseId?: PauseId) => R,
     params: P
   ) {
+    await this.pauseIdWaiter.promise;
     assert(this.pauseId, "pauseId not set before sending a message");
-    return method(params, this.sessionId, this.pauseId);
+    return await method(params, this.sessionId, this.pauseId);
   }
 
   async getObjectPreview(object: ObjectId) {
