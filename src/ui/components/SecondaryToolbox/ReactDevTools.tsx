@@ -172,11 +172,11 @@ class ReplayWall implements Wall {
 
     if (response.returned) {
       const result: any = await response.returned.getJSON();
-      this._listener?.({ event: result.event, payload: result.data });
+      if (result) {
+        this._listener?.({ event: result.event, payload: result.data });
+      }
       return result;
     }
-
-    return response.returned;
   }
 
   private async mapNodesToElements() {
