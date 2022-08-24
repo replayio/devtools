@@ -1,21 +1,13 @@
 Test.describe(`Test that stacktraces are sourcemapped.`, async () => {
   await Test.selectConsole();
 
-  const errorMsg = await Test.waitUntil(() => document.querySelector(".message.error"));
+  const messages = await Test.getAllMessages();
+  const errorMessage = messages.find(message => message.innerText.includes('Error: Baz'));
+  const errorMessageClickTarget = await Test.findMessageExpandableObjectInspector(errorMessage, 'Error');
+  errorMessageClickTarget.click();
 
-  let trace = await Test.waitUntil(() => errorMsg.querySelector(".objectBox-stackTrace"));
-  await checkTopFrame(trace);
-
-  const btn = errorMsg.querySelector(".collapse-button");
-  btn.click();
-
-  trace = await Test.waitUntil(() => errorMsg.querySelector(".stacktrace"));
-  await checkTopFrame(trace);
+  const trace = await Test.waitUntil(() => errorMessage.querySelector('[data-test-name="Stack"]'));
+  if (trace == null || trace.childElementCount === 0) {
+    throw Error('No stack found');
+  }
 });
-
-function checkTopFrame(trace) {
-  return Test.waitUntil(() => {
-    const location = trace.children[0].querySelector(".location");
-    return location.textContent.trim() === "App.js:28";
-  });
-}

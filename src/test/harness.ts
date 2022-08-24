@@ -392,51 +392,61 @@ function findMessages(text: string) {
   return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
-function getAllMessages(opts?: { ignoreErrors: boolean }) {
-  const { ignoreErrors } = opts || {};
+async function getAllMessages() {
+  await waitUntil(() => document.querySelector(`[data-test-name=Message]`), {
+    waitingFor: `Messages to load`,
+  });
+
   const messageNodes = document.querySelectorAll(
     `[data-test-name=Messages] [data-test-name=Message]`
   );
-  const messages = [];
-  for (const node of messageNodes) {
-    const dataType = node.getAttribute("data-test-message-type");
-    let type: string | undefined = "unknown";
-    switch (dataType) {
-      case "console-error":
-      case "console-log":
-      case "console-warning":
-        type = "console-api";
-        break;
-      case "event":
-        break;
-      case "exception":
-        type = ignoreErrors ? undefined : "error";
-        break;
-      case "log-point":
-        type = "logPoint";
-        break;
-      case "terminal-expression":
-        // Contains both "command" and "result" types
-        type = "result";
-        break;
-    }
 
-    if (type) {
-      messages.push({
-        type,
-        content: [(node as HTMLElement).innerText],
-      });
-    }
-  }
-  return messages;
+  return Array.from(messageNodes);
 }
 
-function checkAllMessages(expected: string, opts?: { ignoreErrors: boolean }) {
+function checkAllMessages(expected: string) {
   return waitUntil(
     () => {
-      return isEqual(getAllMessages(opts), expected);
+      const messageNodes = document.querySelectorAll(
+        `[data-test-name=Messages] [data-test-name=Message]`
+      );
+
+      const actual = [];
+      for (const node of messageNodes) {
+        const dataType = node.getAttribute("data-test-message-type");
+
+        let type: string | undefined = "unknown";
+        switch (dataType) {
+          case "console-error":
+          case "console-log":
+          case "console-warning":
+            type = "console-api";
+            break;
+          case "event":
+            break;
+          case "exception":
+            type = "error";
+            break;
+          case "log-point":
+            type = "logPoint";
+            break;
+          case "terminal-expression":
+            // Contains both "command" and "result" types
+            type = "result";
+            break;
+        }
+
+        if (type) {
+          actual.push({
+            type,
+            content: (node as HTMLElement).innerText,
+          });
+        }
+      }
+
+      return isEqual(actual, expected);
     },
-    { waitingFor: `messages with ${JSON.stringify(opts)} to match ${JSON.stringify(expected)}` }
+    { waitingFor: `messages to match ${JSON.stringify(expected)}` }
   );
 }
 
@@ -549,6 +559,22 @@ async function checkMessageObjectContents(
       { waitingFor: ".tree-node to be present" }
     );
   }
+}
+
+async function checkPausedMessage(text: string) {
+  await waitUntil(() => {
+    const messagesList = document.querySelector('[data-test-name="Messages"]')!;
+    const messages = findMessages(text);
+    if (messages.length !== 1) {
+      return false;
+    }
+    const index = Array.from(messagesList.children).indexOf(messages[0]);
+    const previousChild = messagesList.children[index - 1];
+    const result = previousChild.getAttribute('data-test-id') === "Console-CurrentTimeIndicator";
+    return result;
+  }, {
+    waitingFor: `Wait until paused at "${text}"`
+  });
 }
 
 function findScopeNode(text: string) {
@@ -906,11 +932,13 @@ const testCommands = {
   checkHighlighterVisible,
   checkJumpIcon,
   checkMessageObjectContents,
+  checkPausedMessage,
   disableBreakpoint,
   dispatchMouseEvent,
   dispatchMouseEventInGraphics,
   executeInConsole,
   findMarkupNode,
+  findMessageExpandableObjectInspector,
   findMessages,
   findScopeNode,
   getAllMessages,

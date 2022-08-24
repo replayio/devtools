@@ -16,7 +16,7 @@ function StackRenderer({ frames, stack }: { frames: Frame[]; stack: CallStack })
 
   return (
     <Suspense fallback={<Loader />}>
-      <div className={styles.StackGrid}>
+      <div className={styles.StackGrid} data-test-name="Stack">
         {stack.map((frameId, index) => (
           <StackFrameRenderer key={index} frameId={frameId} frames={frames} />
         ))}
