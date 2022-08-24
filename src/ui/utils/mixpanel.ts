@@ -61,6 +61,7 @@ type MixpanelEvent =
   | ["error.add_member_error"]
   | ["error.unfocused_timeline_click"]
   | ["feature.dark_mode", { enabled: boolean }]
+  | ["frame_timeline.start"]
   | ["gutter.add_comment"]
   | ["header.open_share"]
   | ["header.edit_title"]
