@@ -1,9 +1,8 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
-import { connect, ConnectedProps } from "react-redux";
+import React, { ChangeEvent, useState, useMemo } from "react";
 import * as actions from "ui/actions/app";
 import hooks from "ui/hooks";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 import * as selectors from "ui/reducers/app";
-import { UIState } from "ui/state";
 import { WorkspaceUser } from "ui/types";
 import { validateEmail } from "ui/utils/helpers";
 import { TextInput } from "../Forms";
@@ -29,9 +28,11 @@ export function WorkspaceMembers({
   members: WorkspaceUser[];
   isAdmin: boolean;
 }) {
-  const sortedMembers = members.sort(
-    (a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending)
-  );
+  const sortedMembers = useMemo(() => {
+    return members
+      .slice()
+      .sort((a: WorkspaceUser, b: WorkspaceUser) => Number(b.pending) - Number(a.pending));
+  }, [members]);
 
   const canLeave = members.length > 1;
   const canAdminLeave = canLeave && members.filter(a => a.roles?.includes("admin")).length > 1;
@@ -62,7 +63,7 @@ type WorkspaceFormProps = {
   members?: WorkspaceUser[];
 };
 
-function WorkspaceForm({ members }: WorkspaceFormProps) {
+function WorkspaceForm({ members = [] }: WorkspaceFormProps) {
   const workspaceId = useGetTeamIdFromRoute();
   const [inputValue, setInputValue] = useState("");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -72,7 +73,7 @@ function WorkspaceForm({ members }: WorkspaceFormProps) {
     setIsLoading(false);
   });
 
-  const memberEmails = (members || []).filter(m => m.email).map(m => m.email!);
+  const memberEmails = members.filter(m => m.email).map(m => m.email!);
   const onChange = (e: ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
   };
@@ -130,7 +131,6 @@ const settings: Settings<
     settings?: any;
     isAdmin: boolean;
     workspaceId: string;
-    hideModal: PropsFromRedux["hideModal"];
   }
 > = [
   {
@@ -146,13 +146,13 @@ const settings: Settings<
   {
     title: "Team Members",
     icon: "group",
-    component: function TeamMembers({ isAdmin, workspaceId, settings, ...rest }) {
+    component: function TeamMembers({ isAdmin, workspaceId }) {
       const { members } = hooks.useGetWorkspaceMembers(workspaceId);
 
       return (
-        <div className="flex flex-col flex-grow space-y-3">
+        <div className="flex flex-grow flex-col space-y-3">
           <div>{`Manage members here so that everyone who belongs to this team can see each other's replays.`}</div>
-          <WorkspaceForm {...rest} members={members} />
+          <WorkspaceForm members={members} />
           <div className="text-xs font-semibold uppercase">{`Members`}</div>
           <div className="flex-grow overflow-y-auto">
             <div className="workspace-members-container flex flex-col space-y-1.5">
@@ -180,7 +180,8 @@ const settings: Settings<
   {
     title: "Delete Team",
     icon: "cancel",
-    component: function DeleteTeam({ hideModal, workspaceId }) {
+    component: function DeleteTeam({ workspaceId }) {
+      const dispatch = useAppDispatch();
       const redirectToTeam = useRedirectToTeam(true);
       const updateDefaultWorkspace = hooks.useUpdateDefaultWorkspace();
       const deleteWorkspace = hooks.useDeleteWorkspace();
@@ -196,7 +197,7 @@ const settings: Settings<
             deleteWorkspace({
               variables: { workspaceId: workspaceId, shouldDeleteRecordings: true },
             });
-            hideModal();
+            dispatch(actions.hideModal());
             updateDefaultWorkspace({ variables: { workspaceId: null } });
             redirectToTeam("me");
           }
@@ -221,23 +222,22 @@ const settings: Settings<
   },
 ];
 
-function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
+const tabNameForView = {
+  billing: "Billing",
+  members: "Team Members",
+  api: "API Keys",
+} as const;
+
+export default function WorkspaceSettingsModal() {
+  const selectedTab = useAppSelector(state => {
+    const opts = selectors.getModalOptions(state);
+    const view = opts && "view" in opts ? opts.view : null;
+    return view && tabNameForView[view as keyof typeof tabNameForView];
+  });
   const workspaceId = useGetTeamIdFromRoute();
-  const [selectedTab, setTab] = useState<string>();
   const { members } = hooks.useGetWorkspaceMembers(workspaceId);
   const { workspace } = hooks.useGetWorkspace(workspaceId);
   const { userId: localUserId } = hooks.useGetUserId();
-
-  useEffect(() => {
-    if (view) {
-      const views: Record<string, string> = {
-        billing: "Billing",
-        members: "Team Members",
-        api: "API Keys",
-      };
-      setTab(views[view]);
-    }
-  }, [view]);
 
   if (!(workspaceId && workspace)) {
     return null;
@@ -263,7 +263,7 @@ function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
     <SettingsModal
       hiddenTabs={hiddenTabs}
       tab={tab}
-      panelProps={{ isAdmin, workspaceId, ...rest }}
+      panelProps={{ isAdmin, workspaceId }}
       settings={settings}
       size="lg"
       title={
@@ -276,17 +276,3 @@ function WorkspaceSettingsModal({ view, ...rest }: PropsFromRedux) {
     />
   );
 }
-
-const connector = connect(
-  (state: UIState) => {
-    const opts = selectors.getModalOptions(state);
-    const view = opts && "view" in opts ? opts.view : null;
-    return { view };
-  },
-  {
-    hideModal: actions.hideModal,
-  }
-);
-export type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(WorkspaceSettingsModal);
