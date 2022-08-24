@@ -562,19 +562,22 @@ async function checkMessageObjectContents(
 }
 
 async function checkPausedMessage(text: string) {
-  await waitUntil(() => {
-    const messagesList = document.querySelector('[data-test-name="Messages"]')!;
-    const messages = findMessages(text);
-    if (messages.length !== 1) {
-      return false;
+  await waitUntil(
+    () => {
+      const messagesList = document.querySelector('[data-test-name="Messages"]')!;
+      const messages = findMessages(text);
+      if (messages.length !== 1) {
+        return false;
+      }
+      const index = Array.from(messagesList.children).indexOf(messages[0]);
+      const previousChild = messagesList.children[index - 1];
+      const result = previousChild.getAttribute("data-test-id") === "Console-CurrentTimeIndicator";
+      return result;
+    },
+    {
+      waitingFor: `Wait until paused at "${text}"`,
     }
-    const index = Array.from(messagesList.children).indexOf(messages[0]);
-    const previousChild = messagesList.children[index - 1];
-    const result = previousChild.getAttribute('data-test-id') === "Console-CurrentTimeIndicator";
-    return result;
-  }, {
-    waitingFor: `Wait until paused at "${text}"`
-  });
+  );
 }
 
 function findScopeNode(text: string) {
