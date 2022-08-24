@@ -2,7 +2,7 @@ import ObjectPreviewSuspenseCacheAdapter from "devtools/client/debugger/src/comp
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppStore } from "ui/setup/hooks";
 import { isTest } from "ui/utils/environment";
@@ -24,9 +24,10 @@ import { extractIdAndSlug } from "ui/utils/helpers";
 import { startUploadWaitTracking } from "ui/utils/mixpanel";
 import { getRecordingURL } from "ui/utils/recording";
 import useToken from "ui/utils/useToken";
-import useReplayClient from "ui/hooks/useReplayClient";
+import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 
 import Upload from "./upload";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 interface MetadataProps {
   metadata?: {
@@ -132,7 +133,8 @@ function RecordingPage({
   const [recording, setRecording] = useState<RecordingInfo | null>();
   const [uploadComplete, setUploadComplete] = useState(false);
 
-  const replayClient = useReplayClient();
+  useConfigureReplayClientInterop();
+  const replayClient = useContext(ReplayClientContext);
 
   useEffect(() => {
     if (!store) {
