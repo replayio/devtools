@@ -22,24 +22,23 @@ Test.describe(
     await Test.checkPausedMessage("number: 3");
 
     await Test.executeInConsole("1 << 5");
-    await Test.checkPausedMessage("number: 2");
-
-    await Test.stepOverToLine(21);
     await Test.checkPausedMessage("1 << 5");
 
+    await Test.stepOverToLine(21);
+    await Test.checkPausedMessage("number: 3");
+
     await Test.executeInConsole("1 << 7");
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 7");
 
     await Test.reverseStepOverToLine(20);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 5");
 
     await Test.executeInConsole("1 << 6");
-    await Test.checkPausedMessage("number: 2");
 
     await Test.stepOverToLine(21);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 7");
 
     await Test.stepOverToLine(22);
-    await Test.checkPausedMessage("number: 3");
+    await Test.checkPausedMessage("ExampleFinished");
   }
 );
