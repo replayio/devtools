@@ -177,26 +177,25 @@ const baseNextConfig = {
       loader: "raw-loader",
     });
 
-    if (config?.module?.rules) {
-      config.module.rules.push({
-        test: /\.svg$/i,
-        exclude: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
-        issuer: /\.[jt]sx?$/,
-        use: ["@svgr/webpack"],
-      });
+    config.module.rules.push({
+      test: /\.svg$/i,
+      exclude: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
+      issuer: /\.[jt]sx?$/,
+      use: ["@svgr/webpack"],
+    });
 
-      /** Load the SVG sprite through NextJS so it can be cached. */
-      config.module.rules.push({
-        test: /\.svg$/i,
-        include: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
-        loader: "file-loader",
-        options: {
-          name: "icon-sprite.[hash:8].svg",
-          publicPath: `/_next/static/images/`,
-          outputPath: "static/images",
-        },
-      });
-    }
+    /** Load the SVG sprite through NextJS so it can be cached. */
+    config.module.rules.push({
+      test: /\.svg$/i,
+      include: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
+      loader: "file-loader",
+      options: {
+        name: "icon-sprite.[hash:8].svg",
+        publicPath: `/_next/static/images/`,
+        outputPath: "static/images",
+      },
+    });
+
     return config;
   },
 };
