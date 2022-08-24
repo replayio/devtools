@@ -2,12 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-
-import PropTypes from "prop-types";
 import React, { Component } from "react";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import {
   getIsWaitingOnBreak,
   getThreadContext,
@@ -20,14 +17,17 @@ import actions from "../../actions";
 import CommandBarButton from "../shared/Button/CommandBarButton";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import { trackEvent } from "ui/utils/telemetry";
+import type { UIState } from "ui/state";
 
-import { appinfo } from "devtools/shared/services";
+import Services from "devtools/shared/services";
+const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
 
 // NOTE: the "resume" command will call either the resume
 // depending on whether or not the debugger is paused or running
-const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"];
+const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"] as const;
+type PossibleCommands = typeof COMMANDS[number];
 
 const KEYS = {
   WINNT: {
@@ -51,16 +51,18 @@ const KEYS = {
   },
 };
 
-function getKey(action) {
+function getKey(action: string) {
+  // @ts-expect-error could be 'Unknown', whatever
   return getKeyForOS(appinfo.OS, action);
 }
 
-function getKeyForOS(os, action) {
+function getKeyForOS(os: keyof typeof KEYS, action: string): string {
   const osActions = KEYS[os] || KEYS.Linux;
+  // @ts-expect-error whatever
   return osActions[action];
 }
 
-function formatKey(action) {
+function formatKey(action: string) {
   const key = getKey(`${action}Display`) || getKey(action);
   if (isMacOS) {
     const winKey = getKeyForOS("WINNT", `${action}Display`) || getKeyForOS("WINNT", action);
@@ -70,33 +72,39 @@ function formatKey(action) {
   return formatKeyShortcut(key);
 }
 
-class CommandBar extends Component {
-  commandBarNode;
+class CommandBar extends Component<PropsFromRedux> {
+  commandBarNode = React.createRef<HTMLDivElement>();
+  // @ts-expect-error it gets initialized in cDM
+  shortcuts: KeyShortcuts | null;
 
   componentWillUnmount() {
     const shortcuts = this.shortcuts;
-    COMMANDS.forEach(action => shortcuts.off(getKey(action)));
+    COMMANDS.forEach(action => shortcuts!.off(getKey(action)));
     if (isMacOS) {
-      COMMANDS.forEach(action => shortcuts.off(getKeyForOS("WINNT", action)));
+      COMMANDS.forEach(action => shortcuts!.off(getKeyForOS("WINNT", action)));
     }
   }
 
   componentDidMount() {
-    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode });
+    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode.current });
     const shortcuts = this.shortcuts;
 
-    COMMANDS.forEach(action => shortcuts.on(getKey(action), e => this.handleEvent(e, action)));
+    COMMANDS.forEach(action =>
+      shortcuts.on(getKey(action), (e: KeyboardEvent) => this.handleEvent(e, action))
+    );
 
     if (isMacOS) {
       // The Mac supports both the Windows Function keys
       // as well as the Mac non-Function keys
       COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), e => this.handleEvent(e, action))
+        shortcuts.on(getKeyForOS("WINNT", action), (e: KeyboardEvent) =>
+          this.handleEvent(e, action)
+        )
       );
     }
   }
 
-  handleEvent(e, action) {
+  handleEvent(e: KeyboardEvent, action: PossibleCommands) {
     const { cx } = this.props;
     e.preventDefault();
     e.stopPropagation();
@@ -232,14 +240,14 @@ class CommandBar extends Component {
 
   render() {
     return (
-      <div className="command-bar" ref={node => (this.commandBarNode = node)}>
+      <div className="command-bar" ref={this.commandBarNode}>
         {this.renderReplayButtons()}
       </div>
     );
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: UIState) => ({
   cx: getThreadContext(state),
   hasBreakpoints: getBreakpointSources(state).length,
   hasFramePositions: getFramePositions(state)?.positions.length,
@@ -247,11 +255,15 @@ const mapStateToProps = state => ({
   isWaitingOnBreak: getIsWaitingOnBreak(state),
 });
 
-export default connect(mapStateToProps, {
+const connector = connect(mapStateToProps, {
   resume: actions.resume,
   stepIn: actions.stepIn,
   stepOut: actions.stepOut,
   stepOver: actions.stepOver,
   rewind: actions.rewind,
   reverseStepOver: actions.reverseStepOver,
-})(CommandBar);
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(CommandBar);
