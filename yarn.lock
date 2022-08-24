@@ -10909,6 +10909,7 @@ __metadata:
     case-anything: ^2.1.10
     classnames: "*"
     figma-tools: ^0.4.0
+    nanospinner: ^1.1.0
     react: "*"
     svgo: ^2.8.0
     svgson: ^5.2.1
@@ -17566,6 +17567,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"nanospinner@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "nanospinner@npm:1.1.0"
+  dependencies:
+    picocolors: ^1.0.0
+  checksum: 797f0a7c8b053d6fb5188d73e63bab44dec97ff0e7b67ac3d55e9356c6fe002f5af691a9d1232ca086e1fb19301d11c979dc5b0c56e6700004a96c19dfded8f0
+  languageName: node
+  linkType: hard
+
 "napi-build-utils@npm:^1.0.1":
   version: 1.0.2
   resolution: "napi-build-utils@npm:1.0.2"
@@ -20518,6 +20528,7 @@ __metadata:
     eslint-plugin-react-hooks: ^4.4.0
     eslint-plugin-sort-keys-fix: ^1.1.2
     fake-indexeddb: ^3.1.7
+    file-loader: ^6.2.0
     framer-motion: ^6.3.6
     fs-extra: ^10.0.1
     fuzzaldrin-plus: ^0.6.0
