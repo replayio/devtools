@@ -33,6 +33,10 @@ export function BasicUsage() {
 }
 ```
 
+## SVG Sprite
+
+The `sprite.svg` approach is mainly used for performance reasons. There are [downsides](https://twitter.com/_developit/status/1382838799420514317) to strictly rendering in React and this implementation bypasses this by offering an easy-to-use React component and the best performance the browser can offer for rendering multiple instances of an SVG. Please see [this article](https://css-tricks.com/svg-use-with-external-reference-take-2/) for a more in-depth look at this technique.
+
 ## Troubleshooting
 
 Sometimes the build can fail for multiple reasons. Check the following and try running the script again:
