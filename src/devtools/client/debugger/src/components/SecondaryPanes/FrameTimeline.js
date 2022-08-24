@@ -9,6 +9,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
+import { previewLocationCleared } from "devtools/client/debugger/src/reducers/pause";
 
 import classnames from "classnames";
 import ReactTooltip from "react-tooltip";
@@ -188,6 +189,6 @@ export default connect(
   {
     seek: actions.seek,
     setPreviewPausedLocation: actions.setPreviewPausedLocation,
-    clearPreviewPausedLocation: actions.previewLocationCleared,
+    clearPreviewPausedLocation: previewLocationCleared,
   }
 )(FrameTimeline);
