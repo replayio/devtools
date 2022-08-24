@@ -148,7 +148,7 @@ export function createNetworkRequestComment(
 export function createLabels(
   sourceLocation: SourceLocation
 ): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { sourceId, sourceUrl, line } = sourceLocation;
     const filename = getFilenameFromURL(sourceUrl);
     if (!sourceId) {
@@ -168,7 +168,7 @@ export function createLabels(
 
     let snippet = getTextAtLocation(state, sourceLocation) || "";
     if (!snippet) {
-      const sourceContent = await ThreadFront.getSourceContents(sourceId);
+      const sourceContent = await replayClient.getSourceContents(sourceId);
       const lineText = sourceContent.contents.split("\n")[line - 1];
       snippet = lineText?.slice(0, 100).trim();
     }

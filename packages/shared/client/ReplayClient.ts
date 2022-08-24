@@ -22,13 +22,17 @@ import {
   searchSourceContentsMatches,
   SessionId,
   SourceId,
+  functionsMatches,
+  FunctionMatch,
+  keyboardEvents,
+  navigationEvents,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
-import { compareNumericStrings } from "protocol/utils";
+import { compareNumericStrings, defer } from "protocol/utils";
 
 import { ColumnHits, LineHits, ReplayClientEvents, ReplayClientInterface } from "./types";
 
@@ -46,11 +50,13 @@ export class ReplayClient implements ReplayClientInterface {
   private _sessionId: SessionId | null = null;
   private _threadFront: typeof ThreadFront;
 
+  private sessionWaiter = defer<SessionId>();
+
   constructor(dispatchURL: string, threadFront: typeof ThreadFront) {
     this._dispatchURL = dispatchURL;
     this._threadFront = threadFront;
 
-    threadFront.listenForLoadChanges(this._onLoadChanges);
+    this._threadFront.listenForLoadChanges(this._onLoadChanges);
 
     analysisManager.init();
   }
@@ -68,6 +74,11 @@ export class ReplayClient implements ReplayClientInterface {
   // Apps that only communicate with the Replay protocol through this client should use the initialize method instead.
   configure(sessionId: string): void {
     this._sessionId = sessionId;
+    this.sessionWaiter.resolve(sessionId);
+  }
+
+  waitForSession() {
+    return this.sessionWaiter.promise;
   }
 
   get loadedRegions(): LoadedRegions | null {
@@ -138,9 +149,17 @@ export class ReplayClient implements ReplayClientInterface {
     const { sessionId } = await client.Recording.createSession({ recordingId });
 
     this._sessionId = sessionId;
+    this.sessionWaiter.resolve(sessionId);
     this._threadFront.setSessionId(sessionId);
 
     return sessionId;
+  }
+
+  async findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addKeyboardEventsListener(onKeyboardEvents);
+    await client.Session.findKeyboardEvents({}, sessionId!);
+    client.Session.removeKeyboardEventsListener(onKeyboardEvents);
   }
 
   async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
@@ -205,6 +224,13 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
+  async findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
+    const sessionId = this.getSessionIdThrows();
+    client.Session.addNavigationEventsListener(onNavigationEvents);
+    await client.Session.findNavigationEvents({}, sessionId!);
+    client.Session.removeNavigationEventsListener(onNavigationEvents);
+  }
+
   async findSources(): Promise<Source[]> {
     const sources: Source[] = [];
 
@@ -219,6 +245,22 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { data } = await client.Pause.getAllFrames({}, sessionId, pauseId);
     return data;
+  }
+
+  async getAnnotationKinds(): Promise<string[]> {
+    const sessionId = this.getSessionIdThrows();
+    const { kinds } = await client.Session.getAnnotationKinds({}, sessionId);
+    return kinds;
+  }
+
+  async getEventCountForTypes(eventTypes: string[]): Promise<Record<string, number>> {
+    return Object.fromEntries(
+      await Promise.all(
+        eventTypes.map(
+          async eventType => [eventType, await this.getEventCountForType(eventType)] as const
+        )
+      )
+    );
   }
 
   async getEventCountForType(eventType: EventHandlerType): Promise<number> {
@@ -359,7 +401,12 @@ export class ReplayClient implements ReplayClientInterface {
   async getSourceContents(
     sourceId: SourceId
   ): Promise<{ contents: string; contentType: ContentType }> {
-    return this._threadFront.getSourceContents(sourceId);
+    const sessionId = this.getSessionIdThrows();
+    const { contents, contentType } = await client.Debugger.getSourceContents(
+      { sourceId },
+      sessionId
+    );
+    return { contents, contentType };
   }
 
   async getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {
@@ -424,6 +471,39 @@ export class ReplayClient implements ReplayClientInterface {
   /**
    * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
    */
+  async searchFunctions(
+    {
+      query,
+      sourceIds,
+    }: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: FunctionMatch[]) => void
+  ): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+    const thisSearchUniqueId = uniqueId("search-fns-");
+
+    const matchesListener = ({ searchId, matches }: functionsMatches) => {
+      if (searchId === thisSearchUniqueId) {
+        onMatches(matches);
+      }
+    };
+
+    client.Debugger.addFunctionsMatchesListener(matchesListener);
+    try {
+      await client.Debugger.searchFunctions(
+        { searchId: thisSearchUniqueId, sourceIds, query },
+        sessionId
+      );
+    } finally {
+      client.Debugger.removeFunctionsMatchesListener(matchesListener);
+    }
+  }
+
+  /**
+   * Matches can be streamed in over time, so we need to support a callback that can receive them incrementally
+   */
   async searchSources(
     {
       query,
@@ -435,7 +515,7 @@ export class ReplayClient implements ReplayClientInterface {
     onMatches: (matches: SearchSourceContentsMatch[]) => void
   ): Promise<void> {
     const sessionId = this.getSessionIdThrows();
-    const thisSearchUniqueId = uniqueId("search-");
+    const thisSearchUniqueId = uniqueId("search-sources-");
 
     const matchesListener = ({ searchId, matches }: searchSourceContentsMatches) => {
       if (searchId === thisSearchUniqueId) {

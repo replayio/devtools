@@ -42,6 +42,7 @@ import {
 } from "../reducers/app";
 
 import { toggleFocusMode } from "./timeline";
+import { ReplayClientInterface } from "shared/client/types";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -53,7 +54,11 @@ function now(): number {
   return Date.now();
 }
 
-export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
+export function setupApp(
+  store: UIStore,
+  ThreadFront: typeof ThreadFrontType,
+  replayClient: ReplayClientInterface
+) {
   if (!isTest()) {
     tokenManager.addListener(({ token }) => {
       if (token) {
@@ -66,10 +71,12 @@ export function setupApp(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
-    ThreadFront.findKeyboardEvents(({ events }) => onKeyboardEvents(events, store)).then(() => {
-      store.dispatch(loadReceivedKeyboardEvents());
-    });
-    ThreadFront.findNavigationEvents(({ events }) =>
+    replayClient
+      .findKeyboardEvents(({ events }) => onKeyboardEvents(events, store))
+      .then(() => {
+        store.dispatch(loadReceivedKeyboardEvents());
+      });
+    replayClient.findNavigationEvents(({ events }) =>
       onNavigationEvents(events as ReplayNavigationEvent[], store)
     );
   });

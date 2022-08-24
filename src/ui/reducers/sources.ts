@@ -182,7 +182,7 @@ export const {
 } = sourcesSlice.actions;
 
 export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> => {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const existing = getSourceContentsEntry(getState(), sourceId);
     if (existing?.status === LoadingStatus.LOADING) {
       // in flight - resolve this thunk's promise when it completes
@@ -201,7 +201,7 @@ export const loadSourceText = (sourceId: string): UIThunkAction<Promise<void>> =
     dispatch(sourceLoading(sourceId));
 
     try {
-      const response = await ThreadFront.getSourceContents(sourceId);
+      const response = await replayClient.getSourceContents(sourceId);
 
       parser.setSource(sourceId, {
         type: "text",

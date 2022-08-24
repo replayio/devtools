@@ -99,8 +99,8 @@ export async function setupTimeline(store: UIStore) {
 }
 
 export function jumpToInitialPausePoint(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    const { endpoint } = await ThreadFront.getEndpoint();
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    const endpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
     dispatch(pointsReceived([endpoint]));
     let { point, time } = endpoint;
 
@@ -248,7 +248,7 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return async (dispatch, _getState, { ThreadFront }) => {
+  return async (dispatch, _getState, { replayClient }) => {
     if (targetTime == null) {
       return;
     }
@@ -260,7 +260,7 @@ export function seekToTime(targetTime: number): UIThunkAction {
     const nearestEvent = mostRecentPaintOrMouseEvent(targetTime) || { point: "", time: Infinity };
     let bestPoint = nearestEvent;
     try {
-      const pointNearTime = await ThreadFront.getPointNearTime(targetTime);
+      const pointNearTime = await replayClient.getPointNearTime(targetTime);
       if (Math.abs(pointNearTime.time - targetTime) < Math.abs(nearestEvent.time - targetTime)) {
         bestPoint = pointNearTime;
       }
@@ -663,7 +663,7 @@ const shouldRerunAnalysisForBreakpoint = (
 };
 
 export function syncFocusedRegion(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { replayClient }) => {
     const state = getState();
     const focusRegion = getFocusRegion(state) as FocusRegion;
     const zoomTime = getZoomRegion(state);
@@ -672,7 +672,7 @@ export function syncFocusedRegion(): UIThunkAction {
       return;
     }
 
-    ThreadFront.loadRegion(
+    replayClient.loadRegion(
       {
         begin: displayedBeginForFocusRegion(focusRegion),
         end: displayedEndForFocusRegion(focusRegion),

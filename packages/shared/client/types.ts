@@ -24,6 +24,11 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   TimeRange,
+  getResponseBodyResult,
+  getRequestBodyResult,
+  FunctionMatch,
+  keyboardEvents,
+  navigationEvents,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -62,12 +67,16 @@ export interface ReplayClientInterface {
     expression: string,
     frameId: FrameId | null
   ): Promise<EvaluationResult>;
+  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void): Promise<void>;
   findMessages(focusRange: TimeStampedPointRange | null): Promise<{
     messages: Message[];
     overflow: boolean;
   }>;
+  findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
+  getAnnotationKinds(): Promise<string[]>;
+  getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
     focusRange: TimeStampedPointRange | null,
@@ -89,6 +98,13 @@ export interface ReplayClientInterface {
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
   runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
+  searchFunctions(
+    opts: {
+      query: string;
+      sourceIds?: string[];
+    },
+    onMatches: (matches: FunctionMatch[]) => void
+  ): Promise<void>;
   searchSources(
     opts: {
       query: string;

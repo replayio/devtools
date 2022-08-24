@@ -14,10 +14,8 @@ import {
   FrameId,
   Location,
   MappedLocation,
-  keyboardEvents,
   Message,
   missingRegions,
-  navigationEvents,
   newSource,
   ObjectId,
   PauseDescription,
@@ -33,19 +31,15 @@ import {
   SameLineSourceLocations,
   RequestEventInfo,
   RequestInfo,
-  SearchSourceContentsMatch,
-  FunctionMatch,
   responseBodyData,
   requestBodyData,
   findAnnotationsResult,
   Frame,
   PointRange,
-  TimeRange,
   PauseId,
   PauseData,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
-import uniqueId from "lodash/uniqueId";
 
 import { MappedLocationCache } from "../mapped-location-cache";
 import ScopeMapCache from "../scope-map-cache";
@@ -157,9 +151,6 @@ class _ThreadFront {
   // Waiter which resolves when there is at least one loading region
   loadingHasBegun = defer<void>();
 
-  private searchWaiters: Map<string, (params: SearchSourceContentsMatch[]) => void> = new Map();
-  private fnSearchWaiters: Map<string, (params: FunctionMatch[]) => void> = new Map();
-
   // Waiter which resolves when all sources have been loaded.
   private allSourcesWaiter = defer<void>();
   hasAllSources = false;
@@ -206,22 +197,6 @@ class _ThreadFront {
   emit!: (name: ThreadFrontEvent, value?: any) => void;
 
   constructor() {
-    client.Debugger.addSearchSourceContentsMatchesListener(
-      ({ searchId, matches }: { searchId: string; matches: SearchSourceContentsMatch[] }) => {
-        const searchWaiter = this.searchWaiters?.get(searchId);
-        if (searchWaiter) {
-          searchWaiter(matches);
-        }
-      }
-    );
-    client.Debugger.addFunctionsMatchesListener(
-      ({ searchId, matches }: { searchId: string; matches: FunctionMatch[] }) => {
-        const searchWaiter = this.fnSearchWaiters?.get(searchId);
-        if (searchWaiter) {
-          searchWaiter(matches);
-        }
-      }
-    );
     client.Session.addAnnotationsListener(({ annotations }: { annotations: Annotation[] }) => {
       const byKind = groupBy(annotations, "kind");
       Object.keys(byKind).forEach(kind => {
@@ -305,12 +280,6 @@ class _ThreadFront {
         listener(this._mostRecentLoadedRegions);
       }
     }
-  }
-
-  async getAnnotationKinds(): Promise<string[]> {
-    // @ts-ignore
-    const { kinds } = await client.Session.getAnnotationKinds({}, this.sessionId);
-    return kinds;
   }
 
   async getAnnotations(onAnnotations: (annotations: Annotation[]) => void, kind?: string) {
@@ -400,51 +369,8 @@ class _ThreadFront {
     }
   }
 
-  async searchFunctions(
-    { query, sourceIds }: { query: string; sourceIds?: string[] },
-    onMatches: (matches: FunctionMatch[]) => void
-  ) {
-    const sessionId = await this.waitForSession();
-    const searchId = uniqueId("fn-search-");
-    this.fnSearchWaiters.set(searchId, onMatches);
-
-    try {
-      // await client.Debugger.searchFunctions({ searchId, query }, sessionId);
-      await client.Debugger.searchFunctions({ searchId, query, sourceIds }, sessionId);
-    } finally {
-      this.fnSearchWaiters.delete(searchId);
-    }
-  }
-
   async ensureAllSources() {
     await this.allSourcesWaiter.promise;
-  }
-
-  async getSourceContents(sourceId: SourceId) {
-    assert(this.sessionId, "no sessionId");
-    const { contents, contentType } = await client.Debugger.getSourceContents(
-      { sourceId },
-      this.sessionId
-    );
-    return { contents, contentType };
-  }
-
-  async getEventHandlerCounts(eventTypes: string[]) {
-    return Object.fromEntries(
-      await Promise.all(
-        eventTypes.map(async eventType => [
-          eventType,
-          await ThreadFront.getEventHandlerCount(eventType),
-        ])
-      )
-    );
-  }
-
-  async getEventHandlerCount(eventType: string) {
-    await this.waitForSession();
-    assert(this.sessionId, "no sessionId");
-    const { count } = await client.Debugger.getEventHandlerCount({ eventType }, this.sessionId);
-    return count;
   }
 
   getBreakpointPositionsCompressed(
@@ -557,19 +483,6 @@ class _ThreadFront {
     return this.asyncPauses.length
       ? this.asyncPauses[this.asyncPauses.length - 1]
       : this.getCurrentPause();
-  }
-
-  async loadRegion(region: TimeRange, endTime: number) {
-    client.Session.unloadRegion(
-      { region: { begin: 0, end: region.begin } },
-      ThreadFront.sessionId!
-    );
-    client.Session.unloadRegion(
-      { region: { begin: region.end, end: endTime } },
-      ThreadFront.sessionId!
-    );
-
-    await client.Session.loadRegion({ region }, ThreadFront.sessionId!);
   }
 
   async loadAsyncParentFrames() {
@@ -767,15 +680,6 @@ class _ThreadFront {
     return this._findResumeTarget(point, client.Debugger.findResumeTarget);
   }
 
-  getEndpoint() {
-    return client.Session.getEndpoint({}, ThreadFront.sessionId!);
-  }
-
-  async getPointNearTime(time: number) {
-    const { point } = await client.Session.getPointNearTime({ time }, this.sessionId!);
-    return point;
-  }
-
   async findNetworkRequests(
     onRequestsReceived: (data: { requests: RequestInfo[]; events: RequestEventInfo[] }) => void,
     onResponseBodyData: (body: responseBodyData) => void,
@@ -788,32 +692,8 @@ class _ThreadFront {
     client.Network.findRequests({}, sessionId);
   }
 
-  fetchResponseBody(requestId: string) {
-    return client.Network.getResponseBody(
-      { id: requestId, range: { end: 5e9 } },
-      ThreadFront.sessionId!
-    );
-  }
-
-  fetchRequestBody(requestId: string) {
-    return client.Network.getRequestBody(
-      { id: requestId, range: { end: 5e9 } },
-      ThreadFront.sessionId!
-    );
-  }
-
   findMessagesInRange(range: PointRange) {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
-  }
-
-  findKeyboardEvents(onKeyboardEvents: (events: keyboardEvents) => void) {
-    client.Session.addKeyboardEventsListener(onKeyboardEvents);
-    return client.Session.findKeyboardEvents({}, this.sessionId!);
-  }
-
-  findNavigationEvents(onNavigationEvents: (events: navigationEvents) => void) {
-    client.Session.addNavigationEventsListener(onNavigationEvents);
-    return client.Session.findNavigationEvents({}, this.sessionId!);
   }
 
   async findConsoleMessages(

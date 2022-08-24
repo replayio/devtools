@@ -10,6 +10,7 @@ import { ThreadFront, ValueFront } from "protocol/thread";
 import { WiredMessage, RecordingTarget } from "protocol/thread/thread";
 import { Dictionary } from "@reduxjs/toolkit";
 import { SourceDetails } from "ui/reducers/sources";
+import { ReplayClientInterface } from "shared/client/types";
 
 // Information about a jest test which ran in the recording.
 interface JestTestInfo {
@@ -314,7 +315,8 @@ async function getBreakpointLocationOnLine(
 
 // Look for places in the recording used to run jest tests.
 async function setupJestTests(
-  sourcesByUrl: Dictionary<SourceDetails>
+  sourcesByUrl: Dictionary<SourceDetails>,
+  replayClient: ReplayClientInterface
 ): Promise<JestTestState | null> {
   // Look for a source containing the callAsyncCircusFn function which is used to
   // run tests using recent versions of Jest.
@@ -326,7 +328,7 @@ async function setupJestTests(
     return null;
   }
 
-  const { contents } = await ThreadFront.getSourceContents(circusUtilsSourceId);
+  const { contents } = await replayClient.getSourceContents(circusUtilsSourceId);
   const lines = contents.split("\n");
 
   // Whether we've seen the start of the callAsyncCircusFn function.
@@ -393,8 +395,11 @@ function removeTerminalColors(str: string): string {
   return str.replace(/\x1B[[(?);]{0,2}(;?\d)*./g, "");
 }
 
-async function findJestTests(sourcesByUrl: Dictionary<SourceDetails>) {
-  const state = await setupJestTests(sourcesByUrl);
+async function findJestTests(
+  sourcesByUrl: Dictionary<SourceDetails>,
+  replayClient: ReplayClientInterface
+) {
+  const state = await setupJestTests(sourcesByUrl, replayClient);
   if (!state) {
     return;
   }
@@ -450,13 +455,14 @@ async function findJestTests(sourcesByUrl: Dictionary<SourceDetails>) {
 // Look for automated tests associated with a recent version of jest.
 export async function findAutomatedTests(
   recordingTarget: RecordingTarget,
-  sourcesByUrl: Dictionary<SourceDetails>
+  sourcesByUrl: Dictionary<SourceDetails>,
+  replayClient: ReplayClientInterface
 ) {
   if (recordingTarget !== "node") {
     return;
   }
 
-  await findJestTests(sourcesByUrl);
+  await findJestTests(sourcesByUrl, replayClient);
 }
 
 export const TestMessageHandlers: {

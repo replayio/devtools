@@ -18,7 +18,8 @@ import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { Canvas, setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "ui/actions/logpoint";
-import { initSocket, addEventListener } from "protocol/socket";
+// eslint-disable-next-line no-restricted-imports
+import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { bindActionCreators } from "@reduxjs/toolkit";
@@ -55,6 +56,7 @@ import { UnexpectedError } from "ui/state/app";
 
 import { UIState } from "ui/state";
 import { setupGetPreferredLocation } from "ui/utils/preferredLocation";
+import { ReplayClientInterface } from "shared/client/types";
 
 const { setupApp, setupTimeline } = actions;
 
@@ -119,7 +121,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   },
 };
 
-export default async function DevTools(store: AppStore) {
+export default async function setupDevtools(store: AppStore, replayClient: ReplayClientInterface) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -174,7 +176,9 @@ export default async function DevTools(store: AppStore) {
   bootstrapWorkers();
 
   const extraThunkArgs: ThunkExtraArgs = {
-    ThreadFront: ThreadFront,
+    ThreadFront,
+    replayClient,
+    protocolClient,
   };
 
   // Add all these new slice reducers and some related state in a single call,
@@ -213,7 +217,7 @@ export default async function DevTools(store: AppStore) {
     );
   });
 
-  setupApp(store, ThreadFront);
+  setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
   setupEventListeners(store);
   setupGraphics();
