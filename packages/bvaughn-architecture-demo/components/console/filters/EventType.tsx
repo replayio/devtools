@@ -29,6 +29,7 @@ export default function EventType({
     <label
       className={disabled ? styles.EventTypeDisabled : styles.EventType}
       data-test-id={`EventTypes-${event.type}`}
+      data-test-name="EventTypeToggle"
       onClick={stopPropagation}
     >
       <Checkbox disabled={disabled} checked={checked} onChange={toggle} />

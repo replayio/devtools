@@ -655,8 +655,42 @@ async function selectFrame(index: number) {
   await dbgActions.selectFrame(getThreadContext(), frames[index]);
 }
 
-function addEventListenerLogpoints(logpoints: string[]) {
-  return dbgActions.addEventListenerBreakpoints(logpoints);
+// HACKY way of updating an <input> and dispatching events that React will pick up on.
+// We should really be using Playwright and page.fill() for this purpose.
+function setInputValue(input: HTMLInputElement, value: string) {
+  const valueSetter = Object.getOwnPropertyDescriptor(input, "value")!.set!;
+  const prototype = Object.getPrototypeOf(input);
+  const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, "value")!.set!;
+  if (valueSetter && valueSetter !== prototypeValueSetter) {
+    prototypeValueSetter.call(input, value);
+  } else {
+    valueSetter.call(input, value);
+  }
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+async function addEventListenerLogpoints(logpoints: string[]) {
+  const filterInput = await waitUntil(
+    () => document.querySelector<HTMLInputElement>('[data-test-id="EventTypeFilterInput"]'),
+    {
+      waitingFor: "EventTypeFilterInput to be present",
+    }
+  );
+
+  for (let i = 0; i < logpoints.length; i++) {
+    const logpoint = logpoints[i];
+
+    setInputValue(filterInput!, logpoint);
+
+    const toggle = await waitUntil(
+      () => document.querySelector<HTMLElement>('[data-test-name="EventTypeToggle"]'),
+      {
+        waitingFor: "EventTypeToggle to be present",
+      }
+    );
+    toggle!.click();
+  }
 }
 
 async function toggleExceptionLogging() {
@@ -936,6 +970,7 @@ const testCommands = {
   checkJumpIcon,
   checkMessageObjectContents,
   checkPausedMessage,
+  clearConsoleEvaluations,
   disableBreakpoint,
   dispatchMouseEvent,
   dispatchMouseEventInGraphics,
