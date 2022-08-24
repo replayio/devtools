@@ -13,7 +13,12 @@ import { shouldShowNag } from "ui/utils/user";
 import { getSelectedSource } from "ui/reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
-import { fetchHitCounts, getHitCountsForSource } from "ui/reducers/hitCounts";
+import {
+  fetchHitCounts,
+  getHitCountsForSource,
+  getHitCountsStatusForSourceByLine,
+} from "ui/reducers/hitCounts";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -68,6 +73,9 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   const source = useAppSelector(getSelectedSource);
 
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, source!.id));
+  const hitCountStatus = useAppSelector(state =>
+    getHitCountsStatusForSourceByLine(state, source!.id, lastHoveredLineNumber.current || 0)
+  );
 
   let hits: number | undefined;
 
@@ -116,6 +124,14 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
 
   if (!targetNode || isMetaActive) {
     return null;
+  }
+
+  if (hitCountStatus === LoadingStatus.ERRORED) {
+    return (
+      <StaticTooltip targetNode={targetNode}>
+        <Wrapper showWarning={true}>Failed to load hit counts for this section</Wrapper>
+      </StaticTooltip>
+    );
   }
 
   if (!hitCounts) {
