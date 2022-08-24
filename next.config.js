@@ -84,6 +84,15 @@ const baseNextConfig = {
         ],
         source: "/(.*)",
       },
+      {
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+        source: "/_next/static/images/icons-sprite(.*)",
+      },
     ];
   },
 
@@ -182,7 +191,7 @@ const baseNextConfig = {
         include: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
         loader: "file-loader",
         options: {
-          name: "[name].[hash:8].[ext]",
+          name: "icons-sprite.[hash:8].svg",
           publicPath: `/_next/static/images/`,
           outputPath: "static/images",
         },
