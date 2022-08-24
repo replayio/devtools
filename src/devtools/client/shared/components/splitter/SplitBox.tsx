@@ -47,7 +47,10 @@ const SplitBox: FC<SplitterProps> = ({
   }, [size, onControlledPanelResized]);
 
   useEffect(() => {
-    const nodeBounds = splitBoxRef.current!.getBoundingClientRect();
+    if (!splitBoxRef.current) {
+      return;
+    }
+    const nodeBounds = splitBoxRef.current.getBoundingClientRect();
     const splitBoxWidthOrHeight = vert ? nodeBounds.width : nodeBounds.height;
 
     const sizePx = (() => {
