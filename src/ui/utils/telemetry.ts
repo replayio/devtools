@@ -29,6 +29,9 @@ export function setupTelemetry() {
     "already recomputing",
     // sporadic error from asyncStorage, only happens in Mobile Safari
     "Failed to execute 'transaction' on 'IDBDatabase': The database connection is closing.",
+    // this error seems to be triggered by some Office 365 bot,
+    // see https://github.com/getsentry/sentry-javascript/issues/3440
+    "Object Not Found Matching Id:",
   ];
   // We always initialize mixpanel here. This allows us to force enable mixpanel events even if
   // telemetry events are being skipped for any reason, e.g. development, test, etc.
