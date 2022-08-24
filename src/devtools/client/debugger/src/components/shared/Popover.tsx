@@ -8,25 +8,46 @@ import ReactDOM from "react-dom";
 
 import classNames from "classnames";
 import BracketArrow from "./BracketArrow";
+import type { BracketArrowOrientation, BAProps } from "./BracketArrow";
 import SmartGap from "./SmartGap";
 
-class Popover extends Component {
-  $popover;
-  $tooltip;
-  $gap;
-  timerId;
-  wasOnGap;
+interface PopoverProps {
+  type: "tooltip" | "popover";
+  editorRef: any;
+  target: HTMLElement;
+  targetPosition: any;
+  mouseout: () => void;
+  children?: React.ReactNode;
+}
+
+interface PopoverCoords {
+  left: number;
+  top: number;
+  orientation: BracketArrowOrientation;
+  targetMid: { x: number; y: number };
+}
+
+interface PopoverState {
+  coords: PopoverCoords | null;
+}
+
+class Popover extends Component<PopoverProps, PopoverState> {
+  $popover: HTMLDivElement | null = null;
+  $popoverPreview: HTMLDivElement | null = null;
+  $tooltip: HTMLDivElement | null = null;
+  $gap: HTMLElement | null = null;
+  timerId: ReturnType<typeof window.setTimeout> | null = null;
+  wasOnGap: boolean = false;
   state = {
     coords: {
       left: 0,
       top: 0,
       orientation: "down",
       targetMid: { x: 0, y: 0 },
-    },
+    } as PopoverCoords,
   };
   firstRender = true;
-  gapHeight;
-  gapHeight;
+  gapHeight: number = 0;
 
   static defaultProps = {
     type: "popover",
@@ -34,8 +55,7 @@ class Popover extends Component {
 
   componentDidMount() {
     const { type } = this.props;
-    // $FlowIgnore
-    this.gapHeight = this.$gap.getBoundingClientRect().height;
+    this.gapHeight = this.$gap!.getBoundingClientRect().height;
     const coords = type == "popover" ? this.getPopoverCoords() : this.getTooltipCoords();
 
     if (coords) {
@@ -84,7 +104,12 @@ class Popover extends Component {
     this.props.mouseout();
   };
 
-  calculateLeft(target, editor, popover, orientation) {
+  calculateLeft(
+    target: DOMRect,
+    editor: DOMRect,
+    popover: DOMRect,
+    orientation?: BracketArrowOrientation
+  ) {
     const estimatedLeft = target.left;
     const estimatedRight = estimatedLeft + popover.width;
     const isOverflowingRight = estimatedRight > editor.right;
@@ -98,7 +123,7 @@ class Popover extends Component {
     return estimatedLeft;
   }
 
-  calculateTopForRightOrientation = (target, editor, popover) => {
+  calculateTopForRightOrientation = (target: DOMRect, editor: DOMRect, popover: DOMRect) => {
     if (popover.height <= editor.height) {
       const rightOrientationTop = target.top - popover.height / 2;
       if (rightOrientationTop < editor.top) {
@@ -113,7 +138,7 @@ class Popover extends Component {
     return editor.top - target.height;
   };
 
-  calculateOrientation(target, editor, popover) {
+  calculateOrientation(target: DOMRect, editor: DOMRect, popover: DOMRect) {
     const estimatedBottom = target.bottom + popover.height;
     if (editor.bottom > estimatedBottom) {
       return "down";
@@ -126,7 +151,12 @@ class Popover extends Component {
     return "right";
   }
 
-  calculateTop = (target, editor, popover, orientation) => {
+  calculateTop = (
+    target: DOMRect,
+    editor: DOMRect,
+    popover: DOMRect,
+    orientation: BracketArrowOrientation
+  ) => {
     if (orientation === "down") {
       return target.bottom;
     }
@@ -137,7 +167,7 @@ class Popover extends Component {
     return this.calculateTopForRightOrientation(target, editor, popover);
   };
 
-  getPopoverCoords() {
+  getPopoverCoords(): PopoverCoords | null {
     if (!this.$popover || !this.props.editorRef) {
       return null;
     }
@@ -171,7 +201,7 @@ class Popover extends Component {
     };
   }
 
-  getTooltipCoords() {
+  getTooltipCoords(): PopoverCoords | null {
     if (!this.$tooltip || !this.props.editorRef) {
       return null;
     }
@@ -213,15 +243,14 @@ class Popover extends Component {
           type={this.props.type}
           gapHeight={this.gapHeight}
           coords={this.state.coords}
-          // $FlowIgnore
-          offset={this.$gap.getBoundingClientRect().left}
+          offset={this.$gap!.getBoundingClientRect().left}
         />
       </div>
     );
   }
 
-  getPopoverArrow(orientation, left, top) {
-    let arrowProps = {};
+  getPopoverArrow(orientation: BracketArrowOrientation, left: number, top: number) {
+    let arrowProps = {} as React.ComponentProps<typeof BracketArrow>;
 
     if (orientation === "up") {
       arrowProps = { orientation: "down", bottom: 10, left };

@@ -7,7 +7,15 @@
 import React from "react";
 import classNames from "classnames";
 
-const BracketArrow = ({ orientation, left, top, bottom }) => {
+export type BracketArrowOrientation = "up" | "down" | "left" | "right";
+export interface BAProps {
+  orientation?: BracketArrowOrientation;
+  left?: number;
+  top?: number;
+  bottom?: number;
+}
+
+const BracketArrow = ({ orientation, left, top, bottom }: BAProps) => {
   return (
     <div
       className={classNames("bracket-arrow", orientation || "up")}
