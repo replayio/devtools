@@ -383,7 +383,9 @@ async function setMultiSourceLogpoint(
     // Rather than running *this* analysis, create a *new* analysis which only has
     // the found points which fall *inside* of our current focusRegion, and run *that*.
   } finally {
-    await analysis!.releaseAnalysis();
+    if (analysis!) {
+      await analysis.releaseAnalysis();
+    }
   }
 }
 
