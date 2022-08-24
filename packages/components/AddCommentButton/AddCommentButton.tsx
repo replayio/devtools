@@ -5,7 +5,7 @@ import mergeRefs from "react-merge-refs";
 import { Transition } from "react-transition-group";
 import styles from "./AddCommentButton.module.css";
 
-import { Icon } from "../Icon";
+import { Icon } from "design/Icon";
 
 interface AddCommentButtonProps {
   /** Changes the button state to reflect the current active comment is paused on a hit. */
@@ -39,10 +39,10 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
 
     const buttonClassnames = classNames(
       "font-sans font-medium outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
-      styles.addCommentButton,
+      styles.AddCommentButton,
       {
         [styles.isOpened]: isHovered,
-        [styles.pausedOnHit]: isPausedOnHit,
+        [styles.isPausedOnHit]: isPausedOnHit,
       },
       className
     );
@@ -57,7 +57,7 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
         onMouseLeave={clearHover}
         className={buttonClassnames}
       >
-        <Icon name="comment-plus" fill="currentColor" />
+        <Icon name="comment-plus" className={styles.Icon} />
         <TextFade visible={isHovered}>Add Comment</TextFade>
       </button>
     );
@@ -78,7 +78,7 @@ const states = {
 const TextFade = ({ children, visible }: { children: React.ReactNode; visible: boolean }) => (
   <Transition in={visible} timeout={duration}>
     {state => (
-      <span className={styles.fadeText} style={states[state]}>
+      <span className={styles.TextFade} style={states[state]}>
         {children}
       </span>
     )}

@@ -1,4 +1,4 @@
-.fadeText {
+.TextFade {
   white-space: nowrap;
   /* 100ms duration must match constant in component */
   transition: all 100ms 40ms ease;
@@ -7,7 +7,7 @@
   margin: 0 0.5rem 0 0.25rem;
 }
 
-.addCommentButton {
+.AddCommentButton {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
@@ -23,14 +23,18 @@
   background-color: var(--primary-accent);
 }
 
-.addCommentButton svg {
+.AddCommentButton svg {
   flex-shrink: 0;
 }
 
-.addCommentButton.isOpened {
+.AddCommentButton.isOpened {
   width: 122px;
 }
 
-.addCommentButton.pausedOnHit {
+.AddCommentButton.isPausedOnHit {
   background-color: var(--secondary-accent);
+}
+
+.Icon {
+  padding: 0.125rem;
 }
