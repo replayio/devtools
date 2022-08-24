@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
+import { NodeBoundsFront } from "protocol/thread/bounds";
 
 /**
  * Get box quads adjusted for iframes and zoom level.
@@ -27,7 +27,12 @@
  *        An array of objects that have the same structure as quads returned by
  *        getBoxQuads. An empty array if the node has no quads or is invalid.
  */
-function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScroll } = {}) {
+export function getAdjustedQuads(
+  boundaryWindow: Window,
+  node: NodeBoundsFront,
+  region: any,
+  { ignoreZoom, ignoreScroll }: { ignoreZoom?: boolean; ignoreScroll?: boolean } = {}
+) {
   if (!node || !node.getBoxQuads) {
     return [];
   }
@@ -87,7 +92,6 @@ function getAdjustedQuads(boundaryWindow, node, region, { ignoreZoom, ignoreScro
 
   return adjustedQuads;
 }
-exports.getAdjustedQuads = getAdjustedQuads;
 
 /**
  * Check if a node and its document are still alive
@@ -96,7 +100,7 @@ exports.getAdjustedQuads = getAdjustedQuads;
  * @param {DOMNode} node
  * @return {Boolean}
  */
-function isNodeConnected(node) {
+export function isNodeConnected(node: HTMLElement) {
   if (!node.ownerDocument || !node.ownerDocument.defaultView) {
     return false;
   }
@@ -111,7 +115,6 @@ function isNodeConnected(node) {
     return false;
   }
 }
-exports.isNodeConnected = isNodeConnected;
 
 /**
  * Determine whether a node is a ::marker pseudo.
@@ -119,10 +122,9 @@ exports.isNodeConnected = isNodeConnected;
  * @param {DOMNode} node
  * @return {Boolean}
  */
-function isMarkerPseudoElement(node) {
+export function isMarkerPseudoElement(node: HTMLElement) {
   return node.nodeName === "_moz_generated_content_marker";
 }
-exports.isMarkerPseudoElement = isMarkerPseudoElement;
 
 /**
  * Determine whether a node is a ::before pseudo.
@@ -130,10 +132,9 @@ exports.isMarkerPseudoElement = isMarkerPseudoElement;
  * @param {DOMNode} node
  * @return {Boolean}
  */
-function isBeforePseudoElement(node) {
+export function isBeforePseudoElement(node: HTMLElement) {
   return node.nodeName === "_moz_generated_content_before";
 }
-exports.isBeforePseudoElement = isBeforePseudoElement;
 
 /**
  * Determine whether a node is a ::after pseudo.
@@ -141,10 +142,9 @@ exports.isBeforePseudoElement = isBeforePseudoElement;
  * @param {DOMNode} node
  * @return {Boolean}
  */
-function isAfterPseudoElement(node) {
+export function isAfterPseudoElement(node: HTMLElement) {
   return node.nodeName === "_moz_generated_content_after";
 }
-exports.isAfterPseudoElement = isAfterPseudoElement;
 
 /**
  * Returns the viewport's dimensions for the `window` given.
@@ -152,8 +152,7 @@ exports.isAfterPseudoElement = isAfterPseudoElement;
  * @return {Object} An object with `width` and `height` properties, representing the
  * number of pixels for the viewport's size.
  */
-function getViewportDimensions(window) {
-  const canvas = document.getElementById("graphics");
+export function getViewportDimensions() {
+  const canvas = document.getElementById("graphics")! as HTMLCanvasElement;
   return { width: canvas.width, height: canvas.height };
 }
-exports.getViewportDimensions = getViewportDimensions;

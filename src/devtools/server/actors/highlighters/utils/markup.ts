@@ -2,10 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
-const { getViewportDimensions } = require("devtools/shared/layout/utils");
-const EventEmitter = require("devtools/shared/event-emitter");
+import { getViewportDimensions } from "devtools/shared/layout/utils";
+import { NodeFront } from "protocol/thread/node";
 
 const lazyContainer = {
   get CssLogic() {
@@ -13,91 +11,15 @@ const lazyContainer = {
   },
 };
 
-module.exports.getComputedStyle = node => lazyContainer.CssLogic.getComputedStyle(node);
+export const getComputedStyle = (node: HTMLElement) =>
+  lazyContainer.CssLogic.getComputedStyle(node);
 
-module.exports.getBindingElementAndPseudo = node =>
+export const getBindingElementAndPseudo = (node: HTMLElement) =>
   lazyContainer.CssLogic.getBindingElementAndPseudo(node);
 
 const SVG_NS = "http://www.w3.org/2000/svg";
 const XHTML_NS = "http://www.w3.org/1999/xhtml";
 const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
-
-const _tokens = Symbol("classList/tokens");
-
-/**
- * Shims the element's `classList` for anonymous content elements; used
- * internally by `CanvasFrameAnonymousContentHelper.getElement()` method.
- */
-function ClassList(className) {
-  const trimmed = (className || "").trim();
-  this[_tokens] = trimmed ? trimmed.split(/\s+/) : [];
-}
-
-ClassList.prototype = {
-  item(index) {
-    return this[_tokens][index];
-  },
-  contains(token) {
-    return this[_tokens].includes(token);
-  },
-  add(token) {
-    if (!this.contains(token)) {
-      this[_tokens].push(token);
-    }
-    EventEmitter.emit(this, "update");
-  },
-  remove(token) {
-    const index = this[_tokens].indexOf(token);
-
-    if (index > -1) {
-      this[_tokens].splice(index, 1);
-    }
-    EventEmitter.emit(this, "update");
-  },
-  toggle(token, force) {
-    // If force parameter undefined retain the toggle behavior
-    if (force === undefined) {
-      if (this.contains(token)) {
-        this.remove(token);
-      } else {
-        this.add(token);
-      }
-    } else if (force) {
-      // If force is true, enforce token addition
-      this.add(token);
-    } else {
-      // If force is falsy value, enforce token removal
-      this.remove(token);
-    }
-  },
-  get length() {
-    return this[_tokens].length;
-  },
-  [Symbol.iterator]: function* () {
-    for (let i = 0; i < this.tokens.length; i++) {
-      yield this[_tokens][i];
-    }
-  },
-  toString() {
-    return this[_tokens].join(" ");
-  },
-};
-
-/**
- * Is this content window a XUL window?
- * @param {Window} window
- * @return {Boolean}
- */
-function isXUL(window) {
-  // XXX: We temporarily return true for HTML documents if the document disables
-  // scroll frames since the regular highlighter is broken in this case. This
-  // should be removed when bug 1594587 is fixed.
-  return (
-    window.document.documentElement.namespaceURI === XUL_NS ||
-    (window.isChromeWindow && window.document.documentElement.getAttribute("scrolling") === "false")
-  );
-}
-module.exports.isXUL = isXUL;
 
 /**
  * Returns true if a DOM node is "valid", where "valid" means that the node isn't a dead
@@ -106,7 +28,7 @@ module.exports.isXUL = isXUL;
  * @param {Number} nodeType Optional, defaults to ELEMENT_NODE
  * @return {Boolean}
  */
-function isNodeValid(node, nodeType = Node.ELEMENT_NODE) {
+export function isNodeValid(node: NodeFront | undefined, nodeType = Node.ELEMENT_NODE) {
   // Is it still alive?
   if (!node) {
     return false;
@@ -130,7 +52,6 @@ function isNodeValid(node, nodeType = Node.ELEMENT_NODE) {
 
   return true;
 }
-module.exports.isNodeValid = isNodeValid;
 
 /**
  * Helper function that creates SVG DOM nodes.
@@ -143,14 +64,22 @@ module.exports.isNodeValid = isNodeValid;
  * - parent: if provided, the newly created element will be appended to this
  *   node.
  */
-function createSVGNode(win, options) {
+export function createSVGNode(win: Window, options: NodeCreationOptions) {
   if (!options.nodeType) {
     options.nodeType = "box";
   }
   options.namespace = SVG_NS;
   return createNode(win, options);
 }
-module.exports.createSVGNode = createSVGNode;
+
+interface NodeCreationOptions {
+  nodeType?: string;
+  attributes: Record<string, any>;
+  parent?: HTMLElement;
+  text?: string;
+  prefix?: string;
+  namespace?: string;
+}
 
 /**
  * Helper function that creates DOM nodes.
@@ -165,7 +94,7 @@ module.exports.createSVGNode = createSVGNode;
  *   node.
  * - text: if provided, set the text content of the element.
  */
-function createNode(win, options) {
+export function createNode(win: Window, options: NodeCreationOptions) {
   const type = options.nodeType || "div";
   const namespace = options.namespace || XHTML_NS;
   const doc = win.document;
@@ -190,7 +119,6 @@ function createNode(win, options) {
 
   return node;
 }
-module.exports.createNode = createNode;
 
 /**
  * Every highlighters should insert their markup content into the document's
@@ -211,18 +139,21 @@ module.exports.createNode = createNode;
  *        A function that, when executed, returns a DOM node to be inserted into
  *        the canvasFrame.
  */
-function CanvasFrameAnonymousContentHelper(highlighterEnv, nodeBuilder) {
-  this.highlighterEnv = highlighterEnv;
-  this.nodeBuilder = nodeBuilder;
-  this.anonymousContentDocument = document;
+export class CanvasFrameAnonymousContentHelper {
+  listeners = new Map();
+  elements = new Map();
+  anonymousContentDocument: Document | null = document;
+  highlighterEnv: any;
+  nodeBuilder: any;
+  _content: HTMLElement | null = null;
 
-  this.listeners = new Map();
-  this.elements = new Map();
+  constructor(highlighterEnv: any, nodeBuilder: any) {
+    this.highlighterEnv = highlighterEnv;
+    this.nodeBuilder = nodeBuilder;
 
-  this._onWindowReady();
-}
+    this._onWindowReady();
+  }
 
-CanvasFrameAnonymousContentHelper.prototype = {
   destroy() {
     this._remove();
     if (this.highlighterEnv) {
@@ -230,11 +161,10 @@ CanvasFrameAnonymousContentHelper.prototype = {
       this.highlighterEnv = this.nodeBuilder = this._content = null;
     }
     this.anonymousContentDocument = null;
-    this.anonymousContentGlobal = null;
 
     this._removeAllListeners();
     this.elements.clear();
-  },
+  }
 
   _insert() {
     const node = this.nodeBuilder();
@@ -242,7 +172,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
     const container = document.getElementById("highlighter-root");
     container?.appendChild(node);
     this._content = node;
-  },
+  }
 
   _remove() {
     const container = document.getElementById("highlighter-root");
@@ -250,7 +180,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
       container.removeChild(container.firstChild);
     }
     this._content = null;
-  },
+  }
 
   /**
    * The "window-ready" event can be triggered when:
@@ -264,59 +194,55 @@ CanvasFrameAnonymousContentHelper.prototype = {
     this.elements.clear();
     this._insert();
     this.anonymousContentDocument = document;
-  },
+  }
 
-  getComputedStylePropertyValue(id, property) {
+  getComputedStylePropertyValue(id: string, property: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
+      const node = this.content.querySelector(`#${id}`)!;
       const computed = window.getComputedStyle(node);
       return computed.getPropertyValue(property);
     }
-  },
+  }
 
-  getTextContentForElement(id) {
+  getTextContentForElement(id: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
-      return node.innerText;
+      const node = this.content.querySelector<HTMLElement>(`#${id}`)!;
+      return node!.innerText;
     }
-  },
+  }
 
-  setTextContentForElement(id, text) {
+  setTextContentForElement(id: string, text: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
+      const node = this.content.querySelector<HTMLElement>(`#${id}`)!;
       node.innerText = text;
     }
-  },
+  }
 
-  setAttributeForElement(id, name, value) {
+  setAttributeForElement(id: string, name: string, value: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
+      const node = this.content.querySelector(`#${id}`)!;
       node.setAttribute(name, value);
     }
-  },
+  }
 
-  getAttributeForElement(id, name) {
+  getAttributeForElement(id: string, name: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
+      const node = this.content.querySelector(`#${id}`)!;
       return node.getAttribute(name);
     }
     return "";
-  },
+  }
 
-  removeAttributeForElement(id, name) {
+  removeAttributeForElement(id: string, name: string) {
     if (this.content) {
-      const node = this.content.querySelector(`#${id}`);
+      const node = this.content.querySelector(`#${id}`)!;
       node.removeAttribute(name);
     }
-  },
+  }
 
-  hasAttributeForElement(id, name) {
+  hasAttributeForElement(id: string, name: string) {
     return typeof this.getAttributeForElement(id, name) === "string";
-  },
-
-  getCanvasContext(id, type = "2d") {
-    return this.content && this.content.getCanvasContext(id, type);
-  },
+  }
 
   /**
    * Add an event listener to one of the elements inserted in the canvasFrame
@@ -354,7 +280,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
    * @param {String} type
    * @param {Function} handler
    */
-  addEventListenerForElement(id, type, handler) {
+  addEventListenerForElement(id: string, type: string, handler: () => void) {
     if (typeof id !== "string") {
       throw new Error("Expected a string ID in addEventListenerForElement but" + " got: " + id);
     }
@@ -369,7 +295,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
 
     const listeners = this.listeners.get(type);
     listeners.set(id, handler);
-  },
+  }
 
   /**
    * Remove an event listener from one of the elements inserted in the
@@ -377,7 +303,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
    * @param {String} id
    * @param {String} type
    */
-  removeEventListenerForElement(id, type) {
+  removeEventListenerForElement(id: string, type: string) {
     const listeners = this.listeners.get(type);
     if (!listeners) {
       return;
@@ -389,9 +315,9 @@ CanvasFrameAnonymousContentHelper.prototype = {
       const target = this.highlighterEnv.pageListenerTarget;
       target.removeEventListener(type, this, true);
     }
-  },
+  }
 
-  handleEvent(event) {
+  handleEvent(event: Event) {
     const listeners = this.listeners.get(event.type);
     if (!listeners) {
       return;
@@ -409,13 +335,14 @@ CanvasFrameAnonymousContentHelper.prototype = {
             isPropagationStopped = true;
           };
         }
+        // @ts-expect-error
         return obj[name];
       },
     });
 
     // Start at originalTarget, bubble through ancestors and call handlers when
     // needed.
-    let node = event.originalTarget;
+    let node = (event as any).originalTarget;
     while (node) {
       const handler = listeners.get(node.id);
       if (handler) {
@@ -426,7 +353,7 @@ CanvasFrameAnonymousContentHelper.prototype = {
       }
       node = node.parentNode;
     }
-  },
+  }
 
   _removeAllListeners() {
     if (this.highlighterEnv && this.highlighterEnv.pageListenerTarget) {
@@ -436,49 +363,40 @@ CanvasFrameAnonymousContentHelper.prototype = {
       }
     }
     this.listeners.clear();
-  },
+  }
 
-  getElement(id) {
+  getElement(id: string) {
     if (this.elements.has(id)) {
       return this.elements.get(id);
     }
 
-    const classList = new ClassList(this.getAttributeForElement(id, "class"));
-
-    EventEmitter.on(classList, "update", () => {
-      this.setAttributeForElement(id, "class", classList.toString());
-    });
-
     const element = {
       getTextContent: () => this.getTextContentForElement(id),
-      setTextContent: text => this.setTextContentForElement(id, text),
-      setAttribute: (name, val) => this.setAttributeForElement(id, name, val),
-      getAttribute: name => this.getAttributeForElement(id, name),
-      removeAttribute: name => this.removeAttributeForElement(id, name),
-      hasAttribute: name => this.hasAttributeForElement(id, name),
-      getCanvasContext: type => this.getCanvasContext(id, type),
-      addEventListener: (type, handler) => {
+      setTextContent: (text: string) => this.setTextContentForElement(id, text),
+      setAttribute: (name: string, val: string) => this.setAttributeForElement(id, name, val),
+      getAttribute: (name: string) => this.getAttributeForElement(id, name),
+      removeAttribute: (name: string) => this.removeAttributeForElement(id, name),
+      hasAttribute: (name: string) => this.hasAttributeForElement(id, name),
+      addEventListener: (type: string, handler: () => void) => {
         return this.addEventListenerForElement(id, type, handler);
       },
-      removeEventListener: (type, handler) => {
-        return this.removeEventListenerForElement(id, type, handler);
+      removeEventListener: (type: string, handler: () => void) => {
+        return this.removeEventListenerForElement(id, type);
       },
       computedStyle: {
-        getPropertyValue: property => this.getComputedStylePropertyValue(id, property),
+        getPropertyValue: (property: string) => this.getComputedStylePropertyValue(id, property),
       },
-      classList,
     };
 
     this.elements.set(id, element);
 
     return element;
-  },
+  }
 
   get content() {
     return this._content;
-  },
-};
-module.exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHelper;
+  }
+}
 
 /**
  * Move the infobar to the right place in the highlighter. This helper method is utilized
@@ -505,11 +423,16 @@ module.exports.CanvasFrameAnonymousContentHelper = CanvasFrameAnonymousContentHe
  *         If set to `true`, hides the infobar if it's offscreen, instead of automatically
  *         reposition it.
  */
-function moveInfobar(container, bounds, win, options = {}) {
+function moveInfobar(
+  container: HTMLElement,
+  bounds: DOMRect,
+  win: Window,
+  options: { position?: "top" | "bottom"; hideIfOffscreen?: boolean } = {}
+) {
   const zoom = 1;
-  const viewport = getViewportDimensions(win);
+  const viewport = getViewportDimensions();
 
-  const { computedStyle } = container;
+  const { computedStyle } = container as any;
 
   const margin = 2;
   const arrowSize = parseFloat(computedStyle.getPropertyValue("--highlighter-bubble-arrow-size"));
