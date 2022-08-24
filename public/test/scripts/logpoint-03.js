@@ -4,7 +4,7 @@ Test.describe(`Test event logpoints when replaying.`, async () => {
 
   const msg = await Test.waitForMessage("MouseEvent");
 
-  // TODO This test helper needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This test helper needs to be rewritten
   return;
 
   // The message's preview should contain useful properties.

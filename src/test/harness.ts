@@ -517,50 +517,6 @@ async function toggleObjectInspectorNode(node: HTMLElement, expand: boolean = tr
   }
 }
 
-// TODO BRIAN Re-think this whole function/structure
-async function checkMessageObjectContents(
-  msg: HTMLElement,
-  expected: string[],
-  expandList: string[] = []
-) {
-  for (const label of expandList) {
-    const oi = await findMessageExpandableObjectInspector(msg, label);
-    if (oi == null) {
-      throw Error(`Could not find object inspector with label "${label}"`);
-    }
-    await toggleObjectInspectorNode(oi);
-
-    // TODO BRIAN
-    const getterButton: HTMLElement | null = oi.querySelector(".invoke-getter");
-    if (getterButton) {
-      getterButton.click();
-      // TODO BRIAN
-      await waitUntil(() => oi.querySelector(".objectBox"), {
-        waitingFor: "The getter's value is shown",
-      });
-    }
-
-    // TODO BRIAN
-    const expandButton: HTMLElement | null = oi.querySelector(".arrow");
-    if (expandButton) {
-      expandButton.click();
-    }
-
-    await waitUntil(
-      () => {
-        // TODO BRIAN
-        const nodes = oi.querySelectorAll<HTMLElement>(".tree-node");
-        if (nodes && nodes.length > 1) {
-          const properties = [...nodes].map(n => n.textContent);
-          return expected.every(s => properties.find(v => v!.includes(s)));
-        }
-        return null;
-      },
-      { waitingFor: ".tree-node to be present" }
-    );
-  }
-}
-
 async function checkPausedMessage(text: string) {
   await waitUntil(
     () => {
@@ -968,7 +924,6 @@ const testCommands = {
   checkHighlighterShape,
   checkHighlighterVisible,
   checkJumpIcon,
-  checkMessageObjectContents,
   checkPausedMessage,
   clearConsoleEvaluations,
   disableBreakpoint,

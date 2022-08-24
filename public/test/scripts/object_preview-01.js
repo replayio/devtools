@@ -29,7 +29,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
 
   msg = await Test.waitForMessage('{_foo: C');
 
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ['_foo: C{baz: "baz"}" }', 'bar: "bar"', 'baz: "baz"'], ["foo", "bar"]);
 
   await Test.warpToMessage("Done");
@@ -51,12 +51,12 @@ Test.describe(`expressions in the console after time warping.`, async () => {
 
   Test.executeInConsole("Array(1, 2, 3)");
   msg = await Test.waitForMessage("Array(3) [1, 2, 3]");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "length: 3"]);
 
   await Test.executeInConsole("new Uint8Array([1, 2, 3, 4])");
   msg = await Test.waitForMessage("Uint8Array(4) [1, 2, 3, 4]");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "3: 4", "length: 4"]);
 
   await Test.executeInConsole(`RegExp("abd", "g")`);
@@ -64,18 +64,18 @@ Test.describe(`expressions in the console after time warping.`, async () => {
 
   // RegExp object properties are not currently available in chromium.
   if (target == "gecko") {
-    // TODO This function needs to be rewritten
+    // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["global: true", `source: "abd"`]);
   }
 
   await Test.executeInConsole("new Set([1, 2, 3])");
   msg = await Test.waitForMessage("Set(3) [1, 2, 3]");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "size: 3"], ["<entries>"]);
 
   await Test.executeInConsole("new Map([[1, {a:1}], [2, {b:2}]])");
   msg = await Test.waitForMessage("Map(2) {1 → {…}, 2 → {…}}");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(
   //   msg,
   //   ["0: 1 → Object { a: 1 }", "1: 2 → Object { b: 2 }", "size: 2"],
@@ -84,12 +84,12 @@ Test.describe(`expressions in the console after time warping.`, async () => {
 
   await Test.executeInConsole("new WeakSet([{a:1}, {b:2}])");
   msg = await Test.waitForMessage("WeakSet(2) [{…}, {…}]");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["Object { a: 1 }", "Object { b: 2 }"], ["<entries>"]);
 
   await Test.executeInConsole("new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
   msg = await Test.waitForMessage("WeakMap(2) {{…} → {…}, {…} → {…}}");
-  // TODO This function needs to be rewritten
+  // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(
   //   msg,
   //   ["Object { a: 1 } → Object { b: 1 }", "Object { a: 2 } → Object { b: 2 }"],
@@ -101,7 +101,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
 
   // Promise contents aren't currently available in chromium.
   if (target == "gecko") {
-    // TODO This function needs to be rewritten
+    // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
     // await Test.checkMessageObjectContents(msg, ['"pending"'], []);
   }
 
@@ -111,7 +111,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   msg = await Test.waitForMessage("Promise{}");
 
   if (target == "gecko") {
-    // TODO This function needs to be rewritten
+    // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
     // await Test.checkMessageObjectContents(msg, ['"fulfilled"', "a: 1"], ["<value>"]);
   }
 
@@ -121,7 +121,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   msg = await Test.waitForMessage("Promise{}");
 
   if (target == "gecko") {
-    // TODO This function needs to be rewritten
+    // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
     // await Test.checkMessageObjectContents(msg, ['"rejected"', "a: 1"], ["<value>"]);
   }
 

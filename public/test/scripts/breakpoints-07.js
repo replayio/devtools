@@ -26,7 +26,7 @@
     await Test.addBreakpoint("bundle_input.js", 5);
     await Test.addLogpoint("bundle_input.js", 5);
 
-    // TODO This recording doesn't actually have any sources (at least the Protocol doesn't return any).
+    // TODO (replayio/devtools/pull/7586) This recording doesn't actually have any sources (at least the Protocol doesn't return any).
     // The test is cheating by specifying a fake "bundle_input" source
     // but the new Console won't render this, since it can't match it up with an actual source.
     Test.finish();
