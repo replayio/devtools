@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { NodeBoundsFront } from "protocol/thread/bounds";
+import { NodeFront } from "protocol/thread/node";
 
 /**
  * Get box quads adjusted for iframes and zoom level.
@@ -29,7 +30,7 @@ import { NodeBoundsFront } from "protocol/thread/bounds";
  */
 export function getAdjustedQuads(
   boundaryWindow: Window,
-  node: NodeBoundsFront,
+  node: NodeFront | null | undefined,
   region: any,
   { ignoreZoom, ignoreScroll }: { ignoreZoom?: boolean; ignoreScroll?: boolean } = {}
 ) {

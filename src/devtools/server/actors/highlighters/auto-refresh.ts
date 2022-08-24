@@ -4,16 +4,23 @@
 
 "use strict";
 
-const EventEmitter = require("devtools/shared/event-emitter");
-const { isNodeValid } = require("devtools/server/actors/highlighters/utils/markup");
-const { getAdjustedQuads } = require("devtools/shared/layout/utils");
+import EventEmitter from "devtools/shared/event-emitter";
+import { isNodeValid } from "devtools/server/actors/highlighters/utils/markup";
+import { getAdjustedQuads } from "devtools/shared/layout/utils";
+import { NodeFront } from "protocol/thread/node";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
 const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"];
 const QUADS_PROPS = ["p1", "p2", "p3", "p4"];
 
-function arePointsDifferent(pointA, pointB) {
+interface Point {
+  x: number;
+  y: number;
+  w: number;
+}
+
+function arePointsDifferent(pointA: Point, pointB: Point) {
   return (
     Math.abs(pointA.x - pointB.x) >= 0.5 ||
     Math.abs(pointA.y - pointB.y) >= 0.5 ||
@@ -21,7 +28,7 @@ function arePointsDifferent(pointA, pointB) {
   );
 }
 
-function areQuadsDifferent(oldQuads, newQuads) {
+function areQuadsDifferent(oldQuads: Record<string, any[]>, newQuads: Record<string, any[]>) {
   for (const region of BOX_MODEL_REGIONS) {
     const { length } = oldQuads[region];
 
@@ -64,20 +71,32 @@ function areQuadsDifferent(oldQuads, newQuads) {
  * - hidden
  * - updated
  */
-function AutoRefreshHighlighter(highlighterEnv) {
-  EventEmitter.decorate(this);
+// function AutoRefreshHighlighter(highlighterEnv) {
+//   EventEmitter.decorate(this);
 
-  this.highlighterEnv = highlighterEnv;
+//   this.highlighterEnv = highlighterEnv;
 
-  this.currentNode = null;
-  this.currentQuads = {};
+//   this.currentNode = null;
+//   this.currentQuads = {};
 
-  this.update = this.update.bind(this);
-}
+//   this.update = this.update.bind(this);
+// }
 
-AutoRefreshHighlighter.prototype = {
-  _ignoreZoom: false,
-  _ignoreScroll: false,
+// AutoRefreshHighlighter.prototype = {
+class AutoRefreshHighlighter {
+  _ignoreZoom = false;
+  _ignoreScroll = false;
+  highlighterEnv: any;
+  currentNode: NodeFront | undefined = undefined;
+  currentQuads: Record<string, any> = {};
+  options: any;
+
+  constructor(highlighterEnv: any) {
+    EventEmitter.decorate(this);
+    this.highlighterEnv = highlighterEnv;
+
+    this.update = this.update.bind(this);
+  }
 
   /**
    * Window corresponding to the current highlighterEnv. When replaying, this
@@ -86,12 +105,12 @@ AutoRefreshHighlighter.prototype = {
    */
   get win() {
     return window;
-  },
+  }
 
   /* Window containing the target content. */
   get contentWindow() {
     return this.win;
-  },
+  }
 
   /**
    * Show the highlighter on a given node
@@ -99,7 +118,7 @@ AutoRefreshHighlighter.prototype = {
    * @param {Object} options
    *        Object used for passing options
    */
-  show: function (node, options = {}) {
+  show(node: NodeFront | undefined, options: any = {}) {
     const isSameNode = node === this.currentNode;
     const isSameOptions = this._isSameOptions(options);
 
@@ -112,28 +131,30 @@ AutoRefreshHighlighter.prototype = {
     this.currentNode = node;
     this._updateAdjustedQuads();
 
-    const shown = this._show();
+    const shown = this._show() as unknown as boolean;
     if (shown) {
+      // @ts-expect-error
       this.emit("shown");
     }
     return shown;
-  },
+  }
 
   /**
    * Hide the highlighter
    */
-  hide: function () {
+  hide() {
     if (!this.currentNode) {
       return;
     }
 
     this._hide();
-    this.currentNode = null;
+    this.currentNode = undefined;
     this.currentQuads = {};
     this.options = null;
 
+    // @ts-expect-error
     this.emit("hidden");
-  },
+  }
 
   /**
    * Whether the current node is valid for this highlighter type.
@@ -142,15 +163,15 @@ AutoRefreshHighlighter.prototype = {
    * @param {DOMNode} node
    * @return {Boolean}
    */
-  _isNodeValid: function (node) {
+  _isNodeValid(node: NodeFront | undefined) {
     return isNodeValid(node);
-  },
+  }
 
   /**
    * Are the provided options the same as the currently stored options?
    * Returns false if there are no options stored currently.
    */
-  _isSameOptions: function (options) {
+  _isSameOptions(options: any) {
     if (!this.options) {
       return false;
     }
@@ -168,12 +189,12 @@ AutoRefreshHighlighter.prototype = {
     }
 
     return true;
-  },
+  }
 
   /**
    * Update the stored box quads by reading the current node's box quads.
    */
-  _updateAdjustedQuads: function () {
+  _updateAdjustedQuads() {
     this.currentQuads = {};
 
     for (const region of BOX_MODEL_REGIONS) {
@@ -182,65 +203,65 @@ AutoRefreshHighlighter.prototype = {
         ignoreZoom: this._ignoreZoom,
       });
     }
-  },
+  }
 
   /**
    * Update the knowledge we have of the current node's boxquads and return true
    * if any of the points x/y or bounds have change since.
    * @return {Boolean}
    */
-  _hasMoved: function () {
+  _hasMoved() {
     const oldQuads = this.currentQuads;
     this._updateAdjustedQuads();
 
     return areQuadsDifferent(oldQuads, this.currentQuads);
-  },
+  }
 
   /**
    * Update the highlighter if the node has moved since the last update.
    */
-  update: function () {
+  update() {
     if (!this._isNodeValid(this.currentNode)) {
       return;
     }
 
     this._update();
+    // @ts-expect-error
     this.emit("updated");
-  },
+  }
 
-  _show: function () {
+  _show() {
     // To be implemented by sub classes
     // When called, sub classes should actually show the highlighter for
     // this.currentNode, potentially using options in this.options
     throw new Error("Custom highlighter class had to implement _show method");
-  },
+  }
 
-  _update: function () {
+  _update() {
     // To be implemented by sub classes
     // When called, sub classes should update the highlighter shown for
     // this.currentNode
     // This is called as a result of a page zoom or repaint
     throw new Error("Custom highlighter class had to implement _update method");
-  },
+  }
 
-  _scrollUpdate: function () {
+  _scrollUpdate() {
     // Can be implemented by sub classes
     // When called, sub classes can upate the highlighter shown for
     // this.currentNode
     // This is called as a result of a page scroll
-  },
+  }
 
-  _hide: function () {
+  _hide() {
     // To be implemented by sub classes
     // When called, sub classes should actually hide the highlighter
     throw new Error("Custom highlighter class had to implement _hide method");
-  },
+  }
 
-  destroy: function () {
+  destroy() {
     this.hide();
 
     this.highlighterEnv = null;
-    this.currentNode = null;
-  },
-};
-exports.AutoRefreshHighlighter = AutoRefreshHighlighter;
+    this.currentNode = undefined;
+  }
+}
