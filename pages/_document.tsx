@@ -61,6 +61,7 @@ export default class MyDocument extends Document {
           <meta httpEquiv="Content-Security-Policy" content={csp(this.props)} />
           <link rel="stylesheet" href="/fonts/inter/inter.css" />
           <link rel="stylesheet" href="/fonts/material_icons/material_icons.css" />
+          <link rel="preload" as="image" href="/icons.sprite.svg" />
         </Head>
         <body>
           <Main />
