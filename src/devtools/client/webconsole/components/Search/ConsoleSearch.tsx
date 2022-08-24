@@ -73,7 +73,7 @@ export default function ConsoleSearch({}: Props) {
         onKeyDown={onKeyDown}
         placeholder="Find string in logs"
         query={query}
-        summaryMsg={summaryMsg}
+        summaryMsg={summaryMsg || ""}
       />
     </div>
   );
