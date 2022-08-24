@@ -121,7 +121,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   },
 };
 
-export default async function setupDevtools(store: AppStore, replayClient?: ReplayClientInterface) {
+export default async function setupDevtools(store: AppStore, replayClient: ReplayClientInterface) {
   if (window.hasAlreadyBootstrapped) {
     return;
   } else {
@@ -153,15 +153,6 @@ export default async function setupDevtools(store: AppStore, replayClient?: Repl
   window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
-
-  if (!replayClient) {
-    // This _should_ have been passed in from `RecordingPage`.
-    // But, some test code also calls `setupDevtools()`, and those
-    // test files don't call `useReplayClient` anywhere.
-    // Grab the usual instance manually so we can pass it to thunks.
-    const replayClientModule = await import("shared/client/ReplayClientContext");
-    replayClient = replayClientModule.replayClient;
-  }
 
   const initialDebuggerState = await dbgClient.loadInitialState();
   const initialConsoleState = getConsoleInitialState();

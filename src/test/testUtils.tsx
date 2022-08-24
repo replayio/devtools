@@ -9,6 +9,7 @@ import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
+import { createMockReplayClient } from "@bvaughn/src/utils/testing";
 
 import {
   createRecordingOwnerUserIdMock,
@@ -88,7 +89,7 @@ interface ExtendedRenderOptions extends Omit<RenderOptions, "queries"> {
 
 export async function createTestStore(preloadedState: Partial<UIState> = {}) {
   const store = bootstrapStore(preloadedState);
-  await setupDevtools(store);
+  await setupDevtools(store, createMockReplayClient());
 
   return store;
 }
