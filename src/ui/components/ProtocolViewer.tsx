@@ -27,6 +27,7 @@ import { sanitize } from "ui/utils/sanitize";
 
 import styles from "./ProtocolViewer.module.css";
 import { PrimarySmButton } from "./shared/Button";
+import { useGetRecordingId } from "ui/hooks/recordings";
 
 const ReactJson = dynamic(() => import("react-json-view"), {
   ssr: false,
@@ -136,6 +137,7 @@ function ProtocolRequestDetail({
   response: (CommandResponse & Recorded) | undefined;
 }) {
   const { internal: isInternalUser } = useGetUserInfo();
+  const recordingId = useGetRecordingId();
 
   let className = "";
   if (error != null) {
@@ -149,7 +151,12 @@ function ProtocolRequestDetail({
   if (isInternalUser) {
     if (error != null || response == null) {
       const title = `${request.method} failure`;
-      const body = `Session ID: ${ThreadFront.sessionId}\nCommand ID: ${request.id}`;
+      const body = [
+        `Recording ID: ${recordingId}`,
+        `Session ID: ${ThreadFront.sessionId}`,
+        `Command ID: ${request.id}`,
+      ].join("\n");
+
       reportBugLink = `${BACKEND_GITHUB_REPO_BASE_URL}/issues/new?body=${encodeURIComponent(
         body
       )}&title=${encodeURIComponent(title)}&labels=bug,bug-report`;
