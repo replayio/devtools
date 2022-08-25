@@ -48,6 +48,8 @@ const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
 let throttledDispatchPromise: Promise<void> | null = null;
 
+const TEST = process.env.NODE_ENV === "test";
+
 export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
@@ -63,7 +65,7 @@ export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontTyp
   const disableNewComponentArchitecture = prefsService.getBoolPref(
     "devtools.features.disableNewComponentArchitecture"
   );
-  if (disableNewComponentArchitecture) {
+  if (disableNewComponentArchitecture || TEST) {
     ThreadFront.findConsoleMessages(
       (_, msg) => store.dispatch(onConsoleMessage(msg)),
       () => store.dispatch(onConsoleOverflow())
