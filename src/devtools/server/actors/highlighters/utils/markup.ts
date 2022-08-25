@@ -3,6 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { getViewportDimensions } from "devtools/shared/layout/utils";
+import { NodeBoundsFront } from "protocol/thread/bounds";
 import { NodeFront } from "protocol/thread/node";
 
 const lazyContainer = {
@@ -28,7 +29,10 @@ const XUL_NS = "http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul";
  * @param {Number} nodeType Optional, defaults to ELEMENT_NODE
  * @return {Boolean}
  */
-export function isNodeValid(node: NodeFront | undefined, nodeType = Node.ELEMENT_NODE) {
+export function isNodeValid(
+  node: NodeFront | NodeBoundsFront | undefined,
+  nodeType = Node.ELEMENT_NODE
+) {
   // Is it still alive?
   if (!node) {
     return false;
@@ -41,12 +45,12 @@ export function isNodeValid(node: NodeFront | undefined, nodeType = Node.ELEMENT
   }
 
   // Is it of the right type?
-  if (node.nodeType !== nodeType) {
+  if ((node as NodeFront).nodeType !== nodeType) {
     return false;
   }
 
   // Is the node connected to the document?
-  if (!node.isConnected) {
+  if (!(node as NodeFront).isConnected) {
     return false;
   }
 
@@ -75,7 +79,7 @@ export function createSVGNode(win: Window, options: NodeCreationOptions) {
 interface NodeCreationOptions {
   nodeType?: string;
   attributes: Record<string, any>;
-  parent?: HTMLElement;
+  parent?: Element;
   text?: string;
   prefix?: string;
   namespace?: string;
@@ -423,7 +427,7 @@ export class CanvasFrameAnonymousContentHelper {
  *         If set to `true`, hides the infobar if it's offscreen, instead of automatically
  *         reposition it.
  */
-function moveInfobar(
+export function moveInfobar(
   container: HTMLElement,
   bounds: DOMRect,
   win: Window,
@@ -524,4 +528,3 @@ function moveInfobar(
 
   container.setAttribute("position", positionAttribute);
 }
-module.exports.moveInfobar = moveInfobar;

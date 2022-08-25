@@ -27,7 +27,7 @@
 
 "use strict";
 
-const nodeConstants = require("devtools/shared/dom-node-constants");
+const nodeConstants = require("devtools/shared/dom-node-constants").default;
 const {
   getBindingElementAndPseudo,
   getCSSStyleRules,

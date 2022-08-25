@@ -30,7 +30,7 @@ import { NodeFront } from "protocol/thread/node";
  */
 export function getAdjustedQuads(
   boundaryWindow: Window,
-  node: NodeFront | null | undefined,
+  node: NodeFront | NodeBoundsFront | null | undefined,
   region: any,
   { ignoreZoom, ignoreScroll }: { ignoreZoom?: boolean; ignoreScroll?: boolean } = {}
 ) {

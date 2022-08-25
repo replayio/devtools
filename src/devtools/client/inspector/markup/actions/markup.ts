@@ -29,7 +29,7 @@ import {
 import { paused } from "devtools/client/debugger/src/reducers/pause";
 
 import Highlighter from "highlighter/highlighter";
-import { DOCUMENT_TYPE_NODE, TEXT_NODE } from "devtools/shared/dom-node-constants";
+import NodeConstants from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
 
 let rootNodeWaiter: Deferred<void> | undefined;
@@ -145,7 +145,7 @@ export function addChildren(
   return async (dispatch, getState, { ThreadFront }) => {
     if (!features.showWhitespaceNodes) {
       childFronts = childFronts.filter(
-        node => node.nodeType !== TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
+        node => node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
       );
     }
 
@@ -304,7 +304,7 @@ function getPreviousNodeId(state: UIState, nodeId: string) {
   }
   const parentNodeInfo = getNodeInfo(state, parentNodeId);
   assert(parentNodeInfo, "parent node not found in markup state");
-  if (parentNodeInfo.type === DOCUMENT_TYPE_NODE) {
+  if (parentNodeInfo.type === NodeConstants.DOCUMENT_TYPE_NODE) {
     return nodeId;
   }
   const index = parentNodeInfo.children.indexOf(nodeId);
@@ -357,7 +357,7 @@ export function onLeftKey(): UIThunkAction {
       const parentNodeId = getParentNodeId(state, selectedNodeId);
       if (parentNodeId != null) {
         const parentNodeInfo = getNodeInfo(state, parentNodeId);
-        if (parentNodeInfo && parentNodeInfo.type !== DOCUMENT_TYPE_NODE) {
+        if (parentNodeInfo && parentNodeInfo.type !== NodeConstants.DOCUMENT_TYPE_NODE) {
           dispatch(selectNode(parentNodeId, "keyboard"));
         }
       }
@@ -475,7 +475,8 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
   return {
     attributes: node.attributes,
     children: [],
-    displayName: node.nodeType === DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
+    displayName:
+      node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
     displayType: await node.getDisplayType(),
     hasChildren: !!node.hasChildren,
     hasEventListeners: await node.hasEventListeners(),

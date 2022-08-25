@@ -10,7 +10,7 @@ const PropTypes = require("prop-types");
 const { isGrip, wrapRender } = require("./rep-utils");
 const { rep: StringRep, isLongString } = require("./string");
 const { MODE } = require("./constants");
-const nodeConstants = require("devtools/shared/dom-node-constants");
+const nodeConstants = require("devtools/shared/dom-node-constants").default;
 const { createPrimitiveValueFront } = require("protocol/thread");
 
 const MAX_ATTRIBUTE_LENGTH = 50;

@@ -8,19 +8,14 @@ import EventEmitter from "devtools/shared/event-emitter";
 import { isNodeValid } from "devtools/server/actors/highlighters/utils/markup";
 import { getAdjustedQuads } from "devtools/shared/layout/utils";
 import { NodeFront } from "protocol/thread/node";
+import { NodeBoundsFront } from "protocol/thread/bounds";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
-const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"];
-const QUADS_PROPS = ["p1", "p2", "p3", "p4"];
+const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"] as const;
+const QUADS_PROPS = ["p1", "p2", "p3", "p4"] as const;
 
-interface Point {
-  x: number;
-  y: number;
-  w: number;
-}
-
-function arePointsDifferent(pointA: Point, pointB: Point) {
+function arePointsDifferent(pointA: DOMPoint, pointB: DOMPoint) {
   return (
     Math.abs(pointA.x - pointB.x) >= 0.5 ||
     Math.abs(pointA.y - pointB.y) >= 0.5 ||
@@ -28,7 +23,10 @@ function arePointsDifferent(pointA: Point, pointB: Point) {
   );
 }
 
-function areQuadsDifferent(oldQuads: Record<string, any[]>, newQuads: Record<string, any[]>) {
+function areQuadsDifferent(
+  oldQuads: Record<string, DOMQuad[]>,
+  newQuads: Record<string, DOMQuad[]>
+) {
   for (const region of BOX_MODEL_REGIONS) {
     const { length } = oldQuads[region];
 
@@ -83,15 +81,15 @@ function areQuadsDifferent(oldQuads: Record<string, any[]>, newQuads: Record<str
 // }
 
 // AutoRefreshHighlighter.prototype = {
-class AutoRefreshHighlighter {
+export class AutoRefreshHighlighter {
   _ignoreZoom = false;
   _ignoreScroll = false;
   highlighterEnv: any;
-  currentNode: NodeFront | undefined = undefined;
+  currentNode: NodeFront | NodeBoundsFront | undefined = undefined;
   currentQuads: Record<string, any> = {};
   options: any;
 
-  constructor(highlighterEnv: any) {
+  constructor(highlighterEnv?: any) {
     EventEmitter.decorate(this);
     this.highlighterEnv = highlighterEnv;
 
@@ -118,7 +116,7 @@ class AutoRefreshHighlighter {
    * @param {Object} options
    *        Object used for passing options
    */
-  show(node: NodeFront | undefined, options: any = {}) {
+  show(node: NodeFront | NodeBoundsFront | undefined, options: any = {}) {
     const isSameNode = node === this.currentNode;
     const isSameOptions = this._isSameOptions(options);
 
@@ -163,7 +161,7 @@ class AutoRefreshHighlighter {
    * @param {DOMNode} node
    * @return {Boolean}
    */
-  _isNodeValid(node: NodeFront | undefined) {
+  _isNodeValid(node: NodeFront | NodeBoundsFront | undefined) {
     return isNodeValid(node);
   }
 

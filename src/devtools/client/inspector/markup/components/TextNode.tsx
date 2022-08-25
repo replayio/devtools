@@ -1,6 +1,6 @@
 import { assert } from "protocol/utils";
 import React, { PureComponent } from "react";
-const { COMMENT_NODE } = require("devtools/shared/dom-node-constants");
+import NodeConstants from "devtools/shared/dom-node-constants";
 
 interface TextNodeProps {
   type: number;
@@ -11,7 +11,7 @@ class TextNode extends PureComponent<TextNodeProps> {
   render() {
     const { type, value } = this.props;
     assert(typeof value === "string", "value not set in TextNode props");
-    const isComment = type === COMMENT_NODE;
+    const isComment = type === NodeConstants.COMMENT_NODE;
     const isWhiteSpace = !/[^\s]/.exec(value);
 
     return (
