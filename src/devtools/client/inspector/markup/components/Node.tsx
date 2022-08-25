@@ -1,11 +1,6 @@
 import React, { PureComponent, MouseEvent, ReactElement } from "react";
 import { connect, ConnectedProps } from "react-redux";
-const {
-  COMMENT_NODE,
-  DOCUMENT_TYPE_NODE,
-  ELEMENT_NODE,
-  TEXT_NODE,
-} = require("devtools/shared/dom-node-constants");
+import NodeConstants from "devtools/shared/dom-node-constants";
 import { assert } from "protocol/utils";
 import {
   getNode,
@@ -133,15 +128,15 @@ class _Node extends PureComponent<FinalNodeProps> {
     const { node } = this.props;
 
     let component = null;
-    if (node.type === ELEMENT_NODE) {
+    if (node.type === NodeConstants.ELEMENT_NODE) {
       component = <ElementNode node={node} onToggleNodeExpanded={this.props.toggleNodeExpanded} />;
-    } else if (node.type === COMMENT_NODE || node.type === TEXT_NODE) {
+    } else if (node.type === NodeConstants.COMMENT_NODE || node.type === NodeConstants.TEXT_NODE) {
       component = <TextNode type={node.type} value={node.value} />;
     } else {
       component = (
         <ReadOnlyNode
           displayName={node.displayName}
-          isDocType={node.type === DOCUMENT_TYPE_NODE}
+          isDocType={node.type === NodeConstants.DOCUMENT_TYPE_NODE}
           pseudoType={!!node.pseudoType}
         />
       );

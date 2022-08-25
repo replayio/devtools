@@ -1,4 +1,4 @@
-module.exports = {
+const DOM_NODE_CONSTANTS = {
   ELEMENT_NODE: 1,
   ATTRIBUTE_NODE: 2,
   TEXT_NODE: 3,
@@ -20,3 +20,5 @@ module.exports = {
   DOCUMENT_POSITION_CONTAINED_BY: 0x10,
   DOCUMENT_POSITION_IMPLEMENTATION_SPECIFIC: 0x20,
 };
+
+export default DOM_NODE_CONSTANTS;

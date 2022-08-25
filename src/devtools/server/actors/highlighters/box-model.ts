@@ -2,19 +2,18 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-"use strict";
-
-const { AutoRefreshHighlighter } = require("devtools/server/actors/highlighters/auto-refresh");
-const {
+import { AutoRefreshHighlighter } from "./auto-refresh";
+import {
   CanvasFrameAnonymousContentHelper,
   createNode,
   createSVGNode,
   getBindingElementAndPseudo,
   isNodeValid,
   moveInfobar,
-} = require("devtools/server/actors/highlighters/utils/markup");
-const nodeConstants = require("devtools/shared/dom-node-constants");
-const { refreshGraphics } = require("protocol/graphics");
+} from "./utils/markup";
+import NodeConstants from "devtools/shared/dom-node-constants";
+import { refreshGraphics } from "protocol/graphics";
+import { NodeFront } from "protocol/thread/node";
 
 /**
  * Returns the properly cased version of the node's tag name, which can be
@@ -25,7 +24,7 @@ const { refreshGraphics } = require("protocol/graphics");
  * @return {String}
  *         Properly cased version of the node tag name
  */
-const getNodeDisplayName = function (rawNode) {
+const getNodeDisplayName = function (rawNode: HTMLElement) {
   return rawNode.nodeName.toLowerCase();
 };
 
@@ -97,8 +96,11 @@ const GUIDE_STROKE_WIDTH = 1;
  *   </div>
  * </div>
  */
-class BoxModelHighlighter extends AutoRefreshHighlighter {
-  constructor(highlighterEnv) {
+export class BoxModelHighlighter extends AutoRefreshHighlighter {
+  ID_CLASS_PREFIX: string;
+  markup: CanvasFrameAnonymousContentHelper;
+  regionFill: Record<string, any>;
+  constructor(highlighterEnv?: any) {
     super(highlighterEnv);
 
     this.ID_CLASS_PREFIX = "box-model-";
@@ -306,7 +308,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     AutoRefreshHighlighter.prototype.destroy.call(this);
   }
 
-  getElement(id) {
+  getElement(id: string) {
     return this.markup.getElement(this.ID_CLASS_PREFIX + id);
   }
 
@@ -316,8 +318,8 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * @param {DOMNode} node
    * @return {Boolean}
    */
-  _isNodeValid(node) {
-    return node && (isNodeValid(node) || isNodeValid(node, nodeConstants.TEXT_NODE));
+  _isNodeValid(node: NodeFront) {
+    return node && (isNodeValid(node) || isNodeValid(node, NodeConstants.TEXT_NODE));
   }
 
   /**
@@ -346,8 +348,9 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       // node.
       if (
         !this.options.hideInfoBar &&
-        !node.isNodeBoundsFront() &&
-        (node.nodeType === Node.ELEMENT_NODE || node.nodeType === Node.TEXT_NODE)
+        !node!.isNodeBoundsFront() &&
+        ((node as NodeFront).nodeType === Node.ELEMENT_NODE ||
+          (node as NodeFront).nodeType === Node.TEXT_NODE)
       ) {
         this._showInfobar();
       } else {
@@ -414,7 +417,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * @param {String} region The box-model region to get the outer quad for.
    * @return {Object} A quad-like object {p1,p2,p3,p4,bounds}
    */
-  _getOuterQuad(region) {
+  _getOuterQuad(region: string) {
     const quads = this.currentQuads[region];
     if (!quads || !quads.length) {
       return null;
@@ -523,7 +526,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     return true;
   }
 
-  _getBoxPathCoordinates(boxQuad, nextBoxQuad) {
+  _getBoxPathCoordinates(boxQuad: DOMQuad, nextBoxQuad: DOMQuad) {
     const { p1, p2, p3, p4 } = boxQuad;
 
     let path;
@@ -654,7 +657,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * to line them up. This method finds these edges and displays a guide there.
    * @param {String} region The region around which the guides should be shown.
    */
-  _showGuides(region) {
+  _showGuides(region: string) {
     const quad = this._getOuterQuad(region);
 
     if (!quad) {
@@ -706,7 +709,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
    * @param  {Integer} point
    *         x or y co-ordinate. If this is undefined we hide the guide.
    */
-  _updateGuide(side, point = -1) {
+  _updateGuide(side: string, point: number = -1) {
     const guide = this.getElement("guide-" + side);
 
     if (point <= 0) {
@@ -739,7 +742,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
       return;
     }
 
-    const { bindingElement: node, pseudo } = getBindingElementAndPseudo(this.currentNode);
+    const { bindingElement: node, pseudo } = getBindingElementAndPseudo(this.currentNode as any);
 
     // Update the tag, id, classes, pseudo-classes and dimensions
     const displayName = getNodeDisplayName(node);
@@ -748,7 +751,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
 
     const classList = (node.classList || []).length ? "." + [...node.classList].join(".") : "";
 
-    let pseudos = this._getPseudoClasses(node).join("");
+    let pseudos = this._getPseudoClasses().join("");
     if (pseudo) {
       // Display :after as ::after
       pseudos += ":" + pseudo;
@@ -781,7 +784,7 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     this._moveInfobar();
   }
 
-  _getPseudoClasses(node) {
+  _getPseudoClasses() {
     return [];
     /*
     if (node.nodeType !== nodeConstants.ELEMENT_NODE) {
@@ -800,10 +803,10 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     const bounds = this._getOuterBounds();
     const container = this.getElement("infobar-container");
 
-    moveInfobar(container, bounds, this.win);
+    moveInfobar(container, bounds as DOMRect, this.win);
   }
 
-  onPageHide({ target }) {
+  onPageHide({ target }: { target: any }) {
     // If a pagehide event is triggered for current window's highlighter, hide the
     // highlighter.
     if (target.defaultView === this.win) {
@@ -811,11 +814,9 @@ class BoxModelHighlighter extends AutoRefreshHighlighter {
     }
   }
 
-  onWillNavigate({ isTopLevel }) {
+  onWillNavigate({ isTopLevel }: { isTopLevel: boolean }) {
     if (isTopLevel) {
       this.hide();
     }
   }
 }
-
-exports.BoxModelHighlighter = BoxModelHighlighter;
