@@ -12,8 +12,8 @@ import type { UIState } from "ui/state";
 import { prefs } from "../utils/prefs";
 
 type ActiveEventListener = string;
-type EventListenerEvent = { name: string; id: ActiveEventListener };
-type EventListenerCategory = {
+export type EventListenerEvent = { name: string; id: ActiveEventListener };
+export type EventListenerCategory = {
   name: string;
   events: EventListenerEvent[];
 };

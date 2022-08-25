@@ -6,7 +6,7 @@
 
 import React, { Component } from "react";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
 import { previewLocationCleared } from "devtools/client/debugger/src/reducers/pause";
@@ -14,17 +14,23 @@ import { previewLocationCleared } from "devtools/client/debugger/src/reducers/pa
 import classnames from "classnames";
 import ReactTooltip from "react-tooltip";
 import { trackEvent } from "ui/utils/telemetry";
+import type { UIState } from "ui/state";
 
-function getBoundingClientRect(element) {
+function getBoundingClientRect(element?: HTMLElement) {
   if (!element) {
-    // $FlowIgnore
     return;
   }
   return element.getBoundingClientRect();
 }
 
-class FrameTimeline extends Component {
-  _timeline;
+interface FrameTimelineState {
+  scrubbing: boolean;
+  scrubbingProgress: number;
+  lastDisplayIndex: number;
+}
+
+class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
+  _timeline = React.createRef<HTMLDivElement>();
 
   state = {
     scrubbing: false,
@@ -32,12 +38,11 @@ class FrameTimeline extends Component {
     lastDisplayIndex: 0,
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: PropsFromRedux, prevState: FrameTimelineState) {
     if (!document.body) {
       return;
     }
 
-    // To please Flow.
     const bodyClassList = document.body.classList;
 
     if (this.state.scrubbing && !prevState.scrubbing) {
@@ -52,13 +57,13 @@ class FrameTimeline extends Component {
     }
   }
 
-  getProgress(clientX) {
-    const { width, left } = getBoundingClientRect(this._timeline);
+  getProgress(clientX: number) {
+    const { width, left } = getBoundingClientRect(this._timeline.current!)!;
     const progress = ((clientX - left) / width) * 100;
     return Math.min(Math.max(progress, 0), 100);
   }
 
-  getPosition(progress) {
+  getPosition(progress: number) {
     const { framePositions } = this.props;
     if (!framePositions) {
       return;
@@ -77,7 +82,7 @@ class FrameTimeline extends Component {
     return framePositions.positions[adjustedDisplayIndex];
   }
 
-  displayPreview(progress) {
+  displayPreview(progress: number) {
     const { setPreviewPausedLocation } = this.props;
 
     const position = this.getPosition(progress);
@@ -87,7 +92,7 @@ class FrameTimeline extends Component {
     }
   }
 
-  onMouseDown = event => {
+  onMouseDown = (event: React.MouseEvent) => {
     if (!this.props.framePositions) {
       return null;
     }
@@ -97,7 +102,7 @@ class FrameTimeline extends Component {
     this.setState({ scrubbing: true, scrubbingProgress: progress });
   };
 
-  onMouseUp = event => {
+  onMouseUp = (event: MouseEvent) => {
     const { seek, clearPreviewPausedLocation } = this.props;
 
     const progress = this.getProgress(event.clientX);
@@ -110,7 +115,7 @@ class FrameTimeline extends Component {
     }
   };
 
-  onMouseMove = event => {
+  onMouseMove = (event: MouseEvent) => {
     const progress = this.getProgress(event.clientX);
 
     this.displayPreview(progress);
@@ -161,11 +166,7 @@ class FrameTimeline extends Component {
         data-for="frame-timeline-tooltip"
         className={classnames("frame-timeline-container", { scrubbing, paused: framePositions })}
       >
-        <div
-          className="frame-timeline-bar"
-          onMouseDown={this.onMouseDown}
-          ref={r => (this._timeline = r)}
-        >
+        <div className="frame-timeline-bar" onMouseDown={this.onMouseDown} ref={this._timeline}>
           <div
             className="frame-timeline-progress"
             style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
@@ -179,8 +180,8 @@ class FrameTimeline extends Component {
   }
 }
 
-export default connect(
-  state => ({
+const connector = connect(
+  (state: UIState) => ({
     framePositions: selectors.getFramePositions(state),
     selectedLocation: selectors.getSelectedLocation(state),
     selectedFrame: selectors.getSelectedFrame(state),
@@ -191,4 +192,8 @@ export default connect(
     setPreviewPausedLocation: actions.setPreviewPausedLocation,
     clearPreviewPausedLocation: previewLocationCleared,
   }
-)(FrameTimeline);
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(FrameTimeline);

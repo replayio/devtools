@@ -11,13 +11,17 @@ import { CloseButton } from "./Button";
 import AccessibleImage from "./AccessibleImage";
 import classnames from "classnames";
 
-const arrowBtn = (onClick, type, className, tooltip) => {
+const arrowBtn = (
+  onClick: ((e: any) => void) | undefined,
+  type: string,
+  className: string,
+  tooltip: string
+) => {
   const props = {
     className,
     key: type,
     onClick,
     title: tooltip,
-    type,
   };
 
   return (
@@ -27,9 +31,33 @@ const arrowBtn = (onClick, type, className, tooltip) => {
   );
 };
 
-class SearchInput extends Component {
-  displayName;
-  $input;
+interface SearchInputProps {
+  query: string;
+  count: number;
+  placeholder?: string;
+  summaryMsg?: string;
+  isLoading?: boolean;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFocus?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onBlur?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  showErrorEmoji?: boolean;
+  onKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onKeyUp?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onHistoryScroll?: (query: string) => void;
+  handleNext?: (e: React.KeyboardEvent) => void;
+  handlePrev?: (e: React.KeyboardEvent) => void;
+  shouldFocus?: boolean;
+  showClose?: boolean;
+  hasPrefix?: boolean;
+  expanded?: boolean;
+  className?: string;
+  handleClose?: () => void;
+  selectedItemId?: string;
+  size: string;
+}
+
+class SearchInput extends Component<SearchInputProps> {
+  $input: HTMLInputElement | null = null;
 
   static defaultProps = {
     className: "",
@@ -40,19 +68,15 @@ class SearchInput extends Component {
     showClose: true,
   };
 
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      history: [],
-    };
-  }
+  state = {
+    history: [] as string[],
+  };
 
   componentDidMount() {
     this.setFocus();
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps: SearchInputProps) {
     if (this.props.shouldFocus && !prevProps.shouldFocus) {
       this.setFocus();
     }
@@ -86,29 +110,29 @@ class SearchInput extends Component {
     ];
   }
 
-  onFocus = e => {
+  onFocus = (e: React.FocusEvent<HTMLInputElement>) => {
     const { onFocus } = this.props;
 
     if (onFocus) {
-      onFocus(e);
+      onFocus(e as any);
     }
   };
 
-  onBlur = e => {
+  onBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { onBlur } = this.props;
 
     if (onBlur) {
-      onBlur(e);
+      onBlur(e as any);
     }
   };
 
-  onKeyDown = e => {
+  onKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     const { onHistoryScroll, onKeyDown } = this.props;
     if (!onHistoryScroll) {
       return onKeyDown(e);
     }
 
-    const inputValue = e.target.value;
+    const inputValue = (e.target as HTMLInputElement).value;
     const { history } = this.state;
     const currentHistoryIndex = history.indexOf(inputValue);
 
@@ -136,14 +160,15 @@ class SearchInput extends Component {
     }
   };
 
-  saveEnteredTerm(query) {
+  saveEnteredTerm(query: string) {
     const { history } = this.state;
-    const previousIndex = history.indexOf(query);
+    let newHistory = history.slice();
+    const previousIndex = newHistory.indexOf(query);
     if (previousIndex !== -1) {
-      history.splice(previousIndex, 1);
+      newHistory.splice(previousIndex, 1);
     }
-    history.push(query);
-    this.setState({ history });
+    newHistory.push(query);
+    this.setState({ history: newHistory });
   }
 
   renderSummaryMsg() {
@@ -187,23 +212,7 @@ class SearchInput extends Component {
       showClose,
     } = this.props;
 
-    const inputProps = {
-      className: classnames({
-        empty: showErrorEmoji,
-      }),
-      onChange,
-      onKeyDown: e => this.onKeyDown(e),
-      onKeyUp,
-      onFocus: e => this.onFocus(e),
-      onBlur: e => this.onBlur(e),
-      "aria-autocomplete": "list",
-      "aria-controls": "result-list",
-      "aria-activedescendant": expanded && selectedItemId ? `${selectedItemId}-title` : "",
-      placeholder,
-      value: query,
-      spellCheck: false,
-      ref: c => (this.$input = c),
-    };
+    const inputProps = {};
 
     return (
       <div className={`search-outline ${className || ""}`}>
@@ -215,11 +224,27 @@ class SearchInput extends Component {
           aria-expanded={expanded}
         >
           {this.renderSvg()}
-          <input {...inputProps} />
+          <input
+            className={classnames({
+              empty: showErrorEmoji,
+            })}
+            onChange={onChange}
+            onKeyDown={this.onKeyDown}
+            onKeyUp={onKeyUp}
+            onFocus={this.onFocus}
+            onBlur={this.onBlur}
+            aria-autocomplete={"list" as const}
+            aria-controls={"result-list" as const}
+            aria-activedescendant={expanded && selectedItemId ? `${selectedItemId}-title` : ""}
+            placeholder={placeholder}
+            value={query}
+            spellCheck={false}
+            ref={(c: HTMLInputElement | null) => (this.$input = c)}
+          />
           {this.renderSpinner()}
           {this.renderSummaryMsg()}
           {this.renderNav()}
-          {showClose && <CloseButton handleClick={handleClose} buttonClass={size} />}
+          {showClose && <CloseButton handleClick={handleClose} buttonClass={size} tooltip="" />}
         </div>
       </div>
     );

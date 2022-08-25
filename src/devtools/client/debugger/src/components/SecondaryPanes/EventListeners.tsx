@@ -5,9 +5,10 @@
 import React, { Component } from "react";
 import classnames from "classnames";
 
-import { connect } from "react-redux";
+import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
+import type { UIState } from "ui/state";
 
 import AccessibleImage from "../shared/AccessibleImage";
 import { trackEvent } from "ui/utils/telemetry";
@@ -15,8 +16,10 @@ import Spinner from "ui/components/shared/Spinner";
 import Checkbox from "ui/components/shared/Forms/Checkbox";
 import { CountPill } from "devtools/client/webconsole/components/FilterBar/FilterSettings";
 import { maxAnalysisPoints } from "ui/constants";
+import { EventListenerEvent } from "../../reducers/event-listeners";
+import { EventType, EventTypeCategory } from "devtools/server/actors/utils/event-breakpoints";
 
-class EventListeners extends Component {
+class EventListeners extends Component<PropsFromRedux> {
   state = {
     searchText: "",
     focused: false,
@@ -27,7 +30,7 @@ class EventListeners extends Component {
     this.props.loadAdditionalCounts();
   }
 
-  hasMatch(eventOrCategoryName, searchText) {
+  hasMatch(eventOrCategoryName: string, searchText: string) {
     const lowercaseEventOrCategoryName = eventOrCategoryName.toLowerCase();
     const lowercaseSearchText = searchText.toLowerCase();
 
@@ -49,12 +52,12 @@ class EventListeners extends Component {
       }
 
       return results;
-    }, {});
+    }, {} as Record<string, EventListenerEvent[]>);
 
     return searchResults;
   }
 
-  onCategoryToggle(category) {
+  onCategoryToggle(category: string) {
     const { expandedCategories, removeEventListenerExpanded, addEventListenerExpanded } =
       this.props;
 
@@ -67,7 +70,7 @@ class EventListeners extends Component {
     }
   }
 
-  onCategoryClick(eventIds, isChecked) {
+  onCategoryClick(eventIds: string[], isChecked: boolean) {
     const { addEventListeners, removeEventListeners } = this.props;
 
     if (isChecked) {
@@ -78,7 +81,7 @@ class EventListeners extends Component {
     }
   }
 
-  onEventTypeClick(eventId, isChecked) {
+  onEventTypeClick(eventId: string, isChecked: boolean) {
     const { addEventListeners, removeEventListeners } = this.props;
     if (isChecked) {
       addEventListeners([eventId]);
@@ -87,11 +90,11 @@ class EventListeners extends Component {
     }
   }
 
-  onInputChange = event => {
+  onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ searchText: event.currentTarget.value });
   };
 
-  onKeyDown = event => {
+  onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Escape") {
       this.setState({ searchText: "" });
     }
@@ -145,7 +148,7 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoryItem(category, index) {
+  renderCategoryItem(category: EventTypeCategory, index: number) {
     const { eventTypeCounts } = this.props;
     const { expandedCategories } = this.props;
 
@@ -191,7 +194,7 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoriesSection(label, isLoading, categories) {
+  renderCategoriesSection(label: string, isLoading: boolean, categories: EventTypeCategory[]) {
     return (
       <div className="flex flex-col space-y-1">
         <div className="">{label}</div>
@@ -208,7 +211,7 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoryListing(category) {
+  renderCategoryListing(category: EventTypeCategory) {
     const { expandedCategories } = this.props;
 
     const expanded = expandedCategories.includes(category.name);
@@ -244,7 +247,7 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoryHeadingWithCount(category, count) {
+  renderCategoryHeadingWithCount(category: EventTypeCategory, count: number) {
     const { expandedCategories } = this.props;
 
     const expanded = expandedCategories.includes(category.name);
@@ -267,7 +270,7 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategoryHeading(category) {
+  renderCategoryHeading(category: EventTypeCategory) {
     const { expandedCategories } = this.props;
     const expanded = expandedCategories.includes(category.name);
 
@@ -283,11 +286,11 @@ class EventListeners extends Component {
     );
   }
 
-  renderCategory(category) {
+  renderCategory(category: string) {
     return <span className="category-label">{category} ▸ </span>;
   }
 
-  renderListenerEvent(event, category) {
+  renderListenerEvent(event: EventType, category: string) {
     const { activeEventListeners, eventTypeCounts } = this.props;
     const { searchText } = this.state;
 
@@ -309,7 +312,9 @@ class EventListeners extends Component {
             <Checkbox
               value={event.id}
               disabled={isHot}
-              onChange={e => this.onEventTypeClick(event.id, e.target.checked)}
+              onChange={e =>
+                this.onEventTypeClick(event.id, (e.target as HTMLInputElement).checked)
+              }
               checked={activeEventListeners.includes(event.id)}
               className="m-0"
             />
@@ -337,7 +342,7 @@ class EventListeners extends Component {
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: UIState) => ({
   activeEventListeners: selectors.getActiveEventListeners(state),
   categories: selectors.getEventListenerBreakpointTypes(state),
   expandedCategories: selectors.getEventListenerExpanded(state),
@@ -346,10 +351,14 @@ const mapStateToProps = state => ({
   isLoadingAdditionalCounts: selectors.isLoadingAdditionalCounts(state),
 });
 
-export default connect(mapStateToProps, {
+const connector = connect(mapStateToProps, {
   addEventListeners: actions.addEventListenerBreakpoints,
   removeEventListeners: actions.removeEventListenerBreakpoints,
   addEventListenerExpanded: actions.addEventListenerExpanded,
   removeEventListenerExpanded: actions.removeEventListenerExpanded,
   loadAdditionalCounts: actions.loadAdditionalCounts,
-})(EventListeners);
+});
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+export default connector(EventListeners);

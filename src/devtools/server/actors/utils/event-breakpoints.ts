@@ -7,7 +7,27 @@ require("devtools/client/inspector/prefs");
 
 const Services = require("devtools/shared/services");
 
-function generalEvent(groupID, eventType) {
+export type EventId = string;
+
+export interface EventType {
+  id: EventId;
+  name: string;
+}
+
+export interface FullEventType extends EventType {
+  type: string;
+  message: string;
+  eventType?: string;
+  filter?: string;
+  notificationType?: string;
+}
+
+export interface EventTypeCategory {
+  name: string;
+  events: EventType[];
+}
+
+function generalEvent(groupID: string, eventType: string): FullEventType {
   return {
     id: `event.${groupID}.${eventType}`,
     type: "event",
@@ -17,26 +37,26 @@ function generalEvent(groupID, eventType) {
     filter: "general",
   };
 }
-function nodeEvent(groupID, eventType) {
+function nodeEvent(groupID: string, eventType: string): FullEventType {
   return {
     ...generalEvent(groupID, eventType),
     filter: "node",
   };
 }
-function mediaNodeEvent(groupID, eventType) {
+function mediaNodeEvent(groupID: string, eventType: string): FullEventType {
   return {
     ...generalEvent(groupID, eventType),
     filter: "media",
   };
 }
-function globalEvent(groupID, eventType) {
+function globalEvent(groupID: string, eventType: string): FullEventType {
   return {
     ...generalEvent(groupID, eventType),
     message: `Global '${eventType}' event`,
     filter: "global",
   };
 }
-function xhrEvent(groupID, eventType) {
+function xhrEvent(groupID: string, eventType: string): FullEventType {
   return {
     ...generalEvent(groupID, eventType),
     message: `XHR '${eventType}' event`,
@@ -44,7 +64,7 @@ function xhrEvent(groupID, eventType) {
   };
 }
 
-function webSocketEvent(groupID, eventType) {
+function webSocketEvent(groupID: string, eventType: string): FullEventType {
   return {
     ...generalEvent(groupID, eventType),
     message: `WebSocket '${eventType}' event`,
@@ -52,7 +72,7 @@ function webSocketEvent(groupID, eventType) {
   };
 }
 
-function workerEvent(eventType) {
+function workerEvent(eventType: string): FullEventType {
   return {
     ...generalEvent("worker", eventType),
     message: `Worker '${eventType}' event`,
@@ -60,7 +80,12 @@ function workerEvent(eventType) {
   };
 }
 
-function timerEvent(type, operation, name, notificationType) {
+function timerEvent(
+  type: string,
+  operation: string,
+  name: string,
+  notificationType: string
+): FullEventType {
   return {
     id: `timer.${type}.${operation}`,
     type: "simple",
@@ -70,7 +95,7 @@ function timerEvent(type, operation, name, notificationType) {
   };
 }
 
-function animationEvent(operation, name, notificationType) {
+function animationEvent(operation: string, name: string, notificationType: string): FullEventType {
   return {
     id: `animationframe.${operation}`,
     type: "simple",
@@ -161,7 +186,7 @@ const AVAILABLE_BREAKPOINTS = [
       generalEvent("keyboard", "keydown"),
       generalEvent("keyboard", "keyup"),
       generalEvent("keyboard", "keypress"),
-    ].filter(Boolean),
+    ].filter(Boolean) as FullEventType[],
   },
   {
     name: "Load",
@@ -290,13 +315,13 @@ const AVAILABLE_BREAKPOINTS = [
   },
 ];
 
-const FLAT_EVENTS = [];
+const FLAT_EVENTS: FullEventType[] = [];
 for (const category of AVAILABLE_BREAKPOINTS) {
   for (const event of category.items) {
     FLAT_EVENTS.push(event);
   }
 }
-const EVENTS_BY_ID = {};
+const EVENTS_BY_ID: Record<string, FullEventType> = {};
 for (const event of FLAT_EVENTS) {
   if (EVENTS_BY_ID[event.id]) {
     throw new Error("Duplicate event ID detected: " + event.id);
@@ -304,15 +329,15 @@ for (const event of FLAT_EVENTS) {
   EVENTS_BY_ID[event.id] = event;
 }
 
-const SIMPLE_EVENTS = {};
-const DOM_EVENTS = {};
+const SIMPLE_EVENTS: Record<string, string> = {};
+const DOM_EVENTS: Record<string, Record<string, string>> = {};
 for (const eventBP of FLAT_EVENTS) {
   if (eventBP.type === "simple") {
     const { notificationType } = eventBP;
-    if (SIMPLE_EVENTS[notificationType]) {
+    if (SIMPLE_EVENTS[notificationType!]) {
       throw new Error("Duplicate simple event");
     }
-    SIMPLE_EVENTS[notificationType] = eventBP.id;
+    SIMPLE_EVENTS[notificationType!] = eventBP.id;
   } else if (eventBP.type === "event") {
     const { eventType, filter } = eventBP;
 
@@ -340,23 +365,22 @@ for (const eventBP of FLAT_EVENTS) {
         DOM_EVENTS[targetType] = byEventType;
       }
 
-      if (byEventType[eventType]) {
+      if (byEventType[eventType!]) {
         throw new Error("Duplicate dom event: " + eventType);
       }
-      byEventType[eventType] = eventBP.id;
+      byEventType[eventType!] = eventBP.id;
     }
   } else {
     throw new Error("Unknown type: " + eventBP.type);
   }
 }
 
-exports.getAvailableEventBreakpoints = getAvailableEventBreakpoints;
-function getAvailableEventBreakpoints() {
-  const available = [];
+export function getAvailableEventBreakpoints(): EventTypeCategory[] {
+  const available: EventTypeCategory[] = [];
   for (const { name, items } of AVAILABLE_BREAKPOINTS) {
     available.push({
       name,
-      events: items.map(item => ({
+      events: items.filter(Boolean).map(item => ({
         id: item.id,
         name: item.name,
       })),
