@@ -84,6 +84,15 @@ const baseNextConfig = {
         ],
         source: "/(.*)",
       },
+      {
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
+          },
+        ],
+        source: "/_next/static/images/icon-sprite(.*)",
+      },
     ];
   },
 
@@ -170,8 +179,21 @@ const baseNextConfig = {
 
     config.module.rules.push({
       test: /\.svg$/i,
+      exclude: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
       issuer: /\.[jt]sx?$/,
       use: ["@svgr/webpack"],
+    });
+
+    /** Load the SVG sprite through NextJS so it can be cached. */
+    config.module.rules.push({
+      test: /\.svg$/i,
+      include: resourcePath => resourcePath.includes("design/Icon/sprite.svg"),
+      loader: "file-loader",
+      options: {
+        name: "icon-sprite.[contenthash].svg",
+        publicPath: `/_next/static/images/`,
+        outputPath: "static/images",
+      },
     });
 
     return config;

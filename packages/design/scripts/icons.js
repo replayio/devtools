@@ -1,34 +1,34 @@
 const fs = require("fs");
 const path = require("path");
+const { createSpinner } = require("nanospinner");
 
 const { kebabCase } = require("case-anything");
 const dotenv = require("dotenv");
 const { fetchImages } = require("figma-tools");
 const { parse, stringify } = require("svgson");
 const { optimize } = require("svgo");
+const spinner = createSpinner();
 
 dotenv.config({ path: "../../.env" });
 
 async function fetch() {
-  console.log("Fetching icons...");
+  spinner.update({ text: "Fetching svgs from Figma..." });
 
   const svgs = await fetchImages({
     fileId: "ASas6u2DMihEEzw8jPT1XC",
     format: "svg",
-    onEvent: event => console.log(`${event.type}: ${event.status}`),
+    onEvent: event => spinner.update({ text: `${event.type}: ${event.status}` }),
     filter: component => component.pageName.toLowerCase().includes("icons"),
   });
 
   if (!svgs) {
-    console.log("No svgs found...");
+    spinner.warn({ text: "No svgs found..." });
 
     return [];
   }
 
-  console.log("Saving svgs...");
-
   if (fs.existsSync("svgs")) {
-    fs.rmdirSync("svgs", { recursive: true });
+    fs.rmSync("svgs", { recursive: true });
   }
 
   fs.mkdirSync("svgs");
@@ -37,7 +37,7 @@ async function fetch() {
     fs.writeFileSync(path.resolve(`svgs/${kebabCase(svg.name)}.svg`), svg.buffer);
   });
 
-  console.log("Icon svgs saved ✨");
+  spinner.update({ text: "Figma svgs saved to design/svgs" });
 
   return svgs.map(svg => ({
     name: svg.name,
@@ -47,6 +47,8 @@ async function fetch() {
 
 async function start() {
   let svgs;
+
+  spinner.start();
 
   /**
    * This flag is used in case the Figma API is down and we instead need to export
@@ -64,7 +66,7 @@ async function start() {
     }));
   }
 
-  console.log("Building icon svg sprite...");
+  spinner.update({ text: "Building icon svg sprite..." });
 
   const optimizedSvgs = await Promise.all(
     svgs.map(svg =>
@@ -95,11 +97,16 @@ async function start() {
 
   /** Create a svg sprite to use in as an external image in NextJS that's targeted through "use" tags. */
   fs.writeFileSync(
-    path.resolve(__dirname, "../../../public/icons/sprite.svg"),
-    `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${symbolElements.join("")}</svg>`
+    path.resolve("Icon/sprite.svg"),
+    [
+      `<!-- This file was auto-generated using "yarn workspace design icons" -->`,
+      `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">${symbolElements.join(
+        ""
+      )}</svg>`,
+    ].join("\n")
   );
 
-  console.log("Icon components built ✨");
+  spinner.success({ text: "Icon sprite built ✨" });
 }
 
 start();

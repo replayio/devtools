@@ -1,5 +1,6 @@
 import "../src/test-prep";
 
+import { SystemProvider } from "design";
 import { useAuth0 } from "@auth0/auth0-react";
 import Head from "next/head";
 import type { AppContext, AppProps } from "next/app";
@@ -228,12 +229,14 @@ const App = ({ apiKey, ...props }: AppProps & AuthProps) => {
     head = <props.Component {...props.pageProps} headOnly />;
   }
   return (
-    <tokenManager.Auth0Provider apiKey={apiKey}>
-      {head}
-      <AppUtilities>
-        <Routing {...props} />
-      </AppUtilities>
-    </tokenManager.Auth0Provider>
+    <SystemProvider>
+      <tokenManager.Auth0Provider apiKey={apiKey}>
+        {head}
+        <AppUtilities>
+          <Routing {...props} />
+        </AppUtilities>
+      </tokenManager.Auth0Provider>
+    </SystemProvider>
   );
 };
 
