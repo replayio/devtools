@@ -22,24 +22,9 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
     }
     await ThreadFront.ensureAllSources();
     const state = getState();
-    const { sourceId } = getPreferredLocation(
-      state,
-      positions[0].frame!,
-      ThreadFront.preferredGeneratedSources
+    const locations = positions.map(({ frame }) =>
+      getPreferredLocation(state, frame!, ThreadFront.preferredGeneratedSources)
     );
-
-    if (!sourceId) {
-      return;
-    }
-
-    const locations = positions.map(({ frame }) => {
-      const { line, column } = getPreferredLocation(
-        state,
-        frame!,
-        ThreadFront.preferredGeneratedSources
-      );
-      return { line, column, sourceId };
-    });
 
     const combinedPositions = zip(positions, locations).map(([position, location]) => {
       const { point, time } = position!;
