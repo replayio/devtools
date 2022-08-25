@@ -54,11 +54,11 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-base text-center">
+      <p className="text-center text-base">
         Enter your email to be redirected to your SSO provider.
       </p>
       {error ? (
-        <p className="text-base text-center text-red-500">
+        <p className="text-center text-base text-red-500">
           {typeof error === "string"
             ? "We were unable to find your SSO provider right now. Please try again later."
             : "We couldn't find an SSO provider for your email."}
@@ -67,7 +67,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
       <div className="flex flex-row space-x-3">
         <input
           type="email"
-          className="flex-grow w-48 rounded-md"
+          className="w-48 flex-grow rounded-md text-black"
           placeholder="user@company.com"
           value={email}
           onKeyPress={e => (e.key === "Enter" ? onEnterpriseLogin() : null)}
@@ -79,7 +79,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
         </PrimaryLgButton>
       </div>
       <button
-        className="justify-center w-full text-sm font-bold underline text-primaryAccent"
+        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
         onClick={onLogin}
       >
         Sign in with Google
@@ -95,9 +95,9 @@ function LoginMessaging() {
   // time that they have opened the browser.
   if (referrer === LoginReferrer.firstBrowserOpen) {
     return (
-      <div className="text-base text-center">
+      <div className="text-center text-base">
         <p>Replay captures everything you need for the perfect bug report, all in one link!</p>
-        <a href="https://replay.io" className="underline pointer-hand">
+        <a href="https://replay.io" className="pointer-hand underline">
           Learn more
         </a>
       </div>
@@ -107,14 +107,14 @@ function LoginMessaging() {
   return (
     <>
       {isTeamMemberInvite() ? <h1 className="text-2xl font-extrabold">Almost there!</h1> : null}
-      <div className="self-start space-y-4 text-base">
+      <div className="space-y-4 self-start text-base">
         {isTeamMemberInvite() ? (
           <p>In order to join your team, we first need you to sign in.</p>
         ) : (
           <>
             <div className="text-center">
               <p>Replay captures everything you need for the perfect bug report, all in one link</p>
-              <a href="https://replay.io" className="underline pointer-hand">
+              <a href="https://replay.io" className="pointer-hand underline">
                 Learn more
               </a>
             </div>
@@ -135,11 +135,11 @@ function SocialLogin({
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton color="blue" onClick={onLogin} className="justify-center w-full">
+      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
         Sign in with Google
       </PrimaryLgButton>
       <button
-        className="justify-center w-full text-sm font-bold underline text-primaryAccent"
+        className="w-full justify-center text-sm font-bold text-primaryAccent underline"
         onClick={onShowSSOLogin}
       >
         Enterprise Users: Sign in with SSO
@@ -156,7 +156,7 @@ function ReplayBrowserLogin() {
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton color="blue" onClick={onLogin} className="justify-center w-full">
+      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
         Sign in
       </PrimaryLgButton>
     </div>
@@ -190,8 +190,8 @@ function AuthError({ error }: { error: any }) {
   return (
     <OnboardingContentWrapper overlay noLogo>
       <div className="flex flex-row items-center space-x-4">
-        <ExclamationIcon className="flex-shrink-0 w-12 h-12 text-red-500" />
-        <span className="text-base font-bold align-left">{message}</span>
+        <ExclamationIcon className="h-12 w-12 flex-shrink-0 text-red-500" />
+        <span className="align-left text-base font-bold">{message}</span>
       </div>
     </OnboardingContentWrapper>
   );
