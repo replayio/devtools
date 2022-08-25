@@ -8,12 +8,12 @@ import { useFeature } from "ui/hooks/settings";
 // Connects legacy PauseData to the new Object Inspector Suspense cache.
 // This avoids requiring the new Object Inspector to load redundant data.
 export default function ObjectPreviewSuspenseCacheAdapter() {
-  const enableNewComponentArchitecture = useFeature("enableNewComponentArchitecture");
+  const disableNewComponentArchitecture = useFeature("disableNewComponentArchitecture");
 
   // It's important to not miss pre-cached data because there's no way to access it after the fact.
   // So use a layout effect for subscription rather than a passive effect.
   useLayoutEffect(() => {
-    if (!enableNewComponentArchitecture) {
+    if (disableNewComponentArchitecture) {
       return;
     }
 
@@ -33,7 +33,7 @@ export default function ObjectPreviewSuspenseCacheAdapter() {
     return () => {
       removePauseDataListener(handler);
     };
-  }, [enableNewComponentArchitecture]);
+  }, [disableNewComponentArchitecture]);
 
   return null;
 }

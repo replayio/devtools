@@ -44,6 +44,7 @@ export default function Expandable({
         isOpen && useBlockLayoutWhenExpanded ? styles.Block : styles.Inline
       } ${className}`}
       data-test-name="Expandable"
+      data-test-state={isOpen ? "open" : "closed"}
       onClick={onClick}
       onKeyDown={onKeyDown}
       role="button"

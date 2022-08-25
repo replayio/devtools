@@ -89,13 +89,11 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
       s.path = `scope${selectedFrame?.id}.${i}`;
     });
 
-    const enableNewComponentArchitecture = prefsService.getBoolPref(
-      "devtools.features.enableNewComponentArchitecture"
+    const disableNewComponentArchitecture = prefsService.getBoolPref(
+      "devtools.features.disableNewComponentArchitecture"
     );
     let objectInspector = null;
-    if (enableNewComponentArchitecture) {
-      objectInspector = <NewObjectInspector roots={scopes!} />;
-    } else {
+    if (disableNewComponentArchitecture) {
       objectInspector = (
         <ObjectInspector
           roots={scopes!}
@@ -108,10 +106,12 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
           onDOMNodeMouseOut={(grip: any) => unHighlightDomElement()}
         />
       );
+    } else {
+      objectInspector = <NewObjectInspector roots={scopes!} />;
     }
 
     return (
-      <Redacted className="pane scopes-list">
+      <Redacted className="pane scopes-list" data-test-name="ScopesList">
         {originalScopesUnavailable ? (
           <div className="warning">The variables could not be mapped to their original names</div>
         ) : null}

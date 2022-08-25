@@ -1,5 +1,5 @@
 import { ThreadFront, ValueFront } from "protocol/thread";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { act } from "react-dom/test-utils";
 import {
   createConsoleMessage,
@@ -18,6 +18,8 @@ import type { UIStore } from "ui/actions";
 import useConsoleSearch from "./useConsoleSearch";
 import type { Actions, State } from "./useConsoleSearch";
 
+// Note the useConsoleSearch() tested by this file is used for the legacy Console only.
+// It should only run with that feature flag enabled, and should be deleted once the legacy Console is removed.
 describe("useConsoleSearch", () => {
   filterCommonTestWarnings();
 
@@ -35,8 +37,11 @@ describe("useConsoleSearch", () => {
     // eslint-disable-next-line react/display-name
     TestComponent = () => {
       const [state, actions] = useConsoleSearch();
-      lastCommitedSearchActions = actions;
-      lastCommitedSearchState = state;
+
+      useLayoutEffect(() => {
+        lastCommitedSearchActions = actions;
+        lastCommitedSearchState = state;
+      });
 
       return null;
     };

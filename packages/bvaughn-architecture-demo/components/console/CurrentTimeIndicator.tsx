@@ -13,5 +13,11 @@ export default function CurrentTimeIndicator() {
     div.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [executionPoint]);
 
-  return <div ref={ref} className={styles.CurrentTimeIndicator} />;
+  return (
+    <div
+      ref={ref}
+      className={styles.CurrentTimeIndicator}
+      data-test-id="Console-CurrentTimeIndicator"
+    />
+  );
 }

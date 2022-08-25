@@ -11,6 +11,7 @@ import {
   isBrowserInternalMessage,
 } from "devtools/client/webconsole/utils/messages";
 import { loadValue } from "devtools/packages/devtools-reps/object-inspector/items/utils";
+import { prefs as prefsService } from "devtools/shared/services";
 import { TestMessageHandlers } from "ui/actions/find-tests";
 import { LogpointHandlers } from "ui/actions/logpoint";
 import { Pause, ValueFront, ThreadFront as ThreadFrontType } from "protocol/thread";
@@ -47,6 +48,8 @@ const defaultIdGenerator = new IdGenerator();
 let queuedMessages: unknown[] = [];
 let throttledDispatchPromise: Promise<void> | null = null;
 
+const TEST = process.env.NODE_ENV === "test";
+
 export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontType) {
   LogpointHandlers.onPointLoading = (logGroupId, point, time, location) =>
     store.dispatch(onLogpointLoading(logGroupId, point, time, location));
@@ -55,10 +58,19 @@ export function setupMessages(store: UIStore, ThreadFront: typeof ThreadFrontTyp
   LogpointHandlers.clearLogpoint = logGroupId => store.dispatch(messagesClearLogpoint(logGroupId));
   TestMessageHandlers.onTestMessage = msg => store.dispatch(onConsoleMessage(msg));
 
-  ThreadFront.findConsoleMessages(
-    (_, msg) => store.dispatch(onConsoleMessage(msg)),
-    () => store.dispatch(onConsoleOverflow())
-  ).then(() => store.dispatch(setMessagesLoaded(true)), Sentry.captureException);
+  // Don't load Messages for the legacy Console unless it's being used.
+  // Doing this can cause conflict with the new Console due to the design of the Replay client protocol package.
+  // Note that this means toggling from new to legacy Console requires reloading the page before messages will be displayed.
+  // See FE-611
+  const disableNewComponentArchitecture = prefsService.getBoolPref(
+    "devtools.features.disableNewComponentArchitecture"
+  );
+  if (disableNewComponentArchitecture || TEST) {
+    ThreadFront.findConsoleMessages(
+      (_, msg) => store.dispatch(onConsoleMessage(msg)),
+      () => store.dispatch(onConsoleOverflow())
+    ).then(() => store.dispatch(setMessagesLoaded(true)), Sentry.captureException);
+  }
 }
 
 function convertStack(

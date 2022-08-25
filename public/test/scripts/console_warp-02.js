@@ -8,38 +8,37 @@ Test.describe(
     await Test.checkPausedMessage("number: 2");
 
     await Test.stepOverToLine(20);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("number: 3");
 
     // When stepping back we end up earlier than the console call, even though we're
     // paused at the same line. This isn't ideal.
     await Test.reverseStepOverToLine(19);
-    await Test.checkPausedMessage("number: 1");
+    await Test.checkPausedMessage("number: 2");
 
     await Test.warpToMessage("number: 2");
     await Test.checkPausedMessage("number: 2");
 
     await Test.stepOverToLine(20);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("number: 3");
 
     await Test.executeInConsole("1 << 5");
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 5");
 
     await Test.stepOverToLine(21);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("number: 3");
 
     await Test.executeInConsole("1 << 7");
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 7");
 
     await Test.reverseStepOverToLine(20);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 5");
 
     await Test.executeInConsole("1 << 6");
-    await Test.checkPausedMessage("number: 2");
 
     await Test.stepOverToLine(21);
-    await Test.checkPausedMessage("number: 2");
+    await Test.checkPausedMessage("1 << 7");
 
     await Test.stepOverToLine(22);
-    await Test.checkPausedMessage("number: 3");
+    await Test.checkPausedMessage("ExampleFinished");
   }
 );

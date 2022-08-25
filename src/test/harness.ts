@@ -22,13 +22,6 @@ export function waitForTime(ms: number, waitingFor?: string) {
 const dbgSelectors = window.app.selectors!;
 const dbgActions = window.app.actions!;
 
-function waitForElapsedTime(time: number, ms: number) {
-  const wait = time + ms - Date.now();
-  if (wait > 0) {
-    return waitForTime(wait, `time to reach ${time}`);
-  }
-}
-
 function isLongTimeout() {
   return new URL(window.location.href).searchParams.get("longTimeout");
 }
@@ -73,7 +66,7 @@ export function start() {
     () =>
       isFullyLoaded() &&
       dbgSelectors.getViewMode() == "dev" &&
-      document.querySelector(".webconsole-app"),
+      document.querySelector("[data-test-id=ConsoleRoot]"),
     {
       timeout: 1000 * 120,
       waitingFor: "the page to load",
@@ -110,19 +103,19 @@ async function clickElement(selector: string) {
 }
 
 function selectConsole() {
-  return clickElement("button.console-panel-button");
+  return clickElement('[data-test-id="PanelButton-console"]');
 }
 
 async function selectInspector() {
-  await clickElement("button.inspector-panel-button");
-  // ensure that the inspector is fully initialized, including its legacy
-  // components.
+  await clickElement('[data-test-id="PanelButton-inspector"]');
+
   await waitUntil(() => document.querySelector(".inspector ul.children"), {
     waitingFor: "inspector to initialize",
   });
 }
 
-const selectReactDevTools = async () => clickElement("button.react-components-panel-button");
+const selectReactDevTools = async () =>
+  clickElement('[data-test-id="PanelButton-react-components"]');
 const getContext = () => dbgSelectors.getContext();
 const getThreadContext = () => dbgSelectors.getThreadContext();
 
@@ -148,12 +141,6 @@ function waitForSource(url: string) {
 function countSources(url: string) {
   const sources = dbgSelectors.getAllSourceDetails();
   return sources.filter(s => (s.url || "").includes(url)).length;
-}
-
-function waitForSourceCount(url: string, count: number) {
-  return waitUntil(() => countSources(url) === count, {
-    waitingFor: `${count} source to be present`,
-  });
 }
 
 async function selectSource(url: string) {
@@ -254,12 +241,12 @@ function isPaused() {
 }
 
 async function waitForLoadedScopes() {
-  // Since scopes auto-expand, we can assume they are loaded when there is a tree node
-  // with the aria-level attribute equal to "2".
-  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'));
-  await waitUntil(() => document.querySelector('.scopes-list .tree-node[aria-level="2"]'), {
-    waitingFor: "scopes to be loaded (via tree node)",
-  });
+  await waitUntil(
+    () => document.querySelector("[data-test-name=ScopesList] [data-test-name=Expandable]"),
+    {
+      waitingFor: "scopes to be loaded",
+    }
+  );
 }
 
 function waitForSelectedSource(url?: string) {
@@ -291,7 +278,7 @@ function waitForSelectedSource(url?: string) {
 }
 
 async function waitForPaused(url?: string) {
-  const { getSelectedScope, getFrames } = dbgSelectors;
+  const { getFrames, getSelectedScope } = dbgSelectors;
   // Make sure that the debug primary panel is selected so that the test can
   // interact with the pause navigation and info.
   window.app.store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" });
@@ -307,11 +294,6 @@ async function waitForPausedNoSource() {
   window.app.store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" });
 
   await waitUntil(() => isPaused(), { waitingFor: "execution to pause" });
-}
-
-function hasFrames() {
-  const frames = dbgSelectors.getFrames();
-  return frames!.length > 0;
 }
 
 function getVisibleSelectedFrameLine() {
@@ -357,19 +339,19 @@ function resumeAndPauseFunctionFactory(
   };
 }
 
-const reverseStepOverAndPause = resumeAndPauseFunctionFactory("reverseStepOver");
 const stepOverAndPause = resumeAndPauseFunctionFactory("stepOver");
-const stepInAndPause = resumeAndPauseFunctionFactory("stepIn");
-const stepOutAndPause = resumeAndPauseFunctionFactory("stepOut");
 
 async function checkEvaluateInTopFrame(text: string, expected: string) {
   selectConsole();
+
   await executeInConsole(text);
 
   await waitUntil(
     () => {
-      const node: HTMLElement | null = document.querySelector(".message.result .objectBox");
-      return node?.innerText == `${expected}`;
+      const messages = document.querySelectorAll<HTMLElement>(
+        '[data-test-name="Message"][data-test-message-type="terminal-expression"] [data-test-name="TerminalExpression-Result"]'
+      );
+      return Array.from(messages).find((node: HTMLElement) => node.innerText === expected);
     },
     { waitingFor: `message with text "${expected}"` }
   );
@@ -380,9 +362,11 @@ async function checkEvaluateInTopFrame(text: string, expected: string) {
 async function clearConsoleEvaluations() {
   const clearButton = await waitUntil(
     () => {
-      const btn: HTMLButtonElement | null = document.querySelector(".devtools-clear-icon");
-      if (btn && !btn.disabled) {
-        return btn;
+      const button: HTMLButtonElement | null = document.querySelector(
+        '[data-test-id="ClearConsoleEvaluationsButton"]'
+      );
+      if (button && !button.disabled) {
+        return button;
       }
     },
     { waitingFor: "clear console evaluations button to be enabled" }
@@ -394,81 +378,106 @@ async function waitForScopeValue(name: string, value: string) {
   const expected = value !== undefined ? `${name}\n: \n${value}` : name;
   return waitUntil(
     () => {
-      const nodes = document.querySelectorAll<HTMLElement>(".scopes-pane .object-node");
+      const nodes = document.querySelectorAll<HTMLElement>(
+        "[data-test-name=ScopesList] [data-test-name=Expandable]"
+      );
       return [...nodes].some(node => node.innerText == expected);
     },
     { waitingFor: `scope "${value}" to be present` }
   );
 }
 
-function findMessages(text: string, extraSelector = "") {
-  const messages = document.querySelectorAll<HTMLElement>(
-    `.webconsole-output .message${extraSelector}`
-  );
+function findMessages(text: string) {
+  const messages = document.querySelectorAll<HTMLElement>(`[data-test-name=Message]`);
   return [...messages].filter(msg => msg.innerText.includes(text));
 }
 
-function getAllMessages(opts?: { ignoreErrors: boolean }) {
-  const { ignoreErrors } = opts || {};
-  const messageNodes = document.querySelectorAll(`.webconsole-output .message`);
-  const messages = [];
-  for (const node of messageNodes) {
-    let type: string | undefined = "unknown";
-    if (node.classList.contains("logPoint")) {
-      type = "logPoint";
-    } else if (node.classList.contains("console-api")) {
-      type = "console-api";
-    } else if (node.classList.contains("command")) {
-      type = "command";
-    } else if (node.classList.contains("result")) {
-      type = "result";
-    } else if (node.classList.contains("error")) {
-      type = ignoreErrors ? undefined : "error";
-    }
-    if (type) {
-      messages.push({
-        type,
-        content: [
-          ...node.querySelectorAll<HTMLElement>(
-            ".objectBox, .objectBox-stackTrace, syntax-highlighted"
-          ),
-        ].map(n => n.innerText),
-      });
-    }
-  }
-  return messages;
+async function getAllMessages() {
+  await waitUntil(() => document.querySelector(`[data-test-name=Message]`), {
+    waitingFor: `Messages to load`,
+  });
+
+  const messageNodes = document.querySelectorAll(
+    `[data-test-name=Messages] [data-test-name=Message]`
+  );
+
+  return Array.from(messageNodes);
 }
 
-function checkAllMessages(expected: string, opts?: { ignoreErrors: boolean }) {
+function checkAllMessages(expected: string) {
   return waitUntil(
     () => {
-      return isEqual(getAllMessages(opts), expected);
+      const messageNodes = document.querySelectorAll(
+        `[data-test-name=Messages] [data-test-name=Message]`
+      );
+
+      const actual = [];
+      for (const node of messageNodes) {
+        const dataType = node.getAttribute("data-test-message-type");
+
+        let type: string | undefined = "unknown";
+        switch (dataType) {
+          case "console-error":
+          case "console-log":
+          case "console-warning":
+            type = "console-api";
+            break;
+          case "event":
+            break;
+          case "exception":
+            type = "error";
+            break;
+          case "log-point":
+            type = "logPoint";
+            break;
+          case "terminal-expression":
+            // Contains both "command" and "result" types
+            type = "result";
+            break;
+        }
+
+        if (type) {
+          actual.push({
+            type,
+            content: (node as HTMLElement).innerText,
+          });
+        }
+      }
+
+      return isEqual(actual, expected);
     },
-    { waitingFor: `messages with ${JSON.stringify(opts)} to match ${JSON.stringify(expected)}` }
+    { waitingFor: `messages to match ${JSON.stringify(expected)}` }
   );
 }
 
-function waitForMessage(text: string, extraSelector?: string) {
+function waitForMessage(text: string) {
   return waitUntil(
     () => {
-      const messages = findMessages(text, extraSelector);
+      const messages = findMessages(text);
       return messages?.[0];
     },
-    { waitingFor: `a message: ${text} with selector: ${extraSelector}` }
+    { waitingFor: `a message: ${text}` }
   );
 }
 
 async function warpToMessage(text: string) {
   const msg = await waitForMessage(text);
-  const warpButton: HTMLButtonElement | null =
-    msg.querySelector(".rewind") || msg.querySelector(".fast-forward");
-  warpButton!.click();
-  await waitForPaused();
-  assert(msg.classList.contains("paused"), "classList must contain 'paused'");
-}
 
-function checkPausedMessage(text: string) {
-  return waitForMessage(text, ".paused");
+  dispatchMouseEvent(msg, "mouseover");
+
+  const warpButton: HTMLButtonElement | null = await waitUntil(() =>
+    msg.querySelector("[data-test-id=ConsoleMessageHoverButton]")
+  );
+
+  if (warpButton === null) {
+    throw Error("Could not find fast-forward/rewind button");
+  }
+
+  warpButton.click();
+
+  await new Promise(resolve => setTimeout(resolve, 1000));
+
+  await waitForPaused();
 }
 
 function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
@@ -484,103 +493,55 @@ function waitForMessageCount(text: string, count: number, timeoutFactor = 1) {
   );
 }
 
-async function checkMessageStack(text: string, expectedFrameLines: string[], expand: boolean) {
-  const msgNode = await waitForMessage(text);
-  assert(!msgNode.classList.contains("open"), "classList must contain 'open'");
-
-  if (expand) {
-    const button: HTMLButtonElement | null = await waitUntil(
-      () => msgNode.querySelector(".collapse-button"),
-      {
-        waitingFor: `collapse button to be visible`,
-      }
-    );
-    button!.click();
-  }
-
-  const framesNode: HTMLElement | null = await waitUntil(() => msgNode.querySelector(".frames"), {
-    waitingFor: ".frames to be present",
-  });
-  const frameNodes = Array.from(framesNode!.querySelectorAll<HTMLElement>(".frame"));
-  assert(frameNodes.length == expectedFrameLines.length, "unexpected number of frames");
-
-  for (let i = 0; i < frameNodes.length; i++) {
-    const frameNode = frameNodes[i];
-    const line = frameNode.querySelector(".line")!.textContent;
-    assert(line == expectedFrameLines[i].toString(), "unexpected frame line");
-  }
-}
-
 function checkJumpIcon(msg: HTMLElement) {
-  const jumpIcon = msg.querySelector(".jump-definition");
+  const jumpIcon = msg.querySelector('[date-test-name="JumpToDefinitionButton"]');
   assert(jumpIcon, "no jumpIcon");
 }
 
-function findObjectInspectorNode(oi: HTMLElement, nodeLabel: string) {
-  return [...oi.querySelectorAll<HTMLElement>(".tree-node")].find(node => {
-    return node.innerText.replace(/\n/g, "").includes(nodeLabel);
-  });
-}
-
-async function findMessageExpandableObjectInspector(msg: HTMLElement) {
+async function findMessageExpandableObjectInspector(msg: HTMLElement, text: string) {
   return waitUntil(
     () => {
-      const inspectors = msg.querySelectorAll<HTMLElement>(".object-inspector");
-      return [...inspectors].find(oi => oi.querySelector(".arrow"));
+      const nodes = msg.querySelectorAll<HTMLElement>(
+        '[data-test-name="Message"] [data-test-name="Expandable"]'
+      );
+      return Array.from(nodes).find(node => node.innerText.includes(text));
     },
-    { waitingFor: `findMessageExpandableObjectInspector(${msg})` }
+    { waitingFor: `findMessageExpandableObjectInspector(${msg}) with text "${text}"` }
   );
 }
 
-async function toggleObjectInspectorNode(node: HTMLElement) {
-  const arrow: HTMLElement | null = await waitUntil(() => node.querySelector(".arrow"), {
-    waitingFor: ".arrow to be present",
-  });
-  arrow!.click();
+async function toggleObjectInspectorNode(node: HTMLElement, expand: boolean = true) {
+  const isExpanded = node.getAttribute("data-test-state") === "open";
+  if (isExpanded !== expand) {
+    node.click();
+  }
 }
 
-async function checkMessageObjectContents(
-  msg: HTMLElement,
-  expected: string[],
-  expandList: string[] = []
-) {
-  const oi = await findMessageExpandableObjectInspector(msg);
-  await toggleObjectInspectorNode(oi!);
-
-  for (const label of expandList) {
-    const labelNode = await waitUntil(() => findObjectInspectorNode(oi!, label)!, {
-      waitingFor: `findObjectInspectorNode(${oi}, ${label})`,
-    })!;
-    const getterButton: HTMLElement | null = labelNode.querySelector(".invoke-getter");
-    if (getterButton) {
-      getterButton.click();
-      await waitUntil(() => labelNode.querySelector(".objectBox"), {
-        waitingFor: "The getter's value is shown",
-      });
-    }
-    const expandButton: HTMLElement | null = labelNode.querySelector(".arrow");
-    if (expandButton) {
-      expandButton.click();
-    }
-  }
-
+async function checkPausedMessage(text: string) {
   await waitUntil(
     () => {
-      const nodes = oi!.querySelectorAll<HTMLElement>(".tree-node");
-      if (nodes && nodes.length > 1) {
-        const properties = [...nodes].map(n => n.textContent);
-        return expected.every(s => properties.find(v => v!.includes(s)));
+      const messagesList = document.querySelector('[data-test-name="Messages"]')!;
+      const messages = findMessages(text);
+      if (messages.length !== 1) {
+        return false;
       }
-      return null;
+      const index = Array.from(messagesList.children).indexOf(messages[0]);
+      const previousChild = messagesList.children[index - 1];
+      const result = previousChild.getAttribute("data-test-id") === "Console-CurrentTimeIndicator";
+      return result;
     },
-    { waitingFor: ".tree-node to be present" }
+    {
+      waitingFor: `Wait until paused at "${text}"`,
+    }
   );
 }
 
 function findScopeNode(text: string) {
   return waitUntil(
     () => {
-      const nodes = document.querySelectorAll<HTMLElement>(".scopes-list .node");
+      const nodes = document.querySelectorAll<HTMLElement>(
+        "[data-test-name=ScopesList] [data-test-name=ExpandablePreview]"
+      );
       return [...nodes].find(node => node.innerText.includes(text));
     },
     { waitingFor: `scope node "${text}" to be present` }
@@ -650,8 +611,42 @@ async function selectFrame(index: number) {
   await dbgActions.selectFrame(getThreadContext(), frames[index]);
 }
 
-function addEventListenerLogpoints(logpoints: string[]) {
-  return dbgActions.addEventListenerBreakpoints(logpoints);
+// HACKY way of updating an <input> and dispatching events that React will pick up on.
+// We should really be using Playwright and page.fill() for this purpose.
+function setInputValue(input: HTMLInputElement, value: string) {
+  const valueSetter = Object.getOwnPropertyDescriptor(input, "value")!.set!;
+  const prototype = Object.getPrototypeOf(input);
+  const prototypeValueSetter = Object.getOwnPropertyDescriptor(prototype, "value")!.set!;
+  if (valueSetter && valueSetter !== prototypeValueSetter) {
+    prototypeValueSetter.call(input, value);
+  } else {
+    valueSetter.call(input, value);
+  }
+  input.dispatchEvent(new Event("change", { bubbles: true }));
+  input.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+async function addEventListenerLogpoints(logpoints: string[]) {
+  const filterInput = await waitUntil(
+    () => document.querySelector<HTMLInputElement>('[data-test-id="EventTypeFilterInput"]'),
+    {
+      waitingFor: "EventTypeFilterInput to be present",
+    }
+  );
+
+  for (let i = 0; i < logpoints.length; i++) {
+    const logpoint = logpoints[i];
+
+    setInputValue(filterInput!, logpoint);
+
+    const toggle = await waitUntil(
+      () => document.querySelector<HTMLElement>('[data-test-name="EventTypeToggle"]'),
+      {
+        waitingFor: "EventTypeToggle to be present",
+      }
+    );
+    toggle!.click();
+  }
 }
 
 async function toggleExceptionLogging() {
@@ -916,79 +911,73 @@ async function getRecordingTarget() {
 }
 
 const testCommands = {
-  selectConsole,
-  selectInspector,
-  selectReactDevTools,
-  assert,
-  waitForTime,
-  waitForElapsedTime,
-  waitUntil,
-  selectSource,
-  addLogpoint,
   addBreakpoint,
-  setBreakpointOptions,
-  disableBreakpoint,
-  removeAllBreakpoints,
-  loadRegion,
-  unloadRegion,
-  waitForPaused,
-  waitForPausedLine,
-  rewindToLine,
-  resumeToLine,
-  reverseStepOverToLine,
-  stepOverToLine,
-  stepInToLine,
-  stepOutToLine,
-  reverseStepOverAndPause,
-  stepOverAndPause,
-  stepInAndPause,
-  stepOutAndPause,
-  hasFrames,
-  waitForLoadedScopes,
-  checkEvaluateInTopFrame,
-  waitForScopeValue,
-  findMessages,
-  getAllMessages,
-  checkAllMessages,
-  waitForMessage,
-  warpToMessage,
-  checkPausedMessage,
-  waitForMessageCount,
-  checkMessageStack,
-  checkJumpIcon,
-  checkMessageObjectContents,
-  toggleObjectInspectorNode,
-  findScopeNode,
-  toggleScopeNode,
-  writeInConsole,
-  executeInConsole,
-  checkAutocompleteMatches,
-  waitForFrameTimeline,
-  checkFrames,
-  selectFrame,
   addEventListenerLogpoints,
-  toggleExceptionLogging,
-  toggleMappedSources,
-  findMarkupNode,
-  toggleMarkupNode,
-  searchMarkup,
-  waitForSelectedMarkupNode,
-  getMarkupCanvasCoordinate,
-  pickNode,
-  selectMarkupNode,
-  checkComputedStyle,
-  getMatchedSelectors,
-  setLonghandsExpanded,
-  getAppliedRulesJSON,
+  addLogpoint,
+  assert,
+  checkAllMessages,
+  checkAutocompleteMatches,
   checkAppliedRules,
+  checkComputedStyle,
+  checkEvaluateInTopFrame,
+  checkFrames,
+  checkHighlighterShape,
+  checkHighlighterVisible,
+  checkJumpIcon,
+  checkPausedMessage,
+  clearConsoleEvaluations,
+  disableBreakpoint,
   dispatchMouseEvent,
   dispatchMouseEventInGraphics,
-  checkHighlighterVisible,
-  checkHighlighterShape,
+  executeInConsole,
+  findMarkupNode,
+  findMessageExpandableObjectInspector,
+  findMessages,
+  findScopeNode,
+  getAllMessages,
+  getAppliedRulesJSON,
+  getMarkupCanvasCoordinate,
+  getMatchedSelectors,
   getMouseTarget,
   getRecordingTarget,
+  loadRegion,
+  pickNode,
+  removeAllBreakpoints,
+  resumeToLine,
+  reverseStepOverToLine,
+  rewindToLine,
+  searchMarkup,
+  selectConsole,
+  selectFrame,
+  selectInspector,
+  selectMarkupNode,
+  selectReactDevTools,
+  selectSource,
+  setBreakpointOptions,
+  setLonghandsExpanded,
+  stepInToLine,
+  stepOutToLine,
+  stepOverAndPause,
+  stepOverToLine,
+  toggleExceptionLogging,
+  toggleMappedSources,
+  toggleMarkupNode,
+  toggleObjectInspectorNode,
+  toggleScopeNode,
+  unloadRegion,
+  waitForFrameTimeline,
+  waitForLoadedScopes,
+  waitForMessage,
+  waitForMessageCount,
+  waitForPaused,
+  waitForPausedLine,
+  waitForScopeValue,
+  waitForSelectedMarkupNode,
   waitForSource,
-  waitForSourceCount,
+  waitForTime,
+  waitUntil,
+  warpToMessage,
+  writeInConsole,
 };
 
 function isThenable(obj: any): obj is Promise<any> {
@@ -1002,11 +991,16 @@ const commands = mapValues(testCommands, (command, name) => {
     // @ts-expect-error spreading args is FINE TS!
     let result = command(...args);
     if (isThenable(result)) {
-      return result.then(async result => {
-        const duration = new Date().getTime() - startTime;
-        console.log(`Finished ${name} in ${duration}ms`);
-        return result;
-      });
+      return result.then(
+        async result => {
+          const duration = new Date().getTime() - startTime;
+          console.log(`Finished ${name} in ${duration}ms`);
+          return result;
+        },
+        error => {
+          console.error(`Error for ${name}`, error);
+        }
+      );
     }
     const duration = new Date().getTime() - startTime;
     console.log(`Finished ${name} in ${duration}ms`);

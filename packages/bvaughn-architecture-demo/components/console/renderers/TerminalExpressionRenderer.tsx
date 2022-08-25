@@ -84,11 +84,11 @@ function TerminalExpressionRenderer({
           </span>
         )}
         <span className={styles.TerminalLogContents}>
-          <span className={styles.LogContents}>
+          <span className={styles.LogContents} data-test-name="TerminalExpression-Expression">
             <Icon className={styles.PromptIcon} type="prompt" />
             <SyntaxHighlightedExpression expression={terminalExpression.expression} />
           </span>
-          <span className={styles.LogContents}>
+          <span className={styles.LogContents} data-test-name="TerminalExpression-Result">
             <Icon className={styles.EagerEvaluationIcon} type="eager-evaluation" />
             <Suspense fallback={<Loader />}>
               <EvaluatedContent terminalExpression={terminalExpression} />

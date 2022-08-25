@@ -8,16 +8,18 @@ Test.describe(`Test that the element highlighter works everywhere.`, async () =>
   const markupNode = (await Test.findMarkupNode(`div id="iframediv"`)).parentNode;
   await checkHighlighting(markupNode);
 
-  await Test.addBreakpoint("iframe.html", 4);
-  await Test.rewindToLine(4);
-  const debuggerParentNode = await Test.findScopeNode("div#iframediv");
-  const debuggerNode = debuggerParentNode.querySelector(".objectBox-node");
-  await checkHighlighting(debuggerNode);
+  // TODO (replayio/devtools/pull/7586) Rewrite this test
 
-  await Test.selectConsole();
-  Test.executeInConsole("elem");
-  const consoleNode = await Test.waitForMessage("", ".result .objectBox-node");
-  await checkHighlighting(consoleNode);
+  // await Test.addBreakpoint("iframe.html", 4);
+  // await Test.rewindToLine(4);
+  // const debuggerParentNode = await Test.findScopeNode("div#iframediv");
+  // const debuggerNode = debuggerParentNode.querySelector(".objectBox-node");
+  // await checkHighlighting(debuggerNode);
+
+  // await Test.selectConsole();
+  // Test.executeInConsole("elem");
+  // const consoleNode = await Test.waitForMessage("", ".result .objectBox-node");
+  // await checkHighlighting(consoleNode);
 });
 
 const highlighterShape =

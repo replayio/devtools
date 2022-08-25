@@ -122,7 +122,7 @@ export default function KeyValueRenderer({
         styles.KeyValue,
         !showExpandableView && layout === "vertical" ? styles.ToggleAlignmentPadding : null
       )}
-      data-test-id="KeyValue"
+      data-test-name="KeyValue"
     >
       {before}
       {name != null ? (

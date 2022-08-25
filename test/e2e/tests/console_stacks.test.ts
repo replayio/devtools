@@ -16,7 +16,7 @@ it("Test source mapping of console errors.", async () => {
 
       await page.evaluate(() => app.actions.logExceptions(true));
       await page.evaluate(() => app.actions.filterToggled("warn"));
-      await page.click("button.console-panel-button");
+      await page.click('[data-test-id="PanelButton-console"]');
 
       await harness.waitForMessage("console.trace() ConsoleTrace");
       await harness.waitForMessage("ConsoleWarn");

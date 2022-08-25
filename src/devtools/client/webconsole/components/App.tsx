@@ -77,7 +77,7 @@ const App = (): JSX.Element => {
           <FilterBar key="filterbar" />
           <div className="flex flex-grow overflow-hidden">
             <FilterDrawer />
-            <div className="webconsole-app" onClick={onClick}>
+            <div className="webconsole-app" data-test-id="ConsoleRoot" onClick={onClick}>
               <ConsoleNag />
               {consoleOverflow ? (
                 <Warning link="https://www.notion.so/replayio/Debugger-Limitations-5b33bb0e5bd1459cbd7daf3234219c27#8d72d62414a7490586ee5ac3adef09fb">

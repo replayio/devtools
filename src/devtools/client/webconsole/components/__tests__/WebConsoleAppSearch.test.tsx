@@ -12,6 +12,8 @@ useRouter.mockImplementation(() => ({
   query: { id: "abcd" },
 }));
 
+// Note this test is for the legacy Console only.
+// It should only run with that feature flag enabled, and should be deleted once the legacy Console is removed.
 describe("WebConsoleApp search", () => {
   filterCommonTestWarnings();
 

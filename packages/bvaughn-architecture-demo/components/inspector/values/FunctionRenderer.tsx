@@ -53,6 +53,7 @@ export default function FunctionRenderer({ object }: ObjectPreviewRendererProps)
       {functionLocation && inspectFunctionDefinition !== null && (
         <button
           className={styles.IconButton}
+          date-test-name="JumpToDefinitionButton"
           onClick={viewFunctionSource}
           title="Jump to definition"
         >

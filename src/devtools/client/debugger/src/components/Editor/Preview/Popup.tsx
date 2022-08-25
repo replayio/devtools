@@ -139,12 +139,10 @@ export class Popup extends Component<FinalPopupProps> {
     const { preview } = this.props;
     const { root } = preview!;
 
-    const enableNewComponentArchitecture = prefsService.getBoolPref(
-      "devtools.features.enableNewComponentArchitecture"
+    const disableNewComponentArchitecture = prefsService.getBoolPref(
+      "devtools.features.disableNewComponentArchitecture"
     );
-    if (enableNewComponentArchitecture) {
-      return <NewObjectInspector />;
-    } else {
+    if (disableNewComponentArchitecture) {
       if (root.type === "value") {
         if (root.isFunction()) {
           return this.renderFunctionPreview();
@@ -155,6 +153,8 @@ export class Popup extends Component<FinalPopupProps> {
       }
 
       return this.renderSimplePreview();
+    } else {
+      return <NewObjectInspector />;
     }
   }
 

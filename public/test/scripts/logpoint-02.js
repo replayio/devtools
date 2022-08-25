@@ -17,12 +17,12 @@ Test.describe(`modified. Also test that conditional logpoints work.`, async () =
   await Test.waitForMessageCount("Logpoint", 12);
 
   await Test.disableBreakpoint("doc_rr_basic.html", 9);
-  await Test.waitForMessageCount("Logpoint", 11);
+  await Test.waitForMessageCount("Logpoint", 12); // 10 logs in the loop + beginning and end
   await Test.waitForMessageCount("Logpoint Number", 10);
 
   await Test.setBreakpointOptions("doc_rr_basic.html", 20, undefined, {
     logValue: `"Logpoint Number " + number`,
     condition: `number % 2 == 0`,
   });
-  await Test.waitForMessageCount("Logpoint", 6);
+  await Test.waitForMessageCount("Logpoint", 7); // 5 logs in the loop + beginning and end
 });

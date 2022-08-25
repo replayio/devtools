@@ -19,9 +19,9 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "New component architecture",
-    description: "Enable the console and inspector UIs",
-    key: "enableNewComponentArchitecture",
+    label: "Legacy console",
+    description: "Restore the legacy console and inspector UIs",
+    key: "disableNewComponentArchitecture",
   },
   {
     label: "Resolve recording",
@@ -73,8 +73,8 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: enableNewComponentArchitecture, update: updateEnableNewComponentArchitecture } =
-    useFeature("enableNewComponentArchitecture");
+  const { value: disableNewComponentArchitecture, update: updateEnableNewComponentArchitecture } =
+    useFeature("disableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
@@ -85,8 +85,8 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key === "enableNewComponentArchitecture") {
-      updateEnableNewComponentArchitecture(!enableNewComponentArchitecture);
+    } else if (key === "disableNewComponentArchitecture") {
+      updateEnableNewComponentArchitecture(!disableNewComponentArchitecture);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
@@ -95,8 +95,8 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
+    disableNewComponentArchitecture,
     enableColumnBreakpoints,
-    enableNewComponentArchitecture,
     enableResolveRecording,
     hitCounts,
     profileWorkerThreads,

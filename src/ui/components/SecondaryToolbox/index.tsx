@@ -54,9 +54,10 @@ const PanelButton = ({ panel, children }: PanelButtonProps) => {
 
   return (
     <button
-      className={classnames(`${panel}-panel-button relative`, {
+      className={classnames(`relative`, {
         expanded: selectedPanel === panel,
       })}
+      data-test-id={`PanelButton-${panel}`}
       onClick={() => onClick(panel)}
     >
       <div className="label">{children}</div>
@@ -88,11 +89,11 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 };
 
 function ConsolePanel() {
-  const { value: enableNewComponentArchitecture } = useFeature("enableNewComponentArchitecture");
+  const { value: disableNewComponentArchitecture } = useFeature("disableNewComponentArchitecture");
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        {enableNewComponentArchitecture ? <NewConsoleRoot /> : <WebConsoleApp />}
+        {disableNewComponentArchitecture ? <WebConsoleApp /> : <NewConsoleRoot />}
       </div>
     </div>
   );

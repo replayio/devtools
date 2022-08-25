@@ -269,7 +269,11 @@ class Message extends React.Component {
     }
 
     return dom.div(
-      { className: `overlay-container ${overlayType}`, onClick: onRewindClick },
+      {
+        className: `overlay-container ${overlayType}`,
+        "data-test-id": "ConsoleMessageHoverButton",
+        onClick: onRewindClick,
+      },
       dom.div({ className: "info" }, dom.div({ className: "label" }, label)),
       dom.div({ className: "button" }, dom.div({ className: "img" }))
     );
@@ -481,6 +485,7 @@ class Message extends React.Component {
         className: topLevelClasses.join(" "),
         ...mouseEvents,
         "data-message-id": messageId,
+        "data-test-name": "Message",
         "aria-live": type === MESSAGE_TYPE.COMMAND ? "off" : "polite",
         ref: node => (this.messageNode = node),
       },

@@ -28,6 +28,7 @@ import type { ThreadFront as ThreadFrontType } from "./thread";
 import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
+const pausesByPoint = new Map<ExecutionPoint, Pause>();
 
 export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
@@ -157,8 +158,12 @@ export class Pause {
     EventEmitter.decorate<any, PauseEvent>(this);
   }
 
-  static getById(pauseId: PauseId) {
-    return pausesById.get(pauseId);
+  static getById(pauseId: PauseId): Pause | null {
+    return pausesById.get(pauseId) || null;
+  }
+
+  static getByPoint(point: ExecutionPoint): Pause | null {
+    return pausesByPoint.get(point) || null;
   }
 
   private _setPauseId(pauseId: PauseId) {
@@ -169,9 +174,11 @@ export class Pause {
   create(point: ExecutionPoint, time: number) {
     assert(!this.createWaiter, "createWaiter already set");
     assert(!this.pauseId, "pauseId already set");
+
+    pausesByPoint.set(point, this);
+
     this.createWaiter = (async () => {
       const { pauseId, stack, data } = await client.Session.createPause({ point }, this.sessionId);
-
       await this.ThreadFront.ensureAllSources();
       this._setPauseId(pauseId);
       this.point = point;
@@ -194,6 +201,8 @@ export class Pause {
   ) {
     assert(!this.createWaiter, "createWaiter already set");
     assert(!this.pauseId, "pauseId already set");
+
+    pausesByPoint.set(point, this);
 
     this.createWaiter = Promise.resolve();
     this._setPauseId(pauseId);
