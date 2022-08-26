@@ -36,7 +36,12 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
               key={index}
               header={root.name}
               children={protocolValues.map((protocolValue, index) => (
-                <Inspector key={index} pauseId={pause.pauseId!} protocolValue={protocolValue} />
+                <Inspector
+                  context="default"
+                  key={index}
+                  pauseId={pause.pauseId!}
+                  protocolValue={protocolValue}
+                />
               ))}
             />
           );
@@ -45,7 +50,12 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
         case "value": {
           const protocolValue = clientValueToProtocolNamedValue(root);
           children.push(
-            <Inspector key={index} pauseId={pause.pauseId!} protocolValue={protocolValue} />
+            <Inspector
+              context="default"
+              key={index}
+              pauseId={pause.pauseId!}
+              protocolValue={protocolValue}
+            />
           );
           break;
         }

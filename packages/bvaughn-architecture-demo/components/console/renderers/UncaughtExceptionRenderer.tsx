@@ -65,7 +65,11 @@ function UncaughtExceptionRenderer({
         <Suspense fallback={<Loader />}>
           {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
             <Fragment key={index}>
-              <Inspector pauseId={uncaughtException.pauseId} protocolValue={argumentValue} />
+              <Inspector
+                context="console"
+                pauseId={uncaughtException.pauseId}
+                protocolValue={argumentValue}
+              />
               {index < argumentValues.length - 1 && " "}
             </Fragment>
           ))}

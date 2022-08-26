@@ -52,6 +52,7 @@ export default function HTMLExpandable({
         {before}
 
         <HTMLElementRenderer
+          context="nested"
           pauseId={pauseId}
           object={object}
           protocolValue={protocolValue}
@@ -68,6 +69,7 @@ export default function HTMLExpandable({
           </Suspense>
 
           <HTMLElementRenderer
+            context="nested"
             pauseId={pauseId}
             object={object}
             protocolValue={protocolValue}

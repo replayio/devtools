@@ -50,7 +50,7 @@ export default function HTMLElementRenderer({
         preview: text,
         type: "string",
       };
-      return <ClientValueValueRenderer clientValue={clientValue} isNested={true} />;
+      return <ClientValueValueRenderer clientValue={clientValue} context="nested" />;
     } else {
       return null;
     }

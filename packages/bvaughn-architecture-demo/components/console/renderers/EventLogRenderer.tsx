@@ -1,5 +1,5 @@
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
-import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
+import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { EventLog } from "@bvaughn/src/suspense/EventsCache";
@@ -57,12 +57,7 @@ function EventLogRenderer({
     values.length > 0
       ? values.map((value, index) => (
           <Fragment key={index}>
-            <KeyValueRenderer
-              isNested={false}
-              layout="horizontal"
-              pauseId={pauseId}
-              protocolValue={value}
-            />
+            <Inspector context="console" pauseId={pauseId} protocolValue={value} />
             {index < values.length - 1 && " "}
           </Fragment>
         ))

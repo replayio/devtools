@@ -1,8 +1,7 @@
-import { ReactNode, useContext } from "react";
+import { ReactNode } from "react";
 
 import ValueRenderer from "../ValueRenderer";
 
-import PreviewContext from "./PreviewContext";
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
 
@@ -12,9 +11,7 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Set (3) [ 123, "string", Set, … ]
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  const isWithinPreview = useContext(PreviewContext);
-
+export default function SetRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
   const { containerEntries = [], containerEntryCount = 0, overflow = false } = object.preview || {};
   const showOverflowMarker = overflow || containerEntries.length > MAX_PROPERTIES_TO_PREVIEW;
 
@@ -24,10 +21,10 @@ export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererPr
     return <>{object.className} (0)</>;
   } else {
     let propertiesList: ReactNode[] | null = null;
-    if (!isWithinPreview) {
+    if (context !== "nested") {
       propertiesList = slice.map((property, index) => (
         <span key={index} className={styles.Value}>
-          <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property.value} />
+          <ValueRenderer context="nested" pauseId={pauseId} protocolValue={property.value} />
           {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
         </span>
       ));
@@ -51,13 +48,11 @@ export default function SetRenderer({ object, pauseId }: ObjectPreviewRendererPr
         {object.className}
         <span className={styles.ArrayLength}>({containerEntryCount})</span>
         {propertiesList !== null && (
-          <PreviewContext.Provider value={true}>
-            <span className={styles.ArrayPropertyList}>
-              {" ["}
-              {propertiesList || "…"}
-              {"]"}
-            </span>
-          </PreviewContext.Provider>
+          <span className={styles.ArrayPropertyList}>
+            {" ["}
+            {propertiesList || "…"}
+            {"]"}
+          </span>
         )}
       </>
     );

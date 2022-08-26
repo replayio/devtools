@@ -6,12 +6,15 @@ import LazyOffscreen from "./LazyOffscreen";
 
 export type RenderChildrenFunction = () => ReactNode;
 
+function noopOnChange(value: boolean) {}
+
 export default function Expandable({
   children,
   className = "",
   defaultOpen = false,
   header,
   headerClassName = "",
+  onChange = noopOnChange,
   useBlockLayoutWhenExpanded = true,
 }: {
   children: ReactNode;
@@ -19,13 +22,18 @@ export default function Expandable({
   defaultOpen?: boolean;
   header: ReactNode;
   headerClassName?: string;
+  onChange?: (value: boolean) => void;
   useBlockLayoutWhenExpanded?: boolean;
 }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
-    setIsOpen(!isOpen);
+
+    const newIsOpen = !isOpen;
+
+    onChange(newIsOpen);
+    setIsOpen(newIsOpen);
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -33,7 +41,11 @@ export default function Expandable({
       case "Enter":
       case " ":
         event.stopPropagation();
-        setIsOpen(!isOpen);
+
+        const newIsOpen = !isOpen;
+
+        onChange(newIsOpen);
+        setIsOpen(newIsOpen);
         break;
     }
   };

@@ -1,9 +1,8 @@
 import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
-import { ReactNode, useContext } from "react";
+import { ReactNode } from "react";
 
 import ValueRenderer from "../ValueRenderer";
 
-import PreviewContext from "./PreviewContext";
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
 
@@ -13,28 +12,27 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Array (3) ["foo", bar, 123]
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  const isWithinPreview = useContext(PreviewContext);
+export default function ArrayRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
+  const { className, preview } = object;
 
-  const properties = filterNonEnumerableProperties(object.preview?.properties ?? []).filter(
+  const properties = filterNonEnumerableProperties(preview?.properties ?? []).filter(
     property => property.name !== "length"
   );
 
-  const showOverflowMarker =
-    object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
+  const showOverflowMarker = preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
 
   const lengthValue =
-    object.preview?.properties?.find(({ name }) => name === "length") ||
-    object.preview?.getterValues?.find(({ name }) => name === "length");
+    preview?.properties?.find(({ name }) => name === "length") ||
+    preview?.getterValues?.find(({ name }) => name === "length");
   const length = lengthValue?.value || 0;
 
   const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
 
   let propertiesList: ReactNode[] | null = null;
-  if (!isWithinPreview) {
+  if (context !== "nested") {
     propertiesList = slice.map((property, index) => (
       <span key={index} className={styles.Value}>
-        <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={property} />
+        <ValueRenderer context="nested" pauseId={pauseId} protocolValue={property} />
         {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
       </span>
     ));
@@ -53,19 +51,20 @@ export default function ArrayRenderer({ object, pauseId }: ObjectPreviewRenderer
     }
   }
 
+  // Chrome shortens arrays to e.g. "(3) [1,2,3]" but displays the full name for typed arrays.
+  const showClassName = context === "nested" || className !== "Array";
+
   return (
     <>
-      {object.className}
+      {showClassName ? className : null}
       {length > 0 && <span className={styles.ArrayLength}>({length})</span>}
-      <PreviewContext.Provider value={true}>
-        {propertiesList !== null && (
-          <span className={styles.ArrayPropertyList}>
-            {" ["}
-            {propertiesList || "…"}
-            {"]"}
-          </span>
-        )}
-      </PreviewContext.Provider>
+      {propertiesList !== null && (
+        <span className={styles.ArrayPropertyList}>
+          {" ["}
+          {propertiesList || "…"}
+          {"]"}
+        </span>
+      )}
     </>
   );
 }

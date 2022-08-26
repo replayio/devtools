@@ -1,14 +1,16 @@
 const { CI, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
 
 let slowMo = 50;
-if (CI || VISUAL_DEBUG) {
+if (CI) {
+  slowMo = 1000;
+} else if (VISUAL_DEBUG) {
   slowMo = 500;
 }
 
 const config = {
   forbidOnly: !!CI,
   reporter: CI ? "github" : "list",
-  retries: 5,
+  retries: VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",

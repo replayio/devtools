@@ -10,7 +10,6 @@
 .Symbol,
 .Undefined {
   display: inline;
-  vertical-align: top;
 }
 .BigInt {
   color: var(--value-type-bigint);
@@ -127,4 +126,8 @@
 }
 .FunctionName {
   color: var(--object-inspector-function-name);
+}
+
+.ArrayLength {
+  color: var(--object-inspector-separator-color);
 }

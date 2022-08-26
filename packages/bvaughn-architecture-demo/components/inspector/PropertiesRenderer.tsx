@@ -89,7 +89,7 @@ export default function PropertiesRenderer({
               {bucket.properties.map((property, index) => (
                 <KeyValueRenderer
                   key={`property-${index}`}
-                  isNested={true}
+                  context="default"
                   layout="vertical"
                   pauseId={pauseId}
                   protocolValue={property}
@@ -105,7 +105,7 @@ export default function PropertiesRenderer({
         {properties.map((property, index) => (
           <KeyValueRenderer
             key={`property-${index}`}
-            isNested={true}
+            context="default"
             layout="vertical"
             pauseId={pauseId}
             protocolValue={property}
@@ -155,7 +155,7 @@ function ContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entries
       {containerEntries.map(({ key, value }, index) => (
         <KeyValueRenderer
           key={index}
-          isNested={true}
+          context="nested"
           layout="vertical"
           pauseId={pauseId}
           protocolValue={value}
@@ -204,7 +204,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
                     <span className={styles.Separator}>: </span>
                   </>
                 }
-                isNested={true}
+                context="nested"
                 layout="vertical"
                 pauseId={pauseId}
                 protocolValue={key!}
@@ -216,7 +216,7 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
                     <span className={styles.Separator}>: </span>
                   </>
                 }
-                isNested={true}
+                context="nested"
                 layout="vertical"
                 pauseId={pauseId}
                 protocolValue={value}
@@ -226,9 +226,9 @@ function MapContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           header={
             <>
               <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={key!} />
+              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={key!} />
               &nbsp;{"→"}&nbsp;
-              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>
           }
@@ -275,7 +275,7 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
                   <span className={styles.Separator}>: </span>
                 </>
               }
-              isNested={true}
+              context="nested"
               layout="vertical"
               pauseId={pauseId}
               protocolValue={value}
@@ -284,7 +284,7 @@ function SetContainerEntriesChildrenRenderer({ containerEntries, pauseId }: Entr
           header={
             <>
               <span className={styles.MapIndex}>{index}</span>: {"{"}
-              <ValueRenderer isNested={true} pauseId={pauseId} protocolValue={value} />
+              <ValueRenderer context="nested" pauseId={pauseId} protocolValue={value} />
               {"}"}
             </>
           }
