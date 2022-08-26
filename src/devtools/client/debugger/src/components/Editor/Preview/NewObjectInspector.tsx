@@ -37,7 +37,7 @@ export default function NewObjectInspector() {
     <ErrorBoundary>
       <div className={`${styles.Popup} preview-popup`}>
         <Suspense fallback={<Loader />}>
-          <Inspector pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+          <Inspector context="default" pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
         </Suspense>
       </div>
     </ErrorBoundary>

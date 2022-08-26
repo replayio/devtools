@@ -1,5 +1,5 @@
 import Icon from "@bvaughn/components/Icon";
-import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
+import Inspector from "@bvaughn/components/inspector";
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
 import Loader from "@bvaughn/components/Loader";
 import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedExpression";
@@ -127,27 +127,15 @@ function EvaluatedContent({ terminalExpression }: { terminalExpression: Terminal
 
   let children: ReactNode | null = null;
   if (exception) {
-    children = (
-      <KeyValueRenderer
-        isNested={false}
-        layout="horizontal"
-        pauseId={pauseId}
-        protocolValue={exception}
-      />
-    );
+    children = <Inspector context="console" pauseId={pauseId} protocolValue={exception} />;
   } else if (returned) {
     children = returned.value ? (
       <ClientValueValueRenderer
         clientValue={primitiveToClientValue(returned.value)}
-        isNested={false}
+        context="console"
       />
     ) : (
-      <KeyValueRenderer
-        isNested={false}
-        layout="horizontal"
-        pauseId={pauseId}
-        protocolValue={returned}
-      />
+      <Inspector context="console" pauseId={pauseId} protocolValue={returned} />
     );
   }
 

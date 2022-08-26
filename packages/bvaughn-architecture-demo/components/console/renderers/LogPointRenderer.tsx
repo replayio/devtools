@@ -1,5 +1,5 @@
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
-import KeyValueRenderer from "@bvaughn/components/inspector/KeyValueRenderer";
+import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
@@ -140,18 +140,13 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
   const children = isRemote
     ? values.map((value, index) => (
         <Fragment key={index}>
-          <KeyValueRenderer
-            isNested={false}
-            layout="horizontal"
-            pauseId={pauseId!}
-            protocolValue={value}
-          />
+          <Inspector context="console" pauseId={pauseId!} protocolValue={value} />
           {index < values.length - 1 && " "}
         </Fragment>
       ))
     : values.map((value, index) => (
         <Fragment key={index}>
-          <ClientValueValueRenderer clientValue={primitiveToClientValue(value)} isNested={false} />
+          <ClientValueValueRenderer context="console" clientValue={primitiveToClientValue(value)} />
           {index < values.length - 1 && " "}
         </Fragment>
       ));

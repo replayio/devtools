@@ -1,9 +1,8 @@
 import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
-import { ReactNode, useContext } from "react";
+import { ReactNode } from "react";
 
 import KeyValueRenderer from "../KeyValueRenderer";
 
-import PreviewContext from "./PreviewContext";
 import styles from "./shared.module.css";
 import { ObjectPreviewRendererProps } from "./types";
 
@@ -13,9 +12,7 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 //   Object { foo: "abc", bar: 123, … }
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendererProps) {
-  const isWithinPreview = useContext(PreviewContext);
-
+export default function ObjectRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
   const { className, preview } = object;
 
   const properties = filterNonEnumerableProperties(preview?.properties ?? []);
@@ -24,14 +21,13 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
 
   const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
 
-  console.log("<ObjectRenderer>", showOverflowMarker, properties);
   let propertiesList: ReactNode[] | null = null;
-  if (!isWithinPreview) {
+  if (context !== "nested") {
     propertiesList = slice.map((property, index) => (
       <span key={index} className={styles.Value}>
         <KeyValueRenderer
+          context="nested"
           enableInspection={false}
-          isNested={true}
           layout="horizontal"
           pauseId={pauseId}
           protocolValue={property}
@@ -61,13 +57,11 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
   return (
     <>
       {className !== "Object" ? className : null}
-      <PreviewContext.Provider value={true}>
-        <span className={styles.ObjectPropertyList}>
-          {"{"}
-          {propertiesList || "…"}
-          {"}"}
-        </span>
-      </PreviewContext.Provider>
+      <span className={styles.ObjectPropertyList}>
+        {"{"}
+        {propertiesList || "…"}
+        {"}"}
+      </span>
     </>
   );
 }

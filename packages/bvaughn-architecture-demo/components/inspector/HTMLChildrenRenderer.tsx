@@ -58,7 +58,7 @@ function HTMLChildRenderer({
 
   return (
     <KeyValueRenderer
-      isNested={true}
+      context="nested"
       layout="vertical"
       pauseId={pauseId}
       protocolValue={protocolValue}

@@ -1,0 +1,6 @@
+.Inspector {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  white-space: nowrap;
+  overflow: hidden;
+}

@@ -5,6 +5,7 @@ import {
 } from "@replayio/protocol";
 
 export type ObjectPreviewRendererProps = {
+  context: "console" | "default" | "nested";
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
   protocolValue: ProtocolValue;

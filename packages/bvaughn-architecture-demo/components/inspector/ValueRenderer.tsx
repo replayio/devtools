@@ -23,12 +23,12 @@ import { ObjectPreviewRendererProps } from "./values/types";
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default memo(function ValueRenderer({
-  isNested,
+  context,
   layout = "horizontal",
   pauseId,
   protocolValue,
 }: {
-  isNested: boolean;
+  context: "console" | "default" | "nested";
   layout?: "horizontal" | "vertical";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
@@ -86,9 +86,14 @@ export default memo(function ValueRenderer({
     }
 
     return (
-      <ObjectPreviewRenderer object={object} pauseId={pauseId} protocolValue={protocolValue} />
+      <ObjectPreviewRenderer
+        context={context}
+        object={object}
+        pauseId={pauseId}
+        protocolValue={protocolValue}
+      />
     );
   }
 
-  return <ClientValueValueRenderer clientValue={clientValue} isNested={isNested} />;
+  return <ClientValueValueRenderer clientValue={clientValue} context={context} />;
 });

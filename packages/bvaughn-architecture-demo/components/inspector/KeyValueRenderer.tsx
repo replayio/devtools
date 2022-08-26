@@ -23,15 +23,15 @@ import ValueRenderer from "./ValueRenderer";
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
 export default function KeyValueRenderer({
   before = null,
+  context,
   enableInspection = true,
-  isNested = false,
   layout = "horizontal",
   pauseId,
   protocolValue,
 }: {
   before?: ReactNode;
+  context: "console" | "default" | "nested";
   enableInspection?: boolean;
-  isNested: boolean;
   layout: "horizontal" | "vertical";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
@@ -118,15 +118,19 @@ export default function KeyValueRenderer({
     }
   }
 
+  // What we show when expanded or collapsed depends on the context we are displayed in.
+  // For example, objects and arrays rendered directly within the Console won't show preview contents,
+  // but will instead display a short-form (e.g. "Object" or "Array (3)").
+  // When expanded, these objects will continue to display their short form representation.
+  //
+  // In other contexts, Objects and Arrays will display preview values when collapsed (e.g. "{foo: 123}" or "(3) [1, 2, 3]"),
+  // but when expanded they will not display anything (to avoid rendering duplicate data and cluttering the inspector).
   let value: ReactNode = null;
-  // TODO (FE-623) isNested is not the right value for this; we need something more like is-in-scope
-  if (!isExpanded || !isNested) {
-    // In certain contexts, we should hide the preview value of an Object or Array when it is being inspected.
-    // This avoids rendering a lot of unnecessary/duplicate data and cluttering the inspector.
+  if (context === "console" || !isExpanded) {
     value = (
       <ValueRenderer
-        isNested={isNested}
         layout={layout}
+        context={context}
         pauseId={pauseId}
         protocolValue={protocolValue}
       />

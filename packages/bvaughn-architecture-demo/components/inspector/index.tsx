@@ -1,20 +1,3 @@
-import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import Inspector from "./Inspector";
 
-import KeyValueRenderer from "./KeyValueRenderer";
-
-export default function Inspector({
-  pauseId,
-  protocolValue,
-}: {
-  pauseId: PauseId;
-  protocolValue: ProtocolValue;
-}) {
-  return (
-    <KeyValueRenderer
-      isNested={false}
-      layout="horizontal"
-      pauseId={pauseId}
-      protocolValue={protocolValue}
-    />
-  );
-}
+export default Inspector;

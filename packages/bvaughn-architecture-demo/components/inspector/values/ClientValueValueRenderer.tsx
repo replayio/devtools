@@ -5,10 +5,10 @@ import styles from "./shared.module.css";
 // Default renderer for primitive values (like numbers, strings, etc).
 export default function ClientValueValueRenderer({
   clientValue,
-  isNested,
+  context,
 }: {
   clientValue: ClientValue;
-  isNested: boolean;
+  context: "console" | "default" | "nested";
 }) {
   let preview = clientValue.preview;
 
@@ -36,7 +36,7 @@ export default function ClientValueValueRenderer({
       // In fact, this makes them harder to read for the most common case of console logging.
       // However, nested values (either inline previews or expanded key-value pairs) require explicit wrappers
       // to distinguish between string values and variables/pointers.
-      if (isNested) {
+      if (context === "nested") {
         preview = `"${preview}"`;
       }
       break;

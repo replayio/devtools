@@ -97,7 +97,7 @@ function MessageRenderer({
       <Suspense fallback={<Loader />}>
         {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
           <Fragment key={index}>
-            <Inspector pauseId={message.pauseId} protocolValue={argumentValue} />
+            <Inspector context="console" pauseId={message.pauseId} protocolValue={argumentValue} />
             {index < argumentValues.length - 1 && " "}
           </Fragment>
         ))}
