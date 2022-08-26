@@ -34,15 +34,15 @@ function DeletedScreen({ url }: { url: string }) {
   });
 
   return (
-    <div className="w-full h-full">
+    <div className="h-full w-full">
       <Modal>
         <div
-          className="relative flex flex-col items-center justify-between space-y-4 overflow-y-auto text-base rounded-md shadow-lg bg-modalBgcolor p-9"
+          className="relative flex flex-col items-center justify-between space-y-4 overflow-y-auto rounded-md bg-modalBgcolor p-9 text-base shadow-lg"
           style={{ width: "400px" }}
         >
           <ReplayLogo size="sm" />
           <h2 className="text-2xl font-bold ">{`Replay discarded`}</h2>
-          <div className="space-y-2 text-md">
+          <div className="text-md space-y-2">
             <div>{`Hang tight while we load your library...`}</div>
           </div>
         </div>
@@ -84,7 +84,7 @@ function Actions({ onDiscard, status }: { onDiscard: () => void; status: Status 
 
 function LimitWarning() {
   return (
-    <div className="absolute flex p-2 text-xs text-white bg-gray-500 rounded-md shadow-lg bottom-2 right-2 place-content-center">
+    <div className="absolute bottom-2 right-2 flex place-content-center rounded-md bg-gray-500 p-2 text-xs text-white shadow-lg">
       <Icon filename="warning" size="small" className="bg-white" />
       <span className="px-1">Replays work best under 2 minutes</span>
     </div>
@@ -99,9 +99,9 @@ function ReplayScreenshot({
   showLimitWarning: boolean;
 }) {
   return (
-    <div className="relative h-64 px-6 pt-6 rounded-lg shadow-lg bg-jellyfishBgcolor short:hidden">
+    <div className="relative h-64 rounded-lg bg-jellyfishBgcolor px-6 pt-6 shadow-lg short:hidden">
       {showLimitWarning ? <LimitWarning /> : null}
-      <img src={screenData} className="h-full m-auto" />
+      <img src={screenData} className="m-auto h-full" />
     </div>
   );
 }
@@ -177,20 +177,20 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
       <div className="flex flex-col items-center">
         <UploadRecordingTrialEnd {...{ selectedWorkspaceId, workspaces }} />
         <form className="relative flex flex-col items-center overflow-auto" onSubmit={onSubmit}>
-          <div className="flex flex-row mb-10 space-x-4 short:h-auto">
+          <div className="mb-10 flex flex-row space-x-4 short:h-auto">
             <div
-              className="relative flex flex-col overflow-hidden text-lg font-medium shadow-lg rounded-xl"
+              className="relative flex flex-col overflow-hidden rounded-xl text-lg font-medium shadow-lg"
               style={{ width: "620px" }}
             >
-              <div className="absolute w-full h-full bg-jellyfishBgcolor" />
-              <div className="relative px-8 space-y-6 py-9">
+              <div className="absolute h-full w-full bg-jellyfishBgcolor" />
+              <div className="relative space-y-6 px-8 py-9">
                 <ReplayTitle inputValue={inputValue} setInputValue={setInputValue} />
                 <ReplayScreenshot
                   screenData={screenData!}
                   showLimitWarning={showDurationWarning(recording)}
                 />
               </div>
-              <div className="relative px-8 space-y-6 border-t border-themeBorder py-9">
+              <div className="relative space-y-6 border-t border-themeBorder px-8 py-9">
                 <Sharing
                   workspaces={workspaces}
                   selectedWorkspaceId={selectedWorkspaceId}
@@ -210,7 +210,10 @@ export default function UploadScreen({ recording, userSettings, onUpload }: Uplo
               </div>
             </div>
             {showPrivacy && isPublic ? (
-              <div style={{ width: "440px" }}>
+              <div
+                className="relative flex h-full overflow-hidden rounded-xl bg-themeBase-90 shadow-xl"
+                style={{ width: "440px" }}
+              >
                 <Privacy />
               </div>
             ) : null}

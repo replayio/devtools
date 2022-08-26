@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppSelector } from "ui/setup/hooks";
 import Modal from "ui/components/shared/NewModal";
@@ -7,7 +7,11 @@ import hooks from "ui/hooks";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { OperationsData } from "ui/types";
-import { getUniqueDomains } from "ui/components/UploadScreen/Privacy";
+import {
+  getUniqueDomains,
+  Privacy,
+  ToggleShowPrivacyButton,
+} from "ui/components/UploadScreen/Privacy";
 import { CollaboratorRequest, Recording } from "ui/types";
 import { actions } from "ui/actions";
 import Collaborators from "./Collaborators";
@@ -56,14 +60,14 @@ function CollaboratorRequests({ recording }: { recording: Recording }) {
       <div className="space-y-1.5 overflow-auto" style={{ maxHeight: "160px" }}>
         {displayedRequests.map((c, i) => (
           <div
-            className="flex items-center justify-between p-2 space-x-2 rounded-lg hover:bg-theme-base-90"
+            className="hover:bg-theme-base-90 flex items-center justify-between space-x-2 rounded-lg p-2"
             key={i}
           >
             <div className="flex items-center space-x-2">
-              <div className="flex-shrink-0 w-8 overflow-hidden rounded-full">
+              <div className="w-8 flex-shrink-0 overflow-hidden rounded-full">
                 <AvatarImage src={c.user.picture} />
               </div>
-              <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+              <span className="overflow-hidden overflow-ellipsis whitespace-pre">
                 {c.user.name}
               </span>
             </div>
@@ -85,8 +89,8 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   }
 
   return (
-    <section className="p-8 space-y-4">
-      <div className="flex flex-col justify-between w-full space-y-3">
+    <section className="space-y-4 p-8">
+      <div className="flex w-full flex-col justify-between space-y-3">
         <div className="w-full space-y-4">
           <div className="space-y-1.5">
             <div className="font-bold">Add People</div>
@@ -99,13 +103,7 @@ function CollaboratorsSection({ recording }: { recording: Recording }) {
   );
 }
 
-function SecurityWarnings({
-  operations,
-  onClick,
-}: {
-  operations: OperationsData;
-  onClick: () => void;
-}) {
+function SecurityWarnings({ operations }: { operations: OperationsData }) {
   const uniqueDomains = getUniqueDomains(operations);
 
   if (uniqueDomains.length == 0) {
@@ -125,33 +123,47 @@ function EnvironmentVariablesRow() {
 
 function SharingModal({ recording, hideModal }: SharingModalProps) {
   const recordingTarget = useAppSelector(getRecordingTarget);
+  const [showPrivacy, setShowPrivacy] = useState(false);
   const showEnvironmentVariables = recordingTarget == "node";
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
       <div
-        className="relative flex flex-col space-y-0 overflow-hidden text-sm rounded-lg sharing-modal"
-        style={{ width: "460px" }}
+        className="sharing-modal relative flex flex-row overflow-hidden rounded-lg text-sm"
+        style={{ width: showPrivacy ? 720 : 460 }}
       >
-        <CollaboratorsSection recording={recording} />
-        <section className="flex flex-row items-center justify-between p-8 space-x-2 bg-menuHoverBgcolor">
-          <div className="flex flex-row items-start space-x-3 overflow-hidden">
-            <div className="flex items-center justify-center flex-shrink-0 w-8 h-8 mt-1 font-bold bg-blue-200 rounded-full">
-              <MaterialIcon className="text-blue-600" iconSize="xl">
-                people
-              </MaterialIcon>
+        <div className="flex flex-col space-y-0" style={{ width: 460 }}>
+          <CollaboratorsSection recording={recording} />
+          <section className="flex flex-grow flex-row items-center justify-between space-x-2 bg-menuHoverBgcolor px-8 pt-8">
+            <div className="flex flex-row items-start space-x-3 overflow-hidden">
+              <div className="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-200 font-bold">
+                <MaterialIcon className="text-blue-600" iconSize="xl">
+                  people
+                </MaterialIcon>
+              </div>
+              <div className="flex flex-col space-y-1 overflow-hidden">
+                <div className="font-bold">Privacy Settings</div>
+                <PrivacyDropdown {...{ recording }} />
+                {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
+              </div>
             </div>
-            <div className="flex flex-col space-y-1 overflow-hidden">
-              <div className="font-bold">Privacy Settings</div>
-              <PrivacyDropdown {...{ recording }} />
-              {recording.operations ? (
-                <SecurityWarnings operations={recording.operations} onClick={() => {}} />
-              ) : null}
-              {showEnvironmentVariables ? <EnvironmentVariablesRow /> : null}
-            </div>
+            <CopyButton recording={recording} />
+          </section>
+          {recording.operations ? (
+            <section className=" bg-menuHoverBgcolor px-8 pb-6">
+              <ToggleShowPrivacyButton
+                showPrivacy={showPrivacy}
+                operations={recording.operations}
+                setShowPrivacy={setShowPrivacy}
+              />
+            </section>
+          ) : null}
+        </div>
+        {showPrivacy ? (
+          <div className="relative flex overflow-auto bg-menuHoverBgcolor">
+            <Privacy />
           </div>
-          <CopyButton recording={recording} />
-        </section>
+        ) : null}
       </div>
     </Modal>
   );

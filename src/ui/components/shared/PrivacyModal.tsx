@@ -7,7 +7,10 @@ import Modal from "./NewModal";
 function PrivacyModal({ hideModal }: PropsFromRedux) {
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <div style={{ width: "440px", height: "480px" }}>
+      <div
+        className="relative flex overflow-hidden rounded-xl bg-themeBase-90 shadow-xl"
+        style={{ width: "440px", height: "480px" }}
+      >
         <Privacy />
       </div>
     </Modal>
