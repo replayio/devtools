@@ -1,5 +1,6 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
+import maxBy from "lodash/maxBy";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
@@ -185,7 +186,20 @@ export function setupGraphics() {
       await Promise.all(gPaintPromises);
       videoReady.resolve();
     });
-    client.Graphics.addPaintPointsListener(({ paints }) => onPaints(paints));
+    let paintedGraphics = false;
+    client.Graphics.addPaintPointsListener(async ({ paints }) => {
+      onPaints(paints);
+      const latestPaint = maxBy(paints, p => BigInt(p.point));
+      if (
+        !paintedGraphics &&
+        latestPaint &&
+        BigInt(latestPaint.point) > BigInt(ThreadFront.currentPoint)
+      ) {
+        paintedGraphics = true;
+        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+        paintGraphics(screen, mouse);
+      }
+    });
 
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
