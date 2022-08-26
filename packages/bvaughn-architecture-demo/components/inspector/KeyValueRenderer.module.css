@@ -1,6 +1,7 @@
 .KeyValue {
   display: inline;
   text-align: start;
+  vertical-align: top;
 }
 
 .HorizontalName {

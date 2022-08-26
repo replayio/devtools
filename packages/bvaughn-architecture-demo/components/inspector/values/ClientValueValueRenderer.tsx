@@ -36,7 +36,7 @@ export default function ClientValueValueRenderer({
       // In fact, this makes them harder to read for the most common case of console logging.
       // However, nested values (either inline previews or expanded key-value pairs) require explicit wrappers
       // to distinguish between string values and variables/pointers.
-      if (context === "nested") {
+      if (context !== "console") {
         preview = `"${preview}"`;
       }
       break;

@@ -296,7 +296,7 @@ test("should be searchable on complex content", async ({ page }) => {
 
   await showSearchInput(page);
 
-  await page.fill("[data-test-id=ConsoleSearchInput]", "Array(3) [1, 2, 3]");
+  await page.fill("[data-test-id=ConsoleSearchInput]", "(3) [1, 2, 3]");
 
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "searchable-complex-array-preview");
@@ -308,7 +308,7 @@ test("should be searchable on complex content", async ({ page }) => {
 test("should be filterable on complex content", async ({ page }) => {
   await setup(page, true);
 
-  await page.fill("[data-test-id=ConsoleFilterInput]", "Array(3) [1, 2, 3]");
+  await page.fill("[data-test-id=ConsoleFilterInput]", "(3) [1, 2, 3]");
   const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
   await takeScreenshot(page, consoleRoot, "filtered-complex-array-preview");
 
