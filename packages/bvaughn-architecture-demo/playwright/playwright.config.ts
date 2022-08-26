@@ -1,7 +1,9 @@
 const { CI, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
 
 let slowMo = 50;
-if (CI || VISUAL_DEBUG) {
+if (CI) {
+  slowMo = 1000;
+} else if (VISUAL_DEBUG) {
   slowMo = 500;
 }
 
