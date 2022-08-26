@@ -44,7 +44,7 @@ export function useFetchCypressSpec() {
       );
 
       const matches: CypressResult[] = results.map(r => {
-        const match = r.context.match(/(\"|\')(.*)(\"|\')/);
+        const match = r.context.match(/(\"|\'|\`)(.*)(\"|\'|`)/);
         return { test: match?.[2] || "", location: r.location };
       });
 
