@@ -3,7 +3,7 @@ import Loader from "@bvaughn/components/Loader";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { Object as ProtocolObject, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import classNames from "classnames";
-import { ReactNode, Suspense, useContext } from "react";
+import { ReactNode, Suspense, useContext, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import HTMLExpandable from "./HTMLExpandable";
@@ -38,6 +38,8 @@ export default function KeyValueRenderer({
 }) {
   const client = useContext(ReplayClientContext);
   const clientValue = useClientValue(protocolValue, pauseId);
+
+  const [isExpanded, setIsExpanded] = useState(false);
 
   const { objectId, name, type } = clientValue;
 
@@ -116,6 +118,21 @@ export default function KeyValueRenderer({
     }
   }
 
+  let value: ReactNode = null;
+  // TODO (FE-623) isNested is not the right value for this; we need something more like is-in-scope
+  if (!isExpanded || !isNested) {
+    // In certain contexts, we should hide the preview value of an Object or Array when it is being inspected.
+    // This avoids rendering a lot of unnecessary/duplicate data and cluttering the inspector.
+    value = (
+      <ValueRenderer
+        isNested={isNested}
+        layout={layout}
+        pauseId={pauseId}
+        protocolValue={protocolValue}
+      />
+    );
+  }
+
   const header = (
     <span
       className={classNames(
@@ -131,12 +148,8 @@ export default function KeyValueRenderer({
           <span className={styles.Separator}>: </span>
         </>
       ) : null}
-      <ValueRenderer
-        isNested={isNested}
-        layout={layout}
-        pauseId={pauseId}
-        protocolValue={protocolValue}
-      />
+
+      {value}
     </span>
   );
 
@@ -149,6 +162,7 @@ export default function KeyValueRenderer({
           </Suspense>
         }
         header={header}
+        onChange={setIsExpanded}
       />
     );
   } else {

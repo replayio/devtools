@@ -24,6 +24,7 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
 
   const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
 
+  console.log("<ObjectRenderer>", showOverflowMarker, properties);
   let propertiesList: ReactNode[] | null = null;
   if (!isWithinPreview) {
     propertiesList = slice.map((property, index) => (
@@ -40,11 +41,15 @@ export default function ObjectRenderer({ object, pauseId }: ObjectPreviewRendere
     ));
 
     if (showOverflowMarker) {
-      propertiesList.push(
-        <span key="Separator" className={styles.Separator}>
-          ,{" "}
-        </span>
-      );
+      if (properties.length > 0) {
+        // It's possible that we have no unfiltered properties, but still have overflow.
+        propertiesList.push(
+          <span key="Separator" className={styles.Separator}>
+            ,{" "}
+          </span>
+        );
+      }
+
       propertiesList.push(
         <span key="Ellipsis" className={styles.ObjectProperty}>
           …
