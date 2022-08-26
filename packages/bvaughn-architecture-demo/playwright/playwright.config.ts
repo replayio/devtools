@@ -8,7 +8,7 @@ if (CI || VISUAL_DEBUG) {
 const config = {
   forbidOnly: !!CI,
   reporter: CI ? "github" : "list",
-  retries: 5,
+  retries: VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
