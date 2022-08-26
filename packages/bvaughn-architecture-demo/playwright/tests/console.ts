@@ -21,7 +21,7 @@ testSetup(async function regeneratorFunction({ page }) {
   const warningListItem = await locateMessage(page, "console-warning", "This is a warning");
   const arrayKeyValue = warningListItem
     .locator("[data-test-name=Expandable]", {
-      hasText: "Array",
+      hasText: "(3)",
     })
     .last();
   await arrayKeyValue.click();
@@ -141,7 +141,7 @@ test("should expand and inspect arrays", async ({ page }) => {
   await takeScreenshot(page, listItem, "array-collapsed", 1);
 
   const outer = listItem.locator("[data-test-name=Expandable]", { hasText: "This is a warning" });
-  const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "Array" });
+  const keyValue = outer.locator("[data-test-name=Expandable]", { hasText: "(3)" });
   await keyValue.click();
   await takeScreenshot(page, listItem, "array-expanded", 1);
 });

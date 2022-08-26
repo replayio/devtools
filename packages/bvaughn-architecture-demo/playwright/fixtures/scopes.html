@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" />
+    <meta content="utf-8" http-equiv="encoding" />
+  </head>
+  <body>
+    <script type="text/javascript">
+      const array = [123, "abc", true];
+      const arrayWithNesting = [123, array];
+
+      const object = { foo: 123, bar: "abc", baz: true };
+      const objectWithNesting = { foo: 123, object, array, arrayWithNesting };
+
+      arrayWithNesting.push(object, objectWithNesting);
+
+      window.globalValues = {
+        array,
+        arrayWithNesting,
+        object,
+        objectWithNesting,
+      };
+    </script>
+  </body>
+</html>
