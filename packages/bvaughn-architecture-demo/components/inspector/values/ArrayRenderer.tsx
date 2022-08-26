@@ -51,9 +51,12 @@ export default function ArrayRenderer({ context, object, pauseId }: ObjectPrevie
     }
   }
 
+  // Chrome shortens arrays to e.g. "(3) [1,2,3]" but displays the full name for typed arrays.
+  const showClassName = context === "nested" || className !== "Array";
+
   return (
     <>
-      {context === "nested" ? className : null}
+      {showClassName ? className : null}
       {length > 0 && <span className={styles.ArrayLength}>({length})</span>}
       {propertiesList !== null && (
         <span className={styles.ArrayPropertyList}>
