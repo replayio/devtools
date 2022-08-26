@@ -45,6 +45,7 @@ export type ImageBody = {
 export type DisplayableBody = JSONBody | RawBody | TextBody | ImageBody;
 
 const TEXTISH_CONTENT_TYPES = [
+  "application/x-www-form-urlencoded",
   "application/javascript",
   "application/json",
   "application/octet-stream",
