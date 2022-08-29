@@ -71,71 +71,92 @@ export const EventListenersApp = () => {
       {listeners.length === 0 ? (
         <div className="devtools-sidepanel-no-result">No event listeners</div>
       ) : (
-        groupedSortedListeners.map(([eventType, listeners]) => (
-          <div key={eventType} className="devtools-monospace">
-            <ExpandableItem header={eventType}>
-              {listeners.map(
-                ({ functionName, functionParameterNames, locationUrl, location, capture }, i) => {
-                  return (
-                    <ExpandableItem
-                      key={i}
-                      header={
-                        <div className="flex gap-2">
-                          <XHTMLNode node={nodeWithPreview} />
-                          <span>
-                            {location && locationUrl ? (
-                              <span
-                                className="cursor-pointer underline hover:text-gray-500"
-                                title="Open in Debugger"
-                                onClick={() => {
-                                  dispatch(
-                                    onViewSourceInDebugger(
-                                      {
-                                        ...location,
-                                        url: locationUrl,
-                                      },
-                                      true
-                                    )
-                                  );
-                                }}
-                              >
-                                {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:
-                                {location.line}
-                              </span>
-                            ) : (
-                              "[native code]"
-                            )}
-                          </span>
+        groupedSortedListeners.map(([eventType, listeners]) => {
+          const framework = listeners.find(l => !!l.framework)?.framework;
+          // Add either a "Framework" icon (like the React logo) or a "JS" icon
+          // to the event name expanders in the treeview
+          const header = (
+            <div className="flex items-center text-sm">
+              {eventType}
+              <span className={`img ml-1 ${framework ?? "javascript"}`}></span>
+            </div>
+          );
+          return (
+            <div key={eventType} className="devtools-monospace">
+              <ExpandableItem header={header}>
+                {listeners.map(
+                  (
+                    {
+                      functionName,
+                      functionParameterNames,
+                      locationUrl,
+                      location,
+                      capture,
+                      framework,
+                    },
+                    i
+                  ) => {
+                    return (
+                      <ExpandableItem
+                        key={i}
+                        header={
+                          <div className="flex gap-2">
+                            <XHTMLNode node={nodeWithPreview} />
+                            <span>
+                              {location && locationUrl ? (
+                                <span
+                                  className="cursor-pointer underline hover:text-gray-500"
+                                  title="Open in Debugger"
+                                  onClick={() => {
+                                    dispatch(
+                                      onViewSourceInDebugger(
+                                        {
+                                          ...location,
+                                          url: locationUrl,
+                                        },
+                                        true
+                                      )
+                                    );
+                                  }}
+                                >
+                                  {locationUrl.substring(locationUrl.lastIndexOf("/") + 1)}:
+                                  {location.line}
+                                </span>
+                              ) : (
+                                "[native code]"
+                              )}
+                            </span>
+                          </div>
+                        }
+                      >
+                        <div className="pl-4">
+                          <div className="theme-fg-color3">
+                            useCapture:{" "}
+                            <span className="theme-fg-color1">{capture ? "true" : "false"}</span>
+                          </div>
+                          <div>
+                            <span className="theme-fg-color3">handler: </span>
+                            <span
+                              className="italic"
+                              style={{
+                                color: "var(--theme-highlight-lightorange)",
+                              }}
+                            >
+                              f
+                            </span>{" "}
+                            <span className="italic">
+                              {functionName}({functionParameterNames.join(", ")})
+                            </span>
+                          </div>
                         </div>
-                      }
-                    >
-                      <div className="pl-4">
-                        <div className="theme-fg-color3">
-                          useCapture:{" "}
-                          <span className="theme-fg-color1">{capture ? "true" : "false"}</span>
-                        </div>
-                        <div>
-                          <span className="theme-fg-color3">handler: </span>
-                          <span
-                            className="italic"
-                            style={{
-                              color: "var(--theme-highlight-lightorange)",
-                            }}
-                          >
-                            f
-                          </span>{" "}
-                          <span className="italic">
-                            {functionName}({functionParameterNames.join(", ")})
-                          </span>
-                        </div>
-                      </div>
-                    </ExpandableItem>
-                  );
-                }
-              )}
-            </ExpandableItem>
-          </div>
-        ))
+                      </ExpandableItem>
+                    );
+                  }
+                )}
+              </ExpandableItem>
+            </div>
+          );
+        })
       )}
     </div>
   );

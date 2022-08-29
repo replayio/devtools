@@ -7,13 +7,6 @@ import { getSourceDetailsEntities, getPreferredLocation, SourceDetails } from "u
 import { UIState } from "ui/state";
 import { Dictionary } from "@reduxjs/toolkit";
 
-export interface FrameworkEventListener {
-  handler: ValueFront;
-  type: string;
-  capture: boolean;
-  tags: string;
-}
-
 export type FunctionPreview = Required<
   Pick<ObjectPreview, "functionName" | "functionLocation" | "functionParameterNames">
 >;
@@ -25,6 +18,7 @@ export interface EventListenerWithFunctionInfo {
   locationUrl?: string;
   location: Location;
   functionParameterNames: string[];
+  framework?: string;
 }
 
 export type FunctionWithPreview = Omit<ProtocolObject, "preview"> & {
@@ -72,7 +66,8 @@ const formatEventListener = (
   listener: { type: string; capture: boolean },
   fnPreview: FunctionWithPreview,
   state: UIState,
-  sourcesById: Dictionary<SourceDetails>
+  sourcesById: Dictionary<SourceDetails>,
+  framework?: string
 ) => {
   const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview.preview;
   const location = getPreferredLocation(
@@ -89,6 +84,7 @@ const formatEventListener = (
     locationUrl,
     functionName,
     functionParameterNames,
+    framework,
   };
 };
 
@@ -200,7 +196,9 @@ export function getNodeEventListeners(
               { type: obj.name, capture: false },
               obj.value,
               state,
-              sourcesById
+              sourcesById,
+              // We're only finding React-specific event handlers atm
+              "react"
             );
           });
 
