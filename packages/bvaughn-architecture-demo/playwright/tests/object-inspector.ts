@@ -55,6 +55,7 @@ testSetup(async function regeneratorFunction({ page }) {
     "htmlElementWithChildren",
     "render-and-inspect-html-element"
   );
+  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-map");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
   await inspectAndTakeScreenshotOf(page, "regex", "render-and-inspect-regex");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
@@ -69,6 +70,16 @@ testSetup(async function regeneratorFunction({ page }) {
     "mapWithComplexKeys",
     "render-and-inspect-map-with-complex-keys"
   );
+
+  await inspectAndTakeScreenshotOf(page, "overflowingArray", "overflowing-array-expanded");
+  const firstBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
+    hasText: "[0 … 99]",
+  });
+  await firstBucket.click();
+  const secondBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
+    hasText: "[100 … 105]",
+  });
+  await secondBucket.click();
 
   // Getters/setters
   await filterByText(page, "filter_objectWithGettersAndSetters");
@@ -156,7 +167,7 @@ test("should render and inspect HTML elements", async ({ page }) => {
 test("should render and inspect maps", async ({ page }) => {
   await filterByText(page, "map");
 
-  await takeScreenshotOfMessages(page, "render-empty-maps");
+  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-map");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
   await inspectAndTakeScreenshotOf(
     page,
@@ -180,14 +191,14 @@ test("should render and inspect regular expressions", async ({ page }) => {
 test("should render and inspect sets", async ({ page }) => {
   await filterByText(page, "set");
 
-  await takeScreenshotOfMessages(page, "render-empty-sets");
+  await takeScreenshotOfMessages(page, "rendered-sets");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
 });
 
 test("should render and inspect objects", async ({ page }) => {
   await filterByText(page, "filter_object");
 
-  await takeScreenshotOfMessages(page, "render-empty-objects");
+  await takeScreenshotOfMessages(page, "rendered-objects");
   await inspectAndTakeScreenshotOf(page, "objectSimple", "render-and-inspect-object");
 });
 
@@ -218,4 +229,23 @@ test("should render getters and setters correctly", async ({ page }) => {
     .first();
   await arrayRow.click();
   await takeScreenshot(page, arrayRow, "inspect-getter-nested-array");
+});
+
+test("should properly bucket properties for an overflowing array", async ({ page }) => {
+  await filterByText(page, "overflowingArray");
+
+  await inspectAndTakeScreenshotOf(page, "overflowingArray", "overflowing-array-expanded");
+
+  const firstBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
+    hasText: "[0 … 99]",
+  });
+  await firstBucket.click();
+  await takeScreenshotOfMessages(page, "overflowing-array-first-bucket-expanded");
+
+  await firstBucket.click();
+  const secondBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
+    hasText: "[100 … 105]",
+  });
+  await secondBucket.click();
+  await takeScreenshotOfMessages(page, "overflowing-array-second-bucket-expanded");
 });

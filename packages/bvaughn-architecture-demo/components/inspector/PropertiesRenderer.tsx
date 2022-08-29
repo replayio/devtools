@@ -32,13 +32,13 @@ export default function PropertiesRenderer({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { className, objectId, preview } = object;
-
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
-  if (preview == null || preview.overflow) {
-    object = getObjectWithPreview(client, pauseId, objectId, true);
+  if (object.preview == null || object.preview.overflow) {
+    object = getObjectWithPreview(client, pauseId, object.objectId, true);
   }
+
+  const { className, objectId, preview } = object;
 
   const containerEntries = preview?.containerEntries ?? [];
   const properties = useMemo(() => {
@@ -71,13 +71,20 @@ export default function PropertiesRenderer({
   // For collections that contain a lot of properties, group them into "buckets" of 100 props.
   // This most commonly comes into play with large Arrays.
   const buckets: { header: string; properties: ProtocolProperty[] }[] = [];
-  while (properties.length > PROPERTY_BUCKET_SIZE) {
-    const rangeStart = buckets.length * PROPERTY_BUCKET_SIZE;
-    const rangeStop = rangeStart + PROPERTY_BUCKET_SIZE - 1;
-    buckets.push({
-      header: `[${rangeStart} … ${rangeStop}]`,
-      properties: properties.splice(0, PROPERTY_BUCKET_SIZE),
-    });
+  if (properties.length >= PROPERTY_BUCKET_SIZE) {
+    let index = 0;
+
+    while (index < properties.length - 1) {
+      const rangeStart = buckets.length * PROPERTY_BUCKET_SIZE;
+      const rangeStop = Math.min(properties.length, rangeStart + PROPERTY_BUCKET_SIZE) - 1;
+
+      buckets.push({
+        header: `[${rangeStart} … ${rangeStop}]`,
+        properties: properties.slice(rangeStart, rangeStop + 1),
+      });
+
+      index = rangeStop;
+    }
   }
 
   return (
@@ -112,25 +119,27 @@ export default function PropertiesRenderer({
         />
       ))}
 
-      <Suspense fallback={<Loader />}>
-        {properties.map((property, index) => (
-          <Fragment key={index}>
-            {property.get != null && (
-              <GetterRenderer
-                parentObjectId={objectId}
+      {buckets.length === 0 && (
+        <Suspense fallback={<Loader />}>
+          {properties.map((property, index) => (
+            <Fragment key={index}>
+              {property.get != null && (
+                <GetterRenderer
+                  parentObjectId={objectId}
+                  pauseId={pauseId}
+                  protocolProperty={property}
+                />
+              )}
+              <KeyValueRenderer
+                context="default"
+                layout="vertical"
                 pauseId={pauseId}
-                protocolProperty={property}
+                protocolValue={property}
               />
-            )}
-            <KeyValueRenderer
-              context="default"
-              layout="vertical"
-              pauseId={pauseId}
-              protocolValue={property}
-            />
-          </Fragment>
-        ))}
-      </Suspense>
+            </Fragment>
+          ))}
+        </Suspense>
+      )}
 
       {prototype != null && (
         <Expandable
