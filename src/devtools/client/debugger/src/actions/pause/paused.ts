@@ -49,6 +49,8 @@ export function paused({
     // @ts-expect-error optional time mismatch
     const pause = ThreadFront.ensurePause(executionPoint, time);
 
+    await pause.createWaiter;
+
     dispatch(pausedAction({ executionPoint, time, id: pause.pauseId!, frame }));
 
     const cx = getThreadContext(getState());

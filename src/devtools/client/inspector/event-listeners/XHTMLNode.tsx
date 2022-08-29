@@ -1,19 +1,29 @@
-import { NodeFront } from "protocol/thread/node";
 import React, { FC } from "react";
-import { SHADOW_ROOT_TAGNAME } from "../breadcrumbs";
+
+import { NodeWithPreview } from "ui/actions/event-listeners";
 
 type XHTMLNodeProps = {
-  node: NodeFront;
+  node: NodeWithPreview;
 };
 
+const getAttribute = (node: NodeWithPreview, name: string) => {
+  const attr = node.preview.node.attributes?.find(a => a.name == name);
+  return attr?.value;
+};
+
+// Show a stringified DOM node representation, like:
+// button#someId.class1.class2
 export const XHTMLNode: FC<XHTMLNodeProps> = ({ node }) => {
-  const tagText = `${node.isShadowRoot ? SHADOW_ROOT_TAGNAME : node.displayName}${
-    node.pseudoType ? "::" + node.pseudoType : ""
-  }`;
+  const { nodeName, pseudoType, attributes } = node.preview.node;
 
-  const idText = node.id ? `#${node.id}` : "";
+  const id = getAttribute(node, "id");
+  const className = getAttribute(node, "class") || "";
+  const classList = className.split(" ").filter(Boolean);
 
-  const classesText = node.classList.length > 0 ? "." + node.classList.join(".") : "";
+  const tagText = `${nodeName.toLowerCase()}${pseudoType ? "::" + pseudoType : ""}`;
+  const idText = id ? `#${id}` : "";
+  // Add a preceding `.` if there are any classes, plus in-between each
+  const classesText = [""].concat(classList).join(".");
 
   return (
     <span>

@@ -1,42 +1,216 @@
 // Routines for finding framework-specific event listeners within a pause.
 
-import { ValueFront } from "protocol/thread";
-import { NodeFront } from "protocol/thread/node";
+import type { Object as ProtocolObject, ObjectPreview, Location } from "@replayio/protocol";
+import { ThreadFront, ValueFront } from "protocol/thread";
+import { UIThunkAction } from "./index";
+import { getSourceDetailsEntities, getPreferredLocation, SourceDetails } from "ui/reducers/sources";
+import { UIState } from "ui/state";
+import { Dictionary } from "@reduxjs/toolkit";
 
-export interface FrameworkEventListener {
-  handler: ValueFront;
+export type FunctionPreview = Required<
+  Pick<ObjectPreview, "functionName" | "functionLocation" | "functionParameterNames">
+>;
+
+export interface EventListenerWithFunctionInfo {
   type: string;
   capture: boolean;
-  tags: string;
+  functionName: string;
+  locationUrl?: string;
+  location: Location;
+  functionParameterNames: string[];
+  framework?: string;
 }
 
-const frameworkListenersCache = new WeakMap<NodeFront, FrameworkEventListener[]>();
+export type FunctionWithPreview = Omit<ProtocolObject, "preview"> & {
+  preview: FunctionPreview;
+};
 
-export async function getFrameworkEventListeners(node: NodeFront) {
-  if (frameworkListenersCache.has(node)) {
-    return frameworkListenersCache.get(node)!;
-  }
+// TS magic: https://stackoverflow.com/a/57837897/62937
+type DeepRequired<T, P extends string[]> = T extends object
+  ? Omit<T, Extract<keyof T, P[0]>> &
+      Required<{
+        [K in Extract<keyof T, P[0]>]: NonNullable<DeepRequired<T[K], ShiftUnion<P>>>;
+      }>
+  : T;
 
-  const obj = node.getObjectFront();
-  await obj.loadProperties();
-  const props = [...obj.previewValueMap().entries()];
-  const reactProp = props.find(([key]) => key.startsWith("__reactEventHandlers$"));
-  if (!reactProp) {
-    return [];
-  }
+// Analogues to array.prototype.shift
+export type Shift<T extends any[]> = ((...t: T) => any) extends (
+  first: any,
+  ...rest: infer Rest
+) => any
+  ? Rest
+  : never;
 
-  await reactProp[1].loadProperties();
-  const handlerProps = [...reactProp[1].previewValueMap().entries()];
-  const resultListeners = handlerProps
-    .filter(([, contents]) => {
-      return contents.isObject() && contents.className() == "Function";
-    })
-    .map(([name, contents]) => {
-      return { handler: contents, type: name, capture: false, tags: "React" };
+// use a distributed conditional type here
+type ShiftUnion<T> = T extends any[] ? Shift<T> : never;
+
+export type NodeWithPreview = DeepRequired<
+  ProtocolObject,
+  ["preview", "node"] | ["preview", "getterValues"]
+>;
+
+const isFunctionPreview = (obj?: ObjectPreview): obj is FunctionPreview => {
+  return (
+    !!obj && "functionName" in obj && "functionLocation" in obj && "functionParameterNames" in obj
+  );
+};
+
+const isFunctionWithPreview = (obj: ProtocolObject): obj is FunctionWithPreview => {
+  return obj.className === "Function" && isFunctionPreview(obj.preview);
+};
+
+const REACT_16_EVENT_LISTENER_PROP_KEY = "__reactEventHandlers$";
+const REACT_17_18_EVENT_LISTENER_PROP_KEY = "__reactProps$";
+
+const formatEventListener = (
+  listener: { type: string; capture: boolean },
+  fnPreview: FunctionWithPreview,
+  state: UIState,
+  sourcesById: Dictionary<SourceDetails>,
+  framework?: string
+) => {
+  const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview.preview;
+  const location = getPreferredLocation(
+    state,
+    functionLocation,
+    ThreadFront.preferredGeneratedSources
+  );
+
+  const locationUrl = functionLocation ? sourcesById[location.sourceId]?.url : undefined;
+
+  return {
+    ...listener,
+    location,
+    locationUrl,
+    functionName,
+    functionParameterNames,
+    framework,
+  };
+};
+
+const eventListenersCacheByPause = new Map<string, Map<string, EventListenerWithFunctionInfo[]>>();
+
+export function getNodeEventListeners(
+  nodeId: string
+): UIThunkAction<Promise<EventListenerWithFunctionInfo[]>> {
+  return async (dispatch, getState, { ThreadFront, protocolClient, replayClient, objectCache }) => {
+    if (!ThreadFront.currentPause) {
+      return [];
+    }
+    const pauseId = ThreadFront.currentPause.pauseId!;
+
+    if (!eventListenersCacheByPause.has(pauseId)) {
+      eventListenersCacheByPause.set(pauseId, new Map());
+    }
+
+    // Reuse cached event listener entries if we've done this work already
+    const eventListenersCache = eventListenersCacheByPause.get(pauseId)!;
+    const cachedListeners = eventListenersCache.get(nodeId);
+
+    if (cachedListeners) {
+      return cachedListeners;
+    }
+
+    const state = getState();
+    const sourcesById = getSourceDetailsEntities(state);
+
+    // We need to fetch "basic" event listeners from the protocol API
+    const { listeners } = await ThreadFront.currentPause.sendMessage(
+      protocolClient.DOM.getEventListeners,
+      {
+        node: nodeId,
+      }
+    );
+
+    // Reformat those entries to add location/name/params data
+    const formattedListenerEntries = listeners.map(listener => {
+      // TODO These entries exist in current testing, but what's fetching them earlier?
+      const listenerHandler = objectCache.getObjectThrows(
+        pauseId,
+        listener.handler
+      ) as FunctionWithPreview;
+
+      return formatEventListener(listener, listenerHandler, state, sourcesById);
     });
 
-  frameworkListenersCache.set(node, resultListeners);
-  return resultListeners;
+    // Next, we want to find "framework listeners". As currently implemented,
+    // this is really just finding React `onThing` events.
+    // React normally points the "raw" event handlers like `"click"` to a `noop`
+    // function. It's much more useful to see an `onClick` entry that points to
+    // a real file like `Counter.tsx:27` instead.
+
+    // Start by getting "the JS object that represents this DOM node".
+    const domNodeObject = (await objectCache.getObjectWithPreviewHelper(
+      replayClient,
+      pauseId,
+      nodeId
+    )) as NodeWithPreview;
+
+    // DOM nodes can have normal JS object properties.
+    const { properties = [] } = domNodeObject.preview;
+
+    // React adds special secret expando properties to DOM nodes to store
+    // metadata about props and component args.
+    // HACK This is groveling into the guts of React and can easily break!
+    const reactEventListenerProperty = properties.find(
+      prop =>
+        prop.name.startsWith(REACT_16_EVENT_LISTENER_PROP_KEY) ||
+        prop.name.startsWith(REACT_17_18_EVENT_LISTENER_PROP_KEY)
+    );
+
+    if (reactEventListenerProperty) {
+      // Assuming we found the magic "props metadata" object name/ID,
+      // retrieve the actual object contents.
+      const listenerPropObj = await objectCache.getObjectWithPreviewHelper(
+        replayClient,
+        pauseId,
+        reactEventListenerProperty.object!
+      );
+
+      // The object might contain both primitives and objects/functions.
+      // Narrow down the props fields to just objects (including functions)
+      const objectProperties =
+        listenerPropObj.preview?.properties?.filter(prop => !!prop.object) ?? [];
+
+      if (objectProperties.length) {
+        // Then retrieve full preview data for all of those "object" fields
+        const allPropertyPreviews = await Promise.all(
+          objectProperties.map(async prop => ({
+            name: prop.name,
+            value: (await objectCache.getObjectWithPreviewHelper(
+              replayClient,
+              pauseId,
+              prop.object!
+            )) as FunctionWithPreview,
+          }))
+        );
+
+        // Finally, we can filter that down to "objects" that are actually functions.
+        // We can assume that any function this far down is a React event handler,
+        // defined in actual user code.
+        const formattedFrameworkListeners = allPropertyPreviews
+          .filter(obj => obj.value.className === "Function")
+          .map(obj => {
+            // Add an entry like `{name: "onClick", location, locationUrl}
+            return formatEventListener(
+              { type: obj.name, capture: false },
+              obj.value,
+              state,
+              sourcesById,
+              // We're only finding React-specific event handlers atm
+              "react"
+            );
+          });
+
+        // Merge the React event entries into the list of all event listeners
+        formattedListenerEntries.push(...formattedFrameworkListeners);
+      }
+    }
+
+    // Cache all that work for later
+    eventListenersCache.set(nodeId, formattedListenerEntries);
+    return formattedListenerEntries;
+  };
 }
 
 export function logpointGetFrameworkEventListeners(frameId: string, frameworkListeners: string) {

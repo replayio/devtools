@@ -49,6 +49,12 @@ import { setupSourcesListeners } from "devtools/client/debugger/src/actions/sour
 import { setupMarkup } from "devtools/client/inspector/markup/actions/markup";
 import { setupBoxModel } from "devtools/client/inspector/boxmodel/actions/box-model";
 import { setupRules } from "devtools/client/inspector/rules/actions/rules";
+import {
+  getCachedObject,
+  getObjectThrows,
+  getObjectWithPreviewHelper,
+  getObjectPropertyHelper,
+} from "@bvaughn/src/suspense/ObjectPreviews";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -179,6 +185,12 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     ThreadFront,
     replayClient,
     protocolClient,
+    objectCache: {
+      getCachedObject,
+      getObjectThrows,
+      getObjectWithPreviewHelper,
+      getObjectPropertyHelper,
+    },
   };
 
   // Add all these new slice reducers and some related state in a single call,

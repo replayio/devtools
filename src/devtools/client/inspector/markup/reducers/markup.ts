@@ -8,6 +8,7 @@ const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
 
 import { Attr } from "@replayio/protocol";
 import { NodeFront } from "protocol/thread/node";
+import { UIState } from "ui/state";
 
 export interface NodeInfo {
   // A list of the node's attributes.
@@ -131,3 +132,5 @@ export const {
 } = markupSlice.actions;
 
 export default markupSlice.reducer;
+
+export const getSelectedDomNodeId = (state: UIState) => state.markup.selectedNode;
