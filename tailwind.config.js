@@ -62,6 +62,8 @@ module.exports = {
         timejumpText: "var(--timejump-text)",
         toolbarBackground: "var(--theme-toolbar-background)",
         toolbarBackgroundAlt: "var(--theme-toolbar-background-alt)",
+        tooltipBgcolor: "var(--tooltip-bgcolor)",
+        tooltipColor: "var(--tooltip-color)",        
         lightGrey: "var(--light-grey)",
         loadingBackground: "var(--loading-background)",
         loadingBoxes: "var(--loading-boxes)",
