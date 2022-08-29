@@ -61,8 +61,11 @@ function getOrCreateObjectWithPreviewMap(pauseId: PauseId): ObjectMaps {
 // Does not suspend.
 // This method is safe to call outside of render.
 // The Objects it returns are not guaranteed to contain preview information.
-export function getObject(pauseId: PauseId, objectId: ObjectId): Object | null {
+export function getCachedObject(pauseId: PauseId, objectId: ObjectId): Object | null {
   const maps = getOrCreateObjectWithPreviewMap(pauseId);
+  if (maps == null) {
+    return null;
+  }
 
   let record = maps.fullPreviewRecordMap.get(objectId);
   if (record?.status === STATUS_RESOLVED) {
@@ -80,9 +83,27 @@ export function getObject(pauseId: PauseId, objectId: ObjectId): Object | null {
 
 // Does not suspend.
 // This method is safe to call outside of render.
+// It returns a cached object property if one has been previously loaded, or null.
+export function getCachedObjectProperty(
+  pauseId: PauseId,
+  objectId: ObjectId,
+  propertyName: string
+): ProtocolValue | null {
+  const maps = getOrCreateObjectWithPreviewMap(pauseId);
+  if (maps == null) {
+    return null;
+  }
+
+  const key = `${objectId}:${propertyName}`;
+  const value = maps.objectPropertyMap.get(key);
+  return value || null;
+}
+
+// Does not suspend.
+// This method is safe to call outside of render.
 // The Objects it returns are not guaranteed to contain preview information.
 export function getObjectThrows(pauseId: PauseId, objectId: ObjectId): Object {
-  const object = getObject(pauseId, objectId);
+  const object = getCachedObject(pauseId, objectId);
   if (!object) {
     throw Error(`Could not find object "${objectId}" at pause "${pauseId}".`);
   }
@@ -122,6 +143,30 @@ export function getObjectWithPreview(
   }
 }
 
+// Wrapper method around Suspense method.
+// This method can be used by non-React code to prefetch/prime the Suspense cache by loading preview data.
+// Loaded properties can also be accessed via getCachedObject().
+export async function getObjectWithPreviewHelper(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  noOverflow: boolean = false
+): Promise<Object> {
+  try {
+    return getObjectWithPreview(client, pauseId, objectId, noOverflow);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      typeof errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<Object>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
+}
+
 export function getObjectProperty(
   client: ReplayClientInterface,
   pauseId: PauseId,
@@ -150,6 +195,30 @@ export function getObjectProperty(
     return record!.value;
   } else {
     throw record!.value;
+  }
+}
+
+// Wrapper method around Suspense method.
+// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
+// Loaded properties can also be accessed via getCachedObjectProperty().
+export async function getObjectPropertyHelper(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  propertyName: string
+): Promise<ProtocolValue> {
+  try {
+    return getObjectProperty(client, pauseId, objectId, propertyName);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      typeof errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<ProtocolValue>;
+    } else {
+      throw errorOrPromise;
+    }
   }
 }
 
