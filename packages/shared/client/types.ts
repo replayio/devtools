@@ -56,6 +56,8 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };
+
 export type ReplayClientEvents = "loadedRegionsChange";
 
 export interface ReplayClientInterface {
@@ -99,7 +101,7 @@ export interface ReplayClientInterface {
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;
-  runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]>;
+  runAnalysis<Result>(analysisParams: RunAnalysisParams): Promise<Result[]>;
   searchFunctions(
     opts: {
       query: string;
