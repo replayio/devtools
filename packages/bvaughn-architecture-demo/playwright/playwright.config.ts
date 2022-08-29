@@ -2,7 +2,7 @@ import { FullConfig } from "@playwright/test";
 
 const { CI, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
 
-const slowMo = VISUAL_DEBUG ? 500 : 10;
+const slowMo = VISUAL_DEBUG ? 250 : 10;
 
 const config: FullConfig = {
   forbidOnly: !!CI,
