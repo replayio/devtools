@@ -76,9 +76,9 @@ const aggregateHitCountsSelectors = aggregateHitCountsAdapter.getSelectors<UISta
   (state: UIState) => state.hitCounts.aggregateHitCounts
 );
 
-const MAX_LINE_HITS_TO_FETCH = 1000;
+const MAX_LINE_HITS_TO_FETCH = 100;
 // This will fetch hitCounts in chunks of lines. So if line 4 is request, lines
-// 1-1000 will be fetched. If line 1001 is requested, lines 1001-2000 will be
+// 1-100 will be fetched. If line 101 is requested, lines 101-200 will be
 // fetched.
 export const getBoundsForLineNumber = (line: number) => {
   const lower = Math.floor(line / MAX_LINE_HITS_TO_FETCH) * MAX_LINE_HITS_TO_FETCH;

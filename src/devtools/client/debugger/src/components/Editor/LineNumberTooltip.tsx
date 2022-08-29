@@ -99,8 +99,13 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
         lastHoveredLineNumber.current = lineNumber;
       }
       dispatch(updateHoveredLineNumber(lineNumber));
-      dispatch(fetchHitCounts(source!.id, lastHoveredLineNumber.current));
       setTargetNode(lineNumberNode);
+      var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
+      var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
+      var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
+      dispatch(fetchHitCounts(source!.id, editor.codeMirror.lineAtHeight()));
+      dispatch(fetchHitCounts(source!.id, topVisibleLine - 10));
+      dispatch(fetchHitCounts(source!.id, bottomVisibleLine + 10));
     };
     const clearHoveredLineNumber = () => {
       setTargetNode(null);
