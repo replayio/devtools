@@ -1,4 +1,4 @@
-import { getObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getCachedObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { protocolValueToClientValue, Value as ClientValue } from "@bvaughn/src/utils/protocol";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import { useContext, useMemo } from "react";
@@ -11,7 +11,7 @@ export default function useClientValue(
   const client = useContext(ReplayClientContext);
 
   const objectId = protocolValue.object;
-  if (objectId != null && getObject(pauseId, objectId) === null) {
+  if (objectId != null && getCachedObject(pauseId, objectId) === null) {
     // If we are converting an object value, protocolValueToClientValue() will require preview data.
     // Typically we will have already cached this data from a previous request.
     // There may be edge cases where this is not true though (see BAC-2095).

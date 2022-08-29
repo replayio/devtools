@@ -1,5 +1,5 @@
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { getObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getCachedObject, getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { FC, memo, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -78,7 +78,7 @@ export default memo(function ValueRenderer({
     // The downside is that value renderers won't be able to display as much information (e.g. "Array" rather than "Array(3)")
     // but this is how the old console works and each value renderer should be able to downgrade like this.
     const object =
-      getObject(pauseId, clientValue.objectId!) ||
+      getCachedObject(pauseId, clientValue.objectId!) ||
       getObjectWithPreview(client, pauseId, clientValue.objectId!, noOverflow);
 
     if (object == null) {
