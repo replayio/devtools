@@ -55,7 +55,7 @@ testSetup(async function regeneratorFunction({ page }) {
     "htmlElementWithChildren",
     "render-and-inspect-html-element"
   );
-  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-maps");
+  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-map");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
   await inspectAndTakeScreenshotOf(page, "regex", "render-and-inspect-regex");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
@@ -167,7 +167,7 @@ test("should render and inspect HTML elements", async ({ page }) => {
 test("should render and inspect maps", async ({ page }) => {
   await filterByText(page, "map");
 
-  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-maps");
+  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-map");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
   await inspectAndTakeScreenshotOf(
     page,
@@ -191,14 +191,14 @@ test("should render and inspect regular expressions", async ({ page }) => {
 test("should render and inspect sets", async ({ page }) => {
   await filterByText(page, "set");
 
-  await takeScreenshotOfMessages(page, "render-empty-sets");
+  await takeScreenshotOfMessages(page, "rendered-sets");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
 });
 
 test("should render and inspect objects", async ({ page }) => {
   await filterByText(page, "filter_object");
 
-  await takeScreenshotOfMessages(page, "render-empty-objects");
+  await takeScreenshotOfMessages(page, "rendered-objects");
   await inspectAndTakeScreenshotOf(page, "objectSimple", "render-and-inspect-object");
 });
 
