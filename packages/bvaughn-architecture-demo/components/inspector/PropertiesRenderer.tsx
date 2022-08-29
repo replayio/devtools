@@ -32,15 +32,13 @@ export default function PropertiesRenderer({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { className, objectId } = object;
-
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
   if (object.preview == null || object.preview.overflow) {
-    object = getObjectWithPreview(client, pauseId, objectId, true);
+    object = getObjectWithPreview(client, pauseId, object.objectId, true);
   }
 
-  const { preview } = object;
+  const { className, objectId, preview } = object;
 
   const containerEntries = preview?.containerEntries ?? [];
   const properties = useMemo(() => {
