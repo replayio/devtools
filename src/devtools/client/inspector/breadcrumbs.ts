@@ -10,6 +10,8 @@ const ELLIPSIS = "...";
 const EventEmitter = require("devtools/shared/event-emitter");
 import { selection } from "devtools/client/framework/selection";
 import Highlighter from "highlighter/highlighter";
+import { NodeFront } from "protocol/thread/node";
+import { runInThisContext } from "vm";
 
 const MAX_LABEL_LENGTH = 40;
 
@@ -28,31 +30,38 @@ export const SHADOW_ROOT_TAGNAME = "#shadow-root";
  * @param {Window} win The window containing the breadcrumbs
  * @parem {DOMNode} container The element in which to put the scroll box
  */
-function ArrowScrollBox(win, container) {
-  this.win = win;
-  this.doc = win.document;
-  this.container = container;
-  EventEmitter.decorate(this);
-  this.init();
-}
-
-ArrowScrollBox.prototype = {
+class ArrowScrollBox {
+  win: Window;
+  doc: Document;
+  container: HTMLDivElement;
   // Scroll behavior, exposed for testing
-  scrollBehavior: "smooth",
+  scrollBehavior: ScrollBehavior = "smooth";
 
-  /**
-   * Build the HTML, add to the DOM and start listening to
-   * events
-   */
-  init: function () {
-    this.constructHtml();
+  inner: HTMLDivElement;
+  startBtn: HTMLDivElement;
+  endBtn: HTMLDivElement;
+  resizeObserver: ResizeObserver;
 
-    this.onScroll = this.onScroll.bind(this);
-    this.onStartBtnClick = this.onStartBtnClick.bind(this);
-    this.onEndBtnClick = this.onEndBtnClick.bind(this);
-    this.onStartBtnDblClick = this.onStartBtnDblClick.bind(this);
-    this.onEndBtnDblClick = this.onEndBtnDblClick.bind(this);
-    this.checkOverflow = this.checkOverflow.bind(this);
+  constructor(win: Window, container: HTMLDivElement) {
+    this.win = win;
+    this.doc = win.document;
+    this.container = container;
+
+    EventEmitter.decorate(this);
+
+    this.startBtn = this.createElement("div", "scrollbutton-up", this.container) as HTMLDivElement;
+    this.createElement("div", "toolbarbutton-icon", this.startBtn);
+
+    this.createElement("div", "arrowscrollbox-overflow-start-indicator", this.container);
+    this.inner = this.createElement(
+      "div",
+      "html-arrowscrollbox-inner",
+      this.container
+    ) as HTMLDivElement;
+    this.createElement("div", "arrowscrollbox-overflow-end-indicator", this.container);
+
+    this.endBtn = this.createElement("div", "scrollbutton-down", this.container) as HTMLDivElement;
+    this.createElement("div", "toolbarbutton-icon", this.endBtn);
 
     this.inner.addEventListener("scroll", this.onScroll);
     this.startBtn.addEventListener("mousedown", this.onStartBtnClick);
@@ -62,24 +71,24 @@ ArrowScrollBox.prototype = {
 
     this.resizeObserver = new ResizeObserver(this.checkOverflow);
     this.resizeObserver.observe(this.container);
-  },
+  }
 
   /**
    * Scroll to the specified element using the current scroll behavior
    * @param {Element} element element to scroll
    * @param {String} block desired alignment of element after scrolling
    */
-  scrollToElement: function (element, block) {
+  scrollToElement(element: HTMLElement, block: ScrollIntoViewOptions["block"]) {
     element.scrollIntoView({ block: block, behavior: this.scrollBehavior });
-  },
+  }
 
   /**
    * Call the given function once; then continuously
    * while the mouse button is held
    * @param {Function} repeatFn the function to repeat while the button is held
    */
-  clickOrHold: function (repeatFn) {
-    let timer;
+  clickOrHold = (repeatFn: () => void) => {
+    let timer: number;
     const container = this.container;
 
     function handleClick() {
@@ -102,38 +111,38 @@ ArrowScrollBox.prototype = {
     container.addEventListener("mouseout", cancelHold);
     container.addEventListener("mouseup", handleClick);
     timer = window.setTimeout(repeated, SCROLL_REPEAT_MS);
-  },
+  };
 
   /**
    * When start button is dbl clicked scroll to first element
    */
-  onStartBtnDblClick: function () {
+  onStartBtnDblClick = () => {
     const children = this.inner.childNodes;
     if (children.length < 1) {
       return;
     }
 
-    const element = this.inner.childNodes[0];
+    const element = this.inner.childNodes[0] as HTMLElement;
     this.scrollToElement(element, "start");
-  },
+  };
 
   /**
    * When end button is dbl clicked scroll to last element
    */
-  onEndBtnDblClick: function () {
+  onEndBtnDblClick = () => {
     const children = this.inner.childNodes;
     if (children.length < 1) {
       return;
     }
 
-    const element = children[children.length - 1];
+    const element = children[children.length - 1] as HTMLElement;
     this.scrollToElement(element, "start");
-  },
+  };
 
   /**
    * When start arrow button is clicked scroll towards first element
    */
-  onStartBtnClick: function () {
+  onStartBtnClick = () => {
     const scrollToStart = () => {
       const element = this.getFirstInvisibleElement();
       if (!element) {
@@ -144,12 +153,12 @@ ArrowScrollBox.prototype = {
     };
 
     this.clickOrHold(scrollToStart);
-  },
+  };
 
   /**
    * When end arrow button is clicked scroll towards last element
    */
-  onEndBtnClick: function () {
+  onEndBtnClick = () => {
     const scrollToEnd = () => {
       const element = this.getLastInvisibleElement();
       if (!element) {
@@ -160,13 +169,13 @@ ArrowScrollBox.prototype = {
     };
 
     this.clickOrHold(scrollToEnd);
-  },
+  };
 
   /**
    * Event handler for scrolling, update the
    * enabled/disabled status of the arrow buttons
    */
-  onScroll: function () {
+  onScroll = () => {
     const first = this.getFirstInvisibleElement();
     if (!first) {
       this.startBtn.setAttribute("disabled", "true");
@@ -180,22 +189,24 @@ ArrowScrollBox.prototype = {
     } else {
       this.endBtn.removeAttribute("disabled");
     }
-  },
+  };
 
   /**
    * update the visibility of startBtn/endBtn
    */
-  checkOverflow: function () {
+  checkOverflow = () => {
     if (this.inner.scrollWidth > this.container.scrollWidth) {
       this.startBtn.style.display = "flex";
       this.endBtn.style.display = "flex";
+      // @ts-expect-error event emitter stuff
       this.emit("overflow");
     } else {
       this.startBtn.style.display = "none";
       this.endBtn.style.display = "none";
+      // @ts-expect-error event emitter stuff
       this.emit("underflow");
     }
-  },
+  };
 
   /**
    * Check whether the element is to the left of its container but does
@@ -205,9 +216,9 @@ ArrowScrollBox.prototype = {
    * @param {Number} elementLeft the left edge of the element
    * @param {Number} elementRight the right edge of the element
    */
-  elementLeftOfContainer: function (left, right, elementLeft, elementRight) {
+  elementLeftOfContainer(left: number, right: number, elementLeft: number, elementRight: number) {
     return elementLeft < left - SCROLL_MARGIN && elementRight < right - SCROLL_MARGIN;
-  },
+  }
 
   /**
    * Check whether the element is to the right of its container but does
@@ -217,29 +228,29 @@ ArrowScrollBox.prototype = {
    * @param {Number} elementLeft the left edge of the element
    * @param {Number} elementRight the right edge of the element
    */
-  elementRightOfContainer: function (left, right, elementLeft, elementRight) {
+  elementRightOfContainer(left: number, right: number, elementLeft: number, elementRight: number) {
     return elementLeft > left + SCROLL_MARGIN && elementRight > right + SCROLL_MARGIN;
-  },
+  }
 
   /**
    * Get the first (i.e. furthest left for LTR)
    * non or partly visible element in the scroll box
    */
-  getFirstInvisibleElement: function () {
-    const elementsList = Array.from(this.inner.childNodes).reverse();
+  getFirstInvisibleElement = () => {
+    const elementsList = Array.from(this.inner.childNodes).reverse() as HTMLElement[];
 
     const predicate = this.elementLeftOfContainer;
     return this.findFirstWithBounds(elementsList, predicate);
-  },
+  };
 
   /**
    * Get the last (i.e. furthest right for LTR)
    * non or partly visible element in the scroll box
    */
-  getLastInvisibleElement: function () {
+  getLastInvisibleElement = () => {
     const predicate = this.elementRightOfContainer;
-    return this.findFirstWithBounds(this.inner.childNodes, predicate);
-  },
+    return this.findFirstWithBounds([...this.inner.childNodes] as HTMLElement[], predicate);
+  };
 
   /**
    * Find the first element that matches the given predicate, called with bounds
@@ -248,11 +259,14 @@ ArrowScrollBox.prototype = {
    * @param {Function} predicate a function to be called with bounds
    * information
    */
-  findFirstWithBounds: function (elements, predicate) {
+  findFirstWithBounds = (
+    elements: HTMLElement[],
+    predicate: (left: number, right: number, elLeft: number, elRight: number) => boolean
+  ) => {
     const left = this.inner.scrollLeft;
     const right = left + this.inner.clientWidth;
     for (const element of elements) {
-      const elementLeft = element.offsetLeft - element.parentElement.offsetLeft;
+      const elementLeft = element.offsetLeft - element.parentElement!.offsetLeft;
       const elementRight = elementLeft + element.offsetWidth;
 
       // Check that the starting edge of the element is out of the visible area
@@ -263,22 +277,12 @@ ArrowScrollBox.prototype = {
     }
 
     return null;
-  },
+  };
 
   /**
    * Build the HTML for the scroll box and insert it into the DOM
    */
-  constructHtml: function () {
-    this.startBtn = this.createElement("div", "scrollbutton-up", this.container);
-    this.createElement("div", "toolbarbutton-icon", this.startBtn);
-
-    this.createElement("div", "arrowscrollbox-overflow-start-indicator", this.container);
-    this.inner = this.createElement("div", "html-arrowscrollbox-inner", this.container);
-    this.createElement("div", "arrowscrollbox-overflow-end-indicator", this.container);
-
-    this.endBtn = this.createElement("div", "scrollbutton-down", this.container);
-    this.createElement("div", "toolbarbutton-icon", this.endBtn);
-  },
+  constructHtml = () => {};
 
   /**
    * Create an XHTML element with the given class name, and append it to the
@@ -288,7 +292,7 @@ ArrowScrollBox.prototype = {
    * @param {DOMNode} parent the parent node to which it should be appended
    * @return {DOMNode} The new element
    */
-  createElement: function (tagName, className, parent) {
+  createElement = (tagName: string, className: string, parent: HTMLElement) => {
     const el = this.doc.createElementNS(NS_XHTML, tagName);
     el.className = className;
     if (parent) {
@@ -296,21 +300,26 @@ ArrowScrollBox.prototype = {
     }
 
     return el;
-  },
+  };
 
   /**
    * Remove event handlers and clean up
    */
-  destroy: function () {
+  destroy = () => {
     this.inner.removeEventListener("scroll", this.onScroll);
     this.startBtn.removeEventListener("mousedown", this.onStartBtnClick);
     this.endBtn.removeEventListener("mousedown", this.onEndBtnClick);
     this.startBtn.removeEventListener("dblclick", this.onStartBtnDblClick);
-    this.endBtn.removeEventListener("dblclick", this.onRightBtnDblClick);
 
     this.resizeObserver.disconnect();
-  },
-};
+  };
+}
+
+interface NodeHierarchyItem {
+  node: NodeFront;
+  button: HTMLElement;
+  currentPrettyPrintText: string;
+}
 
 /**
  * Display the ancestors of the current node and its children.
@@ -323,40 +332,35 @@ ArrowScrollBox.prototype = {
  * - If the selected node is the last node displayed, append its first (if any).
  *
  */
-export function HTMLBreadcrumbs() {
-  this.win = window;
-  this.doc = window.document;
-  this._init();
-}
+export class HTMLBreadcrumbs {
+  win: Window;
+  doc: Document;
 
-HTMLBreadcrumbs.prototype = {
-  _init: function () {
-    this.outer = this.doc.getElementById("inspector-breadcrumbs");
+  outer: HTMLDivElement;
+  container: HTMLDivElement;
+  arrowScrollBox: ArrowScrollBox;
+  nodeHierarchy: NodeHierarchyItem[];
+  currentIndex: number;
+  breadcrumbsWidgetItemId: number;
+  keyPromise: Promise<void> | null = null;
+  isDestroyed = false;
+
+  constructor() {
+    this.win = window;
+    this.doc = window.document;
+
+    this.outer = this.doc.getElementById("inspector-breadcrumbs") as HTMLDivElement;
     this.arrowScrollBox = new ArrowScrollBox(this.win, this.outer);
 
     this.container = this.arrowScrollBox.inner;
     this.scroll = this.scroll.bind(this);
+    // @ts-expect-error event emitter stuff
     this.arrowScrollBox.on("overflow", this.scroll);
 
     this.outer.addEventListener("click", this, true);
     this.outer.addEventListener("mouseover", this, true);
     this.outer.addEventListener("mouseout", this, true);
     this.outer.addEventListener("focus", this, true);
-
-    this.handleShortcut = this.handleShortcut.bind(this);
-
-    if (flags.testing) {
-      // In tests, we start listening immediately to avoid having to simulate a focus.
-      this.initKeyShortcuts();
-    } else {
-      this.outer.addEventListener(
-        "focus",
-        () => {
-          this.initKeyShortcuts();
-        },
-        { once: true }
-      );
-    }
 
     // We will save a list of already displayed nodes in this array.
     this.nodeHierarchy = [];
@@ -367,25 +371,16 @@ HTMLBreadcrumbs.prototype = {
     // Used to build a unique breadcrumb button Id.
     this.breadcrumbsWidgetItemId = 0;
 
-    this.update = this.update.bind(this);
-    this.updateWithMutations = this.updateWithMutations.bind(this);
-    this.updateSelectors = this.updateSelectors.bind(this);
     selection.on("new-node-front", this.update);
     this.update();
-  },
-
-  initKeyShortcuts() {
-    // this.shortcuts = new KeyShortcuts({ window: this.win, target: this.outer });
-    // this.shortcuts.on("Right", this.handleShortcut);
-    // this.shortcuts.on("Left", this.handleShortcut);
-  },
+  }
 
   /**
    * Build a string that represents the node: tagName#id.class1.class2.
    * @param {NodeFront} node The node to pretty-print
    * @return {String}
    */
-  prettyPrintNodeAsText: function (node) {
+  prettyPrintNodeAsText(node: NodeFront) {
     let text = node.isShadowRoot ? SHADOW_ROOT_TAGNAME : node.displayName;
     if (node.pseudoType) {
       text = "::" + node.pseudoType;
@@ -407,7 +402,7 @@ HTMLBreadcrumbs.prototype = {
     }
 
     return text;
-  },
+  }
 
   /**
    * Build <span>s that represent the node:
@@ -417,7 +412,7 @@ HTMLBreadcrumbs.prototype = {
    * @param {NodeFront} node The node to pretty-print
    * @returns {DocumentFragment}
    */
-  prettyPrintNodeAsXHTML: function (node) {
+  prettyPrintNodeAsXHTML(node: NodeFront) {
     const tagLabel = this.doc.createElementNS(NS_XHTML, "span");
     tagLabel.className = "breadcrumbs-widget-item-tag plain";
 
@@ -473,13 +468,13 @@ HTMLBreadcrumbs.prototype = {
     fragment.appendChild(pseudosLabel);
 
     return fragment;
-  },
+  }
 
   /**
    * Generic event handler.
    * @param {DOMEvent} event.
    */
-  handleEvent: function (event) {
+  handleEvent = (event: MouseEvent) => {
     if (event.type == "click" && event.button == 0) {
       this.handleClick(event);
     } else if (event.type == "mouseover") {
@@ -489,7 +484,7 @@ HTMLBreadcrumbs.prototype = {
     } else if (event.type == "focus") {
       this.handleFocus(event);
     }
-  },
+  };
 
   /**
    * Focus event handler. When breadcrumbs container gets focus,
@@ -497,7 +492,7 @@ HTMLBreadcrumbs.prototype = {
    * breadcrumb. Ensures that the focus stays on the container at all times.
    * @param {DOMEvent} event.
    */
-  handleFocus: function (event) {
+  handleFocus = (event: MouseEvent) => {
     event.stopPropagation();
 
     const node = this.nodeHierarchy[this.currentIndex];
@@ -508,37 +503,39 @@ HTMLBreadcrumbs.prototype = {
     }
 
     this.outer.focus();
-  },
+  };
 
   /**
    * On click navigate to the correct node.
    * @param {DOMEvent} event.
    */
-  handleClick: function (event) {
-    const target = event.target;
+  handleClick = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
     if (target.tagName == "BUTTON") {
+      // @ts-expect-error magic methods!
       target.onBreadcrumbsClick();
     }
-  },
+  };
 
   /**
    * On mouse over, highlight the corresponding content DOM Node.
    * @param {DOMEvent} event.
    */
-  handleMouseOver: function (event) {
-    const target = event.target;
-    if (target.tagName == "BUTTON") {
+  handleMouseOver = (event: MouseEvent) => {
+    const target = event.target as HTMLElement;
+    if (target!.tagName == "BUTTON") {
+      // @ts-expect-error magic methods!
       target.onBreadcrumbsHover();
     }
-  },
+  };
 
   /**
    * On mouse out, make sure to unhighlight.
    * @param {DOMEvent} event.
    */
-  handleMouseOut: function (event) {
+  handleMouseOut = (event: MouseEvent) => {
     Highlighter.unhighlight();
-  },
+  };
 
   /**
    * Handle a keyboard shortcut supported by the breadcrumbs widget.
@@ -548,7 +545,7 @@ HTMLBreadcrumbs.prototype = {
    * @param {DOMEvent} event
    *        Original event that triggered the shortcut.
    */
-  handleShortcut: function (event) {
+  handleShortcut = (event: KeyboardEvent) => {
     if (!selection.isElementNode()) {
       return;
     }
@@ -567,7 +564,7 @@ HTMLBreadcrumbs.prototype = {
       } else if (isRight && this.currentIndex < this.nodeHierarchy.length - 1) {
         currentnode = this.nodeHierarchy[this.currentIndex + 1];
       } else {
-        return null;
+        return;
       }
 
       this.outer.setAttribute("aria-activedescendant", currentnode.button.id);
@@ -575,12 +572,12 @@ HTMLBreadcrumbs.prototype = {
         reason: "breadcrumbs",
       });
     });
-  },
+  };
 
   /**
    * Remove nodes and clean up.
    */
-  destroy: function () {
+  destroy() {
     selection.off("new-node-front", this.update);
 
     this.container.removeEventListener("click", this, true);
@@ -588,37 +585,28 @@ HTMLBreadcrumbs.prototype = {
     this.container.removeEventListener("mouseout", this, true);
     this.container.removeEventListener("focus", this, true);
 
-    if (this.shortcuts) {
-      this.shortcuts.destroy();
-    }
-
     this.empty();
 
+    // @ts-expect-error event emitter stuff
     this.arrowScrollBox.off("overflow", this.scroll);
     this.arrowScrollBox.destroy();
-    this.arrowScrollBox = null;
-    this.outer = null;
-    this.container = null;
-    this.nodeHierarchy = null;
-
-    this.isDestroyed = true;
-  },
+  }
 
   /**
    * Empty the breadcrumbs container.
    */
-  empty: function () {
+  empty() {
     while (this.container.hasChildNodes()) {
-      this.container.firstChild.remove();
+      this.container!.firstChild!.remove();
     }
     this.arrowScrollBox.checkOverflow();
-  },
+  }
 
   /**
    * Set which button represent the selected node.
    * @param {Number} index Index of the displayed-button to select.
    */
-  setCursor: function (index) {
+  setCursor = (index: number) => {
     // Unselect the previously selected button
     if (this.currentIndex > -1 && this.currentIndex < this.nodeHierarchy.length) {
       this.nodeHierarchy[this.currentIndex].button.removeAttribute("checked");
@@ -630,44 +618,44 @@ HTMLBreadcrumbs.prototype = {
       this.outer.removeAttribute("aria-activedescendant");
     }
     this.currentIndex = index;
-  },
+  };
 
   /**
    * Get the index of the node in the cache.
    * @param {NodeFront} node.
    * @returns {Number} The index for this node or -1 if not found.
    */
-  indexOf: function (node) {
+  indexOf = (node: NodeFront) => {
     for (let i = this.nodeHierarchy.length - 1; i >= 0; i--) {
       if (this.nodeHierarchy[i].node === node) {
         return i;
       }
     }
     return -1;
-  },
+  };
 
   /**
    * Remove all the buttons and their references in the cache after a given
    * index.
    * @param {Number} index.
    */
-  cutAfter: function (index) {
+  cutAfter = (index: number) => {
     while (this.nodeHierarchy.length > index + 1) {
       const toRemove = this.nodeHierarchy.pop();
-      this.container.removeChild(toRemove.button);
+      this.container.removeChild(toRemove!.button);
     }
     if (this.currentIndex >= this.nodeHierarchy.length) {
       this.currentIndex = this.nodeHierarchy.length - 1;
     }
     this.arrowScrollBox.checkOverflow();
-  },
+  };
 
   /**
    * Build a button representing the node.
    * @param {NodeFront} node The node from the page.
    * @return {DOMNode} The <button> for this node.
    */
-  buildButton: function (node) {
+  buildButton = (node: NodeFront) => {
     const button = this.doc.createElementNS(NS_XHTML, "button");
     button.appendChild(this.prettyPrintNodeAsXHTML(node));
     button.className = "breadcrumbs-widget-item";
@@ -680,22 +668,24 @@ HTMLBreadcrumbs.prototype = {
       button.focus();
     };
 
+    // @ts-expect-error magic methods!
     button.onBreadcrumbsClick = () => {
       selection.setNodeFront(node, { reason: "breadcrumbs" });
     };
 
+    // @ts-expect-error magic methods!
     button.onBreadcrumbsHover = () => {
       Highlighter.highlight(node);
     };
 
     return button;
-  },
+  };
 
   /**
    * Connecting the end of the breadcrumbs to a node.
    * @param {NodeFront} node The node to reach.
    */
-  expand: function (node) {
+  expand = (node: NodeFront) => {
     const fragment = this.doc.createDocumentFragment();
     let lastButtonInserted = null;
     const originalLength = this.nodeHierarchy.length;
@@ -714,43 +704,44 @@ HTMLBreadcrumbs.prototype = {
           currentPrettyPrintText: this.prettyPrintNodeAsText(node),
         });
       }
-      node = node.parentOrHost();
+      node = node.parentOrHost()!;
     }
+    // @ts-expect-error too many args WHATEVER
     this.container.appendChild(fragment, this.container.firstChild);
     this.arrowScrollBox.checkOverflow();
-  },
+  };
 
   /**
    * Find the "youngest" ancestor of a node which is already in the breadcrumbs.
    * @param {NodeFront} node.
    * @return {Number} Index of the ancestor in the cache, or -1 if not found.
    */
-  getCommonAncestor: function (node) {
+  getCommonAncestor = (node: NodeFront) => {
     while (node) {
       const idx = this.indexOf(node);
       if (idx > -1) {
         return idx;
       }
-      node = node.parentNode();
+      node = node.parentNode()!;
     }
     return -1;
-  },
+  };
 
   /**
    * Ensure the selected node is visible.
    */
-  scroll: function () {
+  scroll = () => {
     // FIXME bug 684352: make sure its immediate neighbors are visible too.
     if (!this.isDestroyed && this.currentIndex >= 0) {
       const element = this.nodeHierarchy[this.currentIndex].button;
       this.arrowScrollBox.scrollToElement(element, "end");
     }
-  },
+  };
 
   /**
    * Update all button outputs.
    */
-  updateSelectors: function () {
+  updateSelectors = () => {
     if (this.isDestroyed) {
       return;
     }
@@ -766,57 +757,14 @@ HTMLBreadcrumbs.prototype = {
 
       // Otherwise, update the whole markup for the button.
       while (button.hasChildNodes()) {
-        button.firstChild.remove();
+        button.firstChild!.remove();
       }
       button.appendChild(this.prettyPrintNodeAsXHTML(node));
       button.setAttribute("title", textOutput);
 
       this.nodeHierarchy[i].currentPrettyPrintText = textOutput;
     }
-  },
-
-  /**
-   * Given a list of mutation changes (passed by the markupmutation event),
-   * decide whether or not they are "interesting" to the current state of the
-   * breadcrumbs widget, i.e. at least one of them should cause part of the
-   * widget to be updated.
-   * @param {Array} mutations The mutations array.
-   * @return {Boolean}
-   */
-  _hasInterestingMutations: function (mutations) {
-    if (!mutations || !mutations.length) {
-      return false;
-    }
-
-    for (const { type, added, removed, target, attributeName } of mutations) {
-      if (type === "childList") {
-        // Only interested in childList mutations if the added or removed
-        // nodes are currently displayed.
-        return (
-          added.some(node => this.indexOf(node) > -1) ||
-          removed.some(node => this.indexOf(node) > -1)
-        );
-      } else if (type === "attributes" && this.indexOf(target) > -1) {
-        // Only interested in attributes mutations if the target is
-        // currently displayed, and the attribute is either id or class.
-        return attributeName === "class" || attributeName === "id";
-      }
-    }
-
-    // Catch all return in case the mutations array was empty, or in case none
-    // of the changes iterated above were interesting.
-    return false;
-  },
-
-  /**
-   * Update the breadcrumbs display when a new node is selected and there are
-   * mutations.
-   * @param {Array} mutations An array of mutations in case this was called as
-   * the "markupmutation" event listener.
-   */
-  updateWithMutations(mutations) {
-    return this.update("markupmutation", mutations);
-  },
+  };
 
   /**
    * Update the breadcrumbs display when a new node is selected.
@@ -824,38 +772,16 @@ HTMLBreadcrumbs.prototype = {
    * @param {Array} mutations An array of mutations in case this was called as
    * the "markupmutation" event listener.
    */
-  update: function (reason, mutations) {
+  update = () => {
     if (this.isDestroyed) {
       return;
     }
 
-    const hasInterestingMutations = this._hasInterestingMutations(mutations);
-    if (reason === "markupmutation" && !hasInterestingMutations) {
-      return;
-    }
-
+    const currentNode = selection.nodeFront!;
     if (!selection.isConnected()) {
       // remove all the crumbs
       this.cutAfter(-1);
       return;
-    }
-
-    // If this was an interesting deletion; then trim the breadcrumb trail
-    let trimmed = false;
-    if (reason === "markupmutation") {
-      for (const { type, removed } of mutations) {
-        if (type !== "childList") {
-          continue;
-        }
-
-        for (const node of removed) {
-          const removedIndex = this.indexOf(node);
-          if (removedIndex > -1) {
-            this.cutAfter(removedIndex - 1);
-            trimmed = true;
-          }
-        }
-      }
     }
 
     if (!selection.isElementNode() && !selection.isShadowRootNode()) {
@@ -864,11 +790,11 @@ HTMLBreadcrumbs.prototype = {
       return;
     }
 
-    let idx = this.indexOf(selection.nodeFront);
+    let idx = this.indexOf(currentNode);
 
     // Is the node already displayed in the breadcrumbs?
     // (and there are no mutations that need re-display of the crumbs)
-    if (idx > -1 && !hasInterestingMutations) {
+    if (idx > -1) {
       // Yes. We select it.
       this.setCursor(idx);
     } else {
@@ -876,16 +802,16 @@ HTMLBreadcrumbs.prototype = {
       if (this.nodeHierarchy.length > 0) {
         // No. We drop all the element that are not direct ancestors
         // of the selection
-        const parent = selection.nodeFront.parentNode();
+        const parent = currentNode.parentNode()!;
         const ancestorIdx = this.getCommonAncestor(parent);
         this.cutAfter(ancestorIdx);
       }
       // we append the missing button between the end of the breadcrumbs display
       // and the current node.
-      this.expand(selection.nodeFront);
+      this.expand(currentNode);
 
       // we select the current node button
-      idx = this.indexOf(selection.nodeFront);
+      idx = this.indexOf(currentNode);
       this.setCursor(idx);
     }
 
@@ -902,5 +828,5 @@ HTMLBreadcrumbs.prototype = {
         }
       }
     }, 0);
-  },
-};
+  };
+}
