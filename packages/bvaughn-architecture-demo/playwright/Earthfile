@@ -1,7 +1,7 @@
 VERSION 0.6
 
 install:
-    FROM  mcr.microsoft.com/playwright:v1.22.0-focal
+    FROM  mcr.microsoft.com/playwright:v1.25.1-focal
     RUN yarn set version 3.2.1
     COPY . /playwright
     WORKDIR /playwright
