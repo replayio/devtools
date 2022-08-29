@@ -2,9 +2,9 @@
   "name": "tests",
   "packageManager": "yarn@3.2.1",
   "devDependencies": {
-    "@playwright/test": "^1.22.2",
+    "@playwright/test": "^1.25.1",
     "error-stack-parser": "^2.1.4",
-    "playwright": "^1.22.2"
+    "playwright": "^1.25.1"
   },
   "scripts": {
     "playwright:install": "playwright install chromium",
