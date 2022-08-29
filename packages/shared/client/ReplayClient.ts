@@ -35,7 +35,13 @@ import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings, defer } from "protocol/utils";
 
-import { ColumnHits, LineHits, ReplayClientEvents, ReplayClientInterface } from "./types";
+import {
+  ColumnHits,
+  LineHits,
+  ReplayClientEvents,
+  ReplayClientInterface,
+  RunAnalysisParams,
+} from "./types";
 
 // TODO How should the client handle concurrent requests?
 // Should we force serialization?
@@ -277,6 +283,8 @@ export class ReplayClient implements ReplayClientInterface {
   ): Promise<PointDescription[]> {
     const collectedPointDescriptions: PointDescription[] = [];
 
+    const locations = this._getCorrespondingLocations(location).map(location => ({ location }));
+
     // The backend doesn't support filtering hit points by condition, so we fall back to running analysis.
     // This is less efficient so we only do it if we have a condition.
     // We should delete this once the backend supports filtering (see BAC-2103).
@@ -320,7 +328,7 @@ export class ReplayClient implements ReplayClientInterface {
       await analysisManager.runAnalysis(
         {
           effectful: false,
-          locations: [{ location }],
+          locations,
           mapper,
           range: focusRange
             ? { begin: focusRange.begin.point, end: focusRange.end.point }
@@ -346,7 +354,7 @@ export class ReplayClient implements ReplayClientInterface {
       await analysisManager.runAnalysis(
         {
           effectful: false,
-          locations: [{ location }],
+          locations,
           mapper: "",
           range: focusRange
             ? { begin: focusRange.begin.point, end: focusRange.end.point }
@@ -394,7 +402,6 @@ export class ReplayClient implements ReplayClientInterface {
       sessionId,
       pauseId || undefined
     );
-    console.log(`getObjectWithPreview("${pauseId}", "${objectId}", ${level})`, result);
     return result.data;
   }
 
@@ -553,10 +560,22 @@ export class ReplayClient implements ReplayClientInterface {
     }
   }
 
-  async runAnalysis<Result>(analysisParams: AnalysisParams): Promise<Result[]> {
+  async runAnalysis<Result>(params: RunAnalysisParams): Promise<Result[]> {
     return new Promise<Result[]>(async (resolve, reject) => {
       const results: Result[] = [];
       let resultReceived = false;
+
+      const { location, ...rest } = params;
+
+      let locations;
+      if (location) {
+        locations = this._getCorrespondingLocations(location).map(location => ({ location }));
+      }
+
+      const analysisParams = {
+        ...rest,
+        locations,
+      };
 
       try {
         await analysisManager.runAnalysis(analysisParams, {
@@ -580,6 +599,16 @@ export class ReplayClient implements ReplayClientInterface {
         reject(error);
       }
     });
+  }
+
+  _getCorrespondingLocations(location: Location): Location[] {
+    const { column, line, sourceId } = location;
+    const sourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
+    return sourceIds.map(sourceId => ({
+      column,
+      line,
+      sourceId,
+    }));
   }
 
   _onLoadChanges = (loadedRegions: LoadedRegions) => {

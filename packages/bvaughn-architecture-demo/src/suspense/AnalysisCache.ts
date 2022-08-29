@@ -95,7 +95,7 @@ async function runAnalysisHelper(
   try {
     const results = await client.runAnalysis<RemoteAnalysisResult>({
       effectful: false,
-      locations: [{ location }],
+      location,
       mapper: createMapperForAnalysis(code, condition),
       range: focusRange || undefined,
     });
