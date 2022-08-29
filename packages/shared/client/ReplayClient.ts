@@ -26,6 +26,7 @@ import {
   FunctionMatch,
   keyboardEvents,
   navigationEvents,
+  Result,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager, { AnalysisParams } from "protocol/analysisManager";
@@ -365,18 +366,36 @@ export class ReplayClient implements ReplayClientInterface {
     return collectedPointDescriptions;
   }
 
+  async getObjectProperty(
+    objectId: ObjectId,
+    pauseId: PauseId,
+    propertyName: string
+  ): Promise<Result> {
+    const sessionId = this.getSessionIdThrows();
+    const { result } = await client.Pause.getObjectProperty(
+      {
+        object: objectId,
+        name: propertyName,
+      },
+      sessionId,
+      pauseId
+    );
+    return result;
+  }
+
   async getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
     level?: ObjectPreviewLevel
   ): Promise<PauseData> {
     const sessionId = this.getSessionIdThrows();
-    const { data } = await client.Pause.getObjectPreview(
+    const result = await client.Pause.getObjectPreview(
       { level, object: objectId },
       sessionId,
       pauseId || undefined
     );
-    return data;
+    console.log(`getObjectWithPreview("${pauseId}", "${objectId}", ${level})`, result);
+    return result.data;
   }
 
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {

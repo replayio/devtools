@@ -1,14 +1,13 @@
+import { FullConfig } from "@playwright/test";
+
 const { CI, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
 
-let slowMo = 50;
-if (CI) {
-  slowMo = 1000;
-} else if (VISUAL_DEBUG) {
-  slowMo = 500;
-}
+const slowMo = VISUAL_DEBUG ? 500 : 10;
 
-const config = {
+const config: FullConfig = {
   forbidOnly: !!CI,
+  globalSetup: require.resolve("./playwright.globalSetup"),
+  // @ts-ignore
   reporter: CI ? "github" : "list",
   retries: VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
@@ -26,7 +25,7 @@ const config = {
   },
   testDir: __dirname,
   testMatch: ["tests/**/*.ts"],
-  timeout: 5000,
+  timeout: 30_000,
 };
 
 if (VISUAL_DEBUG) {

@@ -1,4 +1,4 @@
-import { filterNonEnumerableProperties } from "@bvaughn/src/utils/protocol";
+import { filterPropertiesForInlineObjectPreview } from "@bvaughn/src/utils/protocol";
 import { ReactNode } from "react";
 
 import KeyValueRenderer from "../KeyValueRenderer";
@@ -15,7 +15,7 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 export default function ObjectRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
   const { className, preview } = object;
 
-  const properties = filterNonEnumerableProperties(preview?.properties ?? []);
+  const properties = filterPropertiesForInlineObjectPreview(preview?.properties ?? []);
   const showOverflowMarker =
     object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
 

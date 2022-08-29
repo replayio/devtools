@@ -9,9 +9,10 @@ import {
   Property as ProtocolProperty,
 } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
-import { FC, Suspense, useContext, useMemo } from "react";
+import { FC, Fragment, Suspense, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
+import GetterRenderer from "./GetterRenderer";
 import KeyValueRenderer from "./KeyValueRenderer";
 import styles from "./PropertiesRenderer.module.css";
 import ValueRenderer from "./ValueRenderer";
@@ -31,28 +32,30 @@ export default function PropertiesRenderer({
 }) {
   const client = useContext(ReplayClientContext);
 
+  const { className, objectId, preview } = object;
+
   // If we have an ObjectPreview already, use it.
   // If we just have an Object, then Suspend while we fetch preview data.
-  if (object.preview == null || object.preview.overflow) {
-    object = getObjectWithPreview(client, pauseId, object.objectId, true);
+  if (preview == null || preview.overflow) {
+    object = getObjectWithPreview(client, pauseId, objectId, true);
   }
 
-  const containerEntries = object.preview?.containerEntries ?? [];
+  const containerEntries = preview?.containerEntries ?? [];
   const properties = useMemo(() => {
-    return sortBy(object.preview?.properties ?? [], property => {
+    return sortBy(preview?.properties ?? [], property => {
       const maybeNumber = Number(property.name);
       return isNaN(maybeNumber) ? property.name : maybeNumber;
     });
-  }, [object]);
+  }, [preview]);
 
-  const prototypeId = object.preview?.prototypeId ?? null;
+  const prototypeId = preview?.prototypeId ?? null;
   let prototype = null;
   if (prototypeId) {
     prototype = getObjectWithPreview(client, pauseId, prototypeId);
   }
 
   let EntriesRenderer: FC<EntriesRendererProps> = ContainerEntriesRenderer;
-  switch (object.className) {
+  switch (className) {
     case "Map":
     case "WeakMap": {
       EntriesRenderer = MapContainerEntriesRenderer;
@@ -87,13 +90,21 @@ export default function PropertiesRenderer({
           children={
             <Suspense fallback={<Loader />}>
               {bucket.properties.map((property, index) => (
-                <KeyValueRenderer
-                  key={`property-${index}`}
-                  context="default"
-                  layout="vertical"
-                  pauseId={pauseId}
-                  protocolValue={property}
-                />
+                <Fragment key={index}>
+                  {property.get != null && (
+                    <GetterRenderer
+                      parentObjectId={objectId}
+                      pauseId={pauseId}
+                      protocolProperty={property}
+                    />
+                  )}
+                  <KeyValueRenderer
+                    context="default"
+                    layout="vertical"
+                    pauseId={pauseId}
+                    protocolValue={property}
+                  />
+                </Fragment>
               ))}
             </Suspense>
           }
@@ -103,13 +114,21 @@ export default function PropertiesRenderer({
 
       <Suspense fallback={<Loader />}>
         {properties.map((property, index) => (
-          <KeyValueRenderer
-            key={`property-${index}`}
-            context="default"
-            layout="vertical"
-            pauseId={pauseId}
-            protocolValue={property}
-          />
+          <Fragment key={index}>
+            {property.get != null && (
+              <GetterRenderer
+                parentObjectId={objectId}
+                pauseId={pauseId}
+                protocolProperty={property}
+              />
+            )}
+            <KeyValueRenderer
+              context="default"
+              layout="vertical"
+              pauseId={pauseId}
+              protocolValue={property}
+            />
+          </Fragment>
         ))}
       </Suspense>
 

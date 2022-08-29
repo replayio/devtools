@@ -1,0 +1,38 @@
+.GetterRenderer {
+  display: inline;
+  text-align: start;
+  vertical-align: top;
+}
+
+.Name {
+  color: var(--object-inspector-expanded-key);
+}
+
+.ToggleAlignmentPadding {
+  margin-left: 1.25rem;
+}
+
+.Separator {
+  color: var(--object-inspector-separator-color);
+}
+
+.InvokeGetterButton {
+  height: 1rem;
+  width: 1rem;
+  outline: none;
+  background: none;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  vertical-align: top;
+}
+
+.InvokeGetterIcon {
+  height: 1rem;
+  width: 1rem;
+  color: var(--object-inspector-invoke-getter-icon-color);
+  display: inline-block;
+}
+.InvokeGetterIcon:hover {
+  color: var(--object-inspector-invoke-getter-icon-color-hover);
+}

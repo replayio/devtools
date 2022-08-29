@@ -46,6 +46,8 @@
 
   --object-inspector-go-to-definition-icon-color: #dddddd;
   --object-inspector-go-to-definition-icon-color-hover: #ffffff;
+  --object-inspector-invoke-getter-icon-color: #dddddd;
+  --object-inspector-invoke-getter-icon-color-hover: #ffffff;
   --object-inspector-prototype-color: #939395;
   --object-inspector-separator-color: #939395;
   --object-inspector-function-keyword: #ff7de9;
@@ -133,6 +135,8 @@
 
   --object-inspector-go-to-definition-icon-color: #222222;
   --object-inspector-go-to-definition-icon-color-hover: #000000;
+  --object-inspector-invoke-getter-icon-color: #222222;
+  --object-inspector-invoke-getter-icon-color-hover: #000000;
   --object-inspector-prototype-color: #737373;
   --object-inspector-separator-color: #737373;
   --object-inspector-function-keyword: #dd00a8;

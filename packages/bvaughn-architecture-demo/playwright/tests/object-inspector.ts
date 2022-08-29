@@ -20,6 +20,18 @@ async function inspectAndTakeScreenshotOf(page: Page, partialText: string, scree
   await takeScreenshot(page, keyValue, screenshotName);
 }
 
+async function inspectGetter(page: Page, partialText: string) {
+  const messageItems = await page.locator("[data-test-name=Message]", { hasText: partialText });
+
+  const getter = await messageItems.locator('[data-test-name="GetterRenderer"]', {
+    hasText: partialText,
+  });
+  await takeScreenshot(page, getter, `${partialText}-getter-before-inspection`);
+  const invokeGetterButton = getter.locator('[data-test-name="InvokeGetterButton"]');
+  await invokeGetterButton.click();
+  await takeScreenshot(page, getter, `${partialText}-getter-after-inspection`);
+}
+
 async function takeScreenshotOfMessage(page: Page, partialText: string, screenshotName: string) {
   const messageItem = await page
     .locator("[data-test-name=Message]", { hasText: partialText })
@@ -35,8 +47,6 @@ async function takeScreenshotOfMessages(page: Page, screenshotName: string) {
 }
 
 testSetup(async function regeneratorFunction({ page }) {
-  await page.goto(URL);
-
   await inspectAndTakeScreenshotOf(page, "arrayLength", "render-and-inspect-array");
   await inspectAndTakeScreenshotOf(page, "bigUint64Array", "render-and-inspect-big-uint-64-array");
   await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
@@ -59,11 +69,36 @@ testSetup(async function regeneratorFunction({ page }) {
     "mapWithComplexKeys",
     "render-and-inspect-map-with-complex-keys"
   );
+
+  // Getters/setters
+  await filterByText(page, "filter_objectWithGettersAndSetters");
+  await inspectAndTakeScreenshotOf(
+    page,
+    "objectWithGettersAndSetters",
+    "render-object-with-getters-and-setters"
+  );
+  await inspectGetter(page, "string");
+  await inspectGetter(page, "null");
+  await inspectGetter(page, "undefined");
+  await inspectGetter(page, "object");
+  await inspectGetter(page, "array");
+  const objectRow = await page
+    .locator('[data-test-name="ExpandablePreview"]', { hasText: "objectGetter" })
+    .first();
+  await objectRow.click();
+  const arrayRow = await page
+    .locator('[data-test-name="ExpandablePreview"]', { hasText: "arrayGetter" })
+    .first();
+  await arrayRow.click();
+});
+
+test.beforeEach(async ({ page }) => {
+  page.setDefaultTimeout(5000);
+
+  await page.goto(URL);
 });
 
 test("should render simple values", async ({ page }) => {
-  await page.goto(URL);
-
   await takeScreenshotOfMessage(page, "specialNull", "render-null");
   await takeScreenshotOfMessage(page, "specialUndefined", "render-undefined");
 
@@ -81,9 +116,7 @@ test("should render simple values", async ({ page }) => {
 });
 
 test("should render and inspect arrays", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "array");
+  await filterByText(page, "array");
 
   await takeScreenshotOfMessages(page, "render-arrays");
   await inspectAndTakeScreenshotOf(page, "arrayLength", "render-and-inspect-array");
@@ -91,34 +124,26 @@ test("should render and inspect arrays", async ({ page }) => {
 });
 
 test("should render dates", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "date");
+  await filterByText(page, "date");
 
   await takeScreenshotOfMessages(page, "render-dates");
 });
 
 test("should render errors", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "error");
+  await filterByText(page, "error");
 
   await takeScreenshotOfMessages(page, "render-errors");
 });
 
 test("should render and inspect functions", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "function");
+  await filterByText(page, "function");
 
   await takeScreenshotOfMessages(page, "render-functions");
   await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
 });
 
 test("should render and inspect HTML elements", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "filter_html");
+  await filterByText(page, "filter_html");
 
   await takeScreenshotOfMessages(page, "render-html-elements-and-texts");
   await inspectAndTakeScreenshotOf(
@@ -129,9 +154,7 @@ test("should render and inspect HTML elements", async ({ page }) => {
 });
 
 test("should render and inspect maps", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "map");
+  await filterByText(page, "map");
 
   await takeScreenshotOfMessages(page, "render-empty-maps");
   await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
@@ -148,28 +171,51 @@ test("should render and inspect maps", async ({ page }) => {
 });
 
 test("should render and inspect regular expressions", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "regex");
+  await filterByText(page, "regex");
 
   await takeScreenshotOfMessages(page, "render-regular-expressions");
   await inspectAndTakeScreenshotOf(page, "regex", "render-and-inspect-regex");
 });
 
 test("should render and inspect sets", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "set");
+  await filterByText(page, "set");
 
   await takeScreenshotOfMessages(page, "render-empty-sets");
   await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
 });
 
 test("should render and inspect objects", async ({ page }) => {
-  await page.goto(URL);
-
-  filterByText(page, "filter_object");
+  await filterByText(page, "filter_object");
 
   await takeScreenshotOfMessages(page, "render-empty-objects");
   await inspectAndTakeScreenshotOf(page, "objectSimple", "render-and-inspect-object");
+});
+
+test("should render getters and setters correctly", async ({ page }) => {
+  await filterByText(page, "filter_objectWithGettersAndSetters");
+
+  await inspectAndTakeScreenshotOf(
+    page,
+    "objectWithGettersAndSetters",
+    "render-object-with-getters-and-setters"
+  );
+
+  await inspectGetter(page, "string");
+  await inspectGetter(page, "null");
+  await inspectGetter(page, "undefined");
+  await inspectGetter(page, "object");
+  await inspectGetter(page, "array");
+
+  // Further inspect object and array
+  const objectRow = await page
+    .locator('[data-test-name="ExpandablePreview"]', { hasText: "objectGetter" })
+    .first();
+  await objectRow.click();
+  await takeScreenshot(page, objectRow, "inspect-getter-nested-object");
+
+  const arrayRow = await page
+    .locator('[data-test-name="ExpandablePreview"]', { hasText: "arrayGetter" })
+    .first();
+  await arrayRow.click();
+  await takeScreenshot(page, arrayRow, "inspect-getter-nested-array");
 });

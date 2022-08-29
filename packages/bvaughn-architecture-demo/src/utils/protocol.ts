@@ -40,6 +40,20 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
   return properties.filter(property => property.flags == null || property.flags & 4);
 }
 
+export function filterPropertiesForInlineObjectPreview(
+  properties: ProtocolProperty[]
+): ProtocolProperty[] {
+  // See https://static.replay.io/protocol/tot/Pause/#type-PropertyConfigurationFlags
+  return properties.filter(property => {
+    if (property.flags == null || property.flags & 4) {
+      if (property.get == null && property.set == null) {
+        return true;
+      }
+    }
+    return false;
+  });
+}
+
 function isProtocolProperty(
   valueOrProperty: ProtocolValue | ProtocolNamedValue | ProtocolProperty
 ): valueOrProperty is ProtocolProperty {
