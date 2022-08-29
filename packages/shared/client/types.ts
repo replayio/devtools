@@ -29,6 +29,7 @@ import {
   FunctionMatch,
   keyboardEvents,
   navigationEvents,
+  Result,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 
@@ -88,6 +89,7 @@ export interface ReplayClientInterface {
     pauseId: PauseId,
     level?: ObjectPreviewLevel
   ): Promise<PauseData>;
+  getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;

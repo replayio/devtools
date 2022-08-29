@@ -1,4 +1,4 @@
-import { Object, ObjectId, PauseId } from "@replayio/protocol";
+import { Object, ObjectId, PauseId, Value as ProtocolValue } from "@replayio/protocol";
 
 import { ReplayClientInterface } from "../../../shared/client/types";
 
@@ -8,6 +8,7 @@ import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } fr
 
 type ObjectMap = Map<ObjectId, Object>;
 type RecordMap = Map<ObjectId, Record<Object>>;
+type PropertyRecordMap = Map<string, Record<ProtocolValue>>;
 
 type ObjectMaps = {
   // This map contains Objects with no guarantee of preview information.
@@ -17,6 +18,12 @@ type ObjectMaps = {
   //
   // https://static.replay.io/protocol/tot/Pause/#type-Object
   objectMap: ObjectMap;
+
+  // This map contains Records of Object properties.
+  // This information is fetched (via Suspense) by calling Pause.getObjectProperty().
+  //
+  // https://static.replay.io/protocol/tot/Pause/#method-getObjectProperty
+  objectPropertyMap: PropertyRecordMap;
 
   // These maps contain Records of Objects with preview information.
   // This information is fetched (via Suspense) by calling Pause.getObjectPreview().
@@ -41,6 +48,7 @@ function getOrCreateObjectWithPreviewMap(pauseId: PauseId): ObjectMaps {
   if (!maps) {
     maps = {
       objectMap: new Map(),
+      objectPropertyMap: new Map(),
       previewRecordMap: new Map(),
       fullPreviewRecordMap: new Map(),
     };
@@ -114,6 +122,37 @@ export function getObjectWithPreview(
   }
 }
 
+export function getObjectProperty(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  propertyName: string
+): ProtocolValue {
+  const maps = getOrCreateObjectWithPreviewMap(pauseId);
+  const recordMap = maps.objectPropertyMap;
+  const key = `${objectId}:${propertyName}`;
+
+  let record = recordMap.get(key);
+  if (record == null) {
+    const wakeable = createWakeable<ProtocolValue>();
+
+    record = {
+      status: STATUS_PENDING,
+      value: wakeable,
+    };
+
+    recordMap.set(key, record);
+
+    fetchObjectProperty(client, pauseId, objectId, record, wakeable, propertyName);
+  }
+
+  if (record!.status === STATUS_RESOLVED) {
+    return record!.value;
+  } else {
+    throw record!.value;
+  }
+}
+
 export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
   objects.forEach(object => preCacheObject(pauseId, object));
 }
@@ -155,6 +194,39 @@ export function preCacheObject(pauseId: PauseId, object: Object): void {
         record.value = object;
       }
     }
+  }
+}
+
+async function fetchObjectProperty(
+  client: ReplayClientInterface,
+  pauseId: PauseId,
+  objectId: ObjectId,
+  record: Record<ProtocolValue>,
+  wakeable: Wakeable<ProtocolValue>,
+  propertyName: string
+) {
+  try {
+    const {
+      data: { objects },
+      returned,
+    } = await client.getObjectProperty(objectId, pauseId, propertyName);
+
+    // This response will contain the specific value we're searching for,
+    // but it may contain other nested objects as well.
+    // Pre-populate the cache with those objects so that we can avoid re-requesting them.
+    if (objects) {
+      preCacheObjects(pauseId, objects);
+    }
+
+    record.status = STATUS_RESOLVED;
+    record.value = returned;
+
+    wakeable.resolve(record.value);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
+
+    wakeable.reject(error);
   }
 }
 
