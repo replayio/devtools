@@ -56,16 +56,33 @@
       const object = { foo: 123, bar: "abc", baz: true };
       const objectWithNullPrototype = Object.create(null);
       const objectWithGettersAndSetters = {
-        get foo() {},
-        set bar(value) {},
-        get baz() {},
-        set baz(value) {},
-        method(a, b, c) {},
-      };
-      const objectWithSideEffectfulGetter = {
-        _count: 0,
-        get count() {
-          return this._count++;
+        get numberGetter() {
+          return 123;
+        },
+        get nullGetter() {
+          return null;
+        },
+        get undefinedGetter() {
+          return undefined;
+        },
+        get arrayGetter() {
+          return [123, "abc", true];
+        },
+        get objectGetter() {
+          return { foo: 123, bar: "abc", baz: true };
+        },
+
+        _string: "initial",
+        get stringGetterSetter() {
+          return this._string;
+        },
+        set stringGetterSetter(value) {
+          this._string = value;
+        },
+
+        _boolean: false,
+        set booleanSetter(value) {
+          this._boolean = value;
         },
       };
 
@@ -239,7 +256,6 @@
         filter_objectSimple: object,
         filter_objectWithNullPrototype: objectWithNullPrototype,
         filter_objectWithGettersAndSetters: objectWithGettersAndSetters,
-        filter_objectWithSideEffectfulGetter: objectWithSideEffectfulGetter,
 
         // HTML elements
         filter_htmlElement: htmlElement,
