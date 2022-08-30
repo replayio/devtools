@@ -73,7 +73,7 @@ export default function Tooltip({ label, targetID }: TooltipProps) {
   return (
     <div
       ref={tooltipRefSetter}
-      className="absolute flex w-max items-center space-x-1.5 rounded-2xl bg-black bg-opacity-70 px-2.5 py-1 text-xs text-white"
+      className="absolute flex w-max items-center space-x-1.5 rounded-2xl bg-red-500 bg-opacity-70 px-2.5 py-1 text-xs text-white"
     >
       {label}
     </div>
