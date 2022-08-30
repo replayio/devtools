@@ -57,14 +57,14 @@ export default function Expandable({
       } ${className}`}
       data-test-name="Expandable"
       data-test-state={isOpen ? "open" : "closed"}
-      onClick={onClick}
-      onKeyDown={onKeyDown}
-      role="button"
-      tabIndex={0}
     >
       <span
         className={`${styles.ToggleButton} ${headerClassName}`}
         data-test-name="ExpandablePreview"
+        onClick={onClick}
+        onKeyDown={onKeyDown}
+        role="button"
+        tabIndex={0}
       >
         <span className={isOpen ? styles.ArrowExpanded : styles.ArrowCollapsed}>
           <Icon className={styles.ArrowIcon} type="arrow" />
