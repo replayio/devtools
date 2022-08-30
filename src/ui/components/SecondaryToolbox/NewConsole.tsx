@@ -170,7 +170,7 @@ function FocusContextReduxAdapter({ children }: PropsWithChildren) {
 }
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
-function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
+export function InspectorContextReduxAdapter({ children }: PropsWithChildren) {
   const sourcesById = useAppSelector(getSourceDetailsEntities);
   const dispatch = useAppDispatch();
 

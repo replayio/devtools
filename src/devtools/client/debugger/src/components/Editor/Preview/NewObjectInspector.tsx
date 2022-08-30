@@ -7,6 +7,7 @@ import { Value as ProtocolValue } from "@replayio/protocol";
 import { ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { Suspense, useMemo } from "react";
+import { InspectorContextReduxAdapter } from "ui/components/SecondaryToolbox/NewConsole";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getPreview } from "../../../selectors";
@@ -35,11 +36,13 @@ export default function NewObjectInspector() {
 
   return (
     <ErrorBoundary>
-      <div className={`${styles.Popup} preview-popup`}>
-        <Suspense fallback={<Loader />}>
-          <Inspector context="default" pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
-        </Suspense>
-      </div>
+      <InspectorContextReduxAdapter>
+        <div className={`${styles.Popup} preview-popup`}>
+          <Suspense fallback={<Loader />}>
+            <Inspector context="default" pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+          </Suspense>
+        </div>
+      </InspectorContextReduxAdapter>
     </ErrorBoundary>
   );
 }
