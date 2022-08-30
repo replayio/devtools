@@ -108,7 +108,7 @@ window {
   background-size: 14px;
 }
 
-#inspector-breadcrumbs-toolbar {
+.inspector-breadcrumbs-toolbar {
   padding: 0px;
   border-bottom-width: 0px;
   border-top-width: 1px;
@@ -120,8 +120,8 @@ window {
   position: relative;
 }
 
-#inspector-breadcrumbs-toolbar,
-#inspector-breadcrumbs-toolbar * {
+.inspector-breadcrumbs-toolbar,
+.inspector-breadcrumbs-toolbar * {
   box-sizing: border-box;
   direction: ltr;
 }
@@ -132,7 +132,7 @@ window {
   /* Break out of the XUL flexbox, so the splitter can still shrink the
      markup view even if the contents of the breadcrumbs are wider than
      the new width. */
-  position: absolute;
+  /* position: absolute; */
   top: 0;
   left: 0;
   bottom: 0;

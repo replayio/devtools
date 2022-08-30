@@ -4,15 +4,16 @@ import { UIState } from "ui/state";
 import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
 import { getNodeInfo } from "../selectors/markup";
-const { HTMLBreadcrumbs } = require("devtools/client/inspector/breadcrumbs");
+const { HTMLBreadcrumbs: HTMLBreadcrumbsLegacy } = require("devtools/client/inspector/breadcrumbs");
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
+import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
 
 export interface MarkupProps {}
 
 function setupLegacyComponents() {
   const searchbox = new MarkupSearchbox();
   searchbox.setupSearchBox();
-  new HTMLBreadcrumbs();
+  new HTMLBreadcrumbsLegacy();
 }
 
 type PropsFromParent = {};
@@ -63,7 +64,7 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
           </div>
           {isMarkupEmpty ? <LoadingProgressBar /> : null}
         </div>
-        <div id="inspector-breadcrumbs-toolbar" className="devtools-toolbar">
+        <div className="inspector-breadcrumbs-toolbar devtools-toolbar">
           <div
             id="inspector-breadcrumbs"
             className="breadcrumbs-widget-container"
@@ -72,6 +73,7 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
             tabIndex={0}
           ></div>
         </div>
+        <HTMLBreadcrumbs />
       </div>
     </div>
   );
