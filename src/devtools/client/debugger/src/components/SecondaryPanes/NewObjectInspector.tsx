@@ -6,9 +6,9 @@ import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
-import { InspectorContextReduxAdapter } from "ui/components/SecondaryToolbox/NewConsole";
 
 import styles from "./NewObjectInspector.module.css";
 

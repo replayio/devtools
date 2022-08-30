@@ -4,10 +4,10 @@ import Loader from "@bvaughn/components/Loader";
 import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolValue } from "@bvaughn/src/utils/protocol";
 import { Value as ProtocolValue } from "@replayio/protocol";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { Suspense, useMemo } from "react";
-import { InspectorContextReduxAdapter } from "ui/components/SecondaryToolbox/NewConsole";
 import { useAppSelector } from "ui/setup/hooks";
 
 import { getPreview } from "../../../selectors";
