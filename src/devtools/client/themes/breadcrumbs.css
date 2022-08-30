@@ -16,8 +16,8 @@
 
 .breadcrumbs-widget-container {
   margin-right: 3px;
-  max-height: 24px; /* Set max-height for proper sizing on linux */
-  height: 24px; /* Set height to prevent starting small waiting for content */
+  max-height: 32px; /* Set max-height for proper sizing on linux */
+  height: 32px; /* Set height to prevent starting small waiting for content */
 }
 
 .breadcrumbs-widget-container:-moz-locale-dir(rtl) {
@@ -116,13 +116,25 @@
   top: -1px;
 }
 
-.breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-id {
+.breadcrumbs-widget-item .breadcrumbs-widget-item-id,
+.breadcrumbs-widget-item .breadcrumbs-widget-item-classes {
+  max-width: 150px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-id,
+.breadcrumbs-widget-item.selectedBreadcrumb .breadcrumbs-widget-item-id {
   color: var(--theme-highlight-purple);
 }
 
 .breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-tag,
 .breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-pseudo-classes,
-.breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-classes {
+.breadcrumbs-widget-item[checked] .breadcrumbs-widget-item-classes,
+.breadcrumbs-widget-item.selectedBreadcrumb .breadcrumbs-widget-item-tag,
+.breadcrumbs-widget-item.selectedBreadcrumb .breadcrumbs-widget-item-pseudo-classes,
+.breadcrumbs-widget-item.selectedBreadcrumb .breadcrumbs-widget-item-classes {
   color: var(--primary-accent);
 }
 
