@@ -159,7 +159,7 @@
   --theme-text-field-bgcolor: var(--theme-base-90);
   --text-field-border: var(--cool-gray-300);
   --tab-selected-bgcolor: var(--theme-base-100); /* current tab */
-  --tooltip-color: #fff;
+  --tooltip-color: white;
   --tooltip-bgcolor: #38383d;
 
   /* Tabs (Light) */
