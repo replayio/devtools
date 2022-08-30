@@ -502,7 +502,7 @@ async function findMessageExpandableObjectInspector(msg: HTMLElement, text: stri
   return waitUntil(
     () => {
       const nodes = msg.querySelectorAll<HTMLElement>(
-        '[data-test-name="Message"] [data-test-name="Expandable"]'
+        '[data-test-name="Message"] [data-test-name="Expandable"] [role="button"]'
       );
       return Array.from(nodes).find(node => node.innerText.includes(text));
     },
