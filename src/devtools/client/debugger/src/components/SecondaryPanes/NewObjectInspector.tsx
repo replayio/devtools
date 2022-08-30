@@ -6,6 +6,7 @@ import "@bvaughn/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
 import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
+import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
 
@@ -67,9 +68,11 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
 
   return (
     <ErrorBoundary>
-      <div className={`${styles.Popup} preview-popup`}>
-        <Suspense fallback={<Loader />}>{children}</Suspense>
-      </div>
+      <InspectorContextReduxAdapter>
+        <div className={`${styles.Popup} preview-popup`}>
+          <Suspense fallback={<Loader />}>{children}</Suspense>
+        </div>
+      </InspectorContextReduxAdapter>
     </ErrorBoundary>
   );
 }
