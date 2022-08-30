@@ -1,5 +1,5 @@
 import { Editor } from "codemirror";
-import React, { useRef, useState } from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   EditorWithAutocomplete,
@@ -82,6 +82,9 @@ export default function JSTerm() {
     setHistoryIndex(0);
   };
 
+  const [key, setKey] = useState(0);
+  useLayoutEffect(() => () => setKey(prevKey => prevKey + 1), []);
+
   // TODO [bvaughn] Refocus JSTerm <input> when SearchInput is hidden
   return (
     <div>
@@ -95,6 +98,7 @@ export default function JSTerm() {
           <div className="console-chevron ml-3 mr-1 h-3 w-3" />
           {isInLoadedRegion ? (
             <EditorWithAutocomplete
+              key={key}
               onEditorMount={(editor: Editor, showAutocomplete?: (show: boolean) => void) =>
                 (window.jsterm = getJsTermApi(editor, _execute, showAutocomplete))
               }
