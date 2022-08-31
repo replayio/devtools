@@ -1,11 +1,11 @@
 import classnames from "classnames";
-import Highlighter from "highlighter/highlighter";
 import { getDevicePixelRatio } from "protocol/graphics";
 import { ThreadFront } from "protocol/thread";
 import { EventEmitter } from "protocol/utils";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
+import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 
 export const nodePicker: any = {};
 
@@ -104,9 +104,9 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
     this.lastPickerPosition = pos;
     const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (this.lastPickerPosition == pos && nodeBounds) {
-      Highlighter.highlight(nodeBounds);
+      this.props.highlightNode(nodeBounds.nodeId);
     } else {
-      Highlighter.unhighlight();
+      this.props.unhighlightNode();
     }
   };
 
@@ -124,14 +124,14 @@ class NodePicker extends React.Component<PropsFromRedux, NodePickerState> {
 
     const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
     if (nodeBounds) {
-      Highlighter.highlight(nodeBounds);
+      this.props.highlightNode(nodeBounds.nodeId);
       const node = await ThreadFront.ensureNodeLoaded(nodeBounds.nodeId);
-      if (node && Highlighter.currentNode == nodeBounds) {
+      if (node) {
         const { selection } = await import("devtools/client/framework/selection");
         selection.setNodeFront(node);
       }
     } else {
-      Highlighter.unhighlight();
+      this.props.unhighlightNode();
     }
   }
 
@@ -156,6 +156,8 @@ const connector = connect(null, {
   setIsNodePickerActive: actions.setIsNodePickerActive,
   setMouseTargetsLoading: actions.setMouseTargetsLoading,
   setSelectedPanel: actions.setSelectedPanel,
+  highlightNode,
+  unhighlightNode,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

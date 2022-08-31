@@ -13,9 +13,9 @@ import {
 } from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/reducers/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
-import Highlighter from "highlighter/highlighter";
 import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
+import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 
 import type { Store, Wall } from "react-devtools-inline/frontend";
 
@@ -34,7 +34,9 @@ class ReplayWall implements Wall {
     private enablePicker: (opts: NodePickerOpts) => void,
     private initializePicker: () => void,
     private disablePicker: () => void,
-    private onShutdown: () => void
+    private onShutdown: () => void,
+    private highlightNode: (nodeId: string) => void,
+    private unhighlightNode: () => void
   ) {}
 
   // called by the frontend to register a listener for receiving backend messages
@@ -95,7 +97,7 @@ class ReplayWall implements Wall {
           const { rendererID, id } = payload;
 
           if (this.highlightedElementId) {
-            Highlighter.unhighlight();
+            this.unhighlightNode();
           }
           this.highlightedElementId = id;
 
@@ -112,12 +114,12 @@ class ReplayWall implements Wall {
             return;
           }
 
-          Highlighter.highlight(nodeFront);
+          this.highlightNode(nodeFront.id!);
           break;
         }
 
         case "clearNativeElementHighlight": {
-          Highlighter.unhighlight();
+          this.unhighlightNode();
           this.highlightedElementId = undefined;
           break;
         }
@@ -144,6 +146,8 @@ class ReplayWall implements Wall {
             onPicked: _ => {
               this._listener?.({ event: "stopInspectingNative", payload: true });
             },
+            onHighlightNode: this.highlightNode,
+            onUnhighlightNode: this.unhighlightNode,
             enabledNodeIds: [...nodeToElementId.keys()],
           });
 
@@ -219,12 +223,21 @@ function createReactDevTools(
   enablePicker: (opts: NodePickerOpts) => void,
   initializePicker: () => void,
   disablePicker: () => void,
-  onShutdown: () => void
+  onShutdown: () => void,
+  highlightNode: (nodeId: string) => void,
+  unhighlightNode: () => void
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
   const target = { postMessage() {} };
-  const wall = new ReplayWall(enablePicker, initializePicker, disablePicker, onShutdown);
+  const wall = new ReplayWall(
+    enablePicker,
+    initializePicker,
+    disablePicker,
+    onShutdown,
+    highlightNode,
+    unhighlightNode
+  );
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, {
     checkBridgeProtocolCompatibility: false,
@@ -311,6 +324,14 @@ export default function ReactDevtoolsPanel() {
     dispatch(setHasReactComponents(false));
   }
 
+  function dispatchHighlightNode(nodeId: string) {
+    dispatch(highlightNode(nodeId));
+  }
+
+  function dispatchUnhighlightNode() {
+    dispatch(unhighlightNode());
+  }
+
   if (protocolCheckFailed) {
     return (
       <div className="flex flex-col gap-4 p-4">
@@ -353,7 +374,9 @@ export default function ReactDevtoolsPanel() {
     enablePicker,
     initializePicker,
     disablePicker,
-    onShutdown
+    onShutdown,
+    dispatchHighlightNode,
+    dispatchUnhighlightNode
   );
 
   return (

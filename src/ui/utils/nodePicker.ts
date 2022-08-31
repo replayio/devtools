@@ -1,10 +1,11 @@
 import { ThreadFront } from "protocol/thread";
 import { getDevicePixelRatio } from "protocol/graphics";
-import Highlighter from "highlighter/highlighter";
 
 export interface NodePickerOpts {
   onHovering?: (nodeId: string | null) => void;
   onPicked: (nodeId: string | null) => void;
+  onHighlightNode: (nodeId: string) => void;
+  onUnhighlightNode: () => void;
   enabledNodeIds?: string[];
 }
 
@@ -40,13 +41,13 @@ class NodePicker {
       return;
     }
     if (nodeBounds) {
-      Highlighter.highlight(nodeBounds);
+      this.opts?.onHighlightNode(nodeBounds.nodeId);
       if (nodeBounds.nodeId !== this.hoveredNodeId) {
         this.hoveredNodeId = nodeBounds.nodeId;
         this.opts?.onHovering?.(nodeBounds.nodeId);
       }
     } else {
-      Highlighter.unhighlight();
+      this.opts?.onUnhighlightNode();
     }
   };
 

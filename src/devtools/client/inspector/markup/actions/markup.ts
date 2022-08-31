@@ -269,7 +269,7 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
   return async (dispatch, getState, { ThreadFront }) => {
     const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
     if (nodeFront) {
-      Highlighter.highlight(nodeFront, 1000);
+      dispatch(highlightNode(nodeId, 1000));
       const { selection } = await import("devtools/client/framework/selection");
       selection.setNodeFront(nodeFront, { reason });
     }
@@ -450,21 +450,19 @@ export function onPageDownKey(): UIThunkAction {
 // This doesn't even need to be in Redux
 let hoveredNodeId: string | null = null;
 
-export function highlightNode(nodeId: string): UIThunkAction {
+export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     if (hoveredNodeId !== nodeId) {
       hoveredNodeId = nodeId;
-      Highlighter.highlight(ThreadFront.currentPause!.getNodeFront(nodeId));
+      Highlighter.highlight(ThreadFront.currentPause!.getNodeFront(nodeId), duration);
     }
   };
 }
 
-export function unhighlightNode(nodeId: string): UIThunkAction {
+export function unhighlightNode(): UIThunkAction {
   return async (dispatch, getState) => {
-    if (hoveredNodeId && nodeId === hoveredNodeId) {
-      hoveredNodeId = null;
-      Highlighter.unhighlight();
-    }
+    hoveredNodeId = null;
+    Highlighter.unhighlight();
   };
 }
 
