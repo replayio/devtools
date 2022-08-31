@@ -4299,6 +4299,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/playwright@npm:^0.2.24":
+  version: 0.2.24
+  resolution: "@replayio/playwright@npm:0.2.24"
+  dependencies:
+    "@replayio/replay": ^0.9.4
+    "@replayio/test-utils": ^0.1.0
+    uuid: ^8.3.2
+  peerDependencies:
+    "@playwright/test": 1.19.x
+  bin:
+    replayio-playwright: bin/replayio-playwright.js
+  checksum: 1ac3c8d9727cf568a8e0042829e57537458f39e6f8a84559b9512529e01923211e97ba72a96c7339ab1729707932cbc19e0b9cd103d9c34eee04042b28b40e30
+  languageName: node
+  linkType: hard
+
 "@replayio/protocol@npm:^0.31.0":
   version: 0.31.0
   resolution: "@replayio/protocol@npm:0.31.0"
@@ -4328,6 +4343,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/replay@npm:^0.9.4":
+  version: 0.9.4
+  resolution: "@replayio/replay@npm:0.9.4"
+  dependencies:
+    "@replayio/sourcemap-upload": ^1.0.3
+    commander: ^7.2.0
+    is-uuid: ^1.0.2
+    jsonata: ^1.8.6
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: bin/replay.js
+  checksum: a1b9ce3e15922b040e0aaa21b95d61a856b0cf7bc9b9d74a0e0dc8387d9ed1cfa1329f5a880ad7e55fd5af35df3dacd429bc4adfa1ff3cf0f280b7378458c849
+  languageName: node
+  linkType: hard
+
 "@replayio/sourcemap-upload@npm:^1.0.1":
   version: 1.0.1
   resolution: "@replayio/sourcemap-upload@npm:1.0.1"
@@ -4338,6 +4370,30 @@ __metadata:
     node-fetch: ^2.6.1
     string.prototype.matchall: ^4.0.5
   checksum: 208cb345039022833addb9c0d6838e83ae395296d8c2e177ff4a5b0539042bae716859e78b478c4f0a370b2aad0fdf9f5f922de348f872a2b4d7b72db615793a
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.0.3":
+  version: 1.0.3
+  resolution: "@replayio/sourcemap-upload@npm:1.0.3"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: ba3c51be7762e702c097436e40288f04de330cc06d49987060ec4803455d6e1de1cfe77bf663c838183759a601c9221af8367d72ca1ef33828c839cad3d23304
+  languageName: node
+  linkType: hard
+
+"@replayio/test-utils@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@replayio/test-utils@npm:0.1.0"
+  dependencies:
+    "@replayio/replay": ^0.9.4
+    node-fetch: ^2.6.7
+    uuid: ^8.3.2
+  checksum: 1ae70b45de0d02808023a01d8fc6c70b7860b5f0974234ac006ff9ace15876cfb8506e5f22e4b077dcd1221df0a08f4b6c506339c77db66714377e551f9f19f5
   languageName: node
   linkType: hard
 
@@ -13701,6 +13757,7 @@ __metadata:
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
     "@playwright/test": 1.19
+    "@replayio/playwright": ^0.2.24
   languageName: unknown
   linkType: soft
 
@@ -16669,6 +16726,13 @@ __metadata:
   bin:
     json5: lib/cli.js
   checksum: 74b8a23b102a6f2bf2d224797ae553a75488b5adbaee9c9b6e5ab8b510a2fc6e38f876d4c77dea672d4014a44b2399e15f2051ac2b37b87f74c0c7602003543b
+  languageName: node
+  linkType: hard
+
+"jsonata@npm:^1.8.6":
+  version: 1.8.6
+  resolution: "jsonata@npm:1.8.6"
+  checksum: 748e052aa1d848ba263918603a5e7e872c26fbd63fbb3330dd28cb9fa9aed0478730732fe03149fddcb1b1b4963f5eb359f06da6e17ef84734f2067b1841b995
   languageName: node
   linkType: hard
 
