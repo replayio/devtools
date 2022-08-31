@@ -180,13 +180,19 @@ export const timeIsBeyondKnownPaints = (time: number) =>
 
 export function setupGraphics() {
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
+    let paintedGraphics = false;
+
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
+      if (!paintedGraphics) {
+        paintedGraphics = true;
+        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
+        paintGraphics(screen, mouse);
+      }
       hasAllPaintPoints = true;
       await Promise.all(gPaintPromises);
       videoReady.resolve();
     });
-    let paintedGraphics = false;
     client.Graphics.addPaintPointsListener(async ({ paints }) => {
       onPaints(paints);
       const latestPaint = maxBy(paints, p => BigInt(p.point));
