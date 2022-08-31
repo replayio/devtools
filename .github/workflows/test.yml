@@ -60,7 +60,7 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/download-artifact@v2
+      - run: yarn
       - uses: replayio/action-playwright@main
         with:
           working-directory: ./packages/e2e-tests
