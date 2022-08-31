@@ -71,6 +71,7 @@ jobs:
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
+          RECORD_REPLAY_TEST_METRICS: 1
   mock-test:
     name: Mock Tests
     runs-on: macos-latest
