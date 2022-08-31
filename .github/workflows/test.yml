@@ -21,30 +21,6 @@ jobs:
         with:
           name: macOS-replay-playwright
           path: macOS-replay-playwright.tar.xz
-  download-node:
-    name: Download node
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    steps:
-      - name: Download
-        run: wget https://static.replay.io/downloads/macOS-replay-node
-      - name: Create artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: replay-node
-          path: macOS-replay-node
-  download-driver:
-    name: Download recording driver
-    runs-on: ubuntu-latest
-    timeout-minutes: 2
-    steps:
-      - name: Download
-        run: wget https://static.replay.io/downloads/macOS-recordreplay.so
-      - name: Create artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: replay-driver
-          path: macOS-recordreplay.so
   preview-branch:
     name: Wait for Vercel Preview Branch
     runs-on: ubuntu-latest
@@ -75,7 +51,7 @@ jobs:
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
     runs-on: macos-latest
-    needs: [download-browser, download-node, download-driver, preview-branch, generate-test-run-id]
+    needs: [preview-branch, generate-test-run-id]
     strategy:
       # GH cancels other matrixed jobs by default if one fails. We want all E2E jobs to complete.
       fail-fast: false
@@ -85,9 +61,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
-      - uses: ./.github/actions/test
+      - uses: replayio/action-playwright@main
+        with:
+          working-directory: ./packages/e2e-tests
+          api-key: ${{ env.RECORD_REPLAY_API_KEY }}
+          public: true
         env:
-          TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
+          RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
           INPUT_STRIPE: ${{ matrix.shard }}/10
           RECORD_REPLAY_WEBHOOK_URL: ${{ secrets.RECORD_REPLAY_WEBHOOK_URL }}
