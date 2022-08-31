@@ -14,7 +14,7 @@ interface Position {
   y: number;
 }
 
-class NodePicker {
+export class NodePicker {
   private opts: NodePickerOpts | undefined;
   private pickerPosition: Position | undefined;
   private hoveredNodeId: string | undefined;
@@ -37,9 +37,6 @@ class NodePicker {
     const pos = this.mouseEventCanvasPosition(e);
     this.pickerPosition = pos;
     const nodeBounds = await this.nodeBounds(pos, this.opts?.enabledNodeIds);
-    if (this.pickerPosition !== pos) {
-      return;
-    }
     if (nodeBounds) {
       this.opts?.onHighlightNode(nodeBounds.nodeId);
       if (nodeBounds.nodeId !== this.hoveredNodeId) {
@@ -92,5 +89,3 @@ class NodePicker {
     return pos ? await ThreadFront.getMouseTarget(pos.x, pos.y, enabledNodeIds) : undefined;
   }
 }
-
-export default new NodePicker();

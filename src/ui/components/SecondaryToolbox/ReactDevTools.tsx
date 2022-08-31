@@ -13,7 +13,7 @@ import {
 } from "ui/reducers/reactDevTools";
 import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/reducers/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
-import NodePicker, { NodePickerOpts } from "ui/utils/nodePicker";
+import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 
@@ -277,6 +277,8 @@ async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: F
   }
 }
 
+const nodePickerInstance = new NodePickerClass();
+
 export default function ReactDevtoolsPanel() {
   const annotations = useAppSelector(getAnnotations);
   const currentPoint = useAppSelector(getCurrentPoint);
@@ -307,14 +309,14 @@ export default function ReactDevtoolsPanel() {
   function enablePicker(opts: NodePickerOpts) {
     dispatch(setIsNodePickerActive(true));
     dispatch(setIsNodePickerInitializing(false));
-    NodePicker.enable(opts);
+    nodePickerInstance.enable(opts);
   }
   function initializePicker() {
     dispatch(setIsNodePickerActive(false));
     dispatch(setIsNodePickerInitializing(true));
   }
   function disablePicker() {
-    NodePicker.disable();
+    nodePickerInstance.disable();
     dispatch(setIsNodePickerActive(false));
     dispatch(setIsNodePickerInitializing(false));
   }

@@ -454,7 +454,10 @@ export function highlightNode(nodeId: string, duration?: number): UIThunkAction 
   return async (dispatch, getState, { ThreadFront }) => {
     if (hoveredNodeId !== nodeId) {
       hoveredNodeId = nodeId;
-      Highlighter.highlight(ThreadFront.currentPause!.getNodeFront(nodeId), duration);
+      const node = await ThreadFront.ensureNodeLoaded(nodeId);
+      if (node) {
+        Highlighter.highlight(node, duration);
+      }
     }
   };
 }
