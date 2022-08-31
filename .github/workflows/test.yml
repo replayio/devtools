@@ -61,6 +61,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: yarn
+        env:
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - uses: replayio/action-playwright@main
         with:
           working-directory: ./packages/e2e-tests
