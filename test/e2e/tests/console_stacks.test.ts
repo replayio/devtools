@@ -1,6 +1,22 @@
+import { Page } from "@recordreplay/playwright";
 import config from "../config";
 import TestHarness from "../harness";
 import { runPlaywrightTest } from "../runTest";
+
+async function toggleFilterOn(page: Page, id: string) {
+  const selector = `[data-test-id="FilterToggle-${id}"]`;
+  const isChecked = await page.evaluate(
+    selector => {
+      const input = document.querySelector(`${selector} input`);
+      return (input as HTMLInputElement).checked;
+    },
+    [selector]
+  );
+
+  if (!isChecked) {
+    await page.click(selector);
+  }
+}
 
 it("Test source mapping of console errors.", async () => {
   // Not supported on chromium, needs source maps.
@@ -14,8 +30,8 @@ it("Test source mapping of console errors.", async () => {
       const harness = new TestHarness(page);
       await harness.start();
 
-      await page.evaluate(() => app.actions.logExceptions(true));
-      await page.evaluate(() => app.actions.filterToggled("warn"));
+      await toggleFilterOn(page, "exceptions");
+      await toggleFilterOn(page, "warnings");
       await page.click('[data-test-id="PanelButton-console"]');
 
       await harness.waitForMessage("console.trace() ConsoleTrace");
