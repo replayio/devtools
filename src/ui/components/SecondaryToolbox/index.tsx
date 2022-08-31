@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
 import WebConsoleApp from "devtools/client/webconsole/components/App";
 
-import NodePicker from "../NodePicker";
+import { NodePicker } from "../NodePicker";
 import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { ReduxDevToolsPanel } from "./ReduxDevTools";

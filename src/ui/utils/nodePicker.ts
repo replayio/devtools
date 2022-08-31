@@ -1,10 +1,11 @@
 import { ThreadFront } from "protocol/thread";
 import { getDevicePixelRatio } from "protocol/graphics";
-import Highlighter from "highlighter/highlighter";
 
 export interface NodePickerOpts {
   onHovering?: (nodeId: string | null) => void;
   onPicked: (nodeId: string | null) => void;
+  onHighlightNode: (nodeId: string) => void;
+  onUnhighlightNode: () => void;
   enabledNodeIds?: string[];
 }
 
@@ -13,7 +14,7 @@ interface Position {
   y: number;
 }
 
-class NodePicker {
+export class NodePicker {
   private opts: NodePickerOpts | undefined;
   private pickerPosition: Position | undefined;
   private hoveredNodeId: string | undefined;
@@ -36,17 +37,14 @@ class NodePicker {
     const pos = this.mouseEventCanvasPosition(e);
     this.pickerPosition = pos;
     const nodeBounds = await this.nodeBounds(pos, this.opts?.enabledNodeIds);
-    if (this.pickerPosition !== pos) {
-      return;
-    }
     if (nodeBounds) {
-      Highlighter.highlight(nodeBounds);
+      this.opts?.onHighlightNode(nodeBounds.nodeId);
       if (nodeBounds.nodeId !== this.hoveredNodeId) {
         this.hoveredNodeId = nodeBounds.nodeId;
         this.opts?.onHovering?.(nodeBounds.nodeId);
       }
     } else {
-      Highlighter.unhighlight();
+      this.opts?.onUnhighlightNode();
     }
   };
 
@@ -91,5 +89,3 @@ class NodePicker {
     return pos ? await ThreadFront.getMouseTarget(pos.x, pos.y, enabledNodeIds) : undefined;
   }
 }
-
-export default new NodePicker();

@@ -3,19 +3,33 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import React from "react";
+import { connect, ConnectedProps } from "react-redux";
 
+import { UIState } from "ui/state";
 import { selection } from "devtools/client/framework/selection";
+
 import Highlighter from "highlighter/highlighter";
 
 import { BoxModelSideLabel } from "./BoxModelSideLabel";
 
 import { Layout, LayoutNumericFields } from "../reducers/box-model";
+import { getSelectedNodeId } from "../../markup/selectors/markup";
+import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
 
 interface BMMProps {
   layout: Layout;
 }
 
-export class BoxModelMain extends React.PureComponent<BMMProps> {
+const mapState = (state: UIState) => ({
+  selectedNodeId: getSelectedNodeId(state),
+});
+
+const connector = connect(mapState, { highlightNode, unhighlightNode });
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
+type FinalBMMProps = BMMProps & PropsFromRedux;
+
+export class BoxModelMain extends React.PureComponent<FinalBMMProps> {
   getBorderOrPaddingValue = (property: keyof LayoutNumericFields) => {
     const { layout } = this.props;
     return layout[property] ? parseFloat(layout[property]) : "-";
@@ -115,12 +129,14 @@ export class BoxModelMain extends React.PureComponent<BMMProps> {
   };
 
   onHideBoxModelHighlighter = () => {
-    Highlighter.unhighlight();
+    this.props.unhighlightNode();
   };
 
   onShowBoxModelHighlighter = () => {
-    const { nodeFront } = selection;
-    Highlighter.highlight(nodeFront!);
+    const { selectedNodeId, highlightNode } = this.props;
+    if (selectedNodeId) {
+      highlightNode(selectedNodeId);
+    }
   };
 
   onHighlightMouseOver = (event: React.MouseEvent) => {
@@ -232,3 +248,5 @@ export class BoxModelMain extends React.PureComponent<BMMProps> {
     );
   }
 }
+
+export default connector(BoxModelMain);

@@ -62,7 +62,7 @@ export function HTMLBreadcrumbs() {
       };
 
       const handleMouseLeave = () => {
-        dispatch(unhighlightNode(node.id));
+        dispatch(unhighlightNode());
       };
 
       return (
@@ -89,7 +89,7 @@ export function HTMLBreadcrumbs() {
     }
 
     // Find the last button DOM node
-    const buttons = [...containerRef.current!.querySelectorAll(".breadcrumbs-widget-item")];
+    const buttons = [...(containerRef.current?.querySelectorAll(".breadcrumbs-widget-item") || [])];
     const [lastButton] = buttons.slice(-1);
 
     if (lastButton) {

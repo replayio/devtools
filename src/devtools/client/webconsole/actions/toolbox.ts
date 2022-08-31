@@ -23,10 +23,11 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
       return;
     }
 
-    const { highlighter } = await import("highlighter/highlighter");
+    const { highlightNode } = await import("devtools/client/inspector/markup/actions/markup");
+
     const nodeFront = grip.getNodeFront();
-    if (highlighter && nodeFront) {
-      highlighter.highlight(nodeFront);
+    if (nodeFront) {
+      dispatch(highlightNode(nodeFront.id));
     }
   };
 }

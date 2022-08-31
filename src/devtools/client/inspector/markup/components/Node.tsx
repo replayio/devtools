@@ -57,7 +57,7 @@ class _Node extends PureComponent<FinalNodeProps> {
   };
 
   onMouseLeave = () => {
-    this.props.unhighlightNode(this.props.node.id);
+    this.props.unhighlightNode();
   };
 
   scrollIntoView = (el: HTMLElement | null) => {
