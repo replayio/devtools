@@ -1,6 +1,7 @@
 import { UIStore } from "ui/actions";
 import { getRecordingId } from "ui/utils/recording";
 import { prefs, features, asyncStore } from "ui/utils/prefs";
+import { asyncStore as debuggerAsyncStore } from "devtools/client/debugger/src/utils/prefs";
 
 // eslint-disable-next-line no-restricted-imports
 import { triggerEvent, sendMessage, client } from "protocol/socket";
@@ -15,6 +16,7 @@ declare global {
     prefs: typeof prefs;
     features: typeof features;
     asyncStore: typeof asyncStore;
+    debuggerAsyncStore: typeof debuggerAsyncStore;
     dumpPrefs: () => string;
     dumpBasicProcessing: () => void;
     local: () => void;
@@ -55,6 +57,7 @@ export async function setupAppHelper(store: UIStore) {
     prefs,
     features,
     asyncStore,
+    debuggerAsyncStore,
     triggerEvent,
     replaySession,
     client,

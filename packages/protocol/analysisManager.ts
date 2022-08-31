@@ -160,6 +160,9 @@ class AnalysisManager {
         !handler.onAnalysisResult || client.Analysis.runAnalysis({ analysisId }, sessionId),
         !handler.onAnalysisPoints || client.Analysis.findAnalysisPoints({ analysisId }, sessionId),
       ]);
+    } catch (e) {
+      this.onAnalysisError({ analysisId, error: e instanceof Error ? e.message : "Unknown Error" });
+      console.error(e);
     } finally {
       this.handlers.delete(analysisId);
       await client.Analysis.releaseAnalysis({ analysisId }, sessionId);

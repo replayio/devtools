@@ -30,8 +30,6 @@ import { syncBreakpoint } from "../breakpoints";
 import { loadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 
-import { prefs } from "../../utils/prefs";
-
 function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     // source may have been modified by selectLocation
