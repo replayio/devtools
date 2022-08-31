@@ -16,7 +16,7 @@ export interface EventListenerWithFunctionInfo {
   capture: boolean;
   functionName: string;
   locationUrl?: string;
-  location: Location;
+  location?: Location;
   functionParameterNames: string[];
   framework?: string;
 }
@@ -70,13 +70,14 @@ const formatEventListener = (
   framework?: string
 ) => {
   const { functionLocation, functionName = "", functionParameterNames = [] } = fnPreview.preview;
-  const location = getPreferredLocation(
-    state,
-    functionLocation,
-    ThreadFront.preferredGeneratedSources
-  );
 
-  const locationUrl = functionLocation ? sourcesById[location.sourceId]?.url : undefined;
+  let location: Location | undefined = undefined;
+  let locationUrl: string | undefined = undefined;
+  if (functionLocation) {
+    location = getPreferredLocation(state, functionLocation, ThreadFront.preferredGeneratedSources);
+
+    locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
+  }
 
   return {
     ...listener,

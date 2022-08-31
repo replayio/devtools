@@ -1,5 +1,7 @@
 import { UIState } from "ui/state";
 
+export const getMarkupNodes = (state: UIState) => state.markup.tree;
+
 export const getNode = (state: UIState, nodeId: string | null) =>
   typeof nodeId === "string" ? state.markup.tree.entities[nodeId] : undefined;
 
