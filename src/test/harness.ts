@@ -649,9 +649,31 @@ async function addEventListenerLogpoints(logpoints: string[]) {
   }
 }
 
-async function toggleExceptionLogging() {
-  const shouldLogExceptions = dbgSelectors.getShouldLogExceptions();
-  dbgActions.logExceptions(!shouldLogExceptions);
+async function toggleExceptionLogging(checked: boolean) {
+  const input = await waitUntil(
+    () =>
+      document.querySelector<HTMLInputElement>('[data-test-id="FilterToggle-exceptions"] input'),
+    {
+      waitingFor: "Exceptions toggle to be present",
+    }
+  );
+
+  if (input!.checked !== checked) {
+    input!.click();
+  }
+}
+
+async function toggleFilter(id: string, checked: boolean) {
+  const input = await waitUntil(
+    () => document.querySelector<HTMLInputElement>(`[data-test-id="FilterToggle-${id}"] input`),
+    {
+      waitingFor: "Exceptions toggle to be present",
+    }
+  );
+
+  if (input!.checked !== checked) {
+    input!.click();
+  }
 }
 
 async function toggleMappedSources() {

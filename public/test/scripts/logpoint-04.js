@@ -1,5 +1,5 @@
 Test.describe(`Test exception logpoints.`, async () => {
-  await Test.toggleExceptionLogging();
+  await Test.toggleExceptionLogging(true);
   await Test.selectConsole();
 
   await Test.warpToMessage("Object { number: 4 }");
