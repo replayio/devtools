@@ -6,7 +6,8 @@ type $FixTypeLater = any;
 
 export async function openExample(page: Page, example: string) {
   const recordingId = exampleRecordings[example];
-  await page.goto(`http://localhost:8080/recording/${recordingId}?e2e=1`);
+  const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
+  await page.goto(`${base}/recording/${recordingId}?e2e=1`);
 }
 
 export async function clickDevTools(page: Page) {
