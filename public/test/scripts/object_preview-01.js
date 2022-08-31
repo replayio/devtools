@@ -50,7 +50,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   }
 
   Test.executeInConsole("Array(1, 2, 3)");
-  msg = await Test.waitForMessage("Array(3) [1, 2, 3]");
+  msg = await Test.waitForMessage("(3) [1, 2, 3]");
   // TODO (replayio/devtools/pull/7586) This function needs to be rewritten
   // await Test.checkMessageObjectContents(msg, ["0: 1", "1: 2", "2: 3", "length: 3"]);
 
