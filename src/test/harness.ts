@@ -375,13 +375,13 @@ async function clearConsoleEvaluations() {
 }
 
 async function waitForScopeValue(name: string, value: string) {
-  const expected = value !== undefined ? `${name}\n: \n${value}` : name;
+  const expected = value !== undefined ? `${name}: ${value}` : name;
   return waitUntil(
     () => {
       const nodes = document.querySelectorAll<HTMLElement>(
         "[data-test-name=ScopesList] [data-test-name=Expandable]"
       );
-      return [...nodes].some(node => node.innerText == expected);
+      return Array.from(nodes).some(node => node.innerText.includes(expected));
     },
     { waitingFor: `scope "${value}" to be present` }
   );
@@ -389,7 +389,7 @@ async function waitForScopeValue(name: string, value: string) {
 
 function findMessages(text: string) {
   const messages = document.querySelectorAll<HTMLElement>(`[data-test-name=Message]`);
-  return [...messages].filter(msg => msg.innerText.includes(text));
+  return Array.from(messages).filter(message => message.innerText.includes(text));
 }
 
 async function getAllMessages() {
@@ -513,7 +513,8 @@ async function findMessageExpandableObjectInspector(msg: HTMLElement, text: stri
 async function toggleObjectInspectorNode(node: HTMLElement, expand: boolean = true) {
   const isExpanded = node.getAttribute("data-test-state") === "open";
   if (isExpanded !== expand) {
-    node.click();
+    const button = node.querySelector<HTMLDivElement>("[data-test-name=ExpandablePreview]")!;
+    button.click();
   }
 }
 
@@ -540,15 +541,17 @@ function findScopeNode(text: string) {
   return waitUntil(
     () => {
       const nodes = document.querySelectorAll<HTMLElement>(
-        "[data-test-name=ScopesList] [data-test-name=ExpandablePreview]"
+        "[data-test-name=ScopesList] [data-test-name=Expandable]"
       );
-      return [...nodes].find(node => node.innerText.includes(text));
+      return Array.from(nodes).find(node => node.innerText.includes(text));
     },
     { waitingFor: `scope node "${text}" to be present` }
   );
 }
 
 async function toggleScopeNode(text: string) {
+  const scopeBlock = await findScopeNode("Block");
+  await toggleObjectInspectorNode(scopeBlock!);
   const node = await findScopeNode(text);
   return toggleObjectInspectorNode(node!);
 }
@@ -649,9 +652,31 @@ async function addEventListenerLogpoints(logpoints: string[]) {
   }
 }
 
-async function toggleExceptionLogging() {
-  const shouldLogExceptions = dbgSelectors.getShouldLogExceptions();
-  dbgActions.logExceptions(!shouldLogExceptions);
+async function toggleExceptionLogging(checked: boolean) {
+  const input = await waitUntil(
+    () =>
+      document.querySelector<HTMLInputElement>('[data-test-id="FilterToggle-exceptions"] input'),
+    {
+      waitingFor: "Exceptions toggle to be present",
+    }
+  );
+
+  if (input!.checked !== checked) {
+    input!.click();
+  }
+}
+
+async function toggleFilter(id: string, checked: boolean) {
+  const input = await waitUntil(
+    () => document.querySelector<HTMLInputElement>(`[data-test-id="FilterToggle-${id}"] input`),
+    {
+      waitingFor: "Exceptions toggle to be present",
+    }
+  );
+
+  if (input!.checked !== checked) {
+    input!.click();
+  }
 }
 
 async function toggleMappedSources() {
