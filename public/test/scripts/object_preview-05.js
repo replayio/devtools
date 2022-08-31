@@ -6,13 +6,13 @@ Test.describe(`Test scope mapping and switching between generated/original sourc
   await Test.warpToMessage("20");
   await Test.waitForPausedLine(15);
   await Test.waitForScopeValue("bar");
-  await Test.waitForScopeValue("bararr", "Array(3) […]");
+  await Test.waitForScopeValue("bararr", "(3) […]");
   await Test.waitForScopeValue("barobj", "{…}");
   await Test.executeInConsole("bararr.length * 100");
   await Test.waitForMessage("300");
 
   await Test.toggleMappedSources();
   await Test.waitForPausedLine(12);
-  await Test.waitForScopeValue("e", "Array(3) […]");
+  await Test.waitForScopeValue("e", "(3) […]");
   await Test.waitForScopeValue("o", "{…}");
 });
