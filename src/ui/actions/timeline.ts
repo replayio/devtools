@@ -64,7 +64,7 @@ import {
   setPlaybackStalled,
   setTimelineState,
 } from "../reducers/timeline";
-import { framePositionsCleared } from "devtools/client/debugger/src/reducers/pause";
+import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 
 import { getLoadedRegions } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
@@ -359,7 +359,7 @@ function playback(beginTime: number, endTime: number): UIThunkAction {
         return dispatch(setTimelineState({ currentTime: endTime, playback: null }));
       }
 
-      dispatch({ type: "RESUME" });
+      dispatch(resumed());
       dispatch(
         setTimelineState({
           currentTime,

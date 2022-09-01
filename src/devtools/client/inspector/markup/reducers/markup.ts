@@ -119,6 +119,13 @@ const markupSlice = createSlice({
       state.scrollIntoViewNode = action.payload;
     },
   },
+  extraReducers: builder => {
+    // dispatched by actions/timeline.ts, in `playback()`
+    builder.addCase("pause/resumed", (state, action) => {
+      // Clear out the DOM nodes data whenever the user hits "Play" in the timeline
+      return initialState;
+    });
+  },
 });
 
 export const {

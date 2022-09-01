@@ -6,6 +6,7 @@ import Nodes from "./Nodes";
 import { getNodeInfo } from "../selectors/markup";
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
+import { getIsPaused } from "devtools/client/debugger/src/reducers/pause";
 
 export interface MarkupProps {}
 
@@ -16,7 +17,7 @@ function setupLegacyComponents() {
 
 type PropsFromParent = {};
 
-function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
+function MarkupApp({ markupRootNode, isPaused }: PropsFromRedux & PropsFromParent) {
   const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
 
   useEffect(() => setupLegacyComponents(), []);
@@ -60,7 +61,7 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
               {<Nodes />}
             </div>
           </div>
-          {isMarkupEmpty ? <LoadingProgressBar /> : null}
+          {isPaused && isMarkupEmpty ? <LoadingProgressBar /> : null}
         </div>
         <HTMLBreadcrumbs />
       </div>
@@ -70,6 +71,7 @@ function MarkupApp({ markupRootNode }: PropsFromRedux & PropsFromParent) {
 
 const connector = connect((state: UIState) => ({
   markupRootNode: getNodeInfo(state, state.markup.rootNode!),
+  isPaused: getIsPaused(state),
 }));
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
