@@ -60,6 +60,13 @@ export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?:
 
 export type ReplayClientEvents = "loadedRegionsChange";
 
+export type HitPointsStatus =
+  | "complete"
+  | "too-many-points-to-find"
+  | "too-many-points-to-run-analysis";
+
+export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointsStatus];
+
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
@@ -85,7 +92,7 @@ export interface ReplayClientInterface {
     focusRange: TimeStampedPointRange | null,
     location: Location,
     condition: string | null
-  ): Promise<TimeStampedPoint[]>;
+  ): Promise<HitPointsAndStatusTuple>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,

@@ -3,7 +3,6 @@ import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Loader from "../Loader";
@@ -109,42 +108,52 @@ function HitPointsWarning({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const hitPoints = getHitPointsForLocation(client, point.location, null, focusRange);
+  const [_, status] = getHitPointsForLocation(client, point.location, null, focusRange);
 
-  if (hitPoints.length >= MAX_POINTS_FOR_FULL_ANALYSIS) {
-    return (
-      <div className={styles.HitPointsWarning}>
-        <Icon className={styles.HitPointsWarningIcon} type="warning" /> Use Focus Mode to reduce the
-        number of hits.
-      </div>
-    );
-  } else {
-    return null;
+  switch (status) {
+    case "too-many-points-to-find":
+    case "too-many-points-to-run-analysis": {
+      return (
+        <div className={styles.HitPointsWarning}>
+          <Icon className={styles.HitPointsWarningIcon} type="warning" /> Use Focus Mode to reduce
+          the number of hits.
+        </div>
+      );
+    }
   }
+
+  return null;
 }
 
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const hitPoints = getHitPointsForLocation(client, point.location, null, focusRange);
+  const [hitPoints, status] = getHitPointsForLocation(client, point.location, null, focusRange);
 
-  if (hitPoints.length === 0) {
-    return (
-      <ul className={styles.HitPointsList}>
-        <li className={styles.HitPointListItem}>No hits</li>
-      </ul>
-    );
-  } else {
-    return (
-      <ul className={styles.HitPointsList}>
-        <li className={styles.HitPointListItem}>Hits:</li>
-        {hitPoints.map(hitPoint => (
-          <li key={hitPoint.point} className={styles.HitPointListItem}>
-            •
-          </li>
-        ))}
-      </ul>
-    );
+  switch (status) {
+    case "too-many-points-to-find": {
+      return null;
+    }
+    default: {
+      if (hitPoints.length === 0) {
+        return (
+          <ul className={styles.HitPointsList}>
+            <li className={styles.HitPointListItem}>No hits</li>
+          </ul>
+        );
+      } else {
+        return (
+          <ul className={styles.HitPointsList}>
+            <li className={styles.HitPointListItem}>Hits:</li>
+            {hitPoints.map(hitPoint => (
+              <li key={hitPoint.point} className={styles.HitPointListItem}>
+                •
+              </li>
+            ))}
+          </ul>
+        );
+      }
+    }
   }
 }
