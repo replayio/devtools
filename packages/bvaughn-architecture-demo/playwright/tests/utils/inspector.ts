@@ -5,13 +5,14 @@ export async function toggleExpandable<T>(
   partialText: string,
   expanded: boolean = true
 ): Promise<void> {
-  const locator = page.locator(`[data-test-name="Expandable"]`, { hasText: partialText }).last();
+  const expandable = page.locator(`[data-test-name="Expandable"]`, { hasText: partialText }).last();
 
-  const isExpanded = await locator.evaluate(
+  const isExpanded = await expandable.evaluate(
     'node => node.getDataAttribute("data-test-state") === "opened"'
   );
 
   if (isExpanded !== expanded) {
-    await locator.click();
+    const button = expandable.locator(`[role="button"]`);
+    await button.click();
   }
 }

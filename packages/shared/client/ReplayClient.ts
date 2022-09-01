@@ -33,10 +33,14 @@ import analysisManager, { AnalysisParams } from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { compareNumericStrings, defer } from "protocol/utils";
+import { isTooManyPointsError } from "shared/utils/error";
 
 import {
   ColumnHits,
+  HitPointsAndStatusTuple,
+  HitPointsStatus,
   LineHits,
   ReplayClientEvents,
   ReplayClientInterface,
@@ -280,8 +284,9 @@ export class ReplayClient implements ReplayClientInterface {
     focusRange: TimeStampedPointRange | null,
     location: Location,
     condition: string | null
-  ): Promise<PointDescription[]> {
-    const collectedPointDescriptions: PointDescription[] = [];
+  ): Promise<HitPointsAndStatusTuple> {
+    const collectedHitPoints: TimeStampedPoint[] = [];
+    let status: HitPointsStatus | null = null;
 
     const locations = this._getCorrespondingLocations(location).map(location => ({ location }));
 
@@ -325,53 +330,85 @@ export class ReplayClient implements ReplayClientInterface {
         ];
       `;
 
-      await analysisManager.runAnalysis(
-        {
-          effectful: false,
-          locations,
-          mapper,
-          range: focusRange
-            ? { begin: focusRange.begin.point, end: focusRange.end.point }
-            : undefined,
-        },
-        {
-          onAnalysisError: (errorMessage: string) => {
-            throw Error(errorMessage);
+      try {
+        await analysisManager.runAnalysis(
+          {
+            effectful: false,
+            locations,
+            mapper,
+            range: focusRange
+              ? { begin: focusRange.begin.point, end: focusRange.end.point }
+              : undefined,
           },
-          onAnalysisResult: results => {
-            results.forEach(({ value }) => {
-              if (value.match) {
-                collectedPointDescriptions.push({
-                  point: value.point,
-                  time: value.time,
-                });
+          {
+            onAnalysisError: (errorMessage: string) => {
+              if (errorMessage.includes("too many points")) {
+                status = "too-many-points-to-find";
+              } else {
+                throw Error(errorMessage);
               }
-            });
-          },
+            },
+            onAnalysisResult: results => {
+              results.forEach(({ value }) => {
+                if (value.match) {
+                  collectedHitPoints.push({
+                    point: value.point,
+                    time: value.time,
+                  });
+                }
+              });
+            },
+          }
+        );
+      } catch (error) {
+        if (isTooManyPointsError(error)) {
+          status = "too-many-points-to-find";
+        } else {
+          throw error;
         }
-      );
+      }
     } else {
-      await analysisManager.runAnalysis(
-        {
-          effectful: false,
-          locations,
-          mapper: "",
-          range: focusRange
-            ? { begin: focusRange.begin.point, end: focusRange.end.point }
-            : undefined,
-        },
-        {
-          onAnalysisError: (errorMessage: string) => {
-            throw Error(errorMessage);
+      try {
+        await analysisManager.runAnalysis(
+          {
+            effectful: false,
+            locations,
+            mapper: "",
+            range: focusRange
+              ? { begin: focusRange.begin.point, end: focusRange.end.point }
+              : undefined,
           },
-          onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
-            collectedPointDescriptions.push(...pointDescriptions);
-          },
+          {
+            onAnalysisError: (errorMessage: string) => {
+              if (errorMessage.includes("too many points")) {
+                status = "too-many-points-to-find";
+              } else {
+                throw Error(errorMessage);
+              }
+            },
+            onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
+              collectedHitPoints.push(...pointDescriptions);
+            },
+          }
+        );
+      } catch (error) {
+        if (isTooManyPointsError(error)) {
+          status = "too-many-points-to-find";
+        } else {
+          throw error;
         }
-      );
+      }
     }
 
-    return collectedPointDescriptions;
+    if (status == null) {
+      if (collectedHitPoints.length > MAX_POINTS_FOR_FULL_ANALYSIS) {
+        status = "too-many-points-to-run-analysis";
+      } else {
+        status = "complete";
+      }
+    }
+
+    return [collectedHitPoints, status];
   }
 
   async getObjectProperty(

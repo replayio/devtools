@@ -138,29 +138,29 @@ export function LoggablesContextRoot({
 
     points.forEach(point => {
       if (point.enableLogging) {
-        const hitPoints = getHitPointsForLocation(
+        const [hitPoints, status] = getHitPointsForLocation(
           client,
           point.location,
           point.condition,
           focusRange
         );
-        if (hitPoints.length < MAX_POINTS_FOR_FULL_ANALYSIS) {
-          hitPoints.forEach(hitPoint => {
-            if (
-              focusRange === null ||
-              isExecutionPointsWithinRange(
-                hitPoint.point,
-                focusRange.begin.point,
-                focusRange.end.point
-              )
-            ) {
+
+        switch (status) {
+          case "too-many-points-to-find":
+          case "too-many-points-to-run-analysis": {
+            // Don't try to render log points if there are too many hits.
+            break;
+          }
+          default: {
+            hitPoints.forEach(hitPoint => {
               pointInstances.push({
                 point,
                 timeStampedHitPoint: hitPoint,
                 type: "PointInstance",
               });
-            }
-          });
+            });
+            break;
+          }
         }
       }
     });

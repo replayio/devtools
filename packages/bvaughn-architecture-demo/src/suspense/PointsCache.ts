@@ -4,16 +4,15 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import { ReplayClientInterface } from "shared/client/types";
+import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
 import { isUnloadedRegionError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
-import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "../utils/time";
+import { isExecutionPointsLessThan } from "../utils/time";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
-const focusRangeToLogPointsMap: Map<string, TimeStampedPoint[]> = new Map();
-const locationToHitPointsMap: Map<string, Record<TimeStampedPoint[]>> = new Map();
+const locationToHitPointsMap: Map<string, Record<HitPointsAndStatusTuple>> = new Map();
 const sortedExecutionPoints: TimeStampedPoint[] = [];
 const timeToExecutionPointMap: Map<number, Record<ExecutionPoint>> = new Map();
 
@@ -42,41 +41,20 @@ export function getClosestPointForTime(
   }
 }
 
-function getFilteredLogPoints(
-  location: Location,
-  logPoints: TimeStampedPoint[],
-  focusRange: TimeStampedPointRange | null
-): TimeStampedPoint[] {
-  if (focusRange == null) {
-    return logPoints;
-  } else {
-    const key = `${location.sourceId}:${location.line}:${location.column}:${focusRange.begin}:${focusRange.end}`;
-    if (!focusRangeToLogPointsMap.has(key)) {
-      const focusBeginPoint = focusRange!.begin.point;
-      const focusEndPoint = focusRange!.end.point;
-
-      focusRangeToLogPointsMap.set(
-        key,
-        logPoints.filter(logPoint =>
-          isExecutionPointsWithinRange(logPoint.point, focusBeginPoint, focusEndPoint)
-        )
-      );
-    }
-
-    return focusRangeToLogPointsMap.get(key)!;
-  }
-}
-
 export function getHitPointsForLocation(
   client: ReplayClientInterface,
   location: Location,
   condition: string | null,
   focusRange: TimeStampedPointRange | null
-): TimeStampedPoint[] {
-  const key = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
+): HitPointsAndStatusTuple {
+  // TODO We could add an optimization here to avoid re-fetching if we ever fetched all points (no focus range)
+  // without any overflow, and then later fetch for a focus range. Right now we re-fetch in this case.
+
+  const locationKey = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
+  const key = focusRange ? `${locationKey}:${focusRange.begin}:${focusRange.end}` : locationKey;
   let record = locationToHitPointsMap.get(key);
   if (record == null) {
-    const wakeable = createWakeable<TimeStampedPoint[]>();
+    const wakeable = createWakeable<HitPointsAndStatusTuple>();
 
     record = {
       status: STATUS_PENDING,
@@ -89,7 +67,7 @@ export function getHitPointsForLocation(
   }
 
   if (record.status === STATUS_RESOLVED) {
-    return getFilteredLogPoints(location, record.value, focusRange);
+    return record.value;
   } else {
     throw record.value;
   }
@@ -123,16 +101,20 @@ async function fetchHitPointsForLocation(
   focusRange: TimeStampedPointRange | null,
   location: Location,
   condition: string | null,
-  record: Record<TimeStampedPoint[]>,
-  wakeable: Wakeable<TimeStampedPoint[]>
+  record: Record<HitPointsAndStatusTuple>,
+  wakeable: Wakeable<HitPointsAndStatusTuple>
 ) {
   try {
-    const executionPoints = await client.getHitPointsForLocation(focusRange, location, condition);
+    const [executionPoints, status] = await client.getHitPointsForLocation(
+      focusRange,
+      location,
+      condition
+    );
 
     record.status = STATUS_RESOLVED;
-    record.value = executionPoints;
+    record.value = [executionPoints, status];
 
-    wakeable.resolve(executionPoints);
+    wakeable.resolve(record.value);
   } catch (error) {
     record.status = STATUS_REJECTED;
     record.value = error;

@@ -7,10 +7,10 @@ import testSetup from "./utils/testSetup";
 const URL = `${getBaseURL()}/tests/source-and-console?${getURLFlags()}`;
 
 testSetup(async function regeneratorFunction({ page }) {
-  await addLogPoint(page, 12);
+  await addLogPoint(page, 13);
 
-  await fillLogPointText(page, 12, "z");
-  await fillLogPointText(page, 12, "printError");
+  await fillLogPointText(page, 13, "z");
+  await fillLogPointText(page, 13, "printError");
 
   await toggleProtocolMessages(page, false);
 
@@ -18,13 +18,16 @@ testSetup(async function regeneratorFunction({ page }) {
   const keyValue = message.locator("[data-test-name=Expandable]");
   await keyValue.click();
 
-  await addLogPoint(page, 26);
-  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`);
-  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+  await addLogPoint(page, 28);
+  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`);
+  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+
+  await addLogPoint(page, 68);
+  await addLogPoint(page, 70);
 });
 
 async function addLogPoint(page: Page, lineNumber: number) {
-  const selector = `[data-test-id="Source-test-console-levels.html"] [data-test-id=SourceLine-${lineNumber}]`;
+  const selector = `[data-test-id="Source-source-and-console.html"] [data-test-id=SourceLine-${lineNumber}]`;
   await page.hover(selector);
   const button = page.locator(`${selector} button`);
   await button.click();
@@ -51,25 +54,25 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("should not allow saving log points with invalid content", async ({ page }) => {
-  await addLogPoint(page, 12);
-  await fillLogPointText(page, 12, "'1");
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, "'1");
 
-  const pointPanel = page.locator("[data-test-id=PointPanel-12]");
+  const pointPanel = page.locator("[data-test-id=PointPanel-13]");
   await takeScreenshot(page, pointPanel, "point-panel-invalid-content");
 });
 
 test("should not allow saving log points with invalid conditional", async ({ page }) => {
-  await addLogPoint(page, 12);
-  await fillLogPointText(page, 12, "true", "'1");
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, "true", "'1");
 
-  const pointPanel = page.locator("[data-test-id=PointPanel-12]");
+  const pointPanel = page.locator("[data-test-id=PointPanel-13]");
   await takeScreenshot(page, pointPanel, "point-panel-invalid-conditional");
 });
 
 test("should run remote analysis for log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 12);
-  await fillLogPointText(page, 12, "printError");
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, "printError");
 
   const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
   await takeScreenshot(page, sourceRoot, "log-point-analysis-source");
@@ -85,28 +88,28 @@ test("should run remote analysis for log points", async ({ page }) => {
 
 test("should support conditional log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 26);
+  await addLogPoint(page, 28);
 
   const messages = page.locator("[data-test-name=Messages]");
 
-  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`);
+  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`);
   await takeScreenshot(page, messages, "log-point-multi-hits-console");
 
-  await fillLogPointText(page, 26, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
+  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
   await takeScreenshot(page, messages, "log-point-multi-hits-with-conditional-console");
 });
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 12);
-  await fillLogPointText(page, 12, "z");
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, "z");
 
   const message = page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, message, "log-point-invalid-remote-analysis-console");
 });
 
 test("should include log points in search results", async ({ page }) => {
-  await addLogPoint(page, 12);
+  await addLogPoint(page, 13);
 
   await page.fill("[data-test-id=ConsoleSearchInput]", "stack");
   const messages = page.locator("[data-test-name=Messages]");
@@ -114,7 +117,7 @@ test("should include log points in search results", async ({ page }) => {
 });
 
 test("should include log points when filtering data", async ({ page }) => {
-  await addLogPoint(page, 12);
+  await addLogPoint(page, 13);
 
   await page.fill("[data-test-id=ConsoleFilterInput]", "stack");
   const messages = page.locator("[data-test-name=Messages]");
@@ -125,7 +128,7 @@ test("should include log points when filtering data", async ({ page }) => {
 });
 
 test("should support custom badge styles for log points", async ({ page }) => {
-  await addLogPoint(page, 12);
+  await addLogPoint(page, 13);
 
   await toggleProtocolMessages(page, false);
 
@@ -138,4 +141,28 @@ test("should support custom badge styles for log points", async ({ page }) => {
   await message.click({ button: "right" });
   await page.click("[data-test-id=ConsoleContextMenu-Badge-unicorn]");
   await takeScreenshot(page, message, "log-point-message-with-unicorn-badge");
+});
+
+test("should handle too many points to find", async ({ page }) => {
+  await addLogPoint(page, 68);
+
+  const popup = page.locator('[data-test-id="PointPanel-68"]');
+  await takeScreenshot(page, popup, "log-point-message-too-many-points-to-find");
+
+  await toggleProtocolMessages(page, false);
+
+  const messagesList = page.locator('[data-test-name="Messages"]');
+  await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
+});
+
+test("should handle too many points to run analysis", async ({ page }) => {
+  await addLogPoint(page, 70);
+
+  const popup = page.locator('[data-test-id="PointPanel-70"]');
+  await takeScreenshot(page, popup, "log-point-message-too-many-points-to-run-analysis");
+
+  await toggleProtocolMessages(page, false);
+
+  const messagesList = page.locator('[data-test-name="Messages"]');
+  await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
 });
