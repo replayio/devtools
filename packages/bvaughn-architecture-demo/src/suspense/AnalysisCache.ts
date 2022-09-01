@@ -100,10 +100,6 @@ async function runAnalysisHelper(
       range: focusRange || undefined,
     });
 
-    if (results.length === 0) {
-      throw new Error("No results returned from analysis");
-    }
-
     const resultsMap = new Map();
     results.forEach(result => {
       const objects = result.data.objects;
