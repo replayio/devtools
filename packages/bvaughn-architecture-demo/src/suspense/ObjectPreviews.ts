@@ -158,7 +158,7 @@ export async function getObjectWithPreviewHelper(
     if (
       errorOrPromise != null &&
       typeof errorOrPromise === "object" &&
-      typeof errorOrPromise.hasOwnProperty("then")
+      errorOrPromise.hasOwnProperty("then")
     ) {
       return errorOrPromise as Promise<Object>;
     } else {
@@ -213,7 +213,7 @@ export async function getObjectPropertyHelper(
     if (
       errorOrPromise != null &&
       typeof errorOrPromise === "object" &&
-      typeof errorOrPromise.hasOwnProperty("then")
+      errorOrPromise.hasOwnProperty("then")
     ) {
       return errorOrPromise as Promise<ProtocolValue>;
     } else {
