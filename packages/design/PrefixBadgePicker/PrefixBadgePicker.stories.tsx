@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { Column, PrefixBadgePicker } from "components";
+import { PrefixBadgePicker } from "design";
 
 export default {
   title: "Components/PrefixBadgePicker",
@@ -8,15 +8,9 @@ export default {
 
 export function BasicUsage() {
   return (
-    <>
-      <Column gap={2} className="theme-light items-start p-1">
-        <PrefixBadgePicker />
-        <PrefixBadgePicker initialValue="unicorn" />
-      </Column>
-      <Column gap={2} className="theme-dark items-start p-1" style={{ backgroundColor: "#192230" }}>
-        <PrefixBadgePicker />
-        <PrefixBadgePicker initialValue="unicorn" />
-      </Column>
-    </>
+    <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
+      <PrefixBadgePicker />
+      <PrefixBadgePicker initialValue="unicorn" />
+    </div>
   );
 }
