@@ -8,6 +8,7 @@ import {
   Scope,
   TimeStampedPoint,
 } from "@replayio/protocol";
+import jsTokens from "js-tokens";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
@@ -73,7 +74,11 @@ export function runAnalysis(
 
     locationAndTimeToValueMap.set(key, record);
 
-    runAnalysisHelper(client, focusRange, location, code, condition, record, wakeable);
+    if (!condition && canRunLocalAnalysis(code)) {
+      runLocalAnalysis(code, record, wakeable);
+    } else {
+      runRemoteAnalysis(client, focusRange, location, code, condition, record, wakeable);
+    }
   }
 
   if (record.status === STATUS_RESOLVED) {
@@ -83,7 +88,113 @@ export function runAnalysis(
   }
 }
 
-async function runAnalysisHelper(
+export function canRunLocalAnalysis(code: string): boolean {
+  const tokens = jsTokens(code);
+  // @ts-ignore
+  for (let token of tokens) {
+    switch (token.type) {
+      case "IdentifierName": {
+        switch (token.value) {
+          case "false":
+          case "Infinity":
+          case "NaN":
+          case "null":
+          case "true":
+          case "undefined": {
+            // Supported
+            break;
+          }
+          default: {
+            return false;
+          }
+        }
+        break;
+      }
+      case "Punctuator": {
+        switch (token.value) {
+          case ",": {
+            // Supported
+            break;
+          }
+          default: {
+            return false;
+          }
+        }
+        break;
+      }
+      case "NoSubstitutionTemplate":
+      case "NumericLiteral":
+      case "StringLiteral":
+      case "WhiteSpace": {
+        // supported
+        break;
+      }
+      default: {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+async function runLocalAnalysis(
+  code: string,
+  record: Record<AnalysisResults>,
+  wakeable: Wakeable<AnalysisResults>
+) {
+  try {
+    const analysisResults = await new Promise<AnalysisResults>((resolve, reject) => {
+      if (code === "location") {
+        reject();
+      }
+
+      const escapedCode = code.replace(/"/g, '\\"');
+      // Most globals (like window and document) aren't defined in a Worker, but the location global is.
+      const workerCode = `
+          const values = (() => eval("[${escapedCode}]"))();
+          postMessage(values);
+      `;
+      const blob = new Blob([workerCode], { type: "text/javascript" });
+      const objectURL = URL.createObjectURL(blob);
+      const worker = new Worker(objectURL);
+      worker.addEventListener("message", event => {
+        const values = event.data;
+        const analysisResults: AnalysisResults = (timeStampedPoint: TimeStampedPoint) => ({
+          executionPoint: timeStampedPoint.point,
+          isRemote: false,
+          pauseId: null,
+          time: timeStampedPoint.time,
+          values,
+        });
+
+        resolve(analysisResults);
+        clearTimeout(timeoutID);
+      });
+      worker.addEventListener("error", event => {
+        reject(event.message);
+        clearTimeout(timeoutID);
+      });
+      worker.postMessage("start");
+      const timeoutID = setTimeout(() => {
+        worker.terminate();
+        reject("Timed out");
+      }, 500);
+    });
+
+    record.status = STATUS_RESOLVED;
+    record.value = analysisResults;
+
+    wakeable.resolve(analysisResults);
+  } catch (error) {
+    record.status = STATUS_REJECTED;
+    record.value = error;
+
+    wakeable.reject(error);
+  }
+}
+
+async function runRemoteAnalysis(
   client: ReplayClientInterface,
   focusRange: PointRange | null,
   location: Location,
