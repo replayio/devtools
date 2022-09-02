@@ -4,10 +4,12 @@ import styles from "./Inspector.module.css";
 import KeyValueRenderer from "./KeyValueRenderer";
 
 export default function Inspector({
+  className,
   context,
   pauseId,
   protocolValue,
 }: {
+  className?: string;
   context: "console" | "default";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
@@ -25,7 +27,7 @@ export default function Inspector({
     return keyValue;
   } else {
     return (
-      <div className={styles.Inspector} data-test-id="InspectorRoot">
+      <div className={`${styles.Inspector} ${className || ""}`} data-test-id="InspectorRoot">
         {keyValue}
       </div>
     );

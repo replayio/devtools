@@ -39,7 +39,12 @@ export default function NewObjectInspector() {
       <InspectorContextReduxAdapter>
         <div className={`${styles.Popup} preview-popup`}>
           <Suspense fallback={<Loader />}>
-            <Inspector context="default" pauseId={pause.pauseId!} protocolValue={protocolValue} />{" "}
+            <Inspector
+              className={styles.Inspector}
+              context="default"
+              pauseId={pause.pauseId!}
+              protocolValue={protocolValue}
+            />{" "}
           </Suspense>
         </div>
       </InspectorContextReduxAdapter>
