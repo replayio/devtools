@@ -19,7 +19,7 @@ import type { PartialLocation } from "devtools/client/debugger/src/actions/sourc
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { getTextAtPosition } from "devtools/client/debugger/src/utils/source";
 import { assert } from "protocol/utils";
-import { UiState } from "devtools/client/webconsole/reducers/ui";
+import { preCacheSources } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 
 export interface SourceDetails {
   isSourceMapped: boolean;
@@ -102,6 +102,12 @@ const sourcesSlice = createSlice({
       state.allSourcesReceived = true;
 
       sourceDetailsAdapter.addMany(state.sourceDetails, newSourcesToCompleteSourceDetails(sources));
+
+      // The backend doesn't send the same source twice, nor should we request them twice (since it wastes bytes).
+      // Pre-cache source data in the new Suspense cache then so that it can use it for e.g. displaying sources in the Console.
+      //
+      // TODO [bvaughn] Will the new console code need to add some step similar to newSourcesToCompleteSourceDetails() to map between generated and corresponding sources?
+      preCacheSources(sources);
 
       const sourcesByUrl: Record<string, string[]> = {};
 
