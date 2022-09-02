@@ -3,9 +3,6 @@ import { Children, cloneElement, isValidElement, useRef, useState } from "react"
 import classNames from "classnames";
 import { motion } from "framer-motion";
 
-import { getSpacingClassNamesFromProps } from "../utils";
-import { SpacingProps } from "../types";
-
 import styles from "./Picker.module.css";
 
 export function Picker<Values extends any>({
@@ -22,8 +19,7 @@ export function Picker<Values extends any>({
   className?: string;
   style?: React.CSSProperties;
   title?: string;
-} & SpacingProps) {
-  const parsedProps = getSpacingClassNamesFromProps(props);
+}) {
   const previousId = useRef(null);
   const transitioning = useRef(false);
   const [isActive, setIsActive] = useState(false);
@@ -35,9 +31,9 @@ export function Picker<Values extends any>({
 
   return (
     <motion.div
-      {...parsedProps}
+      {...props}
       data-open={isOpen}
-      className={classNames(styles.Picker, parsedProps.className)}
+      className={classNames(styles.Picker, props.className)}
       title={isOpen ? undefined : "Select a prefix badge"}
       initial={isOpen ? "opened" : "closed"}
       animate={isOpen ? "opened" : "closed"}
