@@ -352,15 +352,17 @@ class _ThreadFront {
     const sessionId = await this.waitForSession();
 
     const allSources: newSource[] = [];
-    client.Debugger.findSources({}, sessionId).then(() => {
+    const newSourceListener = (source: newSource) => {
+      allSources.push(source);
+    };
+    client.Debugger.addNewSourceListener(newSourceListener);
+    await client.Debugger.findSources({}, sessionId);
+    if (!this.hasAllSources) {
       this.hasAllSources = true;
       this.allSourcesWaiter.resolve();
-    });
-    client.Debugger.addNewSourceListener(source => {
-      allSources.push(source);
-    });
+    }
+    client.Debugger.removeNewSourceListener(newSourceListener);
 
-    await this.ensureAllSources();
     for (const source of allSources) {
       onSource(source);
     }
