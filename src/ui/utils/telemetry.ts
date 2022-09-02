@@ -48,9 +48,23 @@ export function setupTelemetry() {
     release: process.env.REPLAY_RELEASE ? process.env.REPLAY_RELEASE : "development",
     beforeSend(event) {
       if (event) {
-        const exceptionValue = event?.exception?.values?.[0].value;
-        if (ignoreList.some(ignore => exceptionValue?.includes(ignore))) {
-          return null;
+        const exception = event.exception?.values?.[0];
+        if (exception) {
+          if (ignoreList.some(ignore => exception.value?.includes(ignore))) {
+            return null;
+          }
+          // Chrome sends errors from the browser console to window.onerror and hence
+          // to Sentry, we try to detect these and filter them out.
+          // See https://github.com/getsentry/sentry-javascript/issues/5179
+          if (exception.stacktrace?.frames?.length === 1) {
+            const frame = exception.stacktrace.frames[0];
+            if (
+              frame.function === "?" &&
+              (frame.filename === "<anonymous>" || frame.filename === window.location.href)
+            ) {
+              return null;
+            }
+          }
         }
       }
 
