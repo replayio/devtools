@@ -6,7 +6,7 @@ import Expandable from "@bvaughn/components/Expandable";
 import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
-import { Fragment, MouseEvent, useRef, useState } from "react";
+import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
@@ -31,9 +31,11 @@ function UncaughtExceptionRenderer({
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
 
-  const location = Array.isArray(uncaughtException.location)
-    ? uncaughtException.location[0]
-    : uncaughtException.location;
+  const locations = useMemo(() => {
+    return Array.isArray(uncaughtException.location)
+      ? uncaughtException.location
+      : [uncaughtException.location];
+  }, [uncaughtException.location]);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -96,7 +98,9 @@ function UncaughtExceptionRenderer({
       )}
       <Icon className={styles.ErrorIcon} type="error" />
       <span className={styles.Source}>
-        <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+        <Suspense fallback={<Loader />}>
+          {locations.length > 0 && <Source locations={locations} />}
+        </Suspense>
       </span>
       {showExpandable ? (
         <Expandable
@@ -111,7 +115,7 @@ function UncaughtExceptionRenderer({
       {isHovered && (
         <MessageHoverButton
           executionPoint={uncaughtException.point}
-          location={location}
+          locations={locations}
           showAddCommentButton={true}
           time={uncaughtException.time}
         />

@@ -52,7 +52,10 @@ function LogPointRenderer({
     show(logPointInstance, { x: event.pageX, y: event.pageY });
   };
 
-  const location = logPointInstance.point.location;
+  const locations = useMemo(
+    () => [logPointInstance.point.location],
+    [logPointInstance.point.location]
+  );
 
   // Note the Suspense key below is set to the log point expression's content/code.
   // This causes the Suspense boundary to immediately show a fallback state when content is edited,
@@ -87,13 +90,15 @@ function LogPointRenderer({
       role="listitem"
     >
       <span className={styles.Source}>
-        <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+        <Suspense fallback={<Loader />}>
+          {locations.length > 0 && <Source locations={locations} />}
+        </Suspense>
       </span>
       {primaryContent}
       {isHovered && (
         <MessageHoverButton
           executionPoint={logPointInstance.timeStampedHitPoint.point}
-          location={logPointInstance.point.location}
+          locations={locations}
           showAddCommentButton={true}
           time={logPointInstance.timeStampedHitPoint.time}
         />

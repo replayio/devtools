@@ -28,6 +28,10 @@ import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import { EMPTY_TABS } from "devtools/client/debugger/src/reducers/tabs";
 import { getCorrespondingSourceIds } from "ui/reducers/sources";
 import { ThreadFront } from "protocol/thread";
+import { replayClient } from "shared/client/ReplayClientContext";
+import { ReplayClient } from "shared/client/ReplayClient";
+import { getPreferredLocation } from "ui/utils/preferredLocation";
+import { Location } from "@replayio/protocol";
 
 declare global {
   interface Window {
@@ -129,6 +133,11 @@ export async function bootstrapApp() {
   if (typeof window === "undefined") {
     return store;
   }
+
+  // Wire up new Console and Object Inspector to the Redux logic for preferred source.
+  (replayClient as ReplayClient).injectGetPreferredLocation(
+    (locations: Location[]) => getPreferredLocation(locations) || null
+  );
 
   ThreadFront.getCorrespondingSourceIds = (sourceId: string) => {
     return getCorrespondingSourceIds(store.getState(), sourceId);

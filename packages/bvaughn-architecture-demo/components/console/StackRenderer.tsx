@@ -33,9 +33,7 @@ function StackFrameRenderer({ frameId, frames }: { frameId: FrameId; frames: Fra
     return null;
   }
 
-  const location = frame.location[0];
-  const source = location !== null ? getSource(client, location.sourceId) : null;
-  if (location == null || source == null) {
+  if (frame.location.length === 0) {
     return <div className={styles.Frame}>{frame.functionName}</div>;
   } else {
     return (
@@ -43,7 +41,7 @@ function StackFrameRenderer({ frameId, frames }: { frameId: FrameId; frames: Fra
         <span>{frame.functionName || "(anonymous)"}</span>
         <span>@</span>
         <span className={styles.SourceColumn}>
-          <Source className={styles.Source} location={location} />
+          <Source className={styles.Source} locations={frame.location} />
         </span>
       </>
     );

@@ -16,15 +16,16 @@ import {
 
 import styles from "./MessageHoverButton.module.css";
 import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export default function MessageHoverButton({
   executionPoint,
-  location,
+  locations,
   showAddCommentButton,
   time,
 }: {
   executionPoint: ExecutionPoint;
-  location: Location | null;
+  locations: Location[] | null;
   showAddCommentButton: boolean;
   time: number;
 }) {
@@ -40,6 +41,9 @@ export default function MessageHoverButton({
   const [isPending, startTransition] = useTransition();
 
   const isCurrentlyPausedAt = currentExecutionPoint === executionPoint;
+
+  const client = useContext(ReplayClientContext);
+  const location = locations ? client.getPreferredLocation(locations) : null;
 
   let button = null;
   if (isCurrentlyPausedAt) {
