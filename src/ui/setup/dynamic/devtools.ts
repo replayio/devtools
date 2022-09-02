@@ -116,7 +116,7 @@ const SessionErrorMessages: Record<number, Partial<UnexpectedError>> = {
   },
   [SessionError.OldBuild]: {
     content:
-      "This recording is no longer available because we have updated Replay. We apologise for the inconvenience.",
+      "This recording is no longer available because we have updated Replay. Please try recording a new replay.",
   },
   [SessionError.LongRecording]: {
     content: "You’ve hit an error that happens with long recordings. Can you try a shorter one?",
