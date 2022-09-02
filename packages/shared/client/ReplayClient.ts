@@ -600,7 +600,6 @@ export class ReplayClient implements ReplayClientInterface {
   async runAnalysis<Result>(params: RunAnalysisParams): Promise<Result[]> {
     return new Promise<Result[]>(async (resolve, reject) => {
       const results: Result[] = [];
-      let resultReceived = false;
 
       const { location, ...rest } = params;
 
@@ -620,18 +619,11 @@ export class ReplayClient implements ReplayClientInterface {
             reject(errorMessage);
           },
           onAnalysisResult: analysisEntries => {
-            resultReceived = true;
             results.push(...analysisEntries.map(entry => entry.value));
           },
         });
 
-        if (resultReceived) {
-          resolve(results);
-        } else {
-          // No result was returned.
-          // This might happen when e.g. exceptions are being queried for a recording with no exceptions.
-          resolve([]);
-        }
+        resolve(results);
       } catch (error) {
         reject(error);
       }
