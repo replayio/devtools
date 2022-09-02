@@ -5,5 +5,7 @@
 }
 
 .Inspector {
-  overflow-x: auto;
+  max-height: 250px;
+  max-width: 400px;
+  overflow: auto;
 }
