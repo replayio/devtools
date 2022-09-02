@@ -13,6 +13,9 @@ import {
   childrenAdded,
   newRootAdded,
   nodeSelected,
+  nodeHighlighted,
+  nodeBoxModelLoaded,
+  nodeHighlightingCleared,
   updateChildrenLoading,
   updateNodeExpanded,
   updateScrollIntoViewNode,
@@ -28,9 +31,9 @@ import {
 
 import { paused } from "devtools/client/debugger/src/reducers/pause";
 
-import Highlighter from "highlighter/highlighter";
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
+import { clearTimeout } from "timers";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
@@ -447,16 +450,32 @@ export function onPageDownKey(): UIThunkAction {
   };
 }
 
-// This doesn't even need to be in Redux
-let hoveredNodeId: string | null = null;
+let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 
 export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    if (hoveredNodeId !== nodeId) {
-      hoveredNodeId = nodeId;
-      const node = await ThreadFront.ensureNodeLoaded(nodeId);
-      if (node) {
-        Highlighter.highlight(node, duration);
+    const { highlightedNode, nodeBoxModels } = getState().markup;
+    if (highlightedNode !== nodeId) {
+      dispatch(nodeHighlighted(nodeId));
+
+      if (!(nodeId in nodeBoxModels.entities)) {
+        const node = await ThreadFront.ensureNodeLoaded(nodeId);
+        if (node) {
+          const boxModel = await node.getBoxModel();
+          if (boxModel) {
+            dispatch(nodeBoxModelLoaded(boxModel));
+          }
+        }
+      }
+
+      if (unhighlightTimer) {
+        clearTimeout(unhighlightTimer);
+      }
+
+      if (duration) {
+        unhighlightTimer = setTimeout(() => {
+          dispatch(unhighlightNode());
+        }, duration);
       }
     }
   };
@@ -464,8 +483,7 @@ export function highlightNode(nodeId: string, duration?: number): UIThunkAction 
 
 export function unhighlightNode(): UIThunkAction {
   return async (dispatch, getState) => {
-    hoveredNodeId = null;
-    Highlighter.unhighlight();
+    dispatch(nodeHighlightingCleared());
   };
 }
 

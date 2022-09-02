@@ -362,7 +362,7 @@ export class NodeFront {
 
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
 
-function buildBoxQuads(array: Quads) {
+export function buildBoxQuads(array: Quads) {
   assert(array.length % 8 == 0, "quads length must be a multiple of 8");
   array = [...array];
   const rv = [];

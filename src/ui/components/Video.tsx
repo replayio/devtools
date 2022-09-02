@@ -14,6 +14,7 @@ import MaterialIcon from "./shared/MaterialIcon";
 import { setShowVideoPanel } from "ui/actions/layout";
 import { getViewMode } from "ui/reducers/layout";
 import Tooltip from "./shared/Tooltip";
+import { PreviewNodeHighlighter } from "devtools/client/inspector/markup/components/PreviewNodeHighlighter";
 
 const HideVideoButton: FC = () => {
   const dispatch = useAppDispatch();
@@ -109,7 +110,9 @@ function Video({
         </CommentsOverlay>
       ) : null}
       {isNodePickerInitializing ? <Tooltip label="Loading…" targetID="video" /> : null}
-      <div id="highlighter-root"></div>
+      <div id="highlighter-root">
+        <PreviewNodeHighlighter />
+      </div>
       {viewMode === "dev" ? <HideVideoButton /> : null}
     </div>
   );

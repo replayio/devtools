@@ -30,8 +30,8 @@ const getNodeDisplayName = function (rawNode: HTMLElement) {
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
-const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"];
-const BOX_MODEL_SIDES = ["top", "right", "bottom", "left"];
+const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"] as const;
+const BOX_MODEL_SIDES = ["top", "right", "bottom", "left"] as const;
 // Width of boxmodelhighlighter guides
 const GUIDE_STROKE_WIDTH = 1;
 

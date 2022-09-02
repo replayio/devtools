@@ -12,8 +12,8 @@ import { NodeBoundsFront } from "protocol/thread/bounds";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
-const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"] as const;
-const QUADS_PROPS = ["p1", "p2", "p3", "p4"] as const;
+export const BOX_MODEL_REGIONS = ["margin", "border", "padding", "content"] as const;
+export const QUADS_PROPS = ["p1", "p2", "p3", "p4"] as const;
 
 function arePointsDifferent(pointA: DOMPoint, pointB: DOMPoint) {
   return (

@@ -1,4 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
+import { BoxModel } from "@replayio/protocol";
 // Side-effectful import - needed to initialize these prefs
 import "devtools/client/inspector/prefs";
 const Services = require("devtools/shared/services");
@@ -64,6 +65,8 @@ export interface MarkupState {
   selectedNode: string | null;
   // A node that should be scrolled into view.
   scrollIntoViewNode: string | null;
+  highlightedNode: string | null;
+  nodeBoxModels: EntityState<BoxModel>;
   // An object representing the markup tree. The key to the object represents the object
   // ID of a NodeFront of a given node. The value of each item in the object contains
   // an object representing the properties of the given node.
@@ -71,6 +74,13 @@ export interface MarkupState {
 }
 
 const nodeAdapter = createEntityAdapter<NodeInfo>();
+const boxModelAdapter = createEntityAdapter<BoxModel>({
+  selectId: boxModel => boxModel.node,
+});
+
+export const { selectById: selectNodeBoxModelById } = boxModelAdapter.getSelectors(
+  (state: UIState) => state.markup.nodeBoxModels
+);
 
 const initialState: MarkupState = {
   collapseAttributes: Services.prefs.getBoolPref(ATTR_COLLAPSE_ENABLED_PREF),
@@ -78,6 +88,8 @@ const initialState: MarkupState = {
   rootNode: null,
   selectedNode: null,
   scrollIntoViewNode: null,
+  highlightedNode: null,
+  nodeBoxModels: boxModelAdapter.getInitialState(),
   tree: nodeAdapter.getInitialState(),
 };
 
@@ -118,6 +130,15 @@ const markupSlice = createSlice({
     updateScrollIntoViewNode(state, action: PayloadAction<string | null>) {
       state.scrollIntoViewNode = action.payload;
     },
+    nodeHighlighted(state, action: PayloadAction<string>) {
+      state.highlightedNode = action.payload;
+    },
+    nodeBoxModelLoaded(state, action: PayloadAction<BoxModel>) {
+      boxModelAdapter.addOne(state.nodeBoxModels, action);
+    },
+    nodeHighlightingCleared(state) {
+      state.highlightedNode = null;
+    },
   },
   extraReducers: builder => {
     // dispatched by actions/timeline.ts, in `playback()`
@@ -136,6 +157,9 @@ export const {
   updateChildrenLoading,
   nodeSelected,
   updateScrollIntoViewNode,
+  nodeHighlighted,
+  nodeBoxModelLoaded,
+  nodeHighlightingCleared,
 } = markupSlice.actions;
 
 export default markupSlice.reducer;

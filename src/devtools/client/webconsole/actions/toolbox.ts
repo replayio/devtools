@@ -33,12 +33,10 @@ export function highlightDomElement(grip: $FixTypeLater): UIThunkAction {
 }
 
 export function unHighlightDomElement(): UIThunkAction {
-  return async () => {
-    const { highlighter } = await import("highlighter/highlighter");
+  return async dispatch => {
+    const { unhighlightNode } = await import("devtools/client/inspector/markup/actions/markup");
 
-    if (highlighter) {
-      highlighter.unhighlight();
-    }
+    dispatch(unhighlightNode());
   };
 }
 
