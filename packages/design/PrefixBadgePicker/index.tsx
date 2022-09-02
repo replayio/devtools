@@ -1,134 +1,78 @@
-import type { ComponentProps, ReactNode } from "react";
-import { Children, cloneElement, isValidElement, useRef, useState } from "react";
+import type { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
+import * as React from "react";
 import classNames from "classnames";
 import { motion } from "framer-motion";
+import { Picker } from "./Picker";
 
-import styles from "./Picker.module.css";
+import styles from "./PrefixBadgePicker.module.css";
 
-export function Picker<Values extends any>({
-  value,
-  onChange,
-  children,
-  backgroundColor,
-  ...props
+export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as const;
+
+/**
+ * Allows picking a prefix badge for identifying console messages more easily.
+ * Used in PanelEditor when a log point is being added.
+ */
+export function PrefixBadgePicker({
+  initialValue,
+  onSelect,
 }: {
-  value: Values;
-  onChange: (value: Values) => void;
-  children: ReactNode;
-  backgroundColor?: string;
-  className?: string;
-  style?: React.CSSProperties;
-  title?: string;
+  /** The current selected badge. */
+  initialValue?: PrefixBadge | undefined;
+
+  /** Callback when a badge has been selected. */
+  onSelect?: (prefixBadge?: PrefixBadge) => void;
 }) {
-  const previousId = useRef(null);
-  const transitioning = useRef(false);
-  const [isActive, setIsActive] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const transition = {
-    duration: isOpen ? 0.16 : 0.2,
-    opacity: { duration: isOpen ? 0.1 : 0.04 },
+  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | undefined>(initialValue);
+  const handleSelect = (prefixBadgeName: PrefixBadge | undefined) => {
+    setActiveBadge(prefixBadgeName);
+    onSelect?.(prefixBadgeName);
   };
 
   return (
-    <motion.div
-      {...props}
-      data-open={isOpen}
-      className={classNames(styles.Picker, props.className)}
-      title={isOpen ? undefined : "Select a prefix badge"}
-      initial={isOpen ? "opened" : "closed"}
-      animate={isOpen ? "opened" : "closed"}
-      onMouseEnter={() => setIsActive(true)}
-      onMouseLeave={() => !isOpen && !transitioning.current && setIsActive(false)}
-      variants={{
-        opened: {
-          transition: {
-            staggerChildren: 0.02,
-          },
-        },
-        closed: {
-          transition: {
-            staggerChildren: 0.02,
-          },
-        },
-      }}
-    >
-      <motion.div
+    <div className="z-10 flex" style={{ width: 26, height: 26 }}>
+      <Picker<PrefixBadge | undefined>
+        value={activeBadge}
+        onChange={handleSelect}
+        className={styles.PrefixBadgePicker}
+      >
+        <ToggleButton id="toggle" />
+        {badges.map(badge => (
+          <motion.button
+            key={badge}
+            id={badge}
+            variants={{
+              active: { scale: 1 },
+              opened: { scale: 1 },
+              closed: { scale: 0.82 },
+            }}
+            className={styles.PrefixBadge}
+          >
+            <motion.div
+              className={
+                badge === "unicorn"
+                  ? styles.UnicornBadge
+                  : classNames(styles.ColorBadge, styles[badge])
+              }
+            />
+          </motion.button>
+        ))}
+      </Picker>
+    </div>
+  );
+}
+
+function ToggleButton(props: React.ComponentProps<typeof motion.button>) {
+  return (
+    <motion.button {...props} className={classNames(styles.PrefixBadge, props.className)}>
+      <motion.span
         layout
-        transition={transition}
-        className={styles.PickerFill}
-        style={{
-          borderRadius: 32,
-          backgroundColor: isActive ? "var(--badge-background--active)" : "var(--badge-background)",
+        variants={{
+          opened: { width: "0.5rem", height: "0.1rem" },
+          closed: { width: "0.3rem", height: "0.3rem" },
         }}
+        transition={{ duration: 0.16 }}
+        className={styles.DefaultBadge}
       />
-      {Children.toArray(children).map(child => {
-        if (!isValidElement(child)) {
-          throw Error("Picker children must be a valid React element.");
-        }
-
-        if (!child.props.id) {
-          const name = typeof child.type === "string" ? child.type : child.type.name;
-          throw Error(`Immediate Picker child "${name}" must pass an "id" prop.`);
-        }
-
-        const isToggle = child.props.id === "toggle";
-        const showToggle = value === undefined && isToggle;
-        const isChildActive = value === child.props.id || showToggle;
-        const wasChildActive = previousId.current === child.props.id;
-        const childVariants = child.props.variants || {};
-        const onSelect = () => {
-          const nextIsOpen = !isOpen;
-
-          setIsOpen(nextIsOpen);
-
-          if (nextIsOpen) {
-            setIsActive(true);
-          } else {
-            /** Wait until the fill is finished animating before removing the active background color. */
-            setTimeout(() => {
-              setIsActive(false);
-              transitioning.current = false;
-            }, transition.duration * 1000);
-
-            transitioning.current = true;
-          }
-
-          const nextActiveId = isToggle ? undefined : child.props.id;
-
-          previousId.current = isChildActive ? child.props.id : undefined;
-
-          onChange(nextActiveId);
-        };
-
-        return cloneElement(child, {
-          disabled: !isOpen && !isChildActive,
-          layout: "position",
-          variants: {
-            opened: {
-              ...childVariants.opened,
-              opacity: 1,
-            },
-            closed: {
-              ...childVariants.closed,
-              scale: isChildActive ? 1 : childVariants.closed?.scale,
-              opacity: isChildActive ? 1 : 0,
-            },
-          },
-          transition: {
-            ...transition,
-            ...child.props.transition,
-          },
-          style: {
-            zIndex: isChildActive || wasChildActive ? 10 : 1,
-            gridColumn: isOpen ? undefined : 1,
-            gridRow: 1,
-            ...child.props.style,
-          },
-          onClick: onSelect,
-          "data-is-active": isChildActive,
-          "data-was-active": wasChildActive,
-        } as ComponentProps<typeof motion.button>);
-      })}
-    </motion.div>
+    </motion.button>
   );
 }
