@@ -143,11 +143,60 @@ export function PreviewNodeHighlighter() {
     }
   }
 
+  // The original highlighter logic supported showing guides for all regions,
+  // but as of 2022-09, only seems to show them for the content area.
+  // Mimicking that behavior here.
+  const guideRegionsToShow = ["content"] as const;
+
+  const renderedGuides = guideRegionsToShow.map(region => {
+    const quad = getOuterQuad(region, boxModelQuads);
+
+    if (!quad) {
+      return null;
+    }
+
+    const { p1, p2, p3, p4 } = quad;
+
+    const allX = [p1.x, p2.x, p3.x, p4.x].sort((a, b) => a - b);
+    const allY = [p1.y, p2.y, p3.y, p4.y].sort((a, b) => a - b);
+
+    const sides = {
+      left: allX[0],
+      right: allX[3] - 1,
+      top: allY[0],
+      bottom: allY[3] - 1,
+    } as const;
+
+    return Object.entries(sides).map(([side, coord]) => {
+      if (coord <= 0) {
+        return null;
+      }
+      const isHorizontal = side === "top" || side === "bottom";
+      const coordString = `${coord}`;
+
+      const coords = isHorizontal
+        ? {
+            x1: "0",
+            y1: coordString,
+            x2: "100%",
+            y2: coordString,
+          }
+        : {
+            x1: coordString,
+            y1: "0",
+            x2: coordString,
+            y2: "100%",
+          };
+      return <line key={side} className={`box-model-guide-${side}`} {...coords} />;
+    });
+  });
+
   return (
     <div className="highlighter-container" aria-hidden="true" style={containerStyle}>
       <div id="box-model-root" className="box-model-root">
         <svg className="box-model-elements" style={{ width: "100%", height: "100%" }}>
           <g className="box-model-regions">{renderedPaths}</g>
+          {renderedGuides}
           {/* <line className="box-model-guide-top" x1="..." y1="..." x2="..." y2="..." />
           <line className="box-model-guide-right" x1="..." y1="..." x2="..." y2="..." />
           <line className="box-model-guide-bottom" x1="..." y1="..." x2="..." y2="..." />
