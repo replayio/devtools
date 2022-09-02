@@ -51,8 +51,6 @@ function EventLogRenderer({
     className = `${className} ${styles.Focused}`;
   }
 
-  const location = eventLog.location[0];
-
   const content =
     values.length > 0
       ? values.map((value, index) => (
@@ -95,13 +93,15 @@ function EventLogRenderer({
         onMouseLeave={() => setIsHovered(false)}
       >
         <span className={styles.Source}>
-          <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+          <Suspense fallback={<Loader />}>
+            <Source locations={eventLog.location} />
+          </Suspense>
         </span>
         {primaryContent}
         {isHovered && (
           <MessageHoverButton
             executionPoint={eventLog.point}
-            location={location}
+            locations={eventLog.location}
             showAddCommentButton={true}
             time={eventLog.time}
           />

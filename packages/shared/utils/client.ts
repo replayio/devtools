@@ -3,7 +3,7 @@ import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
 import { decode } from "shared/client/encoder";
 import { ReplayClient } from "shared/client/ReplayClient";
-import { LogEntry, ReplayClientInterface } from "shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { hasFlag } from "./url";
 

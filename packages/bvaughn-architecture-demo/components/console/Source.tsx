@@ -8,13 +8,19 @@ import styles from "./Source.module.css";
 
 export default function Source({
   className = "",
-  location,
+  locations,
 }: {
   className?: string;
-  location: ProtocolLocation;
+  locations: ProtocolLocation[];
 }) {
   const { inspectFunctionDefinition } = useContext(InspectorContext);
   const client = useContext(ReplayClientContext);
+
+  const location = client.getPreferredLocation(locations);
+  if (location == null) {
+    return null;
+  }
+
   const source = getSource(client, location.sourceId);
   if (source == null) {
     return null;

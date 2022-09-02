@@ -100,7 +100,7 @@ function TerminalExpressionRenderer({
       {isHovered && (
         <MessageHoverButton
           executionPoint={terminalExpression.point}
-          location={null}
+          locations={null}
           showAddCommentButton={false}
           time={terminalExpression.time}
         />

@@ -29,7 +29,7 @@ import {
   Result,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
-import analysisManager, { AnalysisParams } from "protocol/analysisManager";
+import analysisManager from "protocol/analysisManager";
 // eslint-disable-next-line no-restricted-imports
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -51,11 +51,12 @@ import {
 // Should we force serialization?
 // Should we cancel in-flight requests and start new ones?
 
-type WaitUntilLoadedCallbacks = () => boolean;
+type GetPreferredLocation = (locations: Location[]) => Location | null;
 
 export class ReplayClient implements ReplayClientInterface {
   private _dispatchURL: string;
   private _eventHandlers: Map<ReplayClientEvents, Function[]> = new Map();
+  private _injectedGetPreferredLocation: GetPreferredLocation | null = null;
   private _loadedRegions: LoadedRegions | null = null;
   private _recordingId: RecordingId | null = null;
   private _sessionId: SessionId | null = null;
@@ -171,6 +172,12 @@ export class ReplayClient implements ReplayClientInterface {
     client.Session.addKeyboardEventsListener(onKeyboardEvents);
     await client.Session.findKeyboardEvents({}, sessionId!);
     client.Session.removeKeyboardEventsListener(onKeyboardEvents);
+  }
+
+  // Allows legacy app to inject Redux source/location data into the client.
+  // TODO [bvaughn] This is a stop-gap; we should move this logic into the new architecture somehow.
+  injectGetPreferredLocation(getPreferredLocation: GetPreferredLocation) {
+    this._injectedGetPreferredLocation = getPreferredLocation;
   }
 
   async findMessages(focusRange: TimeStampedPointRange | null): Promise<{
@@ -446,6 +453,14 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
     return point;
+  }
+
+  getPreferredLocation(locations: Location[]): Location | null {
+    if (this._injectedGetPreferredLocation != null) {
+      return this._injectedGetPreferredLocation(locations);
+    }
+
+    return locations[0] || null;
   }
 
   getRecordingId(): RecordingId | null {

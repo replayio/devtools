@@ -54,7 +54,6 @@ function MessageRenderer({
 
   const frames = message.data.frames || EMPTY_ARRAY;
   const frame = frames.length > 0 ? frames[frames.length - 1] : null;
-  const location = frame ? frame.location[0] : null;
 
   let className = styles.Row;
   let icon = null;
@@ -131,7 +130,9 @@ function MessageRenderer({
         )}
         {icon}
         <span className={styles.Source}>
-          <Suspense fallback={<Loader />}>{location && <Source location={location} />}</Suspense>
+          <Suspense fallback={<Loader />}>
+            {frame?.location?.length > 0 && <Source locations={frame.location} />}
+          </Suspense>
         </span>
         {frame != null && message.stack != null && showExpandable ? (
           <Expandable
@@ -147,7 +148,7 @@ function MessageRenderer({
         {isHovered && (
           <MessageHoverButton
             executionPoint={message.point.point}
-            location={location}
+            locations={frame?.location || null}
             showAddCommentButton={true}
             time={message.point.time}
           />
