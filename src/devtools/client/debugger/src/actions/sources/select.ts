@@ -132,9 +132,10 @@ export function selectLocation(
     if (location.sourceUrl && location.sourceUrl !== source?.url) {
       await ThreadFront.ensureAllSources();
       const state = getState();
-      const sourceId = getSourceToDisplayForUrl(state, location.sourceUrl)!.id;
-      source = getSourceDetails(state, sourceId);
-      location = { ...location, sourceId };
+      source = getSourceToDisplayForUrl(state, location.sourceUrl);
+      if (source) {
+        location = { ...location, sourceId: source.id };
+      }
     }
     if (!source) {
       // If there is no source we deselect the current selected source
