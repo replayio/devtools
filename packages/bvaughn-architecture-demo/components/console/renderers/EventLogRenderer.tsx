@@ -61,7 +61,7 @@ function EventLogRenderer({
             {index < values.length - 1 && " "}
           </Fragment>
         ))
-      : " ";
+      : null;
 
   const showContextMenu = (event: MouseEvent) => {
     event.preventDefault();
@@ -73,7 +73,11 @@ function EventLogRenderer({
       {showTimestamps && (
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
-      <span className={styles.LogContents}>{content}</span>
+      {content ? (
+        <span className={styles.LogContents}>{content}</span>
+      ) : (
+        <span className={styles.LogContentsEmpty}>No data to display.</span>
+      )}
     </>
   );
 
