@@ -3,6 +3,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState, ZoomRegion } from "ui/state/timeline";
 import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/utils/timeline";
+import sortBy from "lodash/sortBy";
 
 function initialTimelineState(): TimelineState {
   return {
@@ -49,8 +50,10 @@ const timelineSlice = createSlice({
       let actionIndex = 0;
       let stateIndex = 0;
 
-      while (actionIndex < action.payload.length) {
-        const actionPoint = action.payload[actionIndex];
+      const received = sortBy(action.payload, x => BigInt(x.point));
+
+      while (actionIndex < received.length) {
+        const actionPoint = received[actionIndex];
 
         let stateIndexPoint = state.points[stateIndex];
 
