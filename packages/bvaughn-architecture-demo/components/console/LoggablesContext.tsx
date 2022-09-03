@@ -11,7 +11,6 @@ import { isInNodeModules } from "@bvaughn/src/utils/messages";
 import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { EventHandlerType } from "@replayio/protocol";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import {
   createContext,
   MutableRefObject,

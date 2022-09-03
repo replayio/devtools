@@ -34,7 +34,7 @@ import {
   getZoomRegion,
   getShowFocusModeControls,
   setPlaybackPrecachedTime,
-  pointsReceived,
+  pointsReceivedThunk,
 } from "ui/reducers/timeline";
 import { FocusRegion, HoveredItem } from "ui/state/timeline";
 import {
@@ -100,7 +100,7 @@ export async function setupTimeline(store: UIStore) {
 export function jumpToInitialPausePoint(): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const endpoint = await replayClient.getSessionEndpoint(replayClient.getSessionId()!);
-    dispatch(pointsReceived([endpoint]));
+    dispatch(pointsReceivedThunk([endpoint]));
     let { point, time } = endpoint;
 
     const state = getState();
@@ -198,7 +198,7 @@ export function setTimelineToTime(time: number | null, updateGraphics = true): U
   };
 }
 
-function updatePausePointParams({
+export function updatePausePointParams({
   point,
   time,
   hasFrames,
@@ -234,6 +234,7 @@ export function seek(
       ThreadFront.timeWarpToPause(pause);
     } else {
       const regions = getLoadedRegions(getState());
+      const focusRegion = getFocusRegion(getState());
       const isTimeInLoadedRegion = regions !== null && isTimeInRegions(time, regions.loaded);
       if (isTimeInLoadedRegion) {
         ThreadFront.timeWarp(point, time, hasFrames);
@@ -242,6 +243,7 @@ export function seek(
         // In this case the best we can do is update the current time and the "video" frame.
         dispatch(setTimelineState({ currentTime: time }));
         dispatch(setTimelineToTime(time, true));
+        updatePausePointParams({ point, time, hasFrames, focusRegion });
       }
     }
     return true;

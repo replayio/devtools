@@ -27,7 +27,7 @@ import reactDevTools from "ui/reducers/reactDevTools";
 import timeline, {
   allPaintsReceived,
   paintsReceived,
-  pointsReceived,
+  pointsReceivedThunk,
   setPlaybackStalled,
 } from "ui/reducers/timeline";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
@@ -39,6 +39,7 @@ import {
   setRefreshGraphicsCallback,
   setVideoUrlCallback,
 } from "protocol/graphics";
+import { setPointsReceivedCallback as setAnalysisPointsReceivedCallback } from "protocol/analysisManager";
 
 import { extendStore, AppStore } from "../store";
 import { startAppListening } from "../listenerMiddleware";
@@ -257,12 +258,17 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   let points: TimeStampedPoint[] = [];
 
   const onPointsReceived = debounce(() => {
-    store.dispatch(pointsReceived(points));
+    store.dispatch(pointsReceivedThunk(points));
     store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
     points = [];
   }, 1_000);
 
   setPointsReceivedCallback(newPoints => {
+    points.push(...newPoints);
+    onPointsReceived();
+  });
+
+  setAnalysisPointsReceivedCallback(newPoints => {
     points.push(...newPoints);
     onPointsReceived();
   });

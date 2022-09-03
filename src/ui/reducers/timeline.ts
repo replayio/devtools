@@ -1,14 +1,14 @@
 import { TimeStampedPoint } from "@replayio/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
-import { FocusRegion, HoveredItem, TimelineState, ZoomRegion } from "ui/state/timeline";
 import {
   displayedEndForFocusRegion,
   displayedBeginForFocusRegion,
   mergeSortedPointLists,
 } from "ui/utils/timeline";
+import { FocusRegion, HoveredItem, TimelineState, UnsafeFocusRegion } from "ui/state/timeline";
 import sortBy from "lodash/sortBy";
-import maxBy from "lodash/maxBy";
+import { UIThunkAction } from "ui/actions";
 
 function initialTimelineState(): TimelineState {
   return {
@@ -71,6 +71,12 @@ const timelineSlice = createSlice({
   },
 });
 
+// If abs(A - B) > EPSILON, then A and B are considered different.
+// If abs(A - B) < EPSILON, then A and B are considered equal.
+const EPSILON = 0.0001;
+// returns true is A is less than B, and the difference is greater than EPSILON
+const lessThan = (a: number, b: number) => b - a > EPSILON;
+
 export const {
   allPaintsReceived,
   setHoveredItem,
@@ -81,6 +87,41 @@ export const {
   pointsReceived,
   paintsReceived,
 } = timelineSlice.actions;
+
+export const pointsReceivedThunk = (points: TimeStampedPoint[]): UIThunkAction => {
+  return (dispatch, getState) => {
+    const state = getState() as UIState;
+    dispatch(pointsReceived(points));
+    const focusRegion = getFocusRegion(state) as UnsafeFocusRegion | null;
+    if (!focusRegion) {
+      return;
+    }
+    // If we have just received points that we did not know about, those points
+    // might represent a better fit for the user-requested focus window than
+    // whatever points we were using before. If so, we will narrow the focus
+    // region down farther to the best-found points. However, in the case that
+    // we might be mucking about with time beyond the precision of floating
+    // point numbers, we should just chill, we are close enough to the user
+    // specified boundary (hence the epsilon check).
+    // See https://github.com/replayio/devtools/pull/7666 for more info.
+    const betterFocusStart = points.find(
+      p =>
+        BigInt(focusRegion.begin.point) < BigInt(p.point) && lessThan(p.time, focusRegion.beginTime)
+    );
+    const betterFocusEnd = points.find(
+      p => BigInt(p.point) < BigInt(focusRegion.end.point) && lessThan(focusRegion.endTime, p.time)
+    );
+    if (betterFocusStart || betterFocusEnd) {
+      dispatch(
+        setFocusRegion({
+          ...focusRegion,
+          begin: betterFocusStart || focusRegion.begin,
+          end: betterFocusEnd || focusRegion.end,
+        })
+      );
+    }
+  };
+};
 
 export default timelineSlice.reducer;
 

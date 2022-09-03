@@ -1,3 +1,4 @@
+import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import {
   addEventHandlerEntryPointsParameters,
   addFunctionEntryPointsParameters,
@@ -10,6 +11,7 @@ import {
   ExecutionPoint,
   PointDescription,
   PointRange,
+  TimeStampedPoint,
 } from "@replayio/protocol";
 import { addEventListener } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -85,6 +87,11 @@ export interface AnalysisHandler<T> {
 
 // When running analyses in batches, limit on the points to use in each batch.
 const MaxPointsPerBatch = MAX_POINTS_FOR_FULL_ANALYSIS;
+
+let onPointsReceived: (points: TimeStampedPoint[]) => void;
+export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
+  onPointsReceived = callback;
+}
 
 class AnalysisManager {
   private handlers = new Map<AnalysisId, AnalysisHandler<any>>();
@@ -208,9 +215,17 @@ class AnalysisManager {
   };
 
   private readonly onAnalysisPoints = ({ analysisId, points }: analysisPoints) => {
+    if (typeof onPointsReceived === "function") {
+      onPointsReceived(points);
+    }
     const handler = this.handlers.get(analysisId);
+    points.forEach(point => {
+      preCacheExecutionPointForTime(point);
+      if (handler != null && typeof handler.onAnalysisPoints === "function") {
+        ThreadFront.updateMappedLocation(point.frame);
+      }
+    });
     if (handler != null && typeof handler.onAnalysisPoints === "function") {
-      points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
       handler.onAnalysisPoints(points);
     }
   };
