@@ -359,6 +359,9 @@ export function getPreferredLocation(
   locations: MappedLocation,
   preferredGeneratedSources: Set<string>
 ) {
+  if (!state.sources.allSourcesReceived) {
+    return locations[0];
+  }
   const sourceId = getPreferredSourceId(
     getSourceDetailsEntities(state),
     locations.map(l => l.sourceId),
