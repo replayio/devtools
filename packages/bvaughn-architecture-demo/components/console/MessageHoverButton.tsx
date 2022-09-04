@@ -32,7 +32,7 @@ export default function MessageHoverButton({
   const ref = useRef<HTMLButtonElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
-  const { inspectFunctionDefinition } = useContext(InspectorContext);
+  const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
   const { accessToken, recordingId } = useContext(SessionContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { executionPoint: currentExecutionPoint, update } = useContext(TimelineContext);
@@ -50,6 +50,9 @@ export default function MessageHoverButton({
     if (showAddCommentButton && accessToken) {
       const addCommentTransition = () => {
         startTransition(async () => {
+          if (showCommentsPanel !== null) {
+            showCommentsPanel();
+          }
           await addCommentGraphQL(graphQLClient, accessToken, recordingId, {
             content: "",
             hasFrames: true,
