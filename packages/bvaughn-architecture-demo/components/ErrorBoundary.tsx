@@ -27,7 +27,8 @@ export default class ErrorBoundary extends Component<PropsWithChildren<{}>, Erro
           <ReplayLogo />
           <div className={styles.Header}>Our apologies!</div>
           <div className={styles.Message}>
-            Something went wrong while replaying, we'll look into it as soon as possible.
+            <p>Something went wrong while replaying.</p>
+            <p>We'll look into it as soon as possible.</p>
           </div>
         </div>
       );

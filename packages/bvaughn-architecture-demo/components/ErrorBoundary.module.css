@@ -3,6 +3,7 @@
   text-align: center;
   background-color: var(--background-color-error);
   color: var(--color-default);
+  grid-column: 2;
 }
 
 .Logo {
