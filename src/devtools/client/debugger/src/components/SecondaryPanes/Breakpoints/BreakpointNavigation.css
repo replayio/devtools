@@ -17,7 +17,8 @@
 }
 
 .breakpoint-navigation-commands > * {
-  padding: 4px;
+  padding: 0 4px;
+  height: 20px;
 }
 
 .breakpoint-navigation-commands > *:hover:not(.disabled) {
@@ -37,6 +38,8 @@
 }
 
 .breakpoint-navigation-status-container {
+  margin-top: 1px;
+  height: 19px;
   min-width: 50px;
   display: flex;
   justify-content: flex-end;
