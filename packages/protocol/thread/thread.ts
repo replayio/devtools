@@ -48,6 +48,7 @@ import { defer, assert, EventEmitter } from "../utils";
 
 import { Pause } from "./pause";
 import { ValueFront } from "./value";
+import { isInLoadedRegion } from "devtools/client/debugger/src/utils/pause";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -482,7 +483,7 @@ class _ThreadFront {
       : this.getCurrentPause();
   }
 
-  async loadAsyncParentFrames() {
+  async loadAsyncParentFrames(loadedRegions: LoadedRegions) {
     await this.getCurrentPause().ensureLoaded();
     const basePause = this.lastAsyncPause();
     assert(basePause, "no lastAsyncPause");
@@ -494,6 +495,11 @@ class _ThreadFront {
     if (basePause != this.lastAsyncPause()) {
       return [];
     }
+
+    if (!isInLoadedRegion(steps[0].point)) {
+      return [];
+    }
+
     const entryPause = this.ensurePause(steps[0].point, steps[0].time);
     this.asyncPauses.push(entryPause);
     const frames = await entryPause.getFrames();

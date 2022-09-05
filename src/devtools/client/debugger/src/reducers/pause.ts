@@ -208,9 +208,10 @@ export const fetchAsyncFrames = createAsyncThunk<
   { state: UIState; extra: ThunkExtraArgs }
 >(
   "pause/fetchAsyncFrames",
-  async ({ cx }, thunkApi) => {
+  async ({}, thunkApi) => {
     const { ThreadFront } = thunkApi.extra;
     let asyncFrames: PauseFrame[] = [];
+    const loadedRegions = getLoadedRegions(thunkApi.getState())!;
 
     // How many times to fetch an async set of parent frames.
     const MAX_ASYNC_FRAME_GROUPS = 5;
@@ -220,7 +221,7 @@ export const fetchAsyncFrames = createAsyncThunk<
     // so the first group of async frames is group 1.
     // These are used to generate frame IDs, such as `"2:3"` (third frame in group 2)
     for (let asyncIndex = 1; asyncIndex <= MAX_ASYNC_FRAME_GROUPS; asyncIndex++) {
-      const frames = await ThreadFront.loadAsyncParentFrames();
+      const frames = await ThreadFront.loadAsyncParentFrames(loadedRegions);
 
       if (!frames.length) {
         break;

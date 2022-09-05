@@ -19,11 +19,12 @@ import {
   SettingsTabTitle,
   AppMode,
 } from "ui/state/app";
-import { PanelName } from "ui/state/layout";
 import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { compareBigInt } from "ui/utils/helpers";
 import { prefs } from "ui/utils/prefs";
+import { isInLoadedRegion } from "devtools/client/debugger/src/utils/pause";
+
 import {
   displayedEndForFocusRegion,
   isPointInRegions,
@@ -371,13 +372,6 @@ export const isPointInLoadingRegion = createSelector(
   getLoadedRegions,
   (_state: UIState, executionPoint: string) => executionPoint,
   (regions: LoadedRegions | null, executionPoint: string) => {
-    return (
-      regions !== null &&
-      regions.loading.some(
-        ({ begin, end }) =>
-          BigInt(executionPoint) >= BigInt(begin.point) &&
-          BigInt(executionPoint) <= BigInt(end.point)
-      )
-    );
+    return isInLoadedRegion(regions, executionPoint);
   }
 );
