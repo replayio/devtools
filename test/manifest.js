@@ -144,6 +144,9 @@ module.exports = [
     example: "cra/dist/index.html",
     script: "sourcemap_stacktrace.js",
     targets: ["gecko", "chromium"],
+
+    // Disabled because this test only works with the new console
+    disabled: true,
   },
   {
     example: "node/basic.js",
@@ -206,6 +209,9 @@ module.exports = [
     example: "doc_rr_objects.html",
     script: "object_preview-01.js",
     targets: ["gecko", "chromium"],
+
+    // Disabled because this test only works with the new console
+    disabled: true,
   },
   {
     example: "doc_rr_objects.html",
@@ -228,6 +234,9 @@ module.exports = [
     example: "node/objects.js",
     script: "node_object_preview-01.js",
     targets: ["node"],
+
+    // Disabled because this test only works with the new console
+    disabled: true,
   },
 
   //////////////////////////////////////////////////////////////////////////////
