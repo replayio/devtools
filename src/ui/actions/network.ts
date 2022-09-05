@@ -113,7 +113,7 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     });
 
     const timeStampedPoint = requestSummary.point;
-    const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
+    const pause = await ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
     const formattedFrames = await Promise.all(
       frames?.map((frame, i) => createFrame(getState, frame, i))

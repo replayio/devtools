@@ -117,7 +117,7 @@ export class Pause {
   point: ExecutionPoint | null;
   time: number | null;
   hasFrames: boolean | null;
-  createWaiter: Promise<void> | null;
+  createWaiter: Promise<Pause> | null;
   frames: Map<FrameId, WiredFrame>;
   scopes: Map<ScopeId, WiredScope>;
   objects: Map<ObjectId, WiredObject>;
@@ -189,7 +189,10 @@ export class Pause {
         this.stack = stack.map(id => this.frames.get(id)!);
       }
       pausesById.set(pauseId, this);
+      return this;
     })();
+
+    return this.createWaiter;
   }
 
   instantiate(

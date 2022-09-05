@@ -127,7 +127,7 @@ class ReplayWall implements Wall {
         case "startInspectingNative": {
           this.initializePicker();
 
-          await ThreadFront.getCurrentPause().ensureLoaded();
+          await ThreadFront.getCurrentPause();
           const rv = await ThreadFront.currentPause!.loadMouseTargets();
 
           if (!rv) {

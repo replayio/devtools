@@ -414,7 +414,7 @@ async function findJestTests(
           name = names[i] + " \u25b6 " + name;
         }
       }
-      const pause = ThreadFront.ensurePause(startPoint.point, startPoint.time);
+      const pause = await ThreadFront.ensurePause(startPoint.point, startPoint.time);
       const pauseId = await pause.pauseIdWaiter.promise;
       TestMessageHandlers.onTestMessage?.({
         source: "ConsoleAPI",
@@ -438,7 +438,7 @@ async function findJestTests(
         errorText = "unknown test failure";
       }
       errorText = removeTerminalColors(errorText);
-      const pause = ThreadFront.ensurePause(errorPoint.point, errorPoint.time);
+      const pause = await ThreadFront.ensurePause(errorPoint.point, errorPoint.time);
       const pauseId = await pause.pauseIdWaiter.promise;
       TestMessageHandlers.onTestMessage?.({
         source: "ConsoleAPI",

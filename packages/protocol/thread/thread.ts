@@ -434,20 +434,19 @@ class _ThreadFront {
     }
   }
 
-  ensurePause(point: ExecutionPoint, time: number) {
+  async ensurePause(point: ExecutionPoint, time: number): Promise<Pause> {
     assert(this.sessionId, "no sessionId");
     let pause = Pause.getByPoint(point);
     if (pause) {
       return pause;
     }
     pause = new Pause(this);
-    pause.create(point, time);
-    return pause;
+    return pause.create(point, time);
   }
 
-  getCurrentPause() {
+  async getCurrentPause() {
     if (!this.currentPause) {
-      this.currentPause = this.ensurePause(this.currentPoint, this.currentTime);
+      this.currentPause = await this.ensurePause(this.currentPoint, this.currentTime);
     }
     return this.currentPause;
   }
@@ -473,7 +472,8 @@ class _ThreadFront {
       return [];
     }
 
-    return await this.getCurrentPause().getFrames();
+    const pause = await this.getCurrentPause();
+    return pause.getFrames();
   }
 
   lastAsyncPause() {
@@ -483,8 +483,9 @@ class _ThreadFront {
   }
 
   async loadAsyncParentFrames() {
-    await this.getCurrentPause().ensureLoaded();
-    const basePause = this.lastAsyncPause();
+    const currentPause = await this.getCurrentPause();
+
+    const basePause = await this.lastAsyncPause();
     assert(basePause, "no lastAsyncPause");
     const baseFrames = await basePause.getFrames();
     if (!baseFrames) {
@@ -494,7 +495,7 @@ class _ThreadFront {
     if (basePause != this.lastAsyncPause()) {
       return [];
     }
-    const entryPause = this.ensurePause(steps[0].point, steps[0].time);
+    const entryPause = await this.ensurePause(steps[0].point, steps[0].time);
     this.asyncPauses.push(entryPause);
     const frames = await entryPause.getFrames();
     if (entryPause != this.lastAsyncPause()) {
@@ -716,8 +717,7 @@ class _ThreadFront {
     if (!this.sessionId) {
       return null;
     }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
+    const pause = await this.getCurrentPause();
     await pause.loadDocument();
     return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
   }
@@ -731,8 +731,8 @@ class _ThreadFront {
     if (!this.sessionId) {
       return [];
     }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
+    const pause = await this.getCurrentPause();
+
     const nodes = await pause.searchDOM(query);
     return pause == this.currentPause ? nodes : null;
   }
@@ -741,8 +741,7 @@ class _ThreadFront {
     if (!this.sessionId) {
       return;
     }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
+    const pause = await this.getCurrentPause();
     await pause.loadMouseTargets();
     return pause == this.currentPause;
   }
@@ -751,15 +750,13 @@ class _ThreadFront {
     if (!this.sessionId) {
       return null;
     }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
+    const pause = await this.getCurrentPause();
     const nodeBounds = await pause.getMouseTarget(x, y, nodeIds);
     return pause == this.currentPause ? nodeBounds : null;
   }
 
   async ensureNodeLoaded(objectId: ObjectId) {
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
+    const pause = await this.getCurrentPause();
     const node = await pause.ensureDOMFrontAndParents(objectId);
     return pause == this.currentPause ? node : null;
   }

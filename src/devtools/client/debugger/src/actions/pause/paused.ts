@@ -47,16 +47,13 @@ export function paused({
     trackEvent("paused");
 
     // @ts-expect-error optional time mismatch
-    const pause = ThreadFront.ensurePause(executionPoint, time);
-
-    await pause.createWaiter;
-
-    dispatch(pausedAction({ executionPoint, time, id: pause.pauseId!, frame }));
-
+    const pause = await ThreadFront.ensurePause(executionPoint, time);
     const cx = getThreadContext(getState());
 
+    dispatch(pausedAction({ executionPoint, time, id: pause.pauseId!, frame }));
     try {
-      await pause.createWaiter;
+      // @ts-expect-error optional time mismatch
+      await ThreadFront.ensurePause(executionPoint, time);
     } catch (e) {
       console.error(e);
       dispatch(pauseCreationFailed(executionPoint));
