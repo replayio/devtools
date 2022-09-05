@@ -86,22 +86,22 @@ export default function ConsoleRoot({
               </div>
             }
           >
-            <LoggablesContextRoot messageListRef={messageListRef}>
-              <SearchContextRoot
-                messageListRef={messageListRef}
-                showSearchInputByDefault={showSearchInputByDefault}
-              >
-                <div className={styles.MessageColumn}>
-                  <ErrorBoundary>
+            <ErrorBoundary>
+              <LoggablesContextRoot messageListRef={messageListRef}>
+                <SearchContextRoot
+                  messageListRef={messageListRef}
+                  showSearchInputByDefault={showSearchInputByDefault}
+                >
+                  <div className={styles.MessageColumn}>
                     <MessagesList ref={messageListRef} />
-                  </ErrorBoundary>
 
-                  {terminalInput}
+                    {terminalInput}
 
-                  <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
-                </div>
-              </SearchContextRoot>
-            </LoggablesContextRoot>
+                    <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
+                  </div>
+                </SearchContextRoot>
+              </LoggablesContextRoot>
+            </ErrorBoundary>
           </Suspense>
 
           <ContextMenu />
