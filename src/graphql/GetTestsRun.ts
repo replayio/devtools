@@ -49,6 +49,7 @@ export interface GetTestsRun_node_Workspace_testRuns_recordings {
 export interface GetTestsRun_node_Workspace_testRuns {
   __typename: "TestRun";
   id: string | null;
+  title: string | null;
   branch: string | null;
   commitId: string | null;
   commitTitle: string | null;

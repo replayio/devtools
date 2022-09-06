@@ -75,6 +75,11 @@ export function TestRunListItem({ testRun, onClick }: { testRun: TestRun; onClic
             <RunStats testRun={testRun} />
           </div>
           <Attributes testRun={testRun} />
+          {testRun.title ? (
+            <div className="flex flex-row items-center justify-between text-xs">
+              {testRun.title}
+            </div>
+          ) : null}
         </div>
       </a>
     </Link>

@@ -13,7 +13,7 @@ export interface GetConnection_auth {
 }
 
 export interface GetConnection {
-  auth: GetConnection_auth | null;
+  auth: GetConnection_auth;
 }
 
 export interface GetConnectionVariables {

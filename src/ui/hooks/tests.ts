@@ -35,6 +35,7 @@ export interface TestRunStats {
 }
 export interface TestRun {
   id: string | null;
+  title: string | null;
   commitTitle: string | null;
   commitId: string | null;
   mergeTitle: string | null;
@@ -78,6 +79,7 @@ const GET_TEST_RUNS_FOR_WORKSPACE = gql`
         id
         testRuns {
           id
+          title
           branch
           commitId
           commitTitle
@@ -126,7 +128,7 @@ const GET_TEST_RUN = gql`
         id
         testRuns(id: $id) {
           id
-          id
+          title
           branch
           commitId
           commitTitle
