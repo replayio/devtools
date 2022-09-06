@@ -1,7 +1,10 @@
 import { MappedLocation } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { UIStore } from "ui/actions";
-import { getPreferredLocation as getPreferredLocationSelector } from "ui/reducers/sources";
+import {
+  getPreferredLocation as getPreferredLocationSelector,
+  getCorrespondingSourceIds,
+} from "ui/reducers/sources";
 
 // TODO [hbenl] some components ask for preferred locations in render functions or effects
 // (so without direct access to the redux store), this is a temporary hack until these
@@ -9,10 +12,22 @@ import { getPreferredLocation as getPreferredLocationSelector } from "ui/reducer
 
 let store: UIStore;
 
-export function getPreferredLocation(location: MappedLocation | undefined) {
-  return (
-    location &&
-    getPreferredLocationSelector(store.getState(), location, ThreadFront.preferredGeneratedSources)
+export function getPreferredLocation(locations: MappedLocation | undefined) {
+  if (!locations) {
+    return;
+  }
+  const state = store.getState();
+  // TODO [hbenl] another hack: the new console doesn't update sourceIds in locations
+  // to their first corresponding sourceId, which getPreferredLocationSelector
+  // subsequently complains about
+  const correspondingLocations = locations.map(location => ({
+    ...location,
+    sourceId: getCorrespondingSourceIds(state, location.sourceId)[0],
+  }));
+  return getPreferredLocationSelector(
+    state,
+    correspondingLocations,
+    ThreadFront.preferredGeneratedSources
   );
 }
 
