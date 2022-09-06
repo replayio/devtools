@@ -73,6 +73,9 @@ export function RunSummary() {
         <Attributes testRun={testRun} />
         <RunnerLink testRun={testRun} />
       </div>
+      {testRun.title ? (
+        <div className="flex flex-row items-center justify-between text-xs">{testRun.title}</div>
+      ) : null}
     </div>
   );
 }
