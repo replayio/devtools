@@ -536,16 +536,6 @@ export function refreshGraphics() {
         gDevicePixelRatio,
       });
     }
-
-    // Apply the same transforms to any displayed highlighter.
-    const highlighterContainer = document.querySelector(".highlighter-container") as HTMLElement;
-    if (highlighterContainer && gDevicePixelRatio) {
-      highlighterContainer.style.transform = `scale(${bounds.scale * gDevicePixelRatio})`;
-      highlighterContainer.style.left = `${bounds.left}px`;
-      highlighterContainer.style.top = `${bounds.top}px`;
-      highlighterContainer.style.width = `${bounds.width / gDevicePixelRatio}px`;
-      highlighterContainer.style.height = `${bounds.height / gDevicePixelRatio}px`;
-    }
   } else {
     cx.clearRect(0, 0, canvas.width, canvas.height);
   }

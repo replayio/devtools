@@ -122,7 +122,6 @@
 /* Highlighter - Infobar */
 
 #highlighter-root [class$="infobar-container"] {
-  display: none;
   position: absolute;
   max-width: 95%;
 
@@ -160,7 +159,6 @@
 #highlighter-root [class$="infobar-container"] > [class$="infobar"]:before,
 #highlighter-root [class$="infobar-container"] > [class$="infobar"]:after {
   content: "";
-  display: none;
   position: absolute;
   height: 0;
   width: 0;

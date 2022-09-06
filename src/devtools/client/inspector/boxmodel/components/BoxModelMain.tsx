@@ -6,9 +6,6 @@ import React from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import { UIState } from "ui/state";
-import { selection } from "devtools/client/framework/selection";
-
-import Highlighter from "highlighter/highlighter";
 
 import { BoxModelSideLabel } from "./BoxModelSideLabel";
 

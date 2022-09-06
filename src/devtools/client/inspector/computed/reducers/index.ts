@@ -33,6 +33,12 @@ const reducers: ReducerObject<ComputedState, ComputedAction> = {
 
     return { ...state, expandedProperties };
   },
+  // dispatched by actions/timeline.ts, in `playback()`
+  // @ts-expect-error
+  "pause/resumed"() {
+    // Clear out the DOM nodes data whenever the user hits "Play" in the timeline
+    return INITIAL_COMPUTED;
+  },
 };
 
 export default createReducer(INITIAL_COMPUTED, reducers);
