@@ -3,7 +3,7 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import classNames from "classnames";
-import { badges } from "components/PrefixBadgePicker/PrefixBadgePicker";
+import { badges } from "design/PrefixBadgePicker";
 import { PrefixBadge, SourceLocation } from "devtools/client/debugger/src/reducers/types";
 import { MessageContainer } from "devtools/client/webconsole/components/Output/MessageContainer";
 import { StateContext } from "devtools/client/webconsole/components/Search";
