@@ -158,7 +158,11 @@ function LineHitCounts({ editor }: Props) {
     drawLines();
 
     return () => {
-      editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      try {
+        editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      } catch (e) {
+        console.warn(e);
+      }
       resizeBreakpointGutter(editor.editor);
 
       doc.off("change", drawLines);
