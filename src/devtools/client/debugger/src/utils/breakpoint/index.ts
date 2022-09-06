@@ -16,7 +16,6 @@ import type {
 import assert from "../assert";
 import { features } from "../prefs";
 
-export * from "./astBreakpointLocation";
 export * from "./breakpointPositions";
 
 // Return the first argument that is a string, or null if nothing is a
@@ -124,7 +123,6 @@ export function createPendingBreakpoint(bp: Breakpoint, sourceUrl: string): Pend
     options: bp.options,
     disabled: bp.disabled,
     location,
-    astLocation: bp.astLocation!,
   };
 }
 

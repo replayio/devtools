@@ -17,7 +17,7 @@ import {
 } from "../../reducers/breakpoints";
 import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
 import { getSymbols, getRequestedBreakpointLocations } from "../../selectors";
-import { getLocationKey, getASTLocation } from "../../utils/breakpoint";
+import { getLocationKey } from "../../utils/breakpoint";
 import { getTextAtPosition } from "../../utils/source";
 import {
   fetchPossibleBreakpointsForSource,
@@ -125,7 +125,6 @@ export function addBreakpoint(
     }
 
     const symbols = getSymbols(state, source);
-    const astLocation = getASTLocation(symbols, location);
 
     const originalContent = getSourceContent(state, source.id);
     const originalText = getTextAtPosition(originalContent, location);
@@ -139,7 +138,6 @@ export function addBreakpoint(
       disabled,
       options,
       location,
-      astLocation,
       text,
       originalText,
     };

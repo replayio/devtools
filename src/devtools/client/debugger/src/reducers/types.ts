@@ -127,7 +127,6 @@ export type ASTLocation = {
 export type Breakpoint = {
   readonly id: BreakpointId;
   readonly location: Location & { sourceUrl: string };
-  readonly astLocation: ASTLocation | null | undefined;
   readonly disabled: boolean;
   readonly text: string;
   readonly originalText: string;
@@ -161,27 +160,14 @@ export type XHRBreakpoint = {
   readonly text: string;
 };
 
-/**
- * PendingBreakpoint
- *
- * @memberof types
- * @static
- */
 export type PendingBreakpoint = {
   readonly location: Location & { sourceUrl: string };
-  readonly astLocation: ASTLocation;
   readonly generatedLocation?: PendingLocation;
   readonly disabled: boolean;
   readonly text?: string;
   readonly options: BreakpointOptions;
 };
 
-/**
- * Frame ID
- *
- * @memberof types
- * @static
- */
 export type FrameId = string;
 type Expr = string;
 export type XScopeVariable = {
@@ -193,12 +179,6 @@ export type XScopeVariables = {
   frameBase?: Expr | null;
 };
 
-/**
- * ContextMenuItem
- *
- * @memberof types
- * @static
- */
 export type ContextMenuItem = {
   id: string;
   label: string;
@@ -207,11 +187,6 @@ export type ContextMenuItem = {
   click: (...args: Array<any>) => any;
 };
 
-/**
- * why
- * @memberof types
- * @static
- */
 export type ExceptionReason = {
   exception: string | Grip;
   message: string;
