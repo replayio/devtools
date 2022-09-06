@@ -63,7 +63,8 @@ export type ReplayClientEvents = "loadedRegionsChange";
 export type HitPointsStatus =
   | "complete"
   | "too-many-points-to-find"
-  | "too-many-points-to-run-analysis";
+  | "too-many-points-to-run-analysis"
+  | "unknown-error";
 
 export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointsStatus];
 
