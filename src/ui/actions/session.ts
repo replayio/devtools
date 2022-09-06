@@ -165,6 +165,7 @@ export function createSocket(
       const experimentalSettings: ExperimentalSettings = {
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache || !!features.profileWorkerThreads,
+        disableQueryCache: !features.enableQueryCache,
         profileWorkerThreads: !!features.profileWorkerThreads,
       };
 

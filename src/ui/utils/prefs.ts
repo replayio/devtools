@@ -1,5 +1,6 @@
 import { PrefsHelper } from "devtools/client/shared/prefs";
 import { pref } from "devtools/shared/services";
+import { isTest } from "./environment";
 
 const { asyncStoreHelper } = require("devtools/shared/async-store-helper");
 
@@ -22,17 +23,19 @@ pref("devtools.hitCounts", "hide-counts");
 // app features
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
+// TODO - remove this ternary once the new console is default again
+pref("devtools.features.disableNewComponentArchitecture", isTest() ? false : true);
+pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.enableLargeText", false);
-pref("devtools.features.disableNewComponentArchitecture", true);
+pref("devtools.features.enableQueryCache", false);
+pref("devtools.features.hitCounts", true);
 pref("devtools.features.logProtocol", false);
 pref("devtools.features.logProtocolEvents", false);
 pref("devtools.features.originalClassNames", false);
+pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.hitCounts", true);
-pref("devtools.features.disableUnHitLines", false);
-pref("devtools.features.profileWorkerThreads", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -55,17 +58,18 @@ export const prefs = new PrefsHelper("devtools", {
 export const features = new PrefsHelper("devtools.features", {
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
+  disableNewComponentArchitecture: ["Bool", "disableNewComponentArchitecture"],
+  enableQueryCache: ["Bool", "enableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
-  disableNewComponentArchitecture: ["Bool", "disableNewComponentArchitecture"],
   hitCounts: ["Bool", "hitCounts"],
   logProtocol: ["Bool", "logProtocol"],
   logProtocolEvents: ["Bool", "logProtocolEvents"],
   originalClassNames: ["Bool", "originalClassNames"],
+  profileWorkerThreads: ["Bool", "profileWorkerThreads"],
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
-  profileWorkerThreads: ["Bool", "profileWorkerThreads"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

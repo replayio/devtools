@@ -39,6 +39,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
       "Record a performance profile of the source worker and send it to Replay to help diagnose performance issues",
     key: "profileWorkerThreads",
   },
+  {
+    label: "Enable query-level caching",
+    description:
+      "Allow the backend to return previously generated responses without re-running the request",
+    key: "enableQueryCache",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -79,6 +85,8 @@ export default function ExperimentalSettings({}) {
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
+  const { value: enableQueryCache, update: updateEnableQueryCache } =
+    useFeature("enableQueryCache");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -91,11 +99,14 @@ export default function ExperimentalSettings({}) {
       updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
       updateProfileWorkerThreads(!profileWorkerThreads);
+    } else if (key === "enableQueryCache") {
+      updateEnableQueryCache(!enableQueryCache);
     }
   };
 
   const localSettings = {
     disableNewComponentArchitecture,
+    enableQueryCache,
     enableColumnBreakpoints,
     enableResolveRecording,
     hitCounts,
