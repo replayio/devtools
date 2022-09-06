@@ -453,19 +453,22 @@ export function onPageDownKey(): UIThunkAction {
 let unhighlightTimer: ReturnType<typeof window.setTimeout> | null = null;
 
 export function highlightNode(nodeId: string, duration?: number): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, protocolClient }) => {
+    if (!ThreadFront.currentPause) {
+      return;
+    }
+
     const { highlightedNode, nodeBoxModels } = getState().markup;
     if (highlightedNode !== nodeId) {
       dispatch(nodeHighlighted(nodeId));
 
       if (!(nodeId in nodeBoxModels.entities)) {
-        const node = await ThreadFront.ensureNodeLoaded(nodeId);
-        if (node) {
-          const boxModel = await node.getBoxModel();
-          if (boxModel) {
-            dispatch(nodeBoxModelLoaded(boxModel));
-          }
-        }
+        const { model: nodeBoxModel } = await protocolClient.DOM.getBoxModel(
+          { node: nodeId },
+          ThreadFront.sessionId!,
+          ThreadFront.currentPause.pauseId!
+        );
+        dispatch(nodeBoxModelLoaded(nodeBoxModel));
       }
 
       if (unhighlightTimer) {
