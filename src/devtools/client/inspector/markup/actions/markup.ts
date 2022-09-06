@@ -33,7 +33,6 @@ import { paused } from "devtools/client/debugger/src/reducers/pause";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
-import { clearTimeout } from "timers";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
