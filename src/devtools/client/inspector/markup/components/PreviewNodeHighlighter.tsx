@@ -1,10 +1,10 @@
-import React, { useState, useEffect, unstable_Offscreen as Offscreen } from "react";
+import React from "react";
 
 import { useAppSelector } from "ui/setup/hooks";
 import { buildBoxQuads } from "protocol/thread/node";
 
-import { selectNodeBoxModelById } from "../reducers/markup";
-import { getAdjustedQuads } from "devtools/shared/layout/utils";
+import { NodeInfo, selectNodeBoxModelById } from "../reducers/markup";
+import { Canvas } from "ui/state/app";
 
 // Note that the order of items in this array is important because it is used
 // for drawing the BoxModelHighlighter's path elements correctly.
@@ -88,6 +88,39 @@ function getOuterQuad(region: BoxModelKeys, boxModelQuads: BoxModelQuads): QuadW
   return quad;
 }
 
+function getOuterBounds(boxModelQuads: BoxModelQuads) {
+  for (const region of BOX_MODEL_REGIONS) {
+    const quad = getOuterQuad(region, boxModelQuads);
+
+    if (!quad) {
+      // Invisible element such as a script tag.
+      break;
+    }
+
+    const { bottom, height, left, right, top, width, x, y } = quad.bounds;
+
+    if (width > 0 || height > 0) {
+      return { bottom, height, left, right, top, width, x, y };
+    }
+  }
+
+  return {
+    bottom: 0,
+    height: 0,
+    left: 0,
+    right: 0,
+    top: 0,
+    width: 0,
+    x: 0,
+    y: 0,
+  };
+}
+
+const getAttribute = (node: NodeInfo, name: string) => {
+  const attr = node.attributes?.find(a => a.name == name);
+  return attr?.value;
+};
+
 export function PreviewNodeHighlighter() {
   const highlightedNodeId = useAppSelector(state => state.markup.highlightedNode);
   const highlightedNodeBoxModel = useAppSelector(state =>
@@ -95,10 +128,11 @@ export function PreviewNodeHighlighter() {
   );
   const canvas = useAppSelector(state => state.app.canvas);
 
-  if (!highlightedNodeBoxModel) {
+  if (!highlightedNodeBoxModel || !canvas) {
     return null;
   }
 
+  // Convert the raw numeric box model data from the server into DOMQuad instances
   const boxModelQuads = BOX_MODEL_REGIONS.reduce((obj, region) => {
     obj[region] = buildBoxQuads(highlightedNodeBoxModel[region]);
     return obj;
@@ -108,7 +142,9 @@ export function PreviewNodeHighlighter() {
     return null;
   }
 
-  const renderedPaths = BOX_MODEL_REGIONS.map(region => {
+  // The various content boxes are rendered as `<path>` elements with drawing instructions
+  // for the four corners
+  const renderedBoxPaths = BOX_MODEL_REGIONS.map(region => {
     const quads = boxModelQuads[region];
 
     const pathCoords = quads.map(quad => {
@@ -130,6 +166,9 @@ export function PreviewNodeHighlighter() {
   let containerStyle: React.CSSProperties = {};
 
   if (canvas) {
+    // Transform the contents of the highlighter DOM node so that it
+    // correctly matches the scale of the preview canvas area, in order
+    // to get the highlight overlaid over the correct DOM node.
     const { left, top, width, height, scale, gDevicePixelRatio } = canvas;
 
     if (gDevicePixelRatio) {
@@ -148,6 +187,8 @@ export function PreviewNodeHighlighter() {
   // Mimicking that behavior here.
   const guideRegionsToShow = ["content"] as const;
 
+  // Guides are rendered as SVG `<line>` tags, extending vertically or horizontally,
+  // aligned with the outer edge of a given box model side.
   const renderedGuides = guideRegionsToShow.map(region => {
     const quad = getOuterQuad(region, boxModelQuads);
 
@@ -157,6 +198,7 @@ export function PreviewNodeHighlighter() {
 
     const { p1, p2, p3, p4 } = quad;
 
+    // Sort x and y values so that we can figure out sides from min/max values
     const allX = [p1.x, p2.x, p3.x, p4.x].sort((a, b) => a - b);
     const allY = [p1.y, p2.y, p3.y, p4.y].sort((a, b) => a - b);
 
@@ -193,30 +235,137 @@ export function PreviewNodeHighlighter() {
 
   return (
     <div className="highlighter-container" aria-hidden="true" style={containerStyle}>
-      <div id="box-model-root" className="box-model-root">
+      <div id="box-model-root" className="box-model-root" style={{ position: "relative" }}>
         <svg className="box-model-elements" style={{ width: "100%", height: "100%" }}>
-          <g className="box-model-regions">{renderedPaths}</g>
+          <g className="box-model-regions">{renderedBoxPaths}</g>
           {renderedGuides}
-          {/* <line className="box-model-guide-top" x1="..." y1="..." x2="..." y2="..." />
-          <line className="box-model-guide-right" x1="..." y1="..." x2="..." y2="..." />
-          <line className="box-model-guide-bottom" x1="..." y1="..." x2="..." y2="..." />
-          <line className="box-model-guide-left" x1="..." y1="..." x2="..." y2="..." /> */}
         </svg>
-        {/* <div className="box-model-infobar-container">
-          <div className="box-model-infobar-arrow highlighter-infobar-arrow-top" />
-          <div className="box-model-infobar">
-            <div className="box-model-infobar-text" align="center">
-              <span className="box-model-infobar-tagname">Node name</span>
-              <span className="box-model-infobar-id">Node id</span>
-              <span className="box-model-infobar-classes">.someClass</span>
-              <span className="box-model-infobar-pseudo-classes">:hover</span>
-              <span className="box-model-infobar-grid-type">Grid Type</span>
-              <span className="box-model-infobar-flex-type">Flex Type</span>
-            </div>
-          </div>
-          <div className="box-model-infobar-arrow box-model-infobar-arrow-bottom" />
-        </div> */}
       </div>
     </div>
   );
+}
+
+interface InfoBarProps {
+  highlightedNodeId: string;
+  boxModelQuads: BoxModelQuads;
+  canvas: Canvas;
+}
+
+// Not rendered for now due to styling/layout concerns, and the prior highlighting logic
+// wasn't actually showing this infobar label anyway.
+// TODO  Revisit showing the infobar contents later
+function NodeHighlighterLabelInfobar({ highlightedNodeId, boxModelQuads, canvas }: InfoBarProps) {
+  const markupNodes = useAppSelector(state => state.markup.tree.entities);
+  const infobarContainerStyle: React.CSSProperties = calculateInfobarTransformStyles(
+    boxModelQuads,
+    canvas
+  );
+
+  let tagText = "";
+  let idText = "";
+  let classesText = "";
+  let pseudoText = "";
+
+  const node = markupNodes[highlightedNodeId!];
+  if (node) {
+    const id = getAttribute(node, "id");
+    const className = getAttribute(node, "class") || "";
+    const classList = className.split(" ").filter(Boolean);
+
+    const { displayName, pseudoType } = node;
+
+    tagText = `${displayName.toLowerCase()}`;
+    pseudoText = pseudoType || "";
+    idText = id ? `#${id}` : "";
+    // Add a preceding `.` if there are any classes, plus in-between each
+    classesText = [""].concat(classList).join(".");
+  }
+
+  return (
+    <div className="box-model-infobar-container" style={infobarContainerStyle}>
+      <div className="box-model-infobar-arrow highlighter-infobar-arrow-top" />
+      <span className="box-model-infobar-tagname">{tagText}</span>
+      <span className="box-model-infobar-id">{idText}</span>
+      <span className="box-model-infobar-classes">{classesText}</span>
+      <span className="box-model-infobar-pseudo-classes">{pseudoText}</span>
+      <div className="box-model-infobar-arrow box-model-infobar-arrow-bottom" />
+    </div>
+  );
+}
+
+function calculateInfobarTransformStyles(boxModelQuads: BoxModelQuads, canvas: Canvas) {
+  const bounds = getOuterBounds(boxModelQuads);
+
+  // This logic was ported from the legacy highlighter and tweaked slightly.
+  // It seems to work in general, in that the infobar label now appears within the
+  // canvas preview area.  However, thus far it only shows up up above the highlighted
+  // node, and the "arrows" don't show up at all.
+  // It's at least a decent starting point to getting this working if we pick up with this.
+  const zoom = 1;
+  let hideArrow: "true" | "false" = "false";
+  let position: "top" | "bottom" = "top";
+  let hideInfobar = false;
+  let displayPosition: React.CSSProperties["position"] = "absolute";
+
+  const HIGHLIGHTER_ARROW_BUBBLE_SIZE_PX = 8;
+  const arrowSize = HIGHLIGHTER_ARROW_BUBBLE_SIZE_PX;
+  const viewportWidth = canvas.width;
+  const viewportHeight = canvas.height;
+
+  const margin = 2;
+  const containerHeight = 64;
+  const containerWidth = 300;
+  const containerHalfWidth = containerWidth / 2;
+
+  // Defines the boundaries for the infobar.
+  const topBoundary = margin;
+  const bottomBoundary = viewportHeight - containerHeight - margin - 1;
+  const leftBoundary = containerHalfWidth + margin;
+  const rightBoundary = viewportWidth - containerHalfWidth - margin;
+
+  let top = bounds.y - containerHeight - arrowSize;
+  const bottom = bounds.bottom + margin + arrowSize;
+  let left = bounds.x + bounds.width / 2;
+  let isOverlapTheNode = false;
+
+  const canBePlacedOnTop = top >= window.scrollY;
+  const canBePlacedOnBottom = bottomBoundary + window.scrollY - bottom > 0;
+
+  const isOffscreenOnTop = top < topBoundary;
+  const isOffscreenOnBottom = top > bottomBoundary;
+  const isOffscreenOnLeft = left < leftBoundary;
+  const isOffscreenOnRight = left > rightBoundary;
+
+  if (isOffscreenOnTop) {
+    top = topBoundary;
+    isOverlapTheNode = true;
+  } else if (isOffscreenOnBottom) {
+    top = bottomBoundary;
+    isOverlapTheNode = true;
+  } else if (isOffscreenOnLeft || isOffscreenOnRight) {
+    isOverlapTheNode = true;
+    // top -= pageYOffset;
+  }
+
+  if (isOverlapTheNode && false) {
+    hideInfobar = true;
+  } else if (isOverlapTheNode) {
+    left = left = Math.min(Math.max(leftBoundary, left - 0), rightBoundary);
+    displayPosition = "fixed";
+    hideArrow = "true";
+  } else {
+    displayPosition = "absolute";
+    hideArrow = "false";
+  }
+
+  const infobarContainerStyle: React.CSSProperties = {
+    position: displayPosition,
+    transformOrigin: "0 0",
+    transform: `scale(${1 / zoom}) translate(calc(${left}px - 50%), ${top}px)`,
+    top: 0,
+    left: 0,
+    fontSize: 48,
+  };
+
+  return infobarContainerStyle;
 }
