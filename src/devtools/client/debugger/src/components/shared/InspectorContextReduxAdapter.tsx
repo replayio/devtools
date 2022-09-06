@@ -10,6 +10,7 @@ import { onViewSourceInDebugger, openNodeInInspector } from "devtools/client/web
 import { Pause, ThreadFront, ValueFront } from "protocol/thread";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
+import { setSelectedPrimaryPanel } from "ui/actions/layout";
 
 // Adapter that connects inspect-function and inspect-html-element actions with Redux.
 export default function InspectorContextReduxAdapter({ children }: { children: ReactNode }) {
@@ -34,6 +35,10 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
     },
     [sourcesById, dispatch]
   );
+
+  const showCommentsPanel = useCallback(() => {
+    dispatch(setSelectedPrimaryPanel("comments"));
+  }, [dispatch]);
 
   // TODO (FE-337) Make this function work, then pass it down through the context.
   const inspectHTMLElement = useCallback(
@@ -83,8 +88,8 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
   );
 
   const context = useMemo(
-    () => ({ inspectFunctionDefinition, inspectHTMLElement: null }),
-    [inspectFunctionDefinition]
+    () => ({ inspectFunctionDefinition, inspectHTMLElement: null, showCommentsPanel }),
+    [inspectFunctionDefinition, showCommentsPanel]
   );
 
   return <InspectorContext.Provider value={context}>{children}</InspectorContext.Provider>;

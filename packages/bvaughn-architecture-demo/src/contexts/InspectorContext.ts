@@ -8,6 +8,8 @@ import { createContext } from "react";
 
 type InspectFunctionDefinition = (mappedLocation: MappedLocation) => void;
 
+type ShowCommentsPanel = () => void;
+
 type InspectHTMLElement = (
   protocolValue: ProtocolValue,
   pauseId: PauseId,
@@ -18,6 +20,7 @@ type InspectHTMLElement = (
 export type InspectorContextType = {
   inspectFunctionDefinition: InspectFunctionDefinition | null;
   inspectHTMLElement: InspectHTMLElement | null;
+  showCommentsPanel: ShowCommentsPanel | null;
 };
 
 // Certain inspectable values (like HTML Elements) require additional info regarding their location within the recording.
@@ -35,4 +38,5 @@ export const InspectableTimestampedPointContext =
 export const InspectorContext = createContext<InspectorContextType>({
   inspectFunctionDefinition: null,
   inspectHTMLElement: null,
+  showCommentsPanel: null,
 });
