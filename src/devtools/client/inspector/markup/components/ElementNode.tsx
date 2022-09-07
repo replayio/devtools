@@ -106,16 +106,6 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderInlineTextChild() {
-    const { isInlineTextChild, value, type } = this.props.node;
-
-    if (!isInlineTextChild) {
-      return null;
-    }
-
-    return <TextNode type={type} value={value} />;
-  }
-
   renderOpenTag() {
     const { displayName } = this.props.node;
 
@@ -131,30 +121,13 @@ class ElementNode extends PureComponent<ElementNodeProps> {
     );
   }
 
-  renderScrollableBadge() {
-    if (!this.props.node.isScrollable) {
-      return null;
-    }
-
-    return (
-      <div
-        className="inspector-badge scrollable-badge"
-        title="This element has scrollable overflow"
-      >
-        Scroll
-      </div>
-    );
-  }
-
   render() {
     return (
       <span className="editor">
         {this.renderOpenTag()}
         <span className="markup-expand-badge" onClick={this.onExpandBadgeClick}></span>
-        {this.renderInlineTextChild()}
         {this.renderCloseTag()}
         {this.renderDisplayBadge()}
-        {this.renderScrollableBadge()}
       </span>
     );
   }

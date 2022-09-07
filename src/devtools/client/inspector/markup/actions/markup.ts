@@ -1,5 +1,6 @@
 import { assert, defer, Deferred } from "protocol/utils";
 import type { NodeFront } from "protocol/thread/node";
+import { HTML_NS } from "protocol/thread/node";
 import { SelectionReason } from "devtools/client/framework/selection";
 import { selection } from "devtools/client/framework/selection";
 
@@ -269,7 +270,7 @@ export function selectionChanged(
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    const nodeFront = ThreadFront.currentPause?.getNodeFront(nodeId);
+    const nodeFront = await ThreadFront.ensureNodeLoaded(nodeId);
     if (nodeFront) {
       dispatch(highlightNode(nodeId, 1000));
       const { selection } = await import("devtools/client/framework/selection");
@@ -504,9 +505,7 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
     id,
     isDisplayed: await node.isDisplayed(),
     isExpanded,
-    isInlineTextChild: !!node.inlineTextChild,
-    isScrollable: node.isScrollable,
-    namespaceURI: node.namespaceURI,
+    namespaceURI: HTML_NS,
     parentNodeId: parentNode?.objectId(),
     pseudoType: node.pseudoType,
     tagName: node.tagName,

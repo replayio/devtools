@@ -42,22 +42,7 @@ type SelectionEvent =
  *   document
  *   isRoot()
  *   isNode()
- *   isHTMLNode()
  *
- * Check the nature of the node:
- *
- *   isElementNode()
- *   isAttributeNode()
- *   isTextNode()
- *   isCDATANode()
- *   isEntityRefNode()
- *   isEntityNode()
- *   isProcessingInstructionNode()
- *   isCommentNode()
- *   isDocumentNode()
- *   isDocumentTypeNode()
- *   isDocumentFragmentNode()
- *   isNotationNode()
  */
 export class Selection {
   private _nodeFront: NodeFront | undefined | null;
@@ -92,21 +77,12 @@ export class Selection {
     nodeFront: NodeFront | null,
     {
       reason = "unknown",
-      isSlotted = false,
     }: Partial<{
       reason: SelectionReason | undefined;
       isSlotted: boolean;
     }> = {}
   ) {
     this.reason = reason;
-
-    // If an inlineTextChild text node is being set, then set it's parent instead.
-    /*
-    const parentNode = nodeFront && nodeFront.parentNode();
-    if (nodeFront && parentNode && parentNode.inlineTextChild === nodeFront) {
-      nodeFront = parentNode;
-    }
-    */
 
     if (this._nodeFront == null && nodeFront == null) {
       // Avoid to notify multiple "unselected" events with a null/undefined nodeFront
@@ -115,7 +91,6 @@ export class Selection {
       return;
     }
 
-    this._isSlotted = isSlotted;
     this._nodeFront = nodeFront;
 
     this.emit("new-node-front", nodeFront, this.reason);
@@ -123,11 +98,6 @@ export class Selection {
 
   get nodeFront() {
     return this._nodeFront;
-  }
-
-  isRoot() {
-    // NYI : NodeFront#isDocumentElement doesn't exist yet
-    return false; // this.isNode() && this.isConnected() && this._nodeFront.isDocumentElement;
   }
 
   isNode() {
@@ -139,10 +109,6 @@ export class Selection {
     return node && node.isConnected;
   }
 
-  isHTMLNode() {
-    return this.isNode();
-  }
-
   // Node type
 
   isElementNode() {
@@ -151,76 +117,6 @@ export class Selection {
 
   isPseudoElementNode() {
     return this.isNode() && !this.nodeFront!.pseudoType;
-  }
-
-  isAnonymousNode() {
-    return false;
-  }
-
-  isAttributeNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.ATTRIBUTE_NODE;
-  }
-
-  isTextNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.TEXT_NODE;
-  }
-
-  isCDATANode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.CDATA_SECTION_NODE;
-  }
-
-  isEntityRefNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.ENTITY_REFERENCE_NODE;
-  }
-
-  isEntityNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.ENTITY_NODE;
-  }
-
-  isProcessingInstructionNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.PROCESSING_INSTRUCTION_NODE;
-  }
-
-  isCommentNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.PROCESSING_INSTRUCTION_NODE;
-  }
-
-  isDocumentNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.DOCUMENT_NODE;
-  }
-
-  /**
-   * @returns true if the selection is the <body> HTML element.
-   */
-  isBodyNode() {
-    return this.isHTMLNode() && this.isConnected() && this.nodeFront!.nodeName === "BODY";
-  }
-
-  /**
-   * @returns true if the selection is the <head> HTML element.
-   */
-  isHeadNode() {
-    return this.isHTMLNode() && this.isConnected() && this.nodeFront!.nodeName === "HEAD";
-  }
-
-  isDocumentTypeNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.DOCUMENT_TYPE_NODE;
-  }
-
-  isDocumentFragmentNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.DOCUMENT_FRAGMENT_NODE;
-  }
-
-  isNotationNode() {
-    return this.isNode() && this.nodeFront!.nodeType == nodeConstants.NOTATION_NODE;
-  }
-
-  isSlotted() {
-    return this._isSlotted;
-  }
-
-  isShadowRootNode() {
-    return this.isNode() && this.nodeFront!.isShadowRoot;
   }
 
   // added by EventEmitter.decorate(this) in the constructor

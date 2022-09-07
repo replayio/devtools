@@ -1,4 +1,4 @@
-import { Node as NodeDescription, AppliedRule, BoxModel, Quads } from "@replayio/protocol";
+import { Node as NodeDescription, AppliedRule, BoxModel } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
 import { client } from "../socket";
@@ -8,7 +8,7 @@ import { Pause, WiredObject } from "./pause";
 import { RuleFront } from "./rule";
 import { ValueFront } from "./value";
 
-const HTML_NS = "http://www.w3.org/1999/xhtml";
+export const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 export interface WiredEventListener {
   handler: ValueFront;
@@ -69,10 +69,6 @@ export class NodeFront {
     return new ValueFront(this._pause, { object: this._object.objectId });
   }
 
-  isNodeBoundsFront() {
-    return false;
-  }
-
   get isConnected() {
     return this._node.isConnected;
   }
@@ -100,17 +96,6 @@ export class NodeFront {
   // The pseudo element type.
   get pseudoType() {
     return this._node.pseudoType;
-  }
-
-  get pseudoClassLocks() {
-    // NYI
-    return [];
-  }
-
-  // The namespace URI of the node.
-  get namespaceURI() {
-    // NYI
-    return HTML_NS;
   }
 
   get doctypeString() {
@@ -169,21 +154,6 @@ export class NodeFront {
   // The node's `nodeValue` which identifies the value of the current node.
   getNodeValue() {
     return this._node.nodeValue;
-  }
-
-  get isShadowRoot() {
-    // NYI
-    return false;
-  }
-
-  get isShadowHost() {
-    // NYI
-    return false;
-  }
-
-  get isDirectShadowHostChild() {
-    // NYI
-    return false;
   }
 
   async querySelector(selector: string) {
@@ -286,31 +256,6 @@ export class NodeFront {
     return null;
   }
 
-  async getBoxModel() {
-    if (!this._waiters.quads) {
-      this._waiters.quads = defer();
-      try {
-        const { model } = await this._pause.sendMessage(client.DOM.getBoxModel, {
-          node: this._object.objectId,
-        });
-        this._quads = model;
-        this._waiters.quads.resolve(model);
-      } catch (e) {
-        this._waiters.quads.resolve(null);
-      }
-    }
-
-    return this._waiters.quads.promise;
-  }
-
-  getBoxQuads(box: "content" | "padding" | "border" | "margin") {
-    if (!this._quads) {
-      return null;
-    }
-
-    return buildBoxQuads(this._quads[box]);
-  }
-
   async getBoundingClientRect() {
     if (!this._waiters.bounds) {
       this._waiters.bounds = defer();
@@ -327,55 +272,6 @@ export class NodeFront {
 
     return this._waiters.bounds.promise;
   }
-
-  get customElementLocation() {
-    // NYI
-    return undefined;
-  }
-
-  // Whether or not the node is scrollable.
-  get isScrollable() {
-    // NYI
-    return false;
-  }
-
-  get inlineTextChild() {
-    // NYI
-    return null;
-  }
-
-  get getGridFragments() {
-    // NYI
-    return null;
-  }
-
-  get getAsFlexContainer() {
-    // NYI
-    return null;
-  }
-
-  get parentFlexElement() {
-    // NYI
-    return null;
-  }
 }
 
 Object.setPrototypeOf(NodeFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));
-
-export function buildBoxQuads(array: Quads) {
-  assert(array.length % 8 == 0, "quads length must be a multiple of 8");
-  array = [...array];
-  const rv = [];
-  while (array.length) {
-    const [x1, y1, x2, y2, x3, y3, x4, y4] = array.splice(0, 8);
-    rv.push(
-      DOMQuad.fromQuad({
-        p1: { x: x1, y: y1 },
-        p2: { x: x2, y: y2 },
-        p3: { x: x3, y: y3 },
-        p4: { x: x4, y: y4 },
-      })
-    );
-  }
-  return rv;
-}

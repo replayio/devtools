@@ -185,26 +185,6 @@ export class ValueFront {
     }
   }
 
-  containerEntryCount() {
-    return this._object!.preview!.containerEntryCount;
-  }
-
-  regexpString() {
-    return this._object!.preview!.regexpString;
-  }
-
-  dateTime() {
-    return this._object!.preview!.dateTime;
-  }
-
-  functionName() {
-    return this._object!.preview!.functionName;
-  }
-
-  functionParameterNames() {
-    return this._object!.preview!.functionParameterNames;
-  }
-
   mappedFunctionLocation() {
     return this._object?.preview?.functionLocation;
   }
@@ -253,10 +233,6 @@ export class ValueFront {
 
   isNode() {
     return !!this._object!.preview!.node;
-  }
-
-  isNodeBoundsFront() {
-    return false;
   }
 
   nodeType() {
