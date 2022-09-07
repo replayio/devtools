@@ -29,7 +29,7 @@ export function ToggleShowPrivacyButton({
     <button
       type="button"
       onClick={() => setShowPrivacy(!showPrivacy)}
-      className="group flex w-full flex-row items-center justify-between rounded-lg p-3 text-left font-normal"
+      className="flex flex-row items-center justify-between w-full p-3 font-normal text-left rounded-lg group"
     >
       <div className="flex flex-row items-center space-x-2">
         <MaterialIcon iconSize="xl">storage</MaterialIcon>
@@ -49,7 +49,7 @@ function FavIcon({ url }: { url: string }) {
         <MaterialIcon>public</MaterialIcon>
       </div>
       <img
-        className="absolute top-0 left-0 h-4 w-4 bg-transparent"
+        className="absolute top-0 left-0 w-4 h-4 bg-transparent"
         src={`https://www.google.com/s2/favicons?domain=${url}`}
       />
     </div>
@@ -67,7 +67,7 @@ function Source({ url }: { url: string }) {
 
 function PrivacyData({ icon, name, urls }: { icon: string; name: string; urls: string[] }) {
   return (
-    <div className="space-y-3 rounded-lg p-3">
+    <div className="p-3 space-y-3 rounded-lg">
       <div className="flex flex-row items-center space-x-2 font-bold">
         <MaterialIcon iconSize="xl">{icon}</MaterialIcon>
         <div>{name}</div>
@@ -86,14 +86,14 @@ export function Privacy() {
   const { operations } = recording ?? {};
 
   return (
-    <div className="m-5 flex flex-col space-y-7 overflow-hidden">
+    <div className="flex flex-col m-5 overflow-hidden space-y-7">
       <div className="flex flex-col space-y-1">
         <div className="text-lg font-bold">Privacy</div>
         <div className="">
           {`Replays include all of the data needed to replay the browser. `}
           <ExternalLink
             href="https://www.replay.io/security-privacy"
-            className="text-primaryAccent underline"
+            className="underline text-primaryAccent"
           >
             Learn more
           </ExternalLink>
