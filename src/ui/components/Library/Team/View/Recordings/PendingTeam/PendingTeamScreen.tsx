@@ -83,6 +83,9 @@ function MockRecordingRow({ date, name }: { date: string; name: string }) {
 }
 
 export function PendingTeamScreen({ workspace }: { workspace: PendingWorkspaceInvitation }) {
+  if (!workspace) {
+    return null;
+  }
   const { name } = workspace;
 
   return (
