@@ -97,13 +97,8 @@ function KeyboardShortcuts({
       e.preventDefault();
       trackEvent("key_shortcut.show_command_palette");
 
-      if (viewMode === "dev" && !selectedSource && toolboxLayout === "ide") {
-        // Show the command palette in the editor
-        showCommandPaletteInEditor();
-      } else {
-        toggleCommandPalette();
-      }
-
+      toggleCommandPalette();
+      
       const paletteInput = getCommandPaletteInput();
       if (paletteInput) {
         paletteInput.focus();
