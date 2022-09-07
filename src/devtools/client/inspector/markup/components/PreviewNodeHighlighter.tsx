@@ -1,7 +1,8 @@
 import React from "react";
+import type { Quads } from "@replayio/protocol";
 
 import { useAppSelector } from "ui/setup/hooks";
-import { buildBoxQuads } from "protocol/thread/node";
+import { assert } from "protocol/utils";
 
 import { NodeInfo, selectNodeBoxModelById } from "../reducers/markup";
 import { Canvas } from "ui/state/app";
@@ -38,6 +39,24 @@ interface QuadWithBounds {
     x: number;
     y: number;
   };
+}
+
+export function buildBoxQuads(array: Quads) {
+  assert(array.length % 8 == 0, "quads length must be a multiple of 8");
+  array = [...array];
+  const rv = [];
+  while (array.length) {
+    const [x1, y1, x2, y2, x3, y3, x4, y4] = array.splice(0, 8);
+    rv.push(
+      DOMQuad.fromQuad({
+        p1: { x: x1, y: y1 },
+        p2: { x: x2, y: y2 },
+        p3: { x: x3, y: y3 },
+        p4: { x: x4, y: y4 },
+      })
+    );
+  }
+  return rv;
 }
 
 function getOuterQuad(region: BoxModelKeys, boxModelQuads: BoxModelQuads): QuadWithBounds | null {

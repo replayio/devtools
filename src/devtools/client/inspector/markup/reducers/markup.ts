@@ -32,10 +32,6 @@ export interface NodeInfo {
   isDisplayed: boolean;
   // Whether or not the node is expanded.
   isExpanded: boolean;
-  // Whether or not the node is an inline text child. NYI
-  isInlineTextChild: boolean;
-  // Whether or not the node is scrollable. NYI
-  isScrollable: boolean;
   // The namespace URI of the node. NYI
   namespaceURI: string;
   // The object id of the parent node.

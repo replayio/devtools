@@ -3,7 +3,11 @@ import classnames from "classnames";
 
 import { useAppDispatch } from "ui/setup/hooks";
 import { ThreadFront } from "protocol/thread";
-import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import {
+  highlightNode,
+  unhighlightNode,
+  selectNode,
+} from "devtools/client/inspector/markup/actions/markup";
 import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
 import { loadMouseTargets, setIsNodePickerActive, setMouseTargetsLoading } from "ui/actions/app";
 import { setSelectedPanel } from "ui/actions/layout";
@@ -58,11 +62,7 @@ export function NodePicker() {
   const handleNodeSelected = useCallback(
     async function handleNodeSelected(nodeId: string) {
       dispatch(highlightNode(nodeId));
-      const node = await ThreadFront.ensureNodeLoaded(nodeId);
-      if (node) {
-        const { selection } = await import("devtools/client/framework/selection");
-        selection.setNodeFront(node);
-      }
+      dispatch(selectNode(nodeId));
     },
     [dispatch]
   );

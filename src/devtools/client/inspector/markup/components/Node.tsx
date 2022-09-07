@@ -86,7 +86,7 @@ class _Node extends PureComponent<FinalNodeProps> {
       return <span>Loading…</span>;
     }
 
-    if (!children.length || node.isInlineTextChild) {
+    if (!children.length) {
       return null;
     }
 
@@ -103,10 +103,10 @@ class _Node extends PureComponent<FinalNodeProps> {
    * Renders the closing tag of the current node.
    */
   renderClosingTag() {
-    const { hasChildren, isInlineTextChild, displayName } = this.props.node;
+    const { hasChildren, displayName } = this.props.node;
     // Whether or not the node can be expander - True if node has children and child is
     // not an inline text node.
-    const canExpand = hasChildren && !isInlineTextChild;
+    const canExpand = hasChildren;
 
     if (!canExpand) {
       return null;
@@ -169,7 +169,7 @@ class _Node extends PureComponent<FinalNodeProps> {
 
     // Whether or not the node can be expanded - True if node has children and child is
     // not an inline text node.
-    const canExpand = node.hasChildren && !node.isInlineTextChild;
+    const canExpand = node.hasChildren;
     // Whether or not to the show the expanded - True if node can expand and the parent
     // node is not the root node.
     const showExpander = canExpand && node.parentNodeId !== rootNodeId;
@@ -177,7 +177,7 @@ class _Node extends PureComponent<FinalNodeProps> {
     return (
       <li
         className={classnames("child", {
-          collapsed: !node.isExpanded || node.isInlineTextChild,
+          collapsed: !node.isExpanded,
           "not-displayed": !node.isDisplayed,
           expandable: showExpander,
         })}
