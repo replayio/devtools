@@ -39,7 +39,7 @@ export function Dropdown({
   fontSizeClass?: "text-sm" | "text-base";
 }) {
   return (
-    <Menu as="div" className="recording-options inline-block text-left shadow-lg">
+    <Menu as="div" className="inline-block text-left shadow-lg recording-options">
       {({ open }) => (
         <Menu.Items
           static
@@ -102,7 +102,7 @@ export function DropdownItemContent({
           )}
         />
       </div>
-      <span className="overflow-hidden overflow-ellipsis whitespace-pre">{children}</span>
+      <span className="overflow-hidden whitespace-pre overflow-ellipsis">{children}</span>
     </div>
   );
 }
