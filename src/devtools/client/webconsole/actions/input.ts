@@ -64,7 +64,7 @@ export function paywallExpression(expression: string, reason = "team-user"): UIT
     const selectedFrame = getSelectedFrame(getState());
     const asyncIndex = selectedFrame?.asyncIndex;
 
-    const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
+    const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
     const evalId = await dispatchExpression(dispatch, pause!, expression);
 
     dispatch(
@@ -98,7 +98,7 @@ export function evaluateExpression(expression: string): UIThunkAction {
     const asyncIndex = selectedFrame?.asyncIndex;
     const frameId = selectedFrame?.protocolId;
 
-    const pause = await ThreadFront.pauseForAsyncIndex(asyncIndex);
+    const pause = ThreadFront.pauseForAsyncIndex(asyncIndex);
     const evalId = await dispatchExpression(dispatch, pause!, expression);
 
     dispatch(
@@ -201,7 +201,7 @@ async function evaluateJSAsync(
   if (failed || !(returned || exception)) {
     v = createPrimitiveValueFront(
       "Error: Evaluation failed",
-      await ThreadFront.pauseForAsyncIndex(asyncIndex!)
+      ThreadFront.pauseForAsyncIndex(asyncIndex!)
     );
   } else if (returned) {
     v = returned;

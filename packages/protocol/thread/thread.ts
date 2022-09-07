@@ -504,14 +504,14 @@ class _ThreadFront {
     return frames.slice(1);
   }
 
-  async pauseForAsyncIndex(asyncIndex?: number) {
+  pauseForAsyncIndex(asyncIndex?: number) {
     const pause = asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.getCurrentPause();
     assert(pause, "no pause for given asyncIndex");
     return pause;
   }
 
   async getScopes(asyncIndex: number, frameId: FrameId) {
-    const pause = await this.pauseForAsyncIndex(asyncIndex);
+    const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
     return await pause.getScopes(frameId);
   }
@@ -531,7 +531,7 @@ class _ThreadFront {
     frameId?: FrameId;
     pure?: boolean;
   }) {
-    const pause = await this.pauseForAsyncIndex(asyncIndex);
+    const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
 
     const rv = await pause.evaluate(frameId, text, pure);
@@ -764,8 +764,8 @@ class _ThreadFront {
     return pause == this.currentPause ? node : null;
   }
 
-  async getFrameSteps(asyncIndex: number, frameId: FrameId) {
-    const pause = await this.pauseForAsyncIndex(asyncIndex);
+  getFrameSteps(asyncIndex: number, frameId: FrameId) {
+    const pause = this.pauseForAsyncIndex(asyncIndex);
     return pause.getFrameSteps(frameId);
   }
 

@@ -9,11 +9,14 @@ import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
+import { useAppSelector } from "ui/setup/hooks";
+import { getSelectedFrame } from "../../selectors/pause";
 
 import styles from "./NewObjectInspector.module.css";
 
 export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
-  const pause = ThreadFront.currentPause;
+  const selectedFrame = useAppSelector(getSelectedFrame);
+  const pause = ThreadFront.pauseForAsyncIndex(selectedFrame?.asyncIndex);
 
   // HACK
   // The new Object Inspector does not consume ValueFronts.
