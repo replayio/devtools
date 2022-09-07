@@ -8,12 +8,12 @@ import CommandPalette from "ui/components/CommandPalette";
 export default function WelcomeBox() {
   return (
     <div className="flex flex-col items-center w-full h-full overflow-hidden">
-      <div className="relative flex justify-center w-full h-full px-8 pt-14">
-        <div className="relative flex flex-col items-center w-full h-full text-lg">
+      <div className="relative flex justify-center w-full h-full px-8 pt-24">
+        <div className="relative flex flex-col items-center w-full h-full text-sm">
           
 
         
-          <div className="flex flex-row space-x-4 text-sm">
+          <div className="flex flex-row space-x-4">
             
             <div>
               <div className="pb-3 text-right">Command palette</div>
@@ -28,8 +28,13 @@ export default function WelcomeBox() {
             </div>
 
           </div>
-          
 
+          <hr />
+          
+          <div className="absolute flex flex-row w-full bottom-16">
+            <div className="left-0 w-full hover:underline"><a href="https://docs.replay.io">Docs</a></div>
+            <div className="text-right hover:underline"><a href="https://replay.io/discord">Discord</a></div>
+          </div>
 
 
         </div>

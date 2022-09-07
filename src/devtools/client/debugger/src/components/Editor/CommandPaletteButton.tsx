@@ -16,7 +16,7 @@ export default function CommandPaletteButton() {
       className={classNames("command-palette cursor-auto", { active: !selectedSource })}
       onClick={showCommandPalette}
     >
-      <div className="img palette" style={{ height: "24px", width: "24px" }} />
+      <div className="img replay-logo" style={{ height: "20px", width: "20px" }} />
     </button>
   );
 }

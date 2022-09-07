@@ -525,7 +525,9 @@ button.open-inspector {
 .img.palette {
   -webkit-mask-image: url(/images/palette.svg);
 }
-
+.img.replay-logo {
+  -webkit-mask-image: url(/images/replay-logo.svg);
+}
 .overlay-container.rewind .img {
   -webkit-mask-image: url(~devtools/client/debugger/images/rewind-button.svg);
 }
