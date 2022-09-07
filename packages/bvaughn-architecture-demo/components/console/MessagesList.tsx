@@ -9,7 +9,7 @@ import {
   isTerminalExpression,
   isUncaughtException,
 } from "@bvaughn/src/utils/loggables";
-import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
+import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Icon from "../Icon";
@@ -33,7 +33,8 @@ type CurrentTimeIndicatorPlacement = Loggable | "begin" | "end";
 // 1. Using React Suspense (and Suspense caches) for just-in-time loading of Protocol data
 // 2. Using an injected ReplayClientInterface to enable easy testing/mocking
 function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement> }) {
-  const { isTransitionPending: isFocusTransitionPending } = useContext(FocusContext);
+  const { isTransitionPending: isFocusTransitionPending, range: focusRange } =
+    useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(SearchContext);
@@ -56,8 +57,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     });
     return nearestLoggable || "end";
   }, [currentExecutionPoint, loggables]);
-
-  const { range: focusRange } = useContext(FocusContext);
 
   // TRICKY
   // Message filtering is done client-side, but overflow/counts are server-side so it comes from Suspense.
@@ -84,9 +83,10 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       listItems.push(currentTimeIndicator);
     }
 
+    const loggableExecutionPoint = getLoggableExecutionPoint(loggable);
     const isLoaded =
-      loadedRegions !== null &&
-      isPointInRegions(getLoggableExecutionPoint(loggable), loadedRegions.loaded);
+      loadedRegions !== null && isPointInRegions(loggableExecutionPoint, loadedRegions.loaded);
+
     if (isLoaded) {
       if (isEventLog(loggable)) {
         listItems.push(
@@ -98,14 +98,28 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
           />
         );
       } else if (isPointInstance(loggable)) {
-        listItems.push(
-          <LogPointRenderer
-            key={index}
-            index={index}
-            isFocused={loggable === currentSearchResult}
-            logPointInstance={loggable}
-          />
-        );
+        // Respect the focus region and _don't_ show LogPointRenderers  outside the focus range
+        // (since they have analysis that results in errors otherwise ).
+        // TODO Is this _too_ restrictive?
+
+        const isFocused =
+          focusRange === null ||
+          isExecutionPointsWithinRange(
+            loggableExecutionPoint,
+            focusRange.begin.point,
+            focusRange.end.point
+          );
+
+        if (isFocused) {
+          listItems.push(
+            <LogPointRenderer
+              key={index}
+              index={index}
+              isFocused={loggable === currentSearchResult}
+              logPointInstance={loggable}
+            />
+          );
+        }
       } else if (isProtocolMessage(loggable)) {
         listItems.push(
           <MessageRenderer
