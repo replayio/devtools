@@ -58,8 +58,11 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
   }
 
   getProgress(clientX: number) {
-    const { width, left } = getBoundingClientRect(this._timeline.current!)!;
-    const progress = ((clientX - left) / width) * 100;
+    const rect = getBoundingClientRect(this._timeline.current || undefined);
+    if (!rect) {
+      return 0;
+    }
+    const progress = ((clientX - rect.left) / rect.width) * 100;
     return Math.min(Math.max(progress, 0), 100);
   }
 
