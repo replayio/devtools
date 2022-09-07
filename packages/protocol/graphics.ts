@@ -181,29 +181,29 @@ export const timeIsBeyondKnownPaints = (time: number) =>
 export function setupGraphics() {
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
     let paintedGraphics = false;
+    const maybePaintGraphics = async () => {
+      if (!paintedGraphics) {
+        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime, false, true);
+        if (screen && mouse) {
+          paintedGraphics = true;
+          paintGraphics(screen, mouse);
+        }
+      }
+    };
 
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
-      if (!paintedGraphics) {
-        paintedGraphics = true;
-        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-        paintGraphics(screen, mouse);
-      }
       hasAllPaintPoints = true;
       await Promise.all(gPaintPromises);
+      maybePaintGraphics();
       videoReady.resolve();
     });
     client.Graphics.addPaintPointsListener(async ({ paints }) => {
       onPaints(paints);
-      const latestPaint = maxBy(paints, p => BigInt(p.point));
-      if (
-        !paintedGraphics &&
-        latestPaint &&
-        BigInt(latestPaint.point) > BigInt(ThreadFront.currentPoint)
-      ) {
-        paintedGraphics = true;
-        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime);
-        paintGraphics(screen, mouse);
+      const latestPaint = BigInt(maxBy(paints, p => BigInt(p.point))?.point || 0);
+      const currentPoint = BigInt(ThreadFront.currentPoint);
+      if (currentPoint && latestPaint >= currentPoint) {
+        maybePaintGraphics();
       }
     });
 
@@ -358,10 +358,11 @@ export interface MouseAndClickPosition {
 
 export async function getGraphicsAtTime(
   time: number,
-  forPlayback = false
+  forPlayback = false,
+  allowLastPaint = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
   const paintIndex = mostRecentIndex(gPaintPoints, time);
-  if (paintIndex === undefined || timeIsBeyondKnownPaints(time)) {
+  if (paintIndex === undefined || (timeIsBeyondKnownPaints(time) && !allowLastPaint)) {
     // There are no graphics to paint here.
     return {};
   }
