@@ -82,3 +82,7 @@
   flex: 1;
   padding: 0.5rem;
 }
+
+.ErrorBoundaryFallback {
+  grid-column: 2;
+}
