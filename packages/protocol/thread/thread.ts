@@ -459,11 +459,7 @@ class _ThreadFront {
     hasFrames: boolean,
     data: PauseData = {}
   ) {
-    let pause = Pause.getByPoint(point);
-    if (pause) {
-      return pause;
-    }
-    pause = new Pause(this);
+    const pause = new Pause(this);
     pause.instantiate(pauseId, point, time, hasFrames, data);
     return pause;
   }
