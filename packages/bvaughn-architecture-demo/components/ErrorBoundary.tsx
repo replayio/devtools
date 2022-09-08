@@ -5,7 +5,11 @@ import styles from "./ErrorBoundary.module.css";
 
 type ErrorBoundaryState = { error: Error | null };
 
-export default class ErrorBoundary extends Component<PropsWithChildren<{}>, ErrorBoundaryState> {
+type ErrorBoundaryProps = PropsWithChildren<{
+  fallbackClassName?: string;
+}>;
+
+export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   state: ErrorBoundaryState = { error: null };
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -19,11 +23,12 @@ export default class ErrorBoundary extends Component<PropsWithChildren<{}>, Erro
   }
 
   render() {
+    const { fallbackClassName } = this.props;
     const { error } = this.state;
 
     if (error !== null) {
       return (
-        <div className={styles.Error}>
+        <div className={`${styles.Error} ${fallbackClassName || ""}`}>
           <ReplayLogo />
           <div className={styles.Header}>Our apologies!</div>
           <div className={styles.Message}>

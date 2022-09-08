@@ -86,7 +86,7 @@ export default function ConsoleRoot({
               </div>
             }
           >
-            <ErrorBoundary>
+            <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
               <LoggablesContextRoot messageListRef={messageListRef}>
                 <SearchContextRoot
                   messageListRef={messageListRef}
