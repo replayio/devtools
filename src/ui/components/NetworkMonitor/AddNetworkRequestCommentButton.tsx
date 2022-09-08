@@ -1,7 +1,7 @@
 import { useAppDispatch } from "ui/setup/hooks";
 import { createNetworkRequestComment } from "ui/actions/comments";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { AddCommentButton } from "design";
+import { AddCommentButton } from "../../../../packages/components";
 import { RequestSummary } from "./utils";
 import useAuth0 from "ui/utils/useAuth0";
 
