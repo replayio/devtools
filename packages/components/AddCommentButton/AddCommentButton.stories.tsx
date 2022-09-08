@@ -1,5 +1,5 @@
 import { Meta } from "@storybook/react";
-import { AddCommentButton } from "design";
+import { AddCommentButton } from "components";
 
 export default {
   title: "Components/AddCommentButton",

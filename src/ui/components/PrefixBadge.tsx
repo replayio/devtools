@@ -3,7 +3,8 @@ import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import { Breakpoint } from "devtools/client/debugger/src/selectors";
 import React from "react";
 import { useAppDispatch } from "ui/setup/hooks";
-import { PrefixBadgePicker } from "design";
+import { useFeature } from "ui/hooks/settings";
+import { PrefixBadgePicker } from "../../../packages/components";
 
 import styles from "./PrefixBadge.module.css";
 
