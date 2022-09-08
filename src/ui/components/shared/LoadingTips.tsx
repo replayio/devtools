@@ -2,8 +2,9 @@ import React, { FC, useEffect, useRef, useState } from "react";
 import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
+import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
 
-const TIP_DURATION = 5000;
+const TIP_DURATION = 12000;
 
 const TIPS = [
   {
@@ -19,20 +20,34 @@ const TIPS = [
     icon: KeyIcon,
   },
   {
-    title: "Intellectual property",
-    description:
-      "Replay is architected with your privacy in mind. We try our hardest not to collect sensitive information that we don't need, and will never sell your information.",
-    icon: CloudIcon,
-  },
-  {
     title: "Private by default",
     description: "Replay will never view or analyze your replays without your explicit permission.",
     icon: ShieldIcon,
   },
+  {
+    title: "Focus Mode",
+    description:
+      "Try typing shift-f to focus your debugging session to a precise location.",
+    icon: LightbulbIcon,
+  },
+  {
+    title: "Command palette",
+    description:
+      "Command-k launches Replay's command palette which helps find things faster.",
+    icon: LightbulbIcon,
+  },
+  {
+    title: "Print statements",
+    description:
+      "Print statements might be Replay's best feature! Try clicking on a line of code in the editor.",
+    icon: LightbulbIcon,
+  },
 ] as const;
 
 export const LoadingTips: FC = () => {
-  const [currentTipIdx, setCurrentTipIdx] = useState(0);
+  const rand = Math.floor(Math.random() * (TIPS.length));
+  console.log(rand);
+  const [currentTipIdx, setCurrentTipIdx] = useState(rand);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
   const timerRef = useRef<NodeJS.Timeout>();
 
@@ -50,9 +65,9 @@ export const LoadingTips: FC = () => {
   }, [currentTipIdx]);
 
   return (
-    <div className="h-32 w-96 space-y-8">
-      <div className="bg-loadingBoxes flex max-w-lg items-center space-x-4 rounded-lg px-8 py-4 align-middle text-bodyColor">
-        <div className="h-16 w-16">
+    <div className="h-32 space-y-8 w-96">
+      <div className="flex items-center max-w-lg px-8 py-4 space-x-4 align-middle rounded-lg shadow-sm bg-loadingBoxes text-bodyColor">
+        <div className="w-16 h-16">
           <Icon />
         </div>
         <div className="flex flex-col space-y-2">
