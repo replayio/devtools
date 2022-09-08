@@ -98,28 +98,14 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
           />
         );
       } else if (isPointInstance(loggable)) {
-        // Respect the focus region and _don't_ show LogPointRenderers  outside the focus range
-        // (since they have analysis that results in errors otherwise ).
-        // TODO Is this _too_ restrictive?
-
-        const isFocused =
-          focusRange === null ||
-          isExecutionPointsWithinRange(
-            loggableExecutionPoint,
-            focusRange.begin.point,
-            focusRange.end.point
-          );
-
-        if (isFocused) {
-          listItems.push(
-            <LogPointRenderer
-              key={index}
-              index={index}
-              isFocused={loggable === currentSearchResult}
-              logPointInstance={loggable}
-            />
-          );
-        }
+        listItems.push(
+          <LogPointRenderer
+            key={index}
+            index={index}
+            isFocused={loggable === currentSearchResult}
+            logPointInstance={loggable}
+          />
+        );
       } else if (isProtocolMessage(loggable)) {
         listItems.push(
           <MessageRenderer
