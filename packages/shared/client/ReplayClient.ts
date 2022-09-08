@@ -352,6 +352,8 @@ export class ReplayClient implements ReplayClientInterface {
               if (errorMessage.includes("too many points")) {
                 status = "too-many-points-to-find";
               } else {
+                console.error(errorMessage);
+
                 status = "unknown-error";
               }
             },
@@ -371,6 +373,8 @@ export class ReplayClient implements ReplayClientInterface {
         if (isTooManyPointsError(error)) {
           status = "too-many-points-to-find";
         } else {
+          console.error(error);
+
           status = "unknown-error";
         }
       }
@@ -402,6 +406,8 @@ export class ReplayClient implements ReplayClientInterface {
         if (isTooManyPointsError(error)) {
           status = "too-many-points-to-find";
         } else {
+          console.error(error);
+
           status = "unknown-error";
         }
       }
