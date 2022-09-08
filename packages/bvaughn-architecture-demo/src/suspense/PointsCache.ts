@@ -51,7 +51,9 @@ export function getHitPointsForLocation(
   // without any overflow, and then later fetch for a focus range. Right now we re-fetch in this case.
 
   const locationKey = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
-  const key = focusRange ? `${locationKey}:${focusRange.begin}:${focusRange.end}` : locationKey;
+  const key = focusRange
+    ? `${locationKey}:${focusRange.begin.point}:${focusRange.end.point}`
+    : locationKey;
   let record = locationToHitPointsMap.get(key);
   if (record == null) {
     const wakeable = createWakeable<HitPointsAndStatusTuple>();
