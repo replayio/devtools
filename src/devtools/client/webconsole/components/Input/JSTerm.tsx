@@ -47,6 +47,7 @@ export default function JSTerm() {
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
   const isInLoadedRegion = useAppSelector(getIsInLoadedRegion);
+  const playback = useAppSelector(getPlayback);
 
   const [value, setValue] = useState("");
   const [autocompletePreview, setAutocompletePreview] = useState<string | null>(null);
@@ -54,6 +55,8 @@ export default function JSTerm() {
   const _execute = () => executeRef.current();
 
   const { moveHistoryCursor, setHistoryIndex } = useEvaluationHistory(setValue);
+
+  const canEval = recording && recording.userRole !== "team-user";
 
   const onKeyPress = (e: KeyboardEvent, editor: Editor) => {
     if (e.key === Keys.ENTER && !e.shiftKey) {
@@ -71,12 +74,7 @@ export default function JSTerm() {
       return;
     }
 
-    const canEval = recording!.userRole !== "team-user";
-    if (canEval) {
-      dispatch(evaluateExpression(value));
-    } else {
-      dispatch(paywallExpression(value));
-    }
+    dispatch(evaluateExpression(value));
 
     setValue("");
     setHistoryIndex(0);
@@ -84,6 +82,16 @@ export default function JSTerm() {
 
   const [key, setKey] = useState(0);
   useLayoutEffect(() => () => setKey(prevKey => prevKey + 1), []);
+
+  let inaccessibleReason: InaccessibleReason | undefined = undefined;
+
+  if (canEval) {
+    if (!isInLoadedRegion) {
+      inaccessibleReason = playback ? "disabledPlayback" : "other";
+    }
+  } else {
+    inaccessibleReason = "userRole";
+  }
 
   // TODO [bvaughn] Refocus JSTerm <input> when SearchInput is hidden
   return (
@@ -96,7 +104,9 @@ export default function JSTerm() {
           tabIndex={-1}
         >
           <div className="console-chevron ml-3 mr-1 h-3 w-3" />
-          {isInLoadedRegion ? (
+          {inaccessibleReason ? (
+            <InaccessibleEditor reason={inaccessibleReason} />
+          ) : (
             <EditorWithAutocomplete
               key={key}
               onEditorMount={(editor: Editor, showAutocomplete?: (show: boolean) => void) =>
@@ -107,8 +117,6 @@ export default function JSTerm() {
               setValue={setValue}
               onRegularKeyPress={onKeyPress}
             />
-          ) : (
-            <InaccessibleEditor />
           )}
         </div>
       </div>
@@ -117,9 +125,20 @@ export default function JSTerm() {
   );
 }
 
-function InaccessibleEditor() {
-  const playback = useAppSelector(getPlayback);
-  const msg = playback ? "Console evaluations are disabled during playback" : "Unavailable…";
+type InaccessibleReason = "disabledPlayback" | "userRole" | "other";
+
+interface InaccessibleEditorProps {
+  reason: InaccessibleReason;
+}
+
+const reasonStrings: Record<InaccessibleReason, string> = {
+  disabledPlayback: "Console evaluations are disabled during playback",
+  userRole: "Only 'Developer'-role users can evaluate expressions",
+  other: "Unavailable...",
+};
+
+function InaccessibleEditor({ reason }: InaccessibleEditorProps) {
+  const msg = reasonStrings[reason];
 
   return <div className="flex h-full items-center italic text-gray-400">{msg}</div>;
 }
