@@ -2,10 +2,12 @@
   color: var(--color-default);
   display: flex;
   flex-direction: column;
+  flex-wrap: wrap;
+  max-height: 250px !important;
+  max-width: 400px;
+  overflow: auto;
 }
 
 .Inspector {
-  max-height: 250px;
-  max-width: 400px;
-  overflow: auto;
+  overflow: initial;
 }
