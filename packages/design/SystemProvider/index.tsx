@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import Head from "next/head";
 
-import iconSprite from "./Icon/sprite.svg";
+import iconSprite from "../Icon/sprite.svg";
 
 /** Provides design system functionality to all descendant components. */
 export function SystemProvider({ children }: { children: ReactNode }) {
