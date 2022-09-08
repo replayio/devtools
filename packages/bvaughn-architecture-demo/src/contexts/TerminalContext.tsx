@@ -20,10 +20,10 @@ export type TerminalExpression = {
   type: "TerminalExpression";
 };
 
-type NewMessage = Omit<TerminalExpression, "id" | "type">;
+export type NewTerminalExpression = Omit<TerminalExpression, "id" | "type">;
 
 export type TerminalContextType = {
-  addMessage: (newMessage: NewMessage) => void;
+  addMessage: (partialTerminalExpression: NewTerminalExpression) => void;
   clearMessages: () => void;
   isPending: boolean;
   messages: TerminalExpression[];
@@ -38,17 +38,20 @@ export function TerminalContextRoot({ children }: PropsWithChildren<{}>) {
 
   const [isPending, startTransition] = useTransition();
 
-  const addMessage = useCallback((newMessage: Omit<TerminalExpression, "id" | "type">) => {
-    startTransition(() => {
-      const message: TerminalExpression = {
-        ...newMessage,
-        id: idCounter++,
-        type: "TerminalExpression",
-      };
+  const addMessage = useCallback(
+    (partialTerminalExpression: Omit<TerminalExpression, "id" | "type">) => {
+      startTransition(() => {
+        const message: TerminalExpression = {
+          ...partialTerminalExpression,
+          id: idCounter++,
+          type: "TerminalExpression",
+        };
 
-      setMessages(prevMessages => [...prevMessages, message]);
-    });
-  }, []);
+        setMessages(prevMessages => [...prevMessages, message]);
+      });
+    },
+    []
+  );
 
   const clearMessages = useCallback(() => setMessages([]), []);
 

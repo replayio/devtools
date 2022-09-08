@@ -22,7 +22,6 @@ import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getTheme } from "ui/reducers/app";
-import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
 import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
@@ -84,7 +83,6 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     "eventListenerBreakpoints",
     state => state.eventListenerBreakpoints
   );
-  updateAsyncPrefs(state, oldState, "commandHistory", state => state.messages?.commandHistory);
 
   // This is lazy-loaded, so it may not exist on startup
   if (state.consoleUI && oldState.consoleUI) {
@@ -206,7 +204,6 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPanel: getSelectedPanel(state),
     localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
-    consoleFilters: getAllFilters(state),
   };
 
   const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };

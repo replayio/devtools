@@ -15,7 +15,6 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
-  disableNewComponentArchitecture: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
   enableLargeText: boolean;

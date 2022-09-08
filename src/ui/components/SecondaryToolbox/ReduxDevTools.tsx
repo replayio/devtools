@@ -21,9 +21,7 @@ export const ReduxDevToolsPanel = () => {
   const [ReduxDevToolsAppRoot, setRoot] = useState<typeof Root | null>(null);
   const rootRef = useRef<Root | null>(null);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
-  const currentTimestamp = useAppSelector(
-    (state: UIState) => state.messages.pausedExecutionPointTime
-  );
+
   // Collect the current Replay app theme so we can apply it to the Redux DevTools
   const appTheme = useAppSelector((state: UIState) => state.app.theme);
   // Also save the current RDT theme in state, so we can do stupid syncing tricks

@@ -1,5 +1,5 @@
-import { preCacheObject } from "@bvaughn/src/suspense/ObjectPreviews";
-import { stringify } from "@bvaughn/src/utils/string";
+import { preCacheObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { stringify } from "bvaughn-architecture-demo/src/utils/string";
 import { Pause, ThreadFront } from "protocol/thread";
 import { useContext, useEffect } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";

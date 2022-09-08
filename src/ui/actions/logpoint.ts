@@ -13,7 +13,6 @@ import {
   PointDescription,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import { exceptionLogpointErrorReceived } from "devtools/client/webconsole/reducers/messages";
 import { EventId } from "devtools/server/actors/utils/event-breakpoints";
 import { UIStore } from "ui/actions";
 import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
@@ -615,8 +614,6 @@ export async function setExceptionLogpoint(logGroupId: string) {
     } else {
       msg = "An error occured while fetching exceptions. Try again.";
     }
-
-    store.dispatch(exceptionLogpointErrorReceived(msg));
   }
 }
 

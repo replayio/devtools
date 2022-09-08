@@ -17,7 +17,6 @@ import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
-import { messages as messagesReducer } from "devtools/client/webconsole/reducers/messages";
 
 import { context } from "ui/setup/redux/middleware/context";
 import hitCounts from "ui/reducers/hitCounts";
@@ -46,7 +45,6 @@ let reducers = {
   sources: sources,
   hitCounts: hitCounts,
   layout: layoutReducer,
-  messages: messagesReducer,
   possibleBreakpoints: possibleBreakpoints,
   protocolMessages: protocolMessages,
   tabs: tabsReducer,

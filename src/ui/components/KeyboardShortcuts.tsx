@@ -1,17 +1,14 @@
 import { useEffect, useMemo } from "react";
-
 import { connect, ConnectedProps } from "react-redux";
 import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 import { UIThunkAction } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { getSelectedSource } from "ui/reducers/sources";
 import * as dbgActions from "devtools/client/debugger/src/actions/ui";
 import { toggleQuickOpen, closeQuickOpen } from "devtools/client/debugger/src/actions/quick-open";
 import { getActiveSearch, getQuickOpenEnabled } from "devtools/client/debugger/src/selectors";
 import { trackEvent } from "ui/utils/telemetry";
-import { deselectSource } from "devtools/client/debugger/src/actions/sources/select";
 import { getCommandPaletteInput } from "./CommandPalette/SearchInput";
 import { isEditableElement, addGlobalShortcut, removeGlobalShortcut } from "ui/utils/key-shortcuts";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -42,12 +39,9 @@ const closeOpenModalsOnEscape = (e: KeyboardEvent): UIThunkAction => {
 
 function KeyboardShortcuts({
   createFrameComment,
-  showCommandPaletteInEditor,
   setSelectedPrimaryPanel,
   focusFullTextInput,
   setViewMode,
-  selectedSource,
-  toolboxLayout,
   toggleCommandPalette,
   toggleFocusMode,
   togglePaneCollapse,
@@ -98,7 +92,7 @@ function KeyboardShortcuts({
       trackEvent("key_shortcut.show_command_palette");
 
       toggleCommandPalette();
-      
+
       const paletteInput = getCommandPaletteInput();
       if (paletteInput) {
         paletteInput.focus();
@@ -169,13 +163,10 @@ function KeyboardShortcuts({
     return shortcuts;
   }, [
     isAuthenticated,
-    showCommandPaletteInEditor,
     setSelectedPrimaryPanel,
     focusFullTextInput,
     protocolTimeline,
     setViewMode,
-    selectedSource,
-    toolboxLayout,
     toggleCommandPalette,
     toggleFocusMode,
     togglePaneCollapse,
@@ -206,8 +197,6 @@ function KeyboardShortcuts({
 const connector = connect(
   (state: UIState) => ({
     selectedPrimaryPanel: selectors.getSelectedPrimaryPanel(state),
-    selectedSource: getSelectedSource(state),
-    toolboxLayout: selectors.getToolboxLayout(state),
     viewMode: selectors.getViewMode(state),
   }),
   {
@@ -218,7 +207,6 @@ const connector = connect(
     togglePaneCollapse: actions.togglePaneCollapse,
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
-    showCommandPaletteInEditor: deselectSource,
     toggleThemeAction: actions.toggleTheme,
     toggleQuickOpen,
     closeOpenModalsOnEscape,

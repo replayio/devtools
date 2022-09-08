@@ -1,11 +1,10 @@
-import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
-import Inspector from "@bvaughn/components/inspector";
-import Loader from "@bvaughn/components/Loader";
-import "@bvaughn/pages/variables.css";
-import { clientValueToProtocolValue } from "@bvaughn/src/utils/protocol";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import "bvaughn-architecture-demo/pages/variables.css";
+import { clientValueToProtocolValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { Value as ProtocolValue } from "@replayio/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import { ValueItem } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { Suspense, useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
@@ -27,7 +26,9 @@ export default function NewObjectInspector() {
       return null;
     }
 
-    return clientValueToProtocolValue(preview?.root as ValueItem);
+    // TODO [bvaughn] preview.root is not a type that clientValueToProtocolNamedValue() was written for
+    // We should create a different adapter function for this
+    return clientValueToProtocolValue(preview?.root);
   }, [preview]);
 
   if (pause == null || pause.pauseId == null || protocolValue === null) {
