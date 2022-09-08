@@ -7,8 +7,9 @@ import { useFeature } from "ui/hooks/settings";
 
 // Connects legacy PauseData to the new Object Inspector Suspense cache.
 // This avoids requiring the new Object Inspector to load redundant data.
+// TODO Consider moving this logic into `bootstrapApp()` instead
 export default function ObjectPreviewSuspenseCacheAdapter() {
-  const disableNewComponentArchitecture = useFeature("disableNewComponentArchitecture");
+  const { value: disableNewComponentArchitecture } = useFeature("disableNewComponentArchitecture");
 
   // It's important to not miss pre-cached data because there's no way to access it after the fact.
   // So use a layout effect for subscription rather than a passive effect.
