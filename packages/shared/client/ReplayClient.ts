@@ -123,7 +123,7 @@ export class ReplayClient implements ReplayClientInterface {
     if (frameId === null) {
       const response = await client.Pause.evaluateInGlobal(
         {
-          expression,
+          expression: `(${expression})`,
           pure: false,
         },
         sessionId,
@@ -134,7 +134,7 @@ export class ReplayClient implements ReplayClientInterface {
       const response = await client.Pause.evaluateInFrame(
         {
           frameId,
-          expression,
+          expression: `(${expression})`,
           pure: false,
           useOriginalScopes: true,
         },
