@@ -1,4 +1,5 @@
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
+import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
@@ -70,9 +71,11 @@ function LogPointRenderer({
       )}
       <span className={styles.LogContents}>
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
-        <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
-          <AnalyzedContent logPointInstance={logPointInstance} />
-        </Suspense>
+        <ErrorBoundary>
+          <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
+            <AnalyzedContent logPointInstance={logPointInstance} />
+          </Suspense>
+        </ErrorBoundary>
       </span>
     </>
   );
