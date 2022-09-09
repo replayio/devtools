@@ -20,6 +20,13 @@
   margin-right: 4px;
 }
 
+.portal-dropdown-wrapper button:hover {
+  background-color: var(--tab-bgcolor);
+}
+.portal-dropdown-wrapper button:hover .icon {
+  background-color: var(--theme-icon-hover-color);
+}
+
 .portal-dropdown-container .mask {
   position: fixed;
   width: 100%;

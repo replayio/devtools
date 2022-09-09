@@ -68,16 +68,15 @@ h2 {
   background-color: var(--theme-icon-color);
 }
 
+#command-button-pick:hover {
+  background-color: var(--tab-bgcolor);
+}
 #command-button-pick:hover::before {
-  background-color: var(--theme-icon-dimmed-color);
+  background-color: var(--theme-icon-hover-color);
 }
 
 #command-button-pick.active::before {
   background-color: var(--primary-accent);
-}
-
-#command-button-pick:hover {
-  background-color: var(--toolbarbutton-focus-bgcolor);
 }
 
 .app-mask {

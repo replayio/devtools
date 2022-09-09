@@ -1055,3 +1055,10 @@ a.learn-more-link.webconsole-learn-more-link {
   /* tailwind text-gray-500 */
   color: rgba(107, 114, 128);
 }
+
+.video-picker-button:hover {
+  background-color: var(--tab-bgcolor);
+}
+.video-picker-button:hover .material-icons {
+  color: var(--theme-icon-hover-color);
+}
