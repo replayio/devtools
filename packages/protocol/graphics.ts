@@ -248,9 +248,16 @@ export function setupGraphics() {
 
 export async function repaint(force = false) {
   const recordingTarget = await ThreadFront.getRecordingTarget();
-  if (recordingTarget === "node") {
-    return;
+  switch (recordingTarget) {
+    case "chromium": {
+      // FE-673: Disable re-painting for Chromium for the time being; reenable once it is stable.
+      return;
+    }
+    case "node": {
+      return;
+    }
   }
+
   let graphicsFetched = false;
 
   let didStall = false;
