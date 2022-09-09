@@ -25,7 +25,7 @@ const HideVideoButton: FC = () => {
 
   return (
     <button
-      className="absolute top-0 right-0 flex rounded-full bg-tabBgcolor p-1"
+      className="video-picker-button absolute top-0 right-0 flex rounded-full bg-tabBgcolor p-1"
       title="Hide Video"
       onClick={onClick}
     >
