@@ -26,6 +26,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
           dispatch(
             onViewSourceInDebugger({
               url,
+              sourceId: location.sourceId,
               line: location.line,
               column: location.column,
             })
