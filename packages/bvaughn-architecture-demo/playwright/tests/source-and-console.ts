@@ -69,6 +69,24 @@ test("should not allow saving log points with invalid conditional", async ({ pag
   await takeScreenshot(page, pointPanel, "point-panel-invalid-conditional");
 });
 
+test("should run local analysis for log points", async ({ page }) => {
+  await toggleProtocolMessages(page, false);
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, '"local", 123, true');
+
+  const message = page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, message, "log-point-local-analysis");
+});
+
+test("should support new lines in log points", async ({ page }) => {
+  await toggleProtocolMessages(page, false);
+  await addLogPoint(page, 13);
+  await fillLogPointText(page, 13, '"one\\ntwo"');
+
+  const message = page.locator("[data-test-name=Message]").first();
+  await takeScreenshot(page, message, "log-point-with-new-lines");
+});
+
 test("should run remote analysis for log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
   await addLogPoint(page, 13);
