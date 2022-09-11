@@ -185,6 +185,11 @@ export function createMockReplayClient() {
     getObjectProperty: jest.fn().mockImplementation(async () => ({})),
     getPointNearTime: jest.fn().mockImplementation(async () => ({ point: "0", time: 0 })),
     getPreferredLocation: jest.fn().mockImplementation(async () => ({})),
+    getRecordingCapabilities: jest.fn().mockImplementation(async () => ({
+      supportsEventTypes: false,
+      supportsNetworkRequests: false,
+      supportsRepaintingGraphics: false,
+    })),
     getRecordingId: jest.fn().mockImplementation(async () => "fake-recording-id"),
     getSessionEndpoint: jest.fn().mockImplementation(async () => ({
       point: "1000",

@@ -24,14 +24,13 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   TimeRange,
-  getResponseBodyResult,
-  getRequestBodyResult,
   FunctionMatch,
   keyboardEvents,
   navigationEvents,
   Result,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
+import { RecordingCapabilities } from "protocol/thread/thread";
 
 export type LogEntry = {
   args: any[];
@@ -102,6 +101,7 @@ export interface ReplayClientInterface {
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
   getPreferredLocation(locations: Location[]): Location | null;
+  getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;

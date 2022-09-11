@@ -247,15 +247,9 @@ export function setupGraphics() {
 }
 
 export async function repaint(force = false) {
-  const recordingTarget = await ThreadFront.getRecordingTarget();
-  switch (recordingTarget) {
-    case "chromium": {
-      // FE-673: Disable re-painting for Chromium for the time being; reenable once it is stable.
-      return;
-    }
-    case "node": {
-      return;
-    }
+  const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+  if (recordingCapabilities.supportsRepaintingGraphics) {
+    return;
   }
 
   let graphicsFetched = false;

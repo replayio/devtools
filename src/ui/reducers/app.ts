@@ -331,10 +331,6 @@ export const getCanvas = (state: UIState) => state.app.canvas;
 export const getVideoUrl = (state: UIState) => state.app.videoUrl;
 export const getDefaultSettingsTab = (state: UIState) => state.app.defaultSettingsTab;
 export const getRecordingTarget = (state: UIState) => state.app.recordingTarget;
-export const getHasGraphics = (state: UIState) => {
-  const target = state.app.recordingTarget;
-  return target == "gecko";
-};
 export const getRecordingWorkspace = (state: UIState) => state.app.recordingWorkspace;
 export const isRegionLoaded = (state: UIState, time: number | null | undefined) =>
   typeof time !== "number" || isTimeInRegions(time, getLoadedRegions(state)?.loaded);
