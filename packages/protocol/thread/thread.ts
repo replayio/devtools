@@ -84,6 +84,12 @@ export type WiredMessage = Omit<Message, "argumentValues"> & {
   argumentValues?: ValueFront[];
 };
 
+export type RecordingCapabilities = {
+  supportsEventTypes: boolean;
+  supportsNetworkRequests: boolean;
+  supportsRepaintingGraphics: boolean;
+};
+
 // Target applications which can create recordings.
 export enum RecordingTarget {
   gecko = "gecko",
@@ -143,6 +149,7 @@ class _ThreadFront {
   sessionWaiter = defer<SessionId>();
 
   // Waiter which resolves with the target used to create the recording.
+  recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
   recordingTargetWaiter = defer<RecordingTarget>();
 
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
@@ -226,7 +233,47 @@ class _ThreadFront {
     console.debug({ sessionId });
 
     const { buildId } = await client.Session.getBuildId({}, sessionId);
-    this.recordingTargetWaiter.resolve(getRecordingTarget(buildId));
+
+    const recordingTarget = getRecordingTarget(buildId);
+
+    let recordingCapabilities: RecordingCapabilities;
+    switch (recordingTarget) {
+      case "chromium": {
+        recordingCapabilities = {
+          supportsEventTypes: false,
+          supportsNetworkRequests: false,
+          supportsRepaintingGraphics: false,
+        };
+        break;
+      }
+      case "gecko": {
+        recordingCapabilities = {
+          supportsEventTypes: true,
+          supportsNetworkRequests: true,
+          supportsRepaintingGraphics: true,
+        };
+        break;
+      }
+      case "node": {
+        recordingCapabilities = {
+          supportsEventTypes: true,
+          supportsNetworkRequests: true,
+          supportsRepaintingGraphics: false,
+        };
+        break;
+      }
+      case "unknown":
+      default: {
+        recordingCapabilities = {
+          supportsEventTypes: false,
+          supportsNetworkRequests: false,
+          supportsRepaintingGraphics: false,
+        };
+      }
+    }
+
+    this.recordingCapabilitiesWaiter.resolve(recordingCapabilities);
+    this.recordingTargetWaiter.resolve(recordingTarget);
   }
 
   waitForSession() {
@@ -319,6 +366,10 @@ class _ThreadFront {
     this._accessToken = accessToken;
 
     return client.Authentication.setAccessToken({ accessToken });
+  }
+
+  getRecordingCapabilities(): Promise<RecordingCapabilities> {
+    return this.recordingCapabilitiesWaiter.promise;
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {

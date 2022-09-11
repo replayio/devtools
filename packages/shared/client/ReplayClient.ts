@@ -34,6 +34,7 @@ import analysisManager from "protocol/analysisManager";
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { RecordingCapabilities } from "protocol/thread/thread";
 import { compareNumericStrings, defer } from "protocol/utils";
 import { isTooManyPointsError } from "shared/utils/error";
 
@@ -104,6 +105,10 @@ export class ReplayClient implements ReplayClientInterface {
 
     const handlers = this._eventHandlers.get(type)!;
     handlers.push(handler);
+  }
+
+  async getRecordingCapabilities(): Promise<RecordingCapabilities> {
+    return this._threadFront.getRecordingCapabilities();
   }
 
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
