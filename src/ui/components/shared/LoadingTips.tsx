@@ -46,7 +46,6 @@ const TIPS = [
 
 export const LoadingTips: FC = () => {
   const rand = Math.floor(Math.random() * (TIPS.length));
-  console.log(rand);
   const [currentTipIdx, setCurrentTipIdx] = useState(rand);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
   const timerRef = useRef<NodeJS.Timeout>();
