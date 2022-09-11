@@ -26,7 +26,6 @@ import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
-import { getHasGraphics } from "ui/reducers/app";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
 import { useFeature } from "ui/hooks/settings";
@@ -38,7 +37,6 @@ interface PanelButtonsProps {
   hasReactComponents: boolean;
   hasReduxAnnotations: boolean;
   toolboxLayout: ToolboxLayout;
-  hasGraphics: boolean;
   recordingCapabilities: RecordingCapabilities;
 }
 
@@ -73,14 +71,14 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   hasReactComponents,
   hasReduxAnnotations,
   toolboxLayout,
-  hasGraphics,
   recordingCapabilities,
 }) => {
+  const { supportsNetworkRequests } = recordingCapabilities;
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
-      {hasGraphics && <NodePicker />}
+      {supportsNetworkRequests && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {hasGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
+      {supportsNetworkRequests && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
@@ -88,9 +86,7 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       )}
       {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
       {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
-      {recordingCapabilities.supportsNetworkRequests && (
-        <PanelButton panel="network">Network</PanelButton>
-      )}
+      {supportsNetworkRequests && <PanelButton panel="network">Network</PanelButton>}
     </div>
   );
 };
@@ -142,7 +138,6 @@ export default function SecondaryToolboxSuspenseWrapper() {
 
 function SecondaryToolbox() {
   const selectedPanel = useAppSelector(getSelectedPanel);
-  const hasGraphics = useAppSelector(getHasGraphics);
   const hasReactComponents = useAppSelector(selectors.hasReactComponents);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
@@ -157,10 +152,9 @@ function SecondaryToolbox() {
   const hasReduxAnnotations = reduxAnnotations.length > 0;
 
   return (
-    <div className={classnames(`secondary-toolbox rounded-lg`, { node: !hasGraphics })}>
+    <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          hasGraphics={hasGraphics}
           hasReactComponents={hasReactComponents}
           hasReduxAnnotations={hasReduxAnnotations}
           recordingCapabilities={recordingCapabilities}
