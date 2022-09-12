@@ -1,5 +1,5 @@
 import { ExecutionPoint, ObjectId } from "@replayio/protocol";
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ThreadFront } from "protocol/thread";
@@ -101,20 +101,17 @@ class ReplayWall implements Wall {
           }
           this.highlightedElementId = id;
 
-          const response = await ThreadFront.evaluate({
+          const response = await ThreadFront.evaluateNew({
             asyncIndex: 0,
             text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
           });
-          if (!response.returned || this.highlightedElementId !== id) {
+
+          const nodeId = response.returned?.object;
+          if (!nodeId || this.highlightedElementId !== id) {
             return;
           }
 
-          const nodeFront = response.returned.getNodeFront();
-          if (!nodeFront || this.highlightedElementId !== id) {
-            return;
-          }
-
-          this.highlightNode(nodeFront.id!);
+          this.highlightNode(nodeId);
           break;
         }
 
