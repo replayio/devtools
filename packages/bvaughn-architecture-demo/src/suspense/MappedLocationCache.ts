@@ -3,7 +3,7 @@ import {
   MappedLocation as ProtocolMappedLocation,
 } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
-import { createGenericCache } from "./GenericCache";
+import { createGenericCache } from "./createGenericCache";
 
 export const { getValue: getMappedLocation } = createGenericCache<
   [ReplayClientInterface, ProtocolLocation],

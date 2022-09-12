@@ -18,7 +18,7 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
       record.status = STATUS_RESOLVED;
       record.value = value;
 
-      wakeable.resolve(record.value);
+      wakeable.resolve(value);
     } catch (error) {
       record.status = STATUS_REJECTED;
       record.value = error;

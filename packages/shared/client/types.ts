@@ -88,6 +88,10 @@ export interface ReplayClientInterface {
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getAnnotationKinds(): Promise<string[]>;
+  getBreakpointPositions(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]>;
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
@@ -95,6 +99,7 @@ export interface ReplayClientInterface {
     location: Location,
     condition: string | null
   ): Promise<HitPointsAndStatusTuple>;
+  getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
@@ -109,11 +114,6 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
-  getBreakpointPositions(
-    sourceId: SourceId,
-    range?: { start: SourceLocation; end: SourceLocation }
-  ): Promise<SameLineSourceLocations[]>;
-  getMappedLocation(location: Location): Promise<MappedLocation>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;

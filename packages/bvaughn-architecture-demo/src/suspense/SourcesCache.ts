@@ -8,7 +8,7 @@ import {
 import { LineHits, ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
-import { createGenericCache } from "./GenericCache";
+import { createGenericCache } from "./createGenericCache";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
