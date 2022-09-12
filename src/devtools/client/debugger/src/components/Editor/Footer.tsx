@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import React, { memo, Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
@@ -7,7 +7,7 @@ import { getSelectedSource } from "ui/reducers/sources";
 import SourcemapToggle from "./SourcemapToggle";
 import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
 
-type CursorPosition = {
+export type CursorPosition = {
   readonly column: number;
   readonly line: number;
 };
@@ -132,8 +132,10 @@ function SourceFooter() {
 
   return (
     <div className="source-footer">
-      <SourcemapToggle />
-      <SourcemapVisualizerLink />
+      <Suspense>
+        <SourcemapToggle cursorPosition={cursorPosition} />
+        <SourcemapVisualizerLink cursorPosition={cursorPosition} />
+      </Suspense>
       <div className="source-footer-end">{cursorPositionUI}</div>
     </div>
   );
