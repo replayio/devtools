@@ -1,3 +1,4 @@
+import { TimeStampedPointWithPaintHash } from "@bvaughn/src/suspense/PaintsCache";
 import { ScreenShot } from "@replayio/protocol";
 
 import { ThreadFront } from "./thread";
@@ -35,7 +36,10 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The promise may be rejected
    * if another preview screenshot is requested before this download was started.
    */
-  async getScreenshotForPreview(point: string, paintHash: string): Promise<ScreenShot | undefined> {
+  async getScreenshotForPreview({
+    paintHash,
+    point,
+  }: TimeStampedPointWithPaintHash): Promise<ScreenShot | undefined> {
     if (!paintHash) {
       return undefined;
     }
@@ -63,10 +67,10 @@ export class ScreenshotCache {
    * Returns a promise for the requested screenshot. The download will be started
    * immediately and will only be rejected if sendMessage() throws.
    */
-  async getScreenshotForPlayback(
-    point: string,
-    paintHash: string
-  ): Promise<ScreenShot | undefined> {
+  async getScreenshotForPlayback({
+    paintHash,
+    point,
+  }: TimeStampedPointWithPaintHash): Promise<ScreenShot | undefined> {
     if (!paintHash) {
       return undefined;
     }

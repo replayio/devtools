@@ -1,4 +1,4 @@
-import { setHasAllPaintPoints } from "protocol/graphics";
+import { setFetchingPaints, Status } from "@bvaughn/src/suspense/PaintsCache";
 import { createTestStore } from "test/testUtils";
 import { UIStore } from "ui/actions";
 
@@ -30,7 +30,7 @@ describe("Redux timeline state", () => {
     );
 
     // Fake having loaded paint points.
-    setHasAllPaintPoints(true);
+    setFetchingPaints(Status.Finished);
   });
 
   describe("focus region", () => {

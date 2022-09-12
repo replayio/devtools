@@ -5,15 +5,9 @@ import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 import {
   getGraphicsAtTime,
-  gPaintPoints,
   paintGraphics,
-  mostRecentIndex,
   mostRecentPaintOrMouseEvent,
   nextPaintOrMouseEvent,
-  nextPaintEvent,
-  previousPaintEvent,
-  getFirstMeaningfulPaint,
-  timeIsBeyondKnownPaints,
   screenshotCache,
 } from "protocol/graphics";
 import { DownloadCancelledError } from "protocol/screenshot-cache";
@@ -68,6 +62,13 @@ import { framePositionsCleared, resumed } from "devtools/client/debugger/src/red
 import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 import { UIState } from "ui/state";
+import {
+  fetchingPaints,
+  imperitavelyGetNextPaintPointForTime,
+  imperitavelyGetPaintPointForTime,
+  lastReceivedPaintPoint,
+  Status,
+} from "@bvaughn/src/suspense/PaintsCache";
 
 const DEFAULT_FOCUS_WINDOW_PERCENTAGE = 0.2;
 const DEFAULT_FOCUS_WINDOW_MAX_LENGTH = 5000;
@@ -146,12 +147,6 @@ async function getInitialPausePoint(recordingId: string) {
     const { point, time } = firstComment;
     hasFrames = firstComment.hasFrames;
     return { point, time, hasFrames };
-  }
-
-  const firstMeaningfulPaint = await getFirstMeaningfulPaint(10);
-  if (firstMeaningfulPaint) {
-    const { point, time } = firstMeaningfulPaint;
-    return { point, time, hasFrames: false };
   }
 }
 
@@ -249,7 +244,7 @@ export function seek(
 }
 
 export function seekToTime(targetTime: number): UIThunkAction {
-  return async (dispatch, _getState, { replayClient }) => {
+  return async (dispatch, getState, { replayClient }) => {
     if (targetTime == null) {
       return;
     }
@@ -266,6 +261,9 @@ export function seekToTime(targetTime: number): UIThunkAction {
         bestPoint = pointNearTime;
       }
     } catch (e) {}
+    if (getState().timeline.currentTime !== targetTime) {
+      return;
+    }
     dispatch(seek(bestPoint.point, targetTime, false));
   };
 }
@@ -274,9 +272,8 @@ export function togglePlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const playback = getPlayback(state);
-    const currentTime = getCurrentTime(state);
 
-    if (playback || timeIsBeyondKnownPaints(currentTime)) {
+    if (playback) {
       dispatch(stopPlayback());
     } else {
       dispatch(startPlayback());
@@ -288,10 +285,6 @@ export function startPlayback(): UIThunkAction {
   return (dispatch, getState) => {
     const state = getState();
     const currentTime = getCurrentTime(state);
-
-    if (timeIsBeyondKnownPaints(currentTime)) {
-      return;
-    }
 
     const endTime = getZoomRegion(state).endTime;
 
@@ -339,9 +332,13 @@ function playback(beginTime: number, endTime: number): UIThunkAction {
     let nextGraphicsPromise!: ReturnType<typeof getGraphicsAtTime>;
 
     const prepareNextGraphics = () => {
-      nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || endTime);
-      nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
-      dispatch(precacheScreenshots(nextGraphicsTime));
+      if (fetchingPaints === Status.Finished || currentTime <= lastReceivedPaintPoint().time) {
+        nextGraphicsTime = snapTimeForPlayback(nextPaintOrMouseEvent(currentTime)?.time || endTime);
+        nextGraphicsPromise = getGraphicsAtTime(nextGraphicsTime, true);
+        dispatch(precacheScreenshots(nextGraphicsTime));
+      } else {
+        dispatch(stopPlayback());
+      }
     };
     const shouldContinuePlayback = () => getPlayback(getState());
     prepareNextGraphics();
@@ -415,7 +412,7 @@ export function goToPrevPaint(): UIThunkAction {
       return;
     }
 
-    const previous = previousPaintEvent(currentTime);
+    const previous = imperitavelyGetPaintPointForTime(currentTime - 1);
 
     if (!previous) {
       return;
@@ -434,7 +431,7 @@ export function goToNextPaint(): UIThunkAction {
       return;
     }
 
-    const next = nextPaintEvent(currentTime);
+    const next = imperitavelyGetNextPaintPointForTime(currentTime);
 
     if (!next) {
       return;
@@ -652,13 +649,10 @@ const shouldRerunAnalysisForBreakpoint = (
     return true;
   }
 
-  const {
-    analysisLoaded,
-    analysisErrored,
-    isFocusSubset,
-    analysisOverflowed,
-    hasAllDataForFocusRegion,
-  } = getStatusFlagsForAnalysisEntry(latestAnalysisEntry, focusRegion);
+  const { hasAllDataForFocusRegion } = getStatusFlagsForAnalysisEntry(
+    latestAnalysisEntry,
+    focusRegion
+  );
 
   return !hasAllDataForFocusRegion;
 };
@@ -773,13 +767,12 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
 
     const endTime = Math.min(beginTime + PRECACHE_DURATION, recordingDuration);
     for (let time = beginTime; time < endTime; time += SNAP_TIME_INTERVAL) {
-      const index = mostRecentIndex(gPaintPoints, time);
-      if (index === undefined) {
+      const paint = imperitavelyGetPaintPointForTime(time);
+      if (!paint) {
         return;
       }
 
-      const paintHash = gPaintPoints[index].paintHash;
-      if (!screenshotCache.hasScreenshot(paintHash)) {
+      if (!screenshotCache.hasScreenshot(paint.paintHash)) {
         const graphicsPromise = getGraphicsAtTime(time, true);
 
         const precachedTime = Math.max(time - SNAP_TIME_INTERVAL, beginTime);
@@ -796,7 +789,7 @@ export function precacheScreenshots(beginTime: number): UIThunkAction {
     }
 
     let precachedTime = endTime;
-    if (mostRecentIndex(gPaintPoints, precachedTime) === gPaintPoints.length - 1) {
+    if (imperitavelyGetPaintPointForTime(precachedTime) === lastReceivedPaintPoint()) {
       precachedTime = recordingDuration;
     }
     if (precachedTime > getPlaybackPrecachedTime(getState())) {

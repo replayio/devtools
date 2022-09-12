@@ -1,12 +1,20 @@
 // Routines for managing and rendering graphics data fetched over the WRP.
+import {
+  getAllPaints,
+  getPaintPointForTime,
+  imperitavelyGetNextPaintPointForTime,
+  imperitavelyGetPaintPointForTime,
+  setFetchingPaints,
+  Status,
+} from "@bvaughn/src/suspense/PaintsCache";
+import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import { TimeStampedPoint, MouseEvent, ScreenShot, PaintPoint } from "@replayio/protocol";
-import maxBy from "lodash/maxBy";
+import { ReplayClient } from "shared/client/ReplayClient";
+import { ReplayClientInterface } from "shared/client/types";
 
 import { DownloadCancelledError, ScreenshotCache } from "./screenshot-cache";
 import { ThreadFront } from "./thread";
-import { assert, binarySearch, defer, Deferred } from "./utils";
-
-const MINIMUM_VIDEO_CONTENT = 5000;
+import { assert, closerEntry, insertEntrySorted, mostRecentEntry, nextEntry } from "./utils";
 
 declare global {
   interface Window {
@@ -19,73 +27,6 @@ export const screenshotCache = new ScreenshotCache();
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
 
-interface Timed {
-  time: number;
-}
-
-// Given a sorted array of items with "time" properties, find the index of
-// the most recent item at or preceding a given time.
-export function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
-  if (!array.length || time < array[0].time) {
-    return undefined;
-  }
-  const index = binarySearch(0, array.length, (index: number) => {
-    return time - array[index].time;
-  });
-  assert(
-    array[index].time <= time,
-    "The most recent item should be at or preceding the given time"
-  );
-  if (index + 1 < array.length) {
-    assert(array[index + 1].time >= time, "the most recent item's index should be in the array");
-  }
-  return index;
-}
-
-function mostRecentEntry<T extends Timed>(array: T[], time: number) {
-  const index = mostRecentIndex(array, time);
-  return index !== undefined ? array[index] : null;
-}
-
-function nextEntry<T extends Timed>(array: T[], time: number) {
-  const index = mostRecentIndex(array, time);
-  if (index === undefined) {
-    return array.length ? array[0] : null;
-  }
-  return index + 1 < array.length ? array[index + 1] : null;
-}
-
-// Add an entry with a "time" property to an array that is sorted by time.
-function insertEntrySorted<T extends Timed>(array: T[], entry: T) {
-  if (!array.length || array[array.length - 1].time <= entry.time) {
-    array.push(entry);
-  } else {
-    const index = mostRecentIndex(array, entry.time);
-    if (index !== undefined) {
-      array.splice(index + 1, 0, entry);
-    } else {
-      array.unshift(entry);
-    }
-  }
-}
-
-function closerEntry<T1 extends Timed, T2 extends Timed>(
-  time: number,
-  entry1: T1 | null,
-  entry2: T2 | null
-) {
-  if (!entry1) {
-    return entry2;
-  }
-  if (!entry2) {
-    return entry1;
-  }
-  if (Math.abs(time - entry1.time) < Math.abs(time - entry2.time)) {
-    return entry1;
-  }
-  return entry2;
-}
-
 //////////////////////////////
 // Paint / Mouse Event Points
 //////////////////////////////
@@ -93,13 +34,6 @@ function closerEntry<T1 extends Timed, T2 extends Timed>(
 export interface TimeStampedPointWithPaintHash extends TimeStampedPoint {
   paintHash: string;
 }
-
-// All paints that have occurred in the recording, in order. Include the
-// beginning point of the recording as well, which is not painted and has
-// a known point and time.
-export const gPaintPoints: TimeStampedPointWithPaintHash[] = [
-  { point: "0", time: 0, paintHash: "" },
-];
 
 // All mouse events that have occurred in the recording, in order.
 const gMouseEvents: MouseEvent[] = [];
@@ -110,51 +44,9 @@ const gMouseClickEvents: MouseEvent[] = [];
 // Device pixel ratio used by the current screenshot.
 let gDevicePixelRatio = 1;
 
-let gAllNecessaryPaintDataReceived = false;
-
-export const videoReady: Deferred<void> = defer();
-
-const gPaintPromises: Promise<ScreenShot | undefined>[] = [];
-
-function onPaints(paints: PaintPoint[]) {
-  if (typeof onPointsReceived === "function") {
-    onPointsReceived(paints);
-  }
-
-  paints.forEach(async ({ point, time, screenShots }) => {
-    const paintHash = screenShots.find(desc => desc.mimeType == "image/jpeg")!.hash;
-    insertEntrySorted(gPaintPoints, { point, time, paintHash });
-
-    if (gAllNecessaryPaintDataReceived) {
-      // We are all set on the loading front, no need to proactively grab these
-      // paints
-      return;
-    }
-
-    let loadTarget = MINIMUM_VIDEO_CONTENT;
-    if (hasAllPaintPoints) {
-      const lastPaintTime = gPaintPoints[gPaintPoints.length - 1].time;
-      // if we have all of the paints, and the last one happens before the 5
-      // second mark, make that the new goal for considering the video ready
-      if (lastPaintTime < MINIMUM_VIDEO_CONTENT) {
-        loadTarget = lastPaintTime;
-      }
-    }
-
-    if (time < loadTarget) {
-      const screenShotPromise = screenshotCache.getScreenshotForPlayback(point, paintHash);
-      gPaintPromises.push(screenShotPromise);
-    }
-    if (time >= loadTarget) {
-      gAllNecessaryPaintDataReceived = true;
-      await Promise.all(gPaintPromises);
-      videoReady.resolve();
-    }
-  });
-}
-
 function onMouseEvents(events: MouseEvent[]) {
   if (typeof onPointsReceived === "function") {
+    events.forEach(e => preCacheExecutionPointForTime(e));
     onPointsReceived(events);
   }
 
@@ -169,51 +61,17 @@ function onMouseEvents(events: MouseEvent[]) {
     onMouseDownEvents(gMouseClickEvents);
   }
 }
-
-export let hasAllPaintPoints = false;
-
-export const setHasAllPaintPoints = (newValue: boolean) => {
-  hasAllPaintPoints = newValue;
-};
-export const timeIsBeyondKnownPaints = (time: number) =>
-  !hasAllPaintPoints && gPaintPoints[gPaintPoints.length - 1].time < time;
-
-export function setupGraphics() {
+export function setupGraphics(replayClient: ReplayClientInterface) {
   ThreadFront.sessionWaiter.promise.then(async (sessionId: string) => {
-    let paintedGraphics = false;
-    const maybePaintGraphics = async () => {
-      if (!paintedGraphics) {
-        const { screen, mouse } = await getGraphicsAtTime(ThreadFront.currentTime, false, true);
-        if (screen && mouse) {
-          paintedGraphics = true;
-          paintGraphics(screen, mouse);
-        }
-      }
-    };
-
     const { client } = await import("./socket");
-    client.Graphics.findPaints({}, sessionId).then(async () => {
-      hasAllPaintPoints = true;
-      await Promise.all(gPaintPromises);
-      maybePaintGraphics();
-      videoReady.resolve();
-    });
-    client.Graphics.addPaintPointsListener(async ({ paints }) => {
-      onPaints(paints);
-      const latestPaint = BigInt(maxBy(paints, p => BigInt(p.point))?.point || 0);
-      const currentPoint = BigInt(ThreadFront.currentPoint);
-      if (currentPoint && latestPaint >= currentPoint) {
-        maybePaintGraphics();
-      }
-    });
-
     client.Session.findMouseEvents({}, sessionId);
     client.Session.addMouseEventsListener(({ events }) => onMouseEvents(events));
 
     const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
     if (recordingTarget === "node") {
-      // Make sure we never wait for any paints when trying to do things like playback
-      setHasAllPaintPoints(true);
+      setFetchingPaints(Status.Cancelled);
+    } else {
+      getAllPaints(replayClient);
     }
   });
 
@@ -293,46 +151,16 @@ export async function repaint(force = false) {
   paintGraphics(screenShot, mouse);
 }
 
-export function addLastScreen(screen: ScreenShot | null, point: string, time: number) {
-  if (screen) {
-    addScreenShot(screen);
-    const paintHash = screen.hash;
-    insertEntrySorted(gPaintPoints, { point, time, paintHash });
-  }
-}
-
 export function mostRecentPaintOrMouseEvent(time: number) {
-  const paintEntry = mostRecentEntry(gPaintPoints, time);
+  const paintEntry = imperitavelyGetPaintPointForTime(time);
   const mouseEntry = mostRecentEntry(gMouseEvents, time);
   return closerEntry(time, paintEntry, mouseEntry);
 }
 
 export function nextPaintOrMouseEvent(time: number) {
-  const paintEntry = nextEntry(gPaintPoints, time);
+  const paintEntry = imperitavelyGetNextPaintPointForTime(time);
   const mouseEntry = nextEntry(gMouseEvents, time);
   return closerEntry(time, paintEntry, mouseEntry);
-}
-
-export function nextPaintEvent(time: number) {
-  return nextEntry(gPaintPoints, time);
-}
-
-export function previousPaintEvent(time: number) {
-  const entry = mostRecentEntry(gPaintPoints, time);
-  if (entry && entry.time == time) {
-    return mostRecentEntry(gPaintPoints, time - 1);
-  }
-  return entry;
-}
-
-export function getMostRecentPaintPoint(time: number) {
-  return mostRecentEntry(gPaintPoints, time);
-}
-
-export function getClosestPaintPoint(time: number) {
-  const entryBefore = mostRecentEntry(gPaintPoints, time);
-  const entryAfter = nextEntry(gPaintPoints, time);
-  return closerEntry(time, entryBefore, entryAfter);
 }
 
 export function getDevicePixelRatio() {
@@ -359,25 +187,21 @@ export interface MouseAndClickPosition {
 
 export async function getGraphicsAtTime(
   time: number,
-  forPlayback = false,
-  allowLastPaint = false
+  forPlayback = false
 ): Promise<{ screen?: ScreenShot; mouse?: MouseAndClickPosition }> {
-  const paintIndex = mostRecentIndex(gPaintPoints, time);
-  if (paintIndex === undefined || (timeIsBeyondKnownPaints(time) && !allowLastPaint)) {
+  const paint = imperitavelyGetPaintPointForTime(time);
+  if (!paint) {
     // There are no graphics to paint here.
     return {};
   }
 
-  const { point, paintHash } = gPaintPoints[paintIndex];
-  if (!paintHash) {
+  if (!paint.paintHash) {
     return {};
   }
 
-  const screenPromise = forPlayback
-    ? screenshotCache.getScreenshotForPlayback(point, paintHash)
-    : screenshotCache.getScreenshotForPreview(point, paintHash);
-
-  const screen = await screenPromise;
+  const screen = await (forPlayback
+    ? screenshotCache.getScreenshotForPlayback(paint)
+    : screenshotCache.getScreenshotForPreview(paint));
 
   let mouse: MouseAndClickPosition | undefined;
   const mouseEvent = mostRecentEntry(gMouseEvents, time);
@@ -506,13 +330,9 @@ export function refreshGraphics() {
   const graphicsVideo = document.getElementById("graphicsVideo") as HTMLVideoElement;
 
   // Find an image to draw.
-  let image;
-  if (gDrawImage) {
+  let image = gLastImage;
+  if (gDrawImage?.width && gDrawImage?.height) {
     image = gDrawImage;
-    if (!image.width || !image.height) {
-      // The current image hasn't loaded yet.
-      image = gLastImage;
-    }
   }
 
   canvas.style.visibility = "visible";
@@ -574,20 +394,6 @@ async function getScreenshotDimensions(screen: ScreenShot) {
   return { width: img.width, height: img.height };
 }
 
-export async function getFirstMeaningfulPaint(limit: number = 10) {
-  for (const paintPoint of gPaintPoints.slice(0, limit)) {
-    const { screen } = await getGraphicsAtTime(paintPoint.time);
-    if (!screen) {
-      continue;
-    }
-
-    const { width, height } = await getScreenshotDimensions(screen);
-    if (screen.data.length > (width * height) / 40) {
-      return paintPoint;
-    }
-  }
-}
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 // The callbacks below allow external code to observe specific events.
 // This design pattern is a short term strategy to remove external imports from this package.
@@ -610,7 +416,7 @@ export function setMouseDownEventsCallback(callback: typeof onMouseDownEvents): 
 }
 
 let onPausedAtTime: (time: number) => void;
-export function setPausedonPausedAtTimeCallback(callback: typeof onPausedAtTime): void {
+export function setPausedAtTimeCallback(callback: typeof onPausedAtTime): void {
   onPausedAtTime = callback;
 }
 

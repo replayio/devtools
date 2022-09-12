@@ -163,6 +163,8 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
+        // @ts-ignore
+        controllerKey: Math.random() * 10e8,
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache || !!features.profileWorkerThreads,
         disableQueryCache: !features.enableQueryCache,

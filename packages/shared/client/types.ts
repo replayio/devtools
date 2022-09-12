@@ -1,36 +1,37 @@
 import {
   ContentType,
-  createPauseResult,
   EventHandlerType,
   ExecutionPoint,
   FrameId,
+  FunctionMatch,
   KeyboardEvent,
-  loadedRegions as LoadedRegions,
   Location,
+  MappedLocation,
   Message,
   MouseEvent,
   NavigationEvent,
-  newSource as Source,
   ObjectId,
   ObjectPreviewLevel,
+  PaintPoint,
   PauseData,
   PauseId,
   RecordingId,
   Result as EvaluationResult,
-  SessionId,
+  Result,
+  SameLineSourceLocations,
   SearchSourceContentsMatch,
+  SessionId,
   SourceId,
   SourceLocation,
+  TimeRange,
   TimeStampedPoint,
   TimeStampedPointRange,
-  TimeRange,
-  FunctionMatch,
-  keyboardEvents,
-  navigationEvents,
-  Result,
-  MappedLocation,
-  SameLineSourceLocations,
+  createPauseResult,
   getPointsBoundingTimeResult as PointsBoundingTime,
+  keyboardEvents,
+  loadedRegions as LoadedRegions,
+  navigationEvents,
+  newSource as Source,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -86,6 +87,7 @@ export interface ReplayClientInterface {
     overflow: boolean;
   }>;
   findNavigationEvents(onKeyboardEvents: (events: navigationEvents) => void): Promise<void>;
+  findPaints(onPaints: (paints: PaintPoint[]) => void): Promise<PaintPoint[]>;
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getAnnotationKinds(): Promise<string[]>;

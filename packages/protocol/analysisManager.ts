@@ -1,3 +1,4 @@
+import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
 import {
   addEventHandlerEntryPointsParameters,
   addFunctionEntryPointsParameters,
@@ -209,9 +210,14 @@ class AnalysisManager {
 
   private readonly onAnalysisPoints = ({ analysisId, points }: analysisPoints) => {
     const handler = this.handlers.get(analysisId);
-    if (handler != null && typeof handler.onAnalysisPoints === "function") {
-      points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
-      handler.onAnalysisPoints(points);
+    points.forEach(point => {
+      preCacheExecutionPointForTime(point);
+      if (typeof handler?.onAnalysisPoints === "function") {
+        ThreadFront.updateMappedLocation(point.frame);
+      }
+    });
+    if (typeof handler?.onAnalysisPoints === "function") {
+      this.handlers.get(analysisId)?.onAnalysisPoints?.(points);
     }
   };
 

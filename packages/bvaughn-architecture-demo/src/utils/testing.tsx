@@ -175,6 +175,7 @@ export function createMockReplayClient() {
     findKeyboardEvents: jest.fn().mockImplementation(async () => []),
     findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
     findNavigationEvents: jest.fn().mockImplementation(async () => []),
+    findPaints: jest.fn().mockImplementation(async () => []),
     findSources: jest.fn().mockImplementation(async () => []),
     getAllFrames: jest.fn().mockImplementation(async () => []),
     getAnnotationKinds: jest.fn().mockImplementation(async () => []),

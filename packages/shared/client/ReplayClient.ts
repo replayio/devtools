@@ -31,6 +31,7 @@ import {
   MappedLocation,
   SourceLocation,
   SameLineSourceLocations,
+  PaintPoint,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
@@ -266,6 +267,20 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return sources;
+  }
+
+  async findPaints(onPaints: (paints: PaintPoint[]) => void): Promise<PaintPoint[]> {
+    const paints: PaintPoint[] = [];
+
+    const onPaintPoints = ({ paints }: { paints: PaintPoint[] }) => {
+      onPaints(paints);
+      paints.push(...paints);
+    };
+    client.Graphics.addPaintPointsListener(onPaintPoints);
+    await client.Graphics.findPaints({}, this.getSessionIdThrows());
+    client.Graphics.removePaintPointsListener(onPaintPoints);
+
+    return paints;
   }
 
   async getAllFrames(pauseId: PauseId): Promise<PauseData> {

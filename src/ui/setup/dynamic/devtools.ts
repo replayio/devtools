@@ -28,7 +28,7 @@ import timeline, { pointsReceived, setPlaybackStalled } from "ui/reducers/timeli
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 import {
   setMouseDownEventsCallback,
-  setPausedonPausedAtTimeCallback,
+  setPausedAtTimeCallback,
   setPlaybackStatusCallback,
   setPointsReceivedCallback,
   setRefreshGraphicsCallback,
@@ -216,7 +216,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
-  setupGraphics();
+  setupGraphics(replayClient);
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
   setupReactDevTools(store, ThreadFront);
@@ -240,7 +240,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
       store.dispatch(loadReceivedEvents({ mousedown: [...events] }));
     }, 1_000)
   );
-  setPausedonPausedAtTimeCallback((time: number) => {
+  setPausedAtTimeCallback((time: number) => {
     store.dispatch(precacheScreenshots(time));
   });
   setPlaybackStatusCallback((stalled: boolean) => {

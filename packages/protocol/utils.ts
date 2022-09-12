@@ -77,6 +77,94 @@ export function binarySearch(start: number, end: number, callback: (mid: number)
   return start;
 }
 
+interface Timed {
+  time: number;
+}
+
+// Given a sorted array of items with "time" properties, find the index of
+// the most recent item at or preceding a given time.
+export function mostRecentIndex<T extends Timed>(array: T[], time: number): number | undefined {
+  if (!array.length || time < array[0].time) {
+    return undefined;
+  }
+  const index = binarySearch(0, array.length, (index: number) => {
+    return time - array[index].time;
+  });
+  assert(
+    array[index].time <= time,
+    "The most recent item should be at or preceding the given time"
+  );
+  if (index + 1 < array.length) {
+    assert(array[index + 1].time >= time, "the most recent item's index should be in the array");
+  }
+  return index;
+}
+
+const lastTime = (list: Timed[]) => {
+  return list.length ? list[list.length - 1].time : 0;
+};
+
+// Same as mostRecentIndex, except it won't return the last item in the array
+// for values that are beyond the known range
+export function mostRecentContainedIndex<T extends Timed>(
+  array: T[],
+  time: number
+): number | undefined {
+  if (time > lastTime(array)) {
+    return undefined;
+  }
+  return mostRecentIndex(array, time);
+}
+
+export function mostRecentEntry<T extends Timed>(array: T[], time: number) {
+  const index = mostRecentIndex(array, time);
+  return index !== undefined ? array[index] : null;
+}
+
+export function mostRecentContainedEntry<T extends Timed>(array: T[], time: number) {
+  const index = mostRecentContainedIndex(array, time);
+  return index !== undefined ? array[index] : null;
+}
+
+export function nextEntry<T extends Timed>(array: T[], time: number) {
+  const index = mostRecentIndex(array, time);
+  if (index === undefined) {
+    return array.length ? array[0] : null;
+  }
+  return index + 1 < array.length ? array[index + 1] : null;
+}
+
+// Add an entry with a "time" property to an array that is sorted by time.
+export function insertEntrySorted<T extends Timed>(array: T[], entry: T) {
+  if (lastTime(array) <= entry.time) {
+    array.push(entry);
+  } else {
+    const index = mostRecentIndex(array, entry.time);
+    if (index !== undefined) {
+      array.splice(index + 1, 0, entry);
+    } else {
+      array.unshift(entry);
+    }
+  }
+}
+
+export function closerEntry<T1 extends Timed, T2 extends Timed>(
+  time: number,
+  entry1: T1 | null,
+  entry2: T2 | null
+) {
+  if (!entry1) {
+    return entry2;
+  }
+  if (!entry2) {
+    return entry1;
+  }
+  if (Math.abs(time - entry1.time) < Math.abs(time - entry2.time)) {
+    return entry1;
+  }
+  return entry2;
+}
+
 function NotAllowed(reason = "") {
   console.trace(`Not allowed${reason ? ` (${reason})` : ""}`);
 }

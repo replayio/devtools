@@ -1,10 +1,17 @@
-import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
-import { gPaintPoints, hasAllPaintPoints } from "protocol/graphics";
-import { useAppSelector } from "ui/setup/hooks";
-import { useFeature } from "ui/hooks/settings";
+import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getZoomRegion } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
+import { useFeature } from "ui/hooks/settings";
+
+import {
+  fetchingPaints,
+  imperitavelyGetPaintPointForTime,
+  lastReceivedPaintPoint,
+  receivedPaintPoints,
+  Status,
+} from "@bvaughn/src/suspense/PaintsCache";
 
 const Span = ({
   regions,
@@ -70,8 +77,8 @@ const Spans = ({
 export default function ProtocolTimeline() {
   const loadedRegions = useAppSelector(getLoadedRegions);
   const { value: showProtocolTimeline } = useFeature("protocolTimeline");
-  const firstPaint = gPaintPoints[0];
-  const lastPaint = gPaintPoints[gPaintPoints.length - 1];
+  const firstPaint = imperitavelyGetPaintPointForTime(0)!;
+  const lastPaint = lastReceivedPaintPoint();
 
   if (!showProtocolTimeline || !loadedRegions) {
     return null;
@@ -91,11 +98,14 @@ export default function ProtocolTimeline() {
         regions={[
           {
             begin: { point: firstPaint.point, time: firstPaint.time },
-            end: { point: lastPaint.point, time: hasAllPaintPoints ? Infinity : lastPaint.time },
+            end: {
+              point: lastPaint.point,
+              time: fetchingPaints === Status.Finished ? Infinity : lastPaint.time,
+            },
           },
         ]}
         color="sky-500"
-        points={gPaintPoints}
+        points={receivedPaintPoints}
         title="Paints"
       />
     </div>

@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { seekToTime, setTimelineToTime } from "ui/actions/timeline";
+import { seekToTime, setTimelineToTime, stopPlayback } from "ui/actions/timeline";
 import { selectors } from "ui/reducers";
 import { setTimelineState } from "ui/reducers/timeline";
 import { getTimeFromPosition } from "ui/utils/timeline";
@@ -98,6 +98,7 @@ export default function Timeline() {
         <div
           className="progress-bar-container"
           onClick={onClick}
+          onMouseDown={() => dispatch(stopPlayback())}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           onMouseMove={onMouseMove}
