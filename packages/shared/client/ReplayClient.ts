@@ -555,14 +555,9 @@ export class ReplayClient implements ReplayClientInterface {
     return lineLocations;
   }
 
-  async getMappedLocation(
-    location: Location
-  ): Promise<MappedLocation> {
+  async getMappedLocation(location: Location): Promise<MappedLocation> {
     const sessionId = this.getSessionIdThrows();
-    const { mappedLocation } = await client.Debugger.getMappedLocation(
-      { location },
-      sessionId
-    );
+    const { mappedLocation } = await client.Debugger.getMappedLocation({ location }, sessionId);
     return mappedLocation;
   }
 

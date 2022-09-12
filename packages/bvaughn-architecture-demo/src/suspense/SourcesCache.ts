@@ -113,7 +113,7 @@ export interface SourceLocationRange {
   end: ProtocolSourceLocation;
 }
 
-export const { getValue: getBreakpointPositions } = createGenericCache<
+const { getValue: _getBreakpointPositions } = createGenericCache<
   [ReplayClientInterface, ProtocolSourceId, SourceLocationRange | undefined],
   ProtocolSameLineSourceLocations[]
 >(
@@ -123,6 +123,11 @@ export const { getValue: getBreakpointPositions } = createGenericCache<
       ? `${sourceId}:${range.start.line}:${range.start.column}:${range.end.line}:${range.end.column}`
       : sourceId
 );
+export const getBreakpointPositions = (
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  range?: SourceLocationRange
+) => _getBreakpointPositions(client, sourceId, range);
 
 async function fetchSources(client: ReplayClientInterface) {
   sources = await client.findSources();
@@ -175,9 +180,5 @@ async function fetchSourceHitCounts(
 
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
   const sources = getSources(client);
-  return (
-    sources?.filter(source => {
-      return source != null && source.kind !== "inlineScript";
-    }) || []
-  );
+  return sources.filter(source => source.kind !== "inlineScript");
 }

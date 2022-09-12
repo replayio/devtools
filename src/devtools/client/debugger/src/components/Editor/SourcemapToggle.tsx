@@ -1,73 +1,72 @@
-import { SourceId } from "@replayio/protocol";
-import { ThreadFront } from "protocol/thread";
-import React from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { setModal } from "ui/actions/app";
-import { UIState } from "ui/state";
-
-import actions from "../../actions";
+import React, { useContext } from "react";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getAlternateSource } from "../../reducers/pause";
 import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
-import { getUniqueAlternateSourceId } from "../../utils/sourceVisualizations";
-
+import { getAlternateSourceId } from "../../utils/sourceVisualizations";
+import { showAlternateSource } from "../../actions/sources/select";
+import { setModal } from "ui/actions/app";
+import { CursorPosition } from "./Footer";
 import Toggle from "./Toggle";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-function SourcemapError({ onClick }: { onClick: () => void }) {
+function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefined }) {
+  const dispatch = useAppDispatch();
+
+  if (!why) {
+    return null;
+  }
+
+  if (why === "no-sourcemap") {
+    const onClick = () => {
+      dispatch(setModal("sourcemap-setup"));
+    };
+    return (
+      <div className="flex items-center space-x-1" onClick={onClick}>
+        <span>No sourcemaps found.</span>
+        <button className="underline">Learn more</button>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center space-x-1" onClick={onClick}>
-      <span>No sourcemaps found.</span>
-      <button className="underline">Learn more</button>
+    <div className="flex items-center space-x-1">
+      <span>The currently selected position is not mapped</span>
     </div>
   );
 }
 
-export function SourcemapToggle({
-  selectedSource,
-  alternateSource,
-  sourcesById,
-  setModal,
-  showAlternateSource,
-}: PropsFromRedux) {
-  let alternateSourceId: SourceId | undefined;
-  if (alternateSource) {
-    alternateSourceId = alternateSource.id;
-  } else {
-    const result = getUniqueAlternateSourceId(selectedSource, sourcesById);
-    alternateSourceId = result.sourceId;
-    if (!alternateSourceId && result.why === "not-unique") {
-      return null;
-    }
+export default function SourcemapToggle({ cursorPosition }: { cursorPosition: CursorPosition }) {
+  const dispatch = useAppDispatch();
+  const client = useContext(ReplayClientContext);
+  const selectedSource = useAppSelector(getSelectedSource);
+  const alternateSource = useAppSelector(getAlternateSource);
+  const sourcesById = useAppSelector(getSourceDetailsEntities);
+  const alternateSourceIdResult = getAlternateSourceId(
+    client,
+    selectedSource,
+    alternateSource,
+    sourcesById,
+    cursorPosition
+  );
+
+  if (alternateSourceIdResult.why === "no-source") {
+    return null;
   }
 
-  const setEnabled = (v: React.SetStateAction<boolean>) => {
-    showAlternateSource(selectedSource.id, alternateSourceId!);
-  };
-  const onErrorClick = () => {
-    setModal("sourcemap-setup");
+  const setEnabled = () => {
+    if (selectedSource && alternateSourceIdResult.sourceId) {
+      dispatch(showAlternateSource(selectedSource.id, alternateSourceIdResult.sourceId));
+    }
   };
 
   return (
     <label className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
       <Toggle
-        enabled={!!sourcesById[selectedSource.id]?.isSourceMapped}
+        enabled={!!selectedSource?.isSourceMapped}
         setEnabled={setEnabled}
-        disabled={!alternateSourceId}
+        disabled={!alternateSourceIdResult.sourceId}
       />
-      {!alternateSourceId ? <SourcemapError onClick={onErrorClick} /> : <div>Show Source Map</div>}
+      <SourcemapError why={alternateSourceIdResult.why} />
     </label>
   );
 }
-
-const connector = connect(
-  (state: UIState) => ({
-    selectedSource: getSelectedSource(state)!,
-    alternateSource: getAlternateSource(state),
-    sourcesById: getSourceDetailsEntities(state),
-  }),
-  {
-    showAlternateSource: actions.showAlternateSource,
-    setModal,
-  }
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(SourcemapToggle);
