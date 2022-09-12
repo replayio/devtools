@@ -4,8 +4,8 @@ import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
-import { getMappedLocation } from "@bvaughn/src/suspense/MappedLocationCache";
-import { getBreakpointPositions } from "@bvaughn/src/suspense/SourcesCache";
+import { getMappedLocation } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
+import { getBreakpointPositions } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   SourceDetails,
   isOriginalSource,
