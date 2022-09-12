@@ -67,7 +67,14 @@ export async function _internalSetBreakpoint(
     if (shouldPause) {
       const correspondingSourceIds = getCorrespondingSourceIds(state, sourceId);
       for (const correspondingSourceId of correspondingSourceIds) {
-        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+        promises.push(
+          ThreadFront.setBreakpoint(
+            correspondingSourceId,
+            line,
+            column || 0,
+            condition || undefined
+          )
+        );
       }
     }
     if (logValue) {
@@ -82,7 +89,14 @@ export async function _internalSetBreakpoint(
       assert(source, `no source found for ${sourceUrl}`);
       const correspondingSourceIds = getCorrespondingSourceIds(state, source.id);
       for (const correspondingSourceId of correspondingSourceIds) {
-        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+        promises.push(
+          ThreadFront.setBreakpoint(
+            correspondingSourceId,
+            line,
+            column || 0,
+            condition || undefined
+          )
+        );
       }
     }
     if (logValue) {
