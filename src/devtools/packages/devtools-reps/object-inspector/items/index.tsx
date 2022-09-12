@@ -6,8 +6,7 @@ import { getPreferredLocation } from "ui/utils/preferredLocation";
 import { MODE } from "../../reps/constants";
 import ErrorRep from "../../reps/error";
 import PropRep from "../../reps/prop-rep";
-
-type ObjectInspectorItemProps = any;
+import { ObjectInspectorItemProps } from "../components/ObjectInspectorItem";
 
 export * from "./utils";
 

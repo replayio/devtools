@@ -6,7 +6,7 @@ import type {
   getObjectThrows,
   getObjectWithPreviewHelper,
   getObjectPropertyHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+} from "@bvaughn/src/suspense/ObjectPreviews";
 
 interface SuspenseObjectCache {
   getCachedObject: typeof getCachedObject;

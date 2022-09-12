@@ -5,11 +5,16 @@ import debounce from "lodash/debounce";
 // Ordering matters here
 import "devtools/client/inspector/prefs";
 import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
+import { setupExceptions } from "devtools/client/debugger/src/actions/logExceptions";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
+import { setupMessages } from "devtools/client/webconsole/actions/messages";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
+import consoleReducers from "devtools/client/webconsole/reducers";
+import { getConsoleInitialState } from "devtools/client/webconsole/store";
+import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { Canvas, setupGraphics } from "protocol/graphics";
 import { setupLogpoints } from "ui/actions/logpoint";
@@ -49,7 +54,7 @@ import {
   getObjectThrows,
   getObjectWithPreviewHelper,
   getObjectPropertyHelper,
-} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+} from "@bvaughn/src/suspense/ObjectPreviews";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -69,6 +74,10 @@ declare global {
     threadFront?: typeof ThreadFront;
     actions?: typeof actions;
     selectors?: BoundSelectors;
+    // We use 'command' in the backend and 'message' in the frontend so expose both :P
+    console?: {
+      prefs: typeof consolePrefs;
+    };
     debugger?: any;
   }
 }
@@ -147,13 +156,16 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   window.app.threadFront = ThreadFront;
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
+  window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
 
   const initialDebuggerState = await dbgClient.loadInitialState();
+  const initialConsoleState = getConsoleInitialState();
 
   const initialState = {
     ...initialDebuggerState,
+    ...initialConsoleState,
   };
 
   const reducers = {
@@ -164,6 +176,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     timeline,
     protocolMessages: protocolMessages,
     ...debuggerReducers,
+    ...consoleReducers.reducers,
   };
 
   bootstrapWorkers();
@@ -221,8 +234,10 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   setupEventListeners(store);
   setupGraphics();
   initOutputSyntaxHighlighting();
+  setupMessages(store, ThreadFront);
   setupNetwork(store, ThreadFront);
   setupLogpoints(store);
+  setupExceptions(store);
   setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);

@@ -84,6 +84,7 @@ export const prefs = new PrefsHelper("devtools", {
   sourcesCollapsed: ["Bool", "debugger.sources-collapsed"],
   clientSourceMapsEnabled: ["Bool", "source-map.client-service.enabled"],
   chromeAndExtensionsEnabled: ["Bool", "chrome.enabled"],
+  logExceptions: ["Bool", "debugger.log-exceptions"],
   callStackVisible: ["Bool", "debugger.call-stack-visible"],
   scopesVisible: ["Bool", "debugger.scopes-visible"],
   componentVisible: ["Bool", "debugger.component-visible"],

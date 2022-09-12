@@ -13,6 +13,7 @@ import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
 import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
 import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
+import { MessageState } from "devtools/client/webconsole/reducers/messages";
 import { PauseState } from "devtools/client/debugger/src/reducers/pause";
 import type { PendingBreakpointsState } from "devtools/client/debugger/src/selectors";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
@@ -21,6 +22,7 @@ import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
+import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
@@ -38,6 +40,7 @@ export interface UIState {
   breakpoints: BreakpointsState;
   classList: ClassListState;
   computed: ComputedState;
+  consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
   eventListenerBreakpoints: EventListenersState;
   sources: NewSourcesState;
@@ -46,6 +49,7 @@ export interface UIState {
   inspector: InspectorState;
   layout: LayoutState;
   markup: MarkupState;
+  messages: MessageState;
   network: NetworkState;
   pause: PauseState;
   pendingBreakpoints: PendingBreakpointsState;

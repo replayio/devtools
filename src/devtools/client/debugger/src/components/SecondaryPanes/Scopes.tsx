@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+import {
+  highlightDomElement,
+  unHighlightDomElement,
+} from "devtools/client/webconsole/actions/toolbox";
+import { ObjectInspector } from "devtools/packages/devtools-reps";
 import type { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
@@ -9,7 +14,10 @@ import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { Redacted } from "ui/components/Redacted";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { trackEvent } from "ui/utils/telemetry";
 import { formatTimestamp } from "ui/utils/time";
+import { prefs as prefsService } from "devtools/shared/services";
+import type { PauseFrame, ConvertedScope } from "devtools/client/debugger/src/reducers/pause";
 
 import {
   getSelectedFrame,
@@ -18,6 +26,7 @@ import {
   getThreadContext,
   getFramesLoading,
 } from "../../selectors";
+import { openLink, openNodeInInspector } from "devtools/client/webconsole/actions/toolbox";
 import { getScopes } from "../../utils/pause/scopes";
 import NewObjectInspector from "./NewObjectInspector";
 import { UIState } from "ui/state";
@@ -63,7 +72,15 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
   }
 
   renderScopesList() {
-    const { originalScopesUnavailable, selectedFrame } = this.props;
+    const {
+      cx,
+      openLink,
+      openElementInInspector,
+      highlightDomElement,
+      unHighlightDomElement,
+      selectedFrame,
+      originalScopesUnavailable,
+    } = this.props;
     const { scopes } = this.state;
 
     scopes!.forEach((s, i) => {
@@ -72,12 +89,33 @@ class Scopes extends PureComponent<PropsFromRedux, ScopesState> {
       s.path = `scope${selectedFrame?.id}.${i}`;
     });
 
+    const disableNewComponentArchitecture = prefsService.getBoolPref(
+      "devtools.features.disableNewComponentArchitecture"
+    );
+    let objectInspector = null;
+    if (disableNewComponentArchitecture) {
+      objectInspector = (
+        <ObjectInspector
+          roots={scopes!}
+          autoExpandAll={false}
+          autoExpandDepth={1}
+          disableWrap={true}
+          onDOMNodeClick={(grip: any) => openElementInInspector(grip)}
+          onInspectIconClick={(grip: any) => openElementInInspector(grip)}
+          onDOMNodeMouseOver={(grip: any) => highlightDomElement(grip)}
+          onDOMNodeMouseOut={(grip: any) => unHighlightDomElement()}
+        />
+      );
+    } else {
+      objectInspector = <NewObjectInspector roots={scopes!} />;
+    }
+
     return (
       <Redacted className="pane scopes-list" data-test-name="ScopesList">
         {originalScopesUnavailable ? (
           <div className="warning">The variables could not be mapped to their original names</div>
         ) : null}
-        <NewObjectInspector roots={scopes!} />
+        {objectInspector}
       </Redacted>
     );
   }
@@ -155,6 +193,10 @@ const mapStateToProps = (state: UIState) => {
 
 const connector = connect(mapStateToProps, {
   enterFocusMode: enterFocusModeAction,
+  openLink,
+  openElementInInspector: openNodeInInspector,
+  highlightDomElement,
+  unHighlightDomElement,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
 

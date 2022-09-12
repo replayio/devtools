@@ -33,6 +33,7 @@ import "devtools/client/themes/variables.css";
 
 /////////////////// here be dragons ... ////////////////////
 import "codemirror/lib/codemirror.css";
+import "devtools/packages/devtools-reps/object-inspector/components/ObjectInspector.css";
 import "devtools/packages/devtools-reps/reps/reps.css";
 import "devtools/client/debugger/src/components/A11yIntention.css";
 import "devtools/client/debugger/src/components/App.css";
@@ -51,6 +52,7 @@ import "devtools/client/debugger/src/components/QuickOpenModal.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/Breakpoint.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/CommandBar.css";
+import "devtools/client/debugger/src/components/SecondaryPanes/EventListeners.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Frames/Frames.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/Frames/Group.css";
 import "devtools/client/debugger/src/components/SecondaryPanes/FrameTimeline.css";
@@ -91,6 +93,8 @@ import "devtools/client/themes/splitters.css";
 import "devtools/client/themes/toolbars.css";
 import "devtools/client/themes/tooltips.css";
 import "devtools/client/themes/webconsole.css";
+import "devtools/client/webconsole/components/App.css";
+import "devtools/client/webconsole/components/FilterBar/Events.css";
 import "devtools/server/actors/highlighters.css";
 import "ui/components/App.css";
 import "ui/components/Comments/Comments.css";

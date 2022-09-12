@@ -3,6 +3,7 @@ import {
   asyncStore as debuggerAsyncPrefs,
 } from "devtools/client/debugger/src/utils/prefs";
 import { RecordingId } from "@replayio/protocol";
+import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
@@ -21,6 +22,7 @@ import { ToolboxLayout, ViewMode } from "ui/state/layout";
 import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getTheme } from "ui/reducers/app";
+import { getAllFilters } from "devtools/client/webconsole/selectors";
 import { getRecording } from "ui/hooks/recordings";
 import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
@@ -63,6 +65,7 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
 
 const updateStandardPrefs = createPrefsUpdater(prefs);
 const updateAsyncPrefs = createPrefsUpdater(asyncStore);
+const updateWebconsolePrefs = createPrefsUpdater(webconsolePrefs);
 const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
 const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
@@ -81,6 +84,14 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     "eventListenerBreakpoints",
     state => state.eventListenerBreakpoints
   );
+  updateAsyncPrefs(state, oldState, "commandHistory", state => state.messages?.commandHistory);
+
+  // This is lazy-loaded, so it may not exist on startup
+  if (state.consoleUI && oldState.consoleUI) {
+    updateWebconsolePrefs(state, oldState, "timestampsVisible", state => {
+      return state.consoleUI.timestampsVisible;
+    });
+  }
 
   if (state.ui && oldState.ui) {
     updateDebuggerPrefs(
@@ -195,6 +206,7 @@ async function maybeUpdateReplaySessions(state: UIState) {
     selectedPanel: getSelectedPanel(state),
     localNags: getLocalNags(state),
     tabs: persistTabs(getTabs(state)) || [],
+    consoleFilters: getAllFilters(state),
   };
 
   const newState = { ...previousReplaySessions, [recordingId]: currentReplaySession };

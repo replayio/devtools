@@ -72,6 +72,7 @@ export interface PauseState {
   command: string | null;
   lastCommand: string | null;
   previousLocation: Location | null;
+  shouldLogExceptions: boolean;
   replayFramePositions?: { positions: UnknownPosition[] } | null;
 }
 
@@ -111,6 +112,7 @@ const initialState: PauseState = {
   command: null,
   lastCommand: null,
   previousLocation: null,
+  shouldLogExceptions: prefs.logExceptions as boolean,
 };
 
 export const executeCommandOperation = createAsyncThunk<
@@ -313,10 +315,18 @@ const pauseSlice = createSlice({
     frameSelected(state, action: PayloadAction<{ cx: Context; frameId: string }>) {
       state.selectedFrameId = action.payload.frameId;
     },
+    logExceptionsUpdated(state, action: PayloadAction<boolean>) {
+      state.shouldLogExceptions = action.payload;
+      // TODO This is bad, move prefs out of reducers
+      prefs.logExceptions = action.payload;
+    },
     resumed(state) {
       Object.assign(state, resumedPauseState);
       state.threadcx.pauseCounter++;
       state.threadcx.isPaused = false;
+    },
+    expressionEvaluated(state) {
+      state.command = "expression";
     },
   },
   extraReducers: builder => {
@@ -386,8 +396,10 @@ const pauseSlice = createSlice({
 });
 
 export const {
+  expressionEvaluated,
   framePositionsCleared,
   framePositionsLoaded,
+  logExceptionsUpdated,
   frameSelected,
   pauseCreationFailed,
   pauseRequestedAt,
@@ -457,6 +469,10 @@ export function isEvaluatingExpression(state: UIState) {
 
 export function getIsWaitingOnBreak(state: UIState) {
   return state.pause.isWaitingOnBreak;
+}
+
+export function getShouldLogExceptions(state: UIState) {
+  return state.pause.shouldLogExceptions;
 }
 
 export function getFrames(state: UIState) {

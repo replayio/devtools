@@ -23,6 +23,8 @@ pref("devtools.hitCounts", "hide-counts");
 // app features
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
+// TODO - remove this ternary once the new console is default again
+pref("devtools.features.disableNewComponentArchitecture", isTest() ? false : true);
 pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.enableQueryCache", false);
@@ -56,6 +58,7 @@ export const prefs = new PrefsHelper("devtools", {
 export const features = new PrefsHelper("devtools.features", {
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
+  disableNewComponentArchitecture: ["Bool", "disableNewComponentArchitecture"],
   enableQueryCache: ["Bool", "enableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],
@@ -70,6 +73,7 @@ export const features = new PrefsHelper("devtools.features", {
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {
+  commandHistory: ["command-history", []],
   eventListenerBreakpoints: ["event-listener-breakpoints", undefined],
   replaySessions: ["replay-sessions", {}],
 });

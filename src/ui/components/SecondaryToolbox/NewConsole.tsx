@@ -7,11 +7,7 @@ import {
   PointId,
   PointsContext,
 } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  NewTerminalExpression,
-  TerminalContext,
-  TerminalExpression,
-} from "bvaughn-architecture-demo/src/contexts/TerminalContext";
+import { TerminalContext, TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
 import {
   TimelineContext,
   TimelineContextType,
@@ -24,7 +20,6 @@ import React, {
   useEffect,
   useLayoutEffect,
   useMemo,
-  useRef,
   useState,
   useTransition,
 } from "react";
@@ -32,17 +27,15 @@ import {
   SessionContext,
   SessionContextType,
 } from "bvaughn-architecture-demo/src/contexts/SessionContext";
-import { getCachedPauseIdForExecutionPoint } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { getCachedPauseIdForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
 import { Range } from "bvaughn-architecture-demo/src/types";
 import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
-import {
-  getLogPointsList,
-  getPauseId,
-  getSelectedFrame,
-} from "devtools/client/debugger/src/selectors";
+import { getLogPointsList } from "devtools/client/debugger/src/selectors";
+import { messagesClearEvaluations } from "devtools/client/webconsole/actions";
+import { EvaluationEventPayload } from "devtools/client/webconsole/actions/input";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
-import { Pause, ThreadFront } from "protocol/thread";
+import { Pause, ThreadFront, ValueFront } from "protocol/thread";
 import { seek, setFocusRegion } from "ui/actions/timeline";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
@@ -80,13 +73,13 @@ export default function NewConsoleRoot() {
     <SessionContext.Provider value={sessionContext}>
       <TimelineContextAdapter>
         <InspectorContextReduxAdapter>
-          <TerminalContextController>
+          <TerminalContextReduxAdapter>
             <FocusContextReduxAdapter>
               <PointsContextReduxAdapter>
                 <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
               </PointsContextReduxAdapter>
             </FocusContextReduxAdapter>
-          </TerminalContextController>
+          </TerminalContextReduxAdapter>
         </InspectorContextReduxAdapter>
       </TimelineContextAdapter>
     </SessionContext.Provider>
@@ -95,16 +88,6 @@ export default function NewConsoleRoot() {
 
 function JSTermWrapper() {
   const [_, searchActions] = useContext(SearchContext);
-  const { addMessage } = useContext(TerminalContext);
-  const [terminalExpressionHistory, setTerminalExpressionHistory] = useState<string[]>([]);
-
-  // Note that the "frameId" the protocol expects is actually the "protocolId" and NOT the "frameId"
-  const frame = useAppSelector(getSelectedFrame);
-  const frameId = frame?.protocolId || null;
-
-  const pauseId = useAppSelector(getPauseId);
-  const point = useAppSelector(getCurrentPoint);
-  const time = useAppSelector(getCurrentTime);
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
@@ -126,28 +109,9 @@ function JSTermWrapper() {
     }
   };
 
-  const addTerminalExpression = (expression: string) => {
-    if (pauseId == null || point == null) {
-      return;
-    }
-
-    setTerminalExpressionHistory(prev => [...prev, expression]);
-
-    addMessage({
-      expression,
-      frameId: frameId || null,
-      pauseId,
-      point,
-      time,
-    });
-  };
-
   return (
     <div className={styles.JSTermWrapper} onKeyDown={onKeyDown}>
-      <JSTerm
-        addTerminalExpression={addTerminalExpression}
-        terminalExpressionHistory={terminalExpressionHistory}
-      />
+      <JSTerm />
     </div>
   );
 }
@@ -258,41 +222,51 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
 }
 
-function TerminalContextController({ children }: PropsWithChildren) {
+// Adapter that reads console evaluations (from Redux) and passes them to the TerminalContext.
+function TerminalContextReduxAdapter({ children }: PropsWithChildren) {
   const [isPending, startTransition] = useTransition();
   const [messages, setMessages] = useState<TerminalExpression[]>([]);
 
-  const idCounterRef = useRef(0);
+  const dispatch = useAppDispatch();
 
-  const addMessage = useCallback((partialTerminalExpression: NewTerminalExpression) => {
-    // New expressions should be added in a transition because they suspend.
-    startTransition(() => {
+  const clearMessages = useCallback(() => {
+    dispatch(messagesClearEvaluations);
+    setMessages([]);
+  }, [dispatch]);
+
+  // Update derived terminal expressions in a transition (so it's safe to Suspend) when they change.
+  useEffect(() => {
+    const onEvaluation = (data: EvaluationEventPayload) => {
       startTransition(() => {
-        setMessages(prev => [
-          ...prev,
+        setMessages(prevMessages => [
+          ...prevMessages,
           {
-            ...partialTerminalExpression,
-            id: idCounterRef.current++,
+            ...data,
             type: "TerminalExpression",
           },
         ]);
       });
-    });
+    };
+
+    ThreadFront.on("evaluation", onEvaluation);
+    return () => {
+      ThreadFront.off("evaluation", onEvaluation);
+    };
   }, []);
 
-  const clearMessages = useCallback(() => setMessages([]), []);
-
-  const terminalContext = useMemo(
+  const context = useMemo(
     () => ({
-      addMessage,
       clearMessages,
       isPending,
-      messages,
+      messages: messages,
+
+      // New terminal expressions can only be added via JSTerm (and Redux) in this context.
+      addMessage: () => {},
     }),
-    [addMessage, clearMessages, isPending, messages]
+    [clearMessages, isPending, messages]
   );
 
-  return <TerminalContext.Provider value={terminalContext}>{children}</TerminalContext.Provider>;
+  return <TerminalContext.Provider value={context}>{children}</TerminalContext.Provider>;
 }
 
 // Adapter that reads the current execution point and time (from Redux) and passes them to the TimelineContext.

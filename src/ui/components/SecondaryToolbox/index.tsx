@@ -1,18 +1,23 @@
-import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
 import React, { FC, ReactNode, Suspense, useContext } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
+import WebConsoleApp from "devtools/client/webconsole/components/App";
 import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities } from "protocol/thread/thread";
+
 import { NodePicker } from "../NodePicker";
 import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { ReduxDevToolsPanel } from "./ReduxDevTools";
+
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
+
 import { trackEvent } from "ui/utils/telemetry";
+
 import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
@@ -23,6 +28,7 @@ import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
+import { useFeature } from "ui/hooks/settings";
 import Loader from "../shared/Loader";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
@@ -86,10 +92,11 @@ const PanelButtons: FC<PanelButtonsProps> = ({
 };
 
 function ConsolePanel() {
+  const { value: disableNewComponentArchitecture } = useFeature("disableNewComponentArchitecture");
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        <NewConsoleRoot />
+        {disableNewComponentArchitecture ? <WebConsoleApp /> : <NewConsoleRoot />}
       </div>
     </div>
   );

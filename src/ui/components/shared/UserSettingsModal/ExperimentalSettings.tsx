@@ -19,6 +19,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
+    label: "Legacy console",
+    description: "Restore the legacy console and inspector UIs",
+    key: "disableNewComponentArchitecture",
+  },
+  {
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
@@ -74,6 +79,8 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
+  const { value: disableNewComponentArchitecture, update: updateEnableNewComponentArchitecture } =
+    useFeature("disableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
@@ -86,6 +93,8 @@ export default function ExperimentalSettings({}) {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
+    } else if (key === "disableNewComponentArchitecture") {
+      updateEnableNewComponentArchitecture(!disableNewComponentArchitecture);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
@@ -96,9 +105,10 @@ export default function ExperimentalSettings({}) {
   };
 
   const localSettings = {
+    disableNewComponentArchitecture,
+    enableQueryCache,
     enableColumnBreakpoints,
     enableResolveRecording,
-    enableQueryCache,
     hitCounts,
     profileWorkerThreads,
   };

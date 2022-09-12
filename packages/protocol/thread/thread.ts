@@ -38,7 +38,6 @@ import {
   PointRange,
   PauseId,
   PauseData,
-  Value,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -112,7 +111,7 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
-type ThreadFrontEvent = "currentPause" | "paused" | "resumed";
+type ThreadFrontEvent = "currentPause" | "evaluation" | "paused" | "resumed";
 
 declare global {
   interface Window {
@@ -601,38 +600,6 @@ class _ThreadFront {
     return rv;
   }
 
-  // Same as evaluate, but returns the result without wrapping a ValueFront around them.
-  // TODO Replace usages of evaluate with this.
-  async evaluateNew({
-    asyncIndex,
-    text,
-    frameId,
-    pure = false,
-  }: {
-    asyncIndex?: number;
-    text: string;
-    frameId?: FrameId;
-    pure?: boolean;
-  }) {
-    const pause = await this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
-
-    const rv = await pause.evaluate(frameId, text, pure);
-
-    if (repaintAfterEvaluationsExperimentalFlag) {
-      const { repaint } = await import("protocol/graphics");
-      repaint(true);
-    }
-
-    if (rv.returned) {
-      return { exception: null, returned: rv.returned as any as Value };
-    } else if (rv.exception) {
-      return { exception: rv.exception as any as Value, returned: null };
-    } else {
-      return { exception: null, returned: null };
-    }
-  }
-
   // Perform an operation that will change our cached targets about where resume
   // operations will finish.
   private async _invalidateResumeTargets(callback: () => Promise<void>) {
@@ -775,6 +742,25 @@ class _ThreadFront {
 
   findMessagesInRange(range: PointRange) {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
+  }
+
+  async findConsoleMessages(
+    onConsoleMessage: (pause: Pause, message: WiredMessage) => void,
+    onConsoleOverflow: () => void
+  ) {
+    await this.ensureProcessed("basic");
+    client.Console.addNewMessageListener(async ({ message }) => {
+      await this.ensureAllSources();
+      const pause = wireUpMessage(message);
+      onConsoleMessage(pause, message as WiredMessage);
+    });
+
+    return client.Console.findMessages({}, this.sessionId!).then(({ overflow }) => {
+      if (overflow) {
+        console.warn("Too many console messages, not all will be shown");
+        onConsoleOverflow();
+      }
+    });
   }
 
   async getRootDOMNode() {

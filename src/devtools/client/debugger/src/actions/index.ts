@@ -4,6 +4,7 @@
 
 import * as breakpoints from "./breakpoints";
 import * as fileSearch from "./file-search";
+import * as logExceptions from "./logExceptions";
 import * as pause from "./pause";
 import * as preview from "./preview";
 import * as quickOpen from "./quick-open";
@@ -14,6 +15,7 @@ import * as ui from "./ui";
 
 export default {
   ...breakpoints,
+  ...logExceptions,
   ...sources,
   ...tabs,
   ...pause,

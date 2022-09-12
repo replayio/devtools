@@ -72,7 +72,7 @@ import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import { getContextMenu } from "ui/reducers/contextMenus";
 
 import { selectors } from "ui/reducers";
-import { NAG_HEIGHT } from "ui/components/shared/Nags/Nags";
+import { NAG_HEIGHT, NAG_HAT_CLASS } from "ui/components/shared/Nags/Nags";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
