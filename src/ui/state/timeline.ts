@@ -22,6 +22,7 @@ export interface UnsafeFocusRegion {
 }
 
 export interface TimelineState {
+  allPaintsReceived: boolean;
   currentTime: number;
   hoveredItem: HoveredItem | null;
   hoverTime: number | null;
@@ -33,6 +34,7 @@ export interface TimelineState {
     time: number;
   } | null;
   playbackPrecachedTime: number;
+  paints: TimeStampedPoint[];
   points: TimeStampedPoint[];
   recordingDuration: number | null;
   shouldAnimate: boolean;

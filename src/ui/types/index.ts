@@ -14,6 +14,7 @@ export type ExperimentalUserSettings = {
 };
 
 export type LocalExperimentalUserSettings = {
+  basicProcessingLoadingBar: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
   enableLargeText: boolean;

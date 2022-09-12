@@ -2,6 +2,7 @@ import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import clamp from "lodash/clamp";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
+import { assert } from "protocol/utils";
 import { FocusRegion, UnsafeFocusRegion, ZoomRegion } from "ui/state/timeline";
 
 import { timelineMarkerWidth } from "../constants";
@@ -308,4 +309,49 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
   const endIndex = sortedLastIndexBy(sortedPoints, endPoint, ({ point }) => BigInt(point));
 
   return sortedPoints.slice(beginIndex, endIndex);
+}
+
+function assertSorted(a: TimeStampedPoint[]) {
+  a.reduce(
+    (prev, curr) => {
+      assert(prev.time <= curr.time);
+      return curr;
+    },
+    { point: "0", time: 0 }
+  );
+}
+
+export function mergeSortedPointLists(
+  a: TimeStampedPoint[],
+  b: TimeStampedPoint[]
+): TimeStampedPoint[] {
+  assertSorted(a);
+  assertSorted(b);
+
+  // Merge from the smaller array into the larger one.
+  let [source, destination] = a.length < b.length ? [a, b] : [b, a];
+
+  let sourceIndex = 0;
+  let destinationIndex = 0;
+
+  while (sourceIndex < source.length) {
+    const sourcePoint = source[sourceIndex];
+
+    let destinationIndexPoint = destination[destinationIndex];
+
+    if (destinationIndexPoint == null) {
+      destination.push(sourcePoint);
+      sourceIndex++;
+    } else if (sourcePoint.time === destinationIndexPoint.time) {
+      // Don't add duplicates.
+      sourceIndex++;
+    } else if (sourcePoint.time < destinationIndexPoint.time) {
+      destination.splice(destinationIndex, 0, sourcePoint);
+      sourceIndex++;
+      destinationIndex++;
+    } else {
+      destinationIndex++;
+    }
+  }
+  return destination;
 }

@@ -89,6 +89,7 @@ if (typeof window !== "undefined") {
 }
 
 export type ExperimentalSettings = {
+  controllerKey?: string;
   listenForMetrics: boolean;
   disableCache?: boolean;
   disableQueryCache?: boolean;

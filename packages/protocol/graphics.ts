@@ -194,6 +194,8 @@ export function setupGraphics() {
     const { client } = await import("./socket");
     client.Graphics.findPaints({}, sessionId).then(async () => {
       hasAllPaintPoints = true;
+      onAllPaintsReceived(true);
+
       await Promise.all(gPaintPromises);
       maybePaintGraphics();
       videoReady.resolve();
@@ -622,6 +624,11 @@ export function setPlaybackStatusCallback(callback: typeof onPlaybackStatus): vo
 let onPointsReceived: (points: TimeStampedPoint[]) => void;
 export function setPointsReceivedCallback(callback: typeof onPointsReceived): void {
   onPointsReceived = callback;
+}
+
+let onAllPaintsReceived: (received: boolean) => void;
+export function setAllPaintsReceivedCallback(callback: typeof onAllPaintsReceived): void {
+  onAllPaintsReceived = callback;
 }
 
 let onRefreshGraphics: (canvas: Canvas) => void;
