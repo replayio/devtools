@@ -45,7 +45,8 @@ class ReplayWall implements Wall {
     private onShutdown: () => void,
     private highlightNode: (nodeId: string) => void,
     private unhighlightNode: () => void,
-    private replayClient: ReplayClientInterface
+    private replayClient: ReplayClientInterface,
+    private pauseId: string | undefined
   ) {}
 
   // called by the frontend to register a listener for receiving backend messages
@@ -195,15 +196,22 @@ class ReplayWall implements Wall {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluate({ asyncIndex: 0, text: expr });
-      if (response.returned) {
-        const entries = response.returned.previewContainerEntries();
-        for (const { key, value } of entries) {
-          if (!key?.isObject() || !value.isPrimitive() || typeof value.primitive() !== "number") {
-            continue;
+      const response = await ThreadFront.evaluateNew({ asyncIndex: 0, text: expr });
+      if (response.returned?.object) {
+        const mapObjData = await getObjectWithPreviewHelper(
+          this.replayClient,
+          this.pauseId!,
+          response.returned.object
+        );
+
+        mapObjData.preview?.containerEntries?.forEach(entry => {
+          // The backend should have returned numeric node IDs as values.
+          // The keys are DOM node objects. We don't need to fetch them,
+          // because all we care about here is the object IDs anyway.
+          if (typeof entry.key?.object === "string" && typeof entry.value.value === "number") {
+            nodeToElementId.set(entry.key.object, entry.value.value);
           }
-          nodeToElementId.set(key.objectId()!, value.primitive() as number);
-        }
+        });
       }
     }
     return nodeToElementId;
@@ -232,7 +240,8 @@ function createReactDevTools(
   onShutdown: () => void,
   highlightNode: (nodeId: string) => void,
   unhighlightNode: () => void,
-  replayClient: ReplayClientInterface
+  replayClient: ReplayClientInterface,
+  pauseId: string | undefined
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
@@ -244,7 +253,8 @@ function createReactDevTools(
     onShutdown,
     highlightNode,
     unhighlightNode,
-    replayClient
+    replayClient,
+    pauseId
   );
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, {
@@ -416,7 +426,8 @@ export default function ReactDevtoolsPanel() {
     onShutdown,
     dispatchHighlightNode,
     dispatchUnhighlightNode,
-    replayClient
+    replayClient,
+    pauseId
   );
 
   return (
