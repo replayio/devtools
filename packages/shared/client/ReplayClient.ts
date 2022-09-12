@@ -27,6 +27,9 @@ import {
   keyboardEvents,
   navigationEvents,
   Result,
+  MappedLocation,
+  SourceLocation,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
@@ -536,6 +539,31 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async getBreakpointPositions(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]> {
+    const sessionId = this.getSessionIdThrows();
+    const begin = range ? range.start : undefined;
+    const end = range ? range.end : undefined;
+    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
+      { sourceId, begin, end },
+      sessionId
+    );
+    return lineLocations;
+  }
+
+  async getMappedLocation(
+    location: Location
+  ): Promise<MappedLocation> {
+    const sessionId = this.getSessionIdThrows();
+    const { mappedLocation } = await client.Debugger.getMappedLocation(
+      { location },
+      sessionId
+    );
+    return mappedLocation;
   }
 
   async loadRegion(range: TimeRange, duration: number): Promise<void> {

@@ -28,6 +28,8 @@ import {
   keyboardEvents,
   navigationEvents,
   Result,
+  MappedLocation,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -107,6 +109,11 @@ export interface ReplayClientInterface {
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
   getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  getBreakpointPositions(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]>;
+  getMappedLocation(location: Location): Promise<MappedLocation>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;

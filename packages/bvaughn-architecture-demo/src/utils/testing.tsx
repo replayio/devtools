@@ -201,6 +201,8 @@ export function createMockReplayClient() {
       contentType: "text/javascript",
     })),
     getSourceHitCounts: jest.fn().mockImplementation(async () => new Map()),
+    getBreakpointPositions: jest.fn().mockImplementation(async () => []),
+    getMappedLocation: jest.fn().mockImplementation(async () => []),
     initialize: jest.fn().mockImplementation(async () => {}),
     loadRegion: jest.fn().mockImplementation(async () => {}),
     removeEventListener: jest.fn(),
