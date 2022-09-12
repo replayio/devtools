@@ -1,9 +1,10 @@
 import classNames from "classnames";
-import React from "react";
+import React, { useContext } from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
 import MaterialIcon from "../MaterialIcon";
+import { LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
 
 // This is very arbitrary but we need it to keep the editor
 // from running into overflow problems.
@@ -56,4 +57,22 @@ export function EditorNag() {
   }
 
   return <NagHat subText="Now hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
+}
+
+export function ConsoleNag() {
+  const loggables = useContext(LoggablesContext);
+
+  // Don't show the console nag that directs the user to click on one of the console messages
+  // if there aren't any console messages to begin with.
+  if (!loggables.length) {
+    return null;
+  }
+
+  return (
+    <NagHat
+      mainText="Want to see something cool?"
+      subText="Try fast-forwarding or rewinding to a console log"
+      nagType={Nag.FIRST_CONSOLE_NAVIGATE}
+    />
+  );
 }
