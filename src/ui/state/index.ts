@@ -21,7 +21,6 @@ import { NetworkState } from "ui/reducers/network";
 import { QuickOpenState } from "devtools/client/debugger/src/reducers/quick-open";
 import type { TabsState } from "devtools/client/debugger/src/reducers/tabs";
 import type { ThreadsState } from "devtools/client/debugger/src/reducers/threads";
-import type { WebconsoleUIState } from "devtools/client/webconsole/reducers/ui";
 import type { UISliceState } from "devtools/client/debugger/src/reducers/ui";
 
 import { LayoutState } from "./layout";
@@ -39,7 +38,6 @@ export interface UIState {
   breakpoints: BreakpointsState;
   classList: ClassListState;
   computed: ComputedState;
-  consoleUI: WebconsoleUIState;
   contextMenus: ContextMenusState;
   eventListenerBreakpoints: EventListenersState;
   sources: NewSourcesState;

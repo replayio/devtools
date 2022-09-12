@@ -3,7 +3,6 @@ import {
   asyncStore as debuggerAsyncPrefs,
 } from "devtools/client/debugger/src/utils/prefs";
 import { RecordingId } from "@replayio/protocol";
-import { prefs as webconsolePrefs } from "devtools/client/webconsole/utils/prefs";
 import debounce from "lodash/debounce";
 import { UIStore } from "ui/actions";
 import { UIState } from "ui/state";
@@ -64,7 +63,6 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
 
 const updateStandardPrefs = createPrefsUpdater(prefs);
 const updateAsyncPrefs = createPrefsUpdater(asyncStore);
-const updateWebconsolePrefs = createPrefsUpdater(webconsolePrefs);
 const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
 const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
@@ -83,13 +81,6 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     "eventListenerBreakpoints",
     state => state.eventListenerBreakpoints
   );
-
-  // This is lazy-loaded, so it may not exist on startup
-  if (state.consoleUI && oldState.consoleUI) {
-    updateWebconsolePrefs(state, oldState, "timestampsVisible", state => {
-      return state.consoleUI.timestampsVisible;
-    });
-  }
 
   if (state.ui && oldState.ui) {
     updateDebuggerPrefs(
