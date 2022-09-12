@@ -4,7 +4,7 @@ import {
   PauseId,
   Value as ProtocolValue,
 } from "@replayio/protocol";
-import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
+import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { onViewSourceInDebugger, openNodeInInspector } from "devtools/client/webconsole/actions";
 import { Pause, ThreadFront, ValueFront } from "protocol/thread";

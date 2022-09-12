@@ -13,7 +13,7 @@ import { XHTMLNode } from "./XHTMLNode";
 import { onViewSourceInDebugger } from "devtools/client/webconsole/actions/toolbox";
 import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedDomNodeId } from "devtools/client/inspector/markup/reducers/markup";
-import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { getObjectWithPreview } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 export const EventListenersApp = () => {

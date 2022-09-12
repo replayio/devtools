@@ -1,10 +1,11 @@
 import debounce from "lodash/debounce";
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
-import { ThreadFront, ValueFront } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 import { useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { getPropertiesForObject } from "ui/utils/autocomplete";
+import { Value } from "@replayio/protocol";
 
 // Use eager eval to get the properties of the last complete object in the expression.
 export async function getEvaluatedProperties(
@@ -41,15 +42,15 @@ async function eagerEvaluateExpression(
   expression: string,
   asyncIndex: number,
   frameId?: string
-): Promise<ValueFront | null> {
+): Promise<Value | null> {
   try {
-    const { returned, exception, failed } = await ThreadFront.evaluate({
+    const { returned, exception } = await ThreadFront.evaluateNew({
       asyncIndex,
       frameId,
       text: expression,
       pure: true,
     });
-    if (returned && !(failed || exception)) {
+    if (returned && !exception) {
       return returned;
     }
   } catch (err: any) {

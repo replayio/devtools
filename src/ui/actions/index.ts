@@ -13,8 +13,6 @@ import { UIState } from "ui/state";
 import { ReactDevToolsAction } from "./reactDevTools";
 import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
-import UserProperties from "devtools/client/inspector/rules/models/user-properties";
-import * as consoleActions from "devtools/client/webconsole/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
 import { NetworkAction } from "./network";
 import { LayoutAction } from "./layout";
@@ -35,7 +33,6 @@ const { initialAppState, ...actualAppActions } = appActions;
 export const actions = {
   ...actualAppActions,
   ...commentsActions,
-  ...consoleActions,
   ...debuggerActions,
   ...eventListeners,
   ...layoutActions,

@@ -5,7 +5,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   // Several objects currently show up differently in chromium.
   const target = await Test.getRecordingTarget();
 
-  await Test.waitForMessage("Array(20) [0, 1, 2, 3, 4");
+  await Test.waitForMessage("(20) [0, 1, 2, 3, 4");
   await Test.waitForMessage("Uint8Array(20) [0, 1, 2, 3, 4");
   await Test.waitForMessage("Set(22) [{…}, {…}, 0, 1, 2");
   await Test.waitForMessage("Map(21) {{…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4");
@@ -21,7 +21,7 @@ Test.describe(`expressions in the console after time warping.`, async () => {
   msg = await Test.waitForMessage("bar()");
   Test.checkJumpIcon(msg);
 
-  await Test.waitForMessage('Array(6) [undefined, true, 3, null');
+  await Test.waitForMessage('(6) [undefined, true, 3, null');
   await Test.waitForMessage('Proxy{}');
   await Test.waitForMessage("Symbol()");
   await Test.waitForMessage("Symbol(symbol)");

@@ -1,8 +1,8 @@
 import { connect } from "react-redux";
-import { actions } from "ui/actions";
 import SmartTrace from "devtools/client/shared/components/SmartTrace";
+import { onViewSourceInDebugger } from "../actions";
 
 export default connect(null, {
-  onViewSourceInDebugger: actions.onViewSourceInDebugger,
+  onViewSourceInDebugger,
   // @ts-expect-error some nested field mismatch
 })(SmartTrace);

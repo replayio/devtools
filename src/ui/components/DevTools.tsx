@@ -10,7 +10,6 @@ import { selectors } from "../reducers";
 
 import Header from "./Header/index";
 import LoadingScreen from "./shared/LoadingScreen";
-import WaitForReduxSlice from "./WaitForReduxSlice";
 import ReplayLogo from "./shared/ReplayLogo";
 import SplitBox from "devtools/client/shared/components/splitter/SplitBox";
 
@@ -36,7 +35,7 @@ import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
-type _DevToolsProps = PropsFromRedux & DevToolsProps;
+type DevToolsProps = PropsFromRedux & { uploadComplete: boolean };
 
 function ViewLoader() {
   const [showLoader, setShowLoader] = useState(false);
@@ -103,7 +102,7 @@ function _DevTools({
   sessionId,
   showCommandPalette,
   uploadComplete,
-}: _DevToolsProps) {
+}: DevToolsProps) {
   const { isAuthenticated } = useAuth0();
   const recordingId = useGetRecordingId();
   const { recording } = useGetRecording(recordingId);
@@ -198,11 +197,4 @@ const connector = connect(
 type PropsFromRedux = ConnectedProps<typeof connector>;
 const ConnectedDevTools = connector(_DevTools);
 
-type DevToolsProps = { uploadComplete: boolean };
-const DevTools = (props: DevToolsProps) => (
-  <WaitForReduxSlice slice="messages">
-    <ConnectedDevTools {...props} />
-  </WaitForReduxSlice>
-);
-
-export default DevTools;
+export default ConnectedDevTools;

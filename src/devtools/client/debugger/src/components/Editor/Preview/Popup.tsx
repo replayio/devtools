@@ -8,7 +8,6 @@ import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 
-import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
 import {
   highlightDomElement,
   unHighlightDomElement,
@@ -18,16 +17,11 @@ import {
 import { selectSourceURL } from "devtools/client/debugger/src/actions/sources/select";
 import { clearPreview } from "devtools/client/debugger/src/actions/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { prefs as prefsService } from "devtools/shared/services";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 
 import Popover from "../../shared/Popover";
-import PreviewFunction from "../../shared/PreviewFunction";
 
 import NewObjectInspector from "./NewObjectInspector";
-import { getPreferredLocation } from "ui/utils/preferredLocation";
-
-type $FixTypeLater = any;
 
 interface PopupProps {
   preview: PreviewState["preview"];
@@ -51,112 +45,6 @@ export class Popup extends Component<FinalPopupProps> {
 
     return 250;
   };
-
-  renderFunctionPreview() {
-    const { cx, sourcesById, selectSourceURL, preview } = this.props;
-    const { resultGrip } = preview!;
-
-    if (!resultGrip) {
-      return null;
-    }
-
-    const location = getPreferredLocation(resultGrip.mappedFunctionLocation());
-    const locationURL = location ? sourcesById[location.sourceId]?.url : undefined;
-
-    return (
-      <div
-        className="preview-popup"
-        onClick={() =>
-          location &&
-          locationURL &&
-          selectSourceURL(cx, locationURL, {
-            line: location.line,
-            column: 0,
-          })
-        }
-      >
-        <PreviewFunction func={resultGrip} />
-      </div>
-    );
-  }
-
-  renderObjectPreview() {
-    const {
-      preview,
-      openLink,
-      openElementInInspector,
-      highlightDomElement,
-      unHighlightDomElement,
-    } = this.props;
-    const { root } = preview!;
-
-    if (root.getChildren().length == 0) {
-      return (
-        <div className="preview-popup">
-          <span className="label">{"No properties"}</span>
-        </div>
-      );
-    }
-
-    return (
-      <div className="preview-popup" style={{ maxHeight: this.calculateMaxHeight() }}>
-        <ObjectInspector
-          roots={() => root.getChildren()}
-          autoExpandDepth={0}
-          disableWrap={true}
-          focusable={false}
-          // @ts-expect-error prop mismatch? whatever
-          openLink={openLink}
-          onDOMNodeClick={(grip: $FixTypeLater) => openElementInInspector(grip)}
-          onInspectIconClick={(grip: $FixTypeLater) => openElementInInspector(grip)}
-          onDOMNodeMouseOver={(grip: $FixTypeLater) => highlightDomElement(grip)}
-          onDOMNodeMouseOut={() => unHighlightDomElement()}
-        />
-      </div>
-    );
-  }
-
-  renderSimplePreview() {
-    const { openLink, preview } = this.props;
-
-    const { resultGrip } = preview!;
-    return (
-      <div className="preview-popup">
-        {Rep({
-          object: resultGrip,
-          mode: MODE.LONG,
-          openLink,
-        })}
-      </div>
-    );
-  }
-
-  renderPreview() {
-    // We don't have to check and
-    // return on `false`, `""`, `0`, `undefined` etc,
-    // these falsy simple typed value because we want to
-    // do `renderSimplePreview` on these values below.
-    const { preview } = this.props;
-    const { root } = preview!;
-
-    const disableNewComponentArchitecture = prefsService.getBoolPref(
-      "devtools.features.disableNewComponentArchitecture"
-    );
-    if (disableNewComponentArchitecture) {
-      if (root.type === "value") {
-        if (root.isFunction()) {
-          return this.renderFunctionPreview();
-        }
-        if (root.isObject()) {
-          return <div>{this.renderObjectPreview()}</div>;
-        }
-      }
-
-      return this.renderSimplePreview();
-    } else {
-      return <NewObjectInspector />;
-    }
-  }
 
   getPreviewType() {
     const { preview } = this.props;
@@ -190,7 +78,7 @@ export class Popup extends Component<FinalPopupProps> {
         target={this.props.preview!.target}
         mouseout={this.onMouseOut}
       >
-        {this.renderPreview()}
+        <NewObjectInspector />
       </Popover>
     );
   }
