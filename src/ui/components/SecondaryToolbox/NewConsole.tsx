@@ -52,6 +52,7 @@ import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
 
 import styles from "./NewConsole.module.css";
+import { ConsoleNag } from "../shared/Nags/Nags";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -83,7 +84,11 @@ export default function NewConsoleRoot() {
           <TerminalContextController>
             <FocusContextReduxAdapter>
               <PointsContextReduxAdapter>
-                <NewConsole showSearchInputByDefault={false} terminalInput={<JSTermWrapper />} />
+                <NewConsole
+                  nagHeader={<ConsoleNag />}
+                  showSearchInputByDefault={false}
+                  terminalInput={<JSTermWrapper />}
+                />
               </PointsContextReduxAdapter>
             </FocusContextReduxAdapter>
           </TerminalContextController>
