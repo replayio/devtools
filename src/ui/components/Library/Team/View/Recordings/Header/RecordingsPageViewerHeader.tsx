@@ -47,25 +47,21 @@ function ViewerHeaderActions({
   return (
     <>
       <SecondaryButton
-            className={styles.editButton}
-            color="blue"
-            onClick={() => launchWorkspaceSettings()}
-          >
-            Add team member
-          </SecondaryButton>
+        className={styles.editButton}
+        color="blue"
+        onClick={() => launchWorkspaceSettings()}
+      >
+        Add team member
+      </SecondaryButton>
       {recordings.length != 0 ? (
-        <>
-          <SecondaryButton
-            className={styles.editButton}
-            color="blue"
-            onClick={() => setIsEditing(true)}
-          >
-            Edit
-          </SecondaryButton>
-        </>
-      ) : (
-        <></>
-      )}
+        <SecondaryButton
+          className={styles.editButton}
+          color="blue"
+          onClick={() => setIsEditing(true)}
+        >
+          Edit
+        </SecondaryButton>
+      ) : null}
     </>
   );
 }
