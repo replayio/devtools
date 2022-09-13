@@ -200,7 +200,7 @@ const namespaceFromEventName = (event: string): string => {
   return namespace.length ? namespace : NULL_NAMESPACE;
 };
 
-export async function trackMixpanelEvent(...[event, properties]: [...MixpanelEvent]) {
+export function trackMixpanelEvent(...[event, properties]: [...MixpanelEvent]) {
   if (prefs.logTelemetryEvent) {
     console.log("🔴", event, properties);
   }
@@ -209,7 +209,7 @@ export async function trackMixpanelEvent(...[event, properties]: [...MixpanelEve
     mixpanel.track(event, { ...properties, namespace: namespaceFromEventName(event) });
   }
 }
-export async function timeMixpanelEvent(event: MixpanelEvent[0]) {
+export function timeMixpanelEvent(event: MixpanelEvent[0]) {
   if (!mixpanelDisabled) {
     mixpanel.time_event(event);
   }
@@ -217,7 +217,7 @@ export async function timeMixpanelEvent(event: MixpanelEvent[0]) {
 
 const eventsBeingOnlyTrackedOnce = new Set();
 
-export async function trackEventOnce(...[event, properties]: [...MixpanelEvent]) {
+export function trackEventOnce(...[event, properties]: [...MixpanelEvent]) {
   if (eventsBeingOnlyTrackedOnce.has(event)) {
     return;
   }
