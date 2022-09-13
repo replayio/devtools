@@ -1,9 +1,17 @@
 import { ExecutionPoint, ObjectId } from "@replayio/protocol";
-import React from "react";
+import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { ThreadFront } from "protocol/thread";
+
+import { ThreadFront, Pause, ValueFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { ReplayClientInterface } from "shared/client/types";
+import {
+  getObjectWithPreviewHelper,
+  getObjectPropertyHelper,
+} from "@bvaughn/src/suspense/ObjectPreviews";
+
 import { Annotation } from "ui/state/reactDevTools";
 import { getCurrentPoint, getTheme } from "ui/reducers/app";
 import {
@@ -16,6 +24,7 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getJSON } from "ui/utils/objectFetching";
 
 import type { Store, Wall } from "react-devtools-inline/frontend";
 
@@ -36,7 +45,9 @@ class ReplayWall implements Wall {
     private disablePicker: () => void,
     private onShutdown: () => void,
     private highlightNode: (nodeId: string) => void,
-    private unhighlightNode: () => void
+    private unhighlightNode: () => void,
+    private replayClient: ReplayClientInterface,
+    private pauseId: string | undefined
   ) {}
 
   // called by the frontend to register a listener for receiving backend messages
@@ -101,20 +112,17 @@ class ReplayWall implements Wall {
           }
           this.highlightedElementId = id;
 
-          const response = await ThreadFront.evaluate({
+          const response = await ThreadFront.evaluateNew({
             asyncIndex: 0,
             text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
           });
-          if (!response.returned || this.highlightedElementId !== id) {
+
+          const nodeId = response.returned?.object;
+          if (!nodeId || this.highlightedElementId !== id) {
             return;
           }
 
-          const nodeFront = response.returned.getNodeFront();
-          if (!nodeFront || this.highlightedElementId !== id) {
-            return;
-          }
-
-          this.highlightNode(nodeFront.id!);
+          this.highlightNode(nodeId);
           break;
         }
 
@@ -167,7 +175,7 @@ class ReplayWall implements Wall {
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    const response = await ThreadFront.evaluate({
+    const response = await ThreadFront.evaluateNew({
       asyncIndex: 0,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
         payload
@@ -175,7 +183,8 @@ class ReplayWall implements Wall {
     });
 
     if (response.returned) {
-      const result: any = await response.returned.getJSON();
+      const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
+
       if (result) {
         this._listener?.({ event: result.event, payload: result.data });
       }
@@ -189,15 +198,22 @@ class ReplayWall implements Wall {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluate({ asyncIndex: 0, text: expr });
-      if (response.returned) {
-        const entries = response.returned.previewContainerEntries();
-        for (const { key, value } of entries) {
-          if (!key?.isObject() || !value.isPrimitive() || typeof value.primitive() !== "number") {
-            continue;
+      const response = await ThreadFront.evaluateNew({ asyncIndex: 0, text: expr });
+      if (response.returned?.object) {
+        const mapObjData = await getObjectWithPreviewHelper(
+          this.replayClient,
+          this.pauseId!,
+          response.returned.object
+        );
+
+        mapObjData.preview?.containerEntries?.forEach(entry => {
+          // The backend should have returned numeric node IDs as values.
+          // The keys are DOM node objects. We don't need to fetch them,
+          // because all we care about here is the object IDs anyway.
+          if (typeof entry.key?.object === "string" && typeof entry.value.value === "number") {
+            nodeToElementId.set(entry.key.object, entry.value.value);
           }
-          nodeToElementId.set(key.objectId()!, value.primitive() as number);
-        }
+        });
       }
     }
     return nodeToElementId;
@@ -225,7 +241,9 @@ function createReactDevTools(
   disablePicker: () => void,
   onShutdown: () => void,
   highlightNode: (nodeId: string) => void,
-  unhighlightNode: () => void
+  unhighlightNode: () => void,
+  replayClient: ReplayClientInterface,
+  pauseId: string | undefined
 ) {
   const { createBridge, createStore, initialize } = reactDevToolsInlineModule;
 
@@ -236,7 +254,9 @@ function createReactDevTools(
     disablePicker,
     onShutdown,
     highlightNode,
-    unhighlightNode
+    unhighlightNode,
+    replayClient,
+    pauseId
   );
   const bridge = createBridge(target, wall);
   const store = createStore(bridge, {
@@ -260,20 +280,43 @@ function createReactDevTools(
 // We can work around this by checking RD's "bridge protocol" version (which we also store)
 // and loading the appropriate frontend version to match.
 // For more information see https://github.com/facebook/react/issues/24219
-async function loadReactDevToolsInlineModuleFromProtocol(stateUpdaterCallback: Function) {
-  const response = await ThreadFront.evaluate({
+async function loadReactDevToolsInlineModuleFromProtocol(
+  stateUpdaterCallback: Function,
+  replayClient: ReplayClientInterface,
+  pauseId?: string
+) {
+  if (!pauseId) {
+    return;
+  }
+
+  const response = await ThreadFront.evaluateNew({
     asyncIndex: 0,
     text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
   });
-  const json: any = await response?.returned?.getJSON();
-  const version = json?.data?.version;
+  if (response.returned?.object) {
+    // Unwrap the nested eval objects by asking the backend for contents
+    // of the nested fields: `{data: {version: 123}}`
+    const responseDataObject = await getObjectPropertyHelper(
+      replayClient,
+      pauseId,
+      response.returned.object,
+      "data"
+    );
+    const versionData = (await getObjectPropertyHelper(
+      replayClient,
+      pauseId,
+      responseDataObject.object!,
+      "version"
+    )) as { value: number };
+    const { value: version } = versionData;
 
-  // We should only load the DevTools module once we know which protocol version it requires.
-  // If we don't have a version yet, it probably means we're too early in the Replay session.
-  if (version >= 2) {
-    stateUpdaterCallback(await import("react-devtools-inline/frontend"));
-  } else if (version === 1) {
-    stateUpdaterCallback(await import("react-devtools-inline_4_17_0/frontend"));
+    // We should only load the DevTools module once we know which protocol version it requires.
+    // If we don't have a version yet, it probably means we're too early in the Replay session.
+    if (version >= 2) {
+      stateUpdaterCallback(await import("react-devtools-inline/frontend"));
+    } else if (version === 1) {
+      stateUpdaterCallback(await import("react-devtools-inline_4_17_0/frontend"));
+    }
   }
 }
 
@@ -284,10 +327,12 @@ export default function ReactDevtoolsPanel() {
   const currentPoint = useAppSelector(getCurrentPoint);
   const protocolCheckFailed = useAppSelector(getProtocolCheckFailed);
   const reactInitPoint = useAppSelector(getReactInitPoint);
+  const pauseId = useAppSelector(state => state.pause.id);
 
   const dispatch = useAppDispatch();
 
   const theme = useAppSelector(getTheme);
+  const replayClient = useContext(ReplayClientContext);
 
   // Once we've obtained the protocol version, we'll dynamically load the correct module/version.
   const [reactDevToolsInlineModule, setReactDevToolsInlineModule] =
@@ -298,7 +343,11 @@ export default function ReactDevtoolsPanel() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (reactDevToolsInlineModule === null) {
-      loadReactDevToolsInlineModuleFromProtocol(setReactDevToolsInlineModule);
+      loadReactDevToolsInlineModuleFromProtocol(
+        setReactDevToolsInlineModule,
+        replayClient,
+        pauseId
+      );
     }
   });
 
@@ -378,7 +427,9 @@ export default function ReactDevtoolsPanel() {
     disablePicker,
     onShutdown,
     dispatchHighlightNode,
-    dispatchUnhighlightNode
+    dispatchUnhighlightNode,
+    replayClient,
+    pauseId
   );
 
   return (

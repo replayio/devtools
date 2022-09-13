@@ -629,9 +629,9 @@ class _ThreadFront {
     }
 
     if (rv.returned) {
-      return { exception: null, returned: rv.returned as any as Value };
+      return { exception: null, returned: rv.returned as unknown as Value };
     } else if (rv.exception) {
-      return { exception: rv.exception as any as Value, returned: null };
+      return { exception: rv.exception as unknown as Value, returned: null };
     } else {
       return { exception: null, returned: null };
     }
