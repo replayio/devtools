@@ -3,7 +3,7 @@ import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { ThreadFront } from "protocol/thread";
+import { ThreadFront, Pause, ValueFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -24,6 +24,7 @@ import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactD
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
 import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup/actions/markup";
+import { getJSON } from "ui/utils/objectFetching";
 
 import type { Store, Wall } from "react-devtools-inline/frontend";
 
@@ -174,7 +175,7 @@ class ReplayWall implements Wall {
 
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
-    const response = await ThreadFront.evaluate({
+    const response = await ThreadFront.evaluateNew({
       asyncIndex: 0,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
         payload
@@ -182,7 +183,8 @@ class ReplayWall implements Wall {
     });
 
     if (response.returned) {
-      const result: any = await response.returned.getJSON();
+      const result: any = await getJSON(this.replayClient, this.pauseId!, response.returned);
+
       if (result) {
         this._listener?.({ event: result.event, payload: result.data });
       }
