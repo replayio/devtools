@@ -8,14 +8,14 @@ import type { PreviewState } from "devtools/client/debugger/src/reducers/preview
 
 import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 
-import { clearPreview } from "devtools/client/debugger/src/actions/preview";
+import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
 import Popover from "../../shared/Popover";
 
 import NewObjectInspector from "./NewObjectInspector";
 
 interface PopupProps {
-  preview: PreviewState["preview"];
+  preview: PreviewState;
   editorRef: HTMLDivElement;
   target: HTMLElement;
 }
@@ -25,7 +25,7 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
   const cx = useAppSelector(getThreadContext);
 
   const onMouseOut = () => {
-    dispatch(clearPreview(cx, preview!.previewId));
+    dispatch(previewCleared({ cx, previewId: preview!.previewId }));
   };
 
   const { cursorPos, value } = preview!;

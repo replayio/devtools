@@ -3,19 +3,24 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { SourceLocation } from "@replayio/protocol";
+import { nanoid } from "@reduxjs/toolkit";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import type { UIThunkAction } from "ui/actions";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
 
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { isConsole } from "../utils/preview";
-import { getPreview, isSelectedFrameVisible, getSelectedFrame } from "../selectors";
+import { isSelectedFrameVisible, getSelectedFrame } from "../selectors";
 import { getSelectedSource } from "ui/reducers/sources";
+import { getPreview, previewCleared, previewStarted, previewLoaded } from "../reducers/preview";
+
+export function isConsole(expression: string) {
+  return /^console/.test(expression);
+}
 
 type $FixTypeLater = any;
 
 export function updatePreview(
-  cx: Context,
+  cx: ThreadContext,
   target: HTMLElement,
   tokenPos: SourceLocation,
   codeMirror: $FixTypeLater
@@ -49,7 +54,7 @@ export interface EvaluateOptions {
 }
 
 export function setPreview(
-  cx: Context,
+  cx: ThreadContext,
   expression: string,
   location: { start: SourceLocation; end: SourceLocation },
   tokenPos: SourceLocation,
@@ -57,27 +62,28 @@ export function setPreview(
   target: HTMLElement
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    dispatch({
-      type: "START_PREVIEW",
-      value: {
+    dispatch(
+      previewStarted({
+        // TODO DOMRects shouldn't be in Redux
         cursorPos,
         expression,
         location,
         tokenPos,
-      },
-    });
+        previewId: nanoid(),
+      })
+    );
 
     const { previewId } = getPreview(getState())!;
 
     const source = getSelectedSource(getState());
     if (!source) {
-      clearPreview(cx, previewId);
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
     const selectedFrame = getSelectedFrame(getState());
     if (!selectedFrame) {
-      clearPreview(cx, previewId);
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
@@ -104,23 +110,10 @@ export function setPreview(
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
     if (!window.elementIsHovered(target)) {
-      dispatch(clearPreview(cx, previewId));
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
-    dispatch({
-      type: "COMPLETE_PREVIEW",
-      cx,
-      previewId,
-      value: protocolValue,
-    });
-  };
-}
-
-export function clearPreview(cx: Context, previewId: string) {
-  return {
-    type: "CLEAR_PREVIEW",
-    cx,
-    previewId,
+    dispatch(previewLoaded({ cx, previewId, value: protocolValue }));
   };
 }

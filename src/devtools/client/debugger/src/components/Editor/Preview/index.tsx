@@ -15,6 +15,9 @@ import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
 
+import { updatePreview } from "devtools/client/debugger/src/actions/preview";
+import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
+
 const mapStateToProps = (state: UIState) => {
   return {
     cx: getThreadContext(state),
@@ -23,8 +26,8 @@ const mapStateToProps = (state: UIState) => {
 };
 
 const connector = connect(mapStateToProps, {
-  clearPreview: actions.clearPreview,
-  updatePreview: actions.updatePreview,
+  previewCleared,
+  updatePreview,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -109,9 +112,9 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   };
 
   onScroll = () => {
-    const { clearPreview, cx, preview } = this.props;
+    const { previewCleared, cx, preview } = this.props;
     if (cx?.isPaused && preview) {
-      clearPreview(cx, preview.previewId);
+      previewCleared({ cx, previewId: preview.previewId });
     }
   };
 
