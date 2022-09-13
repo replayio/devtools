@@ -100,7 +100,7 @@ export function setTelemetryContext({ id, email, internal }: TelemetryUser) {
   }
 }
 
-export async function sendTelemetryEvent(event: string, tags: any = {}) {
+export function sendTelemetryEvent(event: string, tags: any = {}) {
   if (prefs.logTelemetryEvent) {
     console.log("telemetry event", { event, tags });
   }
