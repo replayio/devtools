@@ -23,9 +23,9 @@ export default function WelcomeBox() {
     <div className="flex flex-col items-center w-full h-full overflow-hidden">
       <div className="relative flex justify-center w-full h-full px-8 pt-24">
         <div className="relative flex flex-col items-center w-full h-full text-sm">
-          <div className="flex flex-col w-full space-y-1 text-bodyColor">
+          <div className="flex flex-col w-full space-y-1 text-menuColor">
             <div
-              className="flex flex-row space-x-4 hover:text-black hover:cursor-pointer group"
+              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
               onClick={openCommandPalette}
             >
               <div className="w-full pt-1 text-right">Command palette</div>
@@ -34,7 +34,7 @@ export default function WelcomeBox() {
               </div>
             </div>
             <div
-              className="flex flex-row space-x-4 hover:text-black hover:cursor-pointer group"
+              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
               onClick={openQuickOpen}
             >
               <div className="w-full pt-1 text-right">Go to file</div>
@@ -43,7 +43,7 @@ export default function WelcomeBox() {
               </div>
             </div>
             <div
-              className="flex flex-row space-x-4 hover:text-black hover:cursor-pointer group"
+              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
               onClick={openFullTextSearch}
             >
               <div className="w-full pt-1 text-right">Find in file</div>
