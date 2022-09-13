@@ -9,15 +9,11 @@ import type { UIState } from "ui/state";
 import type { Preview } from "./types";
 import { ValueItem } from "devtools/packages/devtools-reps";
 
-// TODO Are we really putting more DOM nodes in state?
-type $FixTypeLater = any;
-
 export interface PreviewState {
   preview:
     | (Preview & {
         previewId: string;
         expression: string;
-        target: $FixTypeLater;
         cursorPos: any;
         resultGrip: any;
         root: ValueItem;

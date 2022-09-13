@@ -85,7 +85,6 @@ export function setPreview(
         cursorPos,
         expression,
         location,
-        target,
         tokenPos,
       },
     });

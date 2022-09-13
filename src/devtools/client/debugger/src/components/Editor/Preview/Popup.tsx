@@ -26,6 +26,7 @@ import NewObjectInspector from "./NewObjectInspector";
 interface PopupProps {
   preview: PreviewState["preview"];
   editorRef: HTMLDivElement;
+  target: HTMLElement;
 }
 
 type FinalPopupProps = PropsFromRedux & PopupProps;
@@ -62,7 +63,7 @@ export class Popup extends Component<FinalPopupProps> {
   };
 
   render() {
-    const { preview, editorRef } = this.props;
+    const { preview, editorRef, target } = this.props;
     const { cursorPos, resultGrip } = preview!;
 
     if (resultGrip.isUnavailable()) {
@@ -75,7 +76,7 @@ export class Popup extends Component<FinalPopupProps> {
         targetPosition={cursorPos}
         type={type}
         editorRef={editorRef}
-        target={this.props.preview!.target}
+        target={target}
         mouseout={this.onMouseOut}
       >
         <NewObjectInspector />

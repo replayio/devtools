@@ -33,13 +33,23 @@ type PreviewProps = PropsFromRedux & {
   editorRef: any;
 };
 
-type PreviewState = { selecting: boolean };
+type PreviewState = {
+  selecting: boolean;
+  hoveredTarget: HTMLElement | null;
+};
 
 class Preview extends PureComponent<PreviewProps, PreviewState> {
-  state = { selecting: false };
+  state = { selecting: false, hoveredTarget: null };
 
   componentDidMount() {
     this.updateListeners();
+  }
+
+  componentDidUpdate(prevProps: PreviewProps) {
+    // Reset state on preview dismissal
+    if (!this.props.preview && prevProps.preview && this.state.hoveredTarget) {
+      this.setState({ hoveredTarget: null });
+    }
   }
 
   componentWillUnmount() {
@@ -75,6 +85,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
 
     // Double-check status after timer runs
     if (cx?.isPaused && !this.state.selecting) {
+      this.setState({ hoveredTarget: target });
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
   }, 100);
@@ -106,15 +117,15 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
 
   render() {
     const { preview } = this.props;
-    const { selecting } = this.state;
+    const { selecting, hoveredTarget } = this.state;
 
     return (
       <>
-        {!selecting && preview && (
-          <PreviewHighlight expression={preview.expression} target={preview.target} />
+        {!selecting && preview && hoveredTarget && (
+          <PreviewHighlight expression={preview.expression} target={hoveredTarget!} />
         )}
-        {!selecting && preview?.resultGrip && (
-          <Popup preview={preview} editorRef={this.props.editorRef} />
+        {!selecting && preview?.resultGrip && hoveredTarget && (
+          <Popup preview={preview} editorRef={this.props.editorRef} target={hoveredTarget!} />
         )}
       </>
     );
