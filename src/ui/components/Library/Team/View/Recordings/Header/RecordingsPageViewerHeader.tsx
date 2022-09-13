@@ -7,6 +7,11 @@ import TeamTrialEnd from "./TeamTrialEnd";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
 import { useAppDispatch } from "ui/setup/hooks";
 import { setModal } from "ui/actions/app";
+import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
+import { useRouter } from "next/router";
+import hooks from "ui/hooks";
+import { Workspace } from "ui/types";
+
 
 function ViewerHeaderActions({
   isEditing,
@@ -39,23 +44,27 @@ function ViewerHeaderActions({
   }
 
   const dispatch = useAppDispatch();
-
-  const launchWorkspaceSettings = (e: MouseEvent) => {    
+  const launchWorkspaceSettings = (e: MouseEvent) => {
     dispatch(setModal("workspace-settings"));
   };
 
+  const router = useRouter();
+  const isLibrary = router.asPath.includes(`/team/${MY_LIBRARY_TEAM.id}`);
+
   return (
-    
     <>
+    {!isLibrary ? (
       <SecondaryButton
-            className={styles.editButton}
-            color="blue"
-            onClick={() => launchWorkspaceSettings()}
-          >
-            Add team member
-          </SecondaryButton>
+        className={styles.editButton}
+        color="blue"
+        onClick={() => launchWorkspaceSettings()}
+      >
+        Add team member
+      </SecondaryButton>
+    ) : (<></>) }
+
       {recordings.length != 0 ? (
-        <>          
+        <>
           <SecondaryButton
             className={styles.editButton}
             color="blue"
