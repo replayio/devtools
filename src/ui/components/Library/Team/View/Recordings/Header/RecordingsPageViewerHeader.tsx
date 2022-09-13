@@ -28,6 +28,8 @@ function ViewerHeaderActions({
   setIsEditing: (value: boolean) => void;
   handleDoneEditing: () => void;
 }) {
+  const dispatch = useAppDispatch();
+
   if (isEditing) {
     return (
       <>
@@ -43,8 +45,7 @@ function ViewerHeaderActions({
     );
   }
 
-  const dispatch = useAppDispatch();
-  const launchWorkspaceSettings = (e: MouseEvent) => {
+  const launchWorkspaceSettings = () => {    
     dispatch(setModal("workspace-settings"));
   };
 
@@ -61,6 +62,7 @@ function ViewerHeaderActions({
       >
         Add team member
       </SecondaryButton>
+
     ) : (<></>) }
 
       {recordings.length != 0 ? (
