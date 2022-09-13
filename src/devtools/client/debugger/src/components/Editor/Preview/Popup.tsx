@@ -3,22 +3,13 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import React, { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
 
-import type { UIState } from "ui/state";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 
-import {
-  highlightDomElement,
-  unHighlightDomElement,
-  openLink,
-  openNodeInInspector,
-} from "devtools/client/webconsole/actions/toolbox";
-import { selectSourceURL } from "devtools/client/debugger/src/actions/sources/select";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
+
 import { clearPreview } from "devtools/client/debugger/src/actions/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
-
 import Popover from "../../shared/Popover";
 
 import NewObjectInspector from "./NewObjectInspector";
@@ -29,77 +20,38 @@ interface PopupProps {
   target: HTMLElement;
 }
 
-type FinalPopupProps = PropsFromRedux & PopupProps;
+export function Popup({ editorRef, target, preview }: PopupProps) {
+  const dispatch = useAppDispatch();
+  const cx = useAppSelector(getThreadContext);
 
-export class Popup extends Component<FinalPopupProps> {
-  calculateMaxHeight = () => {
-    const { editorRef } = this.props;
-    if (!editorRef) {
-      return "auto";
-    }
-
-    const { height, top } = editorRef.getBoundingClientRect();
-    const maxHeight = height + top;
-    if (maxHeight < 250) {
-      return maxHeight;
-    }
-
-    return 250;
+  const onMouseOut = () => {
+    dispatch(clearPreview(cx, preview!.previewId));
   };
 
-  getPreviewType() {
-    const { preview } = this.props;
-    const { root } = preview!;
-    if (root.isPrimitive() || (root.type === "value" && root.isFunction())) {
-      return "tooltip";
-    }
+  const { cursorPos, value } = preview!;
 
-    return "popover";
+  if (value === null) {
+    return null;
   }
 
-  onMouseOut = () => {
-    const { clearPreview, cx, preview } = this.props;
-    clearPreview(cx, preview!.previewId);
-  };
+  // Primitives get rendered as a smaller "tooltip" style, above the line.
+  // Other values get rendered as a larger "popover" style, below.
 
-  render() {
-    const { preview, editorRef, target } = this.props;
-    const { cursorPos, resultGrip } = preview!;
+  // The backend returns primitive data in a field called `value`
+  const isPrimitive = typeof value === "object" && "value" in value;
+  const popoverType = isPrimitive ? "tooltip" : "popover";
 
-    if (resultGrip.isUnavailable()) {
-      return null;
-    }
-
-    const type = this.getPreviewType();
-    return (
-      <Popover
-        targetPosition={cursorPos}
-        type={type}
-        editorRef={editorRef}
-        target={target}
-        mouseout={this.onMouseOut}
-      >
-        <NewObjectInspector />
-      </Popover>
-    );
-  }
+  return (
+    <Popover
+      targetPosition={cursorPos}
+      type={popoverType}
+      editorRef={editorRef}
+      target={target}
+      mouseout={onMouseOut}
+    >
+      <NewObjectInspector protocolValue={value} />
+    </Popover>
+  );
 }
 
-const mapStateToProps = (state: UIState) => ({
-  cx: getThreadContext(state),
-  sourcesById: getSourceDetailsEntities(state),
-});
-
-const mapDispatchToProps = {
-  selectSourceURL,
-  openLink,
-  openElementInInspector: openNodeInInspector,
-  highlightDomElement,
-  unHighlightDomElement,
-  clearPreview,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Popup);
+export default Popup;

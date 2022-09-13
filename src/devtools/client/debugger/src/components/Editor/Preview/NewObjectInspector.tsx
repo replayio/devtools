@@ -2,34 +2,21 @@ import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import "bvaughn-architecture-demo/pages/variables.css";
-import { clientValueToProtocolValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import { Value as ProtocolValue } from "@replayio/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import { ThreadFront } from "protocol/thread";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { useAppSelector } from "ui/setup/hooks";
-
-import { getPreview } from "../../../selectors";
 
 import styles from "./NewObjectInspector.module.css";
 
-export default function NewObjectInspector() {
-  const preview = useAppSelector(getPreview);
-  const pause = ThreadFront.currentPause;
+interface NIOProps {
+  protocolValue: ProtocolValue;
+}
 
-  // HACK
-  // The new Object Inspector does not consume ValueFronts.
-  // It works with the Replay protocol's Value objects directly.
-  // At the moment this means that we need to convert the ValueFront back to a protocol Value.
-  const protocolValue: ProtocolValue | null = useMemo(() => {
-    if (preview == null || !preview.hasOwnProperty("root") == null) {
-      return null;
-    }
+export default function NewObjectInspector({ protocolValue }: NIOProps) {
+  const pauseId = useAppSelector(state => state.pause.id);
 
-    return clientValueToProtocolValue(preview?.root);
-  }, [preview]);
-
-  if (pause == null || pause.pauseId == null || protocolValue === null) {
+  if (pauseId == null || protocolValue === null) {
     return null;
   }
 
@@ -41,7 +28,7 @@ export default function NewObjectInspector() {
             <Inspector
               className={styles.Inspector}
               context="default"
-              pauseId={pause.pauseId!}
+              pauseId={pauseId!}
               protocolValue={protocolValue}
             />{" "}
           </Suspense>
