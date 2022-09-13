@@ -30,6 +30,7 @@ import {
   Result,
   MappedLocation,
   SameLineSourceLocations,
+  getPointsBoundingTimeResult as PointsBoundingTime,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -107,6 +108,7 @@ export interface ReplayClientInterface {
   ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
+  getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getPreferredLocation(locations: Location[]): Location | null;
   getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
