@@ -80,11 +80,12 @@ async function fetchPointsBoundingTime(
     if (rethrowError) {
       throw error;
     } else {
-      // TODO
       // Note that we might be caching unloaded region errors by doing this.
       // That's better than flooding the backend with repeated requests,
       // but we also probably don't want to permanently cache this type of error.
-      // Maybe we should somehow make loaded regions part of the cache key?
+      //
+      // That being said, the app shouldn't ask for information about a time/point outside of a loaded region.
+      // If this became a problem, we could require loaded regions and make them part of the cache key when checking for errors.
       timeToErrorMap.set(time, error);
     }
 
