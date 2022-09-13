@@ -148,6 +148,7 @@ const reduxDevToolsOptions: ReduxDevToolsOptions = {
   maxAge: 100,
   stateSanitizer: sanitizeStateForDevtools,
   actionSanitizer: sanitizeActionForDevTools,
+  trace: true,
   // @ts-ignore This field has been renamed, but RTK types haven't caught up yet
   actionsDenylist: [
     "protocolMessages/eventReceived",
