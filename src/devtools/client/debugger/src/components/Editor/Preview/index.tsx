@@ -15,6 +15,9 @@ import { getPreview, getThreadContext } from "../../../selectors";
 import actions from "../../../actions";
 import { PreviewHighlight } from "./PreviewHighlight";
 
+import { updatePreview } from "devtools/client/debugger/src/actions/preview";
+import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
+
 const mapStateToProps = (state: UIState) => {
   return {
     cx: getThreadContext(state),
@@ -23,8 +26,8 @@ const mapStateToProps = (state: UIState) => {
 };
 
 const connector = connect(mapStateToProps, {
-  clearPreview: actions.clearPreview,
-  updatePreview: actions.updatePreview,
+  previewCleared,
+  updatePreview,
 });
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
@@ -33,13 +36,23 @@ type PreviewProps = PropsFromRedux & {
   editorRef: any;
 };
 
-type PreviewState = { selecting: boolean };
+type PreviewState = {
+  selecting: boolean;
+  hoveredTarget: HTMLElement | null;
+};
 
 class Preview extends PureComponent<PreviewProps, PreviewState> {
-  state = { selecting: false };
+  state = { selecting: false, hoveredTarget: null };
 
   componentDidMount() {
     this.updateListeners();
+  }
+
+  componentDidUpdate(prevProps: PreviewProps) {
+    // Reset state on preview dismissal
+    if (!this.props.preview && prevProps.preview && this.state.hoveredTarget) {
+      this.setState({ hoveredTarget: null });
+    }
   }
 
   componentWillUnmount() {
@@ -75,6 +88,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
 
     // Double-check status after timer runs
     if (cx?.isPaused && !this.state.selecting) {
+      this.setState({ hoveredTarget: target });
       updatePreview(cx, target, tokenPos, editor.codeMirror);
     }
   }, 100);
@@ -98,23 +112,23 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   };
 
   onScroll = () => {
-    const { clearPreview, cx, preview } = this.props;
+    const { previewCleared, cx, preview } = this.props;
     if (cx?.isPaused && preview) {
-      clearPreview(cx, preview.previewId);
+      previewCleared({ cx, previewId: preview.previewId });
     }
   };
 
   render() {
     const { preview } = this.props;
-    const { selecting } = this.state;
+    const { selecting, hoveredTarget } = this.state;
 
     return (
       <>
-        {!selecting && preview && (
-          <PreviewHighlight expression={preview.expression} target={preview.target} />
+        {!selecting && preview && hoveredTarget && (
+          <PreviewHighlight expression={preview.expression} target={hoveredTarget!} />
         )}
-        {!selecting && preview?.resultGrip && (
-          <Popup preview={preview} editorRef={this.props.editorRef} />
+        {!selecting && preview?.value && hoveredTarget && (
+          <Popup preview={preview} editorRef={this.props.editorRef} target={hoveredTarget!} />
         )}
       </>
     );

@@ -2,74 +2,65 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import uniqueId from "lodash/uniqueId";
-import type { AnyAction } from "@reduxjs/toolkit";
+import type { Value, SourceLocation } from "@replayio/protocol";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+
 import type { UIState } from "ui/state";
 
-import type { Preview } from "./types";
-import { ValueItem } from "devtools/packages/devtools-reps";
+import { ThreadContext } from "./pause";
 
-// TODO Are we really putting more DOM nodes in state?
-type $FixTypeLater = any;
-
-export interface PreviewState {
-  preview:
-    | (Preview & {
-        previewId: string;
-        expression: string;
-        target: $FixTypeLater;
-        cursorPos: any;
-        resultGrip: any;
-        root: ValueItem;
-      })
-    | null;
+interface PreviewInitialFields {
+  expression: string;
+  // TODO DOMRects shouldn't be in Redux
+  cursorPos: DOMRect;
+  location: { start: SourceLocation; end: SourceLocation };
+  tokenPos: SourceLocation;
 }
 
-export function initialPreviewState(): PreviewState {
-  return {
-    preview: null,
-  };
+interface PreviewStartedContents extends PreviewInitialFields {
+  previewId: string;
 }
 
-function update(state = initialPreviewState(), action: AnyAction) {
-  switch (action.type) {
-    case "CLEAR_PREVIEW": {
-      if (action.previewId !== state.preview?.previewId) {
-        return state;
-      }
+interface PreviewData extends PreviewStartedContents {
+  value: Value | null;
+}
 
-      return { preview: null };
-    }
+export type PreviewState = PreviewData | null;
 
-    case "START_PREVIEW": {
+const initialState = null as PreviewState;
+
+const previewSlice = createSlice({
+  name: "preview",
+  initialState,
+  reducers: {
+    previewStarted(state, action: PayloadAction<PreviewStartedContents>) {
       return {
-        preview: {
-          ...action.value,
-          previewId: uniqueId(),
-        },
+        ...action.payload,
+        value: null,
       };
-    }
-
-    case "COMPLETE_PREVIEW": {
-      const { previewId, value } = action;
-      if (previewId !== state.preview?.previewId) {
-        return state;
+    },
+    previewCleared(state, action: PayloadAction<{ previewId: string; cx: ThreadContext }>) {
+      if (action.payload.previewId === state?.previewId) {
+        return null;
       }
+    },
+    previewLoaded(
+      state,
+      action: PayloadAction<{ cx: ThreadContext; previewId: string; value: Value | null }>
+    ) {
+      const { previewId, value } = action.payload;
 
-      return {
-        preview: {
-          ...state.preview,
-          ...value,
-        },
-      };
-    }
-  }
+      if (previewId === state?.previewId) {
+        state.value = value;
+      }
+    },
+  },
+});
 
-  return state;
-}
+export const { previewStarted, previewLoaded, previewCleared } = previewSlice.actions;
+
+export default previewSlice.reducer;
 
 export function getPreview(state: UIState) {
-  return state.preview.preview;
+  return state.preview;
 }
-
-export default update;

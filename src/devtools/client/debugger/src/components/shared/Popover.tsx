@@ -15,7 +15,7 @@ interface PopoverProps {
   type: "tooltip" | "popover";
   editorRef: any;
   target: HTMLElement;
-  targetPosition: any;
+  targetPosition: DOMRect;
   mouseout: () => void;
   children?: React.ReactNode;
 }
