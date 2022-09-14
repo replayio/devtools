@@ -26,8 +26,6 @@ export default function NewObjectInspector() {
       return null;
     }
 
-    // TODO [bvaughn] preview.root is not a type that clientValueToProtocolNamedValue() was written for
-    // We should create a different adapter function for this
     return clientValueToProtocolValue(preview?.root);
   }, [preview]);
 

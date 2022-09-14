@@ -7,14 +7,15 @@ import "bvaughn-architecture-demo/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors/pause";
+import { Item } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 
 import styles from "./NewObjectInspector.module.css";
 
-// TODO [bvaughn] Add better types for roots
-export default function NewObjectInspector({ roots }: { roots: any[] }) {
+export default function NewObjectInspector({ roots }: { roots: Item[] }) {
+  console.log("<NewObjectInspector>", roots);
   const selectedFrame = useAppSelector(getSelectedFrame);
   const pause = ThreadFront.pauseForAsyncIndex(selectedFrame?.asyncIndex);
 
@@ -29,11 +30,9 @@ export default function NewObjectInspector({ roots }: { roots: any[] }) {
 
     const children: ReactNode[] = [];
 
-    roots.forEach((root: any, index) => {
+    roots.forEach((root: Item, index) => {
       switch (root.type) {
         case "container": {
-          // TODO [bvaughn] root is not a type that clientValueToProtocolNamedValue() was written for
-          // We should create a different adapter function for this
           const protocolValues: ProtocolNamedValue[] = root.contents.map(
             clientValueToProtocolNamedValue
           );
