@@ -1,5 +1,5 @@
-import { filterPropertiesForInlineObjectPreview } from "@bvaughn/src/utils/protocol";
-import { ReactNode } from "react";
+import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
+import { ReactNode, useMemo } from "react";
 
 import KeyValueRenderer from "../KeyValueRenderer";
 
@@ -15,15 +15,23 @@ const MAX_PROPERTIES_TO_PREVIEW = 5;
 export default function ObjectRenderer({ context, object, pauseId }: ObjectPreviewRendererProps) {
   const { className, preview } = object;
 
-  const properties = filterPropertiesForInlineObjectPreview(preview?.properties ?? []);
-  const showOverflowMarker =
-    object.preview?.overflow || properties.length > MAX_PROPERTIES_TO_PREVIEW;
+  const [properties, propertiesWereTruncated] = useMemo(() => {
+    if (preview == null) {
+      return [[], false];
+    }
 
-  const slice = properties.slice(0, MAX_PROPERTIES_TO_PREVIEW);
+    return mergePropertiesAndGetterValues(
+      preview.properties || [],
+      preview.getterValues || [],
+      MAX_PROPERTIES_TO_PREVIEW
+    );
+  }, [preview]);
+
+  const showOverflowMarker = object.preview?.overflow || propertiesWereTruncated;
 
   let propertiesList: ReactNode[] | null = null;
   if (context !== "nested") {
-    propertiesList = slice.map((property, index) => (
+    propertiesList = properties.map((property, index) => (
       <span key={index} className={styles.Value}>
         <KeyValueRenderer
           context="nested"
@@ -32,7 +40,7 @@ export default function ObjectRenderer({ context, object, pauseId }: ObjectPrevi
           pauseId={pauseId}
           protocolValue={property}
         />
-        {index < slice.length - 1 && <span className={styles.Separator}>, </span>}
+        {index < properties.length - 1 && <span className={styles.Separator}>, </span>}
       </span>
     ));
 

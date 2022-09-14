@@ -708,7 +708,7 @@ export class ReplayClient implements ReplayClientInterface {
 
 function waitForOpenConnection(
   socket: WebSocket,
-  maxDurationMs = 2500,
+  maxDurationMs = 5000,
   intervalMs = 100
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {
