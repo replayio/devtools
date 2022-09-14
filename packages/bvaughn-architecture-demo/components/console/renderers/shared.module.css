@@ -164,3 +164,7 @@
 .AnalysisError {
   color: var(--color-error);
 }
+
+.ErrorBoundaryFallback {
+  color: var(--color-error);
+}

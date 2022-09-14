@@ -1,11 +1,12 @@
 import { captureException } from "@sentry/browser";
-import React, { Component, PropsWithChildren } from "react";
+import React, { Component, createElement, PropsWithChildren, ReactNode } from "react";
 
 import styles from "./ErrorBoundary.module.css";
 
 type ErrorBoundaryState = { error: Error | null };
 
 type ErrorBoundaryProps = PropsWithChildren<{
+  fallback?: ReactNode;
   fallbackClassName?: string;
 }>;
 
@@ -23,20 +24,11 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   }
 
   render() {
-    const { fallbackClassName } = this.props;
+    const { fallback, fallbackClassName = "" } = this.props;
     const { error } = this.state;
 
     if (error !== null) {
-      return (
-        <div className={`${styles.Error} ${fallbackClassName || ""}`}>
-          <ReplayLogo />
-          <div className={styles.Header}>Our apologies!</div>
-          <div className={styles.Message}>
-            <p>Something went wrong while replaying.</p>
-            <p>We'll look into it as soon as possible.</p>
-          </div>
-        </div>
-      );
+      return fallback != null ? fallback : <DefaultFallback className={fallbackClassName} />;
     }
 
     return this.props.children;
@@ -50,5 +42,18 @@ function ReplayLogo() {
       <path d="M15.2233 29.0322L8.95319 25.3608L2.68305 21.6893C2.41111 21.5302 2.10268 21.4465 1.78873 21.4465C1.47479 21.4466 1.16639 21.5304 0.894513 21.6896C0.622634 21.8488 0.396847 22.0778 0.239833 22.3535C0.0828188 22.6292 0.000105567 22.942 0 23.2604V37.9461C0.000105567 38.2645 0.0828188 38.5773 0.239833 38.853C0.396847 39.1287 0.622634 39.3577 0.894513 39.5169C1.16639 39.6761 1.47479 39.7599 1.78873 39.76C2.10268 39.76 2.41111 39.6763 2.68305 39.5172L8.95319 35.8458L15.2233 32.1743C15.4952 32.0151 15.721 31.7861 15.878 31.5103C16.035 31.2346 16.1177 30.9217 16.1177 30.6033C16.1177 30.2848 16.035 29.9719 15.878 29.6962C15.721 29.4204 15.4952 29.1914 15.2233 29.0322Z"></path>
       <path d="M33.1056 18.809L26.8355 15.1375L20.5654 11.4661C20.2935 11.307 19.985 11.2233 19.6711 11.2233C19.3572 11.2234 19.0488 11.3072 18.7769 11.4664C18.505 11.6256 18.2792 11.8546 18.1222 12.1303C17.9652 12.406 17.8825 12.7187 17.8823 13.0371V27.7229C17.8825 28.0413 17.9652 28.354 18.1222 28.6297C18.2792 28.9055 18.505 29.1344 18.7769 29.2936C19.0488 29.4528 19.3572 29.5366 19.6711 29.5367C19.985 29.5367 20.2935 29.453 20.5654 29.2939L26.8355 25.6225L33.1056 21.9511C33.3775 21.7918 33.6033 21.5628 33.7603 21.2871C33.9173 21.0113 34 20.6985 34 20.38C34 20.0616 33.9173 19.7487 33.7603 19.473C33.6033 19.1972 33.3775 18.9682 33.1056 18.809V18.809Z"></path>
     </svg>
+  );
+}
+
+function DefaultFallback({ className }: { className: string }) {
+  return (
+    <div className={`${styles.Error} ${className || ""}`}>
+      <ReplayLogo />
+      <div className={styles.Header}>Our apologies!</div>
+      <div className={styles.Message}>
+        <p>Something went wrong while replaying.</p>
+        <p>We'll look into it as soon as possible.</p>
+      </div>
+    </div>
   );
 }
