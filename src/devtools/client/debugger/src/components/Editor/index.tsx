@@ -60,6 +60,7 @@ import {
   hasDocument,
   onTokenMouseOver,
   onLineMouseOver,
+  onMouseScroll,
   startOperation,
   endOperation,
   clearDocuments,
@@ -121,6 +122,8 @@ interface EditorState {
 class Editor extends PureComponent<PropsFromRedux, EditorState> {
   shortcuts = new KeyShortcuts({ window, target: document });
   $editorWrapper: any;
+  lastClientX = 0;
+  lastClientY = 0;
 
   constructor(props: PropsFromRedux) {
     super(props);
@@ -178,6 +181,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
     const { codeMirror } = editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
+    const scrollWrapper = codeMirror.getScrollerElement();
 
     // @ts-expect-error event doesn't exist?
     codeMirror.on("gutterClick", this.onGutterClick);
@@ -188,6 +192,13 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     codeMirrorWrapper.addEventListener("click", e => this.onClick(e));
     codeMirrorWrapper.addEventListener("mouseover", onTokenMouseOver(codeMirror));
     codeMirrorWrapper.addEventListener("mouseover", onLineMouseOver(codeMirror));
+
+    document.addEventListener("mousemove", e => {
+      // Store mouse coords so we can use them when checking the mouse location
+      // during a CodeMirror "scroll" event
+      this.lastClientX = e.clientX;
+      this.lastClientY = e.clientY;
+    });
 
     if (!isFirefox()) {
       codeMirror.on("gutterContextMenu", (cm, line, eventName, event) =>
@@ -238,7 +249,12 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return fromEditorLine(line);
   }
 
-  onEditorScroll = debounce(this.props.updateViewport, 75);
+  onEditorScroll = debounce((...args) => {
+    this.props.updateViewport();
+    if (this.lastClientX && this.lastClientY) {
+      onMouseScroll(this.state.editor?.codeMirror, this.lastClientX, this.lastClientY);
+    }
+  }, 75);
 
   onKeyDown(e: KeyboardEvent) {
     const { codeMirror } = this.state.editor!;

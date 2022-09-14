@@ -83,3 +83,19 @@ export function onLineMouseOver(codeMirror: $FixTypeLater) {
     }
   };
 }
+
+// Copied from `onLineMouseOver` above, but requires `clientX/clientY` passed  in/
+// because scroll events don't appear to contain those coords
+export function onMouseScroll(codeMirror: $FixTypeLater, clientX: number, clientY: number) {
+  let target = document.elementFromPoint(clientX, clientY) as HTMLElement;
+  // Hacky, try to fix this.
+  if (target?.closest(".CodeMirror-linewidget")) {
+    target = target
+      .closest(".CodeMirror-linewidget")!
+      .parentElement!.querySelector(".CodeMirror-line")!;
+  }
+
+  if (isValidTarget(target) && codeMirror) {
+    emitLineMouseEnter(codeMirror, target);
+  }
+}

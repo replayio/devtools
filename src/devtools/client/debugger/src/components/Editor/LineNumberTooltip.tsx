@@ -122,15 +122,16 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       lineNumber: number;
       lineNumberNode: HTMLElement;
     }) => {
-      // Bail out of any pending "clear hover line" dispatch, since we're over a new line
-      clearHoveredLineNumber.cancel();
-
       if (lineNumber !== lastHoveredLineNumber.current) {
+        // Bail out of any pending "clear hover line" dispatch, since we're over a new line
+        clearHoveredLineNumber.cancel();
+
         lastHoveredLineNumber.current = lineNumber;
+
+        dispatch(updateHoveredLineNumber(lineNumber));
+        setTargetNode(lineNumberNode);
+        fetchHitCountsForVisibleLines();
       }
-      dispatch(updateHoveredLineNumber(lineNumber));
-      setTargetNode(lineNumberNode);
-      fetchHitCountsForVisibleLines();
     };
 
     editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
