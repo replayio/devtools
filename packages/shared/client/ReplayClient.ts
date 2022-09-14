@@ -4,6 +4,7 @@ import {
   ExecutionPoint,
   EventHandlerType,
   FrameId,
+  getPointsBoundingTimeResult as PointsBoundingTime,
   loadedRegions as LoadedRegions,
   Location,
   Message,
@@ -465,8 +466,14 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
-    const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
+    const { point } = await client.Session.getPointNearTime({ time }, sessionId);
     return point;
+  }
+
+  async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Session.getPointsBoundingTime({ time }, sessionId);
+    return result;
   }
 
   getPreferredLocation(locations: Location[]): Location | null {
