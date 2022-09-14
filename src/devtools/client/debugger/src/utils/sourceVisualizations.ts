@@ -163,7 +163,13 @@ function getAlternateSourceIdForPosition(
   const breakableLine = Math.min(
     ...lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );
-  let breakableColumn = lineLocations.find(ll => ll.line === breakableLine)!.columns[0];
+
+  const breakableLineLocations = lineLocations.find(ll => ll.line === breakableLine);
+  if (!breakableLineLocations) {
+    return undefined;
+  }
+
+  let breakableColumn = breakableLineLocations.columns[0];
   const mappedLocation = getMappedLocation(client, {
     sourceId: source.id,
     line: breakableLine,
