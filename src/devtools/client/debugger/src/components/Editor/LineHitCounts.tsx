@@ -1,4 +1,4 @@
-import { useMemo, useLayoutEffect } from "react";
+import { useMemo, useLayoutEffect, useRef, useEffect } from "react";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -16,9 +16,12 @@ import {
   getBoundsForLineNumber,
 } from "ui/reducers/hitCounts";
 import { UIState } from "ui/state";
+import type { SourceEditor } from "../../utils/editor/source-editor";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { FocusRegion } from "ui/state/timeline";
 
 type Props = {
-  editor: any;
+  sourceEditor: SourceEditor;
 };
 
 export default function LineHitCountsWrapper(props: Props) {
@@ -32,39 +35,55 @@ export default function LineHitCountsWrapper(props: Props) {
   return <LineHitCounts {...props} />;
 }
 
-function LineHitCounts({ editor }: Props) {
+function LineHitCounts({ sourceEditor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
-  const isCollapsed = hitCountsMode == "hide-counts";
   const currentLineNumber = useAppSelector(
-    (state: UIState) => state.app.hoveredLineNumberLocation?.line || 0
+    (state: UIState) => state.app.hoveredLineNumberLocation?.line
   );
-  const { lower, upper } = getBoundsForLineNumber(currentLineNumber);
+  const focusRegion = useAppSelector(getFocusRegion);
 
-  const hitCountMap = useMemo(
-    () => (hitCounts !== null ? hitCountsToMap(hitCounts) : null),
-    [hitCounts]
-  );
+  const previousFocusRegion = useRef<FocusRegion | null>(null);
+  const previousHitCounts = useRef<Map<number, number> | null>(null);
+
+  const isCollapsed = hitCountsMode == "hide-counts";
+  const isCurrentLineNumberValid = currentLineNumber !== undefined;
+  const { lower, upper } = getBoundsForLineNumber(currentLineNumber || 0);
+
+  const hitCountMap = useMemo(() => {
+    if (hitCounts !== null) {
+      const hitCountsMap = hitCountsToMap(hitCounts);
+      return hitCountsMap;
+    }
+    return null;
+  }, [hitCounts]);
+
+  const updatedLineNumbers = useMemo(() => {
+    return new Set<number>();
+    // We _want_ this re-created every time these change
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hitCountMap, isCollapsed]);
 
   // Min/max hit counts are used to determine heat map color.
-  const { minHitCount, maxHitCount } = useMemo(() => {
+  const [minHitCount, maxHitCount] = useMemo(() => {
     let minHitCount = Infinity;
     let maxHitCount = 0;
     if (hitCounts) {
-      hitCounts.forEach(hitCount => {
-        if (hitCount.hits > 0) {
-          if (minHitCount > hitCount.hits) {
-            minHitCount = hitCount.hits;
+      // Iterate the entire array once to find min/max as we go
+      for (let { hits } of hitCounts) {
+        if (hits > 0) {
+          if (minHitCount > hits) {
+            minHitCount = hits;
           }
-          if (maxHitCount < hitCount.hits) {
-            maxHitCount = hitCount.hits;
+          if (maxHitCount < hits) {
+            maxHitCount = hits;
           }
         }
-      });
+      }
     }
-    return { minHitCount, maxHitCount };
+    return [minHitCount, maxHitCount] as const;
   }, [hitCounts]);
 
   useLayoutEffect(() => {
@@ -74,40 +93,95 @@ function LineHitCounts({ editor }: Props) {
     }
   }, [dispatch, sourceId, hitCounts]);
 
+  // Make sure we have enough room to fit large hit count numbers in the gutter markers
+  const numCharsToFit = useMemo(() => {
+    const numCharsToFit =
+      maxHitCount < 1000
+        ? Math.max(2, maxHitCount.toString().length)
+        : `${(maxHitCount / 1000).toFixed(1)}k`.length;
+    return numCharsToFit;
+  }, [maxHitCount]);
+
+  const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
+
+  // Save `isCollapsed` in a ref so we only create `marker.onClick` callbacks once
+  // TODO Candidate for the eventual `useEvent` hook?
+  const isCollapsedRef = useRef(isCollapsed);
+
   useLayoutEffect(() => {
-    if (!editor) {
+    isCollapsedRef.current = isCollapsed;
+  }, [isCollapsed]);
+
+  useLayoutEffect(() => {
+    if (!sourceEditor) {
       return;
     }
 
-    const doc = editor.editor.getDoc();
+    const { editor } = sourceEditor;
+
+    // Tell CodeMirror to actually create a gutter column for hit counts
+    editor.setOption("gutters", [
+      "breakpoints",
+      "CodeMirror-linenumbers",
+      { className: "hit-markers", style: `width: ${gutterWidth}` },
+    ]);
+    resizeBreakpointGutter(editor);
+
+    // HACK
+    // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
+    // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
+    const gutterElement = sourceEditor.codeMirror.getGutterElement();
+    (gutterElement as HTMLElement).parentElement!.style.setProperty(
+      "--hit-count-gutter-width",
+      `-${gutterWidth}`
+    );
+
+    return () => {
+      try {
+        editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+      } catch (e) {
+        console.warn(e);
+      }
+      resizeBreakpointGutter(editor);
+    };
+  }, [gutterWidth, sourceEditor, isCollapsed]);
+
+  useLayoutEffect(() => {
+    if (!sourceEditor) {
+      return;
+    }
+
+    const { editor } = sourceEditor;
+
     const drawLines = () => {
-      // Make sure we have enough room to fit large hit count numbers.
-      const numCharsToFit =
-        maxHitCount < 1000
-          ? Math.max(2, maxHitCount.toString().length)
-          : `${(maxHitCount / 1000).toFixed(1)}k`.length;
-      const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
-
-      editor.editor.setOption("gutters", [
-        "breakpoints",
-        "CodeMirror-linenumbers",
-        { className: "hit-markers", style: `width: ${gutterWidth}` },
-      ]);
-      resizeBreakpointGutter(editor.editor);
-
-      // HACK
-      // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
-      // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
-      const gutterElement = editor.codeMirror.getGutterElement();
-      (gutterElement as HTMLElement).parentElement!.style.setProperty(
-        "--hit-count-gutter-width",
-        `-${gutterWidth}`
-      );
-
       let lineNumber = lower;
+      const focusRegionChanged = focusRegion !== previousFocusRegion.current;
+      const hitCountMapChanged = hitCountMap !== previousHitCounts.current;
 
-      doc.eachLine(lower, upper, (lineHandle: any) => {
+      // `drawLines` will run reasonably often. However, we will often
+      // want to bail out early and _not_ apply updates to the gutter markers.
+      // The main reason to bail out is if there is no current line number,
+      // which happens any time the mouse is over an "inactive" line in the editor,
+      // or outside the editor entirely.
+      // However, there are a couple situations when we _do_ still want to redraw
+      // even if the mouse isn't over a valid line:
+      // - The focus region just changed
+      // - We refetched hit counts due to the user closing the focus bar
+      if (!isCurrentLineNumberValid && !focusRegionChanged && !hitCountMapChanged) {
+        return;
+      }
+
+      // Attempt to update just the markers for just the 100-line blocks  surrounding
+      // the current line number
+      editor.eachLine(lower, upper, lineHandle => {
         lineNumber++;
+
+        // Skip this line if we've updated it with its current hit count already
+        if (updatedLineNumbers?.has(lineNumber)) {
+          return;
+        }
+
+        updatedLineNumbers?.add(lineNumber);
 
         const hitCount = hitCountMap?.get(lineNumber) || 0;
 
@@ -131,53 +205,68 @@ function LineHitCounts({ editor }: Props) {
 
         if (features.disableUnHitLines) {
           if (hitCount > 0) {
-            editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+            sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
           } else {
             // If this line wasn't hit any, dim the line number,
             // even if it's a line that's technically reachable.
-            editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+            sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
           }
         }
 
-        const markerNode = document.createElement("div");
-        markerNode.onclick = () => updateHitCountsMode(isCollapsed ? "show-counts" : "hide-counts");
+        const info = editor.lineInfo(lineNumber);
+
+        let markerNode: HTMLDivElement;
+        if (info?.gutterMarkers?.["hit-markers"]) {
+          // Retrieve the marker DOM node we already created
+          markerNode = info.gutterMarkers["hit-markers"];
+        } else {
+          markerNode = document.createElement("div");
+          markerNode.onclick = () =>
+            updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
+
+          editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
+        }
+
         markerNode.className = className;
-        if (!isCollapsed && hitCount > 0) {
-          markerNode.textContent =
-            hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+        if (!isCollapsed) {
+          let hitsLabel = "";
+          if (hitCount > 0) {
+            hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+          }
+          markerNode.textContent = hitsLabel;
         }
         markerNode.title = `${hitCount} hits`;
-
-        doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
     };
 
-    doc.on("change", drawLines);
-    doc.on("swapDoc", drawLines);
+    editor.on("change", drawLines);
+    editor.on("swapDoc", drawLines);
 
     drawLines();
 
     return () => {
-      try {
-        editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
-      } catch (e) {
-        console.warn(e);
-      }
-      resizeBreakpointGutter(editor.editor);
-
-      doc.off("change", drawLines);
-      doc.off("swapDoc", drawLines);
+      editor.off("change", drawLines);
+      editor.off("swapDoc", drawLines);
     };
   }, [
-    editor,
+    sourceEditor,
     hitCountMap,
+    updatedLineNumbers,
     isCollapsed,
     minHitCount,
     maxHitCount,
     updateHitCountsMode,
     lower,
     upper,
+    isCurrentLineNumberValid,
+    focusRegion,
   ]);
+
+  useEffect(() => {
+    // Save the previous references for comparison in `drawLines`
+    previousFocusRegion.current = focusRegion;
+    previousHitCounts.current = hitCountMap;
+  }, [focusRegion, hitCountMap]);
 
   // We're just here for the hooks!
   return null;

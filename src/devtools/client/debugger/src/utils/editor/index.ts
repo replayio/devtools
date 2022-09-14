@@ -6,7 +6,7 @@ export * from "./source-documents";
 export * from "./source-search";
 export * from "../ui";
 export { onTokenMouseOver } from "./token-events";
-export { onLineMouseOver } from "./line-events";
+export { onLineMouseOver, onMouseScroll } from "./line-events";
 
 import { SourceLocation } from "graphql";
 import { SourceDetails } from "ui/reducers/sources";

@@ -1,12 +1,15 @@
 import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
 import minBy from "lodash/minBy";
-import React, { useRef, useState, useEffect, ReactNode } from "react";
+import debounce from "lodash/debounce";
+import React, { useRef, useState, useEffect, ReactNode, useCallback } from "react";
+
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { setHoveredLineNumberLocation } from "ui/reducers/app";
+import { getLoadedRegions, setHoveredLineNumberLocation } from "ui/reducers/app";
+import { getShowFocusModeControls } from "ui/reducers/timeline";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
@@ -36,14 +39,14 @@ function Wrapper({
 
   if (showWarning) {
     return (
-      <div className="space-x-2 bg-red-700 static-tooltip-content">
+      <div className="static-tooltip-content space-x-2 bg-red-700">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>
     );
   } else if (showNag) {
     return (
-      <div className="space-x-2 static-tooltip-content" style={{ background: AWESOME_BACKGROUND }}>
+      <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
         <div className="flex flex-col items-start">
           {!loading ? <div className="font-bold">Click to add a print statement</div> : null}
@@ -53,7 +56,7 @@ function Wrapper({
     );
   }
 
-  return <div className="bg-gray-700 static-tooltip-content">{children}</div>;
+  return <div className="static-tooltip-content bg-gray-700">{children}</div>;
 }
 
 type Props = {
@@ -71,6 +74,8 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   const lastHoveredLineNumber = useRef<number | null>(null);
   const isMetaActive = keyModifiers.meta;
   const source = useAppSelector(getSelectedSource);
+  const loadedRegions = useAppSelector(getLoadedRegions);
+  const focusControlsActive = useAppSelector(getShowFocusModeControls);
 
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, source!.id));
   const hitCountStatus = useAppSelector(state =>
@@ -87,7 +92,29 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     hits = lineHitCounts?.hits;
   }
 
+  const fetchHitCountsForVisibleLines = useCallback(() => {
+    var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
+    var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
+    var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
+    dispatch(fetchHitCounts(source!.id, editor.codeMirror.lineAtHeight()));
+    dispatch(fetchHitCounts(source!.id, topVisibleLine - 10));
+    dispatch(fetchHitCounts(source!.id, bottomVisibleLine + 10));
+  }, [editor, dispatch, source]);
+
   useEffect(() => {
+    const clearHoveredLineNumber = debounce(() => {
+      // Only reset the Redux state here after a short delay.
+      // That way, if we immediately mouse from active line X to X + 1,
+      // we won't dispatch a "reset line to null" action as part of that change.
+      // This avoids causing the `{lower, upper} selector to think we're at range 0..100,
+      // which was causing many unnecessary gutter marker updates.
+      // Note that mousing over an inactive line _will_ cause us to clear this line number.
+      setTargetNode(null);
+      if (lastHoveredLineNumber.current !== null) {
+        dispatch(setHoveredLineNumberLocation(null));
+      }
+    }, 10);
+
     const setHoveredLineNumber = ({
       lineNumber,
       lineNumberNode,
@@ -96,20 +123,15 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       lineNumberNode: HTMLElement;
     }) => {
       if (lineNumber !== lastHoveredLineNumber.current) {
+        // Bail out of any pending "clear hover line" dispatch, since we're over a new line
+        clearHoveredLineNumber.cancel();
+
         lastHoveredLineNumber.current = lineNumber;
+
+        dispatch(updateHoveredLineNumber(lineNumber));
+        setTargetNode(lineNumberNode);
+        fetchHitCountsForVisibleLines();
       }
-      dispatch(updateHoveredLineNumber(lineNumber));
-      setTargetNode(lineNumberNode);
-      var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
-      var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
-      var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
-      dispatch(fetchHitCounts(source!.id, editor.codeMirror.lineAtHeight()));
-      dispatch(fetchHitCounts(source!.id, topVisibleLine - 10));
-      dispatch(fetchHitCounts(source!.id, bottomVisibleLine + 10));
-    };
-    const clearHoveredLineNumber = () => {
-      setTargetNode(null);
-      dispatch(setHoveredLineNumberLocation(null));
     };
 
     editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
@@ -118,7 +140,14 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
       editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
     };
-  }, [dispatch, editor.codeMirror, source]);
+  }, [dispatch, editor.codeMirror, fetchHitCountsForVisibleLines]);
+
+  useEffect(() => {
+    // TODO Could maybe be an RTK listener that watches for the "stop focus bar" action?
+    if (!focusControlsActive) {
+      fetchHitCountsForVisibleLines();
+    }
+  }, [loadedRegions, focusControlsActive, fetchHitCountsForVisibleLines]);
 
   useEffect(() => {
     if (hits) {
