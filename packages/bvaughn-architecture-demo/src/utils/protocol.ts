@@ -1,9 +1,11 @@
 import {
+  NamedValue,
   NamedValue as ProtocolNamedValue,
   newSource as ProtocolSource,
   ObjectId as ProtocolObjectId,
   PauseId as ProtocolPauseId,
   Property as ProtocolProperty,
+  PropertyConfigurationFlags,
   Value as ProtocolValue,
 } from "@replayio/protocol";
 import { getObjectThrows } from "../suspense/ObjectPreviews";
@@ -40,18 +42,38 @@ export function filterNonEnumerableProperties(properties: ProtocolProperty[]): P
   return properties.filter(property => property.flags == null || property.flags & 4);
 }
 
-export function filterPropertiesForInlineObjectPreview(
-  properties: ProtocolProperty[]
-): ProtocolProperty[] {
-  // See https://static.replay.io/protocol/tot/Pause/#type-PropertyConfigurationFlags
-  return properties.filter(property => {
-    if (property.flags == null || property.flags & 4) {
-      if (property.get == null && property.set == null) {
-        return true;
-      }
+export function mergePropertiesAndGetterValues(
+  properties: ProtocolProperty[],
+  getterValues: NamedValue[],
+  maxEntries: number = Infinity
+): [Array<NamedValue | ProtocolProperty>, boolean] {
+  const trackedNames: Set<string> = new Set();
+  const mergedProperties: Array<NamedValue | ProtocolProperty> = [];
+
+  for (let index = 0; index < properties.length; index++) {
+    const property = properties[index];
+
+    if (mergedProperties.length >= maxEntries) {
+      return [mergedProperties, true];
     }
-    return false;
-  });
+
+    trackedNames.add(property.name);
+    mergedProperties.push(property);
+  }
+
+  for (let index = 0; index < getterValues.length; index++) {
+    if (mergedProperties.length >= maxEntries) {
+      return [mergedProperties, true];
+    }
+
+    const getterValue = getterValues[index];
+
+    if (!trackedNames.has(getterValue.name)) {
+      mergedProperties.push(getterValue);
+    }
+  }
+
+  return [mergedProperties, false];
 }
 
 function isProtocolProperty(
