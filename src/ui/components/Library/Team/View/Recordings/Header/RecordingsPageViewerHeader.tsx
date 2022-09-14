@@ -12,7 +12,6 @@ import { useRouter } from "next/router";
 import hooks from "ui/hooks";
 import { Workspace } from "ui/types";
 
-
 function ViewerHeaderActions({
   isEditing,
   setIsEditing,
@@ -29,6 +28,7 @@ function ViewerHeaderActions({
   handleDoneEditing: () => void;
 }) {
   const dispatch = useAppDispatch();
+  const router = useRouter();
 
   if (isEditing) {
     return (
@@ -45,25 +45,25 @@ function ViewerHeaderActions({
     );
   }
 
-  const launchWorkspaceSettings = () => {    
+  const launchWorkspaceSettings = () => {
     dispatch(setModal("workspace-settings"));
   };
 
-  const router = useRouter();
   const isLibrary = router.asPath.includes(`/team/${MY_LIBRARY_TEAM.id}`);
 
   return (
     <>
-    {!isLibrary ? (
-      <SecondaryButton
-        className={styles.editButton}
-        color="blue"
-        onClick={() => launchWorkspaceSettings()}
-      >
-        Add team member
-      </SecondaryButton>
-
-    ) : (<></>) }
+      {!isLibrary ? (
+        <SecondaryButton
+          className={styles.editButton}
+          color="blue"
+          onClick={() => launchWorkspaceSettings()}
+        >
+          Add team member
+        </SecondaryButton>
+      ) : (
+        <></>
+      )}
 
       {recordings.length != 0 ? (
         <>
