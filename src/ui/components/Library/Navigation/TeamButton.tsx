@@ -8,7 +8,7 @@ import { useUpdateDefaultWorkspace } from "ui/hooks/settings";
 import { useAppDispatch } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import styles from "../Library.module.css";
-import { MY_LIBRARY_TEAM } from "../Team/TeamContextRoot";
+import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
 import Icon from "ui/components/shared/Icon";
 
 export function TeamButton({
@@ -29,15 +29,15 @@ export function TeamButton({
   const showSettingsButton = isSelected && id && id !== MY_LIBRARY_TEAM.id && !isNew;
   const updateDefaultWorkspace = useUpdateDefaultWorkspace();
 
-  const onClick = () => {
+  const onClick = async () => {
     if (isNew) {
       return;
     }
 
-    updateDefaultWorkspace({
+    await updateDefaultWorkspace({
       variables: { workspaceId: id === MY_LIBRARY_TEAM.id ? MY_LIBRARY_TEAM.databaseId : id },
     });
-    trackEvent("team_change", { workspaceId: id });
+    await trackEvent("team_change", { workspaceId: id });
   };
 
   return (
@@ -49,7 +49,7 @@ export function TeamButton({
         )}
         onClick={onClick}
       >
-        <span className="overflow-hidden whitespace-pre overflow-ellipsis">
+        <span className="overflow-hidden overflow-ellipsis whitespace-pre">
           <div className="flex">
             <LibraryIcon teamType={isTest ? "tests" : "team"} />
             {label}
@@ -80,7 +80,7 @@ export function SettingsButton() {
   return (
     <button
       onClick={onClick}
-      className="w-5 text-sm text-gray-200 transition duration-200 material-icons"
+      className="material-icons w-5 text-sm text-gray-200 transition duration-200"
     >
       settings
     </button>

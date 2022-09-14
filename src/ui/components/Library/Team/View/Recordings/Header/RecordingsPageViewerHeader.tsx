@@ -5,6 +5,12 @@ import BatchActionDropdown from "./BatchActionDropdown";
 import styles from "../../../../Library.module.css";
 import TeamTrialEnd from "./TeamTrialEnd";
 import { useGetTeamIdFromRoute } from "ui/components/Library/Team/utils";
+import { useAppDispatch } from "ui/setup/hooks";
+import { setModal } from "ui/actions/app";
+import { MY_LIBRARY_TEAM } from "ui/components/Library/Team/TeamContextRoot";
+import { useRouter } from "next/router";
+import hooks from "ui/hooks";
+import { Workspace } from "ui/types";
 
 function ViewerHeaderActions({
   isEditing,
@@ -21,6 +27,9 @@ function ViewerHeaderActions({
   setIsEditing: (value: boolean) => void;
   handleDoneEditing: () => void;
 }) {
+  const dispatch = useAppDispatch();
+  const router = useRouter();
+
   if (isEditing) {
     return (
       <>
@@ -36,8 +45,26 @@ function ViewerHeaderActions({
     );
   }
 
+  const launchWorkspaceSettings = () => {
+    dispatch(setModal("workspace-settings"));
+  };
+
+  const isLibrary = router.asPath.includes(`/team/${MY_LIBRARY_TEAM.id}`);
+
   return (
     <>
+      {!isLibrary ? (
+        <SecondaryButton
+          className={styles.editButton}
+          color="blue"
+          onClick={() => launchWorkspaceSettings()}
+        >
+          Add team member
+        </SecondaryButton>
+      ) : (
+        <></>
+      )}
+
       {recordings.length != 0 ? (
         <>
           <SecondaryButton
