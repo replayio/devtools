@@ -48,8 +48,9 @@
   height: 28px;
   line-height: 16px;
   padding: 4px;
-  padding-left: 8px;
   white-space: nowrap;
+  background-color: #28303e;
+  border-radius: 0.25rem;
 }
 
 .breakpoint-panel .statement:first-child {
@@ -127,7 +128,7 @@ non-editing markup */
 }
 
 .breakpoint-panel .summary .statement:hover .expression {
-  background-image: linear-gradient(to right, var(--breakpoint-tip) 50%, transparent 0%);
+  /* background-image: linear-gradient(to right, var(--breakpoint-tip) 50%, transparent 0%); */
   background-position: 1px 14px;
   background-size: 5px 1.5px;
   background-repeat: repeat-x;
@@ -139,6 +140,10 @@ non-editing markup */
   border-top-right-radius: 4px;
 }
 
+.breakpoint-panel .expression {
+  flex: 1;
+}
+
 .breakpoint-panel .summary.enabled:hover {
   background: var(--breakpoint-editfield-hover);
 }
@@ -147,7 +152,10 @@ non-editing markup */
   cursor: pointer;
 }
 
+.breakpoint-panel .summary .statement .pencil {
+  align-self: center;
+}
+
 .breakpoint-panel .summary .statement:hover .pencil {
-  opacity: 1;
   color: var(--breakpoint-tip);
 }
