@@ -71,7 +71,9 @@ function LogPointRenderer({
       )}
       <span className={styles.LogContents}>
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
-        <ErrorBoundary>
+        <ErrorBoundary
+          fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
+        >
           <Suspense key={logPointInstance.point.content} fallback={<Loader />}>
             <AnalyzedContent logPointInstance={logPointInstance} />
           </Suspense>
