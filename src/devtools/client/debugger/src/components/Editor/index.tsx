@@ -481,7 +481,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
           selectedSource={selectedSource}
         />
         <ColumnBreakpoints editor={editor} />
-        <Gutter editor={editor} />
+        <Gutter sourceEditor={editor} />
       </div>
     );
   }

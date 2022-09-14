@@ -16,9 +16,10 @@ import {
   getBoundsForLineNumber,
 } from "ui/reducers/hitCounts";
 import { UIState } from "ui/state";
+import type { SourceEditor } from "../../utils/editor/source-editor";
 
 type Props = {
-  editor: any;
+  sourceEditor: SourceEditor;
 };
 
 export default function LineHitCountsWrapper(props: Props) {
@@ -32,7 +33,7 @@ export default function LineHitCountsWrapper(props: Props) {
   return <LineHitCounts {...props} />;
 }
 
-function LineHitCounts({ editor }: Props) {
+function LineHitCounts({ sourceEditor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
@@ -75,11 +76,13 @@ function LineHitCounts({ editor }: Props) {
   }, [dispatch, sourceId, hitCounts]);
 
   useLayoutEffect(() => {
-    if (!editor) {
+    if (!sourceEditor) {
       return;
     }
 
-    const doc = editor.editor.getDoc();
+    const { editor } = sourceEditor;
+
+    // const doc = editor.editor.getDoc();
     const drawLines = () => {
       // Make sure we have enough room to fit large hit count numbers.
       const numCharsToFit =
@@ -88,17 +91,17 @@ function LineHitCounts({ editor }: Props) {
           : `${(maxHitCount / 1000).toFixed(1)}k`.length;
       const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
 
-      editor.editor.setOption("gutters", [
+      editor.setOption("gutters", [
         "breakpoints",
         "CodeMirror-linenumbers",
         { className: "hit-markers", style: `width: ${gutterWidth}` },
       ]);
-      resizeBreakpointGutter(editor.editor);
+      resizeBreakpointGutter(editor);
 
       // HACK
       // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
       // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
-      const gutterElement = editor.codeMirror.getGutterElement();
+      const gutterElement = sourceEditor.codeMirror.getGutterElement();
       (gutterElement as HTMLElement).parentElement!.style.setProperty(
         "--hit-count-gutter-width",
         `-${gutterWidth}`
@@ -106,7 +109,7 @@ function LineHitCounts({ editor }: Props) {
 
       let lineNumber = lower;
 
-      doc.eachLine(lower, upper, (lineHandle: any) => {
+      editor.eachLine(lower, upper, lineHandle => {
         lineNumber++;
 
         const hitCount = hitCountMap?.get(lineNumber) || 0;
@@ -131,11 +134,11 @@ function LineHitCounts({ editor }: Props) {
 
         if (features.disableUnHitLines) {
           if (hitCount > 0) {
-            editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+            sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
           } else {
             // If this line wasn't hit any, dim the line number,
             // even if it's a line that's technically reachable.
-            editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+            sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
           }
         }
 
@@ -148,28 +151,28 @@ function LineHitCounts({ editor }: Props) {
         }
         markerNode.title = `${hitCount} hits`;
 
-        doc.setGutterMarker(lineHandle, "hit-markers", markerNode);
+        editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
       });
     };
 
-    doc.on("change", drawLines);
-    doc.on("swapDoc", drawLines);
+    editor.on("change", drawLines);
+    editor.on("swapDoc", drawLines);
 
     drawLines();
 
     return () => {
       try {
-        editor.editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
+        editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
       } catch (e) {
         console.warn(e);
       }
-      resizeBreakpointGutter(editor.editor);
+      resizeBreakpointGutter(editor);
 
-      doc.off("change", drawLines);
-      doc.off("swapDoc", drawLines);
+      editor.off("change", drawLines);
+      editor.off("swapDoc", drawLines);
     };
   }, [
-    editor,
+    sourceEditor,
     hitCountMap,
     isCollapsed,
     minHitCount,
