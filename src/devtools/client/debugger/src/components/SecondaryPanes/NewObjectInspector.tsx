@@ -15,7 +15,6 @@ import { useAppSelector } from "ui/setup/hooks";
 import styles from "./NewObjectInspector.module.css";
 
 export default function NewObjectInspector({ roots }: { roots: Item[] }) {
-  console.log("<NewObjectInspector>", roots);
   const selectedFrame = useAppSelector(getSelectedFrame);
   const pause = ThreadFront.pauseForAsyncIndex(selectedFrame?.asyncIndex);
 
