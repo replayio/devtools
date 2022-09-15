@@ -238,7 +238,10 @@ export const getSourcesById = (state: UIState, ids: string[]) => {
   return ids.map(id => getSourceDetails(state, id)!);
 };
 export const getCorrespondingSourceIds = (state: UIState, id: string) => {
-  const source = getSourceDetails(state, id);
+  return getCorrespondingSourceIdsFromSourcesState(state.sources, id);
+};
+export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState, id: string) => {
+  const source = sources.sourceDetails.entities[id];
   // TODO [hbenl] disabled for now because the sources we receive from the backend
   // are incomplete for node recordings, see RUN-508
   // assert(source, `unknown source ${id}`);
@@ -355,22 +358,23 @@ export function getPreferredSourceId(
 // this is the most original location, except when preferSource has been used
 // to prefer a generated source instead.
 export function getPreferredLocation(
-  state: UIState,
+  sources: SourcesState,
   locations: MappedLocation,
   preferredGeneratedSources: Set<string>
 ) {
-  if (!state.sources.allSourcesReceived) {
+  if (!sources.allSourcesReceived) {
     return locations[0];
   }
   const sourceId = getPreferredSourceId(
-    getSourceDetailsEntities(state),
+    sources.sourceDetails.entities,
     locations.map(l => l.sourceId),
     preferredGeneratedSources
   );
   const preferredLocation = locations.find(l => l.sourceId == sourceId);
   assert(preferredLocation, "no preferred location found");
   assert(
-    preferredLocation.sourceId === getCorrespondingSourceIds(state, preferredLocation.sourceId)[0],
+    preferredLocation.sourceId ===
+      getCorrespondingSourceIdsFromSourcesState(sources, preferredLocation.sourceId)[0],
     "location.sourceId should be updated to the first corresponding sourceId"
   );
   return preferredLocation;
@@ -393,12 +397,12 @@ export function getAlternateSourceId(
 }
 
 export function getAlternateLocation(
-  state: UIState,
+  sources: SourcesState,
   locations: MappedLocation,
   preferredGeneratedSources: Set<string>
 ) {
   const alternateId = getAlternateSourceId(
-    getSourceDetailsEntities(state),
+    sources.sourceDetails.entities,
     locations.map(l => l.sourceId),
     preferredGeneratedSources
   );

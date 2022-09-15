@@ -25,7 +25,7 @@ export function getPreferredLocation(locations: MappedLocation | undefined) {
     sourceId: getCorrespondingSourceIds(state, location.sourceId)[0],
   }));
   return getPreferredLocationSelector(
-    state,
+    state.sources,
     correspondingLocations,
     ThreadFront.preferredGeneratedSources
   );

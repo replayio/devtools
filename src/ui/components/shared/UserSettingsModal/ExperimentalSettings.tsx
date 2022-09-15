@@ -46,6 +46,11 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
       "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
     key: "basicProcessingLoadingBar",
   },
+  {
+    label: "Legacy frames panel",
+    description: "Restore the legacy frames and scopes panels",
+    key: "legacyFramesPanel",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -89,6 +94,8 @@ export default function ExperimentalSettings({}) {
   const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
     "basicProcessingLoadingBar"
   );
+  const { value: legacyFramesPanel, update: updateLegacyFramesPanel } =
+    useFeature("legacyFramesPanel");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -103,6 +110,8 @@ export default function ExperimentalSettings({}) {
       updateEnableQueryCache(!enableQueryCache);
     } else if (key === "basicProcessingLoadingBar") {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
+    } else if (key === "legacyFramesPanel") {
+      updateLegacyFramesPanel(!legacyFramesPanel);
     }
   };
 
@@ -113,6 +122,7 @@ export default function ExperimentalSettings({}) {
     enableQueryCache,
     hitCounts,
     profileWorkerThreads,
+    legacyFramesPanel,
   };
 
   const settings = { ...userSettings, ...localSettings };

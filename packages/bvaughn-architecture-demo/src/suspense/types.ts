@@ -23,7 +23,7 @@ export type Record<T> = PendingRecord<T> | ResolvedRecord<T> | RejectedRecord;
 // You can use a Promise for this, but Promises have a downside (the microtask queue).
 // You can also create your own "thennable" if you want to support synchronous resolution/rejection.
 export interface Thennable<T> {
-  then(onFulfill: (value: T) => any, onReject: () => any): void | Thennable<T>;
+  then(onFulfill: (value: T) => any, onReject?: (err: any) => any): void | Thennable<T>;
 }
 
 // Convenience type used by Suspense caches.

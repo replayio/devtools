@@ -5,10 +5,11 @@ import {
 import { ReplayClientInterface } from "shared/client/types";
 import { createGenericCache } from "./createGenericCache";
 
-export const { getValue: getMappedLocation } = createGenericCache<
-  [ReplayClientInterface, ProtocolLocation],
-  ProtocolMappedLocation
->(
+export const {
+  getValueSuspense: getMappedLocationSuspense,
+  getValueAsync: getMappedLocationAsync,
+  getValueIfCached: getMappedLocationIfCached,
+} = createGenericCache<[ReplayClientInterface, ProtocolLocation], ProtocolMappedLocation>(
   (client, location) => client.getMappedLocation(location),
   (client, location) => `${location.sourceId}:${location.line}:${location.column}`
 );

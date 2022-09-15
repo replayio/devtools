@@ -9,6 +9,7 @@ import { getFramePopVariables, getThisVariable } from "./utils";
 import { simplifyDisplayName } from "../frames";
 import { ValueItem, ContainerItem } from "devtools/packages/devtools-reps";
 
+import type { ValueFront } from "protocol/thread";
 import type { ConvertedScope, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 function getScopeTitle(type: string, scope: ConvertedScope) {
@@ -44,7 +45,7 @@ export function getScope(
     if (isLocalScope) {
       vars = vars.concat(getFramePopVariables(why, key));
 
-      let thisDesc_ = selectedFrame.this;
+      let thisDesc_ = selectedFrame.this as ValueFront;
 
       if (bindings && "this" in bindings) {
         // The presence of "this" means we're rendering a "this" binding
