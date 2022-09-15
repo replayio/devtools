@@ -1,5 +1,7 @@
-import { useMemo, useLayoutEffect, useRef, useEffect } from "react";
+import React, { useState, useMemo, useLayoutEffect, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
+import { VariableSizeList as List } from "react-window";
+
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -20,6 +22,7 @@ import { UIState } from "ui/state";
 import type { SourceEditor } from "../../utils/editor/source-editor";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
+import { getLogpointSources } from "devtools/client/debugger/src/selectors/breakpointSources";
 
 type Props = {
   sourceEditor: SourceEditor;
@@ -45,9 +48,19 @@ function LineHitCounts({ sourceEditor }: Props) {
     (state: UIState) => state.app.hoveredLineNumberLocation?.line
   );
   const focusRegion = useAppSelector(getFocusRegion);
+  const logpointSources = useAppSelector(getLogpointSources);
+  const [itemHeight, setItemHeight] = useState(() => {
+    // const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
+    //   "--theme-code-font-size"
+    // );
+    // const fontSize = 11;
+    // return fontSize * 1.4;
+    return 15;
+  });
 
   const previousFocusRegion = useRef<FocusRegion | null>(null);
   const previousHitCounts = useRef<Map<number, number> | null>(null);
+  const hitCountsListRef = useRef<List>(null);
 
   const isCollapsed = hitCountsMode == "hide-counts";
   const isCurrentLineNumberValid = currentLineNumber !== undefined;
@@ -222,19 +235,19 @@ function LineHitCounts({ sourceEditor }: Props) {
           markerNode = info.gutterMarkers["hit-markers"];
         } else {
           markerNode = document.createElement("div");
-          markerNode.onclick = () =>
-            updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
+          // markerNode.onclick = () =>
+          //   updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
 
-          editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
+          // editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
         }
 
-        markerNode.className = className;
+        // markerNode.className = className;
         if (!isCollapsed) {
           let hitsLabel = "";
           if (hitCount > 0) {
             hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
           }
-          markerNode.textContent = hitsLabel;
+          // markerNode.textContent = hitsLabel;
         }
         markerNode.title = `${hitCount} hits`;
       });
@@ -272,26 +285,64 @@ function LineHitCounts({ sourceEditor }: Props) {
   // We're just here for the hooks!
   // return null;
   const scroller = sourceEditor.editor.getScrollerElement();
+
+  useLayoutEffect(() => {
+    return sourceEditor.editor.on("scroll", () => {
+      hitCountsListRef.current?.scrollTo(scroller.scrollTop);
+    });
+  }, [sourceId, sourceEditor.editor, scroller]);
+
   const hitsGutter = scroller.querySelector(".CodeMirror-gutter.hit-markers") as HTMLElement;
   if (!hitsGutter) {
-    return;
+    return null;
   }
-  console.log("Hits gutter: ", hitsGutter);
+
+  const logpointEntry = logpointSources.find(entry => entry.source?.id === sourceId);
+  console.log("Breakpoints entry: ", logpointEntry);
+
   return createPortal(
     <div
       className="hitCountsOverlay"
       style={{
         position: "absolute",
         width: "100%",
-        background: "linear-gradient(#e66465, #9198e5)",
+        // background: "linear-gradient(#e66465, #9198e5)",
         top: 0,
         left: 0,
         height: "100%",
+        paddingTop: 4,
       }}
-    ></div>,
+    >
+      <List
+        height={scroller.getBoundingClientRect().height}
+        itemCount={sourceEditor.editor.lineCount()}
+        key={sourceId}
+        itemSize={index => {
+          if (logpointEntry) {
+            const bp = logpointEntry.breakpoints.find(bp => bp.location.line === index + 1);
+            if (bp) {
+              return 94 + 15;
+            }
+          }
+          return 15;
+        }}
+        overscanCount={50}
+        width={gutterWidth}
+        style={{ overflow: "inherit" }}
+        ref={hitCountsListRef}
+      >
+        {HitCountsRow}
+      </List>
+    </div>,
     hitsGutter
   );
 }
+
+const HitCountsRow = ({ index, style }: { index: number; style?: React.CSSProperties }) => (
+  <div style={{ ...style, backgroundColor: "white", color: "red", borderLeft: "5px solid red" }}>
+    {index + 1}
+  </div>
+);
 
 function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {
   const hitCountMap: Map<number, number> = new Map();
