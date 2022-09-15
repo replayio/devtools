@@ -8,7 +8,7 @@
 
 .breakpoint-panel {
   margin: 4px 0;
-  /* background: var(--theme-toolbar-background); */
+  background: var(--theme-toolbar-background);
   border: 1px solid var(--theme-splitter-color);
   border-left: none;
   border-right: none;
@@ -70,7 +70,7 @@
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   width: 100%;
-  background-color: var(--breakpoint-editfield-active);
+  /* background-color: var(--breakpoint-editfield-active); */
   caret-color: yellow;
 }
 

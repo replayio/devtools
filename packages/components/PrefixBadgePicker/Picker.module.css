@@ -6,7 +6,7 @@
 }
 
 .PickerFill {
-  --badge-background: var(--breakpoint-editfield-active);
+  --badge-background: var(--theme-toolbar-background);
   position: absolute;
   inset: 0;
   background-color: var(--badge-background);

@@ -132,12 +132,7 @@ function Panel({
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
-          <div
-            className="flex py-2 pl-1 pr-2"
-            style={{
-              backgroundColor: "var(--breakpoint-editfield-active)",
-            }}
-          >
+          <div className="flex py-2 pl-1 pr-2">
             <PrefixBadgeButton breakpoint={breakpoint!} />
             <div className="flex-1 min-w-0">
               {editing ? (
