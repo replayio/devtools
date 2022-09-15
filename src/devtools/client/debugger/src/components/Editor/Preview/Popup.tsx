@@ -2,15 +2,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component } from "react";
-
-import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
-
-import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
-
+import Popover from "devtools/client/debugger/src/components/shared/Popover";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
+import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import Popover from "../../shared/Popover";
+import React from "react";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 
 import NewObjectInspector from "./NewObjectInspector";
 
@@ -28,7 +25,7 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
     dispatch(previewCleared({ cx, previewId: preview!.previewId }));
   };
 
-  const { cursorPos, value } = preview!;
+  const { cursorPos, expression, value } = preview!;
 
   if (value === null) {
     return null;
@@ -49,7 +46,7 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
       target={target}
       mouseout={onMouseOut}
     >
-      <NewObjectInspector protocolValue={value} />
+      <NewObjectInspector expression={expression} protocolValue={value} />
     </Popover>
   );
 }

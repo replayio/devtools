@@ -10,10 +10,8 @@ import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { Breakpoint } from "../../../reducers/types";
-import { PointDescription } from "@replayio/protocol";
+import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import { HoveredItem } from "ui/state/timeline";
-
-const { getAnalysisPointsForLocation } = selectors;
 
 function toBigInt(num?: string | null) {
   return num ? BigInt(num) : undefined;
@@ -45,11 +43,6 @@ function hasSecondaryHighlighted({
 
 const connector = connect(
   (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),
@@ -65,6 +58,7 @@ type BTPProps = PropsFromRedux & {
   breakpoint: Breakpoint;
   point: PointDescription;
   index: number;
+  hitPoints: TimeStampedPoint[];
   hoveredItem: HoveredItem | null;
 };
 
@@ -72,10 +66,10 @@ function BreakpointTimelinePoint({
   breakpoint,
   point,
   index,
-  analysisPoints,
   executionPoint,
   zoomRegion,
   seek,
+  hitPoints,
   hoveredItem,
   setHoveredItem,
   clearHoveredItem,
@@ -113,7 +107,7 @@ function BreakpointTimelinePoint({
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
         "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
-      title={`${index + 1}/${(analysisPoints?.data ?? []).length}`}
+      title={`${index + 1}/${hitPoints.length}`}
       onClick={onClick}
       style={{ left: `calc(${leftPercentOffset}% - ${pointWidth / 2}px)` }}
       onMouseEnter={onMouseEnter}
@@ -140,7 +134,7 @@ const MemoizedBreakpointTimelinePoint = React.memo(
       selectorChanged(hasSecondaryHighlighted) ||
       hasChanged("zoomRegion") ||
       hasChanged("executionPoint") ||
-      hasChanged("analysisPoints")
+      hasChanged("hitPoints")
     ) {
       return false;
     }

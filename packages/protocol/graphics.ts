@@ -248,7 +248,7 @@ export function setupGraphics() {
 
 export async function repaint(force = false) {
   const recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-  if (recordingCapabilities.supportsRepaintingGraphics) {
+  if (!recordingCapabilities.supportsRepaintingGraphics) {
     return;
   }
 

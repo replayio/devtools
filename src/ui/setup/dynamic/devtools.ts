@@ -4,7 +4,6 @@ import debounce from "lodash/debounce";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
-import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
@@ -12,7 +11,6 @@ import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
 import { Canvas, setupGraphics } from "protocol/graphics";
-import { setupLogpoints } from "ui/actions/logpoint";
 // eslint-disable-next-line no-restricted-imports
 import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -218,11 +216,9 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
-  setupEventListeners(store);
   setupGraphics();
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
-  setupLogpoints(store);
   setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);

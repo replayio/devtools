@@ -1,81 +1,74 @@
+import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import { PointDescription } from "@replayio/protocol";
-import { connect, ConnectedProps } from "react-redux";
+import { Breakpoint } from "devtools/client/debugger/src/reducers/types";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import React, { useEffect } from "react";
-
-import { getAnalysisPointsForLocation } from "devtools/client/debugger/src/reducers/breakpoints";
+import React, { Suspense, useEffect } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { HitPointStatus } from "shared/client/types";
 import { actions } from "ui/actions";
-import PrefixBadgeButton from "ui/components/PrefixBadge";
 import Icon from "ui/components/shared/Icon";
-import { selectors } from "ui/reducers";
 import type { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
 
 import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
 
-import { trackEvent } from "ui/utils/telemetry";
-import { Breakpoint } from "../../../reducers/types";
-
-const mapStateToProps = (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => {
-  const analysisPoints = getAnalysisPointsForLocation(
-    state,
-    // @ts-ignore Location / SourceLocation mismatch
-    breakpoint.location,
-    breakpoint.options.condition
-  );
-  return {
-    analysisPoints,
-    executionPoint: selectors.getExecutionPoint(state),
-  };
-};
-
-const connector = connect(mapStateToProps, {
-  seek: actions.seek,
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-type BNProps = PropsFromRedux & {
+type ExternalProps = {
   breakpoint: Breakpoint;
   editing: boolean;
+  hitPoints: TimeStampedPoint[] | null;
+  hitPointStatus: HitPointStatus | null;
   showCondition: boolean;
   setShowCondition: (showCondition: boolean) => void;
 };
 
+const connector = connect(
+  (state: UIState) => ({
+    executionPoint: getExecutionPoint(state),
+  }),
+  {
+    seek: actions.seek,
+  }
+);
+
+type PropsFromRedux = ConnectedProps<typeof connector>;
+
 function BreakpointNavigation({
-  analysisPoints,
   breakpoint,
   editing,
   executionPoint,
+  hitPoints,
+  hitPointStatus,
   seek,
   setShowCondition,
   showCondition,
-}: BNProps) {
+}: PropsFromRedux & ExternalProps) {
+  const error = hitPointStatus === "too-many-points-to-find";
+  const isEmpty = hitPoints === null || hitPoints.length === 0;
+
   const navigateToPoint = (point?: PointDescription) => {
     trackEvent("breakpoint.navigate");
     if (point) {
       seek(point.point, point.time, true);
     }
   };
-  const points = analysisPoints?.data || [];
-  const error = analysisPoints?.error;
-  const isEmpty = error || points.length === 0;
 
   let next, prev;
 
-  if (executionPoint && !error && points.length > 0) {
-    prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = points.find(p => compareNumericStrings(p.point, executionPoint) > 0);
+  if (executionPoint && !error && !isEmpty) {
+    prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
+    next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   useEffect(() => {
-    if (analysisPoints) {
-      trackEvent(points.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
-        hits: points.length,
+    if (!error && hitPoints !== null) {
+      trackEvent(hitPoints.length > 0 ? "breakpoint.has_hits" : "breakpoint.no_hits", {
+        hits: hitPoints.length,
       });
     }
-  }, [analysisPoints, points.length]);
+  }, [error, hitPoints]);
 
   if (editing) {
     return (
@@ -94,31 +87,36 @@ function BreakpointNavigation({
     <div
       className={classnames("breakpoint-navigation justify-between p-1.5 pr-4", { empty: isEmpty })}
     >
-      {!isEmpty && !analysisPoints?.error ? (
-        <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
-      ) : null}
-      {analysisPoints && !analysisPoints.error ? (
-        <BreakpointTimeline breakpoint={breakpoint} />
+      <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
+      {!error && hitPoints ? (
+        <BreakpointTimeline
+          breakpoint={breakpoint}
+          hitPoints={hitPoints}
+          hitPointStatus={hitPointStatus!}
+        />
       ) : (
         <div className="flex-grow" />
       )}
       <div className="text-center">
         <PanelStatus
+          hitPoints={hitPoints}
+          hitPointStatus={hitPointStatus}
           prefixBadge={breakpoint.options.prefixBadge!}
-          analysisPoints={analysisPoints!}
         />
       </div>
     </div>
   );
 }
 
-interface BNCProps {
+function BreakpointNavigationCommands({
+  prev,
+  next,
+  navigateToPoint,
+}: {
   prev?: PointDescription;
   next?: PointDescription;
   navigateToPoint: (point?: PointDescription) => void;
-}
-
-function BreakpointNavigationCommands({ prev, next, navigateToPoint }: BNCProps) {
+}) {
   const prevDisabled = !prev;
   const nextDisabled = !next;
   return (
@@ -143,4 +141,16 @@ function BreakpointNavigationCommands({ prev, next, navigateToPoint }: BNCProps)
   );
 }
 
-export default connector(BreakpointNavigation);
+const ConnectedBreakpointNavigation = connector(BreakpointNavigation);
+
+function Loader() {
+  return <div className="breakpoint-navigation empty justify-between p-1.5">Loading</div>;
+}
+
+export default function SuspendingBreakpointNavigation(props: ExternalProps) {
+  return (
+    <Suspense fallback={<Loader />}>
+      <ConnectedBreakpointNavigation {...props} />
+    </Suspense>
+  );
+}

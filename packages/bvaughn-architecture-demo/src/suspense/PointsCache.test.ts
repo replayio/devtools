@@ -13,6 +13,11 @@ describe("PointsCache", () => {
   let mockClient: { [key: string]: jest.Mock };
   let replayClient: ReplayClientInterface;
 
+  let getCachedHitPointsForLocation: (
+    location: Location,
+    condition: string | null,
+    focusRange: TimeStampedPointRange | null
+  ) => HitPointsAndStatusTuple;
   let getClosestPointForTime: (client: ReplayClientInterface, time: number) => ExecutionPoint;
   let getHitPointsForLocation: (
     client: ReplayClientInterface,
@@ -32,6 +37,7 @@ describe("PointsCache", () => {
 
     // Clear and recreate cached data between tests.
     const module = require("./PointsCache");
+    getCachedHitPointsForLocation = module.getCachedHitPointsForLocation;
     getClosestPointForTime = module.getClosestPointForTime;
     getHitPointsForLocation = module.getHitPointsForLocation;
     imperativelyGetClosestPointForTime = module.imperativelyGetClosestPointForTime;
@@ -136,11 +142,22 @@ describe("PointsCache", () => {
     };
 
     it("should cache results to avoid requesting more than once", async () => {
-      mockClient.getHitPointsForLocation.mockReturnValue([[], "complete"]);
+      const tsp = { time: 0, point: "0" };
+      mockClient.getHitPointsForLocation.mockReturnValue([[tsp], "complete"]);
 
       await getHitPointsForLocationHelper(mockLocation, null, null);
       await getHitPointsForLocationHelper(mockLocation, null, null);
 
+      expect(mockClient.getHitPointsForLocation).toBeCalledTimes(1);
+
+      // Verify that the cached getter returns the same thing without re-querying the client.
+      const [cachedTimeStampedPoint, cachedStatus] = getCachedHitPointsForLocation(
+        mockLocation,
+        null,
+        null
+      );
+      expect(cachedTimeStampedPoint).toEqual([tsp]);
+      expect(cachedStatus).toEqual("complete");
       expect(mockClient.getHitPointsForLocation).toBeCalledTimes(1);
     });
 

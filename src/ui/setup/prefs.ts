@@ -75,13 +75,6 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     getConsoleFilterDrawerExpanded
   );
 
-  updateAsyncPrefs(
-    state,
-    oldState,
-    "eventListenerBreakpoints",
-    state => state.eventListenerBreakpoints
-  );
-
   if (state.ui && oldState.ui) {
     updateDebuggerPrefs(
       state,

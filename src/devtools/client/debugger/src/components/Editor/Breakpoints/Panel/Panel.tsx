@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { Suspense, useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
@@ -12,10 +12,6 @@ import type { UIState } from "ui/state";
 import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import {
-  getAnalysisPointsForLocation,
-  AnalysisStatus,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
@@ -23,8 +19,11 @@ import FirstEditNag from "./FirstEditNag";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { prefs } from "ui/utils/prefs";
-import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { getFocusRegion } from "ui/reducers/timeline";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { UnsafeFocusRegion } from "ui/state/timeline";
+import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
   // The indent value is an adjustment for the distance from the gutter's left edge
@@ -35,14 +34,10 @@ function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     executionPoint: getExecutionPoint(state),
+    focusRegion: getFocusRegion(state),
   }),
   {
     setHoveredItem: actions.setHoveredItem,
@@ -53,35 +48,81 @@ const connector = connect(
 type $FixTypeLater = any;
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
-type PanelProps = PropsFromRedux & {
+type ExternalProps = {
   breakpoint?: Breakpoint;
   editor: $FixTypeLater;
   insertAt: number;
 };
 
+type PanelProps = PropsFromRedux & ExternalProps;
+
 function Panel({
-  analysisPoints,
   breakpoint,
+  clearHoveredItem,
   currentTime,
   editor,
   executionPoint,
+  focusRegion,
   insertAt,
   setHoveredItem,
-  clearHoveredItem,
 }: PanelProps) {
   const [editing, setEditing] = useState(false);
   const [showCondition, setShowCondition] = useState(Boolean(breakpoint!.options.condition)); // nosemgrep
   const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
   const dismissNag = hooks.useDismissNag();
-  const points = analysisPoints?.data;
-  const error = analysisPoints?.error;
-  const pausedOnHit = !!points?.some(
+
+  // WARNING
+  // React components should not suspend during a synchronous update.
+  // Breakpoint state is in Redux and might get updated at synchronous/default priority.
+  // To avoid unintentionally suspending in result to such an update, we use a deferred value.
+  // Deferred values automatically lag slightly behind synchronous updates.
+  const replayClient = useContext(ReplayClientContext);
+  const unsafeFocusRegion = focusRegion ? (focusRegion as UnsafeFocusRegion) : null;
+  const breakpointForSuspense = useDeferredValue(breakpoint);
+  const unsafeFocusRegionForSuspense = useDeferredValue(unsafeFocusRegion);
+  const [hitPoints, hitPointStatus] =
+    breakpointForSuspense != null
+      ? getHitPointsForLocation(
+          replayClient,
+          breakpointForSuspense.location,
+          breakpointForSuspense.options.condition || null,
+          unsafeFocusRegionForSuspense
+        )
+      : [null, null];
+
+  // If we were fully using concurrent APIs, updates to something like focus range or breakpoint would be done in a transition,
+  // which would expose an "is pending" flag that we could use to show e.g. "Loading..." while we're updating breakpoints.
+  // In this case, since we're using the deferred API for this, we have to calculate the "is pending" flag ourselves.
+  const isPending =
+    unsafeFocusRegion !== unsafeFocusRegionForSuspense || breakpoint !== breakpointForSuspense;
+
+  // HACK
+  // The TimeStampedPoints within the focus region are always at least as large as (often larger than) the user-defined time range.
+  // Because of this, hit points may be returned that fall outside of the user's selection.
+  // We should filter these out before passing them to the BreakpointNavigation component.
+  const filteredHitPoints = useMemo(() => {
+    if (unsafeFocusRegionForSuspense == null) {
+      return hitPoints;
+    } else {
+      return hitPoints
+        ? hitPoints.filter(hitPoint => {
+            return (
+              hitPoint.time >= unsafeFocusRegionForSuspense.beginTime &&
+              hitPoint.time <= unsafeFocusRegionForSuspense.endTime
+            );
+          })
+        : null;
+    }
+  }, [hitPoints, unsafeFocusRegionForSuspense]);
+
+  const pausedOnHit = !!hitPoints?.some(
     ({ point, time }) => point == executionPoint && time == currentTime
   );
+
   const isHot =
-    error === AnalysisError.TooManyPointsToFind ||
-    (points?.length || 0) > MAX_POINTS_FOR_FULL_ANALYSIS;
+    hitPointStatus === "too-many-points-to-find" ||
+    (hitPoints?.length || 0) > MAX_POINTS_FOR_FULL_ANALYSIS;
 
   useEffect(() => {
     const updateWidth = () => setWidth(getPanelWidth(editor));
@@ -145,9 +186,9 @@ function Panel({
                 />
               ) : (
                 <PanelSummary
-                  analysisPoints={analysisPoints}
                   breakpoint={breakpoint}
                   executionPoint={executionPoint}
+                  hitPoints={filteredHitPoints}
                   isHot={isHot}
                   pausedOnHit={pausedOnHit}
                   setInputToFocus={setInputToFocus}
@@ -157,8 +198,11 @@ function Panel({
             </div>
           </div>
           <BreakpointNavigation
+            key={breakpoint?.options.condition}
             breakpoint={breakpoint!}
             editing={editing}
+            hitPoints={isPending ? null : filteredHitPoints}
+            hitPointStatus={isPending ? null : hitPointStatus}
             showCondition={showCondition}
             setShowCondition={setShowCondition}
           />
@@ -168,4 +212,12 @@ function Panel({
   );
 }
 
-export default connector(Panel);
+const ConnectedPanel = connector(Panel);
+
+export default function ToggleWidgetButtonSuspenseWrapper(props: ExternalProps) {
+  return (
+    <Suspense fallback={null}>
+      <ConnectedPanel {...props} />
+    </Suspense>
+  );
+}

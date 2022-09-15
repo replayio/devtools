@@ -11,7 +11,6 @@ import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
 import { ReactDevToolsAction } from "./reactDevTools";
-import * as eventListeners from "devtools/client/debugger/src/actions/event-listeners";
 import debuggerActions from "devtools/client/debugger/src/actions";
 import { QuickOpenActions } from "devtools/client/debugger/src/actions/quick-open";
 import { NetworkAction } from "./network";
@@ -34,7 +33,6 @@ export const actions = {
   ...actualAppActions,
   ...commentsActions,
   ...debuggerActions,
-  ...eventListeners,
   ...layoutActions,
   ...reactDevToolsActions,
   ...sessionActions,

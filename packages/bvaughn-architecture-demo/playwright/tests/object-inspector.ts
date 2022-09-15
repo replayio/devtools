@@ -1,4 +1,5 @@
 import { Page, test } from "@playwright/test";
+import { toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
 
 import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
@@ -107,6 +108,9 @@ test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
   await page.goto(URL);
+
+  await toggleProtocolMessages(page, false);
+  await toggleProtocolMessage(page, "logs", true);
 });
 
 test("should render simple values", async ({ page }) => {

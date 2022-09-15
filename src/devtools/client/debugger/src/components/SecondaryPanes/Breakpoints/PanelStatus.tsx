@@ -1,13 +1,10 @@
+import { TimeStampedPoint } from "@replayio/protocol";
 import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import { AnalysisError } from "protocol/thread/analysis";
-import { useAppSelector } from "ui/setup/hooks";
+import { HitPointStatus } from "shared/client/types";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
-import {
-  AnalysisStatus,
-  LocationAnalysisSummary,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 
 const numberStatus = (current: number | undefined, total: number | undefined): string => {
   return `${current ?? "?"}/${total ?? "?"}`;
@@ -19,38 +16,37 @@ const maxStatusLength = (total: number | undefined): number => {
 };
 
 export function PanelStatus({
-  analysisPoints,
+  hitPoints,
+  hitPointStatus,
   prefixBadge,
 }: {
-  analysisPoints?: LocationAnalysisSummary;
+  hitPoints: TimeStampedPoint[] | null;
+  hitPointStatus: HitPointStatus | null;
   prefixBadge: PrefixBadge;
 }) {
   const time = useAppSelector(getCurrentTime);
-  let status = "";
+  const hitPointsLength = hitPoints === null ? 0 : hitPoints.length;
 
-  const points = analysisPoints?.data;
-  const error = analysisPoints?.error;
-  const runningStatus = analysisPoints?.status;
-
-  if (
-    !points ||
-    [AnalysisStatus.LoadingPoints, AnalysisStatus.LoadingResults].includes(runningStatus!)
-  ) {
-    status = "Loading";
-  } else if (error) {
-    if (error === AnalysisError.TooManyPointsToFind) {
+  let status = null;
+  switch (hitPointStatus) {
+    case "too-many-points-to-find":
       status = "10k+ hits";
-    } else if (error === AnalysisError.Unknown) {
-      status = "Error";
-    }
-  } else if (points.length == 0) {
-    status = "No hits";
-  } else {
-    const previousTimeIndex = sortedLastIndex(
-      points.map(p => p.time),
-      time
-    );
-    status = numberStatus(previousTimeIndex, points.length);
+      break;
+    case "too-many-points-to-run-analysis":
+      break;
+    default:
+      if (hitPoints === null) {
+        status = "Loading";
+      } else if (hitPointsLength === 0) {
+        status = "No hits";
+      } else {
+        const previousTimeIndex = sortedLastIndex(
+          hitPoints!.map(p => p.time),
+          time
+        );
+        status = numberStatus(previousTimeIndex, hitPointsLength);
+      }
+      break;
   }
 
   return (
@@ -62,7 +58,7 @@ export function PanelStatus({
       >
         <div
           className="text-center"
-          style={{ width: `${maxStatusLength(points?.length)}ch` }}
+          style={{ width: `${maxStatusLength(hitPointsLength)}ch` }}
         ></div>
         {status}
       </div>

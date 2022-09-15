@@ -16,7 +16,7 @@ import {
   getBreakpoint,
 } from "../../reducers/breakpoints";
 import { createPendingBreakpoint } from "../../reducers/pending-breakpoints";
-import { getSymbols, getRequestedBreakpointLocations } from "../../selectors";
+import { getRequestedBreakpointLocations } from "../../selectors";
 import { getLocationKey } from "../../utils/breakpoint";
 import { getTextAtPosition } from "../../utils/source";
 import {
@@ -67,7 +67,7 @@ export function enableBreakpoint(
   cx: Context,
   initialBreakpoint: Breakpoint
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const breakpoint = getBreakpoint(getState(), initialBreakpoint.location);
     if (!breakpoint || !breakpoint.disabled) {
       return;
@@ -77,7 +77,13 @@ export function enableBreakpoint(
 
     dispatch(_setBreakpoint({ ...breakpoint, disabled: false }));
 
-    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(
+      replayClient,
+      ThreadFront,
+      getState(),
+      breakpoint.location,
+      breakpoint.options
+    );
   };
 }
 
@@ -87,7 +93,7 @@ export function addBreakpoint(
   options: Breakpoint["options"] = {},
   disabled = false
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const { sourceId, line, sourceUrl } = initialLocation;
     let column = initialLocation.column;
 
@@ -124,8 +130,6 @@ export function addBreakpoint(
       return;
     }
 
-    const symbols = getSymbols(state, source);
-
     const originalContent = getSourceContent(state, source.id);
     const originalText = getTextAtPosition(originalContent, location);
 
@@ -149,7 +153,13 @@ export function addBreakpoint(
       // to remove any installed breakpoint in the server.
       await _internalRemoveBreakpoint(ThreadFront, state, location);
     } else {
-      await _internalSetBreakpoint(ThreadFront, state, breakpoint.location, breakpoint.options);
+      await _internalSetBreakpoint(
+        replayClient,
+        ThreadFront,
+        state,
+        breakpoint.location,
+        breakpoint.options
+      );
     }
   };
 }
@@ -198,7 +208,7 @@ export function removeBreakpointOption(
   breakpoint: Breakpoint,
   option: keyof Breakpoint["options"]
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     const newOptions = { ...breakpoint.options };
     delete newOptions[option];
 
@@ -206,7 +216,13 @@ export function removeBreakpointOption(
 
     dispatch(_setBreakpoint({ ...breakpoint, options: newOptions }));
 
-    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, newOptions);
+    await _internalSetBreakpoint(
+      replayClient,
+      ThreadFront,
+      getState(),
+      breakpoint.location,
+      newOptions
+    );
   };
 }
 
@@ -215,7 +231,7 @@ export function setBreakpointOptions(
   location: Location & { sourceUrl: string },
   options: Partial<Breakpoint["options"]> = {}
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient }) => {
     let breakpoint = getBreakpoint(getState(), location);
     if (!breakpoint) {
       return dispatch(addBreakpoint(cx, location, options));
@@ -229,6 +245,12 @@ export function setBreakpointOptions(
 
     dispatch(_setBreakpoint(breakpoint));
 
-    await _internalSetBreakpoint(ThreadFront, getState(), breakpoint.location, breakpoint.options);
+    await _internalSetBreakpoint(
+      replayClient,
+      ThreadFront,
+      getState(),
+      breakpoint.location,
+      breakpoint.options
+    );
   };
 }

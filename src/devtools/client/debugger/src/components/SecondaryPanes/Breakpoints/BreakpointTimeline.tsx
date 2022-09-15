@@ -1,37 +1,30 @@
-import React, { useState, useRef, useMemo } from "react";
+import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import { PointDescription } from "@replayio/protocol";
-
-import { actions as UIActions } from "ui/actions";
-import { selectors } from "ui/reducers";
-import { timelineMarkerWidth as pointWidth } from "ui/constants";
-import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
-import { getVisiblePosition } from "ui/utils/timeline";
-import PortalTooltip from "ui/components/shared/PortalTooltip";
-import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
-
-import {
-  getAnalysisPointsForLocation,
-  LocationAnalysisSummary,
-} from "devtools/client/debugger/src/reducers/breakpoints";
 import TimeTooltip from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/TimeTooltip";
-import { UIState } from "ui/state";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { mostRecentPaintOrMouseEvent } from "protocol/graphics";
+import React, { useState, useRef, useMemo, MouseEvent } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { useAppSelector } from "ui/setup/hooks";
-import { HoveredItem } from "ui/state/timeline";
-import { getExecutionPoint } from "../../../selectors";
-import type { Breakpoint } from "../../../reducers/types";
-import UnfocusedRegion from "ui/components/Timeline/UnfocusedRegion";
-import NonLoadingRegions from "ui/components/Timeline/NonLoadingRegions";
+import { HitPointStatus } from "shared/client/types";
+import { actions as UIActions } from "ui/actions";
+import PortalTooltip from "ui/components/shared/PortalTooltip";
 import { UnloadedRegions } from "ui/components/Timeline/UnloadedRegions";
+import { timelineMarkerWidth as pointWidth } from "ui/constants";
+import { selectors } from "ui/reducers";
+import { useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+import { HoveredItem } from "ui/state/timeline";
+import { getVisiblePosition } from "ui/utils/timeline";
+
+import BreakpointTimelinePoint from "./BreakpointTimelinePoint";
 
 function Points({
-  analysisPoints,
   breakpoint,
+  hitPoints,
   hoveredItem,
 }: {
-  analysisPoints: LocationAnalysisSummary;
   breakpoint: any;
+  hitPoints: TimeStampedPoint[];
   hoveredItem: HoveredItem | null;
 }) {
   const executionPoint = useAppSelector(getExecutionPoint);
@@ -42,7 +35,7 @@ function Points({
       return [];
     }
     let previousDisplayed: PointDescription;
-    return analysisPoints.data?.filter(p => {
+    return hitPoints.filter(p => {
       if (
         !previousDisplayed ||
         executionPoint === p.point ||
@@ -53,7 +46,7 @@ function Points({
       }
       return false;
     });
-  }, [analysisPoints.data, executionPoint, duration]);
+  }, [duration, executionPoint, hitPoints]);
 
   return (
     <>
@@ -63,6 +56,7 @@ function Points({
           point={p}
           key={i}
           index={i}
+          hitPoints={hitPoints}
           hoveredItem={hoveredItem}
         />
       ))}
@@ -72,19 +66,22 @@ function Points({
 
 type BreakpointTimelineProps = PropsFromRedux & {
   breakpoint: any;
+  hitPoints: TimeStampedPoint[];
+  hitPointStatus: HitPointStatus;
 };
 
 function BreakpointTimeline({
   breakpoint,
-  analysisPoints,
-  zoomRegion,
   currentTime,
+  hitPoints,
+  hitPointStatus,
   hoveredItem,
   seek,
+  zoomRegion,
 }: BreakpointTimelineProps) {
   const [hoveredTime, setHoveredTime] = useState<number | null>(null);
   const timelineRef = useRef<HTMLDivElement | null>(null);
-  const onClick = (e: React.MouseEvent) => {
+  const onClick = () => {
     if (!hoveredTime) {
       return;
     }
@@ -94,16 +91,16 @@ function BreakpointTimeline({
       seek(event.point, hoveredTime, false);
     }
   };
-  const onMouseMove = (e: React.MouseEvent) => {
+  const onMouseMove = (event: MouseEvent) => {
     const { beginTime, endTime } = zoomRegion;
-    const { left, width } = e.currentTarget.getBoundingClientRect();
-    const clickLeft = e.clientX;
+    const { left, width } = event.currentTarget.getBoundingClientRect();
+    const clickLeft = event.clientX;
 
     const clickPosition = Math.max((clickLeft - left) / width, 0);
     const time = Math.ceil(beginTime + (endTime - beginTime) * clickPosition);
     setHoveredTime(time);
   };
-  const onMouseLeave = (e: React.MouseEvent) => setHoveredTime(null);
+  const onMouseLeave = () => setHoveredTime(null);
 
   const hoverPercent = `${getVisiblePosition({ time: hoveredTime, zoom: zoomRegion }) * 100}%`;
   const percent = getVisiblePosition({ time: currentTime, zoom: zoomRegion }) * 100;
@@ -123,12 +120,8 @@ function BreakpointTimeline({
           <div className="progress-line preview-min" style={{ width: hoverPercent }} />
           <div className="progress-line" style={{ width: `${percent}%` }} />
           <UnloadedRegions />
-          {analysisPoints && !analysisPoints.error ? (
-            <Points
-              analysisPoints={analysisPoints}
-              breakpoint={breakpoint}
-              hoveredItem={hoveredItem}
-            />
+          {hitPointStatus !== "too-many-points-to-find" ? (
+            <Points breakpoint={breakpoint} hitPoints={hitPoints} hoveredItem={hoveredItem} />
           ) : null}
         </div>
       </PortalTooltip>
@@ -137,12 +130,7 @@ function BreakpointTimeline({
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
-    analysisPoints: getAnalysisPointsForLocation(
-      state,
-      breakpoint.location,
-      breakpoint.options.condition
-    ),
+  (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
     hoveredItem: selectors.getHoveredItem(state),
     zoomRegion: selectors.getZoomRegion(state),
@@ -151,5 +139,7 @@ const connector = connect(
     seek: UIActions.seek,
   }
 );
+
 type PropsFromRedux = ConnectedProps<typeof connector>;
+
 export default connector(BreakpointTimeline);
