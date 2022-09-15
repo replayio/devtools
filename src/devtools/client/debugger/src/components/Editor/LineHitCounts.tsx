@@ -50,11 +50,12 @@ function LineHitCounts({ sourceEditor }: Props) {
   const focusRegion = useAppSelector(getFocusRegion);
   const logpointSources = useAppSelector(getLogpointSources);
   const [itemHeight, setItemHeight] = useState(() => {
-    // const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
-    //   "--theme-code-font-size"
-    // );
+    const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
+      "--theme-code-font-size"
+    );
+    console.log("Computed style font size: ", fontSize);
     // const fontSize = 11;
-    // return fontSize * 1.4;
+    // return Number(fontSize) * 1.4;
     return 15;
   });
 
@@ -298,7 +299,6 @@ function LineHitCounts({ sourceEditor }: Props) {
   }
 
   const logpointEntry = logpointSources.find(entry => entry.source?.id === sourceId);
-  console.log("Breakpoints entry: ", logpointEntry);
 
   return createPortal(
     <div
@@ -316,15 +316,24 @@ function LineHitCounts({ sourceEditor }: Props) {
       <List
         height={scroller.getBoundingClientRect().height}
         itemCount={sourceEditor.editor.lineCount()}
-        key={sourceId}
+        key={sourceId + logpointEntry?.breakpoints.length}
         itemSize={index => {
           if (logpointEntry) {
             const bp = logpointEntry.breakpoints.find(bp => bp.location.line === index + 1);
             if (bp) {
-              return 94 + 15;
+              // const lineHandle = sourceEditor.editor.getLineHandle(index);
+              // const lineInfo = sourceEditor.editor.lineInfo(lineHandle);
+              // console.log("Line: ", index + 1, "bp: ", bp, "info: ", lineInfo);
+              return 94 + itemHeight;
             }
           }
-          return 15;
+          return itemHeight;
+        }}
+        itemData={{
+          hitCountMap,
+          minHitCount,
+          maxHitCount,
+          isCollapsed,
         }}
         overscanCount={50}
         width={gutterWidth}
@@ -338,11 +347,51 @@ function LineHitCounts({ sourceEditor }: Props) {
   );
 }
 
-const HitCountsRow = ({ index, style }: { index: number; style?: React.CSSProperties }) => (
-  <div style={{ ...style, backgroundColor: "white", color: "red", borderLeft: "5px solid red" }}>
-    {index + 1}
-  </div>
-);
+interface HitCountsRowProps {
+  index: number;
+  style?: React.CSSProperties;
+  data: {
+    hitCountMap: Map<number, number> | null;
+    minHitCount: number;
+    maxHitCount: number;
+    isCollapsed: boolean;
+  };
+}
+
+const NUM_GRADIENT_COLORS = 3;
+
+const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
+  const { hitCountMap, minHitCount, maxHitCount, isCollapsed } = data;
+  const lineNumber = index + 1;
+  const hitCount = hitCountMap?.get(lineNumber) || 0;
+
+  let className = styles.HitsBadge0;
+  let gradientIndex = NUM_GRADIENT_COLORS - 1;
+  if (hitCount > 0) {
+    if (minHitCount !== maxHitCount) {
+      gradientIndex = Math.min(
+        NUM_GRADIENT_COLORS - 1,
+        Math.round(((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS)
+      );
+    }
+    className = styles[`HitsBadge${gradientIndex + 1}`];
+  }
+
+  let hitsLabel: React.ReactNode = "";
+  if (!isCollapsed) {
+    if (hitCount > 0) {
+      hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+    }
+    // markerNode.textContent = hitsLabel;
+  }
+  const title = `${hitCount} hits (line: ${lineNumber})`;
+
+  return (
+    <div style={style} title={title}>
+      <div className={className}>{hitsLabel}</div>
+    </div>
+  );
+};
 
 function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {
   const hitCountMap: Map<number, number> = new Map();

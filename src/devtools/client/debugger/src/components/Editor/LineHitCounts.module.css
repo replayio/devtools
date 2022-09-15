@@ -7,7 +7,8 @@
   justify-content: center;
 
   width: 100%;
-  height: calc(var(--theme-code-font-size) * 1.4);
+  height: 15px;
+  /* height: calc(var(--theme-code-font-size) * 1.4); */
 
   font-size: 8px;
   border-left: 5px solid var(--gutter-hit-count-background);
