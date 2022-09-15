@@ -81,7 +81,7 @@ export default function FocusModePopout() {
         <div className={styles.Text}>
           <strong>Focus mode</strong> lets you specify a region for your debugging.{" "}
           <a
-            href="https://docs.replay.io/docs/viewer-26591deb256c473a946d0f64abb67859#bf19baaa57004b0d9282cc0a02b281f5"
+            href="https://docs.replay.io/reference-guide/focus-mode"
             rel="noreferrer noopener"
             style={{ textDecoration: "underline" }}
             target="_blank"
