@@ -1,4 +1,12 @@
-import React, { useState, useMemo, useLayoutEffect, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useMemo,
+  useLayoutEffect,
+  useRef,
+  useEffect,
+  useCallback,
+  useReducer,
+} from "react";
 import { createPortal } from "react-dom";
 import { VariableSizeList as List } from "react-window";
 
@@ -23,6 +31,7 @@ import type { SourceEditor } from "../../utils/editor/source-editor";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
 import { getLogpointSources } from "devtools/client/debugger/src/selectors/breakpointSources";
+import { LineHandle } from "codemirror";
 
 type Props = {
   sourceEditor: SourceEditor;
@@ -52,21 +61,16 @@ function LineHitCounts({ sourceEditor }: Props) {
 
   const { value: enableLargeText } = useFeature("enableLargeText");
 
-  // const [itemHeight, setItemHeight] = useState(() => {
-  //   const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
-  //     "--theme-code-font-size"
-  //   );
-  //   console.log("Computed style font size: ", fontSize);
-  //   // const fontSize = 11;
-  //   // return Number(fontSize) * 1.4;
-  //   return 15;
-  // });
-
   const previousFocusRegion = useRef<FocusRegion | null>(null);
   const previousHitCounts = useRef<Map<number, number> | null>(null);
   const hitCountsListRef = useRef<List>(null);
 
   const isCollapsed = hitCountsMode == "hide-counts";
+
+  const toggleHitCountNumbers = useCallback(() => {
+    updateHitCountsMode(isCollapsed ? "show-counts" : "hide-counts");
+  }, [isCollapsed, updateHitCountsMode]);
+
   const isCurrentLineNumberValid = currentLineNumber !== undefined;
   const { lower, upper } = getBoundsForLineNumber(currentLineNumber || 0);
 
@@ -122,14 +126,6 @@ function LineHitCounts({ sourceEditor }: Props) {
 
   const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
 
-  // Save `isCollapsed` in a ref so we only create `marker.onClick` callbacks once
-  // TODO Candidate for the eventual `useEvent` hook?
-  const isCollapsedRef = useRef(isCollapsed);
-
-  useLayoutEffect(() => {
-    isCollapsedRef.current = isCollapsed;
-  }, [isCollapsed]);
-
   useLayoutEffect(() => {
     if (!sourceEditor) {
       return;
@@ -137,7 +133,10 @@ function LineHitCounts({ sourceEditor }: Props) {
 
     const { editor } = sourceEditor;
 
-    // Tell CodeMirror to actually create a gutter column for hit counts
+    // Tell CodeMirror to actually create a gutter column for hit counts.
+    // Note that this now only creates the horizontal space we need - it doesn't
+    // actually _show_ the hit count numbers. Instead, we overlay a virtual list
+    // absolutely positioned on top of this gutter, so we can render them faster.
     editor.setOption("gutters", [
       "breakpoints",
       "CodeMirror-linenumbers",
@@ -156,6 +155,7 @@ function LineHitCounts({ sourceEditor }: Props) {
 
     return () => {
       try {
+        // Remove the hit count gutter.
         editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
       } catch (e) {
         console.warn(e);
@@ -203,24 +203,6 @@ function LineHitCounts({ sourceEditor }: Props) {
 
         const hitCount = hitCountMap?.get(lineNumber + 1) || 0;
 
-        // // We use a gradient to indicate the "heat" (the number of hits).
-        // // This absolute hit count values are relative, per file.
-        // // Cubed root prevents high hit counts from lumping all other values together.
-        // const NUM_GRADIENT_COLORS = 3;
-        // let className = styles.HitsBadge0;
-        // let index = NUM_GRADIENT_COLORS - 1;
-        // if (hitCount > 0) {
-        //   if (minHitCount !== maxHitCount) {
-        //     index = Math.min(
-        //       NUM_GRADIENT_COLORS - 1,
-        //       Math.round(
-        //         ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-        //       )
-        //     );
-        //   }
-        //   className = styles[`HitsBadge${index + 1}`];
-        // }
-
         if (features.disableUnHitLines) {
           if (hitCount > 0) {
             sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
@@ -230,30 +212,6 @@ function LineHitCounts({ sourceEditor }: Props) {
             sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
           }
         }
-
-        // const info = editor.lineInfo(lineNumber);
-
-        // let markerNode: HTMLDivElement;
-        // if (info?.gutterMarkers?.["hit-markers"]) {
-        //   // Retrieve the marker DOM node we already created
-        //   markerNode = info.gutterMarkers["hit-markers"];
-        // } else {
-        //   markerNode = document.createElement("div");
-        //   // markerNode.onclick = () =>
-        //   //   updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
-
-        //   // editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
-        // }
-
-        // // markerNode.className = className;
-        // if (!isCollapsed) {
-        //   let hitsLabel = "";
-        //   if (hitCount > 0) {
-        //     hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
-        //   }
-        //   // markerNode.textContent = hitsLabel;
-        // }
-        // markerNode.title = `${hitCount} hits`;
       });
     };
 
@@ -270,10 +228,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     sourceEditor,
     hitCountMap,
     updatedLineNumbers,
-    isCollapsed,
-    minHitCount,
-    maxHitCount,
-    updateHitCountsMode,
     lower,
     upper,
     isCurrentLineNumberValid,
@@ -286,13 +240,16 @@ function LineHitCounts({ sourceEditor }: Props) {
     previousHitCounts.current = hitCountMap;
   }, [focusRegion, hitCountMap]);
 
-  // We're just here for the hooks!
-  // return null;
+  // Access the actual CodeMirror scrolling element, so we can read some bounds.
+  // This isn't ideal, but we can assume it exists by now.
   const scroller = sourceEditor.editor.getScrollerElement();
 
+  // Look up the print statement definitions for this file
   const logpointsForSource = logpointSources.find(entry => entry.source?.id === sourceId);
 
   useLayoutEffect(() => {
+    // MAGIC: every time the user scrolls CodeMirror, scroll our hit counts virtual list
+    // to the exact same scroll position to keep them in sync.
     return sourceEditor.editor.on("scroll", () => {
       hitCountsListRef.current?.scrollTo(scroller.scrollTop);
     });
@@ -300,14 +257,19 @@ function LineHitCounts({ sourceEditor }: Props) {
 
   useLayoutEffect(() => {
     if (logpointsForSource) {
-      // `react-window` caches item sizes after they've been measured.
-      // If we have print statements, we need to force it to measure those
-      // lines so it knows they're bigger than normal, and can use those
-      // in its positioning calculations for later lines.
-      // That way if we are viewing lines far past the line with the print statement,
-      // `react-window` should take those larger lines into account and work right.
-      // HACK Synchronously force `react-window` to draw and check sizes of
-      // each print statement in this file...
+      /*
+        HACK Synchronously force `react-window` to draw and check sizes of
+        each print statement in this file.
+        
+        `react-window` caches item sizes after they've been measured.
+        If we have print statements, we need to force it to measure those
+        lines so it knows they're bigger than normal, and can use those
+        in its positioning calculations for later lines.
+        That way if we are viewing lines far past the line with the print statement,
+        `react-window` should take those larger lines into account and work right.
+        This isn't ideal perf-wise, but typically there's only a handful of print
+        statements per file, and we only do this when the list of print statements changes.
+      */
       for (let printStatement of logpointsForSource.breakpoints) {
         hitCountsListRef.current?.scrollToItem(printStatement.location.line);
       }
@@ -322,22 +284,20 @@ function LineHitCounts({ sourceEditor }: Props) {
     return null;
   }
 
-  const lineHandle = sourceEditor.editor.getLineHandle(1);
+  const firstLineHandle = sourceEditor.editor.getLineHandle(1) as LineHandle & { height: number };
   const numPrintStatements = logpointsForSource?.breakpoints.length || 0;
-  const firstLineRect = scroller.querySelector(".CodeMirror-line")?.getBoundingClientRect();
 
-  const defaultItemHeight = firstLineRect
-    ? Number(firstLineRect.height.toFixed(4))
-    : // ? firstLineRect.height /**/
-      15;
+  const defaultItemHeight = firstLineHandle?.height ?? 15;
+  // From inspection - if our print statement CSS changes this will need to also
   const EXPECTED_PRINT_STATEMENT_HEIGHT = 94;
-  // console.log("First line info: ", lineHandle, lineInfo, firstLineRect);
 
-  const totalLines = sourceEditor.editor.lineCount();
+  const totalLines = sourceEditor.editor.lineCount() || 1;
 
   const totalDocumentHeight = scroller.getBoundingClientRect().height;
   const combinedPrintStatementSize = EXPECTED_PRINT_STATEMENT_HEIGHT * numPrintStatements;
-  const estimatedSize = (totalDocumentHeight - combinedPrintStatementSize) / (totalLines || 1);
+
+  // Give `react-window` a proper estimate of all other actual line heights
+  const estimatedSize = (totalDocumentHeight - combinedPrintStatementSize) / totalLines;
 
   return createPortal(
     <div
@@ -359,26 +319,12 @@ function LineHitCounts({ sourceEditor }: Props) {
         // Force recreating the list if any of these change
         key={`${sourceId}${logpointsForSource?.breakpoints.length}${enableLargeText}`}
         itemSize={index => {
-          const lineHandle = sourceEditor.editor.getLineHandle(index);
-          // @ts-expect-error `LineHandle` is an opaque type and `.height`` isn't documented
+          const lineHandle = sourceEditor.editor.getLineHandle(index) as LineHandle & {
+            height: number;
+          };
+          // CodeMirror keeps the _actual_ line height in an internal field.
+          // By reusing that, we can get consistent heights for our virtualized list items.
           const itemHeight: number = lineHandle?.height ?? defaultItemHeight;
-
-          // // if (index % 100 === 0) {
-          // //   const lineInfo = sourceEditor.editor.lineInfo(lineHandle);
-          // //   console.log("Individual line info: ", lineHandle, lineInfo);
-          // // }
-
-          if (logpointsForSource) {
-            const bp = logpointsForSource.breakpoints.find(bp => bp.location.line === index + 1);
-            if (bp) {
-              console.log("Line with print statement: ", index, lineHandle, itemHeight);
-              // const lineHandle = sourceEditor.editor.getLineHandle(index);
-              // const lineInfo = sourceEditor.editor.lineInfo(lineHandle);
-              // console.log("Line: ", index + 1, "bp: ", bp, "info: ", lineInfo);
-              // return 94 + itemHeight;
-              return itemHeight;
-            }
-          }
 
           return itemHeight;
         }}
@@ -388,6 +334,7 @@ function LineHitCounts({ sourceEditor }: Props) {
           maxHitCount,
           isCollapsed,
           defaultItemHeight,
+          toggleHitCountNumbers,
         }}
         overscanCount={50}
         width={gutterWidth}
@@ -410,16 +357,26 @@ interface HitCountsRowProps {
     maxHitCount: number;
     isCollapsed: boolean;
     defaultItemHeight: number;
+    toggleHitCountNumbers: () => void;
   };
 }
 
 const NUM_GRADIENT_COLORS = 3;
 
 const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
-  const { hitCountMap, minHitCount, maxHitCount, isCollapsed, defaultItemHeight } = data;
+  const {
+    hitCountMap,
+    minHitCount,
+    maxHitCount,
+    isCollapsed,
+    defaultItemHeight,
+    toggleHitCountNumbers,
+  } = data;
+
   const lineNumber = index + 1;
   const hitCount = hitCountMap?.get(lineNumber) || 0;
 
+  // Some complex-ish math to give us a gradient color based on hit counts for this file
   let className = styles.HitsBadge0;
   let gradientIndex = NUM_GRADIENT_COLORS - 1;
   if (hitCount > 0) {
@@ -432,7 +389,7 @@ const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
     className = styles[`HitsBadge${gradientIndex + 1}`];
   }
 
-  let hitsLabel: React.ReactNode = "";
+  let hitsLabel: React.ReactNode = " ";
   if (!isCollapsed) {
     if (hitCount > 0) {
       hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
@@ -442,7 +399,13 @@ const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
 
   return (
     <div style={style} title={title}>
-      <div className={className} style={{ height: defaultItemHeight }}>
+      <div
+        className={className}
+        // Ensure that the hit color badge itself stays one line high,
+        // and doesn't expand to fill lines that have print statements
+        style={{ height: defaultItemHeight }}
+        onClick={toggleHitCountNumbers}
+      >
         {hitsLabel}
       </div>
     </div>
