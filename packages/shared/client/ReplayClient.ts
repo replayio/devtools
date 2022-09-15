@@ -45,7 +45,7 @@ import { isTooManyPointsError } from "shared/utils/error";
 import {
   ColumnHits,
   HitPointsAndStatusTuple,
-  HitPointsStatus,
+  HitPointStatus,
   LineHits,
   ReplayClientEvents,
   ReplayClientInterface,
@@ -302,7 +302,7 @@ export class ReplayClient implements ReplayClientInterface {
     condition: string | null
   ): Promise<HitPointsAndStatusTuple> {
     const collectedHitPoints: TimeStampedPoint[] = [];
-    let status: HitPointsStatus | null = null;
+    let status: HitPointStatus | null = null;
 
     const locations = this._getCorrespondingLocations(location).map(location => ({ location }));
 

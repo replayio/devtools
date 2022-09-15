@@ -1,6 +1,6 @@
 import { PointDescription } from "@replayio/protocol";
 import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, useRef } from "react";
+import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -15,11 +15,11 @@ import { Nag } from "ui/hooks/users";
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import findLast from "lodash/findLast";
-import { getPointsForHoveredLineNumber } from "devtools/client/debugger/src/reducers/breakpoints";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
 import { useFeature, useStringPref } from "ui/hooks/settings";
+import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
 
 const QuickActionButton: FC<{
   showNag: boolean;
@@ -94,7 +94,6 @@ function QuickActions({
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
   const dispatch = useAppDispatch();
-  const analysisPoints = useAppSelector(getPointsForHoveredLineNumber);
   const executionPoint = useAppSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
@@ -102,18 +101,19 @@ function QuickActions({
   const { value: enableLargeText } = useFeature("enableLargeText");
   const { value: hitCounts } = useFeature("hitCounts");
 
+  const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
+
   const onAddLogpoint = () => {
     dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
   };
 
   let next: PointDescription | undefined, prev: PointDescription | undefined;
 
-  let points = analysisPoints?.data;
-  let error = analysisPoints?.error;
+  const error = hitPointStatus === "too-many-points-to-find";
 
-  if (points && !error && executionPoint) {
-    prev = findLast(points, p => compareNumericStrings(p.point, executionPoint) < 0);
-    next = points.find(p => compareNumericStrings(p.point, executionPoint) > 0);
+  if (hitPoints && !error && executionPoint) {
+    prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
+    next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
 
   const onContinueToNext = () => {
@@ -129,11 +129,11 @@ function QuickActions({
 
   let button;
 
-  if (points && isMetaActive && isShiftActive) {
+  if (hitPoints && isMetaActive && isShiftActive) {
     button = (
       <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />
     );
-  } else if (points && isMetaActive) {
+  } else if (hitPoints && isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
     button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
@@ -161,7 +161,8 @@ function QuickActions({
   );
 }
 
-type ToggleWidgetButtonProps = PropsFromRedux & { editor: any };
+type ExternalProps = { editor: any };
+type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
 
 function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
@@ -229,4 +230,12 @@ const connector = connect(
   {}
 );
 type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(ToggleWidgetButton);
+const ConnectedToggleWidgetButton = connector(ToggleWidgetButton);
+
+export default function ToggleWidgetButtonSuspenseWrapper(props: ExternalProps) {
+  return (
+    <Suspense fallback={null}>
+      <ConnectedToggleWidgetButton {...props} />
+    </Suspense>
+  );
+}

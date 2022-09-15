@@ -4,7 +4,6 @@ import { ASTState } from "devtools/client/debugger/src/reducers/ast";
 import type { AsyncRequestsState } from "devtools/client/debugger/src/reducers/async-requests";
 import { BoxModelState } from "devtools/client/inspector/boxmodel/reducers/box-model";
 import { BreakpointsState } from "devtools/client/debugger/src/selectors";
-import type { EventListenersState } from "devtools/client/debugger/src/selectors";
 import type { FileSearchState } from "devtools/client/debugger/src/selectors";
 import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
@@ -39,7 +38,6 @@ export interface UIState {
   classList: ClassListState;
   computed: ComputedState;
   contextMenus: ContextMenusState;
-  eventListenerBreakpoints: EventListenersState;
   sources: NewSourcesState;
   fileSearch: FileSearchState;
   hitCounts: HitCountsState;

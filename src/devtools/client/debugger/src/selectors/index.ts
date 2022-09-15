@@ -7,7 +7,6 @@ import type { UIState } from "ui/state";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 
 export * from "../reducers/tabs";
-export * from "../reducers/event-listeners";
 export * from "../reducers/pause";
 export * from "../reducers/threads";
 export * from "../reducers/breakpoints";

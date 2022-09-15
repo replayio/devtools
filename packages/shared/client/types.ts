@@ -62,13 +62,13 @@ export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?:
 
 export type ReplayClientEvents = "loadedRegionsChange";
 
-export type HitPointsStatus =
+export type HitPointStatus =
   | "complete"
   | "too-many-points-to-find"
   | "too-many-points-to-run-analysis"
   | "unknown-error";
 
-export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointsStatus];
+export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointStatus];
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;

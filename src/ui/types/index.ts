@@ -9,7 +9,6 @@ export type ExperimentalUserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
-  enableEventLink: boolean;
   enableTeams: boolean;
   enableLargeText: boolean;
 };
