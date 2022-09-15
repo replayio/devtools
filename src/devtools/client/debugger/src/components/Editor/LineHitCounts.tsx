@@ -183,7 +183,7 @@ function LineHitCounts({ sourceEditor }: Props) {
 
         updatedLineNumbers?.add(lineNumber);
 
-        const hitCount = hitCountMap?.get(lineNumber) || 0;
+        const hitCount = hitCountMap?.get(lineNumber + 1) || 0;
 
         // We use a gradient to indicate the "heat" (the number of hits).
         // This absolute hit count values are relative, per file.
