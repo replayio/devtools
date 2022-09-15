@@ -230,4 +230,5 @@ separately stack the pause line visuals and the code. */
 
 .editor-wrapper.showLineHits .CodeMirror-gutters .hit-markers {
   width: 30px;
+  position: relative;
 }

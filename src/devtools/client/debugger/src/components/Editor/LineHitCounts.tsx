@@ -1,4 +1,5 @@
 import { useMemo, useLayoutEffect, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
@@ -269,7 +270,27 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [focusRegion, hitCountMap]);
 
   // We're just here for the hooks!
-  return null;
+  // return null;
+  const scroller = sourceEditor.editor.getScrollerElement();
+  const hitsGutter = scroller.querySelector(".CodeMirror-gutter.hit-markers") as HTMLElement;
+  if (!hitsGutter) {
+    return;
+  }
+  console.log("Hits gutter: ", hitsGutter);
+  return createPortal(
+    <div
+      className="hitCountsOverlay"
+      style={{
+        position: "absolute",
+        width: "100%",
+        background: "linear-gradient(#e66465, #9198e5)",
+        top: 0,
+        left: 0,
+        height: "100%",
+      }}
+    ></div>,
+    hitsGutter
+  );
 }
 
 function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {
