@@ -7,8 +7,8 @@
 }
 
 .breakpoint-panel {
-  margin-bottom: 1px;
-  background: var(--theme-toolbar-background);
+  margin: 4px 0;
+  /* background: var(--theme-toolbar-background); */
   border: 1px solid var(--theme-splitter-color);
   border-left: none;
   border-right: none;
