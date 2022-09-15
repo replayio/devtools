@@ -91,7 +91,9 @@ function BreakpointNavigation({
   }
 
   return (
-    <div className={classnames("breakpoint-navigation justify-between p-1.5", { empty: isEmpty })}>
+    <div
+      className={classnames("breakpoint-navigation justify-between p-1.5 pr-4", { empty: isEmpty })}
+    >
       {!isEmpty && !analysisPoints?.error ? (
         <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
       ) : null}
