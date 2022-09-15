@@ -25,6 +25,7 @@ export default function KeyValueRenderer({
   before = null,
   context,
   enableInspection = true,
+  expandByDefault = false,
   layout = "horizontal",
   pauseId,
   protocolValue,
@@ -32,6 +33,7 @@ export default function KeyValueRenderer({
   before?: ReactNode;
   context: "console" | "default" | "nested";
   enableInspection?: boolean;
+  expandByDefault?: boolean;
   layout: "horizontal" | "vertical";
   pauseId: PauseId;
   protocolValue: ProtocolValue;
@@ -91,6 +93,7 @@ export default function KeyValueRenderer({
                       ) : null}
                     </>
                   }
+                  defaultOpen={expandByDefault}
                   object={objectWithPreview!}
                   pauseId={pauseId}
                   protocolValue={protocolValue}
@@ -165,6 +168,7 @@ export default function KeyValueRenderer({
             <PropertiesRenderer object={objectWithPreview!} pauseId={pauseId} />
           </Suspense>
         }
+        defaultOpen={expandByDefault}
         header={header}
         onChange={setIsExpanded}
       />
