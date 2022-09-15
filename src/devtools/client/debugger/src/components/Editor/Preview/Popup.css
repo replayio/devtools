@@ -6,7 +6,6 @@
   background: var(--theme-base-100);
   width: 400px;
   border: 1px solid var(--theme-splitter-color);
-  padding: 10px;
   height: auto;
   overflow: auto;
   max-height: 400px;
