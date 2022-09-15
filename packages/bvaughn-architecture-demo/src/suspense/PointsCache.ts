@@ -176,6 +176,23 @@ function findNearestCachedSortedExecutionPointIndex(time: number): number {
   }
 }
 
+// Does not suspend.
+// This method is safe to call outside of render.
+// It returns a cached object property if one has been previously loaded, or null.
+export function getCachedHitPointsForLocation(
+  location: Location,
+  condition: string | null,
+  focusRange: TimeStampedPointRange | null
+): HitPointsAndStatusTuple | null {
+  const key = getKey(location, condition, focusRange);
+  const record = locationToHitPointsMap.get(key);
+  if (record?.status === STATUS_RESOLVED) {
+    return record.value;
+  }
+
+  return null;
+}
+
 export function getClosestPointForTime(
   client: ReplayClientInterface,
   time: number
@@ -232,10 +249,7 @@ export function getHitPointsForLocation(
   // TODO We could add an optimization here to avoid re-fetching if we ever fetched all points (no focus range)
   // without any overflow, and then later fetch for a focus range. Right now we re-fetch in this case.
 
-  const locationKey = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
-  const key = focusRange
-    ? `${locationKey}:${focusRange.begin.point}:${focusRange.end.point}`
-    : locationKey;
+  const key = getKey(location, condition, focusRange);
   let record = locationToHitPointsMap.get(key);
   if (record == null) {
     const wakeable = createWakeable<HitPointsAndStatusTuple>();
@@ -257,6 +271,17 @@ export function getHitPointsForLocation(
   } else {
     throw record.value;
   }
+}
+
+function getKey(
+  location: Location,
+  condition: string | null,
+  focusRange: TimeStampedPointRange | null
+): string {
+  const locationKey = `${location.sourceId}:${location.line}:${location.column}:${condition}`;
+  return focusRange
+    ? `${locationKey}:${focusRange.begin.point}:${focusRange.end.point}`
+    : locationKey;
 }
 
 // Note that this method does not work with Suspense.

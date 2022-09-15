@@ -15,12 +15,10 @@ import {
   AnalysisEntry,
   TimeStampedPointRange,
 } from "@replayio/protocol";
-import uniqBy from "lodash/uniqBy";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { AnalysisError, MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
-import { compareNumericStrings } from "protocol/utils";
 import type { UIState } from "ui/state";
-import { filterToFocusRegion, isFocusRegionSubset } from "ui/utils/timeline";
+import { isFocusRegionSubset } from "ui/utils/timeline";
 
 import { getBreakpointsList } from "../selectors/breakpoints";
 import { getLocationKey, isMatchingLocation, isLogpoint } from "../utils/breakpoint";
@@ -404,37 +402,6 @@ export function getLogpointsForSource(state: UIState, sourceId: string) {
   return breakpoints.filter(bp => bp.location.sourceId === sourceId).filter(bp => isLogpoint(bp));
 }
 
-const customAnalysisResultComparator = (
-  a: LocationAnalysisSummary | undefined,
-  b: LocationAnalysisSummary | undefined
-) => {
-  if (!a && !b) {
-    // Both undefined is the same
-    return true;
-  } else if (!a || !b) {
-    // Only one undefined is different
-    return false;
-  }
-  const d1 = a.data;
-  const d2 = b.data;
-
-  // Verify that all point entries have identical sorted point/time values
-  let dataEqual =
-    d1.length === d2.length &&
-    d1.every((item, i) => {
-      const otherItem = d2[i];
-      const pointEqual = item.point === otherItem.point;
-      const timeEqual = item.time === otherItem.time;
-      return pointEqual && timeEqual;
-    });
-
-  const errorEqual = a.error === b.error;
-  const statusEqual = a.status === b.status;
-  const result = dataEqual && errorEqual && statusEqual;
-
-  return result;
-};
-
 export const getAnalysisMappingForLocation = (state: UIState, location: Location | null) => {
   if (!location) {
     return undefined;
@@ -473,124 +440,4 @@ export const getStatusFlagsForAnalysisEntry = (
     isFocusSubset,
     hasAllDataForFocusRegion,
   };
-};
-
-/**
- * Retrieves a unique sorted set of hit points for a given location based on analysis runs.
- * If there is no breakpoint active for the location or no analysis run, returns `undefined`.
- * Otherwise, returns the array of hit points, plus the `status/condition/error` from
- * the latest analysis run.
- */
-export const getAnalysisPointsForLocation = createSelector(
-  [
-    getAnalysisMappingForLocation,
-    (state: UIState) => state.breakpoints.analyses,
-    (state: UIState) => state.timeline.focusRegion,
-    (state: UIState, location: Location | null, condition: string | null = "") => condition,
-  ],
-  (mappingEntry, analyses, focusRegion, condition): LocationAnalysisSummary | undefined => {
-    // First, verify that we have a real location and a breakpoint mapping for that location
-    if (!mappingEntry) {
-      return undefined;
-    }
-
-    // We're going to use the _latest_ analysis run's status for display purposes.
-    const latestAnalysisEntry = analyses.entities[mappingEntry.currentAnalysis!];
-
-    if (!latestAnalysisEntry) {
-      return undefined;
-    }
-
-    const matchingEntries: AnalysisRequest[] = [];
-
-    // Next, filter down all analysis runs for this location, based on matching
-    // against the `condition` the user supplied, as well as whether we
-    // actually legitimately found points
-    mappingEntry.allAnalyses.forEach(analysisId => {
-      const analysisEntry = analyses.entities[analysisId];
-      // TODO Double-check undefined vs empty string conditions here
-      if (!analysisEntry || (analysisEntry.condition ?? "") !== condition) {
-        return;
-      }
-
-      const hasPoints = [
-        // Successful queries
-        AnalysisStatus.PointsRetrieved,
-        AnalysisStatus.Completed,
-        // Presumably got points first
-        AnalysisStatus.LoadingResults,
-        // Should have at least come back with _some_ points
-        AnalysisStatus.ErroredGettingPoints,
-        AnalysisStatus.ErroredRunning,
-      ].includes(analysisEntry.status);
-
-      if (hasPoints) {
-        matchingEntries.push(analysisEntry);
-      }
-    });
-
-    let finalPoints: PointDescription[] = [];
-
-    if (matchingEntries.length === 0) {
-      return undefined;
-    }
-
-    const pointsPerEntry = matchingEntries.map(entry => {
-      const { points = [], results = [] } = entry;
-      if (condition) {
-        // Currently the backend does not filter returned points by condition,
-        // only analysis results.  If there _is_ a condition, _and_ we have
-        // results back, we should filter the total points based on the analysis
-        // results.
-        if (entry.status === AnalysisStatus.Completed) {
-          const resultPointsSet = new Set<string>(results.map(result => result.key));
-          const filteredConditionPoints = points.filter(point => resultPointsSet.has(point.point));
-          return filteredConditionPoints;
-        }
-        // If there is a condition, but this analysis has not completed, we
-        // cannot trust the points it got back, since they will not be filtered.
-        return [];
-      }
-
-      return points;
-    });
-
-    const flattenedPoints = pointsPerEntry.flat();
-    const uniquePoints = uniqBy(flattenedPoints, item => item.point);
-    uniquePoints.sort((a, b) => compareNumericStrings(a.point, b.point));
-
-    // TODO `filterToFocusRegion` wants a pre-sorted array, but maybe a bit cheaper to filter first _then_ sort?
-    finalPoints = focusRegion ? filterToFocusRegion(uniquePoints, focusRegion) : uniquePoints;
-
-    const {
-      analysisLoaded,
-      analysisErrored,
-      isFocusSubset,
-      analysisOverflowed,
-      hasAllDataForFocusRegion,
-    } = getStatusFlagsForAnalysisEntry(latestAnalysisEntry, focusRegion);
-
-    return {
-      data: finalPoints,
-      error: latestAnalysisEntry.error,
-      status: latestAnalysisEntry.status,
-      condition: latestAnalysisEntry.condition,
-      isCompleted: hasAllDataForFocusRegion,
-    };
-  },
-  {
-    memoizeOptions: {
-      // Arbitrary number for cache size
-      maxSize: 100,
-      // Reuse old result if contents are the same
-      resultEqualityCheck: customAnalysisResultComparator,
-    },
-  }
-);
-
-const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
-
-export const getPointsForHoveredLineNumber = (state: UIState) => {
-  const location = getHoveredLineNumberLocation(state);
-  return getAnalysisPointsForLocation(state, location);
 };

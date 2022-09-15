@@ -23,7 +23,7 @@ function getSyntaxHighlightedMarkup(string: string) {
   return markup;
 }
 
-function Expression({ value, isEditable }: { value: string; isEditable: boolean }) {
+function Expression({ value }: { value: string }) {
   return (
     <div className={classNames({ expression: true })}>
       <div
@@ -39,14 +39,14 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
 
   return isEditable ? (
     <div className="group flex space-x-1 px-2 hover:text-primaryAccent">
-      <Expression value={value} isEditable={true} />
+      <Expression value={value} />
       <MaterialIcon className="pencil opacity-0" iconSize="xs">
         edit
       </MaterialIcon>
     </div>
   ) : (
     <div className="rounded-sm px-2">
-      <Popup trigger={<Expression value={value} isEditable={false} />}>
+      <Popup trigger={<Expression value={value} />}>
         {isTeamDeveloper ? (
           <>
             This log cannot be edited because <br />

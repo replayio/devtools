@@ -5,7 +5,6 @@ import { assert } from "protocol/utils";
 
 import analysisManager, { AnalysisHandler, AnalysisParams } from "protocol/analysisManager";
 import { comparePoints, pointPrecedes } from "protocol/execution-point-utils";
-import { Helpers } from "./logpoint";
 import { ThreadFront, ValueFront } from "protocol/thread";
 import { WiredMessage, RecordingTarget } from "protocol/thread/thread";
 import { Dictionary } from "@reduxjs/toolkit";
@@ -34,7 +33,18 @@ interface JestTestInfo {
 // which are associated with a test instead of a hook, returning the name
 // of the test and the point where the callback is invoked.
 const JestTestMapper = `
-${Helpers}
+const finalData = { frames: [], scopes: [], objects: [] };
+function addPauseData({ frames, scopes, objects }) {
+  finalData.frames.push(...(frames || []));
+  finalData.scopes.push(...(scopes || []));
+  finalData.objects.push(...(objects || []));
+}
+function getTopFrame() {
+  const { frame, data } = sendCommand("Pause.getTopFrame");
+  addPauseData(data);
+  return finalData.frames.find(f => f.frameId == frame);
+}
+
 const { point, time, pauseId } = input;
 const { frameId, functionName } = getTopFrame();
 const { result: isHookResult } = sendCommand("Pause.evaluateInFrame", {
@@ -73,7 +83,18 @@ return [{
 // Mapper extracting the "name" and "message" properties from a thrown exception
 // for use in test failure messages.
 const JestExceptionMapper = `
-${Helpers}
+const finalData = { frames: [], scopes: [], objects: [] };
+function addPauseData({ frames, scopes, objects }) {
+  finalData.frames.push(...(frames || []));
+  finalData.scopes.push(...(scopes || []));
+  finalData.objects.push(...(objects || []));
+}
+function getTopFrame() {
+  const { frame, data } = sendCommand("Pause.getTopFrame");
+  addPauseData(data);
+  return finalData.frames.find(f => f.frameId == frame);
+}
+
 const { point, time, pauseId } = input;
 const { frameId, location } = getTopFrame();
 const { exception, data: exceptionData } = sendCommand("Pause.getExceptionValue");

@@ -13,7 +13,6 @@ export const GET_USER_SETTINGS = gql`
       }
       settings {
         disableLogRocket
-        enableEventLink
         enableRepaint
         enableTeams
       }
