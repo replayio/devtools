@@ -49,15 +49,18 @@ function LineHitCounts({ sourceEditor }: Props) {
   );
   const focusRegion = useAppSelector(getFocusRegion);
   const logpointSources = useAppSelector(getLogpointSources);
-  const [itemHeight, setItemHeight] = useState(() => {
-    const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
-      "--theme-code-font-size"
-    );
-    console.log("Computed style font size: ", fontSize);
-    // const fontSize = 11;
-    // return Number(fontSize) * 1.4;
-    return 15;
-  });
+
+  const { value: enableLargeText } = useFeature("enableLargeText");
+
+  // const [itemHeight, setItemHeight] = useState(() => {
+  //   const fontSize = getComputedStyle(document.documentElement).getPropertyValue(
+  //     "--theme-code-font-size"
+  //   );
+  //   console.log("Computed style font size: ", fontSize);
+  //   // const fontSize = 11;
+  //   // return Number(fontSize) * 1.4;
+  //   return 15;
+  // });
 
   const previousFocusRegion = useRef<FocusRegion | null>(null);
   const previousHitCounts = useRef<Map<number, number> | null>(null);
@@ -200,23 +203,23 @@ function LineHitCounts({ sourceEditor }: Props) {
 
         const hitCount = hitCountMap?.get(lineNumber + 1) || 0;
 
-        // We use a gradient to indicate the "heat" (the number of hits).
-        // This absolute hit count values are relative, per file.
-        // Cubed root prevents high hit counts from lumping all other values together.
-        const NUM_GRADIENT_COLORS = 3;
-        let className = styles.HitsBadge0;
-        let index = NUM_GRADIENT_COLORS - 1;
-        if (hitCount > 0) {
-          if (minHitCount !== maxHitCount) {
-            index = Math.min(
-              NUM_GRADIENT_COLORS - 1,
-              Math.round(
-                ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-              )
-            );
-          }
-          className = styles[`HitsBadge${index + 1}`];
-        }
+        // // We use a gradient to indicate the "heat" (the number of hits).
+        // // This absolute hit count values are relative, per file.
+        // // Cubed root prevents high hit counts from lumping all other values together.
+        // const NUM_GRADIENT_COLORS = 3;
+        // let className = styles.HitsBadge0;
+        // let index = NUM_GRADIENT_COLORS - 1;
+        // if (hitCount > 0) {
+        //   if (minHitCount !== maxHitCount) {
+        //     index = Math.min(
+        //       NUM_GRADIENT_COLORS - 1,
+        //       Math.round(
+        //         ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+        //       )
+        //     );
+        //   }
+        //   className = styles[`HitsBadge${index + 1}`];
+        // }
 
         if (features.disableUnHitLines) {
           if (hitCount > 0) {
@@ -228,29 +231,29 @@ function LineHitCounts({ sourceEditor }: Props) {
           }
         }
 
-        const info = editor.lineInfo(lineNumber);
+        // const info = editor.lineInfo(lineNumber);
 
-        let markerNode: HTMLDivElement;
-        if (info?.gutterMarkers?.["hit-markers"]) {
-          // Retrieve the marker DOM node we already created
-          markerNode = info.gutterMarkers["hit-markers"];
-        } else {
-          markerNode = document.createElement("div");
-          // markerNode.onclick = () =>
-          //   updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
+        // let markerNode: HTMLDivElement;
+        // if (info?.gutterMarkers?.["hit-markers"]) {
+        //   // Retrieve the marker DOM node we already created
+        //   markerNode = info.gutterMarkers["hit-markers"];
+        // } else {
+        //   markerNode = document.createElement("div");
+        //   // markerNode.onclick = () =>
+        //   //   updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
 
-          // editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
-        }
+        //   // editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
+        // }
 
-        // markerNode.className = className;
-        if (!isCollapsed) {
-          let hitsLabel = "";
-          if (hitCount > 0) {
-            hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
-          }
-          // markerNode.textContent = hitsLabel;
-        }
-        markerNode.title = `${hitCount} hits`;
+        // // markerNode.className = className;
+        // if (!isCollapsed) {
+        //   let hitsLabel = "";
+        //   if (hitCount > 0) {
+        //     hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+        //   }
+        //   // markerNode.textContent = hitsLabel;
+        // }
+        // markerNode.title = `${hitCount} hits`;
       });
     };
 
@@ -287,26 +290,62 @@ function LineHitCounts({ sourceEditor }: Props) {
   // return null;
   const scroller = sourceEditor.editor.getScrollerElement();
 
+  const logpointsForSource = logpointSources.find(entry => entry.source?.id === sourceId);
+
   useLayoutEffect(() => {
     return sourceEditor.editor.on("scroll", () => {
       hitCountsListRef.current?.scrollTo(scroller.scrollTop);
     });
   }, [sourceId, sourceEditor.editor, scroller]);
 
+  useLayoutEffect(() => {
+    if (logpointsForSource) {
+      // `react-window` caches item sizes after they've been measured.
+      // If we have print statements, we need to force it to measure those
+      // lines so it knows they're bigger than normal, and can use those
+      // in its positioning calculations for later lines.
+      // That way if we are viewing lines far past the line with the print statement,
+      // `react-window` should take those larger lines into account and work right.
+      // HACK Synchronously force `react-window` to draw and check sizes of
+      // each print statement in this file...
+      for (let printStatement of logpointsForSource.breakpoints) {
+        hitCountsListRef.current?.scrollToItem(printStatement.location.line);
+      }
+
+      // Then reset the scroll position to match the actual editor
+      hitCountsListRef.current?.scrollTo(scroller.scrollTop);
+    }
+  }, [logpointsForSource, scroller]);
+
   const hitsGutter = scroller.querySelector(".CodeMirror-gutter.hit-markers") as HTMLElement;
   if (!hitsGutter) {
     return null;
   }
 
-  const logpointEntry = logpointSources.find(entry => entry.source?.id === sourceId);
+  const lineHandle = sourceEditor.editor.getLineHandle(1);
+  const numPrintStatements = logpointsForSource?.breakpoints.length || 0;
+  const firstLineRect = scroller.querySelector(".CodeMirror-line")?.getBoundingClientRect();
+
+  const defaultItemHeight = firstLineRect
+    ? Number(firstLineRect.height.toFixed(4))
+    : // ? firstLineRect.height /**/
+      15;
+  const EXPECTED_PRINT_STATEMENT_HEIGHT = 94;
+  // console.log("First line info: ", lineHandle, lineInfo, firstLineRect);
+
+  const totalLines = sourceEditor.editor.lineCount();
+
+  const totalDocumentHeight = scroller.getBoundingClientRect().height;
+  const combinedPrintStatementSize = EXPECTED_PRINT_STATEMENT_HEIGHT * numPrintStatements;
+  const estimatedSize = (totalDocumentHeight - combinedPrintStatementSize) / (totalLines || 1);
 
   return createPortal(
     <div
       className="hitCountsOverlay"
+      // Match the positioning of the now-empty hit counts gutter inside of CodeMirror
       style={{
         position: "absolute",
         width: "100%",
-        // background: "linear-gradient(#e66465, #9198e5)",
         top: 0,
         left: 0,
         height: "100%",
@@ -314,19 +353,33 @@ function LineHitCounts({ sourceEditor }: Props) {
       }}
     >
       <List
-        height={scroller.getBoundingClientRect().height}
-        itemCount={sourceEditor.editor.lineCount()}
-        key={sourceId + logpointEntry?.breakpoints.length}
+        height={totalDocumentHeight}
+        itemCount={totalLines}
+        estimatedItemSize={estimatedSize}
+        // Force recreating the list if any of these change
+        key={`${sourceId}${logpointsForSource?.breakpoints.length}${enableLargeText}`}
         itemSize={index => {
-          if (logpointEntry) {
-            const bp = logpointEntry.breakpoints.find(bp => bp.location.line === index + 1);
+          const lineHandle = sourceEditor.editor.getLineHandle(index);
+          // @ts-expect-error `LineHandle` is an opaque type and `.height`` isn't documented
+          const itemHeight: number = lineHandle?.height ?? defaultItemHeight;
+
+          // // if (index % 100 === 0) {
+          // //   const lineInfo = sourceEditor.editor.lineInfo(lineHandle);
+          // //   console.log("Individual line info: ", lineHandle, lineInfo);
+          // // }
+
+          if (logpointsForSource) {
+            const bp = logpointsForSource.breakpoints.find(bp => bp.location.line === index + 1);
             if (bp) {
+              console.log("Line with print statement: ", index, lineHandle, itemHeight);
               // const lineHandle = sourceEditor.editor.getLineHandle(index);
               // const lineInfo = sourceEditor.editor.lineInfo(lineHandle);
               // console.log("Line: ", index + 1, "bp: ", bp, "info: ", lineInfo);
-              return 94 + itemHeight;
+              // return 94 + itemHeight;
+              return itemHeight;
             }
           }
+
           return itemHeight;
         }}
         itemData={{
@@ -334,6 +387,7 @@ function LineHitCounts({ sourceEditor }: Props) {
           minHitCount,
           maxHitCount,
           isCollapsed,
+          defaultItemHeight,
         }}
         overscanCount={50}
         width={gutterWidth}
@@ -355,13 +409,14 @@ interface HitCountsRowProps {
     minHitCount: number;
     maxHitCount: number;
     isCollapsed: boolean;
+    defaultItemHeight: number;
   };
 }
 
 const NUM_GRADIENT_COLORS = 3;
 
 const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
-  const { hitCountMap, minHitCount, maxHitCount, isCollapsed } = data;
+  const { hitCountMap, minHitCount, maxHitCount, isCollapsed, defaultItemHeight } = data;
   const lineNumber = index + 1;
   const hitCount = hitCountMap?.get(lineNumber) || 0;
 
@@ -382,13 +437,14 @@ const HitCountsRow = ({ index, style, data }: HitCountsRowProps) => {
     if (hitCount > 0) {
       hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
     }
-    // markerNode.textContent = hitsLabel;
   }
   const title = `${hitCount} hits (line: ${lineNumber})`;
 
   return (
     <div style={style} title={title}>
-      <div className={className}>{hitsLabel}</div>
+      <div className={className} style={{ height: defaultItemHeight }}>
+        {hitsLabel}
+      </div>
     </div>
   );
 };
