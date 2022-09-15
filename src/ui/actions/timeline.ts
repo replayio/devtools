@@ -65,7 +65,7 @@ import {
 } from "../reducers/timeline";
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 
-import { getLoadedRegions } from "./app";
+import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 import { UIState } from "ui/state";
 
@@ -124,7 +124,9 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
     }
-    ThreadFront.timeWarp(point, time, hasFrames);
+    if (isPointInLoadingRegion(state, point)) {
+      ThreadFront.timeWarp(point, time, hasFrames);
+    }
   };
 }
 
