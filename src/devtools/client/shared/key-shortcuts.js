@@ -117,15 +117,21 @@ KeyShortcuts.parseElectronKey = function (window, str) {
   for (const mod of modifiers) {
     if (mod === "Alt") {
       shortcut.alt = true;
-    }
-    if (["Command", "Cmd"].includes(mod)) {
+    } else if (["Command", "Cmd"].includes(mod)) {
       shortcut.meta = true;
-    }
-    if (["Control", "Ctrl"].includes(mod)) {
+    } else if (["CommandOrControl", "CmdOrCtrl"].includes(mod)) {
+      if (isOSX) {
+        shortcut.meta = true;
+      } else {
+        shortcut.ctrl = true;
+      }
+    } else if (["Control", "Ctrl"].includes(mod)) {
       shortcut.ctrl = true;
-    }
-    if (mod === "Shift") {
+    } else if (mod === "Shift") {
       shortcut.shift = true;
+    } else {
+      console.error("Unsupported modifier:", mod, "from key:", str);
+      return null;
     }
   }
 
@@ -199,11 +205,9 @@ KeyShortcuts.parseXulKey = function (modifiers, shortcut) {
     .map(mod => {
       if (mod == "alt") {
         return "Alt";
-      }
-      if (mod == "shift") {
+      } else if (mod == "shift") {
         return "Shift";
-      }
-      if (mod == "accel") {
+      } else if (mod == "accel") {
         return "CmdOrCtrl";
       }
       return mod;
