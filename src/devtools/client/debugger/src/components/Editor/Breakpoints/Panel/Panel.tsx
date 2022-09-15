@@ -91,6 +91,12 @@ function Panel({
         )
       : [null, null];
 
+  // If we were fully using concurrent APIs, updates to something like focus range or breakpoint would be done in a transition,
+  // which would expose an "is pending" flag that we could use to show e.g. "Loading..." while we're updating breakpoints.
+  // In this case, since we're using the deferred API for this, we have to calculate the "is pending" flag ourselves.
+  const isPending =
+    unsafeFocusRegion !== unsafeFocusRegionForSuspense || breakpoint !== breakpointForSuspense;
+
   // HACK
   // The TimeStampedPoints within the focus region are always at least as large as (often larger than) the user-defined time range.
   // Because of this, hit points may be returned that fall outside of the user's selection.
@@ -197,10 +203,11 @@ function Panel({
             </div>
           </div>
           <BreakpointNavigation
+            key={breakpoint?.options.condition}
             breakpoint={breakpoint!}
             editing={editing}
-            hitPoints={filteredHitPoints}
-            hitPointStatus={hitPointStatus}
+            hitPoints={isPending ? null : filteredHitPoints}
+            hitPointStatus={isPending ? null : hitPointStatus}
             showCondition={showCondition}
             setShowCondition={setShowCondition}
           />

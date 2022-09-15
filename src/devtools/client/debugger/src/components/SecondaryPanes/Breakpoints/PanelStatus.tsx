@@ -35,7 +35,9 @@ export function PanelStatus({
     case "too-many-points-to-run-analysis":
       break;
     default:
-      if (hitPointsLength === 0) {
+      if (hitPoints === null) {
+        status = "Loading";
+      } else if (hitPointsLength === 0) {
         status = "No hits";
       } else {
         const previousTimeIndex = sortedLastIndex(

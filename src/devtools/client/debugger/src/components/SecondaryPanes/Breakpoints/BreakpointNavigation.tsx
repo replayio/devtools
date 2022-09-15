@@ -86,10 +86,10 @@ function BreakpointNavigation({
   return (
     <div className={classnames("breakpoint-navigation justify-between p-1.5", { empty: isEmpty })}>
       <BreakpointNavigationCommands prev={prev} next={next} navigateToPoint={navigateToPoint} />
-      {!error ? (
+      {!error && hitPoints ? (
         <BreakpointTimeline
           breakpoint={breakpoint}
-          hitPoints={hitPoints!}
+          hitPoints={hitPoints}
           hitPointStatus={hitPointStatus!}
         />
       ) : (
