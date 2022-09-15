@@ -92,7 +92,7 @@ export function hideRequestDetails() {
 
 export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
   return async (dispatch, getState, { ThreadFront, protocolClient }) => {
-    const state = getState();
+    let state = getState();
     const request = getRequestById(state, requestId);
     const loadedRegions = getLoadedRegions(state);
 
@@ -115,8 +115,10 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     const timeStampedPoint = requestSummary.point;
     const pause = ThreadFront.ensurePause(timeStampedPoint.point, timeStampedPoint.time);
     const frames = (await pause.getFrames())?.filter(Boolean) || [];
-    const formattedFrames = await Promise.all(
-      frames?.map((frame, i) => createFrame(getState, frame, i))
+    await ThreadFront.ensureAllSources();
+    state = getState();
+    const formattedFrames = frames?.map((frame, i) =>
+      createFrame(state.sources, ThreadFront.preferredGeneratedSources, frame, i)
     );
     dispatch({
       type: "SET_FRAMES",

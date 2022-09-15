@@ -10,6 +10,10 @@ export function setErrorHandler(customErrorHandler: ErrorHandler) {
   errorHandler = customErrorHandler;
 }
 
+export function handleError(err: any) {
+  errorHandler(err);
+}
+
 export function makeInfallible(fn: (...args: any[]) => void, thisv?: any) {
   return (...args: any[]) => {
     try {

@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
-import type { Location, TimeStampedPoint, ScopeType, PauseDescription } from "@replayio/protocol";
+import type { Location, TimeStampedPoint, ScopeType, Value } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 import { getPreferredLocation } from "ui/reducers/sources";
 
@@ -36,7 +36,7 @@ export interface PauseFrame {
   displayName: string;
   location: Location;
   alternateLocation?: Location;
-  this?: ValueFront;
+  this: Value | ValueFront;
   source: SourceDetails | null;
   index: number;
   asyncCause?: "async";
@@ -125,7 +125,11 @@ export const executeCommandOperation = createAsyncThunk<
     return { location: null };
   }
 
-  const location = getPreferredLocation(state, resp.frame, ThreadFront.preferredGeneratedSources);
+  const location = getPreferredLocation(
+    state.sources,
+    resp.frame,
+    ThreadFront.preferredGeneratedSources
+  );
 
   return { location };
 });
@@ -195,12 +199,13 @@ export const fetchFrames = createAsyncThunk<
   { cx: Context; pauseId: string },
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/fetchFrames", async ({ cx, pauseId }, thunkApi) => {
-  const frames = (await thunkApi.extra.ThreadFront.getFrames()) ?? [];
-  const resultFrames = await Promise.all(
-    frames.map((frame, i) => createFrame(thunkApi.getState, frame, i))
+  const { ThreadFront } = thunkApi.extra;
+  const frames = (await ThreadFront.getFrames()) ?? [];
+  await ThreadFront.ensureAllSources();
+  const state = thunkApi.getState();
+  return frames.map((frame, i) =>
+    createFrame(state.sources, ThreadFront.preferredGeneratedSources, frame, i)
   );
-  // TS says there could be nulls, but not seeing them in practice
-  return resultFrames as PauseFrame[];
 });
 
 export const fetchAsyncFrames = createAsyncThunk<
@@ -211,6 +216,8 @@ export const fetchAsyncFrames = createAsyncThunk<
   "pause/fetchAsyncFrames",
   async ({ cx }, thunkApi) => {
     const { ThreadFront } = thunkApi.extra;
+    await ThreadFront.ensureAllSources();
+    const state = thunkApi.getState();
     let asyncFrames: PauseFrame[] = [];
 
     // How many times to fetch an async set of parent frames.
@@ -226,11 +233,11 @@ export const fetchAsyncFrames = createAsyncThunk<
       if (!frames.length) {
         break;
       }
-      const wiredFrames = await Promise.all(
-        frames.map((frame, i) => createFrame(thunkApi.getState, frame, i, asyncIndex))
+      const pauseFrames = frames.map((frame, i) =>
+        createFrame(state.sources, ThreadFront.preferredGeneratedSources, frame, i, asyncIndex)
       );
 
-      asyncFrames = asyncFrames.concat(wiredFrames as PauseFrame[]);
+      asyncFrames = asyncFrames.concat(pauseFrames);
     }
 
     if (!asyncFrames.length) {

@@ -34,7 +34,7 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
     await ThreadFront.ensureAllSources();
     const state = getState();
     const locations = positions.map(({ frame }) =>
-      getPreferredLocation(state, frame!, ThreadFront.preferredGeneratedSources)
+      getPreferredLocation(state.sources, frame!, ThreadFront.preferredGeneratedSources)
     );
 
     const combinedPositions = zip(positions, locations).map(([position, location]) => {

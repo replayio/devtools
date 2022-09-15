@@ -74,7 +74,11 @@ const formatEventListener = (
   let location: Location | undefined = undefined;
   let locationUrl: string | undefined = undefined;
   if (functionLocation) {
-    location = getPreferredLocation(state, functionLocation, ThreadFront.preferredGeneratedSources);
+    location = getPreferredLocation(
+      state.sources,
+      functionLocation,
+      ThreadFront.preferredGeneratedSources
+    );
 
     locationUrl = functionLocation?.length > 0 ? sourcesById[location.sourceId]?.url : undefined;
   }

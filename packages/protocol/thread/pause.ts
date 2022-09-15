@@ -16,6 +16,8 @@ import {
   getAllBoundingClientRectsResult,
 } from "@replayio/protocol";
 
+import cloneDeep from "lodash/cloneDeep";
+
 import { client } from "../socket";
 import { defer, assert, Deferred, EventEmitter } from "../utils";
 
@@ -121,6 +123,8 @@ export class Pause {
   frames: Map<FrameId, WiredFrame>;
   scopes: Map<ScopeId, WiredScope>;
   objects: Map<ObjectId, WiredObject>;
+  rawFrames: Map<FrameId, Frame>;
+  rawScopes: Map<ScopeId, Scope>;
   frameSteps: Map<string, PointDescription[]>;
   documentNode: NodeFront | undefined;
   domFronts: Map<string, DOMFront>;
@@ -149,6 +153,8 @@ export class Pause {
     this.frames = new Map();
     this.scopes = new Map();
     this.objects = new Map();
+    this.rawFrames = new Map();
+    this.rawScopes = new Map();
 
     this.frameSteps = new Map();
 
@@ -242,10 +248,19 @@ export class Pause {
       if (!this.frames.has(f.frameId)) {
         this.frames.set(f.frameId, f as WiredFrame);
       }
+      if (!this.rawFrames.has(f.frameId)) {
+        const rawFrame = cloneDeep(f);
+        this.ThreadFront.updateMappedLocation(rawFrame.location);
+        this.ThreadFront.updateMappedLocation(rawFrame.functionLocation);
+        this.rawFrames.set(f.frameId, rawFrame);
+      }
     });
     (scopes || []).forEach(s => {
       if (!this.scopes.has(s.scopeId)) {
         this.scopes.set(s.scopeId, s as WiredScope);
+      }
+      if (!this.rawScopes.has(s.scopeId)) {
+        this.rawScopes.set(s.scopeId, cloneDeep(s));
       }
     });
     (objects || []).forEach(o => {

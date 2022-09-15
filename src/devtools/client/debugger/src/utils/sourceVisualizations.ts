@@ -4,8 +4,8 @@ import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
-import { getMappedLocation } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
-import { getBreakpointPositions } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   SourceDetails,
   isOriginalSource,
@@ -159,7 +159,7 @@ function getAlternateSourceIdForPosition(
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const lineLocations = getBreakpointPositions(client, source.id);
+  const lineLocations = getBreakpointPositionsSuspense(client, source.id);
   const breakableLine = Math.min(
     ...lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );
@@ -170,7 +170,7 @@ function getAlternateSourceIdForPosition(
   }
 
   let breakableColumn = breakableLineLocations.columns[0];
-  const mappedLocation = getMappedLocation(client, {
+  const mappedLocation = getMappedLocationSuspense(client, {
     sourceId: source.id,
     line: breakableLine,
     column: breakableColumn,

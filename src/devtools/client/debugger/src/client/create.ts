@@ -5,21 +5,22 @@
 //
 // This module converts Firefox specific types to the generic types
 
-import { getPreferredLocation, getAlternateLocation } from "ui/reducers/sources";
+import { Frame } from "@replayio/protocol";
+import { WiredFrame } from "protocol/thread/pause";
+import { getPreferredLocation, getAlternateLocation, SourcesState } from "ui/reducers/sources";
+import { PauseFrame } from "../reducers/pause";
 
-export async function createFrame(getState, frame, index = 0, asyncIndex = 0) {
-  if (!frame) {
-    return null;
-  }
-
-  const { ThreadFront } = await import("protocol/thread");
-  await ThreadFront.ensureAllSources();
-  const state = getState();
-
+export function createFrame(
+  sources: SourcesState,
+  preferredGeneratedSources: Set<string>,
+  frame: Frame | WiredFrame,
+  index = 0,
+  asyncIndex = 0
+): PauseFrame {
   const { sourceId, line, column } = getPreferredLocation(
-    state,
+    sources,
     frame.location,
-    ThreadFront.preferredGeneratedSources
+    preferredGeneratedSources
   );
   const location = {
     sourceId,
@@ -28,11 +29,7 @@ export async function createFrame(getState, frame, index = 0, asyncIndex = 0) {
   };
 
   let alternateLocation;
-  const alternate = await getAlternateLocation(
-    state,
-    frame.location,
-    ThreadFront.preferredGeneratedSources
-  );
+  const alternate = getAlternateLocation(sources, frame.location, preferredGeneratedSources);
   if (alternate) {
     alternateLocation = {
       sourceId: alternate.sourceId,
