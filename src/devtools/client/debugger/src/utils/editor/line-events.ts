@@ -29,7 +29,10 @@ const isHoveredOnGutter = (target: HTMLElement) => !!target.closest(".CodeMirror
 const getLineNodeFromGutterTarget = (target: HTMLElement) =>
   target.closest(".CodeMirror-gutter-wrapper")!.parentElement!.querySelector(".CodeMirror-line");
 
-function isValidTarget(target: HTMLElement) {
+function isValidTarget(target?: HTMLElement) {
+  if (!target) {
+    return false;
+  }
   const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
@@ -38,7 +41,10 @@ function isValidTarget(target: HTMLElement) {
   );
 }
 
-function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
+function emitLineMouseEnter(codeMirror: $FixTypeLater, target?: HTMLElement) {
+  if (!target) {
+    return;
+  }
   trackEventOnce("editor.mouse_over");
   const lineNode = isHoveredOnLine(target)
     ? target.closest(".CodeMirror-line")
