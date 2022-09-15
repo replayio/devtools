@@ -125,8 +125,8 @@ function Panel({
   return (
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
       <div
-        className="breakpoint-panel-wrapper mx-3 my-2"
-        style={{ width: `${width}px` }}
+        className="breakpoint-panel-wrapper"
+        style={{ width: `${width + 30}px` }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
@@ -139,7 +139,7 @@ function Panel({
             }}
           >
             <PrefixBadgeButton breakpoint={breakpoint!} />
-            <div className="min-w-0 flex-1">
+            <div className="flex-1 min-w-0">
               {editing ? (
                 <PanelEditor
                   breakpoint={breakpoint}
