@@ -33,7 +33,7 @@ interface ELProps {
 type FinalELProps = PropsFromRedux & ELProps;
 
 class EmptyLines extends Component<FinalELProps> {
-  _rafId: number | null = null;
+  _idCallbackId: number | null = null;
 
   componentDidMount() {
     this.disableEmptyLinesRaf();
@@ -44,8 +44,8 @@ class EmptyLines extends Component<FinalELProps> {
   }
 
   componentWillUnmount() {
-    if (this._rafId) {
-      cancelAnimationFrame(this._rafId);
+    if (this._idCallbackId) {
+      cancelIdleCallback(this._idCallbackId);
     }
 
     const { editor, lower, upper } = this.props;
@@ -58,12 +58,12 @@ class EmptyLines extends Component<FinalELProps> {
   }
 
   disableEmptyLinesRaf = () => {
-    if (this._rafId) {
-      cancelAnimationFrame(this._rafId);
+    if (this._idCallbackId) {
+      clearTimeout(this._idCallbackId);
     }
 
-    this._rafId = requestAnimationFrame(() => {
-      this._rafId = null;
+    this._idCallbackId = requestIdleCallback(() => {
+      this._idCallbackId = null;
       this.disableEmptyLines();
     });
   };
