@@ -3,17 +3,19 @@ import { connect, ConnectedProps } from "react-redux";
 import * as actions from "ui/actions/app";
 import { AvatarImage } from "ui/components/Avatar";
 import hooks from "ui/hooks";
-import { useGetUserInfo } from "ui/hooks/users";
+import { useGetUserInfo, UserInfo } from "ui/hooks/users";
 import * as selectors from "ui/reducers/app";
 import { UIState } from "ui/state";
 import { SettingsTabTitle } from "ui/state/app";
 import useAuth0 from "ui/utils/useAuth0";
+import { useFeature, useBoolPref } from "ui/hooks/settings";
 
 import APIKeys from "../APIKeys";
 import ExternalLink from "../ExternalLink";
 import SettingsModal from "../SettingsModal";
 import { SettingsBodyHeader } from "../SettingsModal/SettingsBody";
 import { Settings } from "../SettingsModal/types";
+import { CheckboxRow } from "./CheckboxRow";
 
 import ExperimentalSettings from "./ExperimentalSettings";
 import PreferencesSettings from "./PreferencesSettings";
@@ -121,7 +123,48 @@ function UserAPIKeys() {
   );
 }
 
-const getSettings = (): Settings<SettingsTabTitle, {}> => [
+function Advanced() {
+  const { value: logTelemetryEvent, update: updateLogTelemetryEvent } =
+    useBoolPref("logTelemetryEvent");
+  const { value: protocolTimeline, update: updateProtocolTimeline } =
+    useFeature("protocolTimeline");
+  const { value: logProtocol, update: updateLogProtocol } = useFeature("logProtocol");
+
+  return (
+    <div>
+      <div className="mb-4">
+        <CheckboxRow
+          id={"mixpanel"}
+          onChange={() => updateLogTelemetryEvent(!logTelemetryEvent)}
+          checked={logTelemetryEvent}
+          label={"Log Mixpanel events to the console"}
+          description={""}
+        />
+      </div>
+      <div className="mb-4">
+        <CheckboxRow
+          id={"protocol-timeline"}
+          onChange={() => updateProtocolTimeline(!protocolTimeline)}
+          checked={protocolTimeline}
+          label={"Visualize protocol events in the timeline"}
+          description={""}
+        />
+      </div>
+
+      <div className="mb-4">
+        <CheckboxRow
+          id={"protocol-viewer"}
+          onChange={() => updateLogProtocol(!logProtocol)}
+          checked={logProtocol}
+          label={"View protocol requests and responses in the panel"}
+          description={""}
+        />
+      </div>
+    </div>
+  );
+}
+
+const getSettings = (user: UserInfo): Settings<SettingsTabTitle, {}> => [
   {
     title: "Personal",
     icon: "person",
@@ -153,15 +196,26 @@ const getSettings = (): Settings<SettingsTabTitle, {}> => [
     icon: "gavel",
     component: Legal,
   },
+  {
+    title: "Advanced",
+    icon: "api",
+    component: Advanced,
+  },
 ];
 
 export function UserSettingsModal(props: PropsFromRedux) {
-  const { features: orgFeatures, loading: orgFeaturesLoading } = hooks.useGetUserInfo();
+  const user = hooks.useGetUserInfo();
   const view = props.view === "preferences" ? "Preferences" : props.defaultSettingsTab;
   const hiddenTabs = [];
 
-  if (!orgFeatures.library) {
-    hiddenTabs.push("API Keys");
+  if (user) {
+    if (!user.features.library) {
+      hiddenTabs.push("API Keys");
+    }
+
+    if (!user.internal) {
+      hiddenTabs.push("Advanced");
+    }
   }
 
   return (
@@ -169,8 +223,8 @@ export function UserSettingsModal(props: PropsFromRedux) {
       hiddenTabs={hiddenTabs}
       tab={view}
       panelProps={{}}
-      settings={getSettings()}
-      loading={orgFeaturesLoading}
+      settings={getSettings(user)}
+      loading={user.loading}
     />
   );
 }
