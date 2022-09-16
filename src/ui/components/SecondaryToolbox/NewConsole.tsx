@@ -53,6 +53,7 @@ import { rangeForFocusRegion } from "ui/utils/timeline";
 
 import styles from "./NewConsole.module.css";
 import { ConsoleNag } from "../shared/Nags/Nags";
+import useTerminalHistory from "./useTerminalHistory";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -101,7 +102,9 @@ export default function NewConsoleRoot() {
 function JSTermWrapper() {
   const [_, searchActions] = useContext(SearchContext);
   const { addMessage } = useContext(TerminalContext);
-  const [terminalExpressionHistory, setTerminalExpressionHistory] = useState<string[]>([]);
+
+  const recordingId = useGetRecordingId();
+  const [terminalExpressionHistory, setTerminalExpressionHistory] = useTerminalHistory(recordingId);
 
   // Note that the "frameId" the protocol expects is actually the "protocolId" and NOT the "frameId"
   const frame = useAppSelector(getSelectedFrame);
@@ -136,7 +139,7 @@ function JSTermWrapper() {
       return;
     }
 
-    setTerminalExpressionHistory(prev => [...prev, expression]);
+    setTerminalExpressionHistory(expression);
 
     addMessage({
       expression,
