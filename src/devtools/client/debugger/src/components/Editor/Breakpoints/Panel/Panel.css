@@ -154,10 +154,6 @@ non-editing markup */
   flex: 1;
 }
 
-.breakpoint-panel .summary.enabled:hover {
-  background: var(--breakpoint-editfield-hover);
-}
-
 .breakpoint-panel .summary .statement:hover {
   cursor: pointer;
 }
