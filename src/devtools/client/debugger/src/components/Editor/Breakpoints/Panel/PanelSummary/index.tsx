@@ -104,7 +104,7 @@ export default function PanelSummary({
 
   return (
     <div
-      className={classNames("summary flex items-center gap-1 text-gray-500", { enabled: isLoaded })}
+      className={classNames("summary flex items-center gap-2 text-gray-500", { enabled: isLoaded })}
     >
       <div className="flex flex-col flex-grow statements-container">
         {conditionValue && (
