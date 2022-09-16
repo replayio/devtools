@@ -19,6 +19,10 @@
   overflow: hidden;
 }
 
+.breakpoint-panel .CodeMirror-lines {
+  background-color: transparent !important;
+}
+
 .breakpoint-panel .button-container {
   padding: 8px;
 }
@@ -50,12 +54,12 @@
   line-height: 16px;
   padding: 4px;
   white-space: nowrap;
-  background-color: #28303e;
+  background-color: var(--theme-base-85);
   border-radius: 0.25rem;
 }
 
 .breakpoint-panel .statement:hover {
-  background-color: #303a4a;
+  background-color: var(--theme-base-90);
 }
 
 .breakpoint-panel .statement:first-child {
@@ -74,7 +78,9 @@
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   width: 100%;
-  background-color: var(--breakpoint-editfield-active);
+  min-height: 28px;
+  padding-top: 2px;
+  background-color: var(--theme-base-90);
   caret-color: yellow;
 }
 
@@ -133,7 +139,6 @@ non-editing markup */
 }
 
 .breakpoint-panel .summary .statement:hover .expression {
-  /* background-image: linear-gradient(to right, var(--breakpoint-tip) 50%, transparent 0%); */
   background-position: 1px 14px;
   background-size: 5px 1.5px;
   background-repeat: repeat-x;

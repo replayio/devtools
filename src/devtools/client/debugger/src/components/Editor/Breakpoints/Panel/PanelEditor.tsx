@@ -97,12 +97,9 @@ class PanelEditor extends PureComponent<Props, State> {
 
     return (
       <div
-        className={classnames(
-          "panel-editor items-top flex flex-row items-start gap-1 rounded-sm bg-breakpointEditfieldActive",
-          {
-            conditional: showCondition,
-          }
-        )}
+        className={classnames("panel-editor items-top flex flex-row items-start gap-1 rounded-sm", {
+          conditional: showCondition,
+        })}
       >
         <PanelForm
           {...{

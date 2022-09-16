@@ -70,10 +70,10 @@ export default function PanelForm({
   };
 
   return (
-    <form className="relative flex flex-grow flex-col space-y-0.5 py-0.5">
+    <form className="relative flex flex-grow flex-col space-y-0.5">
       {showCondition ? (
         <div className="form-row">
-          <div className="mr-1 w-6 flex-shrink-0">if</div>
+          <div className="flex-shrink-0 w-6 mr-1">if</div>
           <PanelInput
             autofocus={inputToFocus == "condition"}
             value={condition}
@@ -84,7 +84,7 @@ export default function PanelForm({
         </div>
       ) : null}
       <div className="form-row">
-        {showCondition ? <div className="mr-1 w-6 flex-shrink-0">log</div> : null}
+        {showCondition ? <div className="flex-shrink-0 w-6 mr-1">log</div> : null}
         <PanelInput
           autofocus={inputToFocus == "logValue"}
           value={logValue}
