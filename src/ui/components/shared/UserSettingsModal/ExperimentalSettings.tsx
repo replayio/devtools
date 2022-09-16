@@ -40,6 +40,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
       "Allow the backend to return previously generated responses without re-running the request",
     key: "enableQueryCache",
   },
+  {
+    label: "Detailed loading bar",
+    description:
+      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
+    key: "basicProcessingLoadingBar",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -80,6 +86,9 @@ export default function ExperimentalSettings({}) {
     useFeature("profileWorkerThreads");
   const { value: enableQueryCache, update: updateEnableQueryCache } =
     useFeature("enableQueryCache");
+  const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
+    "basicProcessingLoadingBar"
+  );
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -92,10 +101,13 @@ export default function ExperimentalSettings({}) {
       updateProfileWorkerThreads(!profileWorkerThreads);
     } else if (key === "enableQueryCache") {
       updateEnableQueryCache(!enableQueryCache);
+    } else if (key === "basicProcessingLoadingBar") {
+      updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     }
   };
 
   const localSettings = {
+    basicProcessingLoadingBar,
     enableColumnBreakpoints,
     enableResolveRecording,
     enableQueryCache,

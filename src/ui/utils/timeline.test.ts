@@ -7,6 +7,7 @@ import {
   getTimeFromPosition,
   isFocusRegionSubset,
   isValidTimeString,
+  mergeSortedPointLists,
   overlap,
 } from "./timeline";
 
@@ -229,5 +230,34 @@ describe("filterToFocusRegion", () => {
       point(15),
       point(20),
     ]);
+  });
+});
+
+describe("mergeSortedPointLists", () => {
+  fit("will correctly interleave overlapping ranges", () => {
+    expect(mergeSortedPointLists([point(5), point(10)], [point(7), point(12)])).toEqual([
+      point(5),
+      point(7),
+      point(10),
+      point(12),
+    ]);
+  });
+
+  fit("will correctly concat non-overlapping ranges", () => {
+    expect(mergeSortedPointLists([point(5), point(7)], [point(10), point(12)])).toEqual([
+      point(5),
+      point(7),
+      point(10),
+      point(12),
+    ]);
+  });
+
+  fit("will raise an error if things are not sorted", () => {
+    expect(() =>
+      mergeSortedPointLists([point(7), point(5)], [point(10), point(12)])
+    ).toThrowError();
+    expect(() =>
+      mergeSortedPointLists([point(5), point(7)], [point(12), point(10)])
+    ).toThrowError();
   });
 });

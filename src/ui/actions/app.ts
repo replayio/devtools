@@ -1,4 +1,3 @@
-import { createEntityAdapter } from "@reduxjs/toolkit";
 import { UIStore, UIThunkAction } from ".";
 import { unprocessedRegions, KeyboardEvent } from "@replayio/protocol";
 import * as selectors from "ui/reducers/app";

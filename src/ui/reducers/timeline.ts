@@ -2,11 +2,17 @@ import { TimeStampedPoint } from "@replayio/protocol";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
 import { FocusRegion, HoveredItem, TimelineState, ZoomRegion } from "ui/state/timeline";
-import { displayedEndForFocusRegion, displayedBeginForFocusRegion } from "ui/utils/timeline";
+import {
+  displayedEndForFocusRegion,
+  displayedBeginForFocusRegion,
+  mergeSortedPointLists,
+} from "ui/utils/timeline";
 import sortBy from "lodash/sortBy";
+import maxBy from "lodash/maxBy";
 
 function initialTimelineState(): TimelineState {
   return {
+    allPaintsReceived: false,
     currentTime: 0,
     focusRegion: null,
     focusRegionBackup: null,
@@ -14,6 +20,7 @@ function initialTimelineState(): TimelineState {
     hoveredItem: null,
     playback: null,
     playbackPrecachedTime: 0,
+    paints: [{ time: 0, point: "0" }],
     points: [{ time: 0, point: "0" }],
     recordingDuration: null,
     shouldAnimate: true,
@@ -47,41 +54,32 @@ const timelineSlice = createSlice({
       state.focusRegion = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
-      let actionIndex = 0;
-      let stateIndex = 0;
-
-      const received = sortBy(action.payload, x => BigInt(x.point));
-
-      while (actionIndex < received.length) {
-        const actionPoint = received[actionIndex];
-
-        let stateIndexPoint = state.points[stateIndex];
-
-        if (stateIndexPoint == null) {
-          state.points.push(actionPoint);
-          actionIndex++;
-        } else if (actionPoint.time === stateIndexPoint.time) {
-          // Don't add duplicates.
-          actionIndex++;
-        } else if (actionPoint.time < stateIndexPoint.time) {
-          state.points.splice(stateIndex, 0, actionPoint);
-          actionIndex++;
-          stateIndex++;
-        } else {
-          stateIndex++;
-        }
-      }
+      state.points = mergeSortedPointLists(
+        state.points,
+        sortBy(action.payload, p => BigInt(p.point))
+      );
+    },
+    paintsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
+      state.paints = mergeSortedPointLists(
+        state.paints,
+        sortBy(action.payload, p => BigInt(p.point))
+      );
+    },
+    allPaintsReceived(state, action: PayloadAction<boolean>) {
+      state.allPaintsReceived = action.payload;
     },
   },
 });
 
 export const {
+  allPaintsReceived,
   setHoveredItem,
   setPlaybackPrecachedTime,
   setPlaybackStalled,
   setFocusRegion,
   setTimelineState,
   pointsReceived,
+  paintsReceived,
 } = timelineSlice.actions;
 
 export default timelineSlice.reducer;
@@ -96,6 +94,19 @@ export const getUnprocessedRegions = (state: UIState) => state.timeline.unproces
 export const getRecordingDuration = (state: UIState) => state.timeline.recordingDuration;
 export const getTimelineDimensions = (state: UIState) => state.timeline.timelineDimensions;
 export const getHoveredItem = (state: UIState) => state.timeline.hoveredItem;
+export const getPaints = (state: UIState) => state.timeline.paints;
+export const getPoints = (state: UIState) => state.timeline.points;
+export const getBasicProcessingProgress = (state: UIState) => {
+  if (state.timeline.allPaintsReceived) {
+    return 1.0;
+  }
+  const maxPaint = state.timeline.paints[state.timeline.paints.length - 1];
+  const maxPoint = state.timeline.points[state.timeline.points.length - 1];
+  if (!maxPoint || maxPoint.point === "0") {
+    return 0.0;
+  }
+  return (1.0 * (maxPaint?.time || 0)) / maxPoint.time;
+};
 export const getPlaybackPrecachedTime = (state: UIState) => state.timeline.playbackPrecachedTime;
 export const getFocusRegion = (state: UIState) => state.timeline.focusRegion;
 export const getFocusRegionBackup = (state: UIState) => state.timeline.focusRegionBackup;

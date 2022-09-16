@@ -163,6 +163,8 @@ export function createSocket(
       }
 
       const experimentalSettings: ExperimentalSettings = {
+        // Uncomment this to get a new session every time you refresh
+        // controllerKey: String(Math.floor(Math.random() * 10e8)),
         listenForMetrics: !!prefs.listenForMetrics,
         disableCache: !!prefs.disableCache || !!features.profileWorkerThreads,
         disableQueryCache: !features.enableQueryCache,

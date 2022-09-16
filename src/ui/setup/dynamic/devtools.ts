@@ -10,7 +10,7 @@ import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
-import { Canvas, setupGraphics } from "protocol/graphics";
+import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -24,7 +24,12 @@ import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
-import timeline, { pointsReceived, setPlaybackStalled } from "ui/reducers/timeline";
+import timeline, {
+  allPaintsReceived,
+  paintsReceived,
+  pointsReceived,
+  setPlaybackStalled,
+} from "ui/reducers/timeline";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 import {
   setMouseDownEventsCallback,
@@ -253,6 +258,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   const onPointsReceived = debounce(() => {
     store.dispatch(pointsReceived(points));
+    store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
     points = [];
   }, 1_000);
 
@@ -261,9 +267,14 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     onPointsReceived();
   });
 
+  setAllPaintsReceivedCallback((received: boolean) => {
+    store.dispatch(allPaintsReceived(received));
+  });
+
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
   });
+
   setVideoUrlCallback((url: string) => {
     store.dispatch(setVideoUrl(url));
   });

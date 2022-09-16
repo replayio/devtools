@@ -86,10 +86,18 @@ export default function JSTerm({
     } else if (e.key === Keys.ARROW_UP && editor.getCursor().line === 0) {
       e.preventDefault();
 
-      if (historyIndex !== null && historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        const newValue = terminalExpressionHistory[newIndex];
+      let newIndex = null;
+      let newValue = null;
 
+      if (historyIndex === null) {
+        newIndex = terminalExpressionHistory.length - 1;
+        newValue = terminalExpressionHistory[newIndex];
+      } else {
+        newIndex = historyIndex - 1;
+        newValue = terminalExpressionHistory[newIndex];
+      }
+
+      if (newIndex >= 0 && newValue != null) {
         setHistoryIndex(newIndex);
         setValue(newValue);
       }
