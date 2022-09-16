@@ -54,12 +54,13 @@
   line-height: 16px;
   padding: 4px;
   white-space: nowrap;
-  background-color: var(--theme-base-85);
+  background-color: var(--theme-text-field-bgcolor);
   border-radius: 0.25rem;
+  transition: background-color 180ms ease-out;
 }
 
 .breakpoint-panel .statement:hover {
-  background-color: var(--theme-base-90);
+  background-color: var(--theme-text-field-bgcolor-hover);
 }
 
 .breakpoint-panel .statement:first-child {
