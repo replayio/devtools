@@ -6,14 +6,41 @@ export type DialogPropTypes = HTMLProps<HTMLDivElement>;
 
 export function Dialog({ children, className, ...props }: DialogPropTypes) {
   return (
-    <div
-      {...props}
-      className={classNames("dialog flex flex-col items-center", className)}
-      role="dialog"
-      style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
-    >
-      {children}
-    </div>
+    <>
+      <div
+        {...props}
+        className={classNames("dialog flex flex-col items-center", className)}
+        role="dialog"
+        style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
+      >
+        {children}
+      </div>
+      <div>
+        <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
+          <div>
+            <div className="flex space-x-2">
+              <div>
+                <a className="hover:underline" href="http://docs.replay.io">
+                  Documentation
+                </a>
+              </div>
+              <div className="text-gray-300">•</div>
+              <div>
+                <a className="hover:underline" href="http://replay.io/discord/">
+                  Discord
+                </a>
+              </div>
+              <div className="text-gray-300">•</div>
+              <div>
+                <a className="hover:underline" href="mailto:support@replay.io">
+                  Email support
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
