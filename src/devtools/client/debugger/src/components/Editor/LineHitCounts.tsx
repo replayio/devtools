@@ -239,16 +239,23 @@ function LineHitCounts({ sourceEditor }: Props) {
       });
     };
 
-    editor.on("change", drawLines);
-    editor.on("swapDoc", drawLines);
+    let idCallbackId: number | null = null;
+    const drawLinesRaf = () => {
+      idCallbackId = requestIdleCallback(drawLines);
+    };
 
-    const rafId = requestAnimationFrame(drawLines);
+    editor.on("change", drawLinesRaf);
+    editor.on("swapDoc", drawLinesRaf);
+
+    drawLinesRaf();
 
     return () => {
-      cancelAnimationFrame(rafId);
+      if (idCallbackId !== null) {
+        cancelIdleCallback(idCallbackId);
+      }
 
-      editor.off("change", drawLines);
-      editor.off("swapDoc", drawLines);
+      editor.off("change", drawLinesRaf);
+      editor.off("swapDoc", drawLinesRaf);
     };
   }, [
     sourceEditor,
