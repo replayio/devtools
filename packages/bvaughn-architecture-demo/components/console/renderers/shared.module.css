@@ -5,15 +5,18 @@
   margin-top: -1px;
   padding: 0.25rem 0.1rem;
   padding-left: 1.5rem;
-  border-top: 1px solid var(--background-color-contrast-1);
   border-bottom: 1px solid var(--background-color-contrast-1);
   position: relative;
 }
 .ErrorRow {
   background-color: var(--background-color-error);
   color: var(--color-error);
+
+  border-top: 1px solid var(--border-color-error);
   border-color: var(--border-color-error);
-  z-index: 5;
+
+  /* Ensure error borders are visible above non-error rows */
+  z-index: 2;
 
   --color-default: var(--color-error);
   --value-type-string: var(--color-error);
@@ -21,7 +24,11 @@
 .WarningRow {
   background-color: var(--background-color-warning);
   color: var(--color-warning);
+  border-top: 1px solid var(--border-color-warning);
   border-color: var(--border-color-warning);
+
+  /* Ensure warning borders are visible above regular rows */
+  z-index: 1;
 
   --color-default: var(--color-warning);
   --value-type-string: var(--color-warning);
@@ -130,21 +137,18 @@
 
 .ColorBadge,
 .UnicornBadge {
-  position: absolute;
-  left: 0.25rem;
+  position: relative;
   display: inline-block;
   width: 0.5rem;
   height: 0.5rem;
-  flex: 0 0 0.5rem;
-  margin: 0 0.25rem;
+  margin: 0 0.5rem 0 -1rem;
 }
 .ColorBadge {
-  top: 0.75rem;
   border-radius: 0.5rem;
   background-color: var(--badge-color);
 }
 .UnicornBadge {
-  top: 0.5rem;
+  top: 0.25rem;
   overflow: visible;
 }
 .Unicorn {

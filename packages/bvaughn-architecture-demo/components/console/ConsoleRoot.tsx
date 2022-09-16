@@ -71,8 +71,6 @@ export default function ConsoleRoot({
 
           <FilterText />
 
-          <div className={styles.Divider} />
-
           <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
             <div className={styles.FilterColumn}>
               <Suspense fallback={<Loader />}>

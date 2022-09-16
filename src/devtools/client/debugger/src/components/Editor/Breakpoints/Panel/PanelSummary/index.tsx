@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { AddCommentButton } from "components";
+import { AddCommentButton } from "design";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
@@ -79,13 +79,13 @@ export default function PanelSummary({
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
     return (
-      <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">
+      <div className="flex items-center rounded-t summary bg-errorBgcolor text-errorColor">
         <Popup
           trigger={
-            <div className="flex items-center space-x-2 overflow-hidden pl-2">
+            <div className="flex items-center pl-2 space-x-2 overflow-hidden">
               <MaterialIcon className="text-xl">error</MaterialIcon>
               <span
-                className="cursor-pointer overflow-hidden overflow-ellipsis whitespace-pre"
+                className="overflow-hidden whitespace-pre cursor-pointer overflow-ellipsis"
                 onClick={() => dispatch(enterFocusMode())}
               >
                 Use Focus Mode to reduce the number of hits.
@@ -106,7 +106,7 @@ export default function PanelSummary({
     <div
       className={classNames("summary flex items-center gap-1 text-gray-500", { enabled: isLoaded })}
     >
-      <div className="statements-container flex flex-grow flex-col">
+      <div className="flex flex-col flex-grow statements-container">
         {conditionValue && (
           <Condition
             isEditable={isEditable}
@@ -122,7 +122,7 @@ export default function PanelSummary({
         />
         {!isTeamDeveloper ? (
           <Popup
-            trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}
+            trigger={<span className="text-gray-400 cursor-default material-icons">lock</span>}
           >
             Editing logpoints is available for Developers in the Team plan
           </Popup>

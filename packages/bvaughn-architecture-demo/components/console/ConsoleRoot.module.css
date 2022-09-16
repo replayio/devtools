@@ -44,18 +44,12 @@
   display: inline-block;
 }
 
-.Divider {
-  grid-column: 1 / -1;
-  grid-row: 2;
-  height: 1px;
-  background-color: var(--background-color-default);
-}
-
 .FilterColumn {
   grid-column: 1;
   overflow: auto;
   height: 100%;
   max-width: 12rem;
+  border-top: 1px solid var(--background-color-default);
   border-right: 1px solid var(--background-color-default);
 }
 
@@ -64,6 +58,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  border-top: 1px solid var(--background-color-default);
 }
 
 .ConsoleRootOpen .MessageColumn {
