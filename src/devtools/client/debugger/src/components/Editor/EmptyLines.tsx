@@ -33,15 +33,21 @@ interface ELProps {
 type FinalELProps = PropsFromRedux & ELProps;
 
 class EmptyLines extends Component<FinalELProps> {
+  _rafId: number | null = null;
+
   componentDidMount() {
-    this.disableEmptyLines();
+    this.disableEmptyLinesRaf();
   }
 
   componentDidUpdate() {
-    this.disableEmptyLines();
+    this.disableEmptyLinesRaf();
   }
 
   componentWillUnmount() {
+    if (this._rafId) {
+      cancelAnimationFrame(this._rafId);
+    }
+
     const { editor, lower, upper } = this.props;
 
     editor.codeMirror.operation(() => {
@@ -50,6 +56,17 @@ class EmptyLines extends Component<FinalELProps> {
       });
     });
   }
+
+  disableEmptyLinesRaf = () => {
+    if (this._rafId) {
+      cancelAnimationFrame(this._rafId);
+    }
+
+    this._rafId = requestAnimationFrame(() => {
+      this._rafId = null;
+      this.disableEmptyLines();
+    });
+  };
 
   disableEmptyLines() {
     const { breakableLines, editor, lower, upper } = this.props;

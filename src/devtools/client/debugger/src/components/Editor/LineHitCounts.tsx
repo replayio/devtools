@@ -242,9 +242,11 @@ function LineHitCounts({ sourceEditor }: Props) {
     editor.on("change", drawLines);
     editor.on("swapDoc", drawLines);
 
-    drawLines();
+    const rafId = requestAnimationFrame(drawLines);
 
     return () => {
+      cancelAnimationFrame(rafId);
+
       editor.off("change", drawLines);
       editor.off("swapDoc", drawLines);
     };
