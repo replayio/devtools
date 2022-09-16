@@ -1,3 +1,10 @@
+.Root {
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  position: relative;
+}
+
 .TextFade {
   white-space: nowrap;
   /* 100ms duration must match constant in component */
@@ -21,6 +28,9 @@
   transition: width 180ms ease-out;
   width: 26px;
   background-color: var(--primary-accent);
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 
 .AddCommentButton svg {
