@@ -37,20 +37,32 @@ testSetup(async function regeneratorFunction({ page }) {
   // Global terminal expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
   await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '"Line 1\\nLine 2"');
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/global");
   await page.keyboard.press("Enter");
 
   // Load Pause data for local expressions
+  // Create Pause data for each message
+  await toggleProtocolMessages(page, false);
+  await toggleProtocolMessage(page, "logs", true);
   const firstListItem = await locateMessage(page, "console-log", "This is a log");
-  await seekToMessage(page, firstListItem);
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
-  await page.keyboard.press("Enter");
   const lastListItem = await locateMessage(page, "console-log", "This is a trace");
   await seekToMessage(page, lastListItem);
+  await seekToMessage(page, firstListItem);
+
+  // Run evaluations
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '{foo: "bar"}');
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '{"href": location.href}');
+  await page.keyboard.press("Enter");
 
   // Event type data
+  await toggleProtocolMessage(page, "logs", false);
   await page.click("[data-test-id=EventCategoryHeader-Mouse]");
   await page.click('[data-test-id="EventTypes-event.mouse.click"]');
   const eventTypeListItem = await locateMessage(page, "event", "MouseEvent");
@@ -399,10 +411,20 @@ test("should evaluate terminal expressions without an execution point", async ({
   await takeScreenshot(page, newListItem, "global-terminal-expression-valid");
 });
 
+test("should support terminal expressions with line breaks", async ({ page }) => {
+  await setup(page);
+
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '"Line 1\\nLine 2"');
+  await page.keyboard.press("Enter");
+
+  const newListItem = await locateMessage(page, "terminal-expression");
+  await takeScreenshot(page, newListItem, "terminal-expression-with-line-breaks");
+});
+
 test("should evaluate and render invalid terminal expressions", async ({ page }) => {
   await setup(page);
 
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/global");
   await page.keyboard.press("Enter");
 
   const newListItem = await locateMessage(page, "terminal-expression");
@@ -414,15 +436,15 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
 
   await toggleProtocolMessage(page, "logs", true);
 
-  let firstListItem = await page.locator("[data-test-name=Message]").first();
-  await seekToMessage(page, firstListItem);
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
 
   await toggleProtocolMessages(page, false);
 
   // Add some expressions
   await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
   await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
   await page.keyboard.press("Enter");
 
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(2);
@@ -434,6 +456,26 @@ test("should show a button to clear terminal expressions", async ({ page }) => {
   // Verify an empty terminal
   expect(await getElementCount(page, "[data-test-name=Message]")).toBe(0);
   expect(await getElementCount(page, "[data-test-id=ClearConsoleEvaluationsButton]")).toBe(0);
+});
+
+test("should escape object expressions in terminal expressions", async ({ page }) => {
+  await setup(page);
+
+  await toggleProtocolMessage(page, "logs", true);
+
+  const listItem = await locateMessage(page, "console-log", "This is a log");
+  await seekToMessage(page, listItem);
+
+  await toggleProtocolMessages(page, false);
+
+  // Add some expressions (local and remote)
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '{foo: "bar"}');
+  await page.keyboard.press("Enter");
+  await page.fill("[data-test-id=ConsoleTerminalInput]", '{"href": location.href}');
+  await page.keyboard.press("Enter");
+
+  const list = page.locator("[data-test-name=Messages]");
+  await takeScreenshot(page, list, "auto-escaped-terminal-expressions");
 });
 
 // TODO Add context menu test for setting focus range

@@ -42,6 +42,7 @@ let inFlightWakeable: Wakeable<ProtocolMessage[]> | null = null;
 let inFlightFocusRange: TimeStampedPointRange | null = null;
 
 let lastFetchDidOverflow: boolean = false;
+let lastFetchError: any | null = null;
 let lastFetchedFocusRange: TimeStampedPointRange | null = null;
 let lastFetchedMessages: ProtocolMessage[] | null = null;
 
@@ -86,24 +87,30 @@ export function getMessages(
 
   // We only need to refetch data if one of the following conditions is true.
   let shouldFetch = false;
-  if (lastFetchedMessages === null) {
-    // We have not yet fetched it at all.
-    shouldFetch = true;
-  } else if (lastFetchDidOverflow && !isRangeEqual(lastFetchedFocusRange, focusRange)) {
-    // The most recent time we fetched it "overflowed" (too many messages to send them all),
-    // and we're trying to fetch a different region.
-    //
-    // There are two things to note about this case.
-    // 1. When devtools is first opened, there is no focused region.
-    //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
-    // 2. We shouldn't compare the new focus region to the most recent focus region,
-    //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
-    //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
-    //    (unless our fetches have overflowed at some point).
-    shouldFetch = true;
-  } else if (!isRangeSubset(lastFetchedFocusRange, focusRange)) {
-    // The new focus region is outside of the most recent region we fetched messages for.
-    shouldFetch = true;
+  if (lastFetchError !== null) {
+    if (!isRangeEqual(lastFetchedFocusRange, focusRange)) {
+      shouldFetch = true;
+    }
+  } else {
+    if (lastFetchedMessages === null) {
+      // We have not yet fetched it at all.
+      shouldFetch = true;
+    } else if (lastFetchDidOverflow && !isRangeEqual(lastFetchedFocusRange, focusRange)) {
+      // The most recent time we fetched it "overflowed" (too many messages to send them all),
+      // and we're trying to fetch a different region.
+      //
+      // There are two things to note about this case.
+      // 1. When devtools is first opened, there is no focused region.
+      //    This is equivalent to focusing on the entire timeline, so we often won't need to refetch messages when focusing for the first time.
+      // 2. We shouldn't compare the new focus region to the most recent focus region,
+      //    but rather to the most recent focus region that we fetched messages for (the entire timeline in many cases).
+      //    If we don't need to refetch after zooming in, then we won't need to refetch after zooming back out either,
+      //    (unless our fetches have overflowed at some point).
+      shouldFetch = true;
+    } else if (!isRangeSubset(lastFetchedFocusRange, focusRange)) {
+      // The new focus region is outside of the most recent region we fetched messages for.
+      shouldFetch = true;
+    }
   }
 
   if (shouldFetch) {
@@ -114,6 +121,10 @@ export function getMessages(
     fetchMessages(client, focusRange, wakeable);
 
     throw inFlightWakeable;
+  }
+
+  if (lastFetchError) {
+    throw lastFetchError;
   }
 
   // TODO (FE-533) Filter Firefox internal browser exceptions (see isFirefoxInternalMessage)
@@ -223,6 +234,7 @@ async function fetchMessages(
       inFlightWakeable = null;
 
       lastFetchDidOverflow = overflow;
+      lastFetchError = null;
       lastFetchedFocusRange = focusRange;
       lastFetchedMessages = protocolMessage;
 
@@ -242,6 +254,11 @@ async function fetchMessages(
     inFlightWakeable = null;
 
     console.error("getMessage() Error for range", printPointRange(focusRange), error);
+
+    lastFetchDidOverflow = false;
+    lastFetchError = error;
+    lastFetchedFocusRange = focusRange;
+    lastFetchedMessages = null;
 
     wakeable.reject(error);
   }

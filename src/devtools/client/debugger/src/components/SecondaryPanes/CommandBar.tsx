@@ -26,25 +26,27 @@ const isMacOS = appinfo.OS === "Darwin";
 
 // NOTE: the "resume" command will call either the resume
 // depending on whether or not the debugger is paused or running
-const COMMANDS = ["resume", "stepOver", "stepIn", "stepOut"] as const;
+const COMMANDS = ["resume", "reverseStepOver", "stepOver", "stepIn", "stepOut"] as const;
 type PossibleCommands = typeof COMMANDS[number];
 
 const KEYS = {
   WINNT: {
     resume: "F8",
+    reverseStepOver: "Shift+F10",
     stepOver: "F10",
     stepIn: "F11",
     stepOut: "Shift+F11",
   },
   Darwin: {
     resume: "Cmd+\\",
+    reverseStepOver: "Cmd+Shift+'",
     stepOver: "Cmd+'",
     stepIn: "Cmd+;",
-    stepOut: "Cmd+Shift+:",
-    stepOutDisplay: "Cmd+Shift+;",
+    stepOut: "Cmd+Shift+;",
   },
   Linux: {
     resume: "F8",
+    reverseStepOver: "Shift+F10",
     stepOver: "F10",
     stepIn: "F11",
     stepOut: "Shift+F11",
@@ -73,7 +75,6 @@ function formatKey(action: string) {
 }
 
 class CommandBar extends Component<PropsFromRedux> {
-  commandBarNode = React.createRef<HTMLDivElement>();
   // @ts-expect-error it gets initialized in cDM
   shortcuts: KeyShortcuts | null;
 
@@ -86,7 +87,10 @@ class CommandBar extends Component<PropsFromRedux> {
   }
 
   componentDidMount() {
-    this.shortcuts = new KeyShortcuts({ window, target: this.commandBarNode.current });
+    this.shortcuts = new KeyShortcuts({
+      window,
+      target: document.body,
+    });
     const shortcuts = this.shortcuts;
 
     COMMANDS.forEach(action =>
@@ -239,11 +243,7 @@ class CommandBar extends Component<PropsFromRedux> {
   }
 
   render() {
-    return (
-      <div className="command-bar" ref={this.commandBarNode}>
-        {this.renderReplayButtons()}
-      </div>
-    );
+    return <div className="command-bar">{this.renderReplayButtons()}</div>;
   }
 }
 

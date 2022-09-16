@@ -2,13 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import { UIState } from "ui/state";
-import { setLogpoint, setLogpointByURL, newLogGroupId, removeLogpoint } from "ui/actions/logpoint";
 import type { ThreadFront as TF } from "protocol/thread";
 import { assert } from "protocol/utils";
+import { ReplayClientInterface } from "shared/client/types";
+import { getCorrespondingSourceIds, getSourceToDisplayForUrl } from "ui/reducers/sources";
+import { UIState } from "ui/state";
 
 import type { BreakpointOptions, SourceLocation } from "../../reducers/types";
-import { getCorrespondingSourceIds, getSourceToDisplayForUrl } from "ui/reducers/sources";
 
 export type InitialBreakpointOptions = Pick<
   BreakpointOptions,
@@ -35,31 +35,16 @@ function locationKey(location: SourceLocation) {
   return `${sourceUrl}:${sourceId}:${line}:${column}`;
 }
 
-function maybeGenerateLogGroupId(options: InitialBreakpointOptions): FinalBreakpointOptions {
-  if (options.logValue) {
-    return { ...options, logGroupId: newLogGroupId() };
-  }
-  return options;
-}
-
-async function maybeClearLogpoint(location: SourceLocation) {
-  const bp = breakpoints[locationKey(location)];
-  if (bp && bp.options.logGroupId) {
-    removeLogpoint(bp.options.logGroupId);
-  }
-}
-
 export async function _internalSetBreakpoint(
+  replayClient: ReplayClientInterface,
   ThreadFront: typeof TF,
   state: UIState,
   location: SourceLocation,
   options: InitialBreakpointOptions
 ) {
-  maybeClearLogpoint(location);
-  const finalOptions = maybeGenerateLogGroupId(options);
-  breakpoints[locationKey(location)] = { location, options: finalOptions };
+  breakpoints[locationKey(location)] = { location, options };
 
-  const { condition, logValue, logGroupId, shouldPause } = finalOptions;
+  const { condition, shouldPause } = options;
   const { line, column, sourceUrl, sourceId } = location;
   const promises = [];
 
@@ -67,13 +52,15 @@ export async function _internalSetBreakpoint(
     if (shouldPause) {
       const correspondingSourceIds = getCorrespondingSourceIds(state, sourceId);
       for (const correspondingSourceId of correspondingSourceIds) {
-        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+        promises.push(
+          ThreadFront.setBreakpoint(
+            correspondingSourceId,
+            line,
+            column || 0,
+            condition || undefined
+          )
+        );
       }
-    }
-    if (logValue) {
-      promises.push(
-        setLogpoint(logGroupId!, { sourceId, line, column: column! }, logValue, condition!)
-      );
     }
   } else {
     if (shouldPause) {
@@ -82,13 +69,15 @@ export async function _internalSetBreakpoint(
       assert(source, `no source found for ${sourceUrl}`);
       const correspondingSourceIds = getCorrespondingSourceIds(state, source.id);
       for (const correspondingSourceId of correspondingSourceIds) {
-        promises.push(ThreadFront.setBreakpoint(correspondingSourceId, line, column!, condition!));
+        promises.push(
+          ThreadFront.setBreakpoint(
+            correspondingSourceId,
+            line,
+            column || 0,
+            condition || undefined
+          )
+        );
       }
-    }
-    if (logValue) {
-      promises.push(
-        setLogpointByURL(logGroupId!, sourceUrl!, line, column!, logValue, condition!, state)
-      );
     }
   }
 
@@ -100,7 +89,6 @@ export async function _internalRemoveBreakpoint(
   state: UIState,
   location: SourceLocation
 ) {
-  maybeClearLogpoint(location);
   delete breakpoints[locationKey(location)];
 
   const { line, column, sourceUrl, sourceId } = location;

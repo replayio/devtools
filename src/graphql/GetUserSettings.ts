@@ -20,7 +20,6 @@ export interface GetUserSettings_viewer_apiKeys {
 export interface GetUserSettings_viewer_settings {
   __typename: "AuthenticatedUserSettings";
   disableLogRocket: boolean;
-  enableEventLink: boolean;
   enableRepaint: boolean;
   enableTeams: boolean;
 }

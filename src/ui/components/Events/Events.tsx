@@ -45,7 +45,6 @@ function Events({ currentTime, events, executionPoint, seek }: PropsFromRedux) {
                 event={e}
                 currentTime={currentTime}
                 executionPoint={executionPoint}
-                showLink={userSettings.enableEventLink}
               />
             </div>
           </div>

@@ -29,7 +29,6 @@ const emptySettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableEventLink: false,
   enableTeams: true,
   enableLargeText: false,
 };
@@ -38,7 +37,6 @@ const testSettings: ExperimentalUserSettings = {
   apiKeys: [],
   defaultWorkspaceId: null,
   disableLogRocket: false,
-  enableEventLink: false,
   enableTeams: true,
   enableLargeText: false,
 };
@@ -124,6 +122,30 @@ export const useStringPref = (prefKey: keyof typeof prefs) => {
   };
 };
 
+export const useBoolPref = (prefKey: keyof typeof prefs) => {
+  const fullKey = `devtools.${prefKey}`;
+  const [pref, setPref] = useState(prefsService.getBoolPref(fullKey));
+
+  const updateValue = useMemo(
+    () => (newValue: boolean) => prefsService.setBoolPref(fullKey, newValue),
+    [fullKey]
+  );
+
+  useEffect(() => {
+    const onUpdate = (prefs: any) => {
+      setPref(prefs.getBoolPref(fullKey));
+    };
+
+    prefsService.addObserver(fullKey, onUpdate, false);
+    return () => prefsService.removeObserver(fullKey, onUpdate);
+  }, [fullKey]);
+
+  return {
+    value: pref,
+    update: updateValue,
+  };
+};
+
 function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUserSettings {
   if (!data?.viewer) {
     return emptySettings;
@@ -134,30 +156,21 @@ function convertUserSettings(data: GetUserSettings | undefined): ExperimentalUse
     apiKeys: data.viewer.apiKeys as ApiKey[],
     defaultWorkspaceId: data.viewer.defaultWorkspace?.id || null,
     disableLogRocket: settings.disableLogRocket,
-    enableEventLink: settings.enableEventLink,
     enableTeams: settings.enableTeams,
     enableLargeText: false,
   };
 }
 
-type MutableSettings = Extract<SettingItemKey, "disableLogRocket" | "enableEventLink">;
+type MutableSettings = Extract<SettingItemKey, "disableLogRocket">;
 
 type GqlPair = {
   disableLogRocket: [UpdateUserSettingsLogRocket, UpdateUserSettingsLogRocketVariables];
-  enableEventLink: [UpdateUserSettingsEventLink, UpdateUserSettingsEventLinkVariables];
 };
 
 const SETTINGS_MUTATIONS: Record<MutableSettings, DocumentNode> = {
   disableLogRocket: gql`
     mutation UpdateUserSettingsLogRocket($newValue: Boolean) {
       updateUserSettings(input: { disableLogRocket: $newValue }) {
-        success
-      }
-    }
-  `,
-  enableEventLink: gql`
-    mutation UpdateUserSettingsEventLink($newValue: Boolean) {
-      updateUserSettings(input: { enableEventLink: $newValue }) {
         success
       }
     }

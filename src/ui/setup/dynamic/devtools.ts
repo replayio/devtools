@@ -4,20 +4,13 @@ import debounce from "lodash/debounce";
 // Side-effectful import, has to be imported before event-listeners
 // Ordering matters here
 import "devtools/client/inspector/prefs";
-import { setupEventListeners } from "devtools/client/debugger/src/actions/event-listeners";
-import { setupExceptions } from "devtools/client/debugger/src/actions/logExceptions";
 import * as dbgClient from "devtools/client/debugger/src/client";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import { bootstrapWorkers } from "devtools/client/debugger/src/utils/bootstrap";
 import { setupDebuggerHelper } from "devtools/client/debugger/src/utils/dbg";
-import { setupMessages } from "devtools/client/webconsole/actions/messages";
 import { setupNetwork } from "devtools/client/webconsole/actions/network";
-import consoleReducers from "devtools/client/webconsole/reducers";
-import { getConsoleInitialState } from "devtools/client/webconsole/store";
-import { prefs as consolePrefs } from "devtools/client/webconsole/utils/prefs";
 import { initOutputSyntaxHighlighting } from "devtools/client/webconsole/utils/syntax-highlighted";
-import { Canvas, setupGraphics } from "protocol/graphics";
-import { setupLogpoints } from "ui/actions/logpoint";
+import { Canvas, setAllPaintsReceivedCallback, setupGraphics } from "protocol/graphics";
 // eslint-disable-next-line no-restricted-imports
 import { initSocket, addEventListener, client as protocolClient } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
@@ -31,7 +24,12 @@ import contextMenus from "ui/reducers/contextMenus";
 import network from "ui/reducers/network";
 import protocolMessages from "ui/reducers/protocolMessages";
 import reactDevTools from "ui/reducers/reactDevTools";
-import timeline, { pointsReceived, setPlaybackStalled } from "ui/reducers/timeline";
+import timeline, {
+  allPaintsReceived,
+  paintsReceived,
+  pointsReceived,
+  setPlaybackStalled,
+} from "ui/reducers/timeline";
 import type { ThunkExtraArgs } from "ui/utils/thunk";
 import {
   setMouseDownEventsCallback,
@@ -54,7 +52,7 @@ import {
   getObjectThrows,
   getObjectWithPreviewHelper,
   getObjectPropertyHelper,
-} from "@bvaughn/src/suspense/ObjectPreviews";
+} from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 
 import { setCanvas } from "ui/actions/app";
 import { precacheScreenshots } from "ui/actions/timeline";
@@ -74,10 +72,6 @@ declare global {
     threadFront?: typeof ThreadFront;
     actions?: typeof actions;
     selectors?: BoundSelectors;
-    // We use 'command' in the backend and 'message' in the frontend so expose both :P
-    console?: {
-      prefs: typeof consolePrefs;
-    };
     debugger?: any;
   }
 }
@@ -156,16 +150,13 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   window.app.threadFront = ThreadFront;
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
-  window.app.console = { prefs: consolePrefs };
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
 
   const initialDebuggerState = await dbgClient.loadInitialState();
-  const initialConsoleState = getConsoleInitialState();
 
   const initialState = {
     ...initialDebuggerState,
-    ...initialConsoleState,
   };
 
   const reducers = {
@@ -176,7 +167,6 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     timeline,
     protocolMessages: protocolMessages,
     ...debuggerReducers,
-    ...consoleReducers.reducers,
   };
 
   bootstrapWorkers();
@@ -231,13 +221,9 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   await setupApp(store, ThreadFront, replayClient);
   setupTimeline(store);
-  setupEventListeners(store);
   setupGraphics();
   initOutputSyntaxHighlighting();
-  setupMessages(store, ThreadFront);
   setupNetwork(store, ThreadFront);
-  setupLogpoints(store);
-  setupExceptions(store);
   setupReactDevTools(store, ThreadFront);
   setupBoxModel(store);
   setupRules(store);
@@ -272,6 +258,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   const onPointsReceived = debounce(() => {
     store.dispatch(pointsReceived(points));
+    store.dispatch(paintsReceived(points.filter(p => "screenShots" in p)));
     points = [];
   }, 1_000);
 
@@ -280,9 +267,14 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
     onPointsReceived();
   });
 
+  setAllPaintsReceivedCallback((received: boolean) => {
+    store.dispatch(allPaintsReceived(received));
+  });
+
   setRefreshGraphicsCallback((canvas: Canvas) => {
     store.dispatch(setCanvas(canvas));
   });
+
   setVideoUrlCallback((url: string) => {
     store.dispatch(setVideoUrl(url));
   });

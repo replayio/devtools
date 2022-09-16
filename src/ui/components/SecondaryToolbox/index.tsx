@@ -1,21 +1,18 @@
-import LazyOffscreen from "@bvaughn/components/LazyOffscreen";
-import React, { FC, ReactNode, useContext } from "react";
+import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
+import React, { FC, ReactNode, Suspense, useContext } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
-import WebConsoleApp from "devtools/client/webconsole/components/App";
-
+import { ThreadFront } from "protocol/thread";
+import { RecordingCapabilities } from "protocol/thread/thread";
 import { NodePicker } from "../NodePicker";
 import { selectors } from "../../reducers";
 import ReactDevtoolsPanel from "./ReactDevTools";
 import { ReduxDevToolsPanel } from "./ReduxDevTools";
-
 import { SecondaryPanelName, ToolboxLayout } from "ui/state/layout";
 import { Redacted } from "../Redacted";
 import ToolboxOptions from "./ToolboxOptions";
 import { EditorPane } from "devtools/client/debugger/src/components/Editor/EditorPane";
-
 import { trackEvent } from "ui/utils/telemetry";
-
 import "ui/setup/dynamic/inspector";
 import NetworkMonitor from "../NetworkMonitor";
 import WaitForReduxSlice from "../WaitForReduxSlice";
@@ -24,10 +21,9 @@ import { getSelectedPanel, getToolboxLayout } from "ui/reducers/layout";
 import { ShowVideoButton } from "./ToolboxButton";
 import SourcesTabLabel from "./SourcesTabLabel";
 import { setSelectedPanel } from "ui/actions/layout";
-import { getHasGraphics } from "ui/reducers/app";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
-import { useFeature } from "ui/hooks/settings";
+import Loader from "../shared/Loader";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -35,7 +31,7 @@ interface PanelButtonsProps {
   hasReactComponents: boolean;
   hasReduxAnnotations: boolean;
   toolboxLayout: ToolboxLayout;
-  hasGraphics: boolean;
+  recordingCapabilities: RecordingCapabilities;
 }
 
 interface PanelButtonProps {
@@ -69,13 +65,14 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   hasReactComponents,
   hasReduxAnnotations,
   toolboxLayout,
-  hasGraphics,
+  recordingCapabilities,
 }) => {
+  const { supportsNetworkRequests } = recordingCapabilities;
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
-      {hasGraphics && <NodePicker />}
+      {supportsNetworkRequests && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {hasGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
+      {supportsNetworkRequests && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
@@ -83,17 +80,16 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       )}
       {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
       {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
-      <PanelButton panel="network">Network</PanelButton>
+      {supportsNetworkRequests && <PanelButton panel="network">Network</PanelButton>}
     </div>
   );
 };
 
 function ConsolePanel() {
-  const { value: disableNewComponentArchitecture } = useFeature("disableNewComponentArchitecture");
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        {disableNewComponentArchitecture ? <WebConsoleApp /> : <NewConsoleRoot />}
+        <NewConsoleRoot />
       </div>
     </div>
   );
@@ -125,13 +121,22 @@ function PanelButtonsScrollOverflowGradient() {
   return <div className="secondary-toolbox-scroll-overflow-gradient"></div>;
 }
 
-export default function SecondaryToolbox() {
+export default function SecondaryToolboxSuspenseWrapper() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <SecondaryToolbox />
+    </Suspense>
+  );
+}
+
+function SecondaryToolbox() {
   const selectedPanel = useAppSelector(getSelectedPanel);
-  const hasGraphics = useAppSelector(getHasGraphics);
   const hasReactComponents = useAppSelector(selectors.hasReactComponents);
   const toolboxLayout = useAppSelector(getToolboxLayout);
   const reduxAnnotations = useContext(ReduxAnnotationsContext);
   const dispatch = useAppDispatch();
+
+  const recordingCapabilities = getRecordingCapabilities();
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));
@@ -140,12 +145,12 @@ export default function SecondaryToolbox() {
   const hasReduxAnnotations = reduxAnnotations.length > 0;
 
   return (
-    <div className={classnames(`secondary-toolbox rounded-lg`, { node: !hasGraphics })}>
+    <div className={classnames(`secondary-toolbox rounded-lg`)}>
       <header className="secondary-toolbox-header">
         <PanelButtons
-          hasGraphics={hasGraphics}
           hasReactComponents={hasReactComponents}
           hasReduxAnnotations={hasReduxAnnotations}
+          recordingCapabilities={recordingCapabilities}
           toolboxLayout={toolboxLayout}
         />
         <div className="secondary-toolbox-right-buttons-container flex">
@@ -155,9 +160,11 @@ export default function SecondaryToolbox() {
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
-        <Panel isActive={selectedPanel === "network"}>
-          <NetworkMonitor />
-        </Panel>
+        {recordingCapabilities.supportsNetworkRequests && (
+          <Panel isActive={selectedPanel === "network"}>
+            <NetworkMonitor />
+          </Panel>
+        )}
         <Panel isActive={selectedPanel === "console"}>
           <ConsolePanel />
         </Panel>
@@ -180,4 +187,27 @@ export default function SecondaryToolbox() {
 
 function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
   return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
+}
+
+let recordingCapabilitiesPromise: Promise<RecordingCapabilities> | null = null;
+let recordingCapabilities: RecordingCapabilities | null = null;
+function getRecordingCapabilities(): RecordingCapabilities {
+  if (recordingCapabilities !== null) {
+    return recordingCapabilities;
+  } else {
+    if (recordingCapabilitiesPromise === null) {
+      recordingCapabilitiesPromise = new Promise(async (resolve, reject) => {
+        try {
+          recordingCapabilities = await ThreadFront.getRecordingCapabilities();
+          recordingCapabilitiesPromise = null;
+
+          resolve(recordingCapabilities!);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    }
+
+    throw recordingCapabilitiesPromise;
+  }
 }

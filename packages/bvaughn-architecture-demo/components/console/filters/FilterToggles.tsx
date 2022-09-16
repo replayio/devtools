@@ -12,6 +12,7 @@ import { Badge, Checkbox } from "design";
 
 import EventsList from "./EventsList";
 import styles from "./FilterToggles.module.css";
+import { getRecordingCapabilities } from "@bvaughn/src/suspense/RecordingCache";
 
 export default function FilterToggles() {
   const {
@@ -23,6 +24,9 @@ export default function FilterToggles() {
     showWarnings,
     update,
   } = useContext(ConsoleFiltersContext);
+
+  const replayClient = useContext(ReplayClientContext);
+  const recordingCapabilities = getRecordingCapabilities(replayClient);
 
   const status = useSyncExternalStore(subscribeForStatus, getStatus, getStatus);
   let exceptionsBadge = null;
@@ -81,8 +85,12 @@ export default function FilterToggles() {
         label="Errors"
         onChange={showErrors => update({ showErrors })}
       />
-      <hr className={styles.Divider} />
-      <EventsList />
+      {recordingCapabilities.supportsEventTypes && (
+        <>
+          <hr className={styles.Divider} />
+          <EventsList />
+        </>
+      )}
       <div className={styles.EmptySpaceFiller} />
       <hr className={styles.Divider} />
       <Toggle

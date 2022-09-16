@@ -24,9 +24,11 @@ import { SearchContextRoot } from "./SearchContext";
 import classNames from "classnames";
 
 export default function ConsoleRoot({
+  nagHeader = null,
   showSearchInputByDefault = true,
   terminalInput = null,
 }: {
+  nagHeader?: ReactNode;
   showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
@@ -93,6 +95,8 @@ export default function ConsoleRoot({
                   showSearchInputByDefault={showSearchInputByDefault}
                 >
                   <div className={styles.MessageColumn}>
+                    {nagHeader}
+
                     <MessagesList ref={messageListRef} />
 
                     {terminalInput}

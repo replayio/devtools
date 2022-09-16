@@ -4,6 +4,7 @@ import {
   ExecutionPoint,
   EventHandlerType,
   FrameId,
+  getPointsBoundingTimeResult as PointsBoundingTime,
   loadedRegions as LoadedRegions,
   Location,
   Message,
@@ -27,6 +28,9 @@ import {
   keyboardEvents,
   navigationEvents,
   Result,
+  MappedLocation,
+  SourceLocation,
+  SameLineSourceLocations,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
@@ -34,13 +38,14 @@ import analysisManager from "protocol/analysisManager";
 import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { RecordingCapabilities } from "protocol/thread/thread";
 import { compareNumericStrings, defer } from "protocol/utils";
 import { isTooManyPointsError } from "shared/utils/error";
 
 import {
   ColumnHits,
   HitPointsAndStatusTuple,
-  HitPointsStatus,
+  HitPointStatus,
   LineHits,
   ReplayClientEvents,
   ReplayClientInterface,
@@ -106,6 +111,10 @@ export class ReplayClient implements ReplayClientInterface {
     handlers.push(handler);
   }
 
+  async getRecordingCapabilities(): Promise<RecordingCapabilities> {
+    return this._threadFront.getRecordingCapabilities();
+  }
+
   async createPause(executionPoint: ExecutionPoint): Promise<createPauseResult> {
     const sessionId = this.getSessionIdThrows();
     const response = await client.Session.createPause({ point: executionPoint }, sessionId);
@@ -123,7 +132,7 @@ export class ReplayClient implements ReplayClientInterface {
     if (frameId === null) {
       const response = await client.Pause.evaluateInGlobal(
         {
-          expression,
+          expression: `(${expression})`,
           pure: false,
         },
         sessionId,
@@ -134,7 +143,7 @@ export class ReplayClient implements ReplayClientInterface {
       const response = await client.Pause.evaluateInFrame(
         {
           frameId,
-          expression,
+          expression: `(${expression})`,
           pure: false,
           useOriginalScopes: true,
         },
@@ -293,7 +302,7 @@ export class ReplayClient implements ReplayClientInterface {
     condition: string | null
   ): Promise<HitPointsAndStatusTuple> {
     const collectedHitPoints: TimeStampedPoint[] = [];
-    let status: HitPointsStatus | null = null;
+    let status: HitPointStatus | null = null;
 
     const locations = this._getCorrespondingLocations(location).map(location => ({ location }));
 
@@ -457,8 +466,14 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getPointNearTime(time: number): Promise<TimeStampedPoint> {
     const sessionId = this.getSessionIdThrows();
-    const { point } = await client.Session.getPointNearTime({ time: time }, sessionId);
+    const { point } = await client.Session.getPointNearTime({ time }, sessionId);
     return point;
+  }
+
+  async getPointsBoundingTime(time: number): Promise<PointsBoundingTime> {
+    const sessionId = this.getSessionIdThrows();
+    const result = await client.Session.getPointsBoundingTime({ time }, sessionId);
+    return result;
   }
 
   getPreferredLocation(locations: Location[]): Location | null {
@@ -531,6 +546,26 @@ export class ReplayClient implements ReplayClientInterface {
     });
 
     return hitCounts;
+  }
+
+  async getBreakpointPositions(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]> {
+    const sessionId = this.getSessionIdThrows();
+    const begin = range ? range.start : undefined;
+    const end = range ? range.end : undefined;
+    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
+      { sourceId, begin, end },
+      sessionId
+    );
+    return lineLocations;
+  }
+
+  async getMappedLocation(location: Location): Promise<MappedLocation> {
+    const sessionId = this.getSessionIdThrows();
+    const { mappedLocation } = await client.Debugger.getMappedLocation({ location }, sessionId);
+    return mappedLocation;
   }
 
   async loadRegion(range: TimeRange, duration: number): Promise<void> {
@@ -673,7 +708,7 @@ export class ReplayClient implements ReplayClientInterface {
 
 function waitForOpenConnection(
   socket: WebSocket,
-  maxDurationMs = 2500,
+  maxDurationMs = 5000,
   intervalMs = 100
 ): Promise<void> {
   return new Promise<void>((resolve, reject) => {

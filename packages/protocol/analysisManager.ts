@@ -202,21 +202,24 @@ class AnalysisManager {
 
   private readonly onAnalysisResult = ({ analysisId, results }: analysisResult) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler, "no handler for given analysisId");
-    handler.onAnalysisResult?.(results);
+    if (handler != null && typeof handler.onAnalysisResult === "function") {
+      handler.onAnalysisResult(results);
+    }
   };
 
   private readonly onAnalysisPoints = ({ analysisId, points }: analysisPoints) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler, "no handler for given analysisId");
-    points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
-    handler.onAnalysisPoints?.(points);
+    if (handler != null && typeof handler.onAnalysisPoints === "function") {
+      points.forEach(point => ThreadFront.updateMappedLocation(point.frame));
+      handler.onAnalysisPoints(points);
+    }
   };
 
   private readonly onAnalysisError = ({ analysisId, error }: analysisError) => {
     const handler = this.handlers.get(analysisId);
-    assert(handler, "no handler for given analysisId");
-    handler.onAnalysisError?.(error);
+    if (handler != null && typeof handler.onAnalysisError === "function") {
+      handler.onAnalysisError(error);
+    }
   };
 }
 

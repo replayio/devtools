@@ -38,6 +38,7 @@ import {
   PointRange,
   PauseId,
   PauseData,
+  Value,
 } from "@replayio/protocol";
 import groupBy from "lodash/groupBy";
 
@@ -84,6 +85,12 @@ export type WiredMessage = Omit<Message, "argumentValues"> & {
   argumentValues?: ValueFront[];
 };
 
+export type RecordingCapabilities = {
+  supportsEventTypes: boolean;
+  supportsNetworkRequests: boolean;
+  supportsRepaintingGraphics: boolean;
+};
+
 // Target applications which can create recordings.
 export enum RecordingTarget {
   gecko = "gecko",
@@ -105,7 +112,7 @@ function getRecordingTarget(buildId: string): RecordingTarget {
   return RecordingTarget.unknown;
 }
 
-type ThreadFrontEvent = "currentPause" | "evaluation" | "paused" | "resumed";
+type ThreadFrontEvent = "currentPause" | "paused" | "resumed";
 
 declare global {
   interface Window {
@@ -143,6 +150,7 @@ class _ThreadFront {
   sessionWaiter = defer<SessionId>();
 
   // Waiter which resolves with the target used to create the recording.
+  recordingCapabilitiesWaiter = defer<RecordingCapabilities>();
   recordingTargetWaiter = defer<RecordingTarget>();
 
   // Waiter which resolves when the debugger has loaded and we've warped to the endpoint.
@@ -226,7 +234,47 @@ class _ThreadFront {
     console.debug({ sessionId });
 
     const { buildId } = await client.Session.getBuildId({}, sessionId);
-    this.recordingTargetWaiter.resolve(getRecordingTarget(buildId));
+
+    const recordingTarget = getRecordingTarget(buildId);
+
+    let recordingCapabilities: RecordingCapabilities;
+    switch (recordingTarget) {
+      case "chromium": {
+        recordingCapabilities = {
+          supportsEventTypes: false,
+          supportsNetworkRequests: false,
+          supportsRepaintingGraphics: false,
+        };
+        break;
+      }
+      case "gecko": {
+        recordingCapabilities = {
+          supportsEventTypes: true,
+          supportsNetworkRequests: true,
+          supportsRepaintingGraphics: true,
+        };
+        break;
+      }
+      case "node": {
+        recordingCapabilities = {
+          supportsEventTypes: true,
+          supportsNetworkRequests: true,
+          supportsRepaintingGraphics: false,
+        };
+        break;
+      }
+      case "unknown":
+      default: {
+        recordingCapabilities = {
+          supportsEventTypes: false,
+          supportsNetworkRequests: false,
+          supportsRepaintingGraphics: false,
+        };
+      }
+    }
+
+    this.recordingCapabilitiesWaiter.resolve(recordingCapabilities);
+    this.recordingTargetWaiter.resolve(recordingTarget);
   }
 
   waitForSession() {
@@ -319,6 +367,10 @@ class _ThreadFront {
     this._accessToken = accessToken;
 
     return client.Authentication.setAccessToken({ accessToken });
+  }
+
+  getRecordingCapabilities(): Promise<RecordingCapabilities> {
+    return this.recordingCapabilitiesWaiter.promise;
   }
 
   getRecordingTarget(): Promise<RecordingTarget> {
@@ -543,10 +595,46 @@ class _ThreadFront {
 
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
+      // Fire and forget
+      // estlint-disable-next-line @typescript-eslint/no-floating-promises
       repaint(true);
     }
 
     return rv;
+  }
+
+  // Same as evaluate, but returns the result without wrapping a ValueFront around them.
+  // TODO Replace usages of evaluate with this.
+  async evaluateNew({
+    asyncIndex,
+    text,
+    frameId,
+    pure = false,
+  }: {
+    asyncIndex?: number;
+    text: string;
+    frameId?: FrameId;
+    pure?: boolean;
+  }) {
+    const pause = await this.pauseForAsyncIndex(asyncIndex);
+    assert(pause, "no pause for asyncIndex");
+
+    const rv = await pause.evaluate(frameId, text, pure);
+
+    if (repaintAfterEvaluationsExperimentalFlag) {
+      const { repaint } = await import("protocol/graphics");
+      // Fire and forget
+      // estlint-disable-next-line @typescript-eslint/no-floating-promises
+      repaint(true);
+    }
+
+    if (rv.returned) {
+      return { exception: null, returned: rv.returned as unknown as Value };
+    } else if (rv.exception) {
+      return { exception: rv.exception as unknown as Value, returned: null };
+    } else {
+      return { exception: null, returned: null };
+    }
   }
 
   // Perform an operation that will change our cached targets about where resume
@@ -691,25 +779,6 @@ class _ThreadFront {
 
   findMessagesInRange(range: PointRange) {
     return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
-  }
-
-  async findConsoleMessages(
-    onConsoleMessage: (pause: Pause, message: WiredMessage) => void,
-    onConsoleOverflow: () => void
-  ) {
-    await this.ensureProcessed("basic");
-    client.Console.addNewMessageListener(async ({ message }) => {
-      await this.ensureAllSources();
-      const pause = wireUpMessage(message);
-      onConsoleMessage(pause, message as WiredMessage);
-    });
-
-    return client.Console.findMessages({}, this.sessionId!).then(({ overflow }) => {
-      if (overflow) {
-        console.warn("Too many console messages, not all will be shown");
-        onConsoleOverflow();
-      }
-    });
   }
 
   async getRootDOMNode() {

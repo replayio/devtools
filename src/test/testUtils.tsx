@@ -9,7 +9,7 @@ import { bootstrapStore } from "ui/setup/store";
 import setupDevtools from "ui/setup/dynamic/devtools";
 import type { UIState } from "ui/state";
 import { v4 as uuid } from "uuid";
-import { createMockReplayClient } from "@bvaughn/src/utils/testing";
+import { createMockReplayClient } from "bvaughn-architecture-demo/src/utils/testing";
 
 import {
   createRecordingOwnerUserIdMock,

@@ -64,7 +64,7 @@ const COMMANDS: readonly Command[] = [
   { key: "show_privacy", label: "Show Privacy" },
   { key: "show_replay_info", label: "Show Replay Info" },
   { key: "show_sharing", label: "Show Sharing Options" },
-  { key: "toggle_dark_mode", label: "Toggle Dark Mode", shortcut: "Shift+T" },
+  { key: "toggle_dark_mode", label: "Toggle Dark Mode", shortcut: "Alt+Shift+T" },
   { key: "toggle_edit_focus", label: "Toggle Edit Focus Mode", shortcut: "Shift+F" },
   { key: "toggle_video", label: "Toggle Video" },
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
@@ -97,7 +97,7 @@ function getShownCommands(searchString: string) {
 
 function PaletteShortcut() {
   return (
-    <div className="absolute flex select-none right-4 text-primaryAccent">
+    <div className="absolute right-4 flex select-none text-primaryAccent">
       <div className="img cmd-icon" style={{ background: "var(--primary-accent)" }} />
       <div className="img k-icon" style={{ background: "var(--primary-accent)" }} />
     </div>
@@ -153,7 +153,7 @@ function CommandPalette({
         </div>
       </div>
       <div
-        className="flex flex-col flex-grow overflow-auto text-sm"
+        className="flex flex-grow flex-col overflow-auto text-sm"
         // By making sure there is always a fraction of an item showing we show
         // that there is more to scroll to "beyond the fold"
         style={{ maxHeight: COMMAND_HEIGHT * ITEMS_TO_SHOW }}

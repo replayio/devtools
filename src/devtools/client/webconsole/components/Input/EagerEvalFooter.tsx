@@ -1,11 +1,15 @@
-import React, { FC, useEffect, useRef, useState, useCallback, useMemo } from "react";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import { Value } from "@replayio/protocol";
 import debounce from "lodash/debounce";
-import { ValueFront } from "protocol/thread";
-import ObjectInspector from "devtools/client/webconsole/utils/connected-object-inspector";
+import React, { FC, useEffect, useRef, useState, useMemo, Suspense } from "react";
+import { ThreadFront } from "protocol/thread";
+
 import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
 
 function useEagerEvalPreview(expression: string) {
-  const [value, setValue] = useState<ValueFront | null>(null);
+  const [value, setValue] = useState<Value | null>(null);
   const expressionRef = useRef(expression);
   const eagerEvaluateExpression = useEagerEvaluateExpression();
 
@@ -16,11 +20,7 @@ function useEagerEvalPreview(expression: string) {
       debounce(async function updateValue(expression: string) {
         setValue(null);
         const rv = await eagerEvaluateExpression(expression);
-        const isUndefined = rv?.isPrimitive && !rv.primitive;
-
-        if (expressionRef.current === expression && !isUndefined) {
-          setValue(rv!);
-        }
+        setValue(rv!);
       }, 300),
     [eagerEvaluateExpression]
   );
@@ -38,26 +38,25 @@ function useEagerEvalPreview(expression: string) {
 }
 
 const Preview: FC<{ expression: string }> = ({ expression }) => {
-  const [text, setText] = useState("");
-  const gripRef = useRef<HTMLDivElement | null>(null);
   const previewValue = useEagerEvalPreview(expression);
-
-  useEffect(() => {
-    if (gripRef.current) {
-      setText(gripRef.current.innerText);
-    }
-  }, [previewValue]);
-
   if (!previewValue) {
+    return null;
+  }
+
+  const pause = ThreadFront.currentPause;
+  if (!pause || !pause.pauseId) {
     return null;
   }
 
   return (
     <div className="pointer-events-none relative">
-      <div className="absolute opacity-0" ref={gripRef}>
-        <ObjectInspector value={previewValue} />
+      <div className="overflow-hidden overflow-ellipsis whitespace-pre opacity-50">
+        <ErrorBoundary>
+          <Suspense fallback={<Loader />}>
+            <Inspector context="default" pauseId={pause.pauseId} protocolValue={previewValue} />
+          </Suspense>
+        </ErrorBoundary>
       </div>
-      <div className="overflow-hidden overflow-ellipsis whitespace-pre opacity-50">{text}</div>
     </div>
   );
 };

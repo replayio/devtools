@@ -266,4 +266,42 @@ describe("MessagesCache", () => {
 
     expect(client.findMessages).toHaveBeenCalledTimes(2);
   });
+
+  it("should not continue to re-request the same messages after a failure", async () => {
+    client.findMessages.mockImplementation(() => {
+      throw new Error("Expected");
+    });
+
+    console.error = jest.fn();
+
+    try {
+      await getMessagesHelper(toTSPR(0, 1));
+    } catch (error) {}
+    expect(client.findMessages).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenCalled();
+
+    try {
+      await getMessagesHelper(toTSPR(0, 1));
+    } catch (error) {}
+    expect(client.findMessages).toHaveBeenCalledTimes(1);
+  });
+
+  it("should re-request messages after a failure if parameters change", async () => {
+    client.findMessages.mockImplementation(() => {
+      throw new Error("Expected");
+    });
+
+    console.error = jest.fn();
+
+    try {
+      await getMessagesHelper(toTSPR(0, 1));
+    } catch (error) {}
+    expect(client.findMessages).toHaveBeenCalledTimes(1);
+    expect(console.error).toHaveBeenCalled();
+
+    try {
+      await getMessagesHelper(toTSPR(0, 2));
+    } catch (error) {}
+    expect(client.findMessages).toHaveBeenCalledTimes(2);
+  });
 });

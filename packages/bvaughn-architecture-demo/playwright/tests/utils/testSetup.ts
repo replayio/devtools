@@ -13,7 +13,17 @@ export default function testSetup(regeneratorFunction: RegeneratorFunction) {
       const nextErrorDialog = await page.locator("nextjs-portal");
       const count = await nextErrorDialog.count();
       if (count !== 0) {
-        throw Error("Next error overlay reported uncaught error");
+        const description = await page.locator("#nextjs__container_errors_desc");
+        const textContent = await description.textContent();
+        if (textContent) {
+          const [name, message] = textContent.split(": ");
+          const error = Error();
+          error.name = name;
+          error.message = message;
+          throw error;
+        } else {
+          throw Error("Next error overlay reported uncaught error");
+        }
       }
     });
 

@@ -1,11 +1,10 @@
 import classNames from "classnames";
-import { getVisibleMessageData } from "devtools/client/webconsole/selectors";
-import React from "react";
-import { useAppSelector } from "ui/setup/hooks";
+import React, { useContext } from "react";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
 import { shouldShowNag } from "ui/utils/user";
 import MaterialIcon from "../MaterialIcon";
+import { LoggablesContext } from "@bvaughn/components/console/LoggablesContext";
 
 // This is very arbitrary but we need it to keep the editor
 // from running into overflow problems.
@@ -61,11 +60,11 @@ export function EditorNag() {
 }
 
 export function ConsoleNag() {
-  const { messageIDs } = useAppSelector(getVisibleMessageData);
+  const loggables = useContext(LoggablesContext);
 
   // Don't show the console nag that directs the user to click on one of the console messages
   // if there aren't any console messages to begin with.
-  if (!messageIDs.length) {
+  if (!loggables.length) {
     return null;
   }
 

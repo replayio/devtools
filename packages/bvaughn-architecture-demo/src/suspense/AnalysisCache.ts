@@ -149,7 +149,7 @@ async function runLocalAnalysis(
         reject();
       }
 
-      const escapedCode = code.replace(/"/g, '\\"');
+      const escapedCode = code.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
       // Most globals (like window and document) aren't defined in a Worker, but the location global is.
       const workerCode = `
           const values = (() => eval("[${escapedCode}]"))();

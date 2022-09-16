@@ -1,11 +1,14 @@
 import {
   ContentType as ProtocolContentType,
   newSource as ProtocolSource,
+  SameLineSourceLocations as ProtocolSameLineSourceLocations,
   SourceId as ProtocolSourceId,
+  SourceLocation as ProtocolSourceLocation,
 } from "@replayio/protocol";
 import { LineHits, ReplayClientInterface } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
+import { createGenericCache } from "./createGenericCache";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
@@ -105,6 +108,27 @@ export function getSourceHitCounts(
   }
 }
 
+export interface SourceLocationRange {
+  start: ProtocolSourceLocation;
+  end: ProtocolSourceLocation;
+}
+
+const { getValue: _getBreakpointPositions } = createGenericCache<
+  [ReplayClientInterface, ProtocolSourceId, SourceLocationRange | undefined],
+  ProtocolSameLineSourceLocations[]
+>(
+  (client, sourceId, range) => client.getBreakpointPositions(sourceId, range),
+  (client, sourceId, range) =>
+    range
+      ? `${sourceId}:${range.start.line}:${range.start.column}:${range.end.line}:${range.end.column}`
+      : sourceId
+);
+export const getBreakpointPositions = (
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId,
+  range?: SourceLocationRange
+) => _getBreakpointPositions(client, sourceId, range);
+
 async function fetchSources(client: ReplayClientInterface) {
   sources = await client.findSources();
 
@@ -156,9 +180,5 @@ async function fetchSourceHitCounts(
 
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
   const sources = getSources(client);
-  return (
-    sources?.filter(source => {
-      return source != null && source.kind !== "inlineScript";
-    }) || []
-  );
+  return sources.filter(source => source.kind !== "inlineScript");
 }

@@ -47,7 +47,8 @@ export type SettingsTabTitle =
   | "Personal"
   | "Legal"
   | "API Keys"
-  | "Preferences";
+  | "Preferences"
+  | "Advanced";
 
 export type ErrorActions =
   | "sign-in"

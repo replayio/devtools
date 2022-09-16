@@ -6,17 +6,20 @@ import KeyValueRenderer from "./KeyValueRenderer";
 export default function Inspector({
   className,
   context,
+  expandByDefault,
   pauseId,
   protocolValue,
 }: {
   className?: string;
   context: "console" | "default";
+  expandByDefault?: boolean;
   pauseId: PauseId;
   protocolValue: ProtocolValue;
 }) {
   const keyValue = (
     <KeyValueRenderer
       context={context}
+      expandByDefault={expandByDefault}
       layout="horizontal"
       pauseId={pauseId}
       protocolValue={protocolValue}

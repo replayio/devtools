@@ -3,22 +3,24 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { SourceLocation } from "@replayio/protocol";
-import type { ThreadFront as TF } from "protocol/thread";
-import { ValueItem } from "devtools/packages/devtools-reps";
-import { createPrimitiveValueFront } from "protocol/thread";
+import { nanoid } from "@reduxjs/toolkit";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import type { UIThunkAction } from "ui/actions";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
 
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { isConsole } from "../utils/preview";
-import { getPreview, isSelectedFrameVisible, getSelectedFrame } from "../selectors";
+import { isSelectedFrameVisible, getSelectedFrame } from "../selectors";
 import { getSelectedSource } from "ui/reducers/sources";
+import { getPreview, previewCleared, previewStarted, previewLoaded } from "../reducers/preview";
+
+export function isConsole(expression: string) {
+  return /^console/.test(expression);
+}
 
 type $FixTypeLater = any;
 
 export function updatePreview(
-  cx: Context,
+  cx: ThreadContext,
   target: HTMLElement,
   tokenPos: SourceLocation,
   codeMirror: $FixTypeLater
@@ -51,27 +53,8 @@ export interface EvaluateOptions {
   frameId?: string;
 }
 
-async function evaluate(
-  ThreadFront: typeof TF,
-  source: string,
-  { asyncIndex, frameId }: EvaluateOptions = {}
-) {
-  const { returned, exception, failed } = await ThreadFront.evaluate({
-    asyncIndex,
-    frameId,
-    text: source,
-  });
-  if (failed) {
-    return { exception: createPrimitiveValueFront("Evaluation failed") };
-  }
-  if (returned) {
-    return { result: returned };
-  }
-  return { exception };
-}
-
 export function setPreview(
-  cx: Context,
+  cx: ThreadContext,
   expression: string,
   location: { start: SourceLocation; end: SourceLocation },
   tokenPos: SourceLocation,
@@ -79,73 +62,58 @@ export function setPreview(
   target: HTMLElement
 ): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
-    dispatch({
-      type: "START_PREVIEW",
-      value: {
+    dispatch(
+      previewStarted({
+        // TODO DOMRects shouldn't be in Redux
         cursorPos,
         expression,
         location,
-        target,
         tokenPos,
-      },
-    });
+        previewId: nanoid(),
+      })
+    );
 
     const { previewId } = getPreview(getState())!;
 
     const source = getSelectedSource(getState());
     if (!source) {
-      clearPreview(cx, previewId);
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
     const selectedFrame = getSelectedFrame(getState());
     if (!selectedFrame) {
-      clearPreview(cx, previewId);
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
-    let { result } = await evaluate(ThreadFront, expression, {
+    const { returned } = await ThreadFront.evaluateNew({
       asyncIndex: selectedFrame.asyncIndex,
       frameId: selectedFrame.protocolId,
+      text: expression,
     });
 
-    if (result === undefined) {
-      result = createPrimitiveValueFront(undefined);
+    let protocolValue = returned;
+
+    if (returned === undefined) {
+      // Per `protocol.ts`, the backend seems to represent undefined as an empty object or similar
+      protocolValue = {};
+    } else if (typeof returned !== "object") {
+      // must be a primitive - wrap this in an object so it can be parsed later
+      // don't _think_ this will happen, but just in case
+      protocolValue = {
+        value: returned,
+      };
     }
-
-    let root = new ValueItem({
-      name: expression,
-      path: expression,
-      contents: result,
-    });
-    await root.loadChildren();
-    // recreate the ValueItem to update its loading state
-    root = root.recreate();
 
     // The first time a popup is rendered, the mouse should be hovered
     // on the token. If it happens to be hovered on whitespace, it should
     // not render anything
     if (!window.elementIsHovered(target)) {
-      dispatch(clearPreview(cx, previewId));
+      dispatch(previewCleared({ cx, previewId }));
       return;
     }
 
-    dispatch({
-      type: "COMPLETE_PREVIEW",
-      cx,
-      previewId,
-      value: {
-        resultGrip: result,
-        root,
-      },
-    });
-  };
-}
-
-export function clearPreview(cx: Context, previewId: string) {
-  return {
-    type: "CLEAR_PREVIEW",
-    cx,
-    previewId,
+    dispatch(previewLoaded({ cx, previewId, value: protocolValue }));
   };
 }

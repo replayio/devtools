@@ -21,11 +21,13 @@ export type RenderChildrenFunction = () => ReactNode;
 // This behavior is different enough to warrant a custom implementation (rather than using <Expandable>).
 export default function HTMLExpandable({
   before = null,
+  defaultOpen = false,
   object,
   pauseId,
   protocolValue,
 }: {
   before?: ReactNode;
+  defaultOpen?: boolean;
   object: ProtocolObject;
   pauseId: ProtocolPauseId;
   protocolValue: ProtocolValue;

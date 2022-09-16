@@ -19,11 +19,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "enableColumnBreakpoints",
   },
   {
-    label: "Legacy console",
-    description: "Restore the legacy console and inspector UIs",
-    key: "disableNewComponentArchitecture",
-  },
-  {
     label: "Resolve recording",
     description: "Mark a replay as resolved",
     key: "enableResolveRecording",
@@ -44,6 +39,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description:
       "Allow the backend to return previously generated responses without re-running the request",
     key: "enableQueryCache",
+  },
+  {
+    label: "Detailed loading bar",
+    description:
+      "Split the loading bar's progress between gathering static resources from the recording and indexing runtime information",
+    key: "basicProcessingLoadingBar",
   },
 ];
 
@@ -79,36 +80,37 @@ export default function ExperimentalSettings({}) {
 
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
-  const { value: disableNewComponentArchitecture, update: updateEnableNewComponentArchitecture } =
-    useFeature("disableNewComponentArchitecture");
 
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
   const { value: enableQueryCache, update: updateEnableQueryCache } =
     useFeature("enableQueryCache");
+  const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
+    "basicProcessingLoadingBar"
+  );
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
       updateEnableColumnBreakpoints(!enableColumnBreakpoints);
     } else if (key == "enableResolveRecording") {
       updateEnableResolveRecording(!enableResolveRecording);
-    } else if (key === "disableNewComponentArchitecture") {
-      updateEnableNewComponentArchitecture(!disableNewComponentArchitecture);
     } else if (key === "hitCounts") {
       updateHitCounts(!hitCounts);
     } else if (key === "profileWorkerThreads") {
       updateProfileWorkerThreads(!profileWorkerThreads);
     } else if (key === "enableQueryCache") {
       updateEnableQueryCache(!enableQueryCache);
+    } else if (key === "basicProcessingLoadingBar") {
+      updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     }
   };
 
   const localSettings = {
-    disableNewComponentArchitecture,
-    enableQueryCache,
+    basicProcessingLoadingBar,
     enableColumnBreakpoints,
     enableResolveRecording,
+    enableQueryCache,
     hitCounts,
     profileWorkerThreads,
   };

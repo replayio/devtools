@@ -3,13 +3,9 @@ import { FC } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFocusRegion, getZoomRegion } from "ui/reducers/timeline";
-import {
-  displayedEndForFocusRegion,
-  getVisiblePosition,
-  overlap,
-  rangeForFocusRegion,
-  displayedBeginForFocusRegion,
-} from "ui/utils/timeline";
+import { getVisiblePosition, overlap } from "ui/utils/timeline";
+import { TimeStampedPointRange } from "@replayio/protocol";
+import { UnsafeFocusRegion } from "ui/state/timeline";
 
 export const UnloadedRegions: FC = () => {
   const loadedRegions = useAppSelector(getLoadedRegions);
@@ -31,7 +27,21 @@ export const UnloadedRegions: FC = () => {
   let beginTime = begin.time;
   let endTime = end.time;
   if (focusRegion) {
-    const overlappingRegions = overlap([rangeForFocusRegion(focusRegion)], loadedRegions.loading);
+    // Even though we technically focus on the nearest points,
+    // We should only show the user a range defining their specified times.
+    const unsafe = focusRegion as UnsafeFocusRegion;
+    const userVisibleTimeStampedPointRange: TimeStampedPointRange = {
+      begin: {
+        point: unsafe.begin.point,
+        time: unsafe.beginTime,
+      },
+      end: {
+        point: unsafe.end.point,
+        time: unsafe.endTime,
+      },
+    };
+
+    const overlappingRegions = overlap([userVisibleTimeStampedPointRange], loadedRegions.loading);
     if (overlappingRegions.length > 0) {
       const focusedAndLoaded = overlappingRegions[0];
       beginTime = focusedAndLoaded.begin.time;

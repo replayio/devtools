@@ -1,36 +1,24 @@
-import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
-import Inspector from "@bvaughn/components/inspector";
-import Loader from "@bvaughn/components/Loader";
-import "@bvaughn/pages/variables.css";
-import { clientValueToProtocolValue } from "@bvaughn/src/utils/protocol";
-import { Value as ProtocolValue } from "@replayio/protocol";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import "bvaughn-architecture-demo/pages/variables.css";
+import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
-import { ValueItem } from "devtools/packages/devtools-reps";
-import { ThreadFront } from "protocol/thread";
-import { Suspense, useMemo } from "react";
+import { Suspense } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 
-import { getPreview } from "../../../selectors";
-
 import styles from "./NewObjectInspector.module.css";
+import useClientValue from "bvaughn-architecture-demo/components/inspector/useClientValue";
 
-export default function NewObjectInspector() {
-  const preview = useAppSelector(getPreview);
-  const pause = ThreadFront.currentPause;
+interface NIOProps {
+  expression: string;
+  protocolValue: ProtocolValue;
+}
 
-  // HACK
-  // The new Object Inspector does not consume ValueFronts.
-  // It works with the Replay protocol's Value objects directly.
-  // At the moment this means that we need to convert the ValueFront back to a protocol Value.
-  const protocolValue: ProtocolValue | null = useMemo(() => {
-    if (preview == null || !preview.hasOwnProperty("root") == null) {
-      return null;
-    }
+export default function NewObjectInspector({ expression, protocolValue }: NIOProps) {
+  const pauseId = useAppSelector(state => state.pause.id);
 
-    return clientValueToProtocolValue(preview?.root as ValueItem);
-  }, [preview]);
-
-  if (pause == null || pause.pauseId == null || protocolValue === null) {
+  if (pauseId == null || protocolValue === null) {
     return null;
   }
 
@@ -39,15 +27,78 @@ export default function NewObjectInspector() {
       <InspectorContextReduxAdapter>
         <div className={`${styles.Popup} preview-popup`}>
           <Suspense fallback={<Loader />}>
-            <Inspector
-              className={styles.Inspector}
-              context="default"
-              pauseId={pause.pauseId!}
-              protocolValue={protocolValue}
-            />{" "}
+            <>
+              <div className={styles.HeaderWrapper}>
+                <SuspendingHeader
+                  expression={expression}
+                  pauseId={pauseId!}
+                  protocolValue={protocolValue}
+                />
+              </div>
+              <div className={styles.InspectorWrapper}>
+                <Inspector
+                  className={styles.Inspector}
+                  context="default"
+                  expandByDefault={true}
+                  pauseId={pauseId!}
+                  protocolValue={protocolValue}
+                />
+              </div>
+            </>
           </Suspense>
         </div>
       </InspectorContextReduxAdapter>
     </ErrorBoundary>
   );
+}
+
+function SuspendingHeader({
+  expression,
+  pauseId,
+  protocolValue,
+}: {
+  expression: string;
+  pauseId: PauseId;
+  protocolValue: ProtocolValue;
+}) {
+  const clientValue = useClientValue(protocolValue, pauseId);
+  console.log("clientValue:", clientValue);
+
+  let header = null;
+  switch (clientValue.type) {
+    case "array":
+      header = "Array";
+      break;
+    case "date":
+      header = "Date";
+      break;
+    case "error":
+      header = "Error";
+      break;
+    case "function":
+      header = "Function";
+      break;
+    case "html-element":
+    case "html-text":
+      header = "HTMLElement";
+      break;
+    case "map":
+      header = "Map";
+      break;
+    case "regexp":
+      header = "RegExp";
+      break;
+    case "set":
+      header = "Set";
+      break;
+    case "object":
+      header = "Object";
+      break;
+  }
+
+  if (header === null) {
+    return null;
+  }
+
+  return <div className={styles.Header}>{header}</div>;
 }

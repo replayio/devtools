@@ -22,7 +22,6 @@ export function createUserSettingsMock(): MockedResponse[] {
       settings: {
         __typename: "AuthenticatedUserSettings",
         disableLogRocket: false,
-        enableEventLink: false,
         enableRepaint: false,
         enableTeams: true,
       },

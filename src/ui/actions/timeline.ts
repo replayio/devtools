@@ -1,7 +1,6 @@
-import { ExecutionPoint, PauseId, TimeStampedPointRange } from "@replayio/protocol";
+import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import { setBreakpointOptions } from "devtools/client/debugger/src/actions/breakpoints/modify";
 import { Breakpoint, getThreadContext } from "devtools/client/debugger/src/selectors";
-import { refetchMessages } from "devtools/client/webconsole/actions/messages";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import sortedLastIndexBy from "lodash/sortedLastIndexBy";
 import {
@@ -66,7 +65,7 @@ import {
 } from "../reducers/timeline";
 import { framePositionsCleared, resumed } from "devtools/client/debugger/src/reducers/pause";
 
-import { getLoadedRegions } from "./app";
+import { getLoadedRegions, isPointInLoadingRegion } from "./app";
 import type { UIStore, UIThunkAction } from "./index";
 import { UIState } from "ui/state";
 
@@ -125,7 +124,9 @@ export function jumpToInitialPausePoint(): UIThunkAction {
       hasFrames = initialPausePoint.hasFrames;
       time = initialPausePoint.time;
     }
-    ThreadFront.timeWarp(point, time, hasFrames);
+    if (isPointInLoadingRegion(state, point)) {
+      ThreadFront.timeWarp(point, time, hasFrames);
+    }
   };
 }
 
@@ -693,7 +694,6 @@ export function syncFocusedRegion(): UIThunkAction {
         dispatch(setBreakpointOptions(cx, b.location, b.options));
       }
     }
-    await dispatch(refetchMessages(focusRegion));
   };
 }
 

@@ -1,20 +1,20 @@
-import Inspector from "@bvaughn/components/inspector";
-import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
-import Expandable from "@bvaughn/components/Expandable";
-import Loader from "@bvaughn/components/Loader";
-import "@bvaughn/pages/variables.css";
-import { clientValueToProtocolNamedValue } from "@bvaughn/src/utils/protocol";
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
-import { ContainerItem, ValueItem } from "devtools/packages/devtools-reps";
+import Inspector from "bvaughn-architecture-demo/components/inspector";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import Expandable from "bvaughn-architecture-demo/components/Expandable";
+import Loader from "bvaughn-architecture-demo/components/Loader";
+import "bvaughn-architecture-demo/pages/variables.css";
+import { clientValueToProtocolNamedValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
+import { getSelectedFrame } from "devtools/client/debugger/src/selectors/pause";
+import { Item } from "devtools/packages/devtools-reps";
 import { ThreadFront } from "protocol/thread";
 import { ReactNode, Suspense, useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
-import { getSelectedFrame } from "../../selectors/pause";
 
 import styles from "./NewObjectInspector.module.css";
 
-export default function NewObjectInspector({ roots }: { roots: Array<ContainerItem | ValueItem> }) {
+export default function NewObjectInspector({ roots }: { roots: Item[] }) {
   const selectedFrame = useAppSelector(getSelectedFrame);
   const pause = ThreadFront.pauseForAsyncIndex(selectedFrame?.asyncIndex);
 
@@ -29,7 +29,7 @@ export default function NewObjectInspector({ roots }: { roots: Array<ContainerIt
 
     const children: ReactNode[] = [];
 
-    roots.forEach((root: ContainerItem | ValueItem, index) => {
+    roots.forEach((root: Item, index) => {
       switch (root.type) {
         case "container": {
           const protocolValues: ProtocolNamedValue[] = root.contents.map(

@@ -1,8 +1,10 @@
 import Expandable from "@bvaughn/components/Expandable";
 import Loader from "@bvaughn/components/Loader";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
+import { mergePropertiesAndGetterValues } from "@bvaughn/src/utils/protocol";
 import {
   ContainerEntry as ProtocolContainerEntry,
+  NamedValue,
   Object as ProtocolObject,
   PauseId,
   PauseId as ProtocolPauseId,
@@ -41,10 +43,20 @@ export default function PropertiesRenderer({
   const { className, objectId, preview } = object;
 
   const containerEntries = preview?.containerEntries ?? [];
+
   const properties = useMemo(() => {
-    return sortBy(preview?.properties ?? [], property => {
-      const maybeNumber = Number(property.name);
-      return isNaN(maybeNumber) ? property.name : maybeNumber;
+    if (preview == null) {
+      return [];
+    }
+
+    const [properties] = mergePropertiesAndGetterValues(
+      preview.properties || [],
+      preview.getterValues || []
+    );
+
+    return sortBy(properties, ({ name }) => {
+      const maybeNumber = Number(name);
+      return isNaN(maybeNumber) ? name : maybeNumber;
     });
   }, [preview]);
 
@@ -70,7 +82,7 @@ export default function PropertiesRenderer({
 
   // For collections that contain a lot of properties, group them into "buckets" of 100 props.
   // This most commonly comes into play with large Arrays.
-  const buckets: { header: string; properties: ProtocolProperty[] }[] = [];
+  const buckets: { header: string; properties: Array<NamedValue | ProtocolProperty> }[] = [];
   if (properties.length >= PROPERTY_BUCKET_SIZE) {
     let index = 0;
 
@@ -98,7 +110,7 @@ export default function PropertiesRenderer({
             <Suspense fallback={<Loader />}>
               {bucket.properties.map((property, index) => (
                 <Fragment key={index}>
-                  {property.get != null && (
+                  {property.hasOwnProperty("get") && (
                     <GetterRenderer
                       parentObjectId={objectId}
                       pauseId={pauseId}
@@ -123,7 +135,7 @@ export default function PropertiesRenderer({
         <Suspense fallback={<Loader />}>
           {properties.map((property, index) => (
             <Fragment key={index}>
-              {property.get != null && (
+              {property.hasOwnProperty("get") && (
                 <GetterRenderer
                   parentObjectId={objectId}
                   pauseId={pauseId}

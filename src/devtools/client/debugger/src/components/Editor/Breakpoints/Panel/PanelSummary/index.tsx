@@ -1,6 +1,5 @@
 import classNames from "classnames";
 import { AddCommentButton } from "design";
-import { LocationAnalysisSummary } from "devtools/client/debugger/src/reducers/breakpoints";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import React, { Dispatch, SetStateAction } from "react";
 import "reactjs-popup/dist/index.css";
@@ -16,13 +15,14 @@ import Condition from "./Condition";
 import Log from "./Log";
 import Popup from "./Popup";
 import useAuth0 from "ui/utils/useAuth0";
+import { TimeStampedPoint } from "@replayio/protocol";
 
 export type Input = "condition" | "logValue";
 
 type PanelSummaryProps = {
-  analysisPoints?: LocationAnalysisSummary;
   breakpoint: any;
   executionPoint: any;
+  hitPoints: TimeStampedPoint[] | null;
   isHot: boolean;
   pausedOnHit: boolean;
   setInputToFocus: Dispatch<SetStateAction<Input>>;
@@ -30,8 +30,8 @@ type PanelSummaryProps = {
 };
 
 export default function PanelSummary({
-  analysisPoints,
   breakpoint,
+  hitPoints,
   isHot,
   pausedOnHit,
   setInputToFocus,
@@ -45,14 +45,14 @@ export default function PanelSummary({
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAuth0();
 
-  const isLoaded = Boolean(analysisPoints && !isHot);
+  const isLoaded = !isHot;
   const isEditable = isLoaded && isTeamDeveloper;
 
   const focusInput = (input: Input) => {
     if (isEditable) {
       trackEvent("breakpoint.start_edit", {
         input,
-        hitsCount: analysisPoints?.data?.length || null,
+        hitsCount: hitPoints?.length || null,
       });
       toggleEditingOn();
       setInputToFocus(input);

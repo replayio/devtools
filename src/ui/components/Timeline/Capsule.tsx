@@ -5,13 +5,14 @@ import { useAppSelector } from "ui/setup/hooks";
 import { getLoadedAndIndexedProgress, getLoadingStatusSlow } from "ui/actions/app";
 import ExternalLink from "ui/components/shared/ExternalLink";
 import useModalDismissSignal from "ui/hooks/useModalDismissSignal";
-import { getShowFocusModeControls } from "ui/reducers/timeline";
+import { getBasicProcessingProgress, getShowFocusModeControls } from "ui/reducers/timeline";
 
 import Icon from "../shared/Icon";
 
 import styles from "./Capsule.module.css";
 import { EditFocusButton } from "./EditFocusButton";
 import FocusInputs from "./FocusInputs";
+import { useFeature } from "ui/hooks/settings";
 
 const SHOW_SLOW_LOADING_POP_OUT_AFTER_DELAY = 1000;
 
@@ -20,7 +21,14 @@ export default function Capsule({
 }: {
   setShowLoadingProgress: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-  const progress = Math.round(useAppSelector(getLoadedAndIndexedProgress) * 100);
+  const indexingProgress = Math.round(useAppSelector(getLoadedAndIndexedProgress) * 100);
+  const basicProcessingProgress = Math.round(useAppSelector(getBasicProcessingProgress) * 100);
+  let progress = indexingProgress;
+  const { value: basicProcessingLoadingBar } = useFeature("basicProcessingLoadingBar");
+
+  if (basicProcessingLoadingBar) {
+    progress = Math.round((basicProcessingProgress + indexingProgress) / 2);
+  }
   const loadingStatusSlow = useAppSelector(getLoadingStatusSlow);
   const showFocusModeControls = useAppSelector(getShowFocusModeControls);
 

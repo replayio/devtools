@@ -24,14 +24,16 @@ import {
   TimeStampedPoint,
   TimeStampedPointRange,
   TimeRange,
-  getResponseBodyResult,
-  getRequestBodyResult,
   FunctionMatch,
   keyboardEvents,
   navigationEvents,
   Result,
+  MappedLocation,
+  SameLineSourceLocations,
+  getPointsBoundingTimeResult as PointsBoundingTime,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
+import { RecordingCapabilities } from "protocol/thread/thread";
 
 export type LogEntry = {
   args: any[];
@@ -60,13 +62,13 @@ export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?:
 
 export type ReplayClientEvents = "loadedRegionsChange";
 
-export type HitPointsStatus =
+export type HitPointStatus =
   | "complete"
   | "too-many-points-to-find"
   | "too-many-points-to-run-analysis"
   | "unknown-error";
 
-export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointsStatus];
+export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointStatus];
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
@@ -87,6 +89,10 @@ export interface ReplayClientInterface {
   findSources(): Promise<Source[]>;
   getAllFrames(pauseId: PauseId): Promise<PauseData>;
   getAnnotationKinds(): Promise<string[]>;
+  getBreakpointPositions(
+    sourceId: SourceId,
+    range?: { start: SourceLocation; end: SourceLocation }
+  ): Promise<SameLineSourceLocations[]>;
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
   getHitPointsForLocation(
@@ -94,6 +100,7 @@ export interface ReplayClientInterface {
     location: Location,
     condition: string | null
   ): Promise<HitPointsAndStatusTuple>;
+  getMappedLocation(location: Location): Promise<MappedLocation>;
   getObjectWithPreview(
     objectId: ObjectId,
     pauseId: PauseId,
@@ -101,7 +108,9 @@ export interface ReplayClientInterface {
   ): Promise<PauseData>;
   getObjectProperty(objectId: ObjectId, pauseId: PauseId, propertyName: string): Promise<Result>;
   getPointNearTime(time: number): Promise<TimeStampedPoint>;
+  getPointsBoundingTime(time: number): Promise<PointsBoundingTime>;
   getPreferredLocation(locations: Location[]): Location | null;
+  getRecordingCapabilities(): Promise<RecordingCapabilities>;
   getRecordingId(): RecordingId | null;
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;

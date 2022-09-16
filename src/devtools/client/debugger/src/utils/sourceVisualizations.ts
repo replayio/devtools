@@ -3,8 +3,16 @@ import type { SourceId } from "@replayio/protocol";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-
-import { SourceDetails, isOriginalSource } from "ui/reducers/sources";
+import { ReplayClientInterface } from "shared/client/types";
+import { getMappedLocation } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
+import { getBreakpointPositions } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import {
+  SourceDetails,
+  isOriginalSource,
+  getBestNonSourceMappedSourceId,
+  getBestSourceMappedSourceId,
+} from "ui/reducers/sources";
+import { CursorPosition } from "../components/Editor/Footer";
 
 import { isNodeModule, isBowerComponent } from "./source";
 
@@ -38,9 +46,11 @@ export function getSourceIDsToSearch(
 }
 
 function getSourceToVisualize(
-  selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null,
-  sourcesById: Dictionary<SourceDetails>
+  selectedSource: SourceDetails | null | undefined,
+  alternateSource: SourceDetails | null | undefined,
+  sourcesById: Dictionary<SourceDetails>,
+  position?: CursorPosition,
+  client?: ReplayClientInterface
 ) {
   if (!selectedSource) {
     return undefined;
@@ -48,19 +58,41 @@ function getSourceToVisualize(
   if (isOriginalSource(selectedSource)) {
     return selectedSource.id;
   }
-  if (alternateSource && isOriginalSource(alternateSource)) {
+  if (!alternateSource) {
+    const alternateSourceId = getUniqueAlternateSourceId(selectedSource, sourcesById).sourceId;
+    if (alternateSourceId) {
+      alternateSource = sourcesById[alternateSourceId];
+    }
+  }
+  if (alternateSource) {
+    assert(
+      isOriginalSource(alternateSource),
+      "either selected or alternate source must be original"
+    );
     return alternateSource.id;
   }
-  const { sourceId } = getUniqueAlternateSourceId(selectedSource, sourcesById);
-  return sourceId;
+  if (position && client) {
+    return getAlternateSourceIdForPosition(client, selectedSource, position, sourcesById);
+  }
 }
 
 export function getSourcemapVisualizerURL(
-  selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null,
-  sourcesById: Dictionary<SourceDetails>
-): string | null {
-  const sourceId = getSourceToVisualize(selectedSource, alternateSource, sourcesById);
+  selectedSource: SourceDetails | null | undefined,
+  alternateSource: SourceDetails | null | undefined,
+  sourcesById: Dictionary<SourceDetails>,
+  position?: CursorPosition,
+  client?: ReplayClientInterface
+) {
+  if (!selectedSource) {
+    return null;
+  }
+  const sourceId = getSourceToVisualize(
+    selectedSource,
+    alternateSource,
+    sourcesById,
+    position,
+    client
+  );
   if (!sourceId) {
     return null;
   }
@@ -74,18 +106,20 @@ export function getSourcemapVisualizerURL(
   return href;
 }
 
+interface AlternateSourceResult {
+  sourceId?: SourceId;
+  why?: "no-source" | "no-sourcemap" | "not-unique";
+}
+
 // Get the ID of the only alternate source that can be switched to from the source with
 // the given ID. This doesn't work for sources that are bundles or linked to bundles
 // through sourcemaps, because in that case there may be multiple alternate sources.
 // If no unique alternate source could be found, the reason ("no-sourcemap" or "not-unique")
 // is returned.
-export function getUniqueAlternateSourceId(
+function getUniqueAlternateSourceId(
   source: SourceDetails,
   sourcesById: Dictionary<SourceDetails>
-): {
-  sourceId?: SourceId;
-  why?: "no-sourcemap" | "not-unique";
-} {
+): AlternateSourceResult {
   const nonPrettyPrintedSourceId = source.prettyPrintedFrom || source.id;
   assert(nonPrettyPrintedSourceId, "couldn't find minified version of pretty-printed source");
   const nonPrettyPrintedSource = sourcesById[nonPrettyPrintedSourceId];
@@ -103,7 +137,7 @@ export function getUniqueAlternateSourceId(
   const sourcemappedSourceIds = nonPrettyPrintedSource.generatedFrom.filter(
     sourceId => sourcesById[sourceId]?.kind === "sourceMapped"
   );
-  if (!sourcemappedSourceIds?.length) {
+  if (!sourcemappedSourceIds.length) {
     return { why: "no-sourcemap" };
   }
   if (sourcemappedSourceIds.length > 1) {
@@ -117,4 +151,69 @@ export function getUniqueAlternateSourceId(
   alternateSourceId = alternateSource.correspondingSourceIds[0];
 
   return { sourceId: alternateSourceId };
+}
+
+function getAlternateSourceIdForPosition(
+  client: ReplayClientInterface,
+  source: SourceDetails,
+  position: CursorPosition,
+  sourcesById: Dictionary<SourceDetails>
+) {
+  const lineLocations = getBreakpointPositions(client, source.id);
+  const breakableLine = Math.min(
+    ...lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
+  );
+
+  const breakableLineLocations = lineLocations.find(ll => ll.line === breakableLine);
+  if (!breakableLineLocations) {
+    return undefined;
+  }
+
+  let breakableColumn = breakableLineLocations.columns[0];
+  const mappedLocation = getMappedLocation(client, {
+    sourceId: source.id,
+    line: breakableLine,
+    column: breakableColumn,
+  });
+  return source.isSourceMapped
+    ? getBestNonSourceMappedSourceId(
+        sourcesById,
+        mappedLocation.map(loc => loc.sourceId)
+      )
+    : getBestSourceMappedSourceId(
+        sourcesById,
+        mappedLocation.map(loc => loc.sourceId)
+      );
+}
+
+export function getAlternateSourceId(
+  client: ReplayClientInterface,
+  selectedSource: SourceDetails | null | undefined,
+  alternateSource: SourceDetails | null | undefined,
+  sourcesById: Dictionary<SourceDetails>,
+  position: CursorPosition
+): AlternateSourceResult {
+  if (alternateSource) {
+    return { sourceId: alternateSource.id };
+  }
+  if (!selectedSource) {
+    return { why: "no-source" };
+  }
+
+  const uniqueAlternate = getUniqueAlternateSourceId(selectedSource, sourcesById);
+  if (uniqueAlternate.sourceId || uniqueAlternate.why === "no-sourcemap") {
+    return uniqueAlternate;
+  }
+
+  const alternateSourceId = getAlternateSourceIdForPosition(
+    client,
+    selectedSource,
+    position,
+    sourcesById
+  );
+  if (alternateSourceId) {
+    return { sourceId: alternateSourceId };
+  }
+
+  return { why: "not-unique" };
 }

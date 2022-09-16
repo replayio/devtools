@@ -20,7 +20,6 @@ import preview from "./preview";
 import quickOpen from "./quick-open";
 import sourceTree from "./source-tree";
 import threads from "./threads";
-import eventListenerBreakpoints from "./event-listeners";
 
 export default {
   breakpoints,
@@ -33,6 +32,5 @@ export default {
   quickOpen,
   sourceTree,
   threads,
-  eventListenerBreakpoints,
   preview,
 };

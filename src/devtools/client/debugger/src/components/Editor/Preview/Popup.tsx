@@ -2,215 +2,53 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
-
-import type { UIState } from "ui/state";
+import Popover from "devtools/client/debugger/src/components/shared/Popover";
+import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
-
-import { ObjectInspector, MODE, Rep } from "devtools/packages/devtools-reps";
-import {
-  highlightDomElement,
-  unHighlightDomElement,
-  openLink,
-  openNodeInInspector,
-} from "devtools/client/webconsole/actions/toolbox";
-import { selectSourceURL } from "devtools/client/debugger/src/actions/sources/select";
-import { clearPreview } from "devtools/client/debugger/src/actions/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { prefs as prefsService } from "devtools/shared/services";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
-
-import Popover from "../../shared/Popover";
-import PreviewFunction from "../../shared/PreviewFunction";
+import React from "react";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 
 import NewObjectInspector from "./NewObjectInspector";
-import { getPreferredLocation } from "ui/utils/preferredLocation";
-
-type $FixTypeLater = any;
 
 interface PopupProps {
-  preview: PreviewState["preview"];
+  preview: PreviewState;
   editorRef: HTMLDivElement;
+  target: HTMLElement;
 }
 
-type FinalPopupProps = PropsFromRedux & PopupProps;
+export function Popup({ editorRef, target, preview }: PopupProps) {
+  const dispatch = useAppDispatch();
+  const cx = useAppSelector(getThreadContext);
 
-export class Popup extends Component<FinalPopupProps> {
-  calculateMaxHeight = () => {
-    const { editorRef } = this.props;
-    if (!editorRef) {
-      return "auto";
-    }
-
-    const { height, top } = editorRef.getBoundingClientRect();
-    const maxHeight = height + top;
-    if (maxHeight < 250) {
-      return maxHeight;
-    }
-
-    return 250;
+  const onMouseOut = () => {
+    dispatch(previewCleared({ cx, previewId: preview!.previewId }));
   };
 
-  renderFunctionPreview() {
-    const { cx, sourcesById, selectSourceURL, preview } = this.props;
-    const { resultGrip } = preview!;
+  const { cursorPos, expression, value } = preview!;
 
-    if (!resultGrip) {
-      return null;
-    }
-
-    const location = getPreferredLocation(resultGrip.mappedFunctionLocation());
-    const locationURL = location ? sourcesById[location.sourceId]?.url : undefined;
-
-    return (
-      <div
-        className="preview-popup"
-        onClick={() =>
-          location &&
-          locationURL &&
-          selectSourceURL(cx, locationURL, {
-            line: location.line,
-            column: 0,
-          })
-        }
-      >
-        <PreviewFunction func={resultGrip} />
-      </div>
-    );
+  if (value === null) {
+    return null;
   }
 
-  renderObjectPreview() {
-    const {
-      preview,
-      openLink,
-      openElementInInspector,
-      highlightDomElement,
-      unHighlightDomElement,
-    } = this.props;
-    const { root } = preview!;
+  // Primitives get rendered as a smaller "tooltip" style, above the line.
+  // Other values get rendered as a larger "popover" style, below.
 
-    if (root.getChildren().length == 0) {
-      return (
-        <div className="preview-popup">
-          <span className="label">{"No properties"}</span>
-        </div>
-      );
-    }
+  // The backend returns primitive data in a field called `value`
+  const isPrimitive = typeof value === "object" && "value" in value;
+  const popoverType = isPrimitive ? "tooltip" : "popover";
 
-    return (
-      <div className="preview-popup" style={{ maxHeight: this.calculateMaxHeight() }}>
-        <ObjectInspector
-          roots={() => root.getChildren()}
-          autoExpandDepth={0}
-          disableWrap={true}
-          focusable={false}
-          // @ts-expect-error prop mismatch? whatever
-          openLink={openLink}
-          onDOMNodeClick={(grip: $FixTypeLater) => openElementInInspector(grip)}
-          onInspectIconClick={(grip: $FixTypeLater) => openElementInInspector(grip)}
-          onDOMNodeMouseOver={(grip: $FixTypeLater) => highlightDomElement(grip)}
-          onDOMNodeMouseOut={() => unHighlightDomElement()}
-        />
-      </div>
-    );
-  }
-
-  renderSimplePreview() {
-    const { openLink, preview } = this.props;
-
-    const { resultGrip } = preview!;
-    return (
-      <div className="preview-popup">
-        {Rep({
-          object: resultGrip,
-          mode: MODE.LONG,
-          openLink,
-        })}
-      </div>
-    );
-  }
-
-  renderPreview() {
-    // We don't have to check and
-    // return on `false`, `""`, `0`, `undefined` etc,
-    // these falsy simple typed value because we want to
-    // do `renderSimplePreview` on these values below.
-    const { preview } = this.props;
-    const { root } = preview!;
-
-    const disableNewComponentArchitecture = prefsService.getBoolPref(
-      "devtools.features.disableNewComponentArchitecture"
-    );
-    if (disableNewComponentArchitecture) {
-      if (root.type === "value") {
-        if (root.isFunction()) {
-          return this.renderFunctionPreview();
-        }
-        if (root.isObject()) {
-          return <div>{this.renderObjectPreview()}</div>;
-        }
-      }
-
-      return this.renderSimplePreview();
-    } else {
-      return <NewObjectInspector />;
-    }
-  }
-
-  getPreviewType() {
-    const { preview } = this.props;
-    const { root } = preview!;
-    if (root.isPrimitive() || (root.type === "value" && root.isFunction())) {
-      return "tooltip";
-    }
-
-    return "popover";
-  }
-
-  onMouseOut = () => {
-    const { clearPreview, cx, preview } = this.props;
-    clearPreview(cx, preview!.previewId);
-  };
-
-  render() {
-    const { preview, editorRef } = this.props;
-    const { cursorPos, resultGrip } = preview!;
-
-    if (resultGrip.isUnavailable()) {
-      return null;
-    }
-
-    const type = this.getPreviewType();
-    return (
-      <Popover
-        targetPosition={cursorPos}
-        type={type}
-        editorRef={editorRef}
-        target={this.props.preview!.target}
-        mouseout={this.onMouseOut}
-      >
-        {this.renderPreview()}
-      </Popover>
-    );
-  }
+  return (
+    <Popover
+      targetPosition={cursorPos}
+      type={popoverType}
+      editorRef={editorRef}
+      target={target}
+      mouseout={onMouseOut}
+    >
+      <NewObjectInspector expression={expression} protocolValue={value} />
+    </Popover>
+  );
 }
 
-const mapStateToProps = (state: UIState) => ({
-  cx: getThreadContext(state),
-  sourcesById: getSourceDetailsEntities(state),
-});
-
-const mapDispatchToProps = {
-  selectSourceURL,
-  openLink,
-  openElementInInspector: openNodeInInspector,
-  highlightDomElement,
-  unHighlightDomElement,
-  clearPreview,
-};
-
-const connector = connect(mapStateToProps, mapDispatchToProps);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(Popup);
+export default Popup;

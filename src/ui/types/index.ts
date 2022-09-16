@@ -9,13 +9,12 @@ export type ExperimentalUserSettings = {
   apiKeys: ApiKey[];
   defaultWorkspaceId: null | string;
   disableLogRocket: boolean;
-  enableEventLink: boolean;
   enableTeams: boolean;
   enableLargeText: boolean;
 };
 
 export type LocalExperimentalUserSettings = {
-  disableNewComponentArchitecture: boolean;
+  basicProcessingLoadingBar: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
   enableLargeText: boolean;
