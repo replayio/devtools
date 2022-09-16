@@ -431,7 +431,7 @@
   --theme-sidebar-background: var(--body-bgcolor);
   --theme-text-field-color: #fff;
   --theme-text-field-bgcolor: var(--theme-base-85);
-  --theme-text-field-bgcolor-hover: var(--theme-base-80);
+  --theme-text-field-bgcolor-hover: var(--theme-base-90);
   --text-field-border: var(--theme-base-85);
   --tab-selected-bgcolor: var(--theme-base-95);
   --tooltip-color: #fff;
