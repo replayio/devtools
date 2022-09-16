@@ -48,18 +48,20 @@ export const AddCommentButton = forwardRef<HTMLButtonElement, AddCommentButtonPr
     );
 
     return (
-      <button
-        ref={mergedRefs}
-        type={type}
-        aria-label="Add comment"
-        onClick={onClick}
-        onMouseEnter={maybeHover}
-        onMouseLeave={clearHover}
-        className={buttonClassnames}
-      >
-        <Icon name="comment-plus" className={styles.Icon} />
-        <TextFade visible={isHovered}>Add Comment</TextFade>
-      </button>
+      <div className={styles.Root}>
+        <button
+          ref={mergedRefs}
+          type={type}
+          aria-label="Add comment"
+          onClick={onClick}
+          onMouseEnter={maybeHover}
+          onMouseLeave={clearHover}
+          className={buttonClassnames}
+        >
+          <Icon name="comment-plus" className={styles.Icon} />
+          <TextFade visible={isHovered}>Add Comment</TextFade>
+        </button>
+      </div>
     );
   }
 );

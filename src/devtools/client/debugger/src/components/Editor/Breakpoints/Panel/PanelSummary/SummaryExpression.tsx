@@ -27,7 +27,7 @@ function Expression({ value }: { value: string }) {
   return (
     <div className={classNames({ expression: true })}>
       <div
-        className="cm-s-mozilla overflow-hidden whitespace-pre"
+        className="overflow-hidden whitespace-pre cm-s-mozilla"
         dangerouslySetInnerHTML={{ __html: getSyntaxHighlightedMarkup(value || "") }}
       />
     </div>
@@ -38,14 +38,14 @@ export function SummaryExpression({ isEditable, value }: SummaryExpressionProps 
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
 
   return isEditable ? (
-    <div className="group flex space-x-1 px-2 hover:text-primaryAccent">
+    <div className="flex flex-1 pr-1 space-x-1 group">
       <Expression value={value} />
-      <MaterialIcon className="pencil opacity-0" iconSize="xs">
+      <MaterialIcon className="pencil" iconSize="xs">
         edit
       </MaterialIcon>
     </div>
   ) : (
-    <div className="rounded-sm px-2">
+    <div className="px-2 rounded-sm">
       <Popup trigger={<Expression value={value} />}>
         {isTeamDeveloper ? (
           <>

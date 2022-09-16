@@ -426,7 +426,7 @@ html #webconsole-notificationbox {
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   line-height: var(--console-output-line-height);
-  background-color: var(--theme-console-input-bgcolor);
+  /* background-color: var(--theme-console-input-bgcolor); */
 }
 
 .console-chevron {

@@ -3,19 +3,24 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 .breakpoint-panel-wrapper {
-  max-width: 500px;
   min-width: 300px;
 }
 
 .breakpoint-panel {
-  border-radius: 4px;
+  margin: 4px 0;
   background: var(--theme-toolbar-background);
   border: 1px solid var(--theme-splitter-color);
+  border-left: none;
+  border-right: none;
   color: var(--theme-toolbar-color);
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
+}
+
+.breakpoint-panel .CodeMirror-lines {
+  background-color: transparent !important;
 }
 
 .breakpoint-panel .button-container {
@@ -48,8 +53,14 @@
   height: 28px;
   line-height: 16px;
   padding: 4px;
-  padding-left: 8px;
   white-space: nowrap;
+  background-color: var(--theme-text-field-bgcolor);
+  border-radius: 0.25rem;
+  transition: background-color 180ms ease-out;
+}
+
+.breakpoint-panel .statement:hover {
+  background-color: var(--theme-text-field-bgcolor-hover);
 }
 
 .breakpoint-panel .statement:first-child {
@@ -68,7 +79,9 @@
   font-family: var(--monospace-font-family);
   font-size: var(--theme-code-font-size);
   width: 100%;
-  background-color: var(--breakpoint-editfield-active);
+  min-height: 28px;
+  padding-top: 2px;
+  background-color: var(--theme-base-90);
   caret-color: yellow;
 }
 
@@ -127,27 +140,28 @@ non-editing markup */
 }
 
 .breakpoint-panel .summary .statement:hover .expression {
-  background-image: linear-gradient(to right, var(--breakpoint-tip) 50%, transparent 0%);
   background-position: 1px 14px;
   background-size: 5px 1.5px;
   background-repeat: repeat-x;
 }
 
 .breakpoint-panel .summary {
-  background: var(--breakpoint-editfield-hover);
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
 }
 
-.breakpoint-panel .summary.enabled:hover {
-  background: var(--breakpoint-editfield-hover);
+.breakpoint-panel .expression {
+  flex: 1;
 }
 
 .breakpoint-panel .summary .statement:hover {
   cursor: pointer;
 }
 
+.breakpoint-panel .summary .statement .pencil {
+  align-self: center;
+}
+
 .breakpoint-panel .summary .statement:hover .pencil {
-  opacity: 1;
   color: var(--breakpoint-tip);
 }

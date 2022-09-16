@@ -1,7 +1,7 @@
 .breakpoint-navigation {
   display: flex;
   flex-direction: row;
-  background-color: var(--theme-toolbar-background);
+  /* background-color: var(--theme-toolbar-background); */
   align-items: center;
 }
 
@@ -62,7 +62,7 @@
   display: flex;
   flex-direction: row;
   flex-grow: 1;
-  background: var(--theme-toolbar-background);
+  /* background: var(--theme-toolbar-background); */
   width: 100%;
   align-items: center;
 }
