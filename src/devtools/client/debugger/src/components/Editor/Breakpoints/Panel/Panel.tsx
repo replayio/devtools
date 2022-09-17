@@ -167,7 +167,7 @@ function Panel({
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
       <div
         className="breakpoint-panel-wrapper"
-        style={{ width: `${width + 30}px` }}
+        style={{ width: `${width}px` }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
       >
