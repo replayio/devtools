@@ -684,7 +684,8 @@ class _ThreadFront {
     }
 
     const epoch = this.resumeTargetEpoch;
-    const { target } = await command({ point }, this.sessionId);
+    const resp = await command({ point }, this.sessionId);
+    const { target } = resp;
     if (epoch == this.resumeTargetEpoch) {
       this.updateMappedLocation(target.frame);
       this.resumeTargets.set(key, target);
@@ -728,6 +729,7 @@ class _ThreadFront {
         time: this.currentTime,
       });
     }
+
     if (
       resumeTarget &&
       loadedRegions.loaded.every(
@@ -739,25 +741,26 @@ class _ThreadFront {
     if (resumeTarget && resumeEmitted) {
       warpToTarget();
     }
+    return resumeTarget;
   }
 
   rewind(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
   }
   resume(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
   }
   reverseStepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
   }
   stepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
   }
   stepIn(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
   }
   stepOut(point: ExecutionPoint, loadedRegions: LoadedRegions) {
-    this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
+    return this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
   }
 
   async resumeTarget(point: ExecutionPoint) {

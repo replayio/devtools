@@ -21,13 +21,6 @@ import { isPointInLoadingRegion } from "ui/reducers/app";
 
 type $FixTypeLater = any;
 
-/**
- * Debugger has just paused
- *
- * @param {object} pauseInfo
- * @memberof actions/pause
- * @static
- */
 export function paused({
   executionPoint,
   frame,
