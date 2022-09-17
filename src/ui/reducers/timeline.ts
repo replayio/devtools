@@ -54,14 +54,16 @@ const timelineSlice = createSlice({
       state.focusRegion = action.payload;
     },
     pointsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
+      const mutablePoints = [...state.points];
       state.points = mergeSortedPointLists(
-        state.points,
+        mutablePoints,
         sortBy(action.payload, p => BigInt(p.point))
       );
     },
     paintsReceived(state, action: PayloadAction<TimeStampedPoint[]>) {
+      const mutablePaints = [...state.paints];
       state.paints = mergeSortedPointLists(
-        state.paints,
+        mutablePaints,
         sortBy(action.payload, p => BigInt(p.point))
       );
     },
