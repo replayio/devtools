@@ -201,6 +201,6 @@ export default class E2ECoverageReporter
 }
 
 process.on("uncaughtException", err => {
-  console.error("Uncaught error in the reporter: " + err);
+  console.error("Uncaught error in the reporter: " + err.message);
   process.exit(1);
 });

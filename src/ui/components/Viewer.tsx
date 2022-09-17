@@ -23,7 +23,7 @@ const Vertical = () => {
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={8}
-      initialSize={prefs.secondaryPanelHeight.toString() as `${number}px`}
+      initialSize={prefs.secondaryPanelHeight as `${number}px`}
       onResizeEnd={(size: string) => {
         prefs.secondaryPanelHeight = size;
       }}

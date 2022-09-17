@@ -245,8 +245,7 @@ function transformEvaluationResultPacket(packet) {
   const parameter = result;
 
   if (typeof exception === "string") {
-    // Wrap thrown strings in Error objects, so `throw "foo"` outputs "Error: foo"
-    exceptionMessage = new Error(exceptionMessage).toString();
+    exceptionMessage = `Error: ${exceptionMessage}`;
   }
 
   const level =
