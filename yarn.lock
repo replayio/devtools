@@ -3940,17 +3940,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/protocol@npm:^0.31.0":
-  version: 0.31.0
-  resolution: "@replayio/protocol@npm:0.31.0"
-  checksum: 3c41fcca0e2adf0ec76a7d31baf93abf9a150f7effe46e378da21ecc9a652de7439acff4c8d89acae5bc0d9a3640052b5f9f1c38e8364e786d6186478ab5aac4
-  languageName: node
-  linkType: hard
-
-"@replayio/protocol@npm:^0.31.1":
-  version: 0.31.1
-  resolution: "@replayio/protocol@npm:0.31.1"
-  checksum: 37b581feaccb678281a198a4d0ca11cffc7bd4c5f648b96dc06cc058f67a2b899a61ba876b371df60876f5ca6a17262df0eca2ff796cb60dbce42d3b9ca5eed0
+"@replayio/protocol@npm:^0.32.2":
+  version: 0.32.2
+  resolution: "@replayio/protocol@npm:0.32.2"
+  checksum: 26c76597dad8dd01498ef3ab2e7fd01a7031a63acf1dd405e821143a60c4e288d14bcb4a56c3858fef8ea2d29de3e52a57fea2287571a91595ab0e79f221fe88
   languageName: node
   linkType: hard
 
@@ -9173,7 +9166,7 @@ __metadata:
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1"
     "@lezer/highlight_bvaughn": "npm:@lezer/highlight@1.1.1"
     "@playwright/test": ^1.23.1
-    "@replayio/protocol": ^0.31.0
+    "@replayio/protocol": ^0.32.2
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     date-fns: ^2.28.0
@@ -17118,7 +17111,7 @@ __metadata:
   resolution: "markerikson-stack-client-prototype-227d06@workspace:packages/markerikson-stack-client-prototype"
   dependencies:
     "@codemirror/lang-javascript": ^6.0.2
-    "@replayio/protocol": ^0.31.0
+    "@replayio/protocol": ^0.32.2
     "@testing-library/jest-dom": ^5.16.3
     "@testing-library/react": ^13.2.0
     "@uiw/react-codemirror": ^4.11.4
@@ -20683,7 +20676,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/protocol": ^0.31.1
+    "@replayio/protocol": ^0.32.2
     "@replayio/replay": ^0.4.2
     "@sentry/react": ^7.9.0
     "@sentry/tracing": ^7.9.0

@@ -310,19 +310,11 @@ export class ReplayClient implements ReplayClientInterface {
   }
 
   async getEventCountForTypes(eventTypes: string[]): Promise<Record<string, number>> {
-    return Object.fromEntries(
-      await Promise.all(
-        eventTypes.map(
-          async eventType => [eventType, await this.getEventCountForType(eventType)] as const
-        )
-      )
-    );
-  }
-
-  async getEventCountForType(eventType: EventHandlerType): Promise<number> {
     const sessionId = this.getSessionIdThrows();
-    const { count } = await client.Debugger.getEventHandlerCount({ eventType }, sessionId);
-    return count;
+    const { counts }: { counts: { type: string; count: number }[] } =
+      await client.Debugger.getEventHandlerCounts({ eventTypes }, sessionId);
+    const countsObject = Object.fromEntries(counts.map(({ type, count }) => [type, count]));
+    return countsObject;
   }
 
   async getHitPointsForLocation(
@@ -342,12 +334,12 @@ export class ReplayClient implements ReplayClientInterface {
       const mapper = `
         const { point, time } = input;
         const { frame: frameId } = sendCommand("Pause.getTopFrame");
-    
+
         const { result: conditionResult } = sendCommand(
           "Pause.evaluateInFrame",
           { frameId, expression: ${JSON.stringify(condition)}, useOriginalScopes: true }
         );
-    
+
         let result;
         if (conditionResult.returned) {
           const { returned } = conditionResult;
@@ -362,7 +354,7 @@ export class ReplayClient implements ReplayClientInterface {
         } else {
           result = 1;
         }
-    
+
         return [
           {
             key: point,
