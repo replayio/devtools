@@ -42,6 +42,7 @@ import {
 
 import { toggleFocusMode } from "./timeline";
 import { ReplayClientInterface } from "shared/client/types";
+import { seekToPreviousPause, seekToNextPause } from "devtools/client/debugger/src/actions/pause";
 
 const supportsPerformanceNow =
   typeof performance !== "undefined" && typeof performance.now === "function";
@@ -277,6 +278,10 @@ export function executeCommand(key: CommandKey): UIThunkAction {
       dispatch(setToolboxLayout("left"));
     } else if (key === "pin_to_bottom_right") {
       dispatch(setToolboxLayout("ide"));
+    } else if (key === "seek_to_previous_pause") {
+      dispatch(seekToPreviousPause());
+    } else if (key === "seek_to_next_pause") {
+      dispatch(seekToNextPause());
     }
 
     dispatch(hideCommandPalette());

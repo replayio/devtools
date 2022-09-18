@@ -44,6 +44,8 @@ function KeyboardShortcuts({
   setViewMode,
   toggleCommandPalette,
   toggleFocusMode,
+  seekToPreviousPause,
+  seekToNextPause,
   togglePaneCollapse,
   viewMode,
   toggleThemeAction,
@@ -154,6 +156,8 @@ function KeyboardShortcuts({
       "CmdOrCtrl+Shift+O": toggleFunctionQuickOpenModal,
       "CmdOrCtrl+O": toggleProjectFunctionQuickOpenModal,
       "CmdOrCtrl+G": toggleLineQuickOpenModal,
+      "CmdOrCtrl+Z": seekToPreviousPause,
+      "Shift+CmdOrCtrl+Z": seekToNextPause,
 
       "~": toggleProtocolTimeline,
 
@@ -176,6 +180,8 @@ function KeyboardShortcuts({
     toggleQuickOpen,
     closeOpenModalsOnEscape,
     createFrameComment,
+    seekToNextPause,
+    seekToPreviousPause,
     recordingId,
   ]);
 
@@ -208,6 +214,8 @@ const connector = connect(
     toggleCommandPalette: actions.toggleCommandPalette,
     toggleFocusMode: actions.toggleFocusMode,
     toggleThemeAction: actions.toggleTheme,
+    seekToPreviousPause: actions.seekToPreviousPause,
+    seekToNextPause: actions.seekToNextPause,
     toggleQuickOpen,
     closeOpenModalsOnEscape,
   }

@@ -3,7 +3,6 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import { Location } from "@replayio/protocol";
 import { previewLocationUpdated } from "../../reducers/pause";
 

@@ -2,10 +2,7 @@ import clamp from "lodash/clamp";
 import React, { ChangeEvent, useState } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { actions } from "ui/actions";
-import hooks from "ui/hooks";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
-import { ExperimentalUserSettings } from "ui/types";
+
 import CommandButton from "./CommandButton";
 import SearchInput from "./SearchInput";
 import { filter } from "fuzzaldrin-plus";
@@ -40,7 +37,9 @@ export type CommandKey =
   | "show_sharing"
   | "toggle_dark_mode"
   | "toggle_edit_focus"
-  | "toggle_video";
+  | "toggle_video"
+  | "seek_to_previous_pause"
+  | "seek_to_next_pause";
 
 const COMMANDS: readonly Command[] = [
   { key: "open_console", label: "Open Console" },
@@ -70,6 +69,8 @@ const COMMANDS: readonly Command[] = [
   { key: "pin_to_bottom", label: "Pin Toolbox To Bottom" },
   { key: "pin_to_left", label: "Pin Toolbox To Left" },
   { key: "pin_to_bottom_right", label: "Pin Toolbox To Bottom Right" },
+  { key: "seek_to_previous_pause", label: "Jump To Previous Pause", shortcut: "Cmd+Z" },
+  { key: "seek_to_next_pause", label: "Jump To Next Pause", shortcut: "Cmd+Shift+Z" },
 ] as const;
 
 const DEFAULT_COMMANDS: readonly CommandKey[] = [

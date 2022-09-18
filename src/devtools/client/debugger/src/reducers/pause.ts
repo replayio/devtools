@@ -23,6 +23,13 @@ export interface Context {
   navigateCounter: number;
 }
 
+interface PauseHistoryItem {
+  pauseId: string;
+  time: number;
+  executionPoint: string;
+  hasFrames: boolean;
+}
+
 export interface ThreadContext {
   isPaused: boolean;
   navigateCounter: number;
@@ -70,6 +77,8 @@ export interface PauseState {
   why: string | null;
   command: string | null;
   previousLocation: Location | null;
+  pauseHistory: PauseHistoryItem[];
+  pauseHistoryIndex: number;
   replayFramePositions?: { positions: UnknownPosition[] } | null;
 }
 
@@ -107,6 +116,8 @@ const initialState: PauseState = {
   ...resumedPauseState,
   command: null,
   previousLocation: null,
+  pauseHistory: [],
+  pauseHistoryIndex: 0,
 };
 
 export const executeCommandOperation = createAsyncThunk<
@@ -270,7 +281,7 @@ const pauseSlice = createSlice({
         time?: number;
       }>
     ) {
-      const { id, frame, why, executionPoint } = action.payload;
+      const { id, frame, why, executionPoint, time } = action.payload;
       Object.assign(state, {
         pauseErrored: false,
         pauseLoading: false,
@@ -284,6 +295,22 @@ const pauseSlice = createSlice({
       state.frames = frame ? [frame] : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
+
+      if (time && state.pauseHistoryIndex == state.pauseHistory.length) {
+        state.pauseHistory.push({
+          pauseId: id,
+          time,
+          executionPoint,
+          hasFrames: !!frame,
+        });
+        state.pauseHistoryIndex++;
+      }
+    },
+    pauseHistoryDecremented(state) {
+      state.pauseHistoryIndex--;
+    },
+    pauseHistoryIncremented(state) {
+      state.pauseHistoryIndex++;
     },
     pauseCreationFailed(state, action: PayloadAction<string>) {
       const executionPoint = action.payload;
@@ -393,6 +420,8 @@ export const {
   framePositionsLoaded,
   frameSelected,
   pauseCreationFailed,
+  pauseHistoryDecremented,
+  pauseHistoryIncremented,
   pauseRequestedAt,
   paused,
   previewLocationCleared,
@@ -438,10 +467,6 @@ export function getPauseCommand(state: UIState) {
   return state.pause.command;
 }
 
-export function isStepping(state: UIState) {
-  return ["stepIn", "stepOver", "stepOut"].includes(getPauseCommand(state)!);
-}
-
 export function getIsPaused(state: UIState) {
   return !!state.pause.frames;
 }
@@ -450,16 +475,7 @@ export function hasFrames(state: UIState) {
   return !!getTopFrame(state);
 }
 
-export function getPreviousPauseFrameLocation(state: UIState) {
-  return state.pause.previousLocation;
-}
-
-export function isEvaluatingExpression(state: UIState) {
-  return state.pause.command === "expression";
-}
-
 export function getFrames(state: UIState) {
-  const f = state.pause.frames;
   const { frames, framesLoading } = state.pause;
   return framesLoading ? null : frames;
 }
@@ -502,17 +518,11 @@ export function isTopFrame(state: UIState) {
   return topFrame == selectedFrame;
 }
 
-export function getExecutionPoint(state: UIState) {
-  return state.pause.executionPoint;
-}
-
-export function getPauseId(state: UIState) {
-  return state.pause.id;
-}
-
-export function getPausePreviewLocation(state: UIState) {
-  return state.pause.pausePreviewLocation;
-}
+export const getExecutionPoint = (state: UIState) => state.pause.executionPoint;
+export const getPauseId = (state: UIState) => state.pause.id;
+export const getPausePreviewLocation = (state: UIState) => state.pause.pausePreviewLocation;
+export const getPauseHistory = (state: UIState) => state.pause.pauseHistory;
+export const getPauseHistoryIndex = (state: UIState) => state.pause.pauseHistoryIndex;
 
 export function getResumePoint(state: UIState, type: string) {
   const framePoints = getFramePositions(state)?.positions.map(p => p.point);
