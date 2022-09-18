@@ -2,14 +2,7 @@ import { ConsoleFiltersContextRoot } from "@bvaughn/src/contexts/ConsoleFiltersC
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
-import {
-  ReactNode,
-  Suspense,
-  unstable_Offscreen as Offscreen,
-  useContext,
-  useRef,
-  useState,
-} from "react";
+import { ReactNode, Suspense, unstable_Offscreen as Offscreen, useContext, useRef } from "react";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 
 import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
@@ -22,6 +15,7 @@ import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
 import classNames from "classnames";
+import { useBoolPref } from "ui/hooks/settings";
 
 export default function ConsoleRoot({
   nagHeader = null,
@@ -34,7 +28,7 @@ export default function ConsoleRoot({
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const { value: isMenuOpen, update: setIsMenuOpen } = useBoolPref("consoleFilterDrawerExpanded");
   const messageListRef = useRef<HTMLElement>(null);
 
   return (
