@@ -64,10 +64,18 @@ function ContextMenu({
         top: mouseCoordinates.y,
       }}
     >
-      <div className={styles.ContextMenuItem} onClick={setFocusBegin}>
+      <div
+        className={styles.ContextMenuItem}
+        data-test-id="ConsoleContextMenu-SetFocusStartButton"
+        onClick={setFocusBegin}
+      >
         Set focus start
       </div>
-      <div className={styles.ContextMenuItem} onClick={setFocusEnd}>
+      <div
+        className={styles.ContextMenuItem}
+        data-test-id="ConsoleContextMenu-SetFocusEndButton"
+        onClick={setFocusEnd}
+      >
         Set focus end
       </div>
       {isPointInstance(loggable) && (

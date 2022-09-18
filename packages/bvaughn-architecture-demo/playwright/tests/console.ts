@@ -8,70 +8,13 @@ import {
   toggleProtocolMessage,
   toggleProtocolMessages,
 } from "./utils/console";
-import { getBaseURL, getElementCount, getURLFlags, takeScreenshot } from "./utils/general";
+import { getElementCount, getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/console?${getURLFlags()}`;
-
-testSetup(async function regeneratorFunction({ page }) {
-  await setup(page, true);
-
-  // Exploring Message values
-
-  const warningListItem = await locateMessage(page, "console-warning", "This is a warning");
-  const arrayKeyValue = warningListItem
-    .locator("[data-test-name=Expandable]", {
-      hasText: "(3) [",
-    })
-    .last();
-  await arrayKeyValue.click();
-
-  const errorListItem = await locateMessage(page, "console-error", "This is an error");
-  let keyValue = errorListItem.locator("[data-test-name=Expandable]", { hasText: "foo" }).last();
-  await keyValue.click();
-
-  const children = errorListItem.locator("[data-test-name=ExpandableChildren]");
-  const nestedKeyValue = children.locator("[data-test-name=Expandable]", { hasText: "foo" });
-  await nestedKeyValue.click();
-
-  // Global terminal expressions
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "someUndefinedVariable");
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", '"Line 1\\nLine 2"');
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/global");
-  await page.keyboard.press("Enter");
-
-  // Load Pause data for local expressions
-  // Create Pause data for each message
-  await toggleProtocolMessages(page, false);
-  await toggleProtocolMessage(page, "logs", true);
-  const firstListItem = await locateMessage(page, "console-log", "This is a log");
-  const lastListItem = await locateMessage(page, "console-log", "This is a trace");
-  await seekToMessage(page, lastListItem);
-  await seekToMessage(page, firstListItem);
-
-  // Run evaluations
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "location.href");
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", "+/local");
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", '{foo: "bar"}');
-  await page.keyboard.press("Enter");
-  await page.fill("[data-test-id=ConsoleTerminalInput]", '{"href": location.href}');
-  await page.keyboard.press("Enter");
-
-  // Event type data
-  await toggleProtocolMessage(page, "logs", false);
-  await page.click("[data-test-id=EventCategoryHeader-Mouse]");
-  await page.click('[data-test-id="EventTypes-event.mouse.click"]');
-  const eventTypeListItem = await locateMessage(page, "event", "MouseEvent");
-  keyValue = eventTypeListItem.locator("[data-test-name=KeyValue]", { hasText: "MouseEvent" });
-  await keyValue.click();
-});
+testSetup("0d0b52a9-96bc-4bd9-b5d8-66275c6cce96");
 
 async function setup(page: Page, toggleState: boolean | null = null) {
-  await page.goto(URL);
+  await page.goto(getTestUrl("console"));
 
   if (typeof toggleState === "boolean") {
     await toggleProtocolMessages(page, toggleState);
@@ -222,6 +165,9 @@ test("should support seeking to a message execution point", async ({ page }) => 
 test("should show and hide search input when Enter and Escape are typed", async ({ page }) => {
   await setup(page, true);
 
+  // Can't search without a Pause so let's ensure there is one.
+  await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
+
   // Search should be hidden
   let searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
   await expect(searchInput).toHaveCount(0);
@@ -243,6 +189,9 @@ test("should show and hide search input when Enter and Escape are typed", async 
 
 test("should be searchable", async ({ page }) => {
   await setup(page, true);
+
+  // Can't search without a Pause so let's ensure there is one.
+  await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
 
   await showSearchInput(page);
 
@@ -309,6 +258,9 @@ test("should log events in the console", async ({ page }) => {
 
 test("should be searchable on complex content", async ({ page }) => {
   await setup(page, true);
+
+  // Can't search without a Pause so let's ensure there is one.
+  await seekToMessage(page, await locateMessage(page, "console-log", "This is a log"));
 
   await showSearchInput(page);
 
@@ -478,5 +430,39 @@ test("should escape object expressions in terminal expressions", async ({ page }
   await takeScreenshot(page, list, "auto-escaped-terminal-expressions");
 });
 
-// TODO Add context menu test for setting focus range
-// TODO Add context menu test for setting log point badge colors
+test("should show the context menu on top of other messages and the current time indicator", async ({
+  page,
+}) => {
+  await setup(page, true);
+
+  const list = page.locator("[data-test-name=Messages]");
+
+  let listItem = await locateMessage(page, "console-log", "This is a trace");
+  await seekToMessage(page, listItem);
+
+  listItem = await locateMessage(page, "console-log", "This is a log");
+  await listItem.click({ button: "right" });
+  await takeScreenshot(page, list, "context-menu-position-one");
+
+  await page.keyboard.press("Escape");
+
+  listItem = await locateMessage(page, "console-error", "This is an error");
+  await listItem.click({ button: "right" });
+  await takeScreenshot(page, list, "context-menu-position-two");
+});
+
+test("should support setting focus range via the context menu", async ({ page }) => {
+  await setup(page, true);
+
+  const list = page.locator("[data-test-name=Messages]");
+
+  let listItem = await locateMessage(page, "console-log", "This is a log");
+  await listItem.click({ button: "right" });
+  await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
+  await takeScreenshot(page, list, "context-menu-focus-after-start");
+
+  listItem = await locateMessage(page, "console-log", "This is a trace");
+  await listItem.click({ button: "right" });
+  await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
+  await takeScreenshot(page, list, "context-menu-focus-after-end");
+});

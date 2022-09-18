@@ -1,10 +1,10 @@
 import { Page, test } from "@playwright/test";
-import { toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
 
-import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import { toggleProtocolMessage, toggleProtocolMessages } from "./utils/console";
+import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/object-inspector?${getURLFlags()}`;
+testSetup("ee4da15f-5d86-4629-8356-c673b5e711b0");
 
 async function filterByText(page: Page, text: string) {
   await page.fill("[data-test-id=ConsoleFilterInput]", text);
@@ -47,67 +47,10 @@ async function takeScreenshotOfMessages(page: Page, screenshotName: string) {
   await takeScreenshot(page, messageItem, screenshotName);
 }
 
-testSetup(async function regeneratorFunction({ page }) {
-  await inspectAndTakeScreenshotOf(page, "arrayLength", "render-and-inspect-array");
-  await inspectAndTakeScreenshotOf(page, "bigUint64Array", "render-and-inspect-big-uint-64-array");
-  await inspectAndTakeScreenshotOf(page, "regularFunction", "render-and-inspect-function");
-  await inspectAndTakeScreenshotOf(
-    page,
-    "htmlElementWithChildren",
-    "render-and-inspect-html-element"
-  );
-  await inspectAndTakeScreenshotOf(page, "emptyMap", "render-empty-map");
-  await inspectAndTakeScreenshotOf(page, "simpleMap", "render-and-inspect-map");
-  await inspectAndTakeScreenshotOf(page, "regex", "render-and-inspect-regex");
-  await inspectAndTakeScreenshotOf(page, "simpleSet", "render-and-inspect-set");
-  await inspectAndTakeScreenshotOf(page, "objectSimple", "render-and-inspect-object");
-  await inspectAndTakeScreenshotOf(
-    page,
-    "mapWithFalsyKeys",
-    "render-and-inspect-map-with-falsy-keys"
-  );
-  await inspectAndTakeScreenshotOf(
-    page,
-    "mapWithComplexKeys",
-    "render-and-inspect-map-with-complex-keys"
-  );
-
-  await inspectAndTakeScreenshotOf(page, "overflowingArray", "overflowing-array-expanded");
-  const firstBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
-    hasText: "[0 … 99]",
-  });
-  await firstBucket.click();
-  const secondBucket = await page.locator('[data-test-name="ExpandablePreview"]', {
-    hasText: "[100 … 105]",
-  });
-  await secondBucket.click();
-
-  // Getters/setters
-  await filterByText(page, "filter_objectWithGettersAndSetters");
-  await inspectAndTakeScreenshotOf(
-    page,
-    "objectWithGettersAndSetters",
-    "render-object-with-getters-and-setters"
-  );
-  await inspectGetter(page, "string");
-  await inspectGetter(page, "null");
-  await inspectGetter(page, "undefined");
-  await inspectGetter(page, "object");
-  await inspectGetter(page, "array");
-  const objectRow = await page
-    .locator('[data-test-name="ExpandablePreview"]', { hasText: "objectGetter" })
-    .first();
-  await objectRow.click();
-  const arrayRow = await page
-    .locator('[data-test-name="ExpandablePreview"]', { hasText: "arrayGetter" })
-    .first();
-  await arrayRow.click();
-});
-
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
-  await page.goto(URL);
+  await page.goto(getTestUrl("console"));
 
   await toggleProtocolMessages(page, false);
   await toggleProtocolMessage(page, "logs", true);

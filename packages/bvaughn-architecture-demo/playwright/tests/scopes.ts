@@ -1,21 +1,15 @@
 import { test } from "@playwright/test";
 
-import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import { getTestUrl, takeScreenshot } from "./utils/general";
 import { toggleExpandable } from "./utils/inspector";
 import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/scopes?${getURLFlags()}`;
-
-testSetup(async function regeneratorFunction({ page }) {
-  await toggleExpandable(page, "globalValues");
-  await toggleExpandable(page, "arrayWithNesting: (");
-  await toggleExpandable(page, "objectWithNesting: {");
-});
+testSetup("bd42974e-7751-4179-b114-53b3d2779778");
 
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
-  await page.goto(URL);
+  await page.goto(getTestUrl("scopes"));
 });
 
 test("should show/hide object and array previews when toggled", async ({ page }) => {

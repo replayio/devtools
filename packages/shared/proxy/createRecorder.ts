@@ -4,7 +4,7 @@ import { findMatch, isIterator, isThennable } from "./utils";
 type Options = {
   onAsyncRequestPending?: Function;
   onAsyncRequestResolved?: Function;
-  onEntriesChanged?: Function;
+  onEntriesChanged?: (newEntry: Entry) => void;
   sanitizeArgs?: (prop: string, args: any[] | null) => any[] | null;
   sanitizeResult?: (prop: string, result: any) => any;
 };
@@ -17,7 +17,7 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
   const {
     onAsyncRequestPending = () => {},
     onAsyncRequestResolved = () => {},
-    onEntriesChanged = () => {},
+    onEntriesChanged = (_: Entry) => {},
     sanitizeArgs = (_: string, args: any[] | null) => args,
     sanitizeResult = (_: string, result: any) => result,
   } = options || {};
@@ -68,14 +68,14 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
         }
 
         onAsyncRequestResolved();
-        onEntriesChanged();
+        onEntriesChanged(entry);
 
         return returnValue;
       });
     } else {
       entry.result = returnValue = sanitizeResult(prop, returnValue);
 
-      onEntriesChanged();
+      onEntriesChanged(entry);
     }
 
     return returnValue;

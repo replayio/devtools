@@ -1,30 +1,10 @@
 import { Page, test } from "@playwright/test";
 
 import { toggleProtocolMessages } from "./utils/console";
-import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/source-and-console?${getURLFlags()}`;
-
-testSetup(async function regeneratorFunction({ page }) {
-  await addLogPoint(page, 13);
-
-  await fillLogPointText(page, 13, "z");
-  await fillLogPointText(page, 13, "printError");
-
-  await toggleProtocolMessages(page, false);
-
-  const message = page.locator("[data-test-name=Message]").first();
-  const keyValue = message.locator("[data-test-name=Expandable]");
-  await keyValue.click();
-
-  await addLogPoint(page, 28);
-  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`);
-  await fillLogPointText(page, 28, `"logsToPrint", logsToPrint`, "logsToPrint <= 3");
-
-  await addLogPoint(page, 68);
-  await addLogPoint(page, 70);
-});
+testSetup("dbd4da74-cf42-41fb-851d-69bed67debcf");
 
 async function addLogPoint(page: Page, lineNumber: number) {
   const selector = `[data-test-id="Source-source-and-console.html"] [data-test-id=SourceLine-${lineNumber}]`;
@@ -47,7 +27,7 @@ async function fillLogPointText(
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
-  await page.goto(URL);
+  await page.goto(getTestUrl("source-and-console"));
 
   await page.click("[data-test-id=SourceExplorerSource-h1]");
   await page.click("[data-test-id=SourceTab-h1]");
@@ -184,3 +164,5 @@ test("should handle too many points to run analysis", async ({ page }) => {
   const messagesList = page.locator('[data-test-name="Messages"]');
   await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
 });
+
+// TODO Add context menu test for setting log point badge colors

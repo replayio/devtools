@@ -60,6 +60,9 @@ export async function showSearchInput(page: Page) {
   if (count > 0) {
     await page.focus('[data-test-id="ConsoleSearchInput"]');
   } else {
+    // Wait until search input is enabled before trying to focus.
+    await page.waitForSelector(`[data-test-id="ConsoleTerminalInput"]:not(:disabled)`);
+
     await page.focus('[data-test-id="ConsoleTerminalInput"]');
     await page.keyboard.down("Meta");
     await page.keyboard.type("f");

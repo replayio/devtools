@@ -1,6 +1,6 @@
 import { FullConfig } from "@playwright/test";
 
-const { CI, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
+const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
 
 const slowMo = VISUAL_DEBUG ? 250 : 10;
 
@@ -9,7 +9,7 @@ const config: FullConfig = {
   globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
-  retries: VISUAL_DEBUG ? 0 : 5,
+  retries: VISUAL_DEBUG || RECORD_PROTOCOL_DATA ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
@@ -28,8 +28,7 @@ const config: FullConfig = {
   timeout: 30_000,
 };
 
-if (VISUAL_DEBUG) {
-  // @ts-ignore
+if (VISUAL_DEBUG || RECORD_PROTOCOL_DATA) {
   config.workers = 1;
 }
 
