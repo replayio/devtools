@@ -16,7 +16,18 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
       return;
     }
 
-    const positions = await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
+    let positions;
+    try {
+      positions = await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
+    } catch (e: any) {
+      // "There are too many points to complete this operation"
+      // is expected if the frame is too long and should not be treated as an error.
+      if (e.code == 55) {
+        return;
+      }
+      throw e;
+    }
+
     if (positions.length === 0) {
       return;
     }
