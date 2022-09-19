@@ -5,11 +5,11 @@
 import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
 import type { Location, TimeStampedPoint, ScopeType, PauseDescription } from "@replayio/protocol";
 import type { UIState } from "ui/state";
+import { getPreferredLocation } from "ui/reducers/sources";
 
 import { WiredNamedValue } from "protocol/thread/pause";
 import { ThreadFront, ValueFront } from "protocol/thread";
 
-import { prefs } from "../utils/prefs";
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
@@ -110,7 +110,7 @@ const initialState: PauseState = {
 };
 
 export const executeCommandOperation = createAsyncThunk<
-  void,
+  { location: Location | null },
   { cx: Context; command: ValidCommand },
   { state: UIState; extra: ThunkExtraArgs }
 >("pause/executeCommand", async ({ cx, command }, thunkApi) => {
@@ -120,7 +120,14 @@ export const executeCommandOperation = createAsyncThunk<
   const loadedRegions = getLoadedRegions(state)!;
   const nextPoint = getResumePoint(state, command)!;
 
-  await ThreadFront[command](nextPoint, loadedRegions);
+  const resp = await ThreadFront[command](nextPoint, loadedRegions);
+  if (!resp?.frame) {
+    return { location: null };
+  }
+
+  const location = getPreferredLocation(state, resp.frame, ThreadFront.preferredGeneratedSources);
+
+  return { location };
 });
 
 // Isn't this a lovely type lookup?
@@ -250,7 +257,6 @@ const pauseSlice = createSlice({
         framesErrored: false,
       });
 
-      state.threadcx.pauseCounter++;
       state.threadcx.isPaused = true;
     },
     paused(
@@ -276,6 +282,8 @@ const pauseSlice = createSlice({
 
       state.selectedFrameId = frame ? frame.id : null;
       state.frames = frame ? [frame] : null;
+      state.threadcx.pauseCounter++;
+      state.pausePreviewLocation = null;
     },
     pauseCreationFailed(state, action: PayloadAction<string>) {
       const executionPoint = action.payload;
@@ -309,7 +317,6 @@ const pauseSlice = createSlice({
     },
     resumed(state) {
       Object.assign(state, resumedPauseState);
-      state.threadcx.pauseCounter++;
       state.threadcx.isPaused = false;
     },
   },
@@ -317,7 +324,6 @@ const pauseSlice = createSlice({
     builder
       .addCase(executeCommandOperation.pending, (state, action) => {
         const { command } = action.meta.arg;
-
         state.command = command;
         state.threadcx.pauseCounter++;
         state.threadcx.isPaused = false;
@@ -331,6 +337,10 @@ const pauseSlice = createSlice({
         }
       })
       .addCase(executeCommandOperation.fulfilled, (state, action) => {
+        state.command = null;
+        state.pausePreviewLocation = action.payload.location;
+      })
+      .addCase(executeCommandOperation.rejected, (state, action) => {
         state.command = null;
       })
       .addCase(fetchFrames.fulfilled, (state, action) => {

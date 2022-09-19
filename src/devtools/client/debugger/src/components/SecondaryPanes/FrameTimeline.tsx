@@ -9,7 +9,6 @@ import React, { Component } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { selectors } from "ui/reducers";
 import { actions } from "ui/actions";
-import { previewLocationCleared } from "devtools/client/debugger/src/reducers/pause";
 
 import classnames from "classnames";
 import ReactTooltip from "react-tooltip";
@@ -106,7 +105,7 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
   };
 
   onMouseUp = (event: MouseEvent) => {
-    const { seek, clearPreviewPausedLocation } = this.props;
+    const { seek } = this.props;
 
     const progress = this.getProgress(event.clientX);
     const position = this.getPosition(progress);
@@ -114,7 +113,6 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
 
     if (position) {
       seek(position.point, position.time, true);
-      clearPreviewPausedLocation();
     }
   };
 
@@ -193,7 +191,6 @@ const connector = connect(
   {
     seek: actions.seek,
     setPreviewPausedLocation: actions.setPreviewPausedLocation,
-    clearPreviewPausedLocation: previewLocationCleared,
   }
 );
 
