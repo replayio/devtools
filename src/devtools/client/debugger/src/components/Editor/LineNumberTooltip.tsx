@@ -17,11 +17,14 @@ import { getSelectedSource } from "ui/reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
 import {
+  getBoundsForLineNumber,
   fetchHitCounts,
   getHitCountsForSource,
   getHitCountsStatusForSourceByLine,
+  getUniqueHitCountsChunksForLines,
 } from "ui/reducers/hitCounts";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { calculateHitCountChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -93,16 +96,15 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }
 
   const fetchHitCountsForVisibleLines = useCallback(() => {
-    var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
-    var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
-    var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
-    dispatch(fetchHitCounts(source!.id, editor.codeMirror.lineAtHeight()));
-    dispatch(fetchHitCounts(source!.id, topVisibleLine - 10));
-    dispatch(fetchHitCounts(source!.id, bottomVisibleLine + 10));
+    const uniqueChunks = calculateHitCountChunksForVisibleLines(editor);
+    // Now try to fetch hit counts for the unique bounds chunks
+    for (let bounds of uniqueChunks) {
+      dispatch(fetchHitCounts(source!.id, bounds.lower));
+    }
   }, [editor, dispatch, source]);
 
   useEffect(() => {
-    const clearHoveredLineNumber = debounce(() => {
+    const debouncedClearHoveredLineNumber = debounce(() => {
       // Only reset the Redux state here after a short delay.
       // That way, if we immediately mouse from active line X to X + 1,
       // we won't dispatch a "reset line to null" action as part of that change.
@@ -115,6 +117,10 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       }
     }, 10);
 
+    const debouncedFetchHitCountsForVisibleLines = debounce(() => {
+      fetchHitCountsForVisibleLines();
+    }, 100);
+
     const setHoveredLineNumber = ({
       lineNumber,
       lineNumberNode,
@@ -124,21 +130,21 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     }) => {
       if (lineNumber !== lastHoveredLineNumber.current) {
         // Bail out of any pending "clear hover line" dispatch, since we're over a new line
-        clearHoveredLineNumber.cancel();
+        debouncedClearHoveredLineNumber.cancel();
 
         lastHoveredLineNumber.current = lineNumber;
 
         dispatch(updateHoveredLineNumber(lineNumber));
         setTargetNode(lineNumberNode);
-        fetchHitCountsForVisibleLines();
+        debouncedFetchHitCountsForVisibleLines();
       }
     };
 
     editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
-    editor.codeMirror.on("lineMouseLeave", clearHoveredLineNumber);
+    editor.codeMirror.on("lineMouseLeave", debouncedClearHoveredLineNumber);
     return () => {
       editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
-      editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
+      editor.codeMirror.off("lineMouseLeave", debouncedClearHoveredLineNumber);
     };
   }, [dispatch, editor.codeMirror, fetchHitCountsForVisibleLines]);
 

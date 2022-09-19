@@ -9,6 +9,7 @@ import { fetchProtocolHitCounts, firstColumnForLocations } from "protocol/thread
 import { listenForCondition } from "ui/setup/listenerMiddleware";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { createSelector } from "reselect";
+import uniqBy from "lodash/uniqBy";
 
 export interface HitCount {
   location: Location;
@@ -211,5 +212,11 @@ export const getHitCountsForSourceByLine = createSelector(getHitCountsForSource,
   }
   return hitCountsByLine;
 });
+
+export const getUniqueHitCountsChunksForLines = (...lines: number[]) => {
+  const lineChunks = lines.map(line => getBoundsForLineNumber(line));
+  const uniqueChunks = uniqBy(lineChunks, chunk => chunk.lower);
+  return uniqueChunks;
+};
 
 export default hitCountsSlice.reducer;

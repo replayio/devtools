@@ -7,9 +7,14 @@ import { getHoveredLineNumberLocation } from "ui/reducers/app";
 import { useAppSelector } from "ui/setup/hooks";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { HitPointsAndStatusTuple } from "shared/client/types";
-import { getPossibleBreakpointsForSelectedSource } from "ui/reducers/possibleBreakpoints";
+import {
+  getPossibleBreakpointsForSourceNormalized,
+  EMPTY_LOCATIONS,
+} from "ui/reducers/possibleBreakpoints";
 
 const isDev = process.env.NODE_ENV !== "production";
+
+const NO_BREAKPOINT_LOCATIONS: Record<number, number[]> = {};
 
 // Note that this hook uses Suspense and so it should not be called outside of a <Suspense></Suspense> wrapper.
 export default function useHitPointsForHoveredLocation(): HitPointsAndStatusTuple | [null, null] {
@@ -28,15 +33,20 @@ export default function useHitPointsForHoveredLocation(): HitPointsAndStatusTupl
     };
   }
 
-  const possibleBreakpoints = useAppSelector(getPossibleBreakpointsForSelectedSource);
-  const isLocationValidBreakpoint =
-    locationOrNull !== null &&
-    possibleBreakpoints.find(
-      location =>
-        location.column === locationOrNull!.column &&
-        location.line === locationOrNull!.line &&
-        location.sourceId === locationOrNull!.sourceId
+  const possibleBreakpoints = useAppSelector(state => {
+    if (!locationOrNull) {
+      return NO_BREAKPOINT_LOCATIONS;
+    }
+    return getPossibleBreakpointsForSourceNormalized(state, locationOrNull.sourceId);
+  });
+
+  let isLocationValidBreakpoint = false;
+  if (locationOrNull !== null) {
+    const breakpointColumnsForLine = possibleBreakpoints[locationOrNull.line] ?? [];
+    isLocationValidBreakpoint = !!breakpointColumnsForLine.find(
+      column => column === locationOrNull!.column
     );
+  }
 
   return isLocationValidBreakpoint
     ? getHitPointsForLocation(replayClient, locationOrNull!, null, unsafeFocusRegion)
