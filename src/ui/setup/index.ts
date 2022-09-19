@@ -73,8 +73,7 @@ export async function getInitialLayoutState(): Promise<LayoutState> {
     };
   }
 
-  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel, consoleFilterDrawerExpanded } =
-    syncInitialLayoutState;
+  const { viewMode, showVideoPanel, toolboxLayout, selectedPanel } = syncInitialLayoutState;
   const initialViewMode = session.viewMode || viewMode;
   trackEvent(initialViewMode == "dev" ? "layout.default_devtools" : "layout.default_viewer");
 
