@@ -154,7 +154,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     const { editor } = sourceEditor;
 
     const drawLines = () => {
-      let lineNumber = lower;
       const focusRegionChanged = focusRegion !== previousFocusRegion.current;
       const hitCountMapChanged = hitCountMap !== previousHitCounts.current;
 
@@ -167,98 +166,106 @@ function LineHitCounts({ sourceEditor }: Props) {
       // even if the mouse isn't over a valid line:
       // - The focus region just changed
       // - We refetched hit counts due to the user closing the focus bar
-      if (!isCurrentLineNumberValid && !focusRegionChanged && !hitCountMapChanged) {
+      if (!focusRegionChanged && !hitCountMapChanged) {
         return;
       }
 
       // Attempt to update just the markers for just the 100-line blocks  surrounding
       // the current line number
-      editor.eachLine(lower, upper, lineHandle => {
-        lineNumber++;
-
-        // Skip this line if we've updated it with its current hit count already
-        if (updatedLineNumbers?.has(lineNumber)) {
-          return;
-        }
-
-        updatedLineNumbers?.add(lineNumber);
-
-        const hitCount = hitCountMap?.get(lineNumber + 1) || 0;
-
-        // We use a gradient to indicate the "heat" (the number of hits).
-        // This absolute hit count values are relative, per file.
-        // Cubed root prevents high hit counts from lumping all other values together.
-        const NUM_GRADIENT_COLORS = 3;
-        let className = styles.HitsBadge0;
-        let index = NUM_GRADIENT_COLORS - 1;
-        if (hitCount > 0) {
-          if (minHitCount !== maxHitCount) {
-            index = Math.min(
-              NUM_GRADIENT_COLORS - 1,
-              Math.round(
-                ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-              )
-            );
+      editor.operation(() => {
+        editor.eachLine(lower, upper, lineHandle => {
+          const currentCMLineNumber = editor.getLineNumber(lineHandle);
+          if (currentCMLineNumber === null) {
+            return;
           }
-          className = styles[`HitsBadge${index + 1}`];
-        }
 
-        if (features.disableUnHitLines) {
+          // CM uses 0-based indexing. Our hit counts are 1-indexed.
+          let oneIndexedLineNumber = currentCMLineNumber + 1;
+          const hitCount = hitCountMap?.get(oneIndexedLineNumber) || 0;
+
+          // Skip this line if we've updated it with its current hit count already
+          if (updatedLineNumbers?.has(oneIndexedLineNumber)) {
+            return;
+          }
+
+          updatedLineNumbers?.add(oneIndexedLineNumber);
+
+          // We use a gradient to indicate the "heat" (the number of hits).
+          // This absolute hit count values are relative, per file.
+          // Cubed root prevents high hit counts from lumping all other values together.
+          const NUM_GRADIENT_COLORS = 3;
+          let className = styles.HitsBadge0;
+          let index = NUM_GRADIENT_COLORS - 1;
           if (hitCount > 0) {
-            sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+            if (minHitCount !== maxHitCount) {
+              index = Math.min(
+                NUM_GRADIENT_COLORS - 1,
+                Math.round(
+                  ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+                )
+              );
+            }
+            className = styles[`HitsBadge${index + 1}`];
+          }
+
+          if (features.disableUnHitLines) {
+            if (hitCount > 0) {
+              sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
+            } else {
+              // If this line wasn't hit any, dim the line number,
+              // even if it's a line that's technically reachable.
+              sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+            }
+          }
+
+          const info = editor.lineInfo(lineHandle);
+
+          let markerNode: HTMLDivElement;
+          if (info?.gutterMarkers?.["hit-markers"]) {
+            // Retrieve the marker DOM node we already created
+            markerNode = info.gutterMarkers["hit-markers"];
           } else {
-            // If this line wasn't hit any, dim the line number,
-            // even if it's a line that's technically reachable.
-            sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
+            markerNode = document.createElement("div");
+            markerNode.onclick = () =>
+              updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
+
+            editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
           }
-        }
 
-        const info = editor.lineInfo(lineNumber);
-
-        let markerNode: HTMLDivElement;
-        if (info?.gutterMarkers?.["hit-markers"]) {
-          // Retrieve the marker DOM node we already created
-          markerNode = info.gutterMarkers["hit-markers"];
-        } else {
-          markerNode = document.createElement("div");
-          markerNode.onclick = () =>
-            updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
-
-          editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
-        }
-
-        markerNode.className = className;
-        if (!isCollapsed) {
-          let hitsLabel = "";
-          if (hitCount > 0) {
-            hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+          markerNode.className = className;
+          if (!isCollapsed) {
+            let hitsLabel = "";
+            if (hitCount > 0) {
+              hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
+            }
+            markerNode.textContent = hitsLabel;
           }
-          markerNode.textContent = hitsLabel;
-        }
-        markerNode.title = `${hitCount} hits`;
+          markerNode.title = `${hitCount} hits`;
+        });
       });
     };
 
-    let idCallbackId: number | null = null;
+    let rafId: number | null = 0;
+    // let idCallbackId: number | null = null;
     const drawLinesRaf = () => {
-      idCallbackId = requestIdleCallback(drawLines);
+      rafId = requestAnimationFrame(drawLines);
     };
 
     editor.on("change", drawLinesRaf);
     editor.on("swapDoc", drawLinesRaf);
 
-    drawLinesRaf();
+    drawLines();
 
     return () => {
-      if (idCallbackId !== null) {
-        cancelIdleCallback(idCallbackId);
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
       }
-
       editor.off("change", drawLinesRaf);
       editor.off("swapDoc", drawLinesRaf);
     };
   }, [
     sourceEditor,
+    sourceId,
     hitCountMap,
     updatedLineNumbers,
     isCollapsed,
