@@ -11,6 +11,8 @@ import {
   useState,
 } from "react";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
+import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
+import classNames from "classnames";
 
 import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
 import styles from "./ConsoleRoot.module.css";
@@ -21,20 +23,22 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
-import classNames from "classnames";
 
 export default function ConsoleRoot({
   nagHeader = null,
   showSearchInputByDefault = true,
   terminalInput = null,
 }: {
+  filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
   showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+
+  const [isMenuOpen, setIsMenuOpen] = useLocalStorage("Replay:Console:MenuOpen", true);
+
   const messageListRef = useRef<HTMLElement>(null);
 
   return (

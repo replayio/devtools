@@ -299,17 +299,33 @@ test("should hide node_modules (and unpkg) if toggled", async ({ page }) => {
 test("should be able to toggle side filter menu open and closed", async ({ page }) => {
   await setup(page, false);
 
-  const consoleRoot = page.locator("[data-test-id=ConsoleRoot]");
-  await takeScreenshot(page, consoleRoot, "filters-side-menu-open");
+  // The filters menu should be open by default.
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toHaveCount(1);
 
   // Fill in filter text; this should be remembered when the side menu is re-opened.
   await page.fill("[data-test-id=EventTypeFilterInput]", "test");
 
+  // Verify that we can close it.
   await page.click("[data-test-id=ConsoleMenuToggleButton]");
-  await takeScreenshot(page, consoleRoot, "filters-side-menu-closed");
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
 
+  // Verify that we can re-open it and the same filter text will still be there.
   await page.click("[data-test-id=ConsoleMenuToggleButton]");
-  await takeScreenshot(page, consoleRoot, "filters-side-menu-reopened");
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
+  const text = await page.locator("[data-test-id=EventTypeFilterInput]").inputValue();
+  expect(text).toBe("test");
+
+  // Close again and verify that the setting is remembered between page reloads.
+  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
+  await page.reload();
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
+
+  // Re-open and verify that the setting is remembered between page reloads.
+  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
+  await page.reload();
+  await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
 });
 
 test("should remember filter toggle preferences between reloads", async ({ page }) => {
