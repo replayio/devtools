@@ -9,6 +9,7 @@ import { UIState } from "ui/state";
 import { prefs, asyncStore } from "ui/utils/prefs";
 import { getRecordingId } from "ui/utils/recording";
 import {
+  getConsoleFilterDrawerExpanded,
   getSelectedPanel,
   getSelectedPrimaryPanel,
   getToolboxLayout,
@@ -67,6 +68,12 @@ const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
 export const updatePrefs = (state: UIState, oldState: UIState) => {
   updateStandardPrefs(state, oldState, "theme", getTheme);
+  updateStandardPrefs(
+    state,
+    oldState,
+    "consoleFilterDrawerExpanded",
+    getConsoleFilterDrawerExpanded
+  );
 
   if (state.ui && oldState.ui) {
     updateDebuggerPrefs(

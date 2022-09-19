@@ -1,6 +1,7 @@
 import { LocalNag } from "ui/setup/prefs";
 
 export type LayoutState = {
+  consoleFilterDrawerExpanded: boolean;
   showCommandPalette: boolean;
   showVideoPanel: boolean;
   selectedPrimaryPanel: PrimaryPanelName;
