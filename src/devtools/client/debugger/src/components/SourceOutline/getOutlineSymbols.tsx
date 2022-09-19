@@ -35,7 +35,10 @@ function getClosestHitCount(
     }
   } else {
     const hitCounts = hitCountsByLine[start.line];
-    const hitCount = hitCounts?.find(hitCount => hitCount.location.column! >= start.column);
+    if (!hitCounts) {
+      return undefined;
+    }
+    const hitCount = hitCounts.find(hitCount => hitCount.location.column! >= start.column);
     return hitCount;
   }
 }
@@ -50,7 +53,7 @@ function addHitCountsToFunctions(
 
   return functions.map(functionSymbol => {
     const hitCount = getClosestHitCount(hitCountsByLine, functionSymbol.location);
-    return { ...functionSymbol, hits: hitCount?.hits };
+    return Object.assign({}, functionSymbol, { hits: hitCount?.hits }); // { ...functionSymbol, hits: hitCount?.hits };
   });
 }
 
