@@ -1,11 +1,19 @@
 import { findMatch, isIterator } from "./utils";
 import { Entry } from "./types";
 
-export default function createPlayer<T>(entries: Entry[]): T {
+type Overrides = {
+  [key: string]: any;
+};
+
+export default function createPlayer<T>(entries: Entry[], overrides?: Overrides): T {
   const proxy = new Proxy(
     {},
     {
       get(_: any, prop: string) {
+        if (overrides?.hasOwnProperty(prop)) {
+          return overrides[prop];
+        }
+
         const logEntry = findMatch(entries, prop, null);
         if (logEntry?.isGetter) {
           const { isAsync, result } = logEntry;

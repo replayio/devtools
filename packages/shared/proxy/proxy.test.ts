@@ -418,8 +418,11 @@ describe("proxy", () => {
       onAsyncRequestPending,
       onAsyncRequestResolved,
     });
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     recorder.asyncMethod();
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     recorder.asyncMethod(1);
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     recorder.asyncMethod();
 
     expect(onAsyncRequestPending).toHaveBeenCalledTimes(3);
@@ -511,6 +514,155 @@ describe("proxy", () => {
 
     // Events won't actually be emitted.
     expect(newHandler).not.toHaveBeenCalled();
+  });
+
+  test("should support optional overrides", () => {
+    class Target {
+      method() {
+        return 1;
+      }
+      methodThatThrows() {
+        throw Error("Nope");
+      }
+    }
+
+    const onEntriesChanged = jest.fn();
+    const mock = jest.fn().mockReturnValue(2);
+
+    const [recorder, entries] = createRecorder(
+      new Target(),
+      { onEntriesChanged },
+      {
+        methodThatThrows: mock,
+      }
+    );
+
+    expect(recorder.method()).toBe(1);
+    expect(recorder.methodThatThrows()).toBe(2);
+
+    expect(mock).toHaveBeenCalledTimes(1);
+
+    expect(entries).toHaveLength(1);
+    expect(onEntriesChanged).toHaveBeenCalledTimes(1);
+
+    const player = createPlayer<Target>(serialize(entries), {
+      methodThatThrows: mock,
+    });
+
+    expect(player.method()).toBe(1);
+    expect(player.methodThatThrows()).toBe(2);
+
+    expect(mock).toHaveBeenCalledTimes(2);
+  });
+
+  test("should expose an API to record custom entries", () => {
+    class Target {
+      method(base: number) {
+        return base * 2;
+      }
+    }
+
+    const target = new Target();
+    const onEntriesChanged = jest.fn();
+
+    const [recorder, entries, recordEntry] = createRecorder(
+      target,
+      { onEntriesChanged },
+      {
+        method: (...args: any[]) => {
+          // @ts-ignore
+          const value = target.method(...args);
+          recordEntry("method", args, value);
+          return value;
+        },
+      }
+    );
+
+    expect(recorder.method(3)).toBe(6);
+
+    expect(entries).toHaveLength(1);
+    expect(onEntriesChanged).toHaveBeenCalledTimes(1);
+
+    const player = createPlayer<Target>(serialize(entries));
+
+    expect(player.method(3)).toBe(6);
+  });
+
+  test("should support event dispatcher pattern via overrides", () => {
+    class Target {
+      handlers: { [key: string]: Function[] } = {};
+      addEventListener(type: string, handler: Function) {
+        if (!this.handlers[type]) {
+          this.handlers[type] = [];
+        }
+        this.handlers[type].push(handler);
+      }
+      dispatchEvent(type: string, data: any) {
+        if (this.handlers[type]) {
+          this.handlers[type].forEach(handler => handler(data));
+        }
+      }
+      removeEventListener(type: string, handler: Function) {
+        if (this.handlers[type]) {
+          const index = this.handlers[type].indexOf(handler);
+          if (index !== -1) {
+            this.handlers[type].splice(index, 1);
+          }
+        }
+      }
+    }
+
+    const [recorder, entries, recordEntry] = createRecorder(
+      new Target(),
+      {},
+      {
+        addEventListener() {
+          // No point to record this operation ...
+        },
+        dispatchEvent(type: string, data: any) {
+          recordEntry(type, [data], undefined);
+        },
+        removeEventListener() {
+          // No point to record this operation ...
+        },
+      }
+    );
+
+    const typedRecorder = recorder as any;
+    typedRecorder.addEventListener("bar", jest.fn());
+    typedRecorder.addEventListener("foo", jest.fn());
+    typedRecorder.dispatchEvent("bar", "abc");
+    typedRecorder.dispatchEvent("foo", true);
+    typedRecorder.dispatchEvent("bar", 123);
+
+    // Entries should only contain event data.
+    expect(entries).toHaveLength(3);
+
+    const onBar = jest.fn();
+    const onFoo = jest.fn();
+
+    const player = createPlayer<Target>(serialize(entries), {
+      addEventListener(type: string, handler: Function) {
+        entries.forEach(entry => {
+          if (entry.prop === type) {
+            handler(type, entry.args?.[0]);
+          }
+        });
+      },
+      removeEventListener: () => {
+        // ...
+      },
+    });
+
+    const typedPlayer = player as any;
+    typedPlayer.addEventListener("bar", onBar);
+    typedPlayer.addEventListener("foo", onFoo);
+
+    expect(onBar).toHaveBeenCalledTimes(2);
+    expect(onBar).toHaveBeenCalledWith("bar", 123);
+    expect(onBar).toHaveBeenCalledWith("bar", "abc");
+    expect(onFoo).toHaveBeenCalledTimes(1);
+    expect(onFoo).toHaveBeenCalledWith("foo", true);
   });
 
   // TODO Add a test case for Symbol.Iterator

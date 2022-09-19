@@ -9,11 +9,21 @@ type Options = {
   sanitizeResult?: (prop: string, result: any) => any;
 };
 
+type Overrides = {
+  [key: string]: any;
+};
+
+type RecordEntry = (prop: string, args: any[] | null, returnValue: any) => void;
+
 // Note that the Proxy recorder has some limitations:
 //   1. It does not support the event emitter pattern.
 //   2. Limited support is available for methods without args (e.g. `getState()`).
 //      Because there is no way to uniquely identify a method call without args, only the last value returned will be recorded.
-export default function createRecorder<T>(target: T, options?: Options): [T, Entry[]] {
+export default function createRecorder<T>(
+  target: T,
+  options?: Options,
+  overrides?: Overrides
+): [T, Entry[], RecordEntry] {
   const {
     onAsyncRequestPending = () => {},
     onAsyncRequestResolved = () => {},
@@ -83,6 +93,10 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
 
   const proxy = new Proxy(target as any, {
     get(target: any, prop: string) {
+      if (overrides?.hasOwnProperty(prop)) {
+        return overrides[prop];
+      }
+
       const isGetter =
         hasOwnProperty(prop) && typeof getOwnPropertyDescriptor(prop)?.get === "function";
       if (isGetter) {
@@ -99,5 +113,5 @@ export default function createRecorder<T>(target: T, options?: Options): [T, Ent
     },
   });
 
-  return [proxy, entries];
+  return [proxy, entries, recordEntry];
 }
