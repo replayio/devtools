@@ -30,7 +30,7 @@ export function BubbleViewportWrapper({
   footer?: ReactNode;
 }) {
   return (
-    <FullViewportWrapper style={{ background: "red" }}>
+    <FullViewportWrapper style={{ background: "#f3f3f4" }}>
       <BubbleBackground />
       <div className="relative space-y-4">{children}</div>
       {footer}

@@ -31,19 +31,19 @@ const TIPS = [
   {
     title: "Focus Mode",
     description:
-      "Try typing shift-f to focus your debugging session to a precise location.",
+      "Shift-F focuses your debugging session to a precise location.",
     icon: LightbulbIcon,
   },
   {
     title: "Command palette",
     description:
-      "Command-k launches Replay's command palette which helps find things faster.",
+      "Command-K launches a command palette to help you find things faster.",
     icon: LightbulbIcon,
   },
   {
     title: "Print statements",
     description:
-      "Print statements might be Replay's best feature! Try clicking on a line of code in the editor.",
+      "Replay's print statements are magic! Add one by hovering on a line of code.",
     icon: LightbulbIcon,
   },
 ] as const;
