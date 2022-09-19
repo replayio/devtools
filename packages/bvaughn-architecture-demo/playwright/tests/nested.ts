@@ -1,18 +1,10 @@
 import { test, Page } from "@playwright/test";
 
 import { toggleProtocolMessages } from "./utils/console";
-import { getBaseURL, getURLFlags, takeScreenshot } from "./utils/general";
+import { getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
-const URL = `${getBaseURL()}/tests/nested?${getURLFlags()}`;
-
-testSetup(async function regeneratorFunction({ page }) {
-  await inspect(page, "{loopBack");
-  await inspect(page, "Array(3)");
-  await inspect(page, "Function(recursive)");
-  await inspect(page, "Map(3)");
-  await inspect(page, "Set(3)");
-});
+testSetup("30a6dd11-bd3e-45db-b6cc-5749c04fb885");
 
 async function inspect(page: Page, partialText: string) {
   const messageItem = await page
@@ -33,7 +25,7 @@ async function inspectAndTakeScreenshotOf(page: Page, partialText: string, scree
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
-  await page.goto(URL);
+  await page.goto(getTestUrl("console"));
   await toggleProtocolMessages(page, true);
 });
 

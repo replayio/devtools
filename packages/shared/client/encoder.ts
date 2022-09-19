@@ -27,12 +27,9 @@ function replacer(_: string, value: any): any {
 }
 
 export function decode(string: string): any {
-  const unsanitized = string.replace(/\\/g, "\\").replace(/\\`/g, "`");
-  return JSON.parse(unsanitized, reviver);
+  return JSON.parse(string, reviver);
 }
 
 export function encode(data: any): string {
-  const stringified = JSON.stringify(data, replacer);
-  const sanitized = stringified.replace(/\\/g, "\\\\").replace(/\`/g, "\\`");
-  return sanitized;
+  return JSON.stringify(data, replacer, 2);
 }

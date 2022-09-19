@@ -11,17 +11,31 @@ const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   scale: "css",
 };
 
-export function getBaseURL(): string {
-  const HOST = process.env.HOST || "localhost";
-  return `http://${HOST}:3000`;
-}
-
 export async function getElementCount(page: Page, queryString: string): Promise<number> {
   const count = await page.evaluate(
     queryString => document.querySelectorAll(queryString).length,
     queryString
   );
   return count;
+}
+
+export function getTestUrl(testRoute: string): string {
+  const { fixtureDataPath, record, recordingId } = global as any;
+
+  const host = process.env.HOST || "localhost";
+
+  const queryParams: string[] = [`host=${host}`];
+  if (fixtureDataPath) {
+    queryParams.push(`fixtureDataPath=${fixtureDataPath}`);
+  }
+  if (record) {
+    queryParams.push("record");
+  }
+  if (recordingId) {
+    queryParams.push(`recordingId=${recordingId}`);
+  }
+
+  return `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
 }
 
 export function getURLFlags(): string {
@@ -40,6 +54,9 @@ export async function takeScreenshot(
     // Skip this method to make the tests run faster.
     return;
   }
+
+  // Make sure any suspended components finish loading data before taking the screenshot.
+  await awaitNoLoaders(page, locator);
 
   if (process.env.VISUAL_DEBUG) {
     await new Promise(resolve => resolve(250));
@@ -80,4 +97,24 @@ async function takeScreenshotHelper(
   } else {
     return locator.screenshot(SCREENSHOT_OPTIONS);
   }
+}
+
+export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
+  let attempts = 0;
+
+  while (attempts < 10) {
+    const locator = scope
+      ? scope.locator("[data-test-name=Loader]")
+      : page.locator("[data-test-name=Loader]");
+    const count = await locator.count();
+    if (count === 0) {
+      return;
+    }
+
+    attempts++;
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  throw Error("Timed out waiting for loaders to finish");
 }

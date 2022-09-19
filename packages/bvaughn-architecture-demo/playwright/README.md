@@ -59,7 +59,7 @@ Test fixture data may need to be updated (if new API calls are added or if the p
 yarn test:update-fixture-data
 ```
 
-After this script finishes, it will write updated fixture data beside of each test (e.g. `console.ts` fixture data will be written to `console.ts.tmp`). Note that this data needs to be manually copied into the test harness file.
+After this script finishes, it will write updated fixture data locally which will need to be committed to Git along with other changes.
 
 ## Debugging failures in Docker
 

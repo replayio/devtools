@@ -9,7 +9,10 @@
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"
   },
-  "ignorePatterns": ["!.storybook"],
+  "ignorePatterns": [
+    "!.storybook",
+    "packages/bvaughn-architecture-demo/playwright/protocol-fixtures/"
+  ],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true

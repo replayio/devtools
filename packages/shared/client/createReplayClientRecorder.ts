@@ -1,4 +1,5 @@
 import createRecorder from "shared/proxy/createRecorder";
+import { Entry } from "shared/proxy/types";
 import { encode } from "./encoder";
 import { ReplayClientInterface } from "./types";
 
@@ -34,14 +35,8 @@ export default function createReplayClientRecorder(
     }
   }
 
-  function onEntriesChanged() {
-    console.log(`
-      const ACCESS_TOKEN = ${hasAccessToken ? `"${FAKE_ACCESS_TOKEN}"` : null};
-      const RECORDING_ID = getFlag("recordingId") || "${recordingId}";
-      const replayClient = createReplayClientForPlaywrightTesting(
-        \`${encode(entries)}\`
-      );
-    `);
+  function onEntriesChanged(newEntry: Entry) {
+    console.log(encode(newEntry));
   }
 
   function sanitizeArgs(prop: string, args: any[] | null): any[] | null {
@@ -58,7 +53,7 @@ export default function createReplayClientRecorder(
     return args;
   }
 
-  const [proxyReplayClient, entries] = createRecorder<ReplayClientInterface>(replayClient, {
+  const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
     onAsyncRequestPending,
     onAsyncRequestResolved,
     onEntriesChanged,
