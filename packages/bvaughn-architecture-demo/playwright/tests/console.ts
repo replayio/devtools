@@ -451,8 +451,7 @@ test("should show the context menu on top of other messages and the current time
   await takeScreenshot(page, list, "context-menu-position-two");
 });
 
-// TODO [bvaughn 7759] Re-enable this test
-test.skip("should support setting focus range via the context menu", async ({ page }) => {
+test("should support setting focus range via the context menu", async ({ page }) => {
   await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
