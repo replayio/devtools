@@ -3,6 +3,10 @@ import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
 import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
+import { useAppDispatch } from "ui/setup/hooks";
+import { getLoadingPageTipIndex, setLoadingPageTipIndex } from "ui/actions/app";
+import { useAppSelector } from "ui/setup/hooks";
+
 
 const TIP_DURATION = 12000;
 
@@ -45,24 +49,10 @@ const TIPS = [
 ] as const;
 
 export const LoadingTips: FC = () => {
-  const rand = Math.floor(Math.random() * (TIPS.length));
-  const [currentTipIdx, setCurrentTipIdx] = useState(rand);
+  
+  const rand = useAppSelector(getLoadingPageTipIndex);
+  const currentTipIdx = Math.floor(rand * (TIPS.length));
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
-  const timerRef = useRef<NodeJS.Timeout>();
-
-  const resetAutoNext = () => timerRef.current !== undefined && clearTimeout(timerRef.current);
-
-  useEffect(() => {
-    resetAutoNext();
-  }, []);
-
-  useEffect(() => {
-    resetAutoNext();
-    timerRef.current = setTimeout(() => {
-      setCurrentTipIdx((currentTipIdx + TIPS.length + 1) % TIPS.length);
-    }, TIP_DURATION);
-  }, [currentTipIdx]);
-
   return (
     <div className="h-32 space-y-8 w-96">
       <div className="flex items-center max-w-lg px-8 py-4 space-x-4 align-middle rounded-lg shadow-sm bg-loadingBoxes text-bodyColor">
