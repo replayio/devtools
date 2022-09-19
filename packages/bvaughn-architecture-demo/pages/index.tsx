@@ -37,7 +37,6 @@ export default function HomePage() {
   // TODO As we finalize the client implementation to interface with Replay backend,
   // we can inject a wrapper here that also reports cache hits and misses to this UI in a debug panel.
 
-  // TODO wat
   const recordFlag = useSyncExternalStore(
     () => () => {},
     () => new URL(window.location.href).searchParams.has("record"),

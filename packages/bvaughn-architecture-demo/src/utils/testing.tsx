@@ -171,6 +171,7 @@ export function createMockReplayClient() {
       frames: [],
       data: {},
     })),
+    dispatchEvent: jest.fn(),
     evaluateExpression: jest.fn().mockImplementation(async () => ({ data: {} })),
     findKeyboardEvents: jest.fn().mockImplementation(async () => []),
     findMessages: jest.fn().mockImplementation(async () => ({ messages: [], overflow: false })),
