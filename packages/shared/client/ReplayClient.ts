@@ -122,6 +122,13 @@ export class ReplayClient implements ReplayClientInterface {
     return response;
   }
 
+  dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
+    const handlers = this._eventHandlers.get(type);
+    if (handlers) {
+      handlers.forEach(handler => handler(...args));
+    }
+  }
+
   async evaluateExpression(
     pauseId: PauseId,
     expression: string,
@@ -699,10 +706,7 @@ export class ReplayClient implements ReplayClientInterface {
   _onLoadChanges = (loadedRegions: LoadedRegions) => {
     this._loadedRegions = loadedRegions;
 
-    const handlers = this._eventHandlers.get("loadedRegionsChange");
-    if (handlers) {
-      handlers.forEach(handler => handler());
-    }
+    this.dispatchEvent("loadedRegionsChange", loadedRegions);
   };
 }
 

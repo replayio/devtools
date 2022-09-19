@@ -75,6 +75,7 @@ export interface ReplayClientInterface {
   addEventListener(type: ReplayClientEvents, handler: Function): void;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
+  dispatchEvent(type: ReplayClientEvents, ...args: any[]): void;
   evaluateExpression(
     pauseId: PauseId,
     expression: string,

@@ -1,7 +1,7 @@
+import { ReplayClientEvents, ReplayClientInterface } from "shared/client/types";
 import createRecorder from "shared/proxy/createRecorder";
 import { Entry } from "shared/proxy/types";
 import { encode } from "./encoder";
-import { ReplayClientInterface } from "./types";
 
 const FAKE_ACCESS_TOKEN = "<fake-access-token>";
 
@@ -53,12 +53,30 @@ export default function createReplayClientRecorder(
     return args;
   }
 
-  const [proxyReplayClient] = createRecorder<ReplayClientInterface>(replayClient, {
-    onAsyncRequestPending,
-    onAsyncRequestResolved,
-    onEntriesChanged,
-    sanitizeArgs,
-  });
+  const dispatchEvent = replayClient.dispatchEvent.bind(replayClient);
+  replayClient.dispatchEvent = (type: ReplayClientEvents, ...args: any[]) => {
+    dispatchEvent(type, ...args);
+
+    recordEntry("dispatchEvent", [type, ...args], undefined);
+  };
+
+  const [proxyReplayClient, _, recordEntry] = createRecorder<ReplayClientInterface>(
+    replayClient,
+    {
+      onAsyncRequestPending,
+      onAsyncRequestResolved,
+      onEntriesChanged,
+      sanitizeArgs,
+    },
+    {
+      addEventListener: (type: ReplayClientEvents, handler: Function) => {
+        return replayClient.addEventListener(type, handler);
+      },
+      removeEventListener: (type: ReplayClientEvents, handler: Function) => {
+        return replayClient.removeEventListener(type, handler);
+      },
+    }
+  );
 
   return proxyReplayClient;
 }
