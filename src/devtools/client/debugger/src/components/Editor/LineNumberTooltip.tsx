@@ -21,8 +21,10 @@ import {
   fetchHitCounts,
   getHitCountsForSource,
   getHitCountsStatusForSourceByLine,
+  getUniqueHitCountsChunksForLines,
 } from "ui/reducers/hitCounts";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+import { calculateHitCountChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -94,32 +96,9 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }
 
   const fetchHitCountsForVisibleLines = useCallback(() => {
-    var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
-    var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
-    var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
-
-    const viewport = editor.editor.getViewport();
-    const { from: topViewportLine, to: bottomViewportLine } = viewport;
-    const centerLine = ((bottomViewportLine - topViewportLine) / 2) | 0;
-
-    // We want to try to ensure we have hit counts above and below the viewport
-    // Can't go less than line index 0, though
-    const bufferAboveLine = Math.max(topVisibleLine - 10, 0);
-    const bufferBelowLine = bottomVisibleLine + 10;
-
-    // But, some of these lines could belong to the same 100-line chunk
-    const lineBounds = [centerLine, bufferAboveLine, bufferBelowLine].map(line =>
-      getBoundsForLineNumber(line)
-    );
-    const lineBoundsMap = new Map<number, { lower: number; upper: number }>();
-
-    // Deduplicate bounds chunks based on their `lower` line number
-    for (let entry of lineBounds) {
-      lineBoundsMap.set(entry.lower, entry);
-    }
-
+    const uniqueChunks = calculateHitCountChunksForVisibleLines(editor);
     // Now try to fetch hit counts for the unique bounds chunks
-    for (let bounds of lineBoundsMap.values()) {
+    for (let bounds of uniqueChunks) {
       dispatch(fetchHitCounts(source!.id, bounds.lower));
     }
   }, [editor, dispatch, source]);
