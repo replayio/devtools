@@ -11,6 +11,7 @@ import {
   useState,
 } from "react";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
+import classNames from "classnames";
 
 import { ConsoleContextMenuContextRoot } from "./ConsoleContextMenuContext";
 import styles from "./ConsoleRoot.module.css";
@@ -21,21 +22,32 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
-import classNames from "classnames";
 
 export default function ConsoleRoot({
+  filterDrawerOpenDefault = false,
   nagHeader = null,
+  onFilterDrawerOpenChange,
   showSearchInputByDefault = true,
   terminalInput = null,
 }: {
+  filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
+  onFilterDrawerOpenChange?: (open: boolean) => void;
   showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
-  const [isMenuOpen, setIsMenuOpen] = useState(true);
+  const [isMenuOpen, setIsMenuOpen] = useState(filterDrawerOpenDefault);
   const messageListRef = useRef<HTMLElement>(null);
+
+  const toggleFilterMenu = () => {
+    const newIsMenuOpen = !isMenuOpen;
+    setIsMenuOpen(newIsMenuOpen);
+    if (typeof onFilterDrawerOpenChange === "function") {
+      onFilterDrawerOpenChange(newIsMenuOpen);
+    }
+  };
 
   return (
     <ConsoleContextMenuContextRoot>
@@ -48,7 +60,7 @@ export default function ConsoleRoot({
             <button
               className={styles.MenuToggleButton}
               data-test-id="ConsoleMenuToggleButton"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={toggleFilterMenu}
               title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
             >
               <Icon

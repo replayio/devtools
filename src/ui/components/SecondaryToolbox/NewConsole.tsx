@@ -45,6 +45,7 @@ import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { Pause, ThreadFront } from "protocol/thread";
 import { seek, setFocusRegion } from "ui/actions/timeline";
 import { useGetRecordingId } from "ui/hooks/recordings";
+import { useBoolPref } from "ui/hooks/settings";
 import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
 import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
@@ -78,6 +79,10 @@ export default function NewConsoleRoot() {
     [duration, recordingId]
   );
 
+  const { value: consoleFilterDrawerOpen, update: setConsoleFilterDrawerOpen } = useBoolPref(
+    "consoleFilterDrawerExpanded"
+  );
+
   return (
     <SessionContext.Provider value={sessionContext}>
       <TimelineContextAdapter>
@@ -86,7 +91,9 @@ export default function NewConsoleRoot() {
             <FocusContextReduxAdapter>
               <PointsContextReduxAdapter>
                 <NewConsole
+                  filterDrawerOpenDefault={consoleFilterDrawerOpen}
                   nagHeader={<ConsoleNag />}
+                  onFilterDrawerOpenChange={setConsoleFilterDrawerOpen}
                   showSearchInputByDefault={false}
                   terminalInput={<JSTermWrapper />}
                 />

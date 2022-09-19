@@ -5,7 +5,6 @@ import { LayoutState, ViewMode } from "ui/state/layout";
 import { features, prefs } from "ui/utils/prefs";
 
 export const syncInitialLayoutState: LayoutState = {
-  consoleFilterDrawerExpanded: prefs.consoleFilterDrawerExpanded as boolean,
   showCommandPalette: false,
   selectedPrimaryPanel: "events",
   viewMode: prefs.defaultMode as ViewMode,
@@ -48,10 +47,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
       return { ...state, toolboxLayout: action.layout };
     }
 
-    case "set_console_filter_drawer_expanded": {
-      return { ...state, consoleFilterDrawerExpanded: action.expanded };
-    }
-
     case "dismiss_local_nag": {
       return {
         ...state,
@@ -69,8 +64,6 @@ export default function update(state = syncInitialLayoutState, action: LayoutAct
 
 export const isInspectorSelected = (state: UIState) =>
   getViewMode(state) === "dev" && getSelectedPanel(state) == "inspector";
-export const getConsoleFilterDrawerExpanded = (state: UIState) =>
-  state.layout.consoleFilterDrawerExpanded;
 export const getShowCommandPalette = (state: UIState) => state.layout.showCommandPalette;
 export const getSelectedPrimaryPanel = (state: UIState) => state.layout.selectedPrimaryPanel;
 export const getSelectedPanel = (state: UIState) => state.layout.selectedPanel;

@@ -7,8 +7,7 @@
   - `<FilterBar>`
     - Renders:
       - `<FilterDrawerToggle>`
-        - Uses: `layout.consoleFilterDrawerExpanded`
-        - Dispatches: `setConsoleFilterDrawerExpanded`
+
       - `<FilterSearchBox>`
         - Dispatches: `filterTextSet`
       - `<ClearButton>`
@@ -16,7 +15,6 @@
         - Dispatches: `messagesClearEvaluations`
         - \*_Note_: does a seemingly expensive `Map > array` conversion on every render just to see if any messages match types "COMMAND" or "RESULT". Should really be a memoized selector?
   - `<FilterDrawer>`
-    - Uses: `layout.consoleFilterDrawerExpanded`
     - Renders:
       - `<FilterSettings>`
         - Uses: `getAllFilters`, `getFilteredMessagesCount`, `getShouldLogExceptions`

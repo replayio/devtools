@@ -16,9 +16,6 @@ import {
 import { trackEvent } from "ui/utils/telemetry";
 import { UIThunkAction } from ".";
 
-type SetConsoleFilterDrawerExpandedAction = Action<"set_console_filter_drawer_expanded"> & {
-  expanded: boolean;
-};
 type SetSelectedPrimaryPanelAction = Action<"set_selected_primary_panel"> & {
   panel: PrimaryPanelName;
 };
@@ -34,7 +31,6 @@ type SetViewModeAction = Action<"set_view_mode"> & { viewMode: ViewMode };
 type DismissLocalNagAction = Action<"dismiss_local_nag"> & { nag: LocalNag };
 export type SetSelectedPanelAction = Action<"set_selected_panel"> & { panel: SecondaryPanelName };
 export type LayoutAction =
-  | SetConsoleFilterDrawerExpandedAction
   | SetSelectedPanelAction
   | SetSelectedPrimaryPanelAction
   | SetShowCommandPaletteAction
@@ -107,10 +103,4 @@ export function setSelectedPanel(panel: SecondaryPanelName): SetSelectedPanelAct
 
 export function setSelectedPrimaryPanel(panel: PrimaryPanelName): SetSelectedPrimaryPanelAction {
   return { type: "set_selected_primary_panel", panel };
-}
-
-export function setConsoleFilterDrawerExpanded(
-  expanded: boolean
-): SetConsoleFilterDrawerExpandedAction {
-  return { type: "set_console_filter_drawer_expanded", expanded };
 }
