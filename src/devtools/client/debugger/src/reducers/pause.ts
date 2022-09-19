@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
-import type { Location, TimeStampedPoint, ScopeType } from "@replayio/protocol";
+import type { Location, TimeStampedPoint, ScopeType, PauseDescription } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 
 import { WiredNamedValue } from "protocol/thread/pause";
@@ -68,9 +68,7 @@ export interface PauseState {
   selectedFrameId: string | null;
   executionPoint: string | null;
   why: string | null;
-  isWaitingOnBreak: boolean;
   command: string | null;
-  lastCommand: string | null;
   previousLocation: Location | null;
   replayFramePositions?: { positions: UnknownPosition[] } | null;
 }
@@ -107,9 +105,7 @@ const initialState: PauseState = {
   id: undefined,
   pausePreviewLocation: null,
   ...resumedPauseState,
-  isWaitingOnBreak: false,
   command: null,
-  lastCommand: null,
   previousLocation: null,
 };
 
@@ -273,7 +269,6 @@ const pauseSlice = createSlice({
         pauseErrored: false,
         pauseLoading: false,
         id,
-        isWaitingOnBreak: false,
         frameScopes: resumedPauseState.frameScopes,
         why,
         executionPoint,
@@ -288,7 +283,6 @@ const pauseSlice = createSlice({
         pauseErrored: true,
         pauseLoading: false,
         id: undefined,
-        isWaitingOnBreak: false,
         selectedFrameId: undefined,
         frames: undefined,
         frameScopes: {},
@@ -325,7 +319,6 @@ const pauseSlice = createSlice({
         const { command } = action.meta.arg;
 
         state.command = command;
-        state.lastCommand = command;
         state.threadcx.pauseCounter++;
         state.threadcx.isPaused = false;
         state.previousLocation = getPauseLocation(state as PauseState, command);
@@ -453,10 +446,6 @@ export function getPreviousPauseFrameLocation(state: UIState) {
 
 export function isEvaluatingExpression(state: UIState) {
   return state.pause.command === "expression";
-}
-
-export function getIsWaitingOnBreak(state: UIState) {
-  return state.pause.isWaitingOnBreak;
 }
 
 export function getFrames(state: UIState) {

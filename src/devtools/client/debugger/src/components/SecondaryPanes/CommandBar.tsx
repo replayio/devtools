@@ -6,7 +6,6 @@ import React, { Component } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 import {
-  getIsWaitingOnBreak,
   getThreadContext,
   getBreakpointSources,
   getFramePositions,
@@ -252,7 +251,6 @@ const mapStateToProps = (state: UIState) => ({
   hasBreakpoints: getBreakpointSources(state).length,
   hasFramePositions: getFramePositions(state)?.positions.length,
   isPaused: hasFrames(state),
-  isWaitingOnBreak: getIsWaitingOnBreak(state),
 });
 
 const connector = connect(mapStateToProps, {
