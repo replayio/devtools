@@ -17,6 +17,7 @@ import { getSelectedSource } from "ui/reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
 import {
+  getBoundsForLineNumber,
   fetchHitCounts,
   getHitCountsForSource,
   getHitCountsStatusForSourceByLine,
@@ -96,13 +97,35 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
     var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
     var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
-    dispatch(fetchHitCounts(source!.id, editor.codeMirror.lineAtHeight()));
-    dispatch(fetchHitCounts(source!.id, topVisibleLine - 10));
-    dispatch(fetchHitCounts(source!.id, bottomVisibleLine + 10));
+
+    const viewport = editor.editor.getViewport();
+    const { from: topViewportLine, to: bottomViewportLine } = viewport;
+    const centerLine = ((bottomViewportLine - topViewportLine) / 2) | 0;
+
+    // We want to try to ensure we have hit counts above and below the viewport
+    // Can't go less than line index 0, though
+    const bufferAboveLine = Math.max(topVisibleLine - 10, 0);
+    const bufferBelowLine = bottomVisibleLine + 10;
+
+    // But, some of these lines could belong to the same 100-line chunk
+    const lineBounds = [centerLine, bufferAboveLine, bufferBelowLine].map(line =>
+      getBoundsForLineNumber(line)
+    );
+    const lineBoundsMap = new Map<number, { lower: number; upper: number }>();
+
+    // Deduplicate bounds chunks based on their `lower` line number
+    for (let entry of lineBounds) {
+      lineBoundsMap.set(entry.lower, entry);
+    }
+
+    // Now try to fetch hit counts for the unique bounds chunks
+    for (let bounds of lineBoundsMap.values()) {
+      dispatch(fetchHitCounts(source!.id, bounds.lower));
+    }
   }, [editor, dispatch, source]);
 
   useEffect(() => {
-    const clearHoveredLineNumber = debounce(() => {
+    const debouncedClearHoveredLineNumber = debounce(() => {
       // Only reset the Redux state here after a short delay.
       // That way, if we immediately mouse from active line X to X + 1,
       // we won't dispatch a "reset line to null" action as part of that change.
@@ -115,6 +138,10 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       }
     }, 10);
 
+    const debouncedFetchHitCountsForVisibleLines = debounce(() => {
+      fetchHitCountsForVisibleLines();
+    }, 100);
+
     const setHoveredLineNumber = ({
       lineNumber,
       lineNumberNode,
@@ -124,21 +151,21 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
     }) => {
       if (lineNumber !== lastHoveredLineNumber.current) {
         // Bail out of any pending "clear hover line" dispatch, since we're over a new line
-        clearHoveredLineNumber.cancel();
+        debouncedClearHoveredLineNumber.cancel();
 
         lastHoveredLineNumber.current = lineNumber;
 
         dispatch(updateHoveredLineNumber(lineNumber));
         setTargetNode(lineNumberNode);
-        fetchHitCountsForVisibleLines();
+        debouncedFetchHitCountsForVisibleLines();
       }
     };
 
     editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
-    editor.codeMirror.on("lineMouseLeave", clearHoveredLineNumber);
+    editor.codeMirror.on("lineMouseLeave", debouncedClearHoveredLineNumber);
     return () => {
       editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
-      editor.codeMirror.off("lineMouseLeave", clearHoveredLineNumber);
+      editor.codeMirror.off("lineMouseLeave", debouncedClearHoveredLineNumber);
     };
   }, [dispatch, editor.codeMirror, fetchHitCountsForVisibleLines]);
 
