@@ -16,7 +16,7 @@ import {
   SourceContent,
   getSelectedLocation,
 } from "ui/reducers/sources";
-import { getPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
+import { getPossibleBreakpointsForSourceNormalized } from "ui/reducers/possibleBreakpoints";
 import type { Breakpoint, Range, SourceLocation } from "../reducers/types";
 import { getViewport } from "../reducers/ui";
 import { sortSelectedLocations } from "../utils/location";
@@ -154,25 +154,25 @@ export const getVisibleColumnBreakpoints = createSelector(
 );
 
 export function getFirstBreakpointPosition(state: UIState, { line, sourceId }: SourceLocation) {
-  const positions = getPossibleBreakpointsForSource(state, sourceId);
+  const positions = getPossibleBreakpointsForSourceNormalized(state, sourceId);
   const source = getSourceDetails(state, sourceId);
 
   if (!source || !positions) {
     return;
   }
 
-  const possibleBreakpointsForLine = positions.filter(position => {
-    return position.line === line;
-  });
+  let locationColumn = 0;
+  const possibleBreakpointsForLine = positions[line];
+  if (possibleBreakpointsForLine) {
+    const sortedColumns = possibleBreakpointsForLine.sort((a, b) => a - b);
 
-  const sortedLocations = sortSelectedLocations(possibleBreakpointsForLine);
-
-  // There _should_ be at least one location here, but handle safely
-  const [firstLocation] = sortedLocations;
+    // There _should_ be at least one location here, but handle safely
+    locationColumn = sortedColumns[0];
+  }
 
   return {
-    line: firstLocation?.line,
-    column: firstLocation?.column,
+    line: line,
+    column: locationColumn,
     sourceId,
     sourceUrl: source.url,
   };

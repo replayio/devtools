@@ -115,13 +115,30 @@ export const getPossibleBreakpointsForSource = (state: UIState, sourceId: string
   return adapterSelectors.selectById(state, sourceId)?.possibleBreakpoints;
 };
 
+export const EMPTY_LOCATIONS: Location[] = [];
+
 export const getPossibleBreakpointsForSelectedSource = (state: UIState): Location[] => {
   const sourceId = getSelectedLocation(state)?.sourceId;
   if (!sourceId) {
-    return [];
+    return EMPTY_LOCATIONS;
   }
-  return getPossibleBreakpointsForSource(state, sourceId) || [];
+  return getPossibleBreakpointsForSource(state, sourceId) || EMPTY_LOCATIONS;
 };
+
+export const getPossibleBreakpointsForSourceNormalized = createSelector(
+  getPossibleBreakpointsForSource,
+  (possibleBreakpoints = []) => {
+    const linesToColumns: Record<number, number[]> = {};
+    for (let location of possibleBreakpoints) {
+      if (!linesToColumns[location.line]) {
+        linesToColumns[location.line] = [];
+      }
+      linesToColumns[location.line].push(location.column);
+    }
+
+    return linesToColumns;
+  }
+);
 
 export const getBreakableLinesForSource = (state: UIState, sourceId: string) => {
   return adapterSelectors.selectById(state, sourceId)?.breakableLines;
