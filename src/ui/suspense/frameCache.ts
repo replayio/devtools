@@ -7,7 +7,7 @@ export const {
   getValueSuspense: getFramesSuspense,
   getValueAsync: getFramesAsync,
   getValueIfCached: getFramesIfCached,
-} = createGenericCache<[PauseId], Frame[] | undefined>(
+} = createGenericCache<[pauseId: PauseId], Frame[] | undefined>(
   async pauseId => {
     const pause = Pause.getById(pauseId);
     assert(pause, `no pause for ${pauseId}`);
