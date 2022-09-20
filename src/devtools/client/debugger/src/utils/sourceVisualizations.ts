@@ -153,6 +153,19 @@ function getUniqueAlternateSourceId(
   return { sourceId: alternateSourceId };
 }
 
+function min(arr: number[]) {
+  if (arr.length === 0) {
+    return Infinity;
+  }
+  let lowest = arr[0];
+  for (let i = 1; i < arr.length; i++) {
+    if (arr[i] < lowest) {
+      lowest = arr[i];
+    }
+  }
+  return lowest;
+}
+
 function getAlternateSourceIdForPosition(
   client: ReplayClientInterface,
   source: SourceDetails,
@@ -160,8 +173,8 @@ function getAlternateSourceIdForPosition(
   sourcesById: Dictionary<SourceDetails>
 ) {
   const lineLocations = getBreakpointPositionsSuspense(client, source.id);
-  const breakableLine = Math.min(
-    ...lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
+  const breakableLine = min(
+    lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );
 
   const breakableLineLocations = lineLocations.find(ll => ll.line === breakableLine);
