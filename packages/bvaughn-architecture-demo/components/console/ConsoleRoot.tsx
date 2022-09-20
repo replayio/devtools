@@ -37,7 +37,7 @@ export default function ConsoleRoot({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = useLocalStorage("Replay:Console:MenuOpen", true);
+  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>("Replay:Console:MenuOpen", true);
 
   const messageListRef = useRef<HTMLElement>(null);
 
