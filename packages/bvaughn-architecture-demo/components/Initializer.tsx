@@ -1,6 +1,8 @@
 // This file is not really part of the architectural demo.
 // It's just a bootstrap for things like auth that I didn't want to spend time actually implementing.
 
+import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import { loadedRegions as LoadedRegions } from "@replayio/protocol";
 import { ReactNode, useContext, useEffect, useRef, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -75,6 +77,28 @@ export default function Initializer({
 
     didInitializeRef.current = true;
   }, [accessToken, client, recordingId]);
+
+  useEffect(() => {
+    const onChange = (loadedRegions: LoadedRegions) => {
+      loadedRegions.indexed.forEach(({ begin, end }) => {
+        preCacheExecutionPointForTime(begin);
+        preCacheExecutionPointForTime(end);
+      });
+      loadedRegions.loaded.forEach(({ begin, end }) => {
+        preCacheExecutionPointForTime(begin);
+        preCacheExecutionPointForTime(end);
+      });
+      loadedRegions.loading.forEach(({ begin, end }) => {
+        preCacheExecutionPointForTime(begin);
+        preCacheExecutionPointForTime(end);
+      });
+    };
+
+    client.addEventListener("loadedRegionsChange", onChange);
+    return () => {
+      client.removeEventListener("loadedRegionsChange", onChange);
+    };
+  }, [client]);
 
   if (context === null) {
     return null;

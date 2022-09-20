@@ -25,10 +25,17 @@ import { ThreadFront } from "protocol/thread";
 import { replayClient } from "shared/client/ReplayClientContext";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { getPreferredLocation } from "ui/utils/preferredLocation";
-import { ExecutionPoint, Location, PauseData, PauseId } from "@replayio/protocol";
+import {
+  ExecutionPoint,
+  loadedRegions as LoadedRegions,
+  Location,
+  PauseData,
+  PauseId,
+} from "@replayio/protocol";
 import { addPauseDataListener } from "protocol/thread/pause";
 import { preCacheObjects } from "@bvaughn/src/suspense/ObjectPreviews";
 import { trackExecutionPointPauseIds } from "@bvaughn/src/suspense/PauseCache";
+import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
 declare global {
   interface Window {
@@ -123,6 +130,23 @@ export async function bootstrapApp() {
     }
 
     trackExecutionPointPauseIds(executionPoint, pauseId);
+  });
+
+  // Listen for changes in loaded regions and pre-caches the points.
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  ThreadFront.listenForLoadChanges((loadedRegions: LoadedRegions) => {
+    loadedRegions.indexed.forEach(({ begin, end }) => {
+      preCacheExecutionPointForTime(begin);
+      preCacheExecutionPointForTime(end);
+    });
+    loadedRegions.loaded.forEach(({ begin, end }) => {
+      preCacheExecutionPointForTime(begin);
+      preCacheExecutionPointForTime(end);
+    });
+    loadedRegions.loading.forEach(({ begin, end }) => {
+      preCacheExecutionPointForTime(begin);
+      preCacheExecutionPointForTime(end);
+    });
   });
 
   // Wire up new Console and Object Inspector to the Redux logic for preferred source.
