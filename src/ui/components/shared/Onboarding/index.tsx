@@ -30,15 +30,16 @@ export function OnboardingContentWrapper({
   return (
     <div
       className={classNames(
-        "relative m-4 flex flex-col items-center bg-black/50 p-9 text-2xl text-white shadow-md rounded-xl",
+        "relative m-4 flex flex-col items-center bg-loadingBoxes p-9 text-2xl text-bodyColor shadow-md rounded-xl",
         overlay ? "max-w-sm space-y-8" : "max-w-3xl space-y-12",
         {
           "rounded-lg bg-opacity-80": overlay,
         }
       )}
     >
-      <img src="/images/logo-wide-dark.svg" className="w-full h-24" />
-
+      <div className="w-4/5 h-24">
+        <ReplayLogo wide size="lg" />
+      </div>
       {children}
     </div>
   );
