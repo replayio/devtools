@@ -686,6 +686,13 @@ export class ReplayClient implements ReplayClientInterface {
     });
   }
 
+  _dispatchEvent(type: ReplayClientEvents, ...args: any[]): void {
+    const handlers = this._eventHandlers.get(type);
+    if (handlers) {
+      handlers.forEach(handler => handler(...args));
+    }
+  }
+
   _getCorrespondingLocations(location: Location): Location[] {
     const { column, line, sourceId } = location;
     const sourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
@@ -699,10 +706,7 @@ export class ReplayClient implements ReplayClientInterface {
   _onLoadChanges = (loadedRegions: LoadedRegions) => {
     this._loadedRegions = loadedRegions;
 
-    const handlers = this._eventHandlers.get("loadedRegionsChange");
-    if (handlers) {
-      handlers.forEach(handler => handler());
-    }
+    this._dispatchEvent("loadedRegionsChange", loadedRegions);
   };
 }
 
