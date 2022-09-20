@@ -43,8 +43,8 @@
 .empty-line .toggle-widget {
   background: #8abfd8 !important;
 }
-rgb(44, 161, 214)rgb(108, 208, 255)rgb(94, 191, 236)rgb(150, 214, 244)
-  .editor-wrapper
+
+.editor-wrapper
   :not(.empty-line):not(.new-breakpoint)
   > .CodeMirror-gutter-wrapper
   > .CodeMirror-linenumber:hover::after {
