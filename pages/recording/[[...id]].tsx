@@ -1,4 +1,3 @@
-import ObjectPreviewSuspenseCacheAdapter from "devtools/client/debugger/src/components/SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
@@ -191,7 +190,6 @@ function RecordingPage({
     return (
       <>
         {head}
-        <ObjectPreviewSuspenseCacheAdapter />
         <DevTools uploadComplete={uploadComplete} />
       </>
     );
