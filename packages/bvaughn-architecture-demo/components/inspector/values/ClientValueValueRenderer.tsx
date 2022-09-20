@@ -48,5 +48,5 @@ export default function ClientValueValueRenderer({
       break;
   }
 
-  return <span className={className}>{preview}</span>;
+  return <span className={className}>{preview || " "}</span>;
 }
