@@ -103,7 +103,7 @@ function LineHitCounts({ sourceEditor }: Props) {
     return numCharsToFit;
   }, [maxHitCount]);
 
-  const gutterWidth = isCollapsed ? "1ch" : `${numCharsToFit + 1}ch`;
+  const gutterWidth = isCollapsed ? "5px" : `${numCharsToFit + 1}ch`;
 
   // Save `isCollapsed` in a ref so we only create `marker.onClick` callbacks once
   // TODO Candidate for the eventual `useEvent` hook?
