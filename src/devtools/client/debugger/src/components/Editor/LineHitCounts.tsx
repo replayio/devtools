@@ -19,7 +19,7 @@ import { UIState } from "ui/state";
 import type { SourceEditor } from "../../utils/editor/source-editor";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
-import { calculateHitCountChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
 type Props = {
   sourceEditor: SourceEditor;
@@ -155,7 +155,7 @@ function LineHitCounts({ sourceEditor }: Props) {
     const { editor } = sourceEditor;
 
     const drawLines = () => {
-      const uniqueChunks = calculateHitCountChunksForVisibleLines(sourceEditor);
+      const uniqueChunks = calculateRangeChunksForVisibleLines(sourceEditor);
 
       editor.operation(() => {
         for (let hitCountChunk of uniqueChunks) {

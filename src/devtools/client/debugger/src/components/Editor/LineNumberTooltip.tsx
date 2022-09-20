@@ -24,7 +24,7 @@ import {
   getUniqueHitCountsChunksForLines,
 } from "ui/reducers/hitCounts";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { calculateHitCountChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -96,7 +96,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }
 
   const fetchHitCountsForVisibleLines = useCallback(() => {
-    const uniqueChunks = calculateHitCountChunksForVisibleLines(editor);
+    const uniqueChunks = calculateRangeChunksForVisibleLines(editor);
     // Now try to fetch hit counts for the unique bounds chunks
     for (let bounds of uniqueChunks) {
       dispatch(fetchHitCounts(source!.id, bounds.lower));
