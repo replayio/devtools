@@ -18,7 +18,7 @@ pref("devtools.sidePanelSize", "240px");
 pref("devtools.theme", "system");
 pref("devtools.toolbox-size", "50%");
 pref("devtools.consoleFilterDrawerExpanded", true);
-pref("devtools.hitCounts", "hide-counts");
+pref("devtools.hitCounts", "show-counts");
 
 // app features
 pref("devtools.features.basicProcessingLoadingBar", false);
