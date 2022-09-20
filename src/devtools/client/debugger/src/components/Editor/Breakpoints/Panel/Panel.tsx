@@ -170,7 +170,7 @@ function Panel({
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
-          <div className="flex space-x-0.5 pt-2 pl-1 pr-4">
+          <div className="flex items-center space-x-0.5 pt-2 pl-1 pr-4">
             <PrefixBadgeButton breakpoint={breakpoint!} />
             <div className="flex-1 min-w-0">
               {editing ? (
