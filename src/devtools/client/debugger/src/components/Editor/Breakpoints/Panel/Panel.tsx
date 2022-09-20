@@ -25,6 +25,12 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
+const gutterOffset = 37;
+
+function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
+  return editor.getScrollInfo().clientWidth - gutterOffset;
+}
+
 const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
@@ -60,6 +66,7 @@ function Panel({
 }: PanelProps) {
   const [editing, setEditing] = useState(false);
   const [showCondition, setShowCondition] = useState(Boolean(breakpoint!.options.condition)); // nosemgrep
+  const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
   const dismissNag = hooks.useDismissNag();
 
@@ -116,6 +123,15 @@ function Panel({
     (hitPoints?.length || 0) > MAX_POINTS_FOR_FULL_ANALYSIS;
 
   useEffect(() => {
+    const updateWidth = () => setWidth(getPanelWidth(editor));
+
+    editor.editor.on("refresh", updateWidth);
+    return () => {
+      editor.editor.off("refresh", updateWidth);
+    };
+  }, [editor]);
+
+  useEffect(() => {
     dismissNag(Nag.FIRST_BREAKPOINT_ADD);
   }, [dismissNag]);
 
@@ -147,7 +163,11 @@ function Panel({
 
   return (
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
-      <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <div
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        style={{ position: "sticky", left: gutterOffset, maxWidth: width }}
+      >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           <div className="flex space-x-0.5 pt-2 pl-1 pr-4">
