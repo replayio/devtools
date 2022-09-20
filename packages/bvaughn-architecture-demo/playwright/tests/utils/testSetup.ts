@@ -1,5 +1,4 @@
 import { ConsoleMessage, test } from "@playwright/test";
-import { exec } from "child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { dirname, join } from "path";
 
@@ -172,8 +171,17 @@ function testSetupUpdateFixtureData() {
     });
 
     const uniqueEntries = Array.from(entriesMap.values());
+    const additionalData =
+      (await page.evaluate("window.REPLAY_CLIENT_RECORDER_ADDITIONAL_DATA")) || null;
 
-    writeFileSync(fixtureDataPath, JSON.stringify(uniqueEntries), "utf-8");
+    writeFileSync(
+      fixtureDataPath,
+      JSON.stringify({
+        entries: uniqueEntries,
+        additionalData,
+      }),
+      "utf-8"
+    );
 
     console.log(`  ${format.green("✓")}    ${format.dim(prefix)} Updating fixture data`);
   });

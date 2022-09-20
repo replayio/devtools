@@ -3,6 +3,7 @@ import { test, expect, Page } from "@playwright/test";
 import {
   hideSearchInput,
   locateMessage,
+  messageLocator,
   seekToMessage,
   showSearchInput,
   toggleProtocolMessage,
@@ -467,19 +468,23 @@ test("should show the context menu on top of other messages and the current time
   await takeScreenshot(page, list, "context-menu-position-two");
 });
 
-// TODO [bvaughn 7759] Re-enable this test
-test.skip("should support setting focus range via the context menu", async ({ page }) => {
+test("should support setting focus range via the context menu", async ({ page }) => {
   await setup(page, true);
 
   const list = page.locator("[data-test-name=Messages]");
+  let listItem;
 
-  let listItem = await locateMessage(page, "console-log", "This is a log");
+  listItem = await locateMessage(page, "console-warning", "This is a warning");
   await listItem.click({ button: "right" });
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusStartButton]");
+  // Give the UI time to settle.
+  await expect(messageLocator(page, "console-log", "This is a log")).toBeHidden();
   await takeScreenshot(page, list, "context-menu-focus-after-start");
 
-  listItem = await locateMessage(page, "console-log", "This is a trace");
+  listItem = await locateMessage(page, "console-error", "This is an error");
   await listItem.click({ button: "right" });
   await page.click("[data-test-id=ConsoleContextMenu-SetFocusEndButton]");
+  // Give the UI time to settle.
+  await expect(messageLocator(page, "console-log", "This is a trace")).toBeHidden();
   await takeScreenshot(page, list, "context-menu-focus-after-end");
 });

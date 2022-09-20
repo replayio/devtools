@@ -13,12 +13,42 @@ import { isExecutionPointsLessThan } from "../utils/time";
 
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
-const cachedPointsForTime: Map<number, ExecutionPoint> = new Map();
+export type CachedPointsForTime = Map<number, ExecutionPoint>;
+type ChangeHandler = (timeStampedPoint: TimeStampedPoint) => void;
+
+const cachedPointsForTime: CachedPointsForTime = new Map();
+const cachedPointsForTimeChangeHandlers: Set<ChangeHandler> = new Set();
 const locationToHitPointsMap: Map<string, Record<HitPointsAndStatusTuple>> = new Map();
 const sortedExecutionPoints: TimeStampedPoint[] = [];
 const sortedPointsBoundingTimes: PointsBoundingTime[] = [];
 const timeToInFlightRequestMap: Map<number, Wakeable<ExecutionPoint>> = new Map();
 const timeToErrorMap: Map<number, any> = new Map();
+
+export function addCachedPointsForTimeListener(handler: ChangeHandler): () => void {
+  cachedPointsForTimeChangeHandlers.add(handler);
+
+  cachedPointsForTime.forEach((point, time) => {
+    try {
+      handler({ point, time });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+
+  return function unsubscribe() {
+    cachedPointsForTimeChangeHandlers.delete(handler);
+  };
+}
+
+function callCachedPointsForTimeListeners(time: number, point: ExecutionPoint): void {
+  cachedPointsForTimeChangeHandlers.forEach(handler => {
+    try {
+      handler({ point, time });
+    } catch (error) {
+      console.error(error);
+    }
+  });
+}
 
 async function fetchPointsBoundingTime(
   client: ReplayClientInterface,
@@ -176,6 +206,10 @@ function findNearestCachedSortedExecutionPointIndex(time: number): number {
   }
 }
 
+export function getCachedHitPoints(): Map<number, ExecutionPoint> {
+  return cachedPointsForTime;
+}
+
 // Does not suspend.
 // This method is safe to call outside of render.
 // It returns a cached object property if one has been previously loaded, or null.
@@ -205,6 +239,8 @@ export function getClosestPointForTime(
     const executionPoint = findCachePointsForTime(time);
     if (executionPoint !== null) {
       cachedPointsForTime.set(time, executionPoint);
+      callCachedPointsForTimeListeners(time, executionPoint);
+
       return executionPoint;
     }
   }
@@ -298,6 +334,8 @@ export async function imperativelyGetClosestPointForTime(
     const executionPoint = findCachePointsForTime(time);
     if (executionPoint !== null) {
       cachedPointsForTime.set(time, executionPoint);
+      callCachedPointsForTimeListeners(time, executionPoint);
+
       return executionPoint;
     }
   }
@@ -328,6 +366,7 @@ export function preCacheExecutionPointForTime(timeStampedPoint: TimeStampedPoint
   const { point, time } = timeStampedPoint;
 
   cachedPointsForTime.set(time, point);
+  callCachedPointsForTimeListeners(time, point);
 
   if (sortedExecutionPoints.length === 0) {
     sortedExecutionPoints.push(timeStampedPoint);

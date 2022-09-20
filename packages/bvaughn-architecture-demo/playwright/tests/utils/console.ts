@@ -25,10 +25,7 @@ export async function locateMessage<T>(
   messageType: MessageType,
   partialText?: string
 ): Promise<Locator> {
-  const locator = page.locator(
-    `[data-test-name=Message][data-test-message-type="${messageType}"]`,
-    { hasText: partialText }
-  );
+  const locator = messageLocator(page, messageType, partialText);
 
   let loop = 0;
 
@@ -47,6 +44,16 @@ export async function locateMessage<T>(
       return locator;
     }
   }
+}
+
+export function messageLocator(
+  page: Page,
+  messageType: MessageType,
+  partialText?: string
+): Locator {
+  return page.locator(`[data-test-name=Message][data-test-message-type="${messageType}"]`, {
+    hasText: partialText,
+  });
 }
 
 export async function seekToMessage(page: Page, messageListItem: Locator) {

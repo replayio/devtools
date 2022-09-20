@@ -1,15 +1,29 @@
+import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
 import { Wakeable } from "bvaughn-architecture-demo/src/suspense/types";
 import { createWakeable } from "bvaughn-architecture-demo/src/utils/suspense";
 import { ThreadFront } from "protocol/thread";
-import { useContext, useMemo } from "react";
+import { useContext, useLayoutEffect, useMemo } from "react";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
 import createReplayClientRecorder from "shared/client/createReplayClientRecorder";
+import { addCachedPointsForTimeListener } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { decode } from "shared/client/encoder";
 import { ReplayClient } from "shared/client/ReplayClient";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { getFlag, hasFlag } from "./url";
+import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
+
+type ReplayClientRecorderAdditionalData = {
+  points: TimeStampedPoint[];
+};
+
+declare global {
+  interface Window {
+    // Share this data with the Playwright test runner via a global.
+    REPLAY_CLIENT_RECORDER_ADDITIONAL_DATA?: ReplayClientRecorderAdditionalData;
+  }
+}
 
 // By default, this context wires the app up to use real Replay backend APIs.
 // We can leverage this when writing tests (or UI demos) by injecting a stub client.
@@ -62,11 +76,23 @@ export function useReplayClientForTesting(): ReplayClientInterface {
   const host = getFlag("host");
   const record = hasFlag("record");
 
+  // Proxy Replay API commands to the backend.
+  // During test "recording" we write these to a fixtures file.
+  // During CI test runs ("playback") we use the fixture data to mock out the backend.
   const memoizedReplayClient = useMemo<ReplayClientInterface>(() => {
     if (host && fixtureDataPath) {
       const encoded = getEncoded(host, fixtureDataPath);
       const decoded = decode(encoded);
-      return createReplayClientPlayer(decoded);
+
+      const { additionalData, entries } = decoded;
+
+      if (additionalData) {
+        additionalData.points.forEach((timeStampedPoint: TimeStampedPoint) => {
+          preCacheExecutionPointForTime(timeStampedPoint);
+        });
+      }
+
+      return createReplayClientPlayer(entries);
     } else {
       if (record) {
         return createReplayClientRecorder(replayClient);
@@ -75,6 +101,22 @@ export function useReplayClientForTesting(): ReplayClientInterface {
       }
     }
   }, [fixtureDataPath, host, record, replayClient]);
+
+  // Some data doesn't get handled by the proxy approach above.
+  // Specifically, data that deals with events.
+  // In most cases this does not matter, but for Suspense caches like PointsCache it is important.
+  // So we separately cache this data during unmount as well.
+  useLayoutEffect(() => {
+    if (record) {
+      // Share this data with the Playwright test runner via a global.
+      window.REPLAY_CLIENT_RECORDER_ADDITIONAL_DATA = {
+        points: [],
+      };
+      return addCachedPointsForTimeListener((timeStampedPoint: TimeStampedPoint) => {
+        window.REPLAY_CLIENT_RECORDER_ADDITIONAL_DATA!.points.push(timeStampedPoint);
+      });
+    }
+  }, [record, replayClient]);
 
   return memoizedReplayClient;
 }

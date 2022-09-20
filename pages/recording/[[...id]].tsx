@@ -1,4 +1,3 @@
-import ObjectPreviewSuspenseCacheAdapter from "devtools/client/debugger/src/components/SecondaryPanes/ObjectPreviewSuspenseCacheAdapter";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { GetStaticProps } from "next/types";
@@ -102,6 +101,7 @@ function useRecordingSlug(recordingId: string) {
         };
         delete query.id;
 
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         router.replace(
           {
             pathname: url,
@@ -156,6 +156,8 @@ function RecordingPage({
         dispatch(setModal("sharing", { recordingId }));
       }
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getRecording();
   }, [
     dispatch,
@@ -191,7 +193,6 @@ function RecordingPage({
     return (
       <>
         {head}
-        <ObjectPreviewSuspenseCacheAdapter />
         <DevTools uploadComplete={uploadComplete} />
       </>
     );
