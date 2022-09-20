@@ -1,8 +1,7 @@
 .ConsoleRoot {
   display: grid;
   grid-template-columns: auto 2fr;
-  grid-template-rows: auto auto 1fr;
-  flex-direction: column;
+  grid-template-rows: auto 1fr;
   flex: 1 1 auto;
   overflow: hidden;
   border-bottom-left-radius: 0.5rem;
