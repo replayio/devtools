@@ -2,7 +2,7 @@ import { getUniqueHitCountsChunksForLines } from "ui/reducers/hitCounts";
 
 import { SourceEditor } from "./source-editor";
 
-export function calculateHitCountChunksForVisibleLines(editor: SourceEditor) {
+export function calculateRangeChunksForVisibleLines(editor: SourceEditor) {
   var rect = editor.codeMirror.getWrapperElement().getBoundingClientRect();
   var topVisibleLine = editor.codeMirror.lineAtHeight(rect.top, "window");
   var bottomVisibleLine = editor.codeMirror.lineAtHeight(rect.bottom, "window");
