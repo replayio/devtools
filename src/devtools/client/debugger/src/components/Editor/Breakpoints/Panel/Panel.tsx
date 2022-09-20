@@ -25,12 +25,10 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
-function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
-  // The indent value is an adjustment for the distance from the gutter's left edge
-  // to the panel's left edge, which is approximately ~60.
-  const panelIndent = 60;
+const gutterOffset = 37;
 
-  return editor.getScrollInfo().clientWidth - panelIndent;
+function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
+  return editor.getScrollInfo().clientWidth - gutterOffset;
 }
 
 const connector = connect(
@@ -166,14 +164,13 @@ function Panel({
   return (
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
       <div
-        className="breakpoint-panel-wrapper"
-        style={{ width: `${width}px` }}
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
+        style={{ position: "sticky", left: gutterOffset, maxWidth: width }}
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
-          <div className="flex space-x-0.5 pt-2 pl-1 pr-4">
+          <div className="flex items-center space-x-0.5 pt-2 pl-1 pr-4">
             <PrefixBadgeButton breakpoint={breakpoint!} />
             <div className="flex-1 min-w-0">
               {editing ? (
