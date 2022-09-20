@@ -596,7 +596,7 @@ class _ThreadFront {
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
       // Fire and forget
-      // estlint-disable-next-line @typescript-eslint/no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       repaint(true);
     }
 
@@ -624,7 +624,7 @@ class _ThreadFront {
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");
       // Fire and forget
-      // estlint-disable-next-line @typescript-eslint/no-floating-promises
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       repaint(true);
     }
 

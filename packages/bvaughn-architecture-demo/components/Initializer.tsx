@@ -72,6 +72,7 @@ export default function Initializer({
         });
       };
 
+      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       asyncInitialize();
     }
 
