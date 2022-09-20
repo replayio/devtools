@@ -25,14 +25,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
-function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
-  // The indent value is an adjustment for the distance from the gutter's left edge
-  // to the panel's left edge, which is approximately ~60.
-  const panelIndent = 60;
-
-  return editor.getScrollInfo().clientWidth - panelIndent;
-}
-
 const connector = connect(
   (state: UIState) => ({
     currentTime: selectors.getCurrentTime(state),
