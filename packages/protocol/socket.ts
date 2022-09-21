@@ -174,7 +174,7 @@ export function initSocket(address: string): WebSocket | null {
   return socket;
 }
 
-export function sendMessage<M extends CommandMethods>(
+export async function sendMessage<M extends CommandMethods>(
   method: M,
   params: CommandParams<M>,
   sessionId?: SessionId,
@@ -189,29 +189,28 @@ export function sendMessage<M extends CommandMethods>(
     gPendingMessages.push(msg);
   }
 
-  return new Promise<CommandResponse>(resolve => gMessageWaiters.set(id, { method, resolve })).then(
-    response => {
-      if (response.error) {
-        gSessionCallbacks?.onResponseError(response);
-
-        const { code, data, message } = response.error;
-
-        if (method === "Session.listenForLoadChanges" && code === 66) {
-          // We are being disconnected after a timeout, no need to raise
-          return;
-        }
-
-        console.warn("Message failed", method, { code, id, message }, data);
-
-        const err = new Error(message) as any;
-        err.name = "CommandError";
-        err.code = code;
-        throw err;
-      }
-
-      return response.result as any;
-    }
+  const response = await new Promise<CommandResponse>(resolve =>
+    gMessageWaiters.set(id, { method, resolve })
   );
+  if (response.error) {
+    gSessionCallbacks?.onResponseError(response);
+
+    const { code, data, message } = response.error;
+
+    if (method === "Session.listenForLoadChanges" && code === 66) {
+      // We are being disconnected after a timeout, no need to raise
+      return {};
+    }
+
+    console.warn("Message failed", method, { code, id, message }, data);
+
+    const err = new Error(message) as any;
+    err.name = "CommandError";
+    err.code = code;
+    throw err;
+  }
+
+  return response.result as any;
 }
 
 const doSend = makeInfallible(message => {
