@@ -2,7 +2,7 @@ import classNames from "classnames";
 import React, { HTMLProps } from "react";
 import ReplayLogo from "./ReplayLogo";
 
-export type DialogPropTypes = HTMLProps<HTMLDivElement>;
+export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean };
 
 export function Dialog({ children, className, showFooterLinks, ...props }: DialogPropTypes) {
   return (
@@ -16,8 +16,7 @@ export function Dialog({ children, className, showFooterLinks, ...props }: Dialo
         {children}
       </div>
 
-      {showFooterLinks ? (
-        <div>
+      {!!showFooterLinks ? (
           <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
             <div>
               <div className="flex space-x-2">
@@ -41,7 +40,6 @@ export function Dialog({ children, className, showFooterLinks, ...props }: Dialo
               </div>
             </div>
           </div>
-        </div>
       ) : null}
     </>
   );
