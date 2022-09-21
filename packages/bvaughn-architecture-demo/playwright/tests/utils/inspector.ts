@@ -1,11 +1,13 @@
-import { Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 
 export async function toggleExpandable<T>(
-  page: Page,
-  partialText: string,
+  pageOrLocator: Page | Locator,
+  partialText?: string,
   expanded: boolean = true
 ): Promise<void> {
-  const expandable = page.locator(`[data-test-name="Expandable"]`, { hasText: partialText }).last();
+  const expandable = pageOrLocator
+    .locator(`[data-test-name="Expandable"]`, { hasText: partialText })
+    .last();
 
   const isExpanded = await expandable.evaluate(
     'node => node.getDataAttribute("data-test-state") === "opened"'

@@ -10,8 +10,8 @@ import { getAsyncParentFramesSuspense, getAsyncParentPauseIdSuspense } from "ui/
 import { Redacted } from "ui/components/Redacted";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
+import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
+import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
 
 import styles from "./NewObjectInspector.module.css";
 
@@ -68,17 +68,7 @@ function Scope({ pauseId, scope }: { pauseId: PauseId; scope: ConvertedScope }) 
   }
   if (scope.bindings) {
     return (
-      <Expandable
-        header={scope.title}
-        children={scope.bindings.map((binding, bindingIndex) => (
-          <Inspector
-            context="default"
-            key={bindingIndex}
-            pauseId={pauseId}
-            protocolValue={binding}
-          />
-        ))}
-      />
+      <ScopesInspector name={scope.title!} pauseId={pauseId} protocolValues={scope.bindings} />
     );
   }
   return null;

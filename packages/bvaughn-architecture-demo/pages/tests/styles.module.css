@@ -15,10 +15,37 @@
   grid-template-columns: 1fr 2fr 2fr;
 }
 
+.HorizontalContainer,
 .VerticalContainer {
   display: flex;
-  flex-direction: row;
   flex: 1 1 auto;
   gap: 0.5rem;
   overflow: auto;
+}
+.HorizontalContainer {
+  flex-direction: column;
+}
+.VerticalContainer {
+  flex-direction: row;
+}
+
+.Block {
+  display: block;
+}
+
+.ScopesPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-x: hidden;
+  background-color: var(--background-color-contrast-2);
+  width: 300px;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+
+.Box {
+  border: 1px solid var(--border-color);
+  display: inline-block;
+  margin: 0.5rem;
 }

@@ -1,4 +1,8 @@
-import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
+import {
+  NamedValue as ProtocolNamedValue,
+  PauseId,
+  Value as ProtocolValue,
+} from "@replayio/protocol";
 
 import styles from "./Inspector.module.css";
 import KeyValueRenderer from "./KeyValueRenderer";
@@ -14,7 +18,7 @@ export default function Inspector({
   context: "console" | "default";
   expandByDefault?: boolean;
   pauseId: PauseId;
-  protocolValue: ProtocolValue;
+  protocolValue: ProtocolValue | ProtocolNamedValue;
 }) {
   const keyValue = (
     <KeyValueRenderer
@@ -30,7 +34,7 @@ export default function Inspector({
     return keyValue;
   } else {
     return (
-      <div className={`${styles.Inspector} ${className || ""}`} data-test-id="InspectorRoot">
+      <div className={`${styles.Inspector} ${className || ""}`} data-test-name="InspectorRoot">
         {keyValue}
       </div>
     );

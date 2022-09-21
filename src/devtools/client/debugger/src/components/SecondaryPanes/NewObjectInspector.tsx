@@ -1,8 +1,8 @@
 import { NamedValue as ProtocolNamedValue } from "@replayio/protocol";
-import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import Expandable from "bvaughn-architecture-demo/components/Expandable";
 import Loader from "bvaughn-architecture-demo/components/Loader";
+import Inspector from "bvaughn-architecture-demo/components/inspector/Inspector";
+import ScopesInspector from "bvaughn-architecture-demo/components/inspector/ScopesInspector";
 import "bvaughn-architecture-demo/pages/variables.css";
 import { clientValueToProtocolNamedValue } from "bvaughn-architecture-demo/src/utils/protocol";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
@@ -17,6 +17,9 @@ import styles from "./NewObjectInspector.module.css";
 export default function NewObjectInspector({ roots }: { roots: Item[] }) {
   const selectedFrame = useAppSelector(getSelectedFrame);
   const pause = ThreadFront.pauseForAsyncIndex(selectedFrame?.asyncIndex);
+
+  // TODO [FE-747]
+  // TODO [FE-754] Migrate most of this to ScopesInspector
 
   // HACK
   // The new Object Inspector does not consume ValueFronts.
@@ -36,17 +39,11 @@ export default function NewObjectInspector({ roots }: { roots: Item[] }) {
             clientValueToProtocolNamedValue
           );
           children.push(
-            <Expandable
+            <ScopesInspector
               key={index}
-              header={root.name}
-              children={protocolValues.map((protocolValue, index) => (
-                <Inspector
-                  context="default"
-                  key={index}
-                  pauseId={pause.pauseId!}
-                  protocolValue={protocolValue}
-                />
-              ))}
+              name={root.name}
+              pauseId={pause.pauseId!}
+              protocolValues={protocolValues}
             />
           );
           break;
@@ -55,8 +52,8 @@ export default function NewObjectInspector({ roots }: { roots: Item[] }) {
           const protocolValue = clientValueToProtocolNamedValue(root);
           children.push(
             <Inspector
-              context="default"
               key={index}
+              context="default"
               pauseId={pause.pauseId!}
               protocolValue={protocolValue}
             />

@@ -25,28 +25,21 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
     dispatch(previewCleared({ cx, previewId: preview!.previewId }));
   };
 
-  const { cursorPos, expression, value } = preview!;
+  const { cursorPos, value } = preview!;
 
   if (value === null) {
     return null;
   }
 
-  // Primitives get rendered as a smaller "tooltip" style, above the line.
-  // Other values get rendered as a larger "popover" style, below.
-
-  // The backend returns primitive data in a field called `value`
-  const isPrimitive = typeof value === "object" && "value" in value;
-  const popoverType = isPrimitive ? "tooltip" : "popover";
-
   return (
     <Popover
       targetPosition={cursorPos}
-      type={popoverType}
+      type="popover"
       editorRef={editorRef}
       target={target}
       mouseout={onMouseOut}
     >
-      <NewObjectInspector expression={expression} protocolValue={value} />
+      <NewObjectInspector protocolValue={value} />
     </Popover>
   );
 }

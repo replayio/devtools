@@ -1,4 +1,4 @@
-import React, { KeyboardEvent, MouseEvent, ReactNode, useState } from "react";
+import React, { KeyboardEvent, MouseEvent, ReactNode, useState, useTransition } from "react";
 
 import styles from "./Expandable.module.css";
 import Icon from "./Icon";
@@ -25,15 +25,23 @@ export default function Expandable({
   onChange?: (value: boolean) => void;
   useBlockLayoutWhenExpanded?: boolean;
 }) {
+  const [isPending, startTransition] = useTransition();
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   const onClick = (event: MouseEvent) => {
     event.stopPropagation();
 
+    if (isPending) {
+      return;
+    }
+
     const newIsOpen = !isOpen;
 
-    onChange(newIsOpen);
-    setIsOpen(newIsOpen);
+    // In case this change triggers a re-render that suspends, it should be in a transition.
+    startTransition(() => {
+      onChange(newIsOpen);
+      setIsOpen(newIsOpen);
+    });
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
