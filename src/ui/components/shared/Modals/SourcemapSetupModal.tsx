@@ -28,12 +28,12 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
 
   return (
     <Modal options={{ maskTransparency: "translucent" }} onMaskClick={hideModal}>
-      <Dialog>
+      <Dialog showFooterLinks={false}>
         <DialogLogo />
         <DialogTitle>Replay is better with sourcemaps</DialogTitle>
         <DialogDescription>{msg}</DialogDescription>
         <DialogActions>
-          <div className="flex w-full flex-col items-center">
+          <div className="flex flex-col items-center w-full">
             <PrimaryButton color="blue" onClick={onClick}>{`Show me how`}</PrimaryButton>
           </div>
         </DialogActions>

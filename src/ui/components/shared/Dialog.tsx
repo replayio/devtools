@@ -2,9 +2,9 @@ import classNames from "classnames";
 import React, { HTMLProps } from "react";
 import ReplayLogo from "./ReplayLogo";
 
-export type DialogPropTypes = HTMLProps<HTMLDivElement>;
+export type DialogPropTypes = HTMLProps<HTMLDivElement> & { showFooterLinks?: boolean };
 
-export function Dialog({ children, className, ...props }: DialogPropTypes) {
+export function Dialog({ children, className, showFooterLinks, ...props }: DialogPropTypes) {
   return (
     <>
       <div
@@ -15,31 +15,32 @@ export function Dialog({ children, className, ...props }: DialogPropTypes) {
       >
         {children}
       </div>
-      <div>
-        <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
-          <div>
-            <div className="flex space-x-2">
-              <div>
-                <a className="hover:underline" href="http://docs.replay.io">
-                  Documentation
-                </a>
-              </div>
-              <div className="text-gray-300">•</div>
-              <div>
-                <a className="hover:underline" href="http://replay.io/discord/">
-                  Discord
-                </a>
-              </div>
-              <div className="text-gray-300">•</div>
-              <div>
-                <a className="hover:underline" href="mailto:support@replay.io">
-                  Email support
-                </a>
+
+      {!!showFooterLinks ? (
+          <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
+            <div>
+              <div className="flex space-x-2">
+                <div>
+                  <a className="hover:underline" href="http://docs.replay.io">
+                    Documentation
+                  </a>
+                </div>
+                <div className="text-gray-300">•</div>
+                <div>
+                  <a className="hover:underline" href="http://replay.io/discord/">
+                    Discord
+                  </a>
+                </div>
+                <div className="text-gray-300">•</div>
+                <div>
+                  <a className="hover:underline" href="mailto:support@replay.io">
+                    Email support
+                  </a>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+      ) : null}
     </>
   );
 }
