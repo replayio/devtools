@@ -36,6 +36,14 @@
   pointer-events: all;
 }
 
+.empty-line .line-action-button {
+  pointer-events: none !important;
+}
+
+.empty-line .toggle-widget {
+  background: #8abfd8 !important;
+}
+
 .editor-wrapper
   :not(.empty-line):not(.new-breakpoint)
   > .CodeMirror-gutter-wrapper

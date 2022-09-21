@@ -17,11 +17,9 @@ import { getSelectedSource } from "ui/reducers/sources";
 
 import StaticTooltip from "./StaticTooltip";
 import {
-  getBoundsForLineNumber,
   fetchHitCounts,
   getHitCountsForSource,
   getHitCountsStatusForSourceByLine,
-  getUniqueHitCountsChunksForLines,
 } from "ui/reducers/hitCounts";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";

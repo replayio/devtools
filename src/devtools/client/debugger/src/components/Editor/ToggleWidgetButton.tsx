@@ -75,7 +75,6 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 };
 
 function QuickActions({
-  isLineHitCountsCollapsed,
   hoveredLineNumber,
   onMouseDown,
   keyModifiers,
@@ -83,7 +82,6 @@ function QuickActions({
   breakpoint,
   cx,
 }: {
-  isLineHitCountsCollapsed: boolean;
   hoveredLineNumber: number;
   onMouseDown: MouseEventHandler;
   keyModifiers: KeyModifiers;
@@ -99,7 +97,6 @@ function QuickActions({
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { height } = targetNode.getBoundingClientRect();
   const { value: enableLargeText } = useFeature("enableLargeText");
-  const { value: hitCounts } = useFeature("hitCounts");
 
   const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
 
@@ -143,17 +140,13 @@ function QuickActions({
     <div
       className={classNames(
         "line-action-button absolute z-50 flex translate-x-full transform flex-row space-x-px",
-        enableLargeText && "bottom-0.5",
-        hitCounts ? (isLineHitCountsCollapsed ? "-right-2" : "-right-5") : "-right-1"
+        enableLargeText && "bottom-0.5"
       )}
       // This is necessary so that we don't move the CodeMirror cursor while clicking.
       onMouseDown={onMouseDown}
       style={{
         top: `-${(1 / 2) * (18 - height)}px`,
-
-        // If hit counts are shown, the button should not overlap with the gutter.
-        // The gutter size changes though based on the number of hits, so we use a CSS variable.
-        right: hitCounts ? "var(--hit-count-gutter-width)" : undefined,
+        right: "var(--print-statement-right-offset)",
       }}
     >
       {button}
@@ -167,9 +160,7 @@ type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
 function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
-  const { value: hitCountsMode } = useStringPref("hitCounts");
 
-  const isLineHitCountsCollapsed = hitCountsMode === "hide-counts";
   const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
   const onMouseDown = (e: React.MouseEvent) => {
     // This keeps the cursor in CodeMirror from moving after clicking on the button.
@@ -208,7 +199,6 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
     <KeyModifiersContext.Consumer>
       {keyModifiers => (
         <QuickActions
-          isLineHitCountsCollapsed={isLineHitCountsCollapsed}
           hoveredLineNumber={hoveredLineNumber}
           onMouseDown={onMouseDown}
           targetNode={targetNode}
