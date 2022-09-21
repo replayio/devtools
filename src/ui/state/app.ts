@@ -97,7 +97,7 @@ export interface AppState {
   loading: number;
   loadingFinished: boolean;
   loadingStatusSlow: boolean;
-  loadingPageTipIndex: number;
+  loadingPageTipSeed: number;
   modal: ModalType | null;
   modalOptions: ModalOptionsType;
   recordingDuration: number;

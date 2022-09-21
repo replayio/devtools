@@ -1,13 +1,10 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC } from "react";
 import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
 import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
-import { useAppDispatch } from "ui/setup/hooks";
-import { getLoadingPageTipIndex, setLoadingPageTipIndex } from "ui/actions/app";
+import { getLoadingPageTipSeed } from "ui/actions/app";
 import { useAppSelector } from "ui/setup/hooks";
-
-const TIP_DURATION = 12000;
 
 const TIPS = [
   {
@@ -45,13 +42,13 @@ const TIPS = [
 ] as const;
 
 export const LoadingTips: FC = () => {
-  const rand = useAppSelector(getLoadingPageTipIndex);
-  const currentTipIdx = Math.floor(rand * TIPS.length);
+  const seed = useAppSelector(getLoadingPageTipSeed);
+  const currentTipIdx = Math.floor(seed * TIPS.length);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
   return (
-    <div className="h-32 space-y-8 w-96">
-      <div className="flex items-center max-w-lg px-8 py-4 space-x-4 align-middle rounded-lg shadow-sm bg-loadingBoxes text-bodyColor">
-        <div className="w-16 h-16">
+    <div className="h-32 w-96 space-y-8">
+      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-loadingBoxes px-8 py-4 align-middle text-bodyColor shadow-sm">
+        <div className="h-16 w-16">
           <Icon />
         </div>
         <div className="flex flex-col space-y-2">

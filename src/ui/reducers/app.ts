@@ -47,7 +47,7 @@ export const initialAppState: AppState = {
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
-  loadingPageTipIndex: Math.random(),
+  loadingPageTipSeed: Math.random(),
   loadingStatusSlow: false,
   modal: null,
   modalOptions: null,
@@ -177,9 +177,6 @@ const appSlice = createSlice({
     setAppMode(state, action: PayloadAction<AppMode>) {
       state.mode = action.payload;
     },
-    setLoadingPageTipIndex(state, action: PayloadAction<number>) {
-      state.loadingPageTipIndex = action.payload;
-    },
   },
 });
 
@@ -199,7 +196,6 @@ export const {
   setIsNodePickerInitializing,
   setLoadedRegions,
   setLoadingFinished,
-  setLoadingPageTipIndex,
   setLoadingStatusSlow,
   setModal,
   setMouseTargetsLoading,
@@ -228,7 +224,7 @@ export const getRecordingDuration = (state: UIState) => state.app.recordingDurat
 
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
-export const getLoadingPageTipIndex = (state: UIState) => state.app.loadingPageTipIndex;
+export const getLoadingPageTipSeed = (state: UIState) => state.app.loadingPageTipSeed;
 export const getLoadingStatusSlow = (state: UIState) => state.app.loadingStatusSlow;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
