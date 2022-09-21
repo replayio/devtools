@@ -385,7 +385,7 @@ export class Pause {
           this.addData(data);
         }
         const scope = this.scopes.get(id);
-        assert(scope, "scope not found");
+        assert(scope, `scope not found (scope ID: ${id})`);
         return scope;
       })
     );
@@ -393,7 +393,7 @@ export class Pause {
 
   async getScopes(frameId: FrameId) {
     const frame = this.frames.get(frameId);
-    assert(frame, "frame not found");
+    assert(frame, `frame not found (frame ID: ${frameId})`);
 
     // Normally we use the original scope chain for the frame if there is one,
     // but when a generated source is marked as preferred we use the generated
