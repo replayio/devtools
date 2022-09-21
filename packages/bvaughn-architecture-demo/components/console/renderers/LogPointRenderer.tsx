@@ -73,7 +73,7 @@ function LogPointRenderer({
         </span>
       )}
       <span className={styles.LogContents} data-test-name="LogContents">
-        {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
+        <BadgeRenderer badge={logPointInstance.point.badge} />
         <ErrorBoundary
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
         >
@@ -172,7 +172,7 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
   );
 }
 
-function BadgeRenderer({ badge }: { badge: Badge }) {
+function BadgeRenderer({ badge }: { badge: Badge | null }) {
   switch (badge) {
     case "unicorn":
       return (
@@ -184,10 +184,14 @@ function BadgeRenderer({ badge }: { badge: Badge }) {
       return (
         <span
           className={styles.ColorBadge}
-          style={{
-            // @ts-ignore
-            "--badge-color": `var(--badge-${badge}-color)`,
-          }}
+          style={
+            badge
+              ? {
+                  // @ts-expect-error
+                  "--badge-color": `var(--badge-${badge}-color)`,
+                }
+              : undefined
+          }
         />
       );
   }
