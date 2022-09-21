@@ -1,3 +1,4 @@
+import { Scope as ProtocolScope, Object as ProtocolObject } from "@replayio/protocol";
 import { parseExpression } from "@babel/parser";
 import {
   isIdentifier as _isIdentifier,
@@ -9,9 +10,6 @@ import {
   CallExpression,
 } from "@babel/types";
 import generate from "@babel/generator";
-import { ValueFront } from "protocol/thread";
-import { WiredObject } from "protocol/thread/pause";
-import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
 import { filter } from "fuzzaldrin-plus";
 
 type PropertyExpression = {
@@ -20,44 +18,7 @@ type PropertyExpression = {
   computed: boolean;
 };
 
-type ObjectPreviewProperty = {
-  value: ValueFront;
-  writable: boolean;
-  configurable: boolean;
-  enumerable: boolean;
-  name: string;
-  get?: any;
-  set?: any;
-};
-
-type ObjectPreview = {
-  containerEntries: any[];
-  getterValues: any[];
-  properties: ObjectPreviewProperty[];
-  prototypeId: any;
-  prototypeValue: ValueFront;
-};
-
-type ObjectFront = {
-  className: string;
-  objectId: string;
-  preview?: ObjectPreview;
-};
-
-type Binding = {
-  name: string;
-  value: ValueFront;
-};
-
-type Scope = {
-  bindings: Binding[];
-  actor: string;
-  parent: Scope;
-  functionName?: string;
-  object?: ValueFront;
-  scopeKind: string;
-  type: "block" | string;
-};
+export type ObjectFetcher = (objectId: string) => Promise<ProtocolObject>;
 
 // This is used as a property name placeholder for what they user could
 //  be trying to type or find the autocomplete match to.
@@ -118,35 +79,46 @@ export function isDotNotation(str: string) {
   return isMemberExpression(str + PROPERTY_PLACEHOLDER);
 }
 
-export function getPropertiesForObject(object?: ObjectFront | WiredObject | null): string[] {
+const OBJECT_PROTOTYPE_PROPERTIES = Object.getOwnPropertyNames(Object.prototype);
+const ARRAY_PROTOTYPE_PROPERTIES = Object.getOwnPropertyNames(Array.prototype);
+
+export async function getPropertiesForObject(
+  objectId: string,
+  fetchObjectWithPreview: ObjectFetcher,
+  maxDepth = Infinity
+): Promise<string[]> {
   const properties = [];
 
-  if (!object) {
+  if (!objectId) {
     return [];
   }
 
-  // The object preview may be undefined until the user expands the object
-  // in the scopes panel. This applies primarily to prototype objects.
+  const object = await fetchObjectWithPreview(objectId);
+  // We _should_ have a preview because `fetchObjectWithPreview`
+  // asked the object cache to retrieve one
   if (object.preview) {
-    const objectProperties = object.preview.properties.map(b => b.name);
+    const objectProperties = object.preview.properties?.map(b => b.name) ?? [];
     properties.unshift(...objectProperties);
   } else {
     if (["Object", "Array"].includes(object.className)) {
-      const prototypeProperties = Object.getOwnPropertyNames(Object.prototype);
-      properties.unshift(...prototypeProperties);
+      properties.unshift(...OBJECT_PROTOTYPE_PROPERTIES);
     }
 
     if (object.className === "Array") {
-      const prototypeProperties = Object.getOwnPropertyNames(Array.prototype);
-      properties.unshift(...prototypeProperties);
+      properties.unshift(...ARRAY_PROTOTYPE_PROPERTIES);
     }
   }
 
-  const prototype = object.preview?.prototypeValue;
+  const prototypeId = object.preview?.prototypeId;
 
   // Recursively gather the properties through the prototype chain.
-  if (prototype?.getObject()) {
-    const prototypeProperties = getPropertiesForObject(prototype.getObject());
+  if (prototypeId && maxDepth > 0) {
+    const prototypeProperties = await getPropertiesForObject(
+      prototypeId,
+      fetchObjectWithPreview,
+      maxDepth - 1
+    );
+
     properties.push(...prototypeProperties);
   }
 
@@ -157,37 +129,20 @@ function shouldVariableAutocomplete(input: string) {
   return isIdentifier(input);
 }
 
-function getBinding(name: string, scope: Scope) {
-  return scope.bindings.find(b => b.name === name);
-}
-function getBindingNames(scope: Scope): string[] {
-  return scope.bindings.map(b => b.name);
-}
-function getGlobalActor(scopes: Scope) {
-  let globalActor = scopes;
+// Looks for the "global object" (ie `window`) and returns its properties
+async function getGlobalVariables(scopes: ProtocolScope[], fetchObject: ObjectFetcher) {
+  // Scopes are ordered nearest to broadest.
+  // _If_ there is a global object, it will be the last scope in the list.
+  const [lastScope] = scopes.slice(-1);
 
-  while (globalActor.parent) {
-    globalActor = globalActor.parent;
-  }
-
-  return globalActor;
-}
-function getGlobalVariables(scopes: Scope) {
-  const globalActor = getGlobalActor(scopes);
-  const globalFront = globalActor.object;
-
-  if (!globalFront) {
+  const globalScopeObjectId = lastScope?.object;
+  if (!globalScopeObjectId) {
     return [];
   }
 
-  // This gets the global object's properties in the background. This happen
-  // async, but we don't await it so that the loading happens in the background.
-  // Once the properties are loaded, they will be available in the globalFront the
-  // next time this function runs and we attempt to get the properties for it.
-  globalFront.loadIfNecessary();
+  const globalObjectProperties = await getPropertiesForObject(globalScopeObjectId, fetchObject, 1);
 
-  const rv = getPropertiesForObject(globalFront.getObject());
-  return rv;
+  return globalObjectProperties;
 }
 
 function getPropertyValue(property: StringLiteral | Identifier) {
@@ -268,25 +223,48 @@ export function insertAutocompleteMatch(value: string, match: string, isArgument
     ? autocompleteLastArgument(value, autocompletedExpression)
     : autocompletedExpression;
 }
-export async function getAutocompleteMatches(input: string, scope: Scope) {
+export async function getAutocompleteMatches(
+  input: string,
+  scopes: ProtocolScope[],
+  fetchObjectWithPreview: ObjectFetcher
+) {
+  const currentScope = scopes[0];
+  if (!currentScope) {
+    return [];
+  }
   const propertyExpression = getPropertyExpression(input);
 
   if (propertyExpression) {
-    const properties = [];
+    const properties: string[] = [];
     const { left, right } = propertyExpression;
 
-    const value = getBinding(left, scope)?.value;
-    if (value) {
-      await value.traversePrototypeChainAsync(
-        current => current.loadIfNecessary(),
-        GETTERS_FROM_PROTOTYPES
+    // TODO This only handles top-level variables because of `=== left`.
+    // TODO Rework this to handle nested field lookups.
+    // TODO This also only looks in the _current_ scope.
+    const matchingBinding = currentScope.bindings?.find(b => b.name === left);
+
+    if (matchingBinding?.object) {
+      // Assuming this variable name represents an object,
+      // fetch its property names up to 1 prototype level deep
+      const prototypeProperties = await getPropertiesForObject(
+        matchingBinding.object,
+        fetchObjectWithPreview,
+        1
       );
-      properties.push(...getPropertiesForObject(value.getObject()));
+      properties.push(...prototypeProperties);
     }
+
+    properties.sort();
 
     return fuzzyFilter(properties, normalizeString(right));
   } else if (shouldVariableAutocomplete(input)) {
-    const variableNames = [...getBindingNames(scope), ...getGlobalVariables(scope)];
+    // TODO this only looks in the _current_ scope
+    const bindingNames = currentScope.bindings?.map(b => b.name) ?? [];
+    const globalVariables = await getGlobalVariables(scopes, fetchObjectWithPreview);
+
+    const variableNames = [...bindingNames, ...globalVariables];
+    variableNames.sort();
+
     return fuzzyFilter(variableNames, normalizeString(input));
   }
 

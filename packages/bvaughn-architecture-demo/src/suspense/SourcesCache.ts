@@ -118,7 +118,11 @@ export const {
   getValueAsync: getBreakpointPositionsAsync,
   getValueIfCached: getBreakpointPositionsIfCached,
 } = createGenericCache<
-  [ReplayClientInterface, ProtocolSourceId, SourceLocationRange?],
+  [
+    replayClient: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    locationRange?: SourceLocationRange
+  ],
   ProtocolSameLineSourceLocations[]
 >(
   (client, sourceId, range) => client.getBreakpointPositions(sourceId, range),

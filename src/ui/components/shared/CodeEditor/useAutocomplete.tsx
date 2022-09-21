@@ -1,4 +1,4 @@
-import { useCallback, useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef, useContext } from "react";
 import {
   fuzzyFilter,
   getAutocompleteMatches,
@@ -6,13 +6,16 @@ import {
   getPropertyExpression,
   insertAutocompleteMatch,
   normalizeString,
+  ObjectFetcher,
 } from "ui/utils/autocomplete";
 import uniq from "lodash/uniq";
 import { useAppSelector } from "ui/setup/hooks";
-import { getFrameScope } from "devtools/client/debugger/src/reducers/pause";
-import { UIState } from "ui/state";
+import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
 import { getSelectedFrame, PauseFrame } from "devtools/client/debugger/src/selectors";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
+import { FrameScopes, getScopesAsync } from "ui/suspense/scopeCache";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(
@@ -38,25 +41,46 @@ function useGetAsyncMatches(
   return matches;
 }
 
-async function getScopeMatches(expression: string, frameScope: any): Promise<string[] | null> {
-  if (!expression || !frameScope?.scope) {
+async function getScopeMatches(
+  expression: string,
+  frameScope: FrameScopes,
+  fetchObject: ObjectFetcher
+): Promise<string[] | null> {
+  if (!expression || !frameScope?.scopes.length) {
     return [];
   }
-  return await getAutocompleteMatches(expression, frameScope.scope);
+  return await getAutocompleteMatches(expression, frameScope.scopes, fetchObject);
 }
 
 function useGetScopeMatches(expression: string) {
-  const frameScope = useAppSelector((state: UIState) => getFrameScope(state, "0:0"));
+  const pauseId = useAppSelector(getPauseId);
+  const replayClient = useContext(ReplayClientContext);
+
   const getScopeMatchesForFrameScope = useCallback(
-    (expression: string) => getScopeMatches(expression, frameScope),
-    [frameScope]
+    async (expression: string) => {
+      if (!pauseId) {
+        return [] as string[];
+      }
+      // TODO Hardcoding frame ID 0 probably isn't great
+      const frameScope = await getScopesAsync(pauseId, "0");
+      if (!frameScope) {
+        return [] as string[];
+      }
+      const fetchObject = (objectId: string) => {
+        return getObjectWithPreviewHelper(replayClient, pauseId, objectId);
+      };
+      return getScopeMatches(expression, frameScope, fetchObject);
+    },
+    [pauseId, replayClient]
   );
+
   return useGetAsyncMatches(expression, getScopeMatchesForFrameScope);
 }
 
 async function getEvalMatches(
   expression: string,
-  frame: PauseFrame | null
+  frame: PauseFrame | null,
+  fetchObject: ObjectFetcher
 ): Promise<string[] | null> {
   if (!frame) {
     return null;
@@ -68,7 +92,8 @@ async function getEvalMatches(
   const evaluatedProperties = await getEvaluatedProperties(
     propertyExpression.left,
     frame.asyncIndex,
-    frame.protocolId
+    frame.protocolId,
+    fetchObject
   );
   if (!evaluatedProperties) {
     return null;
@@ -79,9 +104,21 @@ async function getEvalMatches(
 // This tries to autocomplete the property of the current expression.
 function useGetEvalMatches(expression: string) {
   const frame = useAppSelector(getSelectedFrame);
+  const replayClient = useContext(ReplayClientContext);
+
+  const pauseId = useAppSelector(getPauseId);
+
   const getEvalMatchesForSelectedFrame = useCallback(
-    (expression: string) => getEvalMatches(expression, frame),
-    [frame]
+    async (expression: string) => {
+      if (!pauseId) {
+        return null;
+      }
+      const fetchObject = async (objectId: string) => {
+        return getObjectWithPreviewHelper(replayClient, pauseId, objectId);
+      };
+      return getEvalMatches(expression, frame, fetchObject);
+    },
+    [frame, pauseId, replayClient]
   );
   return useGetAsyncMatches(expression, getEvalMatchesForSelectedFrame);
 }
@@ -91,7 +128,7 @@ function useGetMatches(expression: string, isArgument: boolean) {
   const scopeMatches = useGetScopeMatches(actualExpression);
   const evalMatches = useGetEvalMatches(actualExpression);
 
-  return uniq([...scopeMatches, ...evalMatches]);
+  return uniq([...scopeMatches, ...evalMatches]).sort();
 }
 
 function getShouldShowAutocomplete(

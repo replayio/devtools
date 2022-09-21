@@ -1,31 +1,28 @@
-import debounce from "lodash/debounce";
 import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
-import { GETTERS_FROM_PROTOTYPES } from "devtools/packages/devtools-reps/object-inspector/items";
 import { ThreadFront } from "protocol/thread";
 import { useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
-import { getPropertiesForObject } from "ui/utils/autocomplete";
+import { getPropertiesForObject, ObjectFetcher } from "ui/utils/autocomplete";
 import { Value } from "@replayio/protocol";
 
 // Use eager eval to get the properties of the last complete object in the expression.
+// TODO I'm not sure how this is different than the scopes / properties parsing
 export async function getEvaluatedProperties(
   expression: string,
   asyncIndex: number,
-  frameId?: string
+  frameId: string | undefined,
+  fetchObject: ObjectFetcher
 ): Promise<string[]> {
   try {
-    const { returned, exception, failed } = await ThreadFront.evaluate({
+    const { returned, exception } = await ThreadFront.evaluateNew({
       asyncIndex,
       frameId,
       text: expression,
       pure: true,
     });
-    if (returned && !(failed || exception)) {
-      await returned.traversePrototypeChainAsync(
-        current => current.loadIfNecessary(),
-        GETTERS_FROM_PROTOTYPES
-      );
-      return getPropertiesForObject(returned.getObject());
+    if (returned?.object && !exception) {
+      const properties = await getPropertiesForObject(returned.object, fetchObject, 1);
+      return properties;
     }
   } catch (err: any) {
     let msg = "Error: Eager Evaluation failed";

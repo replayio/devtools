@@ -9,7 +9,10 @@ export const {
   getValueSuspense: getMappedLocationSuspense,
   getValueAsync: getMappedLocationAsync,
   getValueIfCached: getMappedLocationIfCached,
-} = createGenericCache<[ReplayClientInterface, ProtocolLocation], ProtocolMappedLocation>(
+} = createGenericCache<
+  [replayClient: ReplayClientInterface, location: ProtocolLocation],
+  ProtocolMappedLocation
+>(
   (client, location) => client.getMappedLocation(location),
   (client, location) => `${location.sourceId}:${location.line}:${location.column}`
 );
