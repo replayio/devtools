@@ -4,7 +4,7 @@ import ReplayLogo from "./ReplayLogo";
 
 export type DialogPropTypes = HTMLProps<HTMLDivElement>;
 
-export function Dialog({ children, className, ...props }: DialogPropTypes) {
+export function Dialog({ children, className, showFooterLinks, ...props }: DialogPropTypes) {
   return (
     <>
       <div
@@ -13,8 +13,10 @@ export function Dialog({ children, className, ...props }: DialogPropTypes) {
         role="dialog"
         style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
       >
-        {children}
+        {children}                  
       </div>
+
+      {showFooterLinks ?            
       <div>
         <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
           <div>
@@ -40,6 +42,7 @@ export function Dialog({ children, className, ...props }: DialogPropTypes) {
           </div>
         </div>
       </div>
+      : null }
     </>
   );
 }

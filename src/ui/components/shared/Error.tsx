@@ -149,7 +149,7 @@ function Error({ error }: ErrorProps) {
   const { action, message, content } = error;
 
   return (
-    <Dialog>
+    <Dialog showFooterLinks={true}>
       <DialogLogo />
       <DialogTitle>{message}</DialogTitle>
       {content && <DialogDescription>{content}</DialogDescription>}
