@@ -37,7 +37,6 @@ function SourcemapSetupModal({ hideModal, selectedSource }: PropsFromRedux) {
             <PrimaryButton color="blue" onClick={onClick}>{`Show me how`}</PrimaryButton>
           </div>
         </DialogActions>
-        <DialogFooter />
       </Dialog>
     </Modal>
   );

@@ -13,36 +13,36 @@ export function Dialog({ children, className, showFooterLinks, ...props }: Dialo
         role="dialog"
         style={{ animation: "linearFadeIn ease 200ms", width: 400 }}
       >
-        {children}                  
+        {children}
       </div>
 
-      {showFooterLinks ?            
-      <div>
-        <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
-          <div>
-            <div className="flex space-x-2">
-              <div>
-                <a className="hover:underline" href="http://docs.replay.io">
-                  Documentation
-                </a>
-              </div>
-              <div className="text-gray-300">•</div>
-              <div>
-                <a className="hover:underline" href="http://replay.io/discord/">
-                  Discord
-                </a>
-              </div>
-              <div className="text-gray-300">•</div>
-              <div>
-                <a className="hover:underline" href="mailto:support@replay.io">
-                  Email support
-                </a>
+      {showFooterLinks ? (
+        <div>
+          <div className="grid grid-cols-1 gap-1 pt-4 text-xs text-gray-400 place-items-center">
+            <div>
+              <div className="flex space-x-2">
+                <div>
+                  <a className="hover:underline" href="http://docs.replay.io">
+                    Documentation
+                  </a>
+                </div>
+                <div className="text-gray-300">•</div>
+                <div>
+                  <a className="hover:underline" href="http://replay.io/discord/">
+                    Discord
+                  </a>
+                </div>
+                <div className="text-gray-300">•</div>
+                <div>
+                  <a className="hover:underline" href="mailto:support@replay.io">
+                    Email support
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      : null }
+      ) : null}
     </>
   );
 }
