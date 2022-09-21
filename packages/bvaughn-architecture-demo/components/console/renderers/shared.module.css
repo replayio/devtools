@@ -147,8 +147,16 @@
 }
 .ColorBadge {
   border-radius: 0.5rem;
-  background-color: var(--badge-color);
 }
+
+:global(.theme-light) .ColorBadge {
+  background-color: #dcdcdc;
+}
+
+:global(.theme-dark) .ColorBadge {
+  background-color: #898f95;
+}
+
 .UnicornBadge {
   top: 0.25rem;
   overflow: visible;
