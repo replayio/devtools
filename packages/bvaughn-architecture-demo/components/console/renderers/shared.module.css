@@ -1,3 +1,7 @@
+.Row {
+  animation: row-enter 1s ease-in-out;
+}
+
 .Row,
 .ErrorRow,
 .TraceRow,
@@ -171,4 +175,16 @@
 
 .ErrorBoundaryFallback {
   color: var(--color-error);
+}
+
+@keyframes row-enter {
+  0% {
+    background-color: rgba(0, 0, 0, 0);
+  }
+  50% {
+    background-color: rgba(127, 107, 57, 1);
+  }
+  100% {
+    background-color: rgba(0, 0, 0, 0);
+  }
 }
