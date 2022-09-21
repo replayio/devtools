@@ -18,7 +18,7 @@ import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
-import { useFeature, useStringPref } from "ui/hooks/settings";
+import { useFeature } from "ui/hooks/settings";
 import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
 
 const QuickActionButton: FC<{
@@ -89,13 +89,21 @@ function QuickActions({
   breakpoint?: Breakpoint;
   cx: any;
 }) {
+  const [height, setHeight] = useState(18);
+  useEffect(() => {
+    const animationFrameId = requestAnimationFrame(() =>
+      setHeight(targetNode.getBoundingClientRect().height)
+    );
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [targetNode]);
+
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
   const dispatch = useAppDispatch();
   const executionPoint = useAppSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
-  const { height } = targetNode.getBoundingClientRect();
   const { value: enableLargeText } = useFeature("enableLargeText");
 
   const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
