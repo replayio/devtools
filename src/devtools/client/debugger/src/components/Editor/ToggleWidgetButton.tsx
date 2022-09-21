@@ -97,7 +97,6 @@ function QuickActions({
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { height } = targetNode.getBoundingClientRect();
   const { value: enableLargeText } = useFeature("enableLargeText");
-  const { value: hitCountsMode } = useStringPref("hitCounts");
 
   const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
 
@@ -147,16 +146,7 @@ function QuickActions({
       onMouseDown={onMouseDown}
       style={{
         top: `-${(1 / 2) * (18 - height)}px`,
-
-        // If hit counts are shown, the button should not overlap with the gutter.
-        // The gutter size changes though based on the number of hits, so we use a CSS variable.
-        right:
-          // we should move this util to a shared function
-          hitCountsMode === "show-counts"
-            ? "calc(var(--hit-count-gutter-width) - 6px)"
-            : hitCountsMode === "hide-counts"
-            ? "-10px"
-            : "0px",
+        right: "var(--print-statement-button-right-offset)",
       }}
     >
       {button}

@@ -20,14 +20,7 @@ export default function StaticTooltip({ targetNode, children }: StaticTooltipPro
         enableLargeText && "bottom-6",
         hitCountsMode === "show-counts" ? "-right-[20px]" : "-right-[10px]"
       )}
-      style={{
-        right:
-          hitCountsMode === "show-counts"
-            ? "calc(var(--hit-count-gutter-width) - 6px)"
-            : hitCountsMode === "hide-counts"
-            ? "-10px"
-            : "0px",
-      }}
+      style={{ right: "var(--print-statement-button-right-offset)" }}
     >
       {children}
     </div>,
