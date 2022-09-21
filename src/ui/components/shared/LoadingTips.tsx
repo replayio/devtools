@@ -7,7 +7,6 @@ import { useAppDispatch } from "ui/setup/hooks";
 import { getLoadingPageTipIndex, setLoadingPageTipIndex } from "ui/actions/app";
 import { useAppSelector } from "ui/setup/hooks";
 
-
 const TIP_DURATION = 12000;
 
 const TIPS = [
@@ -30,28 +29,24 @@ const TIPS = [
   },
   {
     title: "Focus Mode",
-    description:
-      "Shift-F focuses your debugging session to a precise location.",
+    description: "Shift-F focuses your debugging session to a precise location.",
     icon: LightbulbIcon,
   },
   {
     title: "Command palette",
-    description:
-      "Command-K launches a command palette to help you find things faster.",
+    description: "Command-K launches a command palette to help you find things faster.",
     icon: LightbulbIcon,
   },
   {
     title: "Print statements",
-    description:
-      "Replay's print statements are magic! Add one by hovering on a line of code.",
+    description: "Replay's print statements are magic! Add one by hovering on a line of code.",
     icon: LightbulbIcon,
   },
 ] as const;
 
 export const LoadingTips: FC = () => {
-  
   const rand = useAppSelector(getLoadingPageTipIndex);
-  const currentTipIdx = Math.floor(rand * (TIPS.length));
+  const currentTipIdx = Math.floor(rand * TIPS.length);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
   return (
     <div className="h-32 space-y-8 w-96">

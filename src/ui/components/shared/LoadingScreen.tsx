@@ -55,9 +55,7 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate showTips={true}>
-      <span className="text-sm">
-        {stalled ? "Reticulating splines..." : waitingForMessage}
-      </span>
+      <span className="text-sm">{stalled ? "Reticulating splines..." : waitingForMessage}</span>
     </LoadingScreenTemplate>
   );
 }
