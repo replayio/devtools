@@ -4,7 +4,7 @@
 
 .popover .preview-popup {
   background: var(--theme-base-100);
-  width: 400px;
+  max-width: 400px;
   border: 1px solid var(--theme-splitter-color);
   height: auto;
   overflow: auto;

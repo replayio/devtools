@@ -1,0 +1,9 @@
+.ScopesInspector {
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  color: var(--color-default);
+}
+
+.Expandable {
+  width: 100%;
+}

@@ -31,6 +31,7 @@
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-warning: #fce2a1;
+  --border-color: #e1e6ed;
   --border-color-error: #7a4242;
   --border-color-warning: #6f5920;
 
@@ -103,6 +104,7 @@
   --background-color-contrast-5: #081121;
   --background-color-default: #e9e9e9;
   --background-color-error: #ffeeee;
+  --border-color: #081121;
   --border-color-error: #f8d7d7;
   --border-color-warning: #fce2a1;
 
