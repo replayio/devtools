@@ -146,7 +146,7 @@ function QuickActions({
       onMouseDown={onMouseDown}
       style={{
         top: `-${(1 / 2) * (18 - height)}px`,
-        right: "var(--print-statement-button-right-offset)",
+        right: "var(--print-statement-right-offset)",
       }}
     >
       {button}

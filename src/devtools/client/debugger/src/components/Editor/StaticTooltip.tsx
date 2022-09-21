@@ -18,7 +18,7 @@ export default function StaticTooltip({ targetNode, children }: StaticTooltipPro
         "pointer-events-none absolute bottom-4 z-50 mb-0.5 flex translate-x-full transform flex-row space-x-px",
         enableLargeText && "bottom-6"
       )}
-      style={{ right: "var(--print-statement-button-right-offset)" }}
+      style={{ right: "var(--print-statement-right-offset)" }}
     >
       {children}
     </div>,

@@ -138,7 +138,7 @@ function LineHitCounts({ sourceEditor }: Props) {
     // If hit counts are shown, the button should not overlap with the gutter.
     // The gutter size changes though based on the number of hits, so we use a CSS variable.
     gutterElement.parentElement!.style.setProperty(
-      "--print-statement-button-right-offset",
+      "--print-statement-right-offset",
       hitCountsMode === "show-counts"
         ? "calc(var(--hit-count-gutter-width) - 6px)"
         : hitCountsMode === "hide-counts"
