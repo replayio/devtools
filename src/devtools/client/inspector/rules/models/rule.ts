@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { Node } from "@replayio/protocol";
 const CssLogic = require("third-party/css-logic/shared-inspector-css-logic");
 import TextProperty from "devtools/client/inspector/rules/models/text-property";
-import { NodeFront } from "protocol/thread/node";
 import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
@@ -12,6 +12,11 @@ import CSSProperties from "third-party/css/css-properties";
 const { parseNamedDeclarations } = require("third-party/css/parsing-utils");
 import ElementStyle from "./element-style";
 const Services = require("devtools/shared/services");
+
+export interface NodeWithId {
+  nodeId: string;
+  node: Node;
+}
 
 export interface RuleInheritance {
   // The NodeFront object id for the element in which the rule is inherited from.
@@ -38,7 +43,7 @@ interface RuleOptions {
   pseudoElement?: string;
   isSystem?: boolean;
   isUnmatched?: boolean;
-  inherited?: NodeFront | null;
+  inherited?: NodeWithId | null;
 }
 
 interface SourceLocation {
@@ -53,14 +58,14 @@ interface SourceLocation {
  *   Applies changes to the properties in a rule.
  *   Maintains a list of TextProperty objects.
  */
-export default class Rule {
+export default class RuleModel {
   elementStyle: ElementStyle;
   domRule: RuleFront | StyleFront;
   matchedSelectors: string[];
   pseudoElement: string;
   isSystem: boolean | undefined;
   isUnmatched: boolean;
-  inherited: NodeFront | null;
+  inherited: NodeWithId | null;
   mediaText: string;
   textProps: TextProperty[];
 
@@ -113,7 +118,7 @@ export default class Rule {
 
     return {
       // The NodeFront object id for the element in which the rule is inherited from.
-      inheritedNodeId: this.inherited.objectId(),
+      inheritedNodeId: this.inherited.nodeId,
       // The display name for the element in which the rule is inherited from.
       inheritedSource: this.inheritedSource,
     };
@@ -129,9 +134,10 @@ export default class Rule {
     }
     this._inheritedSource = "";
     if (this.inherited) {
-      let eltText = this.inherited.displayName;
-      if (this.inherited.id) {
-        eltText += "#" + this.inherited.id;
+      let eltText = this.inherited.node.nodeName.toLowerCase();
+      const idAttr = this.inherited.node.attributes?.find(attr => attr.name === "id");
+      if (idAttr) {
+        eltText += "#" + idAttr.value;
       }
       this._inheritedSource = `Inherited from ${eltText}`;
     }

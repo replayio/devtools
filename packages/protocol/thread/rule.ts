@@ -1,18 +1,24 @@
-import { Rule } from "@replayio/protocol";
+// TODO Move this into `inspector/rules/models` as cleanup
 
-import { assert, DisallowEverythingProxyHandler } from "../utils";
+import { Rule, Object as ProtocolObject } from "@replayio/protocol";
 
-import { Pause, WiredObject } from "./pause";
+import { getCachedObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+
+import { assert } from "../utils";
+
+import { StyleFront } from "./style";
+import { StyleSheetFront } from "./styleSheet";
 
 // Manages interaction with a CSSRule.
 export class RuleFront {
-  private _pause: Pause;
-  private _object: WiredObject;
+  private pauseId: string;
+  private _object: ProtocolObject;
   private _rule: Rule;
+  private _styleFront: StyleFront | null = null;
+  private _styleSheetFront: StyleSheetFront | null = null;
 
-  constructor(pause: Pause, data: WiredObject) {
-    this._pause = pause;
-
+  constructor(pauseId: string, data: ProtocolObject) {
+    this.pauseId = pauseId;
     assert(data && data.preview && data.preview.rule, "no rule preview");
     this._object = data;
     this._rule = data.preview.rule;
@@ -48,14 +54,23 @@ export class RuleFront {
 
   get style() {
     if (this._rule.style) {
-      return this._pause.getStyleFront(this._rule.style);
+      if (!this._styleFront) {
+        // `ElementStyle` makes sure this data is cached already
+        this._styleFront = new StyleFront(getCachedObject(this.pauseId, this._rule.style!)!);
+      }
+      return this._styleFront;
     }
     return null;
   }
 
   get parentStyleSheet() {
     if (this._rule.parentStyleSheet) {
-      return this._pause.getStyleSheetFront(this._rule.parentStyleSheet);
+      if (!this._styleSheetFront) {
+        this._styleSheetFront = new StyleSheetFront(
+          getCachedObject(this.pauseId, this._rule.parentStyleSheet!)!
+        );
+      }
+      return this._styleSheetFront;
     }
     return null;
   }
@@ -93,5 +108,3 @@ export class RuleFront {
     return undefined;
   }
 }
-
-Object.setPrototypeOf(RuleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

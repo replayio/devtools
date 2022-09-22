@@ -1,20 +1,15 @@
-import { StyleSheet } from "@replayio/protocol";
+// TODO Move this into `inspector/rules/models` as cleanup
 
-import { assert, DisallowEverythingProxyHandler } from "../utils";
+import { StyleSheet, Object as ProtocolObject } from "@replayio/protocol";
 
-import { Pause, WiredObject } from "./pause";
+import { assert } from "../utils";
 
 // Manages interaction with a StyleSheet.
 export class StyleSheetFront {
-  private _pause: Pause;
-  private _object: WiredObject;
   private _styleSheet: StyleSheet;
 
-  constructor(pause: Pause, data: WiredObject) {
-    this._pause = pause;
-
+  constructor(data: ProtocolObject) {
     assert(data && data.preview && data.preview.styleSheet, "no styleSheet preview");
-    this._object = data;
     this._styleSheet = data.preview.styleSheet;
   }
 
@@ -30,5 +25,3 @@ export class StyleSheetFront {
     return this._styleSheet.isSystem;
   }
 }
-
-Object.setPrototypeOf(StyleSheetFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

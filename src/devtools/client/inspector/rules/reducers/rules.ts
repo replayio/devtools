@@ -4,7 +4,7 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import type { RuleInheritance, RuleSelector, SourceLink } from "../models/rule";
-import type Rule from "../models/rule";
+import type RuleModel from "../models/rule";
 import type TextProperty from "../models/text-property";
 import { ComputedPropertyInfo, Priority } from "../models/text-property";
 
@@ -78,7 +78,7 @@ const rulesSlice = createSlice({
   initialState,
   reducers: {
     rulesUpdated: {
-      prepare(rules: Rule[] | null) {
+      prepare(rules: RuleModel[] | null) {
         return {
           payload: rules?.map(rule => getRuleState(rule)) ?? [],
         };
@@ -129,7 +129,7 @@ function getDeclarationState(declaration: TextProperty, ruleId: string): Declara
   };
 }
 
-function getRuleState(rule: Rule): RuleState {
+function getRuleState(rule: RuleModel): RuleState {
   return {
     // Array of CSS declarations.
     declarations: rule.declarations.map(declaration =>

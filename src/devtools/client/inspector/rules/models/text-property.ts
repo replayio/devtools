@@ -5,7 +5,7 @@
 const { generateUUID } = require("devtools/shared/generate-uuid");
 const { hasCSSVariable } = require("devtools/client/inspector/rules/utils/utils");
 const { escapeCSSComment } = require("third-party/css/parsing-utils");
-import Rule from "./rule";
+import RuleModel from "./rule";
 import ElementStyle from "./element-style";
 import CSSProperties from "third-party/css/css-properties";
 const { OutputParser } = require("third-party/css/output-parser");
@@ -66,7 +66,7 @@ function getOutputParser() {
  */
 export default class TextProperty {
   id: string;
-  rule: Rule;
+  rule: RuleModel;
   name: string;
   value: string;
   priority: Priority;
@@ -77,7 +77,7 @@ export default class TextProperty {
   overridden?: boolean;
 
   /**
-   * @param {Rule} rule
+   * @param {RuleModel} rule
    *        The rule this TextProperty came from.
    * @param {String} name
    *        The text property name (such as "background" or "border-top").
@@ -95,7 +95,7 @@ export default class TextProperty {
    *        coming from parseDeclarations.
    */
   constructor(
-    rule: Rule,
+    rule: RuleModel,
     name: string,
     value: string,
     priority: Priority,

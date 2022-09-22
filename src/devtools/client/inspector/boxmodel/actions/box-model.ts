@@ -4,12 +4,13 @@ import type { NodeFront } from "protocol/thread/node";
 import { isInspectorSelected } from "ui/reducers/app";
 
 import { selection } from "devtools/client/framework/selection";
+import { getComputedStyleAsync, getBoundingRectAsync } from "ui/suspense/styleCaches";
 
 import { layoutUpdated, LAYOUT_NUMERIC_FIELDS, Layout } from "../reducers/box-model";
 
 export function setupBoxModel(store: UIStore) {
   // Any time a new node is selected in the "Markup" panel, try to update the box model layout data
-  selection.on("new-node-front", (nodeFront: NodeFront, reason: string) => {
+  selection.on("new-node-front", () => {
     if (!isInspectorSelected(store.getState()) || !selection.isNode()) {
       return;
     }
@@ -19,14 +20,32 @@ export function setupBoxModel(store: UIStore) {
 }
 
 function updateBoxModel(): UIThunkAction {
-  return async (dispatch, getState) => {
-    if (!selection.isConnected() || !selection.isElementNode()) {
+  return async (dispatch, getState, { protocolClient, ThreadFront }) => {
+    if (
+      !selection.isConnected() ||
+      !selection.isElementNode() ||
+      !ThreadFront.currentPause?.pauseId
+    ) {
       return;
     }
 
     const { nodeFront } = selection;
-    const bounds = await nodeFront!.getBoundingClientRect();
-    const style = await nodeFront!.getComputedStyle();
+    if (!nodeFront) {
+      return;
+    }
+    const bounds = await getBoundingRectAsync(
+      protocolClient,
+      ThreadFront.sessionId!,
+      ThreadFront.currentPause.pauseId,
+      nodeFront.objectId()
+    );
+
+    const style = await getComputedStyleAsync(
+      protocolClient,
+      ThreadFront.sessionId!,
+      ThreadFront.currentPause.pauseId,
+      nodeFront.objectId()
+    );
 
     if (!bounds || !style) {
       return;
