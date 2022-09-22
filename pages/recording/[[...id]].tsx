@@ -27,6 +27,7 @@ import useConfigureReplayClientInterop from "ui/hooks/useReplayClient";
 
 import Upload from "./upload";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { trackEvent } from "ui/utils/telemetry";
 
 interface MetadataProps {
   metadata?: {
@@ -150,7 +151,12 @@ function RecordingPage({
 
     async function getRecording() {
       await setupDevtools(store, replayClient);
-      setRecording(await getAccessibleRecording(recordingId));
+      const rec = await getAccessibleRecording(recordingId);
+      setRecording(rec);
+
+      if (rec?.metadata?.test) {
+        trackEvent("session_start.test");
+      }
 
       if (Array.isArray(query.id) && query.id[query.id.length - 1] === "share") {
         dispatch(setModal("sharing", { recordingId }));
