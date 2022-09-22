@@ -245,7 +245,7 @@ class _ThreadFront {
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
-          supportsPureEvaluation: true,
+          supportsPureEvaluation: false,
         };
 
         break;
