@@ -6,6 +6,9 @@ import hooks from "ui/hooks";
 import { setViewMode } from "ui/actions/layout";
 import { ViewMode } from "ui/state/layout";
 import { getViewMode } from "ui/reducers/layout";
+import { Nag } from "ui/hooks/users";
+import { shouldShowNag } from "ui/utils/user";
+import MaterialIcon from "../shared/MaterialIcon";
 
 const MODES = [
   {
@@ -25,9 +28,16 @@ export default function ViewToggle() {
   const { recording, loading } = hooks.useGetRecording(recordingId);
   const { userId } = hooks.useGetUserId();
   const isAuthor = userId && userId == recording?.userId;
+  const dismissNag = hooks.useDismissNag();
+  const { nags } = hooks.useGetUserInfo();
+
+  const showDevToggleNag = shouldShowNag(nags, Nag.VIEW_DEVTOOLS) && viewMode != "dev";
 
   const handleToggle = async (mode: ViewMode) => {
     dispatch(setViewMode(mode));
+    if (showDevToggleNag) {
+      dismissNag(Nag.VIEW_DEVTOOLS);
+    }
   };
 
   const shouldHide = isAuthor && !recording?.isInitialized && !isTest();
@@ -37,18 +47,31 @@ export default function ViewToggle() {
   }
 
   return (
-    <div className="view-toggle" role="button">
-      <div
-        className="handle"
-        style={{
-          left: `${(MODES.findIndex(({ mode }) => mode === viewMode) / MODES.length) * 100}%`,
-        }}
-      ></div>
-      {MODES.map(({ mode, label }) => (
-        <div key={mode} className="option" onClick={() => handleToggle(mode)}>
-          <div className={classnames("text", { active: viewMode === mode })}>{label}</div>
-        </div>
-      ))}
+    <div className="flex">
+      {showDevToggleNag && (
+        <button
+          type="button"
+          onClick={() => handleToggle("dev")}
+          className="mr-3 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+          style={{ padding: "5px 12px" }}
+        >
+          <div className="text-sm">Welcome to your first replay! ❤️ Check out DevTools!</div>
+          <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
+        </button>
+      )}
+      <div className="view-toggle" role="button">
+        <div
+          className="handle"
+          style={{
+            left: `${(MODES.findIndex(({ mode }) => mode === viewMode) / MODES.length) * 100}%`,
+          }}
+        ></div>
+        {MODES.map(({ mode, label }) => (
+          <div key={mode} className="option" onClick={() => handleToggle(mode)}>
+            <div className={classnames("text", { active: viewMode === mode })}>{label}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
