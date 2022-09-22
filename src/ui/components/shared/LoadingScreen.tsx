@@ -15,9 +15,9 @@ export function LoadingScreenTemplate({
 }) {
   return (
     <BubbleViewportWrapper>
-      <div className="relative flex flex-col items-center p-8 py-4 pb-8 space-y-8 rounded-lg shadow-md w-96 bg-loadingBoxes">
-        <div className="flex flex-col items-center space-y-2">
-          <ReplayLogo wide size="lg" />
+      <div className="relative flex flex-col items-center p-8 py-12 space-y-1 rounded-lg shadow-sm w-96 bg-loadingBoxes">
+        <div className="flex flex-col items-center space-y-8">
+          <ReplayLogo size="md" />
           {children}
         </div>
       </div>
@@ -55,9 +55,7 @@ function LoadingScreen({
 
   return (
     <LoadingScreenTemplate showTips={true}>
-      <span className="text-sm">
-        {stalled ? "This is taking longer than usual..." : waitingForMessage}
-      </span>
+      <span className="text-sm">{stalled ? "Reticulating splines..." : waitingForMessage}</span>
     </LoadingScreenTemplate>
   );
 }

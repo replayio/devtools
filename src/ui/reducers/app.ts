@@ -47,7 +47,7 @@ export const initialAppState: AppState = {
   loadedRegions: null,
   loading: 4,
   loadingFinished: false,
-  loadingPageTipIndex: 0,
+  loadingPageTipSeed: Math.random(),
   loadingStatusSlow: false,
   modal: null,
   modalOptions: null,
@@ -224,6 +224,7 @@ export const getRecordingDuration = (state: UIState) => state.app.recordingDurat
 
 export const getDisplayedLoadingProgress = (state: UIState) => state.app.displayedLoadingProgress;
 export const getLoadingFinished = (state: UIState) => state.app.loadingFinished;
+export const getLoadingPageTipSeed = (state: UIState) => state.app.loadingPageTipSeed;
 export const getLoadingStatusSlow = (state: UIState) => state.app.loadingStatusSlow;
 export const getLoadedRegions = (state: UIState) => state.app.loadedRegions;
 export const getIndexedAndLoadedRegions = createSelector(getLoadedRegions, loadedRegions => {
