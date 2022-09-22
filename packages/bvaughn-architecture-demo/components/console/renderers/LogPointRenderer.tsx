@@ -21,6 +21,7 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
+import classNames from "classnames";
 
 // Renders PointInstances with shouldLog=true.
 function LogPointRenderer({
@@ -173,28 +174,35 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
 }
 
 function BadgeRenderer({ badge }: { badge: Badge | null }) {
+  let childrenToRender = null;
+
   switch (badge) {
     case "unicorn":
-      return (
+      childrenToRender = (
         <span className={styles.UnicornBadge}>
           <span className={styles.Unicorn} />
         </span>
       );
     default:
-      return (
+      childrenToRender = (
         <span
-          className={styles.ColorBadge}
+          className={classNames(
+            styles.ColorBadge,
+            badge === null ? styles.DefaultColorBadge : undefined
+          )}
           style={
             badge
               ? {
-                  // @ts-expect-error
+                  // @ts-ignore
                   "--badge-color": `var(--badge-${badge}-color)`,
                 }
-              : undefined
+              : {}
           }
         />
       );
   }
+
+  return <span className={styles.BadgeContainer}>{childrenToRender}</span>;
 }
 
 export default memo(LogPointRenderer) as typeof LogPointRenderer;
