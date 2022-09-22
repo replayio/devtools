@@ -52,7 +52,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   return (
     <div className={css.links}>
       <RecordingTrialEnd />
-      {isAuthenticated ? null : null}
+      {isAuthenticated ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
       {recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
