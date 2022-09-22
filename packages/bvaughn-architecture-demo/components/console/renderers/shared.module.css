@@ -196,14 +196,26 @@
   color: var(--color-error);
 }
 
+:global(.theme-light) .ColorBadge {
+  --pulse-color-1: rgba(127, 127, 127, 0.1);
+  --pulse-color-2: rgba(97, 97, 97, 0);
+  --pulse-color-3: rgba(88, 88, 88, 0);
+}
+
+:global(.theme-dark) .ColorBadge {
+  --pulse-color-1: rgba(185, 185, 185, 0.35);
+  --pulse-color-2: rgba(204, 169, 44, 0);
+  --pulse-color-3: rgba(204, 169, 44, 0);
+}
+
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(185, 185, 185, 0.4);
+    box-shadow: 0 0 0 0 var(--pulse-color-1);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(204, 169, 44, 0);
+    box-shadow: 0 0 0 0.45rem var(--pulse-color-2);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(204, 169, 44, 0);
+    box-shadow: 0 0 0 0 var(--pulse-color-3);
   }
 }
