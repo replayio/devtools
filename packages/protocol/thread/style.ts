@@ -1,9 +1,9 @@
-import { StyleDeclaration } from "@replayio/protocol";
+// TODO Move this into `inspector/rules/models` as cleanup
+
+import { StyleDeclaration, Object as ProtocolObject } from "@replayio/protocol";
 import { ELEMENT_STYLE } from "shared/constants";
 
-import { assert, DisallowEverythingProxyHandler } from "../utils";
-
-import { Pause, WiredObject } from "./pause";
+import { assert } from "../utils";
 
 // Manages interaction with a CSSStyleDeclaration.
 // StyleFront represents an inline element style.
@@ -15,13 +15,10 @@ export class StyleFront {
   selectors = undefined;
   href = undefined;
   isSystem = false;
-  private _pause: Pause;
-  private _object: WiredObject;
+  private _object: ProtocolObject;
   private _style: StyleDeclaration;
 
-  constructor(pause: Pause, data: WiredObject) {
-    this._pause = pause;
-
+  constructor(data: ProtocolObject) {
     assert(data && data.preview && data.preview.style, "no style preview");
     this._object = data;
     this._style = data.preview.style;
@@ -52,5 +49,3 @@ export class StyleFront {
     return this._style.cssText;
   }
 }
-
-Object.setPrototypeOf(StyleFront.prototype, new Proxy({}, DisallowEverythingProxyHandler));

@@ -6,6 +6,7 @@ import CSSProperties from "third-party/css/css-properties";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { InspectorState } from "../state";
 const { OutputParser } = require("third-party/css/output-parser");
+import { getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 type SetComputedPropertiesAction = Action<"set_computed_properties"> & {
   properties: ComputedPropertyState[];
@@ -30,8 +31,17 @@ export type InspectorThunkAction<TReturn = void> = ThunkAction<
 >;
 
 export function setComputedProperties(elementStyle: ElementStyle): InspectorThunkAction {
-  return async dispatch => {
-    const properties = await createComputedProperties(elementStyle);
+  return async (dispatch, getState, { protocolClient, ThreadFront }) => {
+    if (!ThreadFront.currentPause?.pauseId) {
+      return;
+    }
+    const computed = await getComputedStyleAsync(
+      protocolClient,
+      ThreadFront.sessionId!,
+      ThreadFront.currentPause.pauseId,
+      elementStyle.nodeId
+    );
+    const properties = await createComputedProperties(elementStyle, computed);
     return dispatch({ type: "set_computed_properties", properties });
   };
 }
@@ -52,9 +62,9 @@ export function setComputedPropertyExpanded(
 }
 
 async function createComputedProperties(
-  elementStyle: ElementStyle
+  elementStyle: ElementStyle,
+  computed: Map<string, string> | undefined
 ): Promise<ComputedPropertyState[]> {
-  const computed = await elementStyle.element.getComputedStyle();
   if (!computed) {
     return [];
   }
@@ -87,10 +97,11 @@ async function createComputedProperties(
       } else {
         if (rule.inherited) {
           // this is an inherited inline style
-          if (rule.inherited.id) {
-            selector = `#${rule.inherited.id}.style`;
+          const idAttr = rule.inherited.node.attributes?.find(attr => attr.name === "id");
+          if (idAttr) {
+            selector = `#${idAttr.value}.style`;
           } else {
-            selector = `${rule.inherited.displayName.toUpperCase()}[${inheritanceCounter}].style`;
+            selector = `${rule.inherited.node.nodeName.toUpperCase()}[${inheritanceCounter}].style`;
             inheritanceCounter++;
           }
         } else {

@@ -481,11 +481,11 @@ export class Pause {
     if (data.preview.node) {
       front = new NodeFront(this, data);
     } else if (data.preview.rule) {
-      front = new RuleFront(this, data);
+      front = new RuleFront(this.pauseId!, data);
     } else if (data.preview.style) {
-      front = new StyleFront(this, data);
+      front = new StyleFront(data);
     } else if (data.preview.styleSheet) {
-      front = new StyleSheetFront(this, data);
+      front = new StyleSheetFront(data);
     } else {
       throw new Error("Unexpected DOM front");
     }

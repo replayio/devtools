@@ -21,15 +21,25 @@ export function setupRules(store: UIStore) {
 }
 
 function updateRulesEntries(): UIThunkAction {
-  return async (dispatch, getState) => {
-    if (!selection.isConnected() || !selection.isElementNode()) {
+  return async (dispatch, getState, { protocolClient, replayClient, ThreadFront }) => {
+    if (
+      !selection.isConnected() ||
+      !selection.isElementNode() ||
+      !ThreadFront.currentPause?.pauseId
+    ) {
       return;
     }
 
     const { nodeFront } = selection;
 
     if (nodeFront) {
-      const elementStyle = new ElementStyle(nodeFront);
+      const elementStyle = new ElementStyle(
+        nodeFront.objectId(),
+        ThreadFront.currentPause.pauseId,
+        ThreadFront.sessionId!,
+        replayClient,
+        protocolClient
+      );
       // The legacy rule style code used a timeout to keep the rules
       // panel update from blocking the UI
       // This is probably not necessary right now, but \o/
