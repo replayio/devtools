@@ -31,11 +31,11 @@ export default function ViewToggle() {
   const dismissNag = hooks.useDismissNag();
   const { nags } = hooks.useGetUserInfo();
 
-  const showDevToggleNag = shouldShowNag(nags, Nag.VIEW_DEVTOOLS) && viewMode != "dev";
+  const showDevtoolsNag = shouldShowNag(nags, Nag.VIEW_DEVTOOLS) && viewMode != "dev";
 
   const handleToggle = async (mode: ViewMode) => {
     dispatch(setViewMode(mode));
-    if (showDevToggleNag) {
+    if (showDevtoolsNag) {
       dismissNag(Nag.VIEW_DEVTOOLS);
     }
   };
@@ -48,14 +48,16 @@ export default function ViewToggle() {
 
   return (
     <div className="flex">
-      {showDevToggleNag && (
+      {showDevtoolsNag && (
         <button
           type="button"
           onClick={() => handleToggle("dev")}
-          className="mr-3 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-buttontextColor hover:bg-primaryAccentHover focus:outline-none focus:ring-2 focus:ring-primaryAccent focus:ring-offset-2"
+          className="mr-3 flex items-center space-x-1.5 rounded-lg bg-primaryAccent text-sm text-buttontextColor hover:bg-primaryAccentHover"
           style={{ padding: "5px 12px" }}
         >
-          <div className="text-sm">Welcome to your first replay! ❤️ Check out DevTools!</div>
+          <div className="overflow-hidden whitespace-nowrap">
+            Welcome to replay ❤️ Check out DevTools!
+          </div>
           <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
         </button>
       )}

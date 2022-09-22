@@ -52,7 +52,7 @@ function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   return (
     <div className={css.links}>
       <RecordingTrialEnd />
-      {isAuthenticated ? <ShareButton /> : null}
+      {isAuthenticated ? null : null}
       <Avatars recordingId={recordingId} />
       {recordingTarget != "node" && <ViewToggle />}
       <UserOptions />
@@ -170,7 +170,7 @@ function Header({ recordingTarget }: PropsFromRedux) {
 
   return (
     <div className={css.header}>
-      <div className="relative flex flex-grow flex-row items-center overflow-hidden">
+      <div className="relative flex flex-row items-center flex-grow overflow-hidden">
         {isAuthenticated && (
           <IconWithTooltip
             icon={backIcon}
