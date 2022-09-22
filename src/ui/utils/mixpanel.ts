@@ -105,6 +105,7 @@ type MixpanelEvent =
   | ["session.devtools_start", { userIsAuthor: boolean; workspaceUuid: WorkspaceUuid | null }]
   | ["session_end", { reason: string }]
   | ["session_start", { workspaceId: WorkspaceId | null }]
+  | ["session_start.test"]
   | ["share_modal.copy_link"]
   | ["share_modal.set_private"]
   | ["share_modal.set_public"]
