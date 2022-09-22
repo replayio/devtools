@@ -1,7 +1,7 @@
-src/devtools/client/debugger/**/fixtures/**
 node_modules
-src/devtools/client/shared/vendor/
-src/devtools/client/shared/sourceeditor/codemirror
 packages/third-party/
-public/test/examples
+src/devtools/client/debugger/**/fixtures/**
+src/devtools/client/shared/sourceeditor/codemirror
+src/devtools/client/shared/vendor/
 src/graphql
+test/examples

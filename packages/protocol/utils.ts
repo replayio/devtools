@@ -123,6 +123,7 @@ export const DisallowEverythingProxyHandler: ProxyHandler<object> = {
     return undefined;
   },
   ownKeys(target) {
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     NotAllowed("ownKeys: " + target);
     return [];
   },

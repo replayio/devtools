@@ -24,6 +24,8 @@
   },
   "plugins": ["import", "react", "prettier", "@typescript-eslint"],
   "rules": {
+    "@typescript-eslint/no-base-to-string": "warn",
+    "@typescript-eslint/no-floating-promises": "error",
     "curly": "error",
     "import/order": [
       "off",

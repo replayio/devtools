@@ -1,1 +1,2 @@
-TODO the flow of information when the recording is being loaded, played and inspected
+TODO the flow of information when the recording is being loaded, played and
+inspected

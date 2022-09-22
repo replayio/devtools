@@ -19,3 +19,4 @@ lint:
         - src/graphql
         - docs/codebase-notes
         - test/fixtures
+        - packages/docs/next.config.mjs

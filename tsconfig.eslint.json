@@ -1,5 +1,12 @@
 {
   // extend your base config so you don't have to redefine your compilerOptions
   "extends": "./tsconfig.json",
-  "include": [".storybook/main.js", "**/*.ts", "**/*.tsx", "**/*.js"]
+  "include": [
+    ".storybook/main.js",
+    ".storybook/preview.js",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.js",
+    "**/*.mjs"
+  ]
 }

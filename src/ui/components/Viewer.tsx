@@ -44,6 +44,7 @@ const Horizontal = () => {
     <SplitBox
       style={{ width: "100%", overflow: "hidden" }}
       splitterSize={8}
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       initialSize={prefs.secondaryPanelHeight.toString() as `${number}px`}
       onResizeEnd={(size: string) => {
         prefs.secondaryPanelHeight = size;

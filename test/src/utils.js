@@ -58,6 +58,7 @@ function sendTelemetryEvent(telemetryEvent, tags) {
   try {
     const request = https.request(options, () => {});
     request.on("error", e => {
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       log(`Error sending telemetry ping: ${e}`);
     });
     request.write(

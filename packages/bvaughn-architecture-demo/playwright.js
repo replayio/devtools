@@ -72,7 +72,7 @@ function runServer() {
 
       clearTimeout(timeoutID);
 
-      runEndToEndTests();
+      void runEndToEndTests();
     }
   });
   serverProcess.stderr.on("data", data => {

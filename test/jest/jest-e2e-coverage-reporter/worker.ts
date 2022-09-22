@@ -139,6 +139,7 @@ function macrotick() {
 }
 
 process.on("uncaughtException", err => {
+  // eslint-disable-next-line @typescript-eslint/no-base-to-string
   parentPort?.postMessage("Uncaught error in the worker: " + err);
   process.exit(1); // mandatory (as per the Node.js docs)
 });
