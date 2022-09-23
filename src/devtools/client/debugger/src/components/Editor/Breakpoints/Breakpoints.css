@@ -36,9 +36,17 @@
   pointer-events: all;
 }
 
+.CodeMirror .line-action-button {
+  display: none;
+}
+
+.CodeMirror:hover .line-action-button {
+  display: block;
+}
+
 .line-action-button.no-hits button {
   pointer-events: none;
-  background: var(--background-color-contrast-4);
+  background: #8abfd8;
 }
 
 .editor-wrapper

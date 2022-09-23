@@ -158,6 +158,7 @@ function QuickActions({
         top: 0,
         left: "var(--toggle-widget-button-offset)",
         transform: `translateY(${lineOffsetTop}px)`,
+        opacity: hoveredLineNumber === null ? 0 : 1,
       }}
     >
       {button}
@@ -186,17 +187,19 @@ function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButto
 
       setLineOffsetTop(lineRect.top - editorOffset);
       setHoveredLineNumber(lineNumber);
+      console.log(lineNumber);
     };
     const onLineLeave = () => {
+      console.log("eave");
       setHoveredLineNumber(null);
     };
 
     sourceEditor.codeMirror.on("lineMouseEnter", onLineEnter);
-    sourceEditor.codeMirror.on("lineMouseLeave", onLineLeave);
+    sourceEditor.codeMirror.on("mouseLeave", onLineLeave);
 
     return () => {
       sourceEditor.codeMirror.off("lineMouseEnter", onLineEnter);
-      sourceEditor.codeMirror.off("lineMouseLeave", onLineLeave);
+      sourceEditor.codeMirror.off("mouseLeave", onLineLeave);
     };
   }, [sourceEditor]);
 
