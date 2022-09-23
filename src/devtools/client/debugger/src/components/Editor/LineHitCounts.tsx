@@ -132,7 +132,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
     // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
     const editorWrapperElement = document.querySelector(".editor-wrapper");
-    const gutterElement = sourceEditor.codeMirror.getGutterElement() as HTMLElement;
 
     editorWrapperElement?.style.setProperty("--hit-count-gutter-width", `-${gutterWidth}`);
 
@@ -150,7 +149,7 @@ function LineHitCounts({ sourceEditor }: Props) {
     editorWrapperElement?.style.setProperty(
       "--toggle-widget-button-offset",
       hitCountsMode === "show-counts"
-        ? `calc(${gutterWidth} + 36px)`
+        ? `calc(${gutterWidth} + 32px)`
         : hitCountsMode === "hide-counts"
         ? "40px"
         : "0px"
