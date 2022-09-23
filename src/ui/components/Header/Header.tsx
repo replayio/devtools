@@ -5,7 +5,7 @@ import { connect, ConnectedProps } from "react-redux";
 import * as selectors from "ui/reducers/app";
 import Avatar from "ui/components/Avatar";
 import { useGetActiveSessions } from "ui/hooks/sessions";
-import ViewToggle from "ui/components/Header/ViewToggle";
+import ViewToggle, { shouldShowDevToolsNag } from "ui/components/Header/ViewToggle";
 import UserOptions from "ui/components/Header/UserOptions";
 import hooks from "ui/hooks";
 import ShareButton from "./ShareButton";
@@ -13,12 +13,14 @@ import useAuth0 from "ui/utils/useAuth0";
 import IconWithTooltip from "ui/components/shared/IconWithTooltip";
 import { Recording } from "ui/types";
 import { UIState } from "ui/state";
+import { getViewMode } from "ui/reducers/layout";
 
 import classNames from "classnames/bind";
 import { RecordingTrialEnd } from "./RecordingTrialEnd";
 import { trackEvent } from "ui/utils/telemetry";
 
 import css from "./Header.module.css";
+import { useAppSelector } from "ui/setup/hooks";
 const cx = classNames.bind(css);
 
 function pasteText(ev: React.ClipboardEvent) {
@@ -48,13 +50,21 @@ function Avatars({ recordingId }: { recordingId: RecordingId | null }) {
 function Links({ recordingTarget }: Pick<PropsFromRedux, "recordingTarget">) {
   const recordingId = hooks.useGetRecordingId();
   const { isAuthenticated } = useAuth0();
+  const { nags } = hooks.useGetUserInfo();
+
+  const viewMode = useAppSelector(getViewMode);
+
+  const showViewToggle = recordingTarget != "node";
+  const showDevtoolsNag = showViewToggle && shouldShowDevToolsNag(nags, viewMode);
+
+  const showShareButton = isAuthenticated && !showDevtoolsNag;
 
   return (
     <div className={css.links}>
       <RecordingTrialEnd />
-      {isAuthenticated ? <ShareButton /> : null}
+      {showShareButton ? <ShareButton /> : null}
       <Avatars recordingId={recordingId} />
-      {recordingTarget != "node" && <ViewToggle />}
+      {showViewToggle && <ViewToggle />}
       <UserOptions />
     </div>
   );
