@@ -56,7 +56,7 @@ export function EditorNag() {
     return null;
   }
 
-  return <NagHat subText="Now hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
+  return <NagHat subText="Next, hover on a line number" nagType={Nag.FIRST_BREAKPOINT_ADD} />;
 }
 
 export function ConsoleNag() {
@@ -70,8 +70,8 @@ export function ConsoleNag() {
 
   return (
     <NagHat
-      mainText="Want to see something cool?"
-      subText="Try fast-forwarding or rewinding to a console log"
+      mainText="How to time travel, step one:"
+      subText="Fast-forward or rewind by hovering on a line in the console"
       nagType={Nag.FIRST_CONSOLE_NAVIGATE}
     />
   );

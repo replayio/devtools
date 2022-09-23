@@ -6,10 +6,12 @@ import { shouldShowNag } from "ui/utils/user";
 
 const TEXT = {
   editPrompt: "Click below to edit your first print statement",
-  savePrompt: "You can add variables here too",
+  savePrompt: "Click save and the console will time travel!",
   success: (
     <>
-      <span className="flex">Now check the console!</span>
+      <span className="flex">
+        Check the console for your print statements. You just time traveled! 🎉
+      </span>
 
       <span className="flex grow justify-end">
         <a
