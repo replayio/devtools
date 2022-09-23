@@ -21,6 +21,18 @@ const MODES = [
   },
 ] as const;
 
+export const shouldShowDevToolsNag = (nags: Nag[], viewMode: ViewMode) => {
+  // If they haven't added a print statement yet, consider them "new"
+  // This should avoid showing it to existing users who have used the app,
+  // but haven't seen the "See DevTools" nag we're adding.
+  const isNewUser = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
+
+  const hasSeenDevtoolsNag = !shouldShowNag(nags, Nag.VIEW_DEVTOOLS);
+  const isViewerMode = viewMode === "non-dev";
+
+  return isNewUser && !hasSeenDevtoolsNag && isViewerMode;
+};
+
 export default function ViewToggle() {
   const dispatch = useAppDispatch();
   const viewMode = useAppSelector(getViewMode);
@@ -31,7 +43,7 @@ export default function ViewToggle() {
   const dismissNag = hooks.useDismissNag();
   const { nags } = hooks.useGetUserInfo();
 
-  const showDevtoolsNag = shouldShowNag(nags, Nag.VIEW_DEVTOOLS) && viewMode != "dev";
+  const showDevtoolsNag = shouldShowDevToolsNag(nags, viewMode);
 
   const handleToggle = async (mode: ViewMode) => {
     dispatch(setViewMode(mode));
@@ -56,7 +68,7 @@ export default function ViewToggle() {
           style={{ padding: "5px 12px" }}
         >
           <div className="overflow-hidden whitespace-nowrap">
-            Welcome to replay ❤️ Check out DevTools!
+            Welcome to Replay ❤️ Check out DevTools!
           </div>
           <MaterialIcon style={{ fontSize: "16px" }}>arrow_forward</MaterialIcon>
         </button>
