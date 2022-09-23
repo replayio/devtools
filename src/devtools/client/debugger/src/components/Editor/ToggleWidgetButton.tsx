@@ -62,12 +62,13 @@ const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: bool
   </QuickActionButton>
 );
 
-const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Breakpoint }> = ({
-  showNag,
-  onClick,
-  breakpoint,
-}) => {
-  const icon = breakpoint?.options.logValue ? "remove" : "add";
+const AddLogpoint: FC<{
+  breakpoint?: Breakpoint;
+  hitPoints?: PointDescription[] | null;
+  showNag: boolean;
+  onClick: () => void;
+}> = ({ breakpoint, hitPoints, showNag, onClick }) => {
+  const icon = hitPoints === null ? "remove" : breakpoint?.options.logValue ? "remove" : "add";
 
   return (
     <QuickActionButton showNag={showNag} onClick={onClick}>
@@ -134,7 +135,14 @@ function QuickActions({
   } else if (hitPoints && isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
-    button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
+    button = (
+      <AddLogpoint
+        breakpoint={breakpoint}
+        showNag={showNag}
+        hitPoints={hitPoints}
+        onClick={onAddLogpoint}
+      />
+    );
   }
 
   return (
@@ -148,7 +156,7 @@ function QuickActions({
       style={{
         position: "absolute",
         top: 0,
-        right: "var(--print-statement-right-offset)",
+        left: "calc(var(--print-statement-right-offset) * -1 + 2rem)",
         transform: `translateY(${lineOffsetTop}px)`,
       }}
     >
@@ -173,7 +181,7 @@ function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButto
       lineNumber: number;
       lineNumberNode: HTMLElement;
     }) => {
-      const editorOffset = 90;
+      const editorOffset = 88;
       const lineRect = lineNumberNode.getBoundingClientRect();
 
       setLineOffsetTop(lineRect.top - editorOffset);

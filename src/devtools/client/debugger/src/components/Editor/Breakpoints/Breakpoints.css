@@ -37,6 +37,7 @@
 }
 
 .line-action-button.no-hits button {
+  pointer-events: none;
   background: var(--background-color-contrast-4);
 }
 
