@@ -1,5 +1,5 @@
 import { PointDescription } from "@replayio/protocol";
-import React, { useEffect, FC, ReactNode, Suspense, useRef, useCallback } from "react";
+import React, { useState, useEffect, FC, ReactNode, Suspense } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -31,7 +31,7 @@ const QuickActionButton: FC<{
     <button
       className={classNames(
         "toggle-widget",
-        "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition hover:scale-125",
+        "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition-transform hover:scale-125",
         `${disabled ? "bg-gray-600" : "bg-primaryAccent"}`
       )}
       onClick={disabled ? () => {} : onClick}
@@ -77,13 +77,17 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 };
 
 function QuickActions({
-  breakpoint,
+  lineOffsetTop,
+  hoveredLineNumber,
   keyModifiers,
-  onAddLogpoint,
+  breakpoint,
+  cx,
 }: {
-  breakpoint?: Breakpoint;
+  lineOffsetTop: number;
+  hoveredLineNumber: number | null;
   keyModifiers: KeyModifiers;
-  onAddLogpoint: () => void;
+  breakpoint?: Breakpoint;
+  cx: any;
 }) {
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
@@ -91,7 +95,7 @@ function QuickActions({
   const executionPoint = useAppSelector(getExecutionPoint);
   const { nags } = hooks.useGetUserInfo();
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
-  // const { value: enableLargeText } = useFeature("enableLargeText");
+  const { value: enableLargeText } = useFeature("enableLargeText");
 
   const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
 
@@ -103,6 +107,12 @@ function QuickActions({
     prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
+
+  const onAddLogpoint = () => {
+    if (hoveredLineNumber !== null) {
+      dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
+    }
+  };
 
   const onContinueToNext = () => {
     if (next) {
@@ -128,10 +138,21 @@ function QuickActions({
   }
 
   return (
-    <div id="add-print-statement" style={{ position: "absolute", top: 0 }}>
-      <div style={{ position: "relative", right: "var(--print-statement-right-offset)" }}>
-        {button}
-      </div>
+    <div
+      id="add-print-statement"
+      className={classNames(
+        "line-action-button absolute z-50 flex translate-x-full transform flex-row space-x-px",
+        enableLargeText && "bottom-0.5",
+        !hitPoints && "no-hits"
+      )}
+      style={{
+        position: "absolute",
+        top: 0,
+        right: "var(--print-statement-right-offset)",
+        transform: `translateY(${lineOffsetTop}px)`,
+      }}
+    >
+      {button}
     </div>
   );
 }
@@ -140,42 +161,26 @@ type ExternalProps = { sourceEditor: SourceEditor };
 type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
 
 function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButtonProps) {
-  const dispatch = useAppDispatch();
-  const hoveredLineNumber = useRef<number | null>(null);
-  const getBreakpoint = useCallback(() => {
-    return breakpoints.find(
-      (breakpoint: any) => breakpoint.location.line === hoveredLineNumber.current
-    );
-  }, [breakpoints]);
-  const onAddLogpoint = () => {
-    if (hoveredLineNumber.current !== null) {
-      const breakpoint = getBreakpoint();
-      dispatch(toggleLogpoint(cx, hoveredLineNumber.current, breakpoint));
-    }
-  };
+  const [lineOffsetTop, setLineOffsetTop] = useState<number>(0);
+  const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
+  const breakpoint = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
 
   useEffect(() => {
-    /** This is the amount of space between the top of the screen and the top of the editor. */
-    const editorOffset = 104;
-    const addPrintStatementElement = document.getElementById("add-print-statement");
-    const onLineEnter = ({ lineNumber }: { lineNumber: number }) => {
-      const lineOffsetTop = sourceEditor.editor.heightAtLine(lineNumber - 0) - editorOffset;
+    const onLineEnter = ({
+      lineNumber,
+      lineNumberNode,
+    }: {
+      lineNumber: number;
+      lineNumberNode: HTMLElement;
+    }) => {
+      const editorOffset = 90;
+      const lineRect = lineNumberNode.getBoundingClientRect();
 
-      hoveredLineNumber.current = lineNumber;
-
-      if (addPrintStatementElement === null) {
-        return;
-      }
-
-      addPrintStatementElement.classList.toggle(
-        "has-log-value",
-        Boolean(getBreakpoint()?.options.logValue)
-      );
-
-      addPrintStatementElement.style.transform = `translateY(${lineOffsetTop}px)`;
+      setLineOffsetTop(lineRect.top - editorOffset);
+      setHoveredLineNumber(lineNumber);
     };
     const onLineLeave = () => {
-      hoveredLineNumber.current = null;
+      setHoveredLineNumber(null);
     };
 
     sourceEditor.codeMirror.on("lineMouseEnter", onLineEnter);
@@ -185,11 +190,19 @@ function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButto
       sourceEditor.codeMirror.off("lineMouseEnter", onLineEnter);
       sourceEditor.codeMirror.off("lineMouseLeave", onLineLeave);
     };
-  }, [sourceEditor, getBreakpoint]);
+  }, [sourceEditor]);
 
   return (
     <KeyModifiersContext.Consumer>
-      {keyModifiers => <QuickActions keyModifiers={keyModifiers} onAddLogpoint={onAddLogpoint} />}
+      {keyModifiers => (
+        <QuickActions
+          lineOffsetTop={lineOffsetTop}
+          hoveredLineNumber={hoveredLineNumber}
+          breakpoint={breakpoint}
+          cx={cx}
+          keyModifiers={keyModifiers}
+        />
+      )}
     </KeyModifiersContext.Consumer>
   );
 }

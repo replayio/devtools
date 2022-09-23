@@ -36,12 +36,8 @@
   pointer-events: all;
 }
 
-.empty-line .line-action-button {
-  pointer-events: none !important;
-}
-
-.empty-line .toggle-widget {
-  background: #8abfd8 !important;
+.line-action-button.no-hits button {
+  background: var(--background-color-contrast-4);
 }
 
 .editor-wrapper
