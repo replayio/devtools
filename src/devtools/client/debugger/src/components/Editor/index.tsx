@@ -485,9 +485,9 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
         <EmptyLines editor={editor} />
         <Breakpoints editor={editor} cx={cx} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
-        {/* <KeyModifiersContext.Consumer>
+        <KeyModifiersContext.Consumer>
           {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
-        </KeyModifiersContext.Consumer> */}
+        </KeyModifiersContext.Consumer>
         <HighlightLines editor={editor} />
         <EditorMenu
           editor={editor}

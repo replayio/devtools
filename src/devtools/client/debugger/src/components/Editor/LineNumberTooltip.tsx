@@ -39,18 +39,15 @@ function Wrapper({
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   if (showWarning) {
-    console.log(`show nag`);
-
     return (
-      <div className="static-tooltip-content space-x-2 bg-red-700">
+      <div className="space-x-2 bg-red-700 static-tooltip-content">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>
     );
   } else if (showNag) {
-    console.log(`show nag`);
     return (
-      <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
+      <div className="space-x-2 static-tooltip-content" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
         <div className="flex flex-col items-start">
           {!loading ? <div className="font-bold">Click to add a print statement</div> : null}
@@ -60,7 +57,7 @@ function Wrapper({
     );
   }
 
-  return <div className="static-tooltip-content bg-gray-700">{children}</div>;
+  return <div className="bg-gray-700 static-tooltip-content">{children}</div>;
 }
 
 type Props = {
@@ -161,7 +158,6 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }, [hits]);
 
   if (!targetNode || isMetaActive) {
-    console.log("fucked");
     return null;
   }
 
@@ -176,24 +172,22 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   if (!hitCounts) {
     return (
       <StaticTooltip targetNode={targetNode}>
-        <Wrapper loading>...</Wrapper>
+        <Wrapper loading>Loading…</Wrapper>
       </StaticTooltip>
     );
   }
 
   if (hits === undefined) {
-    return (
-      <StaticTooltip targetNode={targetNode}>
-        <Wrapper loading>...</Wrapper>
-      </StaticTooltip>
-    );
+    return null;
   }
 
   const count = hits || 0;
 
   return (
     <StaticTooltip targetNode={targetNode}>
-      <Wrapper showWarning={count > 200}>...</Wrapper>
+      <Wrapper showWarning={count > 200}>
+        {count} hit{count == 1 ? "" : "s"}
+      </Wrapper>
     </StaticTooltip>
   );
 }
