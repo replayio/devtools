@@ -30,8 +30,7 @@ const GET_CONNECTION = gql`
   }
 `;
 
-function SSOLogin({ onLogin }: { onLogin: () => void }) {
-  const { loginWithRedirect } = useAuth0();
+function SSOLogin({ onLogin }: { onLogin: (connection: string) => void }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | boolean>(false);
 
@@ -44,10 +43,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
     });
 
     if (resp.data?.auth?.connection) {
-      loginWithRedirect({
-        appState: { returnTo: window.location.pathname + window.location.search },
-        connection: resp.data.auth.connection,
-      });
+      onLogin(resp.data.auth.connection);
     } else {
       setError(resp.errors?.find(e => e.message)?.message || true);
     }
@@ -81,7 +77,7 @@ function SSOLogin({ onLogin }: { onLogin: () => void }) {
       </div>
       <button
         className="w-full justify-center text-sm font-bold text-primaryAccent underline"
-        onClick={onLogin}
+        onClick={() => onLogin("google-oauth2")}
       >
         Sign in with Google
       </button>
@@ -131,12 +127,16 @@ function SocialLogin({
   onLogin,
 }: {
   onShowSSOLogin: () => void;
-  onLogin: () => void;
+  onLogin: (connection: string) => void;
 }) {
   return (
     <div className="space-y-6">
       <LoginMessaging />
-      <PrimaryLgButton color="blue" onClick={onLogin} className="w-full justify-center">
+      <PrimaryLgButton
+        color="blue"
+        onClick={() => onLogin("google-oauth2")}
+        className="w-full justify-center"
+      >
         Sign in with Google
       </PrimaryLgButton>
       <button
@@ -209,7 +209,15 @@ export function LoginLink({
   return <Link href={href}>{children}</Link>;
 }
 
-export default function Login({ returnToPath = "" }: { returnToPath?: string }) {
+export default function Login({
+  returnToPath = "",
+  challenge,
+  state,
+}: {
+  returnToPath?: string;
+  challenge?: string;
+  state?: string;
+}) {
   const { loginWithRedirect, error } = useAuth0();
   const [sso, setSSO] = useState(false);
 
@@ -217,11 +225,20 @@ export default function Login({ returnToPath = "" }: { returnToPath?: string }) 
     returnToPath = "/";
   }
 
-  const onLogin = () =>
-    loginWithRedirect({
+  const onLogin = async (connection: string) => {
+    // browser auth will redirect through this UX to select the connection
+    if (challenge && state) {
+      const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
+      window.location.href = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}`;
+
+      return;
+    }
+
+    await loginWithRedirect({
       appState: { returnTo: returnToPath },
-      connection: "google-oauth2",
+      connection,
     });
+  };
 
   useEffect(() => {
     setUserInBrowserPrefs(null);

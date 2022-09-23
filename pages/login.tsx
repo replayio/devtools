@@ -14,9 +14,20 @@ export default function LoginPage() {
     router.push(router.query.returnTo);
   }
 
+  const challenge = Array.isArray(router.query.challenge)
+    ? router.query.challenge[0]
+    : router.query.challenge;
+  const state = Array.isArray(router.query.state) ? router.query.state[0] : router.query.state;
+
   useEffect(() => {
     dispatch(clearExpectedError());
   }, [dispatch]);
 
-  return <Login returnToPath={String(router.query.returnTo || "/")} />;
+  return (
+    <Login
+      returnToPath={String(router.query.returnTo || "/")}
+      state={state}
+      challenge={challenge}
+    />
+  );
 }

@@ -54,10 +54,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
     const redirectUri = getAppUrl("/api/browser/callback");
     const { id, challenge, serverKey } = await initAuthRequest(key);
-    const url = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${redirectUri}&scope=openid profile offline_access&state=${id}&audience=https://api.replay.io`;
+    const url = `/login?challenge=${challenge}&returnTo=${redirectUri}&state=${id}`;
 
     res.setHeader(
       "Set-Cookie",
