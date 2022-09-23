@@ -131,29 +131,31 @@ function LineHitCounts({ sourceEditor }: Props) {
     // HACK
     // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
     // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
-    const editorWrapperElement = document.querySelector(".editor-wrapper");
+    const editorWrapperElement = document.querySelector(".editor-wrapper") as HTMLElement;
 
-    editorWrapperElement?.style.setProperty("--hit-count-gutter-width", `-${gutterWidth}`);
+    if (editorWrapperElement) {
+      editorWrapperElement.style.setProperty("--hit-count-gutter-width", `-${gutterWidth}`);
 
-    // If hit counts are shown, the button should not overlap with the gutter.
-    // The gutter size changes though based on the number of hits, so we use a CSS variable.
-    editorWrapperElement?.style.setProperty(
-      "--print-statement-right-offset",
-      hitCountsMode === "show-counts"
-        ? "calc(var(--hit-count-gutter-width) - 6px)"
-        : hitCountsMode === "hide-counts"
-        ? "-10px"
-        : "0px"
-    );
+      // If hit counts are shown, the button should not overlap with the gutter.
+      // The gutter size changes though based on the number of hits, so we use a CSS variable.
+      editorWrapperElement.style.setProperty(
+        "--print-statement-right-offset",
+        hitCountsMode === "show-counts"
+          ? "calc(var(--hit-count-gutter-width) - 6px)"
+          : hitCountsMode === "hide-counts"
+          ? "-10px"
+          : "0px"
+      );
 
-    editorWrapperElement?.style.setProperty(
-      "--toggle-widget-button-offset",
-      hitCountsMode === "show-counts"
-        ? `calc(${gutterWidth} + 32px)`
-        : hitCountsMode === "hide-counts"
-        ? "40px"
-        : "0px"
-    );
+      editorWrapperElement?.style.setProperty(
+        "--toggle-widget-button-offset",
+        hitCountsMode === "show-counts"
+          ? `calc(${gutterWidth} + 32px)`
+          : hitCountsMode === "hide-counts"
+          ? "40px"
+          : "0px"
+      );
+    }
 
     return () => {
       try {
