@@ -156,7 +156,7 @@ function QuickActions({
       style={{
         position: "absolute",
         top: 0,
-        left: "calc(var(--print-statement-right-offset) * -1 + 2rem)",
+        left: "var(--toggle-widget-button-offset)",
         transform: `translateY(${lineOffsetTop}px)`,
       }}
     >

@@ -147,6 +147,15 @@ function LineHitCounts({ sourceEditor }: Props) {
         : "0px"
     );
 
+    editorWrapperElement?.style.setProperty(
+      "--toggle-widget-button-offset",
+      hitCountsMode === "show-counts"
+        ? `calc(${gutterWidth} + 36px)`
+        : hitCountsMode === "hide-counts"
+        ? "40px"
+        : "0px"
+    );
+
     return () => {
       try {
         editor.setOption("gutters", ["breakpoints", "CodeMirror-linenumbers"]);
