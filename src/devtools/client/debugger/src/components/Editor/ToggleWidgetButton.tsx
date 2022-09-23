@@ -128,11 +128,10 @@ function QuickActions({
   }
 
   return (
-    <div
-      id="add-print-statement"
-      style={{ position: "absolute", top: 0, right: "var(--print-statement-right-offset)" }}
-    >
-      {button}
+    <div id="add-print-statement" style={{ position: "absolute", top: 0 }}>
+      <div style={{ position: "relative", right: "var(--print-statement-right-offset)" }}>
+        {button}
+      </div>
     </div>
   );
 }
@@ -156,21 +155,24 @@ function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButto
   };
 
   useEffect(() => {
+    /** This is the amount of space between the top of the screen and the top of the editor. */
+    const editorOffset = 104;
     const addPrintStatementElement = document.getElementById("add-print-statement");
     const onLineEnter = ({ lineNumber }: { lineNumber: number }) => {
-      const lineOffsetTop =
-        sourceEditor.editor.heightAtLine(lineNumber) - (addPrintStatementElement?.offsetTop ?? 0);
+      const lineOffsetTop = sourceEditor.editor.heightAtLine(lineNumber - 0) - editorOffset;
 
       hoveredLineNumber.current = lineNumber;
 
-      if (addPrintStatementElement) {
-        addPrintStatementElement.classList.toggle(
-          "has-log-value",
-          Boolean(getBreakpoint()?.options.logValue)
-        );
-
-        addPrintStatementElement.style.transform = `translateY(${lineOffsetTop}px)`;
+      if (addPrintStatementElement === null) {
+        return;
       }
+
+      addPrintStatementElement.classList.toggle(
+        "has-log-value",
+        Boolean(getBreakpoint()?.options.logValue)
+      );
+
+      addPrintStatementElement.style.transform = `translateY(${lineOffsetTop}px)`;
     };
     const onLineLeave = () => {
       hoveredLineNumber.current = null;
