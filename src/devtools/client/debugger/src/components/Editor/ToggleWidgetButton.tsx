@@ -192,9 +192,10 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   }, [editor]);
 
   if (!targetNode || !hoveredLineNumber) {
+    console.log(`hoveredLineNumber (bail)`, hoveredLineNumber);
     return null;
   }
-
+  console.log(`hoveredLineNumber`, hoveredLineNumber);
   return ReactDOM.createPortal(
     <KeyModifiersContext.Consumer>
       {keyModifiers => (

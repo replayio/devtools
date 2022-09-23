@@ -39,6 +39,8 @@ function Wrapper({
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
 
   if (showWarning) {
+    console.log(`show nag`);
+
     return (
       <div className="static-tooltip-content space-x-2 bg-red-700">
         <MaterialIcon>warning_amber</MaterialIcon>
@@ -46,6 +48,7 @@ function Wrapper({
       </div>
     );
   } else if (showNag) {
+    console.log(`show nag`);
     return (
       <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
@@ -102,7 +105,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }, [editor, dispatch, source]);
 
   useEffect(() => {
-    const debouncedClearHoveredLineNumber = debounce(() => {
+    const debouncedClearHoveredLineNumber = () => {
       // Only reset the Redux state here after a short delay.
       // That way, if we immediately mouse from active line X to X + 1,
       // we won't dispatch a "reset line to null" action as part of that change.
@@ -113,7 +116,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       if (lastHoveredLineNumber.current !== null) {
         dispatch(setHoveredLineNumberLocation(null));
       }
-    }, 10);
+    };
 
     const debouncedFetchHitCountsForVisibleLines = debounce(() => {
       fetchHitCountsForVisibleLines();
@@ -127,9 +130,6 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       lineNumberNode: HTMLElement;
     }) => {
       if (lineNumber !== lastHoveredLineNumber.current) {
-        // Bail out of any pending "clear hover line" dispatch, since we're over a new line
-        debouncedClearHoveredLineNumber.cancel();
-
         lastHoveredLineNumber.current = lineNumber;
 
         dispatch(updateHoveredLineNumber(lineNumber));
@@ -161,6 +161,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }, [hits]);
 
   if (!targetNode || isMetaActive) {
+    console.log("fucked");
     return null;
   }
 
@@ -175,22 +176,24 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   if (!hitCounts) {
     return (
       <StaticTooltip targetNode={targetNode}>
-        <Wrapper loading>Loading…</Wrapper>
+        <Wrapper loading>...</Wrapper>
       </StaticTooltip>
     );
   }
 
   if (hits === undefined) {
-    return null;
+    return (
+      <StaticTooltip targetNode={targetNode}>
+        <Wrapper loading>...</Wrapper>
+      </StaticTooltip>
+    );
   }
 
   const count = hits || 0;
 
   return (
     <StaticTooltip targetNode={targetNode}>
-      <Wrapper showWarning={count > 200}>
-        {count} hit{count == 1 ? "" : "s"}
-      </Wrapper>
+      <Wrapper showWarning={count > 200}>...</Wrapper>
     </StaticTooltip>
   );
 }
