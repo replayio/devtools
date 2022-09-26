@@ -149,6 +149,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   window.app = window.app || {};
   window.app.threadFront = ThreadFront;
+  // @ts-expect-error complains about thunk type mismatches
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
   window.app.debugger = setupDebuggerHelper();
