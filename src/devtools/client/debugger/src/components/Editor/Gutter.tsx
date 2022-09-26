@@ -2,11 +2,11 @@ import LineHitCounts from "./LineHitCounts";
 import ToggleWidgetButton from "./ToggleWidgetButton";
 import type { SourceEditor } from "../../utils/editor/source-editor";
 
-export default function Gutter({ editor }: { editor: SourceEditor }) {
+export default function Gutter({ sourceEditor }: { sourceEditor: SourceEditor }) {
   return (
     <>
-      <ToggleWidgetButton sourceEditor={editor} />
-      <LineHitCounts sourceEditor={editor} />
+      <ToggleWidgetButton editor={sourceEditor} />
+      <LineHitCounts sourceEditor={sourceEditor} />
     </>
   );
 }
