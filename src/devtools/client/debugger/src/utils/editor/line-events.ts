@@ -30,9 +30,12 @@ const getLineNodeFromGutterTarget = (target: HTMLElement) =>
   target.closest(".CodeMirror-gutter-wrapper")!.parentElement!.querySelector(".CodeMirror-line");
 
 function isValidTarget(target: HTMLElement) {
+  const isNonBreakableLineNode = target.closest(".empty-line");
   const isTooltip = target.closest(".static-tooltip");
 
-  return (isHoveredOnLine(target) || isHoveredOnGutter(target)) && !isTooltip;
+  return (
+    (isHoveredOnLine(target) || isHoveredOnGutter(target)) && !isNonBreakableLineNode && !isTooltip
+  );
 }
 
 function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
