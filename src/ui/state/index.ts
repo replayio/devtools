@@ -9,7 +9,6 @@ import { ContextMenusState } from "../reducers/contextMenus";
 import { ReactDevToolsState } from "./reactDevTools";
 import { InspectorState } from "devtools/client/inspector/reducers";
 import { MarkupState } from "devtools/client/inspector/markup/reducers/markup";
-import { ClassListState } from "devtools/client/inspector/rules/state/class-list";
 import { RulesState } from "devtools/client/inspector/rules/reducers/rules";
 import { ComputedState } from "devtools/client/inspector/computed/state";
 import { PauseState } from "devtools/client/debugger/src/reducers/pause";
@@ -35,7 +34,6 @@ export interface UIState {
   asyncRequests: AsyncRequestsState;
   boxModel: BoxModelState;
   breakpoints: BreakpointsState;
-  classList: ClassListState;
   computed: ComputedState;
   contextMenus: ContextMenusState;
   sources: NewSourcesState;
