@@ -351,7 +351,7 @@ async function checkEvaluateInTopFrame(text: string, expected: string) {
       const messages = document.querySelectorAll<HTMLElement>(
         '[data-test-name="Message"][data-test-message-type="terminal-expression"] [data-test-name="TerminalExpression-Result"]'
       );
-      return Array.from(messages).find((node: HTMLElement) => node.innerText === expected);
+      return Array.from(messages).find((node: HTMLElement) => node.innerText === String(expected));
     },
     { waitingFor: `message with text "${expected}"` }
   );
