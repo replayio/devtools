@@ -1,6 +1,5 @@
 import { PointDescription } from "@replayio/protocol";
-import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
+import React, { useState, useEffect, FC, ReactNode, Suspense } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -20,6 +19,7 @@ import { getExecutionPoint } from "../../reducers/pause";
 import { seek } from "ui/actions/timeline";
 import { useFeature } from "ui/hooks/settings";
 import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
+import type { SourceEditor } from "../../utils/editor/source-editor";
 
 const QuickActionButton: FC<{
   showNag: boolean;
@@ -31,7 +31,7 @@ const QuickActionButton: FC<{
     <button
       className={classNames(
         "toggle-widget",
-        "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition hover:scale-125",
+        "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition-transform hover:scale-125",
         `${disabled ? "bg-gray-600" : "bg-primaryAccent"}`
       )}
       onClick={disabled ? () => {} : onClick}
@@ -51,6 +51,7 @@ const ContinueToPrevious: FC<{ showNag: boolean; onClick: () => void; disabled: 
     <MaterialIcon>navigate_before</MaterialIcon>
   </QuickActionButton>
 );
+
 const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: boolean }> = ({
   showNag,
   onClick,
@@ -60,12 +61,14 @@ const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: bool
     <MaterialIcon>navigate_next</MaterialIcon>
   </QuickActionButton>
 );
-const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Breakpoint }> = ({
-  showNag,
-  onClick,
-  breakpoint,
-}) => {
-  const icon = breakpoint?.options.logValue ? "remove" : "add";
+
+const AddLogpoint: FC<{
+  breakpoint?: Breakpoint;
+  hitPoints?: PointDescription[] | null;
+  showNag: boolean;
+  onClick: () => void;
+}> = ({ breakpoint, hitPoints, showNag, onClick }) => {
+  const icon = hitPoints === null ? "remove" : breakpoint?.options.logValue ? "remove" : "add";
 
   return (
     <QuickActionButton showNag={showNag} onClick={onClick}>
@@ -75,29 +78,18 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 };
 
 function QuickActions({
+  lineOffsetTop,
   hoveredLineNumber,
-  onMouseDown,
   keyModifiers,
-  targetNode,
   breakpoint,
   cx,
 }: {
-  hoveredLineNumber: number;
-  onMouseDown: MouseEventHandler;
+  lineOffsetTop: number;
+  hoveredLineNumber: number | null;
   keyModifiers: KeyModifiers;
-  targetNode: HTMLElement;
   breakpoint?: Breakpoint;
   cx: any;
 }) {
-  const [height, setHeight] = useState(18);
-  useEffect(() => {
-    const animationFrameId = requestAnimationFrame(() =>
-      setHeight(targetNode.getBoundingClientRect().height)
-    );
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [targetNode]);
-
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
   const dispatch = useAppDispatch();
@@ -108,10 +100,6 @@ function QuickActions({
 
   const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
 
-  const onAddLogpoint = () => {
-    dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
-  };
-
   let next: PointDescription | undefined, prev: PointDescription | undefined;
 
   const error = hitPointStatus === "too-many-points-to-find";
@@ -120,6 +108,12 @@ function QuickActions({
     prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
+
+  const onAddLogpoint = () => {
+    if (hoveredLineNumber !== null) {
+      dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
+    }
+  };
 
   const onContinueToNext = () => {
     if (next) {
@@ -141,20 +135,30 @@ function QuickActions({
   } else if (hitPoints && isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
   } else {
-    button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
+    button = (
+      <AddLogpoint
+        breakpoint={breakpoint}
+        showNag={showNag}
+        hitPoints={hitPoints}
+        onClick={onAddLogpoint}
+      />
+    );
   }
 
   return (
     <div
+      id="add-print-statement"
       className={classNames(
         "line-action-button absolute z-50 flex translate-x-full transform flex-row space-x-px",
-        enableLargeText && "bottom-0.5"
+        enableLargeText && "bottom-0.5",
+        !hitPoints && "no-hits"
       )}
-      // This is necessary so that we don't move the CodeMirror cursor while clicking.
-      onMouseDown={onMouseDown}
       style={{
-        top: `-${(1 / 2) * (18 - height)}px`,
-        right: "var(--print-statement-right-offset)",
+        position: "absolute",
+        top: 0,
+        left: "var(--toggle-widget-button-offset)",
+        transform: `translateY(${lineOffsetTop}px)`,
+        opacity: hoveredLineNumber === null ? 0 : 1,
       }}
     >
       {button}
@@ -162,61 +166,53 @@ function QuickActions({
   );
 }
 
-type ExternalProps = { editor: any };
+type ExternalProps = { sourceEditor: any };
 type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
 
-function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
-  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
+function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButtonProps) {
+  const [lineOffsetTop, setLineOffsetTop] = useState<number>(0);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
-
-  const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
-  const onMouseDown = (e: React.MouseEvent) => {
-    // This keeps the cursor in CodeMirror from moving after clicking on the button.
-    e.stopPropagation();
-  };
+  const breakpoint = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
 
   useEffect(() => {
     const onLineEnter = ({
-      lineNumberNode,
       lineNumber,
+      lineNumberNode,
     }: {
-      lineNumberNode: HTMLElement;
       lineNumber: number;
+      lineNumberNode: HTMLElement;
     }) => {
+      const editorOffset = 88;
+      const lineRect = lineNumberNode.getBoundingClientRect();
+
+      setLineOffsetTop(lineRect.top - editorOffset);
       setHoveredLineNumber(lineNumber);
-      setTargetNode(lineNumberNode);
     };
     const onLineLeave = () => {
-      setTargetNode(null);
       setHoveredLineNumber(null);
     };
 
-    editor.codeMirror.on("lineMouseEnter", onLineEnter);
-    editor.codeMirror.on("lineMouseLeave", onLineLeave);
+    sourceEditor.codeMirror.on("lineMouseEnter", onLineEnter);
+    sourceEditor.codeMirror.on("lineMouseLeave", onLineLeave);
+
     return () => {
-      editor.codeMirror.off("lineMouseEnter", onLineEnter);
-      editor.codeMirror.off("lineMouseLeave", onLineLeave);
+      sourceEditor.codeMirror.off("lineMouseEnter", onLineEnter);
+      sourceEditor.codeMirror.off("lineMouseLeave", onLineLeave);
     };
-  }, [editor]);
+  }, [sourceEditor]);
 
-  if (!targetNode || !hoveredLineNumber) {
-    return null;
-  }
-
-  return ReactDOM.createPortal(
+  return (
     <KeyModifiersContext.Consumer>
       {keyModifiers => (
         <QuickActions
+          lineOffsetTop={lineOffsetTop}
           hoveredLineNumber={hoveredLineNumber}
-          onMouseDown={onMouseDown}
-          targetNode={targetNode}
-          breakpoint={bp}
+          breakpoint={breakpoint}
           cx={cx}
           keyModifiers={keyModifiers}
         />
       )}
-    </KeyModifiersContext.Consumer>,
-    targetNode
+    </KeyModifiersContext.Consumer>
   );
 }
 

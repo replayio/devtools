@@ -2,8 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-//
-import type { Editor } from "codemirror";
 import type { SourceEditor as SE, CodeMirror as CM } from "./source-editor";
 import { assert } from "protocol/utils";
 import { features, prefs } from "../prefs";
@@ -44,7 +42,7 @@ export function createEditor() {
     mode: "javascript",
     foldGutter: features.codeFolding,
     enableCodeFolding: features.codeFolding,
-    readOnly: true,
+    readOnly: "nocursor",
     lineNumbers: true,
     theme: "mozilla",
     styleActiveLine: false,
