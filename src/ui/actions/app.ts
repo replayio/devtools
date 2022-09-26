@@ -58,15 +58,6 @@ export async function setupApp(
   ThreadFront: typeof ThreadFrontType,
   replayClient: ReplayClientInterface
 ) {
-  if (!isTest()) {
-    tokenManager.addListener(({ token }) => {
-      if (token) {
-        ThreadFront.setAccessToken(token);
-      }
-    });
-    await tokenManager.getToken();
-  }
-
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
