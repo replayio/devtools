@@ -33,6 +33,7 @@ import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
+import { isTest } from "ui/utils/environment";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -141,7 +142,7 @@ function _DevTools({
 
   useEffect(() => {
     let token: Promise<TokenState | void> = Promise.resolve();
-    if (isAuthenticated) {
+    if (isAuthenticated && !isTest()) {
       token = tokenManager.getToken();
     }
 
