@@ -1,47 +1,51 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, Suspense } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { UIState } from "ui/state";
-import MarkupSearchbox from "../searchbox";
 import Nodes from "./Nodes";
 import { getNodeInfo } from "../selectors/markup";
 const LoadingProgressBar = require("ui/components/shared/LoadingProgressBar").default;
 import { HTMLBreadcrumbs } from "./HTMLBreadcrumbs";
 import { getIsPaused } from "devtools/client/debugger/src/reducers/pause";
+import { InspectorSearch } from "./InspectorSearch";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 export interface MarkupProps {}
-
-function setupLegacyComponents() {
-  const searchbox = new MarkupSearchbox();
-  searchbox.setupSearchBox();
-}
 
 type PropsFromParent = {};
 
 function MarkupApp({ markupRootNode, isPaused }: PropsFromRedux & PropsFromParent) {
   const isMarkupEmpty = (markupRootNode?.children?.length || 0) == 0;
 
-  useEffect(() => setupLegacyComponents(), []);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const searchBoxShortcutsRef = useRef<KeyShortcuts | null>(null);
+
+  useEffect(() => {
+    searchBoxShortcutsRef.current = new KeyShortcuts({
+      window: document.defaultView,
+      target: contentRef.current,
+    });
+
+    const key = "CmdOrCtrl+F";
+    const listener = (event: KeyboardEvent) => {
+      event.preventDefault();
+      const searchBoxInput =
+        contentRef.current?.querySelector<HTMLInputElement>("#inspector-searchbox");
+
+      searchBoxInput?.focus();
+    };
+
+    searchBoxShortcutsRef.current.on(key, listener);
+
+    return () => {
+      searchBoxShortcutsRef.current?.off(key, listener);
+    };
+  }, []);
 
   return (
     <div className="devtools-inspector-tab-panel">
-      <div id="inspector-main-content" className="devtools-main-content">
+      <div id="inspector-main-content" className="devtools-main-content" ref={contentRef}>
         <div id="inspector-toolbar" className="devtools-toolbar devtools-input-toolbar">
-          <div id="inspector-search" className="devtools-searchbox text-themeTextFieldColor">
-            <input
-              id="inspector-searchbox"
-              className="devtools-searchinput"
-              type="input"
-              placeholder="Search HTML"
-              autoComplete="off"
-            />
-          </div>
-          <div id="inspector-searchlabel-container" hidden={true}>
-            <div
-              className="devtools-separator"
-              style={{ height: "calc(var(--theme-toolbar-height) - 8px" }}
-            ></div>
-            <span id="inspector-searchlabel" className="whitespace-nowrap"></span>
-          </div>
+          <InspectorSearch />
           <div className="devtools-separator" hidden={true}></div>
           <button
             id="inspector-element-add-button"

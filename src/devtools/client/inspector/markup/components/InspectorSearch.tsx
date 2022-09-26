@@ -1,0 +1,143 @@
+import React, { useState, useEffect, useRef, useLayoutEffect, useContext } from "react";
+import { Object as ProtocolObject } from "@replayio/protocol";
+
+import type { UIThunkAction } from "ui/actions";
+import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
+import { getNodeDataAsync } from "ui/suspense/nodeCaches";
+import { getSelectedDomNodeId, nodeSelected } from "../reducers/markup";
+
+const Services = require("devtools/shared/services");
+
+const doFullTextSearch = (
+  queryBefore: string,
+  queryRef: { current: string },
+  reverse: boolean
+): UIThunkAction<Promise<ProtocolObject[] | undefined>> => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    const state = getState();
+    const pauseIdBefore = state.pause.id;
+    const sessionId = state.app.sessionId;
+
+    const results = await getNodeDataAsync(
+      protocolClient,
+      replayClient,
+      sessionId!,
+      pauseIdBefore!,
+      {
+        type: "searchDOM",
+        query: queryBefore,
+      }
+    );
+
+    const stateAfter = getState();
+    const pauseIdAfter = stateAfter.pause.id;
+
+    if (results?.length && pauseIdAfter === pauseIdBefore && queryRef.current === queryBefore) {
+      const currentSelectedNode = stateAfter.markup.selectedNode;
+
+      const currentIndex = currentSelectedNode
+        ? results.findIndex(node => node.objectId === currentSelectedNode)
+        : -1;
+      let index;
+      if (currentIndex == -1) {
+        index = 0;
+      } else if (reverse) {
+        index = currentIndex ? currentIndex - 1 : results.length - 1;
+      } else {
+        index = currentIndex != results.length - 1 ? currentIndex + 1 : 0;
+      }
+
+      const node = results[index];
+
+      dispatch(nodeSelected(node.objectId, "inspectorsearch"));
+    }
+
+    return results;
+  };
+};
+
+export function InspectorSearch() {
+  const dispatch = useAppDispatch();
+  const selectedDomNodeId = useAppSelector(getSelectedDomNodeId);
+
+  // TODO Add a loading indicator of some kind?
+  const [searchText, setSearchText] = useState("");
+  const [activeSearchText, setActiveSearchText] = useState<string | null>(null);
+
+  const [results, setResults] = useState<ProtocolObject[] | null>(null);
+
+  const latestSearchTextRef = useRef(searchText);
+
+  const startFullTextSearch = async (query: string, reverseSearchDirection: boolean) => {
+    if (activeSearchText !== query) {
+      setActiveSearchText(query);
+      setResults(null);
+    }
+
+    const results = await dispatch(
+      doFullTextSearch(query, latestSearchTextRef, reverseSearchDirection)
+    );
+
+    setResults(results || null);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchText(e.target.value);
+  };
+
+  useLayoutEffect(() => {
+    latestSearchTextRef.current = searchText;
+  });
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      startFullTextSearch(searchText, e.shiftKey);
+    }
+
+    // Honestly I have no idea why this was in the original search logic.
+    // Apparently search if you hit CTRL+G? Weird combo.
+    const modifierKey = Services.appinfo.OS === "Darwin" ? e.metaKey : e.ctrlKey;
+    if (e.key === "g" && modifierKey) {
+      startFullTextSearch(searchText, e.shiftKey);
+      e.preventDefault();
+    }
+  };
+
+  let labelText = "";
+  let labelHidden = !results;
+
+  if (results) {
+    if (results.length === 0) {
+      labelText = "No matches";
+    } else {
+      const resultsIndex = results.findIndex(node => node.objectId === selectedDomNodeId);
+      labelText = `${resultsIndex + 1} of ${results.length}`;
+    }
+  }
+
+  return (
+    <>
+      <div id="inspector-search" className="devtools-searchbox text-themeTextFieldColor">
+        <input
+          id="inspector-searchbox"
+          className="devtools-searchinput"
+          type="input"
+          placeholder="Search HTML"
+          autoComplete="off"
+          onKeyDown={handleKeyDown}
+          onChange={handleChange}
+          value={searchText}
+        />
+      </div>
+      <div id="inspector-searchlabel-container" hidden={labelHidden}>
+        <div
+          className="devtools-separator"
+          style={{ height: "calc(var(--theme-toolbar-height) - 8px" }}
+        ></div>
+        <span id="inspector-searchlabel" className="whitespace-nowrap">
+          {labelText}
+        </span>
+      </div>
+    </>
+  );
+}

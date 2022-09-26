@@ -8,7 +8,7 @@ import {
 } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
-import { createGenericCache } from "@bvaughn/src/suspense/createGenericCache";
+import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
 import {
   getObjectWithPreviewHelper,
   preCacheObjects,
@@ -32,6 +32,10 @@ type NodeFetchOptions =
       type: "querySelector";
       nodeId: string;
       selector: string;
+    }
+  | {
+      type: "searchDOM";
+      query: string;
     };
 export function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
@@ -49,21 +53,20 @@ export const {
     pauseId: PauseId,
     options: NodeFetchOptions
   ],
-  ProtocolObject | undefined
+  ProtocolObject[] | undefined
 >(
   async (client, replayClient, sessionId, pauseId, options) => {
-    let nodeId: string | undefined; //[] = [];
+    let nodeIds: string[] = [];
     let pauseData = null as PauseData | null;
+
     switch (options.type) {
       case "node": {
-        // nodeIds.push(options.nodeId);
-        nodeId = options.nodeId;
+        nodeIds.push(options.nodeId);
         break;
       }
       case "document": {
         const { document, data } = await client.DOM.getDocument({}, sessionId, pauseId);
-        // nodeIds.push(document);
-        nodeId = document;
+        nodeIds.push(document);
         pauseData = data;
         break;
       }
@@ -77,8 +80,7 @@ export const {
         );
         pauseData = data;
         // Ancestor nodes will be cached too, but we'll just return
-        // nodeIds.push(options.nodeId);
-        nodeId = options.nodeId;
+        nodeIds.push(options.nodeId);
         break;
       }
       case "querySelector": {
@@ -91,7 +93,21 @@ export const {
           pauseId
         );
         pauseData = data;
-        nodeId = result;
+        if (result) {
+          nodeIds.push(result);
+        }
+        break;
+      }
+      case "searchDOM": {
+        const { nodes, data } = await client.DOM.performSearch(
+          {
+            query: options.query,
+          },
+          sessionId,
+          pauseId
+        );
+        pauseData = data;
+        nodeIds = nodes;
         break;
       }
       default: {
@@ -103,16 +119,15 @@ export const {
       preCacheObjects(pauseId, pauseData.objects);
     }
 
-    if (!nodeId) {
-      return;
+    if (!nodeIds.length) {
+      return [];
     }
 
-    return getObjectWithPreviewHelper(replayClient, pauseId, nodeId);
-    // const nodePromises = nodeIds.map(nodeId =>
-    //   getObjectWithPreviewHelper(replayClient, pauseId, nodeId)
-    // );
+    const nodePromises = nodeIds.map(nodeId =>
+      getObjectWithPreviewHelper(replayClient, pauseId, nodeId)
+    );
 
-    // return Promise.all(nodePromises);
+    return Promise.all(nodePromises);
   },
   (client, replayClient, sessionId, pauseId, options) => {
     let typeKey = "";
@@ -128,6 +143,10 @@ export const {
       }
       case "querySelector": {
         typeKey = `${options.nodeId}|${options.selector}`;
+        break;
+      }
+      case "searchDOM": {
+        typeKey = options.query;
         break;
       }
       default: {

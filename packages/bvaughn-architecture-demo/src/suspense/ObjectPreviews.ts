@@ -222,7 +222,7 @@ export async function getObjectPropertyHelper(
   }
 }
 
-export function preCacheObjects(pauseId: PauseId, objects: Object[]): void {
+export function preCacheObjects(pauseId: PauseId, objects: Object[] = []): void {
   objects.forEach(object => preCacheObject(pauseId, object));
 }
 
