@@ -89,6 +89,7 @@ export type RecordingCapabilities = {
   supportsEventTypes: boolean;
   supportsNetworkRequests: boolean;
   supportsRepaintingGraphics: boolean;
+  supportsPureEvaluation: boolean;
 };
 
 // Target applications which can create recordings.
@@ -244,7 +245,9 @@ class _ThreadFront {
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
+          supportsPureEvaluation: false,
         };
+
         break;
       }
       case "gecko": {
@@ -252,6 +255,7 @@ class _ThreadFront {
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: true,
+          supportsPureEvaluation: true,
         };
         break;
       }
@@ -260,6 +264,7 @@ class _ThreadFront {
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: false,
+          supportsPureEvaluation: false,
         };
         break;
       }
@@ -269,6 +274,7 @@ class _ThreadFront {
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
+          supportsPureEvaluation: false,
         };
       }
     }
@@ -586,7 +592,8 @@ class _ThreadFront {
     const pause = this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
 
-    const rv = await pause.evaluate(frameId, text, pure);
+    const abilities = await this.recordingCapabilitiesWaiter.promise;
+    const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
     if (rv.returned) {
       rv.returned = new ValueFront(pause, rv.returned);
     } else if (rv.exception) {
@@ -618,8 +625,8 @@ class _ThreadFront {
   }) {
     const pause = await this.pauseForAsyncIndex(asyncIndex);
     assert(pause, "no pause for asyncIndex");
-
-    const rv = await pause.evaluate(frameId, text, pure);
+    const abilities = await this.recordingCapabilitiesWaiter.promise;
+    const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
 
     if (repaintAfterEvaluationsExperimentalFlag) {
       const { repaint } = await import("protocol/graphics");

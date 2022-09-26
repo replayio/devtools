@@ -1,9 +1,10 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC } from "react";
 import CloudIcon from "../../../image/zypsy/zypsy-security-icon1.svg";
 import KeyIcon from "../../../image/zypsy/zypsy-security-icon2.svg";
 import ShieldIcon from "../../../image/zypsy/zypsy-security-icon3.svg";
-
-const TIP_DURATION = 5000;
+import LightbulbIcon from "../../../image/zypsy/lightbulb-icon.svg";
+import { getLoadingPageTipSeed } from "ui/actions/app";
+import { useAppSelector } from "ui/setup/hooks";
 
 const TIPS = [
   {
@@ -19,39 +20,34 @@ const TIPS = [
     icon: KeyIcon,
   },
   {
-    title: "Intellectual property",
-    description:
-      "Replay is architected with your privacy in mind. We try our hardest not to collect sensitive information that we don't need, and will never sell your information.",
-    icon: CloudIcon,
-  },
-  {
     title: "Private by default",
     description: "Replay will never view or analyze your replays without your explicit permission.",
     icon: ShieldIcon,
   },
+  {
+    title: "Focus Mode",
+    description: "Shift-F focuses your debugging session to a precise location.",
+    icon: LightbulbIcon,
+  },
+  {
+    title: "Command palette",
+    description: "Command-K launches a command palette to help you find things faster.",
+    icon: LightbulbIcon,
+  },
+  {
+    title: "Print statements",
+    description: "Replay's print statements are magic! Add one by hovering on a line of code.",
+    icon: LightbulbIcon,
+  },
 ] as const;
 
 export const LoadingTips: FC = () => {
-  const [currentTipIdx, setCurrentTipIdx] = useState(0);
+  const seed = useAppSelector(getLoadingPageTipSeed);
+  const currentTipIdx = Math.floor(seed * TIPS.length);
   const { title, description, icon: Icon } = TIPS[currentTipIdx];
-  const timerRef = useRef<NodeJS.Timeout>();
-
-  const resetAutoNext = () => timerRef.current !== undefined && clearTimeout(timerRef.current);
-
-  useEffect(() => {
-    resetAutoNext();
-  }, []);
-
-  useEffect(() => {
-    resetAutoNext();
-    timerRef.current = setTimeout(() => {
-      setCurrentTipIdx((currentTipIdx + TIPS.length + 1) % TIPS.length);
-    }, TIP_DURATION);
-  }, [currentTipIdx]);
-
   return (
     <div className="h-32 w-96 space-y-8">
-      <div className="bg-loadingBoxes flex max-w-lg items-center space-x-4 rounded-lg px-8 py-4 align-middle text-bodyColor">
+      <div className="flex max-w-lg items-center space-x-4 rounded-lg bg-loadingBoxes px-8 py-4 align-middle text-bodyColor shadow-sm">
         <div className="h-16 w-16">
           <Icon />
         </div>

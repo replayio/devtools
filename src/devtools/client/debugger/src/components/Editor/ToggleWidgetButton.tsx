@@ -90,6 +90,15 @@ function QuickActions({
   breakpoint?: Breakpoint;
   cx: any;
 }) {
+  const [height, setHeight] = useState(18);
+  useEffect(() => {
+    const animationFrameId = requestAnimationFrame(() =>
+      setHeight(targetNode.getBoundingClientRect().height)
+    );
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [targetNode]);
+
   const isMetaActive = keyModifiers.meta;
   const isShiftActive = keyModifiers.shift;
   const dispatch = useAppDispatch();

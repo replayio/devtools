@@ -39,7 +39,7 @@
 .LabelHovered {
   line-height: 1rem;
   transition: padding 100ms ease-in-out;
-  transition: all 250ms ease-in-out;
+  transition: all 140ms ease-in-out;
   overflow: hidden;
 }
 .Label {

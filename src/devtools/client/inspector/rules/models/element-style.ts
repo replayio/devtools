@@ -2,13 +2,17 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+import { ProtocolClient } from "@replayio/protocol";
 const Services = require("devtools/shared/services");
-import Rule from "devtools/client/inspector/rules/models/rule";
-import { NodeFront } from "protocol/thread/node";
+import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
 import { RuleFront } from "protocol/thread/rule";
 import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import TextProperty, { ComputedProperty } from "./text-property";
+
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { ReplayClientInterface } from "shared/client/types";
+import { getAppliedRulesAsync } from "ui/suspense/styleCaches";
 
 var NON_ASCII = "[^\\x00-\\x7F]";
 var ESCAPE = "\\\\[^\n\r]";
@@ -28,20 +32,31 @@ const PREF_INACTIVE_CSS_ENABLED = "devtools.inspector.inactive.css.enabled";
  *   Maintains a list of Rule objects for a given element.
  */
 export default class ElementStyle {
-  element: NodeFront;
+  /** The element whose style we're viewing */
+  nodeId: string;
+  pauseId: string;
+  sessionId: string;
+  replayClient: ReplayClientInterface;
+  client: ProtocolClient;
   pseudoElements: string[];
-  rules: Rule[] | null;
+  rules: RuleModel[] | null;
   variablesMap: Map<string, Map<string, string>>;
   destroyed?: boolean;
 
   private _unusedCssEnabled?: boolean;
 
-  /**
-   * @param  {NodeFront} element
-   *         The element whose style we are viewing.
-   */
-  constructor(element: NodeFront) {
-    this.element = element;
+  constructor(
+    nodeId: string,
+    pauseId: string,
+    sessionId: string,
+    replayClient: ReplayClientInterface,
+    client: ProtocolClient
+  ) {
+    this.nodeId = nodeId;
+    this.pauseId = pauseId;
+    this.sessionId = sessionId;
+    this.replayClient = replayClient;
+    this.client = client;
     this.pseudoElements = [];
     this.rules = [];
     this.variablesMap = new Map<string, Map<string, string>>();
@@ -54,19 +69,6 @@ export default class ElementStyle {
     return this._unusedCssEnabled;
   }
 
-  destroy() {
-    if (this.destroyed) {
-      return;
-    }
-
-    this.destroyed = true;
-    this.pseudoElements = [];
-
-    for (const rule of this.rules || []) {
-      rule.destroy();
-    }
-  }
-
   /**
    * Refresh the list of rules to be displayed for the active element.
    * Upon completion, this.rules[] will hold a list of Rule objects.
@@ -77,50 +79,99 @@ export default class ElementStyle {
   async populate() {
     this.rules = [];
 
-    const applied = await this.element.getAppliedRules();
-    if (applied === null) {
-      this.rules = null;
+    const nodeObject = await getObjectWithPreviewHelper(
+      this.replayClient,
+      this.pauseId,
+      this.nodeId
+    );
+    const node = nodeObject?.preview?.node;
+
+    if (!node) {
       return;
     }
 
+    const wiredRules = await getAppliedRulesAsync(
+      this.client,
+      this.replayClient,
+      this.sessionId,
+      this.pauseId,
+      this.nodeId
+    );
+
     // Show rules applied to pseudo-elements first.
-    for (const { rule, pseudoElement } of applied) {
+    for (const { rule, pseudoElement } of wiredRules) {
       if (pseudoElement) {
         this._maybeAddRule(rule, undefined, pseudoElement);
       }
     }
 
     // The inline rule has higher priority than applied rules.
-    const inline = this.element.getInlineStyle();
-    if (inline) {
-      this._maybeAddRule(inline);
+    if (node.style) {
+      const inlineStyleObject = await getObjectWithPreviewHelper(
+        this.replayClient,
+        this.pauseId,
+        node.style
+      );
+      const styleFront = new StyleFront(inlineStyleObject);
+      this._maybeAddRule(styleFront);
     }
 
     // Show rules applied directly to the element in priority order.
-    for (const { rule, pseudoElement } of applied) {
+    for (const { rule, pseudoElement } of wiredRules) {
       if (!pseudoElement) {
         this._maybeAddRule(rule);
       }
     }
 
+    let parentNodeId = node.parentNode;
+
     // Show relevant rules applied to parent elements.
-    for (let elem = this.element.parentNode(); elem; elem = elem.parentNode()) {
+    while (parentNodeId) {
+      const nodeObject = await getObjectWithPreviewHelper(
+        this.replayClient,
+        this.pauseId,
+        parentNodeId
+      );
+      const elem = nodeObject.preview?.node;
+      if (!elem) {
+        break;
+      }
+      const elemNodeWithId = { nodeId: parentNodeId, node: elem };
+
       if (elem.nodeType == Node.ELEMENT_NODE) {
-        const parentInline = elem.getInlineStyle();
-        if (parentInline && parentInline.properties.length > 0) {
-          this._maybeAddRule(parentInline, elem);
+        if (elem.style) {
+          const styleObject = await getObjectWithPreviewHelper(
+            this.replayClient,
+            this.pauseId,
+            elem.style!
+          );
+          const parentInline = new StyleFront(styleObject);
+          if (parentInline.properties.length > 0) {
+            this._maybeAddRule(parentInline, elemNodeWithId);
+          }
         }
-        const parentApplied = await elem.getAppliedRules();
+
+        const parentApplied = await getAppliedRulesAsync(
+          this.client,
+          this.replayClient,
+          this.sessionId,
+          this.pauseId,
+          parentNodeId
+        );
+
         if (parentApplied === null) {
           this.rules = null;
           return;
         }
+
         for (const { rule, pseudoElement } of parentApplied) {
           if (!pseudoElement) {
-            this._maybeAddRule(rule, /* inherited */ elem);
+            this._maybeAddRule(rule, elemNodeWithId);
           }
         }
       }
+
+      parentNodeId = elem.parentNode;
     }
 
     // Store a list of all pseudo-element types found in the matching rules.
@@ -135,7 +186,7 @@ export default class ElementStyle {
    *
    * @param  {String|null} id
    *         The id of the Rule object.
-   * @return {Rule|undefined} of the given rule id or undefined if it cannot be found.
+   * @return {RuleModel|undefined} of the given rule id or undefined if it cannot be found.
    */
   getRule(id: string | null) {
     return id ? this.rules?.find(rule => rule.domRule.objectId() === id) : undefined;
@@ -151,7 +202,7 @@ export default class ElementStyle {
    */
   private _maybeAddRule(
     ruleFront: RuleFront | StyleFront,
-    inherited?: NodeFront,
+    inherited?: NodeWithId,
     pseudoElement?: string
   ) {
     if (ruleFront.isSystem) {
@@ -160,7 +211,7 @@ export default class ElementStyle {
       return false;
     }
 
-    this.rules?.push(new Rule(this, { rule: ruleFront, inherited, pseudoElement }));
+    this.rules?.push(new RuleModel(this, { rule: ruleFront, inherited, pseudoElement }));
     return true;
   }
 

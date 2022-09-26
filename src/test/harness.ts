@@ -1016,16 +1016,11 @@ const commands = mapValues(testCommands, (command, name) => {
     // @ts-expect-error spreading args is FINE TS!
     let result = command(...args);
     if (isThenable(result)) {
-      return result.then(
-        async result => {
-          const duration = new Date().getTime() - startTime;
-          console.log(`Finished ${name} in ${duration}ms`);
-          return result;
-        },
-        error => {
-          console.error(`Error for ${name}`, error);
-        }
-      );
+      return result.then(async result => {
+        const duration = new Date().getTime() - startTime;
+        console.log(`Finished ${name} in ${duration}ms`);
+        return result;
+      });
     }
     const duration = new Date().getTime() - startTime;
     console.log(`Finished ${name} in ${duration}ms`);
