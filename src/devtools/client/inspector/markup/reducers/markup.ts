@@ -1,5 +1,5 @@
 import { createSlice, createEntityAdapter, PayloadAction, EntityState } from "@reduxjs/toolkit";
-import { BoxModel } from "@replayio/protocol";
+import { BoxModel, PseudoType } from "@replayio/protocol";
 // Side-effectful import - needed to initialize these prefs
 import "devtools/client/inspector/prefs";
 const Services = require("devtools/shared/services");
@@ -39,7 +39,7 @@ export interface NodeInfo {
   // The object id of the parent node.
   parentNodeId: string | undefined;
   // The pseudo element type.
-  pseudoType: NodeFront["pseudoType"];
+  pseudoType: PseudoType;
   // The name of the current node.
   tagName: string | undefined;
   // The node's `nodeType` which identifies what the node is.

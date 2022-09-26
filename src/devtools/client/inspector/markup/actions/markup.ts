@@ -1,11 +1,12 @@
-import { Object as ProtocolObject } from "@replayio/protocol";
+import { Object as ProtocolObject, ProtocolClient } from "@replayio/protocol";
 import { assert, defer, Deferred } from "protocol/utils";
-import type { NodeFront } from "protocol/thread/node";
 import { HTML_NS } from "protocol/thread/node";
 import { UIState } from "ui/state";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { isInspectorSelected } from "ui/reducers/app";
 import type { UIStore, UIThunkAction } from "ui/actions";
+import { getNodeDataAsync, getNodeEventListenersAsync } from "ui/suspense/nodeCaches";
+import { getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 import {
   resetMarkup,
@@ -35,6 +36,7 @@ import { paused, getPauseId } from "devtools/client/debugger/src/reducers/pause"
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { ReplayClientInterface } from "shared/client/types";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
@@ -71,7 +73,7 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
     actionCreator: paused,
     effect: async (action, listenerApi) => {
       const { condition, dispatch, getState, cancelActiveListeners, extra } = listenerApi;
-      const { ThreadFront } = extra;
+      const { ThreadFront, replayClient, protocolClient } = extra;
 
       cancelActiveListeners();
 
@@ -85,15 +87,17 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
 
         // Clear selection if pauses have differed
         const pause = ThreadFront.getCurrentPause();
-        const currentPauseId = getPauseId(getState());
+        let currentPauseId = getPauseId(getState());
         const selectedNodeId = getSelectedDomNodeId(getState());
 
         if (selectedNodeId && currentPauseId && currentPauseId !== originalPauseId) {
           dispatch(nodeSelected(null));
         }
 
+        // Clear out and reset all the node tree data
         await dispatch(newRoot());
-        if (ThreadFront.currentPause !== pause) {
+        currentPauseId = getPauseId(getState());
+        if (currentPauseId !== originalPauseId) {
           return;
         }
 
@@ -102,16 +106,30 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         if (latestSelectedNodeId) {
           dispatch(selectionChanged(false));
         } else {
-          const rootNode = await ThreadFront.getRootDOMNode();
+          const [rootNode] = await getNodeDataAsync(
+            protocolClient,
+            replayClient,
+            ThreadFront.sessionId!,
+            ThreadFront.currentPause!.pauseId!,
+            { type: "document" }
+          );
 
           if (!rootNode) {
             return;
           }
 
           const selectedNodeId = getSelectedDomNodeId(getState());
-          const defaultNode = await rootNode.querySelector("body");
-          if (defaultNode && !selectedNodeId && ThreadFront.currentPause === pause) {
-            dispatch(nodeSelected(defaultNode.objectId(), "navigateaway"));
+          const [defaultNode] = await getNodeDataAsync(
+            protocolClient,
+            replayClient,
+            ThreadFront.sessionId!,
+            ThreadFront.currentPause!.pauseId!,
+            { type: "querySelector", nodeId: rootNode.objectId, selector: "body" }
+          );
+
+          currentPauseId = getPauseId(getState());
+          if (defaultNode && !selectedNodeId && currentPauseId === originalPauseId) {
+            dispatch(nodeSelected(defaultNode.objectId, "navigateaway"));
           }
         }
       }
@@ -145,17 +163,36 @@ export function reset() {
  * Clears the tree and adds the new root node.
  */
 export function newRoot(): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const pause = ThreadFront.currentPause;
     assert(pause, "no current pause");
-    const rootNodeFront = await ThreadFront.getRootDOMNode();
-    if (!rootNodeFront || ThreadFront.currentPause !== pause) {
+    const originalPauseId = getPauseId(getState());
+
+    const [rootNodeData] = await getNodeDataAsync(
+      protocolClient,
+      replayClient,
+      ThreadFront.sessionId!,
+      ThreadFront.currentPause!.pauseId!,
+      { type: "document" }
+    );
+
+    let currentPauseId = getPauseId(getState());
+    if (!rootNodeData || currentPauseId !== originalPauseId) {
       return;
     }
-    const rootNode = await convertNode(rootNodeFront);
-    if (ThreadFront.currentPause !== pause) {
+    const rootNode = await convertNode(
+      rootNodeData.objectId,
+      replayClient,
+      protocolClient,
+      ThreadFront.sessionId!,
+      currentPauseId!
+    );
+
+    currentPauseId = getPauseId(getState());
+    if (currentPauseId !== originalPauseId) {
       return;
     }
+
     dispatch(newRootAdded(rootNode));
     if (rootNodeWaiter) {
       rootNodeWaiter.resolve();
@@ -168,22 +205,42 @@ export function newRoot(): UIThunkAction<Promise<void>> {
  * Adds the children of a node to the tree and updates the parent's `children` property.
  */
 export function addChildren(
-  parentFront: NodeFront,
-  childFronts: NodeFront[]
+  parentNodeId: string,
+  childNodes: ProtocolObject[]
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    let childrenToAdd = childNodes;
+
     if (!features.showWhitespaceNodes) {
-      childFronts = childFronts.filter(
-        node => node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.getNodeValue()!)
-      );
+      childrenToAdd = childNodes.filter(nodeObject => {
+        const node = nodeObject?.preview?.node;
+        if (!node) {
+          return false;
+        }
+        return node.nodeType !== NodeConstants.TEXT_NODE || /[^\s]/.exec(node.nodeValue!);
+      });
     }
 
-    const children = await Promise.all(childFronts.map(node => convertNode(node)));
-    if (ThreadFront.currentPause !== parentFront.pause) {
+    const originalPauseId = getPauseId(getState());
+
+    const children = await Promise.all(
+      childrenToAdd.map(node =>
+        convertNode(
+          node.objectId,
+          replayClient,
+          protocolClient,
+          ThreadFront.sessionId!,
+          originalPauseId!
+        )
+      )
+    );
+
+    let currentPauseId = getPauseId(getState());
+    if (currentPauseId !== originalPauseId) {
       return;
     }
 
-    dispatch(childrenAdded({ parentNodeId: parentFront.objectId(), children }));
+    dispatch(childrenAdded({ parentNodeId, children }));
   };
 }
 
@@ -213,7 +270,7 @@ export function expandNode(
   nodeId: string,
   shouldScrollIntoView = false
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const node = getNodeInfo(getState(), nodeId);
     assert(node, "node not found in markup state");
 
@@ -229,15 +286,26 @@ export function expandNode(
         dispatch(updateScrollIntoViewNode(node.id));
       }
 
-      const pause = ThreadFront.currentPause;
-      assert(pause, "no current pause");
-      const nodeFront = pause.getNodeFront(nodeId);
-      const childNodes = await nodeFront.childNodes();
-      if (ThreadFront.currentPause !== pause) {
+      const originalPauseId = getPauseId(getState());
+
+      assert(originalPauseId, "no current pause");
+
+      const childNodes = await getNodeDataAsync(
+        protocolClient,
+        replayClient,
+        ThreadFront.sessionId!,
+        ThreadFront.currentPause!.pauseId!,
+        { type: "childNodes", nodeId }
+      );
+
+      let currentPauseId = getPauseId(getState());
+      if (currentPauseId !== originalPauseId) {
         return;
       }
-      await dispatch(addChildren(nodeFront, childNodes));
-      if (ThreadFront.currentPause !== pause) {
+      await dispatch(addChildren(nodeId, childNodes));
+
+      currentPauseId = getPauseId(getState());
+      if (currentPauseId !== originalPauseId) {
         return;
       }
       dispatch(updateChildrenLoading({ nodeId, isLoadingChildren: false }));
@@ -311,9 +379,17 @@ export function selectionChanged(
 }
 
 export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    const nodeFront = await ThreadFront.ensureNodeLoaded(nodeId);
-    if (nodeFront) {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    // Ensure we have the data loaded
+    const nodes = await getNodeDataAsync(
+      protocolClient,
+      replayClient,
+      ThreadFront.sessionId!,
+      ThreadFront.currentPause!.pauseId!,
+      { type: "parentNodes", nodeId }
+    );
+
+    if (nodes.length) {
       dispatch(highlightNode(nodeId, 1000));
 
       dispatch(nodeSelected(nodeId, reason));
@@ -532,29 +608,46 @@ export function unhighlightNode(): UIThunkAction {
   };
 }
 
-async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promise<NodeInfo> {
-  const parentNode = node.parentNode();
-  const id = node.objectId();
+async function convertNode(
+  nodeId: string,
+  replayClient: ReplayClientInterface,
+  client: ProtocolClient,
+  sessionId: string,
+  pauseId: string,
+  { isExpanded = false } = {}
+): Promise<NodeInfo> {
+  const [nodeObject, computedStyle, eventListeners] = await Promise.all([
+    getObjectWithPreviewHelper(replayClient, pauseId, nodeId),
+    getComputedStyleAsync(client, sessionId, pauseId, nodeId),
+    getNodeEventListenersAsync(client, sessionId, pauseId, nodeId),
+  ]);
+
+  const node = nodeObject?.preview?.node;
+  assert(node, "No preview for node: " + nodeId);
+
+  const displayType = computedStyle?.get("display");
 
   return {
-    attributes: node.attributes,
+    attributes: node.attributes || [],
     children: [],
-    isConnected: node.isConnected,
-    isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
     displayName:
-      node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
-    displayType: await node.getDisplayType(),
-    hasChildren: !!node.hasChildren,
-    hasEventListeners: await node.hasEventListeners(),
-    id,
-    isDisplayed: await node.isDisplayed(),
+      node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE
+        ? `<!DOCTYPE ${node.nodeName}>`
+        : node.nodeName.toLowerCase(),
+    displayType,
+    hasChildren: !!node.childNodes?.length,
+    hasEventListeners: !!eventListeners,
+    id: nodeId,
+    isConnected: node.isConnected,
+    isDisplayed: !!displayType && displayType !== "none",
+    isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
     isExpanded,
     namespaceURI: HTML_NS,
-    parentNodeId: parentNode?.objectId(),
+    parentNodeId: node.parentNode,
     pseudoType: node.pseudoType,
-    tagName: node.tagName,
+    tagName: node.nodeType === Node.ELEMENT_NODE ? node.nodeName : undefined,
     type: node.nodeType,
-    value: node.getNodeValue(),
+    value: node.nodeValue,
     isLoadingChildren: false,
   };
 }

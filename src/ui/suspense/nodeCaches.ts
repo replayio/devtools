@@ -36,6 +36,10 @@ type NodeFetchOptions =
   | {
       type: "searchDOM";
       query: string;
+    }
+  | {
+      type: "childNodes";
+      nodeId: string;
     };
 export function assertUnreachable(_x: never): never {
   throw new Error("Didn't expect to get here");
@@ -53,7 +57,7 @@ export const {
     pauseId: PauseId,
     options: NodeFetchOptions
   ],
-  ProtocolObject[] | undefined
+  ProtocolObject[]
 >(
   async (client, replayClient, sessionId, pauseId, options) => {
     let nodeIds: string[] = [];
@@ -81,6 +85,13 @@ export const {
         pauseData = data;
         // Ancestor nodes will be cached too, but we'll just return
         nodeIds.push(options.nodeId);
+        break;
+      }
+      case "childNodes": {
+        const nodeObject = await getObjectWithPreviewHelper(replayClient, pauseId, options.nodeId);
+
+        nodeIds = nodeObject?.preview?.node?.childNodes ?? [];
+
         break;
       }
       case "querySelector": {
@@ -134,7 +145,8 @@ export const {
 
     switch (options.type) {
       case "node":
-      case "parentNodes": {
+      case "parentNodes":
+      case "childNodes": {
         typeKey = options.nodeId;
         break;
       }
