@@ -4,7 +4,6 @@ import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent, EventKind } from "ui/state/app";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import tokenManager from "ui/utils/tokenManager";
 import {
   hideCommandPalette,
   setSelectedPanel,
