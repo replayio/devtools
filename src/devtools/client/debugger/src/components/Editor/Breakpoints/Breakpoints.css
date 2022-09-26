@@ -36,12 +36,17 @@
   pointer-events: all;
 }
 
-.empty-line .line-action-button {
-  pointer-events: none !important;
+.line-action-button.no-hits button {
+  pointer-events: none;
+  background: #8abfd8;
 }
 
-.empty-line .toggle-widget {
-  background: #8abfd8 !important;
+.editor-wrapper .line-action-button {
+  display: none;
+}
+
+.editor-wrapper:hover .line-action-button {
+  display: block;
 }
 
 .editor-wrapper

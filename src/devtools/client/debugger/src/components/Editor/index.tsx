@@ -181,7 +181,6 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
     const { codeMirror } = editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
-    const scrollWrapper = codeMirror.getScrollerElement();
 
     // @ts-expect-error event doesn't exist?
     codeMirror.on("gutterClick", this.onGutterClick);
@@ -497,7 +496,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
           selectedSource={selectedSource}
         />
         <ColumnBreakpoints editor={editor} />
-        <Gutter sourceEditor={editor} />
+        <Gutter editor={editor} />
       </div>
     );
   }
