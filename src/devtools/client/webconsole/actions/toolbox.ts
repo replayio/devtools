@@ -14,6 +14,7 @@ import { showSource } from "devtools/client/debugger/src/actions/ui";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
+import { nodeSelected } from "devtools/client/inspector/markup/reducers/markup";
 
 type $FixTypeLater = any;
 
@@ -66,10 +67,8 @@ export function openNodeInInspector(
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
-    const { selection } = await import("devtools/client/framework/selection");
-    await selection.setNodeFront(nodeFront, {
-      reason,
-    });
+    // TODO Replace this
+    dispatch(nodeSelected(nodeFront.objectId()));
   };
 }
 

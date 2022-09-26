@@ -29,7 +29,9 @@ export interface NodeInfo {
   id: string;
   // Whether or not the node is displayed. If a node has the attribute
   // `display: none`, it is not displayed (faded in the markup view).
+  isConnected: boolean;
   isDisplayed: boolean;
+  isElement: boolean;
   // Whether or not the node is expanded.
   isExpanded: boolean;
   // The namespace URI of the node. NYI
@@ -48,6 +50,17 @@ export interface NodeInfo {
   isLoadingChildren: boolean;
 }
 
+export type SelectionReason =
+  | "navigateaway"
+  | "markup"
+  | "debugger"
+  | "breadcrumbs"
+  | "inspectorsearch"
+  | "box-model"
+  | "console"
+  | "keyboard"
+  | "unknown";
+
 // export type MarkupTree = { [key: string]: NodeInfo | undefined };
 
 export interface MarkupState {
@@ -59,6 +72,7 @@ export interface MarkupState {
   rootNode: string | null;
   // The selected node to display in the DOM view.
   selectedNode: string | null;
+  selectionReason: SelectionReason | null;
   // A node that should be scrolled into view.
   scrollIntoViewNode: string | null;
   highlightedNode: string | null;
@@ -83,6 +97,7 @@ const initialState: MarkupState = {
   collapseAttributeLength: Services.prefs.getIntPref(ATTR_COLLAPSE_LENGTH_PREF),
   rootNode: null,
   selectedNode: null,
+  selectionReason: null,
   scrollIntoViewNode: null,
   highlightedNode: null,
   nodeBoxModels: boxModelAdapter.getInitialState(),
@@ -120,8 +135,20 @@ const markupSlice = createSlice({
       const { nodeId, isLoadingChildren } = action.payload;
       nodeAdapter.updateOne(state.tree, { id: nodeId, changes: { isLoadingChildren } });
     },
-    nodeSelected(state, action: PayloadAction<string | null>) {
-      state.selectedNode = action.payload;
+    nodeSelected: {
+      reducer(
+        state,
+        action: PayloadAction<{ nodeId: string | null; reason: SelectionReason | undefined }>
+      ) {
+        const { nodeId, reason = null } = action.payload;
+        state.selectedNode = nodeId;
+        state.selectionReason = nodeId ? reason : null;
+      },
+      prepare(nodeId: string | null, reason?: SelectionReason) {
+        return {
+          payload: { nodeId, reason },
+        };
+      },
     },
     updateScrollIntoViewNode(state, action: PayloadAction<string | null>) {
       state.scrollIntoViewNode = action.payload;

@@ -1,9 +1,7 @@
+import { Object as ProtocolObject } from "@replayio/protocol";
 import { assert, defer, Deferred } from "protocol/utils";
 import type { NodeFront } from "protocol/thread/node";
 import { HTML_NS } from "protocol/thread/node";
-import { SelectionReason } from "devtools/client/framework/selection";
-import { selection } from "devtools/client/framework/selection";
-
 import { UIState } from "ui/state";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { isInspectorSelected } from "ui/reducers/app";
@@ -21,6 +19,8 @@ import {
   updateNodeExpanded,
   updateScrollIntoViewNode,
   NodeInfo,
+  SelectionReason,
+  getSelectedDomNodeId,
 } from "../reducers/markup";
 
 import {
@@ -30,25 +30,43 @@ import {
   isNodeExpanded,
 } from "../selectors/markup";
 
-import { paused } from "devtools/client/debugger/src/reducers/pause";
+import { paused, getPauseId } from "devtools/client/debugger/src/reducers/pause";
 
 import NodeConstants from "devtools/shared/dom-node-constants";
 import { features } from "devtools/client/inspector/prefs";
+import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 
 let rootNodeWaiter: Deferred<void> | undefined;
 
 export function setupMarkup(store: UIStore, startAppListening: AppStartListening) {
-  // Any time a new node is selected in the "Markup" panel, check to see if the "Elements" panel is
-  // actually visible. If so, update our selection in Redux, including expanding ancestor nodes.
-  selection.on("new-node-front", (nodeFront: NodeFront, reason: string) => {
-    if (!isInspectorSelected(store.getState()) || !selection.isNode()) {
-      return;
-    }
+  // Any time a new node is selected in the "Markup" panel,
+  // check to see if the "Elements" panel is actually visible.
+  // If so, update our selection in Redux, including expanding ancestor nodes.
 
-    store.dispatch(selectionChanged(reason === "navigateaway", reason !== "markup"));
+  startAppListening({
+    actionCreator: nodeSelected,
+    effect: async (action, listenerApi) => {
+      const { extra, getState, dispatch } = listenerApi;
+      const { ThreadFront, protocolClient, replayClient } = extra;
+      const state = getState();
+      const { selectedNode, selectionReason } = state.markup;
+
+      if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+        return;
+      }
+
+      // Ignore any `nodeSelected` actions dispatched during `selectionChanged` (could cause an infinite loop)
+      listenerApi.unsubscribe();
+
+      dispatch(selectionChanged(selectionReason === "navigateaway", selectionReason !== "markup"));
+
+      // Restore listening to `nodeSelected`
+      listenerApi.subscribe();
+    },
   });
 
-  // Any time the app is paused, clear out all fetched DOM nodes, and reload the "Markup" panel.
+  // Any time the app is paused, clear out all fetched DOM nodes,
+  // and reload the "Markup" panel.
   startAppListening({
     actionCreator: paused,
     effect: async (action, listenerApi) => {
@@ -56,6 +74,8 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
       const { ThreadFront } = extra;
 
       cancelActiveListeners();
+
+      const originalPauseId = getPauseId(getState());
 
       // every time we pause, clear the existing DOM node info
       dispatch(reset());
@@ -65,8 +85,11 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
 
         // Clear selection if pauses have differed
         const pause = ThreadFront.getCurrentPause();
-        if (selection.nodeFront && selection.nodeFront.pause !== pause) {
-          selection.setNodeFront(null);
+        const currentPauseId = getPauseId(getState());
+        const selectedNodeId = getSelectedDomNodeId(getState());
+
+        if (selectedNodeId && currentPauseId && currentPauseId !== originalPauseId) {
+          dispatch(nodeSelected(null));
         }
 
         await dispatch(newRoot());
@@ -74,7 +97,9 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
           return;
         }
 
-        if (selection.nodeFront) {
+        const latestSelectedNodeId = getSelectedDomNodeId(getState());
+
+        if (latestSelectedNodeId) {
           dispatch(selectionChanged(false));
         } else {
           const rootNode = await ThreadFront.getRootDOMNode();
@@ -83,9 +108,10 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
             return;
           }
 
+          const selectedNodeId = getSelectedDomNodeId(getState());
           const defaultNode = await rootNode.querySelector("body");
-          if (defaultNode && !selection.nodeFront && ThreadFront.currentPause === pause) {
-            selection.setNodeFront(defaultNode, { reason: "navigateaway" });
+          if (defaultNode && !selectedNodeId && ThreadFront.currentPause === pause) {
+            dispatch(nodeSelected(defaultNode.objectId(), "navigateaway"));
           }
         }
       }
@@ -175,7 +201,7 @@ export function toggleNodeExpanded(nodeId: string, isExpanded: boolean): UIThunk
       dispatch(expandNode(nodeId));
     }
 
-    selection.setNodeFront(ThreadFront.currentPause.getNodeFront(nodeId));
+    dispatch(nodeSelected(nodeId));
   };
 }
 
@@ -229,10 +255,10 @@ export function selectionChanged(
   expandSelectedNode: boolean,
   shouldScrollIntoView = false
 ): UIThunkAction {
-  return async (dispatch, getState) => {
-    const selectedNode = selection.nodeFront;
+  return async (dispatch, getState, { replayClient }) => {
+    const selectedNodeId = getSelectedDomNodeId(getState());
 
-    if (!selectedNode) {
+    if (!selectedNodeId) {
       dispatch(nodeSelected(null));
       return;
     }
@@ -240,30 +266,46 @@ export function selectionChanged(
     if (rootNodeWaiter) {
       await rootNodeWaiter.promise;
     }
-    if (selection.nodeFront !== selectedNode) {
+
+    let latestSelectedNodeId = getSelectedDomNodeId(getState());
+    if (latestSelectedNodeId !== selectedNodeId) {
       return;
     }
 
-    dispatch(nodeSelected(selectedNode.objectId()));
+    const pauseId = getPauseId(getState())!;
+
+    dispatch(nodeSelected(latestSelectedNodeId));
 
     // collect the selected node's ancestors in top-down order
-    let ancestors = [];
-    let ancestor = expandSelectedNode ? selectedNode : selectedNode.parentNode();
-    while (ancestor) {
-      ancestors.unshift(ancestor);
-      ancestor = ancestor.parentNode();
+    const selectedNode = await getObjectWithPreviewHelper(
+      replayClient,
+      pauseId,
+      latestSelectedNodeId
+    );
+    let ancestors: string[] = [];
+
+    let ancestorId = expandSelectedNode
+      ? latestSelectedNodeId
+      : selectedNode.preview?.node?.parentNode;
+
+    while (ancestorId) {
+      ancestors.unshift(ancestorId);
+
+      const node = await getObjectWithPreviewHelper(replayClient, pauseId, ancestorId);
+      ancestorId = node?.preview?.node?.parentNode;
     }
 
     // expand each ancestor, loading its children if necessary
-    for (const ancestor of ancestors) {
-      await dispatch(expandNode(ancestor.objectId(), shouldScrollIntoView));
-      if (selection.nodeFront !== selectedNode) {
+    for (const ancestorId of ancestors) {
+      await dispatch(expandNode(ancestorId, shouldScrollIntoView));
+      latestSelectedNodeId = getSelectedDomNodeId(getState());
+      if (latestSelectedNodeId !== selectedNodeId) {
         return;
       }
     }
 
     if (shouldScrollIntoView) {
-      dispatch(updateScrollIntoViewNode(selectedNode.objectId()));
+      dispatch(updateScrollIntoViewNode(latestSelectedNodeId));
     }
   };
 }
@@ -273,8 +315,8 @@ export function selectNode(nodeId: string, reason?: SelectionReason): UIThunkAct
     const nodeFront = await ThreadFront.ensureNodeLoaded(nodeId);
     if (nodeFront) {
       dispatch(highlightNode(nodeId, 1000));
-      const { selection } = await import("devtools/client/framework/selection");
-      selection.setNodeFront(nodeFront, { reason });
+
+      dispatch(nodeSelected(nodeId, reason));
     }
   };
 }
@@ -497,6 +539,8 @@ async function convertNode(node: NodeFront, { isExpanded = false } = {}): Promis
   return {
     attributes: node.attributes,
     children: [],
+    isConnected: node.isConnected,
+    isElement: node.nodeType === NodeConstants.ELEMENT_NODE,
     displayName:
       node.nodeType === NodeConstants.DOCUMENT_TYPE_NODE ? node.doctypeString : node.displayName,
     displayType: await node.getDisplayType(),

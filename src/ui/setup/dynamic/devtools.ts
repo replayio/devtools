@@ -226,8 +226,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
   setupReactDevTools(store, ThreadFront);
-  setupBoxModel(store);
-  setupRules(store);
+  setupBoxModel(store, startAppListening);
+  setupRules(store, startAppListening);
   setupGetPreferredLocation(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
