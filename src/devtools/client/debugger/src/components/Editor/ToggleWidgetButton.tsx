@@ -166,7 +166,7 @@ function QuickActions({
   );
 }
 
-type ExternalProps = { sourceEditor: SourceEditor };
+type ExternalProps = { sourceEditor: any };
 type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
 
 function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButtonProps) {
@@ -187,19 +187,17 @@ function ToggleWidgetButton({ sourceEditor, cx, breakpoints }: ToggleWidgetButto
 
       setLineOffsetTop(lineRect.top - editorOffset);
       setHoveredLineNumber(lineNumber);
-      console.log(lineNumber);
     };
     const onLineLeave = () => {
-      console.log("eave");
       setHoveredLineNumber(null);
     };
 
     sourceEditor.codeMirror.on("lineMouseEnter", onLineEnter);
-    sourceEditor.codeMirror.on("mouseLeave", onLineLeave);
+    sourceEditor.codeMirror.on("lineMouseLeave", onLineLeave);
 
     return () => {
       sourceEditor.codeMirror.off("lineMouseEnter", onLineEnter);
-      sourceEditor.codeMirror.off("mouseLeave", onLineLeave);
+      sourceEditor.codeMirror.off("lineMouseLeave", onLineLeave);
     };
   }, [sourceEditor]);
 
