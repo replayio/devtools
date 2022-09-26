@@ -102,7 +102,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
   }, [editor, dispatch, source]);
 
   useEffect(() => {
-    const debouncedClearHoveredLineNumber = () => {
+    const debouncedClearHoveredLineNumber = debounce(() => {
       // Only reset the Redux state here after a short delay.
       // That way, if we immediately mouse from active line X to X + 1,
       // we won't dispatch a "reset line to null" action as part of that change.
@@ -113,7 +113,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       if (lastHoveredLineNumber.current !== null) {
         dispatch(setHoveredLineNumberLocation(null));
       }
-    };
+    }, 10);
 
     const debouncedFetchHitCountsForVisibleLines = debounce(() => {
       fetchHitCountsForVisibleLines();
