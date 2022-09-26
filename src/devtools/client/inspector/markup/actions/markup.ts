@@ -6,7 +6,7 @@ import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { isInspectorSelected } from "ui/reducers/app";
 import type { UIStore, UIThunkAction } from "ui/actions";
 import { getNodeDataAsync, getNodeEventListenersAsync } from "ui/suspense/nodeCaches";
-import { getComputedStyleAsync } from "ui/suspense/styleCaches";
+import { getBoundingRectAsync, getComputedStyleAsync } from "ui/suspense/styleCaches";
 
 import {
   resetMarkup,
@@ -608,6 +608,39 @@ export function unhighlightNode(): UIThunkAction {
   };
 }
 
+export const searchDOM = (query: string): UIThunkAction<Promise<ProtocolObject[]>> => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    const state = getState();
+    const pauseIdBefore = state.pause.id;
+    const sessionId = state.app.sessionId;
+
+    const results = await getNodeDataAsync(
+      protocolClient,
+      replayClient,
+      sessionId!,
+      pauseIdBefore!,
+      {
+        type: "searchDOM",
+        query,
+      }
+    );
+
+    return results;
+  };
+};
+
+export const getNodeBoundingRect = (
+  nodeId: string
+): UIThunkAction<Promise<DOMRect | undefined>> => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    const state = getState();
+    const pauseId = state.pause.id;
+    const sessionId = state.app.sessionId;
+
+    return getBoundingRectAsync(protocolClient, sessionId!, pauseId!, nodeId);
+  };
+};
+
 async function convertNode(
   nodeId: string,
   replayClient: ReplayClientInterface,
@@ -644,7 +677,7 @@ async function convertNode(
     isExpanded,
     namespaceURI: HTML_NS,
     parentNodeId: node.parentNode,
-    pseudoType: node.pseudoType,
+    pseudoType: node.pseudoType!,
     tagName: node.nodeType === Node.ELEMENT_NODE ? node.nodeName : undefined,
     type: node.nodeType,
     value: node.nodeValue,

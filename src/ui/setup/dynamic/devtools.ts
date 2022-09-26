@@ -71,7 +71,7 @@ declare global {
   }
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
-    actions?: typeof actions;
+    actions?: ResolveThunks<typeof actions>;
     selectors?: BoundSelectors;
     debugger?: any;
   }
@@ -333,3 +333,26 @@ type KeysAssignableToType<O extends object, T> = {
 }[keyof O];
 
 export type Tail<A> = A extends [any, ...infer Rest] ? Rest : never;
+
+// Stolen from React-Redux. Cuts out the "returns a thunk function"
+// part of a thunk action creator to reflect how it works when dispatched.
+export type InferThunkActionCreatorType<TActionCreator extends (...args: any[]) => any> =
+  TActionCreator extends (...args: infer TParams) => (...args: any[]) => infer TReturn
+    ? (...args: TParams) => TReturn
+    : TActionCreator;
+
+export type HandleThunkActionCreator<TActionCreator> = TActionCreator extends (
+  ...args: any[]
+) => any
+  ? InferThunkActionCreatorType<TActionCreator>
+  : TActionCreator;
+
+// redux-thunk middleware returns thunk's return value from dispatch call
+// https://github.com/reduxjs/redux-thunk#composition
+export type ResolveThunks<TDispatchProps> = TDispatchProps extends {
+  [key: string]: any;
+}
+  ? {
+      [C in keyof TDispatchProps]: HandleThunkActionCreator<TDispatchProps[C]>;
+    }
+  : TDispatchProps;

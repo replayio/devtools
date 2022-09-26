@@ -5,6 +5,7 @@ import type { UIThunkAction } from "ui/actions";
 import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 import { getNodeDataAsync } from "ui/suspense/nodeCaches";
 import { getSelectedDomNodeId, nodeSelected } from "../reducers/markup";
+import { searchDOM } from "../actions/markup";
 
 const Services = require("devtools/shared/services");
 
@@ -16,18 +17,8 @@ const doFullTextSearch = (
   return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     const state = getState();
     const pauseIdBefore = state.pause.id;
-    const sessionId = state.app.sessionId;
 
-    const results = await getNodeDataAsync(
-      protocolClient,
-      replayClient,
-      sessionId!,
-      pauseIdBefore!,
-      {
-        type: "searchDOM",
-        query: queryBefore,
-      }
-    );
+    const results = await dispatch(searchDOM(queryBefore));
 
     const stateAfter = getState();
     const pauseIdAfter = stateAfter.pause.id;
