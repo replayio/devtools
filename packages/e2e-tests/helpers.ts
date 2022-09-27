@@ -7,6 +7,9 @@ import {
 } from "@playwright-testing-library/test/fixture";
 
 export const test = base.extend<TestingLibraryFixtures>(fixtures);
+test.use({
+  testIdAttribute: "data-test-id",
+});
 
 export type TestArgs = PlaywrightTestArgs & TestingLibraryFixtures;
 export type Screen = TestArgs["screen"];
@@ -27,11 +30,11 @@ export async function openExample(screen: Screen, example: string) {
 }
 
 export async function clickDevTools(screen: Screen) {
-  return screen.getByTestId("ViewToggle-DevTools").click();
+  return screen.queryByTestId("ViewToggle-DevTools").click();
 }
 
 export async function selectConsole(screen: Screen) {
-  return screen.getByTestId("PanelButton-console").click();
+  return screen.queryByTestId("PanelButton-console").click();
 }
 
 export async function getBreakpointsPane(screen: Screen) {
@@ -61,7 +64,7 @@ export async function openSourceExplorer(screen: Screen) {
 }
 
 export async function togglePausePane(screen: Screen) {
-  return screen.getByRole("button", { name: "motion_photos_paused" }).click();
+  return screen.queryByRole("button", { name: "motion_photos_paused" }).click();
 }
 
 // Console
