@@ -32,6 +32,8 @@ import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import tokenManager, { TokenState } from "ui/utils/tokenManager";
+import { isTest } from "ui/utils/environment";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -53,7 +55,7 @@ function ViewLoader() {
   }
 
   return (
-    <div className="absolute flex items-center justify-center w-full h-full bg-chrome">
+    <div className="absolute flex h-full w-full items-center justify-center bg-chrome">
       <ReplayLogo size="md" color="gray" />
     </div>
   );
@@ -64,8 +66,8 @@ function Body() {
   const viewMode = useAppSelector(getViewMode);
 
   return (
-    <div className="pr-2 vertical-panels">
-      <div className="flex flex-row h-full overflow-hidden bg-chrome">
+    <div className="vertical-panels pr-2">
+      <div className="flex h-full flex-row overflow-hidden bg-chrome">
         <Toolbar />
         <ReduxAnnotationsProvider>
           <SplitBox
@@ -139,12 +141,27 @@ function _DevTools({
   });
 
   useEffect(() => {
-    createSocket(recordingId, ThreadFront);
+    let token: Promise<TokenState | void> = Promise.resolve();
+    if (isAuthenticated && !isTest()) {
+      token = tokenManager.getToken();
+    }
+
+    token
+      .then(async ts => {
+        if (ts?.token) {
+          await ThreadFront.setAccessToken(ts.token);
+        }
+
+        createSocket(recordingId, ThreadFront);
+      })
+      .catch(() => {
+        console.error("Failed to create session");
+      });
 
     return () => {
       clearTrialExpired();
     };
-  }, [clearTrialExpired, createSocket, recordingId]);
+  }, [isAuthenticated, clearTrialExpired, createSocket, recordingId]);
 
   useEffect(() => {
     if (uploadComplete && loadingFinished) {

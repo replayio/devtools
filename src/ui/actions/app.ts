@@ -4,7 +4,6 @@ import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent, EventKind } from "ui/state/app";
 import groupBy from "lodash/groupBy";
 import { compareBigInt } from "ui/utils/helpers";
-import tokenManager from "ui/utils/tokenManager";
 import {
   hideCommandPalette,
   setSelectedPanel,
@@ -19,7 +18,7 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { isTest, getTest } from "ui/utils/environment";
+import { getTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
 
@@ -58,15 +57,6 @@ export async function setupApp(
   ThreadFront: typeof ThreadFrontType,
   replayClient: ReplayClientInterface
 ) {
-  if (!isTest()) {
-    tokenManager.addListener(({ token }) => {
-      if (token) {
-        ThreadFront.setAccessToken(token);
-      }
-    });
-    await tokenManager.getToken();
-  }
-
   ThreadFront.waitForSession().then(sessionId => {
     store.dispatch(setSessionId(sessionId));
 
