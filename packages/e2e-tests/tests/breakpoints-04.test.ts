@@ -1,12 +1,11 @@
 import {
-  test,
-  openExample,
-  rewindToLine,
   addBreakpoint,
   clickDevTools,
-  checkEvaluateInTopFrame,
+  openExample,
+  rewindToLine,
   resumeToLine,
   Screen,
+  test,
 } from "../helpers";
 
 // Test hitting breakpoints when using tricky control flow constructs:
@@ -20,8 +19,8 @@ test(`catch, finally, generators, and async/await.`, async ({ screen }) => {
   await resumeToBreakpoint(screen, 20);
   await resumeToBreakpoint(screen, 32);
   await resumeToBreakpoint(screen, 27);
-  await resumeToLine(screen, 32);
-  await resumeToLine(screen, 27);
+  await resumeToLine(screen, {lineNumber: 32});
+  await resumeToLine(screen, {lineNumber: 27});
   await resumeToBreakpoint(screen, 42);
   await resumeToBreakpoint(screen, 44);
   await resumeToBreakpoint(screen, 50);
@@ -29,13 +28,13 @@ test(`catch, finally, generators, and async/await.`, async ({ screen }) => {
   await resumeToBreakpoint(screen, 65);
   await resumeToBreakpoint(screen, 72);
 
-  async function rewindToBreakpoint(screen: Screen, line: number) {
-    await addBreakpoint(screen, "doc_control_flow.html", line);
-    await rewindToLine(screen, line);
+  async function rewindToBreakpoint(screen: Screen, lineNumber: number) {
+    await addBreakpoint(screen, "doc_control_flow.html", lineNumber);
+    await rewindToLine(screen, {lineNumber});
   }
 
-  async function resumeToBreakpoint(screen: Screen, line: number) {
-    await addBreakpoint(screen, "doc_control_flow.html", line);
-    await resumeToLine(screen, line);
+  async function resumeToBreakpoint(screen: Screen, lineNumber: number) {
+    await addBreakpoint(screen, "doc_control_flow.html", lineNumber);
+    await resumeToLine(screen, {lineNumber});
   }
 });
