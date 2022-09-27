@@ -110,6 +110,7 @@ export function AccordionPane({
   return (
     <div
       className={classNames("group relative h-full w-full", className)}
+      data-test-id={`AccordionPane-${header.replace(/ /g, "")}`}
       style={{
         height,
         minHeight: _expanded ? MIN_HEIGHT : "auto",

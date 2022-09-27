@@ -10,12 +10,7 @@ import { useFeature } from "ui/hooks/settings";
 import { UIState } from "ui/state";
 
 import actions from "../../actions";
-import {
-  getActiveSearch,
-  getSelectedPrimaryPaneTab,
-  getContext,
-  getSourcesCollapsed,
-} from "../../selectors";
+import { getSelectedPrimaryPaneTab, getContext, getSourcesCollapsed } from "../../selectors";
 
 import Outline from "../SourceOutline/SourceOutline";
 import SourcesTree from "./SourcesTree";
