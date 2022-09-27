@@ -10,7 +10,6 @@ const config: PlaywrightTestConfig = {
       width: 1024,
       height: 600,
     },
-
   },
 };
 export default config;

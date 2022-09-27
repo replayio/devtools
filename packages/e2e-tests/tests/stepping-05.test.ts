@@ -1,5 +1,5 @@
-import { test } from "@playwright/test";
 import {
+  test,
   openExample,
   clickDevTools,
   rewindToLine,
@@ -13,27 +13,27 @@ import {
   warpToMessage,
 } from "../helpers";
 
-test(`Test stepping in pretty-printed code`, async ({ page }) => {
-  await openExample(page, "doc_minified.html");
-  await clickDevTools(page);
-  await addBreakpoint(page, "bundle_input.js", 4);
-  await rewindToLine(page, 4);
-  await stepInToLine(page, 1);
+test(`Test stepping in pretty-printed code`, async ({ screen }) => {
+  await openExample(screen, "doc_minified.html");
+  await clickDevTools(screen);
+  await addBreakpoint(screen, "bundle_input.js", 4);
+  await rewindToLine(screen, 4);
+  await stepInToLine(screen, 1);
 
   // Add a breakpoint in minified.html and resume to there
-  await addBreakpoint(page, "doc_minified.html", 8);
-  await resumeToLine(page, 8);
-  await stepOverToLine(page, 8);
-  await stepOverToLine(page, 9);
+  await addBreakpoint(screen, "doc_minified.html", 8);
+  await resumeToLine(screen, 8);
+  await stepOverToLine(screen, 8);
+  await stepOverToLine(screen, 9);
 
-  await selectConsole(page);
-  await addEventListenerLogpoints(page, ["event.mouse.click"]);
-  await warpToMessage(page, "click", 14);
+  await selectConsole(screen);
+  await addEventListenerLogpoints(screen, ["event.mouse.click"]);
+  await warpToMessage(screen, "click", 14);
 
-  await stepInToLine(page, 2);
-  await stepOutToLine(page, 15);
-  await stepInToLine(page, 10);
-  await stepOutToLine(page, 15);
-  await stepInToLine(page, 5);
-  await stepOutToLine(page, 15);
+  await stepInToLine(screen, 2);
+  await stepOutToLine(screen, 15);
+  await stepInToLine(screen, 10);
+  await stepOutToLine(screen, 15);
+  await stepInToLine(screen, 5);
+  await stepOutToLine(screen, 15);
 });

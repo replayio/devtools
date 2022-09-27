@@ -1,6 +1,5 @@
-import { test } from "@playwright/test";
-
 import {
+  test,
   openExample,
   rewindToLine,
   addBreakpoint,
@@ -8,17 +7,17 @@ import {
   checkEvaluateInTopFrame,
   resumeToLine,
 } from "../helpers";
-test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ page }) => {
-  await openExample(page, "doc_rr_basic.html");
-  await clickDevTools(page);
+test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ screen }) => {
+  await openExample(screen, "doc_rr_basic.html");
+  await clickDevTools(screen);
 
-  await addBreakpoint(page, "doc_rr_basic.html", 21);
-  await rewindToLine(page, 21);
+  await addBreakpoint(screen, "doc_rr_basic.html", 21);
+  await rewindToLine(screen, 21);
 
-  await checkEvaluateInTopFrame(page, "number", "10");
-  await checkEvaluateInTopFrame(page, "dump(3)", `Error: Evaluation failed`);
-  await checkEvaluateInTopFrame(page, "number", "10");
-  await checkEvaluateInTopFrame(page, "dump(3)", `Error: Evaluation failed`);
-  await checkEvaluateInTopFrame(page, "number", "10");
-  await checkEvaluateInTopFrame(page, "testStepping2()", "undefined");
+  await checkEvaluateInTopFrame(screen, "number", "10");
+  await checkEvaluateInTopFrame(screen, "dump(3)", `Error: Evaluation failed`);
+  await checkEvaluateInTopFrame(screen, "number", "10");
+  await checkEvaluateInTopFrame(screen, "dump(3)", `Error: Evaluation failed`);
+  await checkEvaluateInTopFrame(screen, "number", "10");
+  await checkEvaluateInTopFrame(screen, "testStepping2()", "undefined");
 });

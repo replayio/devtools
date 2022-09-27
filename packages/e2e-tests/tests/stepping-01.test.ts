@@ -1,5 +1,5 @@
-import { test } from "@playwright/test";
 import {
+  test,
   checkEvaluateInTopFrame,
   openExample,
   rewind,
@@ -11,30 +11,30 @@ import {
   togglePausePane,
 } from "../helpers";
 
-test("Test basic step-over/back functionality.", async ({ page }) => {
-  await openExample(page, "doc_rr_basic.html");
-  await clickDevTools(page);
+test("Test basic step-over/back functionality.", async ({ screen }) => {
+  await openExample(screen, "doc_rr_basic.html");
+  await clickDevTools(screen);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, "doc_rr_basic.html");
+  await clickSourceTreeNode(screen, "test");
+  await clickSourceTreeNode(screen, "examples");
+  await clickSourceTreeNode(screen, "doc_rr_basic.html");
 
   // Pause on line 20
-  await toggleBreakpoint(page, 20);
-  await togglePausePane(page);
-  await rewind(page);
+  await toggleBreakpoint(screen, 20);
+  await togglePausePane(screen);
+  await rewind(screen);
 
   // Should get ten when evaluating number.
-  await checkEvaluateInTopFrame(page, "number", "10");
+  await checkEvaluateInTopFrame(screen, "number", "10");
 
   // Should get nine when stepping over.
-  await reverseStepOver(page);
-  await checkEvaluateInTopFrame(page, "number", "9");
+  await reverseStepOver(screen);
+  await checkEvaluateInTopFrame(screen, "number", "9");
 
   // Should get ten when stepping over.
-  await stepOver(page);
-  await checkEvaluateInTopFrame(page, "number", "10");
+  await stepOver(screen);
+  await checkEvaluateInTopFrame(screen, "number", "10");
 
   await new Promise(r => setTimeout(r, 1_000));
 });

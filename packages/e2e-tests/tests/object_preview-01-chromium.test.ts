@@ -1,5 +1,5 @@
 // // Test the objects produced by console.log() calls and by evaluating various
-// test(`expressions in the console after time warping.`, async ({ page }) => {
+// test(`expressions in the console after time warping.`, async ({ screen }) => {
 //   await Test.selectConsole();
 
 //   // Several objects currently show up differently in chromium.

@@ -1,6 +1,6 @@
 // // TODO: fix this test
 
-import test from "@playwright/test";
+import { test } from "../helpers";
 
 // (async () => {
 //   const url = new URL(location.href);
@@ -94,5 +94,4 @@ import test from "@playwright/test";
 //   );
 // }
 
-test(`TODO.`, async ({ page }) => {
-});
+test(`TODO.`, async ({ screen }) => {});
