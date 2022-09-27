@@ -7,12 +7,13 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:install": "playwright install",
+    "test": "playwright test"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@playwright/test": "1.19",
+    "@playwright/test": "^1.23.1",
     "@replayio/playwright": "^0.2.24"
   }
 }
