@@ -1,6 +1,4 @@
-import { Page, Locator, expect, test as base, PlaywrightTestArgs } from "@playwright/test";
-import { assert } from "protocol/utils";
-
+import { test as base, PlaywrightTestArgs } from "@playwright/test";
 import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
@@ -17,9 +15,15 @@ export type Within = TestArgs["within"];
 
 const exampleRecordings = require("./examples.json");
 
-type $FixTypeLater = any;
-
 type Expected = string | boolean | number;
+type MessageType =
+  | "console-error"
+  | "console-log"
+  | "console-warning"
+  | "event"
+  | "exception"
+  | "log-point"
+  | "terminal-expression";
 
 export async function openExample(screen: Screen, example: string) {
   const recordingId = exampleRecordings[example];
@@ -35,6 +39,10 @@ export async function clickDevTools(screen: Screen) {
 
 export async function selectConsole(screen: Screen) {
   return screen.queryByTestId("PanelButton-console").click();
+}
+
+export async function getCallStackPane(screen: Screen) {
+  return screen.queryByTestId("AccordionPane-CallStack");
 }
 
 export async function getBreakpointsPane(screen: Screen) {
@@ -81,7 +89,7 @@ export async function checkEvaluateInTopFrame(screen: Screen, value: string, exp
     { value }
   );
 
-  await waitForConsoleMessage(screen, expected);
+  await waitForConsoleMessage(screen, expected, "terminal-expression");
   await clearConsoleEvaluations(screen);
 }
 
@@ -89,8 +97,16 @@ export async function getConsoleMessage(screen: Screen, message: Expected) {
   return screen.locator(`[data-test-name="Messages"]:has-text("${message}")`);
 }
 
-export async function waitForConsoleMessage(screen: Screen, message: Expected) {
-  return screen.waitForSelector(`[data-test-name="Messages"]:has-text("${message}")`);
+export async function waitForConsoleMessage(
+  screen: Screen,
+  expected: Expected,
+  messageType?: MessageType
+) {
+  const attributeSelector = messageType
+    ? `[data-test-message-type="${messageType}"]`
+    : '[data-test-name="Message"]';
+
+  await screen.waitForSelector(`${attributeSelector}:has-text("${expected}")`);
 }
 
 export async function warpToMessage(screen: Screen, text: string, line?: number) {
@@ -131,6 +147,23 @@ export async function addEventListenerLogpoints(screen: Screen, logpoints: strin
 }
 
 // Debugger
+
+export async function getCurrentCallStackFrameInfo(screen: Screen) {
+  const fileNameNode = await screen.locator(".frame.selected .filename");
+  const lineNumberNode = await screen.locator(".frame.selected .line");
+  const fileName = await fileNameNode.textContent();
+  const lineNumber = await lineNumberNode.textContent();
+  return {
+    fileName: fileName || null,
+    lineNumber: lineNumber ? parseInt(lineNumber, 10) : null,
+  };
+}
+
+export async function getSelectedLineNumber(screen: Screen) {
+  const lineNumber = await screen.locator(".new-debug-line .CodeMirror-linenumber");
+  const textContent = await lineNumber.textContent();
+  return textContent;
+}
 
 export async function getSourceLine(screen: Screen, lineNumber: number) {
   return screen.locator(".CodeMirror-gutter-wrapper", {
@@ -247,22 +280,61 @@ export async function toggleBreakpoint(screen: Screen, number: number) {
 export async function rewind(screen: Screen) {
   await screen.locator(".command-bar-button").first().click();
   await new Promise(r => setTimeout(r, 100));
+
   await screen.evaluate(() => window.app.selectors!.getIsPaused());
 }
 
-export async function resumeToLine(screen: Screen, line: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.resume(params.cx), { cx: cx });
+export async function resumeToLine(
+  screen: Screen,
+  options: {
+    lineNumber: number;
+    url?: string;
+  }
+) {
+  const { url = null, lineNumber } = options;
 
-  await waitForPaused(screen, line);
+  if (url !== null) {
+    await selectSource(screen, url);
+  }
+
+  while (true) {
+    const button = screen.getByTitle("Resume ⌘\\ F8");
+    await button.click();
+
+    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
+
+    if (selectedLineNumber === null) {
+      throw Error(`Unable to resume to line ${lineNumber}`);
+    } else if (lineNumber === selectedLineNumber) {
+      return;
+    }
+  }
 }
 
-export async function rewindToLine(screen: Screen, line?: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.rewind(params.cx), { cx: cx });
+export async function rewindToLine(
+  screen: Screen,
+  options: {
+    lineNumber: number;
+    url?: string;
+  }
+) {
+  const { url = null, lineNumber } = options;
 
-  if (line) {
-    await waitForPaused(screen, line);
+  if (url !== null) {
+    await selectSource(screen, url);
+  }
+
+  while (true) {
+    const button = screen.getByTitle("Rewind Execution");
+    await button.click();
+
+    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
+
+    if (selectedLineNumber === null) {
+      throw Error(`Unable to rewind to line ${lineNumber}`);
+    } else if (lineNumber === selectedLineNumber) {
+      return;
+    }
   }
 }
 
