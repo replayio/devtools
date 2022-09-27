@@ -1,5 +1,5 @@
-import { test } from "@playwright/test";
 import {
+  test,
   openExample,
   clickDevTools,
   rewindToLine,
@@ -11,36 +11,36 @@ import {
 } from "../helpers";
 
 test(`Stepping past the beginning or end of a frame should act like a step-out.`, async ({
-  page,
+  screen,
 }) => {
-  await openExample(page, "doc_rr_basic.html");
-  await clickDevTools(page);
+  await openExample(screen, "doc_rr_basic.html");
+  await clickDevTools(screen);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, "doc_rr_basic.html");
+  await clickSourceTreeNode(screen, "test");
+  await clickSourceTreeNode(screen, "examples");
+  await clickSourceTreeNode(screen, "doc_rr_basic.html");
 
-  await toggleBreakpoint(page, 20);
+  await toggleBreakpoint(screen, 20);
 
-  await rewindToLine(page, 20);
-  await checkEvaluateInTopFrame(page, "number", "10");
-  await reverseStepOverToLine(page, 19);
-  await reverseStepOverToLine(page, 11);
+  await rewindToLine(screen, 20);
+  await checkEvaluateInTopFrame(screen, "number", "10");
+  await reverseStepOverToLine(screen, 19);
+  await reverseStepOverToLine(screen, 11);
 
   // After reverse-stepping out of the topmost frame we should rewind to the
   // last breakpoint hit.
-  await reverseStepOverToLine(page, 20);
-  await checkEvaluateInTopFrame(page, "number", "9");
+  await reverseStepOverToLine(screen, 20);
+  await checkEvaluateInTopFrame(screen, "number", "9");
 
-  await stepOverToLine(page, 21);
-  await stepOverToLine(page, 22);
-  await stepOverToLine(page, 12);
-  await stepOverToLine(page, 16);
-  await stepOverToLine(page, 17);
+  await stepOverToLine(screen, 21);
+  await stepOverToLine(screen, 22);
+  await stepOverToLine(screen, 12);
+  await stepOverToLine(screen, 16);
+  await stepOverToLine(screen, 17);
 
   // After forward-stepping out of the topmost frame we should run forward to
   // the next breakpoint hit.
-  await stepOverToLine(page, 20);
-  await checkEvaluateInTopFrame(page, "number", "10");
+  await stepOverToLine(screen, 20);
+  await checkEvaluateInTopFrame(screen, "number", "10");
 });

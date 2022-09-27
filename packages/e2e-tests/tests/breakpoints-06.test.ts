@@ -1,8 +1,7 @@
 // TODO fix this test
 
-import { test, Page, expect } from "@playwright/test";
-
 import {
+  test,
   openExample,
   clickDevTools,
   removeAllBreakpoints,
@@ -10,28 +9,29 @@ import {
   addBreakpoint,
   resumeToLine,
   waitForConsoleMessage,
+  Screen,
 } from "../helpers";
 
-async function checkMessageLocation(page: Page, text: string, location: string) {
-  const msg = await waitForConsoleMessage(page, text);
+async function checkMessageLocation(screen: Screen, text: string, location: string) {
+  const msg = await waitForConsoleMessage(screen, text);
   expect(
     msg.querySelector(".frame-link a").innerText == location,
     `Message location should be ${location}`
   );
 }
 
-test(`Test breakpoints in a sourcemapped file.`, async ({ page }) => {
-  await openExample(page, "doc_prod_bundle.html");
-  await clickDevTools(page);
+test(`Test breakpoints in a sourcemapped file.`, async ({ screen }) => {
+  await openExample(screen, "doc_prod_bundle.html");
+  await clickDevTools(screen);
   console.log("Test that the breakpoint added to line 15 maps to line 15");
-  await addBreakpoint(page, "bundle_input.js", 15, undefined, {
+  await addBreakpoint(screen, "bundle_input.js", 15, undefined, {
     logValue: "'line 15'",
   });
-  await checkMessageLocation(page, "line 15", "bundle_input.js:15");
+  await checkMessageLocation(screen, "line 15", "bundle_input.js:15");
 
   console.log("Test that the breakpoint added to line 17 maps to line 17");
-  await addBreakpoint(page, "bundle_input.js", 17, undefined, {
+  await addBreakpoint(screen, "bundle_input.js", 17, undefined, {
     logValue: "'line 17'",
   });
-  await checkMessageLocation(page, "line 17", "bundle_input.js:17");
+  await checkMessageLocation(screen, "line 17", "bundle_input.js:17");
 });
