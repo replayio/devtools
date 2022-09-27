@@ -1,5 +1,5 @@
-import { test } from "@playwright/test";
 import {
+  test,
   openExample,
   clickDevTools,
   rewindToLine,
@@ -12,31 +12,31 @@ import {
   waitForScopeValue,
 } from "../helpers";
 
-test("Test basic step-over/back functionality.", async ({ page }) => {
-  await openExample(page, "doc_rr_basic.html");
-  await clickDevTools(page);
+test("Test basic step-over/back functionality.", async ({ screen }) => {
+  await openExample(screen, "doc_rr_basic.html");
+  await clickDevTools(screen);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(page, "test");
-  await clickSourceTreeNode(page, "examples");
-  await clickSourceTreeNode(page, "doc_rr_basic.html");
+  await clickSourceTreeNode(screen, "test");
+  await clickSourceTreeNode(screen, "examples");
+  await clickSourceTreeNode(screen, "doc_rr_basic.html");
 
-  await toggleBreakpoint(page, 21);
-  await rewindToLine(page, 21);
+  await toggleBreakpoint(screen, 21);
+  await rewindToLine(screen, 21);
 
-  await stepInToLine(page, 24);
-  await stepOverToLine(page, 25);
-  await stepOverToLine(page, 26);
-  await reverseStepOverToLine(page, 25);
-  await stepInToLine(page, 29);
-  await stepOverToLine(page, 30);
-  await stepOverToLine(page, 31);
+  await stepInToLine(screen, 24);
+  await stepOverToLine(screen, 25);
+  await stepOverToLine(screen, 26);
+  await reverseStepOverToLine(screen, 25);
+  await stepInToLine(screen, 29);
+  await stepOverToLine(screen, 30);
+  await stepOverToLine(screen, 31);
 
   // Check that the scopes pane shows the value of the local variable.
-  await waitForScopeValue(page, "c", "NaN");
-  await stepOverToLine(page, 32);
-  await reverseStepOverToLine(page, 31);
-  await stepOutToLine(page, 26);
-  await reverseStepOverToLine(page, 25);
-  await reverseStepOverToLine(page, 24);
+  await waitForScopeValue(screen, "c", "NaN");
+  await stepOverToLine(screen, 32);
+  await reverseStepOverToLine(screen, 31);
+  await stepOutToLine(screen, 26);
+  await reverseStepOverToLine(screen, 25);
+  await reverseStepOverToLine(screen, 24);
 });

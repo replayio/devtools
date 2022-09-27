@@ -1,6 +1,5 @@
-import { test } from "@playwright/test";
-
 import {
+  test,
   openExample,
   rewindToLine,
   addBreakpoint,
@@ -11,16 +10,16 @@ import {
 
 // Test hitting breakpoints when rewinding past the point where the breakpoint
 test(`Test hitting breakpoints when rewinding past the point where the breakpoint.`, async ({
-  page,
+  screen,
 }) => {
-  await openExample(page, "doc_rr_basic.html");
-  await clickDevTools(page);
+  await openExample(screen, "doc_rr_basic.html");
+  await clickDevTools(screen);
 
-  await rewindToLine(page);
+  await rewindToLine(screen);
 
-  await addBreakpoint(page, "doc_rr_basic.html", 21);
-  await resumeToLine(page, 21);
-  await checkEvaluateInTopFrame(page, "number", "1");
-  await resumeToLine(page, 21);
-  await checkEvaluateInTopFrame(page, "number", "2");
+  await addBreakpoint(screen, "doc_rr_basic.html", 21);
+  await resumeToLine(screen, 21);
+  await checkEvaluateInTopFrame(screen, "number", "1");
+  await resumeToLine(screen, 21);
+  await checkEvaluateInTopFrame(screen, "number", "2");
 });

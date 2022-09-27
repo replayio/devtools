@@ -1,6 +1,5 @@
-import { test, Page } from "@playwright/test";
-
 import {
+  test,
   openExample,
   clickDevTools,
   removeAllBreakpoints,
@@ -9,17 +8,17 @@ import {
   resumeToLine,
 } from "../helpers";
 
-test(`Test interaction of breakpoints with debugger statements.`, async ({ page }) => {
-  await openExample(page, "doc_debugger_statements.html");
-  await clickDevTools(page);
+test(`Test interaction of breakpoints with debugger statements.`, async ({ screen }) => {
+  await openExample(screen, "doc_debugger_statements.html");
+  await clickDevTools(screen);
 
   // TODO: remove timeout
   await new Promise(r => setTimeout(r, 1000));
-  await rewindToLine(page, 9);
-  await addBreakpoint(page, "doc_debugger_statements.html", 8);
-  await rewindToLine(page, 8);
-  await resumeToLine(page, 9);
-  await removeAllBreakpoints(page);
-  await rewindToLine(page, 7);
-  await resumeToLine(page, 9);
+  await rewindToLine(screen, 9);
+  await addBreakpoint(screen, "doc_debugger_statements.html", 8);
+  await rewindToLine(screen, 8);
+  await resumeToLine(screen, 9);
+  await removeAllBreakpoints(screen);
+  await rewindToLine(screen, 7);
+  await resumeToLine(screen, 9);
 });
