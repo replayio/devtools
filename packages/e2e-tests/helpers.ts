@@ -1,4 +1,6 @@
-import { test as base, PlaywrightTestArgs } from "@playwright/test";
+import { Page, Locator, expect, test as base, PlaywrightTestArgs } from "@playwright/test";
+
+import { waitFor, within, wait } from "@playwright-testing-library/test";
 import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
@@ -77,17 +79,23 @@ export async function togglePausePane(screen: Screen) {
 
 // Console
 
+function delay(timeout: number) {
+  return new Promise(r => setTimeout(r, timeout));
+}
+
 export async function checkEvaluateInTopFrame(screen: Screen, value: string, expected: Expected) {
   await selectConsole(screen);
 
-  await screen.evaluate(
-    async params => {
-      window.jsterm.setValue(params.value);
-      await new Promise(r => setTimeout(r, 10));
-      window.jsterm.execute();
-    },
-    { value }
-  );
+  const consoleRoot = screen.queryByTestId("ConsoleRoot");
+  await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
+
+  const term = screen.queryByTestId("JSTerm");
+  const textArea = term.locator("textarea");
+
+  await textArea.focus();
+  await textArea.type(value);
+
+  await textArea.press("Enter");
 
   await waitForConsoleMessage(screen, expected, "terminal-expression");
   await clearConsoleEvaluations(screen);
@@ -137,7 +145,7 @@ export async function checkJumpIcon(screen: Screen, message: string) {
 }
 
 export async function clearConsoleEvaluations(screen: Screen) {
-  await screen.locator("#toolbox-content-console button").nth(1).click();
+  return screen.queryByTestId("ClearConsoleEvaluationsButton").click();
 }
 
 export async function addEventListenerLogpoints(screen: Screen, logpoints: string[]) {
