@@ -7,13 +7,15 @@
     "test": "tests"
   },
   "scripts": {
-    "test:install": "playwright install",
-    "test": "playwright test"
+    "test": "playwright test",
+    "test:debug": "DEBUG=1 playwright test",
+    "test:install": "playwright install"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@playwright/test": "^1.23.1",
-    "@replayio/playwright": "^0.2.24"
+  "devDependencies": {
+    "@playwright/test": "^1.25.1",
+    "@replayio/playwright": "^0.2.24",
+    "playwright": "^1.25.1"
   }
 }
