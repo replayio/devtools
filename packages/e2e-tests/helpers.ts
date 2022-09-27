@@ -167,7 +167,7 @@ export async function getSelectedLineNumber(screen: Screen) {
 
 export async function getSourceLine(screen: Screen, lineNumber: number) {
   return screen.locator(".CodeMirror-gutter-wrapper", {
-    has: screen.locator(`.CodeMirror-linenumber:has-text("${lineNumber}")`),
+    has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
   });
 }
 
@@ -262,6 +262,15 @@ function waitForSelectedSource(screen: Screen, url?: string) {
   );
 }
 
+export async function removeBreakpoint(screen: Screen, url: string, lineNumber: number) {
+  await clickDevTools(screen);
+  await openSourceExplorer(screen);
+  await selectSource(screen, url);
+
+  const line = await getSourceLine(screen, lineNumber);
+  await line.locator(".CodeMirror-linenumber").click({ force: true });
+}
+
 export async function removeAllBreakpoints(screen: Screen) {
   screen.evaluate(async () => {
     await app.actions.removeAllBreakpoints(app.selectors.getThreadContext());
@@ -314,11 +323,11 @@ export async function resumeToLine(
 export async function rewindToLine(
   screen: Screen,
   options: {
-    lineNumber: number;
+    lineNumber?: number;
     url?: string;
-  }
+  } = {}
 ) {
-  const { url = null, lineNumber } = options;
+  const { url = null, lineNumber = null } = options;
 
   if (url !== null) {
     await selectSource(screen, url);
@@ -328,12 +337,16 @@ export async function rewindToLine(
     const button = screen.getByTitle("Rewind Execution");
     await button.click();
 
-    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
-
-    if (selectedLineNumber === null) {
-      throw Error(`Unable to rewind to line ${lineNumber}`);
-    } else if (lineNumber === selectedLineNumber) {
+    if (lineNumber === null) {
       return;
+    } else {
+      const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
+
+      if (selectedLineNumber === null) {
+        throw Error(`Unable to rewind to line ${lineNumber}`);
+      } else if (lineNumber === selectedLineNumber) {
+        return;
+      }
     }
   }
 }
