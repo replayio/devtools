@@ -156,7 +156,7 @@ function JSTermWrapper() {
   };
 
   return (
-    <div className={styles.JSTermWrapper} onKeyDown={onKeyDown}>
+    <div className={styles.JSTermWrapper} onKeyDown={onKeyDown} data-test-id="JSTerm">
       <JSTerm
         addTerminalExpression={addTerminalExpression}
         terminalExpressionHistory={terminalExpressionHistory}
