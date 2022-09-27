@@ -1,5 +1,7 @@
 // // TODO: fix this test
 
+import test from "@playwright/test";
+
 // (async () => {
 //   const url = new URL(location.href);
 //   if (!url.searchParams.get("navigated")) {
