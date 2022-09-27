@@ -192,6 +192,7 @@ class SourceTreeItem extends Component<FinalSTIProps> {
     return (
       <div
         className={classnames("node", { focused })}
+        data-item-name={`SourceTreeItem-${item.name.replace(/ /g, "")}`}
         key={item.path}
         onClick={this.onClick}
         onContextMenu={e => this.onContextMenu(e, item)}

@@ -23,6 +23,32 @@ export async function selectConsole(page: Page) {
   return page.locator('[data-test-id="PanelButton-console"]').click();
 }
 
+export async function getBreakpointsPane(page: Page) {
+  return page.locator('[data-test-id="AccordionPane-Breakpoints"]');
+}
+
+export async function openPauseInformation(page: Page) {
+  // Only click if it's not already open; clicking again will collapse the side bar.
+  const pane = await getBreakpointsPane(page);
+  const isVisible = await pane.isVisible();
+  if (!isVisible) {
+    return page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+  }
+}
+
+export async function getSourcesPane(page: Page) {
+  return page.locator('[data-test-id="AccordionPane-Sources"]');
+}
+
+export async function openSourceExplorer(page: Page) {
+  // Only click if it's not already open; clicking again will collapse the side bar.
+  const pane = await getSourcesPane(page);
+  const isVisible = await pane.isVisible();
+  if (!isVisible) {
+    return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
+  }
+}
+
 export async function togglePausePane(page: Page) {
   return page.locator('button:has-text("motion_photos_paused")').click();
 }
@@ -68,7 +94,11 @@ export async function executeInConsole(page: Page, text: string) {
   // TODO [PR 7550]
 }
 
-export async function checkMessageObjectContents(page: Page, message: HTMLElement, expectedContents: Expected[]) {
+export async function checkMessageObjectContents(
+  page: Page,
+  message: HTMLElement,
+  expectedContents: Expected[]
+) {
   // TODO [PR 7550]
 }
 
@@ -88,99 +118,75 @@ export async function addEventListenerLogpoints(page: Page, logpoints: string[])
 
 // Debugger
 
+export async function getSourceLine(page: Page, lineNumber: number) {
+  return page.locator(".CodeMirror-gutter-wrapper", {
+    has: page.locator(`.CodeMirror-linenumber:has-text("${lineNumber}")`),
+  });
+}
+
 export async function addBreakpoint(
   page: Page,
   url: string,
-  line: number,
-  column?: number,
-  options?: $FixTypeLater
+  lineNumber: number,
+  columnIndex?: number
 ) {
-  // const bpCount = dbgSelectors.getBreakpointCount();
-  const bpCount = await page.evaluate(() => window.app.selectors!.getBreakpointCount());
-  if (options) {
-    /*
-    const source = await waitForSource(url);
-    const sourceId = source!.id;
-    await dbgActions.addBreakpoint(
-      getContext(),
-      { sourceId, line, column, sourceUrl: source!.url! },
-      options
+  await clickDevTools(page);
+  await openSourceExplorer(page);
+  await selectSource(page, url);
+
+  const line = await getSourceLine(page, lineNumber);
+  await line.locator(".CodeMirror-linenumber").hover();
+  await line.locator(".CodeMirror-linenumber").click();
+
+  await openPauseInformation(page);
+
+  const breakpointGroup = await page.waitForSelector(`.breakpoints-list-source:has-text("${url}")`);
+  if (columnIndex != null) {
+    await breakpointGroup.waitForSelector(
+      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
     );
-    */
   } else {
-    // If there are no options, use the default log value for adding new breakpoints,
-    // as if the user clicked on the line.
-    assert(!column, "column should not bet set if there are no options");
-    await selectSource(page, url);
-
-    await page.evaluate(
-      params => {
-        const cx = app.selectors.getThreadContext();
-        app.actions.addBreakpointAtLine(cx, params.line);
-      },
-      { line }
-    );
-
-    await page.waitForFunction(
-      async params => {
-        const bpCount = window.app.selectors!.getBreakpointCount();
-        if (bpCount !== params.bpCount) {
-          return false;
-        }
-
-        await app.threadFront.waitForInvalidateCommandsToFinish();
-      },
-      { bpCount: bpCount + 1 }
-    );
+    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
   }
 }
 
-async function selectSource(page: Page, url: string) {
-  await page.waitForFunction(params => app.selectors.fuzzyFindSourceByUrl(params.url), { url });
+export async function selectSource(page: Page, url: string) {
+  const pane = await getSourcesPane(page);
 
-  await page.waitForFunction(
-    async params => {
-      const source = window.app.selectors!.fuzzyFindSourceByUrl(params.url);
-      if (!source) {
-        return;
-      }
-      const cx = window.app.selectors!.getThreadContext();
-      return window.app.actions!.selectLocation(cx, { sourceId: source.id }, true);
-    },
-    {
-      url,
+  let foundSource = false;
+
+  while (true) {
+    const item = await pane.locator(`[data-item-name="SourceTreeItem-${url}"]`);
+    let count = await item.count();
+    if (count > 0) {
+      foundSource = true;
+
+      // We found the source; open it and then bail.
+      await item.click();
+
+      break;
     }
-  );
+
+    // Keep drilling in until we find the source.
+    const toggles = await pane.locator('[aria-expanded="false"][data-expandable="true"]');
+    count = await toggles.count();
+    if (count === 0) {
+      break;
+    }
+
+    await toggles.first().click();
+  }
+
+  if (!foundSource) {
+    // We didn't find a matching source; the test should fail.
+    throw new Error(`Could not find source with URL "${url}"`);
+  }
 
   await waitForSelectedSource(page, url);
 }
 
-function waitForSelectedSource(page: Page, url?: string) {
-  return page.waitForFunction(
-    params => {
-      const source = window.app.selectors!.getSelectedSourceWithContent()! || {};
-      if (!source.value) {
-        return false;
-      }
-
-      if (!params.url) {
-        return true;
-      }
-
-      const newSource = app.selectors.fuzzyFindSourceByUrl(params.url)!;
-      if (newSource.id != source.id) {
-        return false;
-      }
-
-      // The hasSymbols check is disabled. Sometimes the parser worker fails for
-      // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
-      // return hasSymbols(source) && getBreakableLines(source.id);
-      return app.selectors.getBreakableLinesForSource(source.id);
-    },
-    {
-      url,
-    }
-  );
+async function waitForSelectedSource(page: Page, url: string) {
+  await page.waitForSelector(`[data-test-name="Source-${url}"]`);
 }
 
 export async function removeAllBreakpoints(page: Page) {
