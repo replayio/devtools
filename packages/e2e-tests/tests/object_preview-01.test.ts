@@ -134,5 +134,6 @@ test(`expressions in the console after time warping.`, async ({ page }) => {
 
   await executeInConsole(page, "baz");
   msg = await waitForConsoleMessage(page, "function baz()");
-  checkJumpIcon(page, msg);
+  const text = await msg.textContent();
+  checkJumpIcon(page, text!);
 });

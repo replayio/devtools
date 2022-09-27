@@ -1,8 +1,11 @@
 import { Page, Locator, expect } from "@playwright/test";
-const exampleRecordings = require("./examples.json");
 import { assert } from "protocol/utils";
 
+const exampleRecordings = require("./examples.json");
+
 type $FixTypeLater = any;
+
+type Expected = string | boolean | number;
 
 export async function openExample(page: Page, example: string) {
   const recordingId = exampleRecordings[example];
@@ -24,7 +27,7 @@ export async function togglePausePane(page: Page) {
 
 // Console
 
-export async function checkEvaluateInTopFrame(page: Page, value: string, expected: string) {
+export async function checkEvaluateInTopFrame(page: Page, value: string, expected: Expected) {
   await page.locator('button:has-text("Console")').click();
   await page.evaluate(
     async params => {
@@ -38,7 +41,7 @@ export async function checkEvaluateInTopFrame(page: Page, value: string, expecte
   await clearConsoleEvaluations(page);
 }
 
-export async function waitForConsoleMessage(page: Page, message: string) {
+export async function waitForConsoleMessage(page: Page, message: Expected) {
   return page.waitForSelector(`.message:has-text('${message}')`);
 }
 
@@ -55,9 +58,13 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
   await waitForPaused(page, line);
 }
 
-export async function executeInConsole() {}
+export async function executeInConsole(page: Page, text: string) {
+  // TODO [PR 7550]
+}
 
-export async function checkMessageObjectContents() {}
+export async function checkMessageObjectContents(page: Page, message: HTMLElement, expectedContents: Expected[]) {
+  // TODO [PR 7550]
+}
 
 export async function checkJumpIcon(page: Page, message: string) {
   return page.waitForSelector(`.message:has-text('${message}') .jump-definition`);
