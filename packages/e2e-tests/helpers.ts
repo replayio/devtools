@@ -10,15 +10,17 @@ type Expected = string | boolean | number;
 export async function openExample(page: Page, example: string) {
   const recordingId = exampleRecordings[example];
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
-  await page.goto(`${base}/recording/${recordingId}?e2e=1`);
+  const url = `${base}/recording/${recordingId}?e2e=1`;
+  console.log(`Navigating to ${url}`);
+  await page.goto(url);
 }
 
 export async function clickDevTools(page: Page) {
-  return page.locator("text=DevTools").click();
+  return page.locator('[data-test-id="ViewToggle-DevTools"]').click();
 }
 
 export async function selectConsole(page: Page) {
-  return page.locator('button:has-text("Console")').click();
+  return page.locator('[data-test-id="PanelButton-console"]').click();
 }
 
 export async function togglePausePane(page: Page) {
@@ -28,7 +30,8 @@ export async function togglePausePane(page: Page) {
 // Console
 
 export async function checkEvaluateInTopFrame(page: Page, value: string, expected: Expected) {
-  await page.locator('button:has-text("Console")').click();
+  await selectConsole(page);
+
   await page.evaluate(
     async params => {
       window.jsterm.setValue(params.value);
@@ -37,18 +40,21 @@ export async function checkEvaluateInTopFrame(page: Page, value: string, expecte
     },
     { value }
   );
+
   await waitForConsoleMessage(page, expected);
   await clearConsoleEvaluations(page);
 }
 
+export async function getConsoleMessage(page: Page, message: Expected) {
+  return page.locator(`[data-test-name="Messages"]:has-text("${message}")`);
+}
+
 export async function waitForConsoleMessage(page: Page, message: Expected) {
-  return page.waitForSelector(`.message:has-text('${message}')`);
+  return page.waitForSelector(`[data-test-name="Messages"]:has-text("${message}")`);
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
-  await page.waitForSelector(`.webconsole-output .message:has-text("${text}")`);
-
-  const msg = page.locator(`.webconsole-output .message:has-text("${text}")`);
+  const msg = await getConsoleMessage(page, text);
   await msg.hover();
   const warpButton = msg.locator(".rewind .button") || msg.locator(".fast-forward");
 

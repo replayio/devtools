@@ -82,7 +82,12 @@ export default function ViewToggle() {
         ></div>
         {MODES.map(({ mode, label }) => (
           <div key={mode} className="option" onClick={() => handleToggle(mode)}>
-            <div className={classnames("text", { active: viewMode === mode })}>{label}</div>
+            <div
+              className={classnames("text", { active: viewMode === mode })}
+              data-test-id={`ViewToggle-${label}`}
+            >
+              {label}
+            </div>
           </div>
         ))}
       </div>
