@@ -1,97 +1,94 @@
-// // TODO: fix this test
+import {
+  addBreakpoint,
+  addLogpoint,
+  clickDevTools,
+  closeSource,
+  delay,
+  openExample,
+  quickOpen,
+  rewindToLine,
+  test,
+  verifyBreakpointStatus,
+} from "../helpers";
 
-import { test } from "../helpers";
+test(`Test TODO name this thing.`, async ({ screen }) => {
+  await openExample(screen, "doc_navigate.html");
+  await clickDevTools(screen);
 
-// (async () => {
-//   const url = new URL(location.href);
-//   if (!url.searchParams.get("navigated")) {
-//     // part one of the test, before the example recording is reloaded:
-//     console.log(`# Test that breakpoints work across navigations.`);
-//     await Test.start();
+  await quickOpen(screen, "bundle_input.js");
 
-//     await Test.waitForSource("bundle_input.js");
+  await addBreakpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
+  await addLogpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
 
-//     Test.app.actions.openQuickOpen();
-//     await Test.waitUntil(() => document.querySelector(".modal-wrapper"), {
-//       waitingFor: "the QuickOpenModal to appear",
-//     });
-//     Test.app.actions.setQuickOpenQuery("bundle");
-//     await Test.waitUntil(
-//       () => {
-//         const foundSourceUrls = [...document.querySelectorAll("#result-list .title")].map(
-//           el => el.textContent
-//         );
-//         return JSON.stringify(foundSourceUrls) === '["bundle_input.js"]';
-//       },
-//       { waitingFor: "bundle_input.js to be present in source urls", timeout: 30 * 1000 }
-//     );
-//     Test.app.actions.closeQuickOpen();
+  await rewindToLine(screen, { lineNumber: 5 });
+  await verifyBreakpointStatus(screen, "2/2", { lineNumber: 5 });
 
-//     await Test.addBreakpoint("bundle_input.js", 5);
-//     await Test.addLogpoint("bundle_input.js", 5);
+  await rewindToLine(screen, { lineNumber: 5 });
+  await verifyBreakpointStatus(screen, "1/2", { lineNumber: 5 });
 
-//     await Test.rewindToLine(5);
-//     await checkBreakpointPanel(2);
+  await closeSource(screen, "bundle_input.js");
 
-//     await Test.rewindToLine(5);
-//     await checkBreakpointPanel(1);
+  await delay(2500); // TODO Finish the test
+});
 
-//     await closeEditor();
-//     // click the first source link in the console
-//     document.querySelectorAll(".webconsole-output .frame-link-source")[0].click();
-//     await checkBreakpointPanel(1);
-//     await checkDebugLine();
+/*
+(async () => {
+    const url = new URL(location.href);
+    if (!url.searchParams.get("navigated")) {
+      // click the first source link in the console
+      document.querySelectorAll(".webconsole-output .frame-link-source")[0].click();
+      await checkBreakpointPanel(1);
+      await checkDebugLine();
+  
+      await closeEditor();
+      // click the second source link in the console
+      document.querySelectorAll(".webconsole-output .frame-link-source")[1].click();
+      await checkBreakpointPanel(1);
+      await checkDebugLine();
+  
+      // wait to ensure that the currently selected panel is saved to asyncStorage
+      // so that it is selected again after reloading
+      await Test.waitForTime(1000);
+  
+      // reload the recording
+      url.searchParams.append("navigated", "true");
+      document.location.href = url.href;
+      await new Promise(() => {});
+    } else {
+      // part two of the test, after reloading:
+      // Test.app.actions.setViewMode("dev");
 
-//     await closeEditor();
-//     // click the second source link in the console
-//     document.querySelectorAll(".webconsole-output .frame-link-source")[1].click();
-//     await checkBreakpointPanel(1);
-//     await checkDebugLine();
+      // await Test.waitUntil(
+      //   () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 2,
+      //   { waitingFor: "a breakpoint and a logpoint to be present" }
+      // );
+  
+      Test.finish();
+    }
+  })();
 
-//     // wait to ensure that the currently selected panel is saved to asyncStorage
-//     // so that it is selected again after reloading
-//     await Test.waitForTime(1000);
-
-//     // reload the recording
-//     url.searchParams.append("navigated", "true");
-//     document.location.href = url.href;
-//     await new Promise(() => {});
-//   } else {
-//     // part two of the test, after reloading:
-//     Test.app.actions.setViewMode("dev");
-
-//     await Test.waitUntil(
-//       () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 2,
-//       { waitingFor: "a breakpoint and a logpoint to be present" }
-//     );
-
-//     Test.finish();
-//   }
-// })();
-
-// async function checkBreakpointPanel(selectedBreakpoint) {
-//   await Test.waitUntil(
-//     () => {
-//       const statusElement = document.querySelector(".breakpoint-navigation-status-container");
-//       return statusElement && statusElement.textContent === `${selectedBreakpoint}/2`;
-//     },
-//     { waitingFor: `${selectedBreakpoint}/2 to be selected` }
-//   );
-// }
-
-// async function checkDebugLine() {
-//   await Test.waitUntil(
-//     () => document.querySelector(".editor-pane .CodeMirror-code .new-debug-line"),
-//     { waitingFor: "new debug line to be present" }
-//   );
-// }
-
-// async function closeEditor() {
-//   document.querySelector(".source-tabs .close").click();
-//   await Test.waitUntil(
-//     () => document.querySelector(".breakpoint-navigation-status-container") === null,
-//     { waitingFor: "source tab to close" }
-//   );
-// }
-
-test(`TODO.`, async ({ screen }) => {});
+  async function checkBreakpointPanel(selectedBreakpoint) {
+    await Test.waitUntil(
+      () => {
+        const statusElement = document.querySelector(".breakpoint-navigation-status-container");
+        return statusElement && statusElement.textContent === `${selectedBreakpoint}/2`;
+      },
+      { waitingFor: `${selectedBreakpoint}/2 to be selected` }
+    );
+  }
+  
+  async function checkDebugLine() {
+    await Test.waitUntil(
+      () => document.querySelector(".editor-pane .CodeMirror-code .new-debug-line"),
+      { waitingFor: "new debug line to be present" }
+    );
+  }
+  
+  async function closeEditor() {
+    document.querySelector(".source-tabs .close").click();
+    await Test.waitUntil(
+      () => document.querySelector(".breakpoint-navigation-status-container") === null,
+      { waitingFor: "source tab to close" }
+    );
+  }
+ */
