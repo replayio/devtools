@@ -60,8 +60,8 @@ test(`expressions in the console after time warping.`, async ({ screen }) => {
 
   await warpToMessage(screen, "Done");
 
-  // await executeInConsole(screen, "Error('helo')");
-  // await waitForConsoleMessage(screen, 'Error: "helo"');
+  await executeInConsole(screen, "Error('helo')");
+  await waitForConsoleMessage(screen, "Error: helo");
 
   // await executeInConsole(
   //   screen,

@@ -149,7 +149,11 @@ export async function warpToMessage(screen: Screen, text: string, line?: number)
 }
 
 export async function executeInConsole(screen: Screen, text: string) {
-  // TODO [PR 7550]
+  const consoleTextArea = screen.locator('[data-test-id="ConsoleRoot"] textarea');
+
+  await consoleTextArea.focus();
+  await consoleTextArea.fill(text);
+  await consoleTextArea.press("Enter");
 }
 
 export async function checkMessageObjectContents(
