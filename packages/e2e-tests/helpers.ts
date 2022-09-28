@@ -315,11 +315,22 @@ export async function closeSource(screen: Screen, url: string) {
 export async function selectSource(screen: Screen, url: string) {
   debugPrint(`Opening source "${chalk.bold(url)}"`, "selectSource");
 
+  // If the source is already open, just focus it.
+  const sourceTab = screen.locator(`[data-test-name="Source-${url}"]`);
+  if (await sourceTab.isVisible()) {
+    debugPrint(`Source "${chalk.bold(url)}" already open`, "selectSource");
+    return;
+  }
+
+  // Otherwise find it in the sources tree.
   const pane = await getSourcesPane(screen);
 
   let foundSource = false;
 
   while (true) {
+    // Wait for the panel's HTML to settle (to reflect the new toggled state.)
+    await pane.innerHTML();
+
     const item = await pane.locator(`[data-item-name="SourceTreeItem-${url}"]`);
     let count = await item.count();
     if (count > 0) {
