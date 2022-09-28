@@ -102,7 +102,6 @@ function useRecordingSlug(recordingId: string) {
         };
         delete query.id;
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
         router.replace(
           {
             pathname: url,
@@ -163,7 +162,6 @@ function RecordingPage({
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     getRecording();
   }, [
     dispatch,
