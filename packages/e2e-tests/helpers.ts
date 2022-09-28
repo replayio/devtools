@@ -1,4 +1,5 @@
 import { expect, test as base, PlaywrightTestArgs, Locator } from "@playwright/test";
+import { waitFor } from "@playwright-testing-library/test";
 import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
@@ -60,8 +61,9 @@ export async function openPauseInformation(screen: Screen) {
   // Only click if it's not already open; clicking again will collapse the side bar.
   const pane = await getBreakpointsPane(screen);
   const isVisible = await pane.isVisible();
+
   if (!isVisible) {
-    return screen.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+    await screen.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
   }
 }
 
@@ -76,10 +78,6 @@ export async function openSourceExplorer(screen: Screen) {
   if (!isVisible) {
     return screen.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
   }
-}
-
-export async function togglePausePane(screen: Screen) {
-  return screen.queryByRole("button", { name: "motion_photos_paused" }).click();
 }
 
 // Console
@@ -171,7 +169,6 @@ export async function clearConsoleEvaluations(screen: Screen) {
 }
 
 export async function expandFilterCategory(screen: Screen, categoryName: string) {
-  const categoryHeader = screen.queryByTestId(`EventCategoryHeader-${categoryName}`);
   const consoleFilters = screen.queryByTestId("ConsoleFilterToggles");
 
   const categoryLabel = consoleFilters.locator(`[data-test-name="Expandable"]`, {
@@ -203,7 +200,7 @@ export async function addEventListenerLogpoints(screen: Screen, eventTypes: stri
 // Debugger
 
 export async function getCurrentCallStackFrameInfo(screen: Screen) {
-  const framesPanel = screen.queryByTestId("FramesPanel");
+  const framesPanel = getFramesPanel(screen);
   const selectedFrame = framesPanel.locator(".frame.selected");
   const fileNameNode = selectedFrame.locator(".filename");
   const lineNumberNode = selectedFrame.locator(".line");
@@ -457,31 +454,35 @@ export async function selectSource(screen: Screen, url: string) {
 }
 
 function waitForSelectedSource(screen: Screen, url?: string) {
-  return screen.waitForFunction(
-    params => {
-      const source = window.app.selectors!.getSelectedSourceWithContent()! || {};
-      if (!source.value) {
-        return false;
-      }
+  if (!url) {
+    return;
+  }
+  return waitFor(async () => {
+    const editorPanel = screen.locator("#toolbox-content-debugger");
+    const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
+    const isTabActive = (await sourceHeader.getAttribute("data-status")) === "active";
 
-      if (!params.url) {
-        return true;
-      }
+    // HACK Assume that the source file has loaded when the combined text of the first
+    // 10 lines is no longer an empty string
+    const codeMirrorLines = editorPanel.locator(".CodeMirror-code .CodeMirror-line");
 
-      const newSource = app.selectors.fuzzyFindSourceByUrl(params.url)!;
-      if (newSource.id != source.id) {
-        return false;
-      }
+    const numLines = await codeMirrorLines.count();
+    // Could be fewer than 10 lines visible, and I can't find a `.slice()` on `Locator`
+    const linesToGrab = Math.min(numLines, 10);
 
-      // The hasSymbols check is disabled. Sometimes the parser worker fails for
-      // unclear reasons. See https://github.com/RecordReplay/devtools/issues/433
-      // return hasSymbols(source) && getBreakableLines(source.id);
-      return app.selectors.getBreakableLinesForSource(source.id);
-    },
-    {
-      url,
-    }
-  );
+    const lineTextPromises = Array.from({ length: linesToGrab }).map((_, i) => {
+      return codeMirrorLines.nth(i).textContent();
+    });
+    const lineTexts = await Promise.all(lineTextPromises);
+
+    const combinedLineText = lineTexts
+      .join()
+      .trim()
+      // Remove zero-width spaces, which would be considered non-empty
+      .replace(/[\u200B-\u200D\uFEFF]/g, "");
+
+    expect(isTabActive && lineTexts.length > 0 && combinedLineText !== "").toBe(true);
+  });
 }
 
 export async function removeBreakpoint(
@@ -518,19 +519,15 @@ export async function removeAllBreakpoints(screen: Screen) {
   }
 }
 
-async function getThreadContext(screen: Screen) {
-  return screen.evaluate(() => window.app.selectors!.getThreadContext());
-}
-
 export async function toggleBreakpoint(screen: Screen, number: number) {
   await screen.locator(`text=${number}`).click();
 }
 
 export async function rewind(screen: Screen) {
-  await screen.locator(".command-bar-button").first().click();
-  await new Promise(r => setTimeout(r, 100));
+  await openPauseInformation(screen);
 
-  await screen.evaluate(() => window.app.selectors!.getIsPaused());
+  const button = screen.getByTitle("Rewind Execution");
+  await button.click();
 }
 
 export async function resumeToLine(
@@ -624,13 +621,10 @@ export async function reverseStepOverToLine(screen: Screen, line: number) {
 }
 
 export async function selectFrame(screen: Screen, index: number) {
-  screen.evaluate(
-    params => {
-      const frames = app.selectors.getFrames()!;
-      return app.actions.selectFrame(app.selectors.getThreadContext(), frames[params.index]);
-    },
-    { index }
-  );
+  const framesPanel = getFramesPanel(screen);
+
+  const frameListItems = framesPanel.locator(".frame");
+  await frameListItems.nth(index).click();
 }
 
 export async function waitForFrameTimeline(screen: Screen, width: string) {
@@ -644,41 +638,42 @@ export async function waitForFrameTimeline(screen: Screen, width: string) {
 }
 
 export async function waitForPaused(screen: Screen, line?: number) {
-  await screen.evaluate(() =>
-    window.app.store.dispatch({ type: "set_selected_primary_panel", panel: "debugger" })
-  );
+  await openPauseInformation(screen);
 
-  await screen.waitForFunction(
-    () => window.app.selectors!.getIsPaused() && window.app.selectors!.getSelectedScope() !== null
-  );
+  await waitFor(async () => {
+    const scopesPanel = getScopesPanel(screen);
+    const framesPanel = getFramesPanel(screen);
 
-  await screen.waitForFunction(() => window.app.selectors!.getFrames()!.length > 0);
+    const frameListItems = framesPanel.locator(".frame");
+    const scopeBlocks = scopesPanel.locator('[data-test-name="Expandable"]');
+    const [numFrames, numScopes] = await Promise.all([frameListItems.count(), scopeBlocks.count()]);
+
+    expect(numFrames > 0 && numScopes > 0).toBe(true);
+  });
 
   if (line) {
-    await screen.waitForFunction(
-      params => {
-        const frame = window.app.selectors!.getVisibleSelectedFrame();
-        return frame?.location?.line === params.line;
-      },
-      { line }
-    );
+    await waitFor(async () => {
+      const { fileName, lineNumber } = await getCurrentCallStackFrameInfo(screen);
+      expect(lineNumber).toBe(line);
+    });
   }
-
-  screen.locator('.scopes-list .tree-node[aria-level="2"]');
 }
 
 export async function checkFrames(screen: Screen, count: number) {
-  return screen.waitForFunction(
-    params => {
-      const frames = app.selectors.getFrames()!;
-      return frames.length == params.count;
-    },
-    { count }
-  );
+  const framesPanel = getFramesPanel(screen);
+  return waitFor(async () => {
+    const frameListItems = framesPanel.locator(".frame");
+    const numFrames = await frameListItems.count();
+    expect(numFrames === count).toBe(true);
+  });
 }
 
 export function getScopesPanel(screen: Screen) {
   return screen.locator('[data-test-name="ScopesList"]');
+}
+
+export function getFramesPanel(screen: Screen) {
+  return screen.queryByTestId("FramesPanel");
 }
 
 export async function expandFirstScope(screen: Screen) {
@@ -688,7 +683,8 @@ export async function expandFirstScope(screen: Screen) {
   }
 }
 
-export function waitForScopeValue(screen: Screen, name: string, value: string) {
+export async function waitForScopeValue(screen: Screen, name: string, value: string) {
+  await expandFirstScope(screen);
   return getScopesPanel(screen)
     .locator(
       `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${value}"))`
@@ -697,17 +693,16 @@ export function waitForScopeValue(screen: Screen, name: string, value: string) {
 }
 
 export async function reverseStepOver(screen: Screen) {
-  await screen.locator('[title="Reverse Step Over"]').click();
-  await new Promise(r => setTimeout(r, 100));
-  await screen.evaluate(() => window.app.selectors!.getIsPaused());
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Reverse Step Over").click();
 }
 
 export async function stepOver(screen: Screen) {
-  await screen.locator('[title="Step Over"]').click();
-  await new Promise(r => setTimeout(r, 100));
-  await screen.evaluate(() => window.app.selectors!.getIsPaused());
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Step Over").click();
 }
 
 export async function clickSourceTreeNode(screen: Screen, node: string) {
+  debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
   await screen.locator(`div[role="tree"] div:has-text("${node}")`).nth(1).click();
 }

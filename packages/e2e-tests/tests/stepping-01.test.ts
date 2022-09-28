@@ -3,12 +3,14 @@ import {
   checkEvaluateInTopFrame,
   openExample,
   rewind,
+  rewindToLine,
   reverseStepOver,
   stepOver,
   clickSourceTreeNode,
   clickDevTools,
   toggleBreakpoint,
   togglePausePane,
+  openPauseInformation,
 } from "../helpers";
 
 test("Test basic step-over/back functionality.", async ({ screen }) => {
@@ -22,8 +24,7 @@ test("Test basic step-over/back functionality.", async ({ screen }) => {
 
   // Pause on line 20
   await toggleBreakpoint(screen, 20);
-  await togglePausePane(screen);
-  await rewind(screen);
+  await rewindToLine(screen);
 
   // Should get ten when evaluating number.
   await checkEvaluateInTopFrame(screen, "number", "10");
