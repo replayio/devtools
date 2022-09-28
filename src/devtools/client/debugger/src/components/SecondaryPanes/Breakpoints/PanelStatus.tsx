@@ -55,6 +55,7 @@ export function PanelStatus({
         className={`rounded-2xl bg-breakpointStatusBG px-3 py-0.5 text-breakpointStatus ${getPrefixBadgeBackgroundColorClassName(
           prefixBadge
         )}`}
+        data-test-name="LogpointPanel-BreakpointStatus"
       >
         <div
           className="text-center"

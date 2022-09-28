@@ -3,6 +3,7 @@ import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
 } from "@playwright-testing-library/test/fixture";
+import chalk from "chalk";
 
 export const test = base.extend<TestingLibraryFixtures>(fixtures);
 test.use({
@@ -25,11 +26,17 @@ type MessageType =
   | "log-point"
   | "terminal-expression";
 
+function debugPrint(message: string, scope?: string) {
+  console.log(message, scope ? chalk.dim(`(${scope})`) : "");
+}
+
 export async function openExample(screen: Screen, example: string) {
   const recordingId = exampleRecordings[example];
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
   const url = `${base}/recording/${recordingId}?e2e=1`;
-  console.log(`Navigating to ${url}`);
+
+  debugPrint(`Navigating to ${chalk.bold(url)}`, "openExample");
+
   await screen.goto(url);
 }
 
@@ -77,7 +84,7 @@ export async function togglePausePane(screen: Screen) {
 
 // Console
 
-function delay(timeout: number) {
+export function delay(timeout: number) {
   return new Promise(r => setTimeout(r, timeout));
 }
 
@@ -173,6 +180,35 @@ export async function getCurrentCallStackFrameInfo(screen: Screen) {
   };
 }
 
+export async function verifyBreakpointStatus(
+  screen: Screen,
+  expectedStatus: string,
+  options: {
+    lineNumber: number;
+    url?: string;
+  }
+) {
+  const { lineNumber, url } = options;
+
+  await openSourceExplorer(screen);
+
+  if (url) {
+    await selectSource(screen, url);
+  }
+
+  debugPrint(
+    `Verifying breakpoint status "${chalk.bold(expectedStatus)}" for line ${chalk.bold(
+      options.lineNumber
+    )}`,
+    "verifyBreakpointStatus"
+  );
+
+  const line = await getSourceLine(screen, lineNumber);
+  expect(
+    line.locator(`[data-test-name="LogpointPanel-BreakpointStatus"]:has-text("${expectedStatus}")`)
+  ).toBeVisible();
+}
+
 export async function getSelectedLineNumber(screen: Screen) {
   const lineNumber = await screen.locator(".new-debug-line .CodeMirror-linenumber");
   const textContent = await lineNumber.textContent();
@@ -180,9 +216,11 @@ export async function getSelectedLineNumber(screen: Screen) {
 }
 
 export async function getSourceLine(screen: Screen, lineNumber: number) {
-  return screen.locator(".CodeMirror-code div", {
-    has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
-  }).first();
+  return screen
+    .locator(".CodeMirror-code div", {
+      has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
+    })
+    .first();
 }
 
 export async function addLogpoint(
@@ -195,7 +233,7 @@ export async function addLogpoint(
 ) {
   const { columnIndex, lineNumber, url } = options;
 
-  console.log(`Adding logpoing at ${url}:${lineNumber}`);
+  debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
 
   await clickDevTools(screen);
 
@@ -208,7 +246,7 @@ export async function addLogpoint(
   await line.hover();
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 
-  expect(await line.locator('.CodeMirror-linewidget')).toBeVisible();
+  expect(await line.locator(".CodeMirror-linewidget")).toBeVisible();
 }
 
 export async function addBreakpoint(
@@ -221,7 +259,7 @@ export async function addBreakpoint(
 ) {
   const { columnIndex, lineNumber, url } = options;
 
-  console.log(`Adding breakpoint at ${url}:${lineNumber}`);
+  debugPrint(`Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "addBreakpoint");
 
   await clickDevTools(screen);
 
@@ -248,7 +286,35 @@ export async function addBreakpoint(
   }
 }
 
-async function selectSource(screen: Screen, url: string) {
+export async function quickOpen(screen: Screen, url: string) {
+  debugPrint("Opening quick-open dialog", "quickOpen");
+  await screen.keyboard.press("Meta+P");
+  await screen.focus('[data-test-id="QuickOpenInput"]');
+
+  debugPrint(`Filtering files by "${chalk.bold(url)}"`, "quickOpen");
+  await screen.keyboard.type(url);
+  await screen.waitForSelector(`[data-test-id="QuickOpenResultsList"]:has-text("${url}")`);
+
+  debugPrint(`Opening file`, "quickOpen");
+  await screen.keyboard.press("Enter");
+  await screen.waitForSelector(`[data-test-name="Source-${url}"]`);
+}
+
+export async function closeSource(screen: Screen, url: string) {
+  debugPrint(`Closing source "${chalk.bold(url)}"`, "selectSource");
+
+  const sourceTab = screen.locator(`[data-test-name="Source-${url}"]`);
+
+  if (await sourceTab.isVisible()) {
+    await sourceTab.locator("button").click();
+  }
+
+  expect(sourceTab).not.toBeVisible();
+}
+
+export async function selectSource(screen: Screen, url: string) {
+  debugPrint(`Opening source "${chalk.bold(url)}"`, "selectSource");
+
   const pane = await getSourcesPane(screen);
 
   let foundSource = false;
@@ -320,7 +386,7 @@ export async function removeBreakpoint(
 ) {
   const { lineNumber, url } = options;
 
-  console.log(`Removing breakpoint at ${url}:${lineNumber}`);
+  debugPrint(`Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "removeBreakpoint");
 
   await clickDevTools(screen);
 
