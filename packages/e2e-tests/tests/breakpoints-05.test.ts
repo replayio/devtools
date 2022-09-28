@@ -1,24 +1,35 @@
 import {
-  test,
-  openExample,
-  clickDevTools,
-  removeAllBreakpoints,
-  rewindToLine,
   addBreakpoint,
+  clickDevTools,
+  openExample,
+  openPauseInformation,
+  removeBreakpoint,
   resumeToLine,
+  rewindToLine,
+  test,
 } from "../helpers";
 
 test(`Test interaction of breakpoints with debugger statements.`, async ({ screen }) => {
   await openExample(screen, "doc_debugger_statements.html");
   await clickDevTools(screen);
+  await openPauseInformation(screen);
 
-  // TODO: remove timeout
-  await new Promise(r => setTimeout(r, 1000));
-  await rewindToLine(screen, 9);
-  await addBreakpoint(screen, "doc_debugger_statements.html", 8);
-  await rewindToLine(screen, 8);
-  await resumeToLine(screen, 9);
-  await removeAllBreakpoints(screen);
-  await rewindToLine(screen, 7);
-  await resumeToLine(screen, 9);
+  // Without any breakpoints, this test should rewind to the closest debugger statement.
+  await rewindToLine(screen, { lineNumber: 9 });
+
+  // Without a breakpoints being the next nearest thing, we should rewind to it.
+  await addBreakpoint(screen, {
+    lineNumber: 8,
+    url: "doc_debugger_statements.html",
+  });
+  await rewindToLine(screen, { lineNumber: 8 });
+  await resumeToLine(screen, { lineNumber: 9 });
+
+  // Without any breakpoints (again), we should rewind to debugger statements.
+  await removeBreakpoint(screen, {
+    lineNumber: 8,
+    url: "doc_debugger_statements.html",
+  });
+  await rewindToLine(screen, { lineNumber: 7 });
+  await resumeToLine(screen, { lineNumber: 9 });
 });

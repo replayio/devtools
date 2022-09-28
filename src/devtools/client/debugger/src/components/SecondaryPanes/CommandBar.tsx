@@ -5,12 +5,7 @@
 import React, { Component } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
-import {
-  getThreadContext,
-  getBreakpointSources,
-  getFramePositions,
-  hasFrames,
-} from "../../selectors";
+import { getThreadContext, getFramePositions, hasFrames } from "../../selectors";
 import { formatKeyShortcut } from "../../utils/text";
 import actions from "../../actions";
 import CommandBarButton from "../shared/Button/CommandBarButton";
@@ -19,6 +14,7 @@ import { trackEvent } from "ui/utils/telemetry";
 import type { UIState } from "ui/state";
 
 import Services from "devtools/shared/services";
+
 const { appinfo } = Services;
 
 const isMacOS = appinfo.OS === "Darwin";
@@ -154,37 +150,21 @@ class CommandBar extends Component<PropsFromRedux> {
   }
 
   renderRewindButton() {
-    const { hasBreakpoints } = this.props;
-    const disabled = !hasBreakpoints;
-
-    const disabledTooltip = "Rewinding is disabled until you add a breakpoint";
-    const tooltip = "Rewind Execution";
-
     return (
       <CommandBarButton
-        disabled={disabled}
         key="rewind"
         onClick={this.onRewind}
-        tooltip={tooltip}
-        disabledTooltip={disabledTooltip}
+        tooltip="Rewind Execution"
         type="rewind"
       />
     );
   }
   renderResumeButton() {
-    const { hasBreakpoints } = this.props;
-    const disabled = !hasBreakpoints;
-
-    const disabledTooltip = "Resuming is disabled until you add a breakpoint";
-    const tooltip = `Resume ${formatKey("resume")}`;
-
     return (
       <CommandBarButton
-        disabled={disabled}
         key="resume"
         onClick={this.onResume}
-        tooltip={tooltip}
-        disabledTooltip={disabledTooltip}
+        tooltip={`Resume ${formatKey("resume")}`}
         type="resume"
       />
     );
@@ -248,7 +228,6 @@ class CommandBar extends Component<PropsFromRedux> {
 
 const mapStateToProps = (state: UIState) => ({
   cx: getThreadContext(state),
-  hasBreakpoints: getBreakpointSources(state).length,
   hasFramePositions: getFramePositions(state)?.positions.length,
   isPaused: hasFrames(state),
 });
