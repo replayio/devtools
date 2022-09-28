@@ -1,14 +1,20 @@
+import { expect } from "@playwright/test";
 import {
   addBreakpoint,
   addLogpoint,
   clickDevTools,
   closeSource,
-  delay,
+  getConsoleMessage,
+  getSourceTab,
   openExample,
+  openMessageSource,
   quickOpen,
   rewindToLine,
+  seekToConsoleMessage,
   test,
   verifyBreakpointStatus,
+  waitForBreakpoint,
+  waitForLogpoint,
 } from "../helpers";
 
 test(`Test TODO name this thing.`, async ({ screen }) => {
@@ -20,75 +26,35 @@ test(`Test TODO name this thing.`, async ({ screen }) => {
   await addBreakpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
   await addLogpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
 
+  // Verify that the command bar can be used to fast forward and rewind to log points.
   await rewindToLine(screen, { lineNumber: 5 });
   await verifyBreakpointStatus(screen, "2/2", { lineNumber: 5 });
-
   await rewindToLine(screen, { lineNumber: 5 });
   await verifyBreakpointStatus(screen, "1/2", { lineNumber: 5 });
 
   await closeSource(screen, "bundle_input.js");
 
-  await delay(2500); // TODO Finish the test
+  // Verify that the Console allows rewinding/fast forwarding to log points as well.
+  const message = await getConsoleMessage(screen, "bundle_input", "log-point");
+  await seekToConsoleMessage(screen, message.last());
+  await verifyBreakpointStatus(screen, "2/2", { lineNumber: 5 });
+  await seekToConsoleMessage(screen, message.first());
+  await verifyBreakpointStatus(screen, "1/2", { lineNumber: 5 });
+
+  await closeSource(screen, "bundle_input.js");
+
+  const sourceTab = getSourceTab(screen, "bundle_input.js");
+
+  // Verify that clicking on the source location in the Console opens the source editor.
+  await sourceTab.waitFor({ state: "detached" });
+  await openMessageSource(message.first());
+  await sourceTab.waitFor({ state: "visible" });
+
+  // Verify that the active source and breakpoints/logpoints are restored after a reload.
+  await screen.reload();
+  await sourceTab.waitFor({ state: "visible" });
+
+  // TODO [FE-757] Re-enable these once both breakpoints and log points are reliably restored after reloading
+  // await waitForBreakpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
+  // await waitForLogpoint(screen, { lineNumber: 5, url: "bundle_input.js" });
 });
-
-/*
-(async () => {
-    const url = new URL(location.href);
-    if (!url.searchParams.get("navigated")) {
-      // click the first source link in the console
-      document.querySelectorAll(".webconsole-output .frame-link-source")[0].click();
-      await checkBreakpointPanel(1);
-      await checkDebugLine();
-  
-      await closeEditor();
-      // click the second source link in the console
-      document.querySelectorAll(".webconsole-output .frame-link-source")[1].click();
-      await checkBreakpointPanel(1);
-      await checkDebugLine();
-  
-      // wait to ensure that the currently selected panel is saved to asyncStorage
-      // so that it is selected again after reloading
-      await Test.waitForTime(1000);
-  
-      // reload the recording
-      url.searchParams.append("navigated", "true");
-      document.location.href = url.href;
-      await new Promise(() => {});
-    } else {
-      // part two of the test, after reloading:
-      // Test.app.actions.setViewMode("dev");
-
-      // await Test.waitUntil(
-      //   () => document.querySelectorAll(".breakpoints-list .breakpoint").length === 2,
-      //   { waitingFor: "a breakpoint and a logpoint to be present" }
-      // );
-  
-      Test.finish();
-    }
-  })();
-
-  async function checkBreakpointPanel(selectedBreakpoint) {
-    await Test.waitUntil(
-      () => {
-        const statusElement = document.querySelector(".breakpoint-navigation-status-container");
-        return statusElement && statusElement.textContent === `${selectedBreakpoint}/2`;
-      },
-      { waitingFor: `${selectedBreakpoint}/2 to be selected` }
-    );
-  }
-  
-  async function checkDebugLine() {
-    await Test.waitUntil(
-      () => document.querySelector(".editor-pane .CodeMirror-code .new-debug-line"),
-      { waitingFor: "new debug line to be present" }
-    );
-  }
-  
-  async function closeEditor() {
-    document.querySelector(".source-tabs .close").click();
-    await Test.waitUntil(
-      () => document.querySelector(".breakpoint-navigation-status-container") === null,
-      { waitingFor: "source tab to close" }
-    );
-  }
- */
