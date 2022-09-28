@@ -1,11 +1,11 @@
 import {
-  test,
-  openExample,
-  rewindToLine,
   addBreakpoint,
-  clickDevTools,
   checkEvaluateInTopFrame,
+  clickDevTools,
+  openExample,
+  test,
   resumeToLine,
+  rewindToLine,
 } from "../helpers";
 
 test(`Test basic breakpoint functionality.`, async ({ screen }) => {

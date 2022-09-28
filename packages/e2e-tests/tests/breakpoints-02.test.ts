@@ -1,10 +1,10 @@
 import {
-  test,
+  addBreakpoint,
+  checkEvaluateInTopFrame,
+  clickDevTools,
   openExample,
   rewindToLine,
-  addBreakpoint,
-  clickDevTools,
-  checkEvaluateInTopFrame,
+  test,
 } from "../helpers";
 
 test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ screen }) => {

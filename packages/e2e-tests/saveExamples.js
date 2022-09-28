@@ -67,7 +67,7 @@ async function saveRecording(example) {
   const lastRecording = recordings[recordings.length - 1];
 
   const id = await replay.uploadRecording(lastRecording.id, {
-    apiKey: "rwk_90fWQyJdA32Ny8helYNm9gy6vtqJnOXH3JkbYMviyuf",
+    apiKey: process.env.API_KEY,
   });
 
   const savedExamples = JSON.parse(fs.readFileSync(`${__dirname}/examples.json`));
