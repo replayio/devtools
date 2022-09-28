@@ -12,7 +12,8 @@ import {
 
 // Test the objects produced by console.log() calls and by evaluating various
 test(`expressions in the console after time warping.`, async ({ screen }) => {
-  let msg;
+  let message;
+
   await openExample(screen, "doc_rr_objects.html");
   await clickDevTools(screen);
   await selectConsole(screen);
@@ -37,17 +38,17 @@ test(`expressions in the console after time warping.`, async ({ screen }) => {
   //   '<div id="foo" class="bar" style="visibility: visible" blahblah="">BAR<div>'
   // );
 
-  // await waitForConsoleMessage(screen, "function bar()");
-  // await checkJumpIcon(screen, "function bar()");
-  // // await new Promise(r => setTimeout(r, 100_000));
+  await waitForConsoleMessage(screen, "ƒbar()");
+  // await checkJumpIcon(screen, "ƒbar()");
+  // await new Promise(r => setTimeout(r, 100_000));
 
-  // await waitForConsoleMessage(screen, 'Array(6) [ undefined, true, 3, null, "z", 40n ]');
-  // await waitForConsoleMessage(screen, "Proxy {  }");
-  // await waitForConsoleMessage(screen, "Symbol()");
-  // await waitForConsoleMessage(screen, "Symbol(symbol)");
-  // await waitForConsoleMessage(screen, `Object { "Symbol()": 42, "Symbol(symbol)": "Symbol()" }`);
+  // await waitForConsoleMessage(screen, '(6) [undefined, true, 3, null, "z", …]');
+  await waitForConsoleMessage(screen, "Proxy{}");
+  await waitForConsoleMessage(screen, "Symbol()");
+  await waitForConsoleMessage(screen, "Symbol(symbol)");
+  await waitForConsoleMessage(screen, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
 
-  // msg = await waitForConsoleMessage(screen, "Object { _foo: C }");
+  message = await waitForConsoleMessage(screen, "{_foo: C{…}, foo: ƒ()}");
 
   // // TODO: add support for expanding objects in the console
   // await checkMessageObjectContents(
@@ -57,7 +58,7 @@ test(`expressions in the console after time warping.`, async ({ screen }) => {
   //   ["foo", "bar"]
   // );
 
-  // await warpToMessage(screen, "Done");
+  await warpToMessage(screen, "Done");
 
   // await executeInConsole(screen, "Error('helo')");
   // await waitForConsoleMessage(screen, 'Error: "helo"');
