@@ -7,8 +7,8 @@ const config: PlaywrightTestConfig = {
     headless: !DEBUG,
     browserName: "chromium",
     viewport: {
-      width: 1024,
-      height: 600,
+      width: 1280,
+      height: 1024,
     },
   },
 };
