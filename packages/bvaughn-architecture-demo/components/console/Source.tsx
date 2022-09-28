@@ -40,7 +40,12 @@ export default function Source({
   const sourceString = `${fileName}:${location.line}`;
 
   return (
-    <span className={`${styles.Source} ${className}`} onClick={openSource} title={sourceString}>
+    <span
+      className={`${styles.Source} ${className}`}
+      data-test-name="Console-Source"
+      onClick={openSource}
+      title={sourceString}
+    >
       {sourceString}
     </span>
   );

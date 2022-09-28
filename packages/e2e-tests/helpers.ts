@@ -1,4 +1,4 @@
-import { expect, test as base, PlaywrightTestArgs } from "@playwright/test";
+import { expect, test as base, PlaywrightTestArgs, Locator } from "@playwright/test";
 import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
@@ -118,6 +118,15 @@ export async function getConsoleMessage(
   return screen.locator(`${attributeSelector}:has-text("${expected}")`);
 }
 
+export async function seekToConsoleMessage(screen: Screen, consoleMessage: Locator) {
+  const textContent = await consoleMessage.textContent();
+
+  debugPrint(`Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
+
+  await consoleMessage.hover();
+  await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
+}
+
 export async function waitForConsoleMessage(
   screen: Screen,
   expected: Expected,
@@ -231,9 +240,10 @@ export async function verifyBreakpointStatus(
   );
 
   const line = await getSourceLine(screen, lineNumber);
-  expect(
-    line.locator(`[data-test-name="LogpointPanel-BreakpointStatus"]:has-text("${expectedStatus}")`)
-  ).toBeVisible();
+  const status = line.locator(
+    `[data-test-name="LogpointPanel-BreakpointStatus"]:has-text("${expectedStatus}")`
+  );
+  await status.waitFor({ state: "visible" });
 }
 
 export async function getSelectedLineNumber(screen: Screen) {
@@ -242,7 +252,7 @@ export async function getSelectedLineNumber(screen: Screen) {
   return textContent;
 }
 
-export async function getSourceLine(screen: Screen, lineNumber: number) {
+export function getSourceLine(screen: Screen, lineNumber: number) {
   return screen
     .locator(".CodeMirror-code div", {
       has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
@@ -258,7 +268,7 @@ export async function addLogpoint(
     url: string;
   }
 ) {
-  const { columnIndex, lineNumber, url } = options;
+  const { lineNumber, url } = options;
 
   debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
 
@@ -273,7 +283,60 @@ export async function addLogpoint(
   await line.hover();
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 
-  expect(await line.locator(".CodeMirror-linewidget")).toBeVisible();
+  await waitForLogpoint(screen, options);
+}
+
+export async function waitForBreakpoint(
+  screen: Screen,
+  options: {
+    columnIndex?: number;
+    lineNumber: number;
+    url: string;
+  }
+) {
+  const { columnIndex, lineNumber, url } = options;
+
+  debugPrint(
+    `Waiting for breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "waitForBreakpoint"
+  );
+
+  await openPauseInformation(screen);
+
+  const breakpointGroup = await screen.waitForSelector(
+    `.breakpoints-list-source:has-text("${url}")`
+  );
+
+  if (columnIndex != null) {
+    await breakpointGroup.waitForSelector(
+      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
+    );
+  } else {
+    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
+  }
+}
+
+export async function waitForLogpoint(
+  screen: Screen,
+  options: {
+    columnIndex?: number;
+    lineNumber: number;
+    url: string;
+  }
+) {
+  const { lineNumber, url } = options;
+
+  debugPrint(`Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "waitForLogpoint");
+
+  await clickDevTools(screen);
+
+  if (url) {
+    await openSourceExplorer(screen);
+    await selectSource(screen, url);
+  }
+
+  const line = getSourceLine(screen, lineNumber);
+  await line.locator(".CodeMirror-linewidget").waitFor({ state: "visible" });
 }
 
 export async function addBreakpoint(
@@ -284,7 +347,7 @@ export async function addBreakpoint(
     url: string;
   }
 ) {
-  const { columnIndex, lineNumber, url } = options;
+  const { lineNumber, url } = options;
 
   debugPrint(`Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "addBreakpoint");
 
@@ -299,18 +362,24 @@ export async function addBreakpoint(
   await line.locator(".CodeMirror-linenumber").hover();
   await line.locator(".CodeMirror-linenumber").click();
 
-  await openPauseInformation(screen);
+  await waitForBreakpoint(screen, options);
+}
 
-  const breakpointGroup = await screen.waitForSelector(
-    `.breakpoints-list-source:has-text("${url}")`
-  );
-  if (columnIndex != null) {
-    await breakpointGroup.waitForSelector(
-      `.breakpoint-line:has-text("${lineNumber}:${columnIndex}")`
-    );
-  } else {
-    await breakpointGroup.waitForSelector(`.breakpoint-line:has-text("${lineNumber}")`);
-  }
+export function getSourceTab(screen: Screen, url: string) {
+  return screen.locator(`[data-test-name="Source-${url}"]`);
+}
+
+export function getMessageSourceLink(message: Locator) {
+  return message.locator(`[data-test-name="Console-Source"]`);
+}
+
+export async function openMessageSource(consoleMessage: Locator) {
+  const sourceLink = getMessageSourceLink(consoleMessage);
+  const textContent = await sourceLink.textContent();
+
+  debugPrint(`Opening message source "${chalk.bold(textContent)}"`, "openMessageSource");
+
+  await sourceLink.click();
 }
 
 export async function quickOpen(screen: Screen, url: string) {
@@ -322,7 +391,7 @@ export async function quickOpen(screen: Screen, url: string) {
   await screen.keyboard.type(url);
   await screen.waitForSelector(`[data-test-id="QuickOpenResultsList"]:has-text("${url}")`);
 
-  debugPrint(`Opening file`, "quickOpen");
+  debugPrint(`Opening file "${chalk.bold(url)}"`, "quickOpen");
   await screen.keyboard.press("Enter");
   await screen.waitForSelector(`[data-test-name="Source-${url}"]`);
 }
@@ -330,24 +399,24 @@ export async function quickOpen(screen: Screen, url: string) {
 export async function closeSource(screen: Screen, url: string) {
   debugPrint(`Closing source "${chalk.bold(url)}"`, "selectSource");
 
-  const sourceTab = screen.locator(`[data-test-name="Source-${url}"]`);
+  const sourceTab = getSourceTab(screen, url);
 
   if (await sourceTab.isVisible()) {
     await sourceTab.locator("button").click();
   }
 
-  expect(sourceTab).not.toBeVisible();
+  await sourceTab.waitFor({ state: "detached" });
 }
 
 export async function selectSource(screen: Screen, url: string) {
-  debugPrint(`Opening source "${chalk.bold(url)}"`, "selectSource");
-
   // If the source is already open, just focus it.
-  const sourceTab = screen.locator(`[data-test-name="Source-${url}"]`);
+  const sourceTab = getSourceTab(screen, url);
   if (await sourceTab.isVisible()) {
     debugPrint(`Source "${chalk.bold(url)}" already open`, "selectSource");
     return;
   }
+
+  debugPrint(`Opening source "${chalk.bold(url)}"`, "selectSource");
 
   // Otherwise find it in the sources tree.
   const pane = await getSourcesPane(screen);
