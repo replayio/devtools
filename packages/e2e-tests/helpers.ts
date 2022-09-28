@@ -352,7 +352,7 @@ export async function resumeToLine(
   await openPauseInformation(screen);
 
   while (true) {
-    const button = screen.getByTitle("Resume ⌘\\ F8");
+    const button = screen.getByTitle(/^Resume/);
     await button.click();
 
     const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
