@@ -1,4 +1,3 @@
-import { expect } from "@playwright/test";
 import {
   addBreakpoint,
   addLogpoint,
@@ -13,8 +12,6 @@ import {
   seekToConsoleMessage,
   test,
   verifyBreakpointStatus,
-  waitForBreakpoint,
-  waitForLogpoint,
 } from "../helpers";
 
 test(`Test TODO name this thing.`, async ({ screen }) => {
