@@ -55,11 +55,12 @@ export default class ResultList extends Component {
   };
 
   render() {
-    const { size, items, role } = this.props;
+    const { dataTestId, size, items, role } = this.props;
 
     return (
       <ul
         className={classnames("result-list", size)}
+        data-test-id={dataTestId}
         id="result-list"
         role={role}
         aria-live="polite"

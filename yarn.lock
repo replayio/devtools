@@ -9376,7 +9376,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chalk@npm:4.1.2, chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
+"chalk@npm:4.1.2, chalk@npm:^4, chalk@npm:^4.0.0, chalk@npm:^4.0.2, chalk@npm:^4.1.0, chalk@npm:^4.1.2":
   version: 4.1.2
   resolution: "chalk@npm:4.1.2"
   dependencies:
@@ -13181,6 +13181,7 @@ __metadata:
     "@playwright-testing-library/test": ^4.4.0
     "@playwright/test": ^1.25.1
     "@replayio/playwright": ^0.2.24
+    chalk: ^4
     playwright: ^1.25.1
   languageName: unknown
   linkType: soft

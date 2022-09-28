@@ -447,6 +447,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
           query={query}
           hasPrefix={true}
           count={this.getResultCount()}
+          dataTestId="QuickOpenInput"
           placeholder={"Go to file…"}
           summaryMsg={this.getSummaryMessage()}
           showErrorEmoji={this.shouldShowErrorEmoji()}
@@ -464,6 +465,7 @@ export class QuickOpenModal extends Component<PropsFromRedux, QOMState> {
         {results && items && (
           <ResultList
             key="results"
+            dataTestId="QuickOpenResultsList"
             items={items}
             selected={selectedIndex}
             selectItem={this.selectResultItem}
