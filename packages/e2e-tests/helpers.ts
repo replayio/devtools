@@ -1,6 +1,4 @@
-import { Page, Locator, expect, test as base, PlaywrightTestArgs } from "@playwright/test";
-
-import { waitFor, within, wait } from "@playwright-testing-library/test";
+import { expect, test as base, PlaywrightTestArgs } from "@playwright/test";
 import {
   locatorFixtures as fixtures,
   LocatorFixtures as TestingLibraryFixtures,
@@ -182,9 +180,35 @@ export async function getSelectedLineNumber(screen: Screen) {
 }
 
 export async function getSourceLine(screen: Screen, lineNumber: number) {
-  return screen.locator(".CodeMirror-gutter-wrapper", {
+  return screen.locator(".CodeMirror-code div", {
     has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
-  });
+  }).first();
+}
+
+export async function addLogpoint(
+  screen: Screen,
+  options: {
+    columnIndex?: number;
+    lineNumber: number;
+    url: string;
+  }
+) {
+  const { columnIndex, lineNumber, url } = options;
+
+  console.log(`Adding logpoing at ${url}:${lineNumber}`);
+
+  await clickDevTools(screen);
+
+  if (url) {
+    await openSourceExplorer(screen);
+    await selectSource(screen, url);
+  }
+
+  const line = await getSourceLine(screen, lineNumber);
+  await line.hover();
+  await line.locator('[data-test-id="ToggleLogpointButton"]').click();
+
+  expect(await line.locator('.CodeMirror-linewidget')).toBeVisible();
 }
 
 export async function addBreakpoint(

@@ -22,11 +22,12 @@ import { useFeature } from "ui/hooks/settings";
 import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
 
 const QuickActionButton: FC<{
-  showNag: boolean;
   children: ReactNode;
-  onClick: () => void;
+  dataTestId?: string;
   disabled?: boolean;
-}> = ({ showNag, disabled, children, onClick }) => {
+  onClick: () => void;
+  showNag: boolean;
+}> = ({ children, dataTestId, disabled, onClick, showNag }) => {
   return (
     <button
       className={classNames(
@@ -34,6 +35,7 @@ const QuickActionButton: FC<{
         "flex rounded-md p-px leading-3 text-buttontextColor shadow-lg transition hover:scale-125",
         `${disabled ? "bg-gray-600" : "bg-primaryAccent"}`
       )}
+      data-test-id={dataTestId}
       onClick={disabled ? () => {} : onClick}
       style={{ background: showNag ? AWESOME_BACKGROUND : "" }}
     >
@@ -47,7 +49,12 @@ const ContinueToPrevious: FC<{ showNag: boolean; onClick: () => void; disabled: 
   onClick,
   disabled,
 }) => (
-  <QuickActionButton showNag={showNag} onClick={onClick} disabled={disabled}>
+  <QuickActionButton
+    dataTestId="ContinueToPreviousButton"
+    showNag={showNag}
+    onClick={onClick}
+    disabled={disabled}
+  >
     <MaterialIcon>navigate_before</MaterialIcon>
   </QuickActionButton>
 );
@@ -56,7 +63,12 @@ const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: bool
   onClick,
   disabled,
 }) => (
-  <QuickActionButton showNag={showNag} onClick={onClick} disabled={disabled}>
+  <QuickActionButton
+    dataTestId="ContinueToNextButton"
+    showNag={showNag}
+    onClick={onClick}
+    disabled={disabled}
+  >
     <MaterialIcon>navigate_next</MaterialIcon>
   </QuickActionButton>
 );
@@ -68,7 +80,7 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
   const icon = breakpoint?.options.logValue ? "remove" : "add";
 
   return (
-    <QuickActionButton showNag={showNag} onClick={onClick}>
+    <QuickActionButton dataTestId="ToggleLogpointButton" showNag={showNag} onClick={onClick}>
       <MaterialIcon>{icon}</MaterialIcon>
     </QuickActionButton>
   );
