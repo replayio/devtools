@@ -133,7 +133,6 @@ export async function bootstrapApp() {
   });
 
   // Listen for changes in loaded regions and pre-caches the points.
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   ThreadFront.listenForLoadChanges((loadedRegions: LoadedRegions) => {
     loadedRegions.indexed.forEach(({ begin, end }) => {
       preCacheExecutionPointForTime(begin);

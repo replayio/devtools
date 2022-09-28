@@ -21,10 +21,8 @@
     "project": ["tsconfig.json"],
     "sourceType": "module"
   },
-  "plugins": ["import", "react", "prettier", "@typescript-eslint"],
+  "plugins": ["import", "react", "prettier"],
   "rules": {
-    "@typescript-eslint/no-base-to-string": "warn",
-    "@typescript-eslint/no-floating-promises": "error",
     "curly": "error",
     "import/order": [
       "off",
