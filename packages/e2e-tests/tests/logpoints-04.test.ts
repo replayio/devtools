@@ -1,13 +1,38 @@
-Test.describe(`Test exception logpoints.`, async () => {
-  await Test.toggleExceptionLogging(true);
-  await Test.selectConsole();
+import { expect } from "@playwright/test";
 
-  await Test.warpToMessage("Object { number: 4 }");
-  await Test.waitForFrameTimeline("100%");
+import {
+  checkEvaluateInTopFrame,
+  clickDevTools,
+  getConsoleMessage,
+  openExample,
+  reverseStepOverToLine,
+  seekToConsoleMessage,
+  selectConsole,
+  test,
+  waitForFrameTimeline,
+} from "../helpers";
 
-  await Test.executeInConsole("number * 10");
-  await Test.waitForMessage("40");
+const url = "doc_exceptions.html";
 
-  await Test.reverseStepOverToLine(15);
-  await Test.waitForFrameTimeline("0%");
+test(`should display exceptions in the console`, async ({ screen }) => {
+  await openExample(screen, url);
+  await clickDevTools(screen);
+
+  await selectConsole(screen);
+
+  await screen.queryByTestId("FilterToggle-exceptions").click();
+
+  let messages = await getConsoleMessage(screen, undefined, "exception");
+  await expect(messages).toHaveCount(20);
+
+  messages = await getConsoleMessage(screen, "number: 4", "exception");
+  await seekToConsoleMessage(screen, messages.first());
+  await waitForFrameTimeline(screen, "100%");
+
+  messages = await getConsoleMessage(screen, "number: 10", "exception");
+  await seekToConsoleMessage(screen, messages.first());
+  await checkEvaluateInTopFrame(screen, "number * 10", "40");
+
+  await reverseStepOverToLine(screen, 15);
+  await waitForFrameTimeline(screen, "0%");
 });

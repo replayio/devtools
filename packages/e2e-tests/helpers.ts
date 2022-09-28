@@ -106,7 +106,7 @@ export async function checkEvaluateInTopFrame(screen: Screen, value: string, exp
 
 export async function getConsoleMessage(
   screen: Screen,
-  expected: Expected,
+  expected?: Expected,
   messageType?: MessageType
 ) {
   await selectConsole(screen);
@@ -115,7 +115,9 @@ export async function getConsoleMessage(
     ? `[data-test-message-type="${messageType}"]`
     : '[data-test-name="Message"]';
 
-  return screen.locator(`${attributeSelector}:has-text("${expected}")`);
+  return expected
+    ? screen.locator(`${attributeSelector}:has-text("${expected}")`)
+    : screen.locator(`${attributeSelector}`);
 }
 
 export async function seekToConsoleMessage(screen: Screen, consoleMessage: Locator) {
@@ -701,6 +703,9 @@ export async function selectFrame(screen: Screen, index: number) {
 }
 
 export async function waitForFrameTimeline(screen: Screen, width: string) {
+  debugPrint(`Waiting for frame progress ${chalk.bold(width)}`, "waitForFrameTimeline");
+
+  await openPauseInformation(screen);
   await screen.waitForFunction(
     params => {
       const elem: HTMLElement | null = document.querySelector(".frame-timeline-progress");
