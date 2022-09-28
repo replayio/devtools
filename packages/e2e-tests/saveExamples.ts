@@ -1,8 +1,10 @@
+import { Page } from "@playwright/test";
+import { readdirSync, readFileSync, writeFileSync } from "fs";
+
 const playwright = require("@recordreplay/playwright");
 const replay = require("@replayio/replay");
-const fs = require("fs");
 
-async function waitUntilMessage(page, message, timeout = 30_000) {
+async function waitUntilMessage(page: Page, message: string, timeout: number = 30_000) {
   return await new Promise((resolve, reject) => {
     let timer = setTimeout(reject, timeout);
     page.on("console", async msg => {
@@ -21,7 +23,7 @@ async function waitUntilMessage(page, message, timeout = 30_000) {
   });
 }
 
-async function recordExample(example) {
+async function recordExample(example: string) {
   let browser, context, page, succeeded;
   try {
     console.log(`Recording ${example}`);
@@ -52,16 +54,16 @@ async function recordExample(example) {
   }
 }
 
-async function publicizeRecording(id) {
+async function publicizeRecording(id: string) {
   `mutation PublicizeRecording {
-    update_recordings_by_pk(_set: {is_private: false}, pk_columns: {id: "ce194585-26a0-406a-b6d7-986a969d7376"}) {
+    update_recordings_by_pk(_set: {is_private: false}, pk_columns: {id: "${id}"}) {
       id
     }
   }
   `;
 }
 
-async function saveRecording(example) {
+async function saveRecording(example: string) {
   console.log(`Saving ${example}`);
   const recordings = replay.listAllRecordings();
   const lastRecording = recordings[recordings.length - 1];
@@ -70,22 +72,20 @@ async function saveRecording(example) {
     apiKey: process.env.API_KEY,
   });
 
-  const savedExamples = JSON.parse(fs.readFileSync(`${__dirname}/examples.json`));
-  fs.writeFileSync(
-    `${__dirname}/examples.json`,
-    JSON.stringify({ ...savedExamples, [example]: id }, null, 2)
-  );
+  const text = "" + readFileSync(`${__dirname}/examples.json`);
+  const json = JSON.parse(text);
+  writeFileSync(`${__dirname}/examples.json`, JSON.stringify({ ...json, [example]: id }, null, 2));
   console.log(`Saved ${example}`);
 }
 
 async function recordExamples() {
-  const files = fs.readdirSync(`public/test/examples`);
+  const files = readdirSync(`public/test/examples`);
   const pages = files.filter(file => file.startsWith("doc"));
   for (const page of pages) {
     await recordExample(page);
   }
 
-  const examples = fs.readFileSync(`${__dirname}/examples.json`, "utf8");
+  const examples = readFileSync(`${__dirname}/examples.json`, "utf8");
   console.log(examples);
 }
 
