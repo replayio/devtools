@@ -77,7 +77,7 @@ export async function togglePausePane(screen: Screen) {
 
 // Console
 
-function delay(timeout: number) {
+export function delay(timeout: number) {
   return new Promise(r => setTimeout(r, timeout));
 }
 
@@ -154,17 +154,44 @@ export async function clearConsoleEvaluations(screen: Screen) {
   return screen.queryByTestId("ClearConsoleEvaluationsButton").click();
 }
 
-export async function addEventListenerLogpoints(screen: Screen, logpoints: string[]) {
-  return screen.evaluate(params => app.actions.addEventListenerBreakpoints(params.logpoints), {
-    logpoints,
+export async function expandFilterCategory(screen: Screen, categoryName: string) {
+  const categoryHeader = screen.queryByTestId(`EventCategoryHeader-${categoryName}`);
+  const consoleFilters = screen.queryByTestId("ConsoleFilterToggles");
+
+  const categoryLabel = consoleFilters.locator(`[data-test-name="Expandable"]`, {
+    hasText: categoryName,
   });
+
+  const state = await categoryLabel.getAttribute("data-test-state");
+  if (state === "closed") {
+    await categoryLabel.click();
+  }
+}
+
+const categoryNames = {
+  keyboard: "Keyboard",
+  mouse: "Mouse",
+  pointer: "Pointer",
+  timer: "Timer",
+  websocket: "WebSocket",
+};
+
+export async function addEventListenerLogpoints(screen: Screen, eventTypes: string[]) {
+  for (let eventType of eventTypes) {
+    const [, categoryKey, eventName] = eventType.split(".");
+    await expandFilterCategory(screen, categoryNames[categoryKey]);
+    await screen.queryByTestId(`EventTypes-${eventType}`).setChecked(true);
+  }
 }
 
 // Debugger
 
 export async function getCurrentCallStackFrameInfo(screen: Screen) {
-  const fileNameNode = await screen.locator(".frame.selected .filename");
-  const lineNumberNode = await screen.locator(".frame.selected .line");
+  const framesPanel = screen.queryByTestId("FramesPanel");
+  const selectedFrame = framesPanel.locator(".frame.selected");
+  const fileNameNode = selectedFrame.locator(".filename");
+  const lineNumberNode = selectedFrame.locator(".line");
+
   const fileName = await fileNameNode.textContent();
   const lineNumber = await lineNumberNode.textContent();
   return {
@@ -180,9 +207,11 @@ export async function getSelectedLineNumber(screen: Screen) {
 }
 
 export async function getSourceLine(screen: Screen, lineNumber: number) {
-  return screen.locator(".CodeMirror-code div", {
-    has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
-  }).first();
+  return screen
+    .locator(".CodeMirror-code div", {
+      has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
+    })
+    .first();
 }
 
 export async function addLogpoint(
@@ -208,7 +237,7 @@ export async function addLogpoint(
   await line.hover();
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 
-  expect(await line.locator('.CodeMirror-linewidget')).toBeVisible();
+  expect(await line.locator(".CodeMirror-linewidget")).toBeVisible();
 }
 
 export async function addBreakpoint(
@@ -423,29 +452,29 @@ export async function rewindToLine(
 }
 
 export async function stepInToLine(screen: Screen, line: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.stepIn(params.cx), { cx: cx });
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Step In").click();
 
   await waitForPaused(screen, line);
 }
 
 export async function stepOutToLine(screen: Screen, line: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.stepOut(params.cx), { cx: cx });
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Step Out").click();
 
   await waitForPaused(screen, line);
 }
 
 export async function stepOverToLine(screen: Screen, line: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.stepOver(params.cx), { cx: cx });
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Step Over").click();
 
   await waitForPaused(screen, line);
 }
 
 export async function reverseStepOverToLine(screen: Screen, line: number) {
-  const cx = await getThreadContext(screen);
-  await screen.evaluate(params => window.app.actions!.reverseStepOver(params.cx), { cx: cx });
+  await openPauseInformation(screen);
+  await screen.queryByTitle("Reverse Step Over").click();
 
   await waitForPaused(screen, line);
 }

@@ -22,7 +22,7 @@ test("Test basic step-over/back functionality.", async ({ screen }) => {
   await clickSourceTreeNode(screen, "doc_rr_basic.html");
 
   await toggleBreakpoint(screen, 21);
-  await rewindToLine(screen, 21);
+  await rewindToLine(screen, { lineNumber: 21 });
 
   await stepInToLine(screen, 24);
   await stepOverToLine(screen, 25);
