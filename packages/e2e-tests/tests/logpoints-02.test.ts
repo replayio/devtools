@@ -1,28 +1,34 @@
-// Test that logpoints appear and disappear as expected as breakpoints are
-Test.describe(`modified. Also test that conditional logpoints work.`, async () => {
-  const { assert } = Test;
+import { expect } from "@playwright/test";
 
-  await Test.selectSource("doc_rr_basic.html");
-  await Test.addBreakpoint("doc_rr_basic.html", 20, undefined, {
-    logValue: `"Logpoint Number", number`,
-  });
-  await Test.addBreakpoint("doc_rr_basic.html", 9, undefined, {
-    logValue: `"Logpoint Beginning"`,
-  });
-  await Test.addBreakpoint("doc_rr_basic.html", 7, undefined, {
-    logValue: `"Logpoint Ending"`,
-  });
+import { addLogpoint, clickDevTools, getConsoleMessage, openExample, test } from "../helpers";
 
-  await Test.selectConsole();
-  await Test.waitForMessageCount("Logpoint", 12);
+const url = "doc_rr_basic.html";
 
-  await Test.disableBreakpoint("doc_rr_basic.html", 9);
-  await Test.waitForMessageCount("Logpoint", 12); // 10 logs in the loop + beginning and end
-  await Test.waitForMessageCount("Logpoint Number", 10);
+test(`conditional log-points`, async ({ screen }) => {
+  await openExample(screen, url);
+  await clickDevTools(screen);
 
-  await Test.setBreakpointOptions("doc_rr_basic.html", 20, undefined, {
-    logValue: `"Logpoint Number " + number`,
+  await addLogpoint(screen, {
     condition: `number % 2 == 0`,
+    content: '"Logpoint Number " + number',
+    lineNumber: 20,
+    url,
   });
-  await Test.waitForMessageCount("Logpoint", 7); // 5 logs in the loop + beginning and end
+
+  await addLogpoint(screen, {
+    content: '"Logpoint Beginning"',
+    lineNumber: 9,
+    url,
+  });
+
+  await addLogpoint(screen, {
+    content: '"Logpoint Ending"',
+    lineNumber: 7,
+    url,
+  });
+
+  const logPointMessages = await getConsoleMessage(screen, "Logpoint", "log-point");
+  await expect(logPointMessages).toHaveCount(7); // 5 logs in the loop + beginning and end
+  await expect(logPointMessages.first()).toHaveText(/Beginning/);
+  await expect(logPointMessages.last()).toHaveText(/Ending/);
 });

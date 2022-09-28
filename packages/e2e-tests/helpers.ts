@@ -264,11 +264,12 @@ export async function addLogpoint(
   options: {
     columnIndex?: number;
     lineNumber: number;
+    condition?: string;
     content?: string;
     url: string;
   }
 ) {
-  const { content, lineNumber, url } = options;
+  const { condition, content, lineNumber, url } = options;
 
   debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
 
@@ -285,22 +286,41 @@ export async function addLogpoint(
 
   await waitForLogpoint(screen, options);
 
-  if (content) {
-    debugPrint(`Setting log-point content to ${chalk.bold(content)}`, "addLogpoint");
-
+  if (condition || content) {
     const line = getSourceLine(screen, lineNumber);
     await line.locator('[data-test-name="LogpointContentSummary"]').click();
 
-    const textArea = await line.locator("textarea");
-    await textArea.waitFor({ state: "visible" });
-    await textArea.focus();
-    await clearTextArea(screen, textArea);
-    await screen.keyboard.type(content);
+    if (condition) {
+      debugPrint(`Setting log-point condition "${chalk.bold(condition)}"`, "addLogpoint");
+
+      await line.locator('[data-test-name="EditLogpointConditionButton"]').click();
+
+      // Condition and content both have text areas.
+      await expect(line.locator("textarea")).toHaveCount(2);
+
+      const textArea = await line.locator("textarea").first();
+      await textArea.focus();
+      await clearTextArea(screen, textArea);
+      await screen.keyboard.type(condition);
+    }
+
+    if (content) {
+      debugPrint(`Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
+
+      // Condition and content both have text areas.
+      // Content will always be the last one regardless of whether the condition text area is visible.
+      const textArea = await line.locator("textarea").last();
+      await textArea.waitFor({ state: "visible" });
+      await textArea.focus();
+      await clearTextArea(screen, textArea);
+      await screen.keyboard.type(content);
+    }
 
     const saveButton = await line.locator('button[title="Save expression"]');
     await expect(saveButton).toBeEnabled();
     await saveButton.click();
 
+    const textArea = await line.locator("textarea");
     await textArea.waitFor({ state: "detached" });
   }
 }
