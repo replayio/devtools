@@ -191,10 +191,18 @@ const categoryNames = {
   websocket: "WebSocket",
 };
 
+type CategoryKey = keyof typeof categoryNames;
+
 export async function addEventListenerLogpoints(screen: Screen, eventTypes: string[]) {
   for (let eventType of eventTypes) {
     const [, categoryKey, eventName] = eventType.split(".");
-    await expandFilterCategory(screen, categoryNames[categoryKey]);
+
+    debugPrint(
+      `Adding event type "${chalk.bold(eventName)}" in category "${chalk.bold(categoryKey)}"`,
+      "addEventListenerLogpoints"
+    );
+
+    await expandFilterCategory(screen, categoryNames[categoryKey as CategoryKey]);
     await screen.queryByTestId(`EventTypes-${eventType}`).setChecked(true);
   }
 }

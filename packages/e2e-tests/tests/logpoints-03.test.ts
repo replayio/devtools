@@ -1,24 +1,25 @@
-Test.describe(`Test event logpoints when replaying.`, async () => {
-  await Test.selectConsole();
-  await Test.addEventListenerLogpoints(["click"]);
+import { expect } from "@playwright/test";
 
-  const msg = await Test.waitForMessage("MouseEvent");
+import {
+  addEventListenerLogpoints,
+  clickDevTools,
+  getConsoleMessage,
+  openExample,
+  test,
+} from "../helpers";
 
-  // TODO (replayio/devtools/pull/7586) This test helper needs to be rewritten
-  return;
+const url = "doc_events.html";
 
-  // The message's preview should contain useful properties.
-  const regexps = [
-    /target: div#divvy/,
-    /clientX: \d+/,
-    /clientY: \d+/,
-    /layerX: \d+/,
-    /layerY: \d+/,
-  ];
-  for (const regexp of regexps) {
-    Test.assert(regexp.test(msg.textContent), `Message text includes ${regexp}`);
-  }
+test(`should display event properties in the console`, async ({ screen }) => {
+  await openExample(screen, url);
+  await clickDevTools(screen);
 
-  // When expanded, other properties should be visible.
-  await Test.checkMessageObjectContents(msg, ["altKey: false", "bubbles: true"]);
+  await addEventListenerLogpoints(screen, ["event.mouse.click"]);
+
+  const message = await getConsoleMessage(screen, "MouseEvent", "event");
+
+  await expect(message).toContainText('type: "click"');
+  await expect(message).toContainText("target: <div");
+  await expect(message).toContainText("clientX: 0");
+  await expect(message).toContainText("clientY: 0");
 });
