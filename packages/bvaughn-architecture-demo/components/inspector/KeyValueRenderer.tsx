@@ -151,7 +151,7 @@ export default function KeyValueRenderer({
       {before}
       {name != null ? (
         <>
-          <span className={nameClass}>{name}</span>
+          <span className={nameClass} data-test-name="KeyValue-Header">{name}</span>
           <span className={styles.Separator}>: </span>
         </>
       ) : null}

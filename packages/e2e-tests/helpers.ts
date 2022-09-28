@@ -126,7 +126,7 @@ export async function waitForConsoleMessage(
 export async function warpToMessage(screen: Screen, text: string, line?: number) {
   const msg = await getConsoleMessage(screen, text);
   await msg.hover();
-  const warpButton = msg.locator(".rewind .button") || msg.locator(".fast-forward");
+  const warpButton = msg.locator('[data-test-id="ConsoleMessageHoverButton"]');
 
   await warpButton.hover();
   await warpButton.click();
@@ -504,8 +504,23 @@ export async function checkFrames(screen: Screen, count: number) {
   );
 }
 
-export async function waitForScopeValue(screen: Screen, name: string, value: string) {
-  await screen.waitForSelector(`.scopes-pane .object-node:has-text("${name}: ${value}")`);
+export function getScopesPanel(screen: Screen) {
+  return screen.locator('[data-test-name="ScopesList"]');
+}
+
+export async function expandFirstScope(screen: Screen) {
+  const expander = getScopesPanel(screen).locator('[data-test-name="Expandable"]').first();
+  if ((await expander.getAttribute("data-test-state")) === "closed") {
+    await expander.click();
+  }
+}
+
+export function waitForScopeValue(screen: Screen, name: string, value: string) {
+  return getScopesPanel(screen)
+    .locator(
+      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${value}"))`
+    )
+    .waitFor();
 }
 
 export async function reverseStepOver(screen: Screen) {
