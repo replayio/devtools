@@ -73,7 +73,10 @@ function BreakpointNavigation({
   if (editing) {
     return (
       <div className="breakpoint-navigation justify-end space-x-1 p-1.5 py-2">
-        <button className="" onClick={() => setShowCondition(!showCondition)}>
+        <button
+          data-test-name="EditLogpointConditionButton"
+          onClick={() => setShowCondition(!showCondition)}
+        >
           <Icon
             filename="filter"
             className={classnames(showCondition ? "bg-primaryAccent" : "bg-gray-400")}
