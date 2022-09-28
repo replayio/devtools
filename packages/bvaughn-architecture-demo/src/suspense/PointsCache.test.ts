@@ -259,7 +259,6 @@ describe("PointsCache", () => {
         throw Error("Expected");
       });
 
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
       expect(async () => {
         await imperativelyGetClosestPointForTime(replayClient, 3);
       }).rejects.toThrow("Expected");

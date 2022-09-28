@@ -259,7 +259,6 @@ export function getClosestPointForTime(
     timeToInFlightRequestMap.set(time, wakeable);
 
     // Fire and forget for the purposes of Suspense.
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchPointsBoundingTime(client, time, wakeable, false);
   }
 
@@ -298,7 +297,6 @@ export function getHitPointsForLocation(
     locationToHitPointsMap.set(key, record);
 
     // Fire and forget for the purposes of Suspense.
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
     fetchHitPointsForLocation(client, focusRange, location, condition, record, wakeable);
   }
 
