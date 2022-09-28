@@ -44,7 +44,6 @@ test(`expressions in the console after time warping.`, async ({ screen }) => {
   await waitForConsoleMessage(screen, "Error: helo");
 
   await executeInConsole(screen, 'function f() { throw Error("there"); }()');
-  // FIXME the first line in this stack isn't right.
   await waitForConsoleMessage(screen, "Error: there");
 
   await executeInConsole(screen, "Array(1, 2, 3)");
