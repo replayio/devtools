@@ -133,14 +133,14 @@ function LineHitCounts({ sourceEditor }: Props) {
     // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
     const gutterElement = sourceEditor.codeMirror.getGutterElement() as HTMLElement;
 
-    gutterElement.parentElement!.style.setProperty("--hit-count-gutter-width", `-${gutterWidth}`);
+    gutterElement.parentElement!.style.setProperty("--hit-count-gutter-width", gutterWidth);
 
     // If hit counts are shown, the button should not overlap with the gutter.
     // The gutter size changes though based on the number of hits, so we use a CSS variable.
     gutterElement.parentElement!.style.setProperty(
       "--print-statement-right-offset",
       hitCountsMode === "show-counts"
-        ? "calc(var(--hit-count-gutter-width) - 6px)"
+        ? `calc(${gutterWidth} - 6px)`
         : hitCountsMode === "hide-counts"
         ? "-10px"
         : "0px"

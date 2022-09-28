@@ -25,10 +25,15 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
-const gutterOffset = 37;
+const lineNumberGutterAndBorderWidth = 31;
 
 function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
-  return editor.getScrollInfo().clientWidth - gutterOffset;
+  const hitMarkersGutter = document.querySelector(".hit-markers") as HTMLElement;
+  const hitMarkersGutterWidth = hitMarkersGutter ? hitMarkersGutter.offsetWidth : 0;
+
+  return (
+    editor.getScrollInfo().clientWidth - lineNumberGutterAndBorderWidth - hitMarkersGutterWidth
+  );
 }
 
 const connector = connect(
@@ -166,7 +171,11 @@ function Panel({
       <div
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
-        style={{ position: "sticky", left: gutterOffset, maxWidth: width }}
+        style={{
+          position: "sticky",
+          left: `calc(${lineNumberGutterAndBorderWidth}px + var(--hit-count-gutter-width))`,
+          maxWidth: width,
+        }}
       >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
