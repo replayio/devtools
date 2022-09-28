@@ -109,6 +109,8 @@ export async function getConsoleMessage(
   expected: Expected,
   messageType?: MessageType
 ) {
+  await selectConsole(screen);
+
   const attributeSelector = messageType
     ? `[data-test-message-type="${messageType}"]`
     : '[data-test-name="Message"]';
@@ -262,10 +264,11 @@ export async function addLogpoint(
   options: {
     columnIndex?: number;
     lineNumber: number;
+    content?: string;
     url: string;
   }
 ) {
-  const { lineNumber, url } = options;
+  const { content, lineNumber, url } = options;
 
   debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
 
@@ -281,6 +284,33 @@ export async function addLogpoint(
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 
   await waitForLogpoint(screen, options);
+
+  if (content) {
+    debugPrint(`Setting log-point content to ${chalk.bold(content)}`, "addLogpoint");
+
+    const line = getSourceLine(screen, lineNumber);
+    await line.locator('[data-test-name="LogpointContentSummary"]').click();
+
+    const textArea = await line.locator("textarea");
+    await textArea.waitFor({ state: "visible" });
+    await textArea.focus();
+    await clearTextArea(screen, textArea);
+    await screen.keyboard.type(content);
+
+    const saveButton = await line.locator('button[title="Save expression"]');
+    await expect(saveButton).toBeEnabled();
+    await saveButton.click();
+
+    await textArea.waitFor({ state: "detached" });
+  }
+}
+
+export async function clearTextArea(screen: Screen, textArea: Locator) {
+  debugPrint(`Clearing content from textarea`, "clearTextArea");
+
+  await textArea.focus();
+  await screen.keyboard.press("Meta+A");
+  await screen.keyboard.press("Backspace");
 }
 
 export async function waitForBreakpoint(
@@ -539,6 +569,11 @@ export async function resumeToLine(
 ) {
   const { url = null, lineNumber } = options;
 
+  debugPrint(
+    `Resuming to line ${chalk.bold(url ? `${url}:${lineNumber}` : lineNumber)}`,
+    "resumeToLine"
+  );
+
   if (url !== null) {
     await selectSource(screen, url);
   }
@@ -593,6 +628,8 @@ export async function rewindToLine(
 }
 
 export async function stepInToLine(screen: Screen, line: number) {
+  debugPrint(`Step in to line ${chalk.bold(line)}`, "stepInToLine");
+
   await openPauseInformation(screen);
   await screen.queryByTitle("Step In").click();
 
@@ -600,6 +637,8 @@ export async function stepInToLine(screen: Screen, line: number) {
 }
 
 export async function stepOutToLine(screen: Screen, line: number) {
+  debugPrint(`Step out to line ${chalk.bold(line)}`, "stepOutToLine");
+
   await openPauseInformation(screen);
   await screen.queryByTitle("Step Out").click();
 
@@ -607,6 +646,8 @@ export async function stepOutToLine(screen: Screen, line: number) {
 }
 
 export async function stepOverToLine(screen: Screen, line: number) {
+  debugPrint(`Step over to line ${chalk.bold(line)}`, "stepOverToLine");
+
   await openPauseInformation(screen);
   await screen.queryByTitle("Step Over").click();
 
@@ -614,6 +655,8 @@ export async function stepOverToLine(screen: Screen, line: number) {
 }
 
 export async function reverseStepOverToLine(screen: Screen, line: number) {
+  debugPrint(`Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
+
   await openPauseInformation(screen);
   await screen.queryByTitle("Reverse Step Over").click();
 
@@ -621,6 +664,8 @@ export async function reverseStepOverToLine(screen: Screen, line: number) {
 }
 
 export async function selectFrame(screen: Screen, index: number) {
+  debugPrint(`Select frame ${chalk.bold(index)}`, "selectFrame");
+
   const framesPanel = getFramesPanel(screen);
 
   const frameListItems = framesPanel.locator(".frame");
@@ -638,6 +683,8 @@ export async function waitForFrameTimeline(screen: Screen, width: string) {
 }
 
 export async function waitForPaused(screen: Screen, line?: number) {
+  debugPrint(`Waiting for pause ${line != null ? `at ${chalk.bold(line)}` : ""}`, "waitForPaused");
+
   await openPauseInformation(screen);
 
   await waitFor(async () => {

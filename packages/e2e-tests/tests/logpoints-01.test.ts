@@ -1,38 +1,57 @@
-// Test basic logpoint functionality. When logpoints are added,
-Test.describe(
-  `new messages should appear in the correct order and allow time warping.`,
-  async () => {
-    const { assert } = Test;
+import { expect } from "@playwright/test";
+import {
+  addLogpoint,
+  checkEvaluateInTopFrame,
+  clickDevTools,
+  openExample,
+  test,
+  resumeToLine,
+  selectConsole,
+  getConsoleMessage,
+  seekToConsoleMessage,
+  reverseStepOverToLine,
+} from "../helpers";
 
-    await Test.selectSource("doc_rr_basic.html");
-    await Test.addBreakpoint("doc_rr_basic.html", 20);
-    await Test.setBreakpointOptions("doc_rr_basic.html", 20, undefined, {
-      logValue: `"Logpoint Number " + number`,
-    });
-    await Test.addBreakpoint("doc_rr_basic.html", 9, undefined, {
-      logValue: `"Logpoint Beginning"`,
-    });
-    await Test.addBreakpoint("doc_rr_basic.html", 7, undefined, {
-      logValue: `"Logpoint Ending"`,
-    });
+const url = "doc_rr_basic.html";
 
-    await Test.selectConsole();
+test(`log-points appear in the correct order and allow time warping`, async ({ screen }) => {
+  await openExample(screen, url);
+  await clickDevTools(screen);
 
-    const messages = await Test.waitForMessageCount("Logpoint", 12);
-    assert(!Test.findMessages("Loading").length, "there should be no more 'Loading' messages");
+  await addLogpoint(screen, {
+    content: '"Logpoint Number " + number',
+    lineNumber: 20,
+    url,
+  });
 
-    assert(messages[0].textContent.includes("Beginning"), "the message should include 'Beginning'");
-    for (let i = 1; i <= 10; i++) {
-      assert(messages[i].textContent.includes("Number " + i), `the message should include 'Number ${i}'`);
-    }
-    assert(messages[11].textContent.includes("Ending"), "the message should include 'Ending'");
+  await addLogpoint(screen, {
+    content: '"Logpoint Beginning"',
+    lineNumber: 9,
+    url,
+  });
 
-    await Test.warpToMessage("Number 5");
+  await addLogpoint(screen, {
+    content: '"Logpoint Ending"',
+    lineNumber: 7,
+    url,
+  });
 
-    await Test.checkEvaluateInTopFrame("number", 5);
-    await Test.reverseStepOverToLine(19);
+  await selectConsole(screen);
 
-    // The logpoint acts like a breakpoint when resuming.
-    await Test.resumeToLine(20);
-  }
-);
+  const loadingMessages = await getConsoleMessage(screen, "Loading", "log-point");
+  await expect(loadingMessages).toHaveCount(0);
+
+  const logPointMessages = await getConsoleMessage(screen, "Logpoint", "log-point");
+  await expect(logPointMessages).toHaveCount(12);
+  await expect(logPointMessages.first()).toHaveText(/Beginning/);
+  await expect(logPointMessages.last()).toHaveText(/Ending/);
+
+  const message = await getConsoleMessage(screen, "Number 5", "log-point");
+  await seekToConsoleMessage(screen, message);
+
+  await checkEvaluateInTopFrame(screen, "number", 5);
+  await reverseStepOverToLine(screen, 19);
+
+  // The log-point acts like a breakpoint when resuming.
+  await resumeToLine(screen, { lineNumber: 20 });
+});
