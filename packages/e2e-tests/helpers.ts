@@ -1,4 +1,4 @@
-import { expect, test as base, PlaywrightTestArgs, Locator } from "@playwright/test";
+import { expect, test as base, PlaywrightTestArgs, Locator, ElementHandle } from "@playwright/test";
 import { waitFor } from "@playwright-testing-library/test";
 import {
   locatorFixtures as fixtures,
@@ -138,7 +138,7 @@ export async function waitForConsoleMessage(
     ? `[data-test-message-type="${messageType}"]`
     : '[data-test-name="Message"]';
 
-  await screen.waitForSelector(`${attributeSelector}:has-text("${expected}")`);
+  return screen.waitForSelector(`${attributeSelector}:has-text("${expected}")`);
 }
 
 export async function warpToMessage(screen: Screen, text: string, line?: number) {
@@ -153,12 +153,16 @@ export async function warpToMessage(screen: Screen, text: string, line?: number)
 }
 
 export async function executeInConsole(screen: Screen, text: string) {
-  // TODO [PR 7550]
+  const consoleTextArea = screen.locator('[data-test-id="ConsoleRoot"] textarea');
+
+  await consoleTextArea.focus();
+  await consoleTextArea.fill(text);
+  await consoleTextArea.press("Enter");
 }
 
 export async function checkMessageObjectContents(
   screen: Screen,
-  message: HTMLElement,
+  message: ElementHandle<HTMLElement | SVGElement>,
   expectedContents: Expected[]
 ) {
   // TODO [PR 7550]
