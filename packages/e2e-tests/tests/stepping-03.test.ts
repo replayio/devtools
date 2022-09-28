@@ -23,7 +23,7 @@ test(`Stepping past the beginning or end of a frame should act like a step-out.`
 
   await toggleBreakpoint(screen, 20);
 
-  await rewindToLine(screen, 20);
+  await rewindToLine(screen, { lineNumber: 20 });
   await checkEvaluateInTopFrame(screen, "number", "10");
   await reverseStepOverToLine(screen, 19);
   await reverseStepOverToLine(screen, 11);
