@@ -101,8 +101,16 @@ export async function checkEvaluateInTopFrame(screen: Screen, value: string, exp
   await clearConsoleEvaluations(screen);
 }
 
-export async function getConsoleMessage(screen: Screen, message: Expected) {
-  return screen.locator(`[data-test-name="Messages"]:has-text("${message}")`);
+export async function getConsoleMessage(
+  screen: Screen,
+  expected: Expected,
+  messageType?: MessageType
+) {
+  const attributeSelector = messageType
+    ? `[data-test-message-type="${messageType}"]`
+    : '[data-test-name="Message"]';
+
+  return screen.locator(`${attributeSelector}:has-text("${expected}")`);
 }
 
 export async function waitForConsoleMessage(
@@ -181,13 +189,22 @@ export async function getSourceLine(screen: Screen, lineNumber: number) {
 
 export async function addBreakpoint(
   screen: Screen,
-  url: string,
-  lineNumber: number,
-  columnIndex?: number
+  options: {
+    columnIndex?: number;
+    lineNumber: number;
+    url: string;
+  }
 ) {
+  const { columnIndex, lineNumber, url } = options;
+
+  console.log(`Adding breakpoint at ${url}:${lineNumber}`);
+
   await clickDevTools(screen);
-  await openSourceExplorer(screen);
-  await selectSource(screen, url);
+
+  if (url) {
+    await openSourceExplorer(screen);
+    await selectSource(screen, url);
+  }
 
   const line = await getSourceLine(screen, lineNumber);
   await line.locator(".CodeMirror-linenumber").hover();
@@ -270,20 +287,38 @@ function waitForSelectedSource(screen: Screen, url?: string) {
   );
 }
 
-export async function removeBreakpoint(screen: Screen, url: string, lineNumber: number) {
+export async function removeBreakpoint(
+  screen: Screen,
+  options: {
+    lineNumber: number;
+    url: string;
+  }
+) {
+  const { lineNumber, url } = options;
+
+  console.log(`Removing breakpoint at ${url}:${lineNumber}`);
+
   await clickDevTools(screen);
-  await openSourceExplorer(screen);
-  await selectSource(screen, url);
+
+  if (url) {
+    await openSourceExplorer(screen);
+    await selectSource(screen, url);
+  }
 
   const line = await getSourceLine(screen, lineNumber);
   await line.locator(".CodeMirror-linenumber").click({ force: true });
 }
 
 export async function removeAllBreakpoints(screen: Screen) {
-  screen.evaluate(async () => {
-    await app.actions.removeAllBreakpoints(app.selectors.getThreadContext());
-    await app.threadFront.waitForInvalidateCommandsToFinish();
-  });
+  while (true) {
+    const breakpoint = screen.locator(".editor.new-breakpoint");
+    const count = await breakpoint.count();
+    if (count > 0) {
+      await breakpoint.click();
+    } else {
+      return;
+    }
+  }
 }
 
 async function getThreadContext(screen: Screen) {
@@ -314,6 +349,8 @@ export async function resumeToLine(
     await selectSource(screen, url);
   }
 
+  await openPauseInformation(screen);
+
   while (true) {
     const button = screen.getByTitle("Resume ⌘\\ F8");
     await button.click();
@@ -340,6 +377,8 @@ export async function rewindToLine(
   if (url !== null) {
     await selectSource(screen, url);
   }
+
+  await openPauseInformation(screen);
 
   while (true) {
     const button = screen.getByTitle("Rewind Execution");
