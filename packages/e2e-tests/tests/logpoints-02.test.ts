@@ -1,12 +1,14 @@
 import { expect } from "@playwright/test";
 
-import { addLogpoint, clickDevTools, getConsoleMessage, openExample, test } from "../helpers";
+import { openDevToolsTab, startTest, test } from "../helpers";
+import { findConsoleMessage } from "../helpers/console-panel";
+import { addLogpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
 test(`conditional log-points`, async ({ screen }) => {
-  await openExample(screen, url);
-  await clickDevTools(screen);
+  await startTest(screen, url);
+  await openDevToolsTab(screen);
 
   await addLogpoint(screen, {
     condition: `number % 2 == 0`,
@@ -27,7 +29,7 @@ test(`conditional log-points`, async ({ screen }) => {
     url,
   });
 
-  const logPointMessages = await getConsoleMessage(screen, "Logpoint", "log-point");
+  const logPointMessages = await findConsoleMessage(screen, "Logpoint", "log-point");
   await expect(logPointMessages).toHaveCount(7); // 5 logs in the loop + beginning and end
   await expect(logPointMessages.first()).toHaveText(/Beginning/);
   await expect(logPointMessages.last()).toHaveText(/Ending/);

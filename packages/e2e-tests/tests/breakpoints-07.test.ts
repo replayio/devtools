@@ -1,22 +1,22 @@
+import { openDevToolsTab, startTest, test } from "../helpers";
+import { quickOpen } from "../helpers/commands";
+import {
+  findConsoleMessage,
+  openMessageSource,
+  seekToConsoleMessage,
+} from "../helpers/console-panel";
+import { rewindToLine } from "../helpers/pause-information-panel";
 import {
   addBreakpoint,
   addLogpoint,
-  clickDevTools,
   closeSource,
-  getConsoleMessage,
   getSourceTab,
-  openExample,
-  openMessageSource,
-  quickOpen,
-  rewindToLine,
-  seekToConsoleMessage,
-  test,
-  verifyBreakpointStatus,
-} from "../helpers";
+  verifyLogpointStep,
+} from "../helpers/source-panel";
 
 test(`Test TODO name this thing.`, async ({ screen }) => {
-  await openExample(screen, "doc_navigate.html");
-  await clickDevTools(screen);
+  await startTest(screen, "doc_navigate.html");
+  await openDevToolsTab(screen);
 
   await quickOpen(screen, "bundle_input.js");
 
@@ -25,18 +25,18 @@ test(`Test TODO name this thing.`, async ({ screen }) => {
 
   // Verify that the command bar can be used to fast forward and rewind to log points.
   await rewindToLine(screen, { lineNumber: 5 });
-  await verifyBreakpointStatus(screen, "2/2", { lineNumber: 5 });
+  await verifyLogpointStep(screen, "2/2", { lineNumber: 5 });
   await rewindToLine(screen, { lineNumber: 5 });
-  await verifyBreakpointStatus(screen, "1/2", { lineNumber: 5 });
+  await verifyLogpointStep(screen, "1/2", { lineNumber: 5 });
 
   await closeSource(screen, "bundle_input.js");
 
   // Verify that the Console allows rewinding/fast forwarding to log points as well.
-  const message = await getConsoleMessage(screen, "bundle_input", "log-point");
+  const message = await findConsoleMessage(screen, "bundle_input", "log-point");
   await seekToConsoleMessage(screen, message.last());
-  await verifyBreakpointStatus(screen, "2/2", { lineNumber: 5 });
+  await verifyLogpointStep(screen, "2/2", { lineNumber: 5 });
   await seekToConsoleMessage(screen, message.first());
-  await verifyBreakpointStatus(screen, "1/2", { lineNumber: 5 });
+  await verifyLogpointStep(screen, "1/2", { lineNumber: 5 });
 
   await closeSource(screen, "bundle_input.js");
 
