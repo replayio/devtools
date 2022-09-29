@@ -40,14 +40,14 @@ function Wrapper({
 
   if (showWarning) {
     return (
-      <div className="static-tooltip-content space-x-2 bg-red-700">
+      <div className="space-x-2 bg-red-700 static-tooltip-content">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>
     );
   } else if (showNag) {
     return (
-      <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
+      <div className="space-x-2 static-tooltip-content" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
         <div className="flex flex-col items-start">
           {!loading ? <div className="font-bold">Click to add a print statement</div> : null}
@@ -57,7 +57,7 @@ function Wrapper({
     );
   }
 
-  return <div className="static-tooltip-content bg-gray-700">{children}</div>;
+  return <div className="bg-gray-700 static-tooltip-content">{children}</div>;
 }
 
 type Props = {
@@ -111,6 +111,7 @@ function LineNumberTooltip({ editor, keyModifiers }: Props) {
       // Note that mousing over an inactive line _will_ cause us to clear this line number.
       setTargetNode(null);
       if (lastHoveredLineNumber.current !== null) {
+        lastHoveredLineNumber.current = null;
         dispatch(setHoveredLineNumberLocation(null));
       }
     }, 10);
