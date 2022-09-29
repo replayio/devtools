@@ -111,6 +111,7 @@ export function AccordionPane({
     <div
       className={classNames("group relative h-full w-full", className)}
       data-test-id={`AccordionPane-${header.replace(/ /g, "")}`}
+      date-test-state={expanded ? "open" : "closed"}
       style={{
         height,
         minHeight: _expanded ? MIN_HEIGHT : "auto",
@@ -120,6 +121,7 @@ export function AccordionPane({
       <div className="flex h-full w-full flex-col overflow-hidden">
         <div
           className="flex w-full cursor-pointer items-center justify-between space-x-2 p-2 px-2"
+          role="button"
           style={{ fontSize: "15px" }}
           onClick={() => onToggle()}
         >

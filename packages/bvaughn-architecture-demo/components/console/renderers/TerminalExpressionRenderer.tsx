@@ -83,7 +83,7 @@ function TerminalExpressionRenderer({
             {formatTimestamp(terminalExpression.time, true)}{" "}
           </span>
         )}
-        <span className={styles.TerminalLogContents}>
+        <span className={styles.TerminalLogContents} data-test-name="LogContents">
           <span className={styles.LogContents} data-test-name="TerminalExpression-Expression">
             <Icon className={styles.PromptIcon} type="prompt" />
             <SyntaxHighlightedExpression expression={terminalExpression.expression} />
