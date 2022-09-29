@@ -1,22 +1,29 @@
-Test.describe(`Test that the element picker works, and iframe behavior.`, async () => {
-  // Events within the iframe should show up.
-  await Test.addEventListenerLogpoints(["event.mouse.click"]);
-  await Test.waitForMessage(
-    "click { target: div#iframediv, clientX: 0, clientY: 0, layerX: 0, layerY: 0 }"
-  );
+import { expect } from "@playwright/test";
 
-  await Test.addBreakpoint("doc_inspector_basic.html", 9);
-  await Test.rewindToLine(9);
+import {
+  clickDevTools,
+  inspectCanvasCoordinates,
+  getElementsPanelSelection,
+  openExample,
+  selectInspector,
+  test,
+} from "../helpers";
 
-  await Test.selectInspector();
+const url = "doc_inspector_basic.html";
 
-  // Pick an element outside the iframe.
-  const mainpoint = await Test.getMarkupCanvasCoordinate("maindiv");
-  await Test.pickNode(mainpoint.x, mainpoint.y);
-  await Test.waitForSelectedMarkupNode(`id="maindiv"`);
+test(`the element picker and iframe behavior`, async ({ screen }) => {
+  await openExample(screen, url);
+  await clickDevTools(screen);
 
-  // Pick an element inside the iframe.
-  const framepoint = await Test.getMarkupCanvasCoordinate("iframediv", ["myiframe"]);
-  await Test.pickNode(framepoint.x, framepoint.y);
-  await Test.waitForSelectedMarkupNode(`id="iframediv"`);
+  await selectInspector(screen);
+
+  // Click on the "maindiv" element in the Canvas view; this is x:5%, y:1%
+  await inspectCanvasCoordinates(screen, 0.05, 0.01);
+  // Verify that the currently selected element in the Elements panel is the expected one:
+  await expect(await getElementsPanelSelection(screen)).toContainText("maindiv");
+
+  // Click on the "myiframe" element in the Canvas view; this is x:5%, y:5%
+  await inspectCanvasCoordinates(screen, 0.05, 0.05);
+  // Verify that the currently selected element in the Elements panel is the expected one:
+  await expect(await getElementsPanelSelection(screen)).toContainText("myiframe");
 });

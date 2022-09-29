@@ -907,3 +907,60 @@ export async function checkComputedStyle(
     expect(result).toBe(true);
   });
 }
+
+// This helper function uses the Elements inspector to click on a part of the preview Canvas.
+// Rather than using hard-coded pixel numbers, the x and y positions passed in should be percentages (0-1)
+// which will be converted to coordinates based on the size of the preview Canvas.
+export async function inspectCanvasCoordinates(
+  screen: Screen,
+  xPercentage: number,
+  yPercentage: number
+) {
+  if (xPercentage < 0 || xPercentage > 1 || yPercentage < 0 || yPercentage > 1) {
+    throw Error(
+      `Invalid coordinate percentages passed (${xPercentage}, ${yPercentage}); must be between 0-1.`
+    );
+  }
+
+  debugPrint(`Inspecting preview Canvas`, "inspectCanvasCoordinates");
+
+  await selectInspector(screen);
+
+  const pickerButton = screen.queryByTitle("Select an element in the video to inspect it")!;
+  await pickerButton.click();
+
+  const canvas = screen.locator("#graphics");
+  const height = await canvas.getAttribute("height");
+  const width = await canvas.getAttribute("width");
+  const x = xPercentage * (width as any as number);
+  const y = yPercentage * (height as any as number);
+
+  debugPrint(
+    `Clicking Canvas coordinates ${chalk.bold(x)}px (${Math.round(
+      xPercentage * 100
+    )}%), ${chalk.bold(y)}px (${Math.round(yPercentage * 100)}%)`,
+    "inspectCanvasCoordinates"
+  );
+
+  canvas.click({ position: { x, y } });
+}
+
+export async function getElementsPanelSelection(screen: Screen) {
+  debugPrint(`Getting Elements panel selection`, "getElementsPanelSelection");
+
+  const elements = screen.locator("#inspector-main-content");
+  const selectedLine = elements.locator(".tag-line.selected");
+
+  return selectedLine;
+}
+
+export async function searchElementsPanel(screen: Screen, searchText: string) {
+  debugPrint(`Searching Elements for text ${chalk.bold(`"${searchText}"`)}`, "searchElementsPanel");
+
+  await selectInspector(screen);
+
+  const input = screen.queryByPlaceholderText("Search HTML")!;
+  await input.focus();
+  await input.type(searchText);
+  await input.press("Enter");
+}
