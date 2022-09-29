@@ -1,9 +1,43 @@
-Test.describe(`Test that objects show up correctly in the scope pane.`, async () => {
-  await Test.warpToMessage("Done");
+import test, { expect } from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
+import { warpToMessage } from "../helpers/console-panel";
+import {
+  closeBreakpointsAccordionPane,
+  closeCallStackAccordionPane,
+  closePrintStatementsAccordionPane,
+  getScopeChildren,
+  openPauseInformationPanel,
+  openScopeBlocks,
+  openScopesAccordionPane,
+} from "../helpers/pause-information-panel";
+import { toggleExpandable } from "../helpers/utils";
+
+const url = "doc_rr_objects.html";
+
+test(`should allow objects in scope to be inspected`, async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+
+  await warpToMessage(page, "Done");
+
+  await openPauseInformationPanel(page);
+
+  await closeBreakpointsAccordionPane(page);
+  await closePrintStatementsAccordionPane(page);
+  await closeCallStackAccordionPane(page);
+  await openScopesAccordionPane(page);
+
+  const blockScope = getScopeChildren(page, "Block").first();
 
   // We should be able to expand the window and see its properties.
-  await Test.toggleScopeNode("Block");
-  await Test.toggleScopeNode("<this>");
-  await Test.findScopeNode("bar()");
-  await Test.findScopeNode("baz()");
+  await openScopeBlocks(page, "Block");
+  await toggleExpandable(page, {
+    scope: blockScope,
+    text: "this",
+  });
+
+  await expect(blockScope).toContainText("Uint8Array");
+  await expect(blockScope).toContainText("ƒbar");
+  await expect(blockScope).toContainText("[0 … 99]");
 });
