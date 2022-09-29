@@ -13148,6 +13148,7 @@ __metadata:
     "@replayio/playwright": ^0.2.24
     chalk: ^4
     playwright: ^1.25.1
+    ts-node: ^10.7.0
   languageName: unknown
   linkType: soft
 
