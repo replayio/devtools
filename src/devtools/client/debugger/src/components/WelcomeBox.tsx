@@ -25,16 +25,16 @@ export default function WelcomeBox() {
         <div className="relative flex flex-col items-center w-full h-full text-sm">
           <div className="flex flex-col w-full space-y-1 text-menuColor">
             <div
-              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
+              className="flex flex-row space-x-4 group hover:cursor-pointer hover:text-menuHoverColor"
               onClick={openCommandPalette}
             >
-              <div className="w-full pt-1 text-right">Command palette</div>
+              <div className="w-full pt-1 text-right truncate">Command palette</div>
               <div className="flex flex-row w-full">
                 <img src="/images/command.svg" /> <img src="/images/k.svg" />
               </div>
             </div>
             <div
-              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
+              className="flex flex-row space-x-4 group hover:cursor-pointer hover:text-menuHoverColor"
               onClick={openQuickOpen}
             >
               <div className="w-full pt-1 text-right">Go to file</div>
@@ -43,7 +43,7 @@ export default function WelcomeBox() {
               </div>
             </div>
             <div
-              className="flex flex-row space-x-4 hover:text-menuHoverColor hover:cursor-pointer group"
+              className="flex flex-row space-x-4 group hover:cursor-pointer hover:text-menuHoverColor"
               onClick={openFullTextSearch}
             >
               <div className="w-full pt-1 text-right">Find in file</div>
@@ -54,8 +54,10 @@ export default function WelcomeBox() {
             </div>
           </div>
           <div className="absolute flex flex-row w-full bottom-16">
-            <div className="left-0 w-full hover:underline">
-              <a href="https://docs.replay.io">Docs</a>
+            <div className="left-0 w-full">
+              <a href="https://docs.replay.io" className="hover:underline">
+                Docs
+              </a>
             </div>
             <div className="text-right hover:underline">
               <a href="https://replay.io/discord">Discord</a>
