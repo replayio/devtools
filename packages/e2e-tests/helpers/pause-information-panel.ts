@@ -5,6 +5,29 @@ import { waitFor } from ".";
 import { openSource } from "./source-explorer-panel";
 import { debugPrint } from "./utils";
 
+async function toggleAccordionPane(pane: Locator, targetState: "open" | "closed") {
+  const name = (await pane.getAttribute("data-test-id"))!.split("-")[1];
+  const currentState = await pane.getAttribute("date-test-state");
+  if (targetState !== currentState) {
+    debugPrint(`${name} pane to ${targetState}`, "toggleAccordionPane");
+    await pane.locator('[role="button"]').click();
+  } else {
+    debugPrint(`${name} pane already ${targetState}`, "toggleAccordionPane");
+  }
+}
+
+export async function closeBreakpointsAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getBreakpointsAccordionPane(page), "closed");
+}
+
+export async function closeCallStackAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getCallStackAccordionPane(page), "closed");
+}
+
+export async function closePrintStatementsAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getPrintStatementsAccordionPane(page), "closed");
+}
+
 export async function expandFirstScope(page: Page): Promise<void> {
   const expander = getScopesPanel(page).locator('[data-test-name="Expandable"]').first();
   if ((await expander.getAttribute("data-test-state")) === "closed") {
@@ -12,11 +35,11 @@ export async function expandFirstScope(page: Page): Promise<void> {
   }
 }
 
-export function getBreakpointsPane(page: Page): Locator {
+export function getBreakpointsAccordionPane(page: Page): Locator {
   return page.locator('[data-test-id="AccordionPane-Breakpoints"]');
 }
 
-export function getCallStackPane(page: Page): Locator {
+export function getCallStackAccordionPane(page: Page): Locator {
   return page.locator('[data-test-id="AccordionPane-CallStack"]');
 }
 
@@ -45,16 +68,64 @@ export function getFramesPanel(page: Page): Locator {
   return page.locator('[data-test-id="FramesPanel"]');
 }
 
+export function getPrintStatementsAccordionPane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-PrintStatements"]');
+}
+
+export function getScopesAccordionPane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-Scopes"]');
+}
+
+export function getScopeChildren(page: Page, text: string): Locator {
+  const scope = page.locator(`[data-test-name="ScopesInspector"]`, {
+    has: page.locator(`[data-test-name="ExpandablePreview"]:has-text("${text}")`),
+  });
+  return scope.locator('[data-test-name="ExpandableChildren"]');
+}
+
 export function getScopesPanel(page: Page): Locator {
   return page.locator('[data-test-name="ScopesList"]');
 }
 
+export async function openBreakpointsAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getBreakpointsAccordionPane(page), "open");
+}
+
+export async function openCallStackPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getCallStackAccordionPane(page), "open");
+}
+
 export async function openPauseInformationPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = getBreakpointsPane(page);
+  const pane = getBreakpointsAccordionPane(page);
   const isVisible = await pane.isVisible();
   if (!isVisible) {
     await page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+  }
+}
+
+export async function openPrintStatementsAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getPrintStatementsAccordionPane(page), "open");
+}
+
+export async function openScopesAccordionPane(page: Page): Promise<void> {
+  await toggleAccordionPane(getScopesAccordionPane(page), "open");
+}
+
+export async function openScopeBlocks(page: Page, text: string): Promise<void> {
+  const blocks = page.locator(`[data-test-name="ScopesInspector"]:has-text("${text}")`);
+  const count = await blocks.count();
+
+  debugPrint(`Found ${count} Scope blocks with text "${chalk.bold(text)}"`, "openScopeBlocks");
+
+  for (let i = 0; i < count; i++) {
+    const block = blocks.nth(i);
+    const expandable = block.locator('[data-test-name="Expandable"][data-test-state="closed"]');
+    if ((await expandable.count()) > 0) {
+      debugPrint(`Opening Scope block`, "openScopeBlocks");
+
+      await expandable.click();
+    }
   }
 }
 

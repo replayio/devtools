@@ -106,7 +106,7 @@ function MessageRenderer({
     );
 
   const logContents = (
-    <span className={styles.LogContents}>
+    <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
       {primaryContent}
     </span>

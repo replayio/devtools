@@ -1,0 +1,20 @@
+import test from "@playwright/test";
+
+const url = "doc_prod_bundle.html";
+
+test(`Test scope mapping and switching between generated/original sources.`, async ({ page }) => {
+  // await Test.addBreakpoint("bundle_input.js", 15, undefined, {
+  //   logValue: "barobj.barprop1 * 10",
+  // });
+  // await Test.warpToMessage("20");
+  // await Test.waitForPausedLine(15);
+  // await Test.waitForScopeValue("bar");
+  // await Test.waitForScopeValue("bararr", "(3) […]");
+  // await Test.waitForScopeValue("barobj", "{…}");
+  // await Test.executeInConsole("bararr.length * 100");
+  // await Test.waitForMessage("300");
+  // await Test.toggleMappedSources();
+  // await Test.waitForPausedLine(12);
+  // await Test.waitForScopeValue("e", "(3) […]");
+  // await Test.waitForScopeValue("o", "{…}");
+});

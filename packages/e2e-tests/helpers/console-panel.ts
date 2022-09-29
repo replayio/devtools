@@ -111,24 +111,25 @@ export async function openMessageSource(message: Locator): Promise<void> {
   await sourceLink.click();
 }
 
-export async function seekToConsoleMessage(page: Page, consoleMessage: Locator): Promise<void> {
-  const textContent = await consoleMessage.textContent();
+export async function seekToConsoleMessage(
+  page: Page,
+  consoleMessage: Locator,
+  line?: number
+): Promise<void> {
+  const textContent = await consoleMessage.locator('[data-test-name="LogContents"]').textContent();
 
   debugPrint(`Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
 
+  await consoleMessage.scrollIntoViewIfNeeded();
   await consoleMessage.hover();
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
+
+  await waitForPaused(page, line);
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
   const message = await findConsoleMessage(page, text);
-  await message.hover();
-
-  const warpButton = message.locator('[data-test-id="ConsoleMessageHoverButton"]');
-  await warpButton.hover();
-  await warpButton.click();
-
-  await waitForPaused(page, line);
+  await seekToConsoleMessage(page, message, line);
 }
 
 export async function verifyConsoleMessage(

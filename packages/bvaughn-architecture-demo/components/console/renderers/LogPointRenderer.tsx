@@ -69,7 +69,7 @@ function LogPointRenderer({
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}{" "}
         </span>
       )}
-      <span className={styles.LogContents}>
+      <span className={styles.LogContents} data-test-name="LogContents">
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
         <ErrorBoundary
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}

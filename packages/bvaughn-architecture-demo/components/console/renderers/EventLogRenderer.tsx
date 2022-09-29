@@ -72,9 +72,13 @@ function EventLogRenderer({
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
       {content ? (
-        <span className={styles.LogContents}>{content}</span>
+        <span className={styles.LogContents} data-test-name="LogContents">
+          {content}
+        </span>
       ) : (
-        <span className={styles.LogContentsEmpty}>No data to display.</span>
+        <span className={styles.LogContentsEmpty} data-test-name="LogContents">
+          No data to display.
+        </span>
       )}
     </>
   );
