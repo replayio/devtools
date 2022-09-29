@@ -49,6 +49,16 @@ export async function selectConsole(screen: Screen) {
   return screen.queryByTestId("PanelButton-console").click();
 }
 
+export function selectInspector(screen: Screen) {
+  return screen.queryByTestId("PanelButton-inspector").click();
+}
+
+export async function selectComputedProperties(screen: Screen) {
+  const locator = screen.locator("#computedview-tab");
+  await locator.waitFor();
+  await locator.click();
+}
+
 export async function getCallStackPane(screen: Screen) {
   return screen.queryByTestId("AccordionPane-CallStack");
 }
@@ -789,4 +799,111 @@ export async function stepOver(screen: Screen) {
 export async function clickSourceTreeNode(screen: Screen, node: string) {
   debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
   await screen.locator(`div[role="tree"] div:has-text("${node}")`).nth(1).click();
+}
+
+export function getMarkupNode(screen: Screen, text: string) {
+  const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return screen.locator(`#markup-box .editor:has-text("${escapedText}")`);
+}
+
+export async function selectMarkupNode(screen: Screen, text: string) {
+  const node = getMarkupNode(screen, text);
+  await node.waitFor();
+  await node.click();
+}
+
+export async function toggleMarkupNode(locator: Locator) {
+  await locator.evaluate(node => {
+    const expander = node.parentElement?.querySelector(".expander");
+    if (expander) {
+      (expander as HTMLElement).click();
+    }
+  });
+}
+
+export function waitForSelectedMarkupNode(screen: Screen, text: string) {
+  const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  return screen.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`).waitFor();
+}
+
+export async function searchMarkup(screen: Screen, text: string) {
+  const searchBox = screen.getByPlaceholderText("Search HTML");
+  await searchBox.fill(text);
+  await searchBox.press("Enter");
+}
+
+export async function selectNextMarkupSearchResult(screen: Screen) {
+  const searchBox = screen.getByPlaceholderText("Search HTML");
+  await searchBox.press("Enter");
+}
+
+export async function checkComputedStyle(
+  screen: Screen,
+  style: string,
+  value: string,
+  expectedSelectors: any = undefined
+) {
+  await selectComputedProperties(screen);
+  await waitFor(async () => {
+    const result = await screen.evaluate(
+      ({ style, value, matchedSelectors }) => {
+        function getMatchedSelectors(property: string) {
+          const propertyNodes = document.querySelectorAll<HTMLElement>(".computed-property-view");
+
+          const propertyNode = [...propertyNodes].find(
+            node =>
+              node!.querySelector(".computed-property-name")!.childNodes[0].textContent === property
+          );
+
+          if (!propertyNode) {
+            return [];
+          }
+
+          const expander: HTMLElement | null = propertyNode.querySelector(".computed-expander");
+          if (!expander!.matches(".open")) {
+            expander!.click();
+          }
+
+          const selectorNodes = (
+            propertyNode.nextSibling as HTMLElement
+          ).querySelectorAll<HTMLElement>(".rule-text");
+          return [...selectorNodes].map(selectorNode => {
+            const selector = (selectorNode.children[0] as HTMLElement).innerText;
+            const value = (selectorNode.children[1] as HTMLElement).innerText;
+            const label = (selectorNode.previousSibling as HTMLElement).innerText;
+            const previousChild = (selectorNode.previousSibling as HTMLElement).children[0];
+            const url = (previousChild as HTMLElement).title;
+            const overridden = (selectorNode.parentNode as HTMLElement).classList.contains(
+              "computed-overridden"
+            );
+            return { selector, value, label, url, overridden };
+          });
+        }
+
+        const names = document.querySelectorAll<HTMLElement>(".computed-property-name");
+        const propertyName = [...names].find(n => n!.textContent!.includes(style));
+        if (!propertyName) {
+          return false;
+        }
+        const container = propertyName.closest(".computed-property-view");
+        if (!container) {
+          return false;
+        }
+        const propertyValue: HTMLElement | null = container.querySelector(
+          ".computed-property-value"
+        );
+        const expectedSelectorsJSON = matchedSelectors
+          ? JSON.stringify(matchedSelectors)
+          : undefined;
+        const selectorsJSON = matchedSelectors
+          ? JSON.stringify(getMatchedSelectors(style))
+          : undefined;
+        return (
+          propertyValue!.textContent!.includes(value) && selectorsJSON === expectedSelectorsJSON
+        );
+      },
+      { style, value, matchedSelectors: expectedSelectors }
+    );
+    expect(result).toBe(true);
+  });
 }
