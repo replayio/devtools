@@ -65,17 +65,22 @@ async function recordExample(example: string) {
   }
 }
 
-async function saveRecording(example: string) {
+async function saveRecording(example: string, recordingId?: string) {
   console.log(`Saving ${example}`);
-  const recordings = listAllRecordings();
-  const lastRecording = recordings[recordings.length - 1];
 
-  const id = await uploadRecording(lastRecording.id, {
+  if (!recordingId) {
+    const recordings = listAllRecordings();
+    const lastRecording = recordings[recordings.length - 1];
+    recordingId = lastRecording.id;
+
+    console.log("Last recording: ", lastRecording);
+  }
+
+  const id = await uploadRecording(recordingId, {
     apiKey: process.env.API_KEY,
   });
 
-  const publicRes = await makeReplayPublic(process.env.API_KEY!, lastRecording.id);
-  console.log("Public res: ", publicRes.data);
+  await makeReplayPublic(process.env.API_KEY!, recordingId);
 
   const text = "" + readFileSync(`${__dirname}/examples.json`);
   const json = JSON.parse(text);
@@ -111,12 +116,14 @@ async function saveNodeExample(nodeExampleName: string) {
     if (recordingId) {
       console.log("Recording succeeded. ID: ", recordingId);
       console.log("Saving recording info...");
-      await saveRecording(`node/${nodeExampleName}`);
+      await saveRecording(`node/${nodeExampleName}`, recordingId);
 
       console.log(`Saved example: ${recordingId}`);
     } else {
       console.error("Did not save a recording!");
     }
+  } else {
+    throw new Error("Could not find example file: " + nodeExampleFilename);
   }
 }
 
