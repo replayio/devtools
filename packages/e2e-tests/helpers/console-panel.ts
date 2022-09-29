@@ -143,6 +143,6 @@ export async function verifyConsoleMessage(
     "verifyConsoleMessage"
   );
 
-  const message = findConsoleMessage(page, expected, messageType);
+  const message = findConsoleMessage(page, expected, messageType).first();
   await message.waitFor();
 }
