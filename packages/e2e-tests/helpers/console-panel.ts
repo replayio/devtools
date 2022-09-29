@@ -48,11 +48,7 @@ export async function enableConsoleMessageType(
   await checkbox.check();
 }
 
-export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
-  debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
-
-  await openConsolePanel(page);
-
+export async function focusConsoleTextArea(page: Page) {
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
 
   // Wait for the Console to stop loading
@@ -61,9 +57,20 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   const term = page.locator('[data-test-id="JSTerm"]');
 
   const textArea = term.locator("textarea");
+
   await textArea.focus();
+
+  return textArea;
+}
+
+export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
+  debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
+
+  await openConsolePanel(page);
+
+  const textArea = await focusConsoleTextArea(page);
+
   await textArea.type(text);
-  await textArea.press("Escape"); // Close auto-complete dialog if open
   await textArea.press("Enter");
 }
 
