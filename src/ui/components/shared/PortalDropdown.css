@@ -22,6 +22,7 @@
 
 .portal-dropdown-wrapper button:hover {
   background-color: var(--tab-bgcolor);
+  border-radius: 6px;
 }
 .portal-dropdown-wrapper button:hover .icon {
   background-color: var(--theme-icon-hover-color);
