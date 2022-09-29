@@ -26,12 +26,16 @@ export async function getCurrentCallStackFrameInfo(screen: Screen): Promise<{
   lineNumber: number | null;
 }> {
   const framesPanel = getFramesPanel(screen);
+  await framesPanel.waitFor();
+
   const selectedFrame = framesPanel.locator(".frame.selected");
+  await selectedFrame.waitFor();
+
   const fileNameNode = selectedFrame.locator(".filename");
   const lineNumberNode = selectedFrame.locator(".line");
-
   const fileName = await fileNameNode.textContent();
   const lineNumber = await lineNumberNode.textContent();
+
   return {
     fileName: fileName || null,
     lineNumber: lineNumber ? parseInt(lineNumber, 10) : null,
