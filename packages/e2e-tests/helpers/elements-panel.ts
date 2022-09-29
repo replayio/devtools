@@ -156,8 +156,9 @@ export async function selectElementsRowWithText(page: Page, text: string): Promi
 }
 
 export async function selectNextElementsPanelSearchResult(page: Page): Promise<void> {
-  const searchBox = page.locator('[placholder="Search HTML"]');
-  await searchBox.press("Enter");
+  const input = page.locator('[placeholder="Search HTML"]')!;
+  await input.focus();
+  await input.press("Enter");
 }
 
 // TODO [FE-626] Make the intent of this function clearer: should it toggle open or closed?
@@ -170,7 +171,8 @@ export async function toggleMarkupNode(locator: Locator): Promise<void> {
   });
 }
 
-export function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
+export async function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
   const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return page.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`).waitFor();
+  const locator = page.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`);
+  await locator.waitFor();
 }
