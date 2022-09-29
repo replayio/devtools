@@ -1,30 +1,23 @@
+import { openDevToolsTab, startTest, test } from "../helpers";
+import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
-  test,
-  openExample,
-  clickDevTools,
-  rewindToLine,
-  stepOverToLine,
-  stepOutToLine,
-  stepInToLine,
-  addEventListenerLogpoints,
-  addBreakpoint,
-  resumeToLine,
-  selectConsole,
-  selectFrame,
-  checkFrames,
-  waitForFrameTimeline,
-  warpToMessage,
-  waitForScopeValue,
-  checkEvaluateInTopFrame,
   reverseStepOverToLine,
-} from "../helpers";
+  selectFrame,
+  stepOutToLine,
+  stepOverToLine,
+  verifyFramesCount,
+  waitForFrameTimeline,
+  waitForScopeValue,
+} from "../helpers/pause-information-panel";
+
+const url = "doc_async.html";
 
 test(`Test stepping in async frames and async call stacks.`, async ({ screen }) => {
-  await openExample(screen, "doc_async.html");
-  await clickDevTools(screen);
+  await startTest(screen, url);
+  await openDevToolsTab(screen);
 
   await warpToMessage(screen, "baz 2");
-  await checkFrames(screen, 5);
+  await verifyFramesCount(screen, 5);
   await waitForScopeValue(screen, "n", "2");
 
   await waitForFrameTimeline(screen, "25%");
@@ -49,11 +42,11 @@ test(`Test stepping in async frames and async call stacks.`, async ({ screen }) 
   await stepOverToLine(screen, 21);
   await stepOverToLine(screen, 22);
   await stepOverToLine(screen, 24);
-  await checkEvaluateInTopFrame(screen, "n", 2);
+  await executeAndVerifyTerminalExpression(screen, "n", 2);
   await stepOutToLine(screen, 24);
-  await checkEvaluateInTopFrame(screen, "n", 3);
+  await executeAndVerifyTerminalExpression(screen, "n", 3);
   await stepOutToLine(screen, 24);
-  await checkEvaluateInTopFrame(screen, "n", 4);
+  await executeAndVerifyTerminalExpression(screen, "n", 4);
   await stepOutToLine(screen, 13);
   await reverseStepOverToLine(screen, 12);
 });

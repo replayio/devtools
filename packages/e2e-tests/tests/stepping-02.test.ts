@@ -1,27 +1,27 @@
+import { openDevToolsTab, startTest, test } from "../helpers";
 import {
-  test,
-  openExample,
-  clickDevTools,
+  reverseStepOverToLine,
   rewindToLine,
   stepInToLine,
-  stepOverToLine,
-  reverseStepOverToLine,
   stepOutToLine,
-  clickSourceTreeNode,
-  toggleBreakpoint,
+  stepOverToLine,
   waitForScopeValue,
-} from "../helpers";
+} from "../helpers/pause-information-panel";
+import { clickSourceTreeNode } from "../helpers/source-explorer-panel";
+import { addBreakpoint } from "../helpers/source-panel";
+
+const url = "doc_rr_basic.html";
 
 test("Test basic step-over/back functionality.", async ({ screen }) => {
-  await openExample(screen, "doc_rr_basic.html");
-  await clickDevTools(screen);
+  await startTest(screen, url);
+  await openDevToolsTab(screen);
 
   // Open doc_rr_basic.html
   await clickSourceTreeNode(screen, "test");
   await clickSourceTreeNode(screen, "examples");
-  await clickSourceTreeNode(screen, "doc_rr_basic.html");
+  await clickSourceTreeNode(screen, url);
 
-  await toggleBreakpoint(screen, 21);
+  await addBreakpoint(screen, { lineNumber: 21, url });
   await rewindToLine(screen, { lineNumber: 21 });
 
   await stepInToLine(screen, 24);

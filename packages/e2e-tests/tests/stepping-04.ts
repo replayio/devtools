@@ -1,14 +1,4 @@
-import {
-  test,
-  openExample,
-  clickDevTools,
-  rewindToLine,
-  reverseStepOverToLine,
-  stepOverToLine,
-  clickSourceTreeNode,
-  toggleBreakpoint,
-  checkEvaluateInTopFrame,
-} from "../helpers";
+import { test } from "../helpers";
 
 test.skip(`Test stepping in blackboxed sources`, async ({ screen }) => {
   // This test is disabled because we removed blackboxing during the codebase
@@ -23,7 +13,7 @@ test.skip(`Test stepping in blackboxed sources`, async ({ screen }) => {
   await Test.stepOverToLine(20); // doc_rr_blackbox.html
 
   // Unblackbox the source.
-  await Test.selectSource("blackbox.js");
+  await Test.openSource("blackbox.js");
   await Test.toggleBlackboxSelectedSource();
 
   // Stepping backward while in a blackboxed source should act like a reverse step out.

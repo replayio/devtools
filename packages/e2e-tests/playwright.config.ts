@@ -12,4 +12,9 @@ const config: PlaywrightTestConfig = {
     },
   },
 };
+
+if (DEBUG) {
+  config.workers = 1;
+}
+
 export default config;

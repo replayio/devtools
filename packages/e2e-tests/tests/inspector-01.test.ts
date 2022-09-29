@@ -1,42 +1,39 @@
+import { openDevToolsTab, startTest, test } from "../helpers";
+import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
-  test,
-  openExample,
-  clickDevTools,
-  selectConsole,
-  warpToMessage,
-  selectInspector,
+  activateInspectorTool,
+  getElementsRowWithText,
+  searchElementsPanel,
+  selectNextElementsPanelSearchResult,
   toggleMarkupNode,
-  getMarkupNode,
-  addBreakpoint,
-  rewindToLine,
-  searchMarkup,
-  waitForSelectedMarkupNode,
-  selectNextMarkupSearchResult,
-} from "../helpers";
+  waitForSelectedElementsRow,
+} from "../helpers/elements-panel";
+import { rewindToLine } from "../helpers/pause-information-panel";
+import { addBreakpoint } from "../helpers/source-panel";
 
 test("Test that scopes are rerendered.", async ({ screen }) => {
-  await openExample(screen, "doc_inspector_basic.html");
-  await clickDevTools(screen);
-  await selectConsole(screen);
+  await startTest(screen, "doc_inspector_basic.html");
+  await openDevToolsTab(screen);
+  await openConsolePanel(screen);
   await warpToMessage(screen, "ExampleFinished");
-  await selectInspector(screen);
+  await activateInspectorTool(screen);
 
-  let node = getMarkupNode(screen, '<div id="maindiv" style="color: red"');
+  let node = getElementsRowWithText(screen, '<div id="maindiv" style="color: red"');
   await node.waitFor();
   await toggleMarkupNode(node);
-  await getMarkupNode(screen, "GOODBYE").waitFor();
+  await getElementsRowWithText(screen, "GOODBYE").waitFor();
 
   await addBreakpoint(screen, { url: "doc_inspector_basic.html", lineNumber: 9 });
   await rewindToLine(screen, { lineNumber: 9 });
 
-  node = getMarkupNode(screen, '<div id="maindiv" style="color: red"');
+  node = getElementsRowWithText(screen, '<div id="maindiv" style="color: red"');
   await node.waitFor();
   await toggleMarkupNode(node);
-  await getMarkupNode(screen, "HELLO").waitFor();
+  await getElementsRowWithText(screen, "HELLO").waitFor();
 
-  await searchMarkup(screen, "STUFF");
-  await waitForSelectedMarkupNode(screen, "STUFF");
+  await searchElementsPanel(screen, "STUFF");
+  await waitForSelectedElementsRow(screen, "STUFF");
 
-  await selectNextMarkupSearchResult(screen);
-  await waitForSelectedMarkupNode(screen, '<div id="div4" some-attribute="STUFF"');
+  await selectNextElementsPanelSearchResult(screen);
+  await waitForSelectedElementsRow(screen, '<div id="div4" some-attribute="STUFF"');
 });

@@ -1,21 +1,19 @@
 import { expect } from "@playwright/test";
 
+import { openDevToolsTab, startTest, test } from "../helpers";
 import {
-  clickDevTools,
-  inspectCanvasCoordinates,
+  activateInspectorTool,
   getElementsPanelSelection,
-  openExample,
-  selectInspector,
-  test,
-} from "../helpers";
+  inspectCanvasCoordinates,
+} from "../helpers/elements-panel";
 
 const url = "doc_inspector_basic.html";
 
 test(`the element picker and iframe behavior`, async ({ screen }) => {
-  await openExample(screen, url);
-  await clickDevTools(screen);
+  await startTest(screen, url);
+  await openDevToolsTab(screen);
 
-  await selectInspector(screen);
+  await activateInspectorTool(screen);
 
   // Click on the "maindiv" element in the Canvas view; this is x:5%, y:1%
   await inspectCanvasCoordinates(screen, 0.05, 0.01);
