@@ -31,4 +31,8 @@ export async function startTest(screen: Screen, example: string) {
   debugPrint(`Navigating to ${chalk.bold(url)}`, "startTest");
 
   await screen.goto(url);
+
+  // Wait for the recording basic information to load such that the primary tabs are visible.
+  await screen.queryByTestId("ViewToggle-Viewer").waitFor();
+  await screen.queryByTestId("ViewToggle-DevTools").waitFor();
 }
