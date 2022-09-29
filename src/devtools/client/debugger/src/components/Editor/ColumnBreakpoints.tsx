@@ -4,14 +4,17 @@
 
 //
 
-import React, { Component } from "react";
+import React, { Component, useEffect } from "react";
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
 import { getVisibleColumnBreakpoints, getContext } from "../../selectors";
 import { getSelectedSource } from "ui/reducers/sources";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
+import { useAppSelector } from "ui/setup/hooks";
 import { getLocationKey } from "../../utils/breakpoint";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
+import { useFeature, useStringPref } from "ui/hooks/settings";
 
 // eslint-disable-next-line max-len
 
@@ -26,33 +29,59 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type $FixTypeLater = any;
 interface CBProps {
-  editor: $FixTypeLater;
+  editor: SourceEditor;
 }
 
-class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
-  render() {
-    const { cx, editor, columnBreakpoints, selectedSource } = this.props;
+function ColumnBreakpoints2({ editor }: CBProps) {
+  const cx = useAppSelector(getContext);
+  const selectedSource = useAppSelector(getSelectedSource);
+  const columnBreakpoints = useAppSelector(getVisibleColumnBreakpoints);
+  const { value: hitCountsMode } = useStringPref("hitCounts");
 
-    if (!selectedSource || columnBreakpoints.length === 0) {
-      return null;
-    }
+  useEffect(() => {
+    const updateWidth = () => {
+      const editorElement = editor.editor.getWrapperElement();
+      const gutter = editor.editor.getGutterElement();
 
-    let breakpoints;
-    // TODO Is this a safe thing to do while rendering?
-    editor.codeMirror.operation(() => {
-      breakpoints = columnBreakpoints.map((breakpoint, i) => (
-        <ColumnBreakpoint
-          cx={cx}
-          key={getLocationKey(breakpoint.location)}
-          columnBreakpoint={breakpoint}
-          editor={editor}
-          source={selectedSource}
-          insertAt={i}
-        />
-      ));
-    });
-    return <div>{breakpoints}</div>;
+      const gutterWidth = gutter.getBoundingClientRect().width;
+      const scrollWidth = editorElement.getBoundingClientRect().width;
+
+      // Magic formula to determine scrollbar width: https://stackoverflow.com/a/60008044/62937
+      let scrollbarWidth = window.innerWidth - document.body.clientWidth;
+
+      // Fill the _visible_ width of the editor, minus scrollbar, minus a small bit of padding
+      const newWidth = scrollWidth - gutterWidth - scrollbarWidth - 10;
+
+      let root = document.documentElement;
+      root.style.setProperty("--print-statement-max-width", newWidth + "px");
+      root.style.setProperty("--codemirror-gutter-width", gutterWidth + "px");
+    };
+
+    editor.editor.on("refresh", updateWidth);
+
+    updateWidth();
+
+    return () => {
+      editor.editor.off("refresh", updateWidth);
+    };
+  }, [editor, hitCountsMode]);
+
+  if (!selectedSource || columnBreakpoints.length === 0) {
+    return null;
   }
+
+  const breakpoints = columnBreakpoints.map((breakpoint, i) => (
+    <ColumnBreakpoint
+      cx={cx}
+      key={getLocationKey(breakpoint.location)}
+      columnBreakpoint={breakpoint}
+      editor={editor}
+      source={selectedSource}
+      insertAt={i}
+    />
+  ));
+
+  return <div>{breakpoints}</div>;
 }
 
-export default connector(ColumnBreakpoints);
+export default React.memo(ColumnBreakpoints2);
