@@ -5,7 +5,7 @@ import { Locator, expect, Page } from "@playwright/test";
 import { openDevToolsTab, startTest, waitFor } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
-import { openPauseInformationPanel } from "../helpers/pause-information-panel";
+import { openPauseInformationPanel, getBreakpointsPane } from "../helpers/pause-information-panel";
 
 interface StackingTestCase {
   id: string;
@@ -141,9 +141,13 @@ const testCases: StackingTestCase[] = [
 async function ensureSidePanelClosed(page: Page) {
   // Clicks that aren't directly on an element can cause the "Comments" pane to open.
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  await openPauseInformationPanel(page);
-  // Then click it again to make sure the panel closes
-  await page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+  const pane = getBreakpointsPane(page);
+  const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');
+  await pauseButton.click();
+  const isVisible = await pane.isVisible();
+  if (isVisible) {
+    await pauseButton.click();
+  }
 }
 
 async function verifySelectedElementUnderCursor(
@@ -209,7 +213,7 @@ test("Element highlighter selects the correct element when they overlap", async 
 
   // Dock the console to the _left_ side, to make the video preview as big as possible
   await page.locator('[data-test-id="consoleDockButton"]').click();
-  await page.locator('[data-test-id="DockToBottomRightButton"]').click();
+  await page.locator('[data-test-id="DockToLeftButton"]').click();
 
   const canvas = page.locator("canvas#graphics");
   const rulesContainer = page.locator("#ruleview-container");

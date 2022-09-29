@@ -209,6 +209,8 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
 }
 
 export async function selectElementsRowWithText(page: Page, text: string): Promise<void> {
+  const elementsTab = page.locator(`button:has-text("Elements")`);
+  await elementsTab.click();
   const node = getElementsRowWithText(page, text);
   await node.waitFor();
   await node.click();
