@@ -1,6 +1,6 @@
-import { test } from "../helpers";
+import test from "@playwright/test";
 
-test.skip(`Test stepping in blackboxed sources`, async ({ screen }) => {
+test.skip(`Test stepping in blackboxed sources`, async ({ page }) => {
   // This test is disabled because we removed blackboxing during the codebase
   // cleanup in summer 2022. If we ever reimplement blackboxing, we should
   // reimplement this test appropriately.

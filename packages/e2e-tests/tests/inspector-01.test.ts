@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import {
   activateInspectorTool,
@@ -11,29 +13,29 @@ import {
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
-test("Test that scopes are rerendered.", async ({ screen }) => {
-  await startTest(screen, "doc_inspector_basic.html");
-  await openDevToolsTab(screen);
-  await openConsolePanel(screen);
-  await warpToMessage(screen, "ExampleFinished");
-  await activateInspectorTool(screen);
+test("Test that scopes are rerendered.", async ({ page }) => {
+  await startTest(page, "doc_inspector_basic.html");
+  await openDevToolsTab(page);
+  await openConsolePanel(page);
+  await warpToMessage(page, "ExampleFinished");
+  await activateInspectorTool(page);
 
-  let node = getElementsRowWithText(screen, '<div id="maindiv" style="color: red"');
+  let node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
   await toggleMarkupNode(node);
-  await getElementsRowWithText(screen, "GOODBYE").waitFor();
+  await getElementsRowWithText(page, "GOODBYE").waitFor();
 
-  await addBreakpoint(screen, { url: "doc_inspector_basic.html", lineNumber: 9 });
-  await rewindToLine(screen, { lineNumber: 9 });
+  await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
+  await rewindToLine(page, { lineNumber: 9 });
 
-  node = getElementsRowWithText(screen, '<div id="maindiv" style="color: red"');
+  node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
   await toggleMarkupNode(node);
-  await getElementsRowWithText(screen, "HELLO").waitFor();
+  await getElementsRowWithText(page, "HELLO").waitFor();
 
-  await searchElementsPanel(screen, "STUFF");
-  await waitForSelectedElementsRow(screen, "STUFF");
+  await searchElementsPanel(page, "STUFF");
+  await waitForSelectedElementsRow(page, "STUFF");
 
-  await selectNextElementsPanelSearchResult(screen);
-  await waitForSelectedElementsRow(screen, '<div id="div4" some-attribute="STUFF"');
+  await selectNextElementsPanelSearchResult(page);
+  await waitForSelectedElementsRow(page, '<div id="div4" some-attribute="STUFF"');
 });

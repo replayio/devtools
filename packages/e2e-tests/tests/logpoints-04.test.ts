@@ -1,6 +1,6 @@
-import { expect } from "@playwright/test";
+import test, { expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest, test } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeAndVerifyTerminalExpression,
   findConsoleMessage,
@@ -11,25 +11,25 @@ import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-in
 
 const url = "doc_exceptions.html";
 
-test(`should display exceptions in the console`, async ({ screen }) => {
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
+test(`should display exceptions in the console`, async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
-  await openConsolePanel(screen);
+  await openConsolePanel(page);
 
-  await screen.queryByTestId("FilterToggle-exceptions").click();
+  await page.locator('[data-test-id="FilterToggle-exceptions"]').click();
 
-  let messages = await findConsoleMessage(screen, undefined, "exception");
+  let messages = await findConsoleMessage(page, undefined, "exception");
   await expect(messages).toHaveCount(20);
 
-  messages = await findConsoleMessage(screen, "number: 4", "exception");
-  await seekToConsoleMessage(screen, messages.first());
-  await waitForFrameTimeline(screen, "100%");
+  messages = await findConsoleMessage(page, "number: 4", "exception");
+  await seekToConsoleMessage(page, messages.first());
+  await waitForFrameTimeline(page, "100%");
 
-  messages = await findConsoleMessage(screen, "number: 10", "exception");
-  await seekToConsoleMessage(screen, messages.first());
-  await executeAndVerifyTerminalExpression(screen, "number * 10", "40");
+  messages = await findConsoleMessage(page, "number: 10", "exception");
+  await seekToConsoleMessage(page, messages.first());
+  await executeAndVerifyTerminalExpression(page, "number * 10", "40");
 
-  await reverseStepOverToLine(screen, 15);
-  await waitForFrameTimeline(screen, "0%");
+  await reverseStepOverToLine(page, 15);
+  await waitForFrameTimeline(page, "0%");
 });

@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
   openConsolePanel,
@@ -6,74 +8,74 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 
-test(`expressions in the console after time warping.`, async ({ screen }) => {
-  await startTest(screen, "doc_rr_objects.html");
-  await openDevToolsTab(screen);
-  await openConsolePanel(screen);
+test(`expressions in the console after time warping.`, async ({ page }) => {
+  await startTest(page, "doc_rr_objects.html");
+  await openDevToolsTab(page);
+  await openConsolePanel(page);
 
-  await verifyConsoleMessage(screen, "(20) [0, 1, 2, 3, 4, …]");
-  await verifyConsoleMessage(screen, "Uint8Array(20) [0, 1, 2, 3, 4, …]");
-  await verifyConsoleMessage(screen, "Set(22) [{…}, {…}, 0, 1, 2, …]");
+  await verifyConsoleMessage(page, "(20) [0, 1, 2, 3, 4, …]");
+  await verifyConsoleMessage(page, "Uint8Array(20) [0, 1, 2, 3, 4, …]");
+  await verifyConsoleMessage(page, "Set(22) [{…}, {…}, 0, 1, 2, …]");
 
-  await verifyConsoleMessage(screen, "Map(21) {{…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, …}");
-  await verifyConsoleMessage(screen, "WeakSet(20) [{…}, {…}, {…}, {…}, {…}, …]");
+  await verifyConsoleMessage(page, "Map(21) {{…} → {…}, 0 → 1, 1 → 2, 2 → 3, 3 → 4, …}");
+  await verifyConsoleMessage(page, "WeakSet(20) [{…}, {…}, {…}, {…}, {…}, …]");
   await verifyConsoleMessage(
-    screen,
+    page,
     "WeakMap(20) {{…} → {…}, {…} → {…}, {…} → {…}, {…} → {…}, {…} → {…}, …}"
   );
-  await verifyConsoleMessage(screen, "{a: 0, a0: 0, a1: 1, a2: 2, a3: 3, …}");
-  await verifyConsoleMessage(screen, "/abc/gi");
-  await verifyConsoleMessage(screen, "Sun Aug 14 2022 12:23:25 GMT-0700 (Pacific Daylight Time)");
+  await verifyConsoleMessage(page, "{a: 0, a0: 0, a1: 1, a2: 2, a3: 3, …}");
+  await verifyConsoleMessage(page, "/abc/gi");
+  await verifyConsoleMessage(page, "Sun Aug 14 2022 12:23:25 GMT-0700 (Pacific Daylight Time)");
 
-  await verifyConsoleMessage(screen, `RangeError: foo`);
+  await verifyConsoleMessage(page, `RangeError: foo`);
 
-  await verifyConsoleMessage(screen, "ƒbar()");
+  await verifyConsoleMessage(page, "ƒbar()");
 
-  await verifyConsoleMessage(screen, "Proxy{}");
-  await verifyConsoleMessage(screen, "Symbol()");
-  await verifyConsoleMessage(screen, "Symbol(symbol)");
-  await verifyConsoleMessage(screen, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
+  await verifyConsoleMessage(page, "Proxy{}");
+  await verifyConsoleMessage(page, "Symbol()");
+  await verifyConsoleMessage(page, "Symbol(symbol)");
+  await verifyConsoleMessage(page, `{Symbol(): 42, Symbol(symbol): Symbol()}`);
 
-  await verifyConsoleMessage(screen, "{_foo: C{…}, foo: ƒ()}");
+  await verifyConsoleMessage(page, "{_foo: C{…}, foo: ƒ()}");
 
-  await warpToMessage(screen, "Done");
+  await warpToMessage(page, "Done");
 
-  await executeTerminalExpression(screen, "Error('helo')");
-  await verifyConsoleMessage(screen, "Error: helo");
+  await executeTerminalExpression(page, "Error('helo')");
+  await verifyConsoleMessage(page, "Error: helo");
 
-  await executeTerminalExpression(screen, 'function f() { throw Error("there"); }()');
-  await verifyConsoleMessage(screen, "Error: there");
+  await executeTerminalExpression(page, 'function f() { throw Error("there"); }()');
+  await verifyConsoleMessage(page, "Error: there");
 
-  await executeTerminalExpression(screen, "Array(1, 2, 3)");
-  await verifyConsoleMessage(screen, "(3) [1, 2, 3]");
+  await executeTerminalExpression(page, "Array(1, 2, 3)");
+  await verifyConsoleMessage(page, "(3) [1, 2, 3]");
 
-  await executeTerminalExpression(screen, "new Uint8Array([1, 2, 3, 4])");
-  await verifyConsoleMessage(screen, "Uint8Array(4) [1, 2, 3, 4]");
+  await executeTerminalExpression(page, "new Uint8Array([1, 2, 3, 4])");
+  await verifyConsoleMessage(page, "Uint8Array(4) [1, 2, 3, 4]");
 
-  await executeTerminalExpression(screen, `RegExp("abd", "g")`);
-  await verifyConsoleMessage(screen, "/abd/g");
+  await executeTerminalExpression(page, `RegExp("abd", "g")`);
+  await verifyConsoleMessage(page, "/abd/g");
 
-  await executeTerminalExpression(screen, "new Set([1, 2, 3])");
-  await verifyConsoleMessage(screen, "Set(3) [1, 2, 3]");
+  await executeTerminalExpression(page, "new Set([1, 2, 3])");
+  await verifyConsoleMessage(page, "Set(3) [1, 2, 3]");
 
-  await executeTerminalExpression(screen, "new Map([[1, {a:1}], [2, {b:2}]])");
-  await verifyConsoleMessage(screen, "Map(2) {1 → {…}, 2 → {…}}");
+  await executeTerminalExpression(page, "new Map([[1, {a:1}], [2, {b:2}]])");
+  await verifyConsoleMessage(page, "Map(2) {1 → {…}, 2 → {…}}");
 
-  await executeTerminalExpression(screen, "new WeakSet([{a:1}, {b:2}])");
-  await verifyConsoleMessage(screen, "WeakSet(2) [{…}, {…}]");
+  await executeTerminalExpression(page, "new WeakSet([{a:1}, {b:2}])");
+  await verifyConsoleMessage(page, "WeakSet(2) [{…}, {…}]");
 
-  await executeTerminalExpression(screen, "new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
-  await verifyConsoleMessage(screen, "WeakMap(2) {{…} → {…}, {…} → {…}}");
+  await executeTerminalExpression(page, "new WeakMap([[{a:1},{b:1}], [{a:2},{b:2}]])");
+  await verifyConsoleMessage(page, "WeakMap(2) {{…} → {…}, {…} → {…}}");
 
-  await executeTerminalExpression(screen, "new Promise(() => {})");
-  await verifyConsoleMessage(screen, "Promise{}");
+  await executeTerminalExpression(page, "new Promise(() => {})");
+  await verifyConsoleMessage(page, "Promise{}");
 
-  await executeTerminalExpression(screen, "Promise.resolve({ a: 1 })");
-  await verifyConsoleMessage(screen, "Promise{}");
+  await executeTerminalExpression(page, "Promise.resolve({ a: 1 })");
+  await verifyConsoleMessage(page, "Promise{}");
 
-  await executeTerminalExpression(screen, "Promise.reject({ a: 1 })");
-  await verifyConsoleMessage(screen, "Promise{}");
+  await executeTerminalExpression(page, "Promise.reject({ a: 1 })");
+  await verifyConsoleMessage(page, "Promise{}");
 
-  await executeTerminalExpression(screen, "baz");
-  await verifyConsoleMessage(screen, "ƒbaz()");
+  await executeTerminalExpression(page, "baz");
+  await verifyConsoleMessage(page, "ƒbaz()");
 });

@@ -11,11 +11,13 @@ import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
 const LAYOUT_ICONS = { ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom" };
 
 function ToolboxOption({
+  dataTestId,
   label,
   onClick,
   selected,
   icon,
 }: {
+  dataTestId?: string;
   label: string;
   onClick: () => void;
   selected: boolean;
@@ -23,7 +25,7 @@ function ToolboxOption({
 }) {
   return (
     <DropdownItem onClick={onClick}>
-      <div className="flex space-x-2">
+      <div className="flex space-x-2" data-test-id={dataTestId}>
         {icon ? <Icon filename={icon} className="bg-iconColor" /> : null}
         <div>{label}</div>
       </div>
@@ -32,11 +34,13 @@ function ToolboxOption({
 }
 
 function LayoutOption({
+  dataTestId,
   label,
   value,
   icon,
   collapseDropdown,
 }: {
+  dataTestId?: string;
   label: string;
   value: ToolboxLayout;
   icon: string;
@@ -51,7 +55,13 @@ function LayoutOption({
   };
 
   return (
-    <ToolboxOption onClick={onClick} label={label} selected={toolboxLayout == value} icon={icon} />
+    <ToolboxOption
+      dataTestId={dataTestId}
+      onClick={onClick}
+      label={label}
+      selected={toolboxLayout == value}
+      icon={icon}
+    />
   );
 }
 
@@ -71,18 +81,21 @@ export default function ToolboxOptions() {
     >
       <Dropdown>
         <LayoutOption
+          dataTestId="DockToBottomRightButton"
           label="Dock to Bottom Right"
           value="ide"
           icon={LAYOUT_ICONS["ide"]}
           collapseDropdown={collapseDropdown}
         />
         <LayoutOption
+          dataTestId="DockToLeftButton"
           label="Dock to Left"
           value="left"
           icon={LAYOUT_ICONS["left"]}
           collapseDropdown={collapseDropdown}
         />
         <LayoutOption
+          dataTestId="DockToBottomButton"
           label="Dock to Bottom"
           value="bottom"
           icon={LAYOUT_ICONS["bottom"]}
