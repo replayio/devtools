@@ -153,7 +153,15 @@ function Panel({
 
   return (
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
-      <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+      <div
+        onMouseEnter={onMouseEnter}
+        onMouseLeave={onMouseLeave}
+        style={{
+          position: "sticky",
+          left: "var(--codemirror-gutter-width)",
+          maxWidth: "var(--print-statement-max-width)",
+        }}
+      >
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           <div className="flex items-center space-x-0.5 pt-2 pl-1 pr-4">

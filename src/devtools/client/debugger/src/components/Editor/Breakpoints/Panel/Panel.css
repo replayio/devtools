@@ -5,6 +5,7 @@
 :root {
   /* This will be overridden by `ColumnBreakpoints.tsx` at runtime */
   --print-statement-max-width: 100%;
+  --codemirror-gutter-width: 0px;
 }
 
 .breakpoint-panel {

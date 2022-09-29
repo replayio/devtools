@@ -54,6 +54,7 @@ function ColumnBreakpoints2({ editor }: CBProps) {
 
       let root = document.documentElement;
       root.style.setProperty("--print-statement-max-width", newWidth + "px");
+      root.style.setProperty("--codemirror-gutter-width", gutterWidth + "px");
     };
 
     editor.editor.on("refresh", updateWidth);
