@@ -3342,24 +3342,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright-testing-library/test@npm:^4.4.0":
-  version: 4.4.0
-  resolution: "@playwright-testing-library/test@npm:4.4.0"
-  dependencies:
-    "@testing-library/dom": ^7.31.2
-    wait-for-expect: ^3.0.2
-  peerDependencies:
-    "@playwright/test": ^1.12.0
-    playwright: ^1.12.0
-  peerDependenciesMeta:
-    "@playwright/test":
-      optional: true
-    playwright:
-      optional: true
-  checksum: 6f6489f66019f04ab06d318376ad347e205a833c716926085d548ad5514d8ee9c8bacc41144f8b2f9d90577d9089624353d7761758d3b60ddcdff44ca990d4d8
-  languageName: node
-  linkType: hard
-
 "@playwright/test@npm:^1.23.1":
   version: 1.23.1
   resolution: "@playwright/test@npm:1.23.1"
@@ -5479,22 +5461,6 @@ __metadata:
   peerDependencies:
     tailwindcss: ">=3.0.0 || >= 3.0.0-alpha.1"
   checksum: 3c4df23491d14b37d8cef88d0f3df80f92b684b801d59c23d600773a4ccac11353a555ca36bea68ae4a82134f9c030d1353c05890a5f0085c1c40c649f806640
-  languageName: node
-  linkType: hard
-
-"@testing-library/dom@npm:^7.31.2":
-  version: 7.31.2
-  resolution: "@testing-library/dom@npm:7.31.2"
-  dependencies:
-    "@babel/code-frame": ^7.10.4
-    "@babel/runtime": ^7.12.5
-    "@types/aria-query": ^4.2.0
-    aria-query: ^4.2.2
-    chalk: ^4.1.0
-    dom-accessibility-api: ^0.5.6
-    lz-string: ^1.4.4
-    pretty-format: ^26.6.2
-  checksum: 54fbedd1ecdfe1d47be2e592b98d18b2ab9d7e731f57231caf9b152593fe7329fe5ebe219e0e5d1e0df5b1ab803121cb8acd8b73bd1fb292bfdc2c55663eb01d
   languageName: node
   linkType: hard
 
@@ -7619,7 +7585,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ansi-regex@npm:^5.0.0, ansi-regex@npm:^5.0.1":
+"ansi-regex@npm:^5.0.1":
   version: 5.0.1
   resolution: "ansi-regex@npm:5.0.1"
   checksum: 2aa4bb54caf2d622f1afdad09441695af2a83aa3fe8b8afa581d205e57ed4261c183c4d3877cee25794443fde5876417d859c108078ab788d6af7e4fe52eb66b
@@ -13178,7 +13144,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "functional-tests@workspace:packages/e2e-tests"
   dependencies:
-    "@playwright-testing-library/test": ^4.4.0
     "@playwright/test": ^1.25.1
     "@replayio/playwright": ^0.2.24
     chalk: ^4
@@ -19420,18 +19385,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^26.6.2":
-  version: 26.6.2
-  resolution: "pretty-format@npm:26.6.2"
-  dependencies:
-    "@jest/types": ^26.6.2
-    ansi-regex: ^5.0.0
-    ansi-styles: ^4.0.0
-    react-is: ^17.0.1
-  checksum: e3b808404d7e1519f0df1aa1f25cee0054ab475775c6b2b8c5568ff23194a92d54bf93274139b6f584ca70fd773be4eaa754b0e03f12bb0a8d1426b07f079976
-  languageName: node
-  linkType: hard
-
 "pretty-format@npm:^27.0.0, pretty-format@npm:^27.0.2, pretty-format@npm:^27.5.1":
   version: 27.5.1
   resolution: "pretty-format@npm:27.5.1"
@@ -24223,13 +24176,6 @@ __metadata:
   dependencies:
     xml-name-validator: ^4.0.0
   checksum: 0af8589942eeb11c9fe29eb31a1a09f3d5dd136aea53a9848dfbabff79ac0dd26fe13eb54d330d5555fe27bb50b28dca0715e09f9cc2bfa7670ccc8b7f919ca2
-  languageName: node
-  linkType: hard
-
-"wait-for-expect@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "wait-for-expect@npm:3.0.2"
-  checksum: 2ec1ebd78023fa10bdcf53d78bbd65feea68fdfa0de0b00f3a72f3df089118b91517839ff3926e5ef6cfd1ede65085326d85b0378d4db62c266cc9c859c2de56
   languageName: node
   linkType: hard
 

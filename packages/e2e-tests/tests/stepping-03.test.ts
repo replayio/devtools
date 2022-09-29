@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import {
   reverseStepOverToLine,
@@ -11,36 +13,36 @@ import { addBreakpoint } from "../helpers/source-panel";
 const url = "doc_rr_basic.html";
 
 test(`Stepping past the beginning or end of a frame should act like a step-out.`, async ({
-  screen,
+  page,
 }) => {
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
   // Open doc_rr_basic.html
-  await clickSourceTreeNode(screen, "test");
-  await clickSourceTreeNode(screen, "examples");
-  await clickSourceTreeNode(screen, url);
+  await clickSourceTreeNode(page, "test");
+  await clickSourceTreeNode(page, "examples");
+  await clickSourceTreeNode(page, url);
 
-  await addBreakpoint(screen, { lineNumber: 20, url });
+  await addBreakpoint(page, { lineNumber: 20, url });
 
-  await rewindToLine(screen, { lineNumber: 20 });
-  await executeAndVerifyTerminalExpression(screen, "number", "10");
-  await reverseStepOverToLine(screen, 19);
-  await reverseStepOverToLine(screen, 11);
+  await rewindToLine(page, { lineNumber: 20 });
+  await executeAndVerifyTerminalExpression(page, "number", "10");
+  await reverseStepOverToLine(page, 19);
+  await reverseStepOverToLine(page, 11);
 
   // After reverse-stepping out of the topmost frame we should rewind to the
   // last breakpoint hit.
-  await reverseStepOverToLine(screen, 20);
-  await executeAndVerifyTerminalExpression(screen, "number", "9");
+  await reverseStepOverToLine(page, 20);
+  await executeAndVerifyTerminalExpression(page, "number", "9");
 
-  await stepOverToLine(screen, 21);
-  await stepOverToLine(screen, 22);
-  await stepOverToLine(screen, 12);
-  await stepOverToLine(screen, 16);
-  await stepOverToLine(screen, 17);
+  await stepOverToLine(page, 21);
+  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 12);
+  await stepOverToLine(page, 16);
+  await stepOverToLine(page, 17);
 
   // After forward-stepping out of the topmost frame we should run forward to
   // the next breakpoint hit.
-  await stepOverToLine(screen, 20);
-  await executeAndVerifyTerminalExpression(screen, "number", "10");
+  await stepOverToLine(page, 20);
+  await executeAndVerifyTerminalExpression(page, "number", "10");
 });

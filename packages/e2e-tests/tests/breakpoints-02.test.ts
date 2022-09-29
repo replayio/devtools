@@ -1,30 +1,32 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ screen }) => {
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
+test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
-  await addBreakpoint(screen, { lineNumber: 21, url });
+  await addBreakpoint(page, { lineNumber: 21, url });
 
-  await rewindToLine(screen, { lineNumber: 21 });
+  await rewindToLine(page, { lineNumber: 21 });
 
-  await executeAndVerifyTerminalExpression(screen, "number", "10");
+  await executeAndVerifyTerminalExpression(page, "number", "10");
   await executeAndVerifyTerminalExpression(
-    screen,
+    page,
     "dump(3)",
     `The expression could not be evaluated.`
   );
-  await executeAndVerifyTerminalExpression(screen, "number", "10");
+  await executeAndVerifyTerminalExpression(page, "number", "10");
   await executeAndVerifyTerminalExpression(
-    screen,
+    page,
     "dump(3)",
     `The expression could not be evaluated.`
   );
-  await executeAndVerifyTerminalExpression(screen, "number", "10");
-  await executeAndVerifyTerminalExpression(screen, "testStepping2()", "undefined");
+  await executeAndVerifyTerminalExpression(page, "number", "10");
+  await executeAndVerifyTerminalExpression(page, "testStepping2()", "undefined");
 });

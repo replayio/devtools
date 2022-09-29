@@ -1,62 +1,65 @@
-import { waitFor } from "@playwright-testing-library/test";
-import { expect, Locator } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
-import { openSource } from "./source-explorer-panel";
 
-import { Screen } from "./types";
+import { waitFor } from ".";
+import { openSource } from "./source-explorer-panel";
 import { debugPrint } from "./utils";
 
-export async function expandFirstScope(screen: Screen): Promise<void> {
-  const expander = getScopesPanel(screen).locator('[data-test-name="Expandable"]').first();
+export async function expandFirstScope(page: Page): Promise<void> {
+  const expander = getScopesPanel(page).locator('[data-test-name="Expandable"]').first();
   if ((await expander.getAttribute("data-test-state")) === "closed") {
     await expander.click();
   }
 }
 
-export function getBreakpointsPane(screen: Screen): Locator {
-  return screen.locator('[data-test-id="AccordionPane-Breakpoints"]');
+export function getBreakpointsPane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-Breakpoints"]');
 }
 
-export function getCallStackPane(screen: Screen): Locator {
-  return screen.queryByTestId("AccordionPane-CallStack");
+export function getCallStackPane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-CallStack"]');
 }
 
-export async function getCurrentCallStackFrameInfo(screen: Screen): Promise<{
+export async function getCurrentCallStackFrameInfo(page: Page): Promise<{
   fileName: string | null;
   lineNumber: number | null;
 }> {
-  const framesPanel = getFramesPanel(screen);
+  const framesPanel = getFramesPanel(page);
+  await framesPanel.waitFor();
+
   const selectedFrame = framesPanel.locator(".frame.selected");
+  await selectedFrame.waitFor();
+
   const fileNameNode = selectedFrame.locator(".filename");
   const lineNumberNode = selectedFrame.locator(".line");
-
   const fileName = await fileNameNode.textContent();
   const lineNumber = await lineNumberNode.textContent();
+
   return {
     fileName: fileName || null,
     lineNumber: lineNumber ? parseInt(lineNumber, 10) : null,
   };
 }
 
-export function getFramesPanel(screen: Screen): Locator {
-  return screen.queryByTestId("FramesPanel");
+export function getFramesPanel(page: Page): Locator {
+  return page.locator('[data-test-id="FramesPanel"]');
 }
 
-export function getScopesPanel(screen: Screen): Locator {
-  return screen.locator('[data-test-name="ScopesList"]');
+export function getScopesPanel(page: Page): Locator {
+  return page.locator('[data-test-name="ScopesList"]');
 }
 
-export async function openPauseInformationPanel(screen: Screen): Promise<void> {
+export async function openPauseInformationPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = getBreakpointsPane(screen);
+  const pane = getBreakpointsPane(page);
   const isVisible = await pane.isVisible();
   if (!isVisible) {
-    await screen.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+    await page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
   }
 }
 
 export async function resumeToLine(
-  screen: Screen,
+  page: Page,
   options: {
     lineNumber: number;
     url?: string;
@@ -70,16 +73,16 @@ export async function resumeToLine(
   );
 
   if (url !== null) {
-    await openSource(screen, url);
+    await openSource(page, url);
   }
 
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
 
   while (true) {
-    const button = screen.getByTitle(/^Resume/);
+    const button = page.locator('[title^="Resume"]');
     await button.click();
 
-    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
+    const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(page);
 
     if (selectedLineNumber === null) {
       throw Error(`Unable to resume to line ${lineNumber}`);
@@ -89,33 +92,33 @@ export async function resumeToLine(
   }
 }
 
-export async function reverseStepOver(screen: Screen): Promise<void> {
+export async function reverseStepOver(page: Page): Promise<void> {
   debugPrint("Reverse step over", "reverseStepOver");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Reverse Step Over").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Reverse Step Over"]').click();
 }
 
-export async function reverseStepOverToLine(screen: Screen, line: number) {
+export async function reverseStepOverToLine(page: Page, line: number) {
   debugPrint(`Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Reverse Step Over").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Reverse Step Over"]').click();
 
-  await waitForPaused(screen, line);
+  await waitForPaused(page, line);
 }
 
-export async function rewind(screen: Screen) {
+export async function rewind(page: Page) {
   debugPrint("Rewinding", "rewind");
 
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
 
-  const button = screen.getByTitle("Rewind Execution");
+  const button = page.locator('[title="Rewind Execution"]');
   await button.click();
 }
 
 export async function rewindToLine(
-  screen: Screen,
+  page: Page,
   options: {
     lineNumber?: number;
     url?: string;
@@ -126,19 +129,19 @@ export async function rewindToLine(
   debugPrint(`Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
 
   if (url !== null) {
-    await openSource(screen, url);
+    await openSource(page, url);
   }
 
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
 
   while (true) {
-    const button = screen.getByTitle("Rewind Execution");
+    const button = page.locator('[title="Rewind Execution"]');
     await button.click();
 
     if (lineNumber === null) {
       return;
     } else {
-      const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(screen);
+      const { lineNumber: selectedLineNumber } = await getCurrentCallStackFrameInfo(page);
 
       if (selectedLineNumber === null) {
         throw Error(`Unable to rewind to line ${lineNumber}`);
@@ -149,51 +152,51 @@ export async function rewindToLine(
   }
 }
 
-export async function selectFrame(screen: Screen, index: number): Promise<void> {
+export async function selectFrame(page: Page, index: number): Promise<void> {
   debugPrint(`Select frame ${chalk.bold(index)}`, "selectFrame");
 
-  const framesPanel = getFramesPanel(screen);
+  const framesPanel = getFramesPanel(page);
 
   const frameListItems = framesPanel.locator(".frame");
   await frameListItems.nth(index).click();
 }
 
-export async function stepInToLine(screen: Screen, line: number) {
+export async function stepInToLine(page: Page, line: number) {
   debugPrint(`Step in to line ${chalk.bold(line)}`, "stepInToLine");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Step In").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Step In"]').click();
 
-  await waitForPaused(screen, line);
+  await waitForPaused(page, line);
 }
 
-export async function stepOutToLine(screen: Screen, line: number) {
+export async function stepOutToLine(page: Page, line: number) {
   debugPrint(`Step out to line ${chalk.bold(line)}`, "stepOutToLine");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Step Out").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Step Out"]').click();
 
-  await waitForPaused(screen, line);
+  await waitForPaused(page, line);
 }
 
-export async function stepOverToLine(screen: Screen, line: number) {
+export async function stepOverToLine(page: Page, line: number) {
   debugPrint(`Step over to line ${chalk.bold(line)}`, "stepOverToLine");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Step Over").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Step Over"]').click();
 
-  await waitForPaused(screen, line);
+  await waitForPaused(page, line);
 }
 
-export async function stepOver(screen: Screen): Promise<void> {
+export async function stepOver(page: Page): Promise<void> {
   debugPrint("Step over", "stepOver");
 
-  await openPauseInformationPanel(screen);
-  await screen.queryByTitle("Step Over").click();
+  await openPauseInformationPanel(page);
+  await page.locator('[title="Step Over"]').click();
 }
 
-export async function verifyFramesCount(screen: Screen, expectedCount: number) {
-  const framesPanel = getFramesPanel(screen);
+export async function verifyFramesCount(page: Page, expectedCount: number) {
+  const framesPanel = getFramesPanel(page);
   return waitFor(async () => {
     const frameListItems = framesPanel.locator(".frame");
     const numFrames = await frameListItems.count();
@@ -201,11 +204,11 @@ export async function verifyFramesCount(screen: Screen, expectedCount: number) {
   });
 }
 
-export async function waitForFrameTimeline(screen: Screen, widthPercentage: string) {
+export async function waitForFrameTimeline(page: Page, widthPercentage: string) {
   debugPrint(`Waiting for frame progress ${chalk.bold(widthPercentage)}`, "waitForFrameTimeline");
 
-  await openPauseInformationPanel(screen);
-  await screen.waitForFunction(
+  await openPauseInformationPanel(page);
+  await page.waitForFunction(
     params => {
       const elem: HTMLElement | null = document.querySelector(".frame-timeline-progress");
       return elem?.style.width == params.widthPercentage;
@@ -214,14 +217,14 @@ export async function waitForFrameTimeline(screen: Screen, widthPercentage: stri
   );
 }
 
-export async function waitForPaused(screen: Screen, line?: number): Promise<void> {
+export async function waitForPaused(page: Page, line?: number): Promise<void> {
   debugPrint(`Waiting for pause ${line != null ? `at ${chalk.bold(line)}` : ""}`, "waitForPaused");
 
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
 
   await waitFor(async () => {
-    const scopesPanel = getScopesPanel(screen);
-    const framesPanel = getFramesPanel(screen);
+    const scopesPanel = getScopesPanel(page);
+    const framesPanel = getFramesPanel(page);
 
     const frameListItems = framesPanel.locator(".frame");
     const scopeBlocks = scopesPanel.locator('[data-test-name="Expandable"]');
@@ -232,16 +235,16 @@ export async function waitForPaused(screen: Screen, line?: number): Promise<void
 
   if (line) {
     await waitFor(async () => {
-      const { lineNumber } = await getCurrentCallStackFrameInfo(screen);
+      const { lineNumber } = await getCurrentCallStackFrameInfo(page);
       expect(lineNumber).toBe(line);
     });
   }
 }
 
-export async function waitForScopeValue(screen: Screen, name: string, value: string) {
-  await expandFirstScope(screen);
+export async function waitForScopeValue(page: Page, name: string, value: string) {
+  await expandFirstScope(page);
 
-  const scopesPanel = getScopesPanel(screen);
+  const scopesPanel = getScopesPanel(page);
   const scopeValue = scopesPanel.locator(
     `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${value}"))`
   );
