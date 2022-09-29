@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   openPauseInformationPanel,
   resumeToLine,
@@ -8,27 +10,27 @@ import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_debugger_statements.html";
 
-test(`Test interaction of breakpoints with debugger statements.`, async ({ screen }) => {
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
-  await openPauseInformationPanel(screen);
+test(`Test interaction of breakpoints with debugger statements.`, async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+  await openPauseInformationPanel(page);
 
   // Without any breakpoints, this test should rewind to the closest debugger statement.
-  await rewindToLine(screen, { lineNumber: 9 });
+  await rewindToLine(page, { lineNumber: 9 });
 
   // Without a breakpoints being the next nearest thing, we should rewind to it.
-  await addBreakpoint(screen, {
+  await addBreakpoint(page, {
     lineNumber: 8,
     url,
   });
-  await rewindToLine(screen, { lineNumber: 8 });
-  await resumeToLine(screen, { lineNumber: 9 });
+  await rewindToLine(page, { lineNumber: 8 });
+  await resumeToLine(page, { lineNumber: 9 });
 
   // Without any breakpoints (again), we should rewind to debugger statements.
-  await removeBreakpoint(screen, {
+  await removeBreakpoint(page, {
     lineNumber: 8,
     url,
   });
-  await rewindToLine(screen, { lineNumber: 7 });
-  await resumeToLine(screen, { lineNumber: 9 });
+  await rewindToLine(page, { lineNumber: 7 });
+  await resumeToLine(page, { lineNumber: 9 });
 });

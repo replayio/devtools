@@ -1,10 +1,11 @@
-import { Locator, expect } from "@playwright/test";
-import { waitFor } from "@playwright-testing-library/test";
+import test from "@playwright/test";
 
-import { openDevToolsTab, startTest, test } from "../helpers";
+import { Locator, expect, Page } from "@playwright/test";
+
+import { openDevToolsTab, startTest, waitFor } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { selectElementsRowWithText } from "../helpers/elements-panel";
 import { openPauseInformationPanel } from "../helpers/pause-information-panel";
-import { Screen } from "../helpers/types";
 
 interface StackingTestCase {
   id: string;
@@ -12,7 +13,7 @@ interface StackingTestCase {
   expectedRules: string[];
 }
 
-// This recording  has 4x4 sets of carefully positioned DOM nodes on screen
+// This recording  has 4x4 sets of carefully positioned DOM nodes on page
 // Many of these boxes overlap in some way, with various CSS position rules in effect.
 // The goal of this test is to verify that when we click at a specific coordinate,
 // the backend correctly determines the right mouse target underneath the cursor,
@@ -137,16 +138,16 @@ const testCases: StackingTestCase[] = [
   },
 ];
 
-async function ensureSidePanelClosed(screen: Screen) {
+async function ensureSidePanelClosed(page: Page) {
   // Clicks that aren't directly on an element can cause the "Comments" pane to open.
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
   // Then click it again to make sure the panel closes
-  await screen.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
+  await page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
 }
 
 async function verifySelectedElementUnderCursor(
-  screen: Screen,
+  page: Page,
   canvas: Locator,
   rulesContainer: Locator,
   scale: number,
@@ -154,11 +155,10 @@ async function verifySelectedElementUnderCursor(
 ) {
   // deselect any previously selected DOM node by selecting `<body>`.
   // This ensures that the "Rules" tab is empty before every test case.
-  await screen.queryByText(/Elements/).click();
-  await screen.queryAllByText(/body/).first().click();
+  await selectElementsRowWithText(page, "body");
 
   // Click the "Select an Element from Preview" button
-  await screen.locator("#command-button-pick").click();
+  await page.locator("#command-button-pick").click();
 
   // Modify the original app coords by the canvas transform scale
   const position = {
@@ -196,26 +196,26 @@ async function verifySelectedElementUnderCursor(
   });
 }
 
-test("Element highlighter selects the correct element when they overlap", async ({ screen }) => {
-  await startTest(screen, "doc_stacking.html");
-  await openDevToolsTab(screen);
+test("Element highlighter selects the correct element when they overlap", async ({ page }) => {
+  await startTest(page, "doc_stacking.html");
+  await openDevToolsTab(page);
 
-  await warpToMessage(screen, "ExampleFinished");
+  await warpToMessage(page, "ExampleFinished");
 
   // Ensure that the left sidebar is collapsed
-  ensureSidePanelClosed(screen);
+  ensureSidePanelClosed(page);
 
-  await openConsolePanel(screen);
+  await openConsolePanel(page);
 
   // Dock the console to the _left_ side, to make the video preview as big as possible
-  await screen.queryByTestId("consoleDockButton").click();
-  await screen.queryByText(/Dock to Left/).click();
+  await page.locator('[data-test-id="consoleDockButton"]').click();
+  await page.locator('[data-test-id="DockToBottomRightButton"]').click();
 
-  const canvas = screen.locator("canvas#graphics");
-  const rulesContainer = screen.locator("#ruleview-container");
+  const canvas = page.locator("canvas#graphics");
+  const rulesContainer = page.locator("#ruleview-container");
 
   // HACK Our preview canvas is scaled down depending on position and original app
-  // screen size. We'll need to alter where we click on screen by the same scale,
+  // page size. We'll need to alter where we click on page by the same scale,
   // in order to correctly click on the intended elements from original x/y coords.
   // Grab the `transform` style from the canvas node and parse out the scale factor.
   const canvasTransformString = await canvas.evaluate(node => {
@@ -228,7 +228,7 @@ test("Element highlighter selects the correct element when they overlap", async 
 
   for (let testCase of testCases) {
     // Really make sure the panel is closed
-    ensureSidePanelClosed(screen);
-    await verifySelectedElementUnderCursor(screen, canvas, rulesContainer, scale, testCase);
+    ensureSidePanelClosed(page);
+    await verifySelectedElementUnderCursor(page, canvas, rulesContainer, scale, testCase);
   }
 });

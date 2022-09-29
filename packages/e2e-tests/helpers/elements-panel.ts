@@ -1,24 +1,24 @@
-import { waitFor } from "@playwright-testing-library/test";
-import { expect, Locator } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { Screen } from "./types";
+import { waitFor } from ".";
+
 import { debugPrint } from "./utils";
 
-export async function activateInspectorTool(screen: Screen): Promise<void> {
-  await screen.queryByTestId("PanelButton-inspector").click();
+export async function activateInspectorTool(page: Page): Promise<void> {
+  await page.locator('[data-test-id="PanelButton-inspector"]').click();
 }
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.
 export async function checkComputedStyle(
-  screen: Screen,
+  page: Page,
   style: string,
   value: string,
   expectedSelectors: any = undefined
 ): Promise<void> {
-  await openComputedPropertiesTab(screen);
+  await openComputedPropertiesTab(page);
   await waitFor(async () => {
-    const result = await screen.evaluate(
+    const result = await page.evaluate(
       ({ style, value, matchedSelectors }) => {
         function getMatchedSelectors(property: string) {
           const propertyNodes = document.querySelectorAll<HTMLElement>(".computed-property-view");
@@ -81,25 +81,25 @@ export async function checkComputedStyle(
   });
 }
 
-export function getElementsPanelSelection(screen: Screen): Locator {
+export function getElementsPanelSelection(page: Page): Locator {
   debugPrint(`Getting Elements panel selection`, "getElementsPanelSelection");
 
-  const elements = screen.locator("#inspector-main-content");
+  const elements = page.locator("#inspector-main-content");
   const selectedLine = elements.locator(".tag-line.selected");
 
   return selectedLine;
 }
 
-export function getElementsRowWithText(screen: Screen, text: string): Locator {
+export function getElementsRowWithText(page: Page, text: string): Locator {
   const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return screen.locator(`#markup-box .editor:has-text("${escapedText}")`);
+  return page.locator(`#markup-box .editor:has-text("${escapedText}")`);
 }
 
 // This helper function uses the Elements inspector to click on a part of the preview Canvas.
 // Rather than using hard-coded pixel numbers, the x and y positions passed in should be percentages (0-1)
 // which will be converted to coordinates based on the size of the preview Canvas.
 export async function inspectCanvasCoordinates(
-  screen: Screen,
+  page: Page,
   xPercentage: number,
   yPercentage: number
 ): Promise<void> {
@@ -111,12 +111,12 @@ export async function inspectCanvasCoordinates(
 
   debugPrint(`Inspecting preview Canvas`, "inspectCanvasCoordinates");
 
-  await activateInspectorTool(screen);
+  await activateInspectorTool(page);
 
-  const pickerButton = screen.queryByTitle("Select an element in the video to inspect it")!;
+  const pickerButton = page.locator('[title="Select an element in the video to inspect it"]')!;
   await pickerButton.click();
 
-  const canvas = screen.locator("#graphics");
+  const canvas = page.locator("#graphics");
   const height = await canvas.getAttribute("height");
   const width = await canvas.getAttribute("width");
   const x = xPercentage * (width as any as number);
@@ -132,31 +132,31 @@ export async function inspectCanvasCoordinates(
   canvas.click({ position: { x, y } });
 }
 
-export async function openComputedPropertiesTab(screen: Screen): Promise<void> {
-  const locator = screen.locator("#computedview-tab");
+export async function openComputedPropertiesTab(page: Page): Promise<void> {
+  const locator = page.locator("#computedview-tab");
   await locator.waitFor();
   await locator.click();
 }
 
-export async function searchElementsPanel(screen: Screen, searchText: string): Promise<void> {
+export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
   debugPrint(`Searching Elements for text ${chalk.bold(`"${searchText}"`)}`, "searchElementsPanel");
 
-  await activateInspectorTool(screen);
+  await activateInspectorTool(page);
 
-  const input = screen.queryByPlaceholderText("Search HTML")!;
+  const input = page.locator('[placeholder="Search HTML"]')!;
   await input.focus();
   await input.type(searchText);
   await input.press("Enter");
 }
 
-export async function selectElementsRowWithText(screen: Screen, text: string): Promise<void> {
-  const node = getElementsRowWithText(screen, text);
+export async function selectElementsRowWithText(page: Page, text: string): Promise<void> {
+  const node = getElementsRowWithText(page, text);
   await node.waitFor();
   await node.click();
 }
 
-export async function selectNextElementsPanelSearchResult(screen: Screen): Promise<void> {
-  const searchBox = screen.getByPlaceholderText("Search HTML");
+export async function selectNextElementsPanelSearchResult(page: Page): Promise<void> {
+  const searchBox = page.locator('[placholder="Search HTML"]');
   await searchBox.press("Enter");
 }
 
@@ -170,7 +170,7 @@ export async function toggleMarkupNode(locator: Locator): Promise<void> {
   });
 }
 
-export function waitForSelectedElementsRow(screen: Screen, text: string): Promise<void> {
+export function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
   const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return screen.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`).waitFor();
+  return page.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`).waitFor();
 }

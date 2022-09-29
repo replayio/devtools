@@ -1,8 +1,8 @@
-import { Locator } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
-import { waitForPaused } from "./pause-information-panel";
 
-import { Expected, MessageType, Screen } from "./types";
+import { waitForPaused } from "./pause-information-panel";
+import { Expected, MessageType } from "./types";
 import { debugPrint } from "./utils";
 
 const categoryNames = {
@@ -15,10 +15,7 @@ const categoryNames = {
 
 type CategoryKey = keyof typeof categoryNames;
 
-export async function addEventListenerLogpoints(
-  screen: Screen,
-  eventTypes: string[]
-): Promise<void> {
+export async function addEventListenerLogpoints(page: Page, eventTypes: string[]): Promise<void> {
   for (let eventType of eventTypes) {
     const [, categoryKey, eventName] = eventType.split(".");
 
@@ -27,26 +24,26 @@ export async function addEventListenerLogpoints(
       "addEventListenerLogpoints"
     );
 
-    await expandFilterCategory(screen, categoryNames[categoryKey as CategoryKey]);
-    await screen.queryByTestId(`EventTypes-${eventType}`).setChecked(true);
+    await expandFilterCategory(page, categoryNames[categoryKey as CategoryKey]);
+    await page.locator(`[data-test-id="EventTypes-${eventType}"]`).setChecked(true);
   }
 }
 
-export async function clearConsoleEvaluations(screen: Screen): Promise<void> {
-  await screen.queryByTestId("ClearConsoleEvaluationsButton").click();
+export async function clearConsoleEvaluations(page: Page): Promise<void> {
+  await page.locator('[data-test-id="ClearConsoleEvaluationsButton"]').click();
 }
 
-export async function executeTerminalExpression(screen: Screen, text: string): Promise<void> {
+export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
   debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
 
-  await openConsolePanel(screen);
+  await openConsolePanel(page);
 
-  const consoleRoot = screen.queryByTestId("ConsoleRoot");
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
 
   // Wait for the Console to stop loading
   await consoleRoot.locator("text=Unavailable...").waitFor({ state: "hidden" });
 
-  const term = screen.queryByTestId("JSTerm");
+  const term = page.locator('[data-test-id="JSTerm"]');
 
   const textArea = term.locator("textarea");
   await textArea.focus();
@@ -55,23 +52,23 @@ export async function executeTerminalExpression(screen: Screen, text: string): P
 }
 
 export async function executeAndVerifyTerminalExpression(
-  screen: Screen,
+  page: Page,
   text: string,
   expected: Expected
 ): Promise<void> {
-  await openConsolePanel(screen);
-  await executeTerminalExpression(screen, text);
-  await verifyConsoleMessage(screen, expected, "terminal-expression");
-  await clearConsoleEvaluations(screen);
+  await openConsolePanel(page);
+  await executeTerminalExpression(page, text);
+  await verifyConsoleMessage(page, expected, "terminal-expression");
+  await clearConsoleEvaluations(page);
 }
 
-export async function expandFilterCategory(screen: Screen, categoryName: string) {
+export async function expandFilterCategory(page: Page, categoryName: string) {
   debugPrint(
     `Expanding Console event filter category "${chalk.bold(categoryName)}"`,
     "expandFilterCategory"
   );
 
-  const consoleFilters = screen.queryByTestId("ConsoleFilterToggles");
+  const consoleFilters = page.locator('[data-test-id="ConsoleFilterToggles"]');
 
   const categoryLabel = consoleFilters.locator(`[data-test-name="Expandable"]`, {
     hasText: categoryName,
@@ -83,12 +80,12 @@ export async function expandFilterCategory(screen: Screen, categoryName: string)
   }
 }
 
-export async function openConsolePanel(screen: Screen): Promise<void> {
-  await screen.queryByTestId("PanelButton-console").click();
+export async function openConsolePanel(page: Page): Promise<void> {
+  await page.locator('[data-test-id="PanelButton-console"]').click();
 }
 
 export function findConsoleMessage(
-  screen: Screen,
+  page: Page,
   expected?: Expected,
   messageType?: MessageType
 ): Locator {
@@ -97,8 +94,8 @@ export function findConsoleMessage(
     : '[data-test-name="Message"]';
 
   return expected
-    ? screen.locator(`${attributeSelector}:has-text("${expected}")`)
-    : screen.locator(`${attributeSelector}`);
+    ? page.locator(`${attributeSelector}:has-text("${expected}")`)
+    : page.locator(`${attributeSelector}`);
 }
 
 export function getMessageSourceLink(message: Locator): Locator {
@@ -114,7 +111,7 @@ export async function openMessageSource(message: Locator): Promise<void> {
   await sourceLink.click();
 }
 
-export async function seekToConsoleMessage(screen: Screen, consoleMessage: Locator): Promise<void> {
+export async function seekToConsoleMessage(page: Page, consoleMessage: Locator): Promise<void> {
   const textContent = await consoleMessage.textContent();
 
   debugPrint(`Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
@@ -123,19 +120,19 @@ export async function seekToConsoleMessage(screen: Screen, consoleMessage: Locat
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
 }
 
-export async function warpToMessage(screen: Screen, text: string, line?: number) {
-  const message = await findConsoleMessage(screen, text);
+export async function warpToMessage(page: Page, text: string, line?: number) {
+  const message = await findConsoleMessage(page, text);
   await message.hover();
 
   const warpButton = message.locator('[data-test-id="ConsoleMessageHoverButton"]');
   await warpButton.hover();
   await warpButton.click();
 
-  await waitForPaused(screen, line);
+  await waitForPaused(page, line);
 }
 
 export async function verifyConsoleMessage(
-  screen: Screen,
+  page: Page,
   expected: Expected,
   messageType?: MessageType
 ) {
@@ -146,6 +143,6 @@ export async function verifyConsoleMessage(
     "verifyConsoleMessage"
   );
 
-  const message = findConsoleMessage(screen, expected, messageType);
+  const message = findConsoleMessage(page, expected, messageType);
   await message.waitFor();
 }

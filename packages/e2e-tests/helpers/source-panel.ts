@@ -1,15 +1,13 @@
-import { expect, Locator } from "@playwright/test";
-import { waitFor } from "@playwright-testing-library/test";
+import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { openDevToolsTab } from ".";
+import { openDevToolsTab, waitFor } from ".";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { Screen } from "./types";
 import { clearTextArea, debugPrint } from "./utils";
 
 export async function addBreakpoint(
-  screen: Screen,
+  page: Page,
   options: {
     columnIndex?: number;
     lineNumber: number;
@@ -20,22 +18,22 @@ export async function addBreakpoint(
 
   debugPrint(`Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "addBreakpoint");
 
-  await openDevToolsTab(screen);
+  await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(screen);
-    await openSource(screen, url);
+    await openSourceExplorerPanel(page);
+    await openSource(page, url);
   }
 
-  const line = await getSourceLine(screen, lineNumber);
+  const line = await getSourceLine(page, lineNumber);
   await line.locator(".CodeMirror-linenumber").hover();
   await line.locator(".CodeMirror-linenumber").click();
 
-  await waitForBreakpoint(screen, options);
+  await waitForBreakpoint(page, options);
 }
 
 export async function addLogpoint(
-  screen: Screen,
+  page: Page,
   options: {
     columnIndex?: number;
     lineNumber: number;
@@ -48,21 +46,21 @@ export async function addLogpoint(
 
   debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
 
-  await openDevToolsTab(screen);
+  await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(screen);
-    await openSource(screen, url);
+    await openSourceExplorerPanel(page);
+    await openSource(page, url);
   }
 
-  const line = await getSourceLine(screen, lineNumber);
+  const line = await getSourceLine(page, lineNumber);
   await line.hover();
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 
-  await waitForLogpoint(screen, options);
+  await waitForLogpoint(page, options);
 
   if (condition || content) {
-    const line = getSourceLine(screen, lineNumber);
+    const line = getSourceLine(page, lineNumber);
     await line.locator('[data-test-name="LogpointContentSummary"]').click();
 
     if (condition) {
@@ -75,8 +73,8 @@ export async function addLogpoint(
 
       const textArea = await line.locator("textarea").first();
       await textArea.focus();
-      await clearTextArea(screen, textArea);
-      await screen.keyboard.type(condition);
+      await clearTextArea(page, textArea);
+      await page.keyboard.type(condition);
     }
 
     if (content) {
@@ -87,8 +85,8 @@ export async function addLogpoint(
       const textArea = await line.locator("textarea").last();
       await textArea.waitFor();
       await textArea.focus();
-      await clearTextArea(screen, textArea);
-      await screen.keyboard.type(content);
+      await clearTextArea(page, textArea);
+      await page.keyboard.type(content);
     }
 
     const saveButton = await line.locator('button[title="Save expression"]');
@@ -100,10 +98,10 @@ export async function addLogpoint(
   }
 }
 
-export async function closeSource(screen: Screen, url: string): Promise<void> {
+export async function closeSource(page: Page, url: string): Promise<void> {
   debugPrint(`Closing source "${chalk.bold(url)}"`, "openSource");
 
-  const sourceTab = getSourceTab(screen, url);
+  const sourceTab = getSourceTab(page, url);
 
   if (await sourceTab.isVisible()) {
     await sourceTab.locator("button").click();
@@ -112,29 +110,29 @@ export async function closeSource(screen: Screen, url: string): Promise<void> {
   await sourceTab.waitFor({ state: "detached" });
 }
 
-export async function getSelectedLineNumber(screen: Screen): Promise<number | null> {
-  const lineNumber = await screen.locator(".new-debug-line .CodeMirror-linenumber");
+export async function getSelectedLineNumber(page: Page): Promise<number | null> {
+  const lineNumber = await page.locator(".new-debug-line .CodeMirror-linenumber");
   const textContent = await lineNumber.textContent();
   return textContent !== null ? parseInt(textContent, 10) : null;
 }
 
-export function getSourceLine(screen: Screen, lineNumber: number): Locator {
-  return screen
+export function getSourceLine(page: Page, lineNumber: number): Locator {
+  return page
     .locator(".CodeMirror-code div", {
-      has: screen.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
+      has: page.locator(`.CodeMirror-linenumber:text-is("${lineNumber}")`),
     })
     .first();
 }
 
-export function getSourceTab(screen: Screen, url: string): Locator {
-  return screen.locator(`[data-test-name="Source-${url}"]`);
+export function getSourceTab(page: Page, url: string): Locator {
+  return page.locator(`[data-test-name="Source-${url}"]`);
 }
 
-export async function removeAllBreakpoints(screen: Screen): Promise<void> {
+export async function removeAllBreakpoints(page: Page): Promise<void> {
   debugPrint(`Removing all breakpoints for the current source`, "removeBreakpoint");
 
   while (true) {
-    const breakpoint = screen.locator(".editor.new-breakpoint");
+    const breakpoint = page.locator(".editor.new-breakpoint");
     const count = await breakpoint.count();
     if (count > 0) {
       await breakpoint.click();
@@ -145,7 +143,7 @@ export async function removeAllBreakpoints(screen: Screen): Promise<void> {
 }
 
 export async function removeBreakpoint(
-  screen: Screen,
+  page: Page,
   options: {
     lineNumber: number;
     url: string;
@@ -155,19 +153,19 @@ export async function removeBreakpoint(
 
   debugPrint(`Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "removeBreakpoint");
 
-  await openDevToolsTab(screen);
+  await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(screen);
-    await openSource(screen, url);
+    await openSourceExplorerPanel(page);
+    await openSource(page, url);
   }
 
-  const line = await getSourceLine(screen, lineNumber);
+  const line = await getSourceLine(page, lineNumber);
   await line.locator(".CodeMirror-linenumber").click({ force: true });
 }
 
 export async function waitForBreakpoint(
-  screen: Screen,
+  page: Page,
   options: {
     columnIndex?: number;
     lineNumber: number;
@@ -181,11 +179,9 @@ export async function waitForBreakpoint(
     "waitForBreakpoint"
   );
 
-  await openPauseInformationPanel(screen);
+  await openPauseInformationPanel(page);
 
-  const breakpointGroup = await screen.waitForSelector(
-    `.breakpoints-list-source:has-text("${url}")`
-  );
+  const breakpointGroup = await page.waitForSelector(`.breakpoints-list-source:has-text("${url}")`);
 
   if (columnIndex != null) {
     await breakpointGroup.waitForSelector(
@@ -197,7 +193,7 @@ export async function waitForBreakpoint(
 }
 
 export async function waitForLogpoint(
-  screen: Screen,
+  page: Page,
   options: {
     columnIndex?: number;
     lineNumber: number;
@@ -208,19 +204,19 @@ export async function waitForLogpoint(
 
   debugPrint(`Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "waitForLogpoint");
 
-  await openDevToolsTab(screen);
+  await openDevToolsTab(page);
 
   if (url) {
-    await openSourceExplorerPanel(screen);
-    await openSource(screen, url);
+    await openSourceExplorerPanel(page);
+    await openSource(page, url);
   }
 
-  const line = getSourceLine(screen, lineNumber);
+  const line = getSourceLine(page, lineNumber);
   await line.locator(".CodeMirror-linewidget").waitFor();
 }
 
 export async function verifyLogpointStep(
-  screen: Screen,
+  page: Page,
   expectedStatus: string,
   options: {
     lineNumber: number;
@@ -229,10 +225,10 @@ export async function verifyLogpointStep(
 ): Promise<void> {
   const { lineNumber, url } = options;
 
-  await openSourceExplorerPanel(screen);
+  await openSourceExplorerPanel(page);
 
   if (url) {
-    await openSource(screen, url);
+    await openSource(page, url);
   }
 
   debugPrint(
@@ -242,7 +238,7 @@ export async function verifyLogpointStep(
     "verifyLogpointStep"
   );
 
-  const line = await getSourceLine(screen, lineNumber);
+  const line = await getSourceLine(page, lineNumber);
   const status = line.locator(
     `[data-test-name="LogpointPanel-BreakpointStatus"]:has-text("${expectedStatus}")`
   );
@@ -250,9 +246,9 @@ export async function verifyLogpointStep(
 }
 
 // TODO [FE-626] Rewrite this helper to reduce complexity.
-export async function waitForSelectedSource(screen: Screen, url: string) {
+export async function waitForSelectedSource(page: Page, url: string) {
   return waitFor(async () => {
-    const editorPanel = screen.locator("#toolbox-content-debugger");
+    const editorPanel = page.locator("#toolbox-content-debugger");
     const sourceHeader = editorPanel.locator(`[data-test-name="Source-${url}"]`);
     const isTabActive = (await sourceHeader.getAttribute("data-status")) === "active";
 
