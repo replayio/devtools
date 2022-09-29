@@ -1,9 +1,9 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint } from "./utils";
-
 const exampleRecordings = require("../examples.json");
+
+import { debugPrint, delay } from "./utils";
 
 export async function openDevToolsTab(page: Page) {
   return page.locator('[data-test-id="ViewToggle-DevTools"]').click();
@@ -27,6 +27,30 @@ export async function startTest(page: Page, example: string) {
   await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
 }
 
-export async function waitFor(callback: () => Promise<void>): Promise<void> {
-  // TODO [FE-626]
+export async function waitFor(
+  callback: () => Promise<void>,
+  options: {
+    retryInterval?: number;
+    timeout?: number;
+  } = {}
+): Promise<void> {
+  const { retryInterval = 250, timeout = 5_000 } = options;
+
+  const startTime = performance.now();
+
+  while (true) {
+    try {
+      await callback();
+
+      return;
+    } catch (error) {
+      if (performance.now() - startTime > timeout) {
+        throw error;
+      }
+
+      await delay(retryInterval);
+
+      continue;
+    }
+  }
 }

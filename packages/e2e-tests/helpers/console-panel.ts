@@ -1,7 +1,7 @@
 import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
-import { waitForPaused } from "./pause-information-panel";
 
+import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
 import { debugPrint } from "./utils";
 
