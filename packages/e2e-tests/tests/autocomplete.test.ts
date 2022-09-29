@@ -1,6 +1,7 @@
 import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
+import { checkAutocompleteMatches } from "../helpers/autocomplete";
 import { focusConsoleTextArea, openConsolePanel, warpToMessage } from "../helpers/console-panel";
 
 test(`Test basic breakpoint functionality.`, async ({ page }) => {
@@ -11,11 +12,14 @@ test(`Test basic breakpoint functionality.`, async ({ page }) => {
 
   const textArea = await focusConsoleTextArea(page);
 
-  textArea.fill("A");
+  textArea.fill("r.");
 
   await page.evaluate(() => {
     window.jsterm.showAutocomplete!(true);
   });
 
-  await new Promise(resolve => setTimeout(resolve, 8000));
+  const objectProperties = Object.getOwnPropertyNames(Object.prototype);
+  const expectedMatches = [...objectProperties, "_foo", "foo"];
+
+  await checkAutocompleteMatches(page, expectedMatches);
 });
