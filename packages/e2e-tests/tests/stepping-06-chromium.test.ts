@@ -8,7 +8,7 @@ Test.describe(`Test stepping in async frames and async call stacks.`, async () =
   
     await Test.warpToMessage("baz 2");
   
-    await Test.checkFrames(5);
+    await Test.verifyFramesCount(5);
   
     await Test.waitForScopeValue("n", "2");
     await Test.waitForFrameTimeline(target == "gecko" ? "25%" : "0%");
@@ -33,11 +33,11 @@ Test.describe(`Test stepping in async frames and async call stacks.`, async () =
     await Test.stepOverToLine(21);
     await Test.stepOverToLine(22);
     await Test.stepOverToLine(24);
-    await Test.checkEvaluateInTopFrame("n", 2);
+    await Test.executeAndVerifyTerminalExpression("n", 2);
     await Test.stepOutToLine(24);
-    await Test.checkEvaluateInTopFrame("n", 3);
+    await Test.executeAndVerifyTerminalExpression("n", 3);
     await Test.stepOutToLine(24);
-    await Test.checkEvaluateInTopFrame("n", 4);
+    await Test.executeAndVerifyTerminalExpression("n", 4);
     await Test.stepOutToLine(13);
     await Test.reverseStepOverToLine(12);
   });

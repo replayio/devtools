@@ -1,18 +1,10 @@
 import { Locator, expect } from "@playwright/test";
 import { waitFor } from "@playwright-testing-library/test";
 
-import {
-  test,
-  openExample,
-  clickDevTools,
-  addBreakpoint,
-  rewindToLine,
-  selectConsole,
-  warpToMessage,
-  delay,
-  openPauseInformation,
-  Screen,
-} from "../helpers";
+import { openDevToolsTab, startTest, test } from "../helpers";
+import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { openPauseInformationPanel } from "../helpers/pause-information-panel";
+import { Screen } from "../helpers/types";
 
 interface StackingTestCase {
   id: string;
@@ -145,10 +137,10 @@ const testCases: StackingTestCase[] = [
   },
 ];
 
-async function ensureSidePanelClosed(screen) {
+async function ensureSidePanelClosed(screen: Screen) {
   // Clicks that aren't directly on an element can cause the "Comments" pane to open.
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  await openPauseInformation(screen);
+  await openPauseInformationPanel(screen);
   // Then click it again to make sure the panel closes
   await screen.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
 }
@@ -205,15 +197,15 @@ async function verifySelectedElementUnderCursor(
 }
 
 test("Element highlighter selects the correct element when they overlap", async ({ screen }) => {
-  await openExample(screen, "doc_stacking.html");
-  await clickDevTools(screen);
+  await startTest(screen, "doc_stacking.html");
+  await openDevToolsTab(screen);
 
   await warpToMessage(screen, "ExampleFinished");
 
   // Ensure that the left sidebar is collapsed
   ensureSidePanelClosed(screen);
 
-  await selectConsole(screen);
+  await openConsolePanel(screen);
 
   // Dock the console to the _left_ side, to make the video preview as big as possible
   await screen.queryByTestId("consoleDockButton").click();

@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector, useAppStore } from "../../app/hooks";
 
 import { sourceEntrySelected } from "../sources/selectedSourcesSlice";
 import {
-  selectSourceDetailsEntities,
+  openSourceDetailsEntities,
   SourceDetails,
   SourceDetailsEntities,
 } from "../sources/sourcesSlice";
@@ -124,7 +124,7 @@ const SourcesTreeItem = ({ node, sourceDetailsEntities, selectedSourceId }: STIP
 
 export const SourcesTree = () => {
   const selectedSourceId = useAppSelector(state => state.selectedSources.selectedSourceId);
-  const sourceDetailsEntities = useAppSelector(selectSourceDetailsEntities);
+  const sourceDetailsEntities = useAppSelector(openSourceDetailsEntities);
   const store = useAppStore();
 
   const sourceDetails = getSourceDetails(store);

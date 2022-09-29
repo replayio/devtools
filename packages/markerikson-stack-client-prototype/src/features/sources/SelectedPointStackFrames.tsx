@@ -3,14 +3,14 @@ import { skipToken } from "@reduxjs/toolkit/dist/query";
 import { useGetPauseQuery } from "../../app/api";
 import { useAppSelector, useAppStore } from "../../app/hooks";
 import {
-  selectSourceDetailsEntities,
+  openSourceDetailsEntities,
   selectCanonicalSourceName,
-  selectSourceDetails,
+  openSourceDetails,
 } from "./sourcesSlice";
 
 export const SelectedPointStackFrames = () => {
   const selectedPoint = useAppSelector(state => state.selectedSources.selectedPoint);
-  const detailsEntities = useAppSelector(selectSourceDetailsEntities);
+  const detailsEntities = useAppSelector(openSourceDetailsEntities);
 
   const { currentData: pause } = useGetPauseQuery(selectedPoint ? selectedPoint : skipToken);
 
