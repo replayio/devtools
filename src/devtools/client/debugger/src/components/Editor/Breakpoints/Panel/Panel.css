@@ -2,6 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
+:root {
+  /* This will be overridden by `ColumnBreakpoints.tsx` at runtime */
+  --print-statement-max-width: 100%;
+}
+
 .breakpoint-panel {
   margin: 0.25rem 0 0.5rem -1px;
   background: var(--theme-toolbar-background);
@@ -11,6 +16,7 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  max-width: var(--print-statement-max-width);
 }
 
 .breakpoint-panel .CodeMirror-lines {

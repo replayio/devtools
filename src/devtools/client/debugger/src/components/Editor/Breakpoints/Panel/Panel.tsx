@@ -24,10 +24,11 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 
 const gutterOffset = 37;
 
-function getPanelWidth({ editor }: { editor: $FixTypeLater }) {
+function getPanelWidth({ editor }: SourceEditor) {
   return editor.getScrollInfo().clientWidth - gutterOffset;
 }
 
@@ -43,12 +44,11 @@ const connector = connect(
   }
 );
 
-type $FixTypeLater = any;
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type ExternalProps = {
   breakpoint?: Breakpoint;
-  editor: $FixTypeLater;
+  editor: SourceEditor;
   insertAt: number;
 };
 
@@ -66,7 +66,6 @@ function Panel({
 }: PanelProps) {
   const [editing, setEditing] = useState(false);
   const [showCondition, setShowCondition] = useState(Boolean(breakpoint!.options.condition)); // nosemgrep
-  const [width, setWidth] = useState(getPanelWidth(editor)); // nosemgrep
   const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
   const dismissNag = hooks.useDismissNag();
 
@@ -123,15 +122,6 @@ function Panel({
     (hitPoints?.length || 0) > MAX_POINTS_FOR_FULL_ANALYSIS;
 
   useEffect(() => {
-    const updateWidth = () => setWidth(getPanelWidth(editor));
-
-    editor.editor.on("refresh", updateWidth);
-    return () => {
-      editor.editor.off("refresh", updateWidth);
-    };
-  }, [editor]);
-
-  useEffect(() => {
     dismissNag(Nag.FIRST_BREAKPOINT_ADD);
   }, [dismissNag]);
 
@@ -163,16 +153,12 @@ function Panel({
 
   return (
     <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
-      <div
-        onMouseEnter={onMouseEnter}
-        onMouseLeave={onMouseLeave}
-        style={{ position: "sticky", left: gutterOffset, maxWidth: width }}
-      >
+      <div onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           <div className="flex items-center space-x-0.5 pt-2 pl-1 pr-4">
             <PrefixBadgeButton breakpoint={breakpoint!} />
-            <div className="flex-1 min-w-0">
+            <div className="min-w-0 flex-1">
               {editing ? (
                 <PanelEditor
                   breakpoint={breakpoint}
