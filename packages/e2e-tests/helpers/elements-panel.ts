@@ -9,76 +9,129 @@ export async function activateInspectorTool(page: Page): Promise<void> {
   await page.locator('[data-test-id="PanelButton-inspector"]').click();
 }
 
-// TODO [FE-626] Rewrite this helper to reduce complexity.
+export async function checkAppliedRules(page: Page, expected: any) {
+  await waitFor(async () => {
+    const appliedRules = await getAppliedRules(page);
+    expect(appliedRules).toEqual(expected);
+  });
+}
+
 export async function checkComputedStyle(
   page: Page,
   style: string,
   value: string,
   expectedSelectors: any = undefined
-): Promise<void> {
-  await openComputedPropertiesTab(page);
+) {
   await waitFor(async () => {
-    const result = await page.evaluate(
-      ({ style, value, matchedSelectors }) => {
-        function getMatchedSelectors(property: string) {
-          const propertyNodes = document.querySelectorAll<HTMLElement>(".computed-property-view");
-
-          const propertyNode = [...propertyNodes].find(
-            node =>
-              node!.querySelector(".computed-property-name")!.childNodes[0].textContent === property
-          );
-
-          if (!propertyNode) {
-            return [];
-          }
-
-          const expander: HTMLElement | null = propertyNode.querySelector(".computed-expander");
-          if (!expander!.matches(".open")) {
-            expander!.click();
-          }
-
-          const selectorNodes = (
-            propertyNode.nextSibling as HTMLElement
-          ).querySelectorAll<HTMLElement>(".rule-text");
-          return [...selectorNodes].map(selectorNode => {
-            const selector = (selectorNode.children[0] as HTMLElement).innerText;
-            const value = (selectorNode.children[1] as HTMLElement).innerText;
-            const label = (selectorNode.previousSibling as HTMLElement).innerText;
-            const previousChild = (selectorNode.previousSibling as HTMLElement).children[0];
-            const url = (previousChild as HTMLElement).title;
-            const overridden = (selectorNode.parentNode as HTMLElement).classList.contains(
-              "computed-overridden"
-            );
-            return { selector, value, label, url, overridden };
-          });
-        }
-
-        const names = document.querySelectorAll<HTMLElement>(".computed-property-name");
-        const propertyName = [...names].find(n => n!.textContent!.includes(style));
-        if (!propertyName) {
-          return false;
-        }
-        const container = propertyName.closest(".computed-property-view");
-        if (!container) {
-          return false;
-        }
-        const propertyValue: HTMLElement | null = container.querySelector(
-          ".computed-property-value"
-        );
-        const expectedSelectorsJSON = matchedSelectors
-          ? JSON.stringify(matchedSelectors)
-          : undefined;
-        const selectorsJSON = matchedSelectors
-          ? JSON.stringify(getMatchedSelectors(style))
-          : undefined;
-        return (
-          propertyValue!.textContent!.includes(value) && selectorsJSON === expectedSelectorsJSON
-        );
-      },
-      { style, value, matchedSelectors: expectedSelectors }
-    );
-    expect(result).toBe(true);
+    const computedStyle = await getComputedStyle(page, style);
+    expect(computedStyle?.value).toEqual(value);
+    if (expectedSelectors) {
+      expect(computedStyle?.selectors).toEqual(expectedSelectors);
+    }
   });
+}
+
+export function expandLonghands(page: Page) {
+  return page.locator(".ruleview-expander").evaluateAll((expanders: HTMLElement[]) => {
+    for (const expander of expanders) {
+      if (expander.style.display !== "none" && !expander.classList.contains("open")) {
+        expander.click();
+      }
+    }
+  });
+}
+
+export async function expandPseudoElementRules(page: Page) {
+  const header = page.locator("#rules-section-pseudoelement-header");
+  if ((await header.count()) === 0) {
+    return;
+  }
+  const classes = await header.locator(".theme-twisty").getAttribute("class");
+  if (!classes?.includes("open")) {
+    await header.click();
+  }
+}
+
+export async function getAppliedRules(page: Page) {
+  await openAppliedRulesTab(page);
+  await expandPseudoElementRules(page);
+  return await page.evaluate(() => {
+    const rules = document.querySelectorAll<HTMLElement>(".ruleview-rule");
+    return [...rules].map(rule => {
+      const selector = rule
+        .querySelector<HTMLElement>(".ruleview-selectorcontainer")!
+        .innerText.trim();
+      const source = rule.querySelector<HTMLElement>(".ruleview-rule-source")!.innerText.trim();
+      const properties = [...rule.querySelectorAll<HTMLElement>(".ruleview-propertycontainer")].map(
+        prop => {
+          let longhandProps;
+          if (prop.nextSibling) {
+            longhandProps = [
+              ...(prop.nextSibling as HTMLElement).querySelectorAll<HTMLElement>("li"),
+            ].map(longhand => ({
+              text: longhand.innerText,
+              overridden: longhand.classList.contains("ruleview-overridden"),
+            }));
+          }
+          const result: any = {
+            text: prop.innerText.trim(),
+            overridden: (prop.parentNode as HTMLElement).className.includes("overridden"),
+          };
+          if (longhandProps) {
+            result.longhandProps = longhandProps;
+          }
+          return result;
+        }
+      );
+      return { selector, source, properties };
+    });
+  });
+}
+
+// TODO [FE-626] Rewrite this helper to reduce complexity.
+export async function getComputedStyle(page: Page, style: string) {
+  await openComputedPropertiesTab(page);
+  return await page.evaluate(style => {
+    const names = document.querySelectorAll<HTMLElement>(".computed-property-name");
+    const propertyName = [...names].find(n => n!.textContent!.includes(style));
+    if (!propertyName) {
+      return;
+    }
+    const container = propertyName.closest(".computed-property-view");
+    if (!container) {
+      return;
+    }
+    const propertyValue: HTMLElement | null = container.querySelector(".computed-property-value");
+    const value = propertyValue?.textContent;
+
+    let selectors: any[] = [];
+    const propertyNodes = document.querySelectorAll<HTMLElement>(".computed-property-view");
+    const propertyNode = [...propertyNodes].find(
+      node => node!.querySelector(".computed-property-name")!.childNodes[0].textContent === style
+    );
+    if (propertyNode) {
+      const expander: HTMLElement | null = propertyNode.querySelector(".computed-expander");
+      if (!expander!.matches(".open")) {
+        expander!.click();
+      }
+      const selectorNodes = (propertyNode.nextSibling as HTMLElement).querySelectorAll<HTMLElement>(
+        ".rule-text"
+      );
+      selectors = [...selectorNodes].map(selectorNode => {
+        const selector = (selectorNode.children[0] as HTMLElement).innerText;
+        const value = (selectorNode.children[1] as HTMLElement).innerText;
+        const label = (selectorNode.previousSibling as HTMLElement).innerText;
+        const previousChild = (selectorNode.previousSibling as HTMLElement).children[0];
+        const url = (previousChild as HTMLElement).title;
+        const overridden = (selectorNode.parentNode as HTMLElement).classList.contains(
+          "computed-overridden"
+        );
+        return { selector, value, label, url, overridden };
+      });
+    }
+
+    return { value, selectors };
+  }, style);
 }
 
 export function getElementsPanelSelection(page: Page): Locator {
@@ -130,6 +183,12 @@ export async function inspectCanvasCoordinates(
   );
 
   canvas.click({ position: { x, y } });
+}
+
+export async function openAppliedRulesTab(page: Page) {
+  const locator = page.locator("#ruleview-tab");
+  await locator.waitFor();
+  await locator.click();
 }
 
 export async function openComputedPropertiesTab(page: Page): Promise<void> {
