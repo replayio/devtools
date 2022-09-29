@@ -21,5 +21,13 @@
   "doc_rr_preview.html": "77b360ee-0b71-4088-abd7-0a94fdf6a847",
   "doc_rr_region_loading.html": "7e0c2f3e-ae52-4af2-8603-6234de4eda10",
   "doc_rr_worker.html": "c1ed2491-1138-40f2-972d-ae9bfafe33fd",
-  "doc_stacking.html": "233a22c5-428e-46f8-a1ac-4b2488ac517e"
+  "doc_stacking.html": "233a22c5-428e-46f8-a1ac-4b2488ac517e",
+  "node/control_flow.js": "df10f204-347f-4bc8-aec3-87353c2cc2cf",
+  "node/async.js": "04b8abef-c5c1-47a2-a10e-cd9f6b312c4d",
+  "node/basic.js": "8e536066-96f5-4fc3-a173-18b9bbde6b31",
+  "node/error.js": "d798918e-e39d-4709-a4d2-337cc31e56cf",
+  "node/exceptions.js": "01fe2aac-afd8-434a-b08e-501f26e00edc",
+  "node/objects.js": "1cdc68b5-32d6-451a-8f47-f9b9a34c13f0",
+  "node/run_worker.js": "8ce08cdc-a3ac-4f14-8dc3-001d0817ec32",
+  "node/spawn.js": "26051e54-c408-4832-a13d-ad02214ec732"
 }
