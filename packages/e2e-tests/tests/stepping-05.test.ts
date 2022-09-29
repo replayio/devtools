@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   addEventListenerLogpoints,
   openConsolePanel,
@@ -15,29 +17,29 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_minified.html";
 
-test(`Test stepping in pretty-printed code`, async ({ screen }) => {
-  screen.setDefaultTimeout(120000);
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
+test(`Test stepping in pretty-printed code`, async ({ page }) => {
+  page.setDefaultTimeout(120000);
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
-  await addBreakpoint(screen, { url: "bundle_input.js", lineNumber: 4 });
-  await rewindToLine(screen, { lineNumber: 4 });
-  await stepInToLine(screen, 1);
+  await addBreakpoint(page, { url: "bundle_input.js", lineNumber: 4 });
+  await rewindToLine(page, { lineNumber: 4 });
+  await stepInToLine(page, 1);
 
   // Add a breakpoint in minified.html and resume to there
-  await addBreakpoint(screen, { url, lineNumber: 8 });
-  await resumeToLine(screen, { lineNumber: 8 });
-  await stepOverToLine(screen, 8);
-  await stepOverToLine(screen, 9);
+  await addBreakpoint(page, { url, lineNumber: 8 });
+  await resumeToLine(page, { lineNumber: 8 });
+  await stepOverToLine(page, 8);
+  await stepOverToLine(page, 9);
 
-  await openConsolePanel(screen);
-  await addEventListenerLogpoints(screen, ["event.mouse.click"]);
-  await warpToMessage(screen, "click", 14);
+  await openConsolePanel(page);
+  await addEventListenerLogpoints(page, ["event.mouse.click"]);
+  await warpToMessage(page, "click", 14);
 
-  await stepInToLine(screen, 2);
-  await stepOutToLine(screen, 15);
-  await stepInToLine(screen, 10);
-  await stepOutToLine(screen, 15);
-  await stepInToLine(screen, 5);
-  await stepOutToLine(screen, 15);
+  await stepInToLine(page, 2);
+  await stepOutToLine(page, 15);
+  await stepInToLine(page, 10);
+  await stepOutToLine(page, 15);
+  await stepInToLine(page, 5);
+  await stepOutToLine(page, 15);
 });

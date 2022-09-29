@@ -1,4 +1,6 @@
-import { openDevToolsTab, startTest, test } from "../helpers";
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
   reverseStepOverToLine,
@@ -12,41 +14,41 @@ import {
 
 const url = "doc_async.html";
 
-test(`Test stepping in async frames and async call stacks.`, async ({ screen }) => {
-  await startTest(screen, url);
-  await openDevToolsTab(screen);
+test(`Test stepping in async frames and async call stacks.`, async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
-  await warpToMessage(screen, "baz 2");
-  await verifyFramesCount(screen, 5);
-  await waitForScopeValue(screen, "n", "2");
+  await warpToMessage(page, "baz 2");
+  await verifyFramesCount(page, 5);
+  await waitForScopeValue(page, "n", "2");
 
-  await waitForFrameTimeline(screen, "25%");
+  await waitForFrameTimeline(page, "25%");
 
-  await selectFrame(screen, 1);
-  await waitForScopeValue(screen, "n", "3");
-  await waitForFrameTimeline(screen, "87%");
+  await selectFrame(page, 1);
+  await waitForScopeValue(page, "n", "3");
+  await waitForFrameTimeline(page, "87%");
 
-  await selectFrame(screen, 2);
-  await waitForScopeValue(screen, "n", "4");
-  await waitForFrameTimeline(screen, "87%");
+  await selectFrame(page, 2);
+  await waitForScopeValue(page, "n", "4");
+  await waitForFrameTimeline(page, "87%");
 
-  await selectFrame(screen, 3);
-  await waitForFrameTimeline(screen, "71%");
+  await selectFrame(page, 3);
+  await waitForFrameTimeline(page, "71%");
 
-  await selectFrame(screen, 4);
-  await waitForFrameTimeline(screen, "100%");
+  await selectFrame(page, 4);
+  await waitForFrameTimeline(page, "100%");
 
-  await selectFrame(screen, 0);
+  await selectFrame(page, 0);
 
-  await stepOverToLine(screen, 20);
-  await stepOverToLine(screen, 21);
-  await stepOverToLine(screen, 22);
-  await stepOverToLine(screen, 24);
-  await executeAndVerifyTerminalExpression(screen, "n", 2);
-  await stepOutToLine(screen, 24);
-  await executeAndVerifyTerminalExpression(screen, "n", 3);
-  await stepOutToLine(screen, 24);
-  await executeAndVerifyTerminalExpression(screen, "n", 4);
-  await stepOutToLine(screen, 13);
-  await reverseStepOverToLine(screen, 12);
+  await stepOverToLine(page, 20);
+  await stepOverToLine(page, 21);
+  await stepOverToLine(page, 22);
+  await stepOverToLine(page, 24);
+  await executeAndVerifyTerminalExpression(page, "n", 2);
+  await stepOutToLine(page, 24);
+  await executeAndVerifyTerminalExpression(page, "n", 3);
+  await stepOutToLine(page, 24);
+  await executeAndVerifyTerminalExpression(page, "n", 4);
+  await stepOutToLine(page, 13);
+  await reverseStepOverToLine(page, 12);
 });

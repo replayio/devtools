@@ -1,27 +1,26 @@
-import { Locator } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
 import { getSourceTab, waitForSelectedSource } from "./source-panel";
-import { Screen } from "./types";
 import { debugPrint } from "./utils";
 
-export async function clickSourceTreeNode(screen: Screen, node: string) {
+export async function clickSourceTreeNode(page: Page, node: string) {
   debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
 
-  await screen.locator(`div[role="tree"] div:has-text("${node}")`).nth(1).click();
+  await page.locator(`div[role="tree"] div:has-text("${node}")`).nth(1).click();
 }
 
-export function getOutlinePane(screen: Screen): Locator {
-  return screen.queryByTestId("AccordionPane-Outline");
+export function getOutlinePane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-Outline"]');
 }
 
-export function getSourcesPane(screen: Screen): Locator {
-  return screen.queryByTestId("AccordionPane-Sources");
+export function getSourcesPane(page: Page): Locator {
+  return page.locator('[data-test-id="AccordionPane-Sources"]');
 }
 
-export async function openSource(screen: Screen, url: string): Promise<void> {
+export async function openSource(page: Page, url: string): Promise<void> {
   // If the source is already open, just focus it.
-  const sourceTab = getSourceTab(screen, url);
+  const sourceTab = getSourceTab(page, url);
   if (await sourceTab.isVisible()) {
     debugPrint(`Source "${chalk.bold(url)}" already open`, "openSource");
     return;
@@ -30,7 +29,7 @@ export async function openSource(screen: Screen, url: string): Promise<void> {
   debugPrint(`Opening source "${chalk.bold(url)}"`, "openSource");
 
   // Otherwise find it in the sources tree.
-  const pane = await getSourcesPane(screen);
+  const pane = await getSourcesPane(page);
 
   let foundSource = false;
 
@@ -64,14 +63,14 @@ export async function openSource(screen: Screen, url: string): Promise<void> {
     throw new Error(`Could not find source with URL "${url}"`);
   }
 
-  await waitForSelectedSource(screen, url);
+  await waitForSelectedSource(page, url);
 }
 
-export async function openSourceExplorerPanel(screen: Screen): Promise<void> {
+export async function openSourceExplorerPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = await getSourcesPane(screen);
+  const pane = await getSourcesPane(page);
   const isVisible = await pane.isVisible();
   if (!isVisible) {
-    return screen.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
+    return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
   }
 }

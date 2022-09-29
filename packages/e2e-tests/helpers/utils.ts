@@ -1,15 +1,13 @@
-import { Locator } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { Screen } from "./types";
-
 // Playwright doesn't provide a good way to do this (yet).
-export async function clearTextArea(screen: Screen, textArea: Locator) {
+export async function clearTextArea(page: Page, textArea: Locator) {
   debugPrint(`Clearing content from textarea`, "clearTextArea");
 
   await textArea.focus();
-  await screen.keyboard.press("Meta+A");
-  await screen.keyboard.press("Backspace");
+  await page.keyboard.press("Meta+A");
+  await page.keyboard.press("Backspace");
 }
 
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
