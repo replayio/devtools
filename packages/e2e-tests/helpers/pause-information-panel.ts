@@ -98,7 +98,18 @@ export async function openCallStackPane(page: Page): Promise<void> {
 export async function openPauseInformationPanel(page: Page): Promise<void> {
   // Only click if it's not already open; clicking again will collapse the side bar.
   const pane = getBreakpointsAccordionPane(page);
-  const isVisible = await pane.isVisible();
+
+  let isVisible = false;
+
+  try {
+    const [textContent, boundingBox] = await Promise.all([
+      pane.textContent({ timeout: 1000 }),
+      pane.boundingBox({ timeout: 1000 }),
+    ]);
+    const width = boundingBox?.width ?? 0;
+    isVisible = !!textContent && width > 0;
+  } catch {}
+
   if (!isVisible) {
     await page.locator('[data-test-name="ToolbarButton-PauseInformation"]').click();
   }

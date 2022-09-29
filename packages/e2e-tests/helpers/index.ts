@@ -23,8 +23,11 @@ export async function startTest(page: Page, example: string) {
   await page.goto(url);
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
-  await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
-  await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
+  if (!example.startsWith("node")) {
+    // Node recordings don't have the "Viewer/DevTools" toggle
+    await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
+    await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
+  }
 }
 
 export async function waitFor(

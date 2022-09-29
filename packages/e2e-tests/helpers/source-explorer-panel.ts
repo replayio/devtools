@@ -2,7 +2,7 @@ import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
 import { getSourceTab, waitForSelectedSource } from "./source-panel";
-import { debugPrint } from "./utils";
+import { debugPrint, delay } from "./utils";
 
 export async function clickSourceTreeNode(page: Page, node: string) {
   debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
@@ -30,6 +30,8 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
   // Otherwise find it in the sources tree.
   const pane = await getSourcesPane(page);
+
+  await openSourceExplorerPanel(page);
 
   let foundSource = false;
 
@@ -67,9 +69,21 @@ export async function openSource(page: Page, url: string): Promise<void> {
 }
 
 export async function openSourceExplorerPanel(page: Page): Promise<void> {
-  // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = await getSourcesPane(page);
-  const isVisible = await pane.isVisible();
+  const pane = getSourcesPane(page);
+  let isVisible = false;
+
+  try {
+    const [textContent, boundingBox] = await Promise.all([
+      pane.textContent({ timeout: 1000 }),
+      pane.boundingBox({ timeout: 1000 }),
+    ]);
+    const width = boundingBox?.width ?? 0;
+
+    // Our panel+accordion leave elements in the page, just shrunk.
+    // Only consider it visible if it has a meaningful width.
+    isVisible = !!textContent && width > 0;
+  } catch {}
+
   if (!isVisible) {
     return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
   }
