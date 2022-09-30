@@ -8,7 +8,7 @@ import {
   seekToConsoleMessage,
 } from "../helpers/console-panel";
 import { resumeToLine, reverseStepOverToLine } from "../helpers/pause-information-panel";
-import { addLogpoint } from "../helpers/source-panel";
+import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
@@ -16,6 +16,7 @@ test(`log-points appear in the correct order and allow time warping`, async ({ p
   await startTest(page, url);
   await openDevToolsTab(page);
 
+  await addBreakpoint(page, { lineNumber: 20, url });
   await addLogpoint(page, {
     content: '"Logpoint Number " + number',
     lineNumber: 20,
@@ -50,6 +51,5 @@ test(`log-points appear in the correct order and allow time warping`, async ({ p
   await executeAndVerifyTerminalExpression(page, "number", 5);
   await reverseStepOverToLine(page, 19);
 
-  // The log-point acts like a breakpoint when resuming.
   await resumeToLine(page, { lineNumber: 20 });
 });
