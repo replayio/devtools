@@ -25,11 +25,54 @@ export async function addBreakpoint(
     await openSource(page, url);
   }
 
+  await scrollUntilLineIsVisible(page, lineNumber);
+
   const line = await getSourceLine(page, lineNumber);
   await line.locator(".CodeMirror-linenumber").hover();
   await line.locator(".CodeMirror-linenumber").click();
 
   await waitForBreakpoint(page, options);
+}
+
+async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
+  let loopCounter = 0;
+
+  while (true) {
+    const visibleLineNumbers = await getVisibleLineNumbers(page);
+
+    if (visibleLineNumbers.includes(lineNumber)) {
+      break;
+    } else {
+      if (loopCounter > 10) {
+        throw new Error("Stuck in infinite scrolling loop looking for  line: " + lineNumber);
+      }
+    }
+    // it must not be on screen, we have to scroll
+    const [first] = visibleLineNumbers;
+
+    const scrollUp = lineNumber < first;
+    const deltaY = scrollUp ? -1000 : 1000;
+    const scroller = page.locator(".CodeMirror-scroll").first();
+    await scroller.click();
+    await page.mouse.wheel(0, deltaY);
+    loopCounter++;
+  }
+}
+
+async function getVisibleLineNumbers(page: Page) {
+  const lineNumberElements = page.locator(".CodeMirror-linenumber");
+  const numElements = await lineNumberElements.count();
+
+  const textContents = await lineNumberElements.allTextContents();
+  const allLineNumbers = textContents.map(s => Number(s));
+
+  const isLine1Visible = allLineNumbers.includes(1);
+  const firstSliceIndex = isLine1Visible ? 0 : 9;
+  // CodeMirror normally has a 10-line buffer on either side of the viewport.
+  // Limit to just what's actually on screen
+  const lineNumbers = allLineNumbers.slice(firstSliceIndex, allLineNumbers.length - 10);
+
+  return lineNumbers;
 }
 
 export async function addLogpoint(
