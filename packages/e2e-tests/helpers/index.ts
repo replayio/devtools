@@ -44,7 +44,7 @@ export async function waitFor(
 
       return;
     } catch (error) {
-      if (typeof error === 'string') {
+      if (typeof error === "string") {
         console.log(error);
       }
 
