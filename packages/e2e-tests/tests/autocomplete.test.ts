@@ -5,7 +5,7 @@ import { checkAutocompleteMatches } from "../helpers/autocomplete";
 import { focusConsoleTextArea, openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { clearTextArea } from "../helpers/utils";
 
-test(`Test basic breakpoint functionality.`, async ({ page }) => {
+test(`autocomplete in the console`, async ({ page }) => {
   await startTest(page, "doc_rr_objects.html");
   await openDevToolsTab(page);
   await openConsolePanel(page);
