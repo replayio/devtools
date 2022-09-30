@@ -1,39 +1,42 @@
-Test.describe(`Test global console evaluation in async frames.`, async () => {
-  await Test.selectConsole();
+import test from "@playwright/test";
 
-  await Test.addBreakpoint("doc_async.html", 20, undefined, { logValue: '"qux", n' });
-  await Test.warpToMessage("qux 2");
-  await Test.checkFrames(5);
+import { openDevToolsTab, startTest } from "../helpers";
+import {
+  executeAndVerifyTerminalExpression,
+  openConsolePanel,
+  verifyConsoleMessage,
+  warpToMessage,
+} from "../helpers/console-panel";
+import { selectFrame, verifyFramesCount } from "../helpers/pause-information-panel";
+import { addLogpoint } from "../helpers/source-panel";
 
-  await Test.executeInConsole('"eval " + n');
+const url = "doc_async.html";
 
-  await Test.selectFrame(2);
-  await Test.executeInConsole('"eval " + n');
+test("support global console evaluations in async frames", async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+  await openConsolePanel(page);
 
-  await Test.selectFrame(4);
-  await Test.executeInConsole('"eval " + n');
+  await addLogpoint(page, { content: '"qux", n', lineNumber: 20, url });
+  await warpToMessage(page, "qux 2", 20);
+  await verifyFramesCount(page, 5);
 
-  await Test.checkAllMessages(
-    [
-      { type: "console-api", content: "foo" },
-      { type: "console-api", content: "bar" },
-      { type: "command", content: '"eval " + n' },
-      { type: "result", content: 'ReferenceError: "n is not defined"' },
-      { type: "console-api", content: "baz 4" },
-      { type: "logPoint", content: "qux 4" },
-      { type: "command", content: '"eval " + n' },
-      { type: "result", content: '"eval 4"' },
-      { type: "console-api", content: "baz 3" },
-      { type: "logPoint", content: "qux 3" },
-      { type: "console-api", content: "baz 2" },
-      { type: "logPoint", content: "qux 2" },
-      { type: "command", content: '"eval " + n' },
-      { type: "result", content: '"eval 2"' },
-      { type: "console-api", content: "baz 1" },
-      { type: "logPoint", content: "qux 1" },
-      { type: "console-api", content: "baz 0" },
-      { type: "logPoint", content: "qux 0" },
-      { type: "console-api", content: "ExampleFinished" },
-    ],
+  await executeAndVerifyTerminalExpression(page, '"eval " + n', "eval 2");
+  await selectFrame(page, 2);
+  await executeAndVerifyTerminalExpression(page, '"eval " + n', "eval 3");
+  await selectFrame(page, 4);
+  await executeAndVerifyTerminalExpression(
+    page,
+    '"eval " + n',
+    "The expression could not be evaluated."
   );
+
+  await verifyConsoleMessage(page, "foo", "console-log");
+  await verifyConsoleMessage(page, "bar", "console-log");
+  await verifyConsoleMessage(page, "baz 4", "console-log");
+  await verifyConsoleMessage(page, "baz 3", "console-log");
+  await verifyConsoleMessage(page, "baz 2", "console-log");
+  await verifyConsoleMessage(page, "baz 1", "console-log");
+  await verifyConsoleMessage(page, "baz 0", "console-log");
+  await verifyConsoleMessage(page, "ExampleFinished", "console-log");
 });

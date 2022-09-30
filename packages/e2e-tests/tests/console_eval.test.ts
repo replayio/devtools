@@ -1,16 +1,21 @@
-Test.describe(`Test global console evaluation.`, async () => {
-  await Test.selectConsole();
-  
-  // we are seeking to an arbitrary point in time 
-  // so that the backend is happy. Yes this is a hack.
-  await Test.app.actions.seekToTime(1570)
-  await Test.executeInConsole("333");
+import test from "@playwright/test";
 
-  await Test.warpToMessage("ExampleFinished");
+import { openDevToolsTab, startTest } from "../helpers";
+import {
+  executeAndVerifyTerminalExpression,
+  openConsolePanel,
+  warpToMessage,
+} from "../helpers/console-panel";
 
-  await Test.executeInConsole("number");
-  await Test.waitForMessage("10");
+const url = "doc_rr_basic.html";
 
-  await Test.executeInConsole("window.updateNumber");
-  await Test.waitForMessage("function updateNumber");
+test("support global console evaluations", async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+  await openConsolePanel(page);
+
+  await executeAndVerifyTerminalExpression(page, "333", 333);
+  await warpToMessage(page, "ExampleFinished", 7);
+  await executeAndVerifyTerminalExpression(page, "number", 10);
+  await executeAndVerifyTerminalExpression(page, "window.updateNumber", "ƒupdateNumber()");
 });
