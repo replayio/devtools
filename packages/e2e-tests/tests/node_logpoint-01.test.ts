@@ -14,7 +14,7 @@ import {
 import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 
-test("Basic node console behavior", async ({ page }) => {
+test("Basic node logpoints", async ({ page }) => {
   await startTest(page, "node/basic.js");
 
   await openConsolePanel(page);

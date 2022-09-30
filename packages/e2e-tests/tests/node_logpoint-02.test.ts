@@ -1,6 +1,6 @@
 import test, { Page, expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest, waitFor } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   resumeToLine,
   rewindToLine,
@@ -15,10 +15,9 @@ import {
   enableConsoleMessageType,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
-import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
-import { addLogpoint } from "../helpers/source-panel";
+import { waitFor } from "../helpers/utils";
 
-test("Basic node console behavior", async ({ page }) => {
+test("Node exception logpoints", async ({ page }) => {
   await startTest(page, "node/exceptions.js");
 
   await openConsolePanel(page);
