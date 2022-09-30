@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
     headless: !DEBUG,
     browserName: "chromium",
     launchOptions: {
-      slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : undefined,
+      slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
     },
     viewport: {
       width: 1280,
