@@ -6,7 +6,12 @@ const exampleRecordings = require("../examples.json");
 import { debugPrint, delay } from "./utils";
 
 export async function openDevToolsTab(page: Page) {
-  return page.locator('[data-test-id="ViewToggle-DevTools"]').click();
+  const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
+
+  // The DevTools tab won't exist if it's a Node recording
+  if (await tab.isVisible()) {
+    await tab.click();
+  }
 }
 
 export async function openViewerTab(page: Page) {
@@ -23,8 +28,11 @@ export async function startTest(page: Page, example: string) {
   await page.goto(url);
 
   // Wait for the recording basic information to load such that the primary tabs are visible.
-  await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
-  await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
+  if (!example.startsWith("node")) {
+    // Node recordings don't have the "Viewer/DevTools" toggle
+    await page.locator('[data-test-id="ViewToggle-Viewer"]').waitFor();
+    await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
+  }
 }
 
 export async function waitFor(
