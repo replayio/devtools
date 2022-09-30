@@ -1,5 +1,6 @@
 import test from "@playwright/test";
 
+// TODO [FE-626]
 test.skip(`Test stepping in blackboxed sources`, async ({ page }) => {
   // This test is disabled because we removed blackboxing during the codebase
   // cleanup in summer 2022. If we ever reimplement blackboxing, we should
