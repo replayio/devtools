@@ -89,6 +89,13 @@ export function findConsoleMessage(
   expected?: Expected,
   messageType?: MessageType
 ): Locator {
+  debugPrint(
+    `Searching for console message${
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
+    }with text "${chalk.bold(expected)}"`,
+    "findConsoleMessage"
+  );
+
   const attributeSelector = messageType
     ? `[data-test-message-type="${messageType}"]`
     : '[data-test-name="Message"]';
@@ -139,7 +146,7 @@ export async function verifyConsoleMessage(
 ) {
   debugPrint(
     `Verifying the presence of a console message${
-      messageType ? ` of type "${chalk.bold(messageType)}" ` : ' '
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
     }with text "${chalk.bold(expected)}"`,
     "verifyConsoleMessage"
   );
