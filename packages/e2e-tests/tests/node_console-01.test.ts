@@ -7,7 +7,6 @@ import {
   executeAndVerifyTerminalExpression,
 } from "../helpers/console-panel";
 import {
-  expandFirstScope,
   selectFrame,
   reverseStepOverToLine,
   waitForScopeValue,
