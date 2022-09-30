@@ -1,6 +1,6 @@
 import test, { Page } from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
+import { startTest } from "../helpers";
 import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
 import { addBreakpoint } from "../helpers/source-panel";
