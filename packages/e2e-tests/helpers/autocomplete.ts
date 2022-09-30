@@ -2,7 +2,7 @@ import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 
 export async function getAutocompleteMatches(page: Page) {
-  await page.waitForSelector(".autocomplete-matches button", { timeout: 1000 });
+  await page.waitForSelector(".autocomplete-matches button");
 
   return page.evaluate(() => {
     const buttons = [
@@ -14,9 +14,13 @@ export async function getAutocompleteMatches(page: Page) {
 }
 
 export async function checkAutocompleteMatches(page: Page, expected: string[]) {
-  const autocompleteMatches = await getAutocompleteMatches(page);
-  const actualJSON = JSON.stringify(autocompleteMatches.sort());
-  const expectedJSON = JSON.stringify([...expected].sort());
+  await expect
+    .poll(async () => {
+      const autocompleteMatches = await getAutocompleteMatches(page);
+      const actualJSON = JSON.stringify(autocompleteMatches.sort());
+      const expectedJSON = JSON.stringify([...expected].sort());
 
-  expect(actualJSON === expectedJSON).toBeTruthy();
+      return actualJSON === expectedJSON;
+    })
+    .toBeTruthy();
 }
