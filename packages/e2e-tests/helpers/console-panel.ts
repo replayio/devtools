@@ -63,6 +63,7 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   const textArea = term.locator("textarea");
   await textArea.focus();
   await textArea.type(text);
+  await textArea.press("Escape"); // Close auto-complete dialog if open
   await textArea.press("Enter");
 }
 
