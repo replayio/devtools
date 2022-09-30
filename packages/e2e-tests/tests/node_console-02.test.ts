@@ -1,17 +1,8 @@
 import test from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import {
-  openConsolePanel,
-  warpToMessage,
-  executeAndVerifyTerminalExpression,
-} from "../helpers/console-panel";
-import {
-  selectFrame,
-  reverseStepOverToLine,
-  waitForScopeValue,
-  waitForPaused,
-} from "../helpers/pause-information-panel";
+import { startTest } from "../helpers";
+import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { reverseStepOverToLine, waitForPaused } from "../helpers/pause-information-panel";
 
 test("Basic node console behavior", async ({ page }) => {
   await startTest(page, "node/error.js");
