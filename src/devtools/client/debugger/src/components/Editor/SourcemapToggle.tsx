@@ -59,10 +59,16 @@ export default function SourcemapToggle({ cursorPosition }: { cursorPosition: Cu
     }
   };
 
+  const enabled = !!selectedSource?.isSourceMapped;
+
   return (
-    <label className="mapped-source flex items-center space-x-1 pt-0.5 pl-3">
+    <label
+      className="mapped-source flex items-center space-x-1 pt-0.5 pl-3"
+      data-test-id="SourceMapToggle"
+      data-test-state={enabled ? "on" : "off"}
+    >
       <Toggle
-        enabled={!!selectedSource?.isSourceMapped}
+        enabled={enabled}
         setEnabled={setEnabled}
         disabled={!alternateSourceIdResult.sourceId}
       />

@@ -207,6 +207,14 @@ export async function removeBreakpoint(
   await line.locator(".CodeMirror-linenumber").click({ force: true });
 }
 
+export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {
+  const toggle = page.locator('[data-test-id="SourceMapToggle"]');
+  const currentState = await toggle.getAttribute("data-test-state");
+  if (currentState !== targetState) {
+    await toggle.click();
+  }
+}
+
 export async function waitForBreakpoint(
   page: Page,
   options: {
