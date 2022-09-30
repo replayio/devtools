@@ -138,9 +138,9 @@ export async function verifyConsoleMessage(
   messageType?: MessageType
 ) {
   debugPrint(
-    `Verifying the presence of a console message of type "${chalk.bold(
-      messageType
-    )}" with text "${chalk.bold(expected)}"`,
+    `Verifying the presence of a console message${
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : ' '
+    }with text "${chalk.bold(expected)}"`,
     "verifyConsoleMessage"
   );
 

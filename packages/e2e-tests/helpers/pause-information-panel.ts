@@ -3,7 +3,8 @@ import chalk from "chalk";
 
 import { waitFor } from ".";
 import { openSource } from "./source-explorer-panel";
-import { debugPrint } from "./utils";
+import { Expected } from "./types";
+import { debugPrint, forEach, toggleExpandable } from "./utils";
 
 async function toggleAccordionPane(pane: Locator, targetState: "open" | "closed") {
   const name = (await pane.getAttribute("data-test-id"))!.split("-")[1];
@@ -28,11 +29,20 @@ export async function closePrintStatementsAccordionPane(page: Page): Promise<voi
   await toggleAccordionPane(getPrintStatementsAccordionPane(page), "closed");
 }
 
-export async function expandFirstScope(page: Page): Promise<void> {
-  const expander = getScopesPanel(page).locator('[data-test-name="Expandable"]').first();
-  if ((await expander.getAttribute("data-test-state")) === "closed") {
-    await expander.click();
+export async function expandAllScopesBlocks(page: Page): Promise<void> {
+  debugPrint("Expanding all Scopes blocks", "expandAllScopesBlocks");
+
+  const scopesPanel = getScopesPanel(page);
+  const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
+
+  const count = await blocks.count();
+  if (count === 0) {
+    throw Error(`No Scope blocks found`);
   }
+
+  await forEach(blocks, async (block: Locator) => {
+    await toggleExpandable(page, { scope: block });
+  });
 }
 
 export function getBreakpointsAccordionPane(page: Page): Locator {
@@ -114,19 +124,22 @@ export async function openScopesAccordionPane(page: Page): Promise<void> {
 
 export async function openScopeBlocks(page: Page, text: string): Promise<void> {
   const blocks = page.locator(`[data-test-name="ScopesInspector"]:has-text("${text}")`);
+
   const count = await blocks.count();
+  if (count === 0) {
+    throw Error(`No Scope blocks found containing text "${text}"`);
+  }
 
   debugPrint(`Found ${count} Scope blocks with text "${chalk.bold(text)}"`, "openScopeBlocks");
 
-  for (let i = 0; i < count; i++) {
-    const block = blocks.nth(i);
+  await forEach(blocks, async block => {
     const expandable = block.locator('[data-test-name="Expandable"][data-test-state="closed"]');
     if ((await expandable.count()) > 0) {
       debugPrint(`Opening Scope block`, "openScopeBlocks");
 
       await expandable.click();
     }
-  }
+  });
 }
 
 export async function resumeToLine(
@@ -279,13 +292,24 @@ export async function waitForFrameTimeline(page: Page, widthPercentage: string) 
   debugPrint(`Waiting for frame progress ${chalk.bold(widthPercentage)}`, "waitForFrameTimeline");
 
   await openPauseInformationPanel(page);
-  await page.waitForFunction(
-    params => {
-      const elem: HTMLElement | null = document.querySelector(".frame-timeline-progress");
-      return elem?.style.width == params.widthPercentage;
-    },
-    { widthPercentage }
-  );
+
+  await waitFor(async () => {
+    const progress = page.locator(".frame-timeline-progress");
+    const style = await progress.getAttribute("style");
+    if (style) {
+      const match = style.match("width: ([0-9]+%);");
+      if (match) {
+        const width = match![1];
+        if (width === widthPercentage) {
+          return;
+        } else {
+          throw `Frame progress is ${width}, expected ${widthPercentage}`;
+        }
+      }
+    }
+
+    throw `Frame progress could not be measured.`;
+  });
 }
 
 export async function waitForPaused(page: Page, line?: number): Promise<void> {
@@ -312,12 +336,19 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
   }
 }
 
-export async function waitForScopeValue(page: Page, name: string, value: string) {
-  await expandFirstScope(page);
+export async function waitForScopeValue(page: Page, name: string, expectedValue: Expected) {
+  debugPrint(
+    `Waiting for scope "${chalk.bold(name)}" to have value "${chalk.bold(expectedValue)}"`,
+    "waitForScopeValue"
+  );
+
+  await expandAllScopesBlocks(page);
 
   const scopesPanel = getScopesPanel(page);
-  const scopeValue = scopesPanel.locator(
-    `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${value}"))`
-  );
+  const scopeValue = scopesPanel
+    .locator(
+      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${expectedValue}"))`
+    )
+    .first();
   await scopeValue.waitFor();
 }

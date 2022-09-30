@@ -5,7 +5,7 @@ import { Locator, expect, Page } from "@playwright/test";
 import { openDevToolsTab, startTest, waitFor } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
-import { openPauseInformationPanel, getBreakpointsPane } from "../helpers/pause-information-panel";
+import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
 
 interface StackingTestCase {
   id: string;
@@ -141,7 +141,7 @@ const testCases: StackingTestCase[] = [
 async function ensureSidePanelClosed(page: Page) {
   // Clicks that aren't directly on an element can cause the "Comments" pane to open.
   // Ensure that it's closed by forcing the "Pause" pane to open instead...
-  const pane = getBreakpointsPane(page);
+  const pane = getBreakpointsAccordionPane(page);
   const pauseButton = page.locator('[data-test-name="ToolbarButton-PauseInformation"]');
   await pauseButton.click();
   const isVisible = await pane.isVisible();
