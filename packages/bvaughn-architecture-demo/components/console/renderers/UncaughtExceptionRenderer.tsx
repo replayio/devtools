@@ -63,7 +63,7 @@ function UncaughtExceptionRenderer({
   const argumentValues = uncaughtException.values || EMPTY_ARRAY;
   const primaryContent =
     argumentValues.length > 0 ? (
-      <span className={styles.LogContents} data-test-name="LogContents ">
+      <span className={styles.LogContents} data-test-name="LogContents">
         <Suspense fallback={<Loader />}>
           {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
             <Fragment key={index}>
