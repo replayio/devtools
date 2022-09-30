@@ -3793,20 +3793,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@replayio/playwright@npm:^0.2.1":
-  version: 0.2.10
-  resolution: "@replayio/playwright@npm:0.2.10"
-  dependencies:
-    "@replayio/replay": ^0.4.2
-    uuid: ^8.3.2
-  peerDependencies:
-    "@playwright/test": 1.19.x
-  bin:
-    replayio-playwright: bin/replayio-playwright.js
-  checksum: 54272267f3ae6f95da2494247b2c610a0ed7aad17d714efa9921335bd602dfdcf624ff3c8d3ff0c4d85ca5b8ade6d24304d1f4ef4b9c682d48784cc093a46766
-  languageName: node
-  linkType: hard
-
 "@replayio/playwright@npm:^0.2.24":
   version: 0.2.24
   resolution: "@replayio/playwright@npm:0.2.24"
@@ -20502,7 +20488,7 @@ __metadata:
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
     "@reduxjs/toolkit": ^1.8.4
-    "@replayio/playwright": ^0.2.1
+    "@replayio/playwright": ^0.2.24
     "@replayio/protocol": ^0.31.1
     "@replayio/replay": ^0.4.2
     "@sentry/react": ^7.9.0
