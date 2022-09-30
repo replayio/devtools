@@ -6,7 +6,12 @@ const exampleRecordings = require("../examples.json");
 import { debugPrint, delay } from "./utils";
 
 export async function openDevToolsTab(page: Page) {
-  return page.locator('[data-test-id="ViewToggle-DevTools"]').click();
+  const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
+
+  // The DevTools tab won't exist if it's a Node recording
+  if (await tab.isVisible()) {
+    await tab.click();
+  }
 }
 
 export async function openViewerTab(page: Page) {

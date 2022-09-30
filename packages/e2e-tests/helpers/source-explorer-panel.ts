@@ -1,8 +1,9 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { getSourceTab, waitForSelectedSource } from "./source-panel";
-import { debugPrint, delay } from "./utils";
+import { waitFor } from "./index";
+import { debugPrint } from "./utils";
 
 export async function clickSourceTreeNode(page: Page, node: string) {
   debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
@@ -28,10 +29,17 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
   debugPrint(`Opening source "${chalk.bold(url)}"`, "openSource");
 
-  // Otherwise find it in the sources tree.
-  const pane = await getSourcesPane(page);
-
   await openSourceExplorerPanel(page);
+
+  // Otherwise find it in the sources tree.
+  const pane = getSourcesPane(page);
+
+  // Ensure that we've got sources loaded
+  await waitFor(async () => {
+    const sourceTreeItems = pane.locator(`role=treeitem`);
+    const numItems = await sourceTreeItems.count();
+    expect(numItems).toBeGreaterThan(0);
+  });
 
   let foundSource = false;
 
@@ -70,19 +78,7 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
 export async function openSourceExplorerPanel(page: Page): Promise<void> {
   const pane = getSourcesPane(page);
-  let isVisible = false;
-
-  try {
-    const [textContent, boundingBox] = await Promise.all([
-      pane.textContent({ timeout: 1000 }),
-      pane.boundingBox({ timeout: 1000 }),
-    ]);
-    const width = boundingBox?.width ?? 0;
-
-    // Our panel+accordion leave elements in the page, just shrunk.
-    // Only consider it visible if it has a meaningful width.
-    isVisible = !!textContent && width > 0;
-  } catch {}
+  let isVisible = await pane.isVisible(); // await isSidePaneVisible(pane);
 
   if (!isVisible) {
     return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();

@@ -6,7 +6,7 @@ import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-
 import { addBreakpoint } from "../helpers/source-panel";
 
 async function resumeToBreakpoint(page: Page, line: number) {
-  await addBreakpoint(page, { url: "control_flow.js", lineNumber: line, isNode: true });
+  await addBreakpoint(page, { url: "control_flow.js", lineNumber: line });
   await resumeToLine(page, { lineNumber: line });
 }
 

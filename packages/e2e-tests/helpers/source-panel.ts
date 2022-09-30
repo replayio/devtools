@@ -12,16 +12,13 @@ export async function addBreakpoint(
     columnIndex?: number;
     lineNumber: number;
     url: string;
-    isNode?: boolean;
   }
 ): Promise<void> {
-  const { lineNumber, url, isNode = false } = options;
+  const { lineNumber, url } = options;
 
   debugPrint(`Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "addBreakpoint");
 
-  if (!isNode) {
-    await openDevToolsTab(page);
-  }
+  await openDevToolsTab(page);
 
   if (url) {
     await openSourceExplorerPanel(page);
@@ -193,16 +190,13 @@ export async function removeBreakpoint(
   options: {
     lineNumber: number;
     url: string;
-    isNode?: boolean;
   }
 ): Promise<void> {
-  const { lineNumber, url, isNode = false } = options;
+  const { lineNumber, url } = options;
 
   debugPrint(`Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "removeBreakpoint");
 
-  if (!isNode) {
-    await openDevToolsTab(page);
-  }
+  await openDevToolsTab(page);
 
   if (url) {
     await openSourceExplorerPanel(page);
