@@ -352,7 +352,7 @@ export async function waitForScopeValue(page: Page, name: string, expectedValue:
   const scopesPanel = getScopesPanel(page);
   const scopeValue = scopesPanel
     .locator(
-      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${escapedValue}"))`
+      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has-text("${escapedValue}")`
     )
     .first();
   await scopeValue.waitFor();
