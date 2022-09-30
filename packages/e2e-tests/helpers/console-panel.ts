@@ -33,6 +33,21 @@ export async function clearConsoleEvaluations(page: Page): Promise<void> {
   await page.locator('[data-test-id="ClearConsoleEvaluationsButton"]').click();
 }
 
+export function getConsoleMessageTypeCheckbox(
+  page: Page,
+  type: "exceptions" | "logs" | "warnings" | "errors"
+) {
+  return page.locator(`input#FilterToggle-${type}`);
+}
+
+export async function enableConsoleMessageType(
+  page: Page,
+  type: "exceptions" | "logs" | "warnings" | "errors"
+) {
+  const checkbox = getConsoleMessageTypeCheckbox(page, type);
+  await checkbox.check();
+}
+
 export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
   debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
 
@@ -62,6 +77,14 @@ export async function executeAndVerifyTerminalExpression(
   await clearConsoleEvaluations(page);
 }
 
+export async function expandConsoleMessage(message: Locator) {
+  const expander = message.locator('[data-test-name="Expandable"]');
+  const state = await expander.getAttribute("data-test-state");
+  if (state === "closed") {
+    await expander.click();
+  }
+}
+
 export async function expandFilterCategory(page: Page, categoryName: string) {
   debugPrint(
     `Expanding Console event filter category "${chalk.bold(categoryName)}"`,
@@ -78,10 +101,6 @@ export async function expandFilterCategory(page: Page, categoryName: string) {
   if (state === "closed") {
     await categoryLabel.click();
   }
-}
-
-export async function openConsolePanel(page: Page): Promise<void> {
-  await page.locator('[data-test-id="PanelButton-console"]').click();
 }
 
 export function findConsoleMessage(
@@ -109,6 +128,18 @@ export function getMessageSourceLink(message: Locator): Locator {
   return message.locator(`[data-test-name="Console-Source"]`);
 }
 
+export async function getFrameLocationsFromMessage(message: Locator) {
+  await expandConsoleMessage(message);
+  const frameLocations = message.locator(
+    '[data-test-name="Stack"] [data-test-name="Console-Source"]'
+  );
+  return await frameLocations.allInnerTexts();
+}
+
+export async function openConsolePanel(page: Page): Promise<void> {
+  await page.locator('[data-test-id="PanelButton-console"]').click();
+}
+
 export async function openMessageSource(message: Locator): Promise<void> {
   const sourceLink = getMessageSourceLink(message);
   const textContent = await sourceLink.textContent();
@@ -134,11 +165,6 @@ export async function seekToConsoleMessage(
   await waitForPaused(page, line);
 }
 
-export async function warpToMessage(page: Page, text: string, line?: number) {
-  const message = await findConsoleMessage(page, text);
-  await seekToConsoleMessage(page, message, line);
-}
-
 export async function verifyConsoleMessage(
   page: Page,
   expected: Expected,
@@ -153,4 +179,9 @@ export async function verifyConsoleMessage(
 
   const message = findConsoleMessage(page, expected, messageType).first();
   await message.waitFor();
+}
+
+export async function warpToMessage(page: Page, text: string, line?: number) {
+  const message = findConsoleMessage(page, text);
+  await seekToConsoleMessage(page, message, line);
 }
