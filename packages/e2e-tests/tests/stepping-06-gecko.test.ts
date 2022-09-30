@@ -20,6 +20,7 @@ test(`Test stepping in async frames and async call stacks.`, async ({ page }) =>
 
   await warpToMessage(page, "baz 2");
   await verifyFramesCount(page, 5);
+
   await waitForScopeValue(page, "n", "2");
 
   await waitForFrameTimeline(page, "25%");
