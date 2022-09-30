@@ -1,9 +1,17 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
+import { RecordingTarget } from "protocol/thread/thread";
 
 const exampleRecordings = require("../examples.json");
 
 import { debugPrint, delay } from "./utils";
+
+export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
+  return page.evaluate(async () => {
+    const target = await app.threadFront.getRecordingTarget();
+    return target;
+  });
+}
 
 export async function openDevToolsTab(page: Page) {
   const tab = page.locator('[data-test-id="ViewToggle-DevTools"]');
