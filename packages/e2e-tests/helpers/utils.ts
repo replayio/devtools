@@ -21,31 +21,38 @@ export function delay(timeout: number) {
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+export async function forEach(
+  locatorList: Locator,
+  callback: (singleLocator: Locator, index: number) => Promise<void>
+): Promise<void> {
+  const count = await locatorList.count();
+  for (let index = 0; index < count; index++) {
+    const singleLocator = locatorList.nth(index);
+    await callback(singleLocator, index);
+  }
+}
+
 export async function toggleExpandable(
   page: Page,
   options: {
     scope?: Locator;
     targetState?: "open" | "closed";
-    text: string;
+    text?: string;
   }
 ): Promise<void> {
   const { scope = page, targetState = "open", text } = options;
 
-  const header = scope.locator(`[data-test-name="KeyValue-Header"]:has-text("${text}")`);
-  const currentState = await header.getAttribute("data-test-state");
-  if (currentState !== targetState) {
-    debugPrint(
-      `${targetState === "open" ? "Opening" : "Closing"} expandable with text "${chalk.bold(
-        text
-      )}"`,
-      "toggleExpandable"
-    );
+  const label = text ? `expandable with text "${chalk.bold(text)}"` : "expandable";
 
-    await header.click();
+  const expander = text
+    ? scope.locator(`[data-test-name="Expandable"]:has-text("${text}")`).first()
+    : scope.locator(`[data-test-name="Expandable"]`).first();
+  const currentState = await expander.getAttribute("data-test-state");
+  if (currentState !== targetState) {
+    debugPrint(`${targetState === "open" ? "Opening" : "Closing"} ${label}`, "toggleExpandable");
+
+    await expander.click();
   } else {
-    debugPrint(
-      `Expandable with text "${chalk.bold(text)}" is already ${targetState}`,
-      "toggleExpandable"
-    );
+    debugPrint(`The ${label} is already ${targetState}`, "toggleExpandable");
   }
 }
