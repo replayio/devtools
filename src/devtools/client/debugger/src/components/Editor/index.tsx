@@ -175,8 +175,13 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     // @ts-expect-error initShortcuts doesn't exist
     editor._initShortcuts = () => {};
     const node = ReactDOM.findDOMNode(this);
+
     if (node instanceof HTMLElement) {
-      editor.appendToLocalElement(node.querySelector(".editor-mount")!);
+      const editorMount: HTMLElement = node.querySelector(".editor-mount")!;
+      while (editorMount.firstChild) {
+        editorMount.removeChild(editorMount.firstChild);
+      }
+      editor.appendToLocalElement(editorMount);
     }
 
     const { codeMirror } = editor;
