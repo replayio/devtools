@@ -4,18 +4,10 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { executeAndVerifyTerminalExpression, warpToMessage } from "../helpers/console-panel";
 import {
   expandAllScopesBlocks,
-  getScopeChildren,
-  reverseStepOverToLine,
-  rewindToLine,
-  selectFrame,
-  stepInToLine,
-  stepOverToLine,
-  verifyFramesCount,
-  waitForFrameTimeline,
+  waitForPaused,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
-import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
-import { delay, toggleExpandable } from "../helpers/utils";
+import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/source-panel";
 
 const url = "doc_prod_bundle.html";
 
@@ -39,11 +31,10 @@ test(`Test scope mapping and switching between generated/original sources.`, asy
 
   await executeAndVerifyTerminalExpression(page, "bararr.length * 100", 300);
 
-  await delay(5_000);
+  await toggleMappedSources(page, "off");
+  await waitForPaused(page, 12);
 
-  // TODO [FE-626]
-  // await Test.toggleMappedSources();
-  // await Test.waitForPausedLine(12);
-  // await Test.waitForScopeValue("e", "(3) […]");
-  // await Test.waitForScopeValue("o", "{…}");
+  await expandAllScopesBlocks(page);
+  await waitForScopeValue(page, "e", "(3) [");
+  await waitForScopeValue(page, "o", "{…}");
 });
