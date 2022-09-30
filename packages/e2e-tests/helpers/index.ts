@@ -22,6 +22,10 @@ export async function openDevToolsTab(page: Page) {
   }
 }
 
+export async function selectNodePicker(page: Page) {
+  await page.locator('[data-test-id="NodePicker"]').click();
+}
+
 export async function openViewerTab(page: Page) {
   return page.locator('[data-test-id="ViewToggle-Viewer"]').click();
 }
