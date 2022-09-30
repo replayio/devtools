@@ -1,7 +1,8 @@
-import { Locator, Page } from "@playwright/test";
+import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { getSourceTab, waitForSelectedSource } from "./source-panel";
+import { waitFor } from "./index";
 import { debugPrint } from "./utils";
 
 export async function clickSourceTreeNode(page: Page, node: string) {
@@ -28,8 +29,17 @@ export async function openSource(page: Page, url: string): Promise<void> {
 
   debugPrint(`Opening source "${chalk.bold(url)}"`, "openSource");
 
+  await openSourceExplorerPanel(page);
+
   // Otherwise find it in the sources tree.
-  const pane = await getSourcesPane(page);
+  const pane = getSourcesPane(page);
+
+  // Ensure that we've got sources loaded
+  await waitFor(async () => {
+    const sourceTreeItems = pane.locator(`role=treeitem`);
+    const numItems = await sourceTreeItems.count();
+    expect(numItems).toBeGreaterThan(0);
+  });
 
   let foundSource = false;
 
@@ -67,9 +77,9 @@ export async function openSource(page: Page, url: string): Promise<void> {
 }
 
 export async function openSourceExplorerPanel(page: Page): Promise<void> {
-  // Only click if it's not already open; clicking again will collapse the side bar.
-  const pane = await getSourcesPane(page);
-  const isVisible = await pane.isVisible();
+  const pane = getSourcesPane(page);
+  let isVisible = await pane.isVisible(); // await isSidePaneVisible(pane);
+
   if (!isVisible) {
     return page.locator('[data-test-name="ToolbarButton-SourceExplorer"]').click();
   }
