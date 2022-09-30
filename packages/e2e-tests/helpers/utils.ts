@@ -1,4 +1,4 @@
-import { expect, Locator, Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
 // Playwright doesn't provide a good way to do this (yet).

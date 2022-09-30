@@ -344,12 +344,15 @@ export async function waitForScopeValue(page: Page, name: string, expectedValue:
     "waitForScopeValue"
   );
 
+  const escapedValue =
+    typeof expectedValue === "string" ? expectedValue.replace(/"/g, '\\"') : expectedValue;
+
   await expandAllScopesBlocks(page);
 
   const scopesPanel = getScopesPanel(page);
   const scopeValue = scopesPanel
     .locator(
-      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${expectedValue}"))`
+      `[data-test-name="KeyValue"]:has([data-test-name="KeyValue-Header"]:text-is("${name}")):has([data-test-name="ClientValue"]:text-is("${escapedValue}"))`
     )
     .first();
   await scopeValue.waitFor();
