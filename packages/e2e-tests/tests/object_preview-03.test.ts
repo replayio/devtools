@@ -2,8 +2,14 @@ import test from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import {
-  openScopeBlocks,
+  expandAllScopesBlocks,
+  getScopeChildren,
+  reverseStepOverToLine,
   rewindToLine,
+  selectFrame,
+  stepInToLine,
+  stepOverToLine,
+  verifyFramesCount,
   waitForFrameTimeline,
   waitForScopeValue,
 } from "../helpers/pause-information-panel";
@@ -19,39 +25,47 @@ test(`Test previews when switching between frames and stepping.`, async ({ page 
   await startTest(page, url);
   await openDevToolsTab(page);
 
+  // TODO [FE-626] How do we get this without reading the ThreadFront global?
+  const target = "gecko" as any;
+
   await addBreakpoint(page, { lineNumber: 17, url });
   await rewindToLine(page, { lineNumber: 17, url });
 
-  await openScopeBlocks(page, "Block");
+  await expandAllScopesBlocks(page);
 
-  await toggleExpandable(page, { text: "barobj" });
+  const blockScope = getScopeChildren(page, "Block");
+
+  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
   await waitForScopeValue(page, "barprop1", 2);
   await waitForScopeValue(page, "barprop2", 3);
 
-  // TODO [FE-626] target == "gecko" ? "42%" : "75%"
-  await waitForFrameTimeline(page, "42%");
+  await waitForFrameTimeline(page, target == "gecko" ? "42%" : "75%");
 
-  // await Test.checkFrames(2);
-  // await Test.selectFrame(1);
-  // await Test.toggleScopeNode("fooobj");
-  // await Test.findScopeNode("fooprop1");
-  // await Test.findScopeNode("fooprop2");
-  // await Test.selectFrame(0);
-  // await Test.stepOverToLine(18);
-  // await Test.waitForFrameTimeline(target == "gecko" ? "71%" : "100%");
-  // await Test.toggleScopeNode("barobj");
-  // await Test.findScopeNode("barprop1");
-  // await Test.waitForScopeValue("barprop1", `"updated"`);
-  // await Test.reverseStepOverToLine(17);
-  // await Test.toggleScopeNode("barobj");
-  // await Test.findScopeNode("barprop1");
-  // await Test.waitForScopeValue("barprop1", "2");
-  // await Test.stepInToLine(21);
-  // await Test.stepOverToLine(22);
-  // await Test.waitForFrameTimeline(target == "gecko" ? "50%" : "100%");
-  // await Test.checkFrames(3);
-  // await Test.selectFrame(1);
-  // await Test.waitForFrameTimeline(target == "gecko" ? "57%" : "75%");
-  // await Test.selectFrame(2);
-  // await Test.waitForFrameTimeline(target == "gecko" ? "66%" : "100%");
+  await verifyFramesCount(page, 2);
+  await selectFrame(page, 1);
+  await toggleExpandable(page, { scope: blockScope, text: "fooobj" });
+  await waitForScopeValue(page, "fooprop1", 0);
+  await waitForScopeValue(page, "fooprop2", 1);
+
+  await selectFrame(page, 0);
+  await stepOverToLine(page, 18);
+  await waitForFrameTimeline(page, target == "gecko" ? "71%" : "100%");
+  await expandAllScopesBlocks(page);
+  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
+  await waitForScopeValue(page, "barprop1", '"updated"');
+  await waitForScopeValue(page, "barprop2", 3);
+
+  await reverseStepOverToLine(page, 17);
+  await expandAllScopesBlocks(page);
+  await toggleExpandable(page, { scope: blockScope, text: "barobj" });
+  await waitForScopeValue(page, "barprop1", "2");
+
+  await stepInToLine(page, 21);
+  await stepOverToLine(page, 22);
+  await waitForFrameTimeline(page, target == "gecko" ? "50%" : "100%");
+  await verifyFramesCount(page, 3);
+  await selectFrame(page, 1);
+  await waitForFrameTimeline(page, target == "gecko" ? "57%" : "75%");
+  await selectFrame(page, 2);
+  await waitForFrameTimeline(page, target == "gecko" ? "66%" : "100%");
 });
