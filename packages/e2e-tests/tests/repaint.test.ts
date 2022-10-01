@@ -1,7 +1,7 @@
 import { Page, test } from "@playwright/test";
+
 import { openDevToolsTab, startTest } from "../helpers";
 import { rewindToLine, stepOver, waitForPaused } from "../helpers/pause-information-panel";
-
 import { addBreakpoint } from "../helpers/source-panel";
 import { waitFor } from "../helpers/utils";
 
