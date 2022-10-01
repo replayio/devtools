@@ -51,6 +51,12 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     description: "Restore the legacy frames and scopes panels",
     key: "legacyFramesPanel",
   },
+  {
+    label: "Console filter drawer defaults to open",
+    description:
+      "Open the console filter settings by default when opening a Replay for the first time",
+    key: "consoleFilterDrawerDefaultsToOpen",
+  },
 ];
 
 const RISKY_EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [];
@@ -86,6 +92,10 @@ export default function ExperimentalSettings({}) {
   const { value: enableResolveRecording, update: updateEnableResolveRecording } =
     useFeature("resolveRecording");
 
+  const {
+    value: consoleFilterDrawerDefaultsToOpen,
+    update: updateConsoleFilterDrawerDefaultsToOpen,
+  } = useFeature("consoleFilterDrawerDefaultsToOpen");
   const { value: hitCounts, update: updateHitCounts } = useFeature("hitCounts");
   const { value: profileWorkerThreads, update: updateProfileWorkerThreads } =
     useFeature("profileWorkerThreads");
@@ -112,11 +122,14 @@ export default function ExperimentalSettings({}) {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
     } else if (key === "legacyFramesPanel") {
       updateLegacyFramesPanel(!legacyFramesPanel);
+    } else if (key === "consoleFilterDrawerDefaultsToOpen") {
+      updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
     }
   };
 
   const localSettings = {
     basicProcessingLoadingBar,
+    consoleFilterDrawerDefaultsToOpen,
     enableColumnBreakpoints,
     enableResolveRecording,
     enableQueryCache,

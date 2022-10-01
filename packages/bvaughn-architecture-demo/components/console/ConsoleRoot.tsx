@@ -23,6 +23,7 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
   nagHeader = null,
@@ -37,7 +38,11 @@ export default function ConsoleRoot({
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>("Replay:Console:MenuOpen", true);
+  const { recordingId } = useContext(SessionContext);
+  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>(
+    `Replay:Console:MenuOpen:${recordingId}`,
+    false
+  );
 
   const messageListRef = useRef<HTMLElement>(null);
 

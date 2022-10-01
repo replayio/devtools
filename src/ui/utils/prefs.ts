@@ -24,6 +24,7 @@ pref("devtools.hitCounts", "hide-counts");
 pref("devtools.features.basicProcessingLoadingBar", false);
 pref("devtools.features.columnBreakpoints", false);
 pref("devtools.features.commentAttachments", false);
+pref("devtools.features.consoleFilterDrawerDefaultsToOpen", false);
 pref("devtools.features.disableUnHitLines", false);
 pref("devtools.features.enableLargeText", false);
 pref("devtools.features.enableQueryCache", false);
@@ -59,6 +60,7 @@ export const features = new PrefsHelper("devtools.features", {
   basicProcessingLoadingBar: ["Bool", "basicProcessingLoadingBar"],
   columnBreakpoints: ["Bool", "columnBreakpoints"],
   commentAttachments: ["Bool", "commentAttachments"],
+  consoleFilterDrawerDefaultsToOpen: ["Bool", "consoleFilterDrawerDefaultsToOpen"],
   enableQueryCache: ["Bool", "enableQueryCache"],
   disableUnHitLines: ["Bool", "disableUnHitLines"],
   enableLargeText: ["Bool", "enableLargeText"],

@@ -15,6 +15,7 @@ export type ExperimentalUserSettings = {
 
 export type LocalExperimentalUserSettings = {
   basicProcessingLoadingBar: boolean;
+  consoleFilterDrawerDefaultsToOpen: boolean;
   enableQueryCache: boolean;
   enableColumnBreakpoints: boolean;
   enableLargeText: boolean;
