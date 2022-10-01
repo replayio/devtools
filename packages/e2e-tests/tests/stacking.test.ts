@@ -2,10 +2,11 @@ import test from "@playwright/test";
 
 import { Locator, expect, Page } from "@playwright/test";
 
-import { openDevToolsTab, startTest, waitFor } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
+import { waitFor } from "../helpers/utils";
 
 interface StackingTestCase {
   id: string;

@@ -1,10 +1,10 @@
 import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { openDevToolsTab, waitFor } from ".";
+import { openDevToolsTab } from ".";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint } from "./utils";
+import { clearTextArea, debugPrint, waitFor } from "./utils";
 
 export async function addBreakpoint(
   page: Page,

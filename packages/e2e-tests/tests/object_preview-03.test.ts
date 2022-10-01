@@ -1,6 +1,6 @@
 import test from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
+import { getRecordingTarget, openDevToolsTab, startTest } from "../helpers";
 import {
   expandAllScopesBlocks,
   getScopeChildren,
@@ -25,8 +25,7 @@ test(`Test previews when switching between frames and stepping.`, async ({ page 
   await startTest(page, url);
   await openDevToolsTab(page);
 
-  // TODO [FE-626] How do we get this without reading the ThreadFront global?
-  const target = "gecko" as any;
+  const target = await getRecordingTarget(page);
 
   await addBreakpoint(page, { lineNumber: 17, url });
   await rewindToLine(page, { lineNumber: 17, url });

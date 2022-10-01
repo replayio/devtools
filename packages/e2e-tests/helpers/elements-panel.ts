@@ -1,9 +1,7 @@
 import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { waitFor } from ".";
-
-import { debugPrint } from "./utils";
+import { debugPrint, waitFor } from "./utils";
 
 export async function activateInspectorTool(page: Page): Promise<void> {
   await page.locator('[data-test-id="PanelButton-inspector"]').click();

@@ -3,7 +3,7 @@ import chalk from "chalk";
 
 import { waitForPaused } from "./pause-information-panel";
 import { Expected, MessageType } from "./types";
-import { debugPrint } from "./utils";
+import { debugPrint, find, waitFor } from "./utils";
 
 const categoryNames = {
   keyboard: "Keyboard",
@@ -63,18 +63,22 @@ export async function executeTerminalExpression(page: Page, text: string): Promi
   const textArea = term.locator("textarea");
   await textArea.focus();
   await textArea.type(text);
+  await textArea.press("Escape"); // Close auto-complete dialog if open
   await textArea.press("Enter");
 }
 
 export async function executeAndVerifyTerminalExpression(
   page: Page,
   text: string,
-  expected: Expected
+  expected: Expected,
+  clearConsoleAfter: boolean = true
 ): Promise<void> {
   await openConsolePanel(page);
   await executeTerminalExpression(page, text);
   await verifyConsoleMessage(page, expected, "terminal-expression");
-  await clearConsoleEvaluations(page);
+  if (clearConsoleAfter) {
+    await clearConsoleEvaluations(page);
+  }
 }
 
 export async function expandConsoleMessage(message: Locator) {
@@ -179,6 +183,57 @@ export async function verifyConsoleMessage(
 
   const message = findConsoleMessage(page, expected, messageType).first();
   await message.waitFor();
+}
+
+// This function considers any message with the current pause line above it as satisfying the "paused at" condition.
+// It doesn't have to be a literal execution point match.
+export async function verifyPausedAtMessage(
+  page: Page,
+  expected: Expected,
+  messageType?: MessageType
+) {
+  debugPrint(
+    `Verifying currently paused at console message${
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
+    }with text "${chalk.bold(expected)}"`,
+    "verifyPausedAtMessage"
+  );
+
+  await waitFor(async () => {
+    const result = await page.evaluate(
+      ({ messageType, text }) => {
+        const attributeSelector = messageType
+          ? `[data-test-message-type="${messageType}"]`
+          : '[data-test-name="Message"]';
+
+        const matchingMessages = Array.from(document.querySelectorAll(attributeSelector)).filter(
+          message => message.textContent?.includes(`${text}`)
+        );
+
+        return (
+          matchingMessages.find(message => {
+            if (
+              message &&
+              message.previousSibling &&
+              (message.previousSibling as Element).getAttribute
+            ) {
+              return (
+                (message.previousSibling as Element).getAttribute("data-test-id") ===
+                "Console-CurrentTimeIndicator"
+              );
+            }
+          }) != null
+        );
+      },
+      { messageType, text: expected }
+    );
+
+    if (!result) {
+      throw `Not paused at console message${
+        messageType ? ` of type "${messageType}" ` : " "
+      }with text "${expected}"`;
+    }
+  });
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {

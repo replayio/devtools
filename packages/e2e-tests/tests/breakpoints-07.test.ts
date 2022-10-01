@@ -15,7 +15,7 @@ import {
   verifyLogpointStep,
 } from "../helpers/source-panel";
 
-test(`Test TODO name this thing.`, async ({ page }) => {
+test(`Test TODO [FE-626] name this thing.`, async ({ page }) => {
   await startTest(page, "doc_navigate.html");
   await openDevToolsTab(page);
 
