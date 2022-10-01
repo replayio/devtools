@@ -10,7 +10,7 @@
   "dependencies": {
     "@codemirror/lang-javascript": "^6.0.2",
     "@replayio/protocol": "^0.31.0",
-    "@uiw/react-codemirror": "^4.11.4",
+    "@uiw/react-codemirror": "^4.12.3",
     "bvaughn-architecture-demo": "workspace:*",
     "lodash": "^4.17.21",
     "next": "^12.1.6",
