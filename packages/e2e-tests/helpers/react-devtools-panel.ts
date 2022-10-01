@@ -1,5 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { waitFor } from ".";
+
+import { waitFor } from "./utils";
 
 export async function checkInspectedItemValue(item: Locator, expectedValue: string) {
   const value = await getInspectedItemValue(item);

@@ -2,8 +2,7 @@ import { Locator, Page, expect } from "@playwright/test";
 import chalk from "chalk";
 
 import { getSourceTab, waitForSelectedSource } from "./source-panel";
-import { waitFor } from "./index";
-import { debugPrint } from "./utils";
+import { debugPrint, waitFor } from "./utils";
 
 export async function clickSourceTreeNode(page: Page, node: string) {
   debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);

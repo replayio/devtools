@@ -42,35 +42,3 @@ export async function startTest(page: Page, example: string) {
     await page.locator('[data-test-id="ViewToggle-DevTools"]').waitFor();
   }
 }
-
-export async function waitFor(
-  callback: () => Promise<void>,
-  options: {
-    retryInterval?: number;
-    timeout?: number;
-  } = {}
-): Promise<void> {
-  const { retryInterval = 250, timeout = 5_000 } = options;
-
-  const startTime = performance.now();
-
-  while (true) {
-    try {
-      await callback();
-
-      return;
-    } catch (error) {
-      if (typeof error === "string") {
-        console.log(error);
-      }
-
-      if (performance.now() - startTime > timeout) {
-        throw error;
-      }
-
-      await delay(retryInterval);
-
-      continue;
-    }
-  }
-}

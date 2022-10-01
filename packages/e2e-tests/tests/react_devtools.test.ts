@@ -1,6 +1,6 @@
 import test, { expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest, waitFor } from "../helpers";
+import { openDevToolsTab, startTest } from "../helpers";
 import {
   executeTerminalExpression,
   findConsoleMessage,
@@ -17,6 +17,7 @@ import {
   waitForReactComponentCount,
 } from "../helpers/react-devtools-panel";
 import { hoverScreenshot } from "../helpers/screenshot";
+import { waitFor } from "../helpers/utils";
 
 test("Test React DevTools.", async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
