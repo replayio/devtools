@@ -21,6 +21,22 @@ export function delay(timeout: number) {
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
+export async function find(
+  locatorList: Locator,
+  callback: (singleLocator: Locator, index: number) => Promise<boolean>
+): Promise<Locator | null> {
+  const count = await locatorList.count();
+  for (let index = 0; index < count; index++) {
+    const singleLocator = locatorList.nth(index);
+    const match = await callback(singleLocator, index);
+    if (match) {
+      return singleLocator;
+    }
+  }
+
+  return null;
+}
+
 export async function forEach(
   locatorList: Locator,
   callback: (singleLocator: Locator, index: number) => Promise<void>
@@ -54,5 +70,37 @@ export async function toggleExpandable(
     await expander.click();
   } else {
     debugPrint(`The ${label} is already ${targetState}`, "toggleExpandable");
+  }
+}
+
+export async function waitFor(
+  callback: () => Promise<void>,
+  options: {
+    retryInterval?: number;
+    timeout?: number;
+  } = {}
+): Promise<void> {
+  const { retryInterval = 250, timeout = 5_000 } = options;
+
+  const startTime = performance.now();
+
+  while (true) {
+    try {
+      await callback();
+
+      return;
+    } catch (error) {
+      if (typeof error === "string") {
+        console.log(error);
+      }
+
+      if (performance.now() - startTime > timeout) {
+        throw error;
+      }
+
+      await delay(retryInterval);
+
+      continue;
+    }
   }
 }
