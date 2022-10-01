@@ -1,10 +1,9 @@
 import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { waitFor } from ".";
 import { openSource } from "./source-explorer-panel";
 import { Expected } from "./types";
-import { debugPrint, forEach, toggleExpandable } from "./utils";
+import { debugPrint, forEach, toggleExpandable, waitFor } from "./utils";
 
 async function toggleAccordionPane(pane: Locator, targetState: "open" | "closed") {
   const name = (await pane.getAttribute("data-test-id"))!.split("-")[1];

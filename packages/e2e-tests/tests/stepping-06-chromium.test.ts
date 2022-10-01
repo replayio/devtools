@@ -1,6 +1,6 @@
 import test from "@playwright/test";
 
-// TODO: Should review when we have chromium examples that are recorded
+// TODO [FE-626] Should review when we have chromium examples that are recorded
 test(`Test stepping in async frames and async call stacks.`, async () => {
   // // Because stepping works differently between gecko and chromium, frame timeline
   // // percentages are different in this test.
