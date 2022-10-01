@@ -1,44 +1,57 @@
-Test.describe(
-  `Test which message is the paused one after warping, stepping, and evaluating.`,
-  async () => {
-    await Test.selectConsole();
+import test from "@playwright/test";
 
-    // When warping to a message, it is the paused one.
-    await Test.warpToMessage("number: 2");
-    await Test.checkPausedMessage("number: 2");
+import { openDevToolsTab, startTest } from "../helpers";
+import {
+  executeAndVerifyTerminalExpression,
+  openConsolePanel,
+  verifyPausedAtMessage,
+  warpToMessage,
+} from "../helpers/console-panel";
+import { reverseStepOverToLine, stepOverToLine } from "../helpers/pause-information-panel";
+import { delay } from "../helpers/utils";
 
-    await Test.stepOverToLine(20);
-    await Test.checkPausedMessage("number: 3");
+const url = "doc_rr_logs.html";
 
-    // When stepping back we end up earlier than the console call, even though we're
-    // paused at the same line. This isn't ideal.
-    await Test.reverseStepOverToLine(19);
-    await Test.checkPausedMessage("number: 2");
+test("support pausing, warping, stepping and evaluating console messages", async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+  await openConsolePanel(page);
 
-    await Test.warpToMessage("number: 2");
-    await Test.checkPausedMessage("number: 2");
+  // When warping to a message, it is the paused one.
+  await warpToMessage(page, "number: 2");
+  await verifyPausedAtMessage(page, "number: 2", "console-log");
 
-    await Test.stepOverToLine(20);
-    await Test.checkPausedMessage("number: 3");
+  await stepOverToLine(page, 20);
+  await verifyPausedAtMessage(page, "number: 3", "console-log");
 
-    await Test.executeInConsole("1 << 5");
-    await Test.checkPausedMessage("1 << 5");
+  // When stepping back we end up earlier than the console call, even though we're paused at the same line.
+  // This isn't ideal.
+  await reverseStepOverToLine(page, 19);
+  await verifyPausedAtMessage(page, "number: 2", "console-log");
 
-    await Test.stepOverToLine(21);
-    await Test.checkPausedMessage("number: 3");
+  await warpToMessage(page, "number: 2");
+  await verifyPausedAtMessage(page, "number: 2", "console-log");
 
-    await Test.executeInConsole("1 << 7");
-    await Test.checkPausedMessage("1 << 7");
+  await stepOverToLine(page, 20);
+  await verifyPausedAtMessage(page, "number: 3", "console-log");
 
-    await Test.reverseStepOverToLine(20);
-    await Test.checkPausedMessage("1 << 5");
+  await executeAndVerifyTerminalExpression(page, "1 << 5", 32, false);
+  await verifyPausedAtMessage(page, "1 << 5", "terminal-expression");
 
-    await Test.executeInConsole("1 << 6");
+  await stepOverToLine(page, 21);
+  await verifyPausedAtMessage(page, "number: 3", "console-log");
 
-    await Test.stepOverToLine(21);
-    await Test.checkPausedMessage("1 << 7");
+  await executeAndVerifyTerminalExpression(page, "1 << 7", 128, false);
+  await verifyPausedAtMessage(page, "1 << 7", "terminal-expression");
 
-    await Test.stepOverToLine(22);
-    await Test.checkPausedMessage("ExampleFinished");
-  }
-);
+  await reverseStepOverToLine(page, 20);
+  await verifyPausedAtMessage(page, "1 << 5", "terminal-expression");
+
+  await executeAndVerifyTerminalExpression(page, "1 << 6", 64, false);
+
+  await stepOverToLine(page, 21);
+  await verifyPausedAtMessage(page, "1 << 7", "terminal-expression");
+
+  await stepOverToLine(page, 22);
+  await verifyPausedAtMessage(page, "ExampleFinished", "console-log");
+});
