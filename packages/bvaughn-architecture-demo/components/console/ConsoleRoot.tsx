@@ -8,6 +8,7 @@ import {
   unstable_Offscreen as Offscreen,
   useContext,
   useRef,
+  useLayoutEffect,
   useState,
 } from "react";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
@@ -43,8 +44,16 @@ export default function ConsoleRoot({
     `Replay:Console:MenuOpen:${recordingId}`,
     false
   );
+  const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
   const messageListRef = useRef<HTMLElement>(null);
+
+  // We default to having the console filters panel turned off, to minimize UI "busyness".
+  // _If_ it's off initially, we want to completely skip rendering it, which
+  // avoids making the "fetch events" calls during app startup to speed up loading.
+  // But, if it's ever been shown and toggled off, continue rendering it
+  // inside the `<Offscreen>` to preserve state.
+  const renderFilters = isMenuOpen || menuValueHasBeenToggled;
 
   return (
     <ConsoleContextMenuContextRoot>
@@ -57,7 +66,10 @@ export default function ConsoleRoot({
             <button
               className={styles.MenuToggleButton}
               data-test-id="ConsoleMenuToggleButton"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => {
+                setIsMenuOpen(!isMenuOpen);
+                setMenuValueHasBeenToggled(true);
+              }}
               title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
             >
               <Icon
@@ -82,9 +94,7 @@ export default function ConsoleRoot({
 
           <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
             <div className={styles.FilterColumn}>
-              <Suspense fallback={<Loader />}>
-                <FilterToggles />
-              </Suspense>
+              <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
             </div>
           </Offscreen>
 
