@@ -8,7 +8,6 @@ import {
   unstable_Offscreen as Offscreen,
   useContext,
   useRef,
-  useLayoutEffect,
   useState,
 } from "react";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
@@ -29,11 +28,13 @@ import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 export default function ConsoleRoot({
   nagHeader = null,
   showSearchInputByDefault = true,
+  showFiltersByDefault = false,
   terminalInput = null,
 }: {
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
   showSearchInputByDefault?: boolean;
+  showFiltersByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
@@ -42,7 +43,7 @@ export default function ConsoleRoot({
   const { recordingId } = useContext(SessionContext);
   const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>(
     `Replay:Console:MenuOpen:${recordingId}`,
-    false
+    showFiltersByDefault
   );
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 

@@ -1,5 +1,5 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
-import NewConsole from "bvaughn-architecture-demo/components/console";
+import ConsoleRoot from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
 import {
@@ -50,6 +50,7 @@ import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducer
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { FocusRegion } from "ui/state/timeline";
 import { rangeForFocusRegion } from "ui/utils/timeline";
+import { useFeature } from "ui/hooks/settings";
 
 import styles from "./NewConsole.module.css";
 import { ConsoleNag } from "../shared/Nags/Nags";
@@ -58,6 +59,9 @@ import useTerminalHistory from "./useTerminalHistory";
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
   const recordingId = useGetRecordingId();
+  const { value: consoleFilterDrawerDefaultsToOpen } = useFeature(
+    "consoleFilterDrawerDefaultsToOpen"
+  );
 
   const duration = useAppSelector(getRecordingDuration)!;
 
@@ -85,9 +89,10 @@ export default function NewConsoleRoot() {
           <TerminalContextController>
             <FocusContextReduxAdapter>
               <PointsContextReduxAdapter>
-                <NewConsole
+                <ConsoleRoot
                   nagHeader={<ConsoleNag />}
                   showSearchInputByDefault={false}
+                  showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
                   terminalInput={<JSTermWrapper />}
                 />
               </PointsContextReduxAdapter>
