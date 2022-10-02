@@ -23,23 +23,38 @@ import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
 import Search from "./Search";
 import { SearchContextRoot } from "./SearchContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
   nagHeader = null,
   showSearchInputByDefault = true,
+  showFiltersByDefault = false,
   terminalInput = null,
 }: {
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
   showSearchInputByDefault?: boolean;
+  showFiltersByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
-  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>("Replay:Console:MenuOpen", true);
+  const { recordingId } = useContext(SessionContext);
+  const [isMenuOpen, setIsMenuOpen] = useLocalStorage<boolean>(
+    `Replay:Console:MenuOpen:${recordingId}`,
+    showFiltersByDefault
+  );
+  const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
   const messageListRef = useRef<HTMLElement>(null);
+
+  // We default to having the console filters panel turned off, to minimize UI "busyness".
+  // _If_ it's off initially, we want to completely skip rendering it, which
+  // avoids making the "fetch events" calls during app startup to speed up loading.
+  // But, if it's ever been shown and toggled off, continue rendering it
+  // inside the `<Offscreen>` to preserve state.
+  const renderFilters = isMenuOpen || menuValueHasBeenToggled;
 
   return (
     <ConsoleContextMenuContextRoot>
@@ -52,7 +67,10 @@ export default function ConsoleRoot({
             <button
               className={styles.MenuToggleButton}
               data-test-id="ConsoleMenuToggleButton"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              onClick={() => {
+                setIsMenuOpen(!isMenuOpen);
+                setMenuValueHasBeenToggled(true);
+              }}
               title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
             >
               <Icon
@@ -77,9 +95,7 @@ export default function ConsoleRoot({
 
           <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
             <div className={styles.FilterColumn}>
-              <Suspense fallback={<Loader />}>
-                <FilterToggles />
-              </Suspense>
+              <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
             </div>
           </Offscreen>
 
