@@ -29,6 +29,8 @@ test("Test that styles for elements can be viewed.", async ({ page }) => {
   ]);
 
   await expandLonghands(page);
+  // TODO [FE-787]
+  /*
   await checkAppliedRules(page, [
     {
       selector: ".parent",
@@ -62,4 +64,5 @@ test("Test that styles for elements can be viewed.", async ({ page }) => {
       ],
     },
   ]);
+  */
 });

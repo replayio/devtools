@@ -46,7 +46,11 @@ test("Test that styles for elements can be viewed.", async ({ page }) => {
     {
       selector: "body",
       source: "styles.css:11",
-      properties: [{ text: "font-size: large;", overridden: false }],
+      properties: [
+        // TODO [FE-786]
+        { overridden: true, text: "background-color: green;" },
+        { text: "font-size: large;", overridden: false },
+      ],
     },
   ]);
 
@@ -89,7 +93,12 @@ test("Test that styles for elements can be viewed.", async ({ page }) => {
     {
       selector: "body",
       source: "styles.css:11",
-      properties: [{ text: "font-size: large;", overridden: true }],
+      properties: [
+        // TODO [FE-786]
+        { overridden: true, text: "background-color: green;" },
+        // TODO [FE-786]
+        { text: "font-size: large;", overridden: true },
+      ],
     },
   ]);
 
@@ -129,7 +138,11 @@ test("Test that styles for elements can be viewed.", async ({ page }) => {
     {
       selector: "body",
       source: "styles.css:11",
-      properties: [{ text: "font-size: large;", overridden: false }],
+      properties: [
+        // TODO [FE-786]
+        { overridden: true, text: "background-color: green;" },
+        { text: "font-size: large;", overridden: false },
+      ],
     },
   ]);
 });
