@@ -36,7 +36,6 @@ export async function render(
     accessToken: null,
     currentUserInfo: null,
     duration: 1000,
-    endPoint: "1000",
     recordingId: "fakeRecordingId",
     sessionId: "fakeSessionId",
     ...options?.sessionContext,

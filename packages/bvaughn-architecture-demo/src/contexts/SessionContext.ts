@@ -6,7 +6,6 @@ export type SessionContextType = {
   accessToken: string | null;
   currentUserInfo: UserInfo | null;
   duration: number;
-  endPoint: ExecutionPoint;
   recordingId: string;
   sessionId: string;
 };
