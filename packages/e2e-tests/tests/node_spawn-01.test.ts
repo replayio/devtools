@@ -26,7 +26,7 @@ test("Basic subprocess spawning", async ({ page }) => {
 
   await openConsolePanel(page);
 
-  // TODO This really needs an `{exact? boolean}` flag, as there are multiple messages
+  // TODO [FE-626] This really needs an `{exact? boolean}` flag, as there are multiple messages
   // with overlapping partial text ("async 2", "sync 2").
   await warpToMessage(page, "sync 2");
   await waitForScopeValue(page, "n", 2);

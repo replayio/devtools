@@ -25,7 +25,7 @@ test("Basic node logpoints", async ({ page }) => {
 
   await warpToMessage(page, "CALL 2");
 
-  // TODO Autocompletion behavior is breaking terminal expressions right now
+  // TODO [FE-626] Autocompletion behavior is breaking terminal expressions right now
   // await executeAndVerifyTerminalExpression(page, "i", 2);
 
   await reverseStepOverToLine(page, 3);

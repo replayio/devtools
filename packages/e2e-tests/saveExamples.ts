@@ -88,7 +88,7 @@ async function saveRecording(example: string, recordingId?: string) {
   console.log(`Saved recording ID for example: ${example}`);
 }
 
-// TODO Tie this into the new `main()` function below
+// TODO [FE-626] Tie this into the new `main()` function below
 async function recordExamples() {
   const files = readdirSync(`public/test/examples`);
   const pages = files.filter(file => file.startsWith("doc"));
@@ -171,7 +171,7 @@ async function main() {
   } else if (exampleType === "cra") {
     recordExample("cra/dist/index.html");
   }
-  // TODO Re-add handling for re-recording other example forms
+  // TODO [FE-626] Re-add handling for re-recording other example forms
 }
 
 (async () => {

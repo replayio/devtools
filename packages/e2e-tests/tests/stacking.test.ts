@@ -99,12 +99,12 @@ const testCases: StackingTestCase[] = [
 
   // The last row has 4 sets of boxes, but some additional checks
 
-  // TODO This lower-left set is finicky and not working right with this  test setup atm.
+  // TODO [FE-626] This lower-left set is finicky and not working right with this  test setup atm.
 
   // elements with multiple client rects:
   // all client rects are highlighted
   // This is a text node with multiple rects, so no rules apply
-  // TODO: Checking things just by lack of rules risks false positives
+  // TODO [FE-626]: Checking things just by lack of rules risks false positives
   // {
   //   id: "r3c0a",
   //   position: { x: 60, y: 340 },
