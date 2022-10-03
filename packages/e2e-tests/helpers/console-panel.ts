@@ -284,6 +284,6 @@ export async function verifyTrimmedConsoleMessages(
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
-  const message = findConsoleMessage(page, text);
+  const message = findConsoleMessage(page, text).first();
   await seekToConsoleMessage(page, message, line);
 }
