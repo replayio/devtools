@@ -5,11 +5,8 @@ import { Locator, expect, Page } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
-import {
-  getBreakpointsAccordionPane,
-  openPauseInformationPanel,
-} from "../helpers/pause-information-panel";
-import { waitFor, mapLocators, delay } from "../helpers/utils";
+import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
+import { mapLocators, waitFor } from "../helpers/utils";
 
 interface StackingTestCase {
   id: string;
