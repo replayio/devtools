@@ -18,10 +18,10 @@ export type Point = {
   badge: Badge | null;
   condition: string | null;
   content: string;
-  enableBreaking: boolean;
-  enableLogging: boolean;
   id: PointId;
   location: Location;
+  shouldBreak: boolean;
+  shouldLog: boolean;
 };
 
 export type PointInstance = {
@@ -62,8 +62,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         badge: null,
         content: "",
         condition: null,
-        enableBreaking: false,
-        enableLogging: false,
+        shouldBreak: false,
+        shouldLog: false,
         ...partialPoint,
         id: idCounter++,
         location,

@@ -63,7 +63,7 @@ export default function Source({
     addPoint(
       {
         content: `"${fileName}", ${lineNumber}`,
-        enableLogging: true,
+        shouldLog: true,
       },
       {
         column: closestColumnNumber,
