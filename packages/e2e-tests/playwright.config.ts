@@ -1,7 +1,7 @@
 import { PlaywrightTestConfig, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { DEBUG, SLOW_MO } = process.env;
+const { CI, DEBUG, SLOW_MO } = process.env;
 
 const config: PlaywrightTestConfig = {
   use: {
@@ -14,24 +14,31 @@ const config: PlaywrightTestConfig = {
       height: 1024,
     },
   },
-  projects: [
-    // {
-    //   name: "replay-firefox",
-    //   use: { ...(replayDevices["Replay Firefox"] as any) },
-    // },
-    // {
-    //   name: "firefox",
-    //   use: { ...devices["Desktop Firefox"] },
-    // },
-    {
-      name: "replay-chromium",
-      use: { ...(replayDevices["Replay Chromium"] as any) },
-    },
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chromium"] },
-    },
-  ],
+  projects: CI
+    ? [
+        // {
+        //   name: "replay-firefox",
+        //   use: { ...(replayDevices["Replay Firefox"] as any) },
+        // },
+        // {
+        //   name: "firefox",
+        //   use: { ...devices["Desktop Firefox"] },
+        // },
+        {
+          name: "replay-chromium",
+          use: { ...(replayDevices["Replay Chromium"] as any) },
+        },
+        {
+          name: "chromium",
+          use: { ...devices["Desktop Chromium"] },
+        },
+      ]
+    : [
+        {
+          name: "chromium",
+          use: { ...devices["Desktop Chromium"] },
+        },
+      ],
 };
 
 if (DEBUG) {
