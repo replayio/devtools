@@ -123,8 +123,9 @@ export function findConsoleMessage(
     ? `[data-test-message-type="${messageType}"]`
     : '[data-test-name="Message"]';
 
+  // Use single quotes because a couple messages have double quoted text displayed
   return expected
-    ? page.locator(`${attributeSelector}:has-text("${expected}")`)
+    ? page.locator(`${attributeSelector}:has-text('${expected}')`)
     : page.locator(`${attributeSelector}`);
 }
 

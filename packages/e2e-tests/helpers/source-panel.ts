@@ -337,21 +337,16 @@ export async function waitForSelectedSource(page: Page, url: string) {
     // 10 lines is no longer an empty string
     const codeMirrorLines = editorPanel.locator(".CodeMirror-code .CodeMirror-line");
 
+    const lineTexts = await mapLocators(codeMirrorLines, lineLocator => lineLocator.textContent());
     const numLines = await codeMirrorLines.count();
-    // Could be fewer than 10 lines visible, and I can't find a `.slice()` on `Locator`
-    const linesToGrab = Math.min(numLines, 10);
-
-    const lineTextPromises = Array.from({ length: linesToGrab }).map((_, i) => {
-      return codeMirrorLines.nth(i).textContent();
-    });
-    const lineTexts = await Promise.all(lineTextPromises);
 
     const combinedLineText = lineTexts
+      .slice(0, 10)
       .join()
       .trim()
       // Remove zero-width spaces, which would be considered non-empty
       .replace(/[\u200B-\u200D\uFEFF]/g, "");
 
-    expect(isTabActive && lineTexts.length > 0 && combinedLineText !== "").toBe(true);
+    expect(isTabActive && numLines > 0 && combinedLineText !== "").toBe(true);
   });
 }
