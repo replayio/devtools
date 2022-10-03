@@ -67,6 +67,7 @@ export default function ConsoleRoot({
             <button
               className={styles.MenuToggleButton}
               data-test-id="ConsoleMenuToggleButton"
+              data-test-state={isMenuOpen ? "open" : "closed"}
               onClick={() => {
                 setIsMenuOpen(!isMenuOpen);
                 setMenuValueHasBeenToggled(true);

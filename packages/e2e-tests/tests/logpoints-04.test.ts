@@ -6,6 +6,7 @@ import {
   findConsoleMessage,
   openConsolePanel,
   seekToConsoleMessage,
+  toggleSideFilters,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-information-panel";
 
@@ -16,6 +17,7 @@ test(`should display exceptions in the console`, async ({ page }) => {
   await openDevToolsTab(page);
 
   await openConsolePanel(page);
+  await toggleSideFilters(page, true);
 
   await page.locator('[data-test-id="FilterToggle-exceptions"]').click();
 
