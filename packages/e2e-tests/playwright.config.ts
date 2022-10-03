@@ -1,12 +1,11 @@
 import { PlaywrightTestConfig, devices } from "@playwright/test";
-import { devices as replayDevices } from "@replayio/playwright";
 
 const { DEBUG, SLOW_MO } = process.env;
 
 const config: PlaywrightTestConfig = {
   use: {
     headless: !DEBUG,
-    // browserName: "chromium",
+    browserName: "chromium",
     launchOptions: {
       slowMo: SLOW_MO ? parseInt(SLOW_MO, 10) : 0,
     },
@@ -15,24 +14,6 @@ const config: PlaywrightTestConfig = {
       height: 1024,
     },
   },
-  projects: [
-    {
-      name: "replay-firefox",
-      use: { ...replayDevices["Replay Firefox"] as any },
-    },
-    {
-      name: "replay-chromium",
-      use: { ...replayDevices["Replay Chromium"] as any },
-    },
-    {
-      name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
-    },
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chromium"] },
-    },
-  ],
 };
 
 if (DEBUG) {
