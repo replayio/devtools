@@ -1,17 +1,13 @@
-import test, { Page } from "@playwright/test";
+import test from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import {
-  resumeToLine,
-  rewindToLine,
-  reverseStepOverToLine,
-} from "../helpers/pause-information-panel";
+import { startTest } from "../helpers";
+import { reverseStepOverToLine } from "../helpers/pause-information-panel";
 import {
   openConsolePanel,
   warpToMessage,
   executeAndVerifyTerminalExpression,
 } from "../helpers/console-panel";
-import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
+import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 
 test("Basic node logpoints", async ({ page }) => {
@@ -26,7 +22,7 @@ test("Basic node logpoints", async ({ page }) => {
   await warpToMessage(page, "CALL 2");
 
   // TODO [FE-626] Autocompletion behavior is breaking terminal expressions right now
-  // await executeAndVerifyTerminalExpression(page, "i", 2);
+  await executeAndVerifyTerminalExpression(page, "i", 2);
 
   await reverseStepOverToLine(page, 3);
 });
