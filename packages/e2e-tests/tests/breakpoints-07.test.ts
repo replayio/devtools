@@ -15,7 +15,7 @@ import {
   verifyLogpointStep,
 } from "../helpers/source-panel";
 
-test(`Test TODO [FE-626] name this thing.`, async ({ page }) => {
+test(`rewind and seek using command bar and console messages`, async ({ page }) => {
   await startTest(page, "doc_navigate.html");
   await openDevToolsTab(page);
 
