@@ -49,6 +49,8 @@ export async function enableConsoleMessageType(
 }
 
 export async function focusConsoleTextArea(page: Page) {
+  await openConsolePanel(page);
+
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
 
   // Wait for the Console to stop loading
@@ -65,8 +67,6 @@ export async function focusConsoleTextArea(page: Page) {
 
 export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
   debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
-
-  await openConsolePanel(page);
 
   const textArea = await focusConsoleTextArea(page);
 
