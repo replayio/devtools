@@ -55,7 +55,10 @@ export default function SidePanel() {
   }
 
   return (
-    <div className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs">
+    <div
+      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
+      data-test-id="leftSidebar"
+    >
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
       {selectedPrimaryPanel === "debugger" && <SecondaryPanes />}
       {selectedPrimaryPanel === "comments" && <CommentCardsList />}

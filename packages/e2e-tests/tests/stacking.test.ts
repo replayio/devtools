@@ -5,8 +5,11 @@ import { Locator, expect, Page } from "@playwright/test";
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
-import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
-import { waitFor, mapLocators } from "../helpers/utils";
+import {
+  getBreakpointsAccordionPane,
+  openPauseInformationPanel,
+} from "../helpers/pause-information-panel";
+import { waitFor, mapLocators, delay } from "../helpers/utils";
 
 interface StackingTestCase {
   id: string;
@@ -187,7 +190,7 @@ async function verifySelectedElementUnderCursor(
     const rulesEntries = rulesContainer.locator(".ruleview-rule");
 
     const ruleSelectors = await mapLocators(rulesEntries, entryLocator =>
-      entryLocator.textContent()
+      entryLocator.locator(".ruleview-selectorcontainer").textContent()
     );
 
     expect(ruleSelectors, `Incorrect rules found for test case: ${testCase.id}`).toEqual(
@@ -203,7 +206,7 @@ test("Element highlighter selects the correct element when they overlap", async 
   await warpToMessage(page, "ExampleFinished");
 
   // Ensure that the left sidebar is collapsed
-  ensureSidePanelClosed(page);
+  await ensureSidePanelClosed(page);
 
   await openConsolePanel(page);
 
