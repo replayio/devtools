@@ -1,25 +1,8 @@
-import test, { Page, expect } from "@playwright/test";
+import test from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import {
-  resumeToLine,
-  rewindToLine,
-  reverseStepOverToLine,
-  waitForFrameTimeline,
-  waitForScopeValue,
-  expandAllScopesBlocks,
-  waitForPaused,
-} from "../helpers/pause-information-panel";
-import {
-  openConsolePanel,
-  warpToMessage,
-  executeTerminalExpression,
-  executeAndVerifyTerminalExpression,
-  enableConsoleMessageType,
-  verifyConsoleMessage,
-} from "../helpers/console-panel";
-import { openSource, openSourceExplorerPanel } from "../helpers/source-explorer-panel";
-import { addLogpoint } from "../helpers/source-panel";
+import { startTest } from "../helpers";
+import { waitForScopeValue, waitForPaused } from "../helpers/pause-information-panel";
+import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 
 test("Basic subprocess spawning", async ({ page }) => {
   await startTest(page, "node/spawn.js");
