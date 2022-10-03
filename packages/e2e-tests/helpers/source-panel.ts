@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { openDevToolsTab } from ".";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, waitFor } from "./utils";
+import { clearTextArea, debugPrint, delay, forEach, waitFor } from "./utils";
 
 export async function addBreakpoint(
   page: Page,
@@ -179,6 +179,23 @@ export async function removeAllBreakpoints(page: Page): Promise<void> {
     const count = await breakpoint.count();
     if (count > 0) {
       await breakpoint.click();
+    } else {
+      return;
+    }
+  }
+}
+
+export async function removeAllLogpoints(page: Page): Promise<void> {
+  debugPrint(`Removing all logpoints for the current source`, "removeAllLogpoints");
+
+  while (true) {
+    const panels = page.locator(".breakpoint-panel");
+    const count = await panels.count();
+    if (count > 0) {
+      const panel = panels.first();
+      await panel.hover();
+
+      await page.locator('[data-test-id="ToggleLogpointButton"]').click();
     } else {
       return;
     }

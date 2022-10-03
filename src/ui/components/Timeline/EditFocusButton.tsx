@@ -18,6 +18,8 @@ export const EditFocusButton = () => {
   return (
     <button
       className={showFocusModeControls ? styles.ToggleOn : styles.ToggleOff}
+      data-test-id="EditFocusButton"
+      data-test-state={showFocusModeControls ? "on" : "off"}
       onClick={onClick}
       title={showFocusModeControls ? "Discard current focus" : "Start focus edit mode"}
     >
