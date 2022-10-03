@@ -1,17 +1,11 @@
-import test, { Page, expect } from "@playwright/test";
+import test, { expect } from "@playwright/test";
 
-import { openDevToolsTab, startTest } from "../helpers";
-import {
-  resumeToLine,
-  rewindToLine,
-  reverseStepOverToLine,
-  waitForFrameTimeline,
-} from "../helpers/pause-information-panel";
+import { startTest } from "../helpers";
+import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-information-panel";
 import {
   openConsolePanel,
   warpToMessage,
   executeTerminalExpression,
-  executeAndVerifyTerminalExpression,
   enableConsoleMessageType,
   verifyConsoleMessage,
   toggleSideFilters,
