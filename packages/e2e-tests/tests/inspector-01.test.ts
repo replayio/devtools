@@ -16,10 +16,11 @@ import { addBreakpoint } from "../helpers/source-panel";
 test("Test that scopes are rerendered.", async ({ page }) => {
   await startTest(page, "doc_inspector_basic.html");
   await openDevToolsTab(page);
+
   await openConsolePanel(page);
   await warpToMessage(page, "ExampleFinished");
-  await activateInspectorTool(page);
 
+  await activateInspectorTool(page);
   let node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
   await toggleMarkupNode(node, true);

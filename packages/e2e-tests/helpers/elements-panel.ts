@@ -141,9 +141,20 @@ export function getElementsPanelSelection(page: Page): Locator {
   return selectedLine;
 }
 
-export function getElementsRowWithText(page: Page, text: string): Locator {
+export function getElementsRowWithText(
+  page: Page,
+  text: string,
+  isSelected: boolean = false
+): Locator {
+  debugPrint(
+    `Searching for Elements row containing "${chalk.bold(text)}"`,
+    "getElementsRowWithText"
+  );
+
   const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  return page.locator(`#markup-box .editor:has-text("${escapedText}")`);
+  return page.locator(
+    `#markup-box ${isSelected ? ".selected" : ""}[role="treeitem"]:has-text("${escapedText}")`
+  );
 }
 
 // This helper function uses the Elements inspector to click on a part of the preview Canvas.
@@ -221,6 +232,8 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
 }
 
 export async function toggleMarkupNode(locator: Locator, open: boolean): Promise<void> {
+  debugPrint(`Toggling element node ${chalk.bold(open ? "open" : "closed")}`, "toggleMarkupNode");
+
   const expander = locator.locator(".expander");
   await expander.waitFor();
 
@@ -231,7 +244,6 @@ export async function toggleMarkupNode(locator: Locator, open: boolean): Promise
 }
 
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
-  const escapedText = text.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-  const locator = page.locator(`#markup-box .selected > .editor:has-text("${escapedText}")`);
+  const locator = getElementsRowWithText(page, text, true);
   await locator.waitFor();
 }
