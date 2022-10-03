@@ -37,21 +37,20 @@ class ColumnBreakpoints extends Component<PropsFromRedux & CBProps> {
       return null;
     }
 
-    let breakpoints;
-    // TODO Is this a safe thing to do while rendering?
-    editor.codeMirror.operation(() => {
-      breakpoints = columnBreakpoints.map((breakpoint, i) => (
-        <ColumnBreakpoint
-          cx={cx}
-          key={getLocationKey(breakpoint.location)}
-          columnBreakpoint={breakpoint}
-          editor={editor}
-          source={selectedSource}
-          insertAt={i}
-        />
-      ));
-    });
-    return <div>{breakpoints}</div>;
+    return (
+      <div>
+        {columnBreakpoints.map((breakpoint, index) => (
+          <ColumnBreakpoint
+            cx={cx}
+            key={getLocationKey(breakpoint.location)}
+            columnBreakpoint={breakpoint}
+            editor={editor}
+            source={selectedSource}
+            insertAt={index}
+          />
+        ))}
+      </div>
+    );
   }
 }
 
