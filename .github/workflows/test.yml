@@ -71,6 +71,7 @@ jobs:
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+          upload-all: true
           project: replay-chromium
         env:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}

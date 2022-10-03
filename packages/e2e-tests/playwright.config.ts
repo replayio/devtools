@@ -13,9 +13,14 @@ const config: PlaywrightTestConfig = {
       width: 1280,
       height: 1024,
     },
+    // Don't allow any one action to take more than 10s
+    actionTimeout: 15000,
   },
+  // Give individual tests up to 60s to complete instead of default 30s
+  timeout: 60000,
+
   // Limit the number of workers on CI, use default locally
-  workers: CI ? 2 : undefined,
+  workers: CI ? 4 : undefined,
   projects: CI
     ? [
         // {
