@@ -5,11 +5,13 @@ import styles from "./EditableTimeInput.module.css";
 
 export default function EditableTimeInputWrapper({
   className,
+  dataTestId,
   defaultValue,
   size,
   validateAndSave,
 }: {
   className?: string;
+  dataTestId?: string;
   defaultValue: string;
   size: number;
   validateAndSave: (formatted: string) => void;
@@ -40,6 +42,7 @@ export default function EditableTimeInputWrapper({
       key={`${defaultValue}-${key}`}
       autoFocus={autoFocusOnMountRef.current}
       className={className}
+      dataTestId={dataTestId}
       defaultValue={defaultValue}
       size={size}
       validateAndSave={validateAndSaveWrapper}
@@ -50,12 +53,14 @@ export default function EditableTimeInputWrapper({
 function EditableTimeInput({
   autoFocus,
   className,
+  dataTestId,
   defaultValue,
   size,
   validateAndSave,
 }: {
   autoFocus: boolean;
   className?: string;
+  dataTestId?: string;
   defaultValue: string;
   size: number;
   validateAndSave: (formatted: string, shouldRefocus: boolean) => void;
@@ -94,6 +99,7 @@ function EditableTimeInput({
     <input
       autoFocus={autoFocus}
       className={`${className} ${styles.Input}`}
+      data-test-id={dataTestId}
       onBlur={onBlur}
       onChange={onChange}
       onKeyDown={onKeyDown}
