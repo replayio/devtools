@@ -16,6 +16,8 @@ const categoryNames = {
 type CategoryKey = keyof typeof categoryNames;
 
 export async function addEventListenerLogpoints(page: Page, eventTypes: string[]): Promise<void> {
+  await toggleSideFilters(page, true);
+
   for (let eventType of eventTypes) {
     const [, categoryKey, eventName] = eventType.split(".");
 
@@ -95,6 +97,8 @@ export async function expandFilterCategory(page: Page, categoryName: string) {
     "expandFilterCategory"
   );
 
+  await toggleSideFilters(page, true);
+
   const consoleFilters = page.locator('[data-test-id="ConsoleFilterToggles"]');
 
   const categoryLabel = consoleFilters.locator(`[data-test-name="Expandable"]`, {
@@ -167,6 +171,20 @@ export async function seekToConsoleMessage(
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
 
   await waitForPaused(page, line);
+}
+
+export async function toggleSideFilters(page: Page, open: boolean): Promise<void> {
+  const button = page.locator('[data-test-id="ConsoleMenuToggleButton"]');
+  const state = await button.getAttribute("data-test-state");
+  const isOpen = state === "open";
+  if (isOpen !== open) {
+    debugPrint(
+      `${chalk.bold(open ? "Opening" : "Closing")} the side filters panel`,
+      "toggleSideFilters"
+    );
+
+    await button.click();
+  }
 }
 
 export async function verifyConsoleMessage(
