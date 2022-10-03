@@ -28,7 +28,7 @@ import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 export default function ConsoleRoot({
   nagHeader = null,
   showSearchInputByDefault = true,
-  showFiltersByDefault = false,
+  showFiltersByDefault = true,
   terminalInput = null,
 }: {
   filterDrawerOpenDefault?: boolean;
