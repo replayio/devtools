@@ -12,6 +12,7 @@ import {
   AnalysisEntry,
   PointDescription,
 } from "@replayio/protocol";
+import { commandError } from "shared/utils/error";
 
 import { makeInfallible } from "./utils";
 
@@ -204,10 +205,7 @@ export async function sendMessage<M extends CommandMethods>(
 
     console.warn("Message failed", method, { code, id, message }, data);
 
-    const err = new Error(message) as any;
-    err.name = "CommandError";
-    err.code = code;
-    throw err;
+    throw commandError(message, code);
   }
 
   return response.result as any;

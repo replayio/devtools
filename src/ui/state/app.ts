@@ -139,7 +139,3 @@ export interface Canvas {
   top: number;
   width: number;
 }
-
-export enum ProtocolError {
-  TooManyPoints = 55,
-}

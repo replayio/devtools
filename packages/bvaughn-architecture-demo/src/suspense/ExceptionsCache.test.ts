@@ -1,5 +1,6 @@
 import { TimeStampedPoint, TimeStampedPointRange } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
+import { CommandError } from "shared/utils/error";
 
 import { createMockReplayClient } from "../utils/testing";
 
@@ -7,8 +8,9 @@ import { Status, UncaughtException } from "./ExceptionsCache";
 
 describe("ExceptionsCache", () => {
   function createCE() {
-    const error = new Error("There are too many points to complete this operation");
+    const error = new Error("There are too many points to complete this operation") as CommandError;
     error.name = "CommandError";
+    error.code = 55;
     return error;
   }
 

@@ -40,7 +40,7 @@ import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
-import { isTooManyPointsError } from "shared/utils/error";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import {
   ColumnHits,
@@ -380,7 +380,7 @@ export class ReplayClient implements ReplayClientInterface {
           }
         );
       } catch (error) {
-        if (isTooManyPointsError(error)) {
+        if (isCommandError(error, ProtocolError.TooManyPoints)) {
           status = "too-many-points-to-find";
         } else {
           console.error(error);
@@ -413,7 +413,7 @@ export class ReplayClient implements ReplayClientInterface {
           }
         );
       } catch (error) {
-        if (isTooManyPointsError(error)) {
+        if (isCommandError(error, ProtocolError.TooManyPoints)) {
           status = "too-many-points-to-find";
         } else {
           console.error(error);

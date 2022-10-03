@@ -1,6 +1,7 @@
-import { isTooManyPointsError } from "@bvaughn/../shared/utils/error";
 import { TimeStampedPointRange } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
+import { ProtocolError } from "shared/utils/error";
+import { isCommandError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isRangeEqual, isRangeSubset } from "../utils/time";
@@ -142,7 +143,7 @@ async function fetchExceptions(client: ReplayClientInterface) {
     // React doesn't use the resolved value.
     wakeable.resolve(null as any);
   } catch (error) {
-    if (isTooManyPointsError(error) && wakeable === inFlightWakeable) {
+    if (isCommandError(error, ProtocolError.TooManyPoints) && wakeable === inFlightWakeable) {
       lastFetchDidFailTooManyPoints = true;
       lastFetchedExceptions = EMPTY_ARRAY;
       lastFetchedFocusRange = inFlightFocusRange;
