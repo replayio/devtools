@@ -119,24 +119,25 @@ const testCases: StackingTestCase[] = [
   //   expectedRules: [".box1"],
   // },
 
+  // TODO [FE-626]:
   // unpositioned children of elements with overflow will be clipped
-  {
-    id: "r3c1",
-    position: { x: 140, y: 340 },
-    expectedRules: ["element", "body > div"],
-  },
+  // {
+  //   id: "r3c1",
+  //   position: { x: 140, y: 340 },
+  //   expectedRules: ["element", "body > div"],
+  // },
   // absolutely positioned elements are _not_ clipped by their unpositioned parent
-  {
-    id: "r3c2",
-    position: { x: 240, y: 340 },
-    expectedRules: [".box1"],
-  },
+  // {
+  //   id: "r3c2",
+  //   position: { x: 240, y: 340 },
+  //   expectedRules: [".box1"],
+  // },
   // absolutely positioned elements _are_ clipped by their relatively positioned parent
-  {
-    id: "r3c3",
-    position: { x: 340, y: 340 },
-    expectedRules: ["element", "body > div"],
-  },
+  // {
+  //   id: "r3c3",
+  //   position: { x: 340, y: 340 },
+  //   expectedRules: ["element", "body > div"],
+  // },
 ];
 
 async function ensureSidePanelClosed(page: Page) {
