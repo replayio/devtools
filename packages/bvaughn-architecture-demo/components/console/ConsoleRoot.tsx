@@ -27,14 +27,14 @@ import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
   nagHeader = null,
+  showFiltersByDefault = true,
   showSearchInputByDefault = true,
-  showFiltersByDefault = false,
   terminalInput = null,
 }: {
   filterDrawerOpenDefault?: boolean;
   nagHeader?: ReactNode;
-  showSearchInputByDefault?: boolean;
   showFiltersByDefault?: boolean;
+  showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =

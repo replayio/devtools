@@ -91,8 +91,8 @@ export default function NewConsoleRoot() {
               <PointsContextReduxAdapter>
                 <ConsoleRoot
                   nagHeader={<ConsoleNag />}
-                  showSearchInputByDefault={false}
                   showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
+                  showSearchInputByDefault={false}
                   terminalInput={<JSTermWrapper />}
                 />
               </PointsContextReduxAdapter>
