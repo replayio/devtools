@@ -120,7 +120,6 @@ export function NodePicker() {
   return (
     <button
       id="command-button-pick"
-      data-test-id="NodePicker"
       className={classnames("devtools-button toolbar-panel-button tab", {
         active: globalNodePickerActive,
       })}
