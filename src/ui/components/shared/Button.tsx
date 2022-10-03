@@ -81,12 +81,13 @@ export const Button = forwardRef<
     size: ButtonSizes;
     style: ButtonStyles;
   }
->(({ size, children, style, color, className, onClick = () => {}, type }, ref) => {
+>(({ size, children, dataTestId, style, color, className, onClick = () => {}, type }, ref) => {
   const buttonClasses = getButtonClasses(color, style, size);
 
   return (
     <button
       onClick={onClick}
+      data-test-id={dataTestId}
       disabled={style === "disabled"}
       className={classNames(buttonClasses, className)}
       ref={ref}
@@ -101,6 +102,7 @@ Button.displayName = "Button";
 interface ButtonProps {
   children?: React.ReactNode;
   className?: string;
+  dataTestId?: string;
   onClick?: () => void;
   type?: "button" | "submit";
 }

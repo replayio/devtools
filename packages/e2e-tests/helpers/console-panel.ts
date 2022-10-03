@@ -172,7 +172,8 @@ export async function seekToConsoleMessage(
 export async function verifyConsoleMessage(
   page: Page,
   expected: Expected,
-  messageType?: MessageType
+  messageType?: MessageType,
+  expectedCount?: number
 ) {
   debugPrint(
     `Verifying the presence of a console message${
@@ -181,8 +182,21 @@ export async function verifyConsoleMessage(
     "verifyConsoleMessage"
   );
 
-  const message = findConsoleMessage(page, expected, messageType).first();
-  await message.waitFor();
+  const messages = findConsoleMessage(page, expected, messageType);
+
+  if (expectedCount != null) {
+    // Verify a specific number of messages
+    await waitFor(async () => {
+      const count = await messages.count();
+      if (count !== expectedCount) {
+        throw `Expected ${expectedCount} messages, but found ${count}`;
+      }
+    });
+  } else {
+    // Or just verify that there was at least one
+    const message = messages.first();
+    await message.waitFor();
+  }
 }
 
 // This function considers any message with the current pause line above it as satisfying the "paused at" condition.
@@ -191,7 +205,7 @@ export async function verifyPausedAtMessage(
   page: Page,
   expected: Expected,
   messageType?: MessageType
-) {
+): Promise<void> {
   debugPrint(
     `Verifying currently paused at console message${
       messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
@@ -232,6 +246,39 @@ export async function verifyPausedAtMessage(
       throw `Not paused at console message${
         messageType ? ` of type "${messageType}" ` : " "
       }with text "${expected}"`;
+    }
+  });
+}
+
+export async function verifyTrimmedConsoleMessages(
+  page: Page,
+  options: {
+    expectedAfter: number;
+    expectedBefore: number;
+  }
+): Promise<void> {
+  const { expectedAfter, expectedBefore } = options;
+
+  const beforeString =
+    expectedBefore === 1 ? "1 message" : `${expectedBefore === 0 ? "no" : expectedBefore} messages`;
+  const afterString =
+    expectedAfter === 1 ? "1 message" : `${expectedAfter === 0 ? "no" : expectedAfter} messages`;
+
+  debugPrint(
+    `Verifying console has trimmed ${beforeString} before and ${afterString} after`,
+    "verifyTrimmedConsoleMessages"
+  );
+
+  await waitFor(async () => {
+    const actualBefore = await page
+      .locator('[data-test-id="MessagesList-TrimmedBeforeCount"]')
+      .textContent();
+    const actualAfter = await page
+      .locator('[data-test-id="MessagesList-TrimmedAfterCount"]')
+      .textContent();
+
+    if (actualBefore !== expectedBefore.toString() || actualAfter !== expectedAfter.toString()) {
+      throw `Expected ${expectedBefore} before and ${expectedAfter} after, but found ${actualBefore} before and ${actualAfter} after`;
     }
   });
 }
