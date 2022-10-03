@@ -8,6 +8,8 @@
   },
   "scripts": {
     "test": "playwright test",
+    "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
+    "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
     "test:debug": "DEBUG=1 playwright test",
     "test:install": "playwright install",
     "ts-node": "ts-node --project ../../tsconfig.json"
@@ -16,7 +18,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.25.1",
-    "@replayio/playwright": "^0.2.24",
+    "@replayio/playwright": "0.2.27",
     "playwright": "^1.25.1",
     "ts-node": "^10.7.0"
   },
