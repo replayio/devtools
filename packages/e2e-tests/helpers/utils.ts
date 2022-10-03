@@ -51,6 +51,18 @@ export async function forEach(
   }
 }
 
+export async function mapLocators<T>(
+  locatorList: Locator,
+  callback: (singleLocator: Locator, index: number) => Promise<T>
+) {
+  const count = await locatorList.count();
+  return Promise.all(
+    Array.from({ length: count }).map((_, i) => {
+      return callback(locatorList.nth(i), i);
+    })
+  );
+}
+
 export async function toggleExpandable(
   page: Page,
   options: {

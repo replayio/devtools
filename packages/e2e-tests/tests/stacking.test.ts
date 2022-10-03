@@ -6,7 +6,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
-import { waitFor } from "../helpers/utils";
+import { waitFor, mapLocators } from "../helpers/utils";
 
 interface StackingTestCase {
   id: string;
@@ -185,15 +185,10 @@ async function verifySelectedElementUnderCursor(
   // and parse out the name of each rule.
   await waitFor(async () => {
     const rulesEntries = rulesContainer.locator(".ruleview-rule");
-    const numEntries = await rulesEntries.count();
 
-    // Why does `Locator` not have a `.map()` function built in?
-    const ruleSelectorPromises = Array.from({ length: numEntries }).map((_, i) => {
-      // Dig the selector text like ".box2" out of the rule list item
-      return rulesEntries.nth(i).locator(".ruleview-selectorcontainer").textContent();
-    });
-
-    const ruleSelectors = await Promise.all(ruleSelectorPromises);
+    const ruleSelectors = await mapLocators(rulesEntries, entryLocator =>
+      entryLocator.textContent()
+    );
 
     expect(ruleSelectors, `Incorrect rules found for test case: ${testCase.id}`).toEqual(
       testCase.expectedRules

@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { openDevToolsTab } from ".";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, delay, forEach, waitFor } from "./utils";
+import { clearTextArea, debugPrint, delay, forEach, waitFor, mapLocators } from "./utils";
 
 export async function addBreakpoint(
   page: Page,
@@ -44,14 +44,14 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
       break;
     } else {
       if (loopCounter > 10) {
-        throw new Error("Stuck in infinite scrolling loop looking for  line: " + lineNumber);
+        throw new Error("Stuck in infinite scrolling loop looking for line: " + lineNumber);
       }
     }
     // it must not be on screen, we have to scroll
     const [first] = visibleLineNumbers;
 
     const scrollUp = lineNumber < first;
-    const deltaY = scrollUp ? -1000 : 1000;
+    const deltaY = scrollUp ? -500 : 500;
     const scroller = page.locator(".CodeMirror-scroll").first();
     await scroller.click();
     await page.mouse.wheel(0, deltaY);
@@ -61,18 +61,31 @@ async function scrollUntilLineIsVisible(page: Page, lineNumber: number) {
 
 async function getVisibleLineNumbers(page: Page) {
   const lineNumberElements = page.locator(".CodeMirror-linenumber");
-  const numElements = await lineNumberElements.count();
 
-  const textContents = await lineNumberElements.allTextContents();
-  const allLineNumbers = textContents.map(s => Number(s));
+  // Start by finding all line number elements within the CodeMirror editor.
+  // For each element, retrieve its full bounding rect, and actual line number value.
+  const lineNumbersWithBounds = await lineNumberElements.evaluateAll(elements => {
+    const linesWithNumbers = elements.map(
+      el => [Number(el.textContent), el.getBoundingClientRect()] as const
+    );
+    return linesWithNumbers.sort((a, b) => {
+      // Sort lines in ascending numerical order
+      return a[0] - b[0];
+    });
+  });
 
-  const isLine1Visible = allLineNumbers.includes(1);
-  const firstSliceIndex = isLine1Visible ? 0 : 9;
-  // CodeMirror normally has a 10-line buffer on either side of the viewport.
-  // Limit to just what's actually on screen
-  const lineNumbers = allLineNumbers.slice(firstSliceIndex, allLineNumbers.length - 10);
+  const codeMirrorElement = page.locator(".CodeMirror").first();
+  const codeMirrorBounds = await codeMirrorElement.evaluate(e => e.getBoundingClientRect());
 
-  return lineNumbers;
+  // If there's more lines than will fit on screen, CodeMirror will keep a buffer of up to
+  // 10 lines above or below the viewport. Filter it down to just lines that are visible.
+  const visibleLines = lineNumbersWithBounds
+    .filter(([lineNumber, lineBounds]) => {
+      return lineBounds.bottom > codeMirrorBounds.top && lineBounds.top < codeMirrorBounds.bottom;
+    })
+    .map(([lineNumber]) => lineNumber);
+
+  return visibleLines;
 }
 
 export async function addLogpoint(
@@ -324,21 +337,16 @@ export async function waitForSelectedSource(page: Page, url: string) {
     // 10 lines is no longer an empty string
     const codeMirrorLines = editorPanel.locator(".CodeMirror-code .CodeMirror-line");
 
+    const lineTexts = await mapLocators(codeMirrorLines, lineLocator => lineLocator.textContent());
     const numLines = await codeMirrorLines.count();
-    // Could be fewer than 10 lines visible, and I can't find a `.slice()` on `Locator`
-    const linesToGrab = Math.min(numLines, 10);
-
-    const lineTextPromises = Array.from({ length: linesToGrab }).map((_, i) => {
-      return codeMirrorLines.nth(i).textContent();
-    });
-    const lineTexts = await Promise.all(lineTextPromises);
 
     const combinedLineText = lineTexts
+      .slice(0, 10)
       .join()
       .trim()
       // Remove zero-width spaces, which would be considered non-empty
       .replace(/[\u200B-\u200D\uFEFF]/g, "");
 
-    expect(isTabActive && lineTexts.length > 0 && combinedLineText !== "").toBe(true);
+    expect(isTabActive && numLines > 0 && combinedLineText !== "").toBe(true);
   });
 }
