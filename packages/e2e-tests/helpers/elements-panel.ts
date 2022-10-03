@@ -220,14 +220,14 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
   await input.press("Enter");
 }
 
-// TODO [FE-626] Make the intent of this function clearer: should it toggle open or closed?
-export async function toggleMarkupNode(locator: Locator): Promise<void> {
-  await locator.evaluate(node => {
-    const expander = node.parentElement?.querySelector(".expander");
-    if (expander) {
-      (expander as HTMLElement).click();
-    }
-  });
+export async function toggleMarkupNode(locator: Locator, open: boolean): Promise<void> {
+  const expander = locator.locator(".expander");
+  await expander.waitFor();
+
+  const isOpen = await expander.evaluate(node => node?.classList.contains("open"));
+  if (isOpen !== open) {
+    await expander.click();
+  }
 }
 
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {

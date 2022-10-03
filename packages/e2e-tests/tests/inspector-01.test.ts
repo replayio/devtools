@@ -22,7 +22,7 @@ test("Test that scopes are rerendered.", async ({ page }) => {
 
   let node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
-  await toggleMarkupNode(node);
+  await toggleMarkupNode(node, true);
   await getElementsRowWithText(page, "GOODBYE").waitFor();
 
   await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
@@ -30,7 +30,7 @@ test("Test that scopes are rerendered.", async ({ page }) => {
 
   node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
-  await toggleMarkupNode(node);
+  await toggleMarkupNode(node, true);
   await getElementsRowWithText(page, "HELLO").waitFor();
 
   await searchElementsPanel(page, "STUFF");
