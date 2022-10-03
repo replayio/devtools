@@ -50,7 +50,7 @@ jobs:
       testRunId: ${{ steps.uuid.outputs.result }}
   e2etest:
     name: End-to-end tests (${{ matrix.shard }})
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     needs: [preview-branch, generate-test-run-id]
     timeout-minutes: 20
     steps:
@@ -58,11 +58,14 @@ jobs:
       - run: yarn
         env:
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+      - name: Install Replay Playwright
+        run: npx @replayio/playwright install
       - uses: replayio/action-playwright@main
         with:
           working-directory: ./packages/e2e-tests
           api-key: ${{ env.RECORD_REPLAY_API_KEY }}
           public: true
+          project: replay-chromium
         env:
           RECORD_REPLAY_METADATA_TEST_RUN_ID: ${{ needs.generate-test-run-id.outputs.testRunId }}
           PLAYWRIGHT_TEST_BASE_URL: ${{ needs.preview-branch.outputs.url }}
