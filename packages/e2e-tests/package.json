@@ -18,6 +18,7 @@
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.25.1",
+    "@recordreplay/playwright": "^1.18.3",
     "@replayio/playwright": "0.2.27",
     "playwright": "^1.25.1",
     "ts-node": "^10.7.0"

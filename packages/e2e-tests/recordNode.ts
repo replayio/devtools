@@ -1,8 +1,8 @@
 import { execSync, spawnSync } from "child_process";
 import fs from "fs";
+import { tmpdir } from "os";
 
 import config from "./config";
-import { tmpFile } from "./utils";
 
 function getRecordingId(file: string) {
   try {
@@ -29,7 +29,7 @@ export async function recordNodeExample(scriptPath: string) {
     return;
   }
 
-  const recordingIdFile = tmpFile();
+  const recordingIdFile = tmpdir() + "/" + ((Math.random() * 1e9) | 0);
 
   spawnSync(nodePath, [scriptPath], {
     env: {

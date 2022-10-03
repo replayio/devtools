@@ -8,8 +8,8 @@ import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import axios from "axios";
 
-import { recordNodeExample } from "../../test/e2e/recordNode";
-import config from "../../test/e2e/config";
+import { recordNodeExample } from "./recordNode";
+import config from "./config";
 
 const playwright = require("@recordreplay/playwright");
 import { uploadRecording, listAllRecordings } from "@replayio/replay";
