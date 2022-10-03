@@ -339,7 +339,9 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
 
 export async function waitForScopeValue(page: Page, name: string, expectedValue: Expected) {
   debugPrint(
-    `Waiting for scope "${chalk.bold(name)}" to have value "${chalk.bold(expectedValue)}"`,
+    `Waiting for scope with variable "${chalk.bold(name)}" to have value "${chalk.bold(
+      expectedValue
+    )}"`,
     "waitForScopeValue"
   );
 

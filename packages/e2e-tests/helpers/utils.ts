@@ -5,8 +5,11 @@ import chalk from "chalk";
 export async function clearTextArea(page: Page, textArea: Locator) {
   debugPrint(`Clearing content from textarea`, "clearTextArea");
 
+  const macOS = process.platform === "darwin";
+  const selectAllCommand = macOS ? "Meta+A" : "Control+A";
+
   await textArea.focus();
-  await page.keyboard.press("Meta+A");
+  await page.keyboard.press(selectAllCommand);
   await page.keyboard.press("Backspace");
 }
 
