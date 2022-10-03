@@ -4,6 +4,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import {
   enableConsoleMessageType,
   openConsolePanel,
+  toggleSideFilters,
   verifyConsoleMessage,
 } from "../helpers/console-panel";
 
@@ -14,6 +15,7 @@ test("Test that errors and warnings from various sources are shown in the consol
   await openDevToolsTab(page);
   await openConsolePanel(page);
 
+  await toggleSideFilters(page, true);
   await enableConsoleMessageType(page, "exceptions");
   await enableConsoleMessageType(page, "warnings");
 
