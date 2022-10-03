@@ -12,11 +12,7 @@ test("element highlighter works everywhere", async ({ page }) => {
 
   await selectNodePicker(page);
 
-  await page.waitForSelector(`[data-value="myiframe"]`);
-
-  const markupNode = await page.locator(`[data-value="myiframe"]`);
-
-  await markupNode.click();
+  await selectElementsRowWithText(page, "myiframe");
 
   const highlighter = page.locator("#box-model-content");
 
