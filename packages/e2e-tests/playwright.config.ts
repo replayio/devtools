@@ -14,6 +14,8 @@ const config: PlaywrightTestConfig = {
       height: 1024,
     },
   },
+  // Limit the number of workers on CI, use default locally
+  workers: CI ? 2 : undefined,
   projects: CI
     ? [
         // {
