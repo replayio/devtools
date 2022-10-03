@@ -136,7 +136,7 @@ export function LoggablesContextRoot({
     const pointInstances: PointInstance[] = [];
 
     points.forEach(point => {
-      if (point.enableLogging) {
+      if (point.shouldLog) {
         const [hitPoints, status] = getHitPointsForLocation(
           client,
           point.location,

@@ -20,7 +20,7 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
-// Renders PointInstances with enableLogging=true.
+// Renders PointInstances with shouldLog=true.
 function LogPointRenderer({
   index,
   isFocused,

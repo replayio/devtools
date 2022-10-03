@@ -50,7 +50,7 @@ export default function PointPanel({ className, point }: { className: string; po
         <input
           className={styles.Input}
           data-test-id={`PointPanelInput-${point.location.line}-content`}
-          disabled={!point.enableLogging}
+          disabled={!point.shouldLog}
           onChange={event => setEditableContent(event.currentTarget.value)}
           onKeyDown={onKeyDown}
           placeholder="Content..."
@@ -58,16 +58,16 @@ export default function PointPanel({ className, point }: { className: string; po
         />
         <label className={styles.Label}>
           <input
-            checked={point.enableBreaking}
-            onChange={event => editPoint(point.id, { enableBreaking: event.currentTarget.checked })}
+            checked={point.shouldBreak}
+            onChange={event => editPoint(point.id, { shouldBreak: event.currentTarget.checked })}
             type="checkbox"
           />
           break?
         </label>
         <label className={styles.Label}>
           <input
-            checked={point.enableLogging}
-            onChange={event => editPoint(point.id, { enableLogging: event.currentTarget.checked })}
+            checked={point.shouldLog}
+            onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
             type="checkbox"
           />
           log?
