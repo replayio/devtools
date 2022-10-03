@@ -1,50 +1,43 @@
-// Test region unloading/loading by checking output of logpoints.
-Test.describe(
-  `Unloading a region should suppress logpoint results.`,
-  async () => {
-    const { assert } = Test;
+import test from "@playwright/test";
 
-    const loadedRegions = app.selectors.getLoadedRegions();
-    // Unload all but the last second of the recording.
-    const unloadTimerange = [0, (loadedRegions.loaded[0].end.time) - 1000];
-    const totalMessageCount = 50;
+import { openDevToolsTab, startTest } from "../helpers";
+import {
+  openConsolePanel,
+  verifyConsoleMessage,
+  verifyTrimmedConsoleMessages,
+} from "../helpers/console-panel";
+import { openSource } from "../helpers/source-explorer-panel";
+import { addLogpoint } from "../helpers/source-panel";
+import { clearFocusRange, setFocusRange } from "../helpers/timeline";
 
-    await Test.selectSource("doc_rr_region_loading.html");
-    await Test.addBreakpoint("doc_rr_region_loading.html", 20, undefined, {
-      logValue: `"Part1Logpoint Number " + number`,
-    });
+const url = "doc_rr_region_loading.html";
 
-    await Test.selectConsole();
-    let messages = await Test.waitForMessageCount("Part1Logpoint", totalMessageCount, 2);
-    assert(!Test.findMessages("Loading").length, "No loading messages should be left.");
-    assert(messages.length == totalMessageCount, "Should have gotten all expected logpoing messages.");
-    await Test.removeAllBreakpoints();
+test("should filter messages as regions based on the active focus mode", async ({ page }) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
 
-    // Unload a region of the recording 1 second in, 2 seconds in duration.
-    await Test.unloadRegion(...unloadTimerange);
+  await openSource(page, url);
+  await addLogpoint(page, {
+    content: `"Log point", number`,
+    lineNumber: 20,
+    url,
+  });
 
-    await Test.addBreakpoint("doc_rr_region_loading.html", 20, undefined, {
-      logValue: `"Part2Logpoint Number " + number`,
-    });
+  await openConsolePanel(page);
 
-    // Wait until we see "Loading…" messages.
-    await Test.waitUntil(() => Test.findMessages("Loading").length > 0);
+  // Verify initially that all 50 messages are present
+  await verifyConsoleMessage(page, "Log point", "log-point", 50);
 
-    // Then wait until they all go away.
-    await Test.waitUntil(() => Test.findMessages("Loading").length === 0);
+  // Set focus region (to force-unload part of the recording)
+  await setFocusRange(page, { startTimeString: "0:04", endTimeString: "0:05" });
 
-    // Then count the number of "Part2Logpoint" messages.
-    messages = Test.findMessages("Part2Logpoint");
-    assert(messages.length >= 1, "Should have gotten at least one logpoint message.");
-    assert(messages.length < totalMessageCount, "Should have lost at least one logpoint message.");
-    await Test.removeAllBreakpoints();
+  // Verify fewer messages
+  await verifyConsoleMessage(page, "Log point", "log-point", 11);
+  await verifyTrimmedConsoleMessages(page, { expectedBefore: 1, expectedAfter: 1 });
 
-    // Reload the unloaded region.
-    await Test.loadRegion(...unloadTimerange);
+  // Clear focus region
+  await clearFocusRange(page);
 
-    await Test.addBreakpoint("doc_rr_region_loading.html", 20, undefined, {
-      logValue: `"Part3Logpoint Number " + number`,
-    });
-    messages = await Test.waitForMessageCount("Part3Logpoint", totalMessageCount, 2);
-  }
-);
+  // Verify 50 messages again
+  await verifyConsoleMessage(page, "Log point", "log-point", 50);
+});

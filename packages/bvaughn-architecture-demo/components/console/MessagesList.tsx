@@ -165,7 +165,8 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       )}
       {countBefore > 0 && (
         <div className={styles.CountRow}>
-          {countBefore} messages filtered before the focus range
+          <span data-test-id="MessagesList-TrimmedBeforeCount">{countBefore}</span> messages
+          filtered before the focus range
         </div>
       )}
       <div
@@ -177,7 +178,10 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
         {listItems}
       </div>
       {countAfter > 0 && (
-        <div className={styles.CountRow}>{countAfter} messages filtered after the focus range</div>
+        <div className={styles.CountRow}>
+          <span data-test-id="MessagesList-TrimmedAfterCount">{countAfter}</span> messages filtered
+          after the focus range
+        </div>
       )}
     </>
   );

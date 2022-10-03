@@ -78,12 +78,14 @@ export default function FocusInputs() {
       <div className={styles.Container}>
         <EditableTimeInput
           className="text-right"
+          dataTestId="FocusStartTimeInput"
           defaultValue={formattedBeginTime}
           size={inputSize}
           validateAndSave={validateAndSaveBeginTime}
         />
         <span>/</span>
         <EditableTimeInput
+          dataTestId="FocusEndTimeInput"
           defaultValue={formattedEndTime}
           size={inputSize}
           validateAndSave={validateAndSaveEndTime}
