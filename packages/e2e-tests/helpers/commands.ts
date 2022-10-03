@@ -1,11 +1,11 @@
 import { Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { debugPrint } from "./utils";
+import { debugPrint, getCommandKey } from "./utils";
 
 export async function quickOpen(page: Page, url: string): Promise<void> {
   debugPrint("Opening quick-open dialog", "quickOpen");
-  await page.keyboard.press("Meta+P");
+  await page.keyboard.press(`${getCommandKey()}+P`);
   await page.focus('[data-test-id="QuickOpenInput"]');
 
   debugPrint(`Filtering files by "${chalk.bold(url)}"`, "quickOpen");

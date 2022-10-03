@@ -1,12 +1,16 @@
 import { Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
+export function getCommandKey() {
+  const macOS = process.platform === "darwin";
+  return macOS ? "Meta" : "Control";
+}
+
 // Playwright doesn't provide a good way to do this (yet).
 export async function clearTextArea(page: Page, textArea: Locator) {
   debugPrint(`Clearing content from textarea`, "clearTextArea");
 
-  const macOS = process.platform === "darwin";
-  const selectAllCommand = macOS ? "Meta+A" : "Control+A";
+  const selectAllCommand = `${getCommandKey()}+A`;
 
   await textArea.focus();
   await page.keyboard.press(selectAllCommand);
