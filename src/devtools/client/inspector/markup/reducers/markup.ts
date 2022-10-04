@@ -121,11 +121,15 @@ const markupSlice = createSlice({
       state.selectedNode = null;
       state.scrollIntoViewNode = null;
     },
-    childrenAdded(state, action: PayloadAction<{ parentNodeId: string; children: NodeInfo[] }>) {
-      const { parentNodeId, children } = action.payload;
+    childrenAdded(state, action: PayloadAction<{ parent: NodeInfo; children: NodeInfo[] }>) {
+      const { parent, children } = action.payload;
 
       nodeAdapter.addMany(state.tree, children);
-      const parentNodeInfo = state.tree.entities[parentNodeId]!;
+      if (!state.tree.entities[parent.id]) {
+        // If by chance the parent doesn't exist yet, add it
+        nodeAdapter.upsertOne(state.tree, parent);
+      }
+      let parentNodeInfo = state.tree.entities[parent.id]!;
       parentNodeInfo.children = children.map(child => child.id);
     },
     updateNodeExpanded(state, action: PayloadAction<{ nodeId: string; isExpanded: boolean }>) {

@@ -222,6 +222,15 @@ export function addChildren(
 
     const originalPauseId = getPauseId(getState());
 
+    // Always ensure we have a parent
+    const parent = await convertNode(
+      parentNodeId,
+      replayClient,
+      protocolClient,
+      ThreadFront.sessionId!,
+      originalPauseId!
+    );
+
     const children = await Promise.all(
       childrenToAdd.map(node =>
         convertNode(
@@ -239,7 +248,7 @@ export function addChildren(
       return;
     }
 
-    dispatch(childrenAdded({ parentNodeId, children }));
+    dispatch(childrenAdded({ parent, children }));
   };
 }
 
