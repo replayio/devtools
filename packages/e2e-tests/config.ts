@@ -4,6 +4,7 @@ import { BrowserName } from "./recordPlaywright";
 
 export default {
   backendUrl: process.env.DISPATCH_ADDRESS || "wss://dispatch.replay.io",
+  browserExamplesPath: join(__dirname, "../../public/test/examples"),
   browserName: (process.env.RECORD_REPLAY_TARGET === "chromium"
     ? "chromium"
     : "firefox") as BrowserName,
@@ -11,8 +12,8 @@ export default {
   devtoolsUrl: process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080",
   driverPath: process.env.RECORD_REPLAY_DRIVER,
   headless: !!process.env.RECORD_REPLAY_PLAYWRIGHT_HEADLESS,
-  nodePath: process.env.RECORD_REPLAY_NODE,
   nodeExamplesPath: join(__dirname, "../../test/examples/node"),
+  nodePath: process.env.RECORD_REPLAY_NODE,
   // This API key allows access to the whole team that holds all these test recordings.
   // If someone wanted to, they could go in and delete the workspace or recordings in it or anything.
   // While thats not great, it's also not the end of the world.
