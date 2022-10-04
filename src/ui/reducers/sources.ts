@@ -247,22 +247,6 @@ export const getCorrespondingSourceIdsFromSourcesState = (sources: SourcesState,
   // assert(source, `unknown source ${id}`);
   return source?.correspondingSourceIds || [id];
 };
-
-// NOTE: should only be used by tests
-export const fuzzyFindSourceByUrl = (state: UIState, url: string) => {
-  const urls = Object.keys(state.sources.sourcesByUrl);
-  const foundUrl = urls.find(_url => _url.includes(url));
-  if (!foundUrl) {
-    return undefined;
-  }
-  const urlEntries = state.sources.sourcesByUrl[foundUrl];
-  const id = urlEntries[0];
-  if (!id) {
-    return undefined;
-  }
-  return getSourceDetails(state, id);
-};
-
 export const getSourceContent = (state: UIState, id: string) => {
   return state.sources.contents.entities[id];
 };
@@ -501,7 +485,6 @@ export const getStableLocationForLocation = (
 */
 
 export const selectors = {
-  fuzzyFindSourceByUrl,
   getAllSourceDetails,
   getSourceDetails,
   getSourceDetailsEntities,
