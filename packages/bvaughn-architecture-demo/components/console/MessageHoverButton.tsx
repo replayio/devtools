@@ -15,8 +15,10 @@ import {
 } from "react";
 
 import styles from "./MessageHoverButton.module.css";
+import { useDismissNag } from "@bvaughn/src/hooks/useDismissNag";
 import { isExecutionPointsGreaterThan } from "@bvaughn/src/utils/time";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Nag } from "@bvaughn/src/graphql/types";
 
 export default function MessageHoverButton({
   executionPoint,
@@ -30,6 +32,7 @@ export default function MessageHoverButton({
   time: number;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
+  const dismissNag = useDismissNag();
   const [isHovered, setIsHovered] = useState(false);
 
   const { inspectFunctionDefinition, showCommentsPanel } = useContext(InspectorContext);
@@ -61,6 +64,8 @@ export default function MessageHoverButton({
             sourceLocation: location,
             time,
           });
+
+          dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
 
           invalidateCache();
         });
