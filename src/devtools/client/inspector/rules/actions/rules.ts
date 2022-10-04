@@ -5,7 +5,11 @@ import { isInspectorSelected } from "ui/reducers/app";
 
 import { rulesUpdated } from "../reducers/rules";
 import { setComputedProperties } from "../../computed/actions";
-import { nodeSelected } from "../../markup/reducers/markup";
+import {
+  nodeSelected,
+  getMarkupNodeById,
+  getSelectedDomNodeId,
+} from "../../markup/reducers/markup";
 
 import ElementStyle from "../models/element-style";
 
@@ -15,19 +19,29 @@ export function setupRules(store: UIStore, startAppListening: AppStartListening)
   startAppListening({
     actionCreator: nodeSelected,
     effect: async (action, listenerApi) => {
-      const { extra, getState, dispatch } = listenerApi;
+      const { extra, getState, dispatch, condition } = listenerApi;
       const { ThreadFront, protocolClient, replayClient } = extra;
       const state = getState();
-      const { selectedNode, tree } = state.markup;
+
+      const selectedNode = getSelectedDomNodeId(state);
 
       if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+        console.log("Bailing out of rule fetching", selectedNode);
         dispatch(rulesUpdated([]));
         return;
       }
 
-      const nodeInfo = tree.entities[selectedNode];
+      let nodeInfo = getMarkupNodeById(state, selectedNode);
+
+      if (!nodeInfo) {
+        await condition((action, currentState) => {
+          return !!getMarkupNodeById(currentState, selectedNode);
+        }, 3000);
+        nodeInfo = getMarkupNodeById(getState(), selectedNode);
+      }
 
       if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
+        console.log("No node info for rules", nodeInfo);
         dispatch(rulesUpdated([]));
         return;
       }

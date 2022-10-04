@@ -88,7 +88,11 @@ const boxModelAdapter = createEntityAdapter<BoxModel>({
   selectId: boxModel => boxModel.node,
 });
 
-export const { selectById: selectNodeBoxModelById } = boxModelAdapter.getSelectors(
+export const { selectById: getMarkupNodeById } = nodeAdapter.getSelectors(
+  (state: UIState) => state.markup.tree
+);
+
+export const { selectById: getNodeBoxModelById } = boxModelAdapter.getSelectors(
   (state: UIState) => state.markup.nodeBoxModels
 );
 

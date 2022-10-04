@@ -4,7 +4,7 @@ import type { Quads } from "@replayio/protocol";
 import { useAppSelector } from "ui/setup/hooks";
 import { assert } from "protocol/utils";
 
-import { NodeInfo, selectNodeBoxModelById } from "../reducers/markup";
+import { NodeInfo, getNodeBoxModelById } from "../reducers/markup";
 import { Canvas } from "ui/state/app";
 
 // Note that the order of items in this array is important because it is used
@@ -143,7 +143,7 @@ const getAttribute = (node: NodeInfo, name: string) => {
 export function PreviewNodeHighlighter() {
   const highlightedNodeId = useAppSelector(state => state.markup.highlightedNode);
   const highlightedNodeBoxModel = useAppSelector(state =>
-    highlightedNodeId ? selectNodeBoxModelById(state, highlightedNodeId) : undefined
+    highlightedNodeId ? getNodeBoxModelById(state, highlightedNodeId) : undefined
   );
   const canvas = useAppSelector(state => state.app.canvas);
 

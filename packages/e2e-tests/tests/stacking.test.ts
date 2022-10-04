@@ -4,7 +4,11 @@ import { Locator, expect, Page } from "@playwright/test";
 
 import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
-import { selectElementsRowWithText } from "../helpers/elements-panel";
+import {
+  selectElementsRowWithText,
+  openElementsPanel,
+  openAppliedRulesTab,
+} from "../helpers/elements-panel";
 import { getBreakpointsAccordionPane } from "../helpers/pause-information-panel";
 import { mapLocators, waitFor } from "../helpers/utils";
 
@@ -121,23 +125,23 @@ const testCases: StackingTestCase[] = [
 
   // TODO [FE-626]:
   // unpositioned children of elements with overflow will be clipped
-  // {
-  //   id: "r3c1",
-  //   position: { x: 140, y: 340 },
-  //   expectedRules: ["element", "body > div"],
-  // },
+  {
+    id: "r3c1",
+    position: { x: 140, y: 340 },
+    expectedRules: ["element", "body > div"],
+  },
   // absolutely positioned elements are _not_ clipped by their unpositioned parent
-  // {
-  //   id: "r3c2",
-  //   position: { x: 240, y: 340 },
-  //   expectedRules: [".box1"],
-  // },
+  {
+    id: "r3c2",
+    position: { x: 240, y: 340 },
+    expectedRules: [".box1"],
+  },
   // absolutely positioned elements _are_ clipped by their relatively positioned parent
-  // {
-  //   id: "r3c3",
-  //   position: { x: 340, y: 340 },
-  //   expectedRules: ["element", "body > div"],
-  // },
+  {
+    id: "r3c3",
+    position: { x: 340, y: 340 },
+    expectedRules: ["element", "body > div"],
+  },
 ];
 
 async function ensureSidePanelClosed(page: Page) {
@@ -156,12 +160,20 @@ async function verifySelectedElementUnderCursor(
   page: Page,
   canvas: Locator,
   rulesContainer: Locator,
-  scale: number,
   testCase: StackingTestCase
 ) {
+  await openElementsPanel(page);
   // deselect any previously selected DOM node by selecting `<body>`.
   // This ensures that the "Rules" tab is empty before every test case.
   await selectElementsRowWithText(page, "body");
+
+  await openAppliedRulesTab(page);
+
+  // HACK Our preview canvas is scaled down depending on position and original app
+  // page size. We'll need to alter where we click on page by the same scale,
+  // in order to correctly click on the intended elements from original x/y coords.
+  // Grab the `transform` style from the canvas node and parse out the scale factor.
+  const scale = await readCanvasTransformScale(canvas);
 
   // Click the "Select an Element from Preview" button
   await page.locator("#command-button-pick").click();
@@ -197,6 +209,17 @@ async function verifySelectedElementUnderCursor(
   });
 }
 
+async function readCanvasTransformScale(canvas: Locator) {
+  const canvasTransformString = await canvas.evaluate(node => {
+    return node.style.transform;
+  });
+  // simpler to rewrite "scale(0.123)" by replacing than regexing right now
+  const scaleString = canvasTransformString.replace("scale(", "").replace(")", "");
+
+  const scale = Number(scaleString);
+  return scale;
+}
+
 test("Element highlighter selects the correct element when they overlap", async ({ page }) => {
   await startTest(page, "doc_stacking.html");
   await openDevToolsTab(page);
@@ -215,21 +238,9 @@ test("Element highlighter selects the correct element when they overlap", async 
   const canvas = page.locator("canvas#graphics");
   const rulesContainer = page.locator("#ruleview-container");
 
-  // HACK Our preview canvas is scaled down depending on position and original app
-  // page size. We'll need to alter where we click on page by the same scale,
-  // in order to correctly click on the intended elements from original x/y coords.
-  // Grab the `transform` style from the canvas node and parse out the scale factor.
-  const canvasTransformString = await canvas.evaluate(node => {
-    return node.style.transform;
-  });
-  // simpler to rewrite "scale(0.123)" by replacing than regexing right now
-  const scaleString = canvasTransformString.replace("scale(", "").replace(")", "");
-
-  const scale = Number(scaleString);
-
   for (let testCase of testCases) {
     // Really make sure the panel is closed
     ensureSidePanelClosed(page);
-    await verifySelectedElementUnderCursor(page, canvas, rulesContainer, scale, testCase);
+    await verifySelectedElementUnderCursor(page, canvas, rulesContainer, testCase);
   }
 });

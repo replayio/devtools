@@ -86,7 +86,6 @@ export function setupMarkup(store: UIStore, startAppListening: AppStartListening
         await ThreadFront.ensureAllSources();
 
         // Clear selection if pauses have differed
-        const pause = ThreadFront.getCurrentPause();
         let currentPauseId = getPauseId(getState());
         const selectedNodeId = getSelectedDomNodeId(getState());
 
