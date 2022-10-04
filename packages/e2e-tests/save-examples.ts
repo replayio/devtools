@@ -18,7 +18,11 @@ import yargs from "yargs";
 
 import config from "./config";
 import { recordNodeExample } from "./recordNode";
+import { recordPlaywright, uploadLastRecording } from "./recordPlaywright";
 
+type Target = "all" | "browser" | "node";
+
+// TODO [FE-626] Support target "cra"
 const argv = yargs
   .option("example", {
     alias: "e",
@@ -36,11 +40,11 @@ const argv = yargs
   .parseSync();
 
 const exampleFilename = argv.example || null;
-const target = argv.target;
+const target: Target = argv.target as Target;
 
-async function getExampleFileNames(path: string): Promise<string[]> {
+async function getExampleFileNames(path: string, fileExtension: string): Promise<string[]> {
   return readdirSync(path).filter(file => {
-    return file.endsWith(".js");
+    return file.endsWith(fileExtension);
   });
 }
 
@@ -59,38 +63,6 @@ function logAnimated(text: string): () => void {
     logUpdate(`${chalk.greenBright("✓")} ${text}`);
     logUpdate.done();
   };
-}
-
-async function recordExample(example: string) {
-  let browser, context, page, succeeded;
-  try {
-    console.log(`Recording ${example}`);
-    browser = await playwright["firefox"].launch({
-      // executablePath: state.browserPath,
-      headless: true,
-    });
-
-    context = await browser.newContext({
-      ignoreHTTPSErrors: true,
-    });
-    page = await context.newPage();
-
-    await page.goto(`http://localhost:8080/test/examples/${example}`);
-    await waitUntilMessage(page, "ExampleFinished");
-    console.log(`Recorded ${example}`);
-    succeeded = true;
-  } catch (e) {
-    succeeded = false;
-    console.error(e);
-  } finally {
-    await page.close();
-    await context.close();
-    await browser.close();
-  }
-
-  if (succeeded) {
-    await saveRecording(example);
-  }
 }
 
 async function saveRecording(example: string, recordingId?: string) {
@@ -120,66 +92,91 @@ async function saveRecording(example: string, recordingId?: string) {
   done();
 }
 
-// TODO [FE-626] Tie this into the new `main()` function below
-// async function recordExamples() {
-//   const files = readdirSync(`public/test/examples`);
-//   const pages = files.filter(file => file.startsWith("doc"));
-//   for (const page of pages) {
-//     await recordExample(page);
-//   }
-
-//   const examples = readFileSync(`${__dirname}/examples.json`, "utf8");
-//   console.log(examples);
-// }
-
-async function saveBrowserExamples() {
+async function saveExamples(
+  examplesTarget: Target,
+  examplesBasePath: string,
+  examplesFileExtension: string,
+  callback: (options: { exampleFilename: string; examplePath: string }) => Promise<void>
+) {
   switch (target) {
     case "all":
-    case "browser":
-      // TODO [FE-626] Re-add handling for re-recording other example forms
-      break;
-  }
-}
-
-async function saveNodeExamples() {
-  switch (target) {
-    case "all":
-    case "node":
+    case examplesTarget:
       const exampleFilenames =
         exampleFilename !== null
           ? [exampleFilename]
-          : await getExampleFileNames(config.nodeExamplesPath);
+          : await getExampleFileNames(config.nodeExamplesPath, examplesFileExtension);
 
-      for (const exampleFilename of exampleFilenames) {
-        const examplePath = join(
-          config.nodeExamplesPath,
-          exampleFilename.endsWith(".js") ? exampleFilename : `${exampleFilename}.js`
-        );
+      for (let exampleFilename of exampleFilenames) {
+        exampleFilename = exampleFilename.endsWith(examplesFileExtension)
+          ? exampleFilename
+          : `${exampleFilename}${examplesFileExtension}`;
+
+        const examplePath = join(examplesBasePath, exampleFilename);
         if (existsSync(examplePath)) {
-          process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
-
-          const done = logAnimated(`Re-recording example ${chalk.bold(exampleFilename)}`);
-
-          const recordingId = await recordNodeExample(examplePath);
-          if (recordingId) {
-            await saveRecording(`node/${exampleFilename}`, recordingId!);
-
-            done();
-            console.log(
-              `Saved recording ${chalk.bold(exampleFilename)} with id ${chalk.bold(recordingId)}`
-            );
-          } else {
-            done();
-            throw `Unable to save recording for ${chalk.bold(exampleFilename)}`;
-          }
-        } else if (target === "node") {
+          await callback({ exampleFilename, examplePath });
+        } else if (target === examplesTarget) {
           // Only error if this was a specific target + example combination.
           // Otherwise assume this is a different type of target.
-          throw `Could not find example ${chalk.bold(exampleFilename)}`;
+          throw `Could not find example ${chalk.bold(exampleFilename)}:\n  ${chalk.dim(
+            examplePath
+          )}`;
         }
       }
       break;
   }
+}
+
+async function saveBrowserExamples() {
+  await saveExamples(
+    "browser",
+    config.browserExamplesPath,
+    ".html",
+    async ({ exampleFilename }) => {
+      const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
+
+      const exampleUrl = `${config.devtoolsUrl}/test/examples/${exampleFilename}`;
+
+      await recordPlaywright(config.browserName, async page => {
+        await page.goto(exampleUrl);
+        await waitUntilMessage(page as Page, "ExampleFinished");
+      });
+
+      done();
+
+      const recordingId = await uploadLastRecording(exampleUrl);
+      if (config.useExampleFile && recordingId) {
+        await saveRecording(exampleFilename, recordingId);
+      }
+    }
+  );
+}
+
+async function saveNodeExamples() {
+  await saveExamples(
+    "node",
+    config.nodeExamplesPath,
+    ".js",
+    async ({ exampleFilename, examplePath }) => {
+      const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
+
+      process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
+
+      const recordingId = await recordNodeExample(examplePath);
+      if (recordingId) {
+        await saveRecording(`node/${exampleFilename}`, recordingId!);
+
+        done();
+
+        console.log(
+          `Saved recording ${chalk.bold(exampleFilename)} with id ${chalk.bold(recordingId)}`
+        );
+      } else {
+        done();
+
+        throw `Unable to save recording for ${chalk.bold(exampleFilename)}`;
+      }
+    }
+  );
 }
 
 async function makeReplayPublic(apiKey: string, recordingId: string) {
