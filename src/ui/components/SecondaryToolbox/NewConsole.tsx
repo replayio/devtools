@@ -221,10 +221,10 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
         badge: logpoint.options.prefixBadge || null,
         condition: logpoint.options.condition || null,
         content: logpoint.options.logValue!,
-        shouldBreak: false,
-        shouldLog: true,
         id: logpoint.id,
         location: logpoint.location,
+        shouldBreak: false,
+        shouldLog: true,
       })),
     [logpoints]
   );
@@ -262,7 +262,7 @@ function PointsContextReduxAdapter({ children }: PropsWithChildren) {
       // PointsContext is read-only in this context.
       // Log points are added by the legacy source Editor component.
       addPoint: () => {},
-      deletePoint: () => {},
+      deletePoints: () => {},
       editPoint,
     }),
     [deferredPoints, editPoint, isPending, points]

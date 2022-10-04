@@ -1,11 +1,12 @@
+import { TimeStampedPointRange } from "@replayio/protocol";
 import {
   ContentType as ProtocolContentType,
   newSource as ProtocolSource,
+  PointRange,
   SameLineSourceLocations as ProtocolSameLineSourceLocations,
   SourceId as ProtocolSourceId,
-  SourceLocation as ProtocolSourceLocation,
 } from "@replayio/protocol";
-import { LineHits, ReplayClientInterface } from "shared/client/types";
+import { LineHits, ReplayClientInterface, SourceLocationRange } from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
@@ -20,9 +21,11 @@ export type ProtocolSourceContents = {
 let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
 
-type LineNumberToHitCountMap = Map<number, LineHits>;
+export type LineNumberToHitCountMap = Map<number, LineHits>;
+type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
-const sourceIdToHitCountsMap: Map<ProtocolSourceId, Record<LineNumberToHitCountMap>> = new Map();
+const sourceIdToHitCountsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
+const sourceIdToMinMaxHitCountsMap: Map<string, MinMaxHitCountTuple> = new Map();
 
 const sourceIdToSourceContentsMap: Map<
   ProtocolSourceId,
@@ -40,6 +43,8 @@ export function getSources(client: ReplayClientInterface) {
 
   if (inProgressSourcesWakeable === null) {
     inProgressSourcesWakeable = createWakeable();
+
+    // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSources(client);
   }
 
@@ -75,6 +80,7 @@ export function getSourceContents(
 
     sourceIdToSourceContentsMap.set(sourceId, record);
 
+    // Suspense caches fire and forget; errors will be handled within the fetch function.
     fetchSourceContents(client, sourceId, record, record.value);
   }
 
@@ -85,20 +91,58 @@ export function getSourceContents(
   }
 }
 
+export function getCachedMinMaxSourceHitCounts(
+  sourceId: ProtocolSourceId,
+  focusRange: TimeStampedPointRange | PointRange | null
+): MinMaxHitCountTuple | [null, null] {
+  const pointRange = focusRange !== null ? toPointRange(focusRange) : null;
+
+  let key = `${sourceId}`;
+  if (pointRange !== null) {
+    key = `${key}:${pointRange.begin}:${pointRange.end}`;
+  }
+
+  return sourceIdToMinMaxHitCountsMap.get(key) || [null, null];
+}
+
 export function getSourceHitCounts(
   client: ReplayClientInterface,
-  sourceId: ProtocolSourceId
+  sourceId: ProtocolSourceId,
+  locationRange: SourceLocationRange,
+  focusRange: TimeStampedPointRange | PointRange | null
 ): LineNumberToHitCountMap {
-  let record = sourceIdToHitCountsMap.get(sourceId);
+  // TODO We could optimize this in some cases to filter in memory.
+
+  // Focus range is tracked as TimeStampedPointRange.
+  // For convenience, this public API accepts either type.
+  let pointRange: PointRange | null = null;
+  if (focusRange !== null) {
+    if (isPointRange(focusRange)) {
+      pointRange = focusRange;
+    } else {
+      pointRange = {
+        begin: focusRange.begin.point,
+        end: focusRange.end.point,
+      };
+    }
+  }
+
+  let key = `${sourceId}:${locationRange.start.line}:${locationRange.start.column}:${locationRange.end.line}:${locationRange.end.column}`;
+  if (pointRange !== null) {
+    key = `${key}:${pointRange.begin}:${pointRange.end}`;
+  }
+
+  let record = sourceIdToHitCountsMap.get(key);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
       value: createWakeable<LineNumberToHitCountMap>(),
     };
 
-    sourceIdToHitCountsMap.set(sourceId, record);
+    sourceIdToHitCountsMap.set(key, record);
 
-    fetchSourceHitCounts(client, sourceId, record, record.value);
+    // Suspense caches fire and forget; errors will be handled within the fetch function.
+    fetchSourceHitCounts(client, sourceId, locationRange, pointRange, record, record.value);
   }
 
   if (record!.status === STATUS_RESOLVED) {
@@ -108,28 +152,19 @@ export function getSourceHitCounts(
   }
 }
 
-export interface SourceLocationRange {
-  start: ProtocolSourceLocation;
-  end: ProtocolSourceLocation;
-}
-
 export const {
   getValueSuspense: getBreakpointPositionsSuspense,
   getValueAsync: getBreakpointPositionsAsync,
   getValueIfCached: getBreakpointPositionsIfCached,
 } = createGenericCache<
-  [
-    replayClient: ReplayClientInterface,
-    sourceId: ProtocolSourceId,
-    locationRange?: SourceLocationRange
-  ],
+  [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
   ProtocolSameLineSourceLocations[]
 >(
-  (client, sourceId, range) => client.getBreakpointPositions(sourceId, range),
-  (client, sourceId, range) =>
-    range
-      ? `${sourceId}:${range.start.line}:${range.start.column}:${range.end.line}:${range.end.column}`
-      : sourceId
+  (client, sourceId) =>
+    client.getBreakpointPositions(sourceId, null).then(breakpoints => {
+      return breakpoints.sort((a, b) => a.line - b.line);
+    }),
+  (_, sourceId) => sourceId
 );
 
 async function fetchSources(client: ReplayClientInterface) {
@@ -163,11 +198,35 @@ async function fetchSourceContents(
 async function fetchSourceHitCounts(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId,
+  locationRange: SourceLocationRange,
+  focusRange: PointRange | null,
   record: Record<LineNumberToHitCountMap>,
   wakeable: Wakeable<LineNumberToHitCountMap>
 ) {
   try {
-    const hitCounts = await client.getSourceHitCounts(sourceId);
+    const locations = await getBreakpointPositionsAsync(client, sourceId);
+    const hitCounts = await client.getSourceHitCounts(
+      sourceId,
+      locationRange,
+      locations,
+      focusRange
+    );
+
+    {
+      // Refine cached min-max hit count as we load more information about a source.
+      // Because hit counts may be filtered by a range of lines, this value may change as new information is loaded in.
+      const key =
+        focusRange === null ? `${sourceId}` : `${sourceId}:${focusRange.begin}:${focusRange.end}`;
+      let [minHitCount, maxHitCount] = sourceIdToMinMaxHitCountsMap.get(key) || [
+        Number.MAX_SAFE_INTEGER,
+        0,
+      ];
+      hitCounts.forEach(hitCount => {
+        minHitCount = Math.min(minHitCount, hitCount.hits);
+        maxHitCount = Math.max(maxHitCount, hitCount.hits);
+      });
+      sourceIdToMinMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
+    }
 
     record.status = STATUS_RESOLVED;
     record.value = hitCounts;
@@ -184,4 +243,19 @@ async function fetchSourceHitCounts(
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
   const sources = getSources(client);
   return sources.filter(source => source.kind !== "inlineScript");
+}
+
+function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
+  return typeof range.begin === "string";
+}
+
+function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {
+  if (isPointRange(range)) {
+    return range;
+  } else {
+    return {
+      begin: range.begin.point,
+      end: range.end.point,
+    };
+  }
 }

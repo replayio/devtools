@@ -31,6 +31,7 @@ import {
   MappedLocation,
   SameLineSourceLocations,
   getPointsBoundingTimeResult as PointsBoundingTime,
+  PointRange,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -69,6 +70,10 @@ export type HitPointStatus =
   | "unknown-error";
 
 export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointStatus];
+export interface SourceLocationRange {
+  start: SourceLocation;
+  end: SourceLocation;
+}
 
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
@@ -91,7 +96,7 @@ export interface ReplayClientInterface {
   getAnnotationKinds(): Promise<string[]>;
   getBreakpointPositions(
     sourceId: SourceId,
-    range?: { start: SourceLocation; end: SourceLocation }
+    range: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]>;
   getEventCountForTypes(eventTypes: EventHandlerType[]): Promise<Record<string, number>>;
   getEventCountForType(eventType: EventHandlerType): Promise<number>;
@@ -115,7 +120,12 @@ export interface ReplayClientInterface {
   getSessionEndpoint(sessionId: SessionId): Promise<TimeStampedPoint>;
   getSessionId(): SessionId | null;
   getSourceContents(sourceId: SourceId): Promise<{ contents: string; contentType: ContentType }>;
-  getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>>;
+  getSourceHitCounts(
+    sourceId: SourceId,
+    locationRange: SourceLocationRange,
+    sourceLocations: SameLineSourceLocations[],
+    focusRange: PointRange | null
+  ): Promise<Map<number, LineHits>>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;

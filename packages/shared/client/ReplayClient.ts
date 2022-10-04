@@ -29,8 +29,8 @@ import {
   navigationEvents,
   Result,
   MappedLocation,
-  SourceLocation,
   SameLineSourceLocations,
+  PointRange,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
@@ -39,7 +39,7 @@ import { client, initSocket } from "protocol/socket";
 import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
-import { compareNumericStrings, defer } from "protocol/utils";
+import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { isTooManyPointsError } from "shared/utils/error";
 
 import {
@@ -50,6 +50,7 @@ import {
   ReplayClientEvents,
   ReplayClientInterface,
   RunAnalysisParams,
+  SourceLocationRange,
 } from "./types";
 
 // TODO How should the client handle concurrent requests?
@@ -508,20 +509,38 @@ export class ReplayClient implements ReplayClientInterface {
     return { contents, contentType };
   }
 
-  async getSourceHitCounts(sourceId: SourceId): Promise<Map<number, LineHits>> {
+  async getSourceHitCounts(
+    sourceId: SourceId,
+    locationRange: SourceLocationRange,
+    sortedSourceLocations: SameLineSourceLocations[],
+    focusRange: PointRange | null
+  ): Promise<Map<number, LineHits>> {
     const sessionId = this.getSessionIdThrows();
-    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
-      {
-        sourceId,
-      },
-      sessionId
+
+    // The protocol returns possible breakpoints for the entire source,
+    // but for large sources this can result in "too many locations" to run hit counts.
+    // To avoid this, we limit the number of lines we request hit count information for.
+    //
+    // Note that since this is a sorted array, we can do better than a plain .filter() for performance.
+    const startLine = locationRange.start.line;
+    const startIndex = binarySearch(
+      0,
+      sortedSourceLocations.length,
+      (index: number) => startLine - sortedSourceLocations[index].line
+    );
+    const endLine = locationRange.end.line;
+    const stopIndex = binarySearch(
+      startIndex,
+      sortedSourceLocations.length,
+      (index: number) => endLine - sortedSourceLocations[index].line
     );
 
     const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
       {
         sourceId,
-        locations: lineLocations,
+        locations: sortedSourceLocations.slice(startIndex, stopIndex + 1),
         maxHits: 250,
+        range: focusRange || undefined,
       },
       sessionId
     );
@@ -550,16 +569,25 @@ export class ReplayClient implements ReplayClientInterface {
 
   async getBreakpointPositions(
     sourceId: SourceId,
-    range?: { start: SourceLocation; end: SourceLocation }
+    locationRange: SourceLocationRange | null
   ): Promise<SameLineSourceLocations[]> {
     const sessionId = this.getSessionIdThrows();
-    const begin = range ? range.start : undefined;
-    const end = range ? range.end : undefined;
+    const begin = locationRange ? locationRange.start : undefined;
+    const end = locationRange ? locationRange.end : undefined;
     const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
       { sourceId, begin, end },
       sessionId
     );
-    return lineLocations;
+
+    // The protocol API does not always respect the begin/end range provided above.
+    const filteredLineLocations = locationRange
+      ? lineLocations.filter(
+          location =>
+            location.line >= locationRange.start.line && location.line <= locationRange.end.line
+        )
+      : lineLocations;
+
+    return filteredLineLocations;
   }
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {

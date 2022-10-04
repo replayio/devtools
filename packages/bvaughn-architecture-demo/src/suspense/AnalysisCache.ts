@@ -179,7 +179,7 @@ async function runLocalAnalysis(
       const timeoutID = setTimeout(() => {
         worker.terminate();
         reject("Timed out");
-      }, 500);
+      }, 5000);
     });
 
     record.status = STATUS_RESOLVED;

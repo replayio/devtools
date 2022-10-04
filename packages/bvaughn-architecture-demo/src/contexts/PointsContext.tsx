@@ -4,12 +4,17 @@ import {
   PropsWithChildren,
   SetStateAction,
   useCallback,
+  useContext,
   useMemo,
   useState,
   useTransition,
 } from "react";
 
-// The new console uses a numeric id but the legacy console uses a string.
+import useLocalStorage from "../hooks/useLocalStorage";
+
+import { SessionContext } from "./SessionContext";
+
+// TODO [FE-757] Replace this with number once old code is fully deleted
 export type PointId = number | string;
 
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
@@ -32,7 +37,7 @@ export type PointInstance = {
 
 export type PointsContextType = {
   addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
-  deletePoint: (id: PointId) => void;
+  deletePoints: (...id: PointId[]) => void;
   editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
   isPending: boolean;
   points: Point[];
@@ -44,17 +49,21 @@ let idCounter: number = 0;
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
-  const [points, setPoints] = useState<Point[]>([]);
-  const [pointsForAnalysis, setPointsForAnalysis] = useState<Point[]>([]);
+  const { recordingId } = useContext(SessionContext);
+  const [points, setPoints] = useLocalStorage<Point[]>(`${recordingId}::points`, []);
+  const [pointsForAnalysis, setPointsForAnalysis] = useState<Point[]>(points);
 
   const [isPending, startTransition] = useTransition();
 
-  const setPointsHelper = useCallback((updater: SetStateAction<Point[]>) => {
-    setPoints(updater);
-    startTransition(() => {
-      setPointsForAnalysis(updater);
-    });
-  }, []);
+  const setPointsHelper = useCallback(
+    (updater: SetStateAction<Point[]>) => {
+      setPoints(updater);
+      startTransition(() => {
+        setPointsForAnalysis(updater);
+      });
+    },
+    [setPoints]
+  );
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
@@ -74,19 +83,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     [setPointsHelper]
   );
 
-  const deletePoint = useCallback(
-    (id: PointId) => {
-      setPointsHelper((prevPoints: Point[]) => {
-        const index = prevPoints.findIndex(point => point.id === id);
-        if (index >= 0) {
-          const newPoints = prevPoints.slice();
-          newPoints.splice(index, 1);
-          return newPoints;
-        }
-
-        throw Error(`Could not find point with "${id}"`);
-      });
-    },
+  const deletePoints = useCallback(
+    (...ids: PointId[]) =>
+      setPointsHelper((prevPoints: Point[]) => prevPoints.filter(point => !ids.includes(point.id))),
     [setPointsHelper]
   );
 
@@ -113,8 +112,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   );
 
   const context = useMemo(
-    () => ({ addPoint, deletePoint, editPoint, isPending, points, pointsForAnalysis }),
-    [addPoint, deletePoint, editPoint, isPending, points, pointsForAnalysis]
+    () => ({ addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis }),
+    [addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis]
   );
 
   return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
