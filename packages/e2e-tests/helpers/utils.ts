@@ -8,7 +8,7 @@ export function getCommandKey() {
 
 // Playwright doesn't provide a good way to do this (yet).
 export async function clearTextArea(page: Page, textArea: Locator) {
-  debugPrint(`Clearing content from textarea`, "clearTextArea");
+  await debugPrint(page, `Clearing content from textarea`, "clearTextArea");
 
   const selectAllCommand = `${getCommandKey()}+A`;
 
@@ -18,8 +18,15 @@ export async function clearTextArea(page: Page, textArea: Locator) {
 }
 
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
-export function debugPrint(message: string, scope?: string) {
+export async function debugPrint(page: Page, message: string, scope?: string) {
   console.log(message, scope ? chalk.dim(`(${scope})`) : "");
+
+  await page.evaluate(
+    ({ message, scope }) => {
+      console.log(`${message} %c${scope || ""}`, "color: #999;");
+    },
+    { message, scope }
+  );
 }
 
 // This helper can be useful when debugging tests but should not be used in committed tests.
@@ -84,11 +91,15 @@ export async function toggleExpandable(
     : scope.locator(`[data-test-name="Expandable"]`).first();
   const currentState = await expander.getAttribute("data-test-state");
   if (currentState !== targetState) {
-    debugPrint(`${targetState === "open" ? "Opening" : "Closing"} ${label}`, "toggleExpandable");
+    await debugPrint(
+      page,
+      `${targetState === "open" ? "Opening" : "Closing"} ${label}`,
+      "toggleExpandable"
+    );
 
     await expander.click();
   } else {
-    debugPrint(`The ${label} is already ${targetState}`, "toggleExpandable");
+    await debugPrint(page, `The ${label} is already ${targetState}`, "toggleExpandable");
   }
 }
 

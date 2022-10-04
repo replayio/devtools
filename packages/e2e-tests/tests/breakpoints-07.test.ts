@@ -45,7 +45,7 @@ test(`rewind and seek using command bar and console messages`, async ({ page }) 
 
   // Verify that clicking on the source location in the Console opens the source editor.
   await sourceTab.waitFor({ state: "detached" });
-  await openMessageSource(message.first());
+  await openMessageSource(page, message.first());
   await sourceTab.waitFor({ state: "visible" });
 
   // Verify that the active source and breakpoints/logpoints are restored after a reload.

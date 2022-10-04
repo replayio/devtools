@@ -132,8 +132,8 @@ export async function getComputedStyle(page: Page, style: string) {
   }, style);
 }
 
-export function getElementsPanelSelection(page: Page): Locator {
-  debugPrint(`Getting Elements panel selection`, "getElementsPanelSelection");
+export async function getElementsPanelSelection(page: Page): Promise<Locator> {
+  await debugPrint(page, `Getting Elements panel selection`, "getElementsPanelSelection");
 
   const elements = page.locator("#inspector-main-content");
   const selectedLine = elements.locator(".tag-line.selected");
@@ -141,12 +141,13 @@ export function getElementsPanelSelection(page: Page): Locator {
   return selectedLine;
 }
 
-export function getElementsRowWithText(
+export async function getElementsRowWithText(
   page: Page,
   text: string,
   isSelected: boolean = false
-): Locator {
-  debugPrint(
+): Promise<Locator> {
+  await debugPrint(
+    page,
     `Searching for Elements row containing "${chalk.bold(text)}"`,
     "getElementsRowWithText"
   );
@@ -171,7 +172,7 @@ export async function inspectCanvasCoordinates(
     );
   }
 
-  debugPrint(`Inspecting preview Canvas`, "inspectCanvasCoordinates");
+  await debugPrint(page, `Inspecting preview Canvas`, "inspectCanvasCoordinates");
 
   await activateInspectorTool(page);
 
@@ -184,7 +185,8 @@ export async function inspectCanvasCoordinates(
   const x = xPercentage * (width as any as number);
   const y = yPercentage * (height as any as number);
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Clicking Canvas coordinates ${chalk.bold(x)}px (${Math.round(
       xPercentage * 100
     )}%), ${chalk.bold(y)}px (${Math.round(yPercentage * 100)}%)`,
@@ -211,7 +213,11 @@ export async function openElementsPanel(page: Page): Promise<void> {
 }
 
 export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
-  debugPrint(`Searching Elements for text ${chalk.bold(`"${searchText}"`)}`, "searchElementsPanel");
+  await debugPrint(
+    page,
+    `Searching Elements for text ${chalk.bold(`"${searchText}"`)}`,
+    "searchElementsPanel"
+  );
 
   await activateInspectorTool(page);
 
@@ -224,7 +230,7 @@ export async function searchElementsPanel(page: Page, searchText: string): Promi
 export async function selectElementsRowWithText(page: Page, text: string): Promise<void> {
   const elementsTab = page.locator(`button:has-text("Elements")`);
   await elementsTab.click();
-  const node = getElementsRowWithText(page, text);
+  const node = await getElementsRowWithText(page, text);
   await node.waitFor();
   await node.click();
 }
@@ -236,7 +242,7 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
 }
 
 export async function waitForElementsToLoad(page: Page): Promise<void> {
-  debugPrint("Waiting for elements to load", "waitForElementsToLoad");
+  await debugPrint(page, "Waiting for elements to load", "waitForElementsToLoad");
 
   const elements = page.locator("#markup-box");
   await elements.waitFor();
@@ -245,8 +251,12 @@ export async function waitForElementsToLoad(page: Page): Promise<void> {
   await tree.waitFor();
 }
 
-export async function toggleMarkupNode(locator: Locator, open: boolean): Promise<void> {
-  debugPrint(`Toggling element node ${chalk.bold(open ? "open" : "closed")}`, "toggleMarkupNode");
+export async function toggleMarkupNode(page: Page, locator: Locator, open: boolean): Promise<void> {
+  await debugPrint(
+    page,
+    `Toggling element node ${chalk.bold(open ? "open" : "closed")}`,
+    "toggleMarkupNode"
+  );
 
   const expander = locator.locator(".expander");
   await expander.waitFor();
@@ -258,6 +268,6 @@ export async function toggleMarkupNode(locator: Locator, open: boolean): Promise
 }
 
 export async function waitForSelectedElementsRow(page: Page, text: string): Promise<void> {
-  const locator = getElementsRowWithText(page, text, true);
+  const locator = await getElementsRowWithText(page, text, true);
   await locator.waitFor();
 }

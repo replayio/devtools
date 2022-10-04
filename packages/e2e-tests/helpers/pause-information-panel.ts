@@ -5,31 +5,31 @@ import { openSource } from "./source-explorer-panel";
 import { Expected } from "./types";
 import { debugPrint, forEach, toggleExpandable, waitFor } from "./utils";
 
-async function toggleAccordionPane(pane: Locator, targetState: "open" | "closed") {
+async function toggleAccordionPane(page: Page, pane: Locator, targetState: "open" | "closed") {
   const name = (await pane.getAttribute("data-test-id"))!.split("-")[1];
   const currentState = await pane.getAttribute("date-test-state");
   if (targetState !== currentState) {
-    debugPrint(`${name} pane to ${targetState}`, "toggleAccordionPane");
+    await debugPrint(page, `${name} pane to ${targetState}`, "toggleAccordionPane");
     await pane.locator('[role="button"]').click();
   } else {
-    debugPrint(`${name} pane already ${targetState}`, "toggleAccordionPane");
+    await debugPrint(page, `${name} pane already ${targetState}`, "toggleAccordionPane");
   }
 }
 
 export async function closeBreakpointsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getBreakpointsAccordionPane(page), "closed");
+  await toggleAccordionPane(page, getBreakpointsAccordionPane(page), "closed");
 }
 
 export async function closeCallStackAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getCallStackAccordionPane(page), "closed");
+  await toggleAccordionPane(page, getCallStackAccordionPane(page), "closed");
 }
 
 export async function closePrintStatementsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getPrintStatementsAccordionPane(page), "closed");
+  await toggleAccordionPane(page, getPrintStatementsAccordionPane(page), "closed");
 }
 
 export async function expandAllScopesBlocks(page: Page): Promise<void> {
-  debugPrint("Expanding all Scopes blocks", "expandAllScopesBlocks");
+  await debugPrint(page, "Expanding all Scopes blocks", "expandAllScopesBlocks");
 
   const scopesPanel = getScopesPanel(page);
   const blocks = scopesPanel.locator('[data-test-name="ScopesInspector"]');
@@ -97,11 +97,11 @@ export function getScopesPanel(page: Page): Locator {
 }
 
 export async function openBreakpointsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getBreakpointsAccordionPane(page), "open");
+  await toggleAccordionPane(page, getBreakpointsAccordionPane(page), "open");
 }
 
 export async function openCallStackPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getCallStackAccordionPane(page), "open");
+  await toggleAccordionPane(page, getCallStackAccordionPane(page), "open");
 }
 
 export async function openPauseInformationPanel(page: Page): Promise<void> {
@@ -116,11 +116,11 @@ export async function openPauseInformationPanel(page: Page): Promise<void> {
 }
 
 export async function openPrintStatementsAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getPrintStatementsAccordionPane(page), "open");
+  await toggleAccordionPane(page, getPrintStatementsAccordionPane(page), "open");
 }
 
 export async function openScopesAccordionPane(page: Page): Promise<void> {
-  await toggleAccordionPane(getScopesAccordionPane(page), "open");
+  await toggleAccordionPane(page, getScopesAccordionPane(page), "open");
 }
 
 export async function openScopeBlocks(page: Page, text: string): Promise<void> {
@@ -131,12 +131,16 @@ export async function openScopeBlocks(page: Page, text: string): Promise<void> {
     throw Error(`No Scope blocks found containing text "${text}"`);
   }
 
-  debugPrint(`Found ${count} Scope blocks with text "${chalk.bold(text)}"`, "openScopeBlocks");
+  await debugPrint(
+    page,
+    `Found ${count} Scope blocks with text "${chalk.bold(text)}"`,
+    "openScopeBlocks"
+  );
 
   await forEach(blocks, async block => {
     const expandable = block.locator('[data-test-name="Expandable"][data-test-state="closed"]');
     if ((await expandable.count()) > 0) {
-      debugPrint(`Opening Scope block`, "openScopeBlocks");
+      await debugPrint(page, `Opening Scope block`, "openScopeBlocks");
 
       await expandable.click();
     }
@@ -152,7 +156,8 @@ export async function resumeToLine(
 ): Promise<void> {
   const { url = null, lineNumber } = options;
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Resuming to line ${chalk.bold(url ? `${url}:${lineNumber}` : lineNumber)}`,
     "resumeToLine"
   );
@@ -178,14 +183,14 @@ export async function resumeToLine(
 }
 
 export async function reverseStepOver(page: Page): Promise<void> {
-  debugPrint("Reverse step over", "reverseStepOver");
+  await debugPrint(page, "Reverse step over", "reverseStepOver");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Reverse Step Over"]').click();
 }
 
 export async function reverseStepOverToLine(page: Page, line: number) {
-  debugPrint(`Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
+  await debugPrint(page, `Reverse step over to line ${chalk.bold(line)}`, "reverseStepOverToLine");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Reverse Step Over"]').click();
@@ -194,7 +199,7 @@ export async function reverseStepOverToLine(page: Page, line: number) {
 }
 
 export async function rewind(page: Page) {
-  debugPrint("Rewinding", "rewind");
+  await debugPrint(page, "Rewinding", "rewind");
 
   await openPauseInformationPanel(page);
 
@@ -211,7 +216,7 @@ export async function rewindToLine(
 ): Promise<void> {
   const { url = null, lineNumber = null } = options;
 
-  debugPrint(`Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
+  await debugPrint(page, `Rewinding to line ${chalk.bold(lineNumber)}`, "rewindToLine");
 
   if (url !== null) {
     await openSource(page, url);
@@ -238,7 +243,7 @@ export async function rewindToLine(
 }
 
 export async function selectFrame(page: Page, index: number): Promise<void> {
-  debugPrint(`Select frame ${chalk.bold(index)}`, "selectFrame");
+  await debugPrint(page, `Select frame ${chalk.bold(index)}`, "selectFrame");
 
   const framesPanel = getFramesPanel(page);
 
@@ -247,7 +252,7 @@ export async function selectFrame(page: Page, index: number): Promise<void> {
 }
 
 export async function stepInToLine(page: Page, line: number) {
-  debugPrint(`Step in to line ${chalk.bold(line)}`, "stepInToLine");
+  await debugPrint(page, `Step in to line ${chalk.bold(line)}`, "stepInToLine");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Step In"]').click();
@@ -256,7 +261,7 @@ export async function stepInToLine(page: Page, line: number) {
 }
 
 export async function stepOutToLine(page: Page, line: number) {
-  debugPrint(`Step out to line ${chalk.bold(line)}`, "stepOutToLine");
+  await debugPrint(page, `Step out to line ${chalk.bold(line)}`, "stepOutToLine");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Step Out"]').click();
@@ -265,7 +270,7 @@ export async function stepOutToLine(page: Page, line: number) {
 }
 
 export async function stepOverToLine(page: Page, line: number) {
-  debugPrint(`Step over to line ${chalk.bold(line)}`, "stepOverToLine");
+  await debugPrint(page, `Step over to line ${chalk.bold(line)}`, "stepOverToLine");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Step Over"]').click();
@@ -274,7 +279,7 @@ export async function stepOverToLine(page: Page, line: number) {
 }
 
 export async function stepOver(page: Page): Promise<void> {
-  debugPrint("Step over", "stepOver");
+  await debugPrint(page, "Step over", "stepOver");
 
   await openPauseInformationPanel(page);
   await page.locator('[title="Step Over"]').click();
@@ -290,7 +295,11 @@ export async function verifyFramesCount(page: Page, expectedCount: number) {
 }
 
 export async function waitForFrameTimeline(page: Page, widthPercentage: string) {
-  debugPrint(`Waiting for frame progress ${chalk.bold(widthPercentage)}`, "waitForFrameTimeline");
+  await debugPrint(
+    page,
+    `Waiting for frame progress ${chalk.bold(widthPercentage)}`,
+    "waitForFrameTimeline"
+  );
 
   await openPauseInformationPanel(page);
 
@@ -314,7 +323,11 @@ export async function waitForFrameTimeline(page: Page, widthPercentage: string) 
 }
 
 export async function waitForPaused(page: Page, line?: number): Promise<void> {
-  debugPrint(`Waiting for pause ${line != null ? `at ${chalk.bold(line)}` : ""}`, "waitForPaused");
+  await debugPrint(
+    page,
+    `Waiting for pause ${line != null ? `at ${chalk.bold(line)}` : ""}`,
+    "waitForPaused"
+  );
 
   await openPauseInformationPanel(page);
 
@@ -338,7 +351,8 @@ export async function waitForPaused(page: Page, line?: number): Promise<void> {
 }
 
 export async function waitForScopeValue(page: Page, name: string, expectedValue: Expected) {
-  debugPrint(
+  await debugPrint(
+    page,
     `Waiting for scope with variable "${chalk.bold(name)}" to have value "${chalk.bold(
       expectedValue
     )}"`,

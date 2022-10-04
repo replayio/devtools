@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { debugPrint } from "./utils";
 
 export async function clearFocusRange(page: Page): Promise<void> {
-  debugPrint(`Clearing focus range`, "clearFocusRange");
+  await debugPrint(page, `Clearing focus range`, "clearFocusRange");
 
   await enterFocusMode(page);
   await setFocusRangeStartTime(page, "");
@@ -24,7 +24,7 @@ async function clearTimeInput(page: Page, input: Locator): Promise<void> {
 }
 
 export async function enterFocusMode(page: Page): Promise<void> {
-  debugPrint("Entering focus range", "enterFocusMode");
+  await debugPrint(page, "Entering focus range", "enterFocusMode");
 
   const button = page.locator('[data-test-id="EditFocusButton"]');
   const state = await button.getAttribute("data-test-state");
@@ -34,7 +34,7 @@ export async function enterFocusMode(page: Page): Promise<void> {
 }
 
 export async function exitFocusMode(page: Page): Promise<void> {
-  debugPrint("Exiting focus range", "exitFocusMode");
+  await debugPrint(page, "Exiting focus range", "exitFocusMode");
 
   const button = page.locator('[data-test-id="EditFocusButton"]');
   const state = await button.getAttribute("data-test-state");
@@ -44,7 +44,7 @@ export async function exitFocusMode(page: Page): Promise<void> {
 }
 
 export async function saveFocusRange(page: Page): Promise<void> {
-  debugPrint("Saving focus range", "setFocusRange");
+  await debugPrint(page, "Saving focus range", "setFocusRange");
 
   await page.locator('[data-test-id="SaveFocusModeButton"]').click();
 }
@@ -55,7 +55,8 @@ export async function setFocusRange(
 ): Promise<void> {
   const { endTimeString, startTimeString } = options;
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Setting focus to ${chalk.bold(`${startTimeString}`)}–${chalk.bold(`${endTimeString}`)}`,
     "setFocusRange"
   );
@@ -67,7 +68,11 @@ export async function setFocusRange(
 }
 
 export async function setFocusRangeEndTime(page: Page, timeString: string): Promise<void> {
-  debugPrint(`Setting focus start time to ${chalk.bold(`${timeString}`)}`, "setFocusRangeEndTime");
+  await debugPrint(
+    page,
+    `Setting focus start time to ${chalk.bold(`${timeString}`)}`,
+    "setFocusRangeEndTime"
+  );
 
   const input = page.locator('[data-test-id="FocusEndTimeInput"]');
   await input.focus();
@@ -76,7 +81,11 @@ export async function setFocusRangeEndTime(page: Page, timeString: string): Prom
 }
 
 export async function setFocusRangeStartTime(page: Page, timeString: string): Promise<void> {
-  debugPrint(`Setting focus end time to ${chalk.bold(`${timeString}`)}`, "setFocusRangeStartTime");
+  await debugPrint(
+    page,
+    `Setting focus end time to ${chalk.bold(`${timeString}`)}`,
+    "setFocusRangeStartTime"
+  );
 
   const input = page.locator('[data-test-id="FocusStartTimeInput"]');
   await input.focus();

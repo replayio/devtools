@@ -34,7 +34,7 @@ test("Test React DevTools.", async ({ page }) => {
   await waitForReactComponentCount(page, 4);
 
   await executeTerminalExpression(page, "document.querySelector('li').getBoundingClientRect()");
-  const message = findConsoleMessage(page, "DOMRect");
+  const message = await findConsoleMessage(page, "DOMRect");
   const left = +(await getPropertyValue(message, "left"));
   const right = +(await getPropertyValue(message, "right"));
   const top = +(await getPropertyValue(message, "top"));

@@ -12,7 +12,7 @@ test("Test that stacktraces are sourcemapped.", async ({ page }) => {
   await openDevToolsTab(page);
   await openConsolePanel(page);
 
-  const message = findConsoleMessage(page, "Error: Baz", "console-error");
+  const message = await findConsoleMessage(page, "Error: Baz", "console-error");
   const locations = await getFrameLocationsFromMessage(message);
   expect(locations).toEqual([
     "App.js:28",

@@ -33,7 +33,7 @@ export async function startTest(page: Page, example: string) {
   const base = process.env.PLAYWRIGHT_TEST_BASE_URL || "http://localhost:8080";
   const url = `${base}/recording/${recordingId}?e2e=1`;
 
-  debugPrint(`Navigating to ${chalk.bold(url)}`, "startTest");
+  await debugPrint(page, `Navigating to ${chalk.bold(url)}`, "startTest");
 
   await page.goto(url);
 
