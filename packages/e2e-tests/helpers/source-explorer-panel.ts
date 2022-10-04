@@ -5,7 +5,7 @@ import { getSourceTab, waitForSelectedSource } from "./source-panel";
 import { debugPrint, waitFor } from "./utils";
 
 export async function clickSourceTreeNode(page: Page, node: string) {
-  debugPrint(`Selecting source tree node: ${chalk.bold(node)}`);
+  await debugPrint(page, `Selecting source tree node: ${chalk.bold(node)}`);
 
   await page.locator(`div[role="tree"] div:has-text("${node}")`).nth(1).click();
 }
@@ -22,11 +22,11 @@ export async function openSource(page: Page, url: string): Promise<void> {
   // If the source is already open, just focus it.
   const sourceTab = getSourceTab(page, url);
   if (await sourceTab.isVisible()) {
-    debugPrint(`Source "${chalk.bold(url)}" already open`, "openSource");
+    await debugPrint(page, `Source "${chalk.bold(url)}" already open`, "openSource");
     return;
   }
 
-  debugPrint(`Opening source "${chalk.bold(url)}"`, "openSource");
+  await debugPrint(page, `Opening source "${chalk.bold(url)}"`, "openSource");
 
   await openSourceExplorerPanel(page);
 

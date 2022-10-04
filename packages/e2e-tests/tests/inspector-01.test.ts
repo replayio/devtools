@@ -21,18 +21,22 @@ test("Test that scopes are rerendered.", async ({ page }) => {
   await warpToMessage(page, "ExampleFinished");
 
   await activateInspectorTool(page);
-  let node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
+  let node = await getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
-  await toggleMarkupNode(node, true);
-  await getElementsRowWithText(page, "GOODBYE").waitFor();
+  await toggleMarkupNode(page, node, true);
+
+  node = await getElementsRowWithText(page, "GOODBYE");
+  await node.waitFor();
 
   await addBreakpoint(page, { url: "doc_inspector_basic.html", lineNumber: 9 });
   await rewindToLine(page, { lineNumber: 9 });
 
-  node = getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
+  node = await getElementsRowWithText(page, '<div id="maindiv" style="color: red"');
   await node.waitFor();
-  await toggleMarkupNode(node, true);
-  await getElementsRowWithText(page, "HELLO").waitFor();
+  await toggleMarkupNode(page, node, true);
+
+  node = await getElementsRowWithText(page, "HELLO");
+  await node.waitFor();
 
   await searchElementsPanel(page, "STUFF");
   await waitForSelectedElementsRow(page, "STUFF");

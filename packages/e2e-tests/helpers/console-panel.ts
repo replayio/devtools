@@ -21,7 +21,8 @@ export async function addEventListenerLogpoints(page: Page, eventTypes: string[]
   for (let eventType of eventTypes) {
     const [, categoryKey, eventName] = eventType.split(".");
 
-    debugPrint(
+    await debugPrint(
+      page,
       `Adding event type "${chalk.bold(eventName)}" in category "${chalk.bold(categoryKey)}"`,
       "addEventListenerLogpoints"
     );
@@ -51,7 +52,11 @@ export async function enableConsoleMessageType(
 }
 
 export async function executeTerminalExpression(page: Page, text: string): Promise<void> {
-  debugPrint(`Executing terminal expression "${chalk.bold(text)}"`, "executeTerminalExpression");
+  await debugPrint(
+    page,
+    `Executing terminal expression "${chalk.bold(text)}"`,
+    "executeTerminalExpression"
+  );
 
   await openConsolePanel(page);
 
@@ -92,7 +97,8 @@ export async function expandConsoleMessage(message: Locator) {
 }
 
 export async function expandFilterCategory(page: Page, categoryName: string) {
-  debugPrint(
+  await debugPrint(
+    page,
     `Expanding Console event filter category "${chalk.bold(categoryName)}"`,
     "expandFilterCategory"
   );
@@ -111,12 +117,13 @@ export async function expandFilterCategory(page: Page, categoryName: string) {
   }
 }
 
-export function findConsoleMessage(
+export async function findConsoleMessage(
   page: Page,
   expected?: Expected,
   messageType?: MessageType
-): Locator {
-  debugPrint(
+): Promise<Locator> {
+  await debugPrint(
+    page,
     `Searching for console message${
       messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
     }with text "${chalk.bold(expected)}"`,
@@ -149,11 +156,15 @@ export async function openConsolePanel(page: Page): Promise<void> {
   await page.locator('[data-test-id="PanelButton-console"]').click();
 }
 
-export async function openMessageSource(message: Locator): Promise<void> {
+export async function openMessageSource(page: Page, message: Locator): Promise<void> {
   const sourceLink = getMessageSourceLink(message);
   const textContent = await sourceLink.textContent();
 
-  debugPrint(`Opening message source "${chalk.bold(textContent)}"`, "openMessageSource");
+  await debugPrint(
+    page,
+    `Opening message source "${chalk.bold(textContent)}"`,
+    "openMessageSource"
+  );
 
   await sourceLink.click();
 }
@@ -165,7 +176,7 @@ export async function seekToConsoleMessage(
 ): Promise<void> {
   const textContent = await consoleMessage.locator('[data-test-name="LogContents"]').textContent();
 
-  debugPrint(`Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
+  await debugPrint(page, `Seeking to message "${chalk.bold(textContent)}"`, "seekToConsoleMessage");
 
   await consoleMessage.scrollIntoViewIfNeeded();
   await consoleMessage.hover();
@@ -179,7 +190,8 @@ export async function toggleSideFilters(page: Page, open: boolean): Promise<void
   const state = await button.getAttribute("data-test-state");
   const isOpen = state === "open";
   if (isOpen !== open) {
-    debugPrint(
+    await debugPrint(
+      page,
       `${chalk.bold(open ? "Opening" : "Closing")} the side filters panel`,
       "toggleSideFilters"
     );
@@ -194,14 +206,15 @@ export async function verifyConsoleMessage(
   messageType?: MessageType,
   expectedCount?: number
 ) {
-  debugPrint(
+  await debugPrint(
+    page,
     `Verifying the presence of a console message${
       messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
     }with text "${chalk.bold(expected)}"`,
     "verifyConsoleMessage"
   );
 
-  const messages = findConsoleMessage(page, expected, messageType);
+  const messages = await findConsoleMessage(page, expected, messageType);
 
   if (expectedCount != null) {
     // Verify a specific number of messages
@@ -225,7 +238,8 @@ export async function verifyPausedAtMessage(
   expected: Expected,
   messageType?: MessageType
 ): Promise<void> {
-  debugPrint(
+  await debugPrint(
+    page,
     `Verifying currently paused at console message${
       messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
     }with text "${chalk.bold(expected)}"`,
@@ -283,7 +297,8 @@ export async function verifyTrimmedConsoleMessages(
   const afterString =
     expectedAfter === 1 ? "1 message" : `${expectedAfter === 0 ? "no" : expectedAfter} messages`;
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Verifying console has trimmed ${beforeString} before and ${afterString} after`,
     "verifyTrimmedConsoleMessages"
   );
@@ -303,6 +318,7 @@ export async function verifyTrimmedConsoleMessages(
 }
 
 export async function warpToMessage(page: Page, text: string, line?: number) {
-  const message = findConsoleMessage(page, text).first();
+  const messages = await findConsoleMessage(page, text);
+  const message = messages.first();
   await seekToConsoleMessage(page, message, line);
 }

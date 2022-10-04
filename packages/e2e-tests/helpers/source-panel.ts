@@ -16,7 +16,11 @@ export async function addBreakpoint(
 ): Promise<void> {
   const { lineNumber, url } = options;
 
-  debugPrint(`Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "addBreakpoint");
+  await debugPrint(
+    page,
+    `Adding breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "addBreakpoint"
+  );
 
   await openDevToolsTab(page);
 
@@ -100,7 +104,11 @@ export async function addLogpoint(
 ): Promise<void> {
   const { condition, content, lineNumber, url } = options;
 
-  debugPrint(`Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "addLogpoint");
+  await debugPrint(
+    page,
+    `Adding log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "addLogpoint"
+  );
 
   await openDevToolsTab(page);
 
@@ -120,7 +128,11 @@ export async function addLogpoint(
     await line.locator('[data-test-name="LogpointContentSummary"]').click();
 
     if (condition) {
-      debugPrint(`Setting log-point condition "${chalk.bold(condition)}"`, "addLogpoint");
+      await debugPrint(
+        page,
+        `Setting log-point condition "${chalk.bold(condition)}"`,
+        "addLogpoint"
+      );
 
       await line.locator('[data-test-name="EditLogpointConditionButton"]').click();
 
@@ -134,7 +146,7 @@ export async function addLogpoint(
     }
 
     if (content) {
-      debugPrint(`Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
+      await debugPrint(page, `Setting log-point content "${chalk.bold(content)}"`, "addLogpoint");
 
       // Condition and content both have text areas.
       // Content will always be the last one regardless of whether the condition text area is visible.
@@ -155,7 +167,7 @@ export async function addLogpoint(
 }
 
 export async function closeSource(page: Page, url: string): Promise<void> {
-  debugPrint(`Closing source "${chalk.bold(url)}"`, "openSource");
+  await debugPrint(page, `Closing source "${chalk.bold(url)}"`, "openSource");
 
   const sourceTab = getSourceTab(page, url);
 
@@ -185,7 +197,7 @@ export function getSourceTab(page: Page, url: string): Locator {
 }
 
 export async function removeAllBreakpoints(page: Page): Promise<void> {
-  debugPrint(`Removing all breakpoints for the current source`, "removeBreakpoint");
+  await debugPrint(page, `Removing all breakpoints for the current source`, "removeBreakpoint");
 
   while (true) {
     const breakpoint = page.locator(".editor.new-breakpoint");
@@ -199,7 +211,7 @@ export async function removeAllBreakpoints(page: Page): Promise<void> {
 }
 
 export async function removeAllLogpoints(page: Page): Promise<void> {
-  debugPrint(`Removing all logpoints for the current source`, "removeAllLogpoints");
+  await debugPrint(page, `Removing all logpoints for the current source`, "removeAllLogpoints");
 
   while (true) {
     const panels = page.locator(".breakpoint-panel");
@@ -224,7 +236,11 @@ export async function removeBreakpoint(
 ): Promise<void> {
   const { lineNumber, url } = options;
 
-  debugPrint(`Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`, "removeBreakpoint");
+  await debugPrint(
+    page,
+    `Removing breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "removeBreakpoint"
+  );
 
   await openDevToolsTab(page);
 
@@ -255,7 +271,8 @@ export async function waitForBreakpoint(
 ): Promise<void> {
   const { columnIndex, lineNumber, url } = options;
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Waiting for breakpoint at ${chalk.bold(`${url}:${lineNumber}`)}`,
     "waitForBreakpoint"
   );
@@ -283,7 +300,11 @@ export async function waitForLogpoint(
 ): Promise<void> {
   const { lineNumber, url } = options;
 
-  debugPrint(`Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`, "waitForLogpoint");
+  await debugPrint(
+    page,
+    `Waiting for log-point at ${chalk.bold(`${url}:${lineNumber}`)}`,
+    "waitForLogpoint"
+  );
 
   await openDevToolsTab(page);
 
@@ -312,7 +333,8 @@ export async function verifyLogpointStep(
     await openSource(page, url);
   }
 
-  debugPrint(
+  await debugPrint(
+    page,
     `Verifying breakpoint status "${chalk.bold(expectedStatus)}" for line ${chalk.bold(
       options.lineNumber
     )}`,

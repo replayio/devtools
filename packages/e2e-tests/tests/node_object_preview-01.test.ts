@@ -27,7 +27,7 @@ test("Showing console objects in node", async ({ page }) => {
 
   await verifyConsoleMessage(page, "RangeError: foo");
 
-  const functionMessage = findConsoleMessage(page, "bar()");
+  const functionMessage = await findConsoleMessage(page, "bar()");
   const jumpIcon = functionMessage.locator('[date-test-name="JumpToDefinitionButton"]');
   const count = await jumpIcon.count();
   expect(count).toBe(1);
