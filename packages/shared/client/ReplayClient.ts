@@ -579,15 +579,7 @@ export class ReplayClient implements ReplayClientInterface {
       sessionId
     );
 
-    // The protocol API does not always respect the begin/end range provided above.
-    const filteredLineLocations = locationRange
-      ? lineLocations.filter(
-          location =>
-            location.line >= locationRange.start.line && location.line <= locationRange.end.line
-        )
-      : lineLocations;
-
-    return filteredLineLocations;
+    return lineLocations;
   }
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {

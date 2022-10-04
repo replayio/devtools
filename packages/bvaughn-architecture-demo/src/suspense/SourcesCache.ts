@@ -157,14 +157,18 @@ export const {
   getValueAsync: getBreakpointPositionsAsync,
   getValueIfCached: getBreakpointPositionsIfCached,
 } = createGenericCache<
-  [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
+  [
+    replayClient: ReplayClientInterface,
+    sourceId: ProtocolSourceId,
+    locationRange: SourceLocationRange | null
+  ],
   ProtocolSameLineSourceLocations[]
 >(
-  (client, sourceId) =>
-    client.getBreakpointPositions(sourceId, null).then(breakpoints => {
-      return breakpoints.sort((a, b) => a.line - b.line);
-    }),
-  (_, sourceId) => sourceId
+  (client, sourceId, range) => client.getBreakpointPositions(sourceId, range),
+  (client, sourceId, range) =>
+    range
+      ? `${sourceId}:${range.start.line}:${range.start.column}:${range.end.line}:${range.end.column}`
+      : sourceId
 );
 
 async function fetchSources(client: ReplayClientInterface) {
@@ -204,7 +208,7 @@ async function fetchSourceHitCounts(
   wakeable: Wakeable<LineNumberToHitCountMap>
 ) {
   try {
-    const locations = await getBreakpointPositionsAsync(client, sourceId);
+    const locations = await getBreakpointPositionsAsync(client, sourceId, locationRange);
     const hitCounts = await client.getSourceHitCounts(
       sourceId,
       locationRange,
