@@ -172,7 +172,7 @@ function getAlternateSourceIdForPosition(
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const lineLocations = getBreakpointPositionsSuspense(client, source.id);
+  const lineLocations = getBreakpointPositionsSuspense(client, source.id, null);
   const breakableLine = min(
     lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );

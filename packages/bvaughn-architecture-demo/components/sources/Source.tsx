@@ -1,8 +1,12 @@
 import Icon from "@bvaughn/components/Icon";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import { getSourceContents, getSourceHitCounts } from "@bvaughn/src/suspense/SourcesCache";
+import {
+  getCachedMinMaxSourceHitCounts,
+  getSourceContents,
+  getSourceHitCounts,
+} from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { suspendInParallel } from "@bvaughn/src/utils/suspense";
 import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
 import { Fragment, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -21,34 +25,27 @@ export default function Source({
 }) {
   const client = useContext(ReplayClientContext);
 
-  const { addPoint, deletePoint, points } = useContext(PointsContext);
+  const { range: focusRange } = useContext(FocusContext);
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
 
   const fileName = getSourceFileName(source) || "unknown";
 
-  const [hitCounts, sourceContents] = suspendInParallel(
-    () => getSourceHitCounts(client, sourceId),
-    () => getSourceContents(client, sourceId)
-  );
+  const sourceContents = getSourceContents(client, sourceId);
 
-  // Min/max hit counts are used to determine heat map color.
-  const { minHitCount, maxHitCount } = useMemo(() => {
-    let minHitCount = Infinity;
-    let maxHitCount = 0;
-    if (hitCounts) {
-      hitCounts.forEach(hitCount => {
-        const hits = hitCount.columnHits?.[0].hits || 0;
-        if (hits > 0) {
-          if (minHitCount > hits) {
-            minHitCount = hits;
-          }
-          if (maxHitCount < hits) {
-            maxHitCount = hits;
-          }
-        }
-      });
-    }
-    return { minHitCount, maxHitCount };
-  }, [hitCounts]);
+  const { lines, locationRange } = useMemo(() => {
+    const lines = sourceContents.contents.split("\n");
+    const locationRange = {
+      start: { line: 0, column: 0 },
+      end: { line: lines.length - 1, column: Number.MAX_SAFE_INTEGER },
+    };
+    return {
+      lines,
+      locationRange,
+    };
+  }, [sourceContents]);
+
+  const hitCounts = getSourceHitCounts(client, sourceId, locationRange, focusRange);
+  const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   const onAddPointButtonClick = (lineNumber: number) => {
     const lineHasHits = hitCounts.has(lineNumber);
@@ -76,7 +73,7 @@ export default function Source({
   return (
     <div className={styles.Source} data-test-id={`Source-${fileName}`}>
       <div className={styles.SourceContents}>
-        {sourceContents.contents.split("\n").map((line, index) => {
+        {lines.map((line, index) => {
           const lineNumber = index + 1;
           const lineHasHits = hitCounts.has(lineNumber);
           const hitCount = hitCounts?.get(lineNumber)?.columnHits?.[0].hits || 0;
@@ -87,7 +84,7 @@ export default function Source({
           const NUM_GRADIENT_COLORS = 3;
           let hitCountClassName = styles.LineHitCount0;
           let hitCountIndex = NUM_GRADIENT_COLORS - 1;
-          if (hitCount > 0) {
+          if (hitCount > 0 && minHitCount !== null && maxHitCount !== null) {
             if (minHitCount !== maxHitCount) {
               hitCountIndex = Math.min(
                 NUM_GRADIENT_COLORS - 1,
@@ -107,7 +104,7 @@ export default function Source({
           let lineSegments = null;
           if (linePoint) {
             hoverButton = (
-              <button className={styles.Button} onClick={() => deletePoint(linePoint.id)}>
+              <button className={styles.Button} onClick={() => deletePoints(linePoint.id)}>
                 <Icon className={styles.Icon} type="remove" />
               </button>
             );
@@ -116,7 +113,17 @@ export default function Source({
                 <pre className={styles.LineSegment}>
                   {line.substring(0, linePoint.location.column)}
                 </pre>
-                <Icon className={styles.BreakpointIcon} type="breakpoint" />
+                <button
+                  className={styles.BreakpointButton}
+                  onClick={() => editPoint(linePoint.id, { shouldBreak: !linePoint.shouldBreak })}
+                >
+                  <Icon
+                    className={
+                      linePoint.shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon
+                    }
+                    type="breakpoint"
+                  />
+                </button>
                 <pre className={styles.LineSegment}>
                   {line.substring(linePoint.location.column)}
                 </pre>

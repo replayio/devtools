@@ -119,7 +119,7 @@ export async function renderFocused(
 
   const pointsContext: PointsContextType = {
     addPoint: jest.fn(),
-    deletePoint: jest.fn(),
+    deletePoints: jest.fn(),
     editPoint: jest.fn(),
     isPending: false,
     points: [],
