@@ -1,6 +1,6 @@
 import { join } from "path";
 
-import { BrowserName } from "./recordPlaywright";
+export type BrowserName = "firefox" | "chromium";
 
 export default {
   backendUrl: process.env.DISPATCH_ADDRESS || "wss://dispatch.replay.io",

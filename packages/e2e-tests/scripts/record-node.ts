@@ -2,7 +2,7 @@ import { execSync, spawnSync } from "child_process";
 import fs from "fs";
 import { tmpdir } from "os";
 
-import config from "./config";
+import config from "../config";
 
 function getRecordingId(file: string) {
   try {
