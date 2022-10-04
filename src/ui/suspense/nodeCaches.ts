@@ -186,7 +186,9 @@ export const {
       sessionId,
       pauseId
     );
-    preCacheObjects(pauseId, data?.objects);
+    if (data?.objects) {
+      preCacheObjects(pauseId, data.objects);
+    }
 
     return listeners;
   },

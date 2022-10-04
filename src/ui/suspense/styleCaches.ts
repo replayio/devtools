@@ -34,7 +34,9 @@ export const {
 
     const uniqueRules = uniqBy(rules, rule => `${rule.rule}|${rule.pseudoElement}`);
 
-    preCacheObjects(pauseId, data.objects ?? []);
+    if (data?.objects) {
+      preCacheObjects(pauseId, data.objects);
+    }
 
     const stylePromises: Promise<ProtocolObject>[] = [];
 

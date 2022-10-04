@@ -81,9 +81,6 @@ module.exports = {
       },
     ];
 
-    // console.log("Config extensions: ", config.resolve.extensions);
-    // console.log("Webpack rules: ", util.inspect(config.module.rules, { depth: 4 }));
-
     return config;
   },
 };
