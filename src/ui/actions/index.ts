@@ -7,6 +7,7 @@ import * as timelineActions from "./timeline";
 import * as sessionActions from "./session";
 import * as commentsActions from "./comments";
 import * as layoutActions from "./layout";
+import * as markupActions from "devtools/client/inspector/markup/actions/markup";
 import * as reactDevToolsActions from "./reactDevTools";
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { UIState } from "ui/state";
@@ -37,4 +38,5 @@ export const actions = {
   ...reactDevToolsActions,
   ...sessionActions,
   ...timelineActions,
+  ...markupActions,
 };

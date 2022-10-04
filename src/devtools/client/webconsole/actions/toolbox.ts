@@ -4,7 +4,6 @@
 
 "use strict";
 
-import type { ValueFront } from "protocol/thread/value";
 import type { UIThunkAction } from "ui/actions";
 import { setSelectedPanel } from "ui/actions/layout";
 import { setHoveredItem, clearHoveredItem } from "ui/actions/timeline";
@@ -14,6 +13,7 @@ import { showSource } from "devtools/client/debugger/src/actions/ui";
 import { getContext } from "devtools/client/debugger/src/selectors";
 import { getSourceDetails, getSourceToDisplayForUrl } from "ui/reducers/sources";
 import { openSourceLink } from "devtools/client/debugger/src/actions/ui";
+import { nodeSelected } from "devtools/client/inspector/markup/reducers/markup";
 
 type $FixTypeLater = any;
 
@@ -51,25 +51,29 @@ export function openLink(url: string): UIThunkAction {
   };
 }
 
+// TODO This function is called by `InspectorContextReduxAdapter`, but disabled
 export function openNodeInInspector(
-  valueFront: ValueFront,
+  nodeId: string,
   reason: "console" | "debugger" = "console"
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
+    /*
     const pause = valueFront.getPause()!;
+
     if (ThreadFront.currentPause !== pause && isRegionLoaded(getState(), pause.time)) {
       ThreadFront.timeWarpToPause(pause);
     }
 
     dispatch(setSelectedPanel("inspector"));
 
+    // TODO Replace this with `getNodeDataAsync` and load parents
+
     // @ts-expect-error private field usage?
     const nodeFront = await pause.ensureDOMFrontAndParents(valueFront!._object!.objectId);
 
-    const { selection } = await import("devtools/client/framework/selection");
-    await selection.setNodeFront(nodeFront, {
-      reason,
-    });
+    // TODO Replace this
+    dispatch(nodeSelected(nodeFront.objectId()));
+    */
   };
 }
 

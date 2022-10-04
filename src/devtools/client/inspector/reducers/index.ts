@@ -8,11 +8,10 @@ import { InspectorAction } from "../actions";
 const { prefs } = require("devtools/client/inspector/prefs");
 
 import boxModel from "devtools/client/inspector/boxmodel/reducers/box-model";
-import classList from "devtools/client/inspector/rules/reducers/class-list";
 import markup from "devtools/client/inspector/markup/reducers/markup";
 import rules from "devtools/client/inspector/rules/reducers/rules";
 import computed from "devtools/client/inspector/computed/reducers";
-export { classList, markup, rules, computed, boxModel };
+export { markup, rules, computed, boxModel };
 
 export type InspectorActiveTab = "ruleview" | "layoutview" | "computedview" | "eventsview";
 

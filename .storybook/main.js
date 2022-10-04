@@ -1,4 +1,5 @@
 const path = require("path");
+const util = require("util");
 
 module.exports = {
   stories: [
@@ -31,6 +32,7 @@ module.exports = {
       "@recordreplay/accordion": path.resolve(__dirname, "../packages/accordion/index.tsx"),
       "third-party": path.resolve(__dirname, "../packages/third-party"),
       "packages/third-party": path.resolve(__dirname, "../packages/third-party"),
+      "@bvaughn": path.resolve(__dirname, "../packages/bvaugh-architecture-demo"),
     };
 
     config.resolve.modules = [
@@ -61,7 +63,7 @@ module.exports = {
       {
         ...existingBabelLoader,
         include: filePath => {
-          const res = filePath.includes(`node_modules${path.sep}protocol`);
+          const res = filePath.includes(`packages`);
           return res;
         },
         exclude: undefined,

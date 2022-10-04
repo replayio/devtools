@@ -71,7 +71,7 @@ declare global {
   }
   interface AppHelpers {
     threadFront?: typeof ThreadFront;
-    actions?: typeof actions;
+    actions?: ResolveThunks<typeof actions>;
     selectors?: BoundSelectors;
     debugger?: any;
   }
@@ -149,6 +149,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
 
   window.app = window.app || {};
   window.app.threadFront = ThreadFront;
+  // @ts-expect-error complains about thunk type mismatches
   window.app.actions = bindActionCreators(actions, store.dispatch);
   window.app.selectors = bindSelectors(store, justSelectors);
   window.app.debugger = setupDebuggerHelper();
@@ -226,8 +227,8 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   initOutputSyntaxHighlighting();
   setupNetwork(store, ThreadFront);
   setupReactDevTools(store, ThreadFront);
-  setupBoxModel(store);
-  setupRules(store);
+  setupBoxModel(store, startAppListening);
+  setupRules(store, startAppListening);
   setupGetPreferredLocation(store);
 
   // Add protocol event listeners for things that the Redux store needs to stay in sync with.
@@ -332,3 +333,26 @@ type KeysAssignableToType<O extends object, T> = {
 }[keyof O];
 
 export type Tail<A> = A extends [any, ...infer Rest] ? Rest : never;
+
+// Stolen from React-Redux. Cuts out the "returns a thunk function"
+// part of a thunk action creator to reflect how it works when dispatched.
+export type InferThunkActionCreatorType<TActionCreator extends (...args: any[]) => any> =
+  TActionCreator extends (...args: infer TParams) => (...args: any[]) => infer TReturn
+    ? (...args: TParams) => TReturn
+    : TActionCreator;
+
+export type HandleThunkActionCreator<TActionCreator> = TActionCreator extends (
+  ...args: any[]
+) => any
+  ? InferThunkActionCreatorType<TActionCreator>
+  : TActionCreator;
+
+// redux-thunk middleware returns thunk's return value from dispatch call
+// https://github.com/reduxjs/redux-thunk#composition
+export type ResolveThunks<TDispatchProps> = TDispatchProps extends {
+  [key: string]: any;
+}
+  ? {
+      [C in keyof TDispatchProps]: HandleThunkActionCreator<TDispatchProps[C]>;
+    }
+  : TDispatchProps;

@@ -1,45 +1,59 @@
 import type { UIStore, UIThunkAction } from "ui/actions";
-import type { NodeFront } from "protocol/thread/node";
+import { AppStartListening } from "ui/setup/listenerMiddleware";
 
 import { isInspectorSelected } from "ui/reducers/app";
 
-import { selection } from "devtools/client/framework/selection";
-import { RuleState, rulesUpdated } from "../reducers/rules";
+import { rulesUpdated } from "../reducers/rules";
 import { setComputedProperties } from "../../computed/actions";
+import {
+  nodeSelected,
+  getMarkupNodeById,
+  getSelectedDomNodeId,
+} from "../../markup/reducers/markup";
 
 import ElementStyle from "../models/element-style";
 
-export function setupRules(store: UIStore) {
-  // Any time a new node is selected in the "Markup" panel, try to update the box model layout data
-  selection.on("new-node-front", (nodeFront: NodeFront, reason: string) => {
-    if (!isInspectorSelected(store.getState()) || !selection.isNode()) {
-      return;
-    }
+export function setupRules(store: UIStore, startAppListening: AppStartListening) {
+  // Any time a new node is selected in the "Markup" panel,
+  // try to update the CSS rules info
+  startAppListening({
+    actionCreator: nodeSelected,
+    effect: async (action, listenerApi) => {
+      const { extra, getState, dispatch, condition } = listenerApi;
+      const { ThreadFront, protocolClient, replayClient } = extra;
+      const state = getState();
 
-    store.dispatch(updateRulesEntries());
-  });
-}
+      const selectedNode = getSelectedDomNodeId(state);
 
-function updateRulesEntries(): UIThunkAction {
-  return async (dispatch, getState, { protocolClient, replayClient, ThreadFront }) => {
-    if (
-      !selection.isConnected() ||
-      !selection.isElementNode() ||
-      !ThreadFront.currentPause?.pauseId
-    ) {
-      return;
-    }
+      if (!isInspectorSelected(state) || !selectedNode || !ThreadFront.currentPause?.pauseId) {
+        console.log("Bailing out of rule fetching", selectedNode);
+        dispatch(rulesUpdated([]));
+        return;
+      }
 
-    const { nodeFront } = selection;
+      let nodeInfo = getMarkupNodeById(state, selectedNode);
 
-    if (nodeFront) {
+      if (!nodeInfo) {
+        await condition((action, currentState) => {
+          return !!getMarkupNodeById(currentState, selectedNode);
+        }, 3000);
+        nodeInfo = getMarkupNodeById(getState(), selectedNode);
+      }
+
+      if (!nodeInfo?.isConnected || !nodeInfo?.isElement) {
+        console.log("No node info for rules", nodeInfo);
+        dispatch(rulesUpdated([]));
+        return;
+      }
+
       const elementStyle = new ElementStyle(
-        nodeFront.objectId(),
+        selectedNode,
         ThreadFront.currentPause.pauseId,
         ThreadFront.sessionId!,
         replayClient,
         protocolClient
       );
+
       // The legacy rule style code used a timeout to keep the rules
       // panel update from blocking the UI
       // This is probably not necessary right now, but \o/
@@ -48,8 +62,6 @@ function updateRulesEntries(): UIThunkAction {
       await elementStyle.populate();
       dispatch(rulesUpdated(elementStyle.rules));
       dispatch(setComputedProperties(elementStyle));
-    } else {
-      dispatch(rulesUpdated([]));
-    }
-  };
+    },
+  });
 }

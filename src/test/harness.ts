@@ -733,16 +733,19 @@ function boundsCenter(bounds: DOMRect) {
 async function getMarkupCanvasCoordinate(text: string, iframes: string[] = []) {
   let x = 0,
     y = 0;
+
   for (const iframeText of iframes) {
-    const node = (await ThreadFront.searchDOM(iframeText))![0];
-    const nodeRect = await node.getBoundingClientRect();
+    const [node] = await dbgActions.searchDOM(iframeText);
+    const nodeRect = await dbgActions.getNodeBoundingRect(node.objectId)!;
+
     const { left, top } = nodeRect!;
     x += left;
     y += top;
   }
-  const node = (await ThreadFront.searchDOM(text))![0];
-  const boundingRect = await node.getBoundingClientRect();
-  const center = boundsCenter(boundingRect!);
+
+  const [node] = await dbgActions.searchDOM(text);
+  const nodeRect = await dbgActions.getNodeBoundingRect(node.objectId)!;
+  const center = boundsCenter(nodeRect!);
   x += center.x;
   y += center.y;
   return { x, y };
