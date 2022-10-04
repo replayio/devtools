@@ -28,8 +28,6 @@ test(`should display exceptions in the console`, async ({ page }) => {
   await seekToConsoleMessage(page, messages.first());
   await waitForFrameTimeline(page, "100%");
 
-  messages = await findConsoleMessage(page, "number: 10", "exception");
-  await seekToConsoleMessage(page, messages.first());
   await executeAndVerifyTerminalExpression(page, "number * 10", "40");
 
   await reverseStepOverToLine(page, 15);
