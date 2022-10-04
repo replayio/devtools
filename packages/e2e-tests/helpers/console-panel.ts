@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
 import { waitForPaused } from "./pause-information-panel";
@@ -34,6 +34,8 @@ export async function addEventListenerLogpoints(page: Page, eventTypes: string[]
 
 export async function clearConsoleEvaluations(page: Page): Promise<void> {
   await page.locator('[data-test-id="ClearConsoleEvaluationsButton"]').click();
+  const evaluations = page.locator('[data-test-message-type="terminal-expression"]');
+  await waitFor(async () => expect(await evaluations.count()).toBe(0));
 }
 
 export function getConsoleMessageTypeCheckbox(
@@ -182,6 +184,9 @@ export async function seekToConsoleMessage(
   await consoleMessage.hover();
   await consoleMessage.locator('[data-test-id="ConsoleMessageHoverButton"]').click();
 
+  await waitFor(async () =>
+    expect(await consoleMessage.getAttribute("data-test-paused-here")).toBe("true")
+  );
   await waitForPaused(page, line);
 }
 

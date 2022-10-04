@@ -6,6 +6,7 @@ import SyntaxHighlightedExpression from "@bvaughn/components/SyntaxHighlightedEx
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { TerminalExpression } from "@bvaughn/src/contexts/TerminalContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -38,6 +39,7 @@ function TerminalExpressionRenderer({
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -64,6 +66,7 @@ function TerminalExpressionRenderer({
       className={className}
       data-search-index={index}
       data-test-message-type="terminal-expression"
+      data-test-paused-here={terminalExpression.point === currentExecutionPoint}
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}
