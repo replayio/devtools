@@ -4,7 +4,7 @@ import { RecordingTarget } from "protocol/thread/thread";
 
 const exampleRecordings = require("../examples.json");
 
-import { debugPrint, delay } from "./utils";
+import { debugPrint } from "./utils";
 
 export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
   return page.evaluate(async () => {
