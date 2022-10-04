@@ -40,7 +40,7 @@ export async function recordNodeExample(scriptPath: string) {
       RECORD_REPLAY_NODE: nodePath,
       RECORD_REPLAY_RECORDING_ID_FILE: recordingIdFile,
     },
-    stdio: "inherit",
+    stdio: "pipe",
   });
 
   return getRecordingId(recordingIdFile);
