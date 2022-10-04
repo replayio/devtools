@@ -60,8 +60,28 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v2
-      - run: yarn
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      # Get the yarn cache path.
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn config get cacheFolder)"
+      - name: Restore yarn cache
+        uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: |
+            ${{ steps.yarn-cache-dir-path.outputs.dir }}
+            **/node_modules
+          key: yarn-cache-folder-${{ hashFiles('**/yarn.lock', '.yarnrc.yml') }}
+          restore-keys: "yarn-cache-folder-"
+      # Actually install packages with Yarn
+      - name: Install packages
+        run: yarn install
         env:
+          YARN_CHECKSUM_BEHAVIOR: "update"
           PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
       - name: Install Replay Playwright
         run: npx @replayio/playwright install
