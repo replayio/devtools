@@ -1,8 +1,9 @@
-import { RecordingId, SourceLocation } from "@replayio/protocol";
+import { SourceLocation } from "@replayio/protocol";
 
 export enum Nag {
   FIRST_LOG_IN = "first_log_in",
   FIRST_REPLAY_2 = "first_replay_2",
+  VIEW_DEVTOOLS = "view_devtools",
   FIRST_BREAKPOINT_EDIT = "first_breakpoint_edit",
   FIRST_BREAKPOINT_ADD = "first_breakpoint_add",
   FIRST_BREAKPOINT_SAVE = "first_breakpoint_save",
@@ -26,8 +27,8 @@ export interface User {
 export type UserInfo = {
   motd: string | null;
   acceptedTOSVersion: number | null;
-  name: string;
-  picture: string;
+  name: string | null;
+  picture: string | null;
   email: string;
   id: string;
   internal: boolean;
