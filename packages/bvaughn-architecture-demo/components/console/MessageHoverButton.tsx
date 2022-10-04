@@ -65,8 +65,6 @@ export default function MessageHoverButton({
             time,
           });
 
-          dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
-
           invalidateCache();
         });
       };
@@ -96,6 +94,8 @@ export default function MessageHoverButton({
       if (inspectFunctionDefinition !== null && location !== null) {
         inspectFunctionDefinition([location]);
       }
+
+      dismissNag(Nag.FIRST_CONSOLE_NAVIGATE);
     };
 
     const label =
