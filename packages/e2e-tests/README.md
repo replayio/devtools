@@ -83,16 +83,16 @@ When we run the tests in CI, we then make recordings of the browser that is exec
 
 ### How to record examples
 
-Examples can be re-recorded using the `save-examples.ts` script. To see all supported configuration parameters run:
+Examples can be re-recorded using the `scripts/save-examples.ts` script. To see all supported configuration parameters run:
 
 ```sh
-./save-examples.ts --help
+./scripts/save-examples.ts --help
 ```
 
 For example, to re-record the _control flow_ test using _node_ you would run:
 
 ```sh
-./save-examples.ts --target=node --example=control_flow
+./scripts/save-examples.ts --target=node --example=control_flow
 ```
 
 ### Folder Structure
@@ -102,9 +102,10 @@ From the root of the repo:
 - `/packages/e2e-tests`:
   - `/tests`: all of the actual E2E test files
   - `/helpers`: "page object"-style helper functions to interact with the client DOM, as well as other assorted utils
+  - `/scripts/save-examples.ts`: TS-Node script to re-record "golden" recording files for different examples
+  - `config.ts`: Configuration for scripts
   - `examples.json`: contains IDs of "golden recordings" for each of the known example files that our tests expect to debug
   - `playwright.config.ts`: Playwright configuration options
-  - `save-examples.ts`: TS-Node script to re-record "golden" recording files for different examples
 - `/public/test/examples`: pre-written example files with specific code that demonstrates assorted aspects of JavaScript behavior (control flow, exceptions, async, sourcemaps). These are the files that are turned into the "golden recordings" that we load and debug during each test.
 - `/test/examples/node`: more pre-written example files for Node execution specifically
 

@@ -16,9 +16,9 @@ import { join } from "path";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
 
-import config from "./config";
-import { recordNodeExample } from "./recordNode";
-import { recordPlaywright, uploadLastRecording } from "./recordPlaywright";
+import config from "../config";
+import { recordNodeExample } from "./record-node";
+import { recordPlaywright, uploadLastRecording } from "./record-playwright";
 
 type Target = "all" | "browser" | "node";
 
@@ -41,6 +41,8 @@ const argv = yargs
 
 const exampleFilename = argv.example || null;
 const target: Target = argv.target as Target;
+
+const examplesJsonPath = join(__dirname, "..", "examples.json");
 
 async function getExampleFileNames(path: string, fileExtension: string): Promise<string[]> {
   return readdirSync(path).filter(file => {
@@ -85,9 +87,9 @@ async function saveRecording(example: string, recordingId?: string) {
 
   await makeReplayPublic(config.replayApiKey, recordingId);
 
-  const text = "" + readFileSync(`${__dirname}/examples.json`);
+  const text = "" + readFileSync(examplesJsonPath);
   const json = JSON.parse(text);
-  writeFileSync(`${__dirname}/examples.json`, JSON.stringify({ ...json, [example]: id }, null, 2));
+  writeFileSync(examplesJsonPath, JSON.stringify({ ...json, [example]: id }, null, 2));
 
   done();
 }

@@ -2,9 +2,7 @@ import replayPlaywright, { Page, BrowserType } from "@recordreplay/playwright";
 import * as cli from "@replayio/replay";
 import findLast from "lodash/findLast";
 
-import config from "./config";
-
-export type BrowserName = "firefox" | "chromium";
+import config, { BrowserName } from "../config";
 
 export async function recordPlaywright(
   browserName: BrowserName,
