@@ -112,24 +112,12 @@ export async function setupApp(
     store.dispatch(durationSeen(Math.max(...parameters.loading.map(r => r.end.time))));
     store.dispatch(setLoadedRegions(parameters));
   });
-  setupTests();
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return dispatch => {
     dispatch(durationSeen(Math.max(...regions.map(r => r.end.time), 0)));
   };
-}
-
-async function setupTests() {
-  const testName = getTest();
-  if (testName) {
-    const Test = await import("test/harness");
-    window.Test = Test.default;
-    const script = document.createElement("script");
-    script.src = `/test/scripts/${testName}`;
-    document.head.appendChild(script);
-  }
 }
 
 const allKeyboardEvents: KeyboardEvent[] = [];
