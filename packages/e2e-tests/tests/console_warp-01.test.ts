@@ -41,7 +41,7 @@ test(`should support warping to console messages.`, async ({ page }) => {
   const errorText =
     target == "gecko" ? "window.foo is undefined" : "Cannot set property 'bar' of undefined";
   await warpToMessage(page, errorText);
-  await reverseStepOverToLine(page, 8);
+  await reverseStepOverToLine(page, 7);
 
   await warpToMessage(page, "superclass", 40);
 
