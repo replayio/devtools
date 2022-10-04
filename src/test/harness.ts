@@ -1049,6 +1049,9 @@ export async function it(description: string, cbk: () => void) {
   await cbk();
 }
 
+// @ts-ignore
+const app = window.app as any;
+
 const TestHarness = { ...commands, dbg, dbgSelectors, app, start, finish, describe, it };
 
 export default TestHarness;

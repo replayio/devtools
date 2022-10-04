@@ -8,6 +8,8 @@ import { debugPrint, delay } from "./utils";
 
 export async function getRecordingTarget(page: Page): Promise<RecordingTarget> {
   return page.evaluate(async () => {
+    // @ts-ignore
+    const app = window.app as any;
     const target = await app.threadFront.getRecordingTarget();
     return target;
   });

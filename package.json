@@ -9,7 +9,6 @@
     "export": "next build && next export -o dist",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test-e2e": "jest --config jest-e2e.config.js --runInBand --forceExit",
     "start": "next start -p 8080",
     "build": "next build",
     "lint": "trunk check",
