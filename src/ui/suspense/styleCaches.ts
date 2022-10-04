@@ -1,7 +1,7 @@
 import { Frame, PauseId, ProtocolClient, Object as ProtocolObject } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
-import { createGenericCache } from "@bvaughn/src/suspense/createGenericCache";
+import { createGenericCache } from "bvaughn-architecture-demo/src/suspense/createGenericCache";
 import {
   getObjectWithPreviewHelper,
   preCacheObjects,

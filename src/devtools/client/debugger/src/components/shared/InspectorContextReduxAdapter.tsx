@@ -80,7 +80,7 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
               objectId = object.preview?.node?.parentNode;
             }
 
-            // dispatch(openNodeInInspector(valueFront));
+            dispatch(openNodeInInspector(objectId));
           }
         }
       })();

@@ -1,4 +1,5 @@
 const path = require("path");
+const util = require("util");
 
 module.exports = {
   stories: [
@@ -62,7 +63,7 @@ module.exports = {
       {
         ...existingBabelLoader,
         include: filePath => {
-          const res = filePath.includes(`node_modules${path.sep}protocol`);
+          const res = filePath.includes(`packages`);
           return res;
         },
         exclude: undefined,
@@ -79,6 +80,9 @@ module.exports = {
         },
       },
     ];
+
+    // console.log("Config extensions: ", config.resolve.extensions);
+    // console.log("Webpack rules: ", util.inspect(config.module.rules, { depth: 4 }));
 
     return config;
   },
