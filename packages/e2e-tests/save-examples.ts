@@ -9,7 +9,9 @@ const playwright = require("@recordreplay/playwright");
 import { uploadRecording, listAllRecordings } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
+import { dots } from "cli-spinners";
 import { readdirSync, readFileSync, writeFileSync, existsSync } from "fs";
+import logUpdate from "log-update";
 import { join } from "path";
 import { v4 as uuidv4 } from "uuid";
 import yargs from "yargs";
@@ -40,6 +42,23 @@ async function getExampleFileNames(path: string): Promise<string[]> {
   return readdirSync(path).filter(file => {
     return file.endsWith(".js");
   });
+}
+
+function logAnimated(text: string): () => void {
+  let index = 0;
+
+  const update = () => {
+    const frame = dots.frames[++index % dots.frames.length];
+    logUpdate(`${chalk.yellowBright(frame)} ${text}`);
+  };
+
+  const intervalId = setInterval(update, dots.interval);
+
+  return () => {
+    clearInterval(intervalId);
+    logUpdate(`${chalk.greenBright("✓")} ${text}`);
+    logUpdate.done();
+  };
 }
 
 async function recordExample(example: string) {
@@ -76,18 +95,17 @@ async function recordExample(example: string) {
 
 async function saveRecording(example: string, recordingId?: string) {
   if (recordingId) {
-    console.log(`Saving ${chalk.bold(example)} with recording id ${recordingId} ...`);
   } else {
     const recordings = listAllRecordings();
     if (recordings.length > 0) {
       const lastRecording = recordings[recordings.length - 1];
       recordingId = lastRecording.id;
-
-      console.log(`Saving ${chalk.bold(example)} as most recent recording id ${recordingId} ...`);
     } else {
       throw "No recording id found";
     }
   }
+
+  const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
 
   const id = await uploadRecording(recordingId, {
     apiKey: config.replayApiKey,
@@ -98,6 +116,8 @@ async function saveRecording(example: string, recordingId?: string) {
   const text = "" + readFileSync(`${__dirname}/examples.json`);
   const json = JSON.parse(text);
   writeFileSync(`${__dirname}/examples.json`, JSON.stringify({ ...json, [example]: id }, null, 2));
+
+  done();
 }
 
 // TODO [FE-626] Tie this into the new `main()` function below
@@ -138,16 +158,18 @@ async function saveNodeExamples() {
         if (existsSync(examplePath)) {
           process.env.RECORD_REPLAY_METADATA_TEST_RUN_ID = uuidv4();
 
-          console.log(`Re-recording example ${chalk.bold(exampleFilename)} ...`);
+          const done = logAnimated(`Re-recording example ${chalk.bold(exampleFilename)}`);
 
           const recordingId = await recordNodeExample(examplePath);
           if (recordingId) {
             await saveRecording(`node/${exampleFilename}`, recordingId!);
 
+            done();
             console.log(
               `Saved recording ${chalk.bold(exampleFilename)} with id ${chalk.bold(recordingId)}`
             );
           } else {
+            done();
             throw `Unable to save recording for ${chalk.bold(exampleFilename)}`;
           }
         } else if (target === "node") {
@@ -215,12 +237,6 @@ async function waitUntilMessage(page: Page, message: string, timeout: number = 3
 
 (async () => {
   try {
-    if (target !== "all") {
-      console.log(`Regenerating ${chalk.bold(target)} test recordings ...`);
-    } else {
-      console.log(`Regenerating test recordings ...`);
-    }
-
     await saveBrowserExamples();
     await saveNodeExamples();
 
