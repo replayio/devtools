@@ -1,0 +1,29 @@
+import test from "@playwright/test";
+
+import { openDevToolsTab, startTest } from "../helpers";
+import { executeAndVerifyTerminalExpression } from "../helpers/console-panel";
+import { resumeToLine, rewindToLine } from "../helpers/pause-information-panel";
+import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+
+const url = "doc_rr_basic.html";
+
+test(`Test stepping forward through breakpoints when rewound before the first one.`, async ({
+  page,
+}) => {
+  await startTest(page, url);
+  await openDevToolsTab(page);
+
+  await addBreakpoint(page, { lineNumber: 8, url });
+  // Rewind to when the point was hit
+  await rewindToLine(page, { lineNumber: 8 });
+  // Rewind further (past the first hit)
+  await rewindToLine(page);
+
+  await removeBreakpoint(page, { lineNumber: 8, url });
+
+  await addBreakpoint(page, { lineNumber: 21, url });
+  await resumeToLine(page, { lineNumber: 21 });
+  await executeAndVerifyTerminalExpression(page, "number", "1");
+  await resumeToLine(page, { lineNumber: 21 });
+  await executeAndVerifyTerminalExpression(page, "number", "2");
+});

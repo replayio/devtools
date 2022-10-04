@@ -1,0 +1,21 @@
+import test from "@playwright/test";
+
+import { startTest } from "../helpers";
+import { rewindToLine, stepOverToLine } from "../helpers/pause-information-panel";
+import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
+import { addBreakpoint } from "../helpers/source-panel";
+
+test("Basic subprocess spawning", async ({ page }) => {
+  await startTest(page, "node/run_worker.js");
+
+  await openConsolePanel(page);
+
+  await warpToMessage(page, "GotWorkerMessage pong");
+  await stepOverToLine(page, 18);
+
+  await addBreakpoint(page, { url: "run_worker.js", lineNumber: 13 });
+  await rewindToLine(page, { lineNumber: 13 });
+
+  await addBreakpoint(page, { url: "run_worker.js", lineNumber: 6 });
+  await rewindToLine(page, { lineNumber: 6 });
+});

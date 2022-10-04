@@ -4,6 +4,7 @@ import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { ProtocolMessage } from "@bvaughn/src/suspense/MessagesCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
 import { Value as ProtocolValue } from "@replayio/protocol";
@@ -37,6 +38,7 @@ function MessageRenderer({
 
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const context = useMemo(
     () => ({
@@ -106,7 +108,7 @@ function MessageRenderer({
     );
 
   const logContents = (
-    <span className={styles.LogContents}>
+    <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
       {primaryContent}
     </span>
@@ -119,6 +121,7 @@ function MessageRenderer({
         className={className}
         data-search-index={index}
         data-test-message-type={testMessageType}
+        data-test-paused-here={message.point.point === currentExecutionPoint}
         data-test-name="Message"
         onContextMenu={showContextMenu}
         onMouseEnter={() => setIsHovered(true)}

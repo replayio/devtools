@@ -15,7 +15,8 @@ lint:
   ignore:
     - linters: [ALL]
       paths:
+        - .github
+        - docs/codebase-notes
         - public
         - src/graphql
-        - docs/codebase-notes
         - test/fixtures

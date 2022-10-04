@@ -2,6 +2,7 @@ import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import Expandable from "@bvaughn/components/Expandable";
 import { UncaughtException } from "@bvaughn/src/suspense/ExceptionsCache";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -30,6 +31,7 @@ function UncaughtExceptionRenderer({
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const locations = useMemo(() => {
     return Array.isArray(uncaughtException.location)
@@ -63,7 +65,7 @@ function UncaughtExceptionRenderer({
   const argumentValues = uncaughtException.values || EMPTY_ARRAY;
   const primaryContent =
     argumentValues.length > 0 ? (
-      <span className={styles.LogContents}>
+      <span className={styles.LogContents} data-test-name="LogContents">
         <Suspense fallback={<Loader />}>
           {argumentValues.map((argumentValue: ProtocolValue, index: number) => (
             <Fragment key={index}>
@@ -87,6 +89,7 @@ function UncaughtExceptionRenderer({
       className={className}
       data-search-index={index}
       data-test-message-type="exception"
+      data-test-paused-here={uncaughtException.point === currentExecutionPoint}
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}

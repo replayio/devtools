@@ -34,6 +34,7 @@ const arrowBtn = (
 interface SearchInputProps {
   query: string;
   count: number;
+  dataTestId?: string;
   placeholder?: string;
   summaryMsg?: string;
   isLoading?: boolean;
@@ -200,6 +201,7 @@ class SearchInput extends Component<SearchInputProps> {
   render() {
     const {
       className,
+      dataTestId,
       expanded,
       handleClose,
       onChange,
@@ -228,6 +230,7 @@ class SearchInput extends Component<SearchInputProps> {
             className={classnames({
               empty: showErrorEmoji,
             })}
+            data-test-id={dataTestId}
             onChange={onChange}
             onKeyDown={this.onKeyDown}
             onKeyUp={onKeyUp}

@@ -8,13 +8,6 @@ import { assert, binarySearch, defer, Deferred } from "./utils";
 
 const MINIMUM_VIDEO_CONTENT = 5000;
 
-declare global {
-  interface Window {
-    // we expose this for use in testing
-    currentScreenshotHash?: string;
-  }
-}
-
 export const screenshotCache = new ScreenshotCache();
 
 const repaintedScreenshots: Map<string, ScreenShot> = new Map();
@@ -419,7 +412,6 @@ let gLastBounds: {
 let gDrawMouse: MouseAndClickPosition | null = null;
 
 export function paintGraphics(screenShot?: ScreenShot, mouse?: MouseAndClickPosition) {
-  window.currentScreenshotHash = screenShot?.hash;
   if (!screenShot) {
     clearGraphics();
   } else {

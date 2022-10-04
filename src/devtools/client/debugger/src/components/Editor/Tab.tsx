@@ -215,6 +215,8 @@ class Tab extends PureComponent<FinalTabProps> {
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
         className={className}
+        data-status={active ? "active" : undefined}
+        data-test-name={`Source-${getTruncatedFileName(source, query)}`}
         key={sourceId}
         onClick={handleTabClick}
         // Accommodate middle click to close tab

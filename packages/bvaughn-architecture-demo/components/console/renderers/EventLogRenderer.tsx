@@ -9,6 +9,7 @@ import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
@@ -25,6 +26,7 @@ function EventLogRenderer({
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -72,9 +74,13 @@ function EventLogRenderer({
         <span className={styles.TimeStamp}>{formatTimestamp(eventLog.time, true)} </span>
       )}
       {content ? (
-        <span className={styles.LogContents}>{content}</span>
+        <span className={styles.LogContents} data-test-name="LogContents">
+          {content}
+        </span>
       ) : (
-        <span className={styles.LogContentsEmpty}>No data to display.</span>
+        <span className={styles.LogContentsEmpty} data-test-name="LogContents">
+          No data to display.
+        </span>
       )}
     </>
   );
@@ -86,6 +92,7 @@ function EventLogRenderer({
         className={className}
         data-search-index={index}
         data-test-message-type="event"
+        data-test-paused-here={eventLog.point === currentExecutionPoint}
         data-test-name="Message"
         role="listitem"
         onContextMenu={showContextMenu}

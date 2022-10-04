@@ -1,0 +1,32 @@
+{
+  "name": "functional-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "helpers.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "playwright test",
+    "test:chromium": "playwright test --project chromium --reporter=@replayio/playwright/reporter,line",
+    "test:replay-chromium": "playwright test --project replay-chromium --reporter=@replayio/playwright/reporter,line",
+    "test:debug": "DEBUG=1 playwright test",
+    "test:install": "playwright install",
+    "ts-node": "ts-node --project ../../tsconfig.json"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.25.1",
+    "@recordreplay/playwright": "^1.18.3",
+    "@replayio/playwright": "0.2.27",
+    "cli-spinners": "^2.7.0",
+    "log-update": "^4",
+    "playwright": "^1.25.1",
+    "ts-node": "^10.7.0",
+    "yargs": "^17.6.0"
+  },
+  "dependencies": {
+    "chalk": "^4"
+  }
+}

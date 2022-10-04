@@ -6,6 +6,7 @@ import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersConte
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -32,6 +33,7 @@ function LogPointRenderer({
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
+  const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -69,7 +71,7 @@ function LogPointRenderer({
           {formatTimestamp(logPointInstance.timeStampedHitPoint.time, true)}{" "}
         </span>
       )}
-      <span className={styles.LogContents}>
+      <span className={styles.LogContents} data-test-name="LogContents">
         {logPointInstance.point.badge && <BadgeRenderer badge={logPointInstance.point.badge} />}
         <ErrorBoundary
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
@@ -88,6 +90,7 @@ function LogPointRenderer({
       className={className}
       data-search-index={index}
       data-test-message-type="log-point"
+      data-test-paused-here={logPointInstance.timeStampedHitPoint.point === currentExecutionPoint}
       data-test-name="Message"
       onContextMenu={showContextMenu}
       onMouseEnter={() => setIsHovered(true)}

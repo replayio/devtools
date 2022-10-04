@@ -2,7 +2,6 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import classNames from "classnames";
 import { FixedSizeList as List } from "react-window";
 import AppContainerPortal from "../AppContainerPortal";
-import { selectInstance } from "@redux-devtools/app";
 
 type ItemData = {
   matches: string[];

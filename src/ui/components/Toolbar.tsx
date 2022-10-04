@@ -71,6 +71,7 @@ function ToolbarButton({
             </MaterialIcon>
           }
           content={label}
+          dataTestName={`ToolbarButton-${label.replace(/ /g, "")}`}
           handleClick={() => handleClick(name)}
         />
       </div>

@@ -146,7 +146,7 @@ export default function Frames({ panel }: { panel: "debugger" | "console" | "web
   }
 
   return (
-    <div className="pane frames">
+    <div className="pane frames" data-test-id="FramesPanel">
       <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
         <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
           <div role="list">
