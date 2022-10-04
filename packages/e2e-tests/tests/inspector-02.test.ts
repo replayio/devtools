@@ -5,6 +5,8 @@ import {
   activateInspectorTool,
   getElementsPanelSelection,
   inspectCanvasCoordinates,
+  openElementsPanel,
+  waitForElementsToLoad,
 } from "../helpers/elements-panel";
 
 const url = "doc_inspector_basic.html";
@@ -12,6 +14,8 @@ const url = "doc_inspector_basic.html";
 test(`the element picker and iframe behavior`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
+  await openElementsPanel(page);
+  await waitForElementsToLoad(page);
 
   await activateInspectorTool(page);
 

@@ -206,6 +206,10 @@ export async function openComputedPropertiesTab(page: Page): Promise<void> {
   await locator.click();
 }
 
+export async function openElementsPanel(page: Page): Promise<void> {
+  await page.locator('[data-test-id="PanelButton-inspector"]').click();
+}
+
 export async function searchElementsPanel(page: Page, searchText: string): Promise<void> {
   debugPrint(`Searching Elements for text ${chalk.bold(`"${searchText}"`)}`, "searchElementsPanel");
 
@@ -229,6 +233,16 @@ export async function selectNextElementsPanelSearchResult(page: Page): Promise<v
   const input = page.locator('[placeholder="Search HTML"]')!;
   await input.focus();
   await input.press("Enter");
+}
+
+export async function waitForElementsToLoad(page: Page): Promise<void> {
+  debugPrint("Waiting for elements to load", "waitForElementsToLoad");
+
+  const elements = page.locator("#markup-box");
+  await elements.waitFor();
+
+  const tree = elements.locator('[role="tree"]');
+  await tree.waitFor();
 }
 
 export async function toggleMarkupNode(locator: Locator, open: boolean): Promise<void> {
