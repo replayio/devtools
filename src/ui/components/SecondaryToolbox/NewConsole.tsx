@@ -2,11 +2,7 @@ import { ExecutionPoint, PauseId } from "@replayio/protocol";
 import ConsoleRoot from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
 import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import {
-  Point,
-  PointId,
-  PointsContext,
-} from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import {
   NewTerminalExpression,
   TerminalContext,
@@ -56,6 +52,7 @@ import styles from "./NewConsole.module.css";
 import { ConsoleNag } from "../shared/Nags/Nags";
 import useTerminalHistory from "./useTerminalHistory";
 import { useGetUserInfo } from "ui/hooks/users";
+import { Point, PointId } from "shared/client/types";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {

@@ -47,7 +47,7 @@ export default function Source({
   const hitCounts = getSourceHitCounts(client, sourceId, locationRange, focusRange);
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
-  const onAddPointButtonClick = (lineNumber: number) => {
+  const onAddPointButtonClick = async (lineNumber: number) => {
     const lineHasHits = hitCounts.has(lineNumber);
     if (!lineHasHits) {
       return;
@@ -57,6 +57,8 @@ export default function Source({
     const closestColumnNumber = hitCountsForLine.columnHits[0]!.location.column;
     const fileName = source?.url?.split("/")?.pop();
 
+    // TODO The legacy app uses the closest function name for the content (if there is one).
+    // This app doesn't yet have logic for parsing source contents though.
     addPoint(
       {
         content: `"${fileName}", ${lineNumber}`,

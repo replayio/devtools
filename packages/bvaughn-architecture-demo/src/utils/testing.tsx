@@ -165,6 +165,8 @@ export function createMockReplayClient() {
       return null;
     },
     addEventListener: jest.fn(),
+    breakpointAdded: jest.fn(),
+    breakpointRemoved: jest.fn(),
     configure: jest.fn().mockImplementation(async () => {}),
     createPause: jest.fn().mockImplementation(async () => ({
       frames: [],

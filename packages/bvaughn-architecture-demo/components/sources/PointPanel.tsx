@@ -1,10 +1,12 @@
 import Icon from "@bvaughn/components/Icon";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { Point, PointsContext } from "@bvaughn/src/contexts/PointsContext";
+import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
 import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
+
 import Loader from "../Loader";
 
 import styles from "./PointPanel.module.css";

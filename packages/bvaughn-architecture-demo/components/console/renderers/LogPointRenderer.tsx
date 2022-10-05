@@ -5,7 +5,7 @@ import Loader from "@bvaughn/components/Loader";
 import { ConsoleFiltersContext } from "@bvaughn/src/contexts/ConsoleFiltersContext";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
-import { Badge, PointInstance } from "@bvaughn/src/contexts/PointsContext";
+import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
@@ -14,6 +14,7 @@ import { Fragment, MouseEvent, useMemo, useRef, useState } from "react";
 import { useLayoutEffect } from "react";
 import { memo, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Badge } from "shared/client/types";
 
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";

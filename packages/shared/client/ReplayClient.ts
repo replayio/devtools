@@ -31,6 +31,7 @@ import {
   MappedLocation,
   SameLineSourceLocations,
   PointRange,
+  BreakpointId,
 } from "@replayio/protocol";
 import uniqueId from "lodash/uniqueId";
 import analysisManager from "protocol/analysisManager";
@@ -47,6 +48,7 @@ import {
   HitPointsAndStatusTuple,
   HitPointStatus,
   LineHits,
+  Point,
   ReplayClientEvents,
   ReplayClientInterface,
   RunAnalysisParams,
@@ -110,6 +112,24 @@ export class ReplayClient implements ReplayClientInterface {
 
     const handlers = this._eventHandlers.get(type)!;
     handlers.push(handler);
+  }
+
+  async breakpointAdded(point: Point): Promise<BreakpointId> {
+    const sessionId = this.getSessionIdThrows();
+    const { breakpointId } = await client.Debugger.setBreakpoint(
+      {
+        location: point.location,
+        condition: point.condition || undefined,
+      },
+      sessionId
+    );
+
+    return breakpointId;
+  }
+
+  async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
+    const sessionId = this.getSessionIdThrows();
+    await client.Debugger.removeBreakpoint({ breakpointId }, sessionId);
   }
 
   async getRecordingCapabilities(): Promise<RecordingCapabilities> {

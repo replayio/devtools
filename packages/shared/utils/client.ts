@@ -1,6 +1,7 @@
-import { ExecutionPoint, TimeStampedPoint } from "@replayio/protocol";
+import { TimeStampedPoint } from "@replayio/protocol";
 import { Wakeable } from "bvaughn-architecture-demo/src/suspense/types";
 import { createWakeable } from "bvaughn-architecture-demo/src/utils/suspense";
+import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 import { ThreadFront } from "protocol/thread";
 import { useContext, useLayoutEffect, useMemo } from "react";
 import createReplayClientPlayer from "shared/client/createReplayClientPlayer";
@@ -12,7 +13,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
 
 import { getFlag, hasFlag } from "./url";
-import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
 
 type ReplayClientRecorderAdditionalData = {
   points: TimeStampedPoint[];
