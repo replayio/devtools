@@ -28,14 +28,16 @@ function MessageRenderer({
   index,
   isFocused,
   message,
+  initialIsHovered = false,
 }: {
   index: number;
   isFocused: boolean;
   message: ProtocolMessage;
+  initialIsHovered: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(initialIsHovered);
 
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);

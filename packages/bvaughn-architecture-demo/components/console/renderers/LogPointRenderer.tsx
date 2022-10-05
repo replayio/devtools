@@ -30,10 +30,12 @@ function LogPointRenderer({
   index,
   isFocused,
   logPointInstance,
+  initialIsHovered = false,
 }: {
   index: number;
   isFocused: boolean;
   logPointInstance: PointInstance;
+  initialIsHovered?: boolean;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
@@ -41,7 +43,7 @@ function LogPointRenderer({
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(initialIsHovered);
 
   useLayoutEffect(() => {
     if (isFocused) {

@@ -19,10 +19,12 @@ function EventLogRenderer({
   eventLog,
   index,
   isFocused,
+  initialIsHovered = false,
 }: {
   eventLog: EventLog;
   index: number;
   isFocused: boolean;
+  initialIsHovered?: boolean;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
@@ -30,7 +32,7 @@ function EventLogRenderer({
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(initialIsHovered);
 
   const { point, pauseId, time, values } = eventLog;
 

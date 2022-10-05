@@ -24,10 +24,12 @@ function UncaughtExceptionRenderer({
   index,
   isFocused,
   uncaughtException,
+  initialIsHovered = false,
 }: {
   index: number;
   isFocused: boolean;
   uncaughtException: UncaughtException;
+  initialIsHovered: boolean;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
@@ -41,7 +43,7 @@ function UncaughtExceptionRenderer({
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const [isHovered, setIsHovered] = useState(false);
+  const [isHovered, setIsHovered] = useState(initialIsHovered);
 
   useLayoutEffect(() => {
     if (isFocused) {

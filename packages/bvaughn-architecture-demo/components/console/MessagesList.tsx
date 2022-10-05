@@ -1,6 +1,8 @@
 import Icon from "@bvaughn/components/Icon";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { Nag } from "@bvaughn/src/graphql/types";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
 import {
   getLoggableExecutionPoint,
@@ -47,7 +49,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
-
+  const { currentUserInfo } = useContext(SessionContext);
   const loadedRegions = useLoadedRegions(replayClient);
 
   // The Console should render a line indicating the current execution point.
@@ -94,6 +96,8 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     const loggableExecutionPoint = getLoggableExecutionPoint(loggable);
     const isLoaded =
       loadedRegions !== null && isPointInRegions(loggableExecutionPoint, loadedRegions.loaded);
+    const shouldShowConsoleNag = currentUserInfo?.nags.includes(Nag.FIRST_CONSOLE_NAVIGATE);
+    const initialIsHovered = Boolean(shouldShowConsoleNag && index === 0);
 
     if (isLoaded) {
       if (isEventLog(loggable)) {
@@ -103,6 +107,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             eventLog={loggable}
+            initialIsHovered={initialIsHovered}
           />
         );
       } else if (isPointInstance(loggable)) {
@@ -112,6 +117,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             logPointInstance={loggable}
+            initialIsHovered={initialIsHovered}
           />
         );
       } else if (isProtocolMessage(loggable)) {
@@ -121,6 +127,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             message={loggable}
+            initialIsHovered={initialIsHovered}
           />
         );
       } else if (isTerminalExpression(loggable)) {
@@ -130,6 +137,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             terminalExpression={loggable}
+            initialIsHovered={initialIsHovered}
           />
         );
       } else if (isUncaughtException(loggable)) {
@@ -139,6 +147,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             uncaughtException={loggable}
+            initialIsHovered={initialIsHovered}
           />
         );
       } else {
