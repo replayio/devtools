@@ -1,7 +1,31 @@
 import { PlaywrightTestConfig, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { CI, DEBUG, SLOW_MO } = process.env;
+const { CI, DEBUG, RECORD, SLOW_MO } = process.env;
+
+const BROWSERS = {
+  CHROMIUM: {
+    name: "chromium",
+    use: { ...devices["Desktop Chromium"] },
+  },
+  REPLAY_CHROMIUM: {
+    name: "replay-chromium",
+    use: { ...(replayDevices["Replay Chromium"] as any) },
+  },
+  REPLAY_FIREFOX: {
+    name: "replay-firefox",
+    use: { ...(replayDevices["Replay Firefox"] as any) },
+  },
+};
+
+let projects;
+if (CI) {
+  projects = [BROWSERS.REPLAY_CHROMIUM, BROWSERS.CHROMIUM];
+} else if (RECORD) {
+  projects = [BROWSERS.REPLAY_FIREFOX];
+} else {
+  projects = [BROWSERS.CHROMIUM];
+}
 
 const config: PlaywrightTestConfig = {
   use: {
@@ -25,31 +49,8 @@ const config: PlaywrightTestConfig = {
 
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
-  projects: CI
-    ? [
-        // {
-        //   name: "replay-firefox",
-        //   use: { ...(replayDevices["Replay Firefox"] as any) },
-        // },
-        // {
-        //   name: "firefox",
-        //   use: { ...devices["Desktop Firefox"] },
-        // },
-        {
-          name: "replay-chromium",
-          use: { ...(replayDevices["Replay Chromium"] as any) },
-        },
-        {
-          name: "chromium",
-          use: { ...devices["Desktop Chromium"] },
-        },
-      ]
-    : [
-        {
-          name: "chromium",
-          use: { ...devices["Desktop Chromium"] },
-        },
-      ],
+
+  projects,
 };
 
 if (DEBUG) {
