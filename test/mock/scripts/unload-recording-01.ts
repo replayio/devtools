@@ -1,7 +1,6 @@
 // Check that unloaded regions in the recording are reflected in the UI.
 
 import { runTest, devtoolsURL } from "../src/runTest";
-import { waitUntil } from "../../../src/test/harness";
 import { installMockEnvironmentInPage, MockHandlerHelpers } from "../src/mockEnvironment";
 import { v4 as uuid } from "uuid";
 import {
@@ -14,6 +13,49 @@ import {
 } from "../src/graphql";
 import { basicMessageHandlers, basicBindings } from "../src/handlers";
 import { Page } from "@recordreplay/playwright";
+
+export function waitForTime(ms: number, waitingFor?: string) {
+  console.log(`waiting ${ms}ms for ${waitingFor}`);
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function isLongTimeout() {
+  return new URL(window.location.href).searchParams.get("longTimeout");
+}
+
+function defaultWaitTimeout() {
+  return 1000 * (isLongTimeout() ? 120 : 10);
+}
+
+export async function waitUntil<T>(
+  fn: () => T,
+  options?: { timeout?: number; waitingFor?: string }
+) {
+  const { timeout, waitingFor } = {
+    timeout: defaultWaitTimeout(),
+    waitingFor: "unknown",
+    ...options,
+  };
+  const start = Date.now();
+  while (true) {
+    const rv = fn();
+    if (rv) {
+      return rv;
+    }
+    const elapsed = Date.now() - start;
+    if (elapsed >= timeout) {
+      break;
+    }
+    if (elapsed < 1000) {
+      await waitForTime(50, waitingFor);
+    } else if (elapsed < 5000) {
+      await waitForTime(200, waitingFor);
+    } else {
+      await waitForTime(1000, waitingFor);
+    }
+  }
+  throw new Error(`waitUntil() timed out waiting for ${waitingFor}`);
+}
 
 const recordingId = uuid();
 const userId = uuid();

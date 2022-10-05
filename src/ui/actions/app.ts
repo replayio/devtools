@@ -1,5 +1,5 @@
 import { UIStore, UIThunkAction } from ".";
-import { unprocessedRegions, KeyboardEvent } from "@replayio/protocol";
+import { unprocessedRegions, KeyboardEvent, NodeBounds } from "@replayio/protocol";
 import * as selectors from "ui/reducers/app";
 import { Canvas, ReplayEvent, ReplayNavigationEvent, EventKind } from "ui/state/app";
 import groupBy from "lodash/groupBy";
@@ -18,9 +18,9 @@ import { getRecordingId } from "ui/utils/recording";
 import { prefs } from "devtools/client/debugger/src/utils/prefs";
 import { shallowEqual } from "devtools/client/debugger/src/utils/compare";
 import { ThreadFront as ThreadFrontType } from "protocol/thread";
-import { getTest } from "ui/utils/environment";
 import { getTheme } from "ui/reducers/app";
 import { getShowVideoPanel } from "ui/reducers/layout";
+import { getBoundingRectsAsync } from "ui/suspense/nodeCaches";
 
 export * from "../reducers/app";
 
@@ -112,24 +112,12 @@ export async function setupApp(
     store.dispatch(durationSeen(Math.max(...parameters.loading.map(r => r.end.time))));
     store.dispatch(setLoadedRegions(parameters));
   });
-  setupTests();
 }
 
 export function onUnprocessedRegions({ level, regions }: unprocessedRegions): UIThunkAction {
   return dispatch => {
     dispatch(durationSeen(Math.max(...regions.map(r => r.end.time), 0)));
   };
-}
-
-async function setupTests() {
-  const testName = getTest();
-  if (testName) {
-    const Test = await import("test/harness");
-    window.Test = Test.default;
-    const script = document.createElement("script");
-    script.src = `/test/scripts/${testName}`;
-    document.head.appendChild(script);
-  }
 }
 
 const allKeyboardEvents: KeyboardEvent[] = [];
@@ -189,12 +177,26 @@ export function setCanvas(canvas: Canvas): UIThunkAction {
   };
 }
 
+export function fetchMouseTargetsForPause(): UIThunkAction<Promise<NodeBounds[] | undefined>> {
+  return async (dispatch, getState, { protocolClient }) => {
+    const state = getState();
+    const pauseId = state.pause.id;
+    const sessionId = state.app.sessionId;
+
+    if (!sessionId || !pauseId) {
+      return;
+    }
+
+    return getBoundingRectsAsync(protocolClient, sessionId, pauseId);
+  };
+}
+
 export function loadMouseTargets(): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState, { ThreadFront, replayClient, protocolClient }) => {
     dispatch(setMouseTargetsLoading(true));
-    const resp = await ThreadFront.loadMouseTargets();
+    const boundingRects = await dispatch(fetchMouseTargetsForPause());
     dispatch(setMouseTargetsLoading(false));
-    if (resp) {
+    if (boundingRects?.length) {
       dispatch(setIsNodePickerActive(true));
     }
   };

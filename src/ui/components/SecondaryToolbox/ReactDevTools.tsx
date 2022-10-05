@@ -1,9 +1,9 @@
-import { ExecutionPoint, ObjectId } from "@replayio/protocol";
+import { ExecutionPoint, NodeBounds, ObjectId } from "@replayio/protocol";
 import React, { useContext } from "react";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 
-import { ThreadFront, Pause, ValueFront } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 import { compareNumericStrings } from "protocol/utils";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { ReplayClientInterface } from "shared/client/types";
@@ -13,13 +13,18 @@ import {
 } from "@bvaughn/src/suspense/ObjectPreviews";
 
 import { Annotation } from "ui/state/reactDevTools";
-import { getCurrentPoint, getTheme } from "ui/reducers/app";
+import {
+  getCurrentPoint,
+  getTheme,
+  setIsNodePickerActive,
+  setIsNodePickerInitializing,
+} from "ui/reducers/app";
 import {
   getAnnotations,
   getProtocolCheckFailed,
   getReactInitPoint,
 } from "ui/reducers/reactDevTools";
-import { setIsNodePickerActive, setIsNodePickerInitializing } from "ui/reducers/app";
+import { fetchMouseTargetsForPause } from "ui/actions/app";
 import { setHasReactComponents, setProtocolCheckFailed } from "ui/actions/reactDevTools";
 import { NodePicker as NodePickerClass, NodePickerOpts } from "ui/utils/nodePicker";
 import { sendTelemetryEvent, trackEvent } from "ui/utils/telemetry";
@@ -27,8 +32,11 @@ import { highlightNode, unhighlightNode } from "devtools/client/inspector/markup
 import { getJSON } from "ui/utils/objectFetching";
 
 import type { Store, Wall } from "react-devtools-inline/frontend";
+import { getMouseTarget } from "ui/suspense/nodeCaches";
 
 type ReactDevToolsInlineModule = typeof import("react-devtools-inline/frontend");
+
+type NodeOptsWithoutBounds = Omit<NodePickerOpts, "onCheckNodeBounds">;
 
 const getDOMNodes = `((rendererID, id) => __REACT_DEVTOOLS_GLOBAL_HOOK__.rendererInterfaces.get(rendererID).findNativeNodesForFiberID(id))`;
 
@@ -40,12 +48,13 @@ class ReplayWall implements Wall {
   store?: Store;
 
   constructor(
-    private enablePicker: (opts: NodePickerOpts) => void,
+    private enablePicker: (opts: NodeOptsWithoutBounds) => void,
     private initializePicker: () => void,
     private disablePicker: () => void,
     private onShutdown: () => void,
     private highlightNode: (nodeId: string) => void,
     private unhighlightNode: () => void,
+    private fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
     private replayClient: ReplayClientInterface,
     private pauseId: string | undefined
   ) {}
@@ -135,10 +144,9 @@ class ReplayWall implements Wall {
         case "startInspectingNative": {
           this.initializePicker();
 
-          await ThreadFront.getCurrentPause().ensureLoaded();
-          const rv = await ThreadFront.currentPause!.loadMouseTargets();
+          const boundingRects = await this.fetchMouseTargetsForPause();
 
-          if (!rv) {
+          if (!boundingRects?.length) {
             this.disablePicker();
             this._listener?.({ event: "stopInspectingNative", payload: true });
             break;
@@ -236,12 +244,13 @@ function createReactDevTools(
   reactDevToolsInlineModule: ReactDevToolsInlineModule,
   annotations: Annotation[],
   currentPoint: ExecutionPoint,
-  enablePicker: (opts: NodePickerOpts) => void,
+  enablePicker: (opts: NodeOptsWithoutBounds) => void,
   initializePicker: () => void,
   disablePicker: () => void,
   onShutdown: () => void,
   highlightNode: (nodeId: string) => void,
   unhighlightNode: () => void,
+  fetchMouseTargetsForPause: () => Promise<NodeBounds[] | undefined>,
   replayClient: ReplayClientInterface,
   pauseId: string | undefined
 ) {
@@ -255,6 +264,7 @@ function createReactDevTools(
     onShutdown,
     highlightNode,
     unhighlightNode,
+    fetchMouseTargetsForPause,
     replayClient,
     pauseId
   );
@@ -355,10 +365,18 @@ export default function ReactDevtoolsPanel() {
     return null;
   }
 
-  function enablePicker(opts: NodePickerOpts) {
+  function enablePicker(opts: NodeOptsWithoutBounds) {
     dispatch(setIsNodePickerActive(true));
     dispatch(setIsNodePickerInitializing(false));
-    nodePickerInstance.enable(opts);
+
+    const actualOpts: NodePickerOpts = {
+      ...opts,
+      onCheckNodeBounds: async (x, y, nodeIds) => {
+        const boundingRects = await dispatchFetchMouseTargets();
+        return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
+      },
+    };
+    nodePickerInstance.enable(actualOpts);
   }
   function initializePicker() {
     dispatch(setIsNodePickerActive(false));
@@ -381,6 +399,10 @@ export default function ReactDevtoolsPanel() {
 
   function dispatchUnhighlightNode() {
     dispatch(unhighlightNode());
+  }
+
+  function dispatchFetchMouseTargets() {
+    return dispatch(fetchMouseTargetsForPause());
   }
 
   if (protocolCheckFailed) {
@@ -428,6 +450,7 @@ export default function ReactDevtoolsPanel() {
     onShutdown,
     dispatchHighlightNode,
     dispatchUnhighlightNode,
+    dispatchFetchMouseTargets,
     replayClient,
     pauseId
   );
