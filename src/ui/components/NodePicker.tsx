@@ -1,5 +1,6 @@
 import React, { useRef, useState, useLayoutEffect, useCallback } from "react";
 import classnames from "classnames";
+import { NodeBounds } from "@replayio/protocol";
 
 import { useAppDispatch } from "ui/setup/hooks";
 import { ThreadFront } from "protocol/thread";
@@ -9,8 +10,14 @@ import {
   selectNode,
 } from "devtools/client/inspector/markup/actions/markup";
 import { NodePicker as NodePickerClass } from "ui/utils/nodePicker";
-import { loadMouseTargets, setIsNodePickerActive, setMouseTargetsLoading } from "ui/actions/app";
+import {
+  fetchMouseTargetsForPause,
+  loadMouseTargets,
+  setIsNodePickerActive,
+  setMouseTargetsLoading,
+} from "ui/actions/app";
 import { setSelectedPanel } from "ui/actions/layout";
+import { getMouseTarget } from "ui/suspense/nodeCaches";
 
 interface Position {
   x: number;
@@ -71,9 +78,13 @@ export function NodePicker() {
     async function nodePickerMouseClickInCanvas(pos: Position | null) {
       setGlobalNodePickerActive(false);
       nodePickerRemoveTime.current = Date.now();
-      const nodeBounds = pos && (await ThreadFront.getMouseTarget(pos.x, pos.y));
+      let nodeBounds: NodeBounds | null = null;
+      if (pos) {
+        const boundingRects = await dispatch(fetchMouseTargetsForPause());
+        nodeBounds = getMouseTarget(boundingRects ?? [], pos.x, pos.y);
+      }
       if (nodeBounds) {
-        handleNodeSelected(nodeBounds.nodeId);
+        handleNodeSelected(nodeBounds.node);
       } else {
         dispatch(unhighlightNode());
       }
@@ -101,6 +112,10 @@ export function NodePicker() {
           } else {
             dispatch(unhighlightNode());
           }
+        },
+        onCheckNodeBounds: async (x, y, nodeIds) => {
+          const boundingRects = await dispatch(fetchMouseTargetsForPause());
+          return getMouseTarget(boundingRects ?? [], x, y, nodeIds);
         },
       });
     } else {

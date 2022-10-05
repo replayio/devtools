@@ -5,6 +5,7 @@ import {
   Node as ProtocolNode,
   PauseData,
   EventListener,
+  NodeBounds,
 } from "@replayio/protocol";
 import uniqBy from "lodash/uniqBy";
 
@@ -194,3 +195,50 @@ export const {
   },
   (client, sessionId, pauseId, nodeId) => `${pauseId}|${nodeId}`
 );
+
+export const {
+  getValueSuspense: getBoundingRectsSuspense,
+  getValueAsync: getBoundingRectsAsync,
+  getValueIfCached: getBoundingRectsIfCached,
+} = createGenericCache<[client: ProtocolClient, sessionId: string, pauseId: PauseId], NodeBounds[]>(
+  async (client, sessionId, pauseId) => {
+    const { elements } = await client.DOM.getAllBoundingClientRects({}, sessionId, pauseId);
+    return elements;
+  },
+  (client, sessionId, pauseId) => `${pauseId}`
+);
+
+export function getMouseTarget(
+  mouseTargets: NodeBounds[],
+  x: number,
+  y: number,
+  nodeIds?: string[]
+) {
+  for (let nodeBounds of mouseTargets) {
+    let { node, rect, rects, clipBounds, visibility, pointerEvents } = nodeBounds;
+    if (nodeIds && !nodeIds.includes(node)) {
+      continue;
+    }
+    if (visibility === "hidden" || pointerEvents === "none") {
+      continue;
+    }
+    if (
+      (clipBounds?.left !== undefined && x < clipBounds.left) ||
+      (clipBounds?.right !== undefined && x > clipBounds.right) ||
+      (clipBounds?.top !== undefined && y < clipBounds.top) ||
+      (clipBounds?.bottom !== undefined && y > clipBounds.bottom)
+    ) {
+      continue;
+    }
+
+    // in the protocol, rects is set to undefined if there is only one rect
+    rects ||= [rect];
+    for (const r of rects) {
+      const [left, top, right, bottom] = r;
+      if (x >= left && x <= right && y >= top && y <= bottom) {
+        return nodeBounds;
+      }
+    }
+  }
+  return null;
+}

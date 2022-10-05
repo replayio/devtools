@@ -1,11 +1,12 @@
-import { ThreadFront } from "protocol/thread";
 import { getDevicePixelRatio } from "protocol/graphics";
+import { NodeBounds } from "@replayio/protocol";
 
 export interface NodePickerOpts {
   onHovering?: (nodeId: string | null) => void;
   onPicked: (nodeId: string | null) => void;
   onHighlightNode: (nodeId: string) => void;
   onUnhighlightNode: () => void;
+  onCheckNodeBounds: (x: number, y: number, nodeIds?: string[]) => Promise<NodeBounds | null>;
   enabledNodeIds?: string[];
 }
 
@@ -35,13 +36,20 @@ export class NodePicker {
 
   private onMouseMove = async (e: MouseEvent) => {
     const pos = this.mouseEventCanvasPosition(e);
+    const opts = this.opts;
     this.pickerPosition = pos;
-    const nodeBounds = await this.nodeBounds(pos, this.opts?.enabledNodeIds);
+    let nodeBounds: NodeBounds | null = null;
+    if (pos) {
+      if (opts?.onCheckNodeBounds) {
+        nodeBounds = await opts.onCheckNodeBounds(pos.x, pos.y, opts?.enabledNodeIds);
+      }
+    }
+
     if (nodeBounds) {
-      this.opts?.onHighlightNode(nodeBounds.nodeId);
-      if (nodeBounds.nodeId !== this.hoveredNodeId) {
-        this.hoveredNodeId = nodeBounds.nodeId;
-        this.opts?.onHovering?.(nodeBounds.nodeId);
+      this.opts?.onHighlightNode(nodeBounds.node);
+      if (nodeBounds.node !== this.hoveredNodeId) {
+        this.hoveredNodeId = nodeBounds.node;
+        this.opts?.onHovering?.(nodeBounds.node);
       }
     } else {
       this.opts?.onUnhighlightNode();
@@ -52,8 +60,13 @@ export class NodePicker {
     const opts = this.opts;
     this.disable();
     const pos = this.mouseEventCanvasPosition(e);
-    const nodeBounds = await this.nodeBounds(pos, opts?.enabledNodeIds);
-    opts?.onPicked(nodeBounds ? nodeBounds.nodeId : null);
+    let nodeBounds: NodeBounds | null = null;
+    if (pos) {
+      if (opts?.onCheckNodeBounds) {
+        nodeBounds = await opts.onCheckNodeBounds(pos.x, pos.y, opts?.enabledNodeIds);
+      }
+    }
+    opts?.onPicked(nodeBounds ? nodeBounds.node : null);
   };
 
   // Get the x/y coordinate of a mouse event wrt the recording's DOM.
@@ -83,9 +96,5 @@ export class NodePicker {
       x: (e.clientX - bounds.left) / scale / pixelRatio,
       y: (e.clientY - bounds.top) / scale / pixelRatio,
     };
-  }
-
-  private async nodeBounds(pos: Position | undefined, enabledNodeIds: string[] | undefined) {
-    return pos ? await ThreadFront.getMouseTarget(pos.x, pos.y, enabledNodeIds) : undefined;
   }
 }
