@@ -2,7 +2,6 @@ import { Suspense, useMemo } from "react";
 import { PauseId } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import {
   getFrameworkGroupingState,
   getPauseId,
@@ -31,38 +30,15 @@ function FramesRenderer({
   panel,
   pauseId,
   asyncIndex = 0,
-  copyStackTrace,
+  getAllFrames,
 }: {
-  panel: "debugger" | "console" | "webconsole";
+  panel: CommonFrameComponentProps["panel"];
   pauseId: PauseId;
   asyncIndex?: number;
-  copyStackTrace: () => void;
+  getAllFrames: () => PauseFrame[];
 }) {
-  const cx = useAppSelector(getThreadContext);
   const sources = useAppSelector(getSourceDetailsEntities);
   const sourcesState = useAppSelector(state => state.sources);
-  const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
-  const selectedFrame = useAppSelector(getSelectedFrame);
-  const dispatch = useAppDispatch();
-
-  function toggleFrameworkGrouping() {
-    dispatch(setFrameworkGroupingAction(!frameworkGroupingOn));
-  }
-  function selectFrame(...args: Parameters<typeof selectFrameAction>) {
-    dispatch(selectFrameAction(...args));
-  }
-
-  const commonProps: CommonFrameComponentProps = {
-    cx,
-    toggleFrameworkGrouping,
-    frameworkGroupingOn,
-    selectFrame,
-    selectedFrame,
-    displayFullUrl: false,
-    disableContextMenu: false,
-    copyStackTrace,
-    panel,
-  };
 
   const protocolFrames = getAsyncParentFramesSuspense(pauseId, asyncIndex);
   const frames = useMemo(
@@ -81,10 +57,6 @@ function FramesRenderer({
       ),
     [asyncIndex, protocolFrames, sources, sourcesState]
   );
-  const framesOrGroups = useMemo(
-    () => (frames && frameworkGroupingOn ? collapseFrames(frames) : frames),
-    [frames, frameworkGroupingOn]
-  );
 
   if (!frames?.length) {
     if (asyncIndex > 0) {
@@ -95,6 +67,72 @@ function FramesRenderer({
 
   return (
     <>
+      <PauseFrames frames={frames} getAllFrames={getAllFrames} panel={panel} />
+      <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
+        <FramesRenderer
+          panel={panel}
+          pauseId={pauseId}
+          asyncIndex={asyncIndex + 1}
+          getAllFrames={getAllFrames}
+        />
+      </Suspense>
+    </>
+  );
+}
+
+export function PauseFrames({
+  frames,
+  getAllFrames,
+  panel,
+  selectFrame,
+}: {
+  frames: PauseFrame[];
+  getAllFrames?: () => PauseFrame[];
+  panel: CommonFrameComponentProps["panel"];
+  selectFrame?: (...args: Parameters<typeof selectFrameAction>) => void;
+}) {
+  const cx = useAppSelector(getThreadContext);
+  const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
+  const selectedFrame = useAppSelector(getSelectedFrame);
+  const dispatch = useAppDispatch();
+
+  if (!getAllFrames) {
+    getAllFrames = () => frames;
+  }
+  if (!selectFrame) {
+    selectFrame = (...args: Parameters<typeof selectFrameAction>) =>
+      dispatch(selectFrameAction(...args));
+  }
+  function toggleFrameworkGrouping() {
+    dispatch(setFrameworkGroupingAction(!frameworkGroupingOn));
+  }
+
+  function copyStackTrace() {
+    const framesToCopy = getAllFrames!()
+      .map(f => formatCopyName(f))
+      .join("\n");
+    copyToTheClipboard(framesToCopy);
+  }
+
+  const commonProps: CommonFrameComponentProps = {
+    cx,
+    toggleFrameworkGrouping,
+    frameworkGroupingOn,
+    selectFrame,
+    selectedFrame,
+    displayFullUrl: false,
+    disableContextMenu: false,
+    copyStackTrace,
+    panel,
+  };
+
+  const framesOrGroups = useMemo(
+    () => (frames && frameworkGroupingOn ? collapseFrames(frames) : frames),
+    [frames, frameworkGroupingOn]
+  );
+
+  return (
+    <>
       {framesOrGroups?.map(frameOrGroup => {
         if (Array.isArray(frameOrGroup)) {
           return <Group {...commonProps} group={frameOrGroup} key={frameOrGroup[0].id} />;
@@ -102,19 +140,11 @@ function FramesRenderer({
           return <Frame {...commonProps} frame={frameOrGroup} key={frameOrGroup.id} />;
         }
       })}
-      <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
-        <FramesRenderer
-          panel={panel}
-          pauseId={pauseId}
-          asyncIndex={asyncIndex + 1}
-          copyStackTrace={copyStackTrace}
-        />
-      </Suspense>
     </>
   );
 }
 
-export default function Frames({ panel }: { panel: "debugger" | "console" | "webconsole" }) {
+export default function Frames({ panel }: { panel: CommonFrameComponentProps["panel"] }) {
   const sourcesState = useAppSelector(state => state.sources);
   const sourcesLoading = useAppSelector(getSourcesLoading);
   const pauseId = useAppSelector(getPauseId);
@@ -138,19 +168,14 @@ export default function Frames({ panel }: { panel: "debugger" | "console" | "web
     );
   }
 
-  function copyStackTrace() {
-    const framesToCopy = getAllCachedPauseFrames(pauseId!, sourcesState)
-      .map(f => formatCopyName(f))
-      .join("\n");
-    copyToTheClipboard(framesToCopy);
-  }
+  const getAllFrames = () => getAllCachedPauseFrames(pauseId!, sourcesState);
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
       <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
         <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
           <div role="list">
-            <FramesRenderer pauseId={pauseId} panel={panel} copyStackTrace={copyStackTrace} />
+            <FramesRenderer pauseId={pauseId} panel={panel} getAllFrames={getAllFrames} />
           </div>
         </Suspense>
       </ErrorBoundary>

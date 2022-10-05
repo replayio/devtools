@@ -7,7 +7,7 @@ import {
   Frame,
 } from "@replayio/protocol";
 import { createFrame } from "devtools/client/debugger/src/client/create";
-import { Context } from "devtools/client/debugger/src/reducers/pause";
+import { Context, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 import { RequestSummary } from "ui/components/NetworkMonitor/utils";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getRequestById, getSummaryById } from "ui/reducers/network";
@@ -32,7 +32,7 @@ type NewRequestBodyPartsAction = {
 
 type SetFramesAction = {
   type: "SET_FRAMES";
-  payload: { frames: any[]; point: string };
+  payload: { frames: PauseFrame[]; point: string };
 };
 
 type ShowRequestDetailsAction = {
