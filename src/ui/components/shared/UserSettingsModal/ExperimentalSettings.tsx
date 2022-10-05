@@ -47,11 +47,6 @@ const EXPERIMENTAL_SETTINGS: ExperimentalSetting[] = [
     key: "basicProcessingLoadingBar",
   },
   {
-    label: "Legacy frames panel",
-    description: "Restore the legacy frames and scopes panels",
-    key: "legacyFramesPanel",
-  },
-  {
     label: "Console filter drawer defaults to open",
     description:
       "Open the console filter settings by default when opening a Replay for the first time",
@@ -104,8 +99,6 @@ export default function ExperimentalSettings({}) {
   const { value: basicProcessingLoadingBar, update: updateBasicProcessingLoadingBar } = useFeature(
     "basicProcessingLoadingBar"
   );
-  const { value: legacyFramesPanel, update: updateLegacyFramesPanel } =
-    useFeature("legacyFramesPanel");
 
   const onChange = (key: ExperimentalKey, value: any) => {
     if (key == "enableColumnBreakpoints") {
@@ -120,8 +113,6 @@ export default function ExperimentalSettings({}) {
       updateEnableQueryCache(!enableQueryCache);
     } else if (key === "basicProcessingLoadingBar") {
       updateBasicProcessingLoadingBar(!basicProcessingLoadingBar);
-    } else if (key === "legacyFramesPanel") {
-      updateLegacyFramesPanel(!legacyFramesPanel);
     } else if (key === "consoleFilterDrawerDefaultsToOpen") {
       updateConsoleFilterDrawerDefaultsToOpen(!consoleFilterDrawerDefaultsToOpen);
     }
@@ -135,7 +126,6 @@ export default function ExperimentalSettings({}) {
     enableQueryCache,
     hitCounts,
     profileWorkerThreads,
-    legacyFramesPanel,
   };
 
   const settings = { ...userSettings, ...localSettings };
