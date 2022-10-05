@@ -9,7 +9,7 @@ const config: FullConfig = {
   globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
-  retries: VISUAL_DEBUG || RECORD_PROTOCOL_DATA ? 0 : 5,
+  retries: VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",
