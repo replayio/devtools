@@ -1,16 +1,17 @@
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import { getFirstVisibleBreakpoints } from "devtools/client/debugger/src/selectors";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
+import { useContext } from "react";
 import { getSelectedSource } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
 
 import Breakpoint from "./Breakpoint";
 
-export default function Breakpoints({ cx, editor }: { cx: Context; editor: SourceEditor }) {
-  const breakpoints = useAppSelector(getFirstVisibleBreakpoints);
+export default function Breakpoints({ editor }: { editor: SourceEditor }) {
   const selectedSource = useAppSelector(getSelectedSource);
 
-  if (!selectedSource || !breakpoints) {
+  const { deletePoints, editPoint, points } = useContext(PointsContext);
+
+  if (!selectedSource || !points) {
     return null;
   }
 
@@ -19,18 +20,20 @@ export default function Breakpoints({ cx, editor }: { cx: Context; editor: Sourc
 
   return (
     <div>
-      {breakpoints.map(breakpoint => {
-        if (renderedLines.has(breakpoint.location.line)) {
+      {points.map(point => {
+        if (renderedLines.has(point.location.line)) {
           return null;
         }
 
-        renderedLines.add(breakpoint.location.line);
+        renderedLines.add(point.location.line);
 
         return (
           <Breakpoint
-            cx={cx}
-            key={breakpoint.id}
-            breakpoint={breakpoint}
+            key={point.id}
+            deletePoints={deletePoints}
+            editPoint={editPoint}
+            point={point}
+            points={points}
             selectedSource={selectedSource}
             editor={editor}
           />

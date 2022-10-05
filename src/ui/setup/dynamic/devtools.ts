@@ -74,6 +74,10 @@ declare global {
     actions?: ResolveThunks<typeof actions>;
     selectors?: BoundSelectors;
     debugger?: any;
+
+    PointsContext?: any;
+    SourcesCache?: any;
+    replayClient?: ReplayClientInterface;
   }
 }
 
@@ -155,11 +159,7 @@ export default async function setupDevtools(store: AppStore, replayClient: Repla
   window.app.debugger = setupDebuggerHelper();
   window.app.prefs = window.app.prefs ?? {};
 
-  const initialDebuggerState = await dbgClient.loadInitialState();
-
-  const initialState = {
-    ...initialDebuggerState,
-  };
+  const initialState = {};
 
   const reducers = {
     app,

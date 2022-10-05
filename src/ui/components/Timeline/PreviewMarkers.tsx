@@ -1,13 +1,14 @@
 import type { PointDescription, Location } from "@replayio/protocol";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
-import { useAppSelector } from "ui/setup/hooks";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { Suspense, useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { selectors } from "ui/reducers";
-import { HoveredItem } from "ui/state/timeline";
+import { useAppSelector } from "ui/setup/hooks";
 
 import Marker from "./Marker";
-import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
-import { Suspense } from "react";
 
 function PreviewMarkers() {
   const currentTime = useAppSelector(selectors.getCurrentTime);
@@ -15,13 +16,38 @@ function PreviewMarkers() {
   const timelineDimensions = useAppSelector(selectors.getTimelineDimensions);
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
 
-  const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
+  const replayClient = useContext(ReplayClientContext);
 
-  if (
-    hitPointStatus === "too-many-points-to-find" ||
-    hitPoints == null ||
-    hitPoints.length > MAX_POINTS_FOR_FULL_ANALYSIS
-  ) {
+  const { focusedSourceId, hoveredLineIndex, visibleLines } = useContext(SourcesContext);
+  const { range: focusRange } = useContext(FocusContext);
+
+  let firstColumnWithHitCounts = null;
+  if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
+    const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
+    const hitCountsForLine = hitCounts.get(hoveredLineIndex)!;
+    if (hitCountsForLine) {
+      const first = hitCountsForLine.columnHits[0];
+      if (first) {
+        firstColumnWithHitCounts = first.location.column;
+      }
+    }
+  }
+
+  const [hitPoints, hitPointStatus] =
+    focusedSourceId !== null && firstColumnWithHitCounts !== null && hoveredLineIndex !== null
+      ? getHitPointsForLocation(
+          replayClient,
+          {
+            sourceId: focusedSourceId,
+            column: firstColumnWithHitCounts,
+            line: hoveredLineIndex,
+          },
+          null,
+          focusRange
+        )
+      : [null, null];
+
+  if (hitPointStatus === "too-many-points-to-find" || hitPoints == null) {
     return null;
   }
 
@@ -29,7 +55,6 @@ function PreviewMarkers() {
     <div className="preview-markers-container">
       {hitPoints.map((point: PointDescription, index: number) => {
         const isPrimaryHighlighted = hoveredItem?.point === point.point;
-        const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 
         return (
           <Marker
@@ -40,7 +65,6 @@ function PreviewMarkers() {
             location={point.frame?.[0]}
             currentTime={currentTime}
             isPrimaryHighlighted={isPrimaryHighlighted}
-            isSecondaryHighlighted={isSecondaryHighlighted}
             zoomRegion={zoomRegion}
             overlayWidth={timelineDimensions.width}
           />
@@ -48,17 +72,6 @@ function PreviewMarkers() {
       })}
     </div>
   );
-}
-
-function getIsSecondaryHighlighted(
-  hoveredItem: HoveredItem | null,
-  location: Location | undefined
-): boolean {
-  if (hoveredItem?.target == "console" || !location || !hoveredItem?.location) {
-    return false;
-  }
-
-  return getLocationKey(hoveredItem.location) == getLocationKey(location);
 }
 
 export default function ToggleWidgetButtonSuspenseWrapper() {

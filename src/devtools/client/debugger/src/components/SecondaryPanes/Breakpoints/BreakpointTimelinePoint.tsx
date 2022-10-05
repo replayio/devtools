@@ -1,16 +1,15 @@
+import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
+import classnames from "classnames";
+import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
+import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
 import React from "react";
 import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-import { selectors } from "ui/reducers";
-import { timelineMarkerWidth as pointWidth } from "ui/constants";
-import type { UIState } from "ui/state";
+import { Point } from "shared/client/types";
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
-import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
-import { Breakpoint } from "../../../reducers/types";
-import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
+import { timelineMarkerWidth as pointWidth } from "ui/constants";
+import { selectors } from "ui/reducers";
+import type { UIState } from "ui/state";
 import { HoveredItem } from "ui/state/timeline";
 
 function toBigInt(num?: string | null) {
@@ -27,22 +26,8 @@ function hasPrimaryHighlight({
   return hoveredItem?.point === point?.point;
 }
 
-function hasSecondaryHighlighted({
-  hoveredItem,
-  breakpoint,
-}: {
-  hoveredItem: HoveredItem | null;
-  breakpoint: Breakpoint;
-}) {
-  if (!breakpoint.id || !hoveredItem?.location) {
-    return false;
-  }
-
-  return breakpoint.id == getLocationKey(hoveredItem.location);
-}
-
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
+  (state: UIState, { breakpoint }: { breakpoint: Point }) => ({
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),
@@ -55,7 +40,7 @@ const connector = connect(
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type BTPProps = PropsFromRedux & {
-  breakpoint: Breakpoint;
+  breakpoint: Point;
   point: PointDescription;
   index: number;
   hitPoints: TimeStampedPoint[];
@@ -105,7 +90,6 @@ function BreakpointTimelinePoint({
         future: pointInt > executionInt,
         pause: pointInt == executionInt,
         "primary-highlight": hasPrimaryHighlight({ hoveredItem, point }),
-        "secondary-highlight": hasSecondaryHighlighted({ hoveredItem, breakpoint }),
       })}
       title={`${index + 1}/${hitPoints.length}`}
       onClick={onClick}
@@ -131,7 +115,6 @@ const MemoizedBreakpointTimelinePoint = React.memo(
 
     if (
       selectorChanged(hasPrimaryHighlight) ||
-      selectorChanged(hasSecondaryHighlighted) ||
       hasChanged("zoomRegion") ||
       hasChanged("executionPoint") ||
       hasChanged("hitPoints")

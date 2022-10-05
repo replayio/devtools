@@ -1,28 +1,19 @@
-import { updateHoveredLineNumber } from "devtools/client/debugger/src/actions/breakpoints/index";
-import minBy from "lodash/minBy";
-import debounce from "lodash/debounce";
-import React, { useRef, useState, useEffect, ReactNode, useCallback } from "react";
-
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import React, { ReactNode, Suspense, useContext, useEffect } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { KeyModifiers } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
 import hooks from "ui/hooks";
 import { Nag } from "ui/hooks/users";
-import { getLoadedRegions, setHoveredLineNumberLocation } from "ui/reducers/app";
-import { getShowFocusModeControls } from "ui/reducers/timeline";
+import { getSelectedSource } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { trackEvent } from "ui/utils/telemetry";
 import { shouldShowNag } from "ui/utils/user";
 
-import { getSelectedSource } from "ui/reducers/sources";
-
 import StaticTooltip from "./StaticTooltip";
-import {
-  fetchHitCounts,
-  getHitCountsForSource,
-  getHitCountsStatusForSourceByLine,
-} from "ui/reducers/hitCounts";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
 export const AWESOME_BACKGROUND = `linear-gradient(116.71deg, #FF2F86 21.74%, #EC275D 83.58%), linear-gradient(133.71deg, #01ACFD 3.31%, #F155FF 106.39%, #F477F8 157.93%, #F33685 212.38%), #007AFF`;
 
@@ -40,14 +31,14 @@ function Wrapper({
 
   if (showWarning) {
     return (
-      <div className="space-x-2 bg-red-700 static-tooltip-content">
+      <div className="static-tooltip-content space-x-2 bg-red-700">
         <MaterialIcon>warning_amber</MaterialIcon>
         <div>{children}</div>
       </div>
     );
   } else if (showNag) {
     return (
-      <div className="space-x-2 static-tooltip-content" style={{ background: AWESOME_BACKGROUND }}>
+      <div className="static-tooltip-content space-x-2" style={{ background: AWESOME_BACKGROUND }}>
         <MaterialIcon iconSize="xl">auto_awesome</MaterialIcon>
         <div className="flex flex-col items-start">
           {!loading ? <div className="font-bold">Click to add a print statement</div> : null}
@@ -57,7 +48,7 @@ function Wrapper({
     );
   }
 
-  return <div className="bg-gray-700 static-tooltip-content">{children}</div>;
+  return <div className="static-tooltip-content bg-gray-700">{children}</div>;
 }
 
 type Props = {
@@ -65,133 +56,70 @@ type Props = {
   keyModifiers: KeyModifiers;
 };
 
-export default function LineNumberTooltipWrapper(props: Props) {
-  return <LineNumberTooltip {...props} />;
-}
-
-function LineNumberTooltip({ editor, keyModifiers }: Props) {
-  const dispatch = useAppDispatch();
-  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
-  const lastHoveredLineNumber = useRef<number | null>(null);
+function LineNumberTooltipSuspends({ editor, keyModifiers }: Props) {
   const isMetaActive = keyModifiers.meta;
-  const source = useAppSelector(getSelectedSource);
-  const loadedRegions = useAppSelector(getLoadedRegions);
-  const focusControlsActive = useAppSelector(getShowFocusModeControls);
+  const source = useAppSelector(getSelectedSource)!;
 
-  const hitCounts = useAppSelector(state => getHitCountsForSource(state, source!.id));
-  const hitCountStatus = useAppSelector(state =>
-    getHitCountsStatusForSourceByLine(state, source!.id, lastHoveredLineNumber.current || 0)
-  );
+  const { hoveredLineIndex, hoveredLineNode, visibleLines } = useContext(SourcesContext);
 
-  let hits: number | undefined;
+  const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
 
-  if (lastHoveredLineNumber.current && hitCounts) {
-    const lineHitCounts = minBy(
-      hitCounts.filter(hitCount => hitCount.location.line === lastHoveredLineNumber.current),
-      b => b.location.column
-    );
-    hits = lineHitCounts?.hits;
+  const hitsCounts =
+    source && visibleLines
+      ? getSourceHitCounts(replayClient, source.id, visibleLines, focusRange)
+      : null;
+
+  let hitsCount: number | null = null;
+  if (hoveredLineIndex != null && hitsCounts != null) {
+    const lineHits = hitsCounts.get(hoveredLineIndex);
+    if (lineHits) {
+      hitsCount = lineHits.hits;
+    }
   }
 
-  const fetchHitCountsForVisibleLines = useCallback(() => {
-    const uniqueChunks = calculateRangeChunksForVisibleLines(editor);
-    // Now try to fetch hit counts for the unique bounds chunks
-    for (let bounds of uniqueChunks) {
-      dispatch(fetchHitCounts(source!.id, bounds.lower));
-    }
-  }, [editor, dispatch, source]);
-
   useEffect(() => {
-    const debouncedClearHoveredLineNumber = debounce(() => {
-      // Only reset the Redux state here after a short delay.
-      // That way, if we immediately mouse from active line X to X + 1,
-      // we won't dispatch a "reset line to null" action as part of that change.
-      // This avoids causing the `{lower, upper} selector to think we're at range 0..100,
-      // which was causing many unnecessary gutter marker updates.
-      // Note that mousing over an inactive line _will_ cause us to clear this line number.
-      setTargetNode(null);
-      if (lastHoveredLineNumber.current !== null) {
-        lastHoveredLineNumber.current = null;
-        dispatch(setHoveredLineNumberLocation(null));
-      }
-    }, 10);
+    trackEvent(hitsCount ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits");
+    trackEvent("breakpoint.preview_hits", { hitsCount });
+  }, [hitsCount]);
 
-    const debouncedFetchHitCountsForVisibleLines = debounce(() => {
-      fetchHitCountsForVisibleLines();
-    }, 100);
-
-    const setHoveredLineNumber = ({
-      lineNumber,
-      lineNumberNode,
-    }: {
-      lineNumber: number;
-      lineNumberNode: HTMLElement;
-    }) => {
-      if (lineNumber !== lastHoveredLineNumber.current) {
-        // Bail out of any pending "clear hover line" dispatch, since we're over a new line
-        debouncedClearHoveredLineNumber.cancel();
-
-        lastHoveredLineNumber.current = lineNumber;
-
-        dispatch(updateHoveredLineNumber(lineNumber));
-        setTargetNode(lineNumberNode);
-        debouncedFetchHitCountsForVisibleLines();
-      }
-    };
-
-    editor.codeMirror.on("lineMouseEnter", setHoveredLineNumber);
-    editor.codeMirror.on("lineMouseLeave", debouncedClearHoveredLineNumber);
-    return () => {
-      editor.codeMirror.off("lineMouseEnter", setHoveredLineNumber);
-      editor.codeMirror.off("lineMouseLeave", debouncedClearHoveredLineNumber);
-    };
-  }, [dispatch, editor.codeMirror, fetchHitCountsForVisibleLines]);
-
-  useEffect(() => {
-    // TODO Could maybe be an RTK listener that watches for the "stop focus bar" action?
-    if (!focusControlsActive) {
-      fetchHitCountsForVisibleLines();
-    }
-  }, [loadedRegions, focusControlsActive, fetchHitCountsForVisibleLines]);
-
-  useEffect(() => {
-    if (hits) {
-      trackEvent(hits ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits");
-      trackEvent("breakpoint.preview_hits", { hitsCount: hits || null });
-    }
-  }, [hits]);
-
-  if (!targetNode || isMetaActive) {
+  if (!hoveredLineIndex || isMetaActive) {
     return null;
   }
 
-  if (hitCountStatus === LoadingStatus.ERRORED) {
-    return (
-      <StaticTooltip targetNode={targetNode}>
-        <Wrapper showWarning={true}>Failed to load hit counts for this section</Wrapper>
-      </StaticTooltip>
-    );
+  if (hitsCounts == null || hoveredLineNode === null) {
+    return <Loading hoveredLineNode={hoveredLineNode} />;
   }
-
-  if (!hitCounts) {
-    return (
-      <StaticTooltip targetNode={targetNode}>
-        <Wrapper loading>Loading…</Wrapper>
-      </StaticTooltip>
-    );
-  }
-
-  if (hits === undefined) {
-    return null;
-  }
-
-  const count = hits || 0;
 
   return (
-    <StaticTooltip targetNode={targetNode}>
-      <Wrapper showWarning={count > 200}>
-        {count} hit{count == 1 ? "" : "s"}
+    <StaticTooltip targetNode={hoveredLineNode}>
+      <Wrapper showWarning={hitsCount! > 200}>
+        {hitsCount} hit{hitsCount == 1 ? "" : "s"}
       </Wrapper>
     </StaticTooltip>
+  );
+}
+
+function Loading({ hoveredLineNode }: { hoveredLineNode: HTMLElement | null }) {
+  if (hoveredLineNode == null) {
+    return null;
+  }
+
+  return (
+    <StaticTooltip targetNode={hoveredLineNode}>
+      <Wrapper loading>Loading…</Wrapper>
+    </StaticTooltip>
+  );
+}
+
+export default function LineNumberTooltip(props: Props) {
+  const { hoveredLineNode } = useContext(SourcesContext);
+
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<Loading hoveredLineNode={hoveredLineNode} />}>
+        <LineNumberTooltipSuspends {...props} />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

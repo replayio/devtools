@@ -1,19 +1,16 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-import React, { Component } from "react";
-
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import KeyShortcuts from "devtools/client/shared/key-shortcuts";
+import Services from "devtools/shared/services";
+import React, { Component, ContextType } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import type { UIState } from "ui/state";
+import { trackEvent } from "ui/utils/telemetry";
+
+import actions from "../../actions";
 import { getThreadContext, getFramePositions, hasFrames } from "../../selectors";
 import { formatKeyShortcut } from "../../utils/text";
-import actions from "../../actions";
-import CommandBarButton from "../shared/Button/CommandBarButton";
-import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-import { trackEvent } from "ui/utils/telemetry";
-import type { UIState } from "ui/state";
 
-import Services from "devtools/shared/services";
+import CommandBarButton from "../shared/Button/CommandBarButton";
 
 const { appinfo } = Services;
 
@@ -72,6 +69,9 @@ function formatKey(action: string) {
 class CommandBar extends Component<PropsFromRedux> {
   // @ts-expect-error it gets initialized in cDM
   shortcuts: KeyShortcuts | null;
+
+  static contextType = PointsContext;
+  context!: ContextType<typeof PointsContext>;
 
   componentWillUnmount() {
     const shortcuts = this.shortcuts;
@@ -159,6 +159,7 @@ class CommandBar extends Component<PropsFromRedux> {
       />
     );
   }
+
   renderResumeButton() {
     return (
       <CommandBarButton

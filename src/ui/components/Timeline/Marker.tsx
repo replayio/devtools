@@ -1,13 +1,14 @@
-import React, { MouseEventHandler } from "react";
-import { getVisiblePosition } from "../../utils/timeline";
-import { connect, ConnectedProps } from "react-redux";
-import classnames from "classnames";
-import { actions } from "../../actions";
-import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { Location, PauseId } from "@replayio/protocol";
+import classnames from "classnames";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import { timelineMarkerWidth as pointWidth } from "../../constants";
+import React, { MouseEventHandler } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import { HoveredItem, ZoomRegion } from "ui/state/timeline";
 import { trackEvent } from "ui/utils/telemetry";
+
+import { actions } from "../../actions";
+import { timelineMarkerWidth as pointWidth } from "../../constants";
+import { getVisiblePosition } from "../../utils/timeline";
 
 // If you do modify this, make sure you change EVERY single reference to this 11px width in
 // the codebase. This includes, but is not limited to, the Timeline component, Message component,
@@ -29,7 +30,6 @@ type MarkerProps = PropsFromRedux & {
   hasFrames: boolean;
   currentTime: number;
   isPrimaryHighlighted: boolean;
-  isSecondaryHighlighted: boolean;
   zoomRegion: ZoomRegion;
   overlayWidth: number;
   pauseId?: PauseId;
@@ -37,9 +37,7 @@ type MarkerProps = PropsFromRedux & {
 
 class Marker extends React.Component<MarkerProps> {
   shouldComponentUpdate(nextProps: Readonly<MarkerProps>) {
-    const highlightChanged =
-      this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted ||
-      this.props.isSecondaryHighlighted !== nextProps.isSecondaryHighlighted;
+    const highlightChanged = this.props.isPrimaryHighlighted !== nextProps.isPrimaryHighlighted;
 
     return (
       highlightChanged ||
@@ -79,8 +77,7 @@ class Marker extends React.Component<MarkerProps> {
   };
 
   render() {
-    const { time, currentTime, isPrimaryHighlighted, isSecondaryHighlighted, zoomRegion } =
-      this.props;
+    const { time, currentTime, isPrimaryHighlighted, zoomRegion } = this.props;
 
     const offsetPercent = getVisiblePosition({ time, zoom: zoomRegion }) * 100;
     if (offsetPercent < 0 || offsetPercent > 100) {
@@ -92,7 +89,6 @@ class Marker extends React.Component<MarkerProps> {
         tabIndex={0}
         className={classnames("marker", {
           "primary-highlight": isPrimaryHighlighted,
-          "secondary-highlight": isSecondaryHighlighted,
           paused: time === currentTime,
         })}
         style={{

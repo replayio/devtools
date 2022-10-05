@@ -1,8 +1,7 @@
 import { ExecutionPoint, PauseId } from "@replayio/protocol";
-import ConsoleRoot from "bvaughn-architecture-demo/components/console";
+import NewConsole from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
-import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
-import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+
 import {
   NewTerminalExpression,
   TerminalContext,
@@ -17,86 +16,48 @@ import React, {
   PropsWithChildren,
   useCallback,
   useContext,
-  useEffect,
   useLayoutEffect,
   useMemo,
   useRef,
   useState,
   useTransition,
 } from "react";
-import {
-  SessionContext,
-  SessionContextType,
-} from "bvaughn-architecture-demo/src/contexts/SessionContext";
 import { getCachedPauseIdForExecutionPoint } from "bvaughn-architecture-demo/src/suspense/PauseCache";
-import { Range } from "bvaughn-architecture-demo/src/types";
-import { setBreakpointPrefixBadge } from "devtools/client/debugger/src/actions/breakpoints";
-import {
-  getLogPointsList,
-  getPauseId,
-  getSelectedFrame,
-} from "devtools/client/debugger/src/selectors";
+import { getPauseId, getSelectedFrame } from "devtools/client/debugger/src/selectors";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { Pause, ThreadFront } from "protocol/thread";
-import { seek, setFocusRegion } from "ui/actions/timeline";
+import { seek } from "ui/actions/timeline";
 import { useGetRecordingId } from "ui/hooks/recordings";
-import { getCurrentPoint, getLoadedRegions } from "ui/reducers/app";
-import { getCurrentTime, getFocusRegion, getRecordingDuration } from "ui/reducers/timeline";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { FocusRegion } from "ui/state/timeline";
-import { rangeForFocusRegion } from "ui/utils/timeline";
 import { useFeature } from "ui/hooks/settings";
+import { getCurrentPoint } from "ui/reducers/app";
+import { getCurrentTime } from "ui/reducers/timeline";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+
+import { ConsoleNag } from "../shared/Nags/Nags";
 
 import styles from "./NewConsole.module.css";
-import { ConsoleNag } from "../shared/Nags/Nags";
 import useTerminalHistory from "./useTerminalHistory";
-import { useGetUserInfo } from "ui/hooks/users";
-import { Point, PointId } from "shared/client/types";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
-  const recordingId = useGetRecordingId();
   const { value: consoleFilterDrawerDefaultsToOpen } = useFeature(
     "consoleFilterDrawerDefaultsToOpen"
   );
 
-  const duration = useAppSelector(getRecordingDuration)!;
-  const currentUserInfo = useGetUserInfo();
-
-  const sessionContext = useMemo<SessionContextType>(
-    () => ({
-      accessToken: ThreadFront.getAccessToken(),
-      recordingId,
-      sessionId: ThreadFront.sessionId!,
-      // Duration info is primarily used by the focus editor (not imported yet)
-      // but Console message context menu also allows refining the focus, which uses it.
-      duration,
-      endPoint: null as any,
-      currentUserInfo,
-    }),
-    [currentUserInfo, duration, recordingId]
-  );
-
   return (
-    <SessionContext.Provider value={sessionContext}>
-      <TimelineContextAdapter>
-        <InspectorContextReduxAdapter>
-          <TerminalContextController>
-            <FocusContextReduxAdapter>
-              <PointsContextReduxAdapter>
-                <ConsoleRoot
-                  nagHeader={<ConsoleNag />}
-                  showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
-                  showSearchInputByDefault={false}
-                  terminalInput={<JSTermWrapper />}
-                />
-              </PointsContextReduxAdapter>
-            </FocusContextReduxAdapter>
-          </TerminalContextController>
-        </InspectorContextReduxAdapter>
-      </TimelineContextAdapter>
-    </SessionContext.Provider>
+    <TimelineContextAdapter>
+      <InspectorContextReduxAdapter>
+        <TerminalContextController>
+          <NewConsole
+            nagHeader={<ConsoleNag />}
+            showFiltersByDefault={consoleFilterDrawerDefaultsToOpen}
+            showSearchInputByDefault={false}
+            terminalInput={<JSTermWrapper />}
+          />
+        </TerminalContextController>
+      </InspectorContextReduxAdapter>
+    </TimelineContextAdapter>
   );
 }
 
@@ -152,119 +113,13 @@ function JSTermWrapper() {
   };
 
   return (
-    <div className={styles.JSTermWrapper} onKeyDown={onKeyDown} data-test-id="JSTerm">
+    <div className={styles.JSTermWrapper} data-test-id="JSTerm" onKeyDown={onKeyDown}>
       <JSTerm
         addTerminalExpression={addTerminalExpression}
         terminalExpressionHistory={terminalExpressionHistory}
       />
     </div>
   );
-}
-
-// Adapter that reads focus region (from Redux) and passes it to the FocusContext.
-function FocusContextReduxAdapter({ children }: PropsWithChildren) {
-  const dispatch = useAppDispatch();
-  const loadedRegions = useAppSelector(getLoadedRegions);
-  const focusRegion = useAppSelector(getFocusRegion);
-
-  const [isPending, startTransition] = useTransition();
-  const [deferredFocusRegion, setDeferredFocusRegion] = useState<FocusRegion | null>(null);
-
-  useEffect(() => {
-    startTransition(() => {
-      setDeferredFocusRegion(focusRegion);
-    });
-  }, [focusRegion, loadedRegions]);
-
-  const update = useCallback(
-    (value: Range | null, _: boolean) => {
-      dispatch(
-        setFocusRegion(
-          value !== null
-            ? {
-                beginTime: value[0],
-                endTime: value[1],
-              }
-            : null
-        )
-      );
-    },
-    [dispatch]
-  );
-
-  const context = useMemo(() => {
-    return {
-      isTransitionPending: isPending,
-      range: deferredFocusRegion ? rangeForFocusRegion(deferredFocusRegion) : null,
-      rangeForDisplay: focusRegion ? rangeForFocusRegion(focusRegion) : null,
-      update,
-    };
-  }, [deferredFocusRegion, isPending, focusRegion, update]);
-
-  return <FocusContext.Provider value={context}>{children}</FocusContext.Provider>;
-}
-
-// Adapter that reads log points (from Redux) and passes them to the PointsContext.
-function PointsContextReduxAdapter({ children }: PropsWithChildren) {
-  const dispatch = useAppDispatch();
-
-  const logpoints = useAppSelector(getLogPointsList);
-
-  // Convert to the Point[] format required by the new Console.
-  const points = useMemo<Point[]>(
-    () =>
-      logpoints.map(logpoint => ({
-        badge: logpoint.options.prefixBadge || null,
-        condition: logpoint.options.condition || null,
-        content: logpoint.options.logValue!,
-        id: logpoint.id,
-        location: logpoint.location,
-        shouldBreak: false,
-        shouldLog: true,
-      })),
-    [logpoints]
-  );
-
-  const [isPending, startTransition] = useTransition();
-  const [deferredPoints, setDeferredPoints] = useState<Point[]>([]);
-
-  // Update derived analysis points in a transition (so it's safe to Suspend) when points change.
-  useEffect(() => {
-    startTransition(() => {
-      setDeferredPoints(points);
-    });
-  }, [points]);
-
-  // Limited edit functionality for this context: setting logpoint badge.
-  const editPoint = useCallback(
-    (id: PointId, partialPoint: Partial<Point>) => {
-      const { badge, ...rest } = partialPoint;
-      if (badge !== undefined && Object.keys(rest).length === 0) {
-        const breakpoint = logpoints.find(logpoint => logpoint.id === id);
-        if (breakpoint) {
-          dispatch(setBreakpointPrefixBadge(breakpoint, badge || undefined));
-        }
-      }
-    },
-    [dispatch, logpoints]
-  );
-
-  const context = useMemo(
-    () => ({
-      isPending,
-      points,
-      pointsForAnalysis: deferredPoints,
-
-      // PointsContext is read-only in this context.
-      // Log points are added by the legacy source Editor component.
-      addPoint: () => {},
-      deletePoints: () => {},
-      editPoint,
-    }),
-    [deferredPoints, editPoint, isPending, points]
-  );
-
-  return <PointsContext.Provider value={context}>{children}</PointsContext.Provider>;
 }
 
 function TerminalContextController({ children }: PropsWithChildren) {

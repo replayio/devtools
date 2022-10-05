@@ -38,15 +38,23 @@ function isValidTarget(target: HTMLElement) {
   );
 }
 
-function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
+function emitLineMouseEnter(
+  codeMirror: $FixTypeLater,
+  target: HTMLElement,
+  clientX: number,
+  clientY: number
+) {
   trackEventOnce("editor.mouse_over");
+  const { line: lineIndex, ch: columnIndex } = codeMirror.coordsChar(
+    { left: clientX, top: clientY },
+    "window"
+  );
+
   const lineNode = isHoveredOnLine(target)
     ? target.closest(".CodeMirror-line")
     : getLineNodeFromGutterTarget(target);
   const row = lineNode!.parentElement!;
-
   const lineNumberNode = getLineNumberNode(row);
-  const lineNumber = safeJsonParse(lineNumberNode!.childNodes[0]!.nodeValue!);
 
   target.addEventListener(
     "mouseleave",
@@ -55,7 +63,11 @@ function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
 
       // Don't trigger a mouse leave event if the user ends up hovering on the gutter button.
       if (gutterButton && !gutterButton.matches(":hover")) {
-        dispatch(codeMirror, "lineMouseLeave", { lineNumber, lineNode });
+        dispatch(codeMirror, "lineMouseLeave", {
+          columnIndex,
+          lineIndex,
+          lineNumberNode,
+        });
       }
     },
     {
@@ -64,7 +76,11 @@ function emitLineMouseEnter(codeMirror: $FixTypeLater, target: HTMLElement) {
     }
   );
 
-  dispatch(codeMirror, "lineMouseEnter", { lineNumber, lineNode, lineNumberNode });
+  dispatch(codeMirror, "lineMouseEnter", {
+    columnIndex,
+    lineIndex,
+    lineNumberNode,
+  });
 }
 
 export function onLineMouseOver(codeMirror: $FixTypeLater) {
@@ -79,7 +95,7 @@ export function onLineMouseOver(codeMirror: $FixTypeLater) {
     }
 
     if (isValidTarget(target)) {
-      emitLineMouseEnter(codeMirror, target);
+      emitLineMouseEnter(codeMirror, target, event.clientX, event.clientY);
     }
   };
 }
@@ -96,6 +112,6 @@ export function onMouseScroll(codeMirror: $FixTypeLater, clientX: number, client
   }
 
   if (isValidTarget(target) && codeMirror) {
-    emitLineMouseEnter(codeMirror, target);
+    emitLineMouseEnter(codeMirror, target, clientX, clientY);
   }
 }

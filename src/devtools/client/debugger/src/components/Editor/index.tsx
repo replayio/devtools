@@ -1,48 +1,33 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-import debounce from "lodash/debounce";
-import React, { PureComponent } from "react";
-import PropTypes from "prop-types";
-import ReactDOM from "react-dom";
 import { bindActionCreators, Dispatch } from "@reduxjs/toolkit";
-import { isFirefox } from "ui/utils/environment";
-
-import { connect, ConnectedProps } from "react-redux";
+import { Location } from "@replayio/protocol";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import classnames from "classnames";
-
-import type { UIState } from "ui/state";
-
-import type { SourceEditor } from "../../utils/editor/source-editor";
-import { getIndentation } from "../../utils/indentation";
-
-import actions from "../../actions";
-
-import SearchBar from "./SearchBar";
-import Preview from "./Preview";
-import Breakpoints from "./Breakpoints/Breakpoints";
-import ColumnBreakpoints from "./ColumnBreakpoints";
-import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
-import DebugLine from "./DebugLine";
-import EmptyLines from "./EmptyLines";
-import EditorMenu from "./EditorMenu";
-import LineNumberTooltip from "./LineNumberTooltip";
-import HighlightLine from "./HighlightLine";
-import HighlightLines from "./HighlightLines";
-import EditorLoadingBar from "./EditorLoadingBar";
-import { EditorNag } from "ui/components/shared/Nags/Nags";
-import { KeyModifiersContext } from "ui/components/KeyModifiers";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
-
+import debounce from "lodash/debounce";
+import PropTypes from "prop-types";
+import React, { PureComponent, useContext } from "react";
+import ReactDOM from "react-dom";
+import { connect, ConnectedProps } from "react-redux";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point, PointId } from "shared/client/types";
+import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
+import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
+import { KeyModifiersContext } from "ui/components/KeyModifiers";
+import { EditorNag, NAG_HEIGHT } from "ui/components/shared/Nags/Nags";
+import { selectors } from "ui/reducers";
+import { getContextMenu } from "ui/reducers/contextMenus";
 import {
   getSelectedSource,
   getSelectedLocation,
   getSelectedSourceWithContent,
 } from "ui/reducers/sources";
+import { isFirefox } from "ui/utils/environment";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
+import type { UIState } from "ui/state";
 
+import actions from "../../actions";
 import {
   showSourceText,
   showLoading,
@@ -65,15 +50,24 @@ import {
   endOperation,
   clearDocuments,
 } from "../../utils/editor";
-import Gutter from "./Gutter";
-
+import type { SourceEditor } from "../../utils/editor/source-editor";
+import { getIndentation } from "../../utils/indentation";
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
 
-import { openContextMenu, closeContextMenu } from "ui/actions/contextMenus";
-import { getContextMenu } from "ui/reducers/contextMenus";
+import Breakpoints from "./Breakpoints/Breakpoints";
+import ColumnBreakpoints from "./ColumnBreakpoints";
+import DebugLine from "./DebugLine";
+import EditorLoadingBar from "./EditorLoadingBar";
+import EditorMenu from "./EditorMenu";
+import EmptyLines from "./EmptyLines";
+import Gutter from "./Gutter";
+import HighlightLine from "./HighlightLine";
+import HighlightLines from "./HighlightLines";
+import LineNumberTooltip from "./LineNumberTooltip";
+import Preview from "./Preview";
+import SearchBar from "./SearchBar";
+import { ReplayClientInterface, SourceLocationRange } from "shared/client/types";
 
-import { selectors } from "ui/reducers";
-import { NAG_HEIGHT } from "ui/components/shared/Nags/Nags";
 const cssVars = {
   searchbarHeight: "var(--editor-searchbar-height)",
 };
@@ -98,7 +92,6 @@ const mapStateToProps = (state: UIState) => {
 const mapDispatchToProps = (dispatch: Dispatch) => ({
   ...bindActionCreators(
     {
-      addBreakpointAtLine: actions.addBreakpointAtLine,
       closeContextMenu,
       closeTab: actions.closeTab,
       openContextMenu,
@@ -113,25 +106,35 @@ const mapDispatchToProps = (dispatch: Dispatch) => ({
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
+type Props = PropsFromRedux & {
+  addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
+  deletePoints: (...id: PointId[]) => void;
+  editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
+  points: Point[];
+  replayClient: ReplayClientInterface;
+  setHoveredLocation: (lineIndex: number | null, lineNumberNode: HTMLElement | null) => void;
+  setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
+};
+
 interface EditorState {
-  highlightedLineRange: any;
-  editor: SourceEditor | null;
   contextMenu: any;
+  editor: SourceEditor | null;
+  highlightedLineRange: any;
 }
 
-class Editor extends PureComponent<PropsFromRedux, EditorState> {
+class Editor extends PureComponent<Props, EditorState> {
   shortcuts = new KeyShortcuts({ window, target: document });
   $editorWrapper: any;
   lastClientX = 0;
   lastClientY = 0;
 
-  constructor(props: PropsFromRedux) {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
-      highlightedLineRange: null,
-      editor: null,
       contextMenu: null,
+      editor: null,
+      highlightedLineRange: null,
     };
   }
 
@@ -145,11 +148,11 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return { shortcuts: this.shortcuts };
   };
 
-  UNSAFE_componentWillReceiveProps(nextProps: PropsFromRedux) {
+  UNSAFE_componentWillReceiveProps(nextProps: Props) {
     this.updateEditor(nextProps);
   }
 
-  updateEditor(props: PropsFromRedux) {
+  updateEditor(props: Props) {
     let editor = this.state.editor;
 
     if (!this.state.editor && props.selectedSource) {
@@ -186,10 +189,13 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
     const { codeMirror } = editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
-    const scrollWrapper = codeMirror.getScrollerElement();
 
     // @ts-expect-error event doesn't exist?
     codeMirror.on("gutterClick", this.onGutterClick);
+    // @ts-ignore Custom event dispatched by devtools/client/debugger/src/utils/editor/line-events
+    codeMirror.on("lineMouseEnter", this.onLineMouseEnter);
+    // @ts-ignore Custom event dispatched by devtools/client/debugger/src/utils/editor/line-events
+    codeMirror.on("lineMouseLeave", this.onLineMouseLeaveDebounced);
 
     // Set code editor wrapper to be focusable
     codeMirrorWrapper.tabIndex = 0;
@@ -231,10 +237,18 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   };
 
   componentWillUnmount() {
-    if (this.state.editor) {
-      this.state.editor.destroy();
+    const { editor } = this.state;
+    if (editor) {
+      editor.destroy();
       clearDocuments();
-      this.state.editor.codeMirror.off("scroll", this.onEditorScroll);
+
+      const { codeMirror } = editor;
+      codeMirror.off("scroll", this.onEditorScroll);
+      // @ts-ignore Custom event dispatched by devtools/client/debugger/src/utils/editor/line-events
+      codeMirror.off("lineMouseEnter", this.onLineMouseEnter);
+      // @ts-ignore Custom event dispatched by devtools/client/debugger/src/utils/editor/line-events
+      codeMirror.off("lineMouseLeave", this.onLineMouseLeaveDebounced);
+
       this.setState({ editor: null });
     }
 
@@ -254,11 +268,21 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return fromEditorLine(line);
   }
 
-  onEditorScroll = debounce((...args) => {
-    this.props.updateViewport();
-    if (this.lastClientX && this.lastClientY) {
-      onMouseScroll(this.state.editor?.codeMirror, this.lastClientX, this.lastClientY);
+  onEditorScroll = debounce(() => {
+    const { updateViewport, setVisibleLines } = this.props;
+    const { editor } = this.state;
+
+    updateViewport();
+
+    if (!editor) {
+      return;
     }
+
+    if (this.lastClientX && this.lastClientY) {
+      onMouseScroll(editor.codeMirror, this.lastClientX, this.lastClientY);
+    }
+
+    setVisibleLines(editor.editor.display.viewFrom, editor.editor.display.viewTo);
   }, 75);
 
   onKeyDown(e: KeyboardEvent) {
@@ -328,34 +352,109 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     this.setState({ contextMenu: null });
   };
 
-  onGutterClick = (cm: any, line: number, gutter: any, ev: MouseEvent) => {
-    const { cx, selectedSource, addBreakpointAtLine } = this.props;
+  onGutterClick = async (cm: any, lineIndex: number, gutter: any, clickEvent: MouseEvent) => {
+    const { addPoint, deletePoints, editPoint, points, replayClient, selectedSource } = this.props;
+    const { editor } = this.state;
+
+    if (editor == null || selectedSource == null) {
+      return;
+    }
+
+    if (typeof lineIndex !== "number") {
+      return;
+    }
+
     // ignore right clicks in the gutter
-    if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
+    if ((clickEvent.ctrlKey && clickEvent.button === 0) || clickEvent.button === 2) {
       return;
     }
-
-    if (typeof line !== "number") {
-      return;
-    }
-
-    const sourceLine = fromEditorLine(line);
 
     // Don't add a breakpoint if the user clicked on something other than the gutter line number,
     // e.g., the blank gutter space caused by adding a CodeMirror widget.
-    if (![...(ev.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
+    if (![...(clickEvent.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
       return;
     }
 
-    return addBreakpointAtLine(cx, sourceLine);
+    const line = lineIndex + 1;
+    const locationRange = {
+      start: { line, column: 0 },
+      end: { line, column: Number.MAX_SAFE_INTEGER },
+    };
+    const breakpoints = await getBreakpointPositionsAsync(
+      replayClient,
+      selectedSource.id,
+      locationRange
+    );
+    if (breakpoints.length === 0) {
+      return;
+    }
+    const breakpointsForLine = breakpoints.find(breakpoint => breakpoint.line === line);
+    if (breakpointsForLine == null || breakpointsForLine.columns.length === 0) {
+      return;
+    }
+
+    const firstBreakableColumn = breakpointsForLine.columns[0];
+
+    const location: Location = {
+      column: firstBreakableColumn,
+      line,
+      sourceId: selectedSource.id,
+    };
+
+    const existingPoint = points.find(
+      point =>
+        point.location.sourceId === location.sourceId &&
+        point.location.line === location.line &&
+        point.location.column === location.column
+    );
+
+    if (existingPoint != null) {
+      if (existingPoint.shouldBreak) {
+        if (existingPoint.shouldLog) {
+          editPoint(existingPoint.id, { shouldBreak: false });
+        } else {
+          deletePoints(existingPoint.id);
+        }
+      } else {
+        editPoint(existingPoint.id, { shouldBreak: true });
+      }
+    } else {
+      addPoint({ shouldBreak: true }, location);
+    }
   };
 
   onGutterContextMenu = (event: MouseEvent) => {
     return this.openMenu(event);
   };
 
+  onLineMouseEnter = ({
+    lineIndex,
+    lineNumberNode,
+  }: {
+    lineIndex: number;
+    lineNumberNode: HTMLElement;
+  }) => {
+    const { setHoveredLocation } = this.props;
+
+    this.onLineMouseLeaveDebounced.cancel();
+
+    setHoveredLocation(lineIndex, lineNumberNode);
+  };
+
+  // Only reset the Redux state here after a short delay.
+  // That way, if we immediately mouse from active line X to X + 1,
+  // we won't dispatch a "reset line to null" action as part of that change.
+  // This avoids causing the `{lower, upper} selector to think we're at range 0..100,
+  // which was causing many unnecessary gutter marker updates.
+  // Note that mousing over an inactive line _will_ cause us to clear this line number.
+  onLineMouseLeaveDebounced = debounce(() => {
+    const { setHoveredLocation } = this.props;
+
+    setHoveredLocation(null, null);
+  }, 50);
+
   onClick(e: MouseEvent) {
-    const { cx, selectedSource, updateCursorPosition } = this.props;
+    const { selectedSource, updateCursorPosition } = this.props;
 
     if (selectedSource) {
       const sourceLocation = getSourceLocationFromMouseEvent(
@@ -368,7 +467,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     }
   }
 
-  shouldScrollToLocation(nextProps: PropsFromRedux, editor: SourceEditor) {
+  shouldScrollToLocation(nextProps: Props, editor: SourceEditor) {
     const { selectedLocation, selectedSourceContent } = this.props;
     if (
       !editor ||
@@ -389,7 +488,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     return isFirstLoad || locationChanged || symbolsChanged;
   }
 
-  scrollToLocation(nextProps: PropsFromRedux, editor: SourceEditor) {
+  scrollToLocation(nextProps: Props, editor: SourceEditor) {
     const { selectedLocation, selectedSource } = nextProps;
 
     if (selectedLocation && this.shouldScrollToLocation(nextProps, editor)) {
@@ -407,7 +506,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
     }
   }
 
-  setText(props: PropsFromRedux, editor: SourceEditor) {
+  setText(props: Props, editor: SourceEditor) {
     const { selectedSource, selectedSourceContent, symbols } = props;
     if (!editor) {
       return;
@@ -464,8 +563,8 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   }
 
   renderItems() {
-    const { cx, selectedSource, closeContextMenu, contextMenu: gutterContextMenu } = this.props;
-    const { editor, contextMenu } = this.state;
+    const { selectedSource, closeContextMenu, contextMenu: gutterContextMenu } = this.props;
+    const { contextMenu, editor } = this.state;
 
     if (!selectedSource || !editor) {
       return null;
@@ -483,7 +582,7 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
         <DebugLine />
         <HighlightLine />
         <EmptyLines editor={editor} />
-        <Breakpoints editor={editor} cx={cx} />
+        <Breakpoints editor={editor} />
         <Preview editor={editor} editorRef={this.$editorWrapper} />
         <KeyModifiersContext.Consumer>
           {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
@@ -512,8 +611,6 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
   }
 
   render() {
-    const { selectedSource } = this.props;
-
     return (
       <div
         className={classnames("editor-wrapper", {
@@ -535,4 +632,23 @@ Editor.childContextTypes = {
   shortcuts: PropTypes.object,
 };
 
-export default connector(Editor);
+const ConnectedEditor = connector(Editor);
+
+export default function EditorWrapper() {
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const { setHoveredLocation, setVisibleLines } = useContext(SourcesContext);
+
+  const replayClient = useContext(ReplayClientContext);
+
+  return (
+    <ConnectedEditor
+      addPoint={addPoint}
+      deletePoints={deletePoints}
+      editPoint={editPoint}
+      points={points}
+      replayClient={replayClient}
+      setHoveredLocation={setHoveredLocation}
+      setVisibleLines={setVisibleLines}
+    />
+  );
+}

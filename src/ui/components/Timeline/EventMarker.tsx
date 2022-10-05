@@ -1,7 +1,8 @@
 import React from "react";
 import { selectors } from "ui/reducers";
-import { ReplayEvent } from "ui/state/app";
 import { useAppSelector } from "ui/setup/hooks";
+import { ReplayEvent } from "ui/state/app";
+
 import Marker from "./Marker";
 
 // TODO This component doesn't appear to be used right now?
@@ -16,7 +17,6 @@ export default function EventMarker({ event, isPrimaryHighlighted }: EventMarker
       hasFrames={false}
       currentTime={currentTime}
       isPrimaryHighlighted={isPrimaryHighlighted}
-      isSecondaryHighlighted={false}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
     />

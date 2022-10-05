@@ -1,25 +1,37 @@
-import { PointDescription } from "@replayio/protocol";
-import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
-import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
+import { PointDescription, SourceId, TimeStampedPointRange } from "@replayio/protocol";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { getSource, getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import classNames from "classnames";
-import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
-import hooks from "ui/hooks";
-import { shouldShowNag } from "ui/utils/user";
-import { Nag } from "ui/hooks/users";
-import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
-import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getExecutionPoint } from "../../reducers/pause";
+import ReactDOM from "react-dom";
+import React, {
+  useState,
+  useEffect,
+  MouseEventHandler,
+  FC,
+  ReactNode,
+  Suspense,
+  useContext,
+} from "react";
+import { Point } from "shared/client/types";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
 import { seek } from "ui/actions/timeline";
+import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
-import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { shouldShowNag } from "ui/utils/user";
+import { Nag } from "ui/hooks/users";
+
+import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 
 const QuickActionButton: FC<{
   children: ReactNode;
@@ -36,7 +48,7 @@ const QuickActionButton: FC<{
         `${disabled ? "bg-gray-600" : "bg-primaryAccent"}`
       )}
       data-test-id={dataTestId}
-      onClick={disabled ? () => {} : onClick}
+      onClick={disabled ? undefined : onClick}
       style={{ background: showNag ? AWESOME_BACKGROUND : "" }}
     >
       {children}
@@ -58,6 +70,7 @@ const ContinueToPrevious: FC<{ showNag: boolean; onClick: () => void; disabled: 
     <MaterialIcon>navigate_before</MaterialIcon>
   </QuickActionButton>
 );
+
 const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: boolean }> = ({
   showNag,
   onClick,
@@ -72,12 +85,13 @@ const ContinueToNext: FC<{ showNag: boolean; onClick: () => void; disabled: bool
     <MaterialIcon>navigate_next</MaterialIcon>
   </QuickActionButton>
 );
-const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Breakpoint }> = ({
+
+const ToggleLogPoint: FC<{ showNag: boolean; onClick: () => void; point?: Point }> = ({
   showNag,
   onClick,
-  breakpoint,
+  point,
 }) => {
-  const icon = breakpoint?.options.logValue ? "remove" : "add";
+  const icon = point?.shouldLog ? "remove" : "add";
 
   return (
     <QuickActionButton dataTestId="ToggleLogpointButton" showNag={showNag} onClick={onClick}>
@@ -87,19 +101,23 @@ const AddLogpoint: FC<{ showNag: boolean; onClick: () => void; breakpoint?: Brea
 };
 
 function QuickActions({
-  hoveredLineNumber,
-  onMouseDown,
+  columnIndex,
+  focusRange,
+  lineIndex,
   keyModifiers,
+  onMouseDown,
+  point,
+  sourceId,
   targetNode,
-  breakpoint,
-  cx,
 }: {
-  hoveredLineNumber: number;
-  onMouseDown: MouseEventHandler;
+  columnIndex: number;
+  focusRange: TimeStampedPointRange | null;
+  lineIndex: number;
   keyModifiers: KeyModifiers;
+  onMouseDown: MouseEventHandler;
+  point?: Point;
+  sourceId: SourceId;
   targetNode: HTMLElement;
-  breakpoint?: Breakpoint;
-  cx: any;
 }) {
   const [height, setHeight] = useState(18);
   useEffect(() => {
@@ -118,17 +136,58 @@ function QuickActions({
   const showNag = shouldShowNag(nags, Nag.FIRST_BREAKPOINT_ADD);
   const { value: enableLargeText } = useFeature("enableLargeText");
 
-  const [hitPoints, hitPointStatus] = useHitPointsForHoveredLocation();
+  const replayClient = useContext(ReplayClientContext);
+  const { addPoint, deletePoints, editPoint } = useContext(PointsContext);
+  const source = getSource(replayClient, sourceId);
+  const fileName = source ? getSourceFileName(source) : null;
 
-  const onAddLogpoint = () => {
-    dispatch(toggleLogpoint(cx, hoveredLineNumber, breakpoint));
+  const lineNumber = lineIndex + 1;
+
+  const [hitPoints, hitPointStatus] = getHitPointsForLocation(
+    replayClient,
+    {
+      sourceId,
+      column: columnIndex,
+      line: lineNumber,
+    },
+    null,
+    focusRange
+  );
+
+  const onToggleLogPoint = async () => {
+    if (point) {
+      if (point.shouldLog) {
+        if (point.shouldBreak) {
+          editPoint(point.id, { shouldLog: false });
+        } else {
+          deletePoints(point.id);
+        }
+      } else {
+        editPoint(point.id, {
+          shouldLog: true,
+        });
+      }
+    } else {
+      addPoint(
+        {
+          // TODO [FE-757] Content string should have the function name, not the file name.
+          content: `"${fileName!}", ${lineNumber}`,
+          shouldLog: true,
+        },
+        {
+          column: columnIndex,
+          line: lineNumber,
+          sourceId,
+        }
+      );
+    }
   };
 
   let next: PointDescription | undefined, prev: PointDescription | undefined;
 
   const error = hitPointStatus === "too-many-points-to-find";
 
-  if (hitPoints && !error && executionPoint) {
+  if (!error && executionPoint) {
     prev = findLast(hitPoints, p => compareNumericStrings(p.point, executionPoint) < 0);
     next = hitPoints.find(p => compareNumericStrings(p.point, executionPoint) > 0);
   }
@@ -146,14 +205,14 @@ function QuickActions({
 
   let button;
 
-  if (hitPoints && isMetaActive && isShiftActive) {
+  if (isMetaActive && isShiftActive) {
     button = (
       <ContinueToPrevious showNag={showNag} onClick={onContinueToPrevious} disabled={!prev} />
     );
-  } else if (hitPoints && isMetaActive) {
+  } else if (isMetaActive) {
     button = <ContinueToNext showNag={showNag} onClick={onContinueToNext} disabled={!next} />;
-  } else {
-    button = <AddLogpoint breakpoint={breakpoint} showNag={showNag} onClick={onAddLogpoint} />;
+  } else if (hitPoints.length > 0) {
+    button = <ToggleLogPoint point={point} showNag={showNag} onClick={onToggleLogPoint} />;
   }
 
   return (
@@ -174,44 +233,42 @@ function QuickActions({
   );
 }
 
-type ExternalProps = { editor: any };
-type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
+function ToggleWidgetButton() {
+  const { points } = useContext(PointsContext);
+  const { focusedSourceId, hoveredLineIndex, hoveredLineNode, visibleLines } =
+    useContext(SourcesContext);
 
-function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
-  const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
-  const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
+  const replayClient = useContext(ReplayClientContext);
 
-  const bp = breakpoints.find((b: any) => b.location.line === hoveredLineNumber);
+  const { range: focusRange } = useContext(FocusContext);
+
+  if (!focusedSourceId || !visibleLines || !hoveredLineNode || hoveredLineIndex === null) {
+    return null;
+  }
+
+  const lineNumber = hoveredLineIndex + 1;
+
+  const point = points.find((b: any) => b.location.line === lineNumber);
+
   const onMouseDown = (e: React.MouseEvent) => {
     // This keeps the cursor in CodeMirror from moving after clicking on the button.
     e.stopPropagation();
   };
 
-  useEffect(() => {
-    const onLineEnter = ({
-      lineNumberNode,
-      lineNumber,
-    }: {
-      lineNumberNode: HTMLElement;
-      lineNumber: number;
-    }) => {
-      setHoveredLineNumber(lineNumber);
-      setTargetNode(lineNumberNode);
-    };
-    const onLineLeave = () => {
-      setTargetNode(null);
-      setHoveredLineNumber(null);
-    };
+  // This widget floats to the left, beside the line number gutter.
+  // It should always add a new Point for the left-most column, regardless of the column breakpoints setting.
+  let firstBreakableColumnIndex: number | null = null;
 
-    editor.codeMirror.on("lineMouseEnter", onLineEnter);
-    editor.codeMirror.on("lineMouseLeave", onLineLeave);
-    return () => {
-      editor.codeMirror.off("lineMouseEnter", onLineEnter);
-      editor.codeMirror.off("lineMouseLeave", onLineLeave);
-    };
-  }, [editor]);
+  const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
+  const hitCountsForLine = hitCounts.get(lineNumber)!;
+  if (hitCountsForLine) {
+    const first = hitCountsForLine.columnHits[0];
+    if (first) {
+      firstBreakableColumnIndex = first.location.column;
+    }
+  }
 
-  if (!targetNode || !hoveredLineNumber) {
+  if (firstBreakableColumnIndex === null) {
     return null;
   }
 
@@ -219,33 +276,25 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
     <KeyModifiersContext.Consumer>
       {keyModifiers => (
         <QuickActions
-          hoveredLineNumber={hoveredLineNumber}
+          columnIndex={firstBreakableColumnIndex!}
+          focusRange={focusRange}
+          lineIndex={hoveredLineIndex}
           onMouseDown={onMouseDown}
-          targetNode={targetNode}
-          breakpoint={bp}
-          cx={cx}
+          point={point}
+          sourceId={focusedSourceId}
+          targetNode={hoveredLineNode}
           keyModifiers={keyModifiers}
         />
       )}
     </KeyModifiersContext.Consumer>,
-    targetNode
+    hoveredLineNode
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    cx: selectors.getThreadContext(state),
-    breakpoints: getBreakpointsForSelectedSource(state),
-  }),
-  {}
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-const ConnectedToggleWidgetButton = connector(ToggleWidgetButton);
-
-export default function ToggleWidgetButtonSuspenseWrapper(props: ExternalProps) {
+export default function ToggleWidgetButtonSuspenseWrapper() {
   return (
     <Suspense fallback={null}>
-      <ConnectedToggleWidgetButton {...props} />
+      <ToggleWidgetButton />
     </Suspense>
   );
 }

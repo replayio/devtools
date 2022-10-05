@@ -20,7 +20,7 @@ require("codemirror/addon/edit/matchbrackets");
 
 export { CodeMirror };
 
-export type EditorWithDoc = Editor & { doc: Doc };
+export type EditorWithDoc = Editor & { doc: Doc; display: { viewFrom: number; viewTo: number } };
 // Maximum allowed margin (in number of lines) from top or bottom of the editor
 // while shifting to a line which was initially out of view.
 const MAX_VERTICAL_OFFSET = 3;

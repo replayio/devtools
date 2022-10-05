@@ -119,6 +119,7 @@ export const executeCommandOperation = createAsyncThunk<
   const state = getState();
   const loadedRegions = getLoadedRegions(state)!;
   const nextPoint = getResumePoint(state, command)!;
+  console.log("executeCommandOperation() nextPoint:", nextPoint);
 
   const resp = await ThreadFront[command](nextPoint, loadedRegions);
   if (!resp?.frame) {

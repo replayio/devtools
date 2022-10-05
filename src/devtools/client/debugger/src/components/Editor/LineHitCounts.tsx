@@ -1,25 +1,22 @@
-import { useMemo, useLayoutEffect, useRef, useEffect } from "react";
-import { useFeature } from "ui/hooks/settings";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import { getSelectedSourceId } from "ui/reducers/sources";
-import { useStringPref } from "ui/hooks/settings";
-
-import styles from "./LineHitCounts.module.css";
-import { features } from "ui/utils/prefs";
-
-import { resizeBreakpointGutter } from "../../utils/ui";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import {
-  fetchHitCounts,
-  HitCount,
-  getHitCountsForSource,
-  getBoundsForLineNumber,
-} from "ui/reducers/hitCounts";
-import { UIState } from "ui/state";
-import type { SourceEditor } from "../../utils/editor/source-editor";
+  getCachedMinMaxSourceHitCounts,
+  getSourceHitCounts,
+} from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { useMemo, useLayoutEffect, useRef, useEffect, useContext, Suspense } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { LineHits } from "shared/client/types";
+import { useFeature, useStringPref } from "ui/hooks/settings";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
-import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import { features } from "ui/utils/prefs";
+import { useAppSelector } from "ui/setup/hooks";
+
+import type { SourceEditor } from "../../utils/editor/source-editor";
+import { resizeBreakpointGutter } from "../../utils/ui";
+
+import styles from "./LineHitCounts.module.css";
 
 type Props = {
   sourceEditor: SourceEditor;
@@ -33,69 +30,54 @@ export default function LineHitCountsWrapper(props: Props) {
     return null;
   }
 
-  return <LineHitCounts {...props} />;
+  return (
+    <Suspense fallback={null}>
+      <LineHitCounts {...props} />
+    </Suspense>
+  );
 }
 
 function LineHitCounts({ sourceEditor }: Props) {
-  const dispatch = useAppDispatch();
-  const sourceId = useAppSelector(getSelectedSourceId)!;
-  const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
+  const { focusedSourceId: sourceId, hoveredLineIndex, visibleLines } = useContext(SourcesContext);
+
+  const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
+  const hitCounts =
+    sourceId && visibleLines
+      ? getSourceHitCounts(replayClient, sourceId, visibleLines, focusRange)
+      : null;
+
+  // Min/max hit counts are used to determine heat map color.
+  const [minHitCount, maxHitCount] = sourceId
+    ? getCachedMinMaxSourceHitCounts(sourceId, focusRange)
+    : [null, null];
+
   const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
-  const currentLineNumber = useAppSelector(
-    (state: UIState) => state.app.hoveredLineNumberLocation?.line
-  );
+
   const focusRegion = useAppSelector(getFocusRegion);
 
   const previousFocusRegion = useRef<FocusRegion | null>(null);
-  const previousHitCounts = useRef<Map<number, number> | null>(null);
+  const previousHitCounts = useRef<Map<number, LineHits> | null>(null);
 
   const isCollapsed = hitCountsMode == "hide-counts";
-  const isCurrentLineNumberValid = currentLineNumber !== undefined;
-  const { lower, upper } = getBoundsForLineNumber(currentLineNumber || 0);
 
-  const hitCountMap = useMemo(() => {
-    if (hitCounts !== null) {
-      const hitCountsMap = hitCountsToMap(hitCounts);
-      return hitCountsMap;
-    }
-    return null;
-  }, [hitCounts]);
+  const isCurrentLineNumberValid = hoveredLineIndex != null;
+
+  const lower = visibleLines ? visibleLines.start.line : null;
+  const upper = visibleLines ? visibleLines.end.line : null;
 
   const updatedLineNumbers = useMemo(() => {
     return new Set<number>();
     // We _want_ this re-created every time these change
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hitCountMap, isCollapsed]);
-
-  // Min/max hit counts are used to determine heat map color.
-  const [minHitCount, maxHitCount] = useMemo(() => {
-    let minHitCount = Infinity;
-    let maxHitCount = 0;
-    if (hitCounts) {
-      // Iterate the entire array once to find min/max as we go
-      for (let { hits } of hitCounts) {
-        if (hits > 0) {
-          if (minHitCount > hits) {
-            minHitCount = hits;
-          }
-          if (maxHitCount < hits) {
-            maxHitCount = hits;
-          }
-        }
-      }
-    }
-    return [minHitCount, maxHitCount] as const;
-  }, [hitCounts]);
-
-  useLayoutEffect(() => {
-    // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
-    if (hitCounts === null) {
-      dispatch(fetchHitCounts(sourceId, 0));
-    }
-  }, [dispatch, sourceId, hitCounts]);
+  }, [hitCounts, isCollapsed]);
 
   // Make sure we have enough room to fit large hit count numbers in the gutter markers
   const numCharsToFit = useMemo(() => {
+    if (maxHitCount === null) {
+      return 0;
+    }
+
     const numCharsToFit =
       maxHitCount < 1000
         ? Math.max(2, maxHitCount.toString().length)
@@ -164,76 +146,73 @@ function LineHitCounts({ sourceEditor }: Props) {
     const { editor } = sourceEditor;
 
     const drawLines = () => {
-      const uniqueChunks = calculateRangeChunksForVisibleLines(sourceEditor);
+      if (lower === null || upper === null) {
+        return;
+      }
 
       editor.operation(() => {
-        for (let hitCountChunk of uniqueChunks) {
-          // Attempt to update just the markers for just the 100-line blocks
-          // overlapping the visible display area
-          const { lower, upper } = hitCountChunk;
-          editor.eachLine(lower, upper, lineHandle => {
-            const currentCMLineNumber = editor.getLineNumber(lineHandle);
-            if (currentCMLineNumber === null) {
-              return;
+        editor.eachLine(lower, upper, lineHandle => {
+          const currentCMLineNumber = editor.getLineNumber(lineHandle);
+          if (currentCMLineNumber === null) {
+            return;
+          }
+
+          // CM uses 0-based indexing. Our hit counts are 1-indexed.
+          let oneIndexedLineNumber = currentCMLineNumber + 1;
+          const hits = hitCounts?.get(oneIndexedLineNumber)?.hits || 0;
+
+          // We use a gradient to indicate the "heat" (the number of hits).
+          // This absolute hit count values are relative, per file.
+          // Cubed root prevents high hit counts from lumping all other values together.
+          const NUM_GRADIENT_COLORS = 3;
+          let className = styles.HitsBadge0;
+          let index = NUM_GRADIENT_COLORS - 1;
+          if (hits > 0 && minHitCount !== null && maxHitCount !== null) {
+            if (minHitCount !== maxHitCount) {
+              index = Math.min(
+                NUM_GRADIENT_COLORS - 1,
+                Math.round(
+                  ((hits - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
+                )
+              );
             }
+            className = styles[`HitsBadge${index + 1}`];
+          }
 
-            // CM uses 0-based indexing. Our hit counts are 1-indexed.
-            let oneIndexedLineNumber = currentCMLineNumber + 1;
-            const hitCount = hitCountMap?.get(oneIndexedLineNumber) || 0;
-
-            // We use a gradient to indicate the "heat" (the number of hits).
-            // This absolute hit count values are relative, per file.
-            // Cubed root prevents high hit counts from lumping all other values together.
-            const NUM_GRADIENT_COLORS = 3;
-            let className = styles.HitsBadge0;
-            let index = NUM_GRADIENT_COLORS - 1;
-            if (hitCount > 0) {
-              if (minHitCount !== maxHitCount) {
-                index = Math.min(
-                  NUM_GRADIENT_COLORS - 1,
-                  Math.round(
-                    ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-                  )
-                );
-              }
-              className = styles[`HitsBadge${index + 1}`];
-            }
-
-            if (features.disableUnHitLines) {
-              if (hitCount > 0) {
-                sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
-              } else {
-                // If this line wasn't hit any, dim the line number,
-                // even if it's a line that's technically reachable.
-                sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
-              }
-            }
-
-            const info = editor.lineInfo(lineHandle);
-
-            let markerNode: HTMLDivElement;
-            if (info?.gutterMarkers?.["hit-markers"]) {
-              // Retrieve the marker DOM node we already created
-              markerNode = info.gutterMarkers["hit-markers"];
+          if (features.disableUnHitLines) {
+            if (hits > 0) {
+              sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
             } else {
-              markerNode = document.createElement("div");
-              markerNode.onclick = () =>
-                updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
-
-              editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
+              // If this line wasn't hit any, dim the line number,
+              // even if it's a line that's technically reachable.
+              sourceEditor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
             }
+          }
 
-            markerNode.className = className;
-            if (!isCollapsed) {
-              let hitsLabel = "";
-              if (hitCount > 0) {
-                hitsLabel = hitCount < 1000 ? `${hitCount}` : `${(hitCount / 1000).toFixed(1)}k`;
-              }
-              markerNode.textContent = hitsLabel;
+          const info = editor.lineInfo(lineHandle);
+
+          let markerNode: HTMLDivElement;
+          if (info?.gutterMarkers?.["hit-markers"]) {
+            // Retrieve the marker DOM node we already created
+            markerNode = info.gutterMarkers["hit-markers"];
+          } else {
+            markerNode = document.createElement("div");
+            markerNode.onclick = () =>
+              updateHitCountsMode(isCollapsedRef.current ? "show-counts" : "hide-counts");
+
+            editor.setGutterMarker(lineHandle, "hit-markers", markerNode);
+          }
+
+          markerNode.className = className;
+          if (!isCollapsed) {
+            let hitsLabel = "";
+            if (hits > 0) {
+              hitsLabel = hits < 1000 ? `${hits}` : `${(hits / 1000).toFixed(1)}k`;
             }
-            markerNode.title = `${hitCount} hits`;
-          });
-        }
+            markerNode.textContent = hitsLabel;
+          }
+          markerNode.title = `${hits} hits`;
+        });
       });
     };
 
@@ -259,7 +238,7 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [
     sourceEditor,
     sourceId,
-    hitCountMap,
+    hitCounts,
     updatedLineNumbers,
     isCollapsed,
     minHitCount,
@@ -274,18 +253,9 @@ function LineHitCounts({ sourceEditor }: Props) {
   useEffect(() => {
     // Save the previous references for comparison in `drawLines`
     previousFocusRegion.current = focusRegion;
-    previousHitCounts.current = hitCountMap;
-  }, [focusRegion, hitCountMap]);
+    previousHitCounts.current = hitCounts;
+  }, [focusRegion, hitCounts]);
 
   // We're just here for the hooks!
   return null;
-}
-
-function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {
-  const hitCountMap: Map<number, number> = new Map();
-  hitCounts.forEach(hitCount => {
-    const line = hitCount.location.line;
-    hitCountMap.set(line, (hitCountMap.get(line) || 0) + hitCount.hits);
-  });
-  return hitCountMap;
 }

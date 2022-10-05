@@ -1,8 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
@@ -14,21 +9,26 @@ import { features } from "../../../utils/prefs";
 import { getExecutionPoint } from "../../../reducers/pause";
 import { CloseButton } from "../../shared/Button";
 import { Redacted } from "ui/components/Redacted";
-import type { Breakpoint } from "../../../reducers/types";
-import { SourceDetails, getHasSiblingOfSameName, MiniSource } from "ui/reducers/sources";
+import { getHasSiblingOfSameName, MiniSource, getSourceDetails } from "ui/reducers/sources";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { Point } from "shared/client/types";
+import { SourceId } from "@replayio/protocol";
 
 type BHExtraProps = {
-  source: SourceDetails;
-  breakpoint: Breakpoint;
+  sourceId: SourceId;
+  breakpoint: Point;
   onRemoveBreakpoints: (cx: Context, source: MiniSource) => void;
 };
 
-const mapStateToProps = (state: UIState, { source }: BHExtraProps) => ({
-  cx: getContext(state),
-  hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
-  executionPoint: getExecutionPoint(state),
-});
+const mapStateToProps = (state: UIState, { sourceId }: BHExtraProps) => {
+  const source = getSourceDetails(state, sourceId)!;
+  return {
+    cx: getContext(state),
+    executionPoint: getExecutionPoint(state),
+    hasSiblingOfSameName: getHasSiblingOfSameName(state, source),
+    source,
+  };
+};
 
 const connector = connect(mapStateToProps, {
   selectSource: actions.selectSource,
