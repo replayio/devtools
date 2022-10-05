@@ -1,4 +1,5 @@
-import { UserInfo } from "./types";
+import { GraphQLClientInterface } from "./GraphQLClient";
+import { Nag, UserInfo } from "./types";
 
 // TODO Pass this client via Context
 let GRAPHQL_URL = "https://api.replay.io/v1/graphql";
@@ -68,4 +69,27 @@ export async function getCurrentUserInfo(accessToken: string | null): Promise<Us
     unsubscribedEmailTypes: viewer.unsubscribedEmailTypes,
     features: viewer.features || {},
   };
+}
+
+const DismissNagMutation = `
+  mutation DismissNag($nag: String!) {
+    dismissNag(input: { nag: $nag }) {
+      success
+    }
+  }
+`;
+
+export async function dismissNag(
+  graphQLClient: GraphQLClientInterface,
+  accessToken: string,
+  nag: Nag
+) {
+  await graphQLClient.send(
+    {
+      operationName: "DismissNag",
+      query: DismissNagMutation,
+      variables: { nag },
+    },
+    accessToken
+  );
 }

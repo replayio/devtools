@@ -29,7 +29,8 @@ const IndexPage: NextPage = () => {
         Session ID: <span title={sessionData.sessionId}>{sessionData.sessionId.slice(0, 8)}</span>
       </div>
       <div style={{ display: "flex", alignItems: "center" }}>
-        User: {currentUserInfo?.name} <img src={currentUserInfo?.picture} height={24} />
+        User: {currentUserInfo?.name}{" "}
+        {currentUserInfo?.picture ? <img src={currentUserInfo?.picture} height={24} /> : null}
       </div>
       <div style={{ display: "flex" }}>
         <div style={{ minWidth: 300 }}>

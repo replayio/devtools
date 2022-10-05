@@ -55,6 +55,7 @@ import { useFeature } from "ui/hooks/settings";
 import styles from "./NewConsole.module.css";
 import { ConsoleNag } from "../shared/Nags/Nags";
 import useTerminalHistory from "./useTerminalHistory";
+import { useGetUserInfo } from "ui/hooks/users";
 
 // Adapter that connects the legacy app Redux stores to the newer React Context providers.
 export default function NewConsoleRoot() {
@@ -64,22 +65,20 @@ export default function NewConsoleRoot() {
   );
 
   const duration = useAppSelector(getRecordingDuration)!;
+  const currentUserInfo = useGetUserInfo();
 
   const sessionContext = useMemo<SessionContextType>(
     () => ({
       accessToken: ThreadFront.getAccessToken(),
       recordingId,
       sessionId: ThreadFront.sessionId!,
-
       // Duration info is primarily used by the focus editor (not imported yet)
       // but Console message context menu also allows refining the focus, which uses it.
       duration,
       endPoint: null as any,
-
-      // Current user info is only used by the new Comments UI (which isn't included yet)
-      currentUserInfo: null as any,
+      currentUserInfo,
     }),
-    [duration, recordingId]
+    [currentUserInfo, duration, recordingId]
   );
 
   return (
