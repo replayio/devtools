@@ -6,6 +6,7 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
+import { commandError, ProtocolError } from "shared/utils/error";
 
 import { createMockReplayClient } from "../utils/testing";
 
@@ -246,9 +247,7 @@ describe("PointsCache", () => {
       preCacheExecutionPointForTime({ time: 9, point: "9" });
 
       mockClient.getPointsBoundingTime.mockImplementation(() => {
-        const commandError = new Error("unloaded");
-        commandError.name = "CommandError";
-        throw commandError;
+        throw commandError("RecordingUnloaded", ProtocolError.RecordingUnloaded);
       });
       expect(await imperativelyGetClosestPointForTime(replayClient, 3)).toBe("2");
       expect(mockClient.getPointsBoundingTime).toHaveBeenCalledTimes(1);

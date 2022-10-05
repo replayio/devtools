@@ -9,6 +9,7 @@ import { selectLocation } from "../sources";
 import { fetchScopes, frameSelected } from "../../reducers/pause";
 import { setFramePositions } from "./setFramePositions";
 import { SourceLocation } from "../../reducers/types";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 export interface TempFrame {
   id: string;
@@ -32,7 +33,16 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
 
     dispatch(frameSelected({ cx, frameId: frame.id }));
 
-    await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
+    try {
+      await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
+    } catch (e) {
+      // TODO [FE-795]: Communicate this to the user
+      if (isCommandError(e, ProtocolError.TooManyPoints)) {
+        console.error(e);
+        return;
+      }
+      throw e;
+    }
 
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());

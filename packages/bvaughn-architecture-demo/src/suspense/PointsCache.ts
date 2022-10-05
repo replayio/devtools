@@ -6,7 +6,7 @@ import {
   TimeStampedPointRange,
 } from "@replayio/protocol";
 import { HitPointsAndStatusTuple, ReplayClientInterface } from "shared/client/types";
-import { isUnloadedRegionError } from "shared/utils/error";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isExecutionPointsLessThan } from "../utils/time";
@@ -344,7 +344,7 @@ export async function imperativelyGetClosestPointForTime(
     await fetchPointsBoundingTime(client, time, createWakeable<ExecutionPoint>(), true);
     return cachedPointsForTime.get(time)!;
   } catch (error) {
-    if (!isUnloadedRegionError(error)) {
+    if (!isCommandError(error, ProtocolError.RecordingUnloaded)) {
       throw error;
     }
   }

@@ -3,6 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import zip from "lodash/zip";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 import type { UIThunkAction } from "ui/actions";
 import { getPreferredLocation } from "ui/reducers/sources";
 
@@ -19,10 +20,11 @@ export function setFramePositions(): UIThunkAction<Promise<void>> {
     let positions;
     try {
       positions = await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
-    } catch (e: any) {
+    } catch (e) {
       // "There are too many points to complete this operation"
       // is expected if the frame is too long and should not be treated as an error.
-      if (e.code == 55) {
+      if (isCommandError(e, ProtocolError.TooManyPoints)) {
+        console.error(e);
         return;
       }
       throw e;
