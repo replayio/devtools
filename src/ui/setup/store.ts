@@ -13,7 +13,6 @@ import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
 import { ThunkExtraArgs, extraThunkArgs } from "ui/utils/thunk";
 import LogRocket from "ui/utils/logrocket";
-import { sanityCheckMiddleware, sanitize } from "ui/utils/sanitize";
 import appReducer from "ui/reducers/app";
 import layoutReducer from "ui/reducers/layout";
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
@@ -55,48 +54,13 @@ let reducers = {
 // Create a custom Immer instance that does not autofreeze.
 const customImmer = new Immer({ autoFreeze: false });
 
-// Store state values that have had `ValueFront` entries stripped out,
-// so we don't keep recalculating them after each action.
-const sanitizedValuesCache = new WeakMap();
-const getSanitizedValue = (item: any, category: string) => {
-  let sanitizedValue: any = sanitizedValuesCache.get(item);
-  if (sanitizedValue === undefined) {
-    sanitizedValue = sanitize(item, "", category, false);
-    sanitizedValuesCache.set(item, sanitizedValue);
-  }
-  return sanitizedValue;
-};
-
 // This _should_ be our UIState type, but I'm getting "<S> is not assignable to UIState" TS errors
 const sanitizeStateForDevtools = <S>(state: S) => {
   const OMITTED = "<OMITTED>";
   enableMapSet();
 
-  const sanitizeContentItem = (item: any) => {
-    if (item.content?.value) {
-      item.content.value.value = OMITTED;
-    }
-  };
-
-  // The state appears to contain several "content" items, which may be either an
-  // object or an array of objects, containing the source strings nested inside.
-  // Handle either case.
-  const sanitizeContents = (rootContents: any) => {
-    if (!rootContents) {
-      return;
-    }
-
-    if (Array.isArray(rootContents)) {
-      rootContents.forEach(item => sanitizeContentItem(item));
-    } else {
-      sanitizeContentItem(rootContents);
-    }
-  };
-
   // Use Immer to simplify nested immutable updates when making a copy of the state
   const sanitizedState = customImmer.produce(state, (draft: any) => {
-    sanitizeContents(draft.sourceTree?.focusedItem?.contents);
-
     if (draft.sources) {
       Object.values(draft.sources.contents.entities).forEach((contentsItem: any) => {
         if (contentsItem.value) {
@@ -114,19 +78,6 @@ const sanitizeStateForDevtools = <S>(state: S) => {
       draft.protocolMessages = OMITTED;
     }
 
-    // These sections may contain nested `ValueFront` objects,
-    // which cause lots of "Not Allowed" messages when serialized.
-    if (draft.messages?.messages) {
-      draft.messages.messages = getSanitizedValue(draft.messages.messages, "messages");
-    }
-
-    if (draft.breakpoints?.analyses) {
-      draft.breakpoints.analyses = getSanitizedValue(
-        draft.breakpoints.analyses,
-        "breakpointAnalyses"
-      );
-    }
-
     if (draft.preview?.preview) {
       draft.preview.preview = OMITTED;
     }
@@ -135,19 +86,9 @@ const sanitizeStateForDevtools = <S>(state: S) => {
   return sanitizedState as S;
 };
 
-const sanitizeActionForDevTools = <A extends AnyAction>(action: A) => {
-  // Actions may contain `ValueFront` objects
-  const sanitizedAction = customImmer.produce(action, draft => {
-    return sanitize(draft, "", `sanitizedAction[${action.type}]`, false);
-  });
-
-  return sanitizedAction;
-};
-
 const reduxDevToolsOptions: ReduxDevToolsOptions = {
   maxAge: 100,
   stateSanitizer: sanitizeStateForDevtools,
-  actionSanitizer: sanitizeActionForDevTools,
   trace: true,
   // @ts-ignore This field has been renamed, but RTK types haven't caught up yet
   actionsDenylist: [
@@ -186,9 +127,7 @@ export function bootstrapStore(initialState: Partial<UIState>) {
       let updatedMiddlewareArray = originalMiddlewareArray.concat([context] as UIStateMiddleware[]);
 
       const telemetryMiddleware = skipTelemetry()
-        ? isDevelopment()
-          ? sanityCheckMiddleware
-          : undefined
+        ? undefined
         : (LogRocket.reduxMiddleware() as UIStateMiddleware);
 
       if (telemetryMiddleware) {

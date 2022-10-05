@@ -1,3 +1,4 @@
+import type { Object } from "@replayio/protocol";
 import { preCacheObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 import { stringify } from "bvaughn-architecture-demo/src/utils/string";
 import { Pause, ThreadFront } from "protocol/thread";
@@ -37,9 +38,7 @@ export default function useConfigureReplayClientInterop() {
         if (!set.has(object)) {
           set.add(object);
 
-          // Deeply clone object data before pre-caching it.
-          // The Pause class mutates these values by adding ValueFronts to them.
-          preCacheObject(pauseId, JSON.parse(stringify(object)));
+          preCacheObject(pauseId, object);
         }
       });
     }

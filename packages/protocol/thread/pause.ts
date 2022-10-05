@@ -13,6 +13,7 @@ import {
   NodeBounds,
   PauseData,
   repaintGraphicsResult,
+  Value,
 } from "@replayio/protocol";
 
 import cloneDeep from "lodash/cloneDeep";
@@ -21,7 +22,6 @@ import { client } from "../socket";
 import { defer, assert, Deferred, EventEmitter } from "../utils";
 
 import type { ThreadFront as ThreadFrontType } from "./thread";
-import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
 const pausesByPoint = new Map<ExecutionPoint, Pause>();
@@ -43,64 +43,13 @@ export function removePauseDataListener(handler: PauseDataHandler): void {
   }
 }
 
-export type WiredObject = Omit<ObjectDescription, "preview"> & {
-  preview?: WiredObjectPreview;
-};
-
-export type WiredObjectPreview = Omit<
-  ObjectPreview,
-  "properties" | "containerEntries" | "promiseState" | "proxyState" | "getterValues"
-> & {
-  properties: WiredProperty[];
-  containerEntries: WiredContainerEntry[];
-  promiseState?: {
-    state: ValueFront;
-    value?: ValueFront;
-  };
-  proxyState?: {
-    target: ValueFront;
-    handler: ValueFront;
-  };
-  getterValues: WiredNamedValue[];
-  prototypeValue: ValueFront;
-};
-
-export interface WiredContainerEntry {
-  key?: ValueFront;
-  value: ValueFront;
-}
-
-export interface WiredProperty {
-  name: string;
-  value: ValueFront;
-  writable: boolean;
-  configurable: boolean;
-  enumerable: boolean;
-  get?: ValueFront;
-  set?: ValueFront;
-}
-
-export interface WiredNamedValue {
-  name: string;
-  value: ValueFront;
-}
-
-export type WiredFrame = Omit<Frame, "this"> & {
-  this: ValueFront;
-};
-
-export type WiredScope = Omit<Scope, "bindings" | "object"> & {
-  bindings?: WiredNamedValue[];
-  object?: ValueFront;
-};
+type PauseEvent = "objects";
 
 export interface EvaluationResult {
-  returned?: ValueFront;
-  exception?: ValueFront;
+  returned?: Value;
+  exception?: Value;
   failed?: boolean;
 }
-
-type PauseEvent = "objects";
 
 // Information about a protocol pause.
 export class Pause {
@@ -112,13 +61,13 @@ export class Pause {
   time: number | null;
   hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
-  frames: Map<FrameId, WiredFrame>;
-  scopes: Map<ScopeId, WiredScope>;
-  objects: Map<ObjectId, WiredObject>;
+  frames: Map<FrameId, Frame>;
+  scopes: Map<ScopeId, Scope>;
+  objects: Map<ObjectId, Object>;
   rawFrames: Map<FrameId, Frame>;
   rawScopes: Map<ScopeId, Scope>;
   frameSteps: Map<string, PointDescription[]>;
-  stack: WiredFrame[] | undefined;
+  stack: Frame[] | undefined;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
@@ -218,21 +167,17 @@ export class Pause {
     }
 
     datas.forEach(d => this._addDataObjects(d));
-    datas.forEach(d => this._updateDataFronts(d));
+    // datas.forEach(d => this._updateDataFronts(d));
   }
 
   ensureLoaded() {
     return this.createWaiter;
   }
 
-  // we're cheating Typescript here: the objects that we add are of type Frame/Scope/ObjectDescription
-  // but we pretend they are of type WiredFrame/WiredScope/WiredObject. These objects will be changed
-  // in _updateDataFronts() so that they have the correct type afterwards.
-  // This cheat is necessary because Typescript doesn't support objects changing their types over time.
   private _addDataObjects({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(f => {
       if (!this.frames.has(f.frameId)) {
-        this.frames.set(f.frameId, f as WiredFrame);
+        this.frames.set(f.frameId, f);
       }
       if (!this.rawFrames.has(f.frameId)) {
         const rawFrame = cloneDeep(f);
@@ -243,7 +188,7 @@ export class Pause {
     });
     (scopes || []).forEach(s => {
       if (!this.scopes.has(s.scopeId)) {
-        this.scopes.set(s.scopeId, s as WiredScope);
+        this.scopes.set(s.scopeId, s);
       }
       if (!this.rawScopes.has(s.scopeId)) {
         this.rawScopes.set(s.scopeId, cloneDeep(s));
@@ -251,101 +196,10 @@ export class Pause {
     });
     (objects || []).forEach(o => {
       if (!this.objects.has(o.objectId)) {
-        this.objects.set(o.objectId, o as WiredObject);
+        this.objects.set(o.objectId, o);
       }
     });
     this.emit("objects", objects || []);
-  }
-
-  private _updateDataFronts({ frames, scopes, objects }: PauseData) {
-    (frames || []).forEach(frame => {
-      (frame as WiredFrame).this = new ValueFront(this, frame.this);
-      this.ThreadFront.updateMappedLocation(frame.location);
-      this.ThreadFront.updateMappedLocation(frame.functionLocation);
-    });
-
-    (scopes || []).forEach(scope => {
-      if (scope.bindings) {
-        const newBindings: WiredNamedValue[] = [];
-        for (const v of scope.bindings) {
-          newBindings.push({
-            name: v.name,
-            value: new ValueFront(this, v),
-          });
-        }
-        scope.bindings = newBindings;
-      }
-      if (scope.object) {
-        (scope as WiredScope).object = new ValueFront(this, { object: scope.object });
-      }
-    });
-
-    (objects || []).forEach(object => {
-      if (object.preview) {
-        const { properties, containerEntries, promiseState, proxyState, getterValues } =
-          object.preview;
-
-        const newProperties = [];
-        for (const p of properties || []) {
-          const flags = "flags" in p ? p.flags! : 7;
-          newProperties.push({
-            name: p.name,
-            value: new ValueFront(this, p),
-            writable: !!(flags & 1),
-            configurable: !!(flags & 2),
-            enumerable: !!(flags & 4),
-            get: p.get ? new ValueFront(this, { object: p.get }) : undefined,
-            set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
-          });
-        }
-        (object as WiredObject).preview!.properties = newProperties;
-
-        const newEntries = [];
-        for (const { key, value } of containerEntries || []) {
-          newEntries.push({
-            key: key ? new ValueFront(this, key) : undefined,
-            value: new ValueFront(this, value),
-          });
-        }
-        (object as WiredObject).preview!.containerEntries = newEntries;
-
-        if (promiseState) {
-          const { state, value } = promiseState;
-
-          (object as WiredObject).preview!.promiseState = {
-            state: new ValueFront(this, { value: state }),
-            value: value ? new ValueFront(this, value) : undefined,
-          };
-        }
-        if (proxyState) {
-          const { target, handler } = proxyState;
-
-          (object as WiredObject).preview!.proxyState = {
-            target: new ValueFront(this, target),
-            handler: new ValueFront(this, handler),
-          };
-        }
-
-        const newGetterValues: WiredNamedValue[] = [];
-        for (const v of getterValues || []) {
-          newGetterValues.push({
-            name: v.name,
-            value: new ValueFront(this, v),
-          });
-        }
-        object.preview.getterValues = newGetterValues;
-
-        const { prototypeId } = object.preview;
-        (object.preview as WiredObjectPreview).prototypeValue = new ValueFront(
-          this,
-          prototypeId ? { object: prototypeId } : { value: null }
-        );
-
-        this.ThreadFront.updateMappedLocation(object.preview.functionLocation);
-      }
-
-      this.objects.get(object.objectId)!.preview = object.preview as WiredObjectPreview;
-    });
   }
 
   async getFrames() {
@@ -412,28 +266,6 @@ export class Pause {
     await this.pauseIdWaiter.promise;
     assert(this.pauseId, "pauseId not set before sending a message");
     return await method(params, this.sessionId, this.pauseId);
-  }
-
-  async getObjectPreview(object: ObjectId) {
-    const { data } = await this.sendMessage(client.Pause.getObjectPreview, {
-      object,
-    });
-    this.addData(data);
-    return this.objects.get(object)!;
-  }
-
-  async getObjectProperty(object: ObjectId, property: string) {
-    const { result } = await this.sendMessage(client.Pause.getObjectProperty, {
-      object,
-      name: property,
-    });
-    const { returned, exception, failed, data } = result;
-    this.addData(data);
-    return {
-      returned: returned ? new ValueFront(this, returned) : undefined,
-      exception: exception ? new ValueFront(this, exception) : undefined,
-      failed,
-    };
   }
 
   async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {

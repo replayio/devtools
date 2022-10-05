@@ -1,7 +1,7 @@
 // Routines for finding framework-specific event listeners within a pause.
 
 import type { Object as ProtocolObject, ObjectPreview, Location } from "@replayio/protocol";
-import { ThreadFront, ValueFront } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 import { UIThunkAction } from "./index";
 import { getSourceDetailsEntities, getPreferredLocation, SourceDetails } from "ui/reducers/sources";
 import { UIState } from "ui/state";

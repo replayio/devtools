@@ -648,7 +648,6 @@ export const getNodeBoundingRect = (
   };
 };
 
-
 export const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 async function convertNode(

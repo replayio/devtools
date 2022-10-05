@@ -1,11 +1,10 @@
-import { Pause, ValueFront } from "protocol/thread";
+import { Pause } from "protocol/thread";
 import { Dispatch, Middleware } from "@reduxjs/toolkit";
 import { UIState } from "ui/state";
 import { UIAction } from "ui/actions";
 
 const forbiddenClasses: Record<string, any> = {
   Pause,
-  ValueFront,
 };
 
 const excludedActions = [

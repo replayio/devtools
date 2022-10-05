@@ -48,7 +48,6 @@ import { client } from "../socket";
 import { defer, assert, EventEmitter } from "../utils";
 
 import { Pause } from "./pause";
-import { ValueFront } from "./value";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -80,10 +79,6 @@ type FindTargetCommand = (
   p: FindTargetParameters,
   sessionId: SessionId
 ) => Promise<FindTargetResult>;
-
-export type WiredMessage = Omit<Message, "argumentValues"> & {
-  argumentValues?: ValueFront[];
-};
 
 export type RecordingCapabilities = {
   supportsEventTypes: boolean;
@@ -791,27 +786,3 @@ class _ThreadFront {
 
 export const ThreadFront = new _ThreadFront();
 EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
-
-export function wireUpMessage(message: Message): Pause {
-  const wiredMessage = message as WiredMessage;
-
-  const pause = ThreadFront.instantiatePause(
-    message.pauseId,
-    message.point.point,
-    message.point.time,
-    !!message.point.frame,
-    message.data
-  );
-
-  if (message.argumentValues) {
-    wiredMessage.argumentValues = message.argumentValues.map(value => new ValueFront(pause, value));
-  }
-
-  ThreadFront.updateMappedLocation(message.point.frame);
-
-  if (message.sourceId) {
-    message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
-  }
-
-  return pause;
-}
