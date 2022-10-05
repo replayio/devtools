@@ -36,7 +36,6 @@ pref("devtools.features.profileWorkerThreads", false);
 pref("devtools.features.protocolTimeline", false);
 pref("devtools.features.repaintEvaluations", false);
 pref("devtools.features.resolveRecording", false);
-pref("devtools.features.legacyFramesPanel", false);
 
 export const prefs = new PrefsHelper("devtools", {
   colorScheme: ["String", "colorScheme"],
@@ -72,7 +71,6 @@ export const features = new PrefsHelper("devtools.features", {
   protocolTimeline: ["Bool", "protocolTimeline"],
   repaintEvaluations: ["Bool", "repaintEvaluations"],
   resolveRecording: ["Bool", "resolveRecording"],
-  legacyFramesPanel: ["Bool", "legacyFramesPanel"],
 });
 
 export const asyncStore = asyncStoreHelper("devtools", {

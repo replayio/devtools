@@ -10,7 +10,7 @@ import { fetchScopes, frameSelected } from "../../reducers/pause";
 import { setFramePositions } from "./setFramePositions";
 import { SourceLocation } from "../../reducers/types";
 
-interface TempFrame {
+export interface TempFrame {
   id: string;
   asyncIndex: number;
   protocolId: string;

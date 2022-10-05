@@ -6,24 +6,16 @@
 
 import React from "react";
 
-import { getTopFrame, getFramesLoading } from "../../selectors";
 import LogpointsPane from "./LogpointsPane";
 import BreakpointsPane from "./BreakpointsPane";
-import Frames from "./Frames";
 import NewFrames from "./Frames/NewFrames";
 import { Accordion, AccordionPane } from "@recordreplay/accordion";
 import CommandBar from "./CommandBar";
 import FrameTimeline from "./FrameTimeline";
-import Scopes from "./Scopes";
 import NewScopes from "./NewScopes";
-import { useAppSelector } from "ui/setup/hooks";
-import { UIState } from "ui/state";
 import { useDebuggerPrefs } from "../../utils/prefs";
-import { features } from "ui/utils/prefs";
 
 export default function SecondaryPanes() {
-  const hasFrames = useAppSelector((state: UIState) => !!getTopFrame(state));
-  const framesLoading = useAppSelector(getFramesLoading);
   const { value: scopesExpanded, update: updateScopesExpanded } =
     useDebuggerPrefs("scopes-visible");
   const { value: callstackVisible, update: updateCallstackVisible } =
@@ -60,11 +52,7 @@ export default function SecondaryPanes() {
           expanded={callstackVisible}
           onToggle={() => updateCallstackVisible(!callstackVisible)}
         >
-          {features.legacyFramesPanel ? (
-            <Frames panel="debugger" />
-          ) : (
-            <NewFrames panel="debugger" />
-          )}
+          <NewFrames panel="debugger" />
         </AccordionPane>
         <AccordionPane
           header="Scopes"
@@ -72,7 +60,7 @@ export default function SecondaryPanes() {
           expanded={scopesExpanded}
           onToggle={() => updateScopesExpanded(!scopesExpanded)}
         >
-          {features.legacyFramesPanel ? <Scopes /> : <NewScopes />}
+          <NewScopes />
         </AccordionPane>
       </Accordion>
     </div>

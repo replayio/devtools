@@ -22,7 +22,6 @@ export type LocalExperimentalUserSettings = {
   enableResolveRecording: boolean;
   hitCounts: boolean;
   profileWorkerThreads: boolean;
-  legacyFramesPanel: boolean;
 };
 
 export type LocalUserSettings = LocalExperimentalUserSettings & {
