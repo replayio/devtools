@@ -96,7 +96,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     const loggableExecutionPoint = getLoggableExecutionPoint(loggable);
     const isLoaded =
       loadedRegions !== null && isPointInRegions(loggableExecutionPoint, loadedRegions.loaded);
-    const includesFirstConsoleNag = currentUserInfo?.nags.includes(Nag.FIRST_CONSOLE_NAVIGATE);
+    const includesFirstConsoleNag = currentUserInfo?.nags?.includes(Nag.FIRST_CONSOLE_NAVIGATE);
     const initialIsHovered = Boolean(!includesFirstConsoleNag && index === 0);
 
     if (isLoaded) {
