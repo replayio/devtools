@@ -9,25 +9,12 @@ import {
   useState,
   useTransition,
 } from "react";
+import { Point, PointId } from "shared/client/types";
 
+import useBreakpointIdsFromServer from "../hooks/useBreakpointIdsFromServer";
 import useLocalStorage from "../hooks/useLocalStorage";
 
 import { SessionContext } from "./SessionContext";
-
-// TODO [FE-757] Replace this with number once old code is fully deleted
-export type PointId = number | string;
-
-export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
-
-export type Point = {
-  badge: Badge | null;
-  condition: string | null;
-  content: string;
-  id: PointId;
-  location: Location;
-  shouldBreak: boolean;
-  shouldLog: boolean;
-};
 
 export type PointInstance = {
   point: Point;
@@ -110,6 +97,8 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
     },
     [setPointsHelper]
   );
+
+  useBreakpointIdsFromServer(points, editPoint);
 
   const context = useMemo(
     () => ({ addPoint, deletePoints, editPoint, isPending, points, pointsForAnalysis }),

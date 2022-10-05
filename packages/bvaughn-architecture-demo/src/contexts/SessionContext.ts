@@ -1,4 +1,3 @@
-import { ExecutionPoint, SourceId } from "@replayio/protocol";
 import { createContext } from "react";
 import { UserInfo } from "../graphql/types";
 

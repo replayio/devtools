@@ -15,10 +15,11 @@ type SourcesContextType = {
   closeSource: (sourceId: SourceId) => void;
   focusedSourceId: SourceId | null;
   hoveredLineIndex: number | null;
+  hoveredLineNode: HTMLElement | null;
   isPending: boolean;
   openSource: (sourceId: SourceId) => void;
   openSourceIds: SourceId[];
-  setHoveredLocation: (lineIndex: number | null) => void;
+  setHoveredLocation: (lineIndex: number | null, lineNode: HTMLElement | null) => void;
   setVisibleLines: (startIndex: number | null, stopIndex: number | null) => void;
 
   // Tracking which lines are currently visible in the editor enables queries to be scoped
@@ -31,6 +32,7 @@ type SourcesContextType = {
 export type OpenSourcesState = {
   focusedSourceId: SourceId | null;
   hoveredLineIndex: number | null;
+  hoveredLineNode: HTMLElement | null;
   openSourceIds: SourceId[];
   visibleLines: SourceLocationRange | null;
 };
@@ -38,6 +40,7 @@ export type OpenSourcesState = {
 const INITIAL_STATE: OpenSourcesState = {
   focusedSourceId: null,
   hoveredLineIndex: null,
+  hoveredLineNode: null,
   openSourceIds: [],
   visibleLines: null,
 };
@@ -47,6 +50,7 @@ type OpenSourceAction = { type: "open_source"; sourceId: SourceId };
 type SetHoveredLineAction = {
   type: "set_hovered_location";
   lineIndex: number | null;
+  lineNode: HTMLElement | null;
 };
 type SetVisibleLines = {
   type: "set_visible_lines";
@@ -67,6 +71,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       const {
         focusedSourceId: prevFocusedSourceId,
         hoveredLineIndex: prevHoveredLine,
+        hoveredLineNode: prevHoveredLineNode,
         openSourceIds,
         visibleLines: prevVisibleLines,
       } = state;
@@ -75,9 +80,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       if (index > -1) {
         let focusedSourceId = prevFocusedSourceId;
         let hoveredLineIndex = prevHoveredLine;
+        let hoveredLineNode = prevHoveredLineNode;
         let visibleLines = prevVisibleLines;
         if (prevFocusedSourceId === sourceId) {
           hoveredLineIndex = null;
+          hoveredLineNode = null;
           visibleLines = null;
 
           if (index > 0) {
@@ -92,6 +99,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         return {
           focusedSourceId,
           hoveredLineIndex,
+          hoveredLineNode,
           openSourceIds: [...openSourceIds.slice(0, index), ...openSourceIds.slice(index + 1)],
           visibleLines,
         };
@@ -115,20 +123,23 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       return {
         focusedSourceId: sourceId,
         hoveredLineIndex: null,
+        hoveredLineNode: null,
         openSourceIds,
         visibleLines: null,
       };
     }
     case "set_hovered_location": {
-      const { lineIndex } = action;
-      const { hoveredLineIndex: prevHoveredLineIndex } = state;
+      const { lineIndex, lineNode } = action;
+      const { hoveredLineIndex: prevHoveredLineIndex, hoveredLineNode: prevHoveredLineNode } =
+        state;
 
-      if (lineIndex === prevHoveredLineIndex) {
+      if (lineIndex === prevHoveredLineIndex && lineNode === prevHoveredLineNode) {
         return state;
       } else {
         return {
           ...state,
           hoveredLineIndex: lineIndex,
+          hoveredLineNode: lineNode,
         };
       }
     }
@@ -196,11 +207,14 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
     });
   }, []);
 
-  const setHoveredLocation = useCallback((lineIndex: number | null) => {
-    startTransition(() => {
-      dispatch({ type: "set_hovered_location", lineIndex });
-    });
-  }, []);
+  const setHoveredLocation = useCallback(
+    (lineIndex: number | null, lineNode: HTMLElement | null) => {
+      startTransition(() => {
+        dispatch({ type: "set_hovered_location", lineIndex, lineNode });
+      });
+    },
+    []
+  );
 
   const setVisibleLines = useCallback((startIndex: number | null, stopIndex: number | null) => {
     startTransition(() => {

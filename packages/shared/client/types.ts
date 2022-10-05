@@ -32,6 +32,7 @@ import {
   SameLineSourceLocations,
   getPointsBoundingTimeResult as PointsBoundingTime,
   PointRange,
+  BreakpointId,
 } from "@replayio/protocol";
 import { AnalysisParams } from "protocol/analysisManager";
 import { RecordingCapabilities } from "protocol/thread/thread";
@@ -59,6 +60,19 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
+// TODO [FE-757] Replace this with number once old code is fully deleted
+export type PointId = number | string;
+export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
+export type Point = {
+  badge: Badge | null;
+  condition: string | null;
+  content: string;
+  id: PointId;
+  location: Location;
+  shouldBreak: boolean;
+  shouldLog: boolean;
+};
+
 export type RunAnalysisParams = Omit<AnalysisParams, "locations"> & { location?: Location };
 
 export type ReplayClientEvents = "loadedRegionsChange";
@@ -78,6 +92,8 @@ export interface SourceLocationRange {
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
+  breakpointAdded(point: Point): Promise<BreakpointId>;
+  breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
   evaluateExpression(

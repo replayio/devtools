@@ -1,9 +1,10 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { Badge, PointsContext } from "@bvaughn/src/contexts/PointsContext";
+import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import useModalDismissSignal from "@bvaughn/src/hooks/useModalDismissSignal";
 import { getLoggableTime, isPointInstance } from "@bvaughn/src/utils/loggables";
 import { useContext, useRef } from "react";
+import { Badge } from "shared/client/types";
 
 import { ConsoleContextMenuContext, Coordinates } from "./ConsoleContextMenuContext";
 import styles from "./ContextMenu.module.css";
