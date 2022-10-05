@@ -578,37 +578,6 @@ class _ThreadFront {
     return this.scopeMaps.getScopeMap(location);
   }
 
-  async evaluate({
-    asyncIndex,
-    text,
-    frameId,
-    pure = false,
-  }: {
-    asyncIndex?: number;
-    text: string;
-    frameId?: FrameId;
-    pure?: boolean;
-  }) {
-    const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
-
-    const abilities = await this.recordingCapabilitiesWaiter.promise;
-    const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
-    if (rv.returned) {
-      rv.returned = new ValueFront(pause, rv.returned);
-    } else if (rv.exception) {
-      rv.exception = new ValueFront(pause, rv.exception);
-    }
-
-    if (repaintAfterEvaluationsExperimentalFlag) {
-      const { repaint } = await import("protocol/graphics");
-      // Fire and forget
-      repaint(true);
-    }
-
-    return rv;
-  }
-
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluateNew({
@@ -783,62 +752,6 @@ class _ThreadFront {
     client.Network.addResponseBodyDataListener(onResponseBodyData);
     client.Network.addRequestBodyDataListener(onRequestBodyData);
     client.Network.findRequests({}, sessionId);
-  }
-
-  findMessagesInRange(range: PointRange) {
-    return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
-  }
-
-  async getRootDOMNode() {
-    if (!this.sessionId) {
-      return null;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    await pause.loadDocument();
-    return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
-  }
-
-  getKnownRootDOMNode() {
-    assert(this.currentPause?.documentNode !== undefined, "no documentNode for current pause");
-    return this.currentPause.documentNode;
-  }
-
-  async searchDOM(query: string) {
-    if (!this.sessionId) {
-      return [];
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const nodes = await pause.searchDOM(query);
-    return pause == this.currentPause ? nodes : null;
-  }
-
-  async loadMouseTargets() {
-    if (!this.sessionId) {
-      return;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    await pause.loadMouseTargets();
-    return pause == this.currentPause;
-  }
-
-  async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
-    if (!this.sessionId) {
-      return null;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const nodeBounds = await pause.getMouseTarget(x, y, nodeIds);
-    return pause == this.currentPause ? nodeBounds : null;
-  }
-
-  async ensureNodeLoaded(objectId: ObjectId) {
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const node = await pause.ensureDOMFrontAndParents(objectId);
-    return pause == this.currentPause ? node : null;
   }
 
   getFrameSteps(asyncIndex: number, frameId: FrameId) {

@@ -273,12 +273,6 @@ export class ValueFront {
     //return this.isObject();
   }
 
-  getNodeFront() {
-    if (this._pause && this._object?.preview?.node) {
-      return this._pause.getNodeFront(this._object.objectId);
-    }
-  }
-
   getProperty(property: string): Promise<EvaluationResult> {
     assert(this._pause, "no pause");
     assert(this._object, "no object to get property of");

@@ -1,6 +1,5 @@
 import { Object as ProtocolObject, ProtocolClient } from "@replayio/protocol";
 import { assert, defer, Deferred } from "protocol/utils";
-import { HTML_NS } from "protocol/thread/node";
 import { UIState } from "ui/state";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
 import { isInspectorSelected } from "ui/reducers/app";
@@ -648,6 +647,9 @@ export const getNodeBoundingRect = (
     return getBoundingRectAsync(protocolClient, sessionId!, pauseId!, nodeId);
   };
 };
+
+
+export const HTML_NS = "http://www.w3.org/1999/xhtml";
 
 async function convertNode(
   nodeId: string,
