@@ -1,18 +1,15 @@
-import { WiredFrame } from "protocol/thread/pause";
 import React from "react";
 import { useAppDispatch } from "ui/setup/hooks";
 import { seekToRequestFrame } from "ui/actions/network";
-import { Frames } from "devtools/client/debugger/src/components/SecondaryPanes/Frames";
+import { PauseFrames } from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
 import { RequestSummary } from "./utils";
 import { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 export const StackTrace = ({
-  cx,
   frames,
   request,
 }: {
-  cx: any;
-  frames: WiredFrame[];
+  frames: PauseFrame[];
   request: RequestSummary;
 }) => {
   const dispatch = useAppDispatch();
@@ -20,20 +17,16 @@ export const StackTrace = ({
     dispatch(seekToRequestFrame(request, frame, cx));
   };
 
-  const renderedFrames = (
-    // @ts-expect-error this seems to be missing a bunch of required Frames props
-    <Frames
-      cx={cx}
-      frames={frames as unknown as PauseFrame[]}
-      selectFrame={selectFrame}
-      frameworkGroupingOn={true}
-    />
-  );
-
   return (
     <div>
       <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
-      <div className="px-2">{renderedFrames}</div>
+      <div className="px-2">
+        <div className="pane frames">
+          <div role="list">
+            <PauseFrames frames={frames} panel="networkmonitor" selectFrame={selectFrame} />
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

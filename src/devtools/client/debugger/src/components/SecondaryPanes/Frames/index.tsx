@@ -186,7 +186,7 @@ export type CommonFrameComponentProps = Pick<
   PropsFromRedux,
   "cx" | "selectedFrame" | "selectFrame" | "disableContextMenu" | "displayFullUrl"
 > & {
-  panel: "console" | "debugger" | "webconsole";
+  panel: "console" | "debugger" | "webconsole" | "networkmonitor";
   frameworkGroupingOn: boolean;
   copyStackTrace: () => void;
   toggleFrameworkGrouping: () => void;

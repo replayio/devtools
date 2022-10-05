@@ -7,9 +7,9 @@ import {
 
 import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";
-import { WiredFrame } from "protocol/thread/pause";
 import { createSelector } from "reselect";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
+import { PauseFrame } from "devtools/client/debugger/src/selectors";
 import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
@@ -23,7 +23,7 @@ import {
 
 export type NetworkState = {
   events: RequestEventInfo[];
-  frames: Record<string, WiredFrame[]>;
+  frames: Record<string, PauseFrame[]>;
   loading: boolean;
   responseBodies: Record<string, ResponseBodyData[]>;
   requestBodies: Record<string, RequestBodyData[]>;
@@ -130,9 +130,8 @@ export const getFormattedFrames = createSelector(
   getFrames,
   getSourceDetailsEntities,
   (frames, sources) => {
-    return Object.keys(frames).reduce((acc: Record<string, WiredFrame[]>, frame) => {
-      // @ts-ignore WiredFrame vs PauseFrame mismatch
-      return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources) as WiredFrame[] };
+    return Object.keys(frames).reduce((acc: Record<string, PauseFrame[]>, frame) => {
+      return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources)! };
     }, {});
   }
 );

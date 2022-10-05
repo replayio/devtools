@@ -5,7 +5,6 @@ import sortBy from "lodash/sortBy";
 import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
-import { useFeature } from "ui/hooks/settings";
 import { getLoadedRegions } from "ui/reducers/app";
 import { getFormattedFrames } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
@@ -341,7 +340,7 @@ const RequestDetails = ({
           {activeTab === "cookies" && <Cookies request={request} />}
           {activeTab === "response" && <ResponseBody request={request} />}
           {activeTab === "request" && <RequestBody request={request} />}
-          {activeTab === "stackTrace" && <StackTrace cx={cx} frames={frames} request={request} />}
+          {activeTab === "stackTrace" && <StackTrace frames={frames} request={request} />}
           {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>
