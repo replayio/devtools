@@ -2748,6 +2748,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@monaco-editor/loader@npm:^1.3.2":
+  version: 1.3.2
+  resolution: "@monaco-editor/loader@npm:1.3.2"
+  dependencies:
+    state-local: ^1.0.6
+  peerDependencies:
+    monaco-editor: ">= 0.21.0 < 1"
+  checksum: 7a1b65052bbaf4ef826392687bd7cfaf839509611034d2d616783b5d3fee91ed304d9086517c3b5f9099707828c57c855ff43407b3c2f5ae480faebb104d4343
+  languageName: node
+  linkType: hard
+
 "@mrmlnc/readdir-enhanced@npm:^2.2.1":
   version: 2.2.1
   resolution: "@mrmlnc/readdir-enhanced@npm:2.2.1"
@@ -5949,6 +5960,31 @@ __metadata:
   dependencies:
     "@types/tern": "*"
   checksum: 423b6378b6415b626d9f54d37d69477f96940b30a695d4ec36402feb59a96f7ab42d1c17b8472fbb222a0966f6061deee234e37bcd3e34c75836e989dc95929d
+  languageName: node
+  linkType: hard
+
+"@types/color-convert@npm:*":
+  version: 2.0.0
+  resolution: "@types/color-convert@npm:2.0.0"
+  dependencies:
+    "@types/color-name": "*"
+  checksum: 027b68665dc2278cc2d83e796ada0a05a08aa5a11297e227c48c7f9f6eac518dec98578ab0072bd211963d3e4b431da70b20ea28d6c3136d0badfd3f9913baee
+  languageName: node
+  linkType: hard
+
+"@types/color-name@npm:*":
+  version: 1.1.1
+  resolution: "@types/color-name@npm:1.1.1"
+  checksum: b71fcad728cc68abcba1d405742134410c8f8eb3c2ef18113b047afca158ad23a4f2c229bcf71a38f4a818dead375c45b20db121d0e69259c2d81e97a740daa6
+  languageName: node
+  linkType: hard
+
+"@types/color@npm:^3.0.3":
+  version: 3.0.3
+  resolution: "@types/color@npm:3.0.3"
+  dependencies:
+    "@types/color-convert": "*"
+  checksum: 4a54a6eca687b1f19d393c6c44e292009e913fa2377b5b815d1cd04470131087d7a799718d9e66a970f43e6ba16e7056a5b40b49d2d0d1d0f1530aff23864528
   languageName: node
   linkType: hard
 
@@ -12415,6 +12451,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fast-plist@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "fast-plist@npm:0.1.2"
+  checksum: 3baf1b4c533024561595f28eae7c36f4fa0782f52374b2f4e067561bd62464240f4bcff8d47b1ed6b981333be5f2bb613ce10229c5ec1e0194dfc271b873ade8
+  languageName: node
+  linkType: hard
+
 "fast-text-encoding@npm:^1.0.4":
   version: 1.0.4
   resolution: "fast-text-encoding@npm:1.0.4"
@@ -17543,6 +17586,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"monaco-editor-textmate@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "monaco-editor-textmate@npm:4.0.0"
+  peerDependencies:
+    monaco-editor: 0.x.x
+    monaco-textmate: ^3.0.0
+  checksum: 9d3f5f24982f928c5f4b7c5c5170a549cb19eb1471eb157aa07bd97cf15cd75dd941585eeb6924b05c54109a55d48adc45191eda9db5d2793b1d8c462181c100
+  languageName: node
+  linkType: hard
+
+"monaco-textmate@npm:^3.0.1":
+  version: 3.0.1
+  resolution: "monaco-textmate@npm:3.0.1"
+  dependencies:
+    fast-plist: ^0.1.2
+  peerDependencies:
+    onigasm: ^2.0.0
+  checksum: 0f2ec07ee3e9a37bb880e2aaef802f82cb666660b40fc3c7c3e35553d740aed34ae94399b06296fddf1f96efdaf27eaf347b39cb14bc08ccfb65162c52771d56
+  languageName: node
+  linkType: hard
+
 "move-concurrently@npm:^1.0.1":
   version: 1.0.1
   resolution: "move-concurrently@npm:1.0.1"
@@ -18366,6 +18430,15 @@ __metadata:
   dependencies:
     mimic-fn: ^2.1.0
   checksum: 2478859ef817fc5d4e9c2f9e5728512ddd1dbc9fb7829ad263765bb6d3b91ce699d6e2332eef6b7dff183c2f490bd3349f1666427eaba4469fba0ac38dfd0d34
+  languageName: node
+  linkType: hard
+
+"onigasm@npm:^2.2.5":
+  version: 2.2.5
+  resolution: "onigasm@npm:2.2.5"
+  dependencies:
+    lru-cache: ^5.1.1
+  checksum: 97aedde610ef561f05853609d6a5b720ec1e123f867bdac1b38b5aeb3bc90ed60209678c75a5f0f9821aa793c720b6d17aabfb956e26ab115ee9b81d6e56bdf7
   languageName: node
   linkType: hard
 
@@ -20526,6 +20599,7 @@ __metadata:
     "@heroicons/react": ^1.0.6
     "@jest/console": ^28.0.2
     "@jridgewell/trace-mapping": ^0.3.14
+    "@monaco-editor/loader": ^1.3.2
     "@next/bundle-analyzer": ^12.2.0
     "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
@@ -20558,6 +20632,7 @@ __metadata:
     "@trunkio/launcher": ^1.0.5
     "@types/classnames": ^2.2.11
     "@types/codemirror": ^5.60.5
+    "@types/color": ^3.0.3
     "@types/cookie": ^0.4.1
     "@types/d3-interpolate": ^3.0.1
     "@types/escape-html": ^1.0.1
@@ -20587,9 +20662,11 @@ __metadata:
     babel-plugin-transform-import-meta: ^2.1.1
     bufferutil: ^4.0.6
     bvaughn-architecture-demo: "workspace:*"
+    case-anything: ^2.1.10
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     codemirror: ^5.65.7
+    color: ^4.2.3
     comlink: ^4.3.1
     cookie: ^0.4.2
     css-loader: ^6.7.1
@@ -20632,10 +20709,13 @@ __metadata:
     logrocket-react: ^5.0.1
     mini-css-extract-plugin: ^2.6.0
     mixpanel-browser: ^2.43.0
+    monaco-editor-textmate: ^4.0.0
+    monaco-textmate: ^3.0.1
     next: ^12.2
     next-compose-plugins: ^2.2.1
     next-global-css: ^1.3.1
     node-fetch: 2.x
+    onigasm: ^2.2.5
     parse-script-tags: ^0.1.7
     postcss: ^8.4.12
     postcss-loader: ^6.2.1
@@ -22152,6 +22232,13 @@ __metadata:
   version: 1.3.4
   resolution: "stackframe@npm:1.3.4"
   checksum: bae1596873595c4610993fa84f86a3387d67586401c1816ea048c0196800c0646c4d2da98c2ee80557fd9eff05877efe33b91ba6cd052658ed96ddc85d19067d
+  languageName: node
+  linkType: hard
+
+"state-local@npm:^1.0.6":
+  version: 1.0.7
+  resolution: "state-local@npm:1.0.7"
+  checksum: d1afcf1429e7e6eb08685b3a94be8797db847369316d4776fd51f3962b15b984dacc7f8e401ad20968e5798c9565b4b377afedf4e4c4d60fe7495e1cbe14a251
   languageName: node
   linkType: hard
 

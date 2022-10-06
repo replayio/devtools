@@ -1,10 +1,10 @@
-import * as React from 'react'
+import * as React from "react";
 
-import type { MonacoOptions } from './hooks/use-monaco'
-import { useMonaco } from './hooks/use-monaco'
+import type { MonacoOptions } from "./hooks/use-monaco";
+import { useMonaco } from "./hooks/use-monaco";
 
-const MIN_LINE_COUNT = 10
-const LINE_HEIGHT = 20
+const MIN_LINE_COUNT = 10;
+const LINE_HEIGHT = 20;
 
 export function Editor({
   value,
@@ -14,14 +14,11 @@ export function Editor({
   folding,
   fontSize,
   focusRange,
-  highlightPosition,
   onChange,
   onMount,
-}: { height?: string | number } & Omit<MonacoOptions, 'containerRef'>) {
-  const ref = React.useRef()
-  const countOfLines = value
-    ? Math.max(value.split('\n').length, MIN_LINE_COUNT)
-    : MIN_LINE_COUNT
+}: { height?: string | number } & Omit<MonacoOptions, "containerRef">) {
+  const ref = React.useRef<HTMLDivElement>(null);
+  const countOfLines = value ? Math.max(value.split("\n").length, MIN_LINE_COUNT) : MIN_LINE_COUNT;
 
   useMonaco({
     containerRef: ref,
@@ -31,12 +28,9 @@ export function Editor({
     folding,
     fontSize,
     focusRange,
-    highlightPosition,
     onChange,
     onMount,
-  })
+  });
 
-  return (
-    <div ref={ref} style={{ height: height ?? countOfLines * LINE_HEIGHT }} />
-  )
+  return <div ref={ref} style={{ height: height ?? countOfLines * LINE_HEIGHT }} />;
 }

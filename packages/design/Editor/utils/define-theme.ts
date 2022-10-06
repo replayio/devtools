@@ -1,101 +1,101 @@
 // copied from: https://github.com/codesandbox/codesandbox-client/blob/master/packages/app/src/embed/components/Content/Monaco/define-theme.js
-import Color from 'color'
+import Color from "color";
 
-const sanitizeColor = (color) => {
+const sanitizeColor = (color: any) => {
   if (!color) {
-    return color
+    return color;
   }
 
   if (/#......$/.test(color) || /#........$/.test(color)) {
-    return color
+    return color;
   }
 
   try {
-    return new Color(color).hexString()
+    return new Color(color).hex();
   } catch (e) {
-    return '#FF0000'
+    return "#FF0000";
   }
-}
+};
 
-const colorsAllowed = ({ foreground, background }) => {
-  if (foreground === 'inherit' || background === 'inherit') {
-    return false
+const colorsAllowed = ({ foreground, background }: { foreground: any; background: any }) => {
+  if (foreground === "inherit" || background === "inherit") {
+    return false;
   }
 
-  return true
-}
+  return true;
+};
 
-const getTheme = (theme) => {
-  const { tokenColors = [], colors = {} } = theme
+const getTheme = (theme: any) => {
+  const { tokenColors = [], colors = {} } = theme;
   const rules = tokenColors
-    .filter((t) => t.settings && t.scope && colorsAllowed(t.settings))
-    .reduce((acc, token) => {
+    .filter((t: any) => t.settings && t.scope && colorsAllowed(t.settings))
+    .reduce((acc: any, token: any) => {
       const settings = {
         foreground: sanitizeColor(token.settings.foreground),
         background: sanitizeColor(token.settings.background),
         fontStyle: token.settings.fontStyle,
-      }
+      };
 
       const scope =
-        typeof token.scope === 'string'
-          ? token.scope.split(',').map((a) => a.trim())
-          : token.scope
+        typeof token.scope === "string" ? token.scope.split(",").map(a => a.trim()) : token.scope;
 
-      scope.map((s) =>
+      scope.map((s: any) =>
         acc.push({
           token: s,
           ...settings,
         })
-      )
+      );
 
-      return acc
-    }, [])
+      return acc;
+    }, []);
 
-  const newColors = colors
-  Object.keys(colors).forEach((c) => {
-    if (newColors[c]) return c
+  const newColors = colors;
+  Object.keys(colors).forEach(c => {
+    if (newColors[c]) {
+      return c;
+    }
 
-    delete newColors[c]
+    delete newColors[c];
 
-    return c
-  })
+    return c;
+  });
 
   return {
     colors: newColors,
     rules,
     type: theme.type,
-  }
-}
+  };
+};
 
-const getBase = (type) => {
-  if (type === 'dark') {
-    return 'vs-dark'
-  }
-
-  if (type === 'hc') {
-    return 'hc-black'
+const getBase = (type: any) => {
+  if (type === "dark") {
+    return "vs-dark";
   }
 
-  return 'vs'
-}
+  if (type === "hc") {
+    return "hc-black";
+  }
 
-const defineTheme = (monaco, theme) => {
+  return "vs";
+};
+
+const defineTheme = (monaco: any, theme: any) => {
   if (theme && monaco.editor.defineTheme) {
-    const transformedTheme = getTheme(theme)
+    const transformedTheme = getTheme(theme);
 
     try {
-      monaco.editor.defineTheme('CodeSandbox', {
+      monaco.editor.defineTheme("CodeSandbox", {
         base: getBase(transformedTheme.type),
         inherit: true,
         colors: transformedTheme.colors,
         rules: transformedTheme.rules,
-      })
+      });
 
-      monaco.editor.setTheme('CodeSandbox')
+      monaco.editor.setTheme("CodeSandbox");
     } catch (e) {
-      console.error(e)
+      console.error(e);
     }
   }
-}
+};
 
-export default defineTheme
+export default defineTheme;

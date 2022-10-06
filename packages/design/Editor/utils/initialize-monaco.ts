@@ -1,30 +1,29 @@
-import loader from '@monaco-editor/loader'
-import { wireTmGrammars } from 'monaco-editor-textmate'
-import { Registry } from 'monaco-textmate'
-import { loadWASM } from 'onigasm'
-import type { AsyncReturnType } from 'type-fest'
-import theme from 'theme/code.json'
-import { allTypes } from 'types'
+import loader from "@monaco-editor/loader";
+import { wireTmGrammars } from "monaco-editor-textmate";
+import { Registry } from "monaco-textmate";
+import { loadWASM } from "onigasm";
+import type { AsyncReturnType } from "type-fest";
+// import theme from "theme/code.json";
 
-import defineTheme from './define-theme'
+import defineTheme from "./define-theme";
 
-export type Monaco = AsyncReturnType<typeof loader.init>
+export type Monaco = AsyncReturnType<typeof loader.init>;
 
 export type InitializeMonacoOptions = {
-  container: HTMLElement
-  monaco: Monaco
-  defaultValue?: string
-  id?: number
-  lineNumbers?: boolean
-  folding?: boolean
-  fontSize?: number
-  onOpenEditor?: (input: any, source: any) => void
-}
+  container: HTMLElement;
+  monaco: Monaco;
+  defaultValue?: string;
+  id?: number;
+  lineNumbers?: boolean;
+  folding?: boolean;
+  fontSize?: number;
+  onOpenEditor?: (input: any, source: any) => void;
+};
 
 export async function initializeMonaco({
   container,
   monaco,
-  defaultValue = '',
+  defaultValue = "",
   id = 0,
   lineNumbers = true,
   folding = true,
@@ -32,96 +31,86 @@ export async function initializeMonaco({
   onOpenEditor = () => null,
 }: InitializeMonacoOptions) {
   try {
-    await loadWASM('/onigasm.wasm')
+    await loadWASM("/onigasm.wasm");
   } catch {
     // try/catch prevents onigasm from erroring on fast refreshes
   }
 
   const registry = new Registry({
-    getGrammarDefinition: async (scopeName) => {
+    getGrammarDefinition: async (scopeName: any) => {
       switch (scopeName) {
-        case 'source.tsx':
+        case "source.tsx":
           return {
-            format: 'json',
-            content: await (await fetch('/tsx.tmLanguage.json')).text(),
-          }
+            format: "json",
+            content: await (await fetch("/tsx.tmLanguage.json")).text(),
+          };
         default:
-          return null
+          return null;
       }
     },
-  })
+  });
 
-  const grammars = new Map()
+  const grammars = new Map();
 
-  grammars.set('typescript', 'source.tsx')
+  grammars.set("typescript", "source.tsx");
 
   const model = monaco.editor.createModel(
     defaultValue,
-    'typescript',
+    "typescript",
     monaco.Uri.parse(`file:///index-${id}.tsx`)
-  )
+  );
 
   const editor = monaco.editor.create(container, {
     model,
     fontSize,
-    fontFamily: 'var(--font-family-mono)',
-    lineNumbers: lineNumbers ? 'on' : 'off',
+    fontFamily: "var(--font-family-mono)",
+    lineNumbers: lineNumbers ? "on" : "off",
     folding: folding,
     automaticLayout: true,
-    language: 'typescript',
+    language: "typescript",
     contextmenu: false,
-    theme: 'vs-dark',
+    theme: "vs-dark",
     formatOnPaste: true,
     formatOnType: true,
     minimap: { enabled: false },
-  })
+  });
 
   // @ts-ignore
-  const editorService = editor._codeEditorService
-  const openEditorBase = editorService.openCodeEditor.bind(editorService)
+  const editorService = editor._codeEditorService;
+  const openEditorBase = editorService.openCodeEditor.bind(editorService);
 
-  editorService.openCodeEditor = async (input, source) => {
-    const result = await openEditorBase(input, source)
+  editorService.openCodeEditor = async (input: any, source: any) => {
+    const result = await openEditorBase(input, source);
     if (result === null) {
-      onOpenEditor(input, source)
+      onOpenEditor(input, source);
     }
-    return result
-  }
+    return result;
+  };
 
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
     jsx: monaco.languages.typescript.JsxEmit.Preserve,
     esModuleInterop: true,
-  })
+  });
 
   /**
    * Load React types
    * alternatively, you can use: https://github.com/lukasbach/monaco-editor-auto-typings
    */
-  fetch('https://unpkg.com/@types/react@17.0.38/index.d.ts')
-    .then((response) => response.text())
-    .then((types) => {
+  fetch("https://unpkg.com/@types/react@17.0.38/index.d.ts")
+    .then(response => response.text())
+    .then(types => {
       monaco.languages.typescript.typescriptDefaults.addExtraLib(
         types,
-        'file:///node_modules/react/index.d.ts'
-      )
-    })
-
-  /**
-   * Load types for components and hooks
-   */
-  allTypes.forEach((typeDef) => {
-    monaco.languages.typescript.typescriptDefaults.addExtraLib(
-      typeDef.code,
-      typeDef.path
-    )
-  })
+        "file:///node_modules/react/index.d.ts"
+      );
+    });
 
   /**
    * Convert VS Code theme to Monaco theme
    */
-  defineTheme(monaco, theme)
+  // defineTheme(monaco, theme);
 
-  await wireTmGrammars(monaco, registry, grammars)
+  await wireTmGrammars(monaco, registry, grammars);
 
-  return editor
+  return editor;
 }
