@@ -7,8 +7,14 @@ import { createMockReplayClient } from "../utils/testing";
 import { Status, UncaughtException } from "./ExceptionsCache";
 
 describe("ExceptionsCache", () => {
-  function createCE() {
-    const error = new Error("There are too many points to complete this operation") as CommandError;
+  function createCE(returnStringLiteral: boolean): Error | string {
+    const errorMessage = "There are too many points to complete this operation";
+
+    if (returnStringLiteral) {
+      return errorMessage;
+    }
+
+    const error = new Error(errorMessage) as CommandError;
     error.name = "CommandError";
     error.code = 55;
     return error;
@@ -120,7 +126,20 @@ describe("ExceptionsCache", () => {
   });
 
   it("should handle a too many exception points", async () => {
-    client.runAnalysis.mockImplementation(() => Promise.reject(createCE()));
+    client.runAnalysis.mockImplementation(() => Promise.reject(createCE(false)));
+
+    const exceptions = await getExceptionsHelper(toTSPR(1, 2));
+    expect(exceptions).toEqual([]);
+    expect(exceptions).toBe(await getExceptionsHelper(toTSPR(1, 2)));
+
+    expect(client.runAnalysis).toHaveBeenCalledTimes(1);
+
+    expect(getStatus()).toBe("failed-too-many-points");
+  });
+
+  // TODO [BAC-2330] Analysis API returns an actual string "There are too many points to complete this operation" as an error.
+  it("should handle a too many exception points (string variant)", async () => {
+    client.runAnalysis.mockImplementation(() => Promise.reject(createCE(true)));
 
     const exceptions = await getExceptionsHelper(toTSPR(1, 2));
     expect(exceptions).toEqual([]);
@@ -201,7 +220,27 @@ describe("ExceptionsCache", () => {
   });
 
   it("should always re-request if focus region changes after too many points error", async () => {
-    client.runAnalysis.mockImplementation(() => Promise.reject(createCE()));
+    client.runAnalysis.mockImplementation(() => Promise.reject(createCE(false)));
+
+    let exceptions = await getExceptionsHelper(toTSPR(0, 3));
+    expect(exceptions).toEqual([]);
+    expect(getStatus()).toBe("failed-too-many-points");
+    expect(client.runAnalysis).toHaveBeenCalledTimes(1);
+
+    exceptions = await getExceptionsHelper(toTSPR(1, 3));
+    expect(exceptions).toEqual([]);
+    expect(getStatus()).toBe("failed-too-many-points");
+    expect(client.runAnalysis).toHaveBeenCalledTimes(2);
+
+    exceptions = await getExceptionsHelper(toTSPR(1, 2));
+    expect(exceptions).toEqual([]);
+    expect(getStatus()).toBe("failed-too-many-points");
+    expect(client.runAnalysis).toHaveBeenCalledTimes(3);
+  });
+
+  // TODO [BAC-2330] Analysis API returns an actual string "There are too many points to complete this operation" as an error.
+  it("should always re-request if focus region changes after too many points error (string variant)", async () => {
+    client.runAnalysis.mockImplementation(() => Promise.reject(createCE(true)));
 
     let exceptions = await getExceptionsHelper(toTSPR(0, 3));
     expect(exceptions).toEqual([]);
@@ -290,7 +329,16 @@ describe("ExceptionsCache", () => {
     });
 
     it("should notify after too many points error", async () => {
-      client.runAnalysis.mockImplementation(() => Promise.reject(createCE()));
+      client.runAnalysis.mockImplementation(() => Promise.reject(createCE(false)));
+
+      await getExceptionsHelper(toTSPR(0, 1));
+
+      expect(statuses).toEqual(["request-in-progress", "failed-too-many-points"]);
+    });
+
+    // TODO [BAC-2330] Analysis API returns an actual string "There are too many points to complete this operation" as an error.
+    it("should notify after too many points error (string variant)", async () => {
+      client.runAnalysis.mockImplementation(() => Promise.reject(createCE(true)));
 
       await getExceptionsHelper(toTSPR(0, 1));
 

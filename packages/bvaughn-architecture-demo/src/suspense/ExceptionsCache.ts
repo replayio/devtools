@@ -1,13 +1,12 @@
 import { TimeStampedPointRange } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
-import { ProtocolError } from "shared/utils/error";
-import { isCommandError } from "shared/utils/error";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { isRangeEqual, isRangeSubset } from "../utils/time";
+
 import { RemoteAnalysisResult } from "./AnalysisCache";
 import { preCacheObjects } from "./ObjectPreviews";
-
 import { Wakeable } from "./types";
 
 export type UncaughtException = RemoteAnalysisResult & {
@@ -79,10 +78,14 @@ export function getExceptions(
     if (!isRangeSubset(lastFetchedFocusRange, focusRange)) {
       // The new range is bigger than the old range so we need to fetch again.
       shouldFetch = true;
-    } else if (!isRangeEqual(lastFetchedFocusRange, focusRange) && lastFetchDidFailTooManyPoints) {
-      // The last time we tried to fetch overflowed,
-      // but the new range is smaller so we should try again
-      shouldFetch = true;
+    } else {
+      if (!isRangeEqual(lastFetchedFocusRange, focusRange)) {
+        // The new range is smaller than the old one
+        if (lastFetchDidFailTooManyPoints) {
+          // The last time we tried to fetch overflowed, so we should try again.
+          shouldFetch = true;
+        }
+      }
     }
   }
 
@@ -143,7 +146,7 @@ async function fetchExceptions(client: ReplayClientInterface) {
     // React doesn't use the resolved value.
     wakeable.resolve(null as any);
   } catch (error) {
-    if (isCommandError(error, ProtocolError.TooManyPoints) && wakeable === inFlightWakeable) {
+    if (wakeable === inFlightWakeable && isCommandError(error, ProtocolError.TooManyPoints)) {
       lastFetchDidFailTooManyPoints = true;
       lastFetchedExceptions = EMPTY_ARRAY;
       lastFetchedFocusRange = inFlightFocusRange;
