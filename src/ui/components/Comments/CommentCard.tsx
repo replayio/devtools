@@ -10,7 +10,6 @@ import styles from "./CommentCard.module.css";
 import CommentPreview from "./CommentPreview";
 import CommentReplyButton from "./CommentReplyButton";
 import EditableRemark from "./EditableRemark";
-import LoomComment from "./LoomComment";
 import ReplyCard from "./ReplyCard";
 
 export default function CommentCard({ comment }: { comment: Comment }) {
@@ -24,8 +23,6 @@ export default function CommentCard({ comment }: { comment: Comment }) {
     dispatch(seekToComment(comment));
   };
 
-  const loomUrl = comment.content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
-
   const showReplyButton = !isCommentContentEmpty(comment.content);
 
   return (
@@ -37,11 +34,7 @@ export default function CommentCard({ comment }: { comment: Comment }) {
 
       <CommentPreview comment={comment} />
 
-      {loomUrl ? (
-        <LoomComment loomUrl={loomUrl} />
-      ) : (
-        <EditableRemark remark={comment} type="comment" />
-      )}
+      <EditableRemark remark={comment} type="comment" />
 
       {comment.replies.map(reply => (
         <ReplyCard key={reply.id} reply={reply} />
