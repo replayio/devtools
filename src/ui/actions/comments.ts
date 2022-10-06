@@ -152,12 +152,15 @@ export function createLabels(
   sourceLocation: SourceLocation
 ): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
+    await ThreadFront.ensureAllSources();
     const state = getState();
-
     const sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
 
     if (sourceId) {
-      sourceLocation.sourceId = sourceId;
+      sourceLocation = {
+        ...sourceLocation,
+        sourceId,
+      };
     }
 
     const { sourceUrl, line } = sourceLocation;

@@ -129,19 +129,18 @@ export function selectLocation(
   openSourcesTab = true
 ): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    const state = getState();
-    const currentSource = getSelectedSource(state);
+    const currentSource = getSelectedSource(getState());
     trackEvent("sources.select_location");
 
     if (getViewMode(getState()) == "non-dev") {
       dispatch(setViewMode("dev"));
     }
 
-    let source = getSourceDetails(state, location.sourceId);
+    let source = getSourceDetails(getState(), location.sourceId);
     if (location.sourceUrl) {
       if (!source || location.sourceUrl !== source.url) {
         await ThreadFront.ensureAllSources();
-        const sourceId = handleUnstableSourceIds(location.sourceUrl!, state);
+        const sourceId = handleUnstableSourceIds(location.sourceUrl!, getState());
         if (sourceId) {
           source = getSourceDetails(getState(), sourceId);
         }
