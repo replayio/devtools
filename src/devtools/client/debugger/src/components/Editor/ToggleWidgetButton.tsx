@@ -6,7 +6,7 @@ import { getSource, getSourceHitCounts } from "bvaughn-architecture-demo/src/sus
 import { getSourceFileName } from "bvaughn-architecture-demo/src/utils/source";
 import classNames from "classnames";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
-import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
+import { getExecutionPoint, getSymbols } from "devtools/client/debugger/src/selectors";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import ReactDOM from "react-dom";
@@ -21,7 +21,6 @@ import React, {
 } from "react";
 import { Point } from "shared/client/types";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-
 import { seek } from "ui/actions/timeline";
 import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
 import MaterialIcon from "ui/components/shared/MaterialIcon";
@@ -30,6 +29,8 @@ import { useFeature } from "ui/hooks/settings";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { shouldShowNag } from "ui/utils/user";
 import { Nag } from "ui/hooks/users";
+
+import { findClosestFunction } from "../../utils/ast";
 
 import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 
@@ -154,6 +155,11 @@ function QuickActions({
     focusRange
   );
 
+  const symbols = useAppSelector(state =>
+    source ? getSymbols(state, { id: source.sourceId, url: source.url }) : null
+  );
+  console.log("symbols:", symbols);
+
   const onToggleLogPoint = async () => {
     if (point) {
       if (point.shouldLog) {
@@ -163,15 +169,31 @@ function QuickActions({
           deletePoints(point.id);
         }
       } else {
+        const closestFunction = symbols
+          ? findClosestFunction(symbols, { column: columnIndex, line: lineNumber })
+          : null;
+        let content = closestFunction
+          ? `"${closestFunction.name}", ${lineNumber}`
+          : `"${fileName!}", ${lineNumber}`;
+
         editPoint(point.id, {
+          content,
           shouldLog: true,
         });
       }
     } else {
+      const closestFunction = symbols
+        ? findClosestFunction(symbols, { column: columnIndex, line: lineNumber })
+        : null;
+      console.log("closestFunction:", closestFunction);
+      let content = closestFunction
+        ? `"${closestFunction.name}", ${lineNumber}`
+        : `"${fileName!}", ${lineNumber}`;
+      console.log("content:", content);
+
       addPoint(
         {
-          // TODO [FE-757] Content string should have the function name, not the file name.
-          content: `"${fileName!}", ${lineNumber}`,
+          content,
           shouldLog: true,
         },
         {
