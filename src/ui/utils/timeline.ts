@@ -327,7 +327,7 @@ export function mergeSortedPointLists(
   a: TimeStampedPoint[],
   b: TimeStampedPoint[]
 ): TimeStampedPoint[] {
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV !== "production") {
     assertSorted(a);
     assertSorted(b);
   }
