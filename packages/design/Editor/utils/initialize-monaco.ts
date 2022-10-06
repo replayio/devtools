@@ -14,7 +14,6 @@ export type InitializeMonacoOptions = {
   monaco: Monaco;
   defaultValue?: string;
   id?: number;
-  lineNumbers?: boolean;
   folding?: boolean;
   fontSize?: number;
   onOpenEditor?: (input: any, source: any) => void;
@@ -25,7 +24,6 @@ export async function initializeMonaco({
   monaco,
   defaultValue = "",
   id = 0,
-  lineNumbers = true,
   folding = true,
   fontSize = 18,
   onOpenEditor = () => null,
@@ -60,11 +58,19 @@ export async function initializeMonaco({
     monaco.Uri.parse(`file:///index-${id}.tsx`)
   );
 
+  const lineNumbers = (lineNumber: number) => {
+    if (lineNumber === 5) {
+      return "+";
+    }
+
+    return lineNumber;
+  };
+
   const editor = monaco.editor.create(container, {
     model,
     fontSize,
+    lineNumbers,
     fontFamily: "var(--font-family-mono)",
-    lineNumbers: lineNumbers ? "on" : "off",
     folding: folding,
     automaticLayout: true,
     language: "typescript",
@@ -73,6 +79,20 @@ export async function initializeMonaco({
     formatOnPaste: true,
     formatOnType: true,
     minimap: { enabled: false },
+  }) as Monaco;
+
+  const lineNumber = 5;
+
+  editor.changeViewZones(function (changeAccessor: any) {
+    var domNode = document.createElement("div");
+
+    changeAccessor.addZone({
+      afterLineNumber: lineNumber,
+      heightInLines: 3,
+      domNode: domNode,
+    });
+
+    domNode.style.background = "lightgreen";
   });
 
   // @ts-ignore
