@@ -13,13 +13,13 @@ test(`Test stepping forward through breakpoints when rewound before the first on
   await startTest(page, url);
   await openDevToolsTab(page);
 
-  await addBreakpoint(page, { lineNumber: 8, url });
+  await addBreakpoint(page, { lineNumber: 9, url });
   // Rewind to when the point was hit
-  await rewindToLine(page, { lineNumber: 8 });
+  await rewindToLine(page, { lineNumber: 9 });
   // Rewind further (past the first hit)
   await rewindToLine(page);
 
-  await removeBreakpoint(page, { lineNumber: 8, url });
+  await removeBreakpoint(page, { lineNumber: 9, url });
 
   await addBreakpoint(page, { lineNumber: 21, url });
   await resumeToLine(page, { lineNumber: 21 });

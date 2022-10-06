@@ -330,12 +330,6 @@ class Editor extends PureComponent<PropsFromRedux, EditorState> {
 
   onGutterClick = (cm: any, line: number, gutter: any, ev: MouseEvent) => {
     const { cx, selectedSource, addBreakpointAtLine } = this.props;
-    const sourceLocation = getSourceLocationFromMouseEvent(
-      this.state.editor!,
-      selectedSource as any,
-      ev
-    );
-
     // ignore right clicks in the gutter
     if ((ev.ctrlKey && ev.button === 0) || ev.button === 2 || !selectedSource) {
       return;
