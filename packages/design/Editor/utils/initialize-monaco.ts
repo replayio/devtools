@@ -30,29 +30,29 @@ export async function initializeMonaco({
   fontSize = 18,
   onOpenEditor = () => null,
 }: InitializeMonacoOptions) {
-  try {
-    await loadWASM("/onigasm.wasm");
-  } catch {
-    // try/catch prevents onigasm from erroring on fast refreshes
-  }
+  // try {
+  //   await loadWASM("/onigasm.wasm");
+  // } catch {
+  //   // try/catch prevents onigasm from erroring on fast refreshes
+  // }
 
-  const registry = new Registry({
-    getGrammarDefinition: async (scopeName: any) => {
-      switch (scopeName) {
-        case "source.tsx":
-          return {
-            format: "json",
-            content: await (await fetch("/tsx.tmLanguage.json")).text(),
-          };
-        default:
-          return null;
-      }
-    },
-  });
+  // const registry = new Registry({
+  //   getGrammarDefinition: async (scopeName: any) => {
+  //     switch (scopeName) {
+  //       case "source.tsx":
+  //         return {
+  //           format: "json",
+  //           content: await (await fetch("/tsx.tmLanguage.json")).text(),
+  //         };
+  //       default:
+  //         return null;
+  //     }
+  //   },
+  // });
 
-  const grammars = new Map();
+  // const grammars = new Map();
 
-  grammars.set("typescript", "source.tsx");
+  // grammars.set("typescript", "source.tsx");
 
   const model = monaco.editor.createModel(
     defaultValue,
@@ -110,7 +110,7 @@ export async function initializeMonaco({
    */
   // defineTheme(monaco, theme);
 
-  await wireTmGrammars(monaco, registry, grammars);
+  // await wireTmGrammars(monaco, registry, grammars);
 
   return editor;
 }
