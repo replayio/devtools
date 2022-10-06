@@ -107,7 +107,7 @@ export function addBreakpoint(
         return;
       }
       column = Math.min(...lineBreakpoints.filter(bp => bp.line === line).map(bp => bp.column));
-      if (!column || column === Infinity) {
+      if (column == null || column === Infinity) {
         console.debug(`No possible breakpoints on line ${line} of source ${sourceId}`);
         return;
       }
