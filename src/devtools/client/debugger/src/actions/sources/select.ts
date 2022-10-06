@@ -34,6 +34,8 @@ import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
 import { fetchSymbolsForSource } from "../../reducers/ast";
+import { UIState } from "ui/state";
+import { Location } from "@replayio/protocol";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -106,6 +108,17 @@ export function addTab(source: SourceDetails) {
   };
 }
 
+// Locations may contain unstable sourceId's, whether because of a backend
+// change or because we are persisting locations across replays.  We try to work
+// around this by comparing source URLs and, if they don't match, use the
+// preferred source for the location's URL.
+export function handleUnstableSourceIds(sourceUrl: string, state: UIState): string | undefined {
+  const sourceByUrl = getSourceToDisplayForUrl(state, sourceUrl);
+  if (sourceByUrl) {
+    return sourceByUrl.id;
+  }
+}
+
 /**
  * @memberof actions/sources
  * @static
@@ -116,27 +129,25 @@ export function selectLocation(
   openSourcesTab = true
 ): UIThunkAction<Promise<unknown>> {
   return async (dispatch, getState, { ThreadFront }) => {
-    const currentSource = getSelectedSource(getState());
+    const state = getState();
+    const currentSource = getSelectedSource(state);
     trackEvent("sources.select_location");
 
     if (getViewMode(getState()) == "non-dev") {
       dispatch(setViewMode("dev"));
     }
 
-    let source = getSourceDetails(getState(), location.sourceId);
-    // The location may contain a sourceId from another session (e.g. when the user clicks
-    // on a comment that has a source location), but a sourceId is not guaranteed
-    // to be stable across sessions (although most of the time it is).
-    // We try to work around this by comparing source URLs and, if they don't match,
-    // use the preferred source for the location's URL.
-    if (location.sourceUrl && location.sourceUrl !== source?.url) {
-      await ThreadFront.ensureAllSources();
-      const state = getState();
-      source = getSourceToDisplayForUrl(state, location.sourceUrl);
-      if (source) {
-        location = { ...location, sourceId: source.id };
+    let source = getSourceDetails(state, location.sourceId);
+    if (location.sourceUrl) {
+      if (!source || location.sourceUrl !== source.url) {
+        await ThreadFront.ensureAllSources();
+        const sourceId = handleUnstableSourceIds(location.sourceUrl!, state);
+        if (sourceId) {
+          source = getSourceDetails(getState(), sourceId);
+        }
       }
     }
+
     if (!source) {
       // If there is no source we deselect the current selected source
       return dispatch(clearSelectedLocation());

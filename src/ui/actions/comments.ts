@@ -1,5 +1,8 @@
 import { RecordingId } from "@replayio/protocol";
-import { selectLocation } from "devtools/client/debugger/src/actions/sources/select";
+import {
+  handleUnstableSourceIds,
+  selectLocation,
+} from "devtools/client/debugger/src/actions/sources/select";
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import {
@@ -149,12 +152,20 @@ export function createLabels(
   sourceLocation: SourceLocation
 ): UIThunkAction<Promise<{ primary: string; secondary: string }>> {
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
-    const { sourceId, sourceUrl, line } = sourceLocation;
-    const filename = getFilenameFromURL(sourceUrl);
+    const state = getState();
+
+    const sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
+
+    if (sourceId) {
+      sourceLocation.sourceId = sourceId;
+    }
+
+    const { sourceUrl, line } = sourceLocation;
+
+    const filename = sourceUrl ? getFilenameFromURL(sourceUrl) : "unknown source";
     if (!sourceId) {
       return { primary: `${filename}:${line}`, secondary: "" };
     }
-    const state = getState();
 
     let symbols = getSymbols(state, { id: sourceId });
     if (!symbols) {
