@@ -33,17 +33,6 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
 
     dispatch(frameSelected({ cx, frameId: frame.id }));
 
-    try {
-      await ThreadFront.getFrameSteps(frame.asyncIndex, frame.protocolId);
-    } catch (e) {
-      // TODO [FE-795]: Communicate this to the user
-      if (isCommandError(e, ProtocolError.TooManyPoints)) {
-        console.error(e);
-        return;
-      }
-      throw e;
-    }
-
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
 
