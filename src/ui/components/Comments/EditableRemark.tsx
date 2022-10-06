@@ -1,9 +1,11 @@
-import { useMemo, useState } from "react";
+import { ReactNode, useMemo, useState } from "react";
 import { useUpdateComment, useUpdateCommentReply } from "ui/hooks/comments/comments";
 import useDeleteComment from "ui/hooks/comments/useDeleteComment";
 import useDeleteCommentReply from "ui/hooks/comments/useDeleteCommentReply";
 import { useGetOwnersAndCollaborators, useGetRecordingId } from "ui/hooks/recordings";
 import { useGetUserId } from "ui/hooks/users";
+import { setModal } from "ui/reducers/app";
+import { useAppDispatch } from "ui/setup/hooks";
 import type { Comment, Remark } from "ui/state/comments";
 import { User } from "ui/types";
 import { formatRelativeTime } from "ui/utils/comments";
@@ -13,6 +15,7 @@ import { AvatarImage } from "../Avatar";
 import TipTapEditor from "./CommentEditor/TipTapEditor";
 import styles from "./EditableRemark.module.css";
 import { FocusContext } from "./FocusContext";
+import LoomComment from "./LoomComment";
 import RemarkDropDown from "./RemarkDropDown";
 
 export default function EditableRemark({
@@ -22,9 +25,11 @@ export default function EditableRemark({
   remark: Remark;
   type: "comment" | "reply";
 }) {
+  const { content, id: remarkId, user } = remark;
+
   const { userId } = useGetUserId();
 
-  const canEdit = remark.user?.id === userId;
+  const canEdit = user?.id === userId;
 
   const deleteComment = useDeleteComment();
   const deleteCommentReply = useDeleteCommentReply();
@@ -37,7 +42,7 @@ export default function EditableRemark({
   const [isPending, setIsPending] = useState(false);
 
   // New comments should default to showing edit mode.
-  const [isEditing, setIsEditing] = useState(canEdit && remark.content === "");
+  const [isEditing, setIsEditing] = useState(canEdit && content === "");
 
   const showOptionsMenu = !isEditing && !isPending && canEdit;
 
@@ -47,14 +52,14 @@ export default function EditableRemark({
 
   const deleteRemark = async () => {
     if (type === "comment") {
-      await deleteComment(remark.id);
+      await deleteComment(remarkId);
     } else {
-      await deleteCommentReply(remark.id);
+      await deleteCommentReply(remarkId);
     }
   };
 
   const publishRemark = () => {
-    saveChanges(remark.content);
+    saveChanges(content);
   };
 
   const discardPendingChanges = () => {
@@ -66,9 +71,9 @@ export default function EditableRemark({
     setIsEditing(false);
 
     if (type === "comment") {
-      await updateComment(remark.id, newContent, true, (remark as Comment).position);
+      await updateComment(remarkId, newContent, true, (remark as Comment).position);
     } else {
-      await updateCommentReply(remark.id, newContent, true);
+      await updateCommentReply(remarkId, newContent, true);
     }
 
     setIsPending(false);
@@ -80,12 +85,14 @@ export default function EditableRemark({
     }
   };
 
+  const loomUrl = content.match(/loom\.com\/share\/(\S*?)(\"|\?)/)?.[1];
+
   return (
     <>
       <div className={styles.HeaderRow}>
-        <AvatarImage className={styles.Avatar} src={remark.user?.picture} />
-        <div className={styles.UserName} title={remark.user?.name || undefined}>
-          {remark.user?.name}
+        <AvatarImage className={styles.Avatar} src={user?.picture} />
+        <div className={styles.UserName} title={user?.name || undefined}>
+          {user?.name}
         </div>
         <div className={styles.Time}>{formatRelativeTime(new Date(remark.createdAt))}</div>
         {showOptionsMenu && (
@@ -103,23 +110,27 @@ export default function EditableRemark({
         className={remark.isPublished ? styles.PublishedContent : styles.UnpublishedContent}
         onDoubleClick={onDoubleClick}
       >
-        <FocusContext.Consumer>
-          {({ autofocus, blur, close, isFocused }) => (
-            <TipTapEditor
-              autofocus={autofocus}
-              blur={blur}
-              close={close}
-              content={remark.content}
-              editable={isEditing && !isPending}
-              handleCancel={discardPendingChanges}
-              handleDelete={deleteRemark}
-              handleSubmit={saveChanges}
-              possibleMentions={users || []}
-              placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
-              takeFocus={isFocused}
-            />
-          )}
-        </FocusContext.Consumer>
+        {loomUrl && !isEditing ? (
+          <LoomComment loomUrl={loomUrl} />
+        ) : (
+          <FocusContext.Consumer>
+            {({ autofocus, blur, close, isFocused }) => (
+              <TipTapEditor
+                autofocus={autofocus}
+                blur={blur}
+                close={close}
+                content={content}
+                editable={isEditing && !isPending}
+                handleCancel={discardPendingChanges}
+                handleDelete={deleteRemark}
+                handleSubmit={saveChanges}
+                possibleMentions={users || []}
+                placeholder={type === "reply" ? "Write a reply..." : "Type a comment"}
+                takeFocus={isFocused}
+              />
+            )}
+          </FocusContext.Consumer>
+        )}
       </div>
     </>
   );
