@@ -314,7 +314,9 @@ export function filterToFocusRegion<T extends TimeStampedPoint>(
 function assertSorted(a: TimeStampedPoint[]) {
   a.reduce(
     (prev, curr) => {
-      assert(prev.time <= curr.time);
+      // It would be cheaper to compare time but at least one recording has a bizarre time (see BAC-2339).
+      // Truthfully, since points are more fine-grained than time, we should be comparing them anyway.
+      assert(BigInt(prev.point) <= BigInt(curr.point));
       return curr;
     },
     { point: "0", time: 0 }
@@ -325,8 +327,10 @@ export function mergeSortedPointLists(
   a: TimeStampedPoint[],
   b: TimeStampedPoint[]
 ): TimeStampedPoint[] {
-  assertSorted(a);
-  assertSorted(b);
+  if (process.env.NODE_ENV !== "production") {
+    assertSorted(a);
+    assertSorted(b);
+  }
 
   // Merge from the smaller array into the larger one.
   let [source, destination] = a.length < b.length ? [a, b] : [b, a];

@@ -16,7 +16,14 @@ export const commandError = (message: string, code: number): CommandError => {
 };
 
 export const isCommandError = (error: unknown, code: number): boolean => {
-  return (
-    error instanceof Error && error.name === "CommandError" && (error as CommandError).code === code
-  );
+  if (error instanceof Error) {
+    return error.name === "CommandError" && (error as CommandError).code === code;
+  } else if (code === ProtocolError.TooManyPoints) {
+    if (typeof error === "string") {
+      // TODO [BAC-2330] The Analysis endpoint returns an error string instead of an error object.
+      return error === "There are too many points to complete this operation";
+    }
+  }
+
+  return false;
 };
