@@ -1,3 +1,4 @@
+import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Expandable from "@bvaughn/components/Expandable";
 import Icon from "@bvaughn/components/Icon";
 import Inspector from "@bvaughn/components/inspector";
@@ -110,7 +111,11 @@ function MessageRenderer({
   const logContents = (
     <span className={styles.LogContents} data-test-name="LogContents">
       {message.text && <span className={styles.MessageText}>{message.text}</span>}
-      {primaryContent}
+      <ErrorBoundary
+        fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
+      >
+        {primaryContent}
+      </ErrorBoundary>
     </span>
   );
 

@@ -22,7 +22,7 @@ import { ObjectPreviewRendererProps } from "./values/types";
 // This renderer only renders a value (no name) and can be used with both horizontal and vertical layouts.
 //
 // https://static.replay.io/protocol/tot/Pause/#type-ObjectPreview
-export default memo(function ValueRenderer({
+function ValueRenderer({
   context,
   layout = "horizontal",
   pauseId,
@@ -96,4 +96,6 @@ export default memo(function ValueRenderer({
   }
 
   return <ClientValueValueRenderer clientValue={clientValue} context={context} />;
-});
+}
+
+export default memo(ValueRenderer);
