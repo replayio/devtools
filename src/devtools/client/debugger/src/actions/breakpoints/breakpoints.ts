@@ -43,9 +43,16 @@ export function addBreakpointAtLine(cx: Context, line: number): UIThunkAction {
   return (dispatch, getState) => {
     const logpoints = getBreakpointsForSelectedSource(getState());
     const breakpoint = logpoints.find(ps => ps.location.line === line);
-    const logValue = isLogpoint(breakpoint);
 
-    dispatch(_addBreakpointAtLine(cx, line, logValue, false, true));
+    if (breakpoint && isLogpoint(breakpoint)) {
+      // if we already have a log point and are adding a pause point too, only
+      // toggle shouldPause
+      return dispatch(
+        addBreakpoint(cx, breakpoint.location, { ...breakpoint.options, shouldPause: true }, false)
+      );
+    } else {
+      dispatch(_addBreakpointAtLine(cx, line, false, false, true));
+    }
   };
 }
 
