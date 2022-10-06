@@ -120,6 +120,14 @@ import "ui/components/Timeline/Tooltip.css";
 import "ui/components/Toolbox.css";
 import "packages/third-party/sourcemap-visualizer/sourcemapVisualizer.css";
 
+function fn(foo: any) {
+  if (!foo) {
+    return "Bar";
+  }
+  return "Foo";
+}
+console.log(/*#__NOINLINE__*/fn(true));
+
 if (isMock()) {
   // If this is an end to end test, bootstrap the mock environment.
   configureMockEnvironmentForTesting();
