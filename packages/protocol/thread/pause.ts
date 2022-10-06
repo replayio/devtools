@@ -249,7 +249,7 @@ export class Pause {
       // if all original variables are unavailable (usually due to sourcemap issues),
       // we show the generated scope chain with a warning message instead
       originalScopesUnavailable = originalScopeChain.every(scope =>
-        (scope.bindings || []).every(binding => binding.value.isUnavailable())
+        (scope.bindings || []).every(binding => binding.unavailable)
       );
       if (!originalScopesUnavailable) {
         scopeChain = originalScopeChain;
