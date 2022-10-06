@@ -378,11 +378,11 @@ export class ReplayClient implements ReplayClientInterface {
               : undefined,
           },
           {
-            onAnalysisError: (errorMessage: string) => {
-              if (errorMessage.includes("too many points")) {
+            onAnalysisError: (error: unknown) => {
+              if (isCommandError(error, ProtocolError.TooManyPoints)) {
                 status = "too-many-points-to-find";
               } else {
-                console.error(errorMessage);
+                console.error(error);
 
                 status = "unknown-error";
               }
@@ -420,11 +420,11 @@ export class ReplayClient implements ReplayClientInterface {
               : undefined,
           },
           {
-            onAnalysisError: (errorMessage: string) => {
-              if (errorMessage.includes("too many points")) {
+            onAnalysisError: (error: unknown) => {
+              if (isCommandError(error, ProtocolError.TooManyPoints)) {
                 status = "too-many-points-to-find";
               } else {
-                throw Error(errorMessage);
+                throw error;
               }
             },
             onAnalysisPoints: (pointDescriptions: PointDescription[]) => {
@@ -711,8 +711,8 @@ export class ReplayClient implements ReplayClientInterface {
 
       try {
         await analysisManager.runAnalysis(analysisParams, {
-          onAnalysisError: (errorMessage: string) => {
-            reject(errorMessage);
+          onAnalysisError: (error: unknown) => {
+            reject(error);
           },
           onAnalysisResult: analysisEntries => {
             results.push(...analysisEntries.map(entry => entry.value));
