@@ -91,7 +91,7 @@ async function getEvalMatches(
   }
   const evaluatedProperties = await getEvaluatedProperties(
     propertyExpression.left,
-    frame.asyncIndex,
+    frame.pauseId,
     frame.protocolId,
     fetchObject
   );

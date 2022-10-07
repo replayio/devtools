@@ -2,11 +2,11 @@ import React, { useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
+import { getSelectedSource } from "ui/reducers/sources";
 
 import { showAlternateSource } from "../../actions/sources/select";
-import { getAlternateSource } from "../../reducers/pause";
-import { getAlternateSourceId } from "../../utils/sourceVisualizations";
+import { getPauseId, getSelectedFrameId } from "../../reducers/pause";
+import { getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
 
 import { CursorPosition } from "./Footer";
 import Toggle from "./Toggle";
@@ -40,15 +40,20 @@ function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefine
 export default function SourcemapToggle({ cursorPosition }: { cursorPosition: CursorPosition }) {
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
+  const pauseId = useAppSelector(getPauseId);
   const selectedSource = useAppSelector(getSelectedSource);
-  const alternateSource = useAppSelector(getAlternateSource);
-  const sourcesById = useAppSelector(getSourceDetailsEntities);
-  const alternateSourceIdResult = getAlternateSourceId(
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
+  const sourcesState = useAppSelector(state => state.sources);
+  if (!pauseId) {
+    return null;
+  }
+  const alternateSourceIdResult = getAlternateSourceIdSuspense(
     client,
+    pauseId,
     selectedSource,
-    alternateSource,
-    sourcesById,
-    cursorPosition
+    selectedFrameId,
+    cursorPosition,
+    sourcesState
   );
 
   if (alternateSourceIdResult.why === "no-source") {

@@ -3,15 +3,16 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { bindActionCreators, Dictionary } from "@reduxjs/toolkit";
+import { bindActionCreators } from "@reduxjs/toolkit";
+import { PauseId } from "@replayio/protocol";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import type { AppDispatch } from "ui/setup/store";
 
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import actions from "../../../actions";
 import { getRawSourceURL } from "../../../utils/source";
-import { getSourcemapVisualizerURL } from "../../../utils/sourceVisualizations";
-import type { SourceDetails } from "ui/reducers/sources";
+import { getSourcemapVisualizerURLSuspense } from "../../../utils/sourceVisualizations";
+import type { SourceDetails, SourcesState } from "ui/reducers/sources";
 
 type EditorActions = ReturnType<typeof editorItemActions>;
 
@@ -38,35 +39,50 @@ const showSourceMenuItem = (
 });
 
 const sourceMapItem = (
-  cx: Context,
+  pauseId: PauseId | undefined,
   selectedSource: SourceDetails,
-  alternateSource: SourceDetails | null,
-  sourcesById: Dictionary<SourceDetails>
-) => ({
-  id: "node-menu-source-map",
-  label: "Visualize source map",
-  accesskey: "B",
-  disabled: !getSourcemapVisualizerURL(selectedSource, alternateSource, sourcesById),
-  click: () => {
-    const href = getSourcemapVisualizerURL(selectedSource, alternateSource, sourcesById);
-    if (href) {
-      window.open(href, "_blank");
-    }
-  },
-});
+  selectedFrameId: string | null,
+  sourcesState: SourcesState
+) => {
+  let visualizerURL: string | null = null;
+  if (pauseId) {
+    try {
+      visualizerURL = getSourcemapVisualizerURLSuspense(
+        pauseId,
+        selectedSource,
+        selectedFrameId,
+        sourcesState
+      );
+    } catch {}
+  }
+
+  return {
+    id: "node-menu-source-map",
+    label: "Visualize source map",
+    accesskey: "B",
+    disabled: !visualizerURL,
+    click: () => {
+      if (visualizerURL) {
+        window.open(visualizerURL, "_blank");
+      }
+    },
+  };
+};
 
 export function editorMenuItems({
   cx,
   editorActions,
+  pauseId,
   selectedSource,
-  alternateSource,
-  sourcesById,
+  selectedFrameId,
+  sourcesState,
 }: {
   cx: Context;
   editorActions: EditorActions;
+  pauseId: PauseId | undefined;
   selectedSource: SourceDetails;
-  alternateSource: SourceDetails | null;
-  sourcesById: Dictionary<SourceDetails>;
+  selectedFrameId: string | null;
+  sourcesState: SourcesState;
 }) {
   const items = [];
 
@@ -74,7 +90,7 @@ export function editorMenuItems({
     copySourceUri2Item(selectedSource),
     { type: "separator" },
     showSourceMenuItem(cx, selectedSource, editorActions),
-    sourceMapItem(cx, selectedSource, alternateSource, sourcesById)
+    sourceMapItem(pauseId, selectedSource, selectedFrameId, sourcesState)
   );
 
   return items;

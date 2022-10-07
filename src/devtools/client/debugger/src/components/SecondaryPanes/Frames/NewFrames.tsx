@@ -10,13 +10,11 @@ import {
   PauseFrame,
 } from "devtools/client/debugger/src/selectors";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
-import { getSourceDetailsEntities, getSourcesLoading, SourcesState } from "ui/reducers/sources";
+import { getSourceDetailsEntities, getSourcesLoading } from "ui/reducers/sources";
 import { formatCallStackFrames } from "../../../selectors/getCallStackFrames";
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
-import { getFramesIfCached } from "ui/suspense/frameCache";
-import { getFrameStepsIfCached } from "ui/suspense/frameStepsCache";
 import { getAsyncParentFramesSuspense } from "ui/suspense/util";
 import { createFrame } from "../../../client/create";
 import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
@@ -25,6 +23,7 @@ import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
 import Frame from "./Frame";
 import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
+import { getAllCachedPauseFrames } from "../../../utils/frames";
 
 function FramesRenderer({
   panel,
@@ -49,13 +48,14 @@ function FramesRenderer({
             sourcesState,
             ThreadFront.preferredGeneratedSources,
             protocolFrame,
+            pauseId,
             index,
             asyncIndex
           )
         ) || null,
         sources
       ),
-    [asyncIndex, protocolFrames, sources, sourcesState]
+    [asyncIndex, pauseId, protocolFrames, sources, sourcesState]
   );
 
   if (!frames?.length) {
@@ -168,7 +168,7 @@ export default function Frames({ panel }: { panel: CommonFrameComponentProps["pa
     );
   }
 
-  const getAllFrames = () => getAllCachedPauseFrames(pauseId!, sourcesState);
+  const getAllFrames = () => getAllCachedPauseFrames(pauseId, sourcesState)!;
 
   return (
     <div className="pane frames" data-test-id="FramesPanel">
@@ -181,42 +181,4 @@ export default function Frames({ panel }: { panel: CommonFrameComponentProps["pa
       </ErrorBoundary>
     </div>
   );
-}
-
-// collects all displayed (and hence cached) frames from the given pauseId
-// and its async parent pauseIds and converts them to PauseFrames
-function getAllCachedPauseFrames(pauseId: PauseId, sourcesState: SourcesState): PauseFrame[] {
-  let allPauseFrames: PauseFrame[] = [];
-  let asyncIndex = 0;
-  while (true) {
-    const pauseFrames = formatCallStackFrames(
-      getFramesIfCached(pauseId)?.map((protocolFrame, index) =>
-        createFrame(
-          sourcesState,
-          ThreadFront.preferredGeneratedSources,
-          protocolFrame,
-          index,
-          asyncIndex
-        )
-      ) || null,
-      sourcesState.sourceDetails.entities
-    );
-    if (!pauseFrames?.length) {
-      break;
-    }
-    allPauseFrames = allPauseFrames.concat(pauseFrames);
-
-    const steps = getFrameStepsIfCached(pauseId, pauseFrames[pauseFrames.length - 1].protocolId);
-    if (!steps?.length) {
-      break;
-    }
-    const asyncParentPause = ThreadFront.ensurePause(steps[0].point, steps[0].time);
-    if (!asyncParentPause.pauseId) {
-      break;
-    }
-    pauseId = asyncParentPause.pauseId;
-    asyncIndex++;
-  }
-
-  return allPauseFrames;
 }

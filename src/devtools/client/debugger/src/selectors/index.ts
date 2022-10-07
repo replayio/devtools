@@ -10,6 +10,5 @@ export * from "../reducers/preview";
 export * from "../reducers/quick-open";
 
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
-export { getCallStackFrames } from "./getCallStackFrames";
 export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
 export * from "./debugLine";

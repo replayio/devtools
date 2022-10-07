@@ -2,14 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import type { UIState } from "ui/state";
 import type { Dictionary } from "@reduxjs/toolkit";
 import type { PauseFrame } from "../reducers/pause";
 
-import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
-import { getFrames } from "../reducers/pause";
+import { SourceDetails } from "ui/reducers/sources";
 import { annotateFrames } from "../utils/pause/frames";
-import { createSelector } from "reselect";
 
 function getLocation(frame: PauseFrame) {
   return frame.location;
@@ -43,9 +40,3 @@ export const formatCallStackFrames = (
 
   return annotateFrames(formattedFrames);
 };
-
-export const getCallStackFrames = createSelector(
-  getFrames,
-  getSourceDetailsEntities,
-  formatCallStackFrames
-);

@@ -122,7 +122,6 @@ class ReplayWall implements Wall {
           this.highlightedElementId = id;
 
           const response = await ThreadFront.evaluateNew({
-            asyncIndex: 0,
             text: `${getDOMNodes}(${rendererID}, ${id})[0]`,
           });
 
@@ -184,7 +183,6 @@ class ReplayWall implements Wall {
   // send a request to the backend in the recording and the reply to the frontend
   private async sendRequest(event: string, payload: any) {
     const response = await ThreadFront.evaluateNew({
-      asyncIndex: 0,
       text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("${event}", ${JSON.stringify(
         payload
       )})`,
@@ -206,7 +204,7 @@ class ReplayWall implements Wall {
       const rendererID = this.store!._rootIDToRendererID.get(rootID)!;
       const elementIDs = JSON.stringify(this.collectElementIDs(rootID));
       const expr = `${elementIDs}.reduce((map, id) => { for (node of ${getDOMNodes}(${rendererID}, id) || []) { map.set(node, id); } return map; }, new Map())`;
-      const response = await ThreadFront.evaluateNew({ asyncIndex: 0, text: expr });
+      const response = await ThreadFront.evaluateNew({ text: expr });
       if (response.returned?.object) {
         const mapObjData = await getObjectWithPreviewHelper(
           this.replayClient,
@@ -300,7 +298,6 @@ async function loadReactDevToolsInlineModuleFromProtocol(
   }
 
   const response = await ThreadFront.evaluateNew({
-    asyncIndex: 0,
     text: ` __RECORD_REPLAY_REACT_DEVTOOLS_SEND_MESSAGE__("getBridgeProtocol", undefined)`,
   });
   if (response.returned?.object) {
