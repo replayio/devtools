@@ -4,7 +4,7 @@ import { startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForPaused } from "../helpers/pause-information-panel";
 
-test("Basic node console behavior", async ({ page }) => {
+test("node_console-02: uncaught exceptions should show up", async ({ page }) => {
   await startTest(page, "node/error.js");
   await openConsolePanel(page);
 

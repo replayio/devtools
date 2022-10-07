@@ -11,7 +11,7 @@ import {
 
 const url = "doc_inspector_basic.html";
 
-test(`the element picker and iframe behavior`, async ({ page }) => {
+test(`inspector-02: element picker and iframe behavior`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openElementsPanel(page);

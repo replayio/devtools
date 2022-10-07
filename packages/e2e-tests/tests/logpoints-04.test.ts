@@ -12,7 +12,7 @@ import { reverseStepOverToLine, waitForFrameTimeline } from "../helpers/pause-in
 
 const url = "doc_exceptions.html";
 
-test(`should display exceptions in the console`, async ({ page }) => {
+test(`logpoints-04: should display exceptions in the console`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

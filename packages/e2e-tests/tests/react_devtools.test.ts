@@ -19,7 +19,7 @@ import {
 import { hoverScreenshot } from "../helpers/screenshot";
 import { waitFor } from "../helpers/utils";
 
-test("Test React DevTools.", async ({ page }) => {
+test("react_devtools: Test React DevTools.", async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
   await openDevToolsTab(page);
 

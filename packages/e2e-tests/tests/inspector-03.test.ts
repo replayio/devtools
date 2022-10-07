@@ -10,7 +10,7 @@ import {
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
-test("Test that styles for elements can be viewed.", async ({ page }) => {
+test("inspector-03: Test that styles for elements can be viewed", async ({ page }) => {
   await startTest(page, "doc_inspector_styles.html");
   await openDevToolsTab(page);
   await openConsolePanel(page);

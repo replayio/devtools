@@ -21,7 +21,9 @@ const url = "doc_rr_preview.html";
 // Note: Because stepping works differently between gecko and chromium,
 // frame timeline percentages are different in the test below.
 
-test(`Test previews when switching between frames and stepping.`, async ({ page }) => {
+test(`object_preview-03: Test previews when switching between frames and stepping`, async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

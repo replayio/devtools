@@ -10,7 +10,7 @@ async function resumeToBreakpoint(page: Page, line: number) {
   await resumeToLine(page, { lineNumber: line });
 }
 
-test("Basic node console behavior", async ({ page }) => {
+test("node_control_flow: catch, finally, generators, and async/await", async ({ page }) => {
   // Default timeout is 30s. Mostly taking 40s in local dev. Bump to 120s.
   test.setTimeout(120000);
   await startTest(page, "node/control_flow.js");

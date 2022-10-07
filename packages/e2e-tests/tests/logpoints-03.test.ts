@@ -5,7 +5,7 @@ import { addEventListenerLogpoints, findConsoleMessage } from "../helpers/consol
 
 const url = "doc_events.html";
 
-test(`should display event properties in the console`, async ({ page }) => {
+test(`logpoints-03: should display event properties in the console`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

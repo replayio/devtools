@@ -12,7 +12,7 @@ import {
 } from "../helpers/console-panel";
 import { waitFor } from "../helpers/utils";
 
-test("Node exception logpoints", async ({ page }) => {
+test("node_logpoint-02: Node exception logpoints", async ({ page }) => {
   await startTest(page, "node/exceptions.js");
 
   await openConsolePanel(page);

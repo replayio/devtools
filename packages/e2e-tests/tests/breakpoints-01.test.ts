@@ -7,7 +7,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`Test basic breakpoint functionality.`, async ({ page }) => {
+test(`breakpoints-01: Test basic breakpoint functionality`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

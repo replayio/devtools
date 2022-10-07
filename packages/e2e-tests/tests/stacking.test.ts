@@ -220,7 +220,9 @@ async function readCanvasTransformScale(canvas: Locator) {
   return scale;
 }
 
-test("Element highlighter selects the correct element when they overlap", async ({ page }) => {
+test("stacking: Element highlighter selects the correct element when they overlap", async ({
+  page,
+}) => {
   await startTest(page, "doc_stacking.html");
   await openDevToolsTab(page);
 

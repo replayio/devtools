@@ -10,7 +10,7 @@ import {
 } from "../helpers/console-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
-test("Showing console objects in node", async ({ page }) => {
+test("node_object_preview: Showing console objects in node", async ({ page }) => {
   await startTest(page, "node/objects.js");
 
   await openConsolePanel(page);

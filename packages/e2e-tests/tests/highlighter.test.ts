@@ -4,7 +4,7 @@ import { openDevToolsTab, startTest } from "../helpers";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { selectElementsRowWithText } from "../helpers/elements-panel";
 
-test("element highlighter works everywhere", async ({ page }) => {
+test("highlighter: element highlighter works everywhere", async ({ page }) => {
   await startTest(page, "doc_inspector_basic.html");
 
   await openDevToolsTab(page);

@@ -12,7 +12,9 @@ import { clearFocusRange, setFocusRange } from "../helpers/timeline";
 
 const url = "doc_rr_region_loading.html";
 
-test("should filter messages as regions based on the active focus mode", async ({ page }) => {
+test("focus_mode-01: should filter messages as regions based on the active focus mode", async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

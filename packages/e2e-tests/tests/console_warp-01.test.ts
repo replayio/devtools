@@ -15,7 +15,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_error.html";
 
-test(`should support warping to console messages.`, async ({ page }) => {
+test(`console_warp-01: should support warping to console messages`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openConsolePanel(page);
