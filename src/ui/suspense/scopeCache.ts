@@ -22,7 +22,8 @@ export const {
       return { scopes: [], originalScopesUnavailable: true };
     }
 
-    const { scopes, originalScopesUnavailable } = await pause.getScopes(frameId);
+    const { scopes: wiredScopes, originalScopesUnavailable } = await pause.getScopes(frameId);
+    const scopes = wiredScopes.map(f => pause!.rawScopes.get(f.scopeId)!);
     return { scopes, originalScopesUnavailable };
   },
   (pauseId, frameId) => `${pauseId}:${frameId}`

@@ -231,6 +231,39 @@ export function protocolValueToClientValue(
   throw Error(`Unsupported value type`);
 }
 
+export function clientValueToProtocolNamedValue(clientValue: any): ProtocolNamedValue {
+  const protocolValue = clientValueToProtocolValue(clientValue);
+  return {
+    ...protocolValue,
+    name: clientValue.name || "",
+  };
+}
+
+export function clientValueToProtocolValue(clientValue: any): ProtocolValue {
+  const protocolValue: ProtocolValue | ProtocolNamedValue = {};
+
+  if (clientValue.contents.isUnavailable()) {
+    protocolValue.unavailable = true;
+  } else if (clientValue.contents.isUninitialized()) {
+    protocolValue.uninitialized = true;
+  } else if (clientValue.contents.isUnserializableNumber()) {
+    protocolValue.unserializableNumber = `${clientValue.contents.primitive()}`;
+  } else if (clientValue.contents.isSymbol()) {
+    protocolValue.symbol = clientValue.contents.primitive() as string;
+  } else if (clientValue.contents.isBigInt()) {
+    protocolValue.bigint = `${clientValue.contents.primitive()}`;
+  } else if (clientValue.isObject()) {
+    protocolValue.object = clientValue.contents.objectId();
+  } else if (clientValue.isPrimitive()) {
+    const primitive = clientValue.contents.primitive();
+    if (primitive !== undefined) {
+      protocolValue.value = primitive;
+    }
+  }
+
+  return protocolValue;
+}
+
 export function primitiveToClientValue(value: any): Value {
   let type: ValueType = "object";
   let preview: string | undefined;

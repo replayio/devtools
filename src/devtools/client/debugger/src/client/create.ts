@@ -6,13 +6,14 @@
 // This module converts Firefox specific types to the generic types
 
 import { Frame } from "@replayio/protocol";
+import { WiredFrame } from "protocol/thread/pause";
 import { getPreferredLocation, getAlternateLocation, SourcesState } from "ui/reducers/sources";
 import { PauseFrame } from "../reducers/pause";
 
 export function createFrame(
   sources: SourcesState,
   preferredGeneratedSources: Set<string>,
-  frame: Frame,
+  frame: Frame | WiredFrame,
   index = 0,
   asyncIndex = 0
 ): PauseFrame {

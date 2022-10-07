@@ -1,7 +1,9 @@
+// TODO Move this into `inspector/rules/models` as cleanup
+
 import { StyleDeclaration, Object as ProtocolObject } from "@replayio/protocol";
 import { ELEMENT_STYLE } from "shared/constants";
 
-import { assert } from "protocol/utils";
+import { assert } from "../utils";
 
 // Manages interaction with a CSSStyleDeclaration.
 // StyleFront represents an inline element style.

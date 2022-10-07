@@ -5,8 +5,8 @@
 import { ProtocolClient } from "@replayio/protocol";
 const Services = require("devtools/shared/services");
 import RuleModel, { NodeWithId } from "devtools/client/inspector/rules/models/rule";
-import { RuleFront } from "./fronts/rule";
-import { StyleFront } from "./fronts/style";
+import { RuleFront } from "protocol/thread/rule";
+import { StyleFront } from "protocol/thread/style";
 import { assert } from "protocol/utils";
 import TextProperty, { ComputedProperty } from "./text-property";
 

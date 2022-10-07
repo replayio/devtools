@@ -67,6 +67,7 @@ export const filterCommonTestWarnings = () => {
     message =>
       message.includes("Socket Open") || message === "indexed" || message.includes("LoadedRegions")
   );
+  filterLoggingInTests(message => message.includes("is of type ValueFront"), "warn");
   // Skip React 18 "stop using ReactDOM.render" message
   filterLoggingInTests(
     message =>

@@ -123,7 +123,10 @@ export async function bootstrapApp() {
   addPauseDataListener((pauseId: PauseId, executionPoint: ExecutionPoint, pauseData: PauseData) => {
     const { objects } = pauseData;
     if (objects) {
-      preCacheObjects(pauseId, objects);
+      // Be sure to clone object data before pre-caching it.
+      // Otherwise ValueFronts might deeply mutate it and change its structure.
+      const cloned = JSON.parse(JSON.stringify(objects));
+      preCacheObjects(pauseId, cloned);
     }
 
     trackExecutionPointPauseIds(executionPoint, pauseId);

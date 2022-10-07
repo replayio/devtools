@@ -7,6 +7,7 @@ import {
 import { InspectorContext } from "bvaughn-architecture-demo/src/contexts/InspectorContext";
 import React, { ReactNode, useCallback, useMemo } from "react";
 import { onViewSourceInDebugger, openNodeInInspector } from "devtools/client/webconsole/actions";
+import { Pause, ThreadFront, ValueFront } from "protocol/thread";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSourceDetailsEntities } from "ui/reducers/sources";
 import { setSelectedPrimaryPanel } from "ui/actions/layout";
@@ -41,7 +42,6 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
   }, [dispatch]);
 
   // TODO (FE-337) Make this function work, then pass it down through the context.
-  /*
   const inspectHTMLElement = useCallback(
     (
       protocolValue: ProtocolValue,
@@ -87,7 +87,6 @@ export default function InspectorContextReduxAdapter({ children }: { children: R
     },
     [dispatch]
   );
-  */
 
   const context = useMemo(
     () => ({ inspectFunctionDefinition, inspectHTMLElement: null, showCommentsPanel }),
