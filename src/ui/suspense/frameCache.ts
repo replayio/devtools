@@ -11,8 +11,8 @@ export const {
   async pauseId => {
     const pause = Pause.getById(pauseId);
     assert(pause, `no pause for ${pauseId}`);
-    const wiredFrames = await pause.getFrames();
-    return wiredFrames?.map(f => pause.rawFrames.get(f.frameId)!);
+    const frames = await pause.getFrames();
+    return frames;
   },
   pauseId => pauseId
 );

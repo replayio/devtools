@@ -48,7 +48,6 @@ import { client } from "../socket";
 import { defer, assert, EventEmitter } from "../utils";
 
 import { Pause } from "./pause";
-import { ValueFront } from "./value";
 
 export interface RecordingDescription {
   duration: TimeStamp;
@@ -80,10 +79,6 @@ type FindTargetCommand = (
   p: FindTargetParameters,
   sessionId: SessionId
 ) => Promise<FindTargetResult>;
-
-export type WiredMessage = Omit<Message, "argumentValues"> & {
-  argumentValues?: ValueFront[];
-};
 
 export type RecordingCapabilities = {
   supportsEventTypes: boolean;
@@ -578,37 +573,6 @@ class _ThreadFront {
     return this.scopeMaps.getScopeMap(location);
   }
 
-  async evaluate({
-    asyncIndex,
-    text,
-    frameId,
-    pure = false,
-  }: {
-    asyncIndex?: number;
-    text: string;
-    frameId?: FrameId;
-    pure?: boolean;
-  }) {
-    const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
-
-    const abilities = await this.recordingCapabilitiesWaiter.promise;
-    const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
-    if (rv.returned) {
-      rv.returned = new ValueFront(pause, rv.returned);
-    } else if (rv.exception) {
-      rv.exception = new ValueFront(pause, rv.exception);
-    }
-
-    if (repaintAfterEvaluationsExperimentalFlag) {
-      const { repaint } = await import("protocol/graphics");
-      // Fire and forget
-      repaint(true);
-    }
-
-    return rv;
-  }
-
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluateNew({
@@ -785,62 +749,6 @@ class _ThreadFront {
     client.Network.findRequests({}, sessionId);
   }
 
-  findMessagesInRange(range: PointRange) {
-    return client.Console.findMessagesInRange({ range }, ThreadFront.sessionId!);
-  }
-
-  async getRootDOMNode() {
-    if (!this.sessionId) {
-      return null;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    await pause.loadDocument();
-    return pause == this.currentPause ? this.getKnownRootDOMNode() : null;
-  }
-
-  getKnownRootDOMNode() {
-    assert(this.currentPause?.documentNode !== undefined, "no documentNode for current pause");
-    return this.currentPause.documentNode;
-  }
-
-  async searchDOM(query: string) {
-    if (!this.sessionId) {
-      return [];
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const nodes = await pause.searchDOM(query);
-    return pause == this.currentPause ? nodes : null;
-  }
-
-  async loadMouseTargets() {
-    if (!this.sessionId) {
-      return;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    await pause.loadMouseTargets();
-    return pause == this.currentPause;
-  }
-
-  async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
-    if (!this.sessionId) {
-      return null;
-    }
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const nodeBounds = await pause.getMouseTarget(x, y, nodeIds);
-    return pause == this.currentPause ? nodeBounds : null;
-  }
-
-  async ensureNodeLoaded(objectId: ObjectId) {
-    const pause = this.getCurrentPause();
-    await pause.ensureLoaded();
-    const node = await pause.ensureDOMFrontAndParents(objectId);
-    return pause == this.currentPause ? node : null;
-  }
-
   getFrameSteps(asyncIndex: number, frameId: FrameId) {
     const pause = this.pauseForAsyncIndex(asyncIndex);
     return pause.getFrameSteps(frameId);
@@ -878,27 +786,3 @@ class _ThreadFront {
 
 export const ThreadFront = new _ThreadFront();
 EventEmitter.decorate<any, ThreadFrontEvent>(ThreadFront);
-
-export function wireUpMessage(message: Message): Pause {
-  const wiredMessage = message as WiredMessage;
-
-  const pause = ThreadFront.instantiatePause(
-    message.pauseId,
-    message.point.point,
-    message.point.time,
-    !!message.point.frame,
-    message.data
-  );
-
-  if (message.argumentValues) {
-    wiredMessage.argumentValues = message.argumentValues.map(value => new ValueFront(pause, value));
-  }
-
-  ThreadFront.updateMappedLocation(message.point.frame);
-
-  if (message.sourceId) {
-    message.sourceId = ThreadFront.getCorrespondingSourceIds(message.sourceId)[0];
-  }
-
-  return pause;
-}

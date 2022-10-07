@@ -1,10 +1,8 @@
-// TODO Move this into `inspector/rules/models` as cleanup
-
 import { Rule, Object as ProtocolObject } from "@replayio/protocol";
 
 import { getCachedObject } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
 
-import { assert } from "../utils";
+import { assert } from "protocol/utils";
 
 import { StyleFront } from "./style";
 import { StyleSheetFront } from "./styleSheet";

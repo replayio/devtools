@@ -2,8 +2,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-import { RuleFront } from "protocol/thread/rule";
-import { StyleFront } from "protocol/thread/style";
+import { RuleFront } from "./fronts/rule";
+import { StyleFront } from "./fronts/style";
 
 /**
  * Store of CSSStyleDeclarations mapped to properties that have been changed by

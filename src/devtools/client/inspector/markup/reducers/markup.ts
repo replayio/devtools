@@ -8,7 +8,6 @@ const ATTR_COLLAPSE_ENABLED_PREF = "devtools.markup.collapseAttributes";
 const ATTR_COLLAPSE_LENGTH_PREF = "devtools.markup.collapseAttributeLength";
 
 import { Attr } from "@replayio/protocol";
-import { NodeFront } from "protocol/thread/node";
 import { UIState } from "ui/state";
 
 export interface NodeInfo {

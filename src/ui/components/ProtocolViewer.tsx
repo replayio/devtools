@@ -23,7 +23,6 @@ import {
   RequestSummary,
 } from "ui/reducers/protocolMessages";
 import { formatDuration, formatTimestamp } from "ui/utils/time";
-import { sanitize } from "ui/utils/sanitize";
 
 import styles from "./ProtocolViewer.module.css";
 import { PrimarySmButton } from "./shared/Button";
@@ -83,20 +82,12 @@ const flattenRequests = (requestMap: { [key: number]: RequestSummary }): Request
 function JSONViewer({ src }: { src: object }) {
   const theme = useAppSelector(getTheme);
 
-  const sanitizedObject = useMemo(() => {
-    // Work around for object data getting mutated to contain `ValueFront`s.
-    // If we try to show those objects in `react-json-view`, it eventually tries
-    // to recurse and show method fields from the `ValueFront` and crashes.
-    // TODO Remove this when we kill `ValueFront`s and `NodeFront`s!
-    return sanitize(src, "", "", false);
-  }, [src]);
-
   return (
     <ReactJson
       displayDataTypes={false}
       displayObjectSize={false}
       shouldCollapse={false}
-      src={sanitizedObject}
+      src={src}
       style={{ backgroundColor: "transparent" }}
       theme={theme == "light" ? "rjv-default" : "tube"}
     />

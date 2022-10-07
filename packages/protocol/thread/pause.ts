@@ -13,7 +13,7 @@ import {
   NodeBounds,
   PauseData,
   repaintGraphicsResult,
-  getAllBoundingClientRectsResult,
+  Value,
 } from "@replayio/protocol";
 
 import cloneDeep from "lodash/cloneDeep";
@@ -21,18 +21,10 @@ import cloneDeep from "lodash/cloneDeep";
 import { client } from "../socket";
 import { defer, assert, Deferred, EventEmitter } from "../utils";
 
-import { NodeBoundsFront } from "./bounds";
-import { NodeFront } from "./node";
-import { RuleFront } from "./rule";
-import { StyleFront } from "./style";
-import { StyleSheetFront } from "./styleSheet";
 import type { ThreadFront as ThreadFrontType } from "./thread";
-import { ValueFront } from "./value";
 
 const pausesById = new Map<PauseId, Pause>();
 const pausesByPoint = new Map<ExecutionPoint, Pause>();
-
-export type DOMFront = NodeFront | RuleFront | StyleFront | StyleSheetFront;
 
 // Allow the new Object Inspector's Suspense cache to observe Pause data and pre-cache it.
 type PauseDataHandler = (
@@ -51,64 +43,13 @@ export function removePauseDataListener(handler: PauseDataHandler): void {
   }
 }
 
-export type WiredObject = Omit<ObjectDescription, "preview"> & {
-  preview?: WiredObjectPreview;
-};
-
-export type WiredObjectPreview = Omit<
-  ObjectPreview,
-  "properties" | "containerEntries" | "promiseState" | "proxyState" | "getterValues"
-> & {
-  properties: WiredProperty[];
-  containerEntries: WiredContainerEntry[];
-  promiseState?: {
-    state: ValueFront;
-    value?: ValueFront;
-  };
-  proxyState?: {
-    target: ValueFront;
-    handler: ValueFront;
-  };
-  getterValues: WiredNamedValue[];
-  prototypeValue: ValueFront;
-};
-
-export interface WiredContainerEntry {
-  key?: ValueFront;
-  value: ValueFront;
-}
-
-export interface WiredProperty {
-  name: string;
-  value: ValueFront;
-  writable: boolean;
-  configurable: boolean;
-  enumerable: boolean;
-  get?: ValueFront;
-  set?: ValueFront;
-}
-
-export interface WiredNamedValue {
-  name: string;
-  value: ValueFront;
-}
-
-export type WiredFrame = Omit<Frame, "this"> & {
-  this: ValueFront;
-};
-
-export type WiredScope = Omit<Scope, "bindings" | "object"> & {
-  bindings?: WiredNamedValue[];
-  object?: ValueFront;
-};
+type PauseEvent = "objects";
 
 export interface EvaluationResult {
-  returned?: ValueFront;
-  exception?: ValueFront;
+  returned?: Value;
+  exception?: Value;
   failed?: boolean;
 }
-
-type PauseEvent = "objects";
 
 // Information about a protocol pause.
 export class Pause {
@@ -120,16 +61,11 @@ export class Pause {
   time: number | null;
   hasFrames: boolean | null;
   createWaiter: Promise<void> | null;
-  frames: Map<FrameId, WiredFrame>;
-  scopes: Map<ScopeId, WiredScope>;
-  objects: Map<ObjectId, WiredObject>;
-  rawFrames: Map<FrameId, Frame>;
-  rawScopes: Map<ScopeId, Scope>;
+  frames: Map<FrameId, Frame>;
+  scopes: Map<ScopeId, Scope>;
+  objects: Map<ObjectId, Object>;
   frameSteps: Map<string, PointDescription[]>;
-  documentNode: NodeFront | undefined;
-  domFronts: Map<string, DOMFront>;
-  stack: WiredFrame[] | undefined;
-  loadMouseTargetsWaiter: Deferred<getAllBoundingClientRectsResult | null> | undefined;
+  stack: Frame[] | undefined;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
   mouseTargets: NodeBounds[] | undefined;
 
@@ -153,13 +89,8 @@ export class Pause {
     this.frames = new Map();
     this.scopes = new Map();
     this.objects = new Map();
-    this.rawFrames = new Map();
-    this.rawScopes = new Map();
 
     this.frameSteps = new Map();
-
-    this.documentNode = undefined;
-    this.domFronts = new Map();
 
     EventEmitter.decorate<any, PauseEvent>(this);
   }
@@ -232,134 +163,31 @@ export class Pause {
     }
 
     datas.forEach(d => this._addDataObjects(d));
-    datas.forEach(d => this._updateDataFronts(d));
   }
 
   ensureLoaded() {
     return this.createWaiter;
   }
 
-  // we're cheating Typescript here: the objects that we add are of type Frame/Scope/ObjectDescription
-  // but we pretend they are of type WiredFrame/WiredScope/WiredObject. These objects will be changed
-  // in _updateDataFronts() so that they have the correct type afterwards.
-  // This cheat is necessary because Typescript doesn't support objects changing their types over time.
   private _addDataObjects({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(f => {
       if (!this.frames.has(f.frameId)) {
-        this.frames.set(f.frameId, f as WiredFrame);
-      }
-      if (!this.rawFrames.has(f.frameId)) {
-        const rawFrame = cloneDeep(f);
-        this.ThreadFront.updateMappedLocation(rawFrame.location);
-        this.ThreadFront.updateMappedLocation(rawFrame.functionLocation);
-        this.rawFrames.set(f.frameId, rawFrame);
+        this.ThreadFront.updateMappedLocation(f.location);
+        this.ThreadFront.updateMappedLocation(f.functionLocation);
+        this.frames.set(f.frameId, f);
       }
     });
     (scopes || []).forEach(s => {
       if (!this.scopes.has(s.scopeId)) {
-        this.scopes.set(s.scopeId, s as WiredScope);
-      }
-      if (!this.rawScopes.has(s.scopeId)) {
-        this.rawScopes.set(s.scopeId, cloneDeep(s));
+        this.scopes.set(s.scopeId, s);
       }
     });
     (objects || []).forEach(o => {
       if (!this.objects.has(o.objectId)) {
-        this.objects.set(o.objectId, o as WiredObject);
+        this.objects.set(o.objectId, o);
       }
     });
     this.emit("objects", objects || []);
-  }
-
-  private _updateDataFronts({ frames, scopes, objects }: PauseData) {
-    (frames || []).forEach(frame => {
-      (frame as WiredFrame).this = new ValueFront(this, frame.this);
-      this.ThreadFront.updateMappedLocation(frame.location);
-      this.ThreadFront.updateMappedLocation(frame.functionLocation);
-    });
-
-    (scopes || []).forEach(scope => {
-      if (scope.bindings) {
-        const newBindings: WiredNamedValue[] = [];
-        for (const v of scope.bindings) {
-          newBindings.push({
-            name: v.name,
-            value: new ValueFront(this, v),
-          });
-        }
-        scope.bindings = newBindings;
-      }
-      if (scope.object) {
-        (scope as WiredScope).object = new ValueFront(this, { object: scope.object });
-      }
-    });
-
-    (objects || []).forEach(object => {
-      if (object.preview) {
-        const { properties, containerEntries, promiseState, proxyState, getterValues } =
-          object.preview;
-
-        const newProperties = [];
-        for (const p of properties || []) {
-          const flags = "flags" in p ? p.flags! : 7;
-          newProperties.push({
-            name: p.name,
-            value: new ValueFront(this, p),
-            writable: !!(flags & 1),
-            configurable: !!(flags & 2),
-            enumerable: !!(flags & 4),
-            get: p.get ? new ValueFront(this, { object: p.get }) : undefined,
-            set: p.set ? new ValueFront(this, { object: p.set }) : undefined,
-          });
-        }
-        (object as WiredObject).preview!.properties = newProperties;
-
-        const newEntries = [];
-        for (const { key, value } of containerEntries || []) {
-          newEntries.push({
-            key: key ? new ValueFront(this, key) : undefined,
-            value: new ValueFront(this, value),
-          });
-        }
-        (object as WiredObject).preview!.containerEntries = newEntries;
-
-        if (promiseState) {
-          const { state, value } = promiseState;
-
-          (object as WiredObject).preview!.promiseState = {
-            state: new ValueFront(this, { value: state }),
-            value: value ? new ValueFront(this, value) : undefined,
-          };
-        }
-        if (proxyState) {
-          const { target, handler } = proxyState;
-
-          (object as WiredObject).preview!.proxyState = {
-            target: new ValueFront(this, target),
-            handler: new ValueFront(this, handler),
-          };
-        }
-
-        const newGetterValues: WiredNamedValue[] = [];
-        for (const v of getterValues || []) {
-          newGetterValues.push({
-            name: v.name,
-            value: new ValueFront(this, v),
-          });
-        }
-        object.preview.getterValues = newGetterValues;
-
-        const { prototypeId } = object.preview;
-        (object.preview as WiredObjectPreview).prototypeValue = new ValueFront(
-          this,
-          prototypeId ? { object: prototypeId } : { value: null }
-        );
-
-        this.ThreadFront.updateMappedLocation(object.preview.functionLocation);
-      }
-
-      this.objects.get(object.objectId)!.preview = object.preview as WiredObjectPreview;
-    });
   }
 
   async getFrames() {
@@ -409,7 +237,7 @@ export class Pause {
       // if all original variables are unavailable (usually due to sourcemap issues),
       // we show the generated scope chain with a warning message instead
       originalScopesUnavailable = originalScopeChain.every(scope =>
-        (scope.bindings || []).every(binding => binding.value.isUnavailable())
+        (scope.bindings || []).every(binding => binding.unavailable)
       );
       if (!originalScopesUnavailable) {
         scopeChain = originalScopeChain;
@@ -428,28 +256,6 @@ export class Pause {
     return await method(params, this.sessionId, this.pauseId);
   }
 
-  async getObjectPreview(object: ObjectId) {
-    const { data } = await this.sendMessage(client.Pause.getObjectPreview, {
-      object,
-    });
-    this.addData(data);
-    return this.objects.get(object)!;
-  }
-
-  async getObjectProperty(object: ObjectId, property: string) {
-    const { result } = await this.sendMessage(client.Pause.getObjectProperty, {
-      object,
-      name: property,
-    });
-    const { returned, exception, failed, data } = result;
-    this.addData(data);
-    return {
-      returned: returned ? new ValueFront(this, returned) : undefined,
-      exception: exception ? new ValueFront(this, exception) : undefined,
-      failed,
-    };
-  }
-
   async evaluate(frameId: FrameId | undefined, expression: string, pure: boolean) {
     assert(this.createWaiter, "no createWaiter");
     await this.createWaiter;
@@ -464,139 +270,6 @@ export class Pause {
     const { returned, exception, failed, data } = result;
     this.addData(data);
     return { returned, exception, failed } as EvaluationResult;
-  }
-
-  // Synchronously get a DOM front for an object whose preview is known.
-  getDOMFront(objectId: ObjectId): NodeFront | RuleFront | StyleFront | StyleSheetFront | null {
-    // Make sure we don't create multiple node fronts for the same object.
-    if (!objectId) {
-      return null;
-    }
-    if (this.domFronts.has(objectId)) {
-      return this.domFronts.get(objectId)!;
-    }
-    const data = this.objects.get(objectId);
-    assert(data && data.preview, "no preview");
-    let front;
-    if (data.preview.node) {
-      front = new NodeFront(this, data);
-    } else if (data.preview.rule) {
-      front = new RuleFront(this.pauseId!, data);
-    } else if (data.preview.style) {
-      front = new StyleFront(data);
-    } else if (data.preview.styleSheet) {
-      front = new StyleSheetFront(data);
-    } else {
-      throw new Error("Unexpected DOM front");
-    }
-    this.domFronts.set(objectId, front);
-    return front;
-  }
-
-  getNodeFront(objectId: ObjectId) {
-    const front = this.getDOMFront(objectId);
-    assert(front instanceof NodeFront, "front must be a NodeFront");
-    return front;
-  }
-
-  getRuleFront(objectId: ObjectId) {
-    const front = this.getDOMFront(objectId);
-    assert(front instanceof RuleFront, "front must be a RuleFront");
-    return front;
-  }
-
-  getStyleFront(objectId: ObjectId) {
-    const front = this.getDOMFront(objectId);
-    assert(front instanceof StyleFront, "front must be a StyleFront");
-    return front;
-  }
-
-  getStyleSheetFront(objectId: ObjectId) {
-    const front = this.getDOMFront(objectId);
-    assert(front instanceof StyleSheetFront, "front must be a StyleSheetFront");
-    return front;
-  }
-
-  // Asynchronously get a DOM front for an object which might not have a preview.
-  async ensureDOMFrontAndParents(nodeId: ObjectId) {
-    let parentId: ObjectId | undefined = nodeId;
-    while (parentId) {
-      const data = this.objects.get(parentId);
-      if (!data || !data.preview) {
-        const { data } = await this.sendMessage(client.DOM.getParentNodes, { node: parentId });
-        this.addData(data);
-        break;
-      }
-      assert(data.preview.node, "no node preview");
-      parentId = data.preview.node.parentNode;
-    }
-    return this.getNodeFront(nodeId)!;
-  }
-
-  async loadDocument() {
-    if (this.documentNode) {
-      return;
-    }
-    assert(this.createWaiter, "no createWaiter");
-    await this.createWaiter;
-    const { document, data } = await this.sendMessage(client.DOM.getDocument, {});
-    this.addData(data);
-    this.documentNode = this.getNodeFront(document);
-  }
-
-  async searchDOM(query: string) {
-    const { nodes, data } = await this.sendMessage(client.DOM.performSearch, { query });
-    this.addData(data);
-    return nodes.map(node => this.getNodeFront(node));
-  }
-
-  async loadMouseTargets() {
-    if (this.loadMouseTargetsWaiter) {
-      return this.loadMouseTargetsWaiter.promise;
-    }
-
-    this.loadMouseTargetsWaiter = defer();
-    let rv = null;
-    try {
-      rv = await this.sendMessage(client.DOM.getAllBoundingClientRects, {});
-      this.mouseTargets = rv.elements;
-    } catch (e) {
-      this.mouseTargets = [];
-      console.error("DOM.getAllBoundingClientRects failed", e);
-    }
-
-    this.loadMouseTargetsWaiter.resolve(rv);
-    return !!rv;
-  }
-
-  async getMouseTarget(x: number, y: number, nodeIds?: string[]) {
-    await this.loadMouseTargets();
-    for (let { node, rect, rects, clipBounds, visibility, pointerEvents } of this.mouseTargets!) {
-      if (nodeIds && !nodeIds.includes(node)) {
-        continue;
-      }
-      if (visibility === "hidden" || pointerEvents === "none") {
-        continue;
-      }
-      if (
-        (clipBounds?.left !== undefined && x < clipBounds.left) ||
-        (clipBounds?.right !== undefined && x > clipBounds.right) ||
-        (clipBounds?.top !== undefined && y < clipBounds.top) ||
-        (clipBounds?.bottom !== undefined && y > clipBounds.bottom)
-      ) {
-        continue;
-      }
-
-      // in the protocol, rects is set to undefined if there is only one rect
-      rects ||= [rect];
-      for (const r of rects) {
-        const [left, top, right, bottom] = r;
-        if (x >= left && x <= right && y >= top && y <= bottom) {
-          return new NodeBoundsFront(this, node, rects);
-        }
-      }
-    }
-    return null;
   }
 
   async repaintGraphics(force = false) {

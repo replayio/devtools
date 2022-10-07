@@ -2,7 +2,6 @@ import { ApolloError } from "@apollo/client";
 import { uploadedData } from "@replayio/protocol";
 import * as Sentry from "@sentry/react";
 
-import { findAutomatedTests } from "ui/actions/find-tests";
 import {
   addEventListener,
   CommandRequest,
@@ -259,10 +258,6 @@ export function createSocket(
       ThreadFront.setSessionId(sessionId);
       const recordingTarget = await ThreadFront.recordingTargetWaiter.promise;
       dispatch(actions.setRecordingTarget(recordingTarget));
-
-      ThreadFront.ensureAllSources().then(() => {
-        findAutomatedTests(recordingTarget, getSourcesToDisplayByUrl(getState()), replayClient);
-      });
 
       // We don't want to show the non-dev version of the app for node replays.
       if (recordingTarget === "node") {

@@ -1,8 +1,6 @@
-// TODO Move this into `inspector/rules/models` as cleanup
-
 import { StyleSheet, Object as ProtocolObject } from "@replayio/protocol";
 
-import { assert } from "../utils";
+import { assert } from "protocol/utils";
 
 // Manages interaction with a StyleSheet.
 export class StyleSheetFront {

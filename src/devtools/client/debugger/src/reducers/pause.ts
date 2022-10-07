@@ -3,12 +3,11 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
-import type { Location, TimeStampedPoint, ScopeType, Value } from "@replayio/protocol";
+import type { Location, TimeStampedPoint, ScopeType, Value, NamedValue } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 import { getPreferredLocation } from "ui/reducers/sources";
 
-import { WiredNamedValue } from "protocol/thread/pause";
-import { ThreadFront, ValueFront } from "protocol/thread";
+import { ThreadFront } from "protocol/thread";
 
 import { getSelectedFrame, getFramePositions } from "../selectors/pause";
 import findLast from "lodash/findLast";
@@ -36,7 +35,7 @@ export interface PauseFrame {
   displayName: string;
   location: Location;
   alternateLocation?: Location;
-  this: Value | ValueFront;
+  this: Value;
   source: SourceDetails | null;
   index: number;
   asyncCause?: "async";
@@ -140,8 +139,8 @@ type ProtocolScope = Awaited<ReturnType<typeof ThreadFront["getScopes"]>>["scope
 export interface ConvertedScope {
   actor: string;
   parent: ConvertedScope | null;
-  bindings: WiredNamedValue[] | undefined;
-  object: ValueFront | undefined;
+  bindings: NamedValue[] | undefined;
+  object: string | undefined;
   functionName: string | undefined;
   type: ScopeType;
   scopeKind: string;
