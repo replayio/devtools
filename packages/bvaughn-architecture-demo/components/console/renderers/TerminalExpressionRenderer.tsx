@@ -46,6 +46,13 @@ function TerminalExpressionRenderer({
   const ref = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    // Always scroll new expressions into view.
+    // These aren't persisted between sessions, so we only need to handle the simple case:
+    // A user has just added a new expression (and it should be scrolled into view).
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
+
+  useLayoutEffect(() => {
     if (isFocused) {
       ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
