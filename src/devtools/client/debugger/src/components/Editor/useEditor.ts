@@ -1,5 +1,5 @@
 import debounce from "lodash/debounce";
-import { RefObject, useLayoutEffect, useRef } from "react";
+import { RefObject, useLayoutEffect, useRef, useState } from "react";
 import { isFirefox } from "ui/utils/environment";
 import {
   getSelectedSource,
@@ -55,7 +55,7 @@ type PrevProps = Partial<Omit<InstanceProps, "cx" | "lastClientX" | "lastClientY
 export default function useEditor(
   containerRef: RefObject<HTMLDivElement>,
   setContextMenu: (event: MouseEvent | null) => void
-): SourceEditor {
+): SourceEditor | null {
   const dispatch = useAppDispatch();
 
   const cx = useAppSelector(getThreadContext);
@@ -80,7 +80,7 @@ export default function useEditor(
     symbols: null,
   });
 
-  const editorRef = useRef<SourceEditor | null>(null);
+  const [editor, setEditor] = useState<SourceEditor | null>(null);
 
   // Create and destroy the SourceEditor on mount/unmount.
   // This effect should come before the others because it (re)creates the Editor instance the others reference.
@@ -88,7 +88,8 @@ export default function useEditor(
   // Only stable values should be used as dependencies (e.g. React refs, state updater functions, Redux dispatch)
   useLayoutEffect(() => {
     const editor = getEditor();
-    editorRef.current = editor;
+
+    setEditor(editor);
 
     const container = containerRef.current!;
 
@@ -115,7 +116,7 @@ export default function useEditor(
     return () => {
       editor.destroy();
 
-      editorRef.current = null;
+      setEditor(null);
 
       clearDocuments();
     };
@@ -138,7 +139,11 @@ export default function useEditor(
 
   // Update editor and/or react to changed props after props render
   useLayoutEffect(() => {
-    const editor = editorRef.current!;
+    if (editor === null) {
+      // TODO Document why this is okay.
+      return;
+    }
+
     const { selectedSource, selectedSourceContent, selectedLocation, symbols } =
       instancePropsRef.current;
     const { selectedSource: prevSelectedSource } = prevPropsRef.current;
@@ -165,8 +170,11 @@ export default function useEditor(
 
   // Add event listeners to SourceEditor
   // Only stable values should be used as dependencies (e.g. React refs, state updater functions, Redux dispatch)
+  // The Editor instance is an exception; ideally it would be stable as well but Code Mirror 5 doesn't handle remounting
   useLayoutEffect(() => {
-    const editor = editorRef.current!;
+    if (editor === null) {
+      return;
+    }
 
     const { codeMirror } = editor;
 
@@ -305,9 +313,9 @@ export default function useEditor(
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverToken);
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverLine);
     };
-  }, [dispatch, setContextMenu]);
+  }, [dispatch, editor, setContextMenu]);
 
-  return editorRef.current!;
+  return editor;
 }
 
 function scrollToLocationHelper(

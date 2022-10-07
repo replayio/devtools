@@ -50,7 +50,7 @@ export default function EditorOuter() {
 
   // Register shortcuts event handlers
   useEffect(() => {
-    if (!selectedSource) {
+    if (editor == null || !selectedSource) {
       return;
     }
 

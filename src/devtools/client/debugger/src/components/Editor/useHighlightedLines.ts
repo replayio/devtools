@@ -27,7 +27,7 @@ type PrevProps = {
 };
 
 // This hook combines legacy HighlightLine and HighlightLines "headless" components.
-export default function useHighlightedLines(editor: SourceEditor) {
+export default function useHighlightedLines(editor: SourceEditor | null) {
   const selectedFrame = useAppSelector(getVisibleSelectedFrame);
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedSource = useAppSelector(getSelectedSourceWithContent) || null;
@@ -42,6 +42,11 @@ export default function useHighlightedLines(editor: SourceEditor) {
 
   // Update highlighted line when selected location changes
   useLayoutEffect(() => {
+    if (editor === null) {
+      // TODO Document why this is okay.
+      return;
+    }
+
     const prevProps = prevPropsRef.current;
 
     const editorLine = selectedLocation?.line ? toEditorLine(selectedLocation.line) : null;
@@ -84,7 +89,7 @@ export default function useHighlightedLines(editor: SourceEditor) {
     prevProps.editorLine = editorLine;
     prevProps.selectedLocation = selectedLocation;
     prevProps.selectedSource = selectedSource;
-  }, [selectedFrame, selectedLocation, selectedSource]);
+  }, [editor, selectedFrame, selectedLocation, selectedSource]);
 
   // Update highlighted line range when selected location changes
   useLayoutEffect(() => {
