@@ -23,8 +23,16 @@ test("highlighter: element highlighter works everywhere", async ({ page }) => {
 
   const pathDefinition = await highlighter.getAttribute("d");
 
-  // TODO:FE-805 This is a hack to get the test to pass. We should figure out why the path definition is different from the original and not use a hardcoded value.
-  const pathDefinitionToCompare = `M10,48.400001525878906 L310,48.400001525878906 L310,198.39999389648438 L10,198.39999389648438`;
+  const normalizedPathDefinition = pathDefinition
+    ?.split(" ")
+    .map(part => {
+      const match = part.match(/^([M|L])(\d+(?:.\d+)?),(\d+(?:.\d+)?)$/);
+      // Note(logan): These matches have subpixel values that fluctuate a bit in CI, so for now we force-round them.
+      return match ? `${match[1]}${Math.floor(+match[2])},${Math.floor(+match[3])}` : part;
+    })
+    .join(" ");
 
-  expect(pathDefinition).toBe(pathDefinitionToCompare);
+  // TODO:FE-805 This is a hack to get the test to pass. We should figure out why the path definition is different from the original and not use a hardcoded value.
+  const pathDefinitionToCompare = `M10,48 L310,48 L310,198 L10,198`;
+  expect(normalizedPathDefinition).toBe(pathDefinitionToCompare);
 });

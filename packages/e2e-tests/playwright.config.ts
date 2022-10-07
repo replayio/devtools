@@ -13,15 +13,15 @@ const config: PlaywrightTestConfig = {
       width: 1280,
       height: 1024,
     },
-    // Don't allow any one action to take more than 10s
-    actionTimeout: 15000,
+    // Don't allow any one action to take more than 15s
+    actionTimeout: CI ? 60000 : 15000,
   },
 
   // Retry failed tests on CI to account for some basic flakiness.
   retries: CI ? 5 : 0,
 
   // Give individual tests up to 60s to complete instead of default 30s
-  timeout: 60000,
+  timeout: 150000,
 
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
@@ -35,14 +35,18 @@ const config: PlaywrightTestConfig = {
         //   name: "firefox",
         //   use: { ...devices["Desktop Firefox"] },
         // },
+
+        // Temporarily disabled normal chromium so we don't accumulate recording data
+        // in the backend CI's tiny setup.
         {
           name: "replay-chromium",
           use: { ...(replayDevices["Replay Chromium"] as any) },
         },
-        {
-          name: "chromium",
-          use: { ...devices["Desktop Chromium"] },
-        },
+
+        // {
+        //   name: "chromium",
+        //   use: { ...devices["Desktop Chromium"] },
+        // },
       ]
     : [
         {

@@ -7,6 +7,7 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+import { delay } from "../helpers/utils";
 
 const url = "doc_debugger_statements.html";
 
@@ -33,6 +34,8 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
     lineNumber: 8,
     url,
   });
+
+  await delay(2_000);
   await rewindToLine(page, { lineNumber: 7 });
   await resumeToLine(page, { lineNumber: 9 });
 });

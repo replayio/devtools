@@ -17,6 +17,7 @@ export async function recordPlaywright(
 
   // @ts-ignore `browserName` key mismatch
   const browserEntry = playwrightBrowsers[browserName] as BrowserType<any>;
+
   const browser = await browserEntry.launch({
     env: {
       ...process.env,
@@ -28,11 +29,11 @@ export async function recordPlaywright(
     executablePath: config.browserPath,
     headless: config.headless,
   });
-
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
+
   try {
     return await script(page);
   } finally {
@@ -47,6 +48,25 @@ export async function uploadLastRecording(url: string) {
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
   if (id) {
+    // Mark the recording as a successful test so that the backend is not forced to preprocess it.
+    cli.addLocalRecordingMetadata(id, {
+      test: {
+        file: "fake.html",
+        path: ["fake.html"],
+        result: "passed",
+        runner: {
+          name: "fake",
+          version: "",
+        },
+        run: {
+          id: "00000000-0000-4000-8000-000000000000",
+          title: "fake",
+        },
+        title: "",
+        version: 1,
+      },
+    });
+
     return await cli.uploadRecording(id, {
       apiKey: config.replayApiKey,
       server: config.backendUrl,

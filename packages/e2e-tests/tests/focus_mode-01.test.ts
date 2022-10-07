@@ -5,6 +5,9 @@ import {
   openConsolePanel,
   verifyConsoleMessage,
   verifyTrimmedConsoleMessages,
+  setConsoleMessageAsFocusStart,
+  setConsoleMessageAsFocusEnd,
+  findConsoleMessage,
 } from "../helpers/console-panel";
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
@@ -30,8 +33,15 @@ test("focus_mode-01: should filter messages as regions based on the active focus
   // Verify initially that all 50 messages are present
   await verifyConsoleMessage(page, "Log point", "log-point", 50);
 
-  // Set focus region (to force-unload part of the recording)
-  await setFocusRange(page, { startTimeString: "0:04", endTimeString: "0:05" });
+  // St the start of the focus region, to force-unload the beginning of the recording.
+  await setConsoleMessageAsFocusStart(page, await findConsoleMessage(page, "34", "log-point"));
+
+  // Verify fewer messages
+  await verifyConsoleMessage(page, "Log point", "log-point", 17);
+  await verifyTrimmedConsoleMessages(page, { expectedBefore: 1, expectedAfter: 0 });
+
+  // Set end of focus region to force-unload the end of the recording.
+  await setConsoleMessageAsFocusEnd(page, await findConsoleMessage(page, "44", "log-point"));
 
   // Verify fewer messages
   await verifyConsoleMessage(page, "Log point", "log-point", 11);
