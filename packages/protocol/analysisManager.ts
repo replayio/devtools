@@ -79,7 +79,7 @@ export type FunctionEntryPoint = Omit<addFunctionEntryPointsParameters, OmitPara
 export type EventHandlerEntryPoint = Omit<addEventHandlerEntryPointsParameters, OmitParams>;
 
 export interface AnalysisHandler<T> {
-  onAnalysisError?: (error: string) => void;
+  onAnalysisError?: (error: unknown) => void;
   onAnalysisPoints?: (points: PointDescription[]) => void;
   onAnalysisResult?: (result: AnalysisEntry[]) => void;
   onFinished?(): T;
