@@ -106,7 +106,7 @@ async function saveExamples(
       const exampleFilenames =
         exampleFilename !== null
           ? [exampleFilename]
-          : await getExampleFileNames(config.nodeExamplesPath, examplesFileExtension);
+          : await getExampleFileNames(examplesBasePath, examplesFileExtension);
 
       for (let exampleFilename of exampleFilenames) {
         exampleFilename = exampleFilename.endsWith(examplesFileExtension)
