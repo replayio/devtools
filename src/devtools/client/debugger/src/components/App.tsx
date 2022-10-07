@@ -18,6 +18,7 @@ import { useGetUserSettings } from "ui/hooks/settings";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import { EditorPane } from "./Editor/EditorPane";
+import ShortcutsContext from "./Editor/ShortcutsContext";
 
 const mapStateToProps = (state: UIState) => ({
   selectedPanel: getSelectedPanel(state),
@@ -33,14 +34,6 @@ type DebuggerProps = PropsFromRedux & { wrapper: HTMLDivElement };
 
 class Debugger extends Component<DebuggerProps> {
   shortcuts = new KeyShortcuts({ window, target: this.props.wrapper });
-
-  static childContextTypes = {
-    shortcuts: PropTypes.object,
-  };
-
-  getChildContext = () => {
-    return { shortcuts: this.shortcuts };
-  };
 
   componentDidMount() {
     this.props.refreshCodeMirror();
@@ -67,11 +60,13 @@ class Debugger extends Component<DebuggerProps> {
 
   render() {
     return (
-      <>
-        <A11yIntention>
-          <EditorPane />
-        </A11yIntention>
-      </>
+      <ShortcutsContext.Provider value={this.shortcuts}>
+        <>
+          <A11yIntention>
+            <EditorPane />
+          </A11yIntention>
+        </>
+      </ShortcutsContext.Provider>
     );
   }
 }

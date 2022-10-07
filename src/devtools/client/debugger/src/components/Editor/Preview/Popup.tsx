@@ -2,14 +2,14 @@ import Popover from "devtools/client/debugger/src/components/shared/Popover";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import { useCallback } from "react";
+import { RefObject, useCallback } from "react";
 import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 
 import NewObjectInspector from "./NewObjectInspector";
 
 interface PopupProps {
   preview: PreviewState;
-  editorRef: HTMLDivElement;
+  editorRef: RefObject<HTMLDivElement>;
   target: HTMLElement;
 }
 
@@ -35,7 +35,7 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
   }
 
   return (
-    <Popover container={editorRef} onMouseLeave={onMouseLeave} showTail={true} target={target}>
+    <Popover containerRef={editorRef} onMouseLeave={onMouseLeave} showTail={true} target={target}>
       <NewObjectInspector protocolValue={value} />
     </Popover>
   );

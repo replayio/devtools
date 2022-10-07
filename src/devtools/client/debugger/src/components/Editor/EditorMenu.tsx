@@ -18,7 +18,7 @@ import { editorMenuItems, editorItemActions } from "./menus/editor";
 interface EditorMenuProps {
   selectedSource: SourceDetails;
   clearContextMenu: () => void;
-  contextMenu?: () => void;
+  contextMenu: Event | null;
   editor: any;
 }
 

@@ -1,12 +1,12 @@
 import type { SourceLocation } from "@replayio/protocol";
 import { updatePreview } from "devtools/client/debugger/src/actions/preview";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
+import { getPreview, getThreadContext } from "devtools/client/debugger/src/selectors";
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import debounce from "lodash/debounce";
-import React, { PureComponent } from "react";
+import { PureComponent, RefObject } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
-
-import { getPreview, getThreadContext } from "../../../selectors";
 
 import Popup from "./Popup";
 import { PreviewHighlight } from "./PreviewHighlight";
@@ -25,8 +25,8 @@ const connector = connect(mapStateToProps, {
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type PreviewProps = PropsFromRedux & {
-  editor: any;
-  editorRef: any;
+  editor: SourceEditor;
+  editorRef: RefObject<HTMLDivElement>;
 };
 
 type PreviewState = {
@@ -52,7 +52,10 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
+    // @ts-ignore This is our custom event type; arguably we should expected CodeMirror defs to include it
     codeMirror.off("tokenenter", this.onTokenEnter);
+    // @ts-ignore This is our custom event type; arguably we should expected CodeMirror defs to include it
+    codeMirror.off("tokenleave", this.onTokenLeave);
     codeMirror.off("scroll", this.onScroll);
     codeMirrorWrapper.removeEventListener("mouseup", this.onMouseUp);
     codeMirrorWrapper.removeEventListener("mousedown", this.onMouseDown);
@@ -62,7 +65,9 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
 
+    // @ts-ignore This is our custom event type; arguably we should expected CodeMirror defs to include it
     codeMirror.on("tokenenter", this.onTokenEnter);
+    // @ts-ignore This is our custom event type; arguably we should expected CodeMirror defs to include it
     codeMirror.on("tokenleave", this.onTokenLeave);
     codeMirror.on("scroll", this.onScroll);
     codeMirrorWrapper.addEventListener("mouseup", this.onMouseUp);

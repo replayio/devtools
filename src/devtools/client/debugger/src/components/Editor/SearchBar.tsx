@@ -5,7 +5,7 @@
 //
 
 import PropTypes from "prop-types";
-import React, { Component } from "react";
+import React, { Component, ContextType } from "react";
 import { connect, ConnectedProps } from "react-redux";
 
 import type { UIState } from "ui/state";
@@ -32,6 +32,7 @@ import debounce from "lodash/debounce";
 
 import type { Modifiers } from "devtools/client/debugger/src/reducers/file-search";
 import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import ShortcutsContext from "./ShortcutsContext";
 
 function getShortcuts() {
   const searchAgainKey = "Cmd+G";
@@ -135,6 +136,9 @@ interface SBState {
 }
 
 class SearchBar extends Component<FinalSBProps, SBState> {
+  static contextType = ShortcutsContext;
+  context!: ContextType<typeof ShortcutsContext>;
+
   constructor(props: FinalSBProps) {
     super(props);
     this.state = {
@@ -147,8 +151,7 @@ class SearchBar extends Component<FinalSBProps, SBState> {
   }
 
   componentWillUnmount() {
-    // @ts-expect-error old context who cares
-    const shortcuts = this.context.shortcuts;
+    const shortcuts = this.context!;
     const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
     shortcuts.off(searchShortcut);
@@ -161,8 +164,7 @@ class SearchBar extends Component<FinalSBProps, SBState> {
     // overwrite this.doSearch with debounced version to
     // reduce frequency of queries
     this.doSearch = debounce(this.doSearch, 100);
-    // @ts-expect-error old context who cares
-    const shortcuts = this.context.shortcuts;
+    const shortcuts = this.context!;
     const { searchShortcut, searchAgainShortcut, shiftSearchAgainShortcut } = getShortcuts();
 
     // Not actually React events but whatever
@@ -398,8 +400,4 @@ class SearchBar extends Component<FinalSBProps, SBState> {
   }
 }
 
-// @ts-expect-error contextTypes shenanigans
-SearchBar.contextTypes = {
-  shortcuts: PropTypes.object,
-};
 export default connector(SearchBar);

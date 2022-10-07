@@ -1,17 +1,17 @@
-import { MouseEvent, ReactNode, useLayoutEffect, useRef } from "react";
+import { MouseEvent, ReactNode, RefObject, useLayoutEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 
 import styles from "./Popover.module.css";
 
 export default function Popover({
   children,
-  container,
+  containerRef,
   onMouseLeave,
   showTail,
   target,
 }: {
   children: ReactNode;
-  container: HTMLElement;
+  containerRef: RefObject<HTMLElement>;
   onMouseLeave?: () => void;
   showTail: boolean;
   target: HTMLElement;
@@ -21,6 +21,7 @@ export default function Popover({
 
   useLayoutEffect(() => {
     const arrow = arrowRef.current!;
+    const container = containerRef.current!;
     const popover = popoverRef.current!;
 
     let ignoreMouseLeaveEventTimeout: NodeJS.Timeout | null = null;
@@ -111,7 +112,7 @@ export default function Popover({
         clearTimeout(ignoreMouseLeaveEventTimeout);
       }
     };
-  }, [container, onMouseLeave, showTail, target]);
+  }, [containerRef, onMouseLeave, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();
