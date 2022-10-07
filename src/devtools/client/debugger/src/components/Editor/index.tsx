@@ -21,13 +21,12 @@ import EditorLoadingBar from "./EditorLoadingBar";
 import EditorMenu from "./EditorMenu";
 import EmptyLines from "./EmptyLines";
 import Gutter from "./Gutter";
-import HighlightLine from "./HighlightLine";
-import HighlightLines from "./HighlightLines";
 import LineNumberTooltip from "./LineNumberTooltip";
 import Preview from "./Preview";
 import SearchBar from "./SearchBar";
 import ShortcutsContext from "./ShortcutsContext";
 import useEditor from "./useEditor";
+import useHighlightedLines from "./useHighlightedLines";
 
 const SEARCH_BAR_HEIGHT_CSS_VAR = "var(--editor-searchbar-height)";
 
@@ -46,6 +45,8 @@ export default function EditorOuter() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor(containerRef, setContextMenu);
+
+  useHighlightedLines(editor);
 
   // Register shortcuts event handlers
   useEffect(() => {
@@ -101,13 +102,13 @@ export default function EditorOuter() {
         />
         {selectedSource ? <SearchBar editor={editor} /> : null}
         <EditorInner
-          clearContextMenu={() => setContextMenu(null)}
           containerRef={containerRef}
           contextMenu={contextMenu}
           cx={cx}
           editor={editor}
           gutterContextMenu={gutterContextMenu}
           selectedSource={selectedSource}
+          setContextMenu={setContextMenu}
         />
       </div>
     </ShortcutsContext.Provider>
@@ -115,21 +116,21 @@ export default function EditorOuter() {
 }
 
 function EditorInner({
-  clearContextMenu,
   containerRef,
   contextMenu,
   cx,
   editor,
   gutterContextMenu,
   selectedSource,
+  setContextMenu,
 }: {
-  clearContextMenu: () => void;
   containerRef: RefObject<HTMLDivElement>;
   contextMenu: MouseEvent | null;
   cx: ThreadContext;
   editor: SourceEditor | null;
   gutterContextMenu: ContextMenu | null;
   selectedSource: SourceDetails | null;
+  setContextMenu: (event: MouseEvent | null) => void;
 }) {
   const dispatch = useAppDispatch();
 
@@ -150,18 +151,16 @@ function EditorInner({
         />
       )}
       <DebugLine />
-      <HighlightLine />
       <EmptyLines editor={editor} />
       <Breakpoints editor={editor} cx={cx} />
       <Preview editor={editor} editorRef={containerRef} />
       <KeyModifiersContext.Consumer>
         {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
       </KeyModifiersContext.Consumer>
-      <HighlightLines editor={editor} />
       <EditorMenu
-        editor={editor}
+        clearContextMenu={() => setContextMenu(null)}
         contextMenu={contextMenu}
-        clearContextMenu={clearContextMenu}
+        editor={editor}
         selectedSource={selectedSource}
       />
       <ColumnBreakpoints editor={editor} />
