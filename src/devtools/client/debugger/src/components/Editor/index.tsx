@@ -20,13 +20,12 @@ import DebugLine from "./DebugLine";
 import EditorLoadingBar from "./EditorLoadingBar";
 import EditorMenu from "./EditorMenu";
 import EmptyLines from "./EmptyLines";
-import Gutter from "./Gutter";
 import LineNumberTooltip from "./LineNumberTooltip";
 import Preview from "./Preview";
 import SearchBar from "./SearchBar";
 import ShortcutsContext from "./ShortcutsContext";
 import useEditor from "./useEditor";
-import useHighlightedLines from "./useHighlightedLines";
+import ToggleWidgetButtonSuspenseWrapper from "./ToggleWidgetButton";
 
 const SEARCH_BAR_HEIGHT_CSS_VAR = "var(--editor-searchbar-height)";
 
@@ -45,8 +44,6 @@ export default function EditorOuter() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const editor = useEditor(containerRef, setContextMenu);
-
-  useHighlightedLines(editor);
 
   // Register shortcuts event handlers
   useEffect(() => {
@@ -164,7 +161,7 @@ function EditorInner({
         selectedSource={selectedSource}
       />
       <ColumnBreakpoints editor={editor} />
-      <Gutter sourceEditor={editor} />
+      <ToggleWidgetButtonSuspenseWrapper editor={editor} />
     </div>
   );
 }

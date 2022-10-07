@@ -21,26 +21,14 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { FocusRegion } from "ui/state/timeline";
 import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
 
-type Props = {
-  sourceEditor: SourceEditor;
-};
-
-export default function LineHitCountsWrapper(props: Props) {
+export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
   const { value: hitCountsEnabled } = useFeature("hitCounts");
-  const { value: hitCountsMode } = useStringPref("hitCounts");
+  const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
 
-  if (!hitCountsEnabled || hitCountsMode == "disabled") {
-    return null;
-  }
-
-  return <LineHitCounts {...props} />;
-}
-
-function LineHitCounts({ sourceEditor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
-  const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
+
   const currentLineNumber = useAppSelector(
     (state: UIState) => state.app.hoveredLineNumberLocation?.line
   );
@@ -88,11 +76,15 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [hitCounts]);
 
   useLayoutEffect(() => {
+    if (!hitCountsEnabled) {
+      return;
+    }
+
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
       dispatch(fetchHitCounts(sourceId, 0));
     }
-  }, [dispatch, sourceId, hitCounts]);
+  }, [dispatch, hitCounts, hitCountsEnabled, sourceId]);
 
   // Make sure we have enough room to fit large hit count numbers in the gutter markers
   const numCharsToFit = useMemo(() => {
@@ -114,7 +106,7 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [isCollapsed]);
 
   useLayoutEffect(() => {
-    if (!sourceEditor) {
+    if (!hitCountsEnabled || !sourceEditor) {
       return;
     }
 
@@ -154,10 +146,10 @@ function LineHitCounts({ sourceEditor }: Props) {
       }
       resizeBreakpointGutter(editor);
     };
-  }, [gutterWidth, sourceEditor, isCollapsed, hitCountsMode]);
+  }, [gutterWidth, hitCountsEnabled, hitCountsMode, isCollapsed, sourceEditor]);
 
   useLayoutEffect(() => {
-    if (!sourceEditor) {
+    if (!hitCountsEnabled || !sourceEditor) {
       return;
     }
 
@@ -252,23 +244,25 @@ function LineHitCounts({ sourceEditor }: Props) {
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
+
       editor.off("change", drawLinesRaf);
       editor.off("swapDoc", drawLinesRaf);
       editor.off("scroll", drawLinesRaf);
     };
   }, [
+    focusRegion,
+    hitCountMap,
+    hitCountsEnabled,
+    isCollapsed,
+    isCurrentLineNumberValid,
+    lower,
+    maxHitCount,
+    minHitCount,
     sourceEditor,
     sourceId,
-    hitCountMap,
     updatedLineNumbers,
-    isCollapsed,
-    minHitCount,
-    maxHitCount,
     updateHitCountsMode,
-    lower,
     upper,
-    isCurrentLineNumberValid,
-    focusRegion,
   ]);
 
   useEffect(() => {
@@ -276,9 +270,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     previousFocusRegion.current = focusRegion;
     previousHitCounts.current = hitCountMap;
   }, [focusRegion, hitCountMap]);
-
-  // We're just here for the hooks!
-  return null;
 }
 
 function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {

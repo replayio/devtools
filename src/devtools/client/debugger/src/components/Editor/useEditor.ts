@@ -39,6 +39,8 @@ import {
 import type { EditorWithDoc, SourceEditor } from "../../utils/editor/source-editor";
 import { getIndentation } from "../../utils/indentation";
 import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
+import useHighlightedLines from "./useHighlightedLines";
+import useLineHitCounts from "./useLineHitCounts";
 
 type InstanceProps = {
   cx: ThreadContext;
@@ -314,6 +316,9 @@ export default function useEditor(
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverLine);
     };
   }, [dispatch, editor, setContextMenu]);
+
+  useHighlightedLines(editor);
+  useLineHitCounts(editor);
 
   return editor;
 }
