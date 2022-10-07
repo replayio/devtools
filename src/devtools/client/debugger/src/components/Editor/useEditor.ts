@@ -8,24 +8,25 @@ import {
   ThreadContext,
 } from "devtools/client/debugger/src/selectors";
 import {
-  showSourceText,
-  showErrorMessage,
-  getEditor,
+  clearDocuments,
   clearEditor,
+  endOperation,
   lineAtHeight,
   fromEditorLine,
   getDocument,
-  scrollToColumn,
-  toEditorLine,
-  toEditorColumn,
+  getEditor,
   getSourceLocationFromMouseEvent,
   hasDocument,
-  onTokenMouseOver,
   onLineMouseOver,
   onMouseScroll,
-  startOperation,
-  endOperation,
+  onTokenMouseOver,
+  scrollToColumn,
+  showErrorMessage,
   showLoading,
+  showSourceText,
+  startOperation,
+  toEditorColumn,
+  toEditorLine,
 } from "devtools/client/debugger/src/utils/editor";
 import type {
   EditorWithDoc,
@@ -126,6 +127,8 @@ export default function useEditor(
       editor.destroy();
 
       setEditor(null);
+
+      clearDocuments();
     };
   }, [containerRef]);
 
@@ -137,7 +140,6 @@ export default function useEditor(
   useLayoutEffect(() => {
     const instanceProps = instancePropsRef.current;
     instanceProps.cx = cx;
-    instanceProps.selectedSource = selectedSource;
     instanceProps.selectedLocation = selectedLocation;
     instanceProps.selectedSource = selectedSource;
     instanceProps.selectedSourceContent = selectedSourceContent;
