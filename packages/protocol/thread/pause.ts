@@ -64,8 +64,6 @@ export class Pause {
   frames: Map<FrameId, Frame>;
   scopes: Map<ScopeId, Scope>;
   objects: Map<ObjectId, Object>;
-  rawFrames: Map<FrameId, Frame>;
-  rawScopes: Map<ScopeId, Scope>;
   frameSteps: Map<string, PointDescription[]>;
   stack: Frame[] | undefined;
   repaintGraphicsWaiter: Deferred<repaintGraphicsResult | null> | undefined;
@@ -91,8 +89,6 @@ export class Pause {
     this.frames = new Map();
     this.scopes = new Map();
     this.objects = new Map();
-    this.rawFrames = new Map();
-    this.rawScopes = new Map();
 
     this.frameSteps = new Map();
 
@@ -167,7 +163,6 @@ export class Pause {
     }
 
     datas.forEach(d => this._addDataObjects(d));
-    // datas.forEach(d => this._updateDataFronts(d));
   }
 
   ensureLoaded() {
@@ -177,21 +172,14 @@ export class Pause {
   private _addDataObjects({ frames, scopes, objects }: PauseData) {
     (frames || []).forEach(f => {
       if (!this.frames.has(f.frameId)) {
+        this.ThreadFront.updateMappedLocation(f.location);
+        this.ThreadFront.updateMappedLocation(f.functionLocation);
         this.frames.set(f.frameId, f);
-      }
-      if (!this.rawFrames.has(f.frameId)) {
-        const rawFrame = cloneDeep(f);
-        this.ThreadFront.updateMappedLocation(rawFrame.location);
-        this.ThreadFront.updateMappedLocation(rawFrame.functionLocation);
-        this.rawFrames.set(f.frameId, rawFrame);
       }
     });
     (scopes || []).forEach(s => {
       if (!this.scopes.has(s.scopeId)) {
         this.scopes.set(s.scopeId, s);
-      }
-      if (!this.rawScopes.has(s.scopeId)) {
-        this.rawScopes.set(s.scopeId, cloneDeep(s));
       }
     });
     (objects || []).forEach(o => {
