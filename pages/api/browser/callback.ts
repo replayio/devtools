@@ -1,6 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
+// patch in node-fetch for pingTelemetry without adding it to the FE bundle
+globalThis.fetch = globalThis.fetch || require("node-fetch");
+
 interface Token {
   access_token: string;
   refresh_token: string;
@@ -79,31 +82,42 @@ async function fetchToken(code: string, verifier: string): Promise<Token> {
   if (token && token.refresh_token) {
     return token;
   } else {
-    throw new Error("Failed to retrieve token");
+    throw new Error(token?.error_description || "Failed to retrieve token");
   }
 }
 
-function redirectToLogin(req: NextApiRequest, res: NextApiResponse) {
-  const message = getQueryValue(req.query.error_description!);
+function redirectToError(res: NextApiResponse, message: string) {
+  const query = new URLSearchParams({
+    type: "auth",
+    message,
+  });
 
-  res.redirect("/browser/error?type=auth&message=" + encodeURIComponent(message));
+  res.redirect("/browser/error?" + query.toString());
 }
+
+class AuthError extends Error {}
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   const code = getQueryValue(req.query.code!);
   const state = getQueryValue(req.query.state!);
+  const authErrorMessage = getQueryValue(req.query.error_description!);
   const browserAuth = req.cookies["replay-browser-auth"];
 
-  if (!code || !state || !browserAuth) {
-    redirectToLogin(req, res);
-    return;
-  }
-
   try {
+    if (authErrorMessage) {
+      throw new AuthError(authErrorMessage);
+    }
+
+    if (!code || !state || !browserAuth) {
+      throw new AuthError("A required parameter was missing. Please try again.");
+    }
+
     const { verifier, id } = JSON.parse(browserAuth);
 
     if (id !== state) {
-      throw new Error("Invalid auth request");
+      // This shouldn't occur and we don't need to broadcast this to the user so
+      // an "uexpected error" message is okay
+      throw new Error("auth state mismatch");
     }
 
     const token = await fetchToken(code, verifier);
@@ -113,7 +127,10 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
   } catch (e: any) {
     console.error(e);
 
-    pingTelemetry("devtools-api-browser-callback", { error: e.message });
-    redirectToLogin(req, res);
+    pingTelemetry("devtools-api-browser-callback", { message: e.message, code: e.code });
+    redirectToError(
+      res,
+      e instanceof AuthError ? e.message : "Unexpected error logging in. Please try again."
+    );
   }
 };
