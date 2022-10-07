@@ -153,7 +153,7 @@ function EditorInner({
       <DebugLine />
       <EmptyLines editor={editor} />
       <Breakpoints editor={editor} cx={cx} />
-      <Preview editor={editor} editorRef={containerRef} />
+      <Preview containerRef={containerRef} editor={editor} />
       <KeyModifiersContext.Consumer>
         {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
       </KeyModifiersContext.Consumer>

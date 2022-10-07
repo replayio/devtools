@@ -26,7 +26,7 @@ const connector = connect(mapStateToProps, {
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type PreviewProps = PropsFromRedux & {
   editor: SourceEditor;
-  editorRef: RefObject<HTMLDivElement>;
+  containerRef: RefObject<HTMLDivElement>;
 };
 
 type PreviewState = {
@@ -118,7 +118,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   };
 
   render() {
-    const { preview } = this.props;
+    const { containerRef, preview } = this.props;
     const { selecting, hoveredTarget } = this.state;
 
     return (
@@ -127,7 +127,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
           <PreviewHighlight expression={preview.expression} target={hoveredTarget!} />
         )}
         {!selecting && preview?.value && hoveredTarget && (
-          <Popup preview={preview} editorRef={this.props.editorRef} target={hoveredTarget!} />
+          <Popup containerRef={containerRef} preview={preview} target={hoveredTarget!} />
         )}
       </>
     );

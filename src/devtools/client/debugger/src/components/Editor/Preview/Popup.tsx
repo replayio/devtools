@@ -8,12 +8,12 @@ import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 import NewObjectInspector from "./NewObjectInspector";
 
 interface PopupProps {
+  containerRef: RefObject<HTMLDivElement>;
   preview: PreviewState;
-  editorRef: RefObject<HTMLDivElement>;
   target: HTMLElement;
 }
 
-export function Popup({ editorRef, target, preview }: PopupProps) {
+export function Popup({ containerRef, target, preview }: PopupProps) {
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getThreadContext);
 
@@ -35,7 +35,12 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
   }
 
   return (
-    <Popover containerRef={editorRef} onMouseLeave={onMouseLeave} showTail={true} target={target}>
+    <Popover
+      containerRef={containerRef}
+      onMouseLeave={onMouseLeave}
+      showTail={true}
+      target={target}
+    >
       <NewObjectInspector protocolValue={value} />
     </Popover>
   );
