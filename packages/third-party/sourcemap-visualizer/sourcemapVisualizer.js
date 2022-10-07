@@ -326,9 +326,10 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     const sm = parseSourceMap(map);
 
     // Populate the file picker
-    fileList.innerHTML = '';
     let initialSelectedIndex = -1;
-    for (let sources = sm.sources, i = 0, n = sources.length; i < n; i++) {
+    const sortedSources = sm.sources.slice().sort( (a, b) => a.name.localeCompare(b.name));
+
+    for (let sources = sortedSources, i = 0, n = sortedSources.length; i < n; i++) {
       const option = document.createElement('option');
       option.textContent = sources[i].name;
       fileList.appendChild(option);
@@ -338,12 +339,12 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     }
 
     // Update the original text area when the source changes
-    const otherSource = index => index === -1 ? 'unmapped' : sm.sources[index].name;
+    const otherSource = index => index === -1 ? null : sortedSources[index].name;
     const originalName = index => sm.names[index];
     originalTextArea = null;
-    if (sm.sources.length > 0) {
+    if (sortedSources.length > 0) {
       const updateOriginalSource = () => {
-        const source = sm.sources[fileList.selectedIndex];
+        const source = sortedSources[fileList.selectedIndex];
         originalTextArea = createTextArea({
           sourceIndex: fileList.selectedIndex,
           text: source.content,
