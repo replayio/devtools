@@ -24,8 +24,8 @@ import LineNumberTooltip from "./LineNumberTooltip";
 import Preview from "./Preview";
 import SearchBar from "./SearchBar";
 import ShortcutsContext from "./ShortcutsContext";
+import ToggleWidgetButton from "./ToggleWidgetButton";
 import useEditor from "./useEditor";
-import ToggleWidgetButtonSuspenseWrapper from "./ToggleWidgetButton";
 
 const SEARCH_BAR_HEIGHT_CSS_VAR = "var(--editor-searchbar-height)";
 
@@ -161,7 +161,7 @@ function EditorInner({
         selectedSource={selectedSource}
       />
       <ColumnBreakpoints editor={editor} />
-      <ToggleWidgetButtonSuspenseWrapper editor={editor} />
+      <ToggleWidgetButton editor={editor} />
     </div>
   );
 }

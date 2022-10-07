@@ -33,7 +33,6 @@ import {
   onMouseScroll,
   startOperation,
   endOperation,
-  clearDocuments,
   showLoading,
 } from "../../utils/editor";
 import type { EditorWithDoc, SourceEditor } from "../../utils/editor/source-editor";
@@ -119,8 +118,6 @@ export default function useEditor(
       editor.destroy();
 
       setEditor(null);
-
-      clearDocuments();
     };
   }, [containerRef]);
 
