@@ -1,4 +1,4 @@
-// modified from https://github.com/evanw/source-map-visualization/blob/7a479ec3631b27cd8b1d97ac2c675ec8d4adccf5/code.js
+// modified from https://github.com/evanw/source-map-visualization/blob/7faaca23c7b673e329b884b4dc218fe2369565e9/code.js
 export default function renderSourcemap(source, sourcemap, url, document) {
   ////////////////////////////////////////////////////////////////////////////////
   // Loading
@@ -14,7 +14,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
   for (let i = 0; i < vlqTable.length; i++) vlqTable[i] = 0xFF;
   for (let i = 0; i < vlqChars.length; i++) vlqTable[vlqChars.charCodeAt(i)] = i;
 
-  function decodeMappings(mappings, sourcesCount) {
+  function decodeMappings(mappings, sourcesCount, namesCount) {
     const n = mappings.length;
     let data = new Int32Array(1024);
     let dataLength = 0;
@@ -41,11 +41,11 @@ export default function renderSourcemap(source, sourcemap, url, document) {
       // Scan over the input
       while (true) {
         // Read a byte
-        if (i >= mappings.length) decodeError('Expected extra data');
+        if (i >= mappings.length) decodeError('Unexpected early end of mapping data');
         const c = mappings.charCodeAt(i);
-        if ((c & 0x7F) !== c) decodeError('Invalid character');
+        if ((c & 0x7F) !== c) decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`);
         const index = vlqTable[c & 0x7F];
-        if (index === 0xFF) decodeError('Invalid character');
+        if (index === 0xFF) decodeError(`Invalid mapping character: ${JSON.stringify(String.fromCharCode(c))}`);
         i++;
 
         // Decode the byte
@@ -111,7 +111,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
       const generatedColumnDelta = decodeVLQ();
       if (generatedColumnDelta < 0) needToSortGeneratedColumns = true;
       generatedColumn += generatedColumnDelta;
-      if (generatedColumn < 0) decodeError('Invalid generated column');
+      if (generatedColumn < 0) decodeError(`Invalid generated column: ${generatedColumn}`);
 
       // It's valid for a mapping to have 1, 4, or 5 variable-length fields
       let isOriginalSourceMissing = true;
@@ -126,17 +126,17 @@ export default function renderSourcemap(source, sourcemap, url, document) {
           // Read the original source
           const originalSourceDelta = decodeVLQ();
           originalSource += originalSourceDelta;
-          if (originalSource < 0 || originalSource >= sourcesCount) decodeError('Invalid original source');
+          if (originalSource < 0 || originalSource >= sourcesCount) decodeError(`Original source index ${originalSource} is invalid (there are ${sourcesCount} sources)`);
 
           // Read the original line
           const originalLineDelta = decodeVLQ();
           originalLine += originalLineDelta;
-          if (originalLine < 0) decodeError('Invalid original line');
+          if (originalLine < 0) decodeError(`Invalid original line: ${originalLine}`);
 
           // Read the original column
           const originalColumnDelta = decodeVLQ();
           originalColumn += originalColumnDelta;
-          if (originalColumn < 0) decodeError('Invalid original column');
+          if (originalColumn < 0) decodeError(`Invalid original column: ${originalColumn}`);
 
           // Check for the optional name index
           if (i < n) {
@@ -149,7 +149,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
               // Read the optional name index
               const originalNameDelta = decodeVLQ();
               originalName += originalNameDelta;
-              if (originalName < 0) decodeError('Invalid original name');
+              if (originalName < 0 || originalName >= namesCount) decodeError(`Original name index ${originalName} is invalid (there are ${namesCount} names)`);
 
               // Handle the next character
               if (i < n) {
@@ -157,7 +157,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
                 if (c === 44 /* , */) {
                   i++;
                 } else if (c !== 59 /* ; */) {
-                  decodeError('Invalid character after mapping');
+                  decodeError(`Invalid character after mapping: ${JSON.stringify(String.fromCharCode(c))}`);
                 }
               }
             }
@@ -310,7 +310,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
       };
     }
 
-    const data = decodeMappings(mappings, sources.length);
+    const data = decodeMappings(mappings, sources.length, names.length);
     generateInverseMappings(sources, data);
     return { sources, names, data };
   }
@@ -318,7 +318,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
   const toolbarHeight = 32;
   const statusBarHeight = 32;
 
-  function finishLoading(code, map, url) {
+  function finishLoading(code, map) {
     const startTime = Date.now();
     toolbar.style.display = 'flex';
     statusBar.style.display = 'flex';
@@ -326,9 +326,10 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     const sm = parseSourceMap(map);
 
     // Populate the file picker
-    fileList.innerHTML = '';
     let initialSelectedIndex = -1;
-    for (let sources = sm.sources, i = 0, n = sources.length; i < n; i++) {
+    const sortedSources = sm.sources.slice().sort( (a, b) => a.name.localeCompare(b.name));
+
+    for (let sources = sortedSources, i = 0, n = sortedSources.length; i < n; i++) {
       const option = document.createElement('option');
       option.textContent = sources[i].name;
       fileList.appendChild(option);
@@ -338,12 +339,12 @@ export default function renderSourcemap(source, sourcemap, url, document) {
     }
 
     // Update the original text area when the source changes
-    const otherSource = index => index === -1 ? 'unmapped' : sm.sources[index].name;
+    const otherSource = index => index === -1 ? null : sortedSources[index].name;
     const originalName = index => sm.names[index];
     originalTextArea = null;
-    if (sm.sources.length > 0) {
+    if (sortedSources.length > 0) {
       const updateOriginalSource = () => {
-        const source = sm.sources[fileList.selectedIndex];
+        const source = sortedSources[fileList.selectedIndex];
         originalTextArea = createTextArea({
           sourceIndex: fileList.selectedIndex,
           text: source.content,
@@ -999,6 +1000,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
         const badMappingBatches = [];
         const whitespaceBatch = [];
         const textBatch = [];
+        let hoveredName = null;
         for (let i = 0; i < originalLineColors.length; i++) {
           mappingBatches.push([]);
           badMappingBatches.push([]);
@@ -1049,6 +1051,9 @@ export default function renderSourcemap(source, sourcemap, url, document) {
             // Get the bounds of this mapping, which may be empty if it's ignored
             const range = rangeOfMapping(map);
             if (range === null) continue;
+            const { startColumn, endColumn } = range;
+            const color = mappings[map + 3] % originalLineColors.length;
+            const [x1, y1, x2, y2] = boxForRange(x, y, row, columnWidth, range);
 
             // Check if this mapping is hovered
             let isHovered = false;
@@ -1071,12 +1076,16 @@ export default function renderSourcemap(source, sourcemap, url, document) {
                 // mapping instead of showing everything that matches the target
                 // so hovering isn't confusing.
                 : isGenerated ? matchesGenerated : matchesOriginal);
+              if (isGenerated && matchesGenerated && hoveredMapping.originalName !== -1) {
+                hoveredName = {
+                  text: originalName(hoveredMapping.originalName),
+                  x: Math.round(x - scrollX + margin + textPaddingX + range.startColumn * columnWidth - 2),
+                  y: Math.round(y + textPaddingY - scrollY + (row + 1.2) * rowHeight),
+                };
+              }
             }
 
             // Add a rectangle to that color's batch
-            const { startColumn, endColumn } = range;
-            const color = mappings[map + 3] % originalLineColors.length;
-            const [x1, y1, x2, y2] = boxForRange(x, y, row, columnWidth, range);
             if (isHovered) {
               hoverBoxes.push({ color, rect: [x1 - 2, y1 - 2, x2 - x1 + 4, y2 - y1 + 4] });
             } else if (row >= lines.length || startColumn > endOfLineColumn) {
@@ -1156,12 +1165,9 @@ export default function renderSourcemap(source, sourcemap, url, document) {
         }
 
         // Update the status bar
-        if (hoveredMapping) {
+        if (hoveredMapping && hoveredMapping.originalColumn !== -1) {
           if (sourceIndex === null) {
             status = `Line ${hoveredMapping.generatedLine + 1}, Offset ${hoveredMapping.generatedColumn}`;
-            if (hoveredMapping.originalName !== -1) {
-              status += `, Name ${originalName(hoveredMapping.originalName)}`;
-            }
           } else {
             status = `Line ${hoveredMapping.originalLine + 1}, Offset ${hoveredMapping.originalColumn}`;
             if (hoveredMapping.originalSource !== sourceIndex) {
@@ -1185,6 +1191,28 @@ export default function renderSourcemap(source, sourcemap, url, document) {
           for (let j = 0; j < textBatch.length; j += 3) {
             c.fillText(textBatch[j], textBatch[j + 1], textBatch[j + 2]);
           }
+        }
+
+        // Draw the original name tooltip
+        if (hoveredName) {
+          const { text, x, y } = hoveredName;
+          const w = 2 * textPaddingX + c.measureText(text).width;
+          const h = rowHeight;
+          const r = 4;
+          c.beginPath();
+          c.arc(x + r, y + r, r, - Math.PI, -Math.PI / 2, false);
+          c.arc(x + w - r, y + r, r, -Math.PI / 2, 0, false);
+          c.arc(x + w - r, y + h - r, r, 0, Math.PI / 2, false);
+          c.arc(x + r, y + h - r, r, Math.PI / 2, Math.PI, false);
+          c.save();
+          c.shadowColor = 'rgba(0, 0, 0, 0.5)';
+          c.shadowOffsetY = 3;
+          c.shadowBlur = 10;
+          c.fillStyle = textColor;
+          c.fill();
+          c.restore();
+          c.fillStyle = backgroundColor;
+          c.fillText(text, x + textPaddingX, y + 0.7 * rowHeight);
         }
 
         // Draw the margin shadow
@@ -1356,7 +1384,7 @@ export default function renderSourcemap(source, sourcemap, url, document) {
 
   document.body.appendChild(canvas);
   onresize();
-  draw();
+  draw(); 
 
   let query = matchMedia('(prefers-color-scheme: dark)');
   try {
