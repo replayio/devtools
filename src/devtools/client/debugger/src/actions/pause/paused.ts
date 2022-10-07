@@ -8,16 +8,16 @@ import { getSelectedFrame, getThreadContext } from "../../selectors";
 import { getSelectedLocation } from "ui/reducers/sources";
 
 import {
-  fetchScopes,
   pauseRequestedAt,
   paused as pausedAction,
-  fetchFrames,
-  fetchAsyncFrames,
   pauseCreationFailed,
+  frameSelected,
 } from "../../reducers/pause";
 import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
 import { isPointInLoadingRegion } from "ui/reducers/app";
+import { getFramesAsync } from "ui/suspense/frameCache";
+import { createFrame } from "../../client/create";
 
 type $FixTypeLater = any;
 
@@ -39,8 +39,7 @@ export function paused({
 
     trackEvent("paused");
 
-    // @ts-expect-error optional time mismatch
-    const pause = ThreadFront.ensurePause(executionPoint, time);
+    const pause = ThreadFront.getCurrentPause();
 
     await pause.createWaiter;
 
@@ -53,12 +52,21 @@ export function paused({
     } catch (e) {
       console.error(e);
       dispatch(pauseCreationFailed(executionPoint));
-      dispatch(fetchFrames.rejected(null, "", { cx, pauseId: pause.pauseId! }));
       return;
     }
 
-    await dispatch(fetchFrames({ cx, pauseId: pause.pauseId! }));
-
+    const frames = await getFramesAsync(pause.pauseId!);
+    if (!frames?.length) {
+      return;
+    }
+    const topFrame = createFrame(
+      getState().sources,
+      ThreadFront.preferredGeneratedSources,
+      frames[0],
+      pause.pauseId!,
+      0
+    );
+    dispatch(frameSelected({ cx, frameId: topFrame.id }));
     const selectedFrame = frame || getSelectedFrame(getState());
     if (selectedFrame) {
       const currentLocation = getSelectedLocation(getState());
@@ -76,11 +84,7 @@ export function paused({
         return;
       }
 
-      await Promise.all([
-        dispatch(fetchAsyncFrames({ cx })),
-        dispatch(setFramePositions()),
-        dispatch(fetchScopes({ cx })),
-      ]);
+      await dispatch(setFramePositions());
     }
   };
 }

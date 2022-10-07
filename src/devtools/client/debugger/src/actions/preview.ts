@@ -88,7 +88,7 @@ export function setPreview(
     }
 
     const { returned } = await ThreadFront.evaluateNew({
-      asyncIndex: selectedFrame.asyncIndex,
+      pauseId: selectedFrame.pauseId,
       frameId: selectedFrame.protocolId,
       text: expression,
     });

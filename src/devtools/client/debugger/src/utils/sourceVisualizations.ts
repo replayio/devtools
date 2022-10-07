@@ -1,5 +1,5 @@
 import { Dictionary } from "@reduxjs/toolkit";
-import type { SourceId } from "@replayio/protocol";
+import type { PauseId, SourceId } from "@replayio/protocol";
 import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
 import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import sortBy from "lodash/sortBy";
@@ -11,11 +11,13 @@ import {
   isOriginalSource,
   getBestNonSourceMappedSourceId,
   getBestSourceMappedSourceId,
+  SourcesState,
 } from "ui/reducers/sources";
 
 import { CursorPosition } from "../components/Editor/Footer";
 
 import { isNodeModule, isBowerComponent } from "./source";
+import { getAllCachedPauseFrames } from "./frames";
 
 export function getSourceIDsToSearch(
   sourcesById: Record<string, SourceDetails>,
@@ -46,10 +48,11 @@ export function getSourceIDsToSearch(
   });
 }
 
-function getSourceToVisualize(
+function getSourceIdToVisualizeSuspense(
+  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  alternateSource: SourceDetails | null | undefined,
-  sourcesById: Dictionary<SourceDetails>,
+  selectedFrameId: string | null,
+  sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
 ) {
@@ -59,38 +62,53 @@ function getSourceToVisualize(
   if (isOriginalSource(selectedSource)) {
     return selectedSource.id;
   }
-  if (!alternateSource) {
-    const alternateSourceId = getUniqueAlternateSourceId(selectedSource, sourcesById).sourceId;
-    if (alternateSourceId) {
-      alternateSource = sourcesById[alternateSourceId];
-    }
+
+  let alternateSourceId = getAlternateSourceIdFromSelectedFrame(
+    pauseId,
+    selectedSource,
+    selectedFrameId,
+    sourcesState
+  );
+  if (!alternateSourceId) {
+    alternateSourceId = getUniqueAlternateSourceId(
+      selectedSource,
+      sourcesState.sourceDetails.entities
+    ).sourceId;
   }
-  if (alternateSource) {
+  if (alternateSourceId) {
+    const alternateSource = sourcesState.sourceDetails.entities[alternateSourceId];
     assert(
-      isOriginalSource(alternateSource),
+      alternateSource && isOriginalSource(alternateSource),
       "either selected or alternate source must be original"
     );
-    return alternateSource.id;
+    return alternateSourceId;
   }
   if (position && client) {
-    return getAlternateSourceIdForPosition(client, selectedSource, position, sourcesById);
+    return getAlternateSourceIdForPositionSuspense(
+      client,
+      selectedSource,
+      position,
+      sourcesState.sourceDetails.entities
+    );
   }
 }
 
-export function getSourcemapVisualizerURL(
+export function getSourcemapVisualizerURLSuspense(
+  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  alternateSource: SourceDetails | null | undefined,
-  sourcesById: Dictionary<SourceDetails>,
+  selectedFrameId: string | null,
+  sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
 ) {
   if (!selectedSource) {
     return null;
   }
-  const sourceId = getSourceToVisualize(
+  const sourceId = getSourceIdToVisualizeSuspense(
+    pauseId,
     selectedSource,
-    alternateSource,
-    sourcesById,
+    selectedFrameId,
+    sourcesState,
     position,
     client
   );
@@ -110,6 +128,19 @@ export function getSourcemapVisualizerURL(
 interface AlternateSourceResult {
   sourceId?: SourceId;
   why?: "no-source" | "no-sourcemap" | "not-unique";
+}
+
+function getAlternateSourceIdFromSelectedFrame(
+  pauseId: PauseId,
+  selectedSource: SourceDetails,
+  selectedFrameId: string | null,
+  sourcesState: SourcesState
+) {
+  const frames = getAllCachedPauseFrames(pauseId, sourcesState) || [];
+  const selectedFrame = frames.find(f => f.id == selectedFrameId);
+  if (selectedFrame?.location.sourceId === selectedSource.id) {
+    return selectedFrame.alternateLocation?.sourceId;
+  }
 }
 
 // Get the ID of the only alternate source that can be switched to from the source with
@@ -167,7 +198,7 @@ function min(arr: number[]) {
   return lowest;
 }
 
-function getAlternateSourceIdForPosition(
+function getAlternateSourceIdForPositionSuspense(
   client: ReplayClientInterface,
   source: SourceDetails,
   position: CursorPosition,
@@ -200,30 +231,41 @@ function getAlternateSourceIdForPosition(
       );
 }
 
-export function getAlternateSourceId(
+export function getAlternateSourceIdSuspense(
   client: ReplayClientInterface,
+  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  alternateSource: SourceDetails | null | undefined,
-  sourcesById: Dictionary<SourceDetails>,
-  position: CursorPosition
+  selectedFrameId: string | null,
+  position: CursorPosition,
+  sourcesState: SourcesState
 ): AlternateSourceResult {
-  if (alternateSource) {
-    return { sourceId: alternateSource.id };
-  }
   if (!selectedSource) {
     return { why: "no-source" };
   }
 
-  const uniqueAlternate = getUniqueAlternateSourceId(selectedSource, sourcesById);
+  let alternateSourceId = getAlternateSourceIdFromSelectedFrame(
+    pauseId,
+    selectedSource,
+    selectedFrameId,
+    sourcesState
+  );
+  if (alternateSourceId) {
+    return { sourceId: alternateSourceId };
+  }
+
+  const uniqueAlternate = getUniqueAlternateSourceId(
+    selectedSource,
+    sourcesState.sourceDetails.entities
+  );
   if (uniqueAlternate.sourceId || uniqueAlternate.why === "no-sourcemap") {
     return uniqueAlternate;
   }
 
-  const alternateSourceId = getAlternateSourceIdForPosition(
+  alternateSourceId = getAlternateSourceIdForPositionSuspense(
     client,
     selectedSource,
     position,
-    sourcesById
+    sourcesState.sourceDetails.entities
   );
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };

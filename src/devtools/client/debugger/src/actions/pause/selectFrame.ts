@@ -3,27 +3,18 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import type { UIThunkAction } from "ui/actions";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { Context, PauseFrame } from "devtools/client/debugger/src/reducers/pause";
 
 import { selectLocation } from "../sources";
-import { fetchScopes, frameSelected } from "../../reducers/pause";
+import { frameSelected } from "../../reducers/pause";
 import { setFramePositions } from "./setFramePositions";
-import { SourceLocation } from "../../reducers/types";
 import { isCommandError, ProtocolError } from "shared/utils/error";
-
-export interface TempFrame {
-  id: string;
-  asyncIndex: number;
-  protocolId: string;
-  state: string;
-  location: SourceLocation;
-}
 
 /**
  * @memberof actions/pause
  * @static
  */
-export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
+export function selectFrame(cx: Context, frame: PauseFrame): UIThunkAction {
   return async (dispatch, getState, { ThreadFront }) => {
     // Frames that aren't on-stack do not support evalling and may not
     // have live inspectable scopes, so we do not allow selecting them.
@@ -35,7 +26,5 @@ export function selectFrame(cx: Context, frame: TempFrame): UIThunkAction {
 
     dispatch(selectLocation(cx, frame.location));
     dispatch(setFramePositions());
-
-    dispatch(fetchScopes({ cx }));
   };
 }

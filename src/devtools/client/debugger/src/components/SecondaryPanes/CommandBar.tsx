@@ -1,13 +1,17 @@
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
+
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
-import { getThreadContext, hasFrames } from "devtools/client/debugger/src/reducers/pause";
+import { getPauseId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { getFramePositions } from "devtools/client/debugger/src/selectors/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
-import React, { Component } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import type { UIState } from "ui/state";
+import React, { useEffect } from "react";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { useGetFrames } from "ui/suspense/frameCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 const { appinfo } = Services;
@@ -64,179 +68,120 @@ function formatKey(action: string) {
   return formatKeyShortcut(key);
 }
 
-class CommandBar extends Component<PropsFromRedux> {
-  // @ts-expect-error it gets initialized in cDM
-  shortcuts: KeyShortcuts | null;
+export default function CommandBar() {
+  const cx = useAppSelector(getThreadContext);
+  const framePositions = useAppSelector(getFramePositions);
+  const pauseId = useAppSelector(getPauseId);
+  const frames = useGetFrames(pauseId);
+  const dispatch = useAppDispatch();
 
-  componentWillUnmount() {
-    const shortcuts = this.shortcuts;
-    COMMANDS.forEach(action => shortcuts!.off(getKey(action)));
-    if (isMacOS) {
-      COMMANDS.forEach(action => shortcuts!.off(getKeyForOS("WINNT", action)));
-    }
-  }
-
-  componentDidMount() {
-    this.shortcuts = new KeyShortcuts({
+  useEffect(() => {
+    const shortcuts = new KeyShortcuts({
       window,
       target: document.body,
     });
-    const shortcuts = this.shortcuts;
+
+    function handleEvent(e: KeyboardEvent, action: PossibleCommands) {
+      e.preventDefault();
+      e.stopPropagation();
+      dispatch(actions[action](cx));
+    }
 
     COMMANDS.forEach(action =>
-      shortcuts.on(getKey(action), (e: KeyboardEvent) => this.handleEvent(e, action))
+      shortcuts.on(getKey(action), (e: KeyboardEvent) => handleEvent(e, action))
     );
 
     if (isMacOS) {
       // The Mac supports both the Windows Function keys
       // as well as the Mac non-Function keys
       COMMANDS.forEach(action =>
-        shortcuts.on(getKeyForOS("WINNT", action), (e: KeyboardEvent) =>
-          this.handleEvent(e, action)
-        )
+        shortcuts.on(getKeyForOS("WINNT", action), (e: KeyboardEvent) => handleEvent(e, action))
       );
     }
-  }
 
-  handleEvent(e: KeyboardEvent, action: PossibleCommands) {
-    const { cx } = this.props;
-    e.preventDefault();
-    e.stopPropagation();
-    if (action === "resume") {
-      this.props.resume(cx);
-    } else {
-      this.props[action](cx);
-    }
-  }
+    return () => {
+      COMMANDS.forEach(action => shortcuts!.off(getKey(action)));
+      if (isMacOS) {
+        COMMANDS.forEach(action => shortcuts!.off(getKeyForOS("WINNT", action)));
+      }
+    };
+  }, [cx, dispatch]);
 
-  onRewind = () => {
-    const { cx } = this.props;
+  const hasFramePositions = !!framePositions?.positions.length;
+  const isPaused = !!frames.value?.length;
+  const disabled = !isPaused || !hasFramePositions;
+  const disabledTooltip = !isPaused
+    ? "Stepping is disabled until you're paused at a point"
+    : "Stepping is disabled because there are too many steps in the current frame";
+
+  function onRewind() {
     trackEvent("debugger.rewind");
-    this.props.rewind(cx);
-  };
-  onResume = () => {
-    const { cx } = this.props;
+    dispatch(actions.rewind(cx));
+  }
+  function onResume() {
     trackEvent("debugger.resume");
-    this.props.resume(cx);
-  };
-  onReverseStepOver = () => {
-    const { cx } = this.props;
+    dispatch(actions.resume(cx));
+  }
+  function onReverseStepOver() {
     trackEvent("debugger.reverse_step_over");
-    this.props.reverseStepOver(cx);
-  };
-  onStepOver = () => {
-    const { cx } = this.props;
+    dispatch(actions.reverseStepOver(cx));
+  }
+  function onStepOver() {
     trackEvent("debugger.step_over");
-    this.props.stepOver(cx);
-  };
-  onStepIn = () => {
-    const { cx } = this.props;
+    dispatch(actions.stepOver(cx));
+  }
+  function onStepIn() {
     trackEvent("debugger.step_in");
-    this.props.stepIn(cx);
-  };
-  onStepOut = () => {
-    const { cx } = this.props;
+    dispatch(actions.stepIn(cx));
+  }
+  function onStepOut() {
     trackEvent("debugger.step_out");
-    this.props.stepOut(cx);
-  };
-
-  resume() {
-    this.props.resume(this.props.cx);
+    dispatch(actions.stepOut(cx));
   }
 
-  renderRewindButton() {
-    return (
-      <CommandBarButton
-        key="rewind"
-        onClick={this.onRewind}
-        tooltip="Rewind Execution"
-        type="rewind"
-      />
-    );
-  }
-
-  renderResumeButton() {
-    return (
+  return (
+    <div className="command-bar">
+      <CommandBarButton key="rewind" onClick={onRewind} tooltip="Rewind Execution" type="rewind" />
       <CommandBarButton
         key="resume"
-        onClick={this.onResume}
+        onClick={onResume}
         tooltip={`Resume ${formatKey("resume")}`}
         type="resume"
       />
-    );
-  }
-
-  renderStepButtons() {
-    const { isPaused, hasFramePositions } = this.props;
-    const disabled = !isPaused || !hasFramePositions;
-    const disabledTooltip = !isPaused
-      ? "Stepping is disabled until you're paused at a point"
-      : "Stepping is disabled because there are too many steps in the current frame";
-
-    return [
-      <div key="divider-2" className="divider" />,
+      <div key="divider-2" className="divider" />
       <CommandBarButton
         disabled={disabled}
         key="reverseStepOver"
-        onClick={this.onReverseStepOver}
+        onClick={onReverseStepOver}
         tooltip="Reverse Step Over"
         disabledTooltip={disabledTooltip}
         type="reverseStepOver"
-      />,
+      />
       <CommandBarButton
         disabled={disabled}
         key="stepOver"
-        onClick={this.onStepOver}
+        onClick={onStepOver}
         tooltip="Step Over"
         disabledTooltip={disabledTooltip}
         type="stepOver"
-      />,
-      <div key="divider-3" className="divider" />,
+      />
+      <div key="divider-3" className="divider" />
       <CommandBarButton
         disabled={disabled}
         key="stepIn"
-        onClick={this.onStepIn}
+        onClick={onStepIn}
         tooltip="Step In"
         disabledTooltip={disabledTooltip}
         type="stepIn"
-      />,
+      />
       <CommandBarButton
         disabled={disabled}
         key="stepOut"
-        onClick={this.onStepOut}
+        onClick={onStepOut}
         tooltip="Step Out"
         disabledTooltip={disabledTooltip}
         type="stepOut"
-      />,
-    ];
-  }
-
-  renderReplayButtons() {
-    const { cx } = this.props;
-
-    return [this.renderRewindButton(), this.renderResumeButton(), this.renderStepButtons()];
-  }
-
-  render() {
-    return <div className="command-bar">{this.renderReplayButtons()}</div>;
-  }
+      />
+    </div>
+  );
 }
-
-const mapStateToProps = (state: UIState) => ({
-  cx: getThreadContext(state),
-  hasFramePositions: getFramePositions(state)?.positions.length,
-  isPaused: hasFrames(state),
-});
-
-const connector = connect(mapStateToProps, {
-  resume: actions.resume,
-  stepIn: actions.stepIn,
-  stepOut: actions.stepOut,
-  stepOver: actions.stepOver,
-  rewind: actions.rewind,
-  reverseStepOver: actions.reverseStepOver,
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export default connector(CommandBar);

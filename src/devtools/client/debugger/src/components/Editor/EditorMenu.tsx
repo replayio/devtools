@@ -10,8 +10,8 @@ import { showMenu } from "devtools/shared/contextmenu";
 
 import type { UIState } from "ui/state";
 import type { AppDispatch } from "ui/setup/store";
-import { getIsPaused, getThreadContext, getAlternateSource } from "../../selectors";
-import { getSourceDetailsEntities, SourceDetails } from "ui/reducers/sources";
+import { getThreadContext, getPauseId, getSelectedFrameId } from "../../selectors";
+import { SourceDetails } from "ui/reducers/sources";
 
 import { editorMenuItems, editorItemActions } from "./menus/editor";
 
@@ -24,9 +24,9 @@ interface EditorMenuProps {
 
 const mapStateToProps = (state: UIState, props: EditorMenuProps) => ({
   cx: getThreadContext(state),
-  isPaused: getIsPaused(state),
-  alternateSource: getAlternateSource(state),
-  sourcesById: getSourceDetailsEntities(state),
+  pauseId: getPauseId(state),
+  selectedFrameId: getSelectedFrameId(state),
+  sourcesState: state.sources,
 });
 
 const connector = connect(mapStateToProps, dispatch => ({
@@ -47,10 +47,11 @@ class EditorMenu extends Component<FinalEMProps> {
   showMenu(props: FinalEMProps) {
     const {
       cx,
+      pauseId,
       selectedSource,
+      selectedFrameId,
       editorActions,
-      alternateSource,
-      sourcesById,
+      sourcesState,
       contextMenu: event,
     } = props;
 
@@ -59,9 +60,10 @@ class EditorMenu extends Component<FinalEMProps> {
       editorMenuItems({
         cx,
         editorActions,
+        pauseId,
         selectedSource,
-        alternateSource: alternateSource || null,
-        sourcesById,
+        selectedFrameId,
+        sourcesState,
       })
     );
   }

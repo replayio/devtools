@@ -6,8 +6,13 @@ import type { UIState } from "ui/state";
 
 import { createSelector } from "reselect";
 
+import { getPauseId, getSelectedFrameId } from "../reducers/pause";
+import { getAllCachedPauseFrames } from "../utils/frames";
+
 export function getSelectedFrame(state: UIState) {
-  const { selectedFrameId, frames } = state.pause;
+  const pauseId = getPauseId(state);
+  const selectedFrameId = getSelectedFrameId(state);
+  const frames = getAllCachedPauseFrames(pauseId, state.sources);
   if (!selectedFrameId || !frames) {
     return null;
   }

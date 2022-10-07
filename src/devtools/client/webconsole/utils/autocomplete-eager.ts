@@ -3,19 +3,19 @@ import { ThreadFront } from "protocol/thread";
 import { useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { getPropertiesForObject, ObjectFetcher } from "ui/utils/autocomplete";
-import { Value } from "@replayio/protocol";
+import { PauseId, Value } from "@replayio/protocol";
 
 // Use eager eval to get the properties of the last complete object in the expression.
 // TODO I'm not sure how this is different than the scopes / properties parsing
 export async function getEvaluatedProperties(
   expression: string,
-  asyncIndex: number,
+  pauseId: PauseId,
   frameId: string | undefined,
   fetchObject: ObjectFetcher
 ): Promise<string[]> {
   try {
     const { returned, exception } = await ThreadFront.evaluateNew({
-      asyncIndex,
+      pauseId,
       frameId,
       text: expression,
       pure: true,
@@ -37,12 +37,12 @@ export async function getEvaluatedProperties(
 
 async function eagerEvaluateExpression(
   expression: string,
-  asyncIndex: number,
+  pauseId: PauseId,
   frameId?: string
 ): Promise<Value | null> {
   try {
     const { returned, exception } = await ThreadFront.evaluateNew({
-      asyncIndex,
+      pauseId,
       frameId,
       text: expression,
       pure: true,
@@ -69,7 +69,7 @@ export function useEagerEvaluateExpression() {
       if (!frame) {
         return null;
       }
-      return eagerEvaluateExpression(expression, frame.asyncIndex, frame.protocolId);
+      return eagerEvaluateExpression(expression, frame.pauseId, frame.protocolId);
     },
     [frame]
   );

@@ -13,7 +13,7 @@ import { getToolboxLayout } from "ui/reducers/layout";
 
 import actions from "../../actions";
 import { openQuickOpen as openQuickOpenAction } from "../../actions/quick-open";
-import { getSourcesForTabs, getIsPaused } from "../../selectors";
+import { getSourcesForTabs } from "../../selectors";
 import { isPretty } from "../../utils/source";
 
 import CommandPaletteButton from "./CommandPaletteButton";
@@ -22,7 +22,6 @@ import Tab from "./Tab";
 const mapStateToProps = (state: UIState) => ({
   selectedSource: getSelectedSource(state),
   tabSources: getSourcesForTabs(state),
-  isPaused: getIsPaused(state),
   toolboxLayout: getToolboxLayout(state),
 });
 
