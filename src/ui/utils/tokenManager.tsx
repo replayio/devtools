@@ -5,13 +5,14 @@ import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
 import { useRouter } from "next/router";
 import { listenForAccessToken } from "./browser";
+import { getAuthClientId, getAuthHost } from "./auth";
 
-const domain = "webreplay.us.auth0.com";
+const domain = getAuthHost();
 const audience = "https://api.replay.io";
 
 const tokenRefreshSecondsBeforeExpiry = 60;
 
-const clientId: string = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
+const clientId = getAuthClientId();
 
 export interface TokenState {
   external?: boolean;

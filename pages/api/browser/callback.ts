@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
 interface Token {
@@ -60,13 +61,16 @@ async function fulfillAuthRequest(id: string, token: string) {
 }
 
 async function fetchToken(code: string, verifier: string): Promise<Token> {
-  const resp = await fetch("https://webreplay.us.auth0.com/oauth/token", {
+  const host = getAuthHost();
+  const clientId = getAuthClientId();
+
+  const resp = await fetch(`https://${host}/oauth/token`, {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       audience: "https://api.replay.io",
       grant_type: "authorization_code",
-      client_id: "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo",
+      client_id: clientId,
       scope: "openid profile offline_access",
       code_verifier: verifier,
       code,

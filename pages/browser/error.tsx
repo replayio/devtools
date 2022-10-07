@@ -1,6 +1,7 @@
 import { useRouter } from "next/dist/client/router";
 import React, { useEffect } from "react";
 import { ExpectedErrorScreen } from "ui/components/shared/Error";
+import { getAuthHost } from "ui/utils/auth";
 import useAuth0 from "ui/utils/useAuth0";
 
 const BrowserError = () => {
@@ -29,6 +30,7 @@ const BrowserError = () => {
       "We received an unexpected authentication source. Did you mean to use an Enterprise SSO? Please try signing in again from the Replay browser.";
   }
 
+  const authHost = getAuthHost();
   const message = type === "auth" ? "Unable to Sign In" : "Unexpected recording error";
 
   return (
@@ -37,7 +39,7 @@ const BrowserError = () => {
         // CORS prevents fetch()-ing the logout URL and logout() wants to
         // redirect so this logs out the user silently so they can restart
         // the auth process cleanly
-        <iframe src="https://webreplay.us.auth0.com/v2/logout" style={{ height: 0, width: 0 }} />
+        <iframe src={`https://${authHost}/v2/logout`} style={{ height: 0, width: 0 }} />
       ) : null}
       <ExpectedErrorScreen
         error={{
