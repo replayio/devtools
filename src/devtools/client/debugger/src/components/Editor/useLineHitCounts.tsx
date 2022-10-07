@@ -1,21 +1,20 @@
+import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
+import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import { useMemo, useLayoutEffect, useRef } from "react";
 import { useFeature, useStringPref } from "ui/hooks/settings";
-import { getSelectedSourceId } from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import styles from "./LineHitCounts.module.css";
-
-import { resizeBreakpointGutter } from "../../utils/ui";
 import {
   fetchHitCounts,
   HitCount,
   getHitCountsForSource,
   getBoundsForLineNumber,
 } from "ui/reducers/hitCounts";
-import { UIState } from "ui/state";
-import type { SourceEditor } from "../../utils/editor/source-editor";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { getFocusRegion } from "ui/reducers/timeline";
-import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
+
+import styles from "./LineHitCounts.module.css";
 
 export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
   const { value: disableUnHitLines } = useFeature("disableUnHitLines");

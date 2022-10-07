@@ -1,20 +1,12 @@
-import debounce from "lodash/debounce";
-import { RefObject, useLayoutEffect, useRef, useState } from "react";
-import { isFirefox } from "ui/utils/environment";
+import { addBreakpointAtLine } from "devtools/client/debugger/src/actions/breakpoints";
+import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+import { updateCursorPosition, updateViewport } from "devtools/client/debugger/src/actions/ui";
 import {
-  getSelectedSource,
-  getSelectedLocation,
-  getSelectedSourceWithContent,
-  SourceDetails,
-  SourceContent,
-} from "ui/reducers/sources";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
-
-import { addBreakpointAtLine } from "../../actions/breakpoints";
-import { PartialLocation } from "../../actions/sources";
-import { updateCursorPosition, updateViewport } from "../../actions/ui";
-import { getSymbols, getThreadContext, SymbolEntry, ThreadContext } from "../../selectors";
+  getSymbols,
+  getThreadContext,
+  SymbolEntry,
+  ThreadContext,
+} from "devtools/client/debugger/src/selectors";
 import {
   showSourceText,
   showErrorMessage,
@@ -34,10 +26,26 @@ import {
   startOperation,
   endOperation,
   showLoading,
-} from "../../utils/editor";
-import type { EditorWithDoc, SourceEditor } from "../../utils/editor/source-editor";
-import { getIndentation } from "../../utils/indentation";
-import { resizeToggleButton, resizeBreakpointGutter } from "../../utils/ui";
+} from "devtools/client/debugger/src/utils/editor";
+import type {
+  EditorWithDoc,
+  SourceEditor,
+} from "devtools/client/debugger/src/utils/editor/source-editor";
+import { getIndentation } from "devtools/client/debugger/src/utils/indentation";
+import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
+import debounce from "lodash/debounce";
+import { RefObject, useLayoutEffect, useRef, useState } from "react";
+import { isFirefox } from "ui/utils/environment";
+import {
+  getSelectedSource,
+  getSelectedLocation,
+  getSelectedSourceWithContent,
+  SourceDetails,
+  SourceContent,
+} from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+
 import useHighlightedLines from "./useHighlightedLines";
 import useLineHitCounts from "./useLineHitCounts";
 
@@ -139,7 +147,8 @@ export default function useEditor(
   // Update editor and/or react to changed props after props render
   useLayoutEffect(() => {
     if (editor === null) {
-      // TODO Document why this is okay.
+      // This hook only uses prev props when there's an Editor.
+      // If the hook is called without an Editor (as part of mounting/remounting) we can bail out early.
       return;
     }
 
@@ -348,7 +357,7 @@ function scrollToLocationHelper(
     }
 
     if (shouldScrollToLocation) {
-      const line = toEditorLine(selectedLocation.line);
+      const line = toEditorLine(selectedLocation.line!);
 
       let column = 0;
       if (hasDocument(selectedSource!.id)) {

@@ -1,5 +1,23 @@
+import { Doc } from "codemirror";
 import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
+import { TempFrame } from "devtools/client/debugger/src/actions/pause/selectFrame";
+import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
+import {
+  getHighlightedLineRange,
+  getVisibleSelectedFrame,
+  HighlightedRange,
+} from "devtools/client/debugger/src/selectors";
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
+import {
+  toEditorLine,
+  endOperation,
+  startOperation,
+} from "devtools/client/debugger/src/utils/editor";
+import {
+  getDocument,
+  hasDocument,
+} from "devtools/client/debugger/src/utils/editor/source-documents";
 import { useLayoutEffect, useRef } from "react";
 import {
   getSelectedLocation,
@@ -7,17 +25,6 @@ import {
   SourceContent,
 } from "ui/reducers/sources";
 import { useAppSelector } from "ui/setup/hooks";
-import {
-  getHighlightedLineRange,
-  getVisibleSelectedFrame,
-  HighlightedRange,
-} from "../../selectors";
-import SourceEditor from "../../utils/editor/source-editor";
-import { toEditorLine, endOperation, startOperation } from "../../utils/editor";
-import { PartialLocation } from "../../actions/sources";
-import { TempFrame } from "../../actions/pause/selectFrame";
-import { getDocument, hasDocument } from "../../utils/editor/source-documents";
-import { Doc } from "codemirror";
 
 type PrevProps = {
   editorLine: number | null;
@@ -43,7 +50,8 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
   // Update highlighted line when selected location changes
   useLayoutEffect(() => {
     if (editor === null) {
-      // TODO Document why this is okay.
+      // This hook only uses prev props when there's an Editor.
+      // If the hook is called without an Editor (as part of mounting/remounting) we can bail out early.
       return;
     }
 

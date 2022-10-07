@@ -1,23 +1,27 @@
 import { PointDescription } from "@replayio/protocol";
-import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import classNames from "classnames";
-import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
-import hooks from "ui/hooks";
-import { shouldShowNag } from "ui/utils/user";
-import { Nag } from "ui/hooks/users";
-import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
-import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import { toggleLogpoint } from "devtools/client/debugger/src/actions/breakpoints/logpoints";
+import {
+  Breakpoint,
+  getBreakpointsForSelectedSource,
+} from "devtools/client/debugger/src/reducers/breakpoints";
+import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getExecutionPoint, getThreadContext } from "../../reducers/pause";
+import ReactDOM from "react-dom";
+import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
 import { seek } from "ui/actions/timeline";
+import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
 import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
-import SourceEditor from "../../utils/editor/source-editor";
+import { Nag } from "ui/hooks/users";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { shouldShowNag } from "ui/utils/user";
+
+import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 
 const QuickActionButton: FC<{
   children: ReactNode;

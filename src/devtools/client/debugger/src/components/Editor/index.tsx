@@ -1,4 +1,12 @@
 import classnames from "classnames";
+import { closeTab } from "devtools/client/debugger/src/actions/tabs";
+import {
+  getActiveSearch,
+  getThreadContext,
+  ThreadContext,
+} from "devtools/client/debugger/src/selectors";
+import { getDocument } from "devtools/client/debugger/src/utils/editor";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { RefObject, useEffect, useMemo, useRef, useState } from "react";
 import { ContextMenu, closeContextMenu } from "ui/actions/contextMenus";
 import GutterContextMenu from "ui/components/ContextMenu/GutterContextMenu";
@@ -8,11 +16,6 @@ import { EditorNag, NAG_HEIGHT } from "ui/components/shared/Nags/Nags";
 import { getContextMenu } from "ui/reducers/contextMenus";
 import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import { closeTab } from "../../actions/tabs";
-import { getActiveSearch, getThreadContext, ThreadContext } from "../../selectors";
-import { getDocument } from "../../utils/editor";
-import type { SourceEditor } from "../../utils/editor/source-editor";
 
 import Breakpoints from "./Breakpoints/Breakpoints";
 import ColumnBreakpoints from "./ColumnBreakpoints";
