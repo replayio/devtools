@@ -40,7 +40,6 @@ import { setUnexpectedError, setExpectedError } from "./errors";
 import { setViewMode } from "./layout";
 import { jumpToInitialPausePoint } from "./timeline";
 import { Action } from "@reduxjs/toolkit";
-import { getSourcesToDisplayByUrl } from "ui/reducers/sources";
 
 export { setUnexpectedError, setExpectedError };
 
@@ -62,6 +61,8 @@ export function getAccessibleRecording(
         if (expectedError) {
           dispatch(setExpectedError(expectedError));
           return null;
+        } else {
+          dispatch(selectors.clearExpectedError());
         }
       }
       return recording!;
