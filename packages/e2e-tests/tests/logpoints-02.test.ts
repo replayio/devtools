@@ -6,7 +6,7 @@ import { addLogpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`conditional log-points`, async ({ page }) => {
+test(`logpoints-02: conditional log-points`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

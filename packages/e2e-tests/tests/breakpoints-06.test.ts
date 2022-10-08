@@ -10,7 +10,7 @@ async function checkMessageLocation(page: Page, text: string, location: string) 
   expect(textContent!.includes(location)).toBeTruthy();
 }
 
-test(`Test log point in a sourcemapped file.`, async ({ page }) => {
+test(`breakpoints-06: Test log point in a sourcemapped file`, async ({ page }) => {
   await startTest(page, "doc_prod_bundle.html");
   await openDevToolsTab(page);
 

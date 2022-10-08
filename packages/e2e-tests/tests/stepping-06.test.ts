@@ -16,7 +16,7 @@ const url = "doc_async.html";
 
 // Because stepping works differently between gecko and chromium,
 // frame timeline percentages are different in this test.
-test(`Test stepping in async frames and async call stacks.`, async ({ page }) => {
+test(`stepping-06: Test stepping in async frames and async call stacks`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

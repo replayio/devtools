@@ -7,7 +7,7 @@ import { waitFor } from "../helpers/utils";
 
 const url = "doc_control_flow.html";
 
-test("repaints the screen screen when stepping over code that modifies the DOM", async ({
+test("repaint: repaints the screen screen when stepping over code that modifies the DOM", async ({
   page,
 }) => {
   await startTest(page, url);

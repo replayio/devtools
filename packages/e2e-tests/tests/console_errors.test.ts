@@ -8,7 +8,7 @@ import {
   verifyConsoleMessage,
 } from "../helpers/console-panel";
 
-test("Test that errors and warnings from various sources are shown in the console.", async ({
+test("console_errors: Test that errors and warnings from various sources are shown in the console", async ({
   page,
 }) => {
   await startTest(page, "doc_exceptions_bundle.html");

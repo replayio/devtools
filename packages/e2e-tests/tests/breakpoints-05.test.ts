@@ -10,7 +10,9 @@ import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_debugger_statements.html";
 
-test(`Test interaction of breakpoints with debugger statements.`, async ({ page }) => {
+test(`breakpoints-05: Test interaction of breakpoints with debugger statements`, async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openPauseInformationPanel(page);

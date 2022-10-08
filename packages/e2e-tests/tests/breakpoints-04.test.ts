@@ -7,7 +7,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 const url = "doc_control_flow.html";
 
 // Test hitting breakpoints when using tricky control flow constructs:
-test(`catch, finally, generators, and async/await.`, async ({ page }) => {
+test(`breakpoints-04: catch, finally, generators, and async/await`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

@@ -13,7 +13,7 @@ import {
 import { rewindToLine } from "../helpers/pause-information-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
-test("Test that scopes are rerendered.", async ({ page }) => {
+test("inspector-01: Test that scopes are rerendered", async ({ page }) => {
   await startTest(page, "doc_inspector_basic.html");
   await openDevToolsTab(page);
 

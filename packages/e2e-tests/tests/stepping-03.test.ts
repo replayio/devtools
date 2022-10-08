@@ -12,7 +12,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`Stepping past the beginning or end of a frame should act like a step-out.`, async ({
+test(`stepping-03: Stepping past the beginning or end of a frame should act like a step-out`, async ({
   page,
 }) => {
   await startTest(page, url);

@@ -7,7 +7,7 @@ import {
   openConsolePanel,
 } from "../helpers/console-panel";
 
-test("Test that stacktraces are sourcemapped.", async ({ page }) => {
+test("sourcemap_stacktrace: Test that stacktraces are sourcemapped", async ({ page }) => {
   await startTest(page, "cra/dist/index.html");
   await openDevToolsTab(page);
   await openConsolePanel(page);

@@ -5,7 +5,7 @@ import { rewindToLine, stepOverToLine } from "../helpers/pause-information-panel
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 import { addBreakpoint } from "../helpers/source-panel";
 
-test("Basic subprocess spawning", async ({ page }) => {
+test("node_worker-01: make sure node workers don't cause crashes", async ({ page }) => {
   await startTest(page, "node/run_worker.js");
 
   await openConsolePanel(page);

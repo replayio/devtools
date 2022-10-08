@@ -8,7 +8,7 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test("Test basic step-over/back functionality.", async ({ page }) => {
+test("stepping-01: Test basic step-over/back functionality", async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

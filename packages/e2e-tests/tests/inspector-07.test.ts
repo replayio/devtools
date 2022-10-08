@@ -10,7 +10,7 @@ import {
   selectNextElementsPanelSearchResult,
 } from "../helpers/elements-panel";
 
-test("Test that styles for elements can be viewed.", async ({ page }) => {
+test("inspector-07: Test that styles for elements can be viewed", async ({ page }) => {
   await startTest(page, "doc_inspector_shorthand.html");
   await openDevToolsTab(page);
   await openConsolePanel(page);

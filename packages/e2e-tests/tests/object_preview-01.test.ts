@@ -8,7 +8,7 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 
-test(`expressions in the console after time warping.`, async ({ page }) => {
+test(`object_preview-01: expressions in the console after time warping`, async ({ page }) => {
   await startTest(page, "doc_rr_objects.html");
   await openDevToolsTab(page);
   await openConsolePanel(page);

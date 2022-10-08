@@ -9,7 +9,7 @@ import {
 
 const url = "doc_rr_basic.html";
 
-test("support global console evaluations", async ({ page }) => {
+test("console_eval: support global console evaluations", async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openConsolePanel(page);

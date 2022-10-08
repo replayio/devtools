@@ -10,7 +10,7 @@ import {
 import { openSource } from "../helpers/source-explorer-panel";
 import { addLogpoint } from "../helpers/source-panel";
 
-test("Basic node logpoints", async ({ page }) => {
+test("node_logpoint-01: Basic node logpoints", async ({ page }) => {
   await startTest(page, "node/basic.js");
 
   await openConsolePanel(page);

@@ -13,7 +13,7 @@ import {
 } from "../helpers/pause-information-panel";
 import { warpToMessage, executeAndVerifyTerminalExpression } from "../helpers/console-panel";
 
-test("Test stepping in async frames and async call stacks", async ({ page }) => {
+test("node_stepping-01: Test stepping in async frames and async call stacks", async ({ page }) => {
   await startTest(page, "node/async.js");
 
   await openPauseInformationPanel(page);

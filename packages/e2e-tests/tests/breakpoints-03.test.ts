@@ -7,7 +7,7 @@ import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`Test stepping forward through breakpoints when rewound before the first one.`, async ({
+test(`breakpoints-03: Test stepping forward through breakpoints when rewound before the first one`, async ({
   page,
 }) => {
   await startTest(page, url);

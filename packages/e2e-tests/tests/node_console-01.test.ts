@@ -8,7 +8,7 @@ import {
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, waitForScopeValue } from "../helpers/pause-information-panel";
 
-test("Basic node console behavior", async ({ page }) => {
+test("node_console-01: Basic node console behavior", async ({ page }) => {
   await startTest(page, "node/basic.js");
   await openConsolePanel(page);
 

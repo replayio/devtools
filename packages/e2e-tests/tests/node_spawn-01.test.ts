@@ -4,7 +4,7 @@ import { startTest } from "../helpers";
 import { waitForScopeValue, waitForPaused } from "../helpers/pause-information-panel";
 import { openConsolePanel, warpToMessage } from "../helpers/console-panel";
 
-test("Basic subprocess spawning", async ({ page }) => {
+test("node_spawn: Basic subprocess spawning", async ({ page }) => {
   await startTest(page, "node/spawn.js");
 
   await openConsolePanel(page);

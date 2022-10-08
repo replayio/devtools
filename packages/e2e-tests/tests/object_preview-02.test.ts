@@ -15,7 +15,7 @@ import { toggleExpandable } from "../helpers/utils";
 
 const url = "doc_rr_objects.html";
 
-test(`should allow objects in scope to be inspected`, async ({ page }) => {
+test(`object_preview-02: should allow objects in scope to be inspected`, async ({ page }) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

@@ -8,11 +8,12 @@ import {
   warpToMessage,
 } from "../helpers/console-panel";
 import { reverseStepOverToLine, stepOverToLine } from "../helpers/pause-information-panel";
-import { delay } from "../helpers/utils";
 
 const url = "doc_rr_logs.html";
 
-test("support pausing, warping, stepping and evaluating console messages", async ({ page }) => {
+test("console_warp-02: support pausing, warping, stepping and evaluating console messages", async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
   await openConsolePanel(page);

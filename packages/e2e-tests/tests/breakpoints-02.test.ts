@@ -7,7 +7,9 @@ import { addBreakpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`Test unhandled divergence while evaluating at a breakpoint.`, async ({ page }) => {
+test(`breakpoints-02: Test unhandled divergence while evaluating at a breakpoint`, async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

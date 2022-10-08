@@ -11,7 +11,9 @@ import { addBreakpoint, addLogpoint, toggleMappedSources } from "../helpers/sour
 
 const url = "doc_prod_bundle.html";
 
-test(`Test scope mapping and switching between generated/original sources.`, async ({ page }) => {
+test(`object_preview-04: Test scope mapping and switching between generated/original sources`, async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 

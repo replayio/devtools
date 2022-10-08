@@ -12,7 +12,9 @@ import { addBreakpoint, addLogpoint } from "../helpers/source-panel";
 
 const url = "doc_rr_basic.html";
 
-test(`log-points appear in the correct order and allow time warping`, async ({ page }) => {
+test(`logpoints-01: log-points appear in the correct order and allow time warping`, async ({
+  page,
+}) => {
   await startTest(page, url);
   await openDevToolsTab(page);
 
