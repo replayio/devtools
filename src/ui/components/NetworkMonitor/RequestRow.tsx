@@ -4,6 +4,7 @@ import { Row } from "react-table";
 
 import styles from "./RequestTable.module.css";
 import { RequestSummary } from "./utils";
+import { getRequestById, getSummaryById } from "ui/reducers/network";
 
 export const RequestRow = ({
   currentTime,

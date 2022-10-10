@@ -7,6 +7,8 @@ import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
 import { isTimeInRegions } from "ui/utils/timeline";
+import { getSummaryById } from "ui/reducers/network";
+import { UIState } from "ui/state";
 
 import { ContextMenu } from "../ContextMenu";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
@@ -45,6 +47,7 @@ const RequestTable = ({
   const dispatch = useAppDispatch() as AppDispatch;
   const loadedRegions = useAppSelector(getLoadedRegions);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
+  const [showCopied, setShowCopied] = useState(true);
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
@@ -78,73 +81,100 @@ const RequestTable = ({
     }
   };
 
+  const copyAsCurl = () => {
+    setContextMenuData(null);
+    navigator.clipboard.writeText("curl '" + contextMenuData.row.values.url + "'");
+
+    setShowCopied(true);
+    setTimeout(() => setShowCopied(false), 2700);
+    setTimeout(() => document.getElementById("showCopied").classList.remove("opacity-100"), 2000);
+    setTimeout(() => document.getElementById("showCopied").classList.add("opacity-0"), 2000);
+  };
+
   let inPast = true;
 
   return (
-    <div className={classNames("no-scrollbar min-w-full bg-bodyBgcolor", className)}>
-      {/* Relative here helps with when the timeline goes past the last request*/}
-      <div
-        className={classNames("flex h-full w-full flex-col overflow-x-auto", styles.request)}
-        {...getTableProps()}
-      >
-        <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
-        <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
-          {rows.map((row: Row<RequestSummary>) => {
-            let firstInFuture = false;
-            if (inPast && row.original.point.time >= currentTime) {
-              inPast = false;
-              firstInFuture = true;
-            }
+    <>
+      <div className={classNames("no-scrollbar min-w-full bg-bodyBgcolor", className)}>
+        {/* Relative here helps with when the timeline goes past the last request*/}
+        <div
+          className={classNames("flex h-full w-full flex-col overflow-x-auto", styles.request)}
+          {...getTableProps()}
+        >
+          <HeaderGroups columns={columns as any} headerGroups={headerGroups} />
+          {showCopied ? (
+            <div className="absolute z-50 grid h-56 grid-cols-1 content-end place-self-center">
+              <div
+                id="showCopied"
+                className="mb-1.5 flex shrink rounded-lg bg-black p-1.5 text-center text-white opacity-100 shadow-2xl transition-all duration-700 ease-in-out"
+              >
+                Copied to clipboard
+              </div>
+            </div>
+          ) : null}
+          <div className="relative w-fit min-w-full overflow-y-auto" {...getTableBodyProps()}>
+            {rows.map((row: Row<RequestSummary>) => {
+              let firstInFuture = false;
+              if (inPast && row.original.point.time >= currentTime) {
+                inPast = false;
+                firstInFuture = true;
+              }
 
-            const isInLoadedRegion = loadedRegions
-              ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
-              : false;
+              const isInLoadedRegion = loadedRegions
+                ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
+                : false;
 
-            prepareRow(row);
+              prepareRow(row);
 
-            return (
-              <RequestRow
-                currentTime={currentTime}
-                isFirstInFuture={firstInFuture}
-                isInLoadedRegion={isInLoadedRegion}
-                isInPast={inPast}
-                isSelected={selectedRequest?.id === row.original.id}
-                key={row.getRowProps().key}
-                onClick={onRowSelect}
-                onSeek={onSeek}
-                row={row}
-                showContentMenuAt={setContextMenuData}
-              />
-            );
-          })}
-          <div
-            className={classNames({
-              [styles.current]: data.every(r => (r.point?.time || 0) < currentTime),
-              [styles.end]: data.every(r => (r.point?.time || 0) < currentTime),
+              return (
+                <RequestRow
+                  currentTime={currentTime}
+                  isFirstInFuture={firstInFuture}
+                  isInLoadedRegion={isInLoadedRegion}
+                  isInPast={inPast}
+                  isSelected={selectedRequest?.id === row.original.id}
+                  key={row.getRowProps().key}
+                  onClick={onRowSelect}
+                  onSeek={onSeek}
+                  row={row}
+                  showContentMenuAt={setContextMenuData}
+                />
+              );
             })}
-          />
+            <div
+              className={classNames({
+                [styles.current]: data.every(r => (r.point?.time || 0) < currentTime),
+                [styles.end]: data.every(r => (r.point?.time || 0) < currentTime),
+              })}
+            />
+          </div>
         </div>
+        {contextMenuData !== null && (
+          <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
+            <Dropdown>
+              <DropdownItem onClick={setFocusStart}>
+                <>
+                  <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
+                  Set focus start
+                </>
+              </DropdownItem>
+              <DropdownItem onClick={setFocusEnd}>
+                <>
+                  <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
+                  Set focus end
+                </>
+              </DropdownItem>
+              <DropdownItem onClick={copyAsCurl}>
+                <>
+                  <Icon filename="copy" className="mr-4 bg-iconColor" size="large" />
+                  Copy as cURL
+                </>
+              </DropdownItem>
+            </Dropdown>
+          </ContextMenu>
+        )}
       </div>
-
-      {contextMenuData !== null && (
-        <ContextMenu x={contextMenuData.pageX} y={contextMenuData.pageY} close={closeContextMenu}>
-          <Dropdown>
-            <DropdownItem onClick={setFocusStart}>
-              <>
-                <Icon filename="set-focus-start" className="mr-4 bg-iconColor" size="large" />
-                Set focus start
-              </>
-            </DropdownItem>
-            <DropdownItem onClick={setFocusEnd}>
-              <>
-                <Icon filename="set-focus-end" className="mr-4 bg-iconColor" size="large" />
-                Set focus end
-              </>
-            </DropdownItem>
-          </Dropdown>
-        </ContextMenu>
-      )}
-    </div>
+    </>
   );
 };
 

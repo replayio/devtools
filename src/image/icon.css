@@ -161,6 +161,10 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/video.svg);
 }
 
+.icon.copy {
+  -webkit-mask-image: url(/icons/copy.svg);
+}
+
 /* global loader component */
 
 .icon.cloud {
