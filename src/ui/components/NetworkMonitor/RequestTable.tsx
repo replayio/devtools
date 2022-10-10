@@ -47,7 +47,7 @@ const RequestTable = ({
   const dispatch = useAppDispatch() as AppDispatch;
   const loadedRegions = useAppSelector(getLoadedRegions);
   const [contextMenuData, setContextMenuData] = useState<ContextMenuData | null>(null);
-  const [showCopied, setShowCopied] = useState(true);
+  const [showCopied, setShowCopied] = useState(false);
 
   const onSeek = (request: RequestSummary) => {
     trackEvent("net_monitor.seek_to_request");
