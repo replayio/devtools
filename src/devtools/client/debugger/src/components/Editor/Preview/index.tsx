@@ -1,22 +1,15 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 import type { SourceLocation } from "@replayio/protocol";
-import React, { PureComponent } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import debounce from "lodash/debounce";
-
-import type { UIState } from "ui/state";
-
-import Popup from "./Popup";
-
-import { getPreview, getThreadContext } from "../../../selectors";
-import actions from "../../../actions";
-import { PreviewHighlight } from "./PreviewHighlight";
-
 import { updatePreview } from "devtools/client/debugger/src/actions/preview";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
+import debounce from "lodash/debounce";
+import React, { PureComponent } from "react";
+import { connect, ConnectedProps } from "react-redux";
+import type { UIState } from "ui/state";
+
+import { getPreview, getThreadContext } from "../../../selectors";
+
+import Popup from "./Popup";
+import { PreviewHighlight } from "./PreviewHighlight";
 
 const mapStateToProps = (state: UIState) => {
   return {
@@ -68,6 +61,7 @@ class Preview extends PureComponent<PreviewProps, PreviewState> {
   updateListeners() {
     const { codeMirror } = this.props.editor;
     const codeMirrorWrapper = codeMirror.getWrapperElement();
+
     codeMirror.on("tokenenter", this.onTokenEnter);
     codeMirror.on("tokenleave", this.onTokenLeave);
     codeMirror.on("scroll", this.onScroll);

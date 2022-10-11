@@ -1,12 +1,8 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 import Popover from "devtools/client/debugger/src/components/shared/Popover";
 import { previewCleared } from "devtools/client/debugger/src/reducers/preview";
 import type { PreviewState } from "devtools/client/debugger/src/reducers/preview";
 import { getThreadContext } from "devtools/client/debugger/src/selectors";
-import React from "react";
+import { useCallback } from "react";
 import { useAppSelector, useAppDispatch } from "ui/setup/hooks";
 
 import NewObjectInspector from "./NewObjectInspector";
@@ -21,24 +17,25 @@ export function Popup({ editorRef, target, preview }: PopupProps) {
   const dispatch = useAppDispatch();
   const cx = useAppSelector(getThreadContext);
 
-  const onMouseOut = () => {
-    dispatch(previewCleared({ cx, previewId: preview!.previewId }));
-  };
+  let previewId: string | null = null;
+  let value = null;
+  if (preview !== null) {
+    previewId = preview.previewId;
+    value = preview.value;
+  }
 
-  const { cursorPos, value } = preview!;
+  const onMouseLeave = useCallback(() => {
+    if (previewId !== null) {
+      dispatch(previewCleared({ cx, previewId }));
+    }
+  }, [cx, dispatch, previewId]);
 
   if (value === null) {
     return null;
   }
 
   return (
-    <Popover
-      targetPosition={cursorPos}
-      type="popover"
-      editorRef={editorRef}
-      target={target}
-      mouseout={onMouseOut}
-    >
+    <Popover container={editorRef} onMouseLeave={onMouseLeave} showTail={true} target={target}>
       <NewObjectInspector protocolValue={value} />
     </Popover>
   );
