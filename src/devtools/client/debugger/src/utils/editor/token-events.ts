@@ -53,7 +53,7 @@ function isValidToken(target: HTMLElement | null) {
     return false;
   }
 
-  const invalidContainers = [".popover", ".breakpont-panel", ".panel-editor"];
+  const invalidContainers = ['[data-test-name="Popover"]', ".breakpont-panel", ".panel-editor"];
   if (invalidContainers.some(selector => target.closest(selector))) {
     return false;
   }
@@ -66,7 +66,7 @@ function dispatch(codeMirror: $FixTypeLater, eventName: string, data: any) {
 }
 
 function invalidLeaveTarget(target: HTMLElement | null) {
-  if (!target || target.closest(".popover")) {
+  if (!target || target.closest('[data-test-name="Popover"]')) {
     return true;
   }
 

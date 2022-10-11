@@ -1,0 +1,40 @@
+.Popover {
+  position: absolute;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  padding: 0.125rem 0;
+}
+
+.Children {
+  max-width: 400px;
+  max-height: 400px;
+  height: auto;
+  overflow: auto;
+  font-size: var(--theme-code-font-size);
+  background-color: var(--theme-base-100);
+  border: 1px solid var(--body-color);
+}
+
+.UpArrow,
+.DownArrow {
+  height: 0.5rem;
+  width: 1rem;
+  z-index: 21;
+}
+.UpArrow {
+  order: 0;
+  margin-bottom: -1px;
+}
+.DownArrow {
+  transform: rotate(180deg);
+  margin-top: -1px;
+  order: 1;
+}
+
+.ArrowBackground {
+  fill: white;
+}
+.ArrowForeground {
+  fill: black;
+}

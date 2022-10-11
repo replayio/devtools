@@ -40,7 +40,6 @@ import "devtools/client/debugger/src/components/Editor/Breakpoints/Panel/Panel.c
 import "devtools/client/debugger/src/components/Editor/Editor.css";
 import "devtools/client/debugger/src/components/Editor/Footer.css";
 import "devtools/client/debugger/src/components/Editor/LineNumberTooltip.css";
-import "devtools/client/debugger/src/components/Editor/Preview/Popup.css";
 import "devtools/client/debugger/src/components/Editor/SearchBar.css";
 import "devtools/client/debugger/src/components/Editor/Tabs.css";
 import "devtools/client/debugger/src/components/SourceOutline/Outline.css";
@@ -65,7 +64,6 @@ import "devtools/client/debugger/src/components/shared/Dropdown.css";
 import "devtools/client/debugger/src/components/shared/ManagedTree.css";
 import "devtools/client/debugger/src/components/shared/menu.css";
 import "devtools/client/debugger/src/components/shared/Modal.css";
-import "devtools/client/debugger/src/components/shared/Popover.css";
 import "devtools/client/debugger/src/components/shared/PreviewFunction.css";
 import "devtools/client/debugger/src/components/shared/ResultList.css";
 import "devtools/client/debugger/src/components/shared/SearchInput.css";
