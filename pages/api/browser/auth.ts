@@ -2,6 +2,9 @@ import cookie from "cookie";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
 
+// patch in node-fetch for pingTelemetry without adding it to the FE bundle
+globalThis.fetch = globalThis.fetch || require("node-fetch");
+
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
 const getAppUrl = (path: string) =>
   `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
