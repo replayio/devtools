@@ -21,7 +21,6 @@ import { persistTabs } from "devtools/client/debugger/src/utils/tabs";
 import { getTabs } from "devtools/client/debugger/src/reducers/tabs";
 import { getTheme } from "ui/reducers/app";
 import { getRecording } from "ui/hooks/recordings";
-import { getPendingBreakpoints } from "devtools/client/debugger/src/selectors";
 
 export interface ReplaySessions {
   [id: string]: ReplaySession;
@@ -61,9 +60,7 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
 }
 
 const updateStandardPrefs = createPrefsUpdater(prefs);
-const updateAsyncPrefs = createPrefsUpdater(asyncStore);
 const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
-const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
 export const updatePrefs = (state: UIState, oldState: UIState) => {
   updateStandardPrefs(state, oldState, "theme", getTheme);
@@ -94,10 +91,6 @@ export const updatePrefs = (state: UIState, oldState: UIState) => {
     );
   }
 
-  if (state.pendingBreakpoints && oldState.pendingBreakpoints) {
-    // @ts-ignore `asyncStoreHelper` is untyped, so TS doesn't know keys here
-    updateDebuggerAsyncPrefs(state, oldState, "pendingBreakpoints", getPendingBreakpoints);
-  }
   maybeUpdateReplaySessions(state);
 };
 

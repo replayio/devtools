@@ -7,21 +7,10 @@ import type { ThreadFront as TF } from "protocol/thread";
 import type { UIStore } from "ui/actions";
 import { allSourcesReceived } from "ui/reducers/sources";
 
-import { initialBreakpointsState } from "../reducers/breakpoints";
-import { asyncStore, verifyPrefSchema } from "../utils/prefs";
+import { verifyPrefSchema } from "../utils/prefs";
 
 import { resumed, paused } from "../actions/pause";
 
-export async function loadInitialState() {
-  // @ts-expect-error missing `pendingBreakpoints` field
-  const pendingBreakpoints = await asyncStore.pendingBreakpoints;
-  const breakpoints = initialBreakpointsState();
-
-  return {
-    pendingBreakpoints,
-    breakpoints,
-  };
-}
 let store: UIStore;
 
 async function setupDebugger(ThreadFront: typeof TF) {

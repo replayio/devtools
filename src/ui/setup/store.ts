@@ -18,8 +18,6 @@ import layoutReducer from "ui/reducers/layout";
 import tabsReducer from "devtools/client/debugger/src/reducers/tabs";
 
 import { context } from "ui/setup/redux/middleware/context";
-import hitCounts from "ui/reducers/hitCounts";
-import possibleBreakpoints from "ui/reducers/possibleBreakpoints";
 import protocolMessages from "ui/reducers/protocolMessages";
 import sources from "ui/reducers/sources";
 
@@ -42,9 +40,7 @@ type ReduxDevToolsOptions = Exclude<
 let reducers = {
   app: appReducer,
   sources: sources,
-  hitCounts: hitCounts,
   layout: layoutReducer,
-  possibleBreakpoints: possibleBreakpoints,
   protocolMessages: protocolMessages,
   tabs: tabsReducer,
 } as unknown as UIStateReducers;
@@ -96,7 +92,6 @@ const reduxDevToolsOptions: ReduxDevToolsOptions = {
     "protocolMessages/responseReceived",
     "protocolMessages/errorReceived",
     "protocolMessages/requestSent",
-    "app/setHoveredLineNumberLocation",
     "app/durationSeen",
     "timeline/setPlaybackPrecachedTime",
   ],
