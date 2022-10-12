@@ -20034,10 +20034,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-devtools-inline_4_17_0@npm:react-devtools-inline@4.17.0":
-  version: 4.17.0
-  resolution: "react-devtools-inline@npm:4.17.0"
-  checksum: 0d7766bdfd3bbdcd629b91a77fc45acd1455971ea3663cd4550d9a865247b6ef28407f758770be1ff1cb6d471ed677ac1b10c9400cd5164dc86380e3196cdea7
+"react-devtools-inline_4_18_0@npm:react-devtools-inline@4.18.0":
+  version: 4.18.0
+  resolution: "react-devtools-inline@npm:4.18.0"
+  checksum: f7ce6ea90bb2bf3b554927fd34f36eb3f6d458ad4ba9b7c4c6070b4f9601e9765bcdc8348715f58e29157ffb6020d298f3d0b5bef77c930ed397ecda450168c2
   languageName: node
   linkType: hard
 
@@ -20650,7 +20650,7 @@ __metadata:
     react-circular-progressbar: ^2.0.4
     react-codemirror2: ^7.2.1
     react-devtools-inline: ^4.24.5
-    react-devtools-inline_4_17_0: "npm:react-devtools-inline@4.17.0"
+    react-devtools-inline_4_18_0: "npm:react-devtools-inline@4.18.0"
     react-dom: 0.0.0-experimental-1e5245df8-20220817
     react-dom-factories: ^1.0.2
     react-is: ^18.2.0

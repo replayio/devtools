@@ -325,7 +325,7 @@ async function loadReactDevToolsInlineModuleFromProtocol(
     if (version >= 2) {
       stateUpdaterCallback(await import("react-devtools-inline/frontend"));
     } else if (version === 1) {
-      stateUpdaterCallback(await import("react-devtools-inline_4_17_0/frontend"));
+      stateUpdaterCallback(await import("react-devtools-inline_4_18_0/frontend"));
     }
   }
 }
