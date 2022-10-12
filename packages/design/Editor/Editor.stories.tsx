@@ -15,7 +15,6 @@ async function handleSubmit(event) {
   const formData = Object.fromEntries(data.entries());
   const body = JSON.stringify(formData);
   const response = await fetch(form.action, {
-
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: body,

@@ -44,18 +44,6 @@ export function useMonaco({
           id,
           lineNumbers,
           fontSize,
-          onOpenEditor: input => {
-            const [base, filename] = input.resource.path
-              .replace("/node_modules/", "") // trim node_modules prefix used by Monaco Editor
-              .replace(".d.ts", "") // trim .d.ts suffix from decalaration
-              .split("/"); // finally split the path into an array
-            if (base === "components" || base === "hooks") {
-              window.open(
-                filename === "index" ? `/${base}` : `/${base}/${kebabCase(filename)}`,
-                "_blank"
-              );
-            }
-          },
         });
         if (onMount) {
           /**

@@ -7,7 +7,7 @@ import * as monacoEditor from "monaco-editor/esm/vs/editor/editor.api";
 
 // import theme from "./theme.json";
 
-import defineTheme from "./define-theme";
+// import defineTheme from "./define-theme";
 
 export type Monaco = typeof monacoEditor;
 
@@ -70,12 +70,13 @@ export async function initializeMonaco({
     automaticLayout: true,
     language: "typescript",
     contextmenu: false,
-    theme: "vs-dark",
+    theme: "vs-light",
     formatOnPaste: true,
     formatOnType: true,
     minimap: { enabled: false },
   });
 
+  /** Example of injecting a view zone */
   const lineNumber = 5;
 
   editor.changeViewZones(changeAccessor => {
@@ -88,7 +89,12 @@ export async function initializeMonaco({
     });
 
     /** Inject Print Statement Panel here */
-    domNode.style.background = "#5b5f62";
+    domNode.style.background = "#ccc";
+  });
+
+  /** Prevent editor from being focused (more aggressive read-only mode) */
+  editor.onDidFocusEditorText(() => {
+    (document.activeElement as HTMLElement)?.blur();
   });
 
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
@@ -109,9 +115,7 @@ export async function initializeMonaco({
       );
     });
 
-  /**
-   * Convert VS Code theme to Monaco theme
-   */
+  /** Convert VS Code theme to Monaco theme */
   // defineTheme(monaco, theme);
 
   // await wireTmGrammars(monaco, registry, grammars);
