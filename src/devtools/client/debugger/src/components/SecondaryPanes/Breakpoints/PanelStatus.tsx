@@ -1,7 +1,6 @@
 import { TimeStampedPoint } from "@replayio/protocol";
-import { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
 import sortedLastIndex from "lodash/sortedLastIndex";
-import { HitPointStatus } from "shared/client/types";
+import { Badge, HitPointStatus } from "shared/client/types";
 import { getPrefixBadgeBackgroundColorClassName } from "ui/components/PrefixBadge";
 import { getCurrentTime } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -22,7 +21,7 @@ export function PanelStatus({
 }: {
   hitPoints: TimeStampedPoint[] | null;
   hitPointStatus: HitPointStatus | null;
-  prefixBadge: PrefixBadge;
+  prefixBadge: Badge;
 }) {
   const time = useAppSelector(getCurrentTime);
   const hitPointsLength = hitPoints === null ? 0 : hitPoints.length;

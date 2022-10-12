@@ -1,13 +1,11 @@
 import type { PointDescription, Location } from "@replayio/protocol";
-import { getLocationKey } from "devtools/client/debugger/src/utils/breakpoint";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
+import { Suspense } from "react";
 import { useAppSelector } from "ui/setup/hooks";
+import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
 import { selectors } from "ui/reducers";
-import { HoveredItem } from "ui/state/timeline";
 
 import Marker from "./Marker";
-import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
-import { Suspense } from "react";
 
 function PreviewMarkers() {
   const currentTime = useAppSelector(selectors.getCurrentTime);
@@ -29,7 +27,6 @@ function PreviewMarkers() {
     <div className="preview-markers-container">
       {hitPoints.map((point: PointDescription, index: number) => {
         const isPrimaryHighlighted = hoveredItem?.point === point.point;
-        const isSecondaryHighlighted = getIsSecondaryHighlighted(hoveredItem, point.frame?.[0]);
 
         return (
           <Marker
@@ -40,7 +37,6 @@ function PreviewMarkers() {
             location={point.frame?.[0]}
             currentTime={currentTime}
             isPrimaryHighlighted={isPrimaryHighlighted}
-            isSecondaryHighlighted={isSecondaryHighlighted}
             zoomRegion={zoomRegion}
             overlayWidth={timelineDimensions.width}
           />
@@ -48,17 +44,6 @@ function PreviewMarkers() {
       })}
     </div>
   );
-}
-
-function getIsSecondaryHighlighted(
-  hoveredItem: HoveredItem | null,
-  location: Location | undefined
-): boolean {
-  if (hoveredItem?.target == "console" || !location || !hoveredItem?.location) {
-    return false;
-  }
-
-  return getLocationKey(hoveredItem.location) == getLocationKey(location);
 }
 
 export default function ToggleWidgetButtonSuspenseWrapper() {

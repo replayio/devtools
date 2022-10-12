@@ -197,11 +197,11 @@ function ToggleWidgetButton({ editor }: Props) {
     }
 
     const onLineEnter = ({
-      lineNumberNode,
       lineNumber,
+      lineNumberNode,
     }: {
-      lineNumberNode: HTMLElement;
       lineNumber: number;
+      lineNumberNode: HTMLElement;
     }) => {
       setHoveredLineNumber(lineNumber);
       setTargetNode(lineNumberNode);

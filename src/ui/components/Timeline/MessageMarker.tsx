@@ -1,13 +1,10 @@
 import React from "react";
 import { useAppSelector } from "ui/setup/hooks";
 import { selectors } from "ui/reducers";
+
 import Marker from "./Marker";
 
-export default function MessageMarker({
-  message,
-  isPrimaryHighlighted,
-  isSecondaryHighlighted,
-}: MessageMarkerProps) {
+export default function MessageMarker({ message, isPrimaryHighlighted }: MessageMarkerProps) {
   const { executionPoint, executionPointTime, frame, pauseId, executionPointHasFrames } = message;
 
   const zoomRegion = useAppSelector(selectors.getZoomRegion);
@@ -23,7 +20,6 @@ export default function MessageMarker({
       pauseId={pauseId}
       currentTime={currentTime}
       isPrimaryHighlighted={isPrimaryHighlighted}
-      isSecondaryHighlighted={isSecondaryHighlighted}
       zoomRegion={zoomRegion}
       overlayWidth={overlayWidth}
     />
@@ -33,5 +29,4 @@ export default function MessageMarker({
 type MessageMarkerProps = {
   message: any;
   isPrimaryHighlighted: boolean;
-  isSecondaryHighlighted: boolean;
 };

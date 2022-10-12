@@ -1,9 +1,9 @@
-import type { PrefixBadge } from "devtools/client/debugger/src/reducers/types";
-import * as React from "react";
 import classNames from "classnames";
 import { motion } from "framer-motion";
-import { Picker } from "./Picker";
+import * as React from "react";
+import { Badge } from "shared/client/types";
 
+import { Picker } from "./Picker";
 import styles from "./PrefixBadgePicker.module.css";
 
 export const badges = ["unicorn", "green", "yellow", "orange", "purple"] as const;
@@ -17,21 +17,21 @@ export function PrefixBadgePicker({
   onSelect,
 }: {
   /** The current selected badge. */
-  initialValue?: PrefixBadge | undefined;
+  initialValue?: Badge | undefined;
 
   /** Callback when a badge has been selected. */
-  onSelect?: (prefixBadge?: PrefixBadge) => void;
+  onSelect?: (prefixBadge: Badge | undefined) => void;
 }) {
-  const [activeBadge, setActiveBadge] = React.useState<PrefixBadge | undefined>(initialValue);
-  const handleSelect = (prefixBadgeName: PrefixBadge | undefined) => {
+  const [activeBadge, setActiveBadge] = React.useState<Badge | undefined>(initialValue);
+  const handleSelect = (prefixBadgeName: Badge | undefined) => {
     setActiveBadge(prefixBadgeName);
     onSelect?.(prefixBadgeName);
   };
 
   return (
     <div className="z-10 flex" style={{ width: 26, height: 26 }}>
-      <Picker<PrefixBadge | undefined>
-        value={activeBadge}
+      <Picker<Badge | undefined>
+        value={activeBadge || undefined}
         onChange={handleSelect}
         className={styles.PrefixBadgePicker}
       >

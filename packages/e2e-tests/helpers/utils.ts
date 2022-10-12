@@ -18,20 +18,24 @@ export async function clearTextArea(page: Page, textArea: Locator) {
 }
 
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
-export async function debugPrint(page: Page, message: string, scope?: string) {
+export async function debugPrint(page: Page | null, message: string, scope?: string) {
   console.log(message, scope ? chalk.dim(`(${scope})`) : "");
 
-  await page.evaluate(
-    ({ message, scope }) => {
-      console.log(`${message} %c${scope || ""}`, "color: #999;");
-    },
-    { message, scope }
-  );
+  if (page !== null) {
+    await page.evaluate(
+      ({ message, scope }) => {
+        console.log(`${message} %c${scope || ""}`, "color: #999;");
+      },
+      { message, scope }
+    );
+  }
 }
 
 // This helper can be useful when debugging tests but should not be used in committed tests.
 // (In other words, don't commit code that relies on this in order to work.)
 export function delay(timeout: number) {
+  debugPrint(null, `Delaying for ${chalk.bold(timeout)}ms`, "delay");
+
   return new Promise(resolve => setTimeout(resolve, timeout));
 }
 
