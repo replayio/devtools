@@ -1,41 +1,27 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
-import { PureComponent } from "react";
 import classnames from "classnames";
-import { actions } from "ui/actions";
-import { connect, ConnectedProps } from "react-redux";
-
-import type { Context } from "../../../reducers/pause";
 import { getDocument, toEditorLine } from "devtools/client/debugger/src/utils/editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
-import { isBreakable, isLogpoint } from "../../../utils/breakpoint";
-import type { Breakpoint as BreakpointType } from "../../../reducers/types";
+import { PureComponent } from "react";
+import { Point, PointId } from "shared/client/types";
 import type { SourceDetails } from "ui/reducers/sources";
 
 const breakpointSvg = document.createElement("div");
 breakpointSvg.innerHTML =
   '<svg viewBox="0 0 60 15" width="60" height="15"><path d="M53.07.5H1.5c-.54 0-1 .46-1 1v12c0 .54.46 1 1 1h51.57c.58 0 1.15-.26 1.53-.7l4.7-6.3-4.7-6.3c-.38-.44-.95-.7-1.53-.7z"/></svg>';
 
-const connector = connect(null, {
-  removeBreakpointsAtLine: actions.removeBreakpointsAtLine,
-});
-
 type $FixTypeLater = any;
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
-type BreakpointProps = PropsFromRedux & {
-  breakpoint: BreakpointType;
+type BreakpointProps = {
+  deletePoints: (...ids: PointId[]) => void;
+  editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
   editor: $FixTypeLater;
-  cx: Context;
+  point: Point;
+  points: Point[];
   selectedSource: SourceDetails;
 };
 
-class Breakpoint extends PureComponent<BreakpointProps> {
+export default class Breakpoint extends PureComponent<BreakpointProps> {
   componentDidMount() {
     this.addBreakpoint(this.props);
   }
@@ -63,7 +49,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   onClick = (event: any) => {
-    const { cx, breakpoint, removeBreakpointsAtLine } = this.props;
+    const { deletePoints, editPoint, point, points } = this.props;
 
     // ignore right clicks
     if ((event.ctrlKey && event.button === 0) || event.button === 2) {
@@ -73,9 +59,15 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     event.stopPropagation();
     event.preventDefault();
 
-    const selectedLocation = breakpoint.location;
-
-    return removeBreakpointsAtLine(cx, selectedLocation.sourceId, selectedLocation.line);
+    if (point.shouldLog) {
+      editPoint(point.id, { shouldBreak: false });
+    } else {
+      deletePoints(
+        ...points
+          .filter(({ location }) => location.line === point.location.line)
+          .map(({ id }) => id)
+      );
+    }
   };
 
   onContextMenu = (event: any) => {
@@ -86,10 +78,10 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   };
 
   addBreakpoint(props: BreakpointProps) {
-    const { breakpoint, editor, selectedSource } = props;
-    const selectedLocation = breakpoint.location;
+    const { point, editor, selectedSource } = props;
+    const selectedLocation = point.location;
 
-    if (!selectedSource || !isBreakable(breakpoint)) {
+    if (!selectedSource || !point.shouldBreak) {
       return;
     }
 
@@ -104,13 +96,13 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     editor.codeMirror.addLineClass(line, "line", "new-breakpoint");
     editor.codeMirror.removeLineClass(line, "line", "breakpoint-disabled");
 
-    if (breakpoint.disabled) {
+    if (!point.shouldBreak) {
       editor.codeMirror.addLineClass(line, "line", "breakpoint-disabled");
     }
   }
 
   removeBreakpoint(props: BreakpointProps) {
-    const { selectedSource, breakpoint } = props;
+    const { selectedSource, point } = props;
     if (!selectedSource) {
       return;
     }
@@ -122,7 +114,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
       return;
     }
 
-    const selectedLocation = breakpoint.location;
+    const selectedLocation = point.location;
     const line = toEditorLine(selectedLocation.line);
 
     // @ts-expect-error method doesn't exist on Doc
@@ -137,5 +129,3 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     return null;
   }
 }
-
-export default connector(Breakpoint);

@@ -25,14 +25,6 @@ export type Mode =
 export type ThreadId = string;
 
 /**
- * Breakpoint ID
- *
- * @memberof types
- * @static
- */
-export type BreakpointId = string;
-
-/**
  * Source ID
  *
  * @memberof types
@@ -119,35 +111,6 @@ export type ASTLocation = {
 };
 
 /**
- * Breakpoint is associated with a Source.
- *
- * @memberof types
- * @static
- */
-export type Breakpoint = {
-  readonly id: BreakpointId;
-  readonly location: Location & { sourceUrl: string };
-  readonly disabled: boolean;
-  readonly text: string;
-  readonly originalText: string;
-  readonly options: BreakpointOptions;
-};
-
-export type PrefixBadge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
-
-/**
- * Options for a breakpoint that can be modified by the user.
- */
-export type BreakpointOptions = {
-  hidden?: boolean;
-  condition?: string | null;
-  logValue?: string | null;
-  logGroupId?: string | null;
-  shouldPause?: boolean;
-  prefixBadge?: PrefixBadge;
-};
-
-/**
  * XHR Breakpoint
  * @memberof types
  * @static
@@ -158,14 +121,6 @@ export type XHRBreakpoint = {
   readonly loading: boolean;
   readonly disabled: boolean;
   readonly text: string;
-};
-
-export type PendingBreakpoint = {
-  readonly location: Location & { sourceUrl: string };
-  readonly generatedLocation?: PendingLocation;
-  readonly disabled: boolean;
-  readonly text?: string;
-  readonly options: BreakpointOptions;
 };
 
 export type FrameId = string;

@@ -1,131 +1,109 @@
-import React, { PureComponent } from "react";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import classnames from "classnames";
-import { connect } from "react-redux";
-const { getContext } = require("devtools/client/debugger/src/selectors");
-import PanelForm, { SubmitButton } from "./PanelForm";
-import actions from "devtools/client/debugger/src/actions";
-import { UIState } from "ui/state";
+import { parser } from "devtools/client/debugger/src/utils/bootstrap";
+import { useContext, useState } from "react";
+import { Point } from "shared/client/types";
+import { trackEvent } from "ui/utils/telemetry";
 
-interface Props {
+import { PanelInput } from "./PanelInput";
+
+export default function PanelEditor({
+  inputToFocus,
+  point,
+  showCondition,
+  toggleEditingOff,
+}: {
+  inputToFocus: "condition" | "content";
+  point: Point;
   showCondition: boolean;
-  setShowCondition: (value: boolean) => void;
   toggleEditingOff: () => void;
-  cx: any;
-  breakpoint: any;
-  setBreakpointOptions: (cx: any, location: any, options: any) => void;
-  inputToFocus: "condition" | "logValue";
-}
-interface State {
-  logValue: string;
-  condition: string;
-  logSyntaxError: string | null;
-  conditionSyntaxError: string | null;
-}
+}) {
+  const [content, setContent] = useState(point.content);
+  const [condition, setCondition] = useState(point.condition || "");
+  const [logSyntaxError, setLogSyntaxError] = useState<string | null>(null);
+  const [conditionSyntaxError, setConditionSyntaxError] = useState<string | null>(null);
 
-const stripTrailingSemiColon = (expr: string) =>
-  expr.match(/.*;$/) ? expr.slice(0, expr.length - 1) : expr;
+  const { editPoint } = useContext(PointsContext);
 
-class PanelEditor extends PureComponent<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    const { breakpoint } = props;
+  const hasError = logSyntaxError !== null || conditionSyntaxError !== null;
 
-    this.state = {
-      logValue: breakpoint.options.logValue,
-      condition: breakpoint.options.condition || "",
-      logSyntaxError: null,
-      conditionSyntaxError: null,
-    };
-  }
-
-  hasError = () => !!this.state.logSyntaxError || this.state.conditionSyntaxError;
-
-  handleSetBreakpoint = async () => {
-    const {
-      showCondition,
-      toggleEditingOff,
-      cx,
-      breakpoint,
-      setBreakpointOptions,
-      setShowCondition,
-    } = this.props;
-    const { logValue, condition } = this.state;
-    const newOptions: { logValue: string; condition?: string; prefixBadge?: string } = {
-      logValue: stripTrailingSemiColon(logValue),
-    };
-
-    // Bail if there is an error.
-    if (this.hasError()) {
+  const savePoint = () => {
+    if (hasError) {
       return;
     }
 
-    if (condition && showCondition) {
-      // Only save the condition if it's showing. If it's dismissed, then we'll assume
-      // that the user didn't intend to save it.
-      newOptions.condition = condition;
-    } else if (!condition) {
-      // If there's no condition, toggle the input box off.
-      setShowCondition(false);
+    if (!showCondition && condition !== "") {
+      setCondition("");
     }
+
+    editPoint(point.id, {
+      condition: showCondition ? condition : null,
+      content,
+    });
 
     toggleEditingOff();
-
-    // Bail if either the logValue or condition hasn't changed.
-    if (
-      newOptions.logValue === breakpoint.options.logValue &&
-      newOptions.condition === breakpoint.options.condition
-    ) {
-      return;
-    }
-
-    if (breakpoint.options.prefixBadge) {
-      newOptions.prefixBadge = breakpoint.options.prefixBadge;
-    }
-
-    setBreakpointOptions(cx, breakpoint.location, newOptions);
   };
 
-  setLogValue = (value: string) => this.setState({ logValue: value });
-  setLogSyntaxError = (error: string | null) => this.setState({ logSyntaxError: error });
-  setCondition = (value: string) => this.setState({ condition: value });
-  setConditionSyntaxError = (error: string | null) =>
-    this.setState({ conditionSyntaxError: error });
+  const onContentChange = async (value: string) => {
+    trackEvent("breakpoint.set_log");
+    setContent(value);
+    const error = await parser.hasSyntaxError(value);
+    setLogSyntaxError(error || null);
+  };
 
-  render() {
-    const { logSyntaxError, logValue, conditionSyntaxError, condition } = this.state;
-    const { toggleEditingOff, inputToFocus, showCondition, breakpoint } = this.props;
+  const onConditionChange = async (value: string) => {
+    setCondition(value);
+    trackEvent("breakpoint.set_condition");
+    if (value === "") {
+      setConditionSyntaxError(null);
+    } else {
+      const error = await parser.hasSyntaxError(value);
+      setConditionSyntaxError(error || null);
+    }
+  };
 
-    return (
-      <div
-        className={classnames("panel-editor flex flex-row items-center gap-1 rounded-sm", {
-          conditional: showCondition,
-        })}
+  return (
+    <div
+      className={classnames("panel-editor flex flex-row items-center gap-1 rounded-sm", {
+        conditional: showCondition,
+      })}
+    >
+      <form className="relative flex flex-grow flex-col space-y-0.5">
+        {showCondition ? (
+          <div className="form-row">
+            <div className="mr-1 w-6 flex-shrink-0">if</div>
+            <PanelInput
+              autofocus={inputToFocus == "condition"}
+              value={condition}
+              onChange={(value: string) => onConditionChange(value)}
+              onEnter={savePoint}
+              onEscape={toggleEditingOff}
+            />
+          </div>
+        ) : null}
+        <div className="form-row">
+          {showCondition ? <div className="mr-1 w-6 flex-shrink-0">log</div> : null}
+          <PanelInput
+            autofocus={inputToFocus == "content"}
+            value={content}
+            onChange={(value: string) => onContentChange(value)}
+            onEnter={savePoint}
+            onEscape={toggleEditingOff}
+          />
+        </div>
+      </form>
+      <button
+        type="button"
+        disabled={hasError}
+        onClick={savePoint}
+        title={hasError ? "Syntax error" : "Save expression"}
+        className={classnames(
+          "inline-flex flex-shrink-0 items-center rounded-full border border-transparent p-1 px-2 font-sans text-xs font-medium leading-4 text-white shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-primaryAccent focus-visible:ring-offset-2",
+          hasError ? "cursor-default bg-gray-400" : "bg-primaryAccent hover:bg-primaryAccentHover"
+        )}
       >
-        <PanelForm
-          {...{
-            logSyntaxError,
-            logValue,
-            conditionSyntaxError,
-            condition,
-            showCondition,
-            toggleEditingOff,
-            inputToFocus,
-          }}
-          handleSetBreakpoint={this.handleSetBreakpoint}
-          setLogValue={this.setLogValue}
-          setLogSyntaxError={this.setLogSyntaxError}
-          setCondition={this.setCondition}
-          setConditionSyntaxError={this.setConditionSyntaxError}
-        />
-        <SubmitButton
-          handleSetBreakpoint={this.handleSetBreakpoint}
-          disabled={!!logSyntaxError || !!conditionSyntaxError}
-        />
-      </div>
-    );
-  }
+        Save
+      </button>
+    </div>
+  );
 }
-
-export default connect((state: UIState) => ({ cx: getContext(state) }), {
-  setBreakpointOptions: actions.setBreakpointOptions,
-})(PanelEditor);

@@ -60,8 +60,7 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
-// TODO [FE-757] Replace this with number once old code is fully deleted
-export type PointId = number | string;
+export type PointId = number;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
   badge: Badge | null;

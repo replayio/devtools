@@ -104,7 +104,6 @@ export default function EditorOuter() {
         <EditorInner
           containerRef={containerRef}
           contextMenu={contextMenu}
-          cx={cx}
           editor={editor}
           gutterContextMenu={gutterContextMenu}
           selectedSource={selectedSource}
@@ -118,7 +117,6 @@ export default function EditorOuter() {
 function EditorInner({
   containerRef,
   contextMenu,
-  cx,
   editor,
   gutterContextMenu,
   selectedSource,
@@ -126,7 +124,6 @@ function EditorInner({
 }: {
   containerRef: RefObject<HTMLDivElement>;
   contextMenu: MouseEvent | null;
-  cx: ThreadContext;
   editor: SourceEditor | null;
   gutterContextMenu: ContextMenu | null;
   selectedSource: SourceDetails | null;
@@ -152,7 +149,7 @@ function EditorInner({
       )}
       <DebugLine />
       <EmptyLines editor={editor} />
-      <Breakpoints editor={editor} cx={cx} />
+      <Breakpoints editor={editor} />
       <Preview containerRef={containerRef} editor={editor} />
       <KeyModifiersContext.Consumer>
         {keyModifiers => <LineNumberTooltip editor={editor} keyModifiers={keyModifiers} />}
@@ -164,7 +161,7 @@ function EditorInner({
         selectedSource={selectedSource}
       />
       <ColumnBreakpoints editor={editor} />
-      <ToggleWidgetButton editor={editor} />
+      <ToggleWidgetButton />
     </div>
   );
 }

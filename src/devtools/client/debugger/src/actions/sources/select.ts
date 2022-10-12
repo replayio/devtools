@@ -10,7 +10,6 @@
 import { UIThunkAction } from "ui/actions";
 import { setSelectedPanel, setViewMode } from "ui/actions/layout";
 import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
-import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
 
 import { trackEvent } from "ui/utils/telemetry";
 
@@ -172,10 +171,7 @@ export function selectLocation(
 
     // This adds the source's text to the client-side parser, which is a necessary step
     // before we can ask the parser to return symbols in `fetchSymbolsForSource`.
-    const textPromise = dispatch(loadSourceText(source.id));
-    const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
-
-    await Promise.all([textPromise, possibleBreakpointsPromise]);
+    await dispatch(loadSourceText(source.id));
 
     // Set shownSource to null first, then the actual source to trigger
     // a proper re-render in the SourcesTree component

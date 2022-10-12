@@ -1,4 +1,4 @@
-import { addBreakpointAtLine } from "devtools/client/debugger/src/actions/breakpoints";
+import { Location } from "@replayio/protocol";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { updateCursorPosition, updateViewport } from "devtools/client/debugger/src/actions/ui";
 import {
@@ -12,7 +12,6 @@ import {
   clearEditor,
   endOperation,
   lineAtHeight,
-  fromEditorLine,
   getDocument,
   getEditor,
   getSourceLocationFromMouseEvent,
@@ -35,7 +34,7 @@ import type {
 import { getIndentation } from "devtools/client/debugger/src/utils/indentation";
 import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import debounce from "lodash/debounce";
-import { RefObject, useLayoutEffect, useRef, useState } from "react";
+import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
 import { isFirefox } from "ui/utils/environment";
 import {
   getSelectedSource,
@@ -49,6 +48,9 @@ import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import useHighlightedLines from "./useHighlightedLines";
 import useLineHitCounts from "./useLineHitCounts";
+import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 type InstanceProps = {
   cx: ThreadContext;
@@ -73,6 +75,9 @@ export default function useEditor(
   const selectedSource = useAppSelector(getSelectedSource) || null;
   const selectedSourceContent = useAppSelector(getSelectedSourceWithContent) || null;
   const symbols = useAppSelector(state => getSymbols(state, selectedSource as any));
+
+  const replayClient = useContext(ReplayClientContext);
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
 
   const instancePropsRef = useRef<InstanceProps>({
     cx,
@@ -219,22 +224,77 @@ export default function useEditor(
 
     const onCodeMirrorContextMenu = (_: any, __: number, ___: any, event: MouseEvent) => {};
 
-    const onCodeMirrorGutterClick = (_: any, line: number, __: any, event: MouseEvent) => {
-      const { button, ctrlKey, target } = event;
-      const { cx, selectedSource } = instancePropsRef.current;
-
-      if ((ctrlKey && button === 0) || button === 2 || !selectedSource) {
-        // ignore right clicks in the gutter
-        return;
-      } else if (typeof line !== "number") {
-        return;
-      } else if (![...(target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
-        // Don't add a breakpoint if the user clicked on something other than the gutter line number,
-        // e.g., the blank gutter space caused by adding a CodeMirror widget.
+    const onCodeMirrorGutterClick = async (
+      cm: any,
+      lineIndex: number,
+      gutter: any,
+      clickEvent: MouseEvent
+    ) => {
+      if (editor == null || selectedSource == null) {
         return;
       }
 
-      return dispatch(addBreakpointAtLine(cx, fromEditorLine(line)));
+      if (typeof lineIndex !== "number") {
+        return;
+      }
+
+      // ignore right clicks in the gutter
+      if ((clickEvent.ctrlKey && clickEvent.button === 0) || clickEvent.button === 2) {
+        return;
+      }
+
+      // Don't add a breakpoint if the user clicked on something other than the gutter line number,
+      // e.g., the blank gutter space caused by adding a CodeMirror widget.
+      if (![...(clickEvent.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
+        return;
+      }
+
+      const line = lineIndex + 1;
+      const locationRange = {
+        start: { line, column: 0 },
+        end: { line, column: Number.MAX_SAFE_INTEGER },
+      };
+      const breakpoints = await getBreakpointPositionsAsync(
+        replayClient,
+        selectedSource.id,
+        locationRange
+      );
+      if (breakpoints.length === 0) {
+        return;
+      }
+      const breakpointsForLine = breakpoints.find(breakpoint => breakpoint.line === line);
+      if (breakpointsForLine == null || breakpointsForLine.columns.length === 0) {
+        return;
+      }
+
+      const firstBreakableColumn = breakpointsForLine.columns[0];
+
+      const location: Location = {
+        column: firstBreakableColumn,
+        line,
+        sourceId: selectedSource.id,
+      };
+
+      const existingPoint = points.find(
+        point =>
+          point.location.sourceId === location.sourceId &&
+          point.location.line === location.line &&
+          point.location.column === location.column
+      );
+
+      if (existingPoint != null) {
+        if (existingPoint.shouldBreak) {
+          if (existingPoint.shouldLog) {
+            editPoint(existingPoint.id, { shouldBreak: false });
+          } else {
+            deletePoints(existingPoint.id);
+          }
+        } else {
+          editPoint(existingPoint.id, { shouldBreak: true });
+        }
+      } else {
+        addPoint({ shouldBreak: true }, location);
+      }
     };
 
     const onCodeMirrorKeyDown = (event: KeyboardEvent) => {
@@ -323,7 +383,17 @@ export default function useEditor(
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverToken);
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverLine);
     };
-  }, [dispatch, editor, setContextMenu]);
+  }, [
+    addPoint,
+    deletePoints,
+    editPoint,
+    dispatch,
+    editor,
+    points,
+    replayClient,
+    selectedSource,
+    setContextMenu,
+  ]);
 
   useHighlightedLines(editor);
   useLineHitCounts(editor);

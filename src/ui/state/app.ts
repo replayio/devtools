@@ -1,6 +1,5 @@
 import {
   SessionId,
-  Location,
   MouseEvent,
   KeyboardEvent,
   NavigationEvent,
@@ -91,7 +90,6 @@ export interface AppState {
   displayedLoadingProgress: number | null;
   events: Events;
   expectedError: ExpectedError | null;
-  hoveredLineNumberLocation: Location | null;
   isNodePickerActive: boolean;
   isNodePickerInitializing: boolean;
   loadedRegions: LoadedRegions | null;

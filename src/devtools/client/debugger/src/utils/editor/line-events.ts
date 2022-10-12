@@ -52,7 +52,7 @@ function emitLineMouseEnter(
       if (gutterButton && !gutterButton.matches(":hover")) {
         dispatch(codeMirror, "lineMouseLeave", {
           columnIndex,
-          lineNumber: lineIndex + 1,
+          lineIndex,
           lineNumberNode,
         });
       }
@@ -65,7 +65,7 @@ function emitLineMouseEnter(
 
   dispatch(codeMirror, "lineMouseEnter", {
     columnIndex,
-    lineNumber: lineIndex + 1,
+    lineIndex,
     lineNumberNode,
   });
 }

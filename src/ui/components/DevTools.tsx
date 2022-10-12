@@ -37,6 +37,7 @@ import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
 import SessionContextAdapter from "./SessionContextAdapter";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
 import { isTest } from "ui/utils/environment";
+import { PointsContextRoot } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 
 const Viewer = React.lazy(() => import("./Viewer"));
 
@@ -196,12 +197,14 @@ function _DevTools({
     <SessionContextAdapter>
       <SourcesContextAdapter>
         <FocusContextReduxAdapter>
-          <KeyModifiers>
-            <Header />
-            <Body />
-            {showCommandPalette ? <CommandPaletteModal /> : null}
-            <KeyboardShortcuts />
-          </KeyModifiers>
+          <PointsContextRoot>
+            <KeyModifiers>
+              <Header />
+              <Body />
+              {showCommandPalette ? <CommandPaletteModal /> : null}
+              <KeyboardShortcuts />
+            </KeyModifiers>
+          </PointsContextRoot>
         </FocusContextReduxAdapter>
       </SourcesContextAdapter>
     </SessionContextAdapter>

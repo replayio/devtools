@@ -1,24 +1,18 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
+import classnames from "classnames";
+import type { Context } from "devtools/client/debugger/src/reducers/pause";
 import React, { PureComponent } from "react";
 import { connect, ConnectedProps } from "react-redux";
 import { createSelector } from "reselect";
-import classnames from "classnames";
-
+import { Point } from "shared/client/types";
 import type { UIState } from "ui/state";
+
 import actions from "../../../actions";
-import { getLocationWithoutColumn, getLocationKey } from "../../../utils/breakpoint";
-import { features } from "../../../utils/prefs";
 import { getSelectedFrame, getContext } from "../../../selectors";
-import type { Breakpoint as BreakpointType } from "../../../reducers/types";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import { compareSourceLocation } from "../../../utils/location";
+
+import { CloseButton } from "../../shared/Button";
 
 import BreakpointOptions from "./BreakpointOptions";
-import { CloseButton } from "../../shared/Button";
 
 const getFormattedFrame = createSelector(getSelectedFrame, frame => {
   if (!frame) {
@@ -44,9 +38,9 @@ type PropsFromRedux = ConnectedProps<typeof connector>;
 type $FixTypeLater = any;
 
 type BreakpointProps = PropsFromRedux & {
-  type: "print-statement" | "breakpoint";
-  breakpoint: BreakpointType;
-  onRemoveBreakpoint: (cx: Context, breakpoint: BreakpointType) => void;
+  type: "logpoint" | "breakpoint";
+  breakpoint: Point;
+  onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
   editor: $FixTypeLater;
 };
 
@@ -77,13 +71,7 @@ class Breakpoint extends PureComponent<BreakpointProps> {
       return false;
     }
 
-    const bpId = features.columnBreakpoints
-      ? getLocationKey(this.selectedLocation)
-      : getLocationWithoutColumn(this.selectedLocation);
-    const frameId = features.columnBreakpoints
-      ? getLocationKey(frame.selectedLocation)
-      : getLocationWithoutColumn(frame.selectedLocation);
-    return bpId == frameId;
+    return compareSourceLocation(this.selectedLocation, frame.selectedLocation);
   }
 
   renderSourceLocation() {
