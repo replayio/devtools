@@ -33,9 +33,9 @@ import {
   PauseId,
 } from "@replayio/protocol";
 import { addPauseDataListener } from "protocol/thread/pause";
-import { preCacheObjects } from "@bvaughn/src/suspense/ObjectPreviews";
-import { trackExecutionPointPauseIds } from "@bvaughn/src/suspense/PauseCache";
-import { preCacheExecutionPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import { preCacheObjects } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { trackExecutionPointPauseIds } from "bvaughn-architecture-demo/src/suspense/PauseCache";
+import { preCacheExecutionPointForTime } from "bvaughn-architecture-demo/src/suspense/PointsCache";
 
 declare global {
   interface Window {

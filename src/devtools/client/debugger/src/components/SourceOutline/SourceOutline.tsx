@@ -108,7 +108,7 @@ export function SourceOutline({
 
   if (!selectedSource || !symbols) {
     return (
-      <div className="p-3 mx-2 mt-2 mb-4 space-y-3 text-xs text-center whitespace-normal rounded-lg text-themeBodyColor bg-chrome">
+      <div className="text-themeBodyColor mx-2 mt-2 mb-4 space-y-3 whitespace-normal rounded-lg bg-chrome p-3 text-center text-xs">
         {`Select a source to see available functions`}
       </div>
     );
@@ -117,7 +117,7 @@ export function SourceOutline({
   if (!symbols || symbols.status === LoadingStatus.LOADING) {
     return (
       <div className="flex justify-center p-4">
-        <Spinner className="w-4 h-4 text-gray-500 animate-spin" />
+        <Spinner className="h-4 w-4 animate-spin text-gray-500" />
       </div>
     );
   }
@@ -126,7 +126,7 @@ export function SourceOutline({
     return (
       <div className={classnames("flex h-full flex-col")}>
         <OutlineFilter filter={filter} updateFilter={setFilter} />
-        <div className="p-3 space-y-3 text-base text-gray-500 whitespace-normal onboarding-text">
+        <div className="onboarding-text space-y-3 whitespace-normal p-3 text-base text-gray-500">
           <p>{`No functions were found.`}</p>
         </div>
       </div>
@@ -136,7 +136,7 @@ export function SourceOutline({
   return (
     <div className={classnames("flex h-full flex-col space-y-2")}>
       <OutlineFilter filter={filter} updateFilter={setFilter} />
-      <div className="flex-grow outline-list">
+      <div className="outline-list flex-grow">
         <AutoSizer>
           {({ height, width }) => {
             const list = (

@@ -32,6 +32,9 @@ import { prefs } from "ui/utils/prefs";
 import { getPaneCollapse } from "devtools/client/debugger/src/selectors";
 import { getViewMode } from "ui/reducers/layout";
 import { useTrackLoadingIdleTime } from "ui/hooks/tracking";
+import SourcesContextAdapter from "./SourcesContextAdapter";
+import FocusContextReduxAdapter from "./FocusContextReduxAdapter";
+import SessionContextAdapter from "./SessionContextAdapter";
 import tokenManager, { TokenState } from "ui/utils/tokenManager";
 import { isTest } from "ui/utils/environment";
 
@@ -190,12 +193,18 @@ function _DevTools({
   }
 
   return (
-    <KeyModifiers>
-      <Header />
-      <Body />
-      {showCommandPalette ? <CommandPaletteModal /> : null}
-      <KeyboardShortcuts />
-    </KeyModifiers>
+    <SessionContextAdapter>
+      <SourcesContextAdapter>
+        <FocusContextReduxAdapter>
+          <KeyModifiers>
+            <Header />
+            <Body />
+            {showCommandPalette ? <CommandPaletteModal /> : null}
+            <KeyboardShortcuts />
+          </KeyModifiers>
+        </FocusContextReduxAdapter>
+      </SourcesContextAdapter>
+    </SessionContextAdapter>
   );
 }
 
