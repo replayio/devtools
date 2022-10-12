@@ -20669,7 +20669,6 @@ __metadata:
     babel-plugin-transform-import-meta: ^2.1.1
     bufferutil: ^4.0.6
     bvaughn-architecture-demo: "workspace:*"
-    case-anything: ^2.1.10
     circular-dependency-plugin: ^5.2.2
     classnames: ^2.3.1
     codemirror: ^5.65.7

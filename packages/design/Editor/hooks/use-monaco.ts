@@ -1,7 +1,6 @@
 // modified from: https://github.com/suren-atoyan/monaco-react/blob/master/src/Editor/Editor.js
 import * as React from "react";
 import loader from "@monaco-editor/loader";
-import { kebabCase } from "case-anything";
 
 import { initializeMonaco } from "../utils/initialize-monaco";
 import type { Monaco } from "../utils/initialize-monaco";

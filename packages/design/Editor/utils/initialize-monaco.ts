@@ -18,7 +18,6 @@ export type InitializeMonacoOptions = {
   id?: number;
   lineNumbers?: any;
   fontSize?: number;
-  onOpenEditor?: (input: any, source: any) => void;
 };
 
 export async function initializeMonaco({
@@ -28,7 +27,6 @@ export async function initializeMonaco({
   id = 0,
   lineNumbers,
   fontSize = 14,
-  onOpenEditor = () => null,
 }: InitializeMonacoOptions) {
   // try {
   //   await loadWASM("/onigasm.wasm");
@@ -101,19 +99,6 @@ export async function initializeMonaco({
     jsx: monaco.languages.typescript.JsxEmit.Preserve,
     esModuleInterop: true,
   });
-
-  /**
-   * Load React types
-   * alternatively, you can use: https://github.com/lukasbach/monaco-editor-auto-typings
-   */
-  fetch("https://unpkg.com/@types/react@17.0.38/index.d.ts")
-    .then(response => response.text())
-    .then(types => {
-      monaco.languages.typescript.typescriptDefaults.addExtraLib(
-        types,
-        "file:///node_modules/react/index.d.ts"
-      );
-    });
 
   /** Convert VS Code theme to Monaco theme */
   // defineTheme(monaco, theme);
