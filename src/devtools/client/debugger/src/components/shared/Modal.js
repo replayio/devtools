@@ -4,9 +4,8 @@
 
 //
 
-import PropTypes from "prop-types";
-import React from "react";
 import classnames from "classnames";
+import React from "react";
 import { Transition } from "react-transition-group";
 
 export const transitionTimeout = 50;
@@ -32,10 +31,6 @@ export class Modal extends React.Component {
     );
   }
 }
-
-Modal.contextTypes = {
-  shortcuts: PropTypes.object,
-};
 
 export default function Slide({
   width = "50%",

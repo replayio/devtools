@@ -2,8 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import React, { Component, useEffect, useState, useRef } from "react";
-import PropTypes from "prop-types";
+import React, { Component, useRef } from "react";
 
 import { connect, ConnectedProps } from "react-redux";
 
@@ -18,6 +17,7 @@ import { useGetUserSettings } from "ui/hooks/settings";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 
 import { EditorPane } from "./Editor/EditorPane";
+import ShortcutsContext from "./Editor/ShortcutsContext";
 
 const mapStateToProps = (state: UIState) => ({
   selectedPanel: getSelectedPanel(state),
@@ -33,14 +33,6 @@ type DebuggerProps = PropsFromRedux & { wrapper: HTMLDivElement };
 
 class Debugger extends Component<DebuggerProps> {
   shortcuts = new KeyShortcuts({ window, target: this.props.wrapper });
-
-  static childContextTypes = {
-    shortcuts: PropTypes.object,
-  };
-
-  getChildContext = () => {
-    return { shortcuts: this.shortcuts };
-  };
 
   componentDidMount() {
     this.props.refreshCodeMirror();
@@ -67,11 +59,13 @@ class Debugger extends Component<DebuggerProps> {
 
   render() {
     return (
-      <>
-        <A11yIntention>
-          <EditorPane />
-        </A11yIntention>
-      </>
+      <ShortcutsContext.Provider value={this.shortcuts}>
+        <>
+          <A11yIntention>
+            <EditorPane />
+          </A11yIntention>
+        </>
+      </ShortcutsContext.Provider>
     );
   }
 }

@@ -12,6 +12,11 @@ type PropsFromParent = {
 };
 type CommentSourceProps = PropsFromRedux & PropsFromParent;
 
+type Labels = {
+  primary: string | null;
+  secondary: string | null;
+};
+
 function CommentSource({
   comment,
   createLabels,
@@ -19,25 +24,20 @@ function CommentSource({
   selectLocation,
   setViewMode,
 }: CommentSourceProps) {
-  const [labels, setLabels] = useState<{ primary: string | null; secondary: string | null }>({
-    primary: comment.primaryLabel,
-    secondary: comment.secondaryLabel,
-  });
+  const [labels, setLabels] = useState<Labels | null>(null);
 
-  // TODO [hbenl] Fix react-hooks/exhaustive-deps
+  const sourceLocation = comment?.sourceLocation;
+
   useEffect(() => {
-    async function updateLabels() {
-      setLabels(await createLabels(comment.sourceLocation!));
+    if (sourceLocation && labels === null) {
+      createLabels(sourceLocation).then(setLabels);
     }
-    if (comment.sourceLocation && !labels.primary && !labels.secondary) {
-      updateLabels();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [createLabels, labels, sourceLocation]);
 
   const onSelectSource = () => {
     setViewMode("dev");
     trackEvent("comments.select_location");
-    selectLocation(context, comment.sourceLocation);
+    selectLocation(context, sourceLocation);
   };
 
   return (
@@ -50,7 +50,7 @@ function CommentSource({
           <div
             className="cm-s-mozilla overflow-hidden whitespace-pre font-mono text-xs"
             style={{ fontSize: "11px" }}
-            dangerouslySetInnerHTML={{ __html: labels.secondary || "" }}
+            dangerouslySetInnerHTML={{ __html: labels?.secondary || "" }}
           />
           <div
             className="flex flex-shrink-0 opacity-0 transition group-hover:opacity-100"

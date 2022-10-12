@@ -1,53 +1,34 @@
-import { useMemo, useLayoutEffect, useRef, useEffect } from "react";
-import { useFeature } from "ui/hooks/settings";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-
-import { getSelectedSourceId } from "ui/reducers/sources";
-import { useStringPref } from "ui/hooks/settings";
-
-import styles from "./LineHitCounts.module.css";
-import { features } from "ui/utils/prefs";
-
-import { resizeBreakpointGutter } from "../../utils/ui";
+import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
+import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
+import { useMemo, useLayoutEffect, useRef } from "react";
+import { useFeature, useStringPref } from "ui/hooks/settings";
 import {
   fetchHitCounts,
   HitCount,
   getHitCountsForSource,
   getBoundsForLineNumber,
 } from "ui/reducers/hitCounts";
-import { UIState } from "ui/state";
-import type { SourceEditor } from "../../utils/editor/source-editor";
+import { getSelectedSourceId } from "ui/reducers/sources";
 import { getFocusRegion } from "ui/reducers/timeline";
-import { FocusRegion } from "ui/state/timeline";
-import { calculateRangeChunksForVisibleLines } from "devtools/client/debugger/src/utils/editor/lineHitCounts";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { UIState } from "ui/state";
 
-type Props = {
-  sourceEditor: SourceEditor;
-};
+import styles from "./LineHitCounts.module.css";
 
-export default function LineHitCountsWrapper(props: Props) {
+export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
+  const { value: disableUnHitLines } = useFeature("disableUnHitLines");
   const { value: hitCountsEnabled } = useFeature("hitCounts");
-  const { value: hitCountsMode } = useStringPref("hitCounts");
+  const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
 
-  if (!hitCountsEnabled || hitCountsMode == "disabled") {
-    return null;
-  }
-
-  return <LineHitCounts {...props} />;
-}
-
-function LineHitCounts({ sourceEditor }: Props) {
   const dispatch = useAppDispatch();
   const sourceId = useAppSelector(getSelectedSourceId)!;
   const hitCounts = useAppSelector(state => getHitCountsForSource(state, sourceId));
-  const { value: hitCountsMode, update: updateHitCountsMode } = useStringPref("hitCounts");
+
   const currentLineNumber = useAppSelector(
     (state: UIState) => state.app.hoveredLineNumberLocation?.line
   );
   const focusRegion = useAppSelector(getFocusRegion);
-
-  const previousFocusRegion = useRef<FocusRegion | null>(null);
-  const previousHitCounts = useRef<Map<number, number> | null>(null);
 
   const isCollapsed = hitCountsMode == "hide-counts";
   const isCurrentLineNumberValid = currentLineNumber !== undefined;
@@ -60,12 +41,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     }
     return null;
   }, [hitCounts]);
-
-  const updatedLineNumbers = useMemo(() => {
-    return new Set<number>();
-    // We _want_ this re-created every time these change
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hitCountMap, isCollapsed]);
 
   // Min/max hit counts are used to determine heat map color.
   const [minHitCount, maxHitCount] = useMemo(() => {
@@ -88,11 +63,15 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [hitCounts]);
 
   useLayoutEffect(() => {
+    if (!hitCountsEnabled) {
+      return;
+    }
+
     // HACK Make sure we load hit count metadata; normally this is done in response to a mouseover event.
     if (hitCounts === null) {
       dispatch(fetchHitCounts(sourceId, 0));
     }
-  }, [dispatch, sourceId, hitCounts]);
+  }, [dispatch, hitCounts, hitCountsEnabled, sourceId]);
 
   // Make sure we have enough room to fit large hit count numbers in the gutter markers
   const numCharsToFit = useMemo(() => {
@@ -106,7 +85,6 @@ function LineHitCounts({ sourceEditor }: Props) {
   const gutterWidth = isCollapsed ? "5px" : `${numCharsToFit + 1}ch`;
 
   // Save `isCollapsed` in a ref so we only create `marker.onClick` callbacks once
-  // TODO Candidate for the eventual `useEvent` hook?
   const isCollapsedRef = useRef(isCollapsed);
 
   useLayoutEffect(() => {
@@ -114,7 +92,7 @@ function LineHitCounts({ sourceEditor }: Props) {
   }, [isCollapsed]);
 
   useLayoutEffect(() => {
-    if (!sourceEditor) {
+    if (!hitCountsEnabled || !sourceEditor) {
       return;
     }
 
@@ -132,7 +110,6 @@ function LineHitCounts({ sourceEditor }: Props) {
     // When hit counts are shown, the hover button (to add a log point) should not overlap with the gutter.
     // That component doesn't know about hit counts though, so we can inform its position via a CSS variable.
     const gutterElement = sourceEditor.codeMirror.getGutterElement() as HTMLElement;
-
     gutterElement.parentElement!.style.setProperty("--hit-count-gutter-width", `-${gutterWidth}`);
 
     // If hit counts are shown, the button should not overlap with the gutter.
@@ -154,10 +131,10 @@ function LineHitCounts({ sourceEditor }: Props) {
       }
       resizeBreakpointGutter(editor);
     };
-  }, [gutterWidth, sourceEditor, isCollapsed, hitCountsMode]);
+  }, [gutterWidth, hitCountsEnabled, hitCountsMode, isCollapsed, sourceEditor]);
 
   useLayoutEffect(() => {
-    if (!sourceEditor) {
+    if (!hitCountsEnabled || !sourceEditor) {
       return;
     }
 
@@ -199,7 +176,7 @@ function LineHitCounts({ sourceEditor }: Props) {
               className = styles[`HitsBadge${index + 1}`];
             }
 
-            if (features.disableUnHitLines) {
+            if (disableUnHitLines) {
               if (hitCount > 0) {
                 sourceEditor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
               } else {
@@ -252,33 +229,26 @@ function LineHitCounts({ sourceEditor }: Props) {
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
+
       editor.off("change", drawLinesRaf);
       editor.off("swapDoc", drawLinesRaf);
       editor.off("scroll", drawLinesRaf);
     };
   }, [
+    disableUnHitLines,
+    focusRegion,
+    hitCountMap,
+    hitCountsEnabled,
+    isCollapsed,
+    isCurrentLineNumberValid,
+    lower,
+    maxHitCount,
+    minHitCount,
     sourceEditor,
     sourceId,
-    hitCountMap,
-    updatedLineNumbers,
-    isCollapsed,
-    minHitCount,
-    maxHitCount,
     updateHitCountsMode,
-    lower,
     upper,
-    isCurrentLineNumberValid,
-    focusRegion,
   ]);
-
-  useEffect(() => {
-    // Save the previous references for comparison in `drawLines`
-    previousFocusRegion.current = focusRegion;
-    previousHitCounts.current = hitCountMap;
-  }, [focusRegion, hitCountMap]);
-
-  // We're just here for the hooks!
-  return null;
 }
 
 function hitCountsToMap(hitCounts: HitCount[]): Map<number, number> {

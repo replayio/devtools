@@ -1,25 +1,27 @@
 import { PointDescription } from "@replayio/protocol";
-import ReactDOM from "react-dom";
-import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import MaterialIcon from "ui/components/shared/MaterialIcon";
-import { selectors } from "ui/reducers";
-import { UIState } from "ui/state";
-import { Breakpoint, getBreakpointsForSelectedSource } from "../../reducers/breakpoints";
 import classNames from "classnames";
-import { toggleLogpoint } from "../../actions/breakpoints/logpoints";
-import hooks from "ui/hooks";
-import { shouldShowNag } from "ui/utils/user";
-import { Nag } from "ui/hooks/users";
-import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
-import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import { toggleLogpoint } from "devtools/client/debugger/src/actions/breakpoints/logpoints";
+import {
+  Breakpoint,
+  getBreakpointsForSelectedSource,
+} from "devtools/client/debugger/src/reducers/breakpoints";
+import { getExecutionPoint, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
+import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
-import { getExecutionPoint } from "../../reducers/pause";
+import ReactDOM from "react-dom";
+import React, { useState, useEffect, MouseEventHandler, FC, ReactNode, Suspense } from "react";
 import { seek } from "ui/actions/timeline";
+import { KeyModifiers, KeyModifiersContext } from "ui/components/KeyModifiers";
+import MaterialIcon from "ui/components/shared/MaterialIcon";
+import hooks from "ui/hooks";
 import { useFeature } from "ui/hooks/settings";
 import useHitPointsForHoveredLocation from "ui/hooks/useHitPointsForHoveredLocation";
+import { Nag } from "ui/hooks/users";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { shouldShowNag } from "ui/utils/user";
+
+import { AWESOME_BACKGROUND } from "./LineNumberTooltip";
 
 const QuickActionButton: FC<{
   children: ReactNode;
@@ -174,10 +176,12 @@ function QuickActions({
   );
 }
 
-type ExternalProps = { editor: any };
-type ToggleWidgetButtonProps = PropsFromRedux & ExternalProps;
+type Props = { editor: SourceEditor | null };
 
-function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps) {
+function ToggleWidgetButton({ editor }: Props) {
+  const cx = useAppSelector(getThreadContext);
+  const breakpoints = useAppSelector(getBreakpointsForSelectedSource);
+
   const [targetNode, setTargetNode] = useState<HTMLElement | null>(null);
   const [hoveredLineNumber, setHoveredLineNumber] = useState<number | null>(null);
 
@@ -188,6 +192,10 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   };
 
   useEffect(() => {
+    if (editor == null) {
+      return;
+    }
+
     const onLineEnter = ({
       lineNumberNode,
       lineNumber,
@@ -203,10 +211,14 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
       setHoveredLineNumber(null);
     };
 
+    // @ts-expect-error Custom event type
     editor.codeMirror.on("lineMouseEnter", onLineEnter);
+    // @ts-expect-error Custom event type
     editor.codeMirror.on("lineMouseLeave", onLineLeave);
     return () => {
+      // @ts-expect-error Custom event type
       editor.codeMirror.off("lineMouseEnter", onLineEnter);
+      // @ts-expect-error Custom event type
       editor.codeMirror.off("lineMouseLeave", onLineLeave);
     };
   }, [editor]);
@@ -232,20 +244,10 @@ function ToggleWidgetButton({ editor, cx, breakpoints }: ToggleWidgetButtonProps
   );
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    cx: selectors.getThreadContext(state),
-    breakpoints: getBreakpointsForSelectedSource(state),
-  }),
-  {}
-);
-type PropsFromRedux = ConnectedProps<typeof connector>;
-const ConnectedToggleWidgetButton = connector(ToggleWidgetButton);
-
-export default function ToggleWidgetButtonSuspenseWrapper(props: ExternalProps) {
+export default function ToggleWidgetButtonSuspenseWrapper(props: Props) {
   return (
     <Suspense fallback={null}>
-      <ConnectedToggleWidgetButton {...props} />
+      <ToggleWidgetButton {...props} />
     </Suspense>
   );
 }
