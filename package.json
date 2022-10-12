@@ -80,7 +80,7 @@
     "react-circular-progressbar": "^2.0.4",
     "react-codemirror2": "^7.2.1",
     "react-devtools-inline": "^4.24.5",
-    "react-devtools-inline_4_17_0": "npm:react-devtools-inline@4.17.0",
+    "react-devtools-inline_4_18_0": "npm:react-devtools-inline@4.18.0",
     "react-dom": "0.0.0-experimental-1e5245df8-20220817",
     "react-dom-factories": "^1.0.2",
     "react-is": "^18.2.0",

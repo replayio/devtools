@@ -188,6 +188,6 @@ https: declare module "react-devtools-inline/frontend" {
   ): typeof ReactDevTools;
 }
 
-https: declare module "react-devtools-inline_4_17_0/frontend" {
+declare module "react-devtools-inline_4_18_0/frontend" {
   export * from "@types/react-devtools-inline/frontend";
 }
