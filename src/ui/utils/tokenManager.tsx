@@ -131,6 +131,7 @@ class TokenManager {
   }
 
   private setExternalAuth(token: string) {
+    this.reset();
     this.setState({ token, external: true }, this.deferredState);
   }
 
