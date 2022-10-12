@@ -10,13 +10,11 @@ export function Editor({
   value,
   id,
   height,
-  lineNumbers,
-  folding,
   fontSize,
   focusRange,
   onChange,
   onMount,
-}: { height?: string | number } & Omit<MonacoOptions, "containerRef">) {
+}: { height?: string | number } & Omit<MonacoOptions, "containerRef" | "lineNumbers">) {
   const ref = React.useRef<HTMLDivElement>(null);
   const countOfLines = value ? Math.max(value.split("\n").length, MIN_LINE_COUNT) : MIN_LINE_COUNT;
 
@@ -24,8 +22,6 @@ export function Editor({
     containerRef: ref,
     value,
     id,
-    lineNumbers,
-    folding,
     fontSize,
     focusRange,
     onChange,

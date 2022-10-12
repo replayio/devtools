@@ -1,20 +1,22 @@
-import loader from "@monaco-editor/loader";
-import { wireTmGrammars } from "monaco-editor-textmate";
-import { Registry } from "monaco-textmate";
-import { loadWASM } from "onigasm";
-import type { AsyncReturnType } from "type-fest";
-// import theme from "theme/code.json";
+// import loader from "@monaco-editor/loader";
+import * as monacoEditor from "monaco-editor/esm/vs/editor/editor.api";
+// import { wireTmGrammars } from "monaco-editor-textmate";
+// import { Registry } from "monaco-textmate";
+// import { loadWASM } from "onigasm";
+// import type { AsyncReturnType } from "type-fest";
+
+// import theme from "./theme.json";
 
 import defineTheme from "./define-theme";
 
-export type Monaco = AsyncReturnType<typeof loader.init>;
+export type Monaco = typeof monacoEditor;
 
 export type InitializeMonacoOptions = {
   container: HTMLElement;
   monaco: Monaco;
   defaultValue?: string;
   id?: number;
-  folding?: boolean;
+  lineNumbers?: any;
   fontSize?: number;
   onOpenEditor?: (input: any, source: any) => void;
 };
@@ -24,8 +26,8 @@ export async function initializeMonaco({
   monaco,
   defaultValue = "",
   id = 0,
-  folding = true,
-  fontSize = 18,
+  lineNumbers,
+  fontSize = 14,
   onOpenEditor = () => null,
 }: InitializeMonacoOptions) {
   // try {
@@ -58,20 +60,13 @@ export async function initializeMonaco({
     monaco.Uri.parse(`file:///index-${id}.tsx`)
   );
 
-  const lineNumbers = (lineNumber: number) => {
-    if (lineNumber === 5) {
-      return "+";
-    }
-
-    return lineNumber;
-  };
-
   const editor = monaco.editor.create(container, {
     model,
     fontSize,
     lineNumbers,
+    folding: false,
+    readOnly: true,
     fontFamily: "var(--font-family-mono)",
-    folding: folding,
     automaticLayout: true,
     language: "typescript",
     contextmenu: false,
@@ -79,11 +74,11 @@ export async function initializeMonaco({
     formatOnPaste: true,
     formatOnType: true,
     minimap: { enabled: false },
-  }) as Monaco;
+  });
 
   const lineNumber = 5;
 
-  editor.changeViewZones(function (changeAccessor: any) {
+  editor.changeViewZones(changeAccessor => {
     var domNode = document.createElement("div");
 
     changeAccessor.addZone({
@@ -92,20 +87,9 @@ export async function initializeMonaco({
       domNode: domNode,
     });
 
-    domNode.style.background = "lightgreen";
+    /** Inject Print Statement Panel here */
+    domNode.style.background = "#5b5f62";
   });
-
-  // @ts-ignore
-  const editorService = editor._codeEditorService;
-  const openEditorBase = editorService.openCodeEditor.bind(editorService);
-
-  editorService.openCodeEditor = async (input: any, source: any) => {
-    const result = await openEditorBase(input, source);
-    if (result === null) {
-      onOpenEditor(input, source);
-    }
-    return result;
-  };
 
   monaco.languages.typescript.typescriptDefaults.setCompilerOptions({
     jsx: monaco.languages.typescript.JsxEmit.Preserve,

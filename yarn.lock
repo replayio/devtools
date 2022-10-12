@@ -17596,6 +17596,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"monaco-editor@npm:^0.34.0":
+  version: 0.34.0
+  resolution: "monaco-editor@npm:0.34.0"
+  checksum: 10a28c1fe07268a23106ec9b743339af603e00c3ce646de72bf74f77e3d44065536f1a11f1a86ed459dfd9cb891261e6c7974377fc511eb65f354d6ddc89275b
+  languageName: node
+  linkType: hard
+
 "monaco-textmate@npm:^3.0.1":
   version: 3.0.1
   resolution: "monaco-textmate@npm:3.0.1"
@@ -20709,6 +20716,7 @@ __metadata:
     logrocket-react: ^5.0.1
     mini-css-extract-plugin: ^2.6.0
     mixpanel-browser: ^2.43.0
+    monaco-editor: ^0.34.0
     monaco-editor-textmate: ^4.0.0
     monaco-textmate: ^3.0.1
     next: ^12.2

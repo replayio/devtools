@@ -10,8 +10,7 @@ export type MonacoOptions = {
   containerRef: React.RefObject<HTMLElement>;
   value?: string;
   id?: number;
-  lineNumbers?: boolean;
-  folding?: boolean;
+  lineNumbers?: any;
   fontSize?: number;
   focusRange?: { column: number; lineNumber: number };
   onChange?: (value: string) => void;
@@ -23,15 +22,14 @@ export function useMonaco({
   value,
   id,
   lineNumbers,
-  folding,
   fontSize,
   focusRange,
   onChange,
   onMount,
 }: MonacoOptions) {
   const [isMounting, setIsMounting] = React.useState(true);
-  const monacoRef = React.useRef<Monaco>(null);
-  const editorRef = React.useRef<ReturnType<Monaco["editor"]["create"]>>(null);
+  const monacoRef = React.useRef<Monaco | null>(null);
+  const editorRef = React.useRef<ReturnType<Monaco["editor"]["create"]> | null>(null);
 
   React.useEffect(() => {
     const cancelable = loader.init();
@@ -45,7 +43,6 @@ export function useMonaco({
           defaultValue: value,
           id,
           lineNumbers,
-          folding,
           fontSize,
           onOpenEditor: input => {
             const [base, filename] = input.resource.path
@@ -65,9 +62,9 @@ export function useMonaco({
            * Add delay to account for loading grammars
            * TODO: look into basing on actual grammar loading time
            */
-          // setTimeout(() => {
-          onMount();
-          // }, 300)
+          setTimeout(() => {
+            onMount();
+          }, 300);
         }
         setIsMounting(false);
       })
@@ -85,11 +82,11 @@ export function useMonaco({
         cancelable.cancel();
       }
     };
-  }, [containerRef, id, lineNumbers, folding, fontSize, onMount, value]);
+  }, [containerRef, id, lineNumbers, fontSize, onMount, value]);
 
   /** Focus the editor on mount. */
   React.useEffect(() => {
-    if (isMounting) {
+    if (isMounting || editorRef.current === null) {
       return;
     }
 
@@ -101,19 +98,21 @@ export function useMonaco({
   }, [isMounting, focusRange]);
 
   React.useEffect(() => {
-    if (isMounting) {
+    if (isMounting || editorRef.current === null) {
       return;
     }
 
     const handleChange = editorRef.current.onDidChangeModelContent(() => {
-      onChange?.(editorRef.current.getValue());
+      if (editorRef.current) {
+        onChange?.(editorRef.current.getValue());
+      }
     });
 
     return () => handleChange.dispose();
   }, [isMounting, onChange]);
 
   React.useEffect(() => {
-    if (isMounting) {
+    if (isMounting || editorRef.current === null) {
       return;
     }
 
@@ -121,7 +120,10 @@ export function useMonaco({
       /** Format file on save (metaKey + s) */
       if (event.keyCode === 49 && event.metaKey) {
         event.preventDefault();
-        editorRef.current.getAction("editor.action.formatDocument").run();
+
+        if (editorRef.current) {
+          editorRef.current.getAction("editor.action.formatDocument").run();
+        }
       }
     });
 
@@ -129,7 +131,7 @@ export function useMonaco({
   }, [isMounting]);
 
   React.useEffect(() => {
-    if (editorRef.current && editorRef.current.getValue() !== value) {
+    if (editorRef.current && editorRef.current.getValue() !== value && value !== undefined) {
       const currentModel = editorRef.current.getModel();
       if (currentModel) {
         editorRef.current.executeEdits("", [

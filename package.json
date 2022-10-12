@@ -71,6 +71,7 @@
     "logrocket": "^2.2.1",
     "logrocket-react": "^5.0.1",
     "mixpanel-browser": "^2.43.0",
+    "monaco-editor": "^0.34.0",
     "monaco-editor-textmate": "^4.0.0",
     "monaco-textmate": "^3.0.1",
     "next": "^12.2",
