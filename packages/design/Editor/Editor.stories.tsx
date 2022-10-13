@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Meta } from "@storybook/react";
 import { Editor } from "design";
 
@@ -22,7 +23,6 @@ async function handleSubmit(event) {
 
   if (!response.ok) {
     const errorMessage = await response.text();
-    setHasError(true);
     throw new Error(errorMessage);
   }
 }
@@ -30,8 +30,13 @@ async function handleSubmit(event) {
 
 export function BasicUsage() {
   return (
-    <div>
-      <Editor value={initialCodeString} />
-    </div>
+    <Editor
+      defaultValue={initialCodeString}
+      lineHitCounts={[
+        [9, 10],
+        [10, 5],
+        [11, 12],
+      ]}
+    />
   );
 }
