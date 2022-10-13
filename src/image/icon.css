@@ -153,6 +153,10 @@ but without a background color so we can use hover effects
   -webkit-mask-image: url(/icons/dock-left.svg);
 }
 
+.icon.dock-full {
+  -webkit-mask-image: url(/icons/dock-full.svg);
+}
+
 .icon.dock-bottom-right {
   -webkit-mask-image: url(/icons/dock-bottom-right.svg);
 }

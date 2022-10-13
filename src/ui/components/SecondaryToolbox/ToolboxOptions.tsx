@@ -1,26 +1,29 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { ToolboxLayout } from "ui/state/layout";
 import { getToolboxLayout } from "ui/reducers/layout";
 import { setToolboxLayout } from "ui/actions/layout";
 import Icon from "../shared/Icon";
-import { ToolboxButton } from "./ToolboxButton";
 import PortalDropdown from "../shared/PortalDropdown";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
+import { getRecordingCapabilities } from "./getRecordingCapabilities";
 
-const LAYOUT_ICONS = { ide: "dock-bottom-right", left: "dock-left", bottom: "dock-bottom" };
+const LAYOUT_ICONS = {
+  bottom: "dock-bottom",
+  full: "dock-full",
+  ide: "dock-bottom-right",
+  left: "dock-left",
+};
 
 function ToolboxOption({
   dataTestId,
   label,
   onClick,
-  selected,
   icon,
 }: {
   dataTestId?: string;
   label: string;
   onClick: () => void;
-  selected: boolean;
   icon?: string;
 }) {
   return (
@@ -46,7 +49,6 @@ function LayoutOption({
   icon: string;
   collapseDropdown: () => void;
 }) {
-  const toolboxLayout = useAppSelector(getToolboxLayout);
   const dispatch = useAppDispatch();
 
   const onClick = () => {
@@ -54,15 +56,7 @@ function LayoutOption({
     collapseDropdown();
   };
 
-  return (
-    <ToolboxOption
-      dataTestId={dataTestId}
-      onClick={onClick}
-      label={label}
-      selected={toolboxLayout == value}
-      icon={icon}
-    />
-  );
+  return <ToolboxOption dataTestId={dataTestId} onClick={onClick} label={label} icon={icon} />;
 }
 
 export default function ToolboxOptions() {
@@ -70,6 +64,57 @@ export default function ToolboxOptions() {
   const [expanded, setExpanded] = useState(false);
   const button = <Icon filename={LAYOUT_ICONS[toolboxLayout]} className="bg-iconColor" />;
   const collapseDropdown = () => setExpanded(false);
+
+  const recordingCapabilities = getRecordingCapabilities();
+
+  let layoutOptions: ReactNode = null;
+
+  if (recordingCapabilities.supportsRepaintingGraphics) {
+    layoutOptions = (
+      <>
+        <LayoutOption
+          dataTestId="DockToBottomRightButton"
+          label="Console on bottom-right"
+          value="ide"
+          icon={LAYOUT_ICONS.ide}
+          collapseDropdown={collapseDropdown}
+        />
+        <LayoutOption
+          dataTestId="DockToLeftButton"
+          label="Console on left"
+          value="left"
+          icon={LAYOUT_ICONS.left}
+          collapseDropdown={collapseDropdown}
+        />
+        <LayoutOption
+          dataTestId="DockToBottomButton"
+          label="Console on bottom"
+          value="bottom"
+          icon={LAYOUT_ICONS.bottom}
+          collapseDropdown={collapseDropdown}
+        />
+      </>
+    );
+  } else {
+    layoutOptions = (
+      <>
+        <LayoutOption
+          dataTestId="DockSplitViewButton"
+          label="Split view"
+          value="ide"
+          icon={LAYOUT_ICONS.left}
+          collapseDropdown={collapseDropdown}
+        />
+        <LayoutOption
+          dataTestId="DockFullViewButton"
+          label="Full view"
+          value="full"
+          icon={LAYOUT_ICONS.full}
+          collapseDropdown={collapseDropdown}
+        />
+      </>
+    );
+  }
 
   return (
     <PortalDropdown
@@ -79,29 +124,7 @@ export default function ToolboxOptions() {
       buttonStyle="toolbox-options p-2 flex items-center text-iconColor hover:text-gray-600"
       distance={0}
     >
-      <Dropdown>
-        <LayoutOption
-          dataTestId="DockToBottomRightButton"
-          label="Dock to Bottom Right"
-          value="ide"
-          icon={LAYOUT_ICONS["ide"]}
-          collapseDropdown={collapseDropdown}
-        />
-        <LayoutOption
-          dataTestId="DockToLeftButton"
-          label="Dock to Left"
-          value="left"
-          icon={LAYOUT_ICONS["left"]}
-          collapseDropdown={collapseDropdown}
-        />
-        <LayoutOption
-          dataTestId="DockToBottomButton"
-          label="Dock to Bottom"
-          value="bottom"
-          icon={LAYOUT_ICONS["bottom"]}
-          collapseDropdown={collapseDropdown}
-        />
-      </Dropdown>
+      <Dropdown>{layoutOptions}</Dropdown>
     </PortalDropdown>
   );
 }

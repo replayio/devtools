@@ -27,4 +27,4 @@ export type SecondaryPanelName =
   | "redux-devtools"
   | "debugger";
 export type PanelName = PrimaryPanelName | SecondaryPanelName;
-export type ToolboxLayout = "ide" | "left" | "bottom";
+export type ToolboxLayout = "bottom" | "full" | "ide" | "left";
