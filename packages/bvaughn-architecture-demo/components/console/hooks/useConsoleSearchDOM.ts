@@ -52,6 +52,7 @@ const INVISIBLE_STATE: State = {
 
 export default function useConsoleSearchDOM(
   listRef: MutableRefObject<HTMLElement | null>,
+  searchInputRef: MutableRefObject<HTMLInputElement | null>,
   defaultVisible: boolean = true
 ): [State, Actions] {
   const loggables = useContext(LoggablesContext);
@@ -63,9 +64,17 @@ export default function useConsoleSearchDOM(
     () => ({
       ...dispatch,
       hide: () => setVisible(false),
-      show: () => setVisible(true),
+      show: () => {
+        setVisible(true);
+
+        // If search is already visible, (re)focus the input.
+        const searchInput = searchInputRef.current;
+        if (searchInput) {
+          searchInput.focus();
+        }
+      },
     }),
-    [dispatch]
+    [dispatch, searchInputRef]
   );
 
   const externalState = useMemo(

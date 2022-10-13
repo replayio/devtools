@@ -48,6 +48,7 @@ export default function ConsoleRoot({
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
   const messageListRef = useRef<HTMLElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // We default to having the console filters panel turned off, to minimize UI "busyness".
   // _If_ it's off initially, we want to completely skip rendering it, which
@@ -111,6 +112,7 @@ export default function ConsoleRoot({
               <LoggablesContextRoot messageListRef={messageListRef}>
                 <SearchContextRoot
                   messageListRef={messageListRef}
+                  searchInputRef={searchInputRef}
                   showSearchInputByDefault={showSearchInputByDefault}
                 >
                   <div className={styles.MessageColumn}>
@@ -120,7 +122,11 @@ export default function ConsoleRoot({
 
                     {terminalInput}
 
-                    <Search className={styles.Row} hideOnEscape={terminalInput !== null} />
+                    <Search
+                      className={styles.Row}
+                      hideOnEscape={terminalInput !== null}
+                      searchInputRef={searchInputRef}
+                    />
                   </div>
                 </SearchContextRoot>
               </LoggablesContextRoot>

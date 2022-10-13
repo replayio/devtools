@@ -1,3 +1,4 @@
+import Icon from "@bvaughn/components/Icon";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { getMessages } from "@bvaughn/src/suspense/MessagesCache";
@@ -10,9 +11,16 @@ import {
   isUncaughtException,
 } from "@bvaughn/src/utils/loggables";
 import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
-import { ForwardedRef, forwardRef, MutableRefObject, ReactNode, useContext, useMemo } from "react";
+import {
+  ForwardedRef,
+  forwardRef,
+  KeyboardEvent,
+  MutableRefObject,
+  ReactNode,
+  useContext,
+  useMemo,
+} from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import Icon from "../Icon";
 
 import { Loggable, LoggablesContext } from "./LoggablesContext";
 import styles from "./MessagesList.module.css";
@@ -37,7 +45,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const replayClient = useContext(ReplayClientContext);
-  const [searchState] = useContext(SearchContext);
+  const [searchState, searchActions] = useContext(SearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const loadedRegions = useLoadedRegions(replayClient);
@@ -142,6 +150,20 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     listItems.push(currentTimeIndicator);
   }
 
+  const onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "f":
+      case "F":
+        if (event.metaKey) {
+          searchActions.show();
+
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+    }
+  };
+
   // Note that it's important to only render messages inside of the message lists.
   // Overflow notifications are displayed outside of the list, to avoid interfering with search.
   // See <LoggablesContextRoot> and useConsoleSearchDOM() for more info.
@@ -172,8 +194,10 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       <div
         className={isTransitionPending ? styles.ContainerPending : styles.Container}
         data-test-name="Messages"
+        onKeyDown={onKeyDown}
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
+        tabIndex={0}
       >
         {listItems}
       </div>

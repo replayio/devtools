@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { MutableRefObject, useContext } from "react";
 
 import Icon from "../Icon";
 
@@ -8,9 +8,11 @@ import { SearchContext } from "./SearchContext";
 export default function Search({
   className,
   hideOnEscape,
+  searchInputRef,
 }: {
   className: string;
   hideOnEscape: boolean;
+  searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
   const [searchState, searchActions] = useContext(SearchContext);
 
@@ -92,6 +94,7 @@ export default function Search({
         onChange={onChange}
         onKeyDown={onKeyDown}
         placeholder="Find in logs"
+        ref={searchInputRef}
         type="text"
         value={searchState.query}
       />
