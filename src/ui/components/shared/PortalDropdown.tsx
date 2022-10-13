@@ -1,6 +1,8 @@
 import React, { CSSProperties, RefObject, useRef, useState, useCallback } from "react";
 
 import { createPortal } from "react-dom";
+import { getToolboxLayout } from "ui/reducers/layout";
+import { useAppSelector } from "ui/setup/hooks";
 import { DropdownProps } from "./Dropdown";
 
 interface PortalDropdownProps extends DropdownProps {
@@ -41,6 +43,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
   } = props;
 
   const contentPosition = getContentPosition(props, buttonRef, dropdownNode);
+  const toolboxLayout = useAppSelector(getToolboxLayout);
 
   return (
     <div className="portal-dropdown-wrapper">
@@ -50,6 +53,7 @@ export default function PortalDropdown(props: PortalDropdownProps) {
         disabled={props.disabled}
         id="portal-dropdown-button"
         data-test-id="consoleDockButton"
+        data-test-state={toolboxLayout}
         onMouseDown={expand}
         ref={buttonRef}
       >

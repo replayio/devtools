@@ -2,7 +2,6 @@ import LazyOffscreen from "bvaughn-architecture-demo/components/LazyOffscreen";
 import React, { FC, ReactNode, Suspense, useContext } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import classnames from "classnames";
-import { ThreadFront } from "protocol/thread";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { NodePicker } from "../NodePicker";
 import { selectors } from "../../reducers";
@@ -24,6 +23,7 @@ import { setSelectedPanel } from "ui/actions/layout";
 import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
 import Loader from "../shared/Loader";
+import { getRecordingCapabilities } from "./getRecordingCapabilities";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -193,27 +193,4 @@ function SecondaryToolbox() {
 
 function Panel({ children, isActive }: { children: ReactNode; isActive: boolean }) {
   return <LazyOffscreen mode={isActive ? "visible" : "hidden"}>{children}</LazyOffscreen>;
-}
-
-let recordingCapabilitiesPromise: Promise<RecordingCapabilities> | null = null;
-let recordingCapabilities: RecordingCapabilities | null = null;
-function getRecordingCapabilities(): RecordingCapabilities {
-  if (recordingCapabilities !== null) {
-    return recordingCapabilities;
-  } else {
-    if (recordingCapabilitiesPromise === null) {
-      recordingCapabilitiesPromise = new Promise(async (resolve, reject) => {
-        try {
-          recordingCapabilities = await ThreadFront.getRecordingCapabilities();
-          recordingCapabilitiesPromise = null;
-
-          resolve(recordingCapabilities!);
-        } catch (error) {
-          reject(error);
-        }
-      });
-    }
-
-    throw recordingCapabilitiesPromise;
-  }
 }
