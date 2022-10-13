@@ -188,6 +188,29 @@ test("should show and hide search input when Enter and Escape are typed", async 
   await takeScreenshot(page, terminalInput, "terminal-input-focused");
 });
 
+test("should re-focus the search input when CMD+F is used again", async ({ page }) => {
+  await setup(page);
+
+  await showSearchInput(page);
+
+  const searchInput = page.locator("[data-test-id=ConsoleSearchInput]");
+  await expect(searchInput).toHaveCount(1);
+  await expect(searchInput).toBeFocused();
+
+  // This part of the test verifies that the search input responds to CMD+F
+  // when focus is within the Console (not just in the terminal input field)
+  const list = page.locator("[data-test-name=Messages]");
+  await list.focus();
+
+  await expect(searchInput).not.toBeFocused();
+
+  await page.keyboard.down("Meta");
+  await page.keyboard.type("f");
+  await page.keyboard.up("Meta");
+
+  await expect(searchInput).toBeFocused();
+});
+
 test("should be searchable", async ({ page }) => {
   await setup(page, true);
 

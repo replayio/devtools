@@ -18,6 +18,11 @@
   opacity: 0.5;
 }
 
+.Container:focus,
+.ContainerPending:focus {
+  outline: none;
+}
+
 .CountRow {
   background-color: var(--background-color-contrast-2);
   padding: 0.5rem 1rem;

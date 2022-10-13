@@ -25,7 +25,7 @@ function getFixtureDataPath(testFileName: string, testCaseName: string): string 
 
 function getRelativeFixtureDataPath(testFileName: string, testCaseName: string): string {
   const directoryName = testFileName.replace("tests/", "").replace(".ts", "");
-  const fileName = `${testCaseName.replace(/\//g, "-").replace(/ /g, "-")}.json`;
+  const fileName = `${testCaseName.replace(/[\/ \+]/g, "-")}.json`;
   return join(directoryName, fileName);
 }
 
