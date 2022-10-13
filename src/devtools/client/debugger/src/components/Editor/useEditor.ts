@@ -1,4 +1,7 @@
-import { addBreakpointAtLine } from "devtools/client/debugger/src/actions/breakpoints";
+import { Location } from "@replayio/protocol";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { updateCursorPosition, updateViewport } from "devtools/client/debugger/src/actions/ui";
 import {
@@ -12,7 +15,6 @@ import {
   clearEditor,
   endOperation,
   lineAtHeight,
-  fromEditorLine,
   getDocument,
   getEditor,
   getSourceLocationFromMouseEvent,
@@ -35,7 +37,8 @@ import type {
 import { getIndentation } from "devtools/client/debugger/src/utils/indentation";
 import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import debounce from "lodash/debounce";
-import { RefObject, useLayoutEffect, useRef, useState } from "react";
+import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { isFirefox } from "ui/utils/environment";
 import {
   getSelectedSource,
@@ -47,6 +50,7 @@ import {
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
+import useEditorBreakpoints from "./Breakpoints/useBreakpoints";
 import useHighlightedLines from "./useHighlightedLines";
 import useLineHitCounts from "./useLineHitCounts";
 
@@ -73,6 +77,10 @@ export default function useEditor(
   const selectedSource = useAppSelector(getSelectedSource) || null;
   const selectedSourceContent = useAppSelector(getSelectedSourceWithContent) || null;
   const symbols = useAppSelector(state => getSymbols(state, selectedSource as any));
+
+  const replayClient = useContext(ReplayClientContext);
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const { setHoveredLocation, setVisibleLines } = useContext(SourcesContext);
 
   const instancePropsRef = useRef<InstanceProps>({
     cx,
@@ -219,22 +227,77 @@ export default function useEditor(
 
     const onCodeMirrorContextMenu = (_: any, __: number, ___: any, event: MouseEvent) => {};
 
-    const onCodeMirrorGutterClick = (_: any, line: number, __: any, event: MouseEvent) => {
-      const { button, ctrlKey, target } = event;
-      const { cx, selectedSource } = instancePropsRef.current;
-
-      if ((ctrlKey && button === 0) || button === 2 || !selectedSource) {
-        // ignore right clicks in the gutter
-        return;
-      } else if (typeof line !== "number") {
-        return;
-      } else if (![...(target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
-        // Don't add a breakpoint if the user clicked on something other than the gutter line number,
-        // e.g., the blank gutter space caused by adding a CodeMirror widget.
+    const onCodeMirrorGutterClick = async (
+      cm: any,
+      lineIndex: number,
+      gutter: any,
+      clickEvent: MouseEvent
+    ) => {
+      if (editor == null || selectedSource == null) {
         return;
       }
 
-      return dispatch(addBreakpointAtLine(cx, fromEditorLine(line)));
+      if (typeof lineIndex !== "number") {
+        return;
+      }
+
+      // ignore right clicks in the gutter
+      if ((clickEvent.ctrlKey && clickEvent.button === 0) || clickEvent.button === 2) {
+        return;
+      }
+
+      // Don't add a breakpoint if the user clicked on something other than the gutter line number,
+      // e.g., the blank gutter space caused by adding a CodeMirror widget.
+      if (![...(clickEvent.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
+        return;
+      }
+
+      const line = lineIndex + 1;
+      const locationRange = {
+        start: { line, column: 0 },
+        end: { line, column: Number.MAX_SAFE_INTEGER },
+      };
+      const breakpoints = await getBreakpointPositionsAsync(
+        replayClient,
+        selectedSource.id,
+        locationRange
+      );
+      if (breakpoints.length === 0) {
+        return;
+      }
+      const breakpointsForLine = breakpoints.find(breakpoint => breakpoint.line === line);
+      if (breakpointsForLine == null || breakpointsForLine.columns.length === 0) {
+        return;
+      }
+
+      const firstBreakableColumn = breakpointsForLine.columns[0];
+
+      const location: Location = {
+        column: firstBreakableColumn,
+        line,
+        sourceId: selectedSource.id,
+      };
+
+      const existingPoint = points.find(
+        point =>
+          point.location.sourceId === location.sourceId &&
+          point.location.line === location.line &&
+          point.location.column === location.column
+      );
+
+      if (existingPoint != null) {
+        if (existingPoint.shouldBreak) {
+          if (existingPoint.shouldLog) {
+            editPoint(existingPoint.id, { shouldBreak: false });
+          } else {
+            deletePoints(existingPoint.id);
+          }
+        } else {
+          editPoint(existingPoint.id, { shouldBreak: true });
+        }
+      } else {
+        addPoint({ shouldBreak: true }, location);
+      }
     };
 
     const onCodeMirrorKeyDown = (event: KeyboardEvent) => {
@@ -257,10 +320,13 @@ export default function useEditor(
       }
     };
 
-    const onCodeMirrorScrollDebounced = debounce((...args) => {
+    const onCodeMirrorScrollDebounced = debounce(() => {
       const { lastClientX, lastClientY } = instancePropsRef.current;
       dispatch(updateViewport());
       onMouseScroll(codeMirror, lastClientX, lastClientY);
+
+      const { viewFrom, viewTo } = editor.editor.display;
+      setVisibleLines(viewFrom, viewTo);
     }, 75);
 
     const onDocumentMouseMove = (event: MouseEvent) => {
@@ -270,6 +336,24 @@ export default function useEditor(
       instanceProps.lastClientY = event.clientY;
     };
 
+    const onCodeMirrorLineMouseEnter = ({
+      columnIndex,
+      lineIndex,
+      lineNumberNode,
+    }: {
+      columnIndex: number;
+      lineIndex: number;
+      lineNumberNode: HTMLElement;
+    }) => {
+      onCodeMirrorLineMouseLeaveDebounced.cancel();
+
+      setHoveredLocation(lineIndex, lineNumberNode);
+    };
+
+    const onCodeMirrorLineMouseLeaveDebounced = debounce(() => {
+      setHoveredLocation(null, null);
+    }, 50);
+
     const onCodeMirrorMouseOverToken = onTokenMouseOver(codeMirror);
     const onCodeMirrorMouseOverLine = onLineMouseOver(codeMirror);
 
@@ -277,6 +361,10 @@ export default function useEditor(
 
     // @ts-expect-error Unknown "gutterClick" event type
     codeMirror.on("gutterClick", onCodeMirrorGutterClick);
+    // @ts-expect-error Unknown "lineMouseEnter" event type
+    codeMirror.on("lineMouseEnter", onCodeMirrorLineMouseEnter);
+    // @ts-expect-error Unknown "lineMouseLeave" event type
+    codeMirror.on("lineMouseLeave", onCodeMirrorLineMouseLeaveDebounced);
     codeMirror.on("scroll", onCodeMirrorScrollDebounced);
 
     const codeMirrorWrapper = codeMirror.getWrapperElement();
@@ -316,6 +404,10 @@ export default function useEditor(
       codeMirror.off("gutterClick", onCodeMirrorGutterClick);
       // @ts-expect-error Handler param types mismatch
       codeMirror.off("gutterContextMenu", onCodeMirrorGutterContextMenu);
+      // @ts-expect-error Handler param types mismatch
+      codeMirror.off("lineMouseEnter", onCodeMirrorLineMouseEnter);
+      // @ts-expect-error Handler param types mismatch
+      codeMirror.off("lineMouseLeave", onCodeMirrorLineMouseLeaveDebounced);
       codeMirror.off("scroll", onCodeMirrorScrollDebounced);
 
       codeMirrorWrapper.removeEventListener("click", onCodeMirrorClick);
@@ -323,10 +415,23 @@ export default function useEditor(
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverToken);
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverLine);
     };
-  }, [dispatch, editor, setContextMenu]);
+  }, [
+    addPoint,
+    deletePoints,
+    editPoint,
+    dispatch,
+    editor,
+    points,
+    replayClient,
+    selectedSource,
+    setContextMenu,
+    setHoveredLocation,
+    setVisibleLines,
+  ]);
 
   useHighlightedLines(editor);
   useLineHitCounts(editor);
+  useEditorBreakpoints(editor);
 
   return editor;
 }

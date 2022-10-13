@@ -1,17 +1,18 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
+import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { ReplayClientInterface } from "shared/client/types";
-import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import { ReplayClientInterface, SourceLocationRange } from "shared/client/types";
 import {
   SourceDetails,
   isOriginalSource,
   getBestNonSourceMappedSourceId,
   getBestSourceMappedSourceId,
 } from "ui/reducers/sources";
+
 import { CursorPosition } from "../components/Editor/Footer";
 
 import { isNodeModule, isBowerComponent } from "./source";
@@ -50,7 +51,8 @@ function getSourceToVisualize(
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
   position?: CursorPosition,
-  client?: ReplayClientInterface
+  client?: ReplayClientInterface,
+  sourceLocationRange: SourceLocationRange | null = null
 ) {
   if (!selectedSource) {
     return undefined;
@@ -72,7 +74,13 @@ function getSourceToVisualize(
     return alternateSource.id;
   }
   if (position && client) {
-    return getAlternateSourceIdForPosition(client, selectedSource, position, sourcesById);
+    return getAlternateSourceIdForPosition(
+      client,
+      selectedSource,
+      position,
+      sourcesById,
+      sourceLocationRange
+    );
   }
 }
 
@@ -81,7 +89,8 @@ export function getSourcemapVisualizerURL(
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
   position?: CursorPosition,
-  client?: ReplayClientInterface
+  client?: ReplayClientInterface,
+  sourceLocationRange: SourceLocationRange | null = null
 ) {
   if (!selectedSource) {
     return null;
@@ -91,7 +100,8 @@ export function getSourcemapVisualizerURL(
     alternateSource,
     sourcesById,
     position,
-    client
+    client,
+    sourceLocationRange
   );
   if (!sourceId) {
     return null;
@@ -170,9 +180,10 @@ function getAlternateSourceIdForPosition(
   client: ReplayClientInterface,
   source: SourceDetails,
   position: CursorPosition,
-  sourcesById: Dictionary<SourceDetails>
+  sourcesById: Dictionary<SourceDetails>,
+  sourceLocationRange: SourceLocationRange | null
 ) {
-  const lineLocations = getBreakpointPositionsSuspense(client, source.id, null);
+  const lineLocations = getBreakpointPositionsSuspense(client, source.id, sourceLocationRange);
   const breakableLine = min(
     lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );
@@ -204,7 +215,8 @@ export function getAlternateSourceId(
   selectedSource: SourceDetails | null | undefined,
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
-  position: CursorPosition
+  position: CursorPosition,
+  sourceLocationRange: SourceLocationRange | null
 ): AlternateSourceResult {
   if (alternateSource) {
     return { sourceId: alternateSource.id };
@@ -222,7 +234,8 @@ export function getAlternateSourceId(
     client,
     selectedSource,
     position,
-    sourcesById
+    sourcesById,
+    sourceLocationRange
   );
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };

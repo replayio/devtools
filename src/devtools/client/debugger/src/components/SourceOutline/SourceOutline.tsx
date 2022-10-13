@@ -1,33 +1,58 @@
-import React, { useRef, useCallback, useMemo, useState, useEffect } from "react";
+import { Location } from "@replayio/protocol";
+import { FocusContext } from "bvaughn-architecture-demo/src/contexts/FocusContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getSourceHitCounts } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import classnames from "classnames";
-
-import { FixedSizeList as List } from "react-window";
+import React, {
+  useRef,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+  Suspense,
+  useContext,
+} from "react";
 import AutoSizer from "react-virtualized-auto-sizer";
-import OutlineFilter from "../PrimaryPanes/OutlineFilter";
-import { findClosestEnclosedSymbol } from "../../utils/ast";
-import { SourceOutlineClass } from "./SourceOutlineClass";
-import { SourceOutlineFunction } from "./SourceOutlineFunction";
-import { getOutlineSymbols } from "./getOutlineSymbols";
-import { connect, ConnectedProps } from "react-redux";
-import { useAppDispatch } from "ui/setup/hooks";
-import { selectors } from "ui/reducers";
-import { actions } from "ui/actions";
-import { UIState } from "ui/state";
-import { getSelectedSource } from "ui/reducers/sources";
+import { FixedSizeList as List } from "react-window";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import Spinner from "ui/components/shared/Spinner";
-import { isFunctionDeclaration } from "./isFunctionSymbol";
-import { FunctionDeclaration, ClassDeclaration } from "../../reducers/ast";
-import { fetchHitCounts, getHitCountsForSourceByLine } from "ui/reducers/hitCounts";
+import { getSelectedSource, SourceDetails } from "ui/reducers/sources";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
+import { selectLocation } from "../../actions/sources";
+import { FunctionDeclaration, ClassDeclaration, getSymbols } from "../../reducers/ast";
+import { getContext, getCursorPosition, SymbolEntry } from "../../selectors";
+import { findClosestEnclosedSymbol } from "../../utils/ast";
+
+import OutlineFilter from "../PrimaryPanes/OutlineFilter";
+
+import { getOutlineSymbols } from "./getOutlineSymbols";
+import { isFunctionDeclaration } from "./isFunctionSymbol";
+import { SourceOutlineClass } from "./SourceOutlineClass";
+import { SourceOutlineFunction } from "./SourceOutlineFunction";
+
 export function SourceOutline({
-  cx,
   cursorPosition,
   selectedSource,
   symbols,
-  hitCounts,
-  selectLocation,
-}: PropsFromRedux) {
+}: {
+  cursorPosition: Location | null;
+  selectedSource: SourceDetails | null;
+  symbols: SymbolEntry | null;
+}) {
+  const dispatch = useAppDispatch();
+  const cx = useAppSelector(getContext);
+
+  const replayClient = useContext(ReplayClientContext);
+  const { range: focusRange } = useContext(FocusContext);
+  const { visibleLines } = useContext(SourcesContext);
+
+  const hitCounts =
+    selectedSource && visibleLines
+      ? getSourceHitCounts(replayClient, selectedSource.id, visibleLines, focusRange)
+      : null;
+
   const [filter, setFilter] = useState("");
   const outlineSymbols = useMemo(
     () => getOutlineSymbols(symbols, filter, hitCounts),
@@ -45,14 +70,6 @@ export function SourceOutline({
     const symbol = findClosestEnclosedSymbol(symbols, cursorPosition);
     return outlineSymbols?.findIndex(a => a === symbol);
   }, [cursorPosition, outlineSymbols, symbols]);
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    if (selectedSource) {
-      // We start by loading the first N lines of hits, where N is the line limit.
-      dispatch(fetchHitCounts(selectedSource.id, 1));
-    }
-  }, [dispatch, selectedSource]);
 
   // TODO [jasonLaster] Fix react-hooks/exhaustive-deps
   useEffect(() => {
@@ -67,15 +84,17 @@ export function SourceOutline({
 
   const handleSelectSymbol = useCallback(
     (symbol: ClassDeclaration | FunctionDeclaration) => {
-      selectLocation(cx, {
-        sourceId: selectedSource!.id,
-        sourceUrl: selectedSource!.url!,
-        line: symbol.location.start.line,
-        column: symbol.location.start.column,
-      });
+      dispatch(
+        selectLocation(cx, {
+          sourceId: selectedSource!.id,
+          sourceUrl: selectedSource!.url!,
+          line: symbol.location.start.line,
+          column: symbol.location.start.column,
+        })
+      );
       setFocusedSymbol(symbol);
     },
-    [selectLocation, selectedSource, cx]
+    [dispatch, selectedSource, cx]
   );
 
   const MemoizedOutlineItem = useCallback(
@@ -160,22 +179,21 @@ export function SourceOutline({
   );
 }
 
-const mapStateToProps = (state: UIState) => {
-  const selectedSource = getSelectedSource(state);
-  const symbols = selectedSource ? selectors.getSymbols(state, selectedSource) : null;
-  const hitCounts = selectedSource ? getHitCountsForSourceByLine(state, selectedSource.id) : null;
-  return {
-    cursorPosition: selectors.getCursorPosition(state),
-    cx: selectors.getContext(state),
-    hitCounts,
-    selectedSource: selectedSource,
-    symbols,
-  };
-};
+export default function SourceOutlineWrapper() {
+  // This goofy outer selection is so that SourceOutline.stories can inject fake values.
+  const cursorPosition = useAppSelector(getCursorPosition);
+  const selectedSource = useAppSelector(getSelectedSource);
+  const symbols = useAppSelector(state =>
+    selectedSource ? getSymbols(state, selectedSource) : null
+  );
 
-const connector = connect(mapStateToProps, {
-  selectLocation: actions.selectLocation,
-});
-
-type PropsFromRedux = ConnectedProps<typeof connector>;
-export default connector(SourceOutline);
+  return (
+    <Suspense fallback={null}>
+      <SourceOutline
+        cursorPosition={cursorPosition || null}
+        selectedSource={selectedSource || null}
+        symbols={symbols}
+      />
+    </Suspense>
+  );
+}

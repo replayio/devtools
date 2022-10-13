@@ -17,7 +17,7 @@ import Popup from "./Popup";
 import useAuth0 from "ui/utils/useAuth0";
 import { TimeStampedPoint } from "@replayio/protocol";
 
-export type Input = "condition" | "logValue";
+export type Input = "condition" | "content";
 
 type PanelSummaryProps = {
   breakpoint: any;
@@ -39,8 +39,8 @@ export default function PanelSummary({
 }: PanelSummaryProps) {
   const { isTeamDeveloper } = hooks.useIsTeamDeveloper();
   const recordingId = useGetRecordingId();
-  const conditionValue = breakpoint.options.condition;
-  const logValue = breakpoint.options.logValue;
+  const conditionValue = breakpoint.condition;
+  const logValue = breakpoint.content;
 
   const dispatch = useAppDispatch();
   const { isAuthenticated } = useAuth0();
@@ -79,13 +79,13 @@ export default function PanelSummary({
   if (isHot) {
     trackEvent("breakpoint.too_many_points");
     return (
-      <div className="flex items-center rounded-t summary bg-errorBgcolor text-errorColor">
+      <div className="summary flex items-center rounded-t bg-errorBgcolor text-errorColor">
         <Popup
           trigger={
-            <div className="flex items-center pl-2 space-x-2 overflow-hidden">
+            <div className="flex items-center space-x-2 overflow-hidden pl-2">
               <MaterialIcon className="text-xl">error</MaterialIcon>
               <span
-                className="overflow-hidden whitespace-pre cursor-pointer overflow-ellipsis"
+                className="cursor-pointer overflow-hidden overflow-ellipsis whitespace-pre"
                 onClick={() => dispatch(enterFocusMode())}
               >
                 Use Focus Mode to reduce the number of hits.
@@ -106,7 +106,7 @@ export default function PanelSummary({
     <div
       className={classNames("summary flex items-center gap-2 text-gray-500", { enabled: isLoaded })}
     >
-      <div className="flex flex-col flex-grow statements-container">
+      <div className="statements-container flex flex-grow flex-col">
         {conditionValue && (
           <Condition
             isEditable={isEditable}
@@ -117,12 +117,12 @@ export default function PanelSummary({
         <Log
           hasCondition={!!conditionValue}
           isEditable={isEditable}
-          onClick={() => focusInput("logValue")}
+          onClick={() => focusInput("content")}
           value={logValue}
         />
         {!isTeamDeveloper ? (
           <Popup
-            trigger={<span className="text-gray-400 cursor-default material-icons">lock</span>}
+            trigger={<span className="material-icons cursor-default text-gray-400">lock</span>}
           >
             Editing logpoints is available for Developers in the Team plan
           </Popup>

@@ -1,12 +1,11 @@
 import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
-import { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import { getExecutionPoint } from "devtools/client/debugger/src/selectors";
 import findLast from "lodash/findLast";
 import { compareNumericStrings } from "protocol/utils";
 import React, { Suspense, useEffect } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { HitPointStatus } from "shared/client/types";
+import { HitPointStatus, Point } from "shared/client/types";
 import { actions } from "ui/actions";
 import Icon from "ui/components/shared/Icon";
 import type { UIState } from "ui/state";
@@ -16,7 +15,7 @@ import BreakpointTimeline from "./BreakpointTimeline";
 import { PanelStatus } from "./PanelStatus";
 
 type ExternalProps = {
-  breakpoint: Breakpoint;
+  breakpoint: Point;
   editing: boolean;
   hitPoints: TimeStampedPoint[] | null;
   hitPointStatus: HitPointStatus | null;
@@ -106,7 +105,7 @@ function BreakpointNavigation({
         <PanelStatus
           hitPoints={hitPoints}
           hitPointStatus={hitPointStatus}
-          prefixBadge={breakpoint.options.prefixBadge!}
+          prefixBadge={breakpoint.badge!}
         />
       </div>
     </div>

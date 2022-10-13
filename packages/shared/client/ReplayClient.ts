@@ -114,17 +114,26 @@ export class ReplayClient implements ReplayClientInterface {
     handlers.push(handler);
   }
 
-  async breakpointAdded(point: Point): Promise<BreakpointId> {
+  async breakpointAdded(point: Point): Promise<BreakpointId[]> {
     const sessionId = this.getSessionIdThrows();
-    const { breakpointId } = await client.Debugger.setBreakpoint(
-      {
-        location: point.location,
-        condition: point.condition || undefined,
-      },
-      sessionId
-    );
 
-    return breakpointId;
+    const breakpointIds: BreakpointId[] = [];
+
+    const correspondingLocations = this._getCorrespondingLocations(point.location);
+    for (let index = 0; index < correspondingLocations.length; index++) {
+      const location = correspondingLocations[index];
+      const { breakpointId } = await client.Debugger.setBreakpoint(
+        {
+          condition: point.condition || undefined,
+          location,
+        },
+        sessionId
+      );
+
+      breakpointIds.push(breakpointId);
+    }
+
+    return breakpointIds;
   }
 
   async breakpointRemoved(breakpointId: BreakpointId): Promise<void> {
