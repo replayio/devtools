@@ -37,7 +37,7 @@ export function OnboardingContentWrapper({
         }
       )}
     >
-      <img src="/images/logo.svg" className="w-full h-24" />
+      {noLogo ? null : <img src="/images/logo.svg" className="h-24 w-full" />}
       {children}
     </div>
   );
