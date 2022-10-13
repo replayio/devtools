@@ -15,7 +15,7 @@ const isOSX = Services.appinfo.OS === "Darwin";
 import { PrimaryLgButton } from "../Button";
 import { OnboardingContentWrapper, OnboardingModalContainer } from "../Onboarding";
 import { GetConnection, GetConnectionVariables } from "graphql/GetConnection";
-import { useRouter } from "next/router";
+import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 
 enum LoginReferrer {
   default = "default",
@@ -228,8 +228,9 @@ export default function Login({
   const onLogin = async (connection: string) => {
     // browser auth will redirect through this UX to select the connection
     if (challenge && state) {
-      const clientId = "4FvFnJJW4XlnUyrXQF8zOLw6vNAH1MAo";
-      window.location.href = `https://webreplay.us.auth0.com/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}`;
+      const authHost = getAuthHost();
+      const clientId = getAuthClientId();
+      window.location.href = `https://${authHost}/authorize?response_type=code&code_challenge_method=S256&code_challenge=${challenge}&client_id=${clientId}&redirect_uri=${returnToPath}&scope=openid profile offline_access&state=${state}&audience=https://api.replay.io&connection=${connection}`;
 
       return;
     }
