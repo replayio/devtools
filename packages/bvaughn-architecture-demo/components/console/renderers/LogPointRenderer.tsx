@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import ClientValueValueRenderer from "@bvaughn/components/inspector/values/ClientValueValueRenderer";
 import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Inspector from "@bvaughn/components/inspector";
@@ -21,7 +22,6 @@ import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 
 import styles from "./shared.module.css";
-import classNames from "classnames";
 
 // Renders PointInstances with shouldLog=true.
 function LogPointRenderer({
@@ -190,14 +190,10 @@ function BadgeRenderer({ badge }: { badge: Badge | null }) {
             styles.ColorBadge,
             badge === null ? styles.DefaultColorBadge : undefined
           )}
-          style={
-            badge
-              ? {
-                  // @ts-ignore
-                  "--badge-color": `var(--badge-${badge}-color)`,
-                }
-              : {}
-          }
+          style={{
+            // @ts-ignore
+            "--badge-color": `var(--badge-${badge ?? "default"}-color)`,
+          }}
         />
       );
   }
