@@ -8,6 +8,8 @@ import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { InspectableTimestampedPointContext } from "@bvaughn/src/contexts/InspectorContext";
 import { PointInstance } from "@bvaughn/src/contexts/PointsContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import { Nag } from "@bvaughn/src/graphql/types";
 import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
 import { primitiveToClientValue } from "@bvaughn/src/utils/protocol";
 import { formatTimestamp } from "@bvaughn/src/utils/time";
@@ -30,13 +32,14 @@ function LogPointRenderer({
   index,
   isFocused,
   logPointInstance,
-  initialIsHovered = false,
 }: {
   index: number;
   isFocused: boolean;
   logPointInstance: PointInstance;
-  initialIsHovered?: boolean;
 }) {
+  const { currentUserInfo } = useContext(SessionContext);
+  const includesFirstConsoleNag = currentUserInfo?.nags?.includes(Nag.FIRST_CONSOLE_NAVIGATE);
+  const initialIsHovered = Boolean(!includesFirstConsoleNag && index === 0);
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);

@@ -32,18 +32,16 @@ function TerminalExpressionRenderer({
   index,
   isFocused,
   terminalExpression,
-  initialIsHovered = false,
 }: {
   index: number;
   isFocused: boolean;
   terminalExpression: TerminalExpression;
-  initialIsHovered?: boolean;
 }) {
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
-  const [isHovered, setIsHovered] = useState(initialIsHovered);
+  const [isHovered, setIsHovered] = useState(false);
 
   const ref = useRef<HTMLDivElement>(null);
 
