@@ -272,12 +272,13 @@ function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
   const urlsThatChange: Set<SourceId> = new Set();
 
   protocolSources.forEach(source => {
-    const { url } = source;
+    const { contentHash, kind, url } = source;
 
     if (url) {
       if (urlToFirstSource.has(url)) {
-        const prevContentHash = urlToFirstSource.get(url)!.contentHash;
-        if (source.contentHash !== prevContentHash) {
+        const firstSource = urlToFirstSource.get(url)!;
+        const { contentHash: prevContentHash, kind: prevKind } = firstSource;
+        if (kind === prevKind && contentHash !== prevContentHash) {
           urlsThatChange.add(url);
         }
       } else {

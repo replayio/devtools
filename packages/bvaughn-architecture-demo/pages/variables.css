@@ -5,6 +5,7 @@
   --font-size-large: 16px;
   --font-size-regular: 12px;
   --font-size-small: 10px;
+  --font-size-tiny: 8px;
 }
 
 :root.theme-dark {
@@ -28,6 +29,9 @@
   --color-hit-counts-1: #2563be;
   --color-hit-counts-2: #6ba6ff;
   --color-hit-counts-3: #baecfa;
+  --color-hit-counts-label-1: #2563be25;
+  --color-hit-counts-label-2: #6ba6ff25;
+  --color-hit-counts-label-3: #baecfa25;
   --color-primary-button: #ffffff;
   --color-secondary-button: #ffffff;
   --color-warning: #fce2a1;

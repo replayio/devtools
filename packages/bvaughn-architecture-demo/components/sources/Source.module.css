@@ -70,6 +70,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: var(--font-size-small);
 }
 
 .LineWithHits,
@@ -80,7 +81,6 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 0.5ch;
 }
 
 .LineWithoutHits .LineNumber {
@@ -92,6 +92,28 @@
 }
 .LineWithHits:hover .LineNumber {
   display: none;
+}
+
+.LineHitCountLabel0,
+.LineHitCountLabel1,
+.LineHitCountLabel2,
+.LineHitCountLabel3 {
+  font-size: var(--font-size-tiny);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-right: 1px solid var(--color-contrast);
+  margin-right: 1ch;
+}
+.LineHitCountLabel1 {
+  background-color: var(--color-hit-counts-label-1);
+}
+.LineHitCountLabel2 {
+  background-color: var(--color-hit-counts-label-2);
+}
+.LineHitCountLabel3 {
+  background-color: var(--color-hit-counts-label-3);
 }
 
 .LineHitCount0,
