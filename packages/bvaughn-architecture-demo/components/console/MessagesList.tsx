@@ -10,7 +10,7 @@ import {
   isTerminalExpression,
   isUncaughtException,
 } from "@bvaughn/src/utils/loggables";
-import { isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
+import { isExecutionPointsLessThan, isExecutionPointsWithinRange } from "@bvaughn/src/utils/time";
 import {
   ForwardedRef,
   forwardRef,
@@ -47,6 +47,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
   const replayClient = useContext(ReplayClientContext);
   const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+
   const loadedRegions = useLoadedRegions(replayClient);
 
   // The Console should render a line indicating the current execution point.
