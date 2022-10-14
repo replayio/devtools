@@ -1,14 +1,15 @@
 import React, { useContext } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
-import { getAlternateSourceId } from "../../utils/sourceVisualizations";
-import { showAlternateSource } from "../../actions/sources/select";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
+
+import { showAlternateSource } from "../../actions/sources/select";
+import { getAlternateSource } from "../../reducers/pause";
+import { getAlternateSourceId } from "../../utils/sourceVisualizations";
+
 import { CursorPosition } from "./Footer";
 import Toggle from "./Toggle";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 
 function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefined }) {
   const dispatch = useAppDispatch();
@@ -42,14 +43,12 @@ export default function SourcemapToggle({ cursorPosition }: { cursorPosition: Cu
   const selectedSource = useAppSelector(getSelectedSource);
   const alternateSource = useAppSelector(getAlternateSource);
   const sourcesById = useAppSelector(getSourceDetailsEntities);
-  const { visibleLines } = useContext(SourcesContext);
   const alternateSourceIdResult = getAlternateSourceId(
     client,
     selectedSource,
     alternateSource,
     sourcesById,
-    cursorPosition,
-    visibleLines
+    cursorPosition
   );
 
   if (alternateSourceIdResult.why === "no-source") {

@@ -5,7 +5,7 @@ import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/su
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
-import { ReplayClientInterface, SourceLocationRange } from "shared/client/types";
+import { ReplayClientInterface } from "shared/client/types";
 import {
   SourceDetails,
   isOriginalSource,
@@ -51,8 +51,7 @@ function getSourceToVisualize(
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
   position?: CursorPosition,
-  client?: ReplayClientInterface,
-  sourceLocationRange: SourceLocationRange | null = null
+  client?: ReplayClientInterface
 ) {
   if (!selectedSource) {
     return undefined;
@@ -74,13 +73,7 @@ function getSourceToVisualize(
     return alternateSource.id;
   }
   if (position && client) {
-    return getAlternateSourceIdForPosition(
-      client,
-      selectedSource,
-      position,
-      sourcesById,
-      sourceLocationRange
-    );
+    return getAlternateSourceIdForPosition(client, selectedSource, position, sourcesById);
   }
 }
 
@@ -89,8 +82,7 @@ export function getSourcemapVisualizerURL(
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
   position?: CursorPosition,
-  client?: ReplayClientInterface,
-  sourceLocationRange: SourceLocationRange | null = null
+  client?: ReplayClientInterface
 ) {
   if (!selectedSource) {
     return null;
@@ -100,8 +92,7 @@ export function getSourcemapVisualizerURL(
     alternateSource,
     sourcesById,
     position,
-    client,
-    sourceLocationRange
+    client
   );
   if (!sourceId) {
     return null;
@@ -180,10 +171,9 @@ function getAlternateSourceIdForPosition(
   client: ReplayClientInterface,
   source: SourceDetails,
   position: CursorPosition,
-  sourcesById: Dictionary<SourceDetails>,
-  sourceLocationRange: SourceLocationRange | null
+  sourcesById: Dictionary<SourceDetails>
 ) {
-  const lineLocations = getBreakpointPositionsSuspense(client, source.id, sourceLocationRange);
+  const lineLocations = getBreakpointPositionsSuspense(client, source.id);
   const breakableLine = min(
     lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );
@@ -215,8 +205,7 @@ export function getAlternateSourceId(
   selectedSource: SourceDetails | null | undefined,
   alternateSource: SourceDetails | null | undefined,
   sourcesById: Dictionary<SourceDetails>,
-  position: CursorPosition,
-  sourceLocationRange: SourceLocationRange | null
+  position: CursorPosition
 ): AlternateSourceResult {
   if (alternateSource) {
     return { sourceId: alternateSource.id };
@@ -234,8 +223,7 @@ export function getAlternateSourceId(
     client,
     selectedSource,
     position,
-    sourcesById,
-    sourceLocationRange
+    sourcesById
   );
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };

@@ -256,15 +256,7 @@ export default function useEditor(
       }
 
       const line = lineIndex + 1;
-      const locationRange = {
-        start: { line, column: 0 },
-        end: { line, column: Number.MAX_SAFE_INTEGER },
-      };
-      const breakpoints = await getBreakpointPositionsAsync(
-        replayClient,
-        selectedSource.id,
-        locationRange
-      );
+      const breakpoints = await getBreakpointPositionsAsync(replayClient, selectedSource.id);
       if (breakpoints.length === 0) {
         return;
       }

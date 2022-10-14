@@ -76,7 +76,7 @@ export default function ColumnBreakpoints({ editor }: { editor: SourceEditor }) 
     return null;
   }
 
-  const breakpoints = getBreakpointPositionsSuspense(replayClient, focusedSourceId, visibleLines);
+  const breakpoints = getBreakpointPositionsSuspense(replayClient, focusedSourceId);
 
   return (
     <div>

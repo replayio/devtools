@@ -41,11 +41,7 @@ export default function EmptyLines({ editor }: ELProps) {
         return;
       }
 
-      const breakpointPositions = await getBreakpointPositionsAsync(
-        replayClient,
-        sourceId,
-        visibleLines
-      );
+      const breakpointPositions = await getBreakpointPositionsAsync(replayClient, sourceId);
       const breakableLines = breakpointPositions.map(({ line }) => line);
 
       // For performance reasons, we should only modify lines (chunks of lines in this case) once.
