@@ -44,10 +44,9 @@ import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
 import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import {
-  ColumnHits,
   HitPointsAndStatusTuple,
   HitPointStatus,
-  LineHits,
+  LineNumberToHitCountMap,
   Point,
   ReplayClientEvents,
   ReplayClientInterface,
@@ -543,7 +542,7 @@ export class ReplayClient implements ReplayClientInterface {
     locationRange: SourceLocationRange,
     sortedSourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
-  ): Promise<Map<number, LineHits>> {
+  ): Promise<LineNumberToHitCountMap> {
     const sessionId = this.getSessionIdThrows();
 
     // The protocol returns possible breakpoints for the entire source,
@@ -564,30 +563,55 @@ export class ReplayClient implements ReplayClientInterface {
       (index: number) => endLine - sortedSourceLocations[index].line
     );
 
-    const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
-      {
-        sourceId,
-        locations: sortedSourceLocations.slice(startIndex, stopIndex + 1),
-        maxHits: 10_000,
-        range: focusRange || undefined,
-      },
-      sessionId
+    const firstColumnLocations = sortedSourceLocations
+      .slice(startIndex, stopIndex + 1)
+      .map(location => ({
+        ...location,
+        columns: location.columns.slice(0, 1),
+      }));
+    const correspondingSourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
+
+    const hitCounts: LineNumberToHitCountMap = new Map();
+
+    await Promise.all(
+      correspondingSourceIds.map(async sourceId => {
+        const { hits: protocolHitCounts } = await client.Debugger.getHitCounts(
+          {
+            sourceId,
+            locations: firstColumnLocations,
+            maxHits: 10_000,
+            range: focusRange || undefined,
+          },
+          sessionId
+        );
+
+        const lines: Set<number> = new Set();
+
+        // Sum hits across corresponding sources,
+        // But only record the first column's hits for any given line in a source.
+        protocolHitCounts.forEach(({ hits, location }) => {
+          const { line } = location;
+          if (!lines.has(line)) {
+            lines.add(line);
+
+            const previous = hitCounts.get(line) || 0;
+            if (previous) {
+              hitCounts.set(line, {
+                count: previous.count + hits,
+                firstBreakableColumnIndex: previous.firstBreakableColumnIndex,
+              });
+            } else {
+              hitCounts.set(line, {
+                count: hits,
+                firstBreakableColumnIndex: location.column,
+              });
+            }
+          }
+        });
+
+        return hitCounts;
+      })
     );
-    console.log("protocolHitCounts:", protocolHitCounts);
-
-    const hitCounts: Map<number, LineHits> = new Map();
-
-    protocolHitCounts.forEach(({ hits, location }) => {
-      const previous = hitCounts.get(location.line) || [];
-
-      hitCounts.set(location.line, [
-        ...previous,
-        {
-          hits: hits,
-          location: location,
-        },
-      ]);
-    });
 
     return hitCounts;
   }
@@ -599,12 +623,28 @@ export class ReplayClient implements ReplayClientInterface {
     const sessionId = this.getSessionIdThrows();
     const begin = locationRange ? locationRange.start : undefined;
     const end = locationRange ? locationRange.end : undefined;
-    const { lineLocations } = await client.Debugger.getPossibleBreakpoints(
-      { sourceId, begin, end },
-      sessionId
+
+    let lineLocations: SameLineSourceLocations[] | null = null;
+
+    // Breakpoint positions must be loaded for all sources,
+    // else future API calls for things like hit counts will fail with "invalid location"
+    // See BAC-2370
+    const correspondingSourceIds = this._threadFront.getCorrespondingSourceIds(sourceId);
+    await Promise.all(
+      correspondingSourceIds.map(async currentSourceId => {
+        const { lineLocations: currentLineLocations } =
+          await client.Debugger.getPossibleBreakpoints(
+            { sourceId: currentSourceId, begin, end },
+            sessionId
+          );
+
+        if (currentSourceId === sourceId) {
+          lineLocations = currentLineLocations;
+        }
+      })
     );
 
-    return lineLocations;
+    return lineLocations!;
   }
 
   async getMappedLocation(location: Location): Promise<MappedLocation> {

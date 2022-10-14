@@ -281,10 +281,7 @@ function ToggleWidgetButton() {
   const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
   const hitCountsForLine = hitCounts.get(lineNumber)!;
   if (hitCountsForLine) {
-    const first = hitCountsForLine[0];
-    if (first) {
-      firstBreakableColumnIndex = first.location.column;
-    }
+    firstBreakableColumnIndex = hitCountsForLine.firstBreakableColumnIndex;
   }
 
   if (firstBreakableColumnIndex === null) {

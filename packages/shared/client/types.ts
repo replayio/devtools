@@ -49,7 +49,11 @@ export type ColumnHits = {
   location: SourceLocation;
 };
 
-export type LineHits = ColumnHits[];
+export type LineHitCounts = {
+  count: number;
+  firstBreakableColumnIndex: number;
+};
+export type LineNumberToHitCountMap = Map<number, LineHitCounts>;
 
 export type Events = {
   keyboardEvents: KeyboardEvent[];
@@ -137,7 +141,7 @@ export interface ReplayClientInterface {
     locationRange: SourceLocationRange,
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
-  ): Promise<Map<number, LineHits>>;
+  ): Promise<LineNumberToHitCountMap>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;

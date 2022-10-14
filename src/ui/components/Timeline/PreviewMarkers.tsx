@@ -26,10 +26,7 @@ function PreviewMarkers() {
     const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
     const hitCountsForLine = hitCounts.get(hoveredLineIndex + 1)!;
     if (hitCountsForLine) {
-      const first = hitCountsForLine[0];
-      if (first) {
-        firstColumnWithHitCounts = first.location.column;
-      }
+      firstColumnWithHitCounts = hitCountsForLine.firstBreakableColumnIndex;
     }
   }
 

@@ -1,4 +1,4 @@
-import { TimeStampedPointRange } from "@replayio/protocol";
+import { SourceId, TimeStampedPointRange } from "@replayio/protocol";
 import {
   ContentType as ProtocolContentType,
   newSource as ProtocolSource,
@@ -6,7 +6,11 @@ import {
   SameLineSourceLocations as ProtocolSameLineSourceLocations,
   SourceId as ProtocolSourceId,
 } from "@replayio/protocol";
-import { LineHits, ReplayClientInterface, SourceLocationRange } from "shared/client/types";
+import {
+  LineNumberToHitCountMap,
+  ReplayClientInterface,
+  SourceLocationRange,
+} from "shared/client/types";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
@@ -18,10 +22,14 @@ export type ProtocolSourceContents = {
   contentType: ProtocolContentType;
 };
 
+export type IndexedSource = ProtocolSource & {
+  contentHashIndex: number;
+  doesContentHashChange: boolean;
+};
+
 let inProgressSourcesWakeable: Wakeable<ProtocolSource[]> | null = null;
 let sources: ProtocolSource[] | null = null;
 
-export type LineNumberToHitCountMap = Map<number, LineHits>;
 type MinMaxHitCountTuple = [minHitCount: number, maxHitCount: number];
 
 const sourceIdToHitCountsMap: Map<string, Record<LineNumberToHitCountMap>> = new Map();
@@ -33,7 +41,7 @@ const sourceIdToSourceContentsMap: Map<
 > = new Map();
 
 export function preCacheSources(value: ProtocolSource[]): void {
-  sources = value;
+  sources = toIndexedSources(value);
 }
 
 export function getSources(client: ReplayClientInterface) {
@@ -172,7 +180,8 @@ export const {
 );
 
 async function fetchSources(client: ReplayClientInterface) {
-  sources = await client.findSources();
+  const protocolSources = await client.findSources();
+  sources = toIndexedSources(protocolSources);
 
   inProgressSourcesWakeable!.resolve(sources!);
   inProgressSourcesWakeable = null;
@@ -226,9 +235,9 @@ async function fetchSourceHitCounts(
         0,
       ];
       hitCounts.forEach(hitCount => {
-        const hits = hitCount.length > 0 ? hitCount[0].hits : 0;
-        minHitCount = Math.min(minHitCount, hits);
-        maxHitCount = Math.max(maxHitCount, hits);
+        const { count } = hitCount;
+        minHitCount = Math.min(minHitCount, count);
+        maxHitCount = Math.max(maxHitCount, count);
       });
       sourceIdToMinMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
     }
@@ -245,6 +254,10 @@ async function fetchSourceHitCounts(
   }
 }
 
+export function isIndexedSource(source: ProtocolSource): source is IndexedSource {
+  return source.hasOwnProperty("contentHashIndex");
+}
+
 export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSource[] {
   const sources = getSources(client);
   return sources.filter(source => source.kind !== "inlineScript");
@@ -252,6 +265,48 @@ export function getSourcesToDisplay(client: ReplayClientInterface): ProtocolSour
 
 function isPointRange(range: TimeStampedPointRange | PointRange): range is PointRange {
   return typeof range.begin === "string";
+}
+
+function toIndexedSources(protocolSources: ProtocolSource[]): IndexedSource[] {
+  const urlToFirstSource: Map<SourceId, ProtocolSource> = new Map();
+  const urlsThatChange: Set<SourceId> = new Set();
+
+  protocolSources.forEach(source => {
+    const { url } = source;
+
+    if (url) {
+      if (urlToFirstSource.has(url)) {
+        const prevContentHash = urlToFirstSource.get(url)!.contentHash;
+        if (source.contentHash !== prevContentHash) {
+          urlsThatChange.add(url);
+        }
+      } else {
+        urlToFirstSource.set(url, source);
+      }
+    }
+  });
+
+  const urlToIndex: Map<string, number> = new Map();
+
+  return protocolSources.map(source => {
+    const { url } = source;
+
+    let contentHashIndex = 0;
+    let doesContentHashChange = false;
+    if (url) {
+      doesContentHashChange = urlsThatChange.has(url);
+
+      const index = urlToIndex.get(url) || 0;
+      contentHashIndex = index;
+      urlToIndex.set(url, index + 1);
+    }
+
+    return {
+      ...source,
+      contentHashIndex,
+      doesContentHashChange,
+    };
+  });
 }
 
 function toPointRange(range: TimeStampedPointRange | PointRange): PointRange {

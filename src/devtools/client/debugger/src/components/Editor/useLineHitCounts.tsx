@@ -8,7 +8,7 @@ import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/sou
 import { resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import { useContext, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { LineHits } from "shared/client/types";
+import { LineNumberToHitCountMap } from "shared/client/types";
 import { useFeature, useStringPref } from "ui/hooks/settings";
 import { getFocusRegion } from "ui/reducers/timeline";
 import { useAppSelector } from "ui/setup/hooks";
@@ -38,7 +38,7 @@ export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
   const focusRegion = useAppSelector(getFocusRegion);
 
   const previousFocusRegion = useRef<FocusRegion | null>(null);
-  const previousHitCounts = useRef<Map<number, LineHits> | null>(null);
+  const previousHitCounts = useRef<LineNumberToHitCountMap | null>(null);
 
   const isCollapsed = hitCountsMode == "hide-counts";
 
@@ -142,7 +142,7 @@ export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
           const lineHitCounts = hitCounts?.get(oneIndexedLineNumber);
 
           // If there are multiple hits for this line, only display the first one.
-          const hits = lineHitCounts && lineHitCounts.length > 0 ? lineHitCounts[0].hits : 0;
+          const hits = lineHitCounts ? lineHitCounts.count : 0;
 
           // We use a gradient to indicate the "heat" (the number of hits).
           // This absolute hit count values are relative, per file.

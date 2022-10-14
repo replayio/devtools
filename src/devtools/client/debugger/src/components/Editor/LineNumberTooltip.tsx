@@ -73,9 +73,9 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
   if (hoveredLineIndex != null && hitsCounts != null) {
     const hoveredLineNumber = hoveredLineIndex + 1;
     const lineHits = hitsCounts.get(hoveredLineNumber);
-    if (lineHits && lineHits.length > 0) {
+    if (lineHits) {
       // If there are multiple columns with hits for a line, show the first one.
-      hitsCount = lineHits[0].hits;
+      hitsCount = lineHits.count;
     }
   }
 

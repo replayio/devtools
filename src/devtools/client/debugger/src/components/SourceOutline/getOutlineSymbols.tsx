@@ -1,8 +1,6 @@
-import type { Location, SourceId } from "@replayio/protocol";
-import { LineNumberToHitCountMap } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
-import { ColumnHits } from "shared/client/types";
+import { LineNumberToHitCountMap } from "shared/client/types";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
 import {
@@ -17,28 +15,19 @@ export type FunctionDeclarationHits = FunctionDeclaration & {
   hits?: number;
 };
 
-export type HitCount = ColumnHits;
+export type HitCount = number;
 
 function getClosestHitCount(
   hitCountsMap: LineNumberToHitCountMap,
   location: AstLocation
 ): HitCount | null {
-  const { column: endColumn, line: endLine } = location.end;
-  const { column: startColumn, line: startLine } = location.start;
+  const { line: endLine } = location.end;
+  const { line: startLine } = location.start;
   for (let line = startLine; line <= endLine; line++) {
     let hitCounts = hitCountsMap.get(line);
     if (hitCounts) {
       if (line === startLine || line === endLine) {
-        const filteredColumnHits = hitCounts.filter(columnHit => {
-          return (
-            line > startLine ||
-            (columnHit.location.column >= startColumn && line < endLine) ||
-            columnHit.location.column <= endColumn
-          );
-        });
-        if (filteredColumnHits.length > 0) {
-          return filteredColumnHits[0];
-        }
+        return hitCounts.count;
       }
     }
   }
@@ -55,8 +44,8 @@ function addHitCountsToFunctions(
   }
 
   return functions.map(functionSymbol => {
-    const hitCount = getClosestHitCount(hitCountsMap, functionSymbol.location);
-    return Object.assign({}, functionSymbol, { hits: hitCount?.hits || 0 });
+    const count = getClosestHitCount(hitCountsMap, functionSymbol.location);
+    return Object.assign({}, functionSymbol, { hits: count || 0 });
   });
 }
 
