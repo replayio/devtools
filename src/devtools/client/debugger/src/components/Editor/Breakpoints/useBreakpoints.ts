@@ -1,9 +1,5 @@
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
-import {
-  getDocument,
-  resizeBreakpointGutter,
-  toEditorLine,
-} from "devtools/client/debugger/src/utils/editor";
+import { getDocument, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/editor";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { features } from "devtools/client/debugger/src/utils/prefs";
 import { useContext, useEffect } from "react";
@@ -71,13 +67,13 @@ export default function useEditorBreakpoints(sourceEditor: SourceEditor | null) 
         event.preventDefault();
       });
 
-      const editorLine = toEditorLine(lineNumber);
-      editor.setGutterMarker(editorLine, "breakpoints", marker);
-      editor.addLineClass(editorLine, "line", "new-breakpoint");
-      editor.removeLineClass(editorLine, "line", "breakpoint-disabled");
+      const lineIndex = lineNumber - 1;
+      editor.setGutterMarker(lineIndex, "breakpoints", marker);
+      editor.addLineClass(lineIndex, "line", "new-breakpoint");
+      editor.removeLineClass(lineIndex, "line", "breakpoint-disabled");
 
       if (!point.shouldBreak) {
-        editor.addLineClass(editorLine, "line", "breakpoint-disabled");
+        editor.addLineClass(lineIndex, "line", "breakpoint-disabled");
       }
     });
 
@@ -90,10 +86,10 @@ export default function useEditorBreakpoints(sourceEditor: SourceEditor | null) 
         }
 
         const lineNumber = point.location.line;
-        const editorLine = toEditorLine(lineNumber);
-        editor.setGutterMarker(editorLine, "breakpoints", null);
-        editor.removeLineClass(editorLine, "line", "new-breakpoint");
-        editor.removeLineClass(editorLine, "line", "breakpoint-disabled");
+        const lineIndex = lineNumber - 1;
+        editor.setGutterMarker(lineIndex, "breakpoints", null);
+        editor.removeLineClass(lineIndex, "line", "new-breakpoint");
+        editor.removeLineClass(lineIndex, "line", "breakpoint-disabled");
       });
     };
   }, [deletePoints, editPoint, points, selectedSource, sourceEditor]);

@@ -71,9 +71,11 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
 
   let hitsCount: number | null = null;
   if (hoveredLineIndex != null && hitsCounts != null) {
-    const lineHits = hitsCounts.get(hoveredLineIndex);
-    if (lineHits) {
-      hitsCount = lineHits.hits;
+    const hoveredLineNumber = hoveredLineIndex + 1;
+    const lineHits = hitsCounts.get(hoveredLineNumber);
+    if (lineHits && lineHits.length > 0) {
+      // If there are multiple columns with hits for a line, show the first one.
+      hitsCount = lineHits[0].hits;
     }
   }
 
@@ -82,11 +84,11 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
     trackEvent("breakpoint.preview_hits", { hitsCount });
   }, [hitsCount]);
 
-  if (!hoveredLineIndex || isMetaActive) {
+  if (isMetaActive) {
     return null;
-  }
-
-  if (hitsCounts == null || hoveredLineNode === null) {
+  } else if (hoveredLineIndex === null || hoveredLineNode === null) {
+    return null;
+  } else if (hitsCount == null) {
     return <Loading hoveredLineNode={hoveredLineNode} />;
   }
 
@@ -99,11 +101,7 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
   );
 }
 
-function Loading({ hoveredLineNode }: { hoveredLineNode: HTMLElement | null }) {
-  if (hoveredLineNode == null) {
-    return null;
-  }
-
+function Loading({ hoveredLineNode }: { hoveredLineNode: HTMLElement }) {
   return (
     <StaticTooltip targetNode={hoveredLineNode}>
       <Wrapper loading>Loading…</Wrapper>
@@ -113,6 +111,9 @@ function Loading({ hoveredLineNode }: { hoveredLineNode: HTMLElement | null }) {
 
 export default function LineNumberTooltip({ keyModifiers }: Props) {
   const { hoveredLineNode } = useContext(SourcesContext);
+  if (hoveredLineNode === null) {
+    return null;
+  }
 
   return (
     <ErrorBoundary>

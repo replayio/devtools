@@ -1,7 +1,6 @@
-import { SameLineSourceLocations } from "@replayio/protocol";
+import { SourceId } from "@replayio/protocol";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
-import { fromEditorLine } from "devtools/client/debugger/src/utils/editor/index";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { useEffect, useContext, useRef } from "react";
 import { replayClient } from "shared/client/ReplayClientContext";
@@ -14,11 +13,11 @@ export default function EmptyLines({ editor }: ELProps) {
   const { focusedSourceId: sourceId, visibleLines } = useContext(SourcesContext);
 
   const memoizedDrawnLinesRef = useRef<{
-    breakpointPositions: SameLineSourceLocations[] | null;
     drawnLinesSet: Set<number>;
+    sourceId: SourceId | null;
   }>({
-    breakpointPositions: null,
     drawnLinesSet: new Set(),
+    sourceId: null,
   });
 
   useEffect(() => {
@@ -51,8 +50,9 @@ export default function EmptyLines({ editor }: ELProps) {
 
       // For performance reasons, we should only modify lines (chunks of lines in this case) once.
       // However if the breakpoint positions change, we need to re-draw things.
-      if (memoizedDrawnLines.breakpointPositions !== breakpointPositions) {
+      if (memoizedDrawnLines.sourceId !== sourceId) {
         memoizedDrawnLines.drawnLinesSet = new Set();
+        memoizedDrawnLines.sourceId = sourceId;
       }
 
       editor.codeMirror.operation(() => {
@@ -63,7 +63,7 @@ export default function EmptyLines({ editor }: ELProps) {
           memoizedDrawnLines.drawnLinesSet.add(lower);
 
           editor.codeMirror.eachLine(lower, upper, lineHandle => {
-            const line = fromEditorLine(editor.codeMirror.getLineNumber(lineHandle)!);
+            const line = editor.codeMirror.getLineNumber(lineHandle)! + 1;
             if (breakableLines.includes(line)) {
               editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
             } else {

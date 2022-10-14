@@ -28,7 +28,6 @@ import {
   showSourceText,
   startOperation,
   toEditorColumn,
-  toEditorLine,
 } from "devtools/client/debugger/src/utils/editor";
 import type {
   EditorWithDoc,
@@ -39,6 +38,7 @@ import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debu
 import debounce from "lodash/debounce";
 import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
 import { isFirefox } from "ui/utils/environment";
 import {
   getSelectedSource,
@@ -58,6 +58,7 @@ type InstanceProps = {
   cx: ThreadContext;
   lastClientX: number;
   lastClientY: number;
+  points: Point[];
   selectedLocation: PartialLocation | null;
   selectedSource: SourceDetails | null;
   selectedSourceContent: SourceContent | null;
@@ -86,6 +87,7 @@ export default function useEditor(
     cx,
     lastClientX: 0,
     lastClientY: 0,
+    points: [],
     selectedLocation,
     selectedSource,
     selectedSourceContent,
@@ -148,6 +150,7 @@ export default function useEditor(
   useLayoutEffect(() => {
     const instanceProps = instancePropsRef.current;
     instanceProps.cx = cx;
+    instanceProps.points = points;
     instanceProps.selectedLocation = selectedLocation;
     instanceProps.selectedSource = selectedSource;
     instanceProps.selectedSourceContent = selectedSourceContent;
@@ -162,13 +165,15 @@ export default function useEditor(
       return;
     }
 
-    const { selectedSource, selectedSourceContent, selectedLocation, symbols } =
-      instancePropsRef.current;
-    const { selectedSource: prevSelectedSource } = prevPropsRef.current;
+    const nextProps = instancePropsRef.current;
+    const prevProps = prevPropsRef.current;
+
+    const { selectedSource, selectedSourceContent, selectedLocation, symbols } = nextProps;
+    const { selectedSource: prevSelectedSource } = prevProps;
 
     startOperation();
-    setTextHelper(editor, instancePropsRef.current);
-    scrollToLocationHelper(editor, prevPropsRef.current, instancePropsRef.current);
+    setTextHelper(editor, prevPropsRef.current, nextProps);
+    scrollToLocationHelper(editor, prevPropsRef.current, nextProps);
     endOperation();
 
     if (selectedSource != prevSelectedSource) {
@@ -178,13 +183,11 @@ export default function useEditor(
       resizeToggleButton(editor.codeMirror);
     }
 
-    const prevProps = prevPropsRef.current;
-    prevProps.selectedSource = selectedSource;
     prevProps.selectedLocation = selectedLocation;
     prevProps.selectedSource = selectedSource;
     prevProps.selectedSourceContent = selectedSourceContent;
     prevProps.symbols = symbols;
-  });
+  }, [dispatch, editor, selectedLocation, selectedSource, selectedSourceContent, symbols]);
 
   // Add event listeners to SourceEditor
   // Only stable values should be used as dependencies (e.g. React refs, state updater functions, Redux dispatch)
@@ -248,7 +251,7 @@ export default function useEditor(
 
       // Don't add a breakpoint if the user clicked on something other than the gutter line number,
       // e.g., the blank gutter space caused by adding a CodeMirror widget.
-      if (![...(clickEvent.target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
+      if (!(clickEvent.target as HTMLElement).classList.contains("CodeMirror-linenumber")) {
         return;
       }
 
@@ -278,6 +281,7 @@ export default function useEditor(
         sourceId: selectedSource.id,
       };
 
+      const points = instancePropsRef.current.points;
       const existingPoint = points.find(
         point =>
           point.location.sourceId === location.sourceId &&
@@ -421,7 +425,6 @@ export default function useEditor(
     editPoint,
     dispatch,
     editor,
-    points,
     replayClient,
     selectedSource,
     setContextMenu,
@@ -464,24 +467,29 @@ function scrollToLocationHelper(
     }
 
     if (shouldScrollToLocation) {
-      const line = toEditorLine(selectedLocation.line!);
+      const lineIndex = selectedLocation.line! - 1;
 
       let column = 0;
       if (hasDocument(selectedSource!.id)) {
         const doc = getDocument(selectedSource!.id);
-        const lineText = doc.getLine(line);
+        const lineText = doc.getLine(lineIndex);
 
         column = toEditorColumn(lineText, selectedLocation.column || 0);
         column = Math.max(column, getIndentation(lineText));
       }
 
-      scrollToColumn(editor.codeMirror, line, column);
+      scrollToColumn(editor.codeMirror, lineIndex, column);
     }
   }
 }
 
-function setTextHelper(editor: SourceEditor, instanceProps: InstanceProps): void {
-  const { selectedSource, selectedSourceContent, symbols } = instanceProps;
+function setTextHelper(editor: SourceEditor, prevProps: PrevProps, nextProps: InstanceProps): void {
+  const {
+    selectedSource: prevSelectedSource,
+    selectedSourceContent: prevSelectedSourceContent,
+    symbols: prevSymbols,
+  } = prevProps;
+  const { selectedSource, selectedSourceContent, symbols } = nextProps;
 
   if (!selectedSource || !selectedSourceContent) {
     clearEditor(editor);
@@ -493,7 +501,11 @@ function setTextHelper(editor: SourceEditor, instanceProps: InstanceProps): void
       value = "Unexpected source error";
     }
     showErrorMessage(editor, value);
-  } else {
+  } else if (
+    prevSelectedSource !== selectedSource ||
+    prevSelectedSourceContent !== selectedSourceContent ||
+    prevSymbols !== symbols
+  ) {
     showSourceText(editor, selectedSource, selectedSourceContent.value, symbols as any);
   }
 }

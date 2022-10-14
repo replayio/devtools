@@ -49,10 +49,7 @@ export type ColumnHits = {
   location: SourceLocation;
 };
 
-export type LineHits = {
-  columnHits: ColumnHits[];
-  hits: number;
-};
+export type LineHits = ColumnHits[];
 
 export type Events = {
   keyboardEvents: KeyboardEvent[];

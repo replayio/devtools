@@ -73,14 +73,6 @@ export function traverseResults(
   }
 }
 
-export function toEditorLine(lineOrOffset?: number) {
-  return lineOrOffset ? lineOrOffset - 1 : 1;
-}
-
-export function fromEditorLine(line: number) {
-  return line + 1;
-}
-
 export function toEditorColumn(lineText: string, column: number) {
   if (!lineText) {
     return 0;
@@ -201,8 +193,8 @@ export function markText(
 }
 
 export function lineAtHeight({ codeMirror }: ObjWithEditor, event: MouseEvent) {
-  const editorLine = codeMirror!.lineAtHeight(event.clientY);
-  return fromEditorLine(editorLine);
+  const lineIndex = codeMirror!.lineAtHeight(event.clientY);
+  return lineIndex + 1;
 }
 
 export function getSourceLocationFromMouseEvent(
@@ -220,7 +212,7 @@ export function getSourceLocationFromMouseEvent(
 
   return {
     sourceId,
-    line: fromEditorLine(line),
+    line: line + 1,
     column: fromEditorColumn(lineText, ch),
   };
 }

@@ -2,6 +2,7 @@ import { SameLineSourceLocations } from "@replayio/protocol";
 import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
 import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
 import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
+import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 import { useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
@@ -9,9 +10,7 @@ import { useStringPref } from "ui/hooks/settings";
 
 import ColumnBreakpoint from "./ColumnBreakpoint";
 
-type $FixTypeLater = any;
-
-export default function ColumnBreakpoints({ editor }: { editor: $FixTypeLater }) {
+export default function ColumnBreakpoints({ editor }: { editor: SourceEditor }) {
   const { focusedSourceId, visibleLines } = useContext(SourcesContext);
 
   const { value: hitCountsMode } = useStringPref("hitCounts");
@@ -94,7 +93,7 @@ function PointsForRow({
   points,
 }: {
   breakpoints: SameLineSourceLocations[];
-  editor: $FixTypeLater;
+  editor: SourceEditor;
   points: Point[];
 }) {
   const line = points[0]!.location.line;

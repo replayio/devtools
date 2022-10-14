@@ -226,8 +226,9 @@ async function fetchSourceHitCounts(
         0,
       ];
       hitCounts.forEach(hitCount => {
-        minHitCount = Math.min(minHitCount, hitCount.hits);
-        maxHitCount = Math.max(maxHitCount, hitCount.hits);
+        const hits = hitCount.length > 0 ? hitCount[0].hits : 0;
+        minHitCount = Math.min(minHitCount, hits);
+        maxHitCount = Math.max(maxHitCount, hits);
       });
       sourceIdToMinMaxHitCountsMap.set(key, [minHitCount, maxHitCount]);
     }

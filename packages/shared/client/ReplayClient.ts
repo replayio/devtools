@@ -117,21 +117,21 @@ export class ReplayClient implements ReplayClientInterface {
   async breakpointAdded(point: Point): Promise<BreakpointId[]> {
     const sessionId = this.getSessionIdThrows();
 
-    const breakpointIds: BreakpointId[] = [];
-
     const correspondingLocations = this._getCorrespondingLocations(point.location);
-    for (let index = 0; index < correspondingLocations.length; index++) {
-      const location = correspondingLocations[index];
-      const { breakpointId } = await client.Debugger.setBreakpoint(
-        {
-          condition: point.condition || undefined,
-          location,
-        },
-        sessionId
-      );
 
-      breakpointIds.push(breakpointId);
-    }
+    const breakpointIds: BreakpointId[] = await Promise.all(
+      correspondingLocations.map(async location => {
+        const { breakpointId } = await client.Debugger.setBreakpoint(
+          {
+            condition: point.condition || undefined,
+            location,
+          },
+          sessionId
+        );
+
+        return breakpointId;
+      })
+    );
 
     return breakpointIds;
   }
@@ -568,29 +568,25 @@ export class ReplayClient implements ReplayClientInterface {
       {
         sourceId,
         locations: sortedSourceLocations.slice(startIndex, stopIndex + 1),
-        maxHits: 250,
+        maxHits: 10_000,
         range: focusRange || undefined,
       },
       sessionId
     );
+    console.log("protocolHitCounts:", protocolHitCounts);
 
     const hitCounts: Map<number, LineHits> = new Map();
 
     protocolHitCounts.forEach(({ hits, location }) => {
-      const previous = hitCounts.get(location.line) || {
-        columnHits: [],
-        hits: 0,
-      };
+      const previous = hitCounts.get(location.line) || [];
 
-      const columnHits: ColumnHits = {
-        hits: hits,
-        location: location,
-      };
-
-      hitCounts.set(location.line, {
-        columnHits: [...previous.columnHits, columnHits],
-        hits: previous.hits + hits,
-      });
+      hitCounts.set(location.line, [
+        ...previous,
+        {
+          hits: hits,
+          location: location,
+        },
+      ]);
     });
 
     return hitCounts;

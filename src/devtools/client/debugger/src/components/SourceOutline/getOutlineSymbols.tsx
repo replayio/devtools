@@ -29,7 +29,7 @@ function getClosestHitCount(
     let hitCounts = hitCountsMap.get(line);
     if (hitCounts) {
       if (line === startLine || line === endLine) {
-        const filteredColumnHits = hitCounts.columnHits.filter(columnHit => {
+        const filteredColumnHits = hitCounts.filter(columnHit => {
           return (
             line > startLine ||
             (columnHit.location.column >= startColumn && line < endLine) ||

@@ -24,9 +24,9 @@ function PreviewMarkers() {
   let firstColumnWithHitCounts = null;
   if (focusedSourceId !== null && hoveredLineIndex !== null && visibleLines !== null) {
     const hitCounts = getSourceHitCounts(replayClient, focusedSourceId, visibleLines, focusRange);
-    const hitCountsForLine = hitCounts.get(hoveredLineIndex)!;
+    const hitCountsForLine = hitCounts.get(hoveredLineIndex + 1)!;
     if (hitCountsForLine) {
-      const first = hitCountsForLine.columnHits[0];
+      const first = hitCountsForLine[0];
       if (first) {
         firstColumnWithHitCounts = first.location.column;
       }
@@ -40,14 +40,18 @@ function PreviewMarkers() {
           {
             sourceId: focusedSourceId,
             column: firstColumnWithHitCounts,
-            line: hoveredLineIndex,
+            line: hoveredLineIndex + 1,
           },
           null,
           focusRange
         )
       : [null, null];
 
-  if (hitPointStatus === "too-many-points-to-find" || hitPoints == null) {
+  if (
+    hitPointStatus === "too-many-points-to-run-analysis" ||
+    hitPointStatus === "too-many-points-to-find" ||
+    hitPoints == null
+  ) {
     return null;
   }
 

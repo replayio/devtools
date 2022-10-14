@@ -49,7 +49,7 @@ export default function useBreakpointIdsFromServer(
         });
 
         prevPoints.forEach(prevPoint => {
-          const point = prevPoints.find(({ id }) => id === prevPoint.id);
+          const point = points.find(({ id }) => id === prevPoint.id);
           if (point == null) {
             const serverIds = pointIdToBreakpointIdMap.get(prevPoint.id);
             if (serverIds != null) {

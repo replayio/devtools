@@ -54,7 +54,7 @@ export default function Source({
     }
 
     const hitCountsForLine = hitCounts.get(lineNumber)!;
-    const closestColumnNumber = hitCountsForLine.columnHits[0]!.location.column;
+    const closestColumnNumber = hitCountsForLine[0]!.location.column;
     const fileName = source?.url?.split("/")?.pop();
 
     // TODO The legacy app uses the closest function name for the content (if there is one).
@@ -78,7 +78,7 @@ export default function Source({
         {lines.map((line, index) => {
           const lineNumber = index + 1;
           const lineHasHits = hitCounts.has(lineNumber);
-          const hitCount = hitCounts?.get(lineNumber)?.columnHits?.[0].hits || 0;
+          const hitCount = hitCounts?.get(lineNumber)?.[0].hits || 0;
 
           // We use a gradient to indicate the "heat" (the number of hits).
           // This absolute hit count values are relative, per file.

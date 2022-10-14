@@ -138,7 +138,11 @@ export default function useLineHitCounts(sourceEditor: SourceEditor | null) {
 
           // CM uses 0-based indexing. Our hit counts are 1-indexed.
           let oneIndexedLineNumber = currentCMLineNumber + 1;
-          const hits = hitCounts?.get(oneIndexedLineNumber)?.hits || 0;
+
+          const lineHitCounts = hitCounts?.get(oneIndexedLineNumber);
+
+          // If there are multiple hits for this line, only display the first one.
+          const hits = lineHitCounts && lineHitCounts.length > 0 ? lineHitCounts[0].hits : 0;
 
           // We use a gradient to indicate the "heat" (the number of hits).
           // This absolute hit count values are relative, per file.
