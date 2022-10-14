@@ -24,6 +24,7 @@ import { ReduxAnnotationsContext } from "./redux-devtools/redux-annotations";
 import NewConsoleRoot from "./NewConsole";
 import Loader from "../shared/Loader";
 import { getRecordingCapabilities } from "./getRecordingCapabilities";
+import { useFeature } from "ui/hooks/settings";
 
 const InspectorApp = React.lazy(() => import("devtools/client/inspector/components/App"));
 
@@ -67,12 +68,14 @@ const PanelButtons: FC<PanelButtonsProps> = ({
   toolboxLayout,
   recordingCapabilities,
 }) => {
-  const { supportsNetworkRequests } = recordingCapabilities;
+  const { supportsNetworkRequests, supportsRepaintingGraphics } = recordingCapabilities;
+  const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
+
   return (
     <div className="panel-buttons theme-tab-font-size flex flex-row items-center overflow-hidden">
-      {supportsNetworkRequests && <NodePicker />}
+      {supportsRepaintingGraphics && <NodePicker />}
       <PanelButton panel="console">Console</PanelButton>
-      {supportsNetworkRequests && <PanelButton panel="inspector">Elements</PanelButton>}
+      {supportsRepaintingGraphics && <PanelButton panel="inspector">Elements</PanelButton>}
       {toolboxLayout !== "ide" && (
         <PanelButton panel="debugger">
           <SourcesTabLabel />
@@ -80,7 +83,9 @@ const PanelButtons: FC<PanelButtonsProps> = ({
       )}
       {hasReactComponents && <PanelButton panel="react-components">React</PanelButton>}
       {hasReduxAnnotations && <PanelButton panel="redux-devtools">Redux</PanelButton>}
-      {supportsNetworkRequests && <PanelButton panel="network">Network</PanelButton>}
+      {(chromiumNetMonitorEnabled || supportsNetworkRequests) && (
+        <PanelButton panel="network">Network</PanelButton>
+      )}
     </div>
   );
 };
@@ -137,6 +142,7 @@ function SecondaryToolbox() {
   const dispatch = useAppDispatch();
 
   const recordingCapabilities = getRecordingCapabilities();
+  const { value: chromiumNetMonitorEnabled } = useFeature("chromiumNetMonitor");
 
   if (selectedPanel === "react-components" && !hasReactComponents) {
     dispatch(setSelectedPanel("console"));
@@ -160,7 +166,7 @@ function SecondaryToolbox() {
         </div>
       </header>
       <Redacted className="secondary-toolbox-content bg-chrome text-xs">
-        {recordingCapabilities.supportsNetworkRequests && (
+        {(chromiumNetMonitorEnabled || recordingCapabilities.supportsNetworkRequests) && (
           <Panel isActive={selectedPanel === "network"}>
             <NetworkMonitor />
           </Panel>

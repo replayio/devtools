@@ -61,7 +61,6 @@ function createPrefsUpdater<T extends Record<string, any>>(prefObj: T) {
 }
 
 const updateStandardPrefs = createPrefsUpdater(prefs);
-const updateAsyncPrefs = createPrefsUpdater(asyncStore);
 const updateDebuggerPrefs = createPrefsUpdater(debuggerPrefs);
 const updateDebuggerAsyncPrefs = createPrefsUpdater(debuggerAsyncPrefs);
 
