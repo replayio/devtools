@@ -419,6 +419,10 @@ export default function useEditor(
     editor,
     replayClient,
     selectedSource,
+    // We could use the source content bundled along in the "Instance Props" ref,
+    // but it's important for this effect to re-run when the source content changes–
+    // so that things like the visible lines range are re-initialized.
+    selectedSourceContent,
     setContextMenu,
     setHoveredLocation,
     setVisibleLines,
