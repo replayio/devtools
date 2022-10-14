@@ -27,12 +27,12 @@ export function FullTextFilter({
 
   return (
     <div className="p-2">
-      <div className="flex items-center space-x-2 rounded-md border-0 bg-themeTextFieldBgcolor px-2 py-1">
+      <div className="flex items-center space-x-2 rounded-md border-0 bg-chrome px-2 py-1">
         <MaterialIcon>search</MaterialIcon>
         <input
           style={{ boxShadow: "unset" }}
           placeholder="Find in files…"
-          className="flex-grow border-0 bg-themeTextFieldBgcolor p-0 text-xs text-themeTextFieldColor focus:outline-none"
+          className="flex-grow border-0 bg-chrome p-0 text-xs text-themeTextFieldColor focus:outline-none"
           type="text"
           value={value}
           onChange={e => setValue(e.target.value)}
