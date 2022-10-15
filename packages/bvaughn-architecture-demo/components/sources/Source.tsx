@@ -18,7 +18,7 @@ import {
   SourceId as ProtocolSourceId,
   SourceId,
 } from "@replayio/protocol";
-import { Fragment, memo, useContext, useMemo } from "react";
+import { CSSProperties, Fragment, memo, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineHitCounts } from "shared/client/types";
 import { Point } from "shared/client/types";
@@ -82,6 +82,7 @@ export default function Source({
               lineNumber={lineNumber}
               maxHitCount={maxHitCount}
               minHitCount={minHitCount}
+              numLines={htmlLines.length}
               point={point || null}
               source={source}
               sourceId={sourceId}
@@ -102,6 +103,7 @@ const MemoizedLine = memo(function Line({
   lineNumber,
   maxHitCount,
   minHitCount,
+  numLines,
   point,
   source,
   sourceId,
@@ -114,11 +116,13 @@ const MemoizedLine = memo(function Line({
   lineNumber: number;
   maxHitCount: number | null;
   minHitCount: number | null;
+  numLines: number;
   point: Point | null;
   source: ProtocolSource;
   sourceId: SourceId;
 }) {
   const maxHitCountStringLength = maxHitCount === null ? 0 : `${maxHitCount}`.length;
+  const maxLineNumberStringLength = `${numLines}`.length;
 
   const lineHasHits = lineHitCounts !== null;
   const hitCount = lineHitCounts?.count || 0;
@@ -246,13 +250,20 @@ const MemoizedLine = memo(function Line({
     );
   }
 
+  // Gutter needs to be  wide enough to fit the largest line number.
+  const style: CSSProperties = {
+    width: `${maxLineNumberStringLength}ch`,
+  };
+
   return (
     <Fragment>
       <div
         className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
         data-test-id={`SourceLine-${lineNumber}`}
       >
-        <div className={styles.LineNumber}>{lineNumber}</div>
+        <div className={styles.LineNumber} style={style}>
+          {lineNumber}
+        </div>
         {hoverButton}
         <div className={hitCountBarClassName} />
         <div
