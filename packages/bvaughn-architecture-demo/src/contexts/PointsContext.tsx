@@ -22,10 +22,14 @@ export type PointInstance = {
   type: "PointInstance";
 };
 
+export type AddPoint = (partialPoint: Partial<Point> | null, location: Location) => void;
+export type DeletePoints = (...id: PointId[]) => void;
+export type EditPoint = (id: PointId, partialPoint: Partial<Point>) => void;
+
 export type PointsContextType = {
-  addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
-  deletePoints: (...id: PointId[]) => void;
-  editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
+  addPoint: AddPoint;
+  deletePoints: DeletePoints;
+  editPoint: EditPoint;
   isPending: boolean;
   points: Point[];
   pointsForAnalysis: Point[];
