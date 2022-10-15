@@ -1,31 +1,27 @@
-import { javascriptLanguage } from "@codemirror/lang-javascript";
-import { ensureSyntaxTree } from "@codemirror/language";
+import {
+  javascriptLanguage,
+  jsxLanguage,
+  tsxLanguage,
+  typescriptLanguage,
+} from "@codemirror/lang-javascript";
+import { jsonLanguage } from "@codemirror/lang-json";
+import { htmlLanguage } from "@codemirror/lang-html";
+import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
 import { Tree } from "@lezer/common";
 import { highlightTree, classHighlighter } from "@lezer/highlight";
 
 import { createGenericCache } from "./createGenericCache";
 
-function codeToState(code: string): EditorState {
-  return EditorState.create({
-    doc: code,
-    extensions: [javascriptLanguage.extension],
-  });
-}
-
-function stateToTree(state: EditorState): Tree | null {
-  return ensureSyntaxTree(state, state.doc.length, 1e9);
-}
-
-function identity(any: any) {
-  return any;
-}
-
 // TODO
 // Suspense can be async; we could move this to a Worker if it's slow.
-async function highlighter(code: string): Promise<string[] | null> {
-  const state = codeToState(code);
-  const tree = stateToTree(state);
+async function highlighter(code: string, fileName: string): Promise<string[] | null> {
+  const language = urlToLanguage(fileName);
+  const state = EditorState.create({
+    doc: code,
+    extensions: [language.extension],
+  });
+  const tree = ensureSyntaxTree(state, state.doc.length, 1e9);
   if (tree === null) {
     return null;
   }
@@ -55,7 +51,32 @@ async function highlighter(code: string): Promise<string[] | null> {
   return container.innerHTML.split("\n");
 }
 
-export const { getValueSuspense: highlight } = createGenericCache<[code: string], string[] | null>(
-  highlighter,
-  identity
-);
+function identity(any: any) {
+  return any;
+}
+
+function urlToLanguage(fileName: string): LRLanguage {
+  const extension = fileName.split(".").pop();
+  switch (extension) {
+    case "js":
+      return javascriptLanguage;
+    case "jsx":
+      return jsxLanguage;
+    case "ts":
+      return typescriptLanguage;
+    case "tsx":
+      return tsxLanguage;
+    case "json":
+      return jsonLanguage;
+    case "html":
+      return htmlLanguage;
+    default:
+      console.error(`Unknown file extension: ${extension}`);
+      return javascriptLanguage;
+  }
+}
+
+export const { getValueSuspense: highlight } = createGenericCache<
+  [code: string, fileName: string],
+  string[] | null
+>(highlighter, identity);

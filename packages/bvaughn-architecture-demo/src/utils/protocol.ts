@@ -339,7 +339,14 @@ export function protocolSourcesToSourceTree(sources: ProtocolSource[]): SourceTr
     if (!source.url) {
       return;
     }
-    const url = new URL(source.url);
+
+    let url;
+    try {
+      url = new URL(source.url);
+    } catch (error) {
+      return;
+    }
+
     if (url.protocol == "replay-content:") {
       return;
     }

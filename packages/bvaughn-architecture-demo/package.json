@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@codemirror/lang-html": "^6.1.2",
     "@codemirror/lang-javascript_bvaughn": "npm:@codemirror/lang-javascript@6.1.0",
+    "@codemirror/lang-json": "^6.0.0",
     "@codemirror/language_bvaughn": "npm:@codemirror/language@6.2.1",
     "@codemirror/state_bvaughn": "npm:@codemirror/state@6.1.2",
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1",

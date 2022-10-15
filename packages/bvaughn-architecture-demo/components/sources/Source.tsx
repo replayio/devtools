@@ -44,23 +44,20 @@ export default function Source({
 
   const sourceContents = getSourceContents(client, sourceId);
 
-  const { lines, locationRange } = useMemo(() => {
+  const locationRange = useMemo(() => {
     const lines = sourceContents.contents.split("\n");
     const locationRange = {
       start: { line: 0, column: 0 },
       end: { line: lines.length - 1, column: Number.MAX_SAFE_INTEGER },
     };
-    return {
-      lines,
-      locationRange,
-    };
+    return locationRange;
   }, [sourceContents]);
 
   const hitCounts = getSourceHitCounts(client, sourceId, locationRange, focusRange);
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   const code = sourceContents.contents;
-  const htmlLines = highlight(code);
+  const htmlLines = highlight(code, fileName);
   if (htmlLines === null) {
     return null;
   }

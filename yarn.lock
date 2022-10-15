@@ -1799,6 +1799,49 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@codemirror/lang-css@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@codemirror/lang-css@npm:6.0.0"
+  dependencies:
+    "@codemirror/autocomplete": ^6.0.0
+    "@codemirror/language": ^6.0.0
+    "@codemirror/state": ^6.0.0
+    "@lezer/css": ^1.0.0
+  checksum: 855a040ec2e22cf074fe1ef433488911b6f628878cdaf94c6deaa30df188860bfbf0f629ca339b56ad66549f00c8011df81d570245266c86ad8311367a448f92
+  languageName: node
+  linkType: hard
+
+"@codemirror/lang-html@npm:^6.1.2":
+  version: 6.1.2
+  resolution: "@codemirror/lang-html@npm:6.1.2"
+  dependencies:
+    "@codemirror/autocomplete": ^6.0.0
+    "@codemirror/lang-css": ^6.0.0
+    "@codemirror/lang-javascript": ^6.0.0
+    "@codemirror/language": ^6.0.0
+    "@codemirror/state": ^6.0.0
+    "@codemirror/view": ^6.2.2
+    "@lezer/common": ^1.0.0
+    "@lezer/html": ^1.0.1
+  checksum: 7d779a4b26d812d10aecb0a524f81e221b0566398d4c1a1aa21e8a9f8ac8d8db94cab627449ebfb63c2e7da8993a16f1a5cdecb14f49f0d521ba2d460e9f4d8e
+  languageName: node
+  linkType: hard
+
+"@codemirror/lang-javascript@npm:^6.0.0, @codemirror/lang-javascript_bvaughn@npm:@codemirror/lang-javascript@6.1.0":
+  version: 6.1.0
+  resolution: "@codemirror/lang-javascript@npm:6.1.0"
+  dependencies:
+    "@codemirror/autocomplete": ^6.0.0
+    "@codemirror/language": ^6.0.0
+    "@codemirror/lint": ^6.0.0
+    "@codemirror/state": ^6.0.0
+    "@codemirror/view": ^6.0.0
+    "@lezer/common": ^1.0.0
+    "@lezer/javascript": ^1.0.0
+  checksum: 7101ff1cc2c275b4e19626ffeba7bdff7799d2ed7d3a7d6cbc03d61035930c49d8b800c7ba3658f17c69e264b78f0ee32fb5633fe088711e4dd3847f11c5d928
+  languageName: node
+  linkType: hard
+
 "@codemirror/lang-javascript@npm:^6.0.2":
   version: 6.0.2
   resolution: "@codemirror/lang-javascript@npm:6.0.2"
@@ -1814,18 +1857,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codemirror/lang-javascript_bvaughn@npm:@codemirror/lang-javascript@6.1.0":
-  version: 6.1.0
-  resolution: "@codemirror/lang-javascript@npm:6.1.0"
+"@codemirror/lang-json@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "@codemirror/lang-json@npm:6.0.0"
   dependencies:
-    "@codemirror/autocomplete": ^6.0.0
     "@codemirror/language": ^6.0.0
-    "@codemirror/lint": ^6.0.0
-    "@codemirror/state": ^6.0.0
-    "@codemirror/view": ^6.0.0
-    "@lezer/common": ^1.0.0
-    "@lezer/javascript": ^1.0.0
-  checksum: 7101ff1cc2c275b4e19626ffeba7bdff7799d2ed7d3a7d6cbc03d61035930c49d8b800c7ba3658f17c69e264b78f0ee32fb5633fe088711e4dd3847f11c5d928
+    "@lezer/json": ^1.0.0
+  checksum: 9eb7b1842e407f87683420ac74c06af224142719daf4d8dad254bffc34e826deaee2a318481b3e875e87051acaac8a56e85b4cc2ed7de53bd0297fc630e8452f
   languageName: node
   linkType: hard
 
@@ -1913,6 +1951,17 @@ __metadata:
     style-mod: ^4.0.0
     w3c-keyname: ^2.2.4
   checksum: 1029fbf3d249ca0f2425dfba6a1db517e77ca06274a0b8886903bf88456d6b6f25df1b2029e7824775b71709617a83623daeb8afd329a8ee3f60ca4f704a50fa
+  languageName: node
+  linkType: hard
+
+"@codemirror/view@npm:^6.2.2":
+  version: 6.3.1
+  resolution: "@codemirror/view@npm:6.3.1"
+  dependencies:
+    "@codemirror/state": ^6.0.0
+    style-mod: ^4.0.0
+    w3c-keyname: ^2.2.4
+  checksum: bebc71ec4697e9b3c27670f8658ad398036e3bf027491785712fde27703e560b5cb1e1496af79362d6f6895e6dde2ab1022342c8273b8ce3319c09b0941a0f6e
   languageName: node
   linkType: hard
 
@@ -2720,6 +2769,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lezer/css@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "@lezer/css@npm:1.0.1"
+  dependencies:
+    "@lezer/highlight": ^1.0.0
+    "@lezer/lr": ^1.0.0
+  checksum: f8c090a1cddef5266c370b85dbdacfb94ea930927c4421c9cbbbda87bb601e6c421d9fea528cee3f16aeead793c9e644b4ebd6a25bd310fc63d375de4d40d6b7
+  languageName: node
+  linkType: hard
+
 "@lezer/highlight@npm:^1.0.0":
   version: 1.0.0
   resolution: "@lezer/highlight@npm:1.0.0"
@@ -2738,6 +2797,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lezer/html@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "@lezer/html@npm:1.0.1"
+  dependencies:
+    "@lezer/common": ^1.0.0
+    "@lezer/highlight": ^1.0.0
+    "@lezer/lr": ^1.0.0
+  checksum: 3672c6a6658eaec0c22495374769da7e7940516a7fcbb6646613ec6e05aa9293aef4c13384aa91ede043aedab2824461c55b49a7b4654236220e76dc270be303
+  languageName: node
+  linkType: hard
+
 "@lezer/javascript@npm:^1.0.0":
   version: 1.0.0
   resolution: "@lezer/javascript@npm:1.0.0"
@@ -2745,6 +2815,16 @@ __metadata:
     "@lezer/highlight": ^1.0.0
     "@lezer/lr": ^1.0.0
   checksum: f6e104791f124e592f7343e4405224cd4a793b688db378b7e7878ddaa1b78525873fadb895fda10b1959fe83a01b498f4c48571eb827c4510b9e1f87f2327970
+  languageName: node
+  linkType: hard
+
+"@lezer/json@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@lezer/json@npm:1.0.0"
+  dependencies:
+    "@lezer/highlight": ^1.0.0
+    "@lezer/lr": ^1.0.0
+  checksum: c1ca0cdf681415b58a383a669944bed66da3aa830870d32d1e471d545cff0fe43d9ac8a0d2a318a96daa99cd5a645b1d58ba8fbdd2e8d7ca4d33a62c7582cbab
   languageName: node
   linkType: hard
 
@@ -9085,7 +9165,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "bvaughn-architecture-demo@workspace:packages/bvaughn-architecture-demo"
   dependencies:
+    "@codemirror/lang-html": ^6.1.2
     "@codemirror/lang-javascript_bvaughn": "npm:@codemirror/lang-javascript@6.1.0"
+    "@codemirror/lang-json": ^6.0.0
     "@codemirror/language_bvaughn": "npm:@codemirror/language@6.2.1"
     "@codemirror/state_bvaughn": "npm:@codemirror/state@6.1.2"
     "@lezer/common_bvaughn": "npm:@lezer/common@1.0.1"

@@ -26,6 +26,9 @@
 .tok-string2 {
   color: #faa;
 }
+.tok-typeName {
+  color: #fff;
+}
 .tok-variableName,
 .tok-variableName2 {
   color: #fff;
