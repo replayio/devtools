@@ -1,3 +1,19 @@
+.tok-comment:hover,
+.tok-definition:hover,
+.tok-local:hover,
+.tok-keyword:hover,
+.tok-number:hover,
+.tok-operator:hover,
+.tok-propertyName:hover,
+.tok-punctuation:hover,
+.tok-string:hover,
+.tok-string2:hover,
+.tok-typeName:hover,
+.tok-variableName:hover,
+.tok-variableName2:hover {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 .tok-comment {
   color: #aaa;
 }

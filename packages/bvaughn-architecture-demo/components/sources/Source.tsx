@@ -18,7 +18,7 @@ import {
   SourceId as ProtocolSourceId,
   SourceId,
 } from "@replayio/protocol";
-import { CSSProperties, Fragment, memo, useContext, useMemo } from "react";
+import { CSSProperties, Fragment, memo, MouseEvent, useContext, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineHitCounts } from "shared/client/types";
 import { Point } from "shared/client/types";
@@ -255,6 +255,22 @@ const MemoizedLine = memo(function Line({
     width: `${maxLineNumberStringLength}ch`,
   };
 
+  const onMouseMove = ({ clientX, currentTarget, target }: MouseEvent) => {
+    const characterIndex = getCharacterIndex(clientX, currentTarget as HTMLElement);
+    if (characterIndex >= 0) {
+      const character = currentTarget.textContent!.charAt(characterIndex);
+
+      // TODO Emit character hover event for hover preview popup.
+      console.log(
+        `onMouseMove()\n  rowIndex: ${
+          lineNumber - 1
+        }\n  columnIndex: ${characterIndex}\n  character: "${character}"\n  token: "${
+          (target as HTMLElement).textContent
+        }"`
+      );
+    }
+  };
+
   return (
     <Fragment>
       <div
@@ -272,9 +288,27 @@ const MemoizedLine = memo(function Line({
         >
           {hitCount > 0 ? hitCount : ""}
         </div>
-        {lineSegments}
+        <div onMouseMove={onMouseMove}>{lineSegments}</div>
       </div>
       {point && <PointPanel className={styles.PointPanel} point={point} />}
     </Fragment>
   );
 });
+
+let cachedCharacterWidth: number | null = null;
+
+function getCharacterIndex(clientX: number, container: HTMLElement): number {
+  if (cachedCharacterWidth === null) {
+    const style = getComputedStyle(container);
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d")!;
+    context.font = `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+    cachedCharacterWidth = context.measureText(" ").width;
+  }
+
+  const offset = clientX - container.getBoundingClientRect().left;
+  const characterIndex = Math.floor(offset / cachedCharacterWidth!);
+
+  return characterIndex;
+}
