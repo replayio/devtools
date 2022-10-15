@@ -1,0 +1,32 @@
+.tok-comment {
+  color: #aaa;
+}
+.tok-definition {
+  color: #ddd;
+}
+.tok-local {
+  color: #ddd;
+}
+.tok-keyword {
+  color: #faf;
+}
+.tok-number {
+  color: #afa;
+}
+.tok-operator {
+  color: #ddd;
+}
+.tok-propertyName {
+  color: #aff;
+}
+.tok-punctuation {
+  color: #ddd;
+}
+.tok-string,
+.tok-string2 {
+  color: #faa;
+}
+.tok-variableName,
+.tok-variableName2 {
+  color: #fff;
+}

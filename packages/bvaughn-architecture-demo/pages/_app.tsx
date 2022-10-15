@@ -7,6 +7,9 @@ import ErrorBoundary from "../components/ErrorBoundary";
 import "./global.css";
 import "./variables.css";
 
+// Used by syntax highlighter
+import "../components/sources/CodeMirror.css";
+
 interface AuthProps {
   apiKey?: string;
 }

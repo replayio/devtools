@@ -6,6 +6,7 @@ import {
   getSourceContents,
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
+import { highlight, tokenize } from "@bvaughn/src/suspense/TokenizerCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
 import { Fragment, useContext, useMemo } from "react";
@@ -74,10 +75,17 @@ export default function Source({
     );
   };
 
+  const code = sourceContents.contents;
+  const tokens = tokenize(code);
+  const htmlLines = tokens ? highlight(code, tokens) : null;
+  if (htmlLines === null) {
+    return null;
+  }
+
   return (
     <div className={styles.Source} data-test-id={`Source-${fileName}`}>
       <div className={styles.SourceContents}>
-        {lines.map((line, index) => {
+        {htmlLines.map((html, index) => {
           const lineNumber = index + 1;
           const lineHasHits = hitCounts.has(lineNumber);
           const hitCount = hitCounts?.get(lineNumber)?.count || 0;
@@ -115,27 +123,78 @@ export default function Source({
                 <Icon className={styles.Icon} type="remove" />
               </button>
             );
-            lineSegments = (
-              <>
-                <pre className={styles.LineSegment}>
-                  {line.substring(0, linePoint.location.column)}
-                </pre>
-                <button
-                  className={styles.BreakpointButton}
-                  onClick={() => editPoint(linePoint.id, { shouldBreak: !linePoint.shouldBreak })}
-                >
-                  <Icon
-                    className={
-                      linePoint.shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon
-                    }
-                    type="breakpoint"
+
+            if (linePoint.location.column === 0) {
+              // Special case; much simpler.
+              lineSegments = (
+                <>
+                  <button
+                    className={styles.BreakpointButton}
+                    onClick={() => editPoint(linePoint.id, { shouldBreak: !linePoint.shouldBreak })}
+                  >
+                    <Icon
+                      className={
+                        linePoint.shouldBreak
+                          ? styles.BreakpointIcon
+                          : styles.DisabledBreakpointIcon
+                      }
+                      type="breakpoint"
+                    />
+                  </button>
+                  <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+                </>
+              );
+            } else {
+              // HACK
+              // This could possibly be done in a smarter way?
+              const div = document.createElement("div");
+              div.innerHTML = html;
+
+              let htmlAfter = "";
+              let htmlBefore = "";
+              let columnIndex = 0;
+              while (div.childNodes.length > 0) {
+                const child = div.childNodes[0];
+
+                htmlBefore += child.hasOwnProperty("outerHTML")
+                  ? (child as HTMLElement).outerHTML
+                  : child.textContent;
+
+                child.remove();
+
+                columnIndex += child.textContent?.length || 0;
+                if (columnIndex >= linePoint.location.column) {
+                  htmlAfter = div.innerHTML;
+                  break;
+                }
+              }
+
+              lineSegments = (
+                <>
+                  <pre
+                    className={styles.LineSegment}
+                    dangerouslySetInnerHTML={{ __html: htmlBefore }}
                   />
-                </button>
-                <pre className={styles.LineSegment}>
-                  {line.substring(linePoint.location.column)}
-                </pre>
-              </>
-            );
+                  <button
+                    className={styles.BreakpointButton}
+                    onClick={() => editPoint(linePoint.id, { shouldBreak: !linePoint.shouldBreak })}
+                  >
+                    <Icon
+                      className={
+                        linePoint.shouldBreak
+                          ? styles.BreakpointIcon
+                          : styles.DisabledBreakpointIcon
+                      }
+                      type="breakpoint"
+                    />
+                  </button>
+                  <pre
+                    className={styles.LineSegment}
+                    dangerouslySetInnerHTML={{ __html: htmlAfter }}
+                  />
+                </>
+              );
+            }
           } else {
             hoverButton = (
               <>
@@ -144,7 +203,9 @@ export default function Source({
                 </button>
               </>
             );
-            lineSegments = <pre className={styles.LineSegment}>{line}</pre>;
+            lineSegments = (
+              <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+            );
           }
 
           return (

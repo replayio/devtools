@@ -150,7 +150,7 @@
   outline: none;
   border: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0.5ch;
   cursor: pointer;
   height: 1rem;
 }
