@@ -11,7 +11,7 @@ import {
   getSourceContents,
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
-import { highlight, tokenize } from "@bvaughn/src/suspense/TokenizerCache";
+import { highlight } from "@bvaughn/src/suspense/TokenizerCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import {
   newSource as ProtocolSource,
@@ -60,8 +60,7 @@ export default function Source({
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
   const code = sourceContents.contents;
-  const tokens = tokenize(code);
-  const htmlLines = tokens ? highlight(code, tokens) : null;
+  const htmlLines = highlight(code);
   if (htmlLines === null) {
     return null;
   }

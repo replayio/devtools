@@ -23,16 +23,13 @@ function identity(any: any) {
 
 // TODO
 // Suspense can be async; we could move this to a Worker if it's slow.
-async function tokenizer(code: string): Promise<Tree | null> {
+async function highlighter(code: string): Promise<string[] | null> {
   const state = codeToState(code);
   const tree = stateToTree(state);
+  if (tree === null) {
+    return null;
+  }
 
-  return tree;
-}
-
-// TODO
-// Suspense can be async; we could move this to a Worker if it's slow.
-async function highlighter(code: string, tree: Tree): Promise<string[]> {
   const container = document.createElement("div");
 
   let position = 0;
@@ -58,12 +55,7 @@ async function highlighter(code: string, tree: Tree): Promise<string[]> {
   return container.innerHTML.split("\n");
 }
 
-export const { getValueSuspense: tokenize } = createGenericCache<[code: string], Tree | null>(
-  tokenizer,
+export const { getValueSuspense: highlight } = createGenericCache<[code: string], string[] | null>(
+  highlighter,
   identity
 );
-
-export const { getValueSuspense: highlight } = createGenericCache<
-  [code: string, tree: Tree],
-  string[]
->(highlighter, identity);
