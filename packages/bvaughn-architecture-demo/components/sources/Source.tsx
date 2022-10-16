@@ -202,13 +202,18 @@ const MemoizedLine = memo(function Line({
     setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
   };
 
+  // Gutter needs to be  wide enough to fit the largest line number.
+  const gutterWidthStyle: CSSProperties = {
+    width: `${maxLineNumberStringLength}ch`,
+  };
+
   let hoverButton = null;
   let lineSegments = null;
   if (point) {
     const { id, location, shouldBreak } = point;
 
     hoverButton = (
-      <button className={styles.Button} onClick={() => deletePoints(id)}>
+      <button className={styles.Button} onClick={() => deletePoints(id)} style={gutterWidthStyle}>
         <Icon className={styles.Icon} type="remove" />
       </button>
     );
@@ -285,7 +290,11 @@ const MemoizedLine = memo(function Line({
   } else {
     hoverButton = (
       <>
-        <button className={styles.Button} onClick={() => onAddPointButtonClick(lineNumber)}>
+        <button
+          className={styles.Button}
+          onClick={() => onAddPointButtonClick(lineNumber)}
+          style={gutterWidthStyle}
+        >
           <Icon className={styles.Icon} type="add" />
         </button>
       </>
@@ -299,18 +308,13 @@ const MemoizedLine = memo(function Line({
     );
   }
 
-  // Gutter needs to be  wide enough to fit the largest line number.
-  const style: CSSProperties = {
-    width: `${maxLineNumberStringLength}ch`,
-  };
-
   return (
     <Fragment>
       <div
         className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
         data-test-id={`SourceLine-${lineNumber}`}
       >
-        <div className={styles.LineNumber} style={style}>
+        <div className={styles.LineNumber} style={gutterWidthStyle}>
           {lineNumber}
         </div>
         {hoverButton}

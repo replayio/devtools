@@ -8,7 +8,6 @@ import { jsonLanguage } from "@codemirror/lang-json";
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
-import { Tree } from "@lezer/common";
 import { highlightTree, classHighlighter } from "@lezer/highlight";
 
 import { createGenericCache } from "./createGenericCache";
