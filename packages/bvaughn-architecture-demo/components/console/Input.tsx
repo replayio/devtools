@@ -3,16 +3,14 @@ import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { FrameId, PauseId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
 
 import styles from "./Input.module.css";
-import { SearchContext } from "./SearchContext";
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
 
 export default function Input() {
-  const client = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(SearchContext);
+  const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
 

@@ -29,7 +29,7 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
-import { SearchContext } from "./SearchContext";
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { isPointInRegions } from "shared/utils/time";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
@@ -45,7 +45,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const replayClient = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(SearchContext);
+  const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const loadedRegions = useLoadedRegions(replayClient);

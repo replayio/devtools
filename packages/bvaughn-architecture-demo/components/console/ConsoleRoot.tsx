@@ -21,8 +21,8 @@ import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
-import Search from "./Search";
-import { SearchContextRoot } from "./SearchContext";
+import ConsoleSearch from "./ConsoleSearch";
+import { ConsoleSearchContextRoot } from "./ConsoleSearchContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
@@ -110,7 +110,7 @@ export default function ConsoleRoot({
           >
             <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
               <LoggablesContextRoot messageListRef={messageListRef}>
-                <SearchContextRoot
+                <ConsoleSearchContextRoot
                   messageListRef={messageListRef}
                   searchInputRef={searchInputRef}
                   showSearchInputByDefault={showSearchInputByDefault}
@@ -122,13 +122,13 @@ export default function ConsoleRoot({
 
                     {terminalInput}
 
-                    <Search
+                    <ConsoleSearch
                       className={styles.Row}
                       hideOnEscape={terminalInput !== null}
                       searchInputRef={searchInputRef}
                     />
                   </div>
-                </SearchContextRoot>
+                </ConsoleSearchContextRoot>
               </LoggablesContextRoot>
             </ErrorBoundary>
           </Suspense>

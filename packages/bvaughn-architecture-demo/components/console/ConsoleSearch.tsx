@@ -2,10 +2,10 @@ import { MutableRefObject, useContext } from "react";
 
 import Icon from "../Icon";
 
-import styles from "./Search.module.css";
-import { SearchContext } from "./SearchContext";
+import styles from "./ConsoleSearch.module.css";
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
 
-export default function Search({
+export default function ConsoleSearch({
   className,
   hideOnEscape,
   searchInputRef,
@@ -14,7 +14,7 @@ export default function Search({
   hideOnEscape: boolean;
   searchInputRef: MutableRefObject<HTMLInputElement | null>;
 }) {
-  const [searchState, searchActions] = useContext(SearchContext);
+  const [searchState, searchActions] = useContext(ConsoleSearchContext);
 
   const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);
