@@ -12,6 +12,7 @@ import styles from "./SourceListRow.module.css";
 
 export type ItemData = {
   addPoint: AddPoint;
+  currentSearchResultLineIndex: number | null;
   deletePoints: DeletePoints;
   editPoint: EditPoint;
   hitCounts: LineNumberToHitCountMap | null;
@@ -30,6 +31,7 @@ const SourceListRow = memo(
 
     const {
       addPoint,
+      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,
@@ -204,7 +206,12 @@ const SourceListRow = memo(
 
     return (
       <div data-test-id={`SourceLine-${lineNumber}`} style={style}>
-        <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
+        <div
+          className={[
+            lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
+            currentSearchResultLineIndex === index ? styles.CurrentSearchResultLine : undefined,
+          ].join(" ")}
+        >
           <div className={styles.LeftContainer}>
             <div
               className={styles.LineNumber}

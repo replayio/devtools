@@ -47,7 +47,7 @@ export default function Sources() {
               mode={sourceId === focusedSourceId ? "visible" : "hidden"}
             >
               <Suspense fallback={<Loader />}>
-                <Source source={source!} sourceId={sourceId} />
+                <Source source={source!} />
               </Suspense>
             </LazyOffscreen>
           );

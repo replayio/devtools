@@ -69,7 +69,24 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         location,
       };
 
-      setPointsHelper(prevPoints => [...prevPoints, point]);
+      setPointsHelper((prevPoints: Point[]) => {
+        let lowIndex = 0;
+        let highIndex = prevPoints.length;
+        while (lowIndex < highIndex) {
+          let middleIndex = (lowIndex + highIndex) >>> 1;
+          const prevPoint = prevPoints[middleIndex];
+
+          if (prevPoint.location.line < location.line) {
+            lowIndex = middleIndex + 1;
+          } else {
+            highIndex = middleIndex;
+          }
+        }
+
+        const insertAtIndex = lowIndex;
+
+        return prevPoints.slice(0, insertAtIndex).concat([point], prevPoints.slice(insertAtIndex));
+      });
     },
     [setPointsHelper]
   );

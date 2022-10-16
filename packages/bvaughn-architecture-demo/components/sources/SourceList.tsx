@@ -22,6 +22,7 @@ import { Point } from "shared/client/types";
 import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
+import { SourceSearchContext } from "./SourceSearchContext";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -33,16 +34,30 @@ export default function SourceList({
   htmlLines,
   setHoveredState,
   source,
-  sourceId,
   width,
 }: {
   height: number;
   htmlLines: string[];
   setHoveredState: (state: HoveredState | null) => void;
   source: ProtocolSource;
-  sourceId: SourceId;
   width: number;
 }) {
+  const { sourceId } = source;
+
+  const [state] = useContext(SourceSearchContext);
+  useLayoutEffect(() => {
+    const { index, results, visible } = state;
+    if (visible) {
+      if (results.length > 0) {
+        const lineIndex = results[index];
+        const list = listRef.current;
+        if (list) {
+          list.scrollToItem(lineIndex);
+        }
+      }
+    }
+  }, [state]);
+
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
@@ -76,9 +91,15 @@ export default function SourceList({
     prevPointsRef.current = points;
   }, [points]);
 
+  let currentSearchResultLineIndex: number | null = null;
+  if (state.visible && state.results.length) {
+    currentSearchResultLineIndex = state.results[state.index]!;
+  }
+
   const itemData = useMemo<ItemData>(
     () => ({
       addPoint,
+      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,
@@ -92,6 +113,7 @@ export default function SourceList({
     }),
     [
       addPoint,
+      currentSearchResultLineIndex,
       deletePoints,
       editPoint,
       hitCounts,
