@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { CSSProperties, Fragment, memo, MouseEvent } from "react";
+import { memo, MouseEvent, useEffect, useRef } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";

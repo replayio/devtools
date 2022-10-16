@@ -6,13 +6,22 @@ import {
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource, SourceId } from "@replayio/protocol";
-import { useCallback, useContext, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
+import styles from "./SourceList.module.css";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -45,7 +54,9 @@ export default function SourceList({
 
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
+  const innerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<List>(null);
+
   const prevPointsRef = useRef<Point[]>([]);
   useLayoutEffect(() => {
     const list = listRef.current;
@@ -105,16 +116,33 @@ export default function SourceList({
     [points, sourceId]
   );
 
+  const maxLineWidthRef = useRef<number>(0);
+
   const onItemsRendered = useCallback(
     ({ visibleStartIndex, visibleStopIndex }: ListOnItemsRenderedProps) => {
       setVisibleLines(visibleStartIndex, visibleStopIndex);
+
+      // Ensure that the list remains wide enough to horizontally scroll to the largest line we've rendered.
+      // This won't quite work the same as a non-windowed solution; it's an approximation.
+      const container = innerRef.current;
+      if (container) {
+        const maxLineWidth = maxLineWidthRef.current;
+        const width = container.parentElement!.scrollWidth;
+        if (width > maxLineWidth) {
+          maxLineWidthRef.current = width;
+
+          container.style.setProperty("--max-line-width", `${width}px`);
+        }
+      }
     },
     [setVisibleLines]
   );
 
   return (
     <List
+      className={styles.List}
       height={height}
+      innerRef={innerRef}
       itemCount={htmlLines.length}
       itemData={itemData}
       itemSize={getItemSize}
