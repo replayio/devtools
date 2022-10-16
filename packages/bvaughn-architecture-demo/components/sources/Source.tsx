@@ -18,15 +18,28 @@ import {
   SourceId as ProtocolSourceId,
   SourceId,
 } from "@replayio/protocol";
-import { CSSProperties, Fragment, memo, MouseEvent, useContext, useMemo } from "react";
+import {
+  CSSProperties,
+  Fragment,
+  memo,
+  MouseEvent,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { LineHitCounts } from "shared/client/types";
 import { Point } from "shared/client/types";
 
 import PointPanel from "./PointPanel";
+import PreviewPopup from "./PreviewPopup";
 import styles from "./Source.module.css";
 
-// TODO Add a real source viewer built on top of Code Mirror, Monoco, or Lexical.
+type HoveredState = {
+  expression: string;
+  target: HTMLElement;
+};
 
 export default function Source({
   source,
@@ -36,6 +49,10 @@ export default function Source({
   sourceId: ProtocolSourceId;
 }) {
   const client = useContext(ReplayClientContext);
+
+  const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
+
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
@@ -63,7 +80,7 @@ export default function Source({
   }
 
   return (
-    <div className={styles.Source} data-test-id={`Source-${fileName}`}>
+    <div className={styles.Source} data-test-id={`Source-${fileName}`} ref={containerRef}>
       <div className={styles.SourceContents}>
         {htmlLines.map((html, index) => {
           const lineNumber = index + 1;
@@ -84,12 +101,20 @@ export default function Source({
               minHitCount={minHitCount}
               numLines={htmlLines.length}
               point={point || null}
+              setHoveredState={setHoveredState}
               source={source}
               sourceId={sourceId}
             />
           );
         })}
       </div>
+      {hoveredState ? (
+        <PreviewPopup
+          containerRef={containerRef}
+          expression={hoveredState.expression}
+          target={hoveredState.target}
+        />
+      ) : null}
     </div>
   );
 }
@@ -105,6 +130,7 @@ const MemoizedLine = memo(function Line({
   minHitCount,
   numLines,
   point,
+  setHoveredState,
   source,
   sourceId,
 }: {
@@ -118,6 +144,7 @@ const MemoizedLine = memo(function Line({
   minHitCount: number | null;
   numLines: number;
   point: Point | null;
+  setHoveredState: (state: HoveredState | null) => void;
   source: ProtocolSource;
   sourceId: SourceId;
 }) {
@@ -169,6 +196,11 @@ const MemoizedLine = memo(function Line({
     hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
   }
 
+  const onMouseMove = (event: MouseEvent) => {
+    const expression = getCurrentExpression(event);
+    setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
+  };
+
   let hoverButton = null;
   let lineSegments = null;
   if (point) {
@@ -193,7 +225,11 @@ const MemoizedLine = memo(function Line({
               type="breakpoint"
             />
           </button>
-          <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+          <pre
+            className={styles.LineSegment}
+            dangerouslySetInnerHTML={{ __html: html }}
+            onMouseMove={onMouseMove}
+          />
         </>
       );
     } else {
@@ -223,7 +259,11 @@ const MemoizedLine = memo(function Line({
 
       lineSegments = (
         <>
-          <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlBefore }} />
+          <pre
+            className={styles.LineSegment}
+            dangerouslySetInnerHTML={{ __html: htmlBefore }}
+            onMouseMove={onMouseMove}
+          />
           <button
             className={styles.BreakpointButton}
             onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
@@ -233,7 +273,11 @@ const MemoizedLine = memo(function Line({
               type="breakpoint"
             />
           </button>
-          <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
+          <pre
+            className={styles.LineSegment}
+            dangerouslySetInnerHTML={{ __html: htmlAfter }}
+            onMouseMove={onMouseMove}
+          />
         </>
       );
     }
@@ -246,29 +290,17 @@ const MemoizedLine = memo(function Line({
       </>
     );
     lineSegments = (
-      <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
+      <pre
+        className={styles.LineSegment}
+        dangerouslySetInnerHTML={{ __html: html }}
+        onMouseMove={onMouseMove}
+      />
     );
   }
 
   // Gutter needs to be  wide enough to fit the largest line number.
   const style: CSSProperties = {
     width: `${maxLineNumberStringLength}ch`,
-  };
-
-  const onMouseMove = ({ clientX, currentTarget, target }: MouseEvent) => {
-    const characterIndex = getCharacterIndex(clientX, currentTarget as HTMLElement);
-    if (characterIndex >= 0) {
-      const character = currentTarget.textContent!.charAt(characterIndex);
-
-      // TODO Emit character hover event for hover preview popup.
-      console.log(
-        `onMouseMove()\n  rowIndex: ${
-          lineNumber - 1
-        }\n  columnIndex: ${characterIndex}\n  character: "${character}"\n  token: "${
-          (target as HTMLElement).textContent
-        }"`
-      );
-    }
   };
 
   return (
@@ -288,27 +320,48 @@ const MemoizedLine = memo(function Line({
         >
           {hitCount > 0 ? hitCount : ""}
         </div>
-        <div onMouseMove={onMouseMove}>{lineSegments}</div>
+        {lineSegments}
       </div>
       {point && <PointPanel className={styles.PointPanel} point={point} />}
     </Fragment>
   );
 });
 
-let cachedCharacterWidth: number | null = null;
-
-function getCharacterIndex(clientX: number, container: HTMLElement): number {
-  if (cachedCharacterWidth === null) {
-    const style = getComputedStyle(container);
-
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d")!;
-    context.font = `${style.fontStyle} ${style.fontVariant} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    cachedCharacterWidth = context.measureText(" ").width;
+function getCurrentExpression({ currentTarget, target }: MouseEvent): string | null {
+  let currentNode = target as HTMLElement;
+  if (currentNode.tagName === "PRE") {
+    return null;
   }
 
-  const offset = clientX - container.getBoundingClientRect().left;
-  const characterIndex = Math.floor(offset / cachedCharacterWidth!);
+  switch (currentNode.className) {
+    case "tok-operator":
+    case "tok-punctuation":
+      return null;
+  }
 
-  return characterIndex;
+  const parentNode = currentTarget as HTMLElement;
+  const children = Array.from(parentNode.childNodes);
+
+  let expression = currentNode.textContent!;
+  while (currentNode != null) {
+    const index = children.indexOf(currentNode);
+    if (index < 1) {
+      break;
+    }
+
+    currentNode = children[index - 1] as HTMLElement;
+    if (currentNode.nodeName === "#text") {
+      break;
+    }
+
+    if (currentNode.className !== "tok-punctuation") {
+      expression = currentNode.textContent + expression;
+    }
+
+    if (currentNode.textContent !== ".") {
+      break;
+    }
+  }
+
+  return expression.startsWith(".") ? expression.slice(1) : expression;
 }
