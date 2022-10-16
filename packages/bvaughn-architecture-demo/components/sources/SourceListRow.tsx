@@ -105,11 +105,6 @@ const SourceListRow = memo(
       setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
     };
 
-    // Gutter needs to be  wide enough to fit the largest line number.
-    const gutterWidthStyle: CSSProperties = {
-      width: `${maxLineNumberStringLength}ch`,
-    };
-
     let hoverButton = null;
     let lineSegments = null;
     if (point) {
@@ -210,16 +205,23 @@ const SourceListRow = memo(
     return (
       <div data-test-id={`SourceLine-${lineNumber}`} style={style}>
         <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
-          <div className={styles.LineNumber} style={gutterWidthStyle}>
-            {lineNumber}
+          <div className={styles.LeftContainer}>
+            <div
+              className={styles.LineNumber}
+              style={{
+                width: `${maxLineNumberStringLength}ch`,
+              }}
+            >
+              {lineNumber}
+            </div>
+            <div className={hitCountBarClassName} style={{ height: `${lineHeight}px` }} />
+            <div
+              className={hitCountLabelClassName}
+              style={{ height: `${lineHeight}px`, width: `${maxHitCountStringLength + 1}ch` }}
+            >
+              {hitCount !== null ? hitCount : ""}
+            </div>
             {hoverButton}
-          </div>
-          <div className={hitCountBarClassName} style={{ height: `${lineHeight}px` }} />
-          <div
-            className={hitCountLabelClassName}
-            style={{ width: `${maxHitCountStringLength + 1}ch` }}
-          >
-            {hitCount !== null ? hitCount : ""}
           </div>
           {lineSegments}
         </div>
