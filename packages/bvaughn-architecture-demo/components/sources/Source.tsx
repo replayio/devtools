@@ -111,6 +111,7 @@ export default function Source({
       {hoveredState ? (
         <PreviewPopup
           containerRef={containerRef}
+          dismiss={() => setHoveredState(null)}
           expression={hoveredState.expression}
           target={hoveredState.target}
         />

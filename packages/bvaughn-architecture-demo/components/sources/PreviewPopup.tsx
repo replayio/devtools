@@ -1,43 +1,54 @@
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { runAnalysis } from "@bvaughn/src/suspense/AnalysisCache";
-import { SourceLocation } from "@replayio/protocol";
+import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
+import { evaluate } from "@bvaughn/src/suspense/PauseCache";
+import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
 import { RefObject, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
-
+import Loader from "../Loader";
 import Popup from "../Popup";
-
-import styles from "./PreviewPopup.module.css";
 
 type Props = {
   containerRef: RefObject<HTMLElement>;
+  dismiss: () => void;
   expression: string;
-  // location: SourceLocation;
+  pause: Pause;
   target: HTMLElement;
 };
 
-function SuspendingPreviewPopup({ containerRef, expression, target }: Props) {
+function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, target }: Props) {
   const client = useContext(ReplayClientContext);
-  const { range } = useContext(FocusContext);
 
-  // HACK Setup a Suspense cache and Client API for this
-  // const { returned } = await ThreadFront.evaluateNew({
-  //   asyncIndex: selectedFrame.asyncIndex,
-  //   frameId: selectedFrame.protocolId,
-  //   text: expression,
-  // });
+  const pauseId = pause.pauseId;
+  const frameId = pause.data.frames?.[0]?.frameId ?? null;
 
-  return (
-    <Popup containerRef={containerRef} target={target} showTail={true}>
-      <div className={styles.PreviewPopup}>{expression}</div>
-    </Popup>
-  );
+  let value: ProtocolValue | null = null;
+  if (frameId !== null && pauseId !== null) {
+    const result = evaluate(client, pauseId, frameId, expression);
+
+    value = result.returned || null;
+  }
+
+  if (pauseId !== null && value !== null) {
+    return (
+      <Popup containerRef={containerRef} onMouseLeave={dismiss} target={target} showTail={true}>
+        <SourcePreviewInspector pauseId={pause.pauseId} protocolValue={value} />
+      </Popup>
+    );
+  } else {
+    return null;
+  }
 }
 
-export default function PreviewPopup(props: Props) {
+export default function PreviewPopup(props: Omit<Props, "pause">) {
+  const pause = useCurrentPause();
+  if (pause === null) {
+    return null;
+  }
+
   return (
     <Suspense fallback={null}>
-      <SuspendingPreviewPopup {...props} />
+      <SuspendingPreviewPopup {...props} pause={pause} />
     </Suspense>
   );
 }
