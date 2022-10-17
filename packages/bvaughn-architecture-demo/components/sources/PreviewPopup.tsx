@@ -5,7 +5,6 @@ import { RefObject, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
-import Loader from "../Loader";
 import Popup from "../Popup";
 
 type Props = {

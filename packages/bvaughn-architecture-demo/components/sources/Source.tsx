@@ -33,7 +33,12 @@ export default function Source({ source }: { source: ProtocolSource }) {
   }
 
   return (
-    <div className={styles.Source} data-test-id={`Source-${fileName}`} ref={containerRef}>
+    <div
+      className={styles.Source}
+      data-test-id={`Source-${fileName}`}
+      data-test-name="Source"
+      ref={containerRef}
+    >
       <div className={styles.SourceList}>
         <AutoSizer>
           {({ height, width }) => (

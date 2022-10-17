@@ -215,6 +215,7 @@ const SourceListRow = memo(
           <div className={styles.LeftContainer}>
             <div
               className={styles.LineNumber}
+              data-test-id={`SourceLine-LineNumber-${lineNumber}`}
               style={{
                 width: `${maxLineNumberStringLength}ch`,
               }}

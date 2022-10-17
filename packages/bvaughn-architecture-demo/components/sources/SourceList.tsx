@@ -6,7 +6,7 @@ import {
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { useCallback, useContext, useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
@@ -15,6 +15,7 @@ import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
+import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -36,9 +37,23 @@ export default function SourceList({
 }) {
   const { sourceId } = source;
 
-  const [state] = useContext(SourceSearchContext);
+  const [sourceFileNameSearchState] = useContext(SourceFileNameSearchContext);
+
+  const query = sourceFileNameSearchState.query;
+  const goToLineMode = query.startsWith(":");
+  const goToLine = goToLineMode ? parseInt(query.slice(1), 10) : null;
+  useEffect(() => {
+    if (goToLine !== null && goToLine >= 0) {
+      const list = listRef.current;
+      if (list) {
+        list.scrollToItem(goToLine);
+      }
+    }
+  }, [goToLine]);
+
+  const [sourceSearchState] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
-    const { index, results, visible } = state;
+    const { index, results, visible } = sourceSearchState;
     if (visible) {
       if (results.length > 0) {
         const lineIndex = results[index];
@@ -48,7 +63,7 @@ export default function SourceList({
         }
       }
     }
-  }, [state]);
+  }, [sourceSearchState]);
 
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
@@ -84,8 +99,8 @@ export default function SourceList({
   }, [points]);
 
   let currentSearchResultLineIndex: number | null = null;
-  if (state.visible && state.results.length) {
-    currentSearchResultLineIndex = state.results[state.index]!;
+  if (sourceSearchState.visible && sourceSearchState.results.length) {
+    currentSearchResultLineIndex = sourceSearchState.results[sourceSearchState.index]!;
   }
 
   const itemData = useMemo<ItemData>(

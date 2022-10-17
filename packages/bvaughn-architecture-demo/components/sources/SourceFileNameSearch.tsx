@@ -18,8 +18,12 @@ export default function SourceFileNameSearch({
   const [searchState, searchActions] = useContext(SourceFileNameSearchContext);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
-    searchActions.search(event.currentTarget.value);
+    const text = event.currentTarget.value;
+    searchActions.search(text);
   };
+
+  const query = searchState.query;
+  const goToLineMode = query.startsWith(":");
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (!searchState.visible) {
@@ -39,12 +43,16 @@ export default function SourceFileNameSearch({
       }
       case "Enter": {
         event.preventDefault();
-        const result = searchState.results[searchState.index];
-        if (result) {
-          openSource(result.source.sourceId);
 
-          searchActions.hide();
+        if (!goToLineMode) {
+          const result = searchState.results[searchState.index];
+          if (result) {
+            openSource(result.source.sourceId);
+          }
         }
+
+        searchActions.search("");
+        searchActions.hide();
         break;
       }
       case "Escape": {
@@ -56,7 +64,7 @@ export default function SourceFileNameSearch({
   };
 
   let results = null;
-  if (searchState.results.length > 0) {
+  if (!goToLineMode && searchState.results.length > 0) {
     results = (
       <div className={styles.Result}>
         {searchState.results.map((result, index) => (
