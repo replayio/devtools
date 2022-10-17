@@ -23,6 +23,8 @@ import Source from "../Source";
 
 import styles from "./shared.module.css";
 
+const NEW_BADGE_THRESHOLD = 5_000;
+
 // Renders PointInstances with shouldLog=true.
 function LogPointRenderer({
   index,
@@ -62,6 +64,8 @@ function LogPointRenderer({
     [logPointInstance.point.location]
   );
 
+  const showNewBadgeFlash = Date.now() - logPointInstance.point.createdAtTime < NEW_BADGE_THRESHOLD;
+
   // Note the Suspense key below is set to the log point expression's content/code.
   // This causes the Suspense boundary to immediately show a fallback state when content is edited,
   // rather than the default React behavior of updating in the background.
@@ -74,7 +78,7 @@ function LogPointRenderer({
         </span>
       )}
       <span className={styles.LogContents} data-test-name="LogContents">
-        <BadgeRenderer badge={logPointInstance.point.badge} />
+        <BadgeRenderer badge={logPointInstance.point.badge} showNewBadgeFlash={showNewBadgeFlash} />
         <ErrorBoundary
           fallback={<div className={styles.ErrorBoundaryFallback}>Something went wrong.</div>}
         >
@@ -173,32 +177,46 @@ function AnalyzedContent({ logPointInstance }: { logPointInstance: PointInstance
   );
 }
 
-function BadgeRenderer({ badge }: { badge: Badge | null }) {
-  let childrenToRender = null;
-
+function BadgeRenderer({
+  badge,
+  showNewBadgeFlash,
+}: {
+  badge: Badge | null;
+  showNewBadgeFlash: boolean;
+}) {
   switch (badge) {
+    case null: {
+      return (
+        <span className={styles.BadgeContainer}>
+          <span
+            className={classNames(
+              styles.DefaultColorBadge,
+              showNewBadgeFlash && styles.PulsingBadge
+            )}
+          />
+        </span>
+      );
+      break;
+    }
     case "unicorn":
-      childrenToRender = (
+      return (
         <span className={styles.UnicornBadge}>
           <span className={styles.Unicorn} />
         </span>
       );
     default:
-      childrenToRender = (
-        <span
-          className={classNames(
-            styles.ColorBadge,
-            badge === null ? styles.DefaultColorBadge : undefined
-          )}
-          style={{
-            // @ts-ignore
-            "--badge-color": `var(--badge-${badge ?? "default"}-color)`,
-          }}
-        />
+      return (
+        <span className={styles.BadgeContainer}>
+          <span
+            className={styles.ColorBadge}
+            style={{
+              // @ts-ignore
+              "--badge-color": `var(--badge-${badge}-color)`,
+            }}
+          />
+        </span>
       );
   }
-
-  return <span className={styles.BadgeContainer}>{childrenToRender}</span>;
 }
 
 export default memo(LogPointRenderer) as typeof LogPointRenderer;

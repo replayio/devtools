@@ -150,21 +150,29 @@
 .UnicornBadge {
   width: 0.5rem;
   height: 0.5rem;
-  box-shadow: 0 0 0 var(--background-color-contrast-1);
-  animation: pulse 1.2s 5;
 }
 .ColorBadge {
   border-radius: 0.5rem;
   background-color: var(--badge-color);
 }
 .DefaultColorBadge {
-  width: 0.3rem;
-  height: 0.3rem;
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: var(--badge-default-color);
+}
+
+.PulsingBadge {
+  box-shadow: 0 0 0 0 var(--pulse-color-off);
+  animation: pulse 1.2s 5;
 }
 
 .UnicornBadge {
   top: 0.25rem;
   overflow: visible;
+  position: relative;
+  display: inline-block;
+  margin: 0 0.5rem 0 -1rem;
 }
 .Unicorn {
   display: inline-block;
@@ -190,12 +198,12 @@
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 var(--pulse-color-1);
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
   }
   70% {
-    box-shadow: 0 0 0 0.5rem var(--pulse-color-2);
+    box-shadow: 0 0 0 0.25rem var(--pulse-color-on);
   }
   100% {
-    box-shadow: 0 0 0 0 var(--pulse-color-3);
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
   }
 }

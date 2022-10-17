@@ -93,9 +93,8 @@
   --badge-yellow-color: #fee608;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
-  --pulse-color-1: rgba(185, 185, 185, 0.35);
-  --pulse-color-2: rgba(204, 169, 44, 0);
-  --pulse-color-3: rgba(204, 169, 44, 0);
+  --pulse-color-off: rgba(0, 0, 0, 0);
+  --pulse-color-on: var(--background-color-contrast-3);
 
   --focus-mode-active-background-color: var(--background-color-contrast-4);
   --focus-mode-thumb-color: var(--background-color-contrast-3);
@@ -188,9 +187,8 @@
   --badge-yellow-color: #e4cd00;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
 
-  --pulse-color-1: rgba(127, 127, 127, 0.1);
-  --pulse-color-2: rgba(97, 97, 97, 0);
-  --pulse-color-3: rgba(88, 88, 88, 0);
+  --pulse-color-off: rgba(255, 255, 255, 0);
+  --pulse-color-on: #f2f2f2;
 
   --focus-mode-active-background-color: var(--background-color-contrast-2);
   --focus-mode-thumb-color: var(--background-color-contrast-5);

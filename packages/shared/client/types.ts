@@ -67,6 +67,7 @@ export type Point = {
   badge: Badge | null;
   condition: string | null;
   content: string;
+  createdAtTime: number;
   id: PointId;
   location: Location;
   shouldBreak: boolean;
