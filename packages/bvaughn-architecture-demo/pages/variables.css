@@ -81,6 +81,7 @@
   --value-type-html-tag-bracket: #e6e9ec;
   --value-type-html-text: #d7d7db;
 
+  --badge-default-color: #898f95;
   --badge-green-color: #69e261;
   --badge-green-contrast-color: #050;
   --badge-orange-color: #ff9a19;
@@ -91,6 +92,9 @@
   --badge-unicorn-contrast-color: #fff;
   --badge-yellow-color: #fee608;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
+
+  --pulse-color-off: rgba(0, 0, 0, 0);
+  --pulse-color-on: var(--background-color-contrast-3);
 
   --focus-mode-active-background-color: var(--background-color-contrast-4);
   --focus-mode-thumb-color: var(--background-color-contrast-3);
@@ -171,6 +175,7 @@
   --value-type-html-tag-bracket: #0c0c0d;
   --value-type-html-text: #0c0c0d;
 
+  --badge-default-color: #dcdcdc;
   --badge-green-color: #73cc6d;
   --badge-green-contrast-color: #fff;
   --badge-orange-color: #da7c04;
@@ -181,6 +186,9 @@
   --badge-unicorn-contrast-color: #fff;
   --badge-yellow-color: #e4cd00;
   --badge-yellow-contrast-color: rgb(99, 79, 5);
+
+  --pulse-color-off: rgba(255, 255, 255, 0);
+  --pulse-color-on: #f2f2f2;
 
   --focus-mode-active-background-color: var(--background-color-contrast-2);
   --focus-mode-thumb-color: var(--background-color-contrast-5);

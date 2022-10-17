@@ -135,21 +135,44 @@
   color: var(--color-error);
 }
 
-.ColorBadge,
-.UnicornBadge {
-  position: relative;
-  display: inline-block;
+.BadgeContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 0.5rem;
   height: 0.5rem;
-  margin: 0 0.5rem 0 -1rem;
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+}
+
+.ColorBadge,
+.UnicornBadge {
+  width: 0.5rem;
+  height: 0.5rem;
 }
 .ColorBadge {
   border-radius: 0.5rem;
   background-color: var(--badge-color);
 }
+.DefaultColorBadge {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 0.25rem;
+  background-color: var(--badge-default-color);
+}
+
+.PulsingBadge {
+  box-shadow: 0 0 0 0 var(--pulse-color-off);
+  animation: pulse 1.2s 5;
+}
+
 .UnicornBadge {
   top: 0.25rem;
   overflow: visible;
+  position: relative;
+  display: inline-block;
+  margin: 0 0.5rem 0 -1rem;
 }
 .Unicorn {
   display: inline-block;
@@ -171,4 +194,16 @@
 
 .ErrorBoundaryFallback {
   color: var(--color-error);
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
+  }
+  70% {
+    box-shadow: 0 0 0 0.25rem var(--pulse-color-on);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--pulse-color-off);
+  }
 }
