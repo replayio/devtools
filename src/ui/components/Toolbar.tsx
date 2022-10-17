@@ -15,6 +15,8 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import hooks from "ui/hooks";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
+import { getPauseId } from "devtools/client/debugger/src/selectors";
+import { useGetFrames } from "ui/suspense/frameCache";
 
 function ToolbarButtonTab({ active }: { active: boolean }) {
   return (
@@ -83,7 +85,9 @@ function ToolbarButton({
 }
 
 export default function Toolbar() {
-  const isPaused = useAppSelector(selectors.hasFrames);
+  const pauseId = useAppSelector(getPauseId);
+  const frames = useGetFrames(pauseId);
+  const hasFrames = !!frames.value?.length;
   const viewMode = useAppSelector(selectors.getViewMode);
   const selectedPrimaryPanel = useAppSelector(getSelectedPrimaryPanel);
   const [showCommentsBadge, setShowCommentsBadge] = useState(false);
@@ -121,7 +125,7 @@ export default function Toolbar() {
               icon="motion_photos_paused"
               name="debugger"
               label="Pause Information"
-              showBadge={isPaused}
+              showBadge={hasFrames}
             />
           </>
         ) : null}

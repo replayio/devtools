@@ -135,9 +135,6 @@ class _ThreadFront {
   // Any pause for the current point.
   _currentPause: Pause | null = null;
 
-  // Pauses created for async parent frames of the current point.
-  asyncPauses: Pause[] = [];
-
   // Recording ID being examined.
   recordingId: RecordingId | null = null;
 
@@ -383,7 +380,6 @@ class _ThreadFront {
     this.currentTime = time;
     this.currentPointHasFrames = !!hasFrames;
     this.currentPause = null;
-    this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time, frame });
   }
 
@@ -397,7 +393,6 @@ class _ThreadFront {
     this.currentTime = time;
     this.currentPointHasFrames = hasFrames;
     this.currentPause = pause;
-    this.asyncPauses.length = 0;
     this.emit("paused", { point, hasFrames, time });
   }
 
@@ -529,46 +524,6 @@ class _ThreadFront {
     return await this.getCurrentPause().getFrames();
   }
 
-  lastAsyncPause() {
-    return this.asyncPauses.length
-      ? this.asyncPauses[this.asyncPauses.length - 1]
-      : this.getCurrentPause();
-  }
-
-  async loadAsyncParentFrames() {
-    await this.getCurrentPause().ensureLoaded();
-    const basePause = this.lastAsyncPause();
-    assert(basePause, "no lastAsyncPause");
-    const baseFrames = await basePause.getFrames();
-    if (!baseFrames) {
-      return [];
-    }
-    const steps = await basePause.getFrameSteps(baseFrames[baseFrames.length - 1].frameId);
-    if (basePause != this.lastAsyncPause()) {
-      return [];
-    }
-    const entryPause = this.ensurePause(steps[0].point, steps[0].time);
-    this.asyncPauses.push(entryPause);
-    const frames = await entryPause.getFrames();
-    if (entryPause != this.lastAsyncPause()) {
-      return [];
-    }
-    assert(frames, "no frames");
-    return frames.slice(1);
-  }
-
-  pauseForAsyncIndex(asyncIndex?: number) {
-    const pause = asyncIndex ? this.asyncPauses[asyncIndex - 1] : this.getCurrentPause();
-    assert(pause, "no pause for given asyncIndex");
-    return pause;
-  }
-
-  async getScopes(asyncIndex: number, frameId: FrameId) {
-    const pause = this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
-    return await pause.getScopes(frameId);
-  }
-
   getScopeMap(location: Location): Promise<Record<string, string>> {
     return this.scopeMaps.getScopeMap(location);
   }
@@ -576,18 +531,18 @@ class _ThreadFront {
   // Same as evaluate, but returns the result without wrapping a ValueFront around them.
   // TODO Replace usages of evaluate with this.
   async evaluateNew({
-    asyncIndex,
+    pauseId,
     text,
     frameId,
     pure = false,
   }: {
-    asyncIndex?: number;
+    pauseId?: PauseId;
     text: string;
     frameId?: FrameId;
     pure?: boolean;
   }) {
-    const pause = await this.pauseForAsyncIndex(asyncIndex);
-    assert(pause, "no pause for asyncIndex");
+    const pause = pauseId ? Pause.getById(pauseId) : this.currentPause;
+    assert(pause, pauseId ? `no pause for pauseId ${pauseId}` : "no current pause");
     const abilities = await this.recordingCapabilitiesWaiter.promise;
     const rv = await pause.evaluate(frameId, text, abilities.supportsPureEvaluation && pure);
 
@@ -665,7 +620,7 @@ class _ThreadFront {
 
   private async _resumeOperation(
     command: FindTargetCommand,
-    selectedPoint: ExecutionPoint,
+    selectedPoint: ExecutionPoint | undefined,
     loadedRegions: LoadedRegions
   ) {
     // Don't allow resumes until we've finished loading and did the initial
@@ -713,22 +668,22 @@ class _ThreadFront {
     return resumeTarget;
   }
 
-  rewind(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  rewind(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findRewindTarget, point, loadedRegions);
   }
-  resume(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  resume(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findResumeTarget, point, loadedRegions);
   }
-  reverseStepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  reverseStepOver(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findReverseStepOverTarget, point, loadedRegions);
   }
-  stepOver(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  stepOver(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findStepOverTarget, point, loadedRegions);
   }
-  stepIn(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  stepIn(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findStepInTarget, point, loadedRegions);
   }
-  stepOut(point: ExecutionPoint, loadedRegions: LoadedRegions) {
+  stepOut(point: ExecutionPoint | undefined, loadedRegions: LoadedRegions) {
     return this._resumeOperation(client.Debugger.findStepOutTarget, point, loadedRegions);
   }
 
@@ -749,8 +704,8 @@ class _ThreadFront {
     client.Network.findRequests({}, sessionId);
   }
 
-  getFrameSteps(asyncIndex: number, frameId: FrameId) {
-    const pause = this.pauseForAsyncIndex(asyncIndex);
+  getFrameSteps(pauseId: PauseId, frameId: FrameId) {
+    const pause = Pause.getById(pauseId)!;
     return pause.getFrameSteps(frameId);
   }
 

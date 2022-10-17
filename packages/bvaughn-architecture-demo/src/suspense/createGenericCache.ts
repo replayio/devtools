@@ -1,11 +1,18 @@
 import { handleError } from "protocol/utils";
+import { useEffect, useRef, useState } from "react";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 import { createWakeable } from "../utils/suspense";
 
 export interface GenericCache<TParams extends Array<any>, TValue> {
   getValueSuspense(...args: TParams): TValue;
   getValueAsync(...args: TParams): Promise<TValue>;
-  getValueIfCached(...args: TParams): TValue | undefined;
+  getValueIfCached(...args: TParams): { value: TValue } | undefined;
+}
+
+interface HookState<TValue> {
+  loading: boolean;
+  value?: TValue;
+  error?: any;
 }
 
 export function createGenericCache<TParams extends Array<any>, TValue>(
@@ -78,17 +85,54 @@ export function createGenericCache<TParams extends Array<any>, TValue>(
       }
     },
 
-    getValueIfCached(...args: TParams): TValue | undefined {
+    getValueIfCached(...args: TParams): { value: TValue } | undefined {
       const cacheKey = getCacheKey(...args);
-      let record = recordMap.get(cacheKey);
+      const record = recordMap.get(cacheKey);
       switch (record?.status) {
         case STATUS_RESOLVED: {
-          return record.value;
+          return { value: record.value };
         }
         case STATUS_REJECTED: {
           throw record.value;
         }
       }
     },
+  };
+}
+
+export function createUseGetValue<TParams extends Array<any>, TValue>(
+  getValueAsync: (...args: TParams) => Promise<TValue>,
+  getValueIfCached: (...args: TParams) => { value: TValue } | undefined,
+  getCacheKey: (...args: TParams) => string
+): (...args: TParams) => HookState<TValue> {
+  return function useGetValue(...args: TParams) {
+    const [counter, setCounter] = useState(0);
+    const fetchingForKey = useRef<string>();
+
+    let cachedValue: { value: TValue } | undefined;
+    let caught: { error: any } | undefined;
+    try {
+      cachedValue = getValueIfCached(...args);
+    } catch (error) {
+      caught = { error };
+    }
+
+    useEffect(() => {
+      const key = getCacheKey(...args);
+
+      if (!cachedValue && !caught) {
+        fetchingForKey.current = key;
+        getValueAsync(...args).then(maybeTriggerRendering, maybeTriggerRendering);
+      }
+
+      function maybeTriggerRendering() {
+        if (fetchingForKey.current === key) {
+          fetchingForKey.current = undefined;
+          setCounter(counter + 1);
+        }
+      }
+    });
+
+    return { loading: !cachedValue && !caught, value: cachedValue?.value, error: caught?.error };
   };
 }

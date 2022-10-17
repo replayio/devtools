@@ -13,8 +13,8 @@ import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 
 import { trackEvent } from "ui/utils/telemetry";
 
-import type { Context } from "../../reducers/pause";
-import { getFrames, getSelectedFrameId } from "../../reducers/pause";
+import { Context, getPauseId } from "../../reducers/pause";
+import { getSelectedFrameId } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
@@ -29,12 +29,12 @@ import {
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
+import { getAllCachedPauseFrames } from "../../utils/frames";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
 import { fetchSymbolsForSource } from "../../reducers/ast";
 import { UIState } from "ui/state";
-import { Location } from "@replayio/protocol";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -228,7 +228,8 @@ export function showAlternateSource(
     }
 
     let selectSourceByPausing = false;
-    const frames = getFrames(state);
+    const pauseId = getPauseId(state);
+    const frames = getAllCachedPauseFrames(pauseId, state.sources);
     if (frames) {
       const selectedFrameId = getSelectedFrameId(state);
       const selectedFrame = frames.find(f => f.id == selectedFrameId);

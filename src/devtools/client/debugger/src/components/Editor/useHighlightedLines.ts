@@ -1,7 +1,6 @@
 import { Doc } from "codemirror";
 import range from "lodash/range";
 import isEmpty from "lodash/isEmpty";
-import { TempFrame } from "devtools/client/debugger/src/actions/pause/selectFrame";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import {
   getHighlightedLineRange,
@@ -80,7 +79,7 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
       if (
         shouldSetHighlightLine(selectedSource, selectedLocation, lineIndex, prevProps.lineIndex)
       ) {
-        if (isDebugLine(selectedFrame as any as TempFrame, selectedLocation!)) {
+        if (isDebugLine(selectedFrame, selectedLocation!)) {
           const doc = getDocument(sourceId);
           // @ts-expect-error method doesn't exist
           doc.addLineClass(lineIndex, "line", "highlight-line");
@@ -132,7 +131,10 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
   }, [editor, highlightedLineRange]);
 }
 
-function isDebugLine(selectedFrame: TempFrame | null, selectedLocation: PartialLocation) {
+function isDebugLine(
+  selectedFrame: ReturnType<typeof getVisibleSelectedFrame>,
+  selectedLocation: PartialLocation
+) {
   if (!selectedFrame) {
     return;
   }

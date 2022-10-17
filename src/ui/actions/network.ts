@@ -118,7 +118,7 @@ export function selectAndFetchRequest(requestId: RequestId): UIThunkAction {
     await ThreadFront.ensureAllSources();
     state = getState();
     const formattedFrames = frames?.map((frame, i) =>
-      createFrame(state.sources, ThreadFront.preferredGeneratedSources, frame, i)
+      createFrame(state.sources, ThreadFront.preferredGeneratedSources, frame, pause.pauseId!, i)
     );
     dispatch({
       type: "SET_FRAMES",
