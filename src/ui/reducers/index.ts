@@ -7,8 +7,6 @@ import reactDevTools, * as reactDevToolsSelectors from "./reactDevTools";
 import debuggerReducers from "devtools/client/debugger/src/reducers";
 import * as debuggerSelectors from "devtools/client/debugger/src/selectors";
 import * as inspectorReducers from "devtools/client/inspector/reducers";
-import * as hitCountsSelectors from "./hitCounts";
-import { selectors as possibleBreakpointsSelectors } from "./possibleBreakpoints";
 import { selectors as sourcesSelectors } from "./sources";
 import protocolMessages from "./protocolMessages";
 
@@ -27,9 +25,7 @@ export const reducers = {
 export const selectors = {
   ...appSelectors,
   ...debuggerSelectors,
-  ...hitCountsSelectors,
   ...layoutSelectors,
-  ...possibleBreakpointsSelectors,
   ...networkSelectors,
   ...reactDevToolsSelectors,
   ...timelineSelectors,

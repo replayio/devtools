@@ -1,4 +1,7 @@
-import { addBreakpointAtLine } from "devtools/client/debugger/src/actions/breakpoints";
+import { Location } from "@replayio/protocol";
+import { PointsContext } from "bvaughn-architecture-demo/src/contexts/PointsContext";
+import { SourcesContext } from "bvaughn-architecture-demo/src/contexts/SourcesContext";
+import { getBreakpointPositionsAsync } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import { updateCursorPosition, updateViewport } from "devtools/client/debugger/src/actions/ui";
 import {
@@ -12,7 +15,6 @@ import {
   clearEditor,
   endOperation,
   lineAtHeight,
-  fromEditorLine,
   getDocument,
   getEditor,
   getSourceLocationFromMouseEvent,
@@ -26,7 +28,6 @@ import {
   showSourceText,
   startOperation,
   toEditorColumn,
-  toEditorLine,
 } from "devtools/client/debugger/src/utils/editor";
 import type {
   EditorWithDoc,
@@ -35,7 +36,9 @@ import type {
 import { getIndentation } from "devtools/client/debugger/src/utils/indentation";
 import { resizeToggleButton, resizeBreakpointGutter } from "devtools/client/debugger/src/utils/ui";
 import debounce from "lodash/debounce";
-import { RefObject, useLayoutEffect, useRef, useState } from "react";
+import { RefObject, useContext, useLayoutEffect, useRef, useState } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
+import { Point } from "shared/client/types";
 import { isFirefox } from "ui/utils/environment";
 import {
   getSelectedSource,
@@ -47,6 +50,7 @@ import {
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { LoadingStatus } from "ui/utils/LoadingStatus";
 
+import useEditorBreakpoints from "./Breakpoints/useBreakpoints";
 import useHighlightedLines from "./useHighlightedLines";
 import useLineHitCounts from "./useLineHitCounts";
 
@@ -54,6 +58,7 @@ type InstanceProps = {
   cx: ThreadContext;
   lastClientX: number;
   lastClientY: number;
+  points: Point[];
   selectedLocation: PartialLocation | null;
   selectedSource: SourceDetails | null;
   selectedSourceContent: SourceContent | null;
@@ -74,10 +79,15 @@ export default function useEditor(
   const selectedSourceContent = useAppSelector(getSelectedSourceWithContent) || null;
   const symbols = useAppSelector(state => getSymbols(state, selectedSource as any));
 
+  const replayClient = useContext(ReplayClientContext);
+  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const { setHoveredLocation, setVisibleLines } = useContext(SourcesContext);
+
   const instancePropsRef = useRef<InstanceProps>({
     cx,
     lastClientX: 0,
     lastClientY: 0,
+    points: [],
     selectedLocation,
     selectedSource,
     selectedSourceContent,
@@ -140,6 +150,7 @@ export default function useEditor(
   useLayoutEffect(() => {
     const instanceProps = instancePropsRef.current;
     instanceProps.cx = cx;
+    instanceProps.points = points;
     instanceProps.selectedLocation = selectedLocation;
     instanceProps.selectedSource = selectedSource;
     instanceProps.selectedSourceContent = selectedSourceContent;
@@ -154,13 +165,15 @@ export default function useEditor(
       return;
     }
 
-    const { selectedSource, selectedSourceContent, selectedLocation, symbols } =
-      instancePropsRef.current;
-    const { selectedSource: prevSelectedSource } = prevPropsRef.current;
+    const nextProps = instancePropsRef.current;
+    const prevProps = prevPropsRef.current;
+
+    const { selectedSource, selectedSourceContent, selectedLocation, symbols } = nextProps;
+    const { selectedSource: prevSelectedSource } = prevProps;
 
     startOperation();
-    setTextHelper(editor, instancePropsRef.current);
-    scrollToLocationHelper(editor, prevPropsRef.current, instancePropsRef.current);
+    setTextHelper(editor, prevPropsRef.current, nextProps);
+    scrollToLocationHelper(editor, prevPropsRef.current, nextProps);
     endOperation();
 
     if (selectedSource != prevSelectedSource) {
@@ -170,13 +183,11 @@ export default function useEditor(
       resizeToggleButton(editor.codeMirror);
     }
 
-    const prevProps = prevPropsRef.current;
-    prevProps.selectedSource = selectedSource;
     prevProps.selectedLocation = selectedLocation;
     prevProps.selectedSource = selectedSource;
     prevProps.selectedSourceContent = selectedSourceContent;
     prevProps.symbols = symbols;
-  });
+  }, [dispatch, editor, selectedLocation, selectedSource, selectedSourceContent, symbols]);
 
   // Add event listeners to SourceEditor
   // Only stable values should be used as dependencies (e.g. React refs, state updater functions, Redux dispatch)
@@ -219,22 +230,70 @@ export default function useEditor(
 
     const onCodeMirrorContextMenu = (_: any, __: number, ___: any, event: MouseEvent) => {};
 
-    const onCodeMirrorGutterClick = (_: any, line: number, __: any, event: MouseEvent) => {
-      const { button, ctrlKey, target } = event;
-      const { cx, selectedSource } = instancePropsRef.current;
-
-      if ((ctrlKey && button === 0) || button === 2 || !selectedSource) {
-        // ignore right clicks in the gutter
-        return;
-      } else if (typeof line !== "number") {
-        return;
-      } else if (![...(target as HTMLElement).classList].includes("CodeMirror-linenumber")) {
-        // Don't add a breakpoint if the user clicked on something other than the gutter line number,
-        // e.g., the blank gutter space caused by adding a CodeMirror widget.
+    const onCodeMirrorGutterClick = async (
+      cm: any,
+      lineIndex: number,
+      gutter: any,
+      clickEvent: MouseEvent
+    ) => {
+      if (editor == null || selectedSource == null) {
         return;
       }
 
-      return dispatch(addBreakpointAtLine(cx, fromEditorLine(line)));
+      if (typeof lineIndex !== "number") {
+        return;
+      }
+
+      // ignore right clicks in the gutter
+      if ((clickEvent.ctrlKey && clickEvent.button === 0) || clickEvent.button === 2) {
+        return;
+      }
+
+      // Don't add a breakpoint if the user clicked on something other than the gutter line number,
+      // e.g., the blank gutter space caused by adding a CodeMirror widget.
+      if (!(clickEvent.target as HTMLElement).classList.contains("CodeMirror-linenumber")) {
+        return;
+      }
+
+      const line = lineIndex + 1;
+      const breakpoints = await getBreakpointPositionsAsync(replayClient, selectedSource.id);
+      if (breakpoints.length === 0) {
+        return;
+      }
+      const breakpointsForLine = breakpoints.find(breakpoint => breakpoint.line === line);
+      if (breakpointsForLine == null || breakpointsForLine.columns.length === 0) {
+        return;
+      }
+
+      const firstBreakableColumn = breakpointsForLine.columns[0];
+
+      const location: Location = {
+        column: firstBreakableColumn,
+        line,
+        sourceId: selectedSource.id,
+      };
+
+      const points = instancePropsRef.current.points;
+      const existingPoint = points.find(
+        point =>
+          point.location.sourceId === location.sourceId &&
+          point.location.line === location.line &&
+          point.location.column === location.column
+      );
+
+      if (existingPoint != null) {
+        if (existingPoint.shouldBreak) {
+          if (existingPoint.shouldLog) {
+            editPoint(existingPoint.id, { shouldBreak: false });
+          } else {
+            deletePoints(existingPoint.id);
+          }
+        } else {
+          editPoint(existingPoint.id, { shouldBreak: true });
+        }
+      } else {
+        addPoint({ shouldBreak: true }, location);
+      }
     };
 
     const onCodeMirrorKeyDown = (event: KeyboardEvent) => {
@@ -257,10 +316,13 @@ export default function useEditor(
       }
     };
 
-    const onCodeMirrorScrollDebounced = debounce((...args) => {
+    const onCodeMirrorScrollDebounced = debounce(() => {
       const { lastClientX, lastClientY } = instancePropsRef.current;
       dispatch(updateViewport());
       onMouseScroll(codeMirror, lastClientX, lastClientY);
+
+      const { viewFrom, viewTo } = editor.editor.display;
+      setVisibleLines(viewFrom, viewTo);
     }, 75);
 
     const onDocumentMouseMove = (event: MouseEvent) => {
@@ -270,6 +332,24 @@ export default function useEditor(
       instanceProps.lastClientY = event.clientY;
     };
 
+    const onCodeMirrorLineMouseEnter = ({
+      columnIndex,
+      lineIndex,
+      lineNumberNode,
+    }: {
+      columnIndex: number;
+      lineIndex: number;
+      lineNumberNode: HTMLElement;
+    }) => {
+      onCodeMirrorLineMouseLeaveDebounced.cancel();
+
+      setHoveredLocation(lineIndex, lineNumberNode);
+    };
+
+    const onCodeMirrorLineMouseLeaveDebounced = debounce(() => {
+      setHoveredLocation(null, null);
+    }, 50);
+
     const onCodeMirrorMouseOverToken = onTokenMouseOver(codeMirror);
     const onCodeMirrorMouseOverLine = onLineMouseOver(codeMirror);
 
@@ -277,6 +357,10 @@ export default function useEditor(
 
     // @ts-expect-error Unknown "gutterClick" event type
     codeMirror.on("gutterClick", onCodeMirrorGutterClick);
+    // @ts-expect-error Unknown "lineMouseEnter" event type
+    codeMirror.on("lineMouseEnter", onCodeMirrorLineMouseEnter);
+    // @ts-expect-error Unknown "lineMouseLeave" event type
+    codeMirror.on("lineMouseLeave", onCodeMirrorLineMouseLeaveDebounced);
     codeMirror.on("scroll", onCodeMirrorScrollDebounced);
 
     const codeMirrorWrapper = codeMirror.getWrapperElement();
@@ -316,6 +400,10 @@ export default function useEditor(
       codeMirror.off("gutterClick", onCodeMirrorGutterClick);
       // @ts-expect-error Handler param types mismatch
       codeMirror.off("gutterContextMenu", onCodeMirrorGutterContextMenu);
+      // @ts-expect-error Handler param types mismatch
+      codeMirror.off("lineMouseEnter", onCodeMirrorLineMouseEnter);
+      // @ts-expect-error Handler param types mismatch
+      codeMirror.off("lineMouseLeave", onCodeMirrorLineMouseLeaveDebounced);
       codeMirror.off("scroll", onCodeMirrorScrollDebounced);
 
       codeMirrorWrapper.removeEventListener("click", onCodeMirrorClick);
@@ -323,10 +411,26 @@ export default function useEditor(
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverToken);
       codeMirrorWrapper.removeEventListener("mouseover", onCodeMirrorMouseOverLine);
     };
-  }, [dispatch, editor, setContextMenu]);
+  }, [
+    addPoint,
+    deletePoints,
+    editPoint,
+    dispatch,
+    editor,
+    replayClient,
+    selectedSource,
+    // We could use the source content bundled along in the "Instance Props" ref,
+    // but it's important for this effect to re-run when the source content changes–
+    // so that things like the visible lines range are re-initialized.
+    selectedSourceContent,
+    setContextMenu,
+    setHoveredLocation,
+    setVisibleLines,
+  ]);
 
   useHighlightedLines(editor);
   useLineHitCounts(editor);
+  useEditorBreakpoints(editor);
 
   return editor;
 }
@@ -359,24 +463,29 @@ function scrollToLocationHelper(
     }
 
     if (shouldScrollToLocation) {
-      const line = toEditorLine(selectedLocation.line!);
+      const lineIndex = selectedLocation.line! - 1;
 
       let column = 0;
       if (hasDocument(selectedSource!.id)) {
         const doc = getDocument(selectedSource!.id);
-        const lineText = doc.getLine(line);
+        const lineText = doc.getLine(lineIndex);
 
         column = toEditorColumn(lineText, selectedLocation.column || 0);
         column = Math.max(column, getIndentation(lineText));
       }
 
-      scrollToColumn(editor.codeMirror, line, column);
+      scrollToColumn(editor.codeMirror, lineIndex, column);
     }
   }
 }
 
-function setTextHelper(editor: SourceEditor, instanceProps: InstanceProps): void {
-  const { selectedSource, selectedSourceContent, symbols } = instanceProps;
+function setTextHelper(editor: SourceEditor, prevProps: PrevProps, nextProps: InstanceProps): void {
+  const {
+    selectedSource: prevSelectedSource,
+    selectedSourceContent: prevSelectedSourceContent,
+    symbols: prevSymbols,
+  } = prevProps;
+  const { selectedSource, selectedSourceContent, symbols } = nextProps;
 
   if (!selectedSource || !selectedSourceContent) {
     clearEditor(editor);
@@ -388,7 +497,11 @@ function setTextHelper(editor: SourceEditor, instanceProps: InstanceProps): void
       value = "Unexpected source error";
     }
     showErrorMessage(editor, value);
-  } else {
+  } else if (
+    prevSelectedSource !== selectedSource ||
+    prevSelectedSourceContent !== selectedSourceContent ||
+    prevSymbols !== symbols
+  ) {
     showSourceText(editor, selectedSource, selectedSourceContent.value, symbols as any);
   }
 }

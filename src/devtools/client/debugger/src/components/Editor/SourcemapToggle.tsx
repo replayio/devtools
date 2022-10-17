@@ -1,13 +1,15 @@
 import React, { useContext } from "react";
-import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getAlternateSource } from "../../reducers/pause";
-import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
-import { getAlternateSourceId } from "../../utils/sourceVisualizations";
-import { showAlternateSource } from "../../actions/sources/select";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { setModal } from "ui/actions/app";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { getSelectedSource, getSourceDetailsEntities } from "ui/reducers/sources";
+
+import { showAlternateSource } from "../../actions/sources/select";
+import { getAlternateSource } from "../../reducers/pause";
+import { getAlternateSourceId } from "../../utils/sourceVisualizations";
+
 import { CursorPosition } from "./Footer";
 import Toggle from "./Toggle";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefined }) {
   const dispatch = useAppDispatch();

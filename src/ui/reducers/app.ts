@@ -1,4 +1,3 @@
-import { Location } from "@replayio/protocol";
 import { createSelector, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RecordingTarget } from "protocol/thread/thread";
 import { getSystemColorSchemePreference } from "ui/utils/environment";
@@ -19,7 +18,6 @@ import {
   SettingsTabTitle,
   AppMode,
 } from "ui/state/app";
-import { PanelName } from "ui/state/layout";
 import { Workspace } from "ui/types";
 import { getNonLoadingRegionTimeRanges } from "ui/utils/app";
 import { compareBigInt } from "ui/utils/helpers";
@@ -41,7 +39,6 @@ export const initialAppState: AppState = {
   displayedLoadingProgress: null,
   events: {},
   expectedError: null,
-  hoveredLineNumberLocation: null,
   isNodePickerActive: false,
   isNodePickerInitializing: false,
   loadedRegions: null,
@@ -147,9 +144,6 @@ const appSlice = createSlice({
       // Load multiple event types into state at once
       Object.assign(state.events, action.payload);
     },
-    setHoveredLineNumberLocation(state, action: PayloadAction<Location | null>) {
-      state.hoveredLineNumberLocation = action.payload;
-    },
     setIsNodePickerActive(state, action: PayloadAction<boolean>) {
       state.isNodePickerActive = action.payload;
     },
@@ -191,7 +185,6 @@ export const {
   setDisplayedLoadingProgress,
   loadReceivedEvents,
   setExpectedError,
-  setHoveredLineNumberLocation,
   setIsNodePickerActive,
   setIsNodePickerInitializing,
   setLoadedRegions,
@@ -296,8 +289,6 @@ export const getUnexpectedError = (state: UIState) => state.app.unexpectedError;
 export const getTrialExpired = (state: UIState) => state.app.trialExpired;
 export const getModal = (state: UIState) => state.app.modal;
 export const getModalOptions = (state: UIState) => state.app.modalOptions;
-
-export const getHoveredLineNumberLocation = (state: UIState) => state.app.hoveredLineNumberLocation;
 
 const NO_EVENTS: MouseEvent[] = [];
 export const getEventsForType = (state: UIState, type: string) =>

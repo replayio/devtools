@@ -28,7 +28,7 @@ export default function Source({
   const { range: focusRange } = useContext(FocusContext);
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
 
-  const fileName = getSourceFileName(source) || "unknown";
+  const fileName = getSourceFileName(source, true) || "unknown";
 
   const sourceContents = getSourceContents(client, sourceId);
 
@@ -47,6 +47,8 @@ export default function Source({
   const hitCounts = getSourceHitCounts(client, sourceId, locationRange, focusRange);
   const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
 
+  const maxHitCountStringLength = `${maxHitCount}`.length;
+
   const onAddPointButtonClick = async (lineNumber: number) => {
     const lineHasHits = hitCounts.has(lineNumber);
     if (!lineHasHits) {
@@ -54,7 +56,7 @@ export default function Source({
     }
 
     const hitCountsForLine = hitCounts.get(lineNumber)!;
-    const closestColumnNumber = hitCountsForLine.columnHits[0]!.location.column;
+    const closestColumnNumber = hitCountsForLine!.firstBreakableColumnIndex;
     const fileName = source?.url?.split("/")?.pop();
 
     // TODO The legacy app uses the closest function name for the content (if there is one).
@@ -78,13 +80,14 @@ export default function Source({
         {lines.map((line, index) => {
           const lineNumber = index + 1;
           const lineHasHits = hitCounts.has(lineNumber);
-          const hitCount = hitCounts?.get(lineNumber)?.columnHits?.[0].hits || 0;
+          const hitCount = hitCounts?.get(lineNumber)?.count || 0;
 
           // We use a gradient to indicate the "heat" (the number of hits).
           // This absolute hit count values are relative, per file.
           // Cubed root prevents high hit counts from lumping all other values together.
           const NUM_GRADIENT_COLORS = 3;
-          let hitCountClassName = styles.LineHitCount0;
+          let hitCountBarClassName = styles.LineHitCount0;
+          let hitCountLabelClassName = styles.LineHitCountLabel0;
           let hitCountIndex = NUM_GRADIENT_COLORS - 1;
           if (hitCount > 0 && minHitCount !== null && maxHitCount !== null) {
             if (minHitCount !== maxHitCount) {
@@ -95,7 +98,9 @@ export default function Source({
                 )
               );
             }
-            hitCountClassName = styles[`LineHitCount${hitCountIndex + 1}`];
+
+            hitCountBarClassName = styles[`LineHitCount${hitCountIndex + 1}`];
+            hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
           }
 
           const linePoint = points.find(
@@ -151,7 +156,13 @@ export default function Source({
               >
                 <div className={styles.LineNumber}>{lineNumber}</div>
                 {hoverButton}
-                <div className={hitCountClassName} />
+                <div className={hitCountBarClassName} />
+                <div
+                  className={hitCountLabelClassName}
+                  style={{ width: `${maxHitCountStringLength + 1}ch` }}
+                >
+                  {hitCount > 0 ? hitCount : ""}
+                </div>
                 {lineSegments}
               </div>
               {linePoint && <PointPanel className={styles.PointPanel} point={linePoint} />}

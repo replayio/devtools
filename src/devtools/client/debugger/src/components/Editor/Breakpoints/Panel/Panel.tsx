@@ -1,7 +1,3 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
 import React, { Suspense, useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
 import classnames from "classnames";
 import PanelEditor from "./PanelEditor";
@@ -13,7 +9,6 @@ import { actions } from "ui/actions";
 import { selectors } from "ui/reducers";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import type { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import PanelSummary from "./PanelSummary";
 import FirstEditNag from "./FirstEditNag";
 import PrefixBadgeButton from "ui/components/PrefixBadge";
@@ -24,6 +19,7 @@ import { getFocusRegion } from "ui/reducers/timeline";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { UnsafeFocusRegion } from "ui/state/timeline";
 import { getHitPointsForLocation } from "bvaughn-architecture-demo/src/suspense/PointsCache";
+import { Point } from "shared/client/types";
 import type { SourceEditor } from "devtools/client/debugger/src/utils/editor/source-editor";
 
 const gutterOffset = 37;
@@ -47,7 +43,7 @@ const connector = connect(
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 type ExternalProps = {
-  breakpoint?: Breakpoint;
+  breakpoint: Point;
   editor: SourceEditor;
   insertAt: number;
 };
@@ -65,8 +61,8 @@ function Panel({
   setHoveredItem,
 }: PanelProps) {
   const [editing, setEditing] = useState(false);
-  const [showCondition, setShowCondition] = useState(Boolean(breakpoint!.options.condition)); // nosemgrep
-  const [inputToFocus, setInputToFocus] = useState<"condition" | "logValue">("logValue");
+  const [showCondition, setShowCondition] = useState(!!breakpoint.condition);
+  const [inputToFocus, setInputToFocus] = useState<"condition" | "content">("content");
   const dismissNag = hooks.useDismissNag();
 
   // WARNING
@@ -83,7 +79,7 @@ function Panel({
       ? getHitPointsForLocation(
           replayClient,
           breakpointForSuspense.location,
-          breakpointForSuspense.options.condition || null,
+          breakpointForSuspense.condition,
           unsafeFocusRegionForSuspense
         )
       : [null, null];
@@ -137,7 +133,7 @@ function Panel({
 
   const onMouseEnter = () => {
     const hoveredItem = {
-      location: breakpoint!.location,
+      location: breakpoint.location,
       target: "widget",
     };
 
@@ -152,7 +148,7 @@ function Panel({
   };
 
   return (
-    <Widget location={breakpoint!.location} editor={editor} insertAt={insertAt}>
+    <Widget location={breakpoint.location} editor={editor} insertAt={insertAt}>
       <div
         onMouseEnter={onMouseEnter}
         onMouseLeave={onMouseLeave}
@@ -165,15 +161,14 @@ function Panel({
         <FirstEditNag editing={editing} />
         <div className={classnames("breakpoint-panel", { editing })}>
           <div className="flex items-center space-x-0.5 pt-2 pl-1 pr-4">
-            <PrefixBadgeButton breakpoint={breakpoint!} />
+            <PrefixBadgeButton point={breakpoint} />
             <div className="min-w-0 flex-1">
               {editing ? (
                 <PanelEditor
-                  breakpoint={breakpoint}
+                  point={breakpoint}
                   toggleEditingOff={toggleEditingOff}
                   inputToFocus={inputToFocus}
                   showCondition={showCondition}
-                  setShowCondition={setShowCondition}
                 />
               ) : (
                 <PanelSummary
@@ -189,8 +184,8 @@ function Panel({
             </div>
           </div>
           <BreakpointNavigation
-            key={breakpoint?.options.condition}
-            breakpoint={breakpoint!}
+            key={breakpoint?.id}
+            breakpoint={breakpoint}
             editing={editing}
             hitPoints={isPending ? null : filteredHitPoints}
             hitPointStatus={isPending ? null : hitPointStatus}

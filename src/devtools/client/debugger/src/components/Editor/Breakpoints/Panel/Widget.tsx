@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
-import { prefs } from "ui/utils/prefs";
 import ReactDOM from "react-dom";
-const { toEditorLine } = require("devtools/client/debugger/src/utils/editor");
+import { prefs } from "ui/utils/prefs";
 
 interface WidgetProps {
   location: any;
@@ -21,8 +20,8 @@ export default function Widget({ location, children, editor, insertAt }: WidgetP
       setLoading(false);
       return;
     }
-    const editorLine = toEditorLine(location.line || 0);
-    const _widget = editor.codeMirror.addLineWidget(editorLine, node, {
+    const lineIndex = location.line != null ? location.line - 1 : 0;
+    const _widget = editor.codeMirror.addLineWidget(lineIndex, node, {
       above: prefs.showPanelAbove,
       insertAt,
     });

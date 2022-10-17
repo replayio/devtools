@@ -1,8 +1,8 @@
 import Icon from "@bvaughn/components/Icon";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
-import { getSourcesToDisplay } from "@bvaughn/src/suspense/SourcesCache";
+import { getSourcesToDisplay, isIndexedSource } from "@bvaughn/src/suspense/SourcesCache";
 import { protocolSourcesToSourceTree } from "@bvaughn/src/utils/protocol";
-import { newSource as Source, SourceId } from "@replayio/protocol";
+import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
@@ -10,7 +10,7 @@ import styles from "./SourceExplorer.module.css";
 
 export default function SourceExplorer() {
   const client = useContext(ReplayClientContext);
-  const { focusedSourceId, openSource } = useContext(SourcesContext);
+  const { openSource } = useContext(SourcesContext);
 
   const sources = getSourcesToDisplay(client);
   const sourceTree = useMemo(() => protocolSourcesToSourceTree(sources), [sources]);
@@ -51,7 +51,15 @@ export default function SourceExplorer() {
               );
             }
             case "source": {
-              const sourceId = node.source.sourceId;
+              const source = node.source;
+              const { sourceId } = source;
+
+              if (isIndexedSource(source)) {
+                if (!source.doesContentHashChange && source.contentHashIndex > 0) {
+                  return null;
+                }
+              }
+
               return (
                 <div
                   key={index}
@@ -63,7 +71,7 @@ export default function SourceExplorer() {
                   }}
                 >
                   <Icon className={styles.Icon} type="document" />
-                  {node.path}
+                  {getSourceFileName(node.source, true)}
                 </div>
               );
             }

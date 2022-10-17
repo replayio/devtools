@@ -2,7 +2,6 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
-import * as breakpoints from "./breakpoints";
 import * as fileSearch from "./file-search";
 import * as pause from "./pause";
 import * as preview from "./preview";
@@ -13,7 +12,6 @@ import * as tabs from "./tabs";
 import * as ui from "./ui";
 
 export default {
-  ...breakpoints,
   ...sources,
   ...tabs,
   ...pause,

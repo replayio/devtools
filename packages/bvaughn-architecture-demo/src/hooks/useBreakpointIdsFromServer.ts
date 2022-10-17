@@ -11,7 +11,7 @@ export default function useBreakpointIdsFromServer(
   const client = useContext(ReplayClientContext);
 
   const prevPointsRef = useRef<Point[] | null>(null);
-  const pointIdToBreakpointIdMapRef = useRef<Map<PointId, BreakpointId>>(new Map());
+  const pointIdToBreakpointIdMapRef = useRef<Map<PointId, BreakpointId[]>>(new Map());
 
   useEffect(() => {
     const pointIdToBreakpointIdMap = pointIdToBreakpointIdMapRef.current;
@@ -19,9 +19,8 @@ export default function useBreakpointIdsFromServer(
     if (prevPoints !== points) {
       if (prevPoints === null) {
         points.forEach(point => {
-          // TODO [BAC-2328] Remove the async update
-          client.breakpointAdded(point).then(serverId => {
-            pointIdToBreakpointIdMap.set(point.id, serverId);
+          client.breakpointAdded(point).then(serverIds => {
+            pointIdToBreakpointIdMap.set(point.id, serverIds);
           });
         });
       } else {
@@ -29,34 +28,34 @@ export default function useBreakpointIdsFromServer(
           const prevPoint = prevPoints.find(({ id }) => id === point.id);
           if (prevPoint == null) {
             if (point.shouldBreak) {
-              // TODO [BAC-2328] Remove the async update
-              client.breakpointAdded(point).then(serverId => {
-                pointIdToBreakpointIdMap.set(point.id, serverId);
+              client.breakpointAdded(point).then(serverIds => {
+                pointIdToBreakpointIdMap.set(point.id, serverIds);
               });
             }
           } else if (prevPoint.shouldBreak !== point.shouldBreak) {
             if (point.shouldBreak) {
-              // TODO [BAC-2328] Remove the async update
-              client.breakpointAdded(point).then(serverId => {
-                pointIdToBreakpointIdMap.set(point.id, serverId);
+              client.breakpointAdded(point).then(serverIds => {
+                pointIdToBreakpointIdMap.set(point.id, serverIds);
               });
             } else {
-              const serverId = pointIdToBreakpointIdMap.get(point.id);
-              if (serverId != null) {
-                // TODO [BAC-2328] Pass location and condition as id
-                client.breakpointRemoved(serverId);
+              const serverIds = pointIdToBreakpointIdMap.get(point.id);
+              if (serverIds != null) {
+                serverIds.forEach(serverId => {
+                  client.breakpointRemoved(serverId);
+                });
               }
             }
           }
         });
 
         prevPoints.forEach(prevPoint => {
-          const point = prevPoints.find(({ id }) => id === prevPoint.id);
+          const point = points.find(({ id }) => id === prevPoint.id);
           if (point == null) {
-            const serverId = pointIdToBreakpointIdMap.get(prevPoint.id);
-            if (serverId != null) {
-              // TODO [BAC-2328] Pass location and condition as id
-              client.breakpointRemoved(serverId);
+            const serverIds = pointIdToBreakpointIdMap.get(prevPoint.id);
+            if (serverIds != null) {
+              serverIds.forEach(serverId => {
+                client.breakpointRemoved(serverId);
+              });
             }
           }
         });

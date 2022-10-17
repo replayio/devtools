@@ -1,66 +1,58 @@
-import type { Location } from "@replayio/protocol";
-import { fuzzySearch } from "../../utils/function";
 import groupBy from "lodash/groupBy";
 import keyBy from "lodash/keyBy";
+import { LineNumberToHitCountMap } from "shared/client/types";
+import { LoadingStatus } from "ui/utils/LoadingStatus";
+
 import {
   FunctionDeclaration,
   ClassDeclaration,
   SymbolEntry,
   AstLocation,
 } from "../../reducers/ast";
-import { LoadingStatus } from "ui/utils/LoadingStatus";
-import { HitCountsByLine } from "ui/reducers/hitCounts";
+import { fuzzySearch } from "../../utils/function";
 
 export type FunctionDeclarationHits = FunctionDeclaration & {
   hits?: number;
 };
 
-export interface HitCount {
-  location: Location;
-  hits: number;
-}
+export type HitCount = number;
 
 function getClosestHitCount(
-  hitCountsByLine: HitCountsByLine,
+  hitCountsMap: LineNumberToHitCountMap,
   location: AstLocation
-): HitCount | undefined {
-  const { start, end } = location;
-  const multiline = end.line > start.line;
-  if (multiline) {
-    for (let line = start.line; line <= end.line; line++) {
-      const hitCount = hitCountsByLine[line]?.[0];
-      if (hitCount) {
-        return hitCount;
+): HitCount | null {
+  const { line: endLine } = location.end;
+  const { line: startLine } = location.start;
+  for (let line = startLine; line <= endLine; line++) {
+    let hitCounts = hitCountsMap.get(line);
+    if (hitCounts) {
+      if (line === startLine || line === endLine) {
+        return hitCounts.count;
       }
     }
-  } else {
-    const hitCounts = hitCountsByLine[start.line];
-    if (!hitCounts) {
-      return undefined;
-    }
-    const hitCount = hitCounts.find(hitCount => hitCount.location.column! >= start.column);
-    return hitCount;
   }
+
+  return null;
 }
 
 function addHitCountsToFunctions(
   functions: FunctionDeclaration[],
-  hitCountsByLine: HitCountsByLine | null
+  hitCountsMap: LineNumberToHitCountMap | null
 ): FunctionDeclarationHits[] {
-  if (!hitCountsByLine) {
+  if (!hitCountsMap) {
     return functions;
   }
 
   return functions.map(functionSymbol => {
-    const hitCount = getClosestHitCount(hitCountsByLine, functionSymbol.location);
-    return Object.assign({}, functionSymbol, { hits: hitCount?.hits }); // { ...functionSymbol, hits: hitCount?.hits };
+    const count = getClosestHitCount(hitCountsMap, functionSymbol.location);
+    return Object.assign({}, functionSymbol, { hits: count || 0 });
   });
 }
 
 export function getOutlineSymbols(
   symbolsEntry: null | SymbolEntry,
   filter: string,
-  hitCounts: HitCountsByLine | null
+  hitCounts: LineNumberToHitCountMap | null
 ) {
   if (!symbolsEntry || symbolsEntry.status !== LoadingStatus.LOADED) {
     return null;

@@ -158,9 +158,7 @@ export const features = new PrefsHelper("devtools.debugger.features", {
   jumpLine: ["Bool", "jump-line"],
 });
 
-export const asyncStore = asyncStoreHelper("debugger", {
-  pendingBreakpoints: ["pending-breakpoints", {}],
-});
+export const asyncStore = asyncStoreHelper("debugger", {});
 
 export function resetSchemaVersion() {
   prefs.debuggerPrefsSchemaVersion = prefsSchemaVersion;
@@ -168,7 +166,6 @@ export function resetSchemaVersion() {
 
 export function verifyPrefSchema() {
   if (prefs.debuggerPrefsSchemaVersion < prefsSchemaVersion) {
-    asyncStore.pendingBreakpoints = {};
     prefs.debuggerPrefsSchemaVersion = prefsSchemaVersion;
   }
 }

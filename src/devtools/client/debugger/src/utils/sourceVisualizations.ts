@@ -1,17 +1,18 @@
 import { Dictionary } from "@reduxjs/toolkit";
 import type { SourceId } from "@replayio/protocol";
+import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
+import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import sortBy from "lodash/sortBy";
 import { ThreadFront } from "protocol/thread";
 import { assert } from "protocol/utils";
 import { ReplayClientInterface } from "shared/client/types";
-import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
-import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import {
   SourceDetails,
   isOriginalSource,
   getBestNonSourceMappedSourceId,
   getBestSourceMappedSourceId,
 } from "ui/reducers/sources";
+
 import { CursorPosition } from "../components/Editor/Footer";
 
 import { isNodeModule, isBowerComponent } from "./source";
@@ -172,7 +173,7 @@ function getAlternateSourceIdForPosition(
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const lineLocations = getBreakpointPositionsSuspense(client, source.id, null);
+  const lineLocations = getBreakpointPositionsSuspense(client, source.id);
   const breakableLine = min(
     lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
   );

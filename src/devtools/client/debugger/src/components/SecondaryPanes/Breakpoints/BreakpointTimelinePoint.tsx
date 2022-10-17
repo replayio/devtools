@@ -1,10 +1,10 @@
 import { PointDescription, TimeStampedPoint } from "@replayio/protocol";
 import classnames from "classnames";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
-import { Breakpoint } from "devtools/client/debugger/src/reducers/types";
 import { inBreakpointPanel } from "devtools/client/debugger/src/utils/editor";
-import React from "react";
+import { memo, MouseEvent } from "react";
 import { connect, ConnectedProps } from "react-redux";
+import { Point } from "shared/client/types";
 import { actions } from "ui/actions";
 import { Circle } from "ui/components/Timeline/Marker";
 import { timelineMarkerWidth as pointWidth } from "ui/constants";
@@ -27,7 +27,7 @@ function hasPrimaryHighlight({
 }
 
 const connector = connect(
-  (state: UIState, { breakpoint }: { breakpoint: Breakpoint }) => ({
+  (state: UIState) => ({
     executionPoint: getExecutionPoint(state),
     zoomRegion: selectors.getZoomRegion(state),
   }),
@@ -40,7 +40,7 @@ const connector = connect(
 
 type PropsFromRedux = ConnectedProps<typeof connector>;
 type BTPProps = PropsFromRedux & {
-  breakpoint: Breakpoint;
+  breakpoint: Point;
   point: PointDescription;
   index: number;
   hitPoints: TimeStampedPoint[];
@@ -67,13 +67,13 @@ function BreakpointTimelinePoint({
       location: breakpoint.location,
     });
 
-  const onMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!inBreakpointPanel(e)) {
+  const onMouseLeave = (event: MouseEvent<HTMLDivElement>) => {
+    if (!inBreakpointPanel(event)) {
       clearHoveredItem();
     }
   };
-  const onClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const onClick = (event: MouseEvent) => {
+    event.stopPropagation();
     seek(point.point, point.time, true);
   };
 
@@ -102,29 +102,26 @@ function BreakpointTimelinePoint({
   );
 }
 
-const MemoizedBreakpointTimelinePoint = React.memo(
-  BreakpointTimelinePoint,
-  (prevProps, nextProps) => {
-    function selectorChanged(selector: (props: BTPProps) => any) {
-      return selector(nextProps) !== selector(prevProps);
-    }
-
-    function hasChanged(key: keyof BTPProps) {
-      return nextProps[key] !== prevProps[key];
-    }
-
-    if (
-      selectorChanged(hasPrimaryHighlight) ||
-      hasChanged("zoomRegion") ||
-      hasChanged("executionPoint") ||
-      hasChanged("hitPoints")
-    ) {
-      return false;
-    }
-
-    return true;
+const MemoizedBreakpointTimelinePoint = memo(BreakpointTimelinePoint, (prevProps, nextProps) => {
+  function selectorChanged(selector: (props: BTPProps) => any) {
+    return selector(nextProps) !== selector(prevProps);
   }
-);
+
+  function hasChanged(key: keyof BTPProps) {
+    return nextProps[key] !== prevProps[key];
+  }
+
+  if (
+    selectorChanged(hasPrimaryHighlight) ||
+    hasChanged("zoomRegion") ||
+    hasChanged("executionPoint") ||
+    hasChanged("hitPoints")
+  ) {
+    return false;
+  }
+
+  return true;
+});
 MemoizedBreakpointTimelinePoint.displayName = "BreakpointTimelinePoint";
 
 export default connector(MemoizedBreakpointTimelinePoint);

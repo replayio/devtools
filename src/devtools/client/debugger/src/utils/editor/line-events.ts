@@ -49,10 +49,10 @@ function emitLineMouseEnter(
       const gutterButton = lineNumberNode!.querySelector(".CodeMirror-gutter-wrapper button");
 
       // Don't trigger a mouse leave event if the user ends up hovering on the gutter button.
-      if (gutterButton && !gutterButton.matches(":hover")) {
+      if (gutterButton == null || !gutterButton.matches(":hover")) {
         dispatch(codeMirror, "lineMouseLeave", {
           columnIndex,
-          lineNumber: lineIndex + 1,
+          lineIndex,
           lineNumberNode,
         });
       }
@@ -65,7 +65,7 @@ function emitLineMouseEnter(
 
   dispatch(codeMirror, "lineMouseEnter", {
     columnIndex,
-    lineNumber: lineIndex + 1,
+    lineIndex,
     lineNumberNode,
   });
 }

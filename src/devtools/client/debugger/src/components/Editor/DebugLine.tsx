@@ -9,7 +9,6 @@ import { connect, ConnectedProps } from "react-redux";
 import type { UIState } from "ui/state";
 
 import {
-  toEditorLine,
   toEditorColumn,
   getDocument,
   startOperation,
@@ -63,27 +62,27 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
       return;
     }
 
-    const line = toEditorLine(location.line);
+    const lineIndex = location.line - 1;
     let { markTextClass, lineClass } = this.getTextClasses(why);
     // @ts-expect-error method doesn't exist on Doc
-    doc.addLineClass(line, "line", lineClass);
+    doc.addLineClass(lineIndex, "line", lineClass);
 
-    const lineText = doc.getLine(line);
+    const lineText = doc.getLine(lineIndex);
     let column = toEditorColumn(lineText, location.column);
     column = Math.max(column, getIndentation(lineText));
 
     // If component updates because user clicks on
     // another source tab, codeMirror will be null.
     // @ts-expect-error doc.cm doesn't exist
-    const columnEnd = doc.cm ? getTokenEnd(doc.cm, line, column) : null;
+    const columnEnd = doc.cm ? getTokenEnd(doc.cm, lineIndex, column) : null;
 
     if (columnEnd === null) {
       markTextClass += " to-line-end";
     }
 
     this.debugExpression = doc.markText(
-      { ch: column, line },
-      { ch: columnEnd!, line },
+      { ch: column, line: lineIndex },
+      { ch: columnEnd!, line: lineIndex },
       { className: markTextClass }
     );
   }
@@ -97,14 +96,14 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
       this.debugExpression.clear();
     }
 
-    const line = toEditorLine(location.line);
+    const lineIndex = location.line - 1;
     const doc = getDocument(location.sourceId);
     if (!doc) {
       return;
     }
     const { lineClass } = this.getTextClasses(why);
     // @ts-expect-error method doesn't exist on Doc
-    doc.removeLineClass(line, "line", lineClass);
+    doc.removeLineClass(lineIndex, "line", lineClass);
   }
 
   getTextClasses(why: PropsFromRedux["why"]) {

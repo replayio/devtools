@@ -4,6 +4,7 @@ import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
+
 import Icon from "../Icon";
 import LazyOffscreen from "../LazyOffscreen";
 
@@ -19,7 +20,7 @@ export default function Sources() {
       <div className={styles.Tabs}>
         {openSourceIds.map(sourceId => {
           const source = getSource(client, sourceId);
-          const fileName = (source && getSourceFileName(source)) || "unknown";
+          const fileName = (source && getSourceFileName(source, true)) || "unknown";
           return (
             <div
               key={sourceId}

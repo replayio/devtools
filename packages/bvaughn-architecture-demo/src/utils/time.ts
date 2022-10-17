@@ -7,8 +7,13 @@ import { ExecutionPoint, PointRange, TimeStampedPointRange } from "@replayio/pro
 import padStart from "lodash/padStart";
 import prettyMilliseconds from "pretty-ms";
 
+const collator = new Intl.Collator("en", {
+  numeric: true,
+  sensitivity: "base",
+});
+
 export function compareExecutionPoints(a: ExecutionPoint, b: ExecutionPoint): number {
-  return a.localeCompare(b, undefined, { numeric: true });
+  return collator.compare(a, b);
 }
 
 export function isExecutionPointsGreaterThan(a: ExecutionPoint, b: ExecutionPoint): boolean {

@@ -118,6 +118,7 @@ export async function addLogpoint(
   }
 
   const line = await getSourceLine(page, lineNumber);
+  await line.waitFor();
   await line.hover();
   await line.locator('[data-test-id="ToggleLogpointButton"]').click();
 

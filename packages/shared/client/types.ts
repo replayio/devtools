@@ -49,10 +49,11 @@ export type ColumnHits = {
   location: SourceLocation;
 };
 
-export type LineHits = {
-  columnHits: ColumnHits[];
-  hits: number;
+export type LineHitCounts = {
+  count: number;
+  firstBreakableColumnIndex: number;
 };
+export type LineNumberToHitCountMap = Map<number, LineHitCounts>;
 
 export type Events = {
   keyboardEvents: KeyboardEvent[];
@@ -60,8 +61,7 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
-// TODO [FE-757] Replace this with number once old code is fully deleted
-export type PointId = number | string;
+export type PointId = number;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
   badge: Badge | null;
@@ -92,7 +92,7 @@ export interface SourceLocationRange {
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  breakpointAdded(point: Point): Promise<BreakpointId>;
+  breakpointAdded(point: Point): Promise<BreakpointId[]>;
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
@@ -141,7 +141,7 @@ export interface ReplayClientInterface {
     locationRange: SourceLocationRange,
     sourceLocations: SameLineSourceLocations[],
     focusRange: PointRange | null
-  ): Promise<Map<number, LineHits>>;
+  ): Promise<LineNumberToHitCountMap>;
   initialize(recordingId: string, accessToken: string | null): Promise<SessionId>;
   loadRegion(range: TimeRange, duration: number): Promise<void>;
   removeEventListener(type: ReplayClientEvents, handler: Function): void;

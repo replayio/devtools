@@ -9,11 +9,7 @@ import {
   HighlightedRange,
 } from "devtools/client/debugger/src/selectors";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
-import {
-  toEditorLine,
-  endOperation,
-  startOperation,
-} from "devtools/client/debugger/src/utils/editor";
+import { endOperation, startOperation } from "devtools/client/debugger/src/utils/editor";
 import {
   getDocument,
   hasDocument,
@@ -27,8 +23,8 @@ import {
 import { useAppSelector } from "ui/setup/hooks";
 
 type PrevProps = {
-  editorLine: number | null;
   highlightedLineRange: HighlightedRange | null;
+  lineIndex: number | null;
   selectedLocation: PartialLocation | null;
   selectedSource: SourceContent | null;
 };
@@ -41,8 +37,8 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
   const highlightedLineRange = useAppSelector(getHighlightedLineRange) || null;
 
   const prevPropsRef = useRef<PrevProps>({
-    editorLine: null,
     highlightedLineRange: null,
+    lineIndex: null,
     selectedLocation: null,
     selectedSource: null,
   });
@@ -57,36 +53,38 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
 
     const prevProps = prevPropsRef.current;
 
-    const editorLine = selectedLocation?.line ? toEditorLine(selectedLocation.line) : null;
-    const prevEditorLine = prevProps.selectedLocation?.line
-      ? toEditorLine(prevProps.selectedLocation.line)
+    const lineIndex = selectedLocation?.line ? selectedLocation.line - 1 : null;
+    const prevLineIndex = prevProps.selectedLocation?.line
+      ? prevProps.selectedLocation.line - 1
       : null;
-    if (editorLine !== prevEditorLine) {
+    if (lineIndex !== prevLineIndex) {
       return;
     }
 
     startOperation();
 
     // Clear highlighted for previous line
-    if (prevEditorLine !== null) {
+    if (prevLineIndex != null) {
       if (isDocumentReady(prevProps.selectedSource, prevProps.selectedLocation!)) {
         const { sourceId: prevSourceId } = prevProps.selectedLocation!;
         const doc = getDocument(prevSourceId);
 
         // @ts-expect-error method doesn't exist
-        doc.removeLineClass(prevEditorLine, "line", "highlight-line");
+        doc.removeLineClass(prevLineIndex, "line", "highlight-line");
       }
     }
 
     // Highlight new line
-    if (editorLine) {
-      const { line, sourceId } = selectedLocation!;
-      if (shouldSetHighlightLine(selectedLocation!, selectedSource, prevProps.editorLine)) {
-        if (line != null && isDebugLine(selectedFrame as any as TempFrame, selectedLocation!)) {
+    if (lineIndex != null && selectedLocation != null) {
+      const { sourceId } = selectedLocation;
+      if (
+        shouldSetHighlightLine(selectedSource, selectedLocation, lineIndex, prevProps.lineIndex)
+      ) {
+        if (isDebugLine(selectedFrame as any as TempFrame, selectedLocation!)) {
           const doc = getDocument(sourceId);
           // @ts-expect-error method doesn't exist
-          doc.addLineClass(editorLine, "line", "highlight-line");
-          resetHighlightLine(doc, editorLine);
+          doc.addLineClass(lineIndex, "line", "highlight-line");
+          resetHighlightLine(doc, lineIndex);
         }
       }
     }
@@ -94,7 +92,7 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
     endOperation();
 
     // Update prev props for next render
-    prevProps.editorLine = editorLine;
+    prevProps.lineIndex = lineIndex;
     prevProps.selectedLocation = selectedLocation;
     prevProps.selectedSource = selectedSource;
   }, [editor, selectedFrame, selectedLocation, selectedSource]);
@@ -158,7 +156,7 @@ function isDocumentReady(
   );
 }
 
-function resetHighlightLine(doc: Doc | null, editorLine: number) {
+function resetHighlightLine(doc: Doc | null, lineIndex: number) {
   const editorWrapper = document.querySelector(".editor-wrapper");
   if (editorWrapper === null) {
     return;
@@ -172,20 +170,20 @@ function resetHighlightLine(doc: Doc | null, editorLine: number) {
   if (doc) {
     setTimeout(() => {
       // @ts-ignore
-      doc.removeLineClass(editorLine, "line", "highlight-line");
+      doc.removeLineClass(lineIndex, "line", "highlight-line");
     }, duration);
   }
 }
 
 function shouldSetHighlightLine(
-  selectedLocation: PartialLocation,
   selectedSource: SourceContent | null,
-  previousEditorLine: number | null
+  selectedLocation: PartialLocation,
+  lineIndex: number | null,
+  prevLineIndex: number | null
 ) {
-  const { line } = selectedLocation;
   if (!isDocumentReady(selectedSource, selectedLocation)) {
     return false;
-  } else if (toEditorLine(line) === previousEditorLine) {
+  } else if (lineIndex === prevLineIndex) {
     return false;
   } else {
     return true;

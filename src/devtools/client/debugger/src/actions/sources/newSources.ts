@@ -1,72 +1,16 @@
-/* This Source Code Form is subject to the terms of the Mozilla Public
- * License, v. 2.0. If a copy of the MPL was not distributed with this
- * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
-
-//
-
-/**
- * Redux actions for the sources state
- * @module actions/sources
- */
-
-import type { UIThunkAction } from "ui/actions";
-import { fetchPossibleBreakpointsForSource } from "ui/reducers/possibleBreakpoints";
-
-import { setRequestedBreakpoint } from "../../reducers/breakpoints";
-import type { Context } from "../../reducers/pause";
-import { getPendingBreakpointsForSource, getContext } from "../../selectors";
+import { getContext } from "../../selectors";
 import { getTabs, tabsRestored } from "devtools/client/debugger/src/reducers/tabs";
 
 import {
-  getSourceDetails,
   allSourcesReceived,
   SourceDetails,
   getAllSourceDetails,
   getSourceToDisplayForUrl,
   getSourceToDisplayById,
 } from "ui/reducers/sources";
-import { syncBreakpoint } from "../breakpoints";
 
-import { loadSourceText, getPreviousPersistedLocation } from "ui/reducers/sources";
+import { getPreviousPersistedLocation } from "ui/reducers/sources";
 import { AppStartListening } from "ui/setup/listenerMiddleware";
-
-function checkPendingBreakpoints(cx: Context, sourceId: string): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    // source may have been modified by selectLocation
-    const source = getSourceDetails(getState(), sourceId);
-    if (!source) {
-      return;
-    }
-
-    const pendingBreakpoints = getPendingBreakpointsForSource(
-      getState(),
-      source,
-      ThreadFront.recordingId!
-    );
-
-    if (pendingBreakpoints.length === 0) {
-      return;
-    }
-
-    for (const bp of pendingBreakpoints) {
-      const line = bp.location.line;
-      const column = bp.location.column;
-      dispatch(setRequestedBreakpoint({ column, line, sourceId }));
-    }
-
-    // load the source text if there is a pending breakpoint for it
-    const textPromise = dispatch(loadSourceText(source.id));
-    const possibleBreakpointsPromise = dispatch(fetchPossibleBreakpointsForSource(source.id));
-
-    await Promise.all([textPromise, possibleBreakpointsPromise]);
-
-    await Promise.all(
-      pendingBreakpoints.map(bp => {
-        return dispatch(syncBreakpoint(cx, sourceId, bp));
-      })
-    );
-  };
-}
 
 // Delay adding these until the store is created
 export const setupSourcesListeners = (startAppListening: AppStartListening) => {
@@ -120,12 +64,6 @@ export const setupSourcesListeners = (startAppListening: AppStartListening) => {
             })
           );
         }
-      }
-
-      // There may have been some breakpoints / print statements persisted as well.
-      // Reload those if possible.
-      for (const source of canonicalTabSources) {
-        dispatch(checkPendingBreakpoints(cx, source.id));
       }
     },
   });
