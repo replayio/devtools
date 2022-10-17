@@ -43,10 +43,11 @@ export default function SourceList({
   const goToLineMode = query.startsWith(":");
   const goToLine = goToLineMode ? parseInt(query.slice(1), 10) : null;
   useEffect(() => {
-    if (goToLine !== null && goToLine >= 0) {
+    if (goToLine !== null && goToLine > 0) {
       const list = listRef.current;
       if (list) {
-        list.scrollToItem(goToLine);
+        const lineIndex = goToLine - 1;
+        list.scrollToItem(lineIndex);
       }
     }
   }, [goToLine]);

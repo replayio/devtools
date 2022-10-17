@@ -37,18 +37,14 @@
 }
 
 .Results {
-  display: flex;
-  align-items: center;
-  gap: 0.5ch;
-  white-space: nowrap;
-  margin-left: 0.5ch;
-  padding: 0 0.5ch;
-  font-size: var(--font-size-small);
 }
 
 .Result,
 .ResultFocused {
   padding: 0.5rem 1rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ResultFocused {
@@ -68,4 +64,9 @@
 
 .ResultURL {
   color: var(--color-dim);
+}
+
+.GoToLinePrefix {
+  color: var(--color-dim);
+  margin-right: 1ch;
 }

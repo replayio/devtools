@@ -72,6 +72,7 @@ function getEncoded(host: string, fixtureDataPath: string): string {
 export function useReplayClientForTesting(): ReplayClientInterface {
   const replayClient = useContext(ReplayClientContext);
 
+  const debug = hasFlag("debug");
   const fixtureDataPath = getFlag("fixtureDataPath");
   const host = getFlag("host");
   const record = hasFlag("record");
@@ -80,7 +81,9 @@ export function useReplayClientForTesting(): ReplayClientInterface {
   // During test "recording" we write these to a fixtures file.
   // During CI test runs ("playback") we use the fixture data to mock out the backend.
   const memoizedReplayClient = useMemo<ReplayClientInterface>(() => {
-    if (host && fixtureDataPath) {
+    if (debug) {
+      return replayClient;
+    } else if (host && fixtureDataPath) {
       const encoded = getEncoded(host, fixtureDataPath);
       const decoded = decode(encoded);
 
@@ -100,7 +103,7 @@ export function useReplayClientForTesting(): ReplayClientInterface {
         return replayClient;
       }
     }
-  }, [fixtureDataPath, host, record, replayClient]);
+  }, [debug, fixtureDataPath, host, record, replayClient]);
 
   // Some data doesn't get handled by the proxy approach above.
   // Specifically, data that deals with events.

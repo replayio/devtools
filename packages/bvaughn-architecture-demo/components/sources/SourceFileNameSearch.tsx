@@ -64,9 +64,18 @@ export default function SourceFileNameSearch({
   };
 
   let results = null;
-  if (!goToLineMode && searchState.results.length > 0) {
+  if (goToLineMode) {
     results = (
-      <div className={styles.Result}>
+      <div className={styles.Results} data-test-id="SourceFileNameSearchResults">
+        <div className={styles.Result}>
+          <span className={styles.GoToLinePrefix}>Go to line</span>
+          {query.slice(1)}
+        </div>
+      </div>
+    );
+  } else if (searchState.results.length > 0) {
+    results = (
+      <div className={styles.Results} data-test-id="SourceFileNameSearchResults">
         {searchState.results.map((result, index) => (
           <Result
             key={result.source.sourceId}
