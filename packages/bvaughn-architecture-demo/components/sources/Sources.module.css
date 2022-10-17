@@ -4,6 +4,10 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+.Sources:focus {
+  outline: none;
 }
 
 .Tabs {

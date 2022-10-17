@@ -59,6 +59,24 @@ export function getSources(client: ReplayClientInterface) {
   throw inProgressSourcesWakeable;
 }
 
+// Wrapper method around getSources Suspense method.
+// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
+export async function getSourcesHelper(client: ReplayClientInterface): Promise<ProtocolSource[]> {
+  try {
+    return getSources(client);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<ProtocolSource[]>;
+    } else {
+      throw errorOrPromise;
+    }
+  }
+}
+
 export function getSource(
   client: ReplayClientInterface,
   sourceId: ProtocolSourceId
@@ -96,6 +114,27 @@ export function getSourceContents(
     return record!.value;
   } else {
     throw record!.value;
+  }
+}
+
+// Wrapper method around getSourceContents Suspense method.
+// This method can be used by non-React code to prefetch/prime the Suspense cache by loading object properties.
+export async function getSourceContentsHelper(
+  client: ReplayClientInterface,
+  sourceId: ProtocolSourceId
+): Promise<ProtocolSourceContents> {
+  try {
+    return getSourceContents(client, sourceId);
+  } catch (errorOrPromise) {
+    if (
+      errorOrPromise != null &&
+      typeof errorOrPromise === "object" &&
+      errorOrPromise.hasOwnProperty("then")
+    ) {
+      return errorOrPromise as Promise<ProtocolSourceContents>;
+    } else {
+      throw errorOrPromise;
+    }
   }
 }
 

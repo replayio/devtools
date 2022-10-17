@@ -5,16 +5,8 @@ import {
   getCachedMinMaxSourceHitCounts,
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
-import { newSource as ProtocolSource, SourceId } from "@replayio/protocol";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { newSource as ProtocolSource } from "@replayio/protocol";
+import { useCallback, useContext, useLayoutEffect, useMemo, useRef } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";

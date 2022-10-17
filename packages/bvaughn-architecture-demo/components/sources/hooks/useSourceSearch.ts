@@ -18,6 +18,7 @@ function search(query: string, lines: string[]): number[] {
 
 export type Actions = SearchActions & {
   hide: () => void;
+  setCode: (code: string) => void;
   show: () => void;
 };
 
@@ -25,7 +26,8 @@ export type State = SearchState<number> & {
   visible: boolean;
 };
 
-export default function useSourceSearch(code: string): [State, Actions] {
+export default function useSourceSearch(): [State, Actions] {
+  const [code, setCode] = useState<string>("");
   const lines = useMemo(() => code.split("\n"), [code]);
   const [state, dispatch] = useSearch<string, number>(lines, search);
 
@@ -35,6 +37,7 @@ export default function useSourceSearch(code: string): [State, Actions] {
     () => ({
       ...dispatch,
       hide: () => setVisible(false),
+      setCode: setCode,
       show: () => setVisible(true),
     }),
     [dispatch]

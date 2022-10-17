@@ -8,6 +8,8 @@ export type State<Result> = {
   results: Result[];
 };
 
+// TODO Move show/hide actions and visible state into this hook.
+
 export type Action<Result> =
   | { type: "goToNext" }
   | { type: "goToPrevious" }

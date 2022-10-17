@@ -1,30 +1,22 @@
-import { RefObject, useContext } from "react";
+import { ChangeEvent, KeyboardEvent, RefObject, useContext } from "react";
 
 import Icon from "../Icon";
 
 import styles from "./SourceSearch.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 
-export default function SourceSearch({
-  hideOnEscape,
-  inputRef,
-}: {
-  hideOnEscape: boolean;
-  inputRef: RefObject<HTMLInputElement>;
-}) {
+export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInputElement> }) {
   const [searchState, searchActions] = useContext(SourceSearchContext);
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);
   };
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Escape": {
-        if (hideOnEscape) {
-          event.preventDefault();
-          searchActions.hide();
-        }
+        event.preventDefault();
+        searchActions.hide();
         break;
       }
       case "Enter": {

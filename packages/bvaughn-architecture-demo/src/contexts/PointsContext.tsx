@@ -1,4 +1,5 @@
 import { Location, TimeStampedPoint } from "@replayio/protocol";
+import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   createContext,
   PropsWithChildren,
@@ -70,22 +71,9 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
       };
 
       setPointsHelper((prevPoints: Point[]) => {
-        let lowIndex = 0;
-        let highIndex = prevPoints.length;
-        while (lowIndex < highIndex) {
-          let middleIndex = (lowIndex + highIndex) >>> 1;
-          const prevPoint = prevPoints[middleIndex];
+        const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
 
-          if (prevPoint.location.line < location.line) {
-            lowIndex = middleIndex + 1;
-          } else {
-            highIndex = middleIndex;
-          }
-        }
-
-        const insertAtIndex = lowIndex;
-
-        return prevPoints.slice(0, insertAtIndex).concat([point], prevPoints.slice(insertAtIndex));
+        return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
       });
     },
     [setPointsHelper]
