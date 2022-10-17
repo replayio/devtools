@@ -286,7 +286,7 @@ export default function ProtocolViewer() {
 
       <div className={styles.Panel}>
         {filteredChunks.map(chunk => (
-          <ProtocolChunk
+          <ProtocolChunkMemo
             key={chunk.ids[0]}
             chunk={chunk}
             responseMap={responseMap}
@@ -441,3 +441,5 @@ function ProtocolChunk({
     </div>
   );
 }
+
+const ProtocolChunkMemo = React.memo(ProtocolChunk);

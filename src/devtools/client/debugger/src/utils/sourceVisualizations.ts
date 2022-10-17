@@ -185,39 +185,46 @@ function getUniqueAlternateSourceId(
   return { sourceId: alternateSourceId };
 }
 
-function min(arr: number[]) {
-  if (arr.length === 0) {
-    return Infinity;
-  }
-  let lowest = arr[0];
-  for (let i = 1; i < arr.length; i++) {
-    if (arr[i] < lowest) {
-      lowest = arr[i];
-    }
-  }
-  return lowest;
-}
-
 function getAlternateSourceIdForPositionSuspense(
   client: ReplayClientInterface,
   source: SourceDetails,
   position: CursorPosition,
   sourcesById: Dictionary<SourceDetails>
 ) {
-  const lineLocations = getBreakpointPositionsSuspense(client, source.id);
-  const breakableLine = min(
-    lineLocations.filter(ll => ll.line >= position.line).map(ll => ll.line)
+  const [breakablePositions, breakablePositionsByLine] = getBreakpointPositionsSuspense(
+    client,
+    source.id
   );
 
-  const breakableLineLocations = lineLocations.find(ll => ll.line === breakableLine);
-  if (!breakableLineLocations) {
+  // We want to find the first breakable line starting from the given cursor location,
+  // so that we can translate that position into an alternate mapped location.
+  let firstBreakableLineAfterPosition: number | null = null;
+
+  // Grab the last line off the array. It's possible there might _not_ be any breakable lines.
+  const [lastBreakableLine] = breakablePositions.slice(-1);
+
+  // We have a Map with line numbers as keys. Rather than check the entire array,
+  // start from the position's line and check succeeding line numbers to find the
+  // next line number that has a breakable position.
+  for (let lineToCheck = position.line; lineToCheck <= lastBreakableLine?.line; lineToCheck++) {
+    if (breakablePositionsByLine.has(lineToCheck)) {
+      firstBreakableLineAfterPosition = lineToCheck;
+      break;
+    }
+  }
+
+  if (firstBreakableLineAfterPosition === null) {
     return undefined;
   }
 
+  const breakableLineLocations = breakablePositionsByLine.get(firstBreakableLineAfterPosition)!;
+
+  // Now we can ask the backend for alternate locations with that line.
   let breakableColumn = breakableLineLocations.columns[0];
+
   const mappedLocation = getMappedLocationSuspense(client, {
     sourceId: source.id,
-    line: breakableLine,
+    line: breakableLineLocations.line,
     column: breakableColumn,
   });
   return source.isSourceMapped

@@ -41,8 +41,10 @@ export default function EmptyLines({ editor }: ELProps) {
         return;
       }
 
-      const breakpointPositions = await getBreakpointPositionsAsync(replayClient, sourceId);
-      const breakableLines = breakpointPositions.map(({ line }) => line);
+      const [, breakpointPositionsByLine] = await getBreakpointPositionsAsync(
+        replayClient,
+        sourceId
+      );
 
       // For performance reasons, we should only modify lines (chunks of lines in this case) once.
       // However if the breakpoint positions change, we need to re-draw things.
@@ -51,23 +53,25 @@ export default function EmptyLines({ editor }: ELProps) {
         memoizedDrawnLines.sourceId = sourceId;
       }
 
-      editor.codeMirror.operation(() => {
-        const lower = visibleLines.start.line;
-        const upper = visibleLines.end.line;
+      const lower = visibleLines.start.line;
+      const upper = visibleLines.end.line;
 
-        if (!memoizedDrawnLines.drawnLinesSet.has(lower)) {
-          memoizedDrawnLines.drawnLinesSet.add(lower);
+      if (!memoizedDrawnLines.drawnLinesSet.has(lower)) {
+        // We only need to update each bucket of 100 lines a single time
+        memoizedDrawnLines.drawnLinesSet.add(lower);
 
+        editor.codeMirror.operation(() => {
           editor.codeMirror.eachLine(lower, upper, lineHandle => {
+            // Mark lines with no breakable positions as "empty" to dim them visually and disable interactions
             const line = editor.codeMirror.getLineNumber(lineHandle)! + 1;
-            if (breakableLines.includes(line)) {
+            if (breakpointPositionsByLine.has(line)) {
               editor.codeMirror.removeLineClass(lineHandle, "line", "empty-line");
             } else {
               editor.codeMirror.addLineClass(lineHandle, "line", "empty-line");
             }
           });
-        }
-      });
+        });
+      }
     }
 
     editor.editor.on("scroll", disableEmptyLinesRaf);
