@@ -1,9 +1,11 @@
 import { FullConfig } from "@playwright/test";
 
-const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, VISUAL_DEBUG } = process.env;
+const { CI, RECORD_PROTOCOL_DATA, RECORD_VIDEO, SLOW_MO, VISUAL_DEBUG } = process.env;
 
 let slowMo = 10;
-if (VISUAL_DEBUG) {
+if (SLOW_MO) {
+  slowMo = parseInt(SLOW_MO, 10);
+} else if (VISUAL_DEBUG) {
   slowMo = 250;
 } else if (RECORD_PROTOCOL_DATA) {
   slowMo = 100;
@@ -14,7 +16,7 @@ const config: FullConfig = {
   globalSetup: require.resolve("./playwright.globalSetup"),
   // @ts-ignore
   reporter: CI ? "github" : "list",
-  retries: VISUAL_DEBUG ? 0 : 5,
+  retries: RECORD_VIDEO || VISUAL_DEBUG ? 0 : 5,
   snapshotDir: "./snapshots",
   use: {
     browserName: "chromium",

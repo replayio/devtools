@@ -4,7 +4,7 @@ import { isIndexedSource } from "../suspense/SourcesCache";
 
 export function getSourceFileName(
   source: ProtocolSource,
-  prependIndex: boolean = false
+  appendIndex: boolean = false
 ): string | null {
   const { url } = source;
   if (!url) {
@@ -13,7 +13,7 @@ export function getSourceFileName(
 
   let fileName = getSourceFileNameFromUrl(url);
 
-  if (prependIndex) {
+  if (appendIndex) {
     if (isIndexedSource(source)) {
       const { contentHashIndex, doesContentHashChange } = source;
       if (doesContentHashChange) {

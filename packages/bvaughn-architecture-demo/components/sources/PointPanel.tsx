@@ -44,11 +44,6 @@ export default function PointPanel({ className, point }: { className: string; po
       data-test-id={`PointPanel-${point.location.line}`}
     >
       <div className={styles.Row}>
-        <Suspense fallback={<Loader />}>
-          <HitPointsWarning point={point} />
-        </Suspense>
-      </div>
-      <div className={styles.Row}>
         <input
           className={styles.Input}
           data-test-id={`PointPanelInput-${point.location.line}-content`}
@@ -64,7 +59,7 @@ export default function PointPanel({ className, point }: { className: string; po
             onChange={event => editPoint(point.id, { shouldBreak: event.currentTarget.checked })}
             type="checkbox"
           />
-          break?
+          <Icon className={styles.LabelIcon} type="pause" />
         </label>
         <label className={styles.Label}>
           <input
@@ -72,7 +67,7 @@ export default function PointPanel({ className, point }: { className: string; po
             onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
             type="checkbox"
           />
-          log?
+          <Icon className={styles.LabelIcon} type="print" />
         </label>
         <small>
           ({point.location.line}:{point.location.column})
@@ -106,11 +101,11 @@ export default function PointPanel({ className, point }: { className: string; po
   );
 }
 
-function HitPointsWarning({ point }: { point: Point }) {
+function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const [_, status] = getHitPointsForLocation(client, point.location, null, focusRange);
+  const [hitPoints, status] = getHitPointsForLocation(client, point.location, null, focusRange);
 
   switch (status) {
     case "too-many-points-to-find":
@@ -121,21 +116,6 @@ function HitPointsWarning({ point }: { point: Point }) {
           the number of hits.
         </div>
       );
-    }
-  }
-
-  return null;
-}
-
-function HitPoints({ point }: { point: Point }) {
-  const client = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
-
-  const [hitPoints, status] = getHitPointsForLocation(client, point.location, null, focusRange);
-
-  switch (status) {
-    case "too-many-points-to-find": {
-      return null;
     }
     default: {
       if (hitPoints.length === 0) {

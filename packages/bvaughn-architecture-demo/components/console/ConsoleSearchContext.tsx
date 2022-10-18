@@ -2,9 +2,9 @@ import { createContext, MutableRefObject, ReactNode, useMemo } from "react";
 
 import useConsoleSearchDOM, { Actions, State } from "./hooks/useConsoleSearchDOM";
 
-export const SearchContext = createContext<[State, Actions]>(null as any);
+export const ConsoleSearchContext = createContext<[State, Actions]>(null as any);
 
-export function SearchContextRoot({
+export function ConsoleSearchContextRoot({
   children,
   messageListRef,
   searchInputRef,
@@ -23,5 +23,5 @@ export function SearchContextRoot({
 
   const context = useMemo<[State, Actions]>(() => [state, actions], [state, actions]);
 
-  return <SearchContext.Provider value={context}>{children}</SearchContext.Provider>;
+  return <ConsoleSearchContext.Provider value={context}>{children}</ConsoleSearchContext.Provider>;
 }

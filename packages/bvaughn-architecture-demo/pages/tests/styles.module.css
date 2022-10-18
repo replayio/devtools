@@ -23,10 +23,10 @@
   overflow: auto;
 }
 .HorizontalContainer {
-  flex-direction: column;
+  flex-direction: row;
 }
 .VerticalContainer {
-  flex-direction: row;
+  flex-direction: column;
 }
 
 .Block {

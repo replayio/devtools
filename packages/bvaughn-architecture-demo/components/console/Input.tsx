@@ -1,25 +1,18 @@
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
-import { getPauseForExecutionPoint } from "@bvaughn/src/suspense/PauseCache";
-import { getClosestPointForTime } from "@bvaughn/src/suspense/PointsCache";
+import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { FrameId, PauseId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { isPointInRegions } from "shared/utils/time";
 
 import Icon from "../Icon";
 
 import styles from "./Input.module.css";
-import { SearchContext } from "./SearchContext";
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
 
 export default function Input() {
-  const client = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(SearchContext);
+  const [searchState, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
   const { executionPoint, time } = useContext(TimelineContext);
-
-  const loadedRegions = useLoadedRegions(client);
 
   const ref = useRef<HTMLInputElement>(null);
   const searchStateVisibleRef = useRef(false);
@@ -32,13 +25,11 @@ export default function Input() {
     searchStateVisibleRef.current = searchState.visible;
   }, [searchState.visible]);
 
-  // If we are not currently paused at an explicit point, find the nearest point and pause there.
-  let pauseId: PauseId | null = null;
-  let frameId: FrameId | null = null;
-  const isLoaded = loadedRegions !== null && isPointInRegions(executionPoint, loadedRegions.loaded);
-  if (isLoaded) {
-    const pause = getPauseForExecutionPoint(client, executionPoint);
+  const pause = useCurrentPause();
 
+  let frameId: FrameId | null = null;
+  let pauseId: PauseId | null = null;
+  if (pause) {
     frameId = pause.data.frames?.[0]?.frameId ?? null;
     pauseId = pause.pauseId;
   }
@@ -63,8 +54,9 @@ export default function Input() {
         }
         break;
       }
-      case "f": {
-        if (event.metaKey) {
+      case "f":
+      case "F": {
+        if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
 
           searchActions.show();

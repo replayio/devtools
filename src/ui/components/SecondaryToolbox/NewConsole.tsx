@@ -1,5 +1,5 @@
 import NewConsole from "bvaughn-architecture-demo/components/console";
-import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
+import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/console/ConsoleSearchContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, { KeyboardEvent, useContext } from "react";
 import { getPauseId, getSelectedFrame } from "devtools/client/debugger/src/selectors";
@@ -41,7 +41,7 @@ export default function NewConsoleRoot() {
 }
 
 function JSTermWrapper() {
-  const [_, searchActions] = useContext(SearchContext);
+  const [_, searchActions] = useContext(ConsoleSearchContext);
   const { addMessage } = useContext(TerminalContext);
 
   const recordingId = useGetRecordingId();

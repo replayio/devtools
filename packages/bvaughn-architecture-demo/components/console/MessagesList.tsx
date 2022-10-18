@@ -29,7 +29,7 @@ import MessageRenderer from "./renderers/MessageRenderer";
 import LogPointRenderer from "./renderers/LogPointRenderer";
 import TerminalExpressionRenderer from "./renderers/TerminalExpressionRenderer";
 import UncaughtExceptionRenderer from "./renderers/UncaughtExceptionRenderer";
-import { SearchContext } from "./SearchContext";
+import { ConsoleSearchContext } from "./ConsoleSearchContext";
 import useLoadedRegions from "@bvaughn/src/hooks/useRegions";
 import { isPointInRegions } from "shared/utils/time";
 import CurrentTimeIndicator from "./CurrentTimeIndicator";
@@ -45,7 +45,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const replayClient = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(SearchContext);
+  const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const loadedRegions = useLoadedRegions(replayClient);
@@ -150,20 +150,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     listItems.push(currentTimeIndicator);
   }
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "f":
-      case "F":
-        if (event.metaKey) {
-          searchActions.show();
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        break;
-    }
-  };
-
   // Note that it's important to only render messages inside of the message lists.
   // Overflow notifications are displayed outside of the list, to avoid interfering with search.
   // See <LoggablesContextRoot> and useConsoleSearchDOM() for more info.
@@ -194,7 +180,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       <div
         className={isTransitionPending ? styles.ContainerPending : styles.Container}
         data-test-name="Messages"
-        onKeyDown={onKeyDown}
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
         tabIndex={0}

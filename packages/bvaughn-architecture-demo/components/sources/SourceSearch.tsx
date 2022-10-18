@@ -1,32 +1,22 @@
-import { MutableRefObject, useContext } from "react";
+import { ChangeEvent, KeyboardEvent, RefObject, useContext } from "react";
 
 import Icon from "../Icon";
 
-import styles from "./Search.module.css";
-import { SearchContext } from "./SearchContext";
+import styles from "./SourceSearch.module.css";
+import { SourceSearchContext } from "./SourceSearchContext";
 
-export default function Search({
-  className,
-  hideOnEscape,
-  searchInputRef,
-}: {
-  className: string;
-  hideOnEscape: boolean;
-  searchInputRef: MutableRefObject<HTMLInputElement | null>;
-}) {
-  const [searchState, searchActions] = useContext(SearchContext);
+export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInputElement> }) {
+  const [searchState, searchActions] = useContext(SourceSearchContext);
 
-  const onChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     searchActions.search(event.currentTarget.value);
   };
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+  const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
       case "Escape": {
-        if (hideOnEscape) {
-          event.preventDefault();
-          searchActions.hide();
-        }
+        event.preventDefault();
+        searchActions.disable();
         break;
       }
       case "Enter": {
@@ -41,7 +31,7 @@ export default function Search({
     }
   };
 
-  if (!searchState.visible) {
+  if (!searchState.enabled) {
     return null;
   }
 
@@ -52,22 +42,22 @@ export default function Search({
         {searchState.index + 1} of {searchState.results.length} results
         <button
           className={styles.ResultsIconButton}
-          data-test-id="ConsoleSearchGoToPreviousButton"
+          data-test-id="SourceSearchGoToPreviousButton"
           onClick={searchActions.goToPrevious}
         >
           <Icon className={styles.ResultsIcon} type="up" />
         </button>
         <button
           className={styles.ResultsIconButton}
-          data-test-id="ConsoleSearchGoToNextButton"
+          data-test-id="SourceSearchGoToNextButton"
           onClick={searchActions.goToNext}
         >
           <Icon className={styles.ResultsIcon} type="down" />
         </button>
         <button
           className={styles.ResultsIconButton}
-          data-test-id="ConsoleSearchClearButton"
-          onClick={searchActions.hide}
+          data-test-id="SourceSearchClearButton"
+          onClick={searchActions.disable}
         >
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>
@@ -77,7 +67,7 @@ export default function Search({
     results = (
       <div className={styles.Results}>
         No results found
-        <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
+        <button className={styles.ResultsIconButton} onClick={searchActions.disable}>
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>
       </div>
@@ -85,16 +75,16 @@ export default function Search({
   }
 
   return (
-    <div className={`${styles.Container} ${className}`} data-test-id="ConsoleSearch">
+    <div className={styles.Container} data-test-id="SourceSearch">
       <Icon className={styles.Icon} type="search" />
       <input
         autoFocus
         className={styles.Input}
-        data-test-id="ConsoleSearchInput"
+        data-test-id="SourceSearchInput"
         onChange={onChange}
         onKeyDown={onKeyDown}
-        placeholder="Find in logs"
-        ref={searchInputRef}
+        placeholder="Find"
+        ref={inputRef}
         type="text"
         value={searchState.query}
       />

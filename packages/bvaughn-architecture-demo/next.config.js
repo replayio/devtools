@@ -7,4 +7,14 @@ module.exports = withTM(["../design"])({
   experimental: {
     externalDir: true,
   },
+
+  compilerOptions: {
+    paths: {
+      "@codemirror/lang-javascript": "@codemirror/lang-javascript_bvaughn",
+      "@codemirror/language": "@codemirror/language_bvaughn",
+      "@codemirror/state": "@codemirror/state_bvaughn",
+      "@lezer/common": "@lezer/common_bvaughn",
+      "@lezer/highlight": "@lezer/highlight_bvaughn",
+    },
+  },
 });

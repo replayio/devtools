@@ -1,0 +1,3 @@
+.List > div {
+  min-width: var(--max-line-width);
+}

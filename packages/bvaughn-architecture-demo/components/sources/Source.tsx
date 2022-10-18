@@ -1,175 +1,65 @@
-import Icon from "@bvaughn/components/Icon";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
-import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
-import {
-  getCachedMinMaxSourceHitCounts,
-  getSourceContents,
-  getSourceHitCounts,
-} from "@bvaughn/src/suspense/SourcesCache";
+import { getSourceContents } from "@bvaughn/src/suspense/SourcesCache";
+import { highlight } from "@bvaughn/src/suspense/TokenizerCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { newSource as ProtocolSource, SourceId as ProtocolSourceId } from "@replayio/protocol";
-import { Fragment, useContext, useMemo } from "react";
+import { newSource as ProtocolSource } from "@replayio/protocol";
+import { useContext, useRef, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import PointPanel from "./PointPanel";
+import PreviewPopup from "./PreviewPopup";
 import styles from "./Source.module.css";
+import SourceList from "./SourceList";
 
-// TODO Add a real source viewer built on top of Code Mirror, Monoco, or Lexical.
+export type HoveredState = {
+  expression: string;
+  target: HTMLElement;
+};
 
-export default function Source({
-  source,
-  sourceId,
-}: {
-  source: ProtocolSource;
-  sourceId: ProtocolSourceId;
-}) {
-  const client = useContext(ReplayClientContext);
+export default function Source({ source }: { source: ProtocolSource }) {
+  const [hoveredState, setHoveredState] = useState<HoveredState | null>(null);
 
-  const { range: focusRange } = useContext(FocusContext);
-  const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const fileName = getSourceFileName(source, true) || "unknown";
 
-  const sourceContents = getSourceContents(client, sourceId);
+  const client = useContext(ReplayClientContext);
+  const sourceContents = getSourceContents(client, source.sourceId);
 
-  const { lines, locationRange } = useMemo(() => {
-    const lines = sourceContents.contents.split("\n");
-    const locationRange = {
-      start: { line: 0, column: 0 },
-      end: { line: lines.length - 1, column: Number.MAX_SAFE_INTEGER },
-    };
-    return {
-      lines,
-      locationRange,
-    };
-  }, [sourceContents]);
-
-  const hitCounts = getSourceHitCounts(client, sourceId, locationRange, focusRange);
-  const [minHitCount, maxHitCount] = getCachedMinMaxSourceHitCounts(sourceId, focusRange);
-
-  const maxHitCountStringLength = `${maxHitCount}`.length;
-
-  const onAddPointButtonClick = async (lineNumber: number) => {
-    const lineHasHits = hitCounts.has(lineNumber);
-    if (!lineHasHits) {
-      return;
-    }
-
-    const hitCountsForLine = hitCounts.get(lineNumber)!;
-    const closestColumnNumber = hitCountsForLine!.firstBreakableColumnIndex;
-    const fileName = source?.url?.split("/")?.pop();
-
-    // TODO The legacy app uses the closest function name for the content (if there is one).
-    // This app doesn't yet have logic for parsing source contents though.
-    addPoint(
-      {
-        content: `"${fileName}", ${lineNumber}`,
-        shouldLog: true,
-      },
-      {
-        column: closestColumnNumber,
-        line: lineNumber,
-        sourceId,
-      }
-    );
-  };
+  // TODO Incrementally parse code using SourceContext -> visibleLines
+  const code = sourceContents.contents;
+  const htmlLines = highlight(code, fileName);
+  if (htmlLines === null) {
+    return null;
+  }
 
   return (
-    <div className={styles.Source} data-test-id={`Source-${fileName}`}>
-      <div className={styles.SourceContents}>
-        {lines.map((line, index) => {
-          const lineNumber = index + 1;
-          const lineHasHits = hitCounts.has(lineNumber);
-          const hitCount = hitCounts?.get(lineNumber)?.count || 0;
-
-          // We use a gradient to indicate the "heat" (the number of hits).
-          // This absolute hit count values are relative, per file.
-          // Cubed root prevents high hit counts from lumping all other values together.
-          const NUM_GRADIENT_COLORS = 3;
-          let hitCountBarClassName = styles.LineHitCount0;
-          let hitCountLabelClassName = styles.LineHitCountLabel0;
-          let hitCountIndex = NUM_GRADIENT_COLORS - 1;
-          if (hitCount > 0 && minHitCount !== null && maxHitCount !== null) {
-            if (minHitCount !== maxHitCount) {
-              hitCountIndex = Math.min(
-                NUM_GRADIENT_COLORS - 1,
-                Math.round(
-                  ((hitCount - minHitCount) / (maxHitCount - minHitCount)) * NUM_GRADIENT_COLORS
-                )
-              );
-            }
-
-            hitCountBarClassName = styles[`LineHitCount${hitCountIndex + 1}`];
-            hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
-          }
-
-          const linePoint = points.find(
-            point => point.location.sourceId === sourceId && point.location.line === lineNumber
-          );
-
-          let hoverButton = null;
-          let lineSegments = null;
-          if (linePoint) {
-            hoverButton = (
-              <button className={styles.Button} onClick={() => deletePoints(linePoint.id)}>
-                <Icon className={styles.Icon} type="remove" />
-              </button>
-            );
-            lineSegments = (
-              <>
-                <pre className={styles.LineSegment}>
-                  {line.substring(0, linePoint.location.column)}
-                </pre>
-                <button
-                  className={styles.BreakpointButton}
-                  onClick={() => editPoint(linePoint.id, { shouldBreak: !linePoint.shouldBreak })}
-                >
-                  <Icon
-                    className={
-                      linePoint.shouldBreak ? styles.BreakpointIcon : styles.DisabledBreakpointIcon
-                    }
-                    type="breakpoint"
-                  />
-                </button>
-                <pre className={styles.LineSegment}>
-                  {line.substring(linePoint.location.column)}
-                </pre>
-              </>
-            );
-          } else {
-            hoverButton = (
-              <>
-                <button className={styles.Button} onClick={() => onAddPointButtonClick(lineNumber)}>
-                  <Icon className={styles.Icon} type="add" />
-                </button>
-              </>
-            );
-            lineSegments = <pre className={styles.LineSegment}>{line}</pre>;
-          }
-
-          return (
-            <Fragment key={index}>
-              <div
-                key={index}
-                className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}
-                data-test-id={`SourceLine-${lineNumber}`}
-              >
-                <div className={styles.LineNumber}>{lineNumber}</div>
-                {hoverButton}
-                <div className={hitCountBarClassName} />
-                <div
-                  className={hitCountLabelClassName}
-                  style={{ width: `${maxHitCountStringLength + 1}ch` }}
-                >
-                  {hitCount > 0 ? hitCount : ""}
-                </div>
-                {lineSegments}
-              </div>
-              {linePoint && <PointPanel className={styles.PointPanel} point={linePoint} />}
-            </Fragment>
-          );
-        })}
+    <div
+      className={styles.Source}
+      data-test-id={`Source-${source.sourceId}`}
+      data-test-name="Source"
+      ref={containerRef}
+    >
+      <div className={styles.SourceList}>
+        <AutoSizer>
+          {({ height, width }) => (
+            <SourceList
+              height={height}
+              htmlLines={htmlLines}
+              setHoveredState={setHoveredState}
+              source={source}
+              width={width}
+            />
+          )}
+        </AutoSizer>
       </div>
+      {hoveredState ? (
+        <PreviewPopup
+          containerRef={containerRef}
+          dismiss={() => setHoveredState(null)}
+          expression={hoveredState.expression}
+          target={hoveredState.target}
+        />
+      ) : null}
     </div>
   );
 }

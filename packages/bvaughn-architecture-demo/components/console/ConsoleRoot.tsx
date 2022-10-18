@@ -3,7 +3,9 @@ import ErrorBoundary from "@bvaughn/components/ErrorBoundary";
 import Icon from "@bvaughn/components/Icon";
 import Loader from "@bvaughn/components/Loader";
 import {
+  KeyboardEvent,
   ReactNode,
+  RefObject,
   Suspense,
   unstable_Offscreen as Offscreen,
   useContext,
@@ -21,8 +23,8 @@ import FilterText from "./filters/FilterText";
 import FilterToggles from "./filters/FilterToggles";
 import { LoggablesContextRoot } from "./LoggablesContext";
 import MessagesList from "./MessagesList";
-import Search from "./Search";
-import { SearchContextRoot } from "./SearchContext";
+import ConsoleSearch from "./ConsoleSearch";
+import { ConsoleSearchContext, ConsoleSearchContextRoot } from "./ConsoleSearchContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 
 export default function ConsoleRoot({
@@ -37,6 +39,47 @@ export default function ConsoleRoot({
   showSearchInputByDefault?: boolean;
   terminalInput?: ReactNode;
 }) {
+  const messageListRef = useRef<HTMLElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  return (
+    <ConsoleContextMenuContextRoot>
+      <ConsoleFiltersContextRoot>
+        <LoggablesContextRoot messageListRef={messageListRef}>
+          <ConsoleSearchContextRoot
+            messageListRef={messageListRef}
+            searchInputRef={searchInputRef}
+            showSearchInputByDefault={showSearchInputByDefault}
+          >
+            <Console
+              messageListRef={messageListRef}
+              nagHeader={nagHeader}
+              searchInputRef={searchInputRef}
+              showFiltersByDefault={showFiltersByDefault}
+              terminalInput={terminalInput}
+            />
+          </ConsoleSearchContextRoot>
+        </LoggablesContextRoot>
+      </ConsoleFiltersContextRoot>
+    </ConsoleContextMenuContextRoot>
+  );
+}
+
+function Console({
+  messageListRef,
+  nagHeader = null,
+  searchInputRef,
+  showFiltersByDefault = true,
+  terminalInput = null,
+}: {
+  messageListRef: RefObject<HTMLElement>;
+  filterDrawerOpenDefault?: boolean;
+  nagHeader?: ReactNode;
+  searchInputRef: RefObject<HTMLInputElement>;
+  showFiltersByDefault?: boolean;
+  terminalInput?: ReactNode;
+}) {
+  const [_, searchActions] = useContext(ConsoleSearchContext);
   const { clearMessages: clearConsoleEvaluations, messages: consoleEvaluations } =
     useContext(TerminalContext);
 
@@ -47,9 +90,6 @@ export default function ConsoleRoot({
   );
   const [menuValueHasBeenToggled, setMenuValueHasBeenToggled] = useState(false);
 
-  const messageListRef = useRef<HTMLElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
   // We default to having the console filters panel turned off, to minimize UI "busyness".
   // _If_ it's off initially, we want to completely skip rendering it, which
   // avoids making the "fetch events" calls during app startup to speed up loading.
@@ -57,85 +97,89 @@ export default function ConsoleRoot({
   // inside the `<Offscreen>` to preserve state.
   const renderFilters = isMenuOpen || menuValueHasBeenToggled;
 
+  const onKeyDown = (event: KeyboardEvent) => {
+    switch (event.key) {
+      case "f":
+      case "F":
+        if (event.ctrlKey || event.metaKey) {
+          searchActions.show();
+
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+    }
+  };
+
   return (
-    <ConsoleContextMenuContextRoot>
-      <ConsoleFiltersContextRoot>
-        <div
-          className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
-          data-test-id="ConsoleRoot"
+    <div
+      className={classNames(styles.ConsoleRoot, isMenuOpen && styles.ConsoleRootOpen)}
+      data-test-id="ConsoleRoot"
+      onKeyDown={onKeyDown}
+      tabIndex={0}
+    >
+      <div className={styles.ConsoleActions}>
+        <button
+          className={styles.MenuToggleButton}
+          data-test-id="ConsoleMenuToggleButton"
+          data-test-state={isMenuOpen ? "open" : "closed"}
+          onClick={() => {
+            setIsMenuOpen(!isMenuOpen);
+            setMenuValueHasBeenToggled(true);
+          }}
+          title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
         >
-          <div className={styles.ConsoleActions}>
-            <button
-              className={styles.MenuToggleButton}
-              data-test-id="ConsoleMenuToggleButton"
-              data-test-state={isMenuOpen ? "open" : "closed"}
-              onClick={() => {
-                setIsMenuOpen(!isMenuOpen);
-                setMenuValueHasBeenToggled(true);
-              }}
-              title={isMenuOpen ? "Close filter menu" : "Open filter menu"}
-            >
-              <Icon
-                className={styles.MenuToggleButtonIcon}
-                type={isMenuOpen ? "menu-open" : "menu-closed"}
-              />
-            </button>
+          <Icon
+            className={styles.MenuToggleButtonIcon}
+            type={isMenuOpen ? "menu-open" : "menu-closed"}
+          />
+        </button>
 
-            {consoleEvaluations.length > 0 && (
-              <button
-                className={styles.DeleteTerminalExpressionButton}
-                data-test-id="ClearConsoleEvaluationsButton"
-                onClick={clearConsoleEvaluations}
-                title="Clear console evaluations"
-              >
-                <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
-              </button>
-            )}
-          </div>
-
-          <FilterText />
-
-          <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
-            <div className={styles.FilterColumn}>
-              <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
-            </div>
-          </Offscreen>
-
-          <Suspense
-            fallback={
-              <div className={styles.Loader}>
-                <Loader />
-              </div>
-            }
+        {consoleEvaluations.length > 0 && (
+          <button
+            className={styles.DeleteTerminalExpressionButton}
+            data-test-id="ClearConsoleEvaluationsButton"
+            onClick={clearConsoleEvaluations}
+            title="Clear console evaluations"
           >
-            <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
-              <LoggablesContextRoot messageListRef={messageListRef}>
-                <SearchContextRoot
-                  messageListRef={messageListRef}
-                  searchInputRef={searchInputRef}
-                  showSearchInputByDefault={showSearchInputByDefault}
-                >
-                  <div className={styles.MessageColumn}>
-                    {nagHeader}
+            <Icon className={styles.DeleteTerminalExpressionIcon} type="delete" />
+          </button>
+        )}
+      </div>
 
-                    <MessagesList ref={messageListRef} />
+      <FilterText />
 
-                    {terminalInput}
-
-                    <Search
-                      className={styles.Row}
-                      hideOnEscape={terminalInput !== null}
-                      searchInputRef={searchInputRef}
-                    />
-                  </div>
-                </SearchContextRoot>
-              </LoggablesContextRoot>
-            </ErrorBoundary>
-          </Suspense>
-
-          <ContextMenu />
+      <Offscreen mode={isMenuOpen ? "visible" : "hidden"}>
+        <div className={styles.FilterColumn}>
+          <Suspense fallback={<Loader />}>{renderFilters && <FilterToggles />}</Suspense>
         </div>
-      </ConsoleFiltersContextRoot>
-    </ConsoleContextMenuContextRoot>
+      </Offscreen>
+
+      <Suspense
+        fallback={
+          <div className={styles.Loader}>
+            <Loader />
+          </div>
+        }
+      >
+        <ErrorBoundary fallbackClassName={styles.ErrorBoundaryFallback}>
+          <div className={styles.MessageColumn}>
+            {nagHeader}
+
+            <MessagesList ref={messageListRef} />
+
+            {terminalInput}
+
+            <ConsoleSearch
+              className={styles.Row}
+              hideOnEscape={terminalInput !== null}
+              searchInputRef={searchInputRef}
+            />
+          </div>
+        </ErrorBoundary>
+      </Suspense>
+
+      <ContextMenu />
+    </div>
   );
 }

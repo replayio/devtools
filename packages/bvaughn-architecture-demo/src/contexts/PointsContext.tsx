@@ -1,4 +1,5 @@
 import { Location, TimeStampedPoint } from "@replayio/protocol";
+import sortedIndexBy from "lodash/sortedIndexBy";
 import {
   createContext,
   PropsWithChildren,
@@ -22,10 +23,14 @@ export type PointInstance = {
   type: "PointInstance";
 };
 
+export type AddPoint = (partialPoint: Partial<Point> | null, location: Location) => void;
+export type DeletePoints = (...id: PointId[]) => void;
+export type EditPoint = (id: PointId, partialPoint: Partial<Point>) => void;
+
 export type PointsContextType = {
-  addPoint: (partialPoint: Partial<Point> | null, location: Location) => void;
-  deletePoints: (...id: PointId[]) => void;
-  editPoint: (id: PointId, partialPoint: Partial<Point>) => void;
+  addPoint: AddPoint;
+  deletePoints: DeletePoints;
+  editPoint: EditPoint;
   isPending: boolean;
   points: Point[];
   pointsForAnalysis: Point[];
@@ -66,7 +71,11 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         location,
       };
 
-      setPointsHelper(prevPoints => [...prevPoints, point]);
+      setPointsHelper((prevPoints: Point[]) => {
+        const index = sortedIndexBy(prevPoints, point, ({ location }) => location.line);
+
+        return prevPoints.slice(0, index).concat([point], prevPoints.slice(index));
+      });
     },
     [setPointsHelper]
   );

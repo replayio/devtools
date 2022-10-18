@@ -4,6 +4,10 @@
   overflow: auto;
   display: flex;
   flex-direction: column;
+  position: relative;
+}
+.Sources:focus {
+  outline: none;
 }
 
 .Tabs {
@@ -37,9 +41,9 @@
 
 .Content {
   background-color: var(--background-color-contrast-2);
-  border-bottom-left-radius: 0.5rem;
+  border: 1px solid var(--background-color-contrast-1);
   border-bottom-right-radius: 0.5rem;
-  padding: 0.5rem;
+  padding: 0;
   flex: 1 1 auto;
   overflow: auto;
 }

@@ -1,0 +1,132 @@
+.LineWithHits,
+.LineWithoutHits {
+  white-space: pre-wrap;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: background-color 250ms;
+}
+
+.LineWithoutHits .LineNumber {
+  color: var(--color-dimmer);
+}
+
+.CurrentSearchResultLine {
+  background-color: var(--background-color-contrast-1);
+}
+
+.Header {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+}
+
+.AddPointButton,
+.RemovePointButton {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+  font: inherit;
+  font-size: var(--font-size-tiny);
+  height: 1.5rem;
+  flex: 0 0 var(--hit-count-size);
+  width: var(--hit-count-size);
+  min-width: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  user-select: false;
+}
+.AddPointButton {
+  display: none;
+}
+.AddPointButton:disabled,
+.RemovePointButton:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.BreakpointIcon,
+.DisabledBreakpointIcon,
+.Icon {
+  width: 1rem;
+  height: 1rem;
+  display: inline-block;
+}
+.BreakpointIcon,
+.DisabledBreakpointIcon {
+  color: var(--color-brand);
+}
+.DisabledBreakpointIcon {
+  opacity: 0.5;
+}
+
+.LineWithHits:hover .AddPointButton {
+  display: flex;
+}
+
+.LineNumber {
+  height: 1.5rem;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  font-size: var(--font-size-small);
+  margin: 0 1ch;
+  color: var(--color-dim);
+  user-select: none;
+}
+
+.LineHitCounts {
+  display: flex;
+  /* Make sure there's enough room for the "+" button */
+  min-width: 1.5rem;
+  flex: 0 0 var(--hit-count-size);
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-tiny);
+  user-select: none;
+}
+.LineHitCounts0 {
+  background-color: var(--color-hit-counts-0);
+}
+.LineHitCounts1 {
+  background-color: var(--color-hit-counts-1);
+  color: var(--color-hit-counts-label-1);
+}
+.LineHitCounts2 {
+  background-color: var(--color-hit-counts-2);
+  color: var(--color-hit-counts-label-2);
+}
+.LineHitCounts3 {
+  background-color: var(--color-hit-counts-3);
+  color: var(--color-hit-counts-label-3);
+}
+
+.PointPanel {
+  margin: 1ch;
+}
+
+.LineSegment {
+  margin: 0;
+}
+
+.BreakpointButton {
+  display: inline-block;
+  background: transparent;
+  outline: none;
+  border: none;
+  padding: 0;
+  margin: 0 0.5ch;
+  cursor: pointer;
+  height: 1rem;
+}
