@@ -5,6 +5,7 @@
   background-color: var(--color-hit-counts-0);
   padding: 0.5rem;
   border-radius: 0.25rem;
+  margin-left: 39px
 }
 
 .Label {
@@ -24,7 +25,8 @@
   border-radius: 0.25rem;
   color: var(--color-default);
   width: 4rem;
-  padding: 0.25rem;
+  padding: 0.5rem;
+  font-size: 11px;
 }
 .Input:disabled {
   opacity: 0.5;
@@ -60,6 +62,7 @@
   width: 1rem;
   height: 1rem;
   display: inline-block;
+  border-radius: 10px;
 }
 
 .Row {
@@ -71,6 +74,7 @@
 
 .HitPointsList {
   margin: 0;
+  margin-top: 4px;
   padding: 0;
   display: flex;
   gap: 0.5ch;
@@ -78,6 +82,36 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   width: 100%;
+}
+
+.Prev {
+  background-color: white;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+}
+
+.Next {
+  background-color: white;
+  width: 14px;
+  height: 14px;
+  border-radius: 7px;
+}
+
+.Timeline {
+  width: 500px;
+  height: 4px;
+  background-color: white;
+  margin-top: 6px;
+  margin-left: 4px;
+  border-radius: 4px;
+}
+
+.HitsBadge {
+  background-color: white;
+  width: 28px;
+  height: 14px;
+  border-radius: 7px;
 }
 
 .HitPointListItem {

@@ -8,6 +8,19 @@
   gap: 1ch;
 }
 
+.SourceLine {
+
+}
+
+.SourceLine:hover {
+  background-color: var(--color-hit-counts-0);
+  cursor: pointer;
+}
+
+.SourceLineWithPanel {
+  background-color: var(--color-hit-counts-0);
+}
+
 .AddPointButton,
 .RemovePointButton {
   position: absolute;
@@ -17,7 +30,7 @@
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
   font: inherit;
-  font-size: var(--font-size-tiny);
+  font-size: var(--font-size-regular);
   height: 1.5rem;
   flex: 0 0 var(--hit-count-size);
   width: var(--hit-count-size);

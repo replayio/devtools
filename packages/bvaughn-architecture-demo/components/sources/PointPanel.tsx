@@ -53,25 +53,32 @@ export default function PointPanel({ className, point }: { className: string; po
           placeholder="Content..."
           value={editableContent}
         />
-        <label className={styles.Label}>
-          <input
-            checked={point.shouldBreak}
-            onChange={event => editPoint(point.id, { shouldBreak: event.currentTarget.checked })}
-            type="checkbox"
-          />
-          <Icon className={styles.LabelIcon} type="pause" />
-        </label>
-        <label className={styles.Label}>
-          <input
-            checked={point.shouldLog}
-            onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
-            type="checkbox"
-          />
-          <Icon className={styles.LabelIcon} type="print" />
-        </label>
-        <small>
-          ({point.location.line}:{point.location.column})
-        </small>
+        {false && (
+          <>
+            {" "}
+            <label className={styles.Label}>
+              <input
+                checked={point.shouldBreak}
+                onChange={event =>
+                  editPoint(point.id, { shouldBreak: event.currentTarget.checked })
+                }
+                type="checkbox"
+              />
+              <Icon className={styles.LabelIcon} type="pause" />
+            </label>
+            <label className={styles.Label}>
+              <input
+                checked={point.shouldLog}
+                onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
+                type="checkbox"
+              />
+              <Icon className={styles.LabelIcon} type="print" />
+            </label>
+            <small>
+              ({point.location.line}:{point.location.column})
+            </small>
+          </>
+        )}
         <button
           className={styles.SaveButton}
           disabled={!isConditionValid || !isContentValid || !hasChanged}
@@ -79,19 +86,21 @@ export default function PointPanel({ className, point }: { className: string; po
             editPoint(point.id, { condition: editableCondition, content: editableContent })
           }
         >
-          <Icon className={styles.SaveButtonIcon} type="save" />
+          <Icon className={styles.SaveButtonIcon} type="comment" />
         </button>
       </div>
-      <div className={styles.Row}>
-        <input
-          className={styles.Input}
-          data-test-id={`PointPanelInput-${point.location.line}-condition`}
-          onChange={event => setEditableCondition(event.currentTarget.value || null)}
-          onKeyDown={onKeyDown}
-          placeholder="Condition..."
-          value={editableCondition || ""}
-        />
-      </div>
+      {false && (
+        <div className={styles.Row}>
+          <input
+            className={styles.Input}
+            data-test-id={`PointPanelInput-${point.location.line}-condition`}
+            onChange={event => setEditableCondition(event.currentTarget.value || null)}
+            onKeyDown={onKeyDown}
+            placeholder="Condition..."
+            value={editableCondition || ""}
+          />
+        </div>
+      )}
       <div className={styles.Row}>
         <Suspense fallback={<Loader />}>
           <HitPoints point={point} />
@@ -127,12 +136,10 @@ function HitPoints({ point }: { point: Point }) {
       } else {
         return (
           <ul className={styles.HitPointsList}>
-            <li className={styles.HitPointListItem}>Hits:</li>
-            {hitPoints.map(hitPoint => (
-              <li key={hitPoint.point} className={styles.HitPointListItem}>
-                •
-              </li>
-            ))}
+            <div className={styles.Prev}></div>
+            <div className={styles.HitsBadge}></div>
+            <div className={styles.Next}></div>
+            <div className={styles.Timeline}></div>
           </ul>
         );
       }

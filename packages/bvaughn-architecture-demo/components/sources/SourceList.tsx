@@ -29,7 +29,7 @@ import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 // HACK
 // We could swap this out for something that lazily measures row height.
 const LINE_HEIGHT = 18;
-const LINE_HEIGHT_WITH_POINT = 18 + 88;
+const LINE_HEIGHT_WITH_POINT = 18 + 68;
 
 export default function SourceList({
   height,

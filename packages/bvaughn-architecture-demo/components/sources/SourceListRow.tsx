@@ -196,7 +196,7 @@ const SourceListRow = memo(
             data-test-name="AddPointButton"
             onClick={() => onAddPointButtonClick(lineNumber)}
           >
-            <Icon className={styles.Icon} type="add" />
+            +{/* <Icon className={styles.Icon} type="add" /> */}
           </button>
         </>
       );
@@ -210,7 +210,11 @@ const SourceListRow = memo(
     }
 
     return (
-      <div data-test-id={`SourceLine-${lineNumber}`} style={style}>
+      <div
+        className={[styles.SourceLine, point && styles.SourceLineWithPanel].join(" ")}
+        data-test-id={`SourceLine-${lineNumber}`}
+        style={style}
+      >
         <div
           className={[
             lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
