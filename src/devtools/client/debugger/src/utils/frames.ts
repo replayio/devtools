@@ -1,46 +1,27 @@
 import { PauseId } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread/thread";
 import { SourcesState } from "ui/reducers/sources";
-import { getFramesIfCached } from "ui/suspense/frameCache";
+import { getPauseFramesIfCached } from "ui/suspense/frameCache";
 import { getFrameStepsIfCached } from "ui/suspense/frameStepsCache";
-import { createFrame } from "../client/create";
 import { PauseFrame } from "../selectors";
-import { formatCallStackFrames } from "../selectors/getCallStackFrames";
 
 // returns all cached frames from the given pauseId and its async parent pauseIds
 // and converts them to PauseFrames
 export function getAllCachedPauseFrames(
-  pauseId: PauseId | undefined,
+  pauseId: PauseId,
   sourcesState: SourcesState
 ): PauseFrame[] | undefined {
-  if (!pauseId) {
-    return undefined;
-  }
-
   let allPauseFrames: PauseFrame[] = [];
   let asyncIndex = 0;
   while (true) {
-    const cachedFrames = getFramesIfCached(pauseId);
-    if (!cachedFrames?.value) {
+    const cachedFrames = getPauseFramesIfCached(pauseId, sourcesState);
+    if (!cachedFrames) {
       break;
     }
-    let protocolFrames = cachedFrames.value;
+    let pauseFrames = cachedFrames;
     if (asyncIndex > 0) {
-      protocolFrames = protocolFrames.slice(1);
+      pauseFrames = pauseFrames.slice(1);
     }
-    const pauseFrames = formatCallStackFrames(
-      protocolFrames.map((protocolFrame, index) =>
-        createFrame(
-          sourcesState,
-          ThreadFront.preferredGeneratedSources,
-          protocolFrame,
-          pauseId!,
-          index,
-          asyncIndex
-        )
-      ) || null,
-      sourcesState.sourceDetails.entities
-    );
     if (!pauseFrames?.length) {
       break;
     }

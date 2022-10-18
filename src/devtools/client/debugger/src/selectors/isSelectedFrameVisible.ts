@@ -6,15 +6,15 @@ import type { UIState } from "ui/state";
 
 import { getSelectedLocation } from "ui/reducers/sources";
 
-import { getSelectedFrame } from "./pause";
+import { getSelectedFrameAsync } from "../selectors/pause";
 
 /*
  * Checks to if the selected frame's source is currently
  * selected.
  */
-export function isSelectedFrameVisible(state: UIState) {
+export async function isSelectedFrameVisible(state: UIState) {
   const selectedLocation = getSelectedLocation(state);
-  const selectedFrame = getSelectedFrame(state);
+  const selectedFrame = await getSelectedFrameAsync(state);
 
   if (!selectedFrame || !selectedLocation) {
     return false;

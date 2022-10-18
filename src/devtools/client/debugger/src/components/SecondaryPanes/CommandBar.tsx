@@ -4,14 +4,14 @@
 
 import actions from "devtools/client/debugger/src/actions/index";
 import CommandBarButton from "devtools/client/debugger/src/components/shared/Button/CommandBarButton";
-import { getPauseId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
-import { getFramePositions } from "devtools/client/debugger/src/selectors/pause";
+import { getSelectedFrameId, getThreadContext } from "devtools/client/debugger/src/reducers/pause";
 import { formatKeyShortcut } from "devtools/client/debugger/src/utils/text";
 import KeyShortcuts from "devtools/client/shared/key-shortcuts";
 import Services from "devtools/shared/services";
 import React, { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { useGetFrames } from "ui/suspense/frameCache";
+import { useGetFrameSteps } from "ui/suspense/frameStepsCache";
 import { trackEvent } from "ui/utils/telemetry";
 
 const { appinfo } = Services;
@@ -70,9 +70,9 @@ function formatKey(action: string) {
 
 export default function CommandBar() {
   const cx = useAppSelector(getThreadContext);
-  const framePositions = useAppSelector(getFramePositions);
-  const pauseId = useAppSelector(getPauseId);
-  const frames = useGetFrames(pauseId);
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
+  const frames = useGetFrames(selectedFrameId?.pauseId);
+  const frameSteps = useGetFrameSteps(selectedFrameId?.pauseId, selectedFrameId?.frameId);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -107,7 +107,7 @@ export default function CommandBar() {
     };
   }, [cx, dispatch]);
 
-  const hasFramePositions = !!framePositions?.positions.length;
+  const hasFramePositions = !!frameSteps.value?.length;
   const isPaused = !!frames.value?.length;
   const disabled = !isPaused || !hasFramePositions;
   const disabledTooltip = !isPaused

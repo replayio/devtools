@@ -1,5 +1,5 @@
 import { Dictionary } from "@reduxjs/toolkit";
-import type { PauseId, SourceId } from "@replayio/protocol";
+import type { SourceId } from "@replayio/protocol";
 import { getMappedLocationSuspense } from "bvaughn-architecture-demo/src/suspense/MappedLocationCache";
 import { getBreakpointPositionsSuspense } from "bvaughn-architecture-demo/src/suspense/SourcesCache";
 import sortBy from "lodash/sortBy";
@@ -13,11 +13,10 @@ import {
   getBestSourceMappedSourceId,
   SourcesState,
 } from "ui/reducers/sources";
-
+import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 import { CursorPosition } from "../components/Editor/Footer";
-
 import { isNodeModule, isBowerComponent } from "./source";
-import { getAllCachedPauseFrames } from "./frames";
+import { PauseAndFrameId } from "../reducers/pause";
 
 export function getSourceIDsToSearch(
   sourcesById: Record<string, SourceDetails>,
@@ -49,9 +48,8 @@ export function getSourceIDsToSearch(
 }
 
 function getSourceIdToVisualizeSuspense(
-  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  selectedFrameId: string | null,
+  selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
@@ -63,12 +61,9 @@ function getSourceIdToVisualizeSuspense(
     return selectedSource.id;
   }
 
-  let alternateSourceId = getAlternateSourceIdFromSelectedFrame(
-    pauseId,
-    selectedSource,
-    selectedFrameId,
-    sourcesState
-  );
+  let alternateSourceId = selectedFrameId
+    ? getAlternateSourceIdFromSelectedFrameSuspense(selectedSource, selectedFrameId, sourcesState)
+    : undefined;
   if (!alternateSourceId) {
     alternateSourceId = getUniqueAlternateSourceId(
       selectedSource,
@@ -94,9 +89,8 @@ function getSourceIdToVisualizeSuspense(
 }
 
 export function getSourcemapVisualizerURLSuspense(
-  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  selectedFrameId: string | null,
+  selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState,
   position?: CursorPosition,
   client?: ReplayClientInterface
@@ -105,7 +99,6 @@ export function getSourcemapVisualizerURLSuspense(
     return null;
   }
   const sourceId = getSourceIdToVisualizeSuspense(
-    pauseId,
     selectedSource,
     selectedFrameId,
     sourcesState,
@@ -130,14 +123,12 @@ interface AlternateSourceResult {
   why?: "no-source" | "no-sourcemap" | "not-unique";
 }
 
-function getAlternateSourceIdFromSelectedFrame(
-  pauseId: PauseId,
+function getAlternateSourceIdFromSelectedFrameSuspense(
   selectedSource: SourceDetails,
-  selectedFrameId: string | null,
+  selectedFrameId: PauseAndFrameId,
   sourcesState: SourcesState
 ) {
-  const frames = getAllCachedPauseFrames(pauseId, sourcesState) || [];
-  const selectedFrame = frames.find(f => f.id == selectedFrameId);
+  const selectedFrame = getPauseFrameSuspense(selectedFrameId, sourcesState);
   if (selectedFrame?.location.sourceId === selectedSource.id) {
     return selectedFrame.alternateLocation?.sourceId;
   }
@@ -240,9 +231,8 @@ function getAlternateSourceIdForPositionSuspense(
 
 export function getAlternateSourceIdSuspense(
   client: ReplayClientInterface,
-  pauseId: PauseId,
   selectedSource: SourceDetails | null | undefined,
-  selectedFrameId: string | null,
+  selectedFrameId: PauseAndFrameId | null,
   position: CursorPosition,
   sourcesState: SourcesState
 ): AlternateSourceResult {
@@ -250,12 +240,9 @@ export function getAlternateSourceIdSuspense(
     return { why: "no-source" };
   }
 
-  let alternateSourceId = getAlternateSourceIdFromSelectedFrame(
-    pauseId,
-    selectedSource,
-    selectedFrameId,
-    sourcesState
-  );
+  let alternateSourceId = selectedFrameId
+    ? getAlternateSourceIdFromSelectedFrameSuspense(selectedSource, selectedFrameId, sourcesState)
+    : undefined;
   if (alternateSourceId) {
     return { sourceId: alternateSourceId };
   }

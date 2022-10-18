@@ -5,19 +5,12 @@
 import type { UIThunkAction } from "ui/actions";
 import type { ThreadContext, ValidCommand } from "devtools/client/debugger/src/reducers/pause";
 import { executeCommandOperation } from "devtools/client/debugger/src/reducers/pause";
-import { getFramePositions } from "../../selectors/pause";
-
-import { setFramePositions } from "./setFramePositions";
 
 export function command(cx: ThreadContext, type: ValidCommand): UIThunkAction {
-  return async (dispatch, getState) => {
+  return async dispatch => {
     if (!type) {
       return;
     }
-    if (!getFramePositions(getState())) {
-      await dispatch(setFramePositions());
-    }
-
     dispatch(executeCommandOperation({ cx, command: type }));
   };
 }

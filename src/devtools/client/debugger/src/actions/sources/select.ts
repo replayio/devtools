@@ -13,8 +13,7 @@ import { getToolboxLayout, getViewMode } from "ui/reducers/layout";
 
 import { trackEvent } from "ui/utils/telemetry";
 
-import { Context, getPauseId } from "../../reducers/pause";
-import { getSelectedFrameId } from "../../reducers/pause";
+import { Context } from "../../reducers/pause";
 import { getTabExists } from "../../reducers/tabs";
 import { closeActiveSearch } from "../../reducers/ui";
 import { setShownSource } from "../../reducers/ui";
@@ -29,12 +28,12 @@ import {
   getSourceToDisplayForUrl,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
-import { getAllCachedPauseFrames } from "../../utils/frames";
 import { createLocation } from "../../utils/location";
 import { paused } from "../pause/paused";
 
 import { fetchSymbolsForSource } from "../../reducers/ast";
 import { UIState } from "ui/state";
+import { getSelectedFrameAsync } from "../../selectors/pause";
 
 export type PartialLocation = Parameters<typeof createLocation>[0];
 
@@ -228,17 +227,12 @@ export function showAlternateSource(
     }
 
     let selectSourceByPausing = false;
-    const pauseId = getPauseId(state);
-    const frames = getAllCachedPauseFrames(pauseId, state.sources);
-    if (frames) {
-      const selectedFrameId = getSelectedFrameId(state);
-      const selectedFrame = frames.find(f => f.id == selectedFrameId);
-      if (
-        selectedFrame?.location.sourceId === oldSourceId &&
-        selectedFrame?.alternateLocation?.sourceId === newSourceId
-      ) {
-        selectSourceByPausing = true;
-      }
+    const selectedFrame = await getSelectedFrameAsync(state);
+    if (
+      selectedFrame?.location.sourceId === oldSourceId &&
+      selectedFrame?.alternateLocation?.sourceId === newSourceId
+    ) {
+      selectSourceByPausing = true;
     }
 
     if (selectSourceByPausing) {

@@ -3,10 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 //
-import { PureComponent } from "react";
-import { connect, ConnectedProps } from "react-redux";
-
-import type { UIState } from "ui/state";
+import { PureComponent, Suspense } from "react";
 
 import {
   toEditorColumn,
@@ -15,44 +12,40 @@ import {
   endOperation,
   getTokenEnd,
 } from "../../utils/editor";
-import { isException } from "../../utils/pause";
 import { getIndentation } from "../../utils/indentation";
-import { getPauseReason, getDebugLineLocation } from "../../selectors";
+import { getDebugLineLocationSuspense } from "../../selectors";
+import { Location } from "@replayio/protocol";
+import { useAppSelector } from "ui/setup/hooks";
 
-const mapStateToProps = (state: UIState) => {
-  return {
-    location: getDebugLineLocation(state),
-    why: getPauseReason(state),
-  };
-};
+const lineClass = "new-debug-line";
 
-const connector = connect(mapStateToProps);
+interface DebugLineProps {
+  location: Location;
+}
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
-
-export class DebugLine extends PureComponent<PropsFromRedux> {
+class DebugLineRenderer extends PureComponent<DebugLineProps> {
   debugExpression: any;
 
   componentDidMount() {
-    const { why, location } = this.props;
-    this.setDebugLine(why, location);
+    const { location } = this.props;
+    this.setDebugLine(location);
   }
 
   componentWillUnmount() {
-    const { why, location } = this.props;
-    this.clearDebugLine(why, location);
+    const { location } = this.props;
+    this.clearDebugLine(location);
   }
 
-  componentDidUpdate(prevProps: PropsFromRedux) {
-    const { why, location } = this.props;
+  componentDidUpdate(prevProps: DebugLineProps) {
+    const { location } = this.props;
 
     startOperation();
-    this.clearDebugLine(prevProps.why, prevProps.location);
-    this.setDebugLine(why, location);
+    this.clearDebugLine(prevProps.location);
+    this.setDebugLine(location);
     endOperation();
   }
 
-  setDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
+  setDebugLine(location: Location) {
     if (!location) {
       return;
     }
@@ -63,7 +56,6 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
     }
 
     const lineIndex = location.line - 1;
-    let { markTextClass, lineClass } = this.getTextClasses(why);
     // @ts-expect-error method doesn't exist on Doc
     doc.addLineClass(lineIndex, "line", lineClass);
 
@@ -76,6 +68,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
     // @ts-expect-error doc.cm doesn't exist
     const columnEnd = doc.cm ? getTokenEnd(doc.cm, lineIndex, column) : null;
 
+    let markTextClass = "debug-expression";
     if (columnEnd === null) {
       markTextClass += " to-line-end";
     }
@@ -87,7 +80,7 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
     );
   }
 
-  clearDebugLine(why: PropsFromRedux["why"], location: PropsFromRedux["location"]) {
+  clearDebugLine(location: Location) {
     if (!location) {
       return;
     }
@@ -101,20 +94,8 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
     if (!doc) {
       return;
     }
-    const { lineClass } = this.getTextClasses(why);
     // @ts-expect-error method doesn't exist on Doc
     doc.removeLineClass(lineIndex, "line", lineClass);
-  }
-
-  getTextClasses(why: PropsFromRedux["why"]) {
-    if (why && isException(why)) {
-      return {
-        markTextClass: "debug-expression-error",
-        lineClass: "new-debug-line-error",
-      };
-    }
-
-    return { markTextClass: "debug-expression", lineClass: "new-debug-line" };
   }
 
   render() {
@@ -122,4 +103,18 @@ export class DebugLine extends PureComponent<PropsFromRedux> {
   }
 }
 
-export default connector(DebugLine);
+function DebugLine() {
+  const location = useAppSelector(getDebugLineLocationSuspense);
+  if (!location) {
+    return null;
+  }
+  return <DebugLineRenderer location={location} />;
+}
+
+export default function DebugLineSuspenseWrapper() {
+  return (
+    <Suspense>
+      <DebugLine />
+    </Suspense>
+  );
+}

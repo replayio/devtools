@@ -5,7 +5,7 @@
 //
 import { bindActionCreators } from "@reduxjs/toolkit";
 import { PauseId } from "@replayio/protocol";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
+import type { Context, PauseAndFrameId } from "devtools/client/debugger/src/reducers/pause";
 import type { AppDispatch } from "ui/setup/store";
 
 import { copyToTheClipboard } from "../../../utils/clipboard";
@@ -41,14 +41,13 @@ const showSourceMenuItem = (
 const sourceMapItem = (
   pauseId: PauseId | undefined,
   selectedSource: SourceDetails,
-  selectedFrameId: string | null,
+  selectedFrameId: PauseAndFrameId | null,
   sourcesState: SourcesState
 ) => {
   let visualizerURL: string | null = null;
   if (pauseId) {
     try {
       visualizerURL = getSourcemapVisualizerURLSuspense(
-        pauseId,
         selectedSource,
         selectedFrameId,
         sourcesState
@@ -81,7 +80,7 @@ export function editorMenuItems({
   editorActions: EditorActions;
   pauseId: PauseId | undefined;
   selectedSource: SourceDetails;
-  selectedFrameId: string | null;
+  selectedFrameId: PauseAndFrameId | null;
   sourcesState: SourcesState;
 }) {
   const items = [];

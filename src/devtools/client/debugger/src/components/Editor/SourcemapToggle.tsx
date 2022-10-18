@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "ui/reducers/sources";
 
 import { showAlternateSource } from "../../actions/sources/select";
-import { getPauseId, getSelectedFrameId } from "../../reducers/pause";
+import { getSelectedFrameId } from "../../reducers/pause";
 import { getAlternateSourceIdSuspense } from "../../utils/sourceVisualizations";
 
 import { CursorPosition } from "./Footer";
@@ -37,19 +37,18 @@ function SourcemapError({ why }: { why: "no-sourcemap" | "not-unique" | undefine
   );
 }
 
-export default function SourcemapToggle({ cursorPosition }: { cursorPosition: CursorPosition }) {
+export default function SourcemapToggleSuspends({
+  cursorPosition,
+}: {
+  cursorPosition: CursorPosition;
+}) {
   const dispatch = useAppDispatch();
   const client = useContext(ReplayClientContext);
-  const pauseId = useAppSelector(getPauseId);
   const selectedSource = useAppSelector(getSelectedSource);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const sourcesState = useAppSelector(state => state.sources);
-  if (!pauseId) {
-    return null;
-  }
   const alternateSourceIdResult = getAlternateSourceIdSuspense(
     client,
-    pauseId,
     selectedSource,
     selectedFrameId,
     cursorPosition,

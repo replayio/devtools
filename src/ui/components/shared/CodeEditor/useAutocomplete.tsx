@@ -10,8 +10,11 @@ import {
 } from "ui/utils/autocomplete";
 import uniq from "lodash/uniq";
 import { useAppSelector } from "ui/setup/hooks";
-import { getPauseId } from "devtools/client/debugger/src/reducers/pause";
-import { getSelectedFrame, PauseFrame } from "devtools/client/debugger/src/selectors";
+import {
+  getPauseId,
+  getSelectedFrameId,
+  PauseAndFrameId,
+} from "devtools/client/debugger/src/reducers/pause";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
 import { FrameScopes, getScopesAsync } from "ui/suspense/scopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -79,10 +82,10 @@ function useGetScopeMatches(expression: string) {
 
 async function getEvalMatches(
   expression: string,
-  frame: PauseFrame | null,
+  pauseAndFrameId: PauseAndFrameId | null,
   fetchObject: ObjectFetcher
 ): Promise<string[] | null> {
-  if (!frame) {
+  if (!pauseAndFrameId) {
     return null;
   }
   const propertyExpression = getPropertyExpression(expression);
@@ -91,8 +94,8 @@ async function getEvalMatches(
   }
   const evaluatedProperties = await getEvaluatedProperties(
     propertyExpression.left,
-    frame.pauseId,
-    frame.protocolId,
+    pauseAndFrameId.pauseId,
+    pauseAndFrameId.frameId,
     fetchObject
   );
   if (!evaluatedProperties) {
@@ -103,7 +106,7 @@ async function getEvalMatches(
 
 // This tries to autocomplete the property of the current expression.
 function useGetEvalMatches(expression: string) {
-  const frame = useAppSelector(getSelectedFrame);
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
   const replayClient = useContext(ReplayClientContext);
 
   const pauseId = useAppSelector(getPauseId);
@@ -116,9 +119,9 @@ function useGetEvalMatches(expression: string) {
       const fetchObject = async (objectId: string) => {
         return getObjectWithPreviewHelper(replayClient, pauseId, objectId);
       };
-      return getEvalMatches(expression, frame, fetchObject);
+      return getEvalMatches(expression, selectedFrameId, fetchObject);
     },
-    [frame, pauseId, replayClient]
+    [selectedFrameId, pauseId, replayClient]
   );
   return useGetAsyncMatches(expression, getEvalMatchesForSelectedFrame);
 }

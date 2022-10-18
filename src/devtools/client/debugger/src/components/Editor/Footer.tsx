@@ -4,8 +4,8 @@ import { useAppSelector } from "ui/setup/hooks";
 import { getSelectedSource } from "ui/reducers/sources";
 import { localStorageGetItem, localStorageSetItem } from "ui/utils/storage";
 
-import SourcemapToggle from "./SourcemapToggle";
-import SourcemapVisualizerLink from "./SourcemapVisualizerLink";
+import SourcemapToggleSuspends from "./SourcemapToggle";
+import SourcemapVisualizerLinkSuspends from "./SourcemapVisualizerLink";
 
 export type CursorPosition = {
   readonly column: number;
@@ -134,8 +134,8 @@ function SourceFooter() {
     <div className="source-footer">
       <ErrorBoundary>
         <Suspense>
-          <SourcemapToggle cursorPosition={cursorPosition} />
-          <SourcemapVisualizerLink cursorPosition={cursorPosition} />
+          <SourcemapToggleSuspends cursorPosition={cursorPosition} />
+          <SourcemapVisualizerLinkSuspends cursorPosition={cursorPosition} />
         </Suspense>
       </ErrorBoundary>
       <div className="source-footer-end">{cursorPositionUI}</div>

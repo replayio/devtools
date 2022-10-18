@@ -1,12 +1,12 @@
 import { Suspense } from "react";
 import { PauseId, Value } from "@replayio/protocol";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { getPauseId, getSelectedFrameId } from "../../selectors";
+import { getSelectedFrameId } from "../../selectors";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
+import { getFrameSuspense } from "ui/suspense/frameCache";
 import { getScopesSuspense } from "ui/suspense/scopeCache";
-import { getAsyncParentFramesSuspense, getAsyncParentPauseIdSuspense } from "ui/suspense/util";
 import { Redacted } from "ui/components/Redacted";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
@@ -16,9 +16,8 @@ import ScopesInspector from "bvaughn-architecture-demo/components/inspector/Scop
 import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {
-  const pauseId = useAppSelector(getPauseId);
-  const frameId = useAppSelector(getSelectedFrameId);
-  if (!pauseId || !frameId) {
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
+  if (!selectedFrameId) {
     return (
       <div className="pane">
         <div className="pane-info empty">Not paused at a point with any scopes</div>
@@ -26,21 +25,15 @@ function ScopesRenderer() {
     );
   }
 
-  const [asyncIndex, index] = frameId.split(":");
-  const asyncPauseId = getAsyncParentPauseIdSuspense(pauseId, +asyncIndex);
-  if (!asyncPauseId) {
-    return null;
-  }
-  const frames = getAsyncParentFramesSuspense(pauseId, +asyncIndex);
-  const frame = frames?.[+index];
+  const frame = getFrameSuspense(selectedFrameId);
   if (!frame) {
     return null;
   }
   const { scopes: protocolScopes, originalScopesUnavailable } = getScopesSuspense(
-    asyncPauseId,
-    frame.frameId
+    selectedFrameId.pauseId,
+    selectedFrameId.frameId
   );
-  const scopes = convertScopes(protocolScopes, frame, asyncPauseId);
+  const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
 
   return (
     <>
@@ -49,7 +42,7 @@ function ScopesRenderer() {
       ) : null}
       <div className={`${styles.Popup} preview-popup`}>
         {scopes.map((scope, scopeIndex) => (
-          <Scope key={scopeIndex} pauseId={asyncPauseId!} scope={scope} />
+          <Scope key={scopeIndex} pauseId={selectedFrameId.pauseId} scope={scope} />
         ))}
       </div>
     </>

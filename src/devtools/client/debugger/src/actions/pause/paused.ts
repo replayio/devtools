@@ -4,7 +4,7 @@
 
 import type { UIThunkAction } from "ui/actions";
 
-import { getSelectedFrame, getThreadContext } from "../../selectors";
+import { getThreadContext } from "../../selectors";
 import { getSelectedLocation } from "ui/reducers/sources";
 
 import {
@@ -13,11 +13,10 @@ import {
   pauseCreationFailed,
   frameSelected,
 } from "../../reducers/pause";
-import { setFramePositions } from "./setFramePositions";
 import { trackEvent } from "ui/utils/telemetry";
 import { isPointInLoadingRegion } from "ui/reducers/app";
 import { getFramesAsync } from "ui/suspense/frameCache";
-import { createFrame } from "../../client/create";
+import { getSelectedFrameAsync } from "../../selectors/pause";
 
 type $FixTypeLater = any;
 
@@ -59,15 +58,8 @@ export function paused({
     if (!frames?.length) {
       return;
     }
-    const topFrame = createFrame(
-      getState().sources,
-      ThreadFront.preferredGeneratedSources,
-      frames[0],
-      pause.pauseId!,
-      0
-    );
-    dispatch(frameSelected({ cx, frameId: topFrame.id }));
-    const selectedFrame = frame || getSelectedFrame(getState());
+    dispatch(frameSelected({ cx, pauseId: pause.pauseId!, frameId: frames[0].frameId }));
+    const selectedFrame = frame || (await getSelectedFrameAsync(getState()));
     if (selectedFrame) {
       const currentLocation = getSelectedLocation(getState());
       if (
@@ -83,8 +75,6 @@ export function paused({
       if (pause !== ThreadFront.currentPause) {
         return;
       }
-
-      await dispatch(setFramePositions());
     }
   };
 }

@@ -1,22 +1,19 @@
 import { Suspense, useMemo } from "react";
 import { PauseId } from "@replayio/protocol";
-import { ThreadFront } from "protocol/thread";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
   getFrameworkGroupingState,
   getPauseId,
-  getSelectedFrame,
+  getSelectedFrameId,
   getThreadContext,
   PauseFrame,
 } from "devtools/client/debugger/src/selectors";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
-import { getSourceDetailsEntities, getSourcesLoading } from "ui/reducers/sources";
-import { formatCallStackFrames } from "../../../selectors/getCallStackFrames";
+import { getSourcesLoading } from "ui/reducers/sources";
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
-import { getAsyncParentFramesSuspense } from "ui/suspense/util";
-import { createFrame } from "../../../client/create";
+import { getAsyncParentPauseIdSuspense } from "ui/suspense/util";
 import { collapseFrames, formatCopyName } from "../../../utils/pause/frames";
 import { copyToTheClipboard } from "../../../utils/clipboard";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
@@ -24,6 +21,7 @@ import Frame from "./Frame";
 import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
 import { getAllCachedPauseFrames } from "../../../utils/frames";
+import { getPauseFramesSuspense } from "ui/suspense/frameCache";
 
 function FramesRenderer({
   panel,
@@ -36,27 +34,15 @@ function FramesRenderer({
   asyncIndex?: number;
   getAllFrames: () => PauseFrame[];
 }) {
-  const sources = useAppSelector(getSourceDetailsEntities);
   const sourcesState = useAppSelector(state => state.sources);
 
-  const protocolFrames = getAsyncParentFramesSuspense(pauseId, asyncIndex);
-  const frames = useMemo(
-    () =>
-      formatCallStackFrames(
-        protocolFrames?.map((protocolFrame, index) =>
-          createFrame(
-            sourcesState,
-            ThreadFront.preferredGeneratedSources,
-            protocolFrame,
-            pauseId,
-            index,
-            asyncIndex
-          )
-        ) || null,
-        sources
-      ),
-    [asyncIndex, pauseId, protocolFrames, sources, sourcesState]
-  );
+  const asyncParentPauseId = getAsyncParentPauseIdSuspense(pauseId, asyncIndex);
+  let frames = asyncParentPauseId
+    ? getPauseFramesSuspense(asyncParentPauseId, sourcesState)
+    : undefined;
+  if (asyncIndex > 0) {
+    frames = frames?.slice(1);
+  }
 
   if (!frames?.length) {
     if (asyncIndex > 0) {
@@ -67,6 +53,13 @@ function FramesRenderer({
 
   return (
     <>
+      {asyncIndex > 0 ? (
+        <div role="listitem">
+          <span className="location-async-cause">
+            <span className="async-label">async</span>
+          </span>
+        </div>
+      ) : null}
       <PauseFrames frames={frames} getAllFrames={getAllFrames} panel={panel} />
       <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
         <FramesRenderer
@@ -93,7 +86,7 @@ export function PauseFrames({
 }) {
   const cx = useAppSelector(getThreadContext);
   const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
-  const selectedFrame = useAppSelector(getSelectedFrame);
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
   const dispatch = useAppDispatch();
 
   if (!getAllFrames) {
@@ -119,7 +112,7 @@ export function PauseFrames({
     toggleFrameworkGrouping,
     frameworkGroupingOn,
     selectFrame,
-    selectedFrame,
+    selectedFrameId,
     displayFullUrl: false,
     disableContextMenu: false,
     copyStackTrace,

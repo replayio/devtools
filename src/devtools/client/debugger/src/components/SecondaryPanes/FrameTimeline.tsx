@@ -4,16 +4,19 @@
 
 //
 
-import React, { Component } from "react";
-
-import { connect, ConnectedProps } from "react-redux";
-import { selectors } from "ui/reducers";
+import React, { Component, Suspense } from "react";
 import { actions } from "ui/actions";
-
 import classnames from "classnames";
 import ReactTooltip from "react-tooltip";
 import { trackEvent } from "ui/utils/telemetry";
-import type { UIState } from "ui/state";
+import { getFrameStepsSuspense } from "ui/suspense/frameStepsCache";
+import { getPreferredLocation, getSelectedLocation, SourcesState } from "ui/reducers/sources";
+import { ThreadFront } from "protocol/thread/thread";
+import { PointDescription, Location } from "@replayio/protocol";
+import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
+import { PartialLocation } from "../../actions/sources/select";
+import { getExecutionPoint, PauseFrame } from "../../reducers/pause";
+import { getSelectedFrameSuspense } from "../../selectors/pause";
 
 function getBoundingClientRect(element?: HTMLElement) {
   if (!element) {
@@ -28,7 +31,17 @@ interface FrameTimelineState {
   lastDisplayIndex: number;
 }
 
-class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
+interface FrameTimelineProps {
+  executionPoint: string | null;
+  selectedLocation: PartialLocation | null;
+  selectedFrame: PauseFrame | null;
+  frameSteps: PointDescription[] | undefined;
+  seek: (point: string, time: number, hasFrames: boolean) => void;
+  setPreviewPausedLocation: (location: Location) => void;
+  sourcesState: SourcesState;
+}
+
+class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineState> {
   _timeline = React.createRef<HTMLDivElement>();
 
   state = {
@@ -37,7 +50,7 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
     lastDisplayIndex: 0,
   };
 
-  componentDidUpdate(prevProps: PropsFromRedux, prevState: FrameTimelineState) {
+  componentDidUpdate(prevProps: FrameTimelineProps, prevState: FrameTimelineState) {
     if (!document.body) {
       return;
     }
@@ -66,12 +79,12 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
   }
 
   getPosition(progress: number) {
-    const { framePositions } = this.props;
-    if (!framePositions) {
+    const { frameSteps } = this.props;
+    if (!frameSteps) {
       return;
     }
 
-    const numberOfPositions = framePositions.positions.length;
+    const numberOfPositions = frameSteps.length;
     const displayIndex = Math.floor((progress / 100) * numberOfPositions);
 
     // We cap the index to the actual existing indices in framePositions.
@@ -81,21 +94,23 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
 
     this.setState({ lastDisplayIndex: adjustedDisplayIndex });
 
-    return framePositions.positions[adjustedDisplayIndex];
+    return frameSteps[adjustedDisplayIndex];
   }
 
   displayPreview(progress: number) {
-    const { setPreviewPausedLocation } = this.props;
+    const { setPreviewPausedLocation, sourcesState } = this.props;
 
-    const position = this.getPosition(progress);
+    const frameStep = this.getPosition(progress);
 
-    if (position) {
-      setPreviewPausedLocation(position.location);
+    if (frameStep?.frame) {
+      setPreviewPausedLocation(
+        getPreferredLocation(sourcesState, frameStep.frame, ThreadFront.preferredGeneratedSources)
+      );
     }
   }
 
   onMouseDown = (event: React.MouseEvent) => {
-    if (!this.props.framePositions) {
+    if (!this.props.frameSteps) {
       return null;
     }
 
@@ -125,9 +140,9 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
 
   getVisibleProgress() {
     const { scrubbing, scrubbingProgress, lastDisplayIndex } = this.state;
-    const { framePositions, selectedLocation, executionPoint } = this.props;
+    const { frameSteps, selectedLocation, executionPoint } = this.props;
 
-    if (!framePositions) {
+    if (!frameSteps) {
       return 0;
     }
 
@@ -141,7 +156,7 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
       return;
     }
 
-    const filteredPositions = framePositions.positions.filter(
+    const filteredSteps = frameSteps.filter(
       position => BigInt(position.point) <= BigInt(executionPoint)
     );
 
@@ -149,23 +164,23 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
     // last index that we stopped scrubbing on. If it is, just use the same progress
     // value that we had while scrubbing so instead of snapping to the executionPoint's
     // progress.
-    if (lastDisplayIndex == filteredPositions.length - 1) {
+    if (lastDisplayIndex == filteredSteps.length - 1) {
       return scrubbingProgress;
     }
 
-    return Math.floor((filteredPositions.length / framePositions.positions.length) * 100);
+    return Math.floor((filteredSteps.length / frameSteps.length) * 100);
   }
 
   render() {
     const { scrubbing } = this.state;
-    const { framePositions } = this.props;
+    const { frameSteps } = this.props;
     const progress = this.getVisibleProgress();
 
     return (
       <div
         data-tip="Frame Progress"
         data-for="frame-timeline-tooltip"
-        className={classnames("frame-timeline-container", { scrubbing, paused: framePositions })}
+        className={classnames("frame-timeline-container", { scrubbing, paused: frameSteps })}
       >
         <div className="frame-timeline-bar" onMouseDown={this.onMouseDown} ref={this._timeline}>
           <div
@@ -173,7 +188,7 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
             style={{ width: `${progress}%`, maxWidth: "calc(100% - 2px)" }}
           />
         </div>
-        {framePositions && (
+        {frameSteps && (
           <ReactTooltip id="frame-timeline-tooltip" delayHide={200} delayShow={200} place={"top"} />
         )}
       </div>
@@ -181,19 +196,48 @@ class FrameTimeline extends Component<PropsFromRedux, FrameTimelineState> {
   }
 }
 
-const connector = connect(
-  (state: UIState) => ({
-    framePositions: selectors.getFramePositions(state),
-    selectedLocation: selectors.getSelectedLocation(state),
-    selectedFrame: selectors.getSelectedFrame(state),
-    executionPoint: selectors.getExecutionPoint(state),
-  }),
-  {
-    seek: actions.seek,
-    setPreviewPausedLocation: actions.setPreviewPausedLocation,
-  }
-);
+function FrameTimeline() {
+  const sourcesState = useAppSelector(state => state.sources);
+  const executionPoint = useAppSelector(getExecutionPoint);
+  const selectedLocation = useAppSelector(getSelectedLocation);
+  const selectedFrame = useAppSelector(getSelectedFrameSuspense);
+  const frameSteps = selectedFrame
+    ? getFrameStepsSuspense(selectedFrame.pauseId, selectedFrame.protocolId)
+    : undefined;
+  const dispatch = useAppDispatch();
 
-type PropsFromRedux = ConnectedProps<typeof connector>;
+  const seek = (point: string, time: number, hasFrames: boolean) =>
+    dispatch(actions.seek(point, time, hasFrames));
+  const setPreviewPausedLocation = (location: Location) =>
+    dispatch(actions.setPreviewPausedLocation(location));
 
-export default connector(FrameTimeline);
+  return (
+    <FrameTimelineRenderer
+      executionPoint={executionPoint}
+      selectedLocation={selectedLocation}
+      selectedFrame={selectedFrame}
+      frameSteps={frameSteps}
+      sourcesState={sourcesState}
+      seek={seek}
+      setPreviewPausedLocation={setPreviewPausedLocation}
+    />
+  );
+}
+
+export default function FrameTimelineSuspenseWrapper() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          data-tip="Frame Progress"
+          data-for="frame-timeline-tooltip"
+          className="frame-timeline-container"
+        >
+          <div className="frame-timeline-bar"></div>
+        </div>
+      }
+    >
+      <FrameTimeline />
+    </Suspense>
+  );
+}
