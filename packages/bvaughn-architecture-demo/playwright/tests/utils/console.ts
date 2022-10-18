@@ -79,7 +79,22 @@ export async function showSearchInput(page: Page) {
   await expect(input).toBeVisible();
 }
 
+export async function toggleSideMenu(page: Page, open: boolean) {
+  await page.waitForSelector(`[data-test-id="ConsoleMenuToggleButton"]`);
+
+  const isOpen = await page.evaluate(() => {
+    const button = document.querySelector(`[data-test-id="ConsoleMenuToggleButton"]`);
+    return button?.getAttribute("data-test-state") === "open";
+  }, []);
+
+  if (isOpen !== open) {
+    await page.click(`[data-test-id="ConsoleMenuToggleButton"]`);
+  }
+}
+
 export async function toggleProtocolMessages(page: Page, on: boolean) {
+  await toggleSideMenu(page, true);
+
   await toggleProtocolMessage(page, "errors", on);
   await toggleProtocolMessage(page, "exceptions", on);
   await toggleProtocolMessage(page, "logs", on);
