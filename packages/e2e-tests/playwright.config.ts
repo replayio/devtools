@@ -43,12 +43,10 @@ const config: PlaywrightTestConfig = {
         //   name: "firefox",
         //   use: { ...devices["Desktop Firefox"] },
         // },
-
         {
           name: "replay-chromium",
           use: { ...(replayDevices["Replay Chromium"] as any) },
         },
-
         {
           name: "chromium",
           use: { ...devices["Desktop Chromium"] },
