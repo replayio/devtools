@@ -205,9 +205,29 @@ export const {
   getValueIfCached: getBreakpointPositionsIfCached,
 } = createGenericCache<
   [replayClient: ReplayClientInterface, sourceId: ProtocolSourceId],
-  ProtocolSameLineSourceLocations[]
+  [
+    breakablePositions: ProtocolSameLineSourceLocations[],
+    breakablePositionsByLine: Map<number, ProtocolSameLineSourceLocations>
+  ]
 >(
-  (client, sourceId) => client.getBreakpointPositions(sourceId, null),
+  async (client, sourceId) => {
+    const breakablePositions = await client.getBreakpointPositions(sourceId, null);
+
+    const breakablePositionsByLine = new Map<number, ProtocolSameLineSourceLocations>();
+    // The positions are already sorted by line number on the backend
+    for (let position of breakablePositions) {
+      // TODO BAC-2329
+      // The backend sometimes returns duplicate columns per line;
+      // In order to prevent the frontend from showing something weird, let's dedupe them here.
+      const uniqueSortedColumns = Array.from(new Set(position.columns));
+      uniqueSortedColumns.sort((a, b) => a - b);
+      position.columns = uniqueSortedColumns;
+
+      // Maps iterate items in insertion order - this is useful later
+      breakablePositionsByLine.set(position.line, position);
+    }
+    return [breakablePositions, breakablePositionsByLine];
+  },
   (_, sourceId) => sourceId
 );
 
@@ -249,7 +269,7 @@ async function fetchSourceHitCounts(
   wakeable: Wakeable<LineNumberToHitCountMap>
 ) {
   try {
-    const locations = await getBreakpointPositionsAsync(client, sourceId);
+    const [locations] = await getBreakpointPositionsAsync(client, sourceId);
     const hitCounts = await client.getSourceHitCounts(
       sourceId,
       locationRange,

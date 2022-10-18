@@ -76,12 +76,20 @@ export default function ColumnBreakpoints({ editor }: { editor: SourceEditor }) 
     return null;
   }
 
-  const breakpoints = getBreakpointPositionsSuspense(replayClient, focusedSourceId);
+  const [, breakpointPositionsByLine] = getBreakpointPositionsSuspense(
+    replayClient,
+    focusedSourceId
+  );
 
   return (
     <div>
       {pointsByLine.map(([lineNumber, points]) => (
-        <PointsForRow key={lineNumber} breakpoints={breakpoints} editor={editor} points={points} />
+        <PointsForRow
+          key={lineNumber}
+          breakpoints={breakpointPositionsByLine}
+          editor={editor}
+          points={points}
+        />
       ))}
     </div>
   );
@@ -92,29 +100,19 @@ function PointsForRow({
   editor,
   points,
 }: {
-  breakpoints: SameLineSourceLocations[];
+  breakpoints: Map<number, SameLineSourceLocations>;
   editor: SourceEditor;
   points: Point[];
 }) {
   const line = points[0]!.location.line;
 
-  // TODO BAC-2329
-  // The backend sometimes returns duplicate columns per line;
-  // In order to prevent the frontend from showing something weird, let's dedupe them here.
-  const breakpointsForLine = useMemo(() => {
-    const match = breakpoints.find(breakpoint => breakpoint.line === line);
-    if (match != null) {
-      return Array.from(new Set(match.columns));
-    } else {
-      return null;
-    }
-  }, [breakpoints, line]);
+  const breakpointsForLine = breakpoints.get(line);
 
-  if (breakpointsForLine == null) {
+  if (!breakpointsForLine) {
     return null;
   }
 
-  return breakpointsForLine.map((column, index) => {
+  return breakpointsForLine.columns.map((column, index) => {
     const point = points.find(point => point.location.column === column);
     if (point == null) {
       return null;

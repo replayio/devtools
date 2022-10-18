@@ -256,11 +256,14 @@ export default function useEditor(
       }
 
       const line = lineIndex + 1;
-      const breakpoints = await getBreakpointPositionsAsync(replayClient, selectedSource.id);
-      if (breakpoints.length === 0) {
+      const [, breakpointPositionsByLine] = await getBreakpointPositionsAsync(
+        replayClient,
+        selectedSource.id
+      );
+      if (breakpointPositionsByLine.size === 0) {
         return;
       }
-      const breakpointsForLine = breakpoints.find(breakpoint => breakpoint.line === line);
+      const breakpointsForLine = breakpointPositionsByLine.get(line);
       if (breakpointsForLine == null || breakpointsForLine.columns.length === 0) {
         return;
       }
