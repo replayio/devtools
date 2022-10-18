@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { clearTextArea, getCommandKey } from "./general";
+import { clearTextArea, delay, getCommandKey } from "./general";
 
 export async function addLogPoint(page: Page, sourceId: string, lineNumber: number) {
   await openSourceFile(page, sourceId);
@@ -56,6 +56,9 @@ export async function goToLine(page: Page, lineNumber: number) {
 
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
   await expect(lineLocator).toBeVisible();
+
+  // Give the list time to render and settle.
+  await delay(1000);
 }
 
 export async function openSourceFile(page: Page, sourceId: string) {

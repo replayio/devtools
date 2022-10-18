@@ -45,7 +45,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     useContext(FocusContext);
   const loggables = useContext(LoggablesContext);
   const replayClient = useContext(ReplayClientContext);
-  const [searchState, searchActions] = useContext(ConsoleSearchContext);
+  const [searchState] = useContext(ConsoleSearchContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
 
   const loadedRegions = useLoadedRegions(replayClient);
@@ -150,20 +150,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
     listItems.push(currentTimeIndicator);
   }
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "f":
-      case "F":
-        if (event.metaKey) {
-          searchActions.show();
-
-          event.preventDefault();
-          event.stopPropagation();
-        }
-        break;
-    }
-  };
-
   // Note that it's important to only render messages inside of the message lists.
   // Overflow notifications are displayed outside of the list, to avoid interfering with search.
   // See <LoggablesContextRoot> and useConsoleSearchDOM() for more info.
@@ -194,7 +180,6 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       <div
         className={isTransitionPending ? styles.ContainerPending : styles.Container}
         data-test-name="Messages"
-        onKeyDown={onKeyDown}
         ref={forwardedRef as MutableRefObject<HTMLDivElement>}
         role="list"
         tabIndex={0}

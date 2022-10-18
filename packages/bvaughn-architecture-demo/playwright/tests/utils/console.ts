@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test";
+import { expect, Locator, Page } from "@playwright/test";
 import { getCommandKey, getElementCount } from "./general";
 
 type MessageType =
@@ -11,6 +11,13 @@ type MessageType =
   | "terminal-expression";
 
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
+
+export async function focusOnConsole(page: Page) {
+  const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
+  await expect(consoleRoot).toBeVisible();
+  await consoleRoot.focus();
+  await expect(consoleRoot).toBeFocused();
+}
 
 export async function hideSearchInput(page: Page) {
   const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
@@ -62,20 +69,14 @@ export async function seekToMessage(page: Page, messageListItem: Locator) {
 }
 
 export async function showSearchInput(page: Page) {
-  // If already visible, just ensure we're focused in it.
-  const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
-  if (count > 0) {
-    await page.focus('[data-test-id="ConsoleSearchInput"]');
-  } else {
-    // Wait until search input is enabled before trying to focus.
-    await page.waitForSelector(`[data-test-id="ConsoleTerminalInput"]:not(:disabled)`);
+  await focusOnConsole(page);
 
-    await page.focus('[data-test-id="ConsoleTerminalInput"]');
+  await page.keyboard.down(getCommandKey());
+  await page.keyboard.type("f");
+  await page.keyboard.up(getCommandKey());
 
-    await page.keyboard.down(getCommandKey());
-    await page.keyboard.type("f");
-    await page.keyboard.up(getCommandKey());
-  }
+  const input = page.locator(`[data-test-id=ConsoleSearchInput]`);
+  await expect(input).toBeVisible();
 }
 
 export async function toggleProtocolMessages(page: Page, on: boolean) {

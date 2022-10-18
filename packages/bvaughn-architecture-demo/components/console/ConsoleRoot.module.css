@@ -9,6 +9,9 @@
   background-color: var(--background-color-contrast-2);
   word-break: break-all;
 }
+.ConsoleRoot:focus {
+  outline: none;
+}
 
 .ConsoleActions {
   grid-column: 1;

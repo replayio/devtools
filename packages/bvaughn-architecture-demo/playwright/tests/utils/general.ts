@@ -13,6 +13,10 @@ const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   scale: "css",
 };
 
+export async function delay(duration: number) {
+  await new Promise(resolve => setTimeout(resolve, duration));
+}
+
 export function getCommandKey() {
   const macOS = process.platform === "darwin";
   return macOS ? "Meta" : "Control";

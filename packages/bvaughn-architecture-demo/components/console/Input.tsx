@@ -54,8 +54,9 @@ export default function Input() {
         }
         break;
       }
-      case "f": {
-        if (event.metaKey) {
+      case "f":
+      case "F": {
+        if (event.ctrlKey || event.metaKey) {
           event.preventDefault();
 
           searchActions.show();
