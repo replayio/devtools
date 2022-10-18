@@ -63,8 +63,8 @@ export default function SourceList({
 
   const [sourceSearchState] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
-    const { index, results, visible } = sourceSearchState;
-    if (visible) {
+    const { enabled, index, results } = sourceSearchState;
+    if (enabled) {
       if (results.length > 0) {
         const lineIndex = results[index];
         const list = listRef.current;
@@ -109,7 +109,7 @@ export default function SourceList({
   }, [points]);
 
   let currentSearchResultLineIndex: number | null = null;
-  if (sourceSearchState.visible && sourceSearchState.results.length) {
+  if (sourceSearchState.enabled && sourceSearchState.results.length) {
     currentSearchResultLineIndex = sourceSearchState.results[sourceSearchState.index]!;
   }
 

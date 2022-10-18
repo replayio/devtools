@@ -26,7 +26,7 @@ export default function SourceFileNameSearch({
   const goToLineMode = query.startsWith(":");
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (!searchState.visible) {
+    if (!searchState.enabled) {
       return;
     }
 
@@ -52,12 +52,12 @@ export default function SourceFileNameSearch({
         }
 
         searchActions.search("");
-        searchActions.hide();
+        searchActions.disable();
         break;
       }
       case "Escape": {
         event.preventDefault();
-        searchActions.hide();
+        searchActions.disable();
         break;
       }
     }

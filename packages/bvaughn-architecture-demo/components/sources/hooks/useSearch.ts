@@ -3,20 +3,23 @@ import { useDeferredValue, useMemo, useReducer, useState } from "react";
 const EMPTY_ARRAY: any[] = [];
 
 export type State<Result> = {
+  enabled: boolean;
   index: number;
   query: string;
   results: Result[];
 };
 
-// TODO Move show/hide actions and visible state into this hook.
-
 export type Action<Result> =
+  | { type: "enable" }
+  | { type: "disable" }
   | { type: "goToNext" }
   | { type: "goToPrevious" }
   | { type: "updateQuery"; query: string }
   | { type: "updateResults"; index: number; results: Result[] };
 
 export type Actions = {
+  enable: () => void;
+  disable: () => void;
   goToNext: () => void;
   goToPrevious: () => void;
   search: (query: string) => void;
@@ -24,6 +27,18 @@ export type Actions = {
 
 function reducer<Result>(state: State<Result>, action: Action<Result>): State<Result> {
   switch (action.type) {
+    case "enable": {
+      return {
+        ...state,
+        enabled: true,
+      };
+    }
+    case "disable": {
+      return {
+        ...state,
+        enabled: false,
+      };
+    }
     case "goToNext": {
       const { index, results } = state;
       return {
@@ -59,6 +74,7 @@ export default function useSearch<Item, Result>(
   stableSearch: (query: string, items: Item[]) => Result[]
 ): [State<Result>, Actions] {
   const [state, dispatch] = useReducer<React.Reducer<State<Result>, Action<Result>>>(reducer, {
+    enabled: false,
     index: -1,
     results: [],
     query: "",
@@ -109,6 +125,8 @@ export default function useSearch<Item, Result>(
 
   const actions = useMemo<Actions>(
     () => ({
+      enable: () => dispatch({ type: "enable" }),
+      disable: () => dispatch({ type: "disable" }),
       goToNext: () => dispatch({ type: "goToNext" }),
       goToPrevious: () => dispatch({ type: "goToPrevious" }),
       search: (query: string) => dispatch({ type: "updateQuery", query }),
@@ -116,14 +134,7 @@ export default function useSearch<Item, Result>(
     []
   );
 
-  const externalState = useMemo<State<Result>>(
-    () => ({
-      index: state.index,
-      query: state.query,
-      results: state.results,
-    }),
-    [state]
-  );
+  const externalState = useMemo<State<Result>>(() => state, [state]);
 
   return [externalState, actions];
 }

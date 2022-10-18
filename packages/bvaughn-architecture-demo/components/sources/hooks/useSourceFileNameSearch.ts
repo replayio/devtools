@@ -1,10 +1,10 @@
+import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import sortedIndexBy from "lodash/sortedIndexBy";
 import { useMemo, useState } from "react";
 
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
-import { getSourceFileName } from "@bvaughn/src/utils/source";
 
 export type Result = {
   characterIndices: number[];
@@ -66,39 +66,23 @@ function search(query: string, sources: ProtocolSource[]): Result[] {
 }
 
 export type Actions = SearchActions & {
-  hide: () => void;
   setSources: (sources: ProtocolSource[]) => void;
-  show: () => void;
 };
 
-export type State = SearchState<Result> & {
-  visible: boolean;
-};
+export type State = SearchState<Result>;
 
 export default function useSourceFileNameSearch(): [State, Actions] {
   const [sources, setSources] = useState<ProtocolSource[]>([]);
 
   const [state, dispatch] = useSearch<ProtocolSource, Result>(sources, search);
 
-  const [visible, setVisible] = useState<boolean>(false);
-
   const externalActions = useMemo(
     () => ({
       ...dispatch,
-      hide: () => setVisible(false),
       setSources,
-      show: () => setVisible(true),
     }),
     [dispatch]
   );
 
-  const externalState = useMemo(
-    () => ({
-      ...state,
-      visible,
-    }),
-    [state, visible]
-  );
-
-  return [externalState, externalActions];
+  return [state, externalActions];
 }

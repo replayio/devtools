@@ -47,8 +47,8 @@ function Sources() {
       const onBodyKeyDown = (event: KeyboardEvent) => {
         switch (event.key) {
           case "Escape":
-            sourceSearchActions.hide();
-            sourceFileNameSearchActions.hide();
+            sourceSearchActions.disable();
+            sourceFileNameSearchActions.disable();
 
             const container = containerRef.current;
             if (container) {
@@ -61,7 +61,7 @@ function Sources() {
           case "o":
           case "O":
             if (event.ctrlKey || event.metaKey) {
-              sourceFileNameSearchActions.show();
+              sourceFileNameSearchActions.enable();
 
               const input = sourceFileNameSearchInputRef.current;
               if (input) {
@@ -78,8 +78,8 @@ function Sources() {
       const onContainerKeyDown = (event: KeyboardEvent) => {
         switch (event.key) {
           case "Escape":
-            sourceSearchActions.hide();
-            sourceFileNameSearchActions.hide();
+            sourceSearchActions.disable();
+            sourceFileNameSearchActions.disable();
 
             const container = containerRef.current;
             if (container) {
@@ -92,7 +92,7 @@ function Sources() {
           case "f":
           case "F":
             if (event.ctrlKey || event.metaKey) {
-              sourceSearchActions.show();
+              sourceSearchActions.enable();
 
               const input = sourceSearchInputRef.current;
               if (input) {
@@ -155,10 +155,10 @@ function Sources() {
             );
           })}
         </div>
-        {sourceFileNameSearchState.visible && (
+        {sourceFileNameSearchState.enabled && (
           <SourceFileNameSearch inputRef={sourceFileNameSearchInputRef} />
         )}
-        {sourceSearchState.visible && <SourceSearch inputRef={sourceSearchInputRef} />}
+        {sourceSearchState.enabled && <SourceSearch inputRef={sourceSearchInputRef} />}
       </div>
     </>
   );

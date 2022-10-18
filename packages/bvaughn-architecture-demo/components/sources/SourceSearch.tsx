@@ -16,7 +16,7 @@ export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInp
     switch (event.key) {
       case "Escape": {
         event.preventDefault();
-        searchActions.hide();
+        searchActions.disable();
         break;
       }
       case "Enter": {
@@ -31,7 +31,7 @@ export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInp
     }
   };
 
-  if (!searchState.visible) {
+  if (!searchState.enabled) {
     return null;
   }
 
@@ -57,7 +57,7 @@ export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInp
         <button
           className={styles.ResultsIconButton}
           data-test-id="SourceSearchClearButton"
-          onClick={searchActions.hide}
+          onClick={searchActions.disable}
         >
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>
@@ -67,7 +67,7 @@ export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInp
     results = (
       <div className={styles.Results}>
         No results found
-        <button className={styles.ResultsIconButton} onClick={searchActions.hide}>
+        <button className={styles.ResultsIconButton} onClick={searchActions.disable}>
           <Icon className={styles.ResultsIcon} type="cancel" />
         </button>
       </div>
