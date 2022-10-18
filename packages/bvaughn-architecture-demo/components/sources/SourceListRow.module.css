@@ -1,3 +1,18 @@
+.LineWithHits,
+.LineWithoutHits {
+  white-space: pre-wrap;
+  font-family: var(--font-family-monospace);
+  font-size: var(--font-size-regular);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  transition: background-color 250ms;
+}
+
+.LineWithoutHits .LineNumber {
+  color: var(--color-dimmer);
+}
+
 .CurrentSearchResultLine {
   background-color: var(--background-color-contrast-1);
 }
@@ -69,20 +84,6 @@
   margin: 0 1ch;
   color: var(--color-dim);
   user-select: none;
-}
-
-.LineWithHits,
-.LineWithoutHits {
-  white-space: pre-wrap;
-  font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular);
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
-.LineWithoutHits .LineNumber {
-  color: var(--color-dimmer);
 }
 
 .LineHitCounts {

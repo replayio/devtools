@@ -48,18 +48,16 @@ export default function SourceList({
 
   const [sourceFileNameSearchState] = useContext(SourceFileNameSearchContext);
 
-  const query = sourceFileNameSearchState.query;
-  const goToLineMode = query.startsWith(":");
-  const goToLine = goToLineMode ? parseInt(query.slice(1), 10) : null;
+  const { goToLineNumber } = sourceFileNameSearchState;
   useEffect(() => {
-    if (goToLine !== null && goToLine > 0) {
+    if (goToLineNumber !== null && goToLineNumber > 0) {
       const list = listRef.current;
       if (list) {
-        const lineIndex = goToLine - 1;
+        const lineIndex = goToLineNumber - 1;
         list.scrollToItem(lineIndex, "smart");
       }
     }
-  }, [goToLine]);
+  }, [goToLineNumber]);
 
   const [sourceSearchState] = useContext(SourceSearchContext);
   useLayoutEffect(() => {
@@ -109,7 +107,9 @@ export default function SourceList({
   }, [points]);
 
   let currentSearchResultLineIndex: number | null = null;
-  if (sourceSearchState.enabled && sourceSearchState.results.length) {
+  if (sourceFileNameSearchState.enabled && sourceFileNameSearchState.goToLineNumber !== null) {
+    currentSearchResultLineIndex = sourceFileNameSearchState.goToLineNumber - 1;
+  } else if (sourceSearchState.enabled && sourceSearchState.results.length) {
     currentSearchResultLineIndex = sourceSearchState.results[sourceSearchState.index]!;
   }
 

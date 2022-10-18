@@ -22,9 +22,6 @@ export default function SourceFileNameSearch({
     searchActions.search(text);
   };
 
-  const query = searchState.query;
-  const goToLineMode = query.startsWith(":");
-
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (!searchState.enabled) {
       return;
@@ -44,7 +41,7 @@ export default function SourceFileNameSearch({
       case "Enter": {
         event.preventDefault();
 
-        if (!goToLineMode) {
+        if (searchState.goToLineNumber === null) {
           const result = searchState.results[searchState.index];
           if (result) {
             openSource(result.source.sourceId);
@@ -64,12 +61,12 @@ export default function SourceFileNameSearch({
   };
 
   let results = null;
-  if (goToLineMode) {
+  if (searchState.goToLineNumber !== null) {
     results = (
       <div className={styles.Results} data-test-id="SourceFileNameSearchResults">
         <div className={styles.Result}>
           <span className={styles.GoToLinePrefix}>Go to line</span>
-          {query.slice(1)}
+          {searchState.goToLineNumber}
         </div>
       </div>
     );

@@ -69,7 +69,9 @@ export type Actions = SearchActions & {
   setSources: (sources: ProtocolSource[]) => void;
 };
 
-export type State = SearchState<Result>;
+export type State = SearchState<Result> & {
+  goToLineNumber: number | null;
+};
 
 export default function useSourceFileNameSearch(): [State, Actions] {
   const [sources, setSources] = useState<ProtocolSource[]>([]);
@@ -84,5 +86,13 @@ export default function useSourceFileNameSearch(): [State, Actions] {
     [dispatch]
   );
 
-  return [state, externalActions];
+  const externalState = useMemo(
+    () => ({
+      ...state,
+      goToLineNumber: state.query.startsWith(":") ? parseInt(state.query.slice(1), 10) : null,
+    }),
+    [state]
+  );
+
+  return [externalState, externalActions];
 }
