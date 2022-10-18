@@ -3,7 +3,7 @@ import {
   ExecutionPoint,
   Frame,
   Location,
-  Object,
+  Object as RecordReplayObject,
   PauseId,
 } from "@replayio/protocol";
 import { ReplayClientInterface } from "shared/client/types";
@@ -26,7 +26,7 @@ export type EventCategory = {
 export type EventLog = {
   data: {
     frames: Frame[];
-    objects: Object[];
+    objects: RecordReplayObject[];
   };
   location: Location[];
   pauseId: PauseId;
@@ -80,35 +80,20 @@ export function getEventTypeEntryPoints(
 async function fetchEventCategoryCounts(client: ReplayClientInterface) {
   const pendingEventCategoryCounts: EventCategory[] = [];
 
-  // Fetch event hit counts in parallel.
-  const promises: Promise<void>[] = [];
-
-  STANDARD_EVENT_CATEGORIES.forEach(category => {
-    const categoryWithCounts: EventCategory = {
-      category: category.category,
-      events: [],
+  const allEvents = await client.getEventCountForTypes(
+    Object.values(STANDARD_EVENT_CATEGORIES)
+      .map(c => c.events.map(e => e.type))
+      .flat()
+  );
+  eventCategoryCounts = Object.values(STANDARD_EVENT_CATEGORIES).map(category => {
+    return {
+      ...category,
+      events: category.events.map(eventType => ({
+        ...eventType,
+        count: allEvents[eventType.type],
+      })),
     };
-
-    category.events.forEach(event => {
-      promises.push(
-        (async () => {
-          const count = await client.getEventCountForType(event.type);
-
-          categoryWithCounts.events.push({
-            count,
-            label: event.label,
-            type: event.type,
-          });
-        })()
-      );
-    });
-
-    pendingEventCategoryCounts.push(categoryWithCounts);
   });
-
-  await Promise.all(promises);
-
-  eventCategoryCounts = pendingEventCategoryCounts;
 
   inProgressEventCategoryCountsWakeable!.resolve(pendingEventCategoryCounts);
   inProgressEventCategoryCountsWakeable = null;
