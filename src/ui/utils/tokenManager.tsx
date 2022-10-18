@@ -3,7 +3,6 @@ import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
-import { useRouter } from "next/router";
 import { listenForAccessToken } from "./browser";
 import { getAuthClientId, getAuthHost } from "./auth";
 
@@ -48,11 +47,15 @@ class TokenManager {
   }
 
   Auth0Provider = ({ children, apiKey }: { apiKey?: string; children: ReactNode }) => {
-    const router = useRouter();
-
     const onRedirectCallback = (appState: AppState) => {
       if (appState?.returnTo) {
-        router.replace(appState?.returnTo);
+        // TODO [ryanjduffy]: We'd normally use router.replace but when other
+        // code (components/Account/index in this case) also does a replace,
+        // this redirect is dropped. There isn't a way to detect this in the
+        // other component without adding more plumbing so, for now, let's full
+        // page refresh to the return URL which is usually a recording and
+        // warrants a reload anyway.
+        window.location.href = appState.returnTo;
       }
     };
 
