@@ -9,7 +9,7 @@ import {
   toggleProtocolMessage,
   toggleProtocolMessages,
 } from "./utils/console";
-import { getElementCount, getTestUrl, takeScreenshot } from "./utils/general";
+import { getCommandKey, getElementCount, getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
 
 testSetup("0d0b52a9-96bc-4bd9-b5d8-66275c6cce96");
@@ -204,9 +204,9 @@ test("should re-focus the search input when CMD+F is used again", async ({ page 
 
   await expect(searchInput).not.toBeFocused();
 
-  await page.keyboard.down("Meta");
+  await page.keyboard.down(getCommandKey());
   await page.keyboard.type("f");
-  await page.keyboard.up("Meta");
+  await page.keyboard.up(getCommandKey());
 
   await expect(searchInput).toBeFocused();
 });

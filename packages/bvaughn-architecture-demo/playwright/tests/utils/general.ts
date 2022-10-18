@@ -6,10 +6,26 @@ import {
   PageScreenshotOptions,
 } from "@playwright/test";
 
+const { HOST, RECORD_PROTOCOL_DATA, VISUAL_DEBUG } = process.env;
+
 const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   animations: "disabled",
   scale: "css",
 };
+
+export function getCommandKey() {
+  const macOS = process.platform === "darwin";
+  return macOS ? "Meta" : "Control";
+}
+
+// Playwright doesn't provide a good way to do this (yet).
+export async function clearTextArea(page: Page, textArea: Locator) {
+  const selectAllCommand = `${getCommandKey()}+A`;
+
+  await textArea.focus();
+  await page.keyboard.press(selectAllCommand);
+  await page.keyboard.press("Backspace");
+}
 
 export async function getElementCount(page: Page, queryString: string): Promise<number> {
   const count = await page.evaluate(
@@ -20,13 +36,16 @@ export async function getElementCount(page: Page, queryString: string): Promise<
 }
 
 export function getTestUrl(testRoute: string): string {
-  const { fixtureDataPath, record, recordingId } = global as any;
+  const { debug, fixtureDataPath, record, recordingId } = global as any;
 
-  const host = process.env.HOST || "localhost";
+  const host = HOST || "localhost";
 
   const queryParams: string[] = [`host=${host}`];
   if (fixtureDataPath) {
     queryParams.push(`fixtureDataPath=${fixtureDataPath}`);
+  }
+  if (debug) {
+    queryParams.push("debug");
   }
   if (record) {
     queryParams.push("record");
@@ -38,18 +57,13 @@ export function getTestUrl(testRoute: string): string {
   return `http://${host}:3000/tests/${testRoute}?${queryParams.join("&")}`;
 }
 
-export function getURLFlags(): string {
-  const RECORD_PROTOCOL_DATA = !!process.env.RECORD_PROTOCOL_DATA;
-  return RECORD_PROTOCOL_DATA ? "record" : "";
-}
-
 export async function takeScreenshot(
   page: Page,
   locator: Locator,
   name: string,
   margin: number = 0
 ): Promise<void> {
-  if (process.env.RECORD_PROTOCOL_DATA) {
+  if (RECORD_PROTOCOL_DATA) {
     // We aren't visually debugging; we're just recording snapshot data.
     // Skip this method to make the tests run faster.
     return;
@@ -58,7 +72,7 @@ export async function takeScreenshot(
   // Make sure any suspended components finish loading data before taking the screenshot.
   await awaitNoLoaders(page, locator);
 
-  if (process.env.VISUAL_DEBUG) {
+  if (VISUAL_DEBUG) {
     await new Promise(resolve => resolve(250));
     return;
   }

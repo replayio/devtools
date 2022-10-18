@@ -1,5 +1,5 @@
 import { Locator, Page } from "@playwright/test";
-import { getElementCount } from "./general";
+import { getCommandKey, getElementCount } from "./general";
 
 type MessageType =
   | "console-error"
@@ -71,9 +71,10 @@ export async function showSearchInput(page: Page) {
     await page.waitForSelector(`[data-test-id="ConsoleTerminalInput"]:not(:disabled)`);
 
     await page.focus('[data-test-id="ConsoleTerminalInput"]');
-    await page.keyboard.down("Meta");
+
+    await page.keyboard.down(getCommandKey());
     await page.keyboard.type("f");
-    await page.keyboard.up("Meta");
+    await page.keyboard.up(getCommandKey());
   }
 }
 

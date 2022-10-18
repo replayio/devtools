@@ -1,17 +1,22 @@
-import { Page, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 
 import { toggleProtocolMessages } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";
+import {
+  addLogPoint,
+  getSourceFileNameSearchResultsLocator,
+  goToLine,
+  openSourceFile,
+  searchSourcesByName,
+  searchSourceText,
+  getSearchSourceLocator,
+  getSourceLocator,
+} from "./utils/source";
 import testSetup from "./utils/testSetup";
 
 testSetup("dbd4da74-cf42-41fb-851d-69bed67debcf");
 
-async function addLogPoint(page: Page, lineNumber: number) {
-  const selector = `[data-test-id="Source-source-and-console.html"] [data-test-id=SourceLine-${lineNumber}]`;
-  await page.hover(selector);
-  const button = page.locator(`${selector} button`);
-  await button.click();
-}
+const sourceId = "h1";
 
 async function fillLogPointText(
   page: Page,
@@ -28,13 +33,11 @@ test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
   await page.goto(getTestUrl("source-and-console"));
-
-  await page.click("[data-test-id=SourceExplorerSource-h1]");
-  await page.click("[data-test-id=SourceTab-h1]");
+  await openSourceFile(page, "h1");
 });
 
 test("should not allow saving log points with invalid content", async ({ page }) => {
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, "'1");
 
   const pointPanel = page.locator("[data-test-id=PointPanel-13]");
@@ -42,7 +45,7 @@ test("should not allow saving log points with invalid content", async ({ page })
 });
 
 test("should not allow saving log points with invalid conditional", async ({ page }) => {
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, "true", "'1");
 
   const pointPanel = page.locator("[data-test-id=PointPanel-13]");
@@ -51,7 +54,7 @@ test("should not allow saving log points with invalid conditional", async ({ pag
 
 test("should run local analysis for log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, '"local", 123, true');
 
   const message = page.locator("[data-test-name=Message]").first();
@@ -60,7 +63,7 @@ test("should run local analysis for log points", async ({ page }) => {
 
 test("should support new lines in log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, '"one\\ntwo"');
 
   const message = page.locator("[data-test-name=Message]").first();
@@ -69,7 +72,7 @@ test("should support new lines in log points", async ({ page }) => {
 
 test("should run remote analysis for log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, "printError");
 
   const sourceRoot = page.locator("[data-test-id=SourcesRoot]");
@@ -86,7 +89,7 @@ test("should run remote analysis for log points", async ({ page }) => {
 
 test("should support conditional log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 28);
+  await addLogPoint(page, sourceId, 28);
 
   const messages = page.locator("[data-test-name=Messages]");
 
@@ -99,7 +102,7 @@ test("should support conditional log points", async ({ page }) => {
 
 test("should gracefully handle invalid remote analysis", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
   await fillLogPointText(page, 13, "z");
 
   const message = page.locator("[data-test-name=Message]").first();
@@ -107,7 +110,7 @@ test("should gracefully handle invalid remote analysis", async ({ page }) => {
 });
 
 test("should include log points in search results", async ({ page }) => {
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
 
   await page.fill("[data-test-id=ConsoleSearchInput]", "stack");
   const messages = page.locator("[data-test-name=Messages]");
@@ -115,7 +118,7 @@ test("should include log points in search results", async ({ page }) => {
 });
 
 test("should include log points when filtering data", async ({ page }) => {
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
 
   await page.fill("[data-test-id=ConsoleFilterInput]", "stack");
   const messages = page.locator("[data-test-name=Messages]");
@@ -126,7 +129,7 @@ test("should include log points when filtering data", async ({ page }) => {
 });
 
 test("should support custom badge styles for log points", async ({ page }) => {
-  await addLogPoint(page, 13);
+  await addLogPoint(page, sourceId, 13);
 
   await toggleProtocolMessages(page, false);
 
@@ -142,7 +145,7 @@ test("should support custom badge styles for log points", async ({ page }) => {
 });
 
 test("should handle too many points to find", async ({ page }) => {
-  await addLogPoint(page, 68);
+  await addLogPoint(page, sourceId, 68);
 
   const popup = page.locator('[data-test-id="PointPanel-68"]');
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-find");
@@ -154,7 +157,7 @@ test("should handle too many points to find", async ({ page }) => {
 });
 
 test("should handle too many points to run analysis", async ({ page }) => {
-  await addLogPoint(page, 70);
+  await addLogPoint(page, sourceId, 70);
 
   const popup = page.locator('[data-test-id="PointPanel-70"]');
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-run-analysis");
@@ -165,4 +168,35 @@ test("should handle too many points to run analysis", async ({ page }) => {
   await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
 });
 
-// TODO Add context menu test for setting log point badge colors
+test("should support fuzzy file search", async ({ page }) => {
+  const searchResultsLocator = getSourceFileNameSearchResultsLocator(page);
+  await searchSourcesByName(page, "e");
+  await takeScreenshot(page, searchResultsLocator, "fuzzy-search-results-with-3-matches");
+  await searchSourcesByName(page, "source");
+  await takeScreenshot(page, searchResultsLocator, "fuzzy-search-results-with-2-matches");
+  await searchSourcesByName(page, "xyz");
+  await expect(searchResultsLocator).not.toBeVisible();
+});
+
+test("should support jumping to a line in the active source file", async ({ page }) => {
+  await openSourceFile(page, sourceId);
+  await goToLine(page, 77);
+  const sourceLocator = getSourceLocator(page, sourceId);
+  await takeScreenshot(page, sourceLocator, "go-to-last-line");
+  await goToLine(page, 1);
+  await takeScreenshot(page, sourceLocator, "go-to-first-line");
+});
+
+test("should support text search in the active source file", async ({ page }) => {
+  await openSourceFile(page, sourceId);
+  const sourceSearchLocator = getSearchSourceLocator(page);
+  await expect(sourceSearchLocator).not.toBeVisible();
+  await searchSourceText(page, "function");
+  await takeScreenshot(page, sourceSearchLocator, "source-search-results");
+  await page.keyboard.press("Shift+Enter");
+  await takeScreenshot(page, sourceSearchLocator, "source-search-last-result-active");
+  await page.keyboard.press("Enter");
+  await takeScreenshot(page, sourceSearchLocator, "source-search-first-result-active");
+  await page.keyboard.press("Escape");
+  await expect(sourceSearchLocator).not.toBeVisible();
+});

@@ -7,7 +7,7 @@ type Entry = {
   args?: string[];
 };
 
-const RECORD_PROTOCOL_DATA = !!process.env.RECORD_PROTOCOL_DATA;
+const { RECORD_PROTOCOL_DATA, VISUAL_DEBUG } = process.env;
 
 const baseDir = join(__dirname, "..", "..");
 
@@ -69,6 +69,8 @@ function testSetupNormal() {
     const recordingId = getTestCaseAnnotation(fileName, line, testCaseName);
 
     // Share state with the next test to be passed via URL query parameters.
+    // @ts-ignore
+    global.debug = !!VISUAL_DEBUG;
     // @ts-ignore
     global.fixtureDataPath = fixtureDataPath;
     // @ts-ignore
