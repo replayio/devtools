@@ -91,6 +91,8 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
       listItems.push(currentTimeIndicator);
     }
 
+    const isLastMessageInRange = index === loggables.length - 1;
+
     const loggableExecutionPoint = getLoggableExecutionPoint(loggable);
     const isLoaded =
       loadedRegions !== null && isPointInRegions(loggableExecutionPoint, loadedRegions.loaded);
@@ -112,6 +114,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             logPointInstance={loggable}
+            isLastMessageInRange={isLastMessageInRange}
           />
         );
       } else if (isProtocolMessage(loggable)) {
@@ -121,6 +124,7 @@ function MessagesList({ forwardedRef }: { forwardedRef: ForwardedRef<HTMLElement
             index={index}
             isFocused={loggable === currentSearchResult}
             message={loggable}
+            isLastMessageInRange={isLastMessageInRange}
           />
         );
       } else if (isTerminalExpression(loggable)) {

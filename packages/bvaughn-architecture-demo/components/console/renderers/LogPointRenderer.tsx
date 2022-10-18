@@ -22,6 +22,7 @@ import { Badge } from "shared/client/types";
 import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
+import { useShowRewindForNUX } from "../hooks/useShowRewindForNUX";
 
 import styles from "./shared.module.css";
 
@@ -32,27 +33,32 @@ function LogPointRenderer({
   index,
   isFocused,
   logPointInstance,
+  isLastMessageInRange = false,
 }: {
   index: number;
   isFocused: boolean;
   logPointInstance: PointInstance;
+  isLastMessageInRange?: boolean;
 }) {
-  const { currentUserInfo } = useContext(SessionContext);
-  const includesFirstConsoleNag = currentUserInfo?.nags?.includes(Nag.FIRST_CONSOLE_NAVIGATE);
-  const initialIsHovered = Boolean(!includesFirstConsoleNag && index === 0);
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
   const { executionPoint: currentExecutionPoint } = useContext(TimelineContext);
+  const shouldShowRewindForNUX = useShowRewindForNUX(isLastMessageInRange);
 
   const ref = useRef<HTMLDivElement>(null);
 
-  const [isHovered, setIsHovered] = useState(initialIsHovered);
+  const [isHovered, setIsHovered] = useState(false);
+
+  const showRewindButton = isHovered || shouldShowRewindForNUX;
 
   useLayoutEffect(() => {
-    if (isFocused) {
-      ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (isFocused || shouldShowRewindForNUX) {
+      ref.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
-  }, [isFocused]);
+  }, [isFocused, shouldShowRewindForNUX]);
 
   let className = styles.Row;
   if (isFocused) {
@@ -114,7 +120,7 @@ function LogPointRenderer({
         </Suspense>
       </span>
       {primaryContent}
-      {isHovered && (
+      {showRewindButton && (
         <MessageHoverButton
           executionPoint={logPointInstance.timeStampedHitPoint.point}
           locations={locations}

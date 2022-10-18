@@ -17,6 +17,7 @@ import { ConsoleContextMenuContext } from "../ConsoleContextMenuContext";
 import MessageHoverButton from "../MessageHoverButton";
 import Source from "../Source";
 import StackRenderer from "../StackRenderer";
+import { useShowRewindForNUX } from "../hooks/useShowRewindForNUX";
 
 import styles from "./shared.module.css";
 
@@ -28,14 +29,20 @@ function MessageRenderer({
   index,
   isFocused,
   message,
+  isLastMessageInRange = false,
 }: {
   index: number;
   isFocused: boolean;
   message: ProtocolMessage;
+  isLastMessageInRange?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
+  const shouldShowRewindForNUX = useShowRewindForNUX(isLastMessageInRange);
+
   const [isHovered, setIsHovered] = useState(false);
+
+  const showRewindButton = isHovered || shouldShowRewindForNUX;
 
   const { show } = useContext(ConsoleContextMenuContext);
   const { showTimestamps } = useContext(ConsoleFiltersContext);
@@ -50,10 +57,13 @@ function MessageRenderer({
   );
 
   useLayoutEffect(() => {
-    if (isFocused) {
-      ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    if (isFocused || shouldShowRewindForNUX) {
+      ref.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
     }
-  }, [isFocused]);
+  }, [isFocused, shouldShowRewindForNUX]);
 
   const frames = message.data.frames || EMPTY_ARRAY;
   const frame = frames.length > 0 ? frames[frames.length - 1] : null;
@@ -153,7 +163,7 @@ function MessageRenderer({
           logContents
         )}
 
-        {isHovered && (
+        {showRewindButton && (
           <MessageHoverButton
             executionPoint={message.point.point}
             locations={frame?.location || null}
