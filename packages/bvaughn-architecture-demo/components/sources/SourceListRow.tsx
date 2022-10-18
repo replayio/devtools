@@ -1,10 +1,11 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { memo, MouseEvent, useEffect, useRef } from "react";
+import { memo, MouseEvent } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
+import { formatHitCount } from "./formatHitCount";
 
 import PointPanel from "./PointPanel";
 import { HoveredState } from "./Source";
@@ -49,16 +50,16 @@ const SourceListRow = memo(
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
     const numLines = htmlLines.length;
-    const html = htmlLines[index];
-    const maxHitCountStringLength = maxHitCount === null ? 0 : `${maxHitCount}`.length;
     const maxLineNumberStringLength = `${numLines}`.length;
+
+    const html = htmlLines[index];
 
     const point = points.find(
       point => point.location.sourceId === sourceId && point.location.line === lineNumber
     );
 
-    const lineHasHits = lineHitCounts !== null;
     const hitCount = lineHitCounts?.count || null;
+    const lineHasHits = hitCount !== null && hitCount > 0;
 
     const onAddPointButtonClick = async (lineNumber: number) => {
       if (lineHitCounts === null) {
@@ -87,8 +88,7 @@ const SourceListRow = memo(
     // This absolute hit count values are relative, per file.
     // Cubed root prevents high hit counts from lumping all other values together.
     const NUM_GRADIENT_COLORS = 3;
-    let hitCountBarClassName = styles.LineHitCount0;
-    let hitCountLabelClassName = styles.LineHitCountLabel0;
+    let hitCountLabelClassName = styles.LineHitCounts0;
     let hitCountIndex = NUM_GRADIENT_COLORS - 1;
     if (hitCount !== null && minHitCount !== null && maxHitCount !== null) {
       if (minHitCount !== maxHitCount) {
@@ -98,8 +98,7 @@ const SourceListRow = memo(
         );
       }
 
-      hitCountBarClassName = styles[`LineHitCount${hitCountIndex + 1}`];
-      hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
+      hitCountLabelClassName = styles[`LineHitCounts${hitCountIndex + 1}`];
     }
 
     const onMouseMove = (event: MouseEvent) => {
@@ -107,13 +106,17 @@ const SourceListRow = memo(
       setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
     };
 
-    let hoverButton = null;
+    let togglePointButton = null;
     let lineSegments = null;
     if (point) {
       const { id, location, shouldBreak } = point;
 
-      hoverButton = (
-        <button className={styles.ToggleButton} onClick={() => deletePoints(id)}>
+      togglePointButton = (
+        <button
+          className={styles.RemovePointButton}
+          data-test-name="RemovePointButton"
+          onClick={() => deletePoints(id)}
+        >
           <Icon className={styles.Icon} type="remove" />
         </button>
       );
@@ -150,9 +153,7 @@ const SourceListRow = memo(
         while (div.childNodes.length > 0) {
           const child = div.childNodes[0];
 
-          htmlBefore += child.hasOwnProperty("outerHTML")
-            ? (child as HTMLElement).outerHTML
-            : child.textContent;
+          htmlBefore += (child as HTMLElement).outerHTML || child.textContent;
 
           child.remove();
 
@@ -188,9 +189,13 @@ const SourceListRow = memo(
         );
       }
     } else {
-      hoverButton = (
+      togglePointButton = (
         <>
-          <button className={styles.ToggleButton} onClick={() => onAddPointButtonClick(lineNumber)}>
+          <button
+            className={styles.AddPointButton}
+            data-test-name="AddPointButton"
+            onClick={() => onAddPointButtonClick(lineNumber)}
+          >
             <Icon className={styles.Icon} type="add" />
           </button>
         </>
@@ -212,24 +217,21 @@ const SourceListRow = memo(
             currentSearchResultLineIndex === index ? styles.CurrentSearchResultLine : undefined,
           ].join(" ")}
         >
-          <div className={styles.LeftContainer}>
-            <div
-              className={styles.LineNumber}
-              data-test-id={`SourceLine-LineNumber-${lineNumber}`}
-              style={{
-                width: `${maxLineNumberStringLength}ch`,
-              }}
-            >
-              {lineNumber}
-            </div>
-            <div className={hitCountBarClassName} style={{ height: `${lineHeight}px` }} />
-            <div
-              className={hitCountLabelClassName}
-              style={{ height: `${lineHeight}px`, width: `${maxHitCountStringLength + 1}ch` }}
-            >
-              {hitCount !== null ? hitCount : ""}
-            </div>
-            {hoverButton}
+          <div
+            className={`${styles.LineHitCounts} ${hitCountLabelClassName}`}
+            style={{ height: `${lineHeight}px` }}
+          >
+            {hitCount !== null ? formatHitCount(hitCount) : ""}
+          </div>
+          {togglePointButton}
+          <div
+            className={styles.LineNumber}
+            data-test-id={`SourceLine-LineNumber-${lineNumber}`}
+            style={{
+              width: `${maxLineNumberStringLength}ch`,
+            }}
+          >
+            {lineNumber}
           </div>
           {lineSegments}
         </div>

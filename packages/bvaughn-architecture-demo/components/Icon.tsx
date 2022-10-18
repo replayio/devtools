@@ -27,6 +27,8 @@ export default function Icon({
     | "invoke-getter"
     | "menu-closed"
     | "menu-open"
+    | "pause"
+    | "print"
     | "prompt"
     | "protocol"
     | "remove"
@@ -125,6 +127,14 @@ export default function Icon({
     case "menu-open":
       path =
         "M3 18h13v-2H3v2zm0-5h10v-2H3v2zm0-7v2h13V6H3zm18 9.59L17.42 12 21 8.41 19.59 7l-5 5 5 5L21 15.59z";
+      break;
+    case "pause":
+      path =
+        "M12,2C6.48,2,2,6.48,2,12s4.48,10,10,10s10-4.48,10-10S17.52,2,12,2z M11,16H9V8h2V16z M15,16h-2V8h2V16z";
+      break;
+    case "print":
+      path =
+        "M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z";
       break;
     case "prompt":
       path = (

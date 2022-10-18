@@ -35,7 +35,7 @@ export default function Source({ source }: { source: ProtocolSource }) {
   return (
     <div
       className={styles.Source}
-      data-test-id={`Source-${fileName}`}
+      data-test-id={`Source-${source.sourceId}`}
       data-test-name="Source"
       ref={containerRef}
     >

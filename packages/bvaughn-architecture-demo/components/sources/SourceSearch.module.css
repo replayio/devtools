@@ -2,7 +2,7 @@
   display: flex;
   width: 100%;
   align-items: center;
-  border-top: 1px solid var(--background-color-contrast-2);
+  padding: 0.5rem;
 }
 
 .Icon {

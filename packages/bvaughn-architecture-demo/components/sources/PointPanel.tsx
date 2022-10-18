@@ -59,7 +59,7 @@ export default function PointPanel({ className, point }: { className: string; po
             onChange={event => editPoint(point.id, { shouldBreak: event.currentTarget.checked })}
             type="checkbox"
           />
-          break?
+          <Icon className={styles.LabelIcon} type="pause" />
         </label>
         <label className={styles.Label}>
           <input
@@ -67,7 +67,7 @@ export default function PointPanel({ className, point }: { className: string; po
             onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
             type="checkbox"
           />
-          log?
+          <Icon className={styles.LabelIcon} type="print" />
         </label>
         <small>
           ({point.location.line}:{point.location.column})

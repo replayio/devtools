@@ -1,3 +1,37 @@
+.theme-dark {
+  --token-background-color: rgba(0, 0, 0, 0.5);
+  --token-comment-color: #8f8f92;
+  --token-definition-color: #fefefe;
+  --token-local-color: #fefefe;
+  --token-keyword-color: #ff42a9;
+  --token-number-color: #ffff00;
+  --token-operator-color: #fefefe;
+  --token-propertyName-color: #ff98eb;
+  --token-punctuation-color: #fefefe;
+  --token-string-color: #08aafa;
+  --token-string2-color: #08aafa;
+  --token-typeName-color: #fff;
+  --token-variableName-color: #58e0ff;
+  --token-variableName2-color: #58e0ff;
+}
+
+.theme-light {
+  --token-background-color: rgba(255, 255, 255, 0.5);
+  --token-comment-color: #737373;
+  --token-definition-color: #4e4e52;
+  --token-local-color: #4e4e52;
+  --token-keyword-color: #de00aa;
+  --token-number-color: #18181a;
+  --token-operator-color: #4e4e52;
+  --token-propertyName-color: #38383d;
+  --token-punctuation-color: #4e4e52;
+  --token-string-color: #0842a4;
+  --token-string2-color: #0842a4;
+  --token-typeName-color: #000;
+  --token-variableName-color: #8d1bdc;
+  --token-variableName2-color: #8d1bdc;
+}
+
 .tok-comment:hover,
 .tok-definition:hover,
 .tok-local:hover,
@@ -11,41 +45,45 @@
 .tok-typeName:hover,
 .tok-variableName:hover,
 .tok-variableName2:hover {
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: var(--token-background-color);
 }
 
 .tok-comment {
-  color: #aaa;
+  color: var(--token-comment-color);
 }
 .tok-definition {
-  color: #ddd;
+  color: var(--token-definition-color);
 }
 .tok-local {
-  color: #ddd;
+  color: var(--token-local-color);
 }
 .tok-keyword {
-  color: #faf;
+  color: var(--token-keyword-color);
 }
 .tok-number {
-  color: #afa;
+  color: var(--token-number-color);
 }
 .tok-operator {
-  color: #ddd;
+  color: var(--token-operator-color);
 }
 .tok-propertyName {
-  color: #aff;
+  color: var(--token-propertyName-color);
 }
 .tok-punctuation {
-  color: #ddd;
+  color: var(--token-punctuation-color);
 }
-.tok-string,
+.tok-string {
+  color: var(--token-string-color);
+}
 .tok-string2 {
-  color: #faa;
+  color: var(--token-string2-color);
 }
 .tok-typeName {
-  color: #fff;
+  color: var(--token-typeName-color);
 }
-.tok-variableName,
+.tok-variableName {
+  color: var(--token-variableName-color);
+}
 .tok-variableName2 {
-  color: #fff;
+  color: var(--token-variableName2-color);
 }

@@ -8,23 +8,34 @@
   gap: 1ch;
 }
 
-.ToggleButton {
+.AddPointButton,
+.RemovePointButton {
   position: absolute;
-  left: 100%;
+  top: 0;
+  left: 0;
+  z-index: 5;
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
+  font: inherit;
+  font-size: var(--font-size-tiny);
   height: 1.5rem;
-  width: 1.5rem;
-  border-radius: 0.5rem;
-  display: none;
+  flex: 0 0 var(--hit-count-size);
+  width: var(--hit-count-size);
+  min-width: 1.5rem;
+  display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   padding: 0;
   margin: 0;
   cursor: pointer;
+  user-select: false;
 }
-.ToggleButton:disabled {
+.AddPointButton {
+  display: none;
+}
+.AddPointButton:disabled,
+.RemovePointButton:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -44,27 +55,20 @@
   opacity: 0.5;
 }
 
-.LeftContainer {
-  position: relative;
-  flex: 0 0 auto;
+.LineWithHits:hover .AddPointButton {
   display: flex;
-}
-
-.LineNumberInput {
-  background-color: var(--background-color-default);
-  border: none;
-  border-radius: 0.25rem;
-  color: var(--color-default);
-  width: 4rem;
-  padding: 0.25rem;
 }
 
 .LineNumber {
   height: 1.5rem;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   font-size: var(--font-size-small);
+  margin: 0 1ch;
+  color: var(--color-dim);
+  user-select: none;
 }
 
 .LineWithHits,
@@ -78,57 +82,37 @@
 }
 
 .LineWithoutHits .LineNumber {
-  color: var(--color-dim);
+  color: var(--color-dimmer);
 }
 
-.LineWithHits:hover .ToggleButton {
+.LineHitCounts {
   display: flex;
-}
-
-.LineHitCountLabel0,
-.LineHitCountLabel1,
-.LineHitCountLabel2,
-.LineHitCountLabel3 {
-  font-size: var(--font-size-tiny);
-  display: flex;
-  flex-shrink: 0;
+  /* Make sure there's enough room for the "+" button */
+  min-width: 1.5rem;
+  flex: 0 0 var(--hit-count-size);
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--color-contrast);
-  margin-right: 0.5ch;
+  font-size: var(--font-size-tiny);
+  user-select: none;
 }
-.LineHitCountLabel1 {
-  background-color: var(--color-hit-counts-label-1);
-}
-.LineHitCountLabel2 {
-  background-color: var(--color-hit-counts-label-2);
-}
-.LineHitCountLabel3 {
-  background-color: var(--color-hit-counts-label-3);
-}
-
-.LineHitCount0,
-.LineHitCount1,
-.LineHitCount2,
-.LineHitCount3 {
-  width: 0.5ch;
-  margin-left: 0.5ch;
-}
-.LineHitCount0 {
+.LineHitCounts0 {
   background-color: var(--color-hit-counts-0);
 }
-.LineHitCount1 {
+.LineHitCounts1 {
   background-color: var(--color-hit-counts-1);
+  color: var(--color-hit-counts-label-1);
 }
-.LineHitCount2 {
+.LineHitCounts2 {
   background-color: var(--color-hit-counts-2);
+  color: var(--color-hit-counts-label-2);
 }
-.LineHitCount3 {
+.LineHitCounts3 {
   background-color: var(--color-hit-counts-3);
+  color: var(--color-hit-counts-label-3);
 }
 
 .PointPanel {
-  margin-left: calc(1.5rem + 0.5ch);
+  margin: 1ch;
 }
 
 .LineSegment {

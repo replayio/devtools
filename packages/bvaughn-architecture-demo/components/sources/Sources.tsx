@@ -60,7 +60,7 @@ function Sources() {
             break;
           case "o":
           case "O":
-            if (event.metaKey) {
+            if (event.ctrlKey || event.metaKey) {
               sourceFileNameSearchActions.show();
 
               const input = sourceFileNameSearchInputRef.current;
@@ -91,7 +91,7 @@ function Sources() {
             break;
           case "f":
           case "F":
-            if (event.metaKey) {
+            if (event.ctrlKey || event.metaKey) {
               sourceSearchActions.show();
 
               const input = sourceSearchInputRef.current;
@@ -158,8 +158,8 @@ function Sources() {
         {sourceFileNameSearchState.visible && (
           <SourceFileNameSearch inputRef={sourceFileNameSearchInputRef} />
         )}
+        {sourceSearchState.visible && <SourceSearch inputRef={sourceSearchInputRef} />}
       </div>
-      {sourceSearchState.visible && <SourceSearch inputRef={sourceSearchInputRef} />}
     </>
   );
 }

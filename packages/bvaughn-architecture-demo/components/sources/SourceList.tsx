@@ -6,11 +6,20 @@ import {
   getSourceHitCounts,
 } from "@bvaughn/src/suspense/SourcesCache";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { useCallback, useContext, useEffect, useLayoutEffect, useMemo, useRef } from "react";
+import {
+  CSSProperties,
+  useCallback,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
+import { formatHitCount } from "./formatHitCount";
 import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
@@ -20,7 +29,7 @@ import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 // HACK
 // We could swap this out for something that lazily measures row height.
 const LINE_HEIGHT = 18;
-const LINE_HEIGHT_WITH_POINT = 18 + 79;
+const LINE_HEIGHT_WITH_POINT = 18 + 88;
 
 export default function SourceList({
   height,
@@ -47,7 +56,7 @@ export default function SourceList({
       const list = listRef.current;
       if (list) {
         const lineIndex = goToLine - 1;
-        list.scrollToItem(lineIndex);
+        list.scrollToItem(lineIndex, "smart");
       }
     }
   }, [goToLine]);
@@ -60,7 +69,7 @@ export default function SourceList({
         const lineIndex = results[index];
         const list = listRef.current;
         if (list) {
-          list.scrollToItem(lineIndex);
+          list.scrollToItem(lineIndex, "smart");
         }
       }
     }
@@ -168,6 +177,13 @@ export default function SourceList({
     [setVisibleLines]
   );
 
+  const maxHitCountStringLength =
+    maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
+  const style: CSSProperties = {
+    // @ts-ignore
+    "--hit-count-size": `${maxHitCountStringLength}ch`,
+  };
+
   return (
     <List
       className={styles.List}
@@ -178,6 +194,7 @@ export default function SourceList({
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}
       ref={listRef}
+      style={style}
       width={width}
     >
       {SourceListRow}

@@ -8,7 +8,7 @@ import { jsonLanguage } from "@codemirror/lang-json";
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
-import { highlightTree, classHighlighter } from "@lezer/highlight";
+import { classHighlighter, highlightTree, tags } from "@lezer/highlight";
 
 import { createGenericCache } from "./createGenericCache";
 
@@ -29,15 +29,29 @@ async function highlighter(code: string, fileName: string): Promise<string[] | n
 
   let position = 0;
 
+  // TODO
+  // Rather than creating a giant HTML string that we then split into lines–
+  // we could be creating the lines array as we go.
   highlightTree(tree, classHighlighter, (from, to, classes) => {
     if (from > position) {
       // No style applied to the token between position and from
       container.appendChild(document.createTextNode(code.slice(position, from)));
     }
 
-    const span = container.appendChild(document.createElement("span"));
-    span.className = classes;
-    span.appendChild(document.createTextNode(code.slice(from, to)));
+    const slice = code.slice(from, to);
+    const lines = slice.split("\n");
+
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+
+      const span = container.appendChild(document.createElement("span"));
+      span.className = classes;
+      span.appendChild(document.createTextNode(line));
+
+      if (index < lines.length - 1) {
+        container.appendChild(document.createTextNode("\n"));
+      }
+    }
 
     position = to;
   });
