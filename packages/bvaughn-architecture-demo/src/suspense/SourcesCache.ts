@@ -11,6 +11,7 @@ import {
   ReplayClientInterface,
   SourceLocationRange,
 } from "shared/client/types";
+import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import { createWakeable } from "../utils/suspense";
 import { createGenericCache } from "./createGenericCache";
@@ -279,10 +280,15 @@ async function fetchSourceHitCounts(
 
     wakeable.resolve(record.value);
   } catch (error) {
-    record.status = STATUS_REJECTED;
-    record.value = error;
+    if (isCommandError(error, ProtocolError.TooManyLocationsToPerformAnalysis)) {
+      record.status = STATUS_RESOLVED;
+      record.value = new Map();
+    } else {
+      record.status = STATUS_REJECTED;
+      record.value = error;
 
-    wakeable.reject(error);
+      wakeable.reject(error);
+    }
   }
 }
 
