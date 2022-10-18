@@ -63,6 +63,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         badge: null,
         content: "",
         condition: null,
+        createdAtTime: Date.now(),
         shouldBreak: false,
         shouldLog: false,
         ...partialPoint,
