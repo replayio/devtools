@@ -231,8 +231,9 @@ export async function verifyConsoleMessage(
         }
       },
       {
-        // In Backend CI it can take a while to evaluate all the logpoints.
-        timeout: 60_000,
+        // For console log poings, it can take quite a while for the messages to finish
+        // eval-ing their expressions, so this needs to be much longer than in production.
+        timeout: process.env.BACKEND_CI ? 60_000 : undefined,
       }
     );
   } else {

@@ -6,12 +6,7 @@
 
 import { Page } from "@playwright/test";
 const playwright = require("@recordreplay/playwright");
-import {
-  uploadRecording,
-  addLocalRecordingMetadata,
-  listAllRecordings,
-  removeRecording,
-} from "@replayio/replay";
+import { uploadRecording, listAllRecordings, removeRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
@@ -83,25 +78,6 @@ async function saveRecording(example: string, recordingId?: string) {
       throw "No recording id found";
     }
   }
-
-  // Mark the recording as a successful test so that the backend is not forced to preprocess it.
-  addLocalRecordingMetadata(recordingId, {
-    test: {
-      file: "fake.html",
-      path: ["fake.html"],
-      result: "passed",
-      runner: {
-        name: "fake",
-        version: "",
-      },
-      run: {
-        id: "00000000-0000-4000-8000-000000000000",
-        title: "fake",
-      },
-      title: "",
-      version: 1,
-    },
-  });
 
   const done = logAnimated(`Saving ${chalk.bold(example)} with recording id ${recordingId}`);
 

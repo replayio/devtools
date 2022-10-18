@@ -17,7 +17,6 @@ export async function recordPlaywright(
 
   // @ts-ignore `browserName` key mismatch
   const browserEntry = playwrightBrowsers[browserName] as BrowserType<any>;
-
   const browser = await browserEntry.launch({
     env: {
       ...process.env,
@@ -29,11 +28,11 @@ export async function recordPlaywright(
     executablePath: config.browserPath,
     headless: config.headless,
   });
+
   const context = await browser.newContext({
     ignoreHTTPSErrors: true,
   });
   const page = await context.newPage();
-
   try {
     return await script(page);
   } finally {
@@ -48,7 +47,10 @@ export async function uploadLastRecording(url: string) {
   const id = findLast(list, rec => rec.metadata.uri === url)?.id;
 
   if (id) {
-    // Mark the recording as a successful test so that the backend is not forced to preprocess it.
+    // When running the Replay backend tests, we run against a selfcontained backend and we don't
+    // want to force it to run Recording.processRecording on every test fixture because it would be
+    // really slow and not do anything useful. By hardcoding this metadata, we can convince the Replay
+    // upload library that since this was a "passed" result, it does not need to process the recording.
     cli.addLocalRecordingMetadata(id, {
       test: {
         file: "fake.html",
