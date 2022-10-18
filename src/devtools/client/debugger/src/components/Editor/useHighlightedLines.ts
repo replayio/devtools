@@ -4,8 +4,9 @@ import isEmpty from "lodash/isEmpty";
 import { PartialLocation } from "devtools/client/debugger/src/actions/sources";
 import {
   getHighlightedLineRange,
-  getVisibleSelectedFrame,
+  getSelectedFrameSuspense,
   HighlightedRange,
+  PauseFrame,
 } from "devtools/client/debugger/src/selectors";
 import SourceEditor from "devtools/client/debugger/src/utils/editor/source-editor";
 import { endOperation, startOperation } from "devtools/client/debugger/src/utils/editor";
@@ -30,7 +31,7 @@ type PrevProps = {
 
 // This hook combines legacy HighlightLine and HighlightLines "headless" components.
 export default function useHighlightedLines(editor: SourceEditor | null) {
-  const selectedFrame = useAppSelector(getVisibleSelectedFrame);
+  const selectedFrame = useAppSelector(getSelectedFrameSuspense);
   const selectedLocation = useAppSelector(getSelectedLocation);
   const selectedSource = useAppSelector(getSelectedSourceWithContent) || null;
   const highlightedLineRange = useAppSelector(getHighlightedLineRange) || null;
@@ -131,10 +132,7 @@ export default function useHighlightedLines(editor: SourceEditor | null) {
   }, [editor, highlightedLineRange]);
 }
 
-function isDebugLine(
-  selectedFrame: ReturnType<typeof getVisibleSelectedFrame>,
-  selectedLocation: PartialLocation
-) {
+function isDebugLine(selectedFrame: PauseFrame | null, selectedLocation: PartialLocation) {
   if (!selectedFrame) {
     return;
   }

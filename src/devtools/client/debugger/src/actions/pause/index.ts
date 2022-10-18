@@ -14,4 +14,3 @@ export { resumed } from "../../reducers/pause";
 export { paused } from "./paused";
 export { selectFrame } from "./selectFrame";
 export * from "./previewPausedLocation";
-export { setFramePositions } from "./setFramePositions";

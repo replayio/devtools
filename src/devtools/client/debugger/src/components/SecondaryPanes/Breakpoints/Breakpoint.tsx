@@ -1,48 +1,42 @@
 import classnames from "classnames";
-import type { Context } from "devtools/client/debugger/src/reducers/pause";
-import React, { PureComponent } from "react";
+import {
+  Context,
+  getSelectedFrameId,
+  PauseFrame,
+} from "devtools/client/debugger/src/reducers/pause";
+import React, { PureComponent, Suspense } from "react";
 import { connect, ConnectedProps } from "react-redux";
-import { createSelector } from "reselect";
 import { Point } from "shared/client/types";
 import type { UIState } from "ui/state";
+import { getPauseFrameSuspense } from "ui/suspense/frameCache";
 
 import actions from "../../../actions";
-import { getSelectedFrame, getContext } from "../../../selectors";
+import { getContext } from "../../../selectors";
 import { compareSourceLocation } from "../../../utils/location";
 
 import { CloseButton } from "../../shared/Button";
 
 import BreakpointOptions from "./BreakpointOptions";
 
-const getFormattedFrame = createSelector(getSelectedFrame, frame => {
-  if (!frame) {
-    return null;
-  }
-
-  return {
-    ...frame,
-    selectedLocation: frame.location,
-  };
-});
-
 const mapStateToProps = (state: UIState) => ({
   cx: getContext(state),
-  frame: getFormattedFrame(state),
+  selectedFrameId: getSelectedFrameId(state),
+  sourcesState: state.sources,
 });
 
 const connector = connect(mapStateToProps, {
   selectSpecificLocation: actions.selectSpecificLocation,
 });
 type PropsFromRedux = ConnectedProps<typeof connector>;
-
-type $FixTypeLater = any;
-
-type BreakpointProps = PropsFromRedux & {
+interface PropsFromParent {
   breakpoint: Point;
   editor: $FixTypeLater;
   onRemoveBreakpoint: (cx: Context, breakpoint: Point) => void;
   type: "logpoint" | "breakpoint";
-};
+}
+type BreakpointProps = PropsFromRedux & PropsFromParent;
+
+type $FixTypeLater = any;
 
 class Breakpoint extends PureComponent<BreakpointProps> {
   get selectedLocation() {
@@ -65,13 +59,12 @@ class Breakpoint extends PureComponent<BreakpointProps> {
     onRemoveBreakpoint(cx, breakpoint);
   };
 
-  isCurrentlyPausedAtBreakpoint() {
-    const { frame } = this.props;
+  isCurrentlyPausedAtBreakpoint(frame: PauseFrame | undefined) {
     if (!frame) {
       return false;
     }
 
-    return compareSourceLocation(this.selectedLocation, frame.selectedLocation);
+    return compareSourceLocation(this.selectedLocation, frame.location);
   }
 
   renderSourceLocation() {
@@ -85,13 +78,16 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 
   render() {
-    const { breakpoint, editor, type } = this.props;
+    const { breakpoint, editor, type, selectedFrameId, sourcesState } = this.props;
+    const frame = selectedFrameId
+      ? getPauseFrameSuspense(selectedFrameId, sourcesState)
+      : undefined;
 
     return (
       <div
         className={classnames({
           breakpoint,
-          paused: this.isCurrentlyPausedAtBreakpoint(),
+          paused: this.isCurrentlyPausedAtBreakpoint(frame),
         })}
         onClick={this.selectBreakpoint}
       >
@@ -107,4 +103,12 @@ class Breakpoint extends PureComponent<BreakpointProps> {
   }
 }
 
-export default connector(Breakpoint);
+const ConnectedBreakpoint = connector(Breakpoint);
+
+export default function BreakpointSuspenseWrapper(props: PropsFromParent) {
+  return (
+    <Suspense>
+      <ConnectedBreakpoint {...props} />
+    </Suspense>
+  );
+}

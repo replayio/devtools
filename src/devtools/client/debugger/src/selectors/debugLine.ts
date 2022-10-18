@@ -4,10 +4,10 @@ import { getPausePreviewLocation } from "../reducers/pause";
 import { getSourceContentsEntry } from "ui/reducers/sources";
 import { hasDocument } from "../utils/editor";
 
-import { getVisibleSelectedFrame } from "./pause";
+import { getSelectedFrameSuspense } from "./pause";
 
-export function getDebugLineLocation(state: UIState) {
-  const frame = getVisibleSelectedFrame(state);
+export function getDebugLineLocationSuspense(state: UIState) {
+  const frame = getSelectedFrameSuspense(state);
   const previewLocation = getPausePreviewLocation(state);
   const location = previewLocation || (frame && frame.location);
   if (!location) {

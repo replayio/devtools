@@ -14,8 +14,7 @@ export function createFrame(
   preferredGeneratedSources: Set<string>,
   frame: Frame,
   pauseId: PauseId,
-  index = 0,
-  asyncIndex = 0
+  index = 0
 ): PauseFrame {
   const { sourceId, line, column } = getPreferredLocation(
     sources,
@@ -41,17 +40,14 @@ export function createFrame(
   const displayName = frame.originalFunctionName || frame.functionName || `(${frame.type})`;
 
   return {
-    id: `${asyncIndex}:${index}`,
+    id: `${pauseId}:${frame.frameId}`,
+    pauseId,
     protocolId: frame.frameId,
-    asyncIndex,
+    index,
     displayName,
     location,
     alternateLocation,
     this: frame.this,
     source: null,
-    index,
-    asyncCause: asyncIndex && index == 0 ? "async" : undefined,
-    state: "on-stack",
-    pauseId,
   };
 }

@@ -3,7 +3,7 @@
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 
 import { createSlice, createAsyncThunk, PayloadAction, AnyAction } from "@reduxjs/toolkit";
-import type { Location, TimeStampedPoint, Value, PauseId } from "@replayio/protocol";
+import type { Location, TimeStampedPoint, Value, PauseId, FrameId } from "@replayio/protocol";
 import type { UIState } from "ui/state";
 import { getPreferredLocation } from "ui/reducers/sources";
 
@@ -13,8 +13,8 @@ import { SourceDetails } from "ui/reducers/sources";
 
 import { ThunkExtraArgs } from "ui/utils/thunk";
 import { getContextFromAction } from "ui/setup/redux/middleware/context";
+import { getFramesAsync } from "ui/suspense/frameCache";
 import { getFrameStepsAsync } from "ui/suspense/frameStepsCache";
-import { getAllCachedPauseFrames } from "../utils/frames";
 
 export interface Context {
   navigateCounter: number;
@@ -28,23 +28,25 @@ export interface ThreadContext {
 
 export interface PauseFrame {
   id: string;
+  pauseId: PauseId;
   protocolId: string;
-  asyncIndex: number;
+  index: number;
   displayName: string;
   location: Location;
   alternateLocation?: Location;
   this: Value;
   source: SourceDetails | null;
-  index: number;
-  asyncCause?: "async";
-  state: "on-stack";
-  pauseId: PauseId;
   // Possibly added later client-side
   library?: string;
 }
 
 // TBD
 type UnknownPosition = TimeStampedPoint & { location: Location };
+
+export interface PauseAndFrameId {
+  pauseId: PauseId;
+  frameId: FrameId;
+}
 
 export interface PauseState {
   cx: { navigateCounter: number };
@@ -53,9 +55,8 @@ export interface PauseState {
   pauseErrored: boolean;
   pauseLoading: boolean;
   pausePreviewLocation: Location | null;
-  selectedFrameId: string | null;
+  selectedFrameId: PauseAndFrameId | null;
   executionPoint: string | null;
-  why: string | null;
   command: string | null;
   replayFramePositions?: { positions: UnknownPosition[] } | null;
 }
@@ -155,7 +156,7 @@ const pauseSlice = createSlice({
         executionPoint,
       });
 
-      state.selectedFrameId = frame ? frame.id : null;
+      state.selectedFrameId = frame ? { pauseId: frame.pauseId, frameId: frame.protocolId } : null;
       state.threadcx.pauseCounter++;
       state.pausePreviewLocation = null;
     },
@@ -186,8 +187,11 @@ const pauseSlice = createSlice({
     framePositionsCleared(state) {
       state.replayFramePositions = null;
     },
-    frameSelected(state, action: PayloadAction<{ cx: Context; frameId: string }>) {
-      state.selectedFrameId = action.payload.frameId;
+    frameSelected(
+      state,
+      action: PayloadAction<{ cx: Context; pauseId: PauseId; frameId: FrameId }>
+    ) {
+      state.selectedFrameId = { pauseId: action.payload.pauseId, frameId: action.payload.frameId };
     },
     resumed(state) {
       Object.assign(state, resumedPauseState);
@@ -244,10 +248,6 @@ export function getThreadContext(state: UIState) {
   return state.pause.threadcx;
 }
 
-export function getPauseReason(state: UIState) {
-  return state.pause.why;
-}
-
 export function getPauseCommand(state: UIState) {
   return state.pause.command;
 }
@@ -278,20 +278,20 @@ export function getPausePreviewLocation(state: UIState) {
 
 async function getResumePoint(state: UIState, type: string) {
   const executionPoint = getExecutionPoint(state);
-  const pauseId = getPauseId(state);
-  const frameId = getSelectedFrameId(state);
-  if (!executionPoint || !pauseId || !frameId) {
+  const selectedFrameId = getSelectedFrameId(state);
+  if (!executionPoint || !selectedFrameId) {
     return;
   }
-  const frames = getAllCachedPauseFrames(pauseId, state.sources);
-  const frame = frames?.find(frame => frame.id === frameId);
+  const frames = await getFramesAsync(selectedFrameId.pauseId);
+  const frame = frames?.find(frame => frame.frameId === selectedFrameId.frameId);
   if (!frames || !frame || frame === frames[0]) {
     return;
   }
-  const frameSteps = await getFrameStepsAsync(frame.pauseId, frame.protocolId);
+  const frameSteps = await getFrameStepsAsync(selectedFrameId.pauseId, selectedFrameId.frameId);
   if (!frameSteps) {
     return;
   }
+
   if (type == "reverseStepOver" || type == "rewind") {
     return findLast(frameSteps, p => compareNumericStrings(p.point, executionPoint) < 0)?.point;
   }

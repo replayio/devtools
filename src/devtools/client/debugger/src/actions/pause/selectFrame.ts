@@ -7,24 +7,14 @@ import type { Context, PauseFrame } from "devtools/client/debugger/src/reducers/
 
 import { selectLocation } from "../sources";
 import { frameSelected } from "../../reducers/pause";
-import { setFramePositions } from "./setFramePositions";
-import { isCommandError, ProtocolError } from "shared/utils/error";
 
 /**
  * @memberof actions/pause
  * @static
  */
 export function selectFrame(cx: Context, frame: PauseFrame): UIThunkAction {
-  return async (dispatch, getState, { ThreadFront }) => {
-    // Frames that aren't on-stack do not support evalling and may not
-    // have live inspectable scopes, so we do not allow selecting them.
-    if (frame.state !== "on-stack") {
-      return dispatch(selectLocation(cx, frame.location));
-    }
-
-    dispatch(frameSelected({ cx, frameId: frame.id }));
-
+  return async dispatch => {
+    dispatch(frameSelected({ cx, pauseId: frame.pauseId, frameId: frame.protocolId }));
     dispatch(selectLocation(cx, frame.location));
-    dispatch(setFramePositions());
   };
 }

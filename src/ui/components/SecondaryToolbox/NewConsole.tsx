@@ -2,7 +2,7 @@ import NewConsole from "bvaughn-architecture-demo/components/console";
 import { SearchContext } from "bvaughn-architecture-demo/components/console/SearchContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, { KeyboardEvent, useContext } from "react";
-import { getPauseId, getSelectedFrame } from "devtools/client/debugger/src/selectors";
+import { getPauseId, getSelectedFrameId } from "devtools/client/debugger/src/selectors";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { useGetRecordingId } from "ui/hooks/recordings";
@@ -48,8 +48,8 @@ function JSTermWrapper() {
   const [terminalExpressionHistory, setTerminalExpressionHistory] = useTerminalHistory(recordingId);
 
   // Note that the "frameId" the protocol expects is actually the "protocolId" and NOT the "frameId"
-  const frame = useAppSelector(getSelectedFrame);
-  const frameId = frame?.protocolId || null;
+  const frame = useAppSelector(getSelectedFrameId);
+  const frameId = frame?.frameId || null;
 
   const pauseId = useAppSelector(getPauseId);
   const point = useAppSelector(getCurrentPoint);

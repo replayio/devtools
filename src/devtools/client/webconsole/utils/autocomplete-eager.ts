@@ -1,4 +1,4 @@
-import { getSelectedFrame } from "devtools/client/debugger/src/selectors";
+import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
 import { ThreadFront } from "protocol/thread";
 import { useMemo } from "react";
 import { useAppSelector } from "ui/setup/hooks";
@@ -62,16 +62,16 @@ async function eagerEvaluateExpression(
 }
 
 export function useEagerEvaluateExpression() {
-  const frame = useAppSelector(getSelectedFrame);
+  const selectedFrameId = useAppSelector(getSelectedFrameId);
   const callback = useMemo(
     // eslint-disable-next-line react/display-name
     () => (expression: string) => {
-      if (!frame) {
+      if (!selectedFrameId) {
         return null;
       }
-      return eagerEvaluateExpression(expression, frame.pauseId, frame.protocolId);
+      return eagerEvaluateExpression(expression, selectedFrameId.pauseId, selectedFrameId.frameId);
     },
-    [frame]
+    [selectedFrameId]
   );
 
   return callback;

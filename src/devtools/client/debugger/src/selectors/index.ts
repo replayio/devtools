@@ -10,5 +10,5 @@ export * from "../reducers/preview";
 export * from "../reducers/quick-open";
 
 export { isSelectedFrameVisible } from "./isSelectedFrameVisible";
-export { getSelectedFrame, getVisibleSelectedFrame, getFramePositions } from "./pause";
+export { getSelectedFrameSuspense, getSelectedFrameAsync } from "./pause";
 export * from "./debugLine";

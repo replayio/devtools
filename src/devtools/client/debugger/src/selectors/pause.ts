@@ -3,37 +3,21 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at <http://mozilla.org/MPL/2.0/>. */
 import type { UIState } from "ui/state";
+import { getPauseFrameAsync, getPauseFrameSuspense } from "ui/suspense/frameCache";
+import { getSelectedFrameId } from "../reducers/pause";
 
-import { createSelector } from "reselect";
-
-import { getPauseId, getSelectedFrameId } from "../reducers/pause";
-import { getAllCachedPauseFrames } from "../utils/frames";
-
-export function getSelectedFrame(state: UIState) {
-  const pauseId = getPauseId(state);
+export function getSelectedFrameSuspense(state: UIState) {
   const selectedFrameId = getSelectedFrameId(state);
-  const frames = getAllCachedPauseFrames(pauseId, state.sources);
-  if (!selectedFrameId || !frames) {
+  if (!selectedFrameId) {
     return null;
   }
-
-  return frames!.find(frame => frame.id == selectedFrameId) || null;
+  return getPauseFrameSuspense(selectedFrameId, state.sources) || null;
 }
 
-export const getVisibleSelectedFrame = createSelector(getSelectedFrame, selectedFrame => {
-  if (!selectedFrame) {
+export async function getSelectedFrameAsync(state: UIState) {
+  const selectedFrameId = getSelectedFrameId(state);
+  if (!selectedFrameId) {
     return null;
   }
-
-  const { id, displayName } = selectedFrame;
-
-  return {
-    id,
-    displayName,
-    location: selectedFrame.location,
-  };
-});
-
-export function getFramePositions(state: UIState) {
-  return state.pause.replayFramePositions;
+  return (await getPauseFrameAsync(selectedFrameId, state.sources)) || null;
 }

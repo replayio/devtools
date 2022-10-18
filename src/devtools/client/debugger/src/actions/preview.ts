@@ -9,7 +9,7 @@ import type { UIThunkAction } from "ui/actions";
 import type { ThreadContext } from "devtools/client/debugger/src/reducers/pause";
 
 import { getExpressionFromCoords } from "../utils/editor/get-expression";
-import { isSelectedFrameVisible, getSelectedFrame } from "../selectors";
+import { isSelectedFrameVisible, getSelectedFrameAsync } from "../selectors";
 import { getSelectedSource } from "ui/reducers/sources";
 import { getPreview, previewCleared, previewStarted, previewLoaded } from "../reducers/preview";
 
@@ -25,11 +25,11 @@ export function updatePreview(
   tokenPos: SourceLocation,
   codeMirror: $FixTypeLater
 ): UIThunkAction {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     const cursorPos = target.getBoundingClientRect();
 
     const state = getState();
-    if (!isCurrentTimeInLoadedRegion(state) || !isSelectedFrameVisible(state)) {
+    if (!isCurrentTimeInLoadedRegion(state) || !(await isSelectedFrameVisible(state))) {
       return;
     }
 
@@ -81,7 +81,7 @@ export function setPreview(
       return;
     }
 
-    const selectedFrame = getSelectedFrame(getState());
+    const selectedFrame = await getSelectedFrameAsync(getState());
     if (!selectedFrame) {
       dispatch(previewCleared({ cx, previewId }));
       return;

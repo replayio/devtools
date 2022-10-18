@@ -106,7 +106,7 @@ export default class FrameComponent extends Component<FrameProps> {
   render() {
     const {
       frame,
-      selectedFrame,
+      selectedFrameId,
       hideLocation,
       shouldMapDisplayName,
       displayFullUrl,
@@ -116,7 +116,8 @@ export default class FrameComponent extends Component<FrameProps> {
     } = this.props;
 
     const className = classNames("frame", {
-      selected: selectedFrame && selectedFrame.id === frame.id,
+      selected:
+        selectedFrameId?.pauseId === frame.pauseId && selectedFrameId?.frameId === frame.protocolId,
     });
 
     if (!frame.source) {
@@ -138,17 +139,6 @@ export default class FrameComponent extends Component<FrameProps> {
         tabIndex={0}
         title={title}
       >
-        {frame.asyncCause && (
-          <span className="location-async-cause">
-            {this.isSelectable && <FrameIndent />}
-            {this.isDebugger ? (
-              <span className="async-label">{frame.asyncCause}</span>
-            ) : (
-              `(Async: ${frame.asyncCause})`
-            )}
-            {this.isSelectable && <br className="clipboard-only" />}
-          </span>
-        )}
         {this.isSelectable && <FrameIndent />}
         <div
           className={classNames("frame-description", panel === "webconsole" ? "frame-link" : "")}
