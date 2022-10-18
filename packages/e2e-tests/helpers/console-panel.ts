@@ -353,7 +353,7 @@ export async function setConsoleMessageAsFocusStart(page: Page, message: Locator
 }
 
 export async function setConsoleMessageAsFocusEnd(page: Page, message: Locator) {
-  await debugPrint(page, `Setting focus range end`, "setConsoleMessageAsFocusStart");
+  await debugPrint(page, `Setting focus range end`, "setConsoleMessageAsFocusEnd");
 
   await message.click({ button: "right" });
   await page.locator('[data-test-id="ConsoleContextMenu-SetFocusEndButton"]').click();
