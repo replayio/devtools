@@ -1,21 +1,33 @@
-FROM node:12
+VERSION 0.6
 
-build:
-    COPY package.json package-lock.json ./
-    RUN yarn install
-    SAVE ARTIFACT node_modules
-    COPY src src
-    RUN mkdir -p ./dist
-    COPY postcss.config.js .
-    COPY tailwind.config.js .
-    COPY webpack.config.js .
-    ARG GIT_SHA
-    RUN REPLAY_BUILD_VISUALIZE=1 NODE_ENV=production ./node_modules/.bin/webpack --env REPLAY_RELEASE=$GIT_SHA
-    SAVE ARTIFACT dist /dist AS LOCAL ./dist
+# NOTE(dmiller): this needs to be 16._15_ otherwise playwright will fail to install, at least until we update our playwright version
+FROM node:16.15-bullseye-slim
 
-dist:
-    COPY +build/node_modules node_modules
-    COPY index.html .
-    COPY +build/dist dist
-    RUN tar -czf dist.tgz index.html dist node_modules
-    SAVE ARTIFACT dist.tgz AS LOCAL ./dist.tgz
+image:
+  RUN apt-get update && apt-get install -y python3 build-essential
+  WORKDIR /app
+
+  COPY package.json yarn.lock .
+  RUN yarn set version 3.2.1
+  COPY packages/protocol/package.json packages/protocol/package.json .
+  COPY packages/bvaughn-architecture-demo/package.json packages/bvaughn-architecture-demo/package.json .
+  COPY packages/design/package.json packages/design/package.json .
+  COPY packages/bvaughn-architecture-demo/playwright/package.json packages/bvaughn-architecture-demo/playwright/package.json .
+
+  COPY .yarnrc.yml .
+  COPY .yarn/plugins/@yarnpkg/plugin-workspace-tools.cjs .yarn/plugins/@yarnpkg/plugin-workspace-tools.cjs
+  RUN yarn install
+
+  COPY . .
+
+  WORKDIR /app/packages/bvaughn-architecture-demo
+  RUN yarn install
+  CMD yarn dev
+  EXPOSE 3000
+  SAVE IMAGE devtools
+
+test-architecture-demo:
+  FROM earthly/dind:alpine
+  WITH DOCKER --load devtools:latest=+image --load playwright-run-test-image=(./packages/bvaughn-architecture-demo/playwright+playwright-run-test-image --HOST=devtools)
+    RUN docker network create --driver bridge integration && docker run -d -p 3000 --network integration --name devtools devtools && docker run --network integration playwright-run-test-image
+  END

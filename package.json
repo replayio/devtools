@@ -116,7 +116,6 @@
     "@jest/console": "^28.0.2",
     "@jridgewell/trace-mapping": "^0.3.14",
     "@next/bundle-analyzer": "^12.2.0",
-    "@recordreplay/playwright": "^1.18.3",
     "@recordreplay/sourcemap-upload-cli": "^0.1.1",
     "@replayio/replay": "^0.9.6",
     "@storybook/addon-actions": "^6.4.20",

@@ -21,6 +21,13 @@ playwright:
             exit 0
     END
 
+playwright-run-test-image:
+    FROM +install
+    ARG --required HOST
+    ENV HOST $HOST
+    CMD node run_tests_for_earthly.js
+    SAVE IMAGE playwright-run-test
+ 
 playwright-update-snapshots:
     ARG --required HOST
     FROM +install

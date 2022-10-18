@@ -1,0 +1,4 @@
+Earthfile
+**/node_modules
+**/.next
+.git

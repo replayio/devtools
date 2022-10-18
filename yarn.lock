@@ -20660,7 +20660,6 @@ __metadata:
     "@jest/console": ^28.0.2
     "@jridgewell/trace-mapping": ^0.3.14
     "@next/bundle-analyzer": ^12.2.0
-    "@recordreplay/playwright": ^1.18.3
     "@recordreplay/sourcemap-upload-cli": ^0.1.1
     "@redux-devtools/app": ^2.1.4
     "@redux-devtools/extension": ^3.2.2
@@ -23597,7 +23596,7 @@ __metadata:
 
 "typescript@patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>":
   version: 4.6.3
-  resolution: "typescript@patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=7ad353"
+  resolution: "typescript@patch:typescript@npm%3A4.6.3#~builtin<compat/typescript>::version=4.6.3&hash=a1c5e5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
