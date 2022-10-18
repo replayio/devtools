@@ -8,12 +8,13 @@ import { jsonLanguage } from "@codemirror/lang-json";
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
-import { classHighlighter, highlightTree, tags } from "@lezer/highlight";
+import { classHighlighter, highlightTree } from "@lezer/highlight";
 
 import { createGenericCache } from "./createGenericCache";
 
 // TODO
-// Suspense can be async; we could move this to a Worker if it's slow.
+// Lower the initial threshold to only parse the first ~1k lines
+// then continue parsing off thread and stream the HTML in.
 async function highlighter(code: string, fileName: string): Promise<string[] | null> {
   const language = urlToLanguage(fileName);
   const state = EditorState.create({
