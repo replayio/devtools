@@ -20,48 +20,89 @@ async function highlighter(code: string, fileName: string): Promise<string[] | n
     doc: code,
     extensions: [language.extension],
   });
+
   const tree = ensureSyntaxTree(state, state.doc.length, 1e9);
   if (tree === null) {
     return null;
   }
 
-  const container = document.createElement("div");
+  const htmlLines: string[] = [];
 
   let position = 0;
+  let inProgressHTMLString = "";
 
-  // TODO
-  // Rather than creating a giant HTML string that we then split into lines–
-  // we could be creating the lines array as we go.
+  let cachedElement: HTMLElement | null = null;
+  // let DEBUG = 0;
+
+  function processSection(section: string, className: string) {
+    if (cachedElement === null) {
+      cachedElement = document.createElement("span");
+    } else {
+      cachedElement.innerHTML = "";
+    }
+
+    let index = 0;
+    let nextIndex = section.indexOf("\n");
+
+    while (true) {
+      if (nextIndex === -1) {
+        const subsection = section.substring(index);
+
+        cachedElement.className = className;
+        cachedElement.textContent = subsection;
+
+        inProgressHTMLString += cachedElement.outerHTML;
+
+        break;
+      } else if (nextIndex !== index) {
+        const subsection =
+          nextIndex >= 0 ? section.substring(index, nextIndex) : section.substring(index);
+
+        cachedElement.className = className;
+        cachedElement.textContent = subsection;
+
+        inProgressHTMLString += cachedElement.outerHTML;
+      }
+
+      if (nextIndex >= 0) {
+        htmlLines.push(inProgressHTMLString);
+
+        inProgressHTMLString = "";
+        cachedElement.innerHTML = "";
+      }
+
+      index = nextIndex + 1;
+      nextIndex = section.indexOf("\n", index);
+
+      // if (++DEBUG > 10_000) {
+      //   throw "Too many iterations";
+      // }
+    }
+  }
+
   highlightTree(tree, classHighlighter, (from, to, classes) => {
     if (from > position) {
-      // No style applied to the token between position and from
-      container.appendChild(document.createTextNode(code.slice(position, from)));
+      // No style applied to the token between position and from.
+      // This typically indicates white space or newline characters.
+      processSection(code.slice(position, from), "");
     }
 
-    const slice = code.slice(from, to);
-    const lines = slice.split("\n");
-
-    for (let index = 0; index < lines.length; index++) {
-      const line = lines[index];
-
-      const span = container.appendChild(document.createElement("span"));
-      span.className = classes;
-      span.appendChild(document.createTextNode(line));
-
-      if (index < lines.length - 1) {
-        container.appendChild(document.createTextNode("\n"));
-      }
-    }
+    processSection(code.slice(from, to), classes);
 
     position = to;
   });
 
   if (position < tree.length - 1) {
-    // No style applied on the trailing text
-    container.appendChild(document.createTextNode(code.slice(position, tree.length)));
+    // No style applied on the trailing text.
+    // This typically indicates white space or newline characters.
+    processSection(code.slice(position, tree.length), "");
   }
 
-  return container.innerHTML.split("\n");
+  if (inProgressHTMLString !== "") {
+    htmlLines.push(inProgressHTMLString);
+  }
+
+  return htmlLines;
 }
 
 function identity(any: any) {
