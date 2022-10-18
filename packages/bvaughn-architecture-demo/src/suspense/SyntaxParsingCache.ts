@@ -130,7 +130,7 @@ function urlToLanguage(fileName: string): LRLanguage {
   }
 }
 
-export const { getValueSuspense: highlight } = createGenericCache<
+export const { getValueSuspense: parse } = createGenericCache<
   [code: string, fileName: string],
   string[] | null
 >(highlighter, identity);
