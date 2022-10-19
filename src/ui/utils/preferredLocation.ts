@@ -24,11 +24,7 @@ export function getPreferredLocation(locations: MappedLocation | undefined) {
     ...location,
     sourceId: getCorrespondingSourceIds(state, location.sourceId)[0],
   }));
-  return getPreferredLocationSelector(
-    state.sources,
-    correspondingLocations,
-    ThreadFront.preferredGeneratedSources
-  );
+  return getPreferredLocationSelector(state.sources, correspondingLocations);
 }
 
 export function setupGetPreferredLocation(_store: UIStore) {

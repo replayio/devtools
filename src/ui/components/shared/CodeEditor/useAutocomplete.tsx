@@ -16,9 +16,11 @@ import {
   PauseAndFrameId,
 } from "devtools/client/debugger/src/reducers/pause";
 import { getEvaluatedProperties } from "devtools/client/webconsole/utils/autocomplete-eager";
-import { FrameScopes, getScopesAsync } from "ui/suspense/scopeCache";
+import { PickedScopes, getScopesAsync, pickScopes } from "ui/suspense/scopeCache";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { getObjectWithPreviewHelper } from "bvaughn-architecture-demo/src/suspense/ObjectPreviews";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
+import { getFramesAsync } from "ui/suspense/frameCache";
 
 // turns an async getMatches function into a hook
 function useGetAsyncMatches(
@@ -46,7 +48,7 @@ function useGetAsyncMatches(
 
 async function getScopeMatches(
   expression: string,
-  frameScope: FrameScopes,
+  frameScope: PickedScopes,
   fetchObject: ObjectFetcher
 ): Promise<string[] | null> {
   if (!expression || !frameScope?.scopes.length) {
@@ -57,24 +59,31 @@ async function getScopeMatches(
 
 function useGetScopeMatches(expression: string) {
   const pauseId = useAppSelector(getPauseId);
+  const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const replayClient = useContext(ReplayClientContext);
 
   const getScopeMatchesForFrameScope = useCallback(
-    async (expression: string) => {
+    async (expression: string): Promise<string[] | null> => {
       if (!pauseId) {
-        return [] as string[];
+        return [];
       }
-      // TODO Hardcoding frame ID 0 probably isn't great
-      const frameScope = await getScopesAsync(pauseId, "0");
-      if (!frameScope) {
-        return [] as string[];
+      const topFrame = (await getFramesAsync(pauseId))?.[0];
+      if (!topFrame) {
+        return [];
+      }
+      const frameScopes = pickScopes(
+        await getScopesAsync(pauseId, topFrame.frameId),
+        preferredGeneratedSources
+      );
+      if (!frameScopes) {
+        return [];
       }
       const fetchObject = (objectId: string) => {
         return getObjectWithPreviewHelper(replayClient, pauseId, objectId);
       };
-      return getScopeMatches(expression, frameScope, fetchObject);
+      return getScopeMatches(expression, frameScopes, fetchObject);
     },
-    [pauseId, replayClient]
+    [pauseId, preferredGeneratedSources, replayClient]
   );
 
   return useGetAsyncMatches(expression, getScopeMatchesForFrameScope);

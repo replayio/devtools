@@ -158,10 +158,6 @@ class _ThreadFront {
 
   getCorrespondingSourceIds = (sourceId: SourceId) => [sourceId];
 
-  // Source IDs for generated sources which should be preferred over any
-  // original source.
-  preferredGeneratedSources = new Set<SourceId>();
-
   // Map sourceId to breakpoint positions.
   breakpointPositions = new Map<string, Promise<SameLineSourceLocations[]>>();
 
@@ -707,20 +703,6 @@ class _ThreadFront {
   getFrameSteps(pauseId: PauseId, frameId: FrameId) {
     const pause = Pause.getById(pauseId)!;
     return pause.getFrameSteps(frameId);
-  }
-
-  preferSource(sourceId: SourceId, value: boolean) {
-    if (value) {
-      this.preferredGeneratedSources.add(sourceId);
-    } else {
-      this.preferredGeneratedSources.delete(sourceId);
-    }
-  }
-
-  hasPreferredGeneratedSource(location: MappedLocation) {
-    return location.some(({ sourceId }) => {
-      return this.preferredGeneratedSources.has(sourceId);
-    });
   }
 
   // Replace the sourceId in a location with the first corresponding sourceId

@@ -6,6 +6,7 @@ import {
 import { fetchSymbolsForSource, getSymbols } from "devtools/client/debugger/src/reducers/ast";
 import { getExecutionPoint } from "devtools/client/debugger/src/reducers/pause";
 import {
+  getPreferredGeneratedSources,
   getPreferredSourceId,
   getSourceDetailsEntities,
   getTextAtLocation,
@@ -222,12 +223,13 @@ async function getCurrentPauseSourceLocation(
     return;
   }
   await ThreadFront.ensureAllSources();
-  const sourcesById = getSourceDetailsEntities(getState());
+  const state = getState();
+  const sourcesById = getSourceDetailsEntities(state);
   const { location } = frame;
   const preferredSourceId = getPreferredSourceId(
     sourcesById,
     location.map(l => l.sourceId),
-    ThreadFront.preferredGeneratedSources
+    getPreferredGeneratedSources(state)
   );
   const preferredLocation = location.find(l => l.sourceId == preferredSourceId);
   if (!preferredLocation) {

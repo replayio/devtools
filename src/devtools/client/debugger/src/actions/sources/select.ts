@@ -26,6 +26,7 @@ import {
   clearSelectedLocation,
   getSourceIdToDisplayForUrl,
   getSourceToDisplayForUrl,
+  preferSource,
 } from "ui/reducers/sources";
 import { getActiveSearch, getExecutionPoint, getThreadContext, getContext } from "../../selectors";
 import { createLocation } from "../../utils/location";
@@ -218,28 +219,13 @@ export function showAlternateSource(
   oldSourceId: string,
   newSourceId: string
 ): UIThunkAction<Promise<void>> {
-  return async (dispatch, getState, { ThreadFront }) => {
+  return async (dispatch, getState) => {
     const state = getState();
     if (getSourceDetails(state, oldSourceId)?.isSourceMapped) {
-      ThreadFront.preferSource(newSourceId, true);
+      dispatch(preferSource({ sourceId: newSourceId, preferred: true }));
     } else {
-      ThreadFront.preferSource(oldSourceId, false);
+      dispatch(preferSource({ sourceId: oldSourceId, preferred: false }));
     }
-
-    let selectSourceByPausing = false;
-    const selectedFrame = await getSelectedFrameAsync(state);
-    if (
-      selectedFrame?.location.sourceId === oldSourceId &&
-      selectedFrame?.alternateLocation?.sourceId === newSourceId
-    ) {
-      selectSourceByPausing = true;
-    }
-
-    if (selectSourceByPausing) {
-      const executionPoint = getExecutionPoint(state);
-      await dispatch(paused({ executionPoint: executionPoint! }));
-    } else {
-      await dispatch(selectSource(getContext(state), newSourceId));
-    }
+    await dispatch(selectSource(getContext(state), newSourceId));
   };
 }

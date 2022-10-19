@@ -112,11 +112,7 @@ export const executeCommandOperation = createAsyncThunk<
     return { location: null };
   }
 
-  const location = getPreferredLocation(
-    state.sources,
-    resp.frame,
-    ThreadFront.preferredGeneratedSources
-  );
+  const location = getPreferredLocation(state.sources, resp.frame);
 
   return { location };
 });
