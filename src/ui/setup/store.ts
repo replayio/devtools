@@ -7,7 +7,7 @@ import {
   ThunkDispatch,
   AnyAction,
 } from "@reduxjs/toolkit";
-import { Immer, enableMapSet } from "immer";
+import { Immer } from "immer";
 import { isDevelopment, skipTelemetry } from "ui/utils/environment";
 import { UIAction } from "ui/actions";
 import { UIState } from "ui/state";
@@ -49,33 +49,23 @@ let reducers = {
 // apparently currently mutating state in ManagedTree.js, so that throws an error if frozen.
 // Create a custom Immer instance that does not autofreeze.
 const customImmer = new Immer({ autoFreeze: false });
+const OMITTED = "<OMITTED>";
 
 // This _should_ be our UIState type, but I'm getting "<S> is not assignable to UIState" TS errors
 const sanitizeStateForDevtools = <S>(state: S) => {
-  const OMITTED = "<OMITTED>";
-  enableMapSet();
-
   // Use Immer to simplify nested immutable updates when making a copy of the state
-  const sanitizedState = customImmer.produce(state, (draft: any) => {
+  const sanitizedState = customImmer.produce(state, (draft: UIState) => {
     if (draft.sources) {
-      Object.values(draft.sources.contents.entities).forEach((contentsItem: any) => {
-        if (contentsItem.value) {
-          contentsItem.value.value = OMITTED;
+      Object.values(draft.sources.contents.entities).forEach(contentsItem => {
+        if (contentsItem!.value) {
+          contentsItem!.value.value = OMITTED;
         }
       });
     }
 
-    if (draft.pause) {
-      draft.pause.frames = OMITTED;
-      draft.pause.frameScopes = OMITTED;
-    }
-
     if (draft.protocolMessages) {
+      // @ts-expect-error
       draft.protocolMessages = OMITTED;
-    }
-
-    if (draft.preview?.preview) {
-      draft.preview.preview = OMITTED;
     }
   });
 
@@ -86,7 +76,6 @@ const reduxDevToolsOptions: ReduxDevToolsOptions = {
   maxAge: 100,
   stateSanitizer: sanitizeStateForDevtools,
   trace: true,
-  // @ts-ignore This field has been renamed, but RTK types haven't caught up yet
   actionsDenylist: [
     "protocolMessages/eventReceived",
     "protocolMessages/responseReceived",
