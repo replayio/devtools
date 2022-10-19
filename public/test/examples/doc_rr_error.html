@@ -4,7 +4,7 @@
 </body>
 <script>
 function recordingFinished() {
-  setTimeout(() => dump(`RecReplaySendAsyncMessage ExampleFinished`), 0);
+  setTimeout(() => console.log(`ExampleFinished`), 0);
   window.foo.bar = 0;
 }
 var number = 0;

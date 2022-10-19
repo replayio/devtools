@@ -25,7 +25,7 @@ test(`object_preview-01: expressions in the console after time warping`, async (
   );
   await verifyConsoleMessage(page, "{a: 0, a0: 0, a1: 1, a2: 2, a3: 3, …}");
   await verifyConsoleMessage(page, "/abc/gi");
-  await verifyConsoleMessage(page, "Sun Aug 14");
+  await verifyConsoleMessage(page, "Tue Oct 18");
 
   await verifyConsoleMessage(page, `RangeError: foo`);
 

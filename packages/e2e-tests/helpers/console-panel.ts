@@ -223,12 +223,19 @@ export async function verifyConsoleMessage(
 
   if (expectedCount != null) {
     // Verify a specific number of messages
-    await waitFor(async () => {
-      const count = await messages.count();
-      if (count !== expectedCount) {
-        throw `Expected ${expectedCount} messages, but found ${count}`;
+    await waitFor(
+      async () => {
+        const count = await messages.count();
+        if (count !== expectedCount) {
+          throw `Expected ${expectedCount} messages, but found ${count}`;
+        }
+      },
+      {
+        // For console log points, it can take quite a while for the messages to finish
+        // eval-ing their expressions, so this needs to be much longer than in production.
+        timeout: process.env.BACKEND_CI ? 60_000 : undefined,
       }
-    });
+    );
   } else {
     // Or just verify that there was at least one
     const message = messages.first();
@@ -309,12 +316,22 @@ export async function verifyTrimmedConsoleMessages(
   );
 
   await waitFor(async () => {
-    const actualBefore = await page
-      .locator('[data-test-id="MessagesList-TrimmedBeforeCount"]')
-      .textContent();
-    const actualAfter = await page
-      .locator('[data-test-id="MessagesList-TrimmedAfterCount"]')
-      .textContent();
+    const beforeCountLocator = page.locator('[data-test-id="MessagesList-TrimmedBeforeCount"]');
+    const afterCountLocator = page.locator('[data-test-id="MessagesList-TrimmedAfterCount"]');
+
+    let actualBefore;
+    if (expectedBefore === 0 && (await beforeCountLocator.count()) === 0) {
+      actualBefore = "0";
+    } else {
+      actualBefore = await beforeCountLocator.textContent();
+    }
+
+    let actualAfter;
+    if (expectedAfter === 0 && (await afterCountLocator.count()) === 0) {
+      actualAfter = "0";
+    } else {
+      actualAfter = await afterCountLocator.textContent();
+    }
 
     if (actualBefore !== expectedBefore.toString() || actualAfter !== expectedAfter.toString()) {
       throw `Expected ${expectedBefore} before and ${expectedAfter} after, but found ${actualBefore} before and ${actualAfter} after`;
@@ -326,4 +343,18 @@ export async function warpToMessage(page: Page, text: string, line?: number) {
   const messages = await findConsoleMessage(page, text);
   const message = messages.first();
   await seekToConsoleMessage(page, message, line);
+}
+
+export async function setConsoleMessageAsFocusStart(page: Page, message: Locator) {
+  await debugPrint(page, `Setting focus range start`, "setConsoleMessageAsFocusStart");
+
+  await message.click({ button: "right" });
+  await page.locator('[data-test-id="ConsoleContextMenu-SetFocusStartButton"]').click();
+}
+
+export async function setConsoleMessageAsFocusEnd(page: Page, message: Locator) {
+  await debugPrint(page, `Setting focus range end`, "setConsoleMessageAsFocusEnd");
+
+  await message.click({ button: "right" });
+  await page.locator('[data-test-id="ConsoleContextMenu-SetFocusEndButton"]').click();
 }

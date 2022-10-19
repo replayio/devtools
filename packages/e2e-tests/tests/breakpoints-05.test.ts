@@ -7,6 +7,7 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
+import { delay } from "../helpers/utils";
 
 const url = "doc_debugger_statements.html";
 
@@ -33,6 +34,12 @@ test(`breakpoints-05: Test interaction of breakpoints with debugger statements`,
     lineNumber: 8,
     url,
   });
+
+  // This slight delay ensures that the breakpoint removal has had time to
+  // be processed and synched to the server, otherwise we could get racy behavior
+  // with the next rewind call.
+  await delay(1_000);
+
   await rewindToLine(page, { lineNumber: 7 });
   await resumeToLine(page, { lineNumber: 9 });
 });

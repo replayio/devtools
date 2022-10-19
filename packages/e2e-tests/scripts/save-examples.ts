@@ -6,7 +6,7 @@
 
 import { Page } from "@playwright/test";
 const playwright = require("@recordreplay/playwright");
-import { uploadRecording, listAllRecordings } from "@replayio/replay";
+import { uploadRecording, listAllRecordings, removeRecording } from "@replayio/replay";
 import axios from "axios";
 import chalk from "chalk";
 import { dots } from "cli-spinners";
@@ -129,28 +129,40 @@ async function saveExamples(
 }
 
 async function saveBrowserExamples() {
-  await saveExamples(
-    "browser",
-    config.browserExamplesPath,
-    ".html",
-    async ({ exampleFilename }) => {
-      const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
+  await saveExamples("browser", config.browserExamplesPath, ".html", saveBrowserExample);
+  // This example is in a subdirectory so we can't look it up as easily, so we just do it manually.
+  if (
+    (target === "all" || target === "browser") &&
+    (exampleFilename === null || exampleFilename === "cra/dist/index.html")
+  ) {
+    await saveBrowserExample({ exampleFilename: "cra/dist/index.html" });
+  }
+}
+async function saveBrowserExample({ exampleFilename }: { exampleFilename: string }) {
+  if (exampleFilename === "iframe.html") {
+    // This one example is used within another one.
+    return;
+  }
 
-      const exampleUrl = `${config.devtoolsUrl}/test/examples/${exampleFilename}`;
+  const done = logAnimated(`Recording example ${chalk.bold(exampleFilename)}`);
 
-      await recordPlaywright(config.browserName, async page => {
-        await page.goto(exampleUrl);
-        await waitUntilMessage(page as Page, "ExampleFinished");
-      });
+  const exampleUrl = `${config.devtoolsUrl}/test/examples/${exampleFilename}`;
 
-      done();
+  await recordPlaywright(config.browserName, async page => {
+    await page.goto(exampleUrl);
+    await waitUntilMessage(page as Page, "ExampleFinished");
+  });
 
-      const recordingId = await uploadLastRecording(exampleUrl);
-      if (config.useExampleFile && recordingId) {
-        await saveRecording(exampleFilename, recordingId);
-      }
-    }
-  );
+  const recordingId = await uploadLastRecording(exampleUrl);
+
+  done();
+
+  if (config.useExampleFile && recordingId) {
+    await saveRecording(exampleFilename, recordingId);
+  }
+  if (recordingId) {
+    removeRecording(recordingId);
+  }
 }
 
 async function saveNodeExamples() {
@@ -166,6 +178,7 @@ async function saveNodeExamples() {
       const recordingId = await recordNodeExample(examplePath);
       if (recordingId) {
         await saveRecording(`node/${exampleFilename}`, recordingId!);
+        removeRecording(recordingId);
 
         done();
 
@@ -215,23 +228,29 @@ async function makeReplayPublic(apiKey: string, recordingId: string) {
   });
 }
 
-async function waitUntilMessage(page: Page, message: string, timeout: number = 30_000) {
-  return await new Promise((resolve, reject) => {
-    let timer = setTimeout(reject, timeout);
+async function waitUntilMessage(
+  page: Page,
+  message: string,
+  timeout: number = 30_000
+): Promise<void> {
+  const gotMatch = await new Promise<boolean>(resolve => {
+    let timer = setTimeout(() => resolve(false), timeout);
     page.on("console", async msg => {
       try {
         const firstArg = await msg.args()[0]?.jsonValue();
-        // console.log(firstArg);
         if (firstArg === message) {
-          const secondArg = await msg.args()[1]?.jsonValue();
           clearTimeout(timer);
-          resolve(secondArg);
+          resolve(true);
         }
       } catch (e) {
         console.log("Unserializable value");
       }
     });
   });
+
+  if (!gotMatch) {
+    throw new Error("Timed out waiting for " + message);
+  }
 }
 
 (async () => {
@@ -241,7 +260,7 @@ async function waitUntilMessage(page: Page, message: string, timeout: number = 3
 
     process.exit(0);
   } catch (error) {
-    console.error(error);
+    console.error("Unexpected error: ", error);
 
     process.exit(1);
   }

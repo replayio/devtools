@@ -1,7 +1,15 @@
 import { PlaywrightTestConfig, devices } from "@playwright/test";
 import { devices as replayDevices } from "@replayio/playwright";
 
-const { CI, DEBUG, SLOW_MO } = process.env;
+const {
+  CI,
+  // The backend tests run against a self-contained backend that can be
+  // much slower than production, so when this is set, tests should use
+  // much longer timeouts.
+  BACKEND_CI,
+  DEBUG,
+  SLOW_MO,
+} = process.env;
 
 const config: PlaywrightTestConfig = {
   use: {
@@ -13,15 +21,15 @@ const config: PlaywrightTestConfig = {
       width: 1280,
       height: 1024,
     },
-    // Don't allow any one action to take more than 10s
-    actionTimeout: 15000,
+    // Don't allow any one action to take more than 15s
+    actionTimeout: BACKEND_CI ? 60_000 : 15_000,
   },
 
   // Retry failed tests on CI to account for some basic flakiness.
   retries: CI ? 5 : 0,
 
-  // Give individual tests up to 60s to complete instead of default 30s
-  timeout: 60000,
+  // Give individual tests a while to complete instead of default 30s
+  timeout: BACKEND_CI ? 150_000 : 60_000,
 
   // Limit the number of workers on CI, use default locally
   workers: CI ? 4 : undefined,
