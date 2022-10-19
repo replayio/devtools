@@ -74,6 +74,7 @@
 
 .LineNumber {
   height: 1.5rem;
+  width: var(--line-number-size);
   display: flex;
   flex-shrink: 0;
   align-items: center;
@@ -86,6 +87,7 @@
 
 .LineHitCountBar {
   flex: 0 0 1ch;
+  height: var(--line-height);
 }
 .LineHitCountBar0 {
   background-color: var(--color-hit-counts-bar-0);
@@ -101,12 +103,12 @@
 }
 
 .LineHitCountLabel {
+  height: var(--line-height);
   font-size: var(--font-size-tiny);
   flex: 0 0 calc(var(--hit-count-size) + 2ch);
   display: flex;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid var(--border-color-light);
   color: var(--color-hit-counts-label-color);
 }
 .LineHitCountLabel0 {
@@ -119,10 +121,6 @@
 }
 .LineHitCountLabel3 {
   background-color: var(--color-hit-counts-label-background-3);
-}
-
-.PointPanel {
-  margin: 1ch;
 }
 
 .LineSegment {
@@ -138,4 +136,18 @@
   margin: 0 0.5ch;
   cursor: pointer;
   height: 1rem;
+}
+
+.LineSegmentsAndPointPanel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-left: 1px solid var(--border-color-light);
+}
+
+.PointPanel {
+  position: absolute;
+  top: var(--line-height);
+  width: 100%;
 }

@@ -8,6 +8,8 @@ export default function Icon({
   type:
     | "add"
     | "arrow"
+    | "arrow-left"
+    | "arrow-right"
     | "breakpoint"
     | "cancel"
     | "close"
@@ -52,6 +54,12 @@ export default function Icon({
       break;
     case "arrow":
       path = "M8 5v14l11-7z";
+      break;
+    case "arrow-left":
+      path = "M14 7l-5 5 5 5V7z";
+      break;
+    case "arrow-right":
+      path = "M10 17l5-5-5-5v10z";
       break;
     case "breakpoint":
       path =

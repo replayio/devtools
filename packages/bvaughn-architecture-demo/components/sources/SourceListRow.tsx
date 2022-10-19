@@ -1,7 +1,7 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { memo, MouseEvent } from "react";
+import { CSSProperties, memo, MouseEvent } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
@@ -10,6 +10,7 @@ import { formatHitCount } from "./formatHitCount";
 import PointPanel from "./PointPanel";
 import { HoveredState } from "./Source";
 import styles from "./SourceListRow.module.css";
+import { findPointForLocation } from "./utils/points";
 import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 
 export type ItemData = {
@@ -54,14 +55,9 @@ const SourceListRow = memo(
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
-    const numLines = htmlLines.length;
-    const maxLineNumberStringLength = `${numLines}`.length;
-
     const html = htmlLines[index];
 
-    const point = points.find(
-      point => point.location.sourceId === sourceId && point.location.line === lineNumber
-    );
+    const point = findPointForLocation(points, sourceId, lineNumber);
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -220,34 +216,32 @@ const SourceListRow = memo(
       );
     }
 
+    const rowStyle: CSSProperties = {
+      ...style,
+      // @ts-ignore
+      "--line-height": `${lineHeight}px`,
+    };
+
     return (
-      <div data-test-id={`SourceLine-${lineNumber}`} style={style}>
+      <div data-test-id={`SourceLine-${lineNumber}`} style={rowStyle}>
         <div
           className={[
             lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
             currentSearchResultLineIndex === index ? styles.CurrentSearchResultLine : undefined,
           ].join(" ")}
         >
-          <div
-            className={styles.LineNumber}
-            data-test-id={`SourceLine-LineNumber-${lineNumber}`}
-            style={{
-              width: `${maxLineNumberStringLength}ch`,
-            }}
-          >
+          <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
           </div>
 
           <div
             className={`${styles.LineHitCountBar} ${hitCountBarClassName}`}
             onClick={() => setShowHitCounts(!showHitCounts)}
-            style={{ height: `${lineHeight}px` }}
           />
           {showHitCounts && (
             <div
               className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
               onClick={() => setShowHitCounts(!showHitCounts)}
-              style={{ height: `${lineHeight}px` }}
             >
               {hitCount !== null ? formatHitCount(hitCount) : ""}
             </div>
@@ -255,9 +249,12 @@ const SourceListRow = memo(
 
           {togglePointButton}
 
-          {lineSegments}
+          <div className={styles.LineSegmentsAndPointPanel}>
+            {lineSegments}
+
+            {point && <PointPanel className={styles.PointPanel} point={point} />}
+          </div>
         </div>
-        {point && <PointPanel className={styles.PointPanel} point={point} />}
       </div>
     );
   },

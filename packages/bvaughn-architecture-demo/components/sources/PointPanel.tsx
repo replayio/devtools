@@ -1,8 +1,11 @@
 import Icon from "@bvaughn/components/Icon";
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
+import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
+import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
+import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { KeyboardEvent, Suspense, useContext, useMemo, useState } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
@@ -10,9 +13,13 @@ import { Point } from "shared/client/types";
 import Loader from "../Loader";
 
 import styles from "./PointPanel.module.css";
+import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
 
 export default function PointPanel({ className, point }: { className: string; point: Point }) {
   const { editPoint } = useContext(PointsContext);
+
+  // TODO Editing
+  const [isEditing, setIsEditing] = useState(false);
 
   const [editableCondition, setEditableCondition] = useState(point.condition);
   const [editableContent, setEditableContent] = useState(point.content);
@@ -24,6 +31,7 @@ export default function PointPanel({ className, point }: { className: string; po
   );
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
+  // TODO Editing
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
       case "Enter":
@@ -38,104 +46,105 @@ export default function PointPanel({ className, point }: { className: string; po
     }
   };
 
-  return (
-    <div
-      className={`${styles.Point} ${className}`}
-      data-test-id={`PointPanel-${point.location.line}`}
-    >
-      <div className={styles.Row}>
-        <input
-          className={styles.Input}
-          data-test-id={`PointPanelInput-${point.location.line}-content`}
-          disabled={!point.shouldLog}
-          onChange={event => setEditableContent(event.currentTarget.value)}
-          onKeyDown={onKeyDown}
-          placeholder="Content..."
-          value={editableContent}
-        />
-        <label className={styles.Label}>
-          <input
-            checked={point.shouldBreak}
-            onChange={event => editPoint(point.id, { shouldBreak: event.currentTarget.checked })}
-            type="checkbox"
-          />
-          <Icon className={styles.LabelIcon} type="pause" />
-        </label>
-        <label className={styles.Label}>
-          <input
-            checked={point.shouldLog}
-            onChange={event => editPoint(point.id, { shouldLog: event.currentTarget.checked })}
-            type="checkbox"
-          />
-          <Icon className={styles.LabelIcon} type="print" />
-        </label>
-        <small>
-          ({point.location.line}:{point.location.column})
-        </small>
-        <button
-          className={styles.SaveButton}
-          disabled={!isConditionValid || !isContentValid || !hasChanged}
-          onClick={() =>
-            editPoint(point.id, { condition: editableCondition, content: editableContent })
-          }
-        >
-          <Icon className={styles.SaveButtonIcon} type="save" />
-        </button>
+  if (isEditing) {
+    // TODO
+    return null;
+  } else {
+    return (
+      <div
+        className={`${styles.Point} ${className}`}
+        data-test-id={`PointPanel-${point.location.line}`}
+      >
+        <div className={styles.Row}>
+          <div className={styles.ContentWrapper}>
+            {/* TODO Badge picker */}
+            <div className={styles.BadgePicker} />
+            <div className={styles.ContentLabel}>{point.content}</div>
+            <button className={styles.EditButton}>
+              <Icon className={styles.EditButtonIcon} type="edit" />
+            </button>
+          </div>
+          <button className={styles.CommentButton}>
+            <Icon className={styles.CommentButtonIcon} type="comment" />
+          </button>
+        </div>
+        <div className={styles.Row}>
+          <Suspense fallback={<Loader />}>
+            <HitPoints point={point} />
+          </Suspense>
+        </div>
       </div>
-      <div className={styles.Row}>
-        <input
-          className={styles.Input}
-          data-test-id={`PointPanelInput-${point.location.line}-condition`}
-          onChange={event => setEditableCondition(event.currentTarget.value || null)}
-          onKeyDown={onKeyDown}
-          placeholder="Condition..."
-          value={editableCondition || ""}
-        />
-      </div>
-      <div className={styles.Row}>
-        <Suspense fallback={<Loader />}>
-          <HitPoints point={point} />
-        </Suspense>
-      </div>
-    </div>
-  );
+    );
+  }
 }
 
+// TODO Hit point timeline
 function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
+  const { duration } = useContext(SessionContext);
+  const { executionPoint, isPending, update } = useContext(TimelineContext);
 
-  const [hitPoints, status] = getHitPointsForLocation(client, point.location, null, focusRange);
+  const [hitPoints] = getHitPointsForLocation(client, point.location, null, focusRange);
 
-  switch (status) {
-    case "too-many-points-to-find":
-    case "too-many-points-to-run-analysis": {
-      return (
-        <div className={styles.HitPointsWarning}>
-          <Icon className={styles.HitPointsWarningIcon} type="warning" /> Use Focus Mode to reduce
-          the number of hits.
-        </div>
-      );
+  const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, executionPoint);
+
+  const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
+  const lastHitPoint = hitPoints.length > 0 ? hitPoints[hitPoints.length - 1] : null;
+  const previousButtonEnabled =
+    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, executionPoint);
+  const nextButtonEnabled =
+    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, executionPoint);
+
+  const goToPrevious = () => {
+    const [prevHitPoint] = findHitPointBefore(hitPoints, executionPoint);
+    if (prevHitPoint !== null) {
+      update(prevHitPoint.time, prevHitPoint.point);
     }
-    default: {
-      if (hitPoints.length === 0) {
-        return (
-          <ul className={styles.HitPointsList}>
-            <li className={styles.HitPointListItem}>No hits</li>
-          </ul>
-        );
-      } else {
-        return (
-          <ul className={styles.HitPointsList}>
-            <li className={styles.HitPointListItem}>Hits:</li>
-            {hitPoints.map(hitPoint => (
-              <li key={hitPoint.point} className={styles.HitPointListItem}>
-                •
-              </li>
-            ))}
-          </ul>
-        );
-      }
+  };
+  const goToNext = () => {
+    const [nextHitPoint] = findHitPointAfter(hitPoints, executionPoint);
+    if (nextHitPoint !== null) {
+      update(nextHitPoint.time, nextHitPoint.point);
     }
-  }
+  };
+
+  const label =
+    currentHitPointIndex !== null
+      ? `${currentHitPointIndex + 1} / ${hitPoints.length}`
+      : hitPoints.length;
+
+  return (
+    <>
+      <button
+        className={styles.PreviousHitPointButton}
+        disabled={isPending || !previousButtonEnabled}
+        onClick={goToPrevious}
+      >
+        <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
+      </button>
+      <div className={styles.HitPointsLabel}>{label}</div>
+      <button
+        className={styles.NextHitPointButton}
+        disabled={isPending || !nextButtonEnabled}
+        onClick={goToNext}
+      >
+        <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
+      </button>
+      <div className={styles.HitPointTimeline}>
+        {hitPoints.map(hitPoint => (
+          <button
+            className={
+              currentHitPoint === hitPoint ? styles.HitPointButtonCurrent : styles.HitPointButton
+            }
+            key={hitPoint.point}
+            onClick={() => update(hitPoint.time, hitPoint.point)}
+            style={{
+              left: `${(100 * hitPoint.time) / duration}%`,
+            }}
+          />
+        ))}
+      </div>
+    </>
+  );
 }
