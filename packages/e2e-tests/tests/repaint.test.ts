@@ -21,12 +21,18 @@ test("repaints the screen screen when stepping over code that modifies the DOM",
   await stepOver(page);
   await waitForPaused(page);
 
-  await waitFor(async () => {
-    const nextDataUrl = await getCanvasDataUrl(page);
-    if (prevDataUrl === nextDataUrl) {
-      throw `The screenshot did not change`;
+  await waitFor(
+    async () => {
+      const nextDataUrl = await getCanvasDataUrl(page);
+      if (prevDataUrl === nextDataUrl) {
+        throw `The screenshot did not change`;
+      }
+    },
+    {
+      // Add a bit of extra time for the backend CI to generate a new screenshot.
+      timeout: process.env.BACKEND_CI ? 30_000 : undefined,
     }
-  });
+  );
 });
 
 async function getCanvasDataUrl(page: Page): Promise<string> {
