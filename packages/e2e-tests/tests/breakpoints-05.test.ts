@@ -7,7 +7,6 @@ import {
   rewindToLine,
 } from "../helpers/pause-information-panel";
 import { addBreakpoint, removeBreakpoint } from "../helpers/source-panel";
-import { delay } from "../helpers/utils";
 
 const url = "doc_debugger_statements.html";
 

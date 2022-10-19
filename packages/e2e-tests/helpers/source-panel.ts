@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { openDevToolsTab } from ".";
 import { openPauseInformationPanel } from "./pause-information-panel";
 import { openSource, openSourceExplorerPanel } from "./source-explorer-panel";
-import { clearTextArea, debugPrint, delay, forEach, waitFor, mapLocators } from "./utils";
+import { clearTextArea, debugPrint, delay, waitFor, mapLocators } from "./utils";
 
 export async function addBreakpoint(
   page: Page,
