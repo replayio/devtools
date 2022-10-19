@@ -219,34 +219,6 @@ export class Pause {
     );
   }
 
-  async getScopes(frameId: FrameId) {
-    const frame = this.frames.get(frameId);
-    assert(frame, `frame not found (frame ID: ${frameId})`);
-
-    // Normally we use the original scope chain for the frame if there is one,
-    // but when a generated source is marked as preferred we use the generated
-    // scope chain instead. In the original case we still load the frame's
-    // normal scope chain first, as currently the backend does not supply
-    // related objects when loading original scopes and we don't deal with that
-    // properly.
-    let scopeChain = await this.ensureScopeChain(frame.scopeChain);
-    let originalScopesUnavailable = false;
-    if (frame.originalScopeChain && !this.ThreadFront.hasPreferredGeneratedSource(frame.location)) {
-      const originalScopeChain = await this.ensureScopeChain(frame.originalScopeChain);
-
-      // if all original variables are unavailable (usually due to sourcemap issues),
-      // we show the generated scope chain with a warning message instead
-      originalScopesUnavailable = originalScopeChain.every(scope =>
-        (scope.bindings || []).every(binding => binding.unavailable)
-      );
-      if (!originalScopesUnavailable) {
-        scopeChain = originalScopeChain;
-      }
-    }
-
-    return { scopes: scopeChain, originalScopesUnavailable };
-  }
-
   async sendMessage<P, R>(
     method: (parameters: P, sessionId?: SessionId, pauseId?: PauseId) => R,
     params: P

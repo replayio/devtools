@@ -79,6 +79,7 @@ export interface SourcesState {
   selectedLocationHasScrolled: boolean;
   persistedSelectedLocation: PartialLocation | null;
   sourcesByUrl: Record<string, string[]>;
+  preferredGeneratedSources: string[];
 }
 
 const initialState: SourcesState = {
@@ -91,6 +92,7 @@ const initialState: SourcesState = {
   // TODO Move prefs out of reducers and load this separately
   persistedSelectedLocation: (prefs.pendingSelectedLocation as PartialLocation) || null,
   sourcesByUrl: {},
+  preferredGeneratedSources: [],
 };
 
 const sourcesSlice = createSlice({
@@ -170,6 +172,19 @@ const sourcesSlice = createSlice({
       state.selectedLocation = null;
       state.persistedSelectedLocation = null;
     },
+    preferSource: (state, action: PayloadAction<{ sourceId: string; preferred: boolean }>) => {
+      if (action.payload.preferred) {
+        if (!state.preferredGeneratedSources.includes(action.payload.sourceId)) {
+          state.preferredGeneratedSources.push(action.payload.sourceId);
+        }
+      } else {
+        if (state.preferredGeneratedSources.includes(action.payload.sourceId)) {
+          state.preferredGeneratedSources = state.preferredGeneratedSources.filter(
+            sourceId => sourceId !== action.payload.sourceId
+          );
+        }
+      }
+    },
   },
   extraReducers: builder => {
     builder.addCase("debuggerUI/setViewport", state => {
@@ -182,6 +197,7 @@ export const {
   allSourcesReceived,
   clearSelectedLocation,
   locationSelected,
+  preferSource,
   sourceLoading,
   sourceLoaded,
   sourceErrored,
@@ -335,7 +351,7 @@ export function getBestNonSourceMappedSourceId(
 export function getPreferredSourceId(
   sourcesById: Dictionary<SourceDetails>,
   sourceIds: string[],
-  preferredGeneratedSources?: Set<string>
+  preferredGeneratedSources?: string[]
 ) {
   const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
   const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
@@ -345,7 +361,7 @@ export function getPreferredSourceId(
   if (!nonSourceMappedId) {
     return sourceMappedId;
   }
-  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+  if (preferredGeneratedSources?.includes(nonSourceMappedId)) {
     return nonSourceMappedId;
   }
   return sourceMappedId;
@@ -357,18 +373,14 @@ export function getPreferredSourceId(
 // choose the location which we should be using within the devtools. Normally
 // this is the most original location, except when preferSource has been used
 // to prefer a generated source instead.
-export function getPreferredLocation(
-  sources: SourcesState,
-  locations: MappedLocation,
-  preferredGeneratedSources: Set<string>
-) {
+export function getPreferredLocation(sources: SourcesState, locations: MappedLocation) {
   if (!sources.allSourcesReceived) {
     return locations[0];
   }
   const sourceId = getPreferredSourceId(
     sources.sourceDetails.entities,
     locations.map(l => l.sourceId),
-    preferredGeneratedSources
+    sources.preferredGeneratedSources
   );
   const preferredLocation = locations.find(l => l.sourceId == sourceId);
   assert(preferredLocation, "no preferred location found");
@@ -383,28 +395,24 @@ export function getPreferredLocation(
 export function getAlternateSourceId(
   sourcesById: Dictionary<SourceDetails>,
   sourceIds: string[],
-  preferredGeneratedSources?: Set<string>
+  preferredGeneratedSources?: string[]
 ) {
   const sourceMappedId = getBestSourceMappedSourceId(sourcesById, sourceIds);
   const nonSourceMappedId = getBestNonSourceMappedSourceId(sourcesById, sourceIds);
   if (!sourceMappedId || !nonSourceMappedId) {
     return;
   }
-  if (preferredGeneratedSources?.has(nonSourceMappedId)) {
+  if (preferredGeneratedSources?.includes(nonSourceMappedId)) {
     return sourceMappedId;
   }
   return nonSourceMappedId;
 }
 
-export function getAlternateLocation(
-  sources: SourcesState,
-  locations: MappedLocation,
-  preferredGeneratedSources: Set<string>
-) {
+export function getAlternateLocation(sources: SourcesState, locations: MappedLocation) {
   const alternateId = getAlternateSourceId(
     sources.sourceDetails.entities,
     locations.map(l => l.sourceId),
-    preferredGeneratedSources
+    sources.preferredGeneratedSources
   );
   if (alternateId) {
     return locations.find(l => l.sourceId == alternateId);
@@ -466,6 +474,9 @@ export const getSourceToDisplayForUrl = (state: UIState, url: string) => {
 export const getPreviousPersistedLocation = (state: UIState) =>
   state.sources.persistedSelectedLocation;
 
+export const getPreferredGeneratedSources = (state: UIState) =>
+  state.sources.preferredGeneratedSources;
+
 /*
 export const getStableLocationForLocation = (
   state: UIState,
@@ -510,6 +521,7 @@ export const selectors = {
   getSourceIdToDisplayForUrl,
   getSourceIdsByUrl,
   getSourcesToDisplayByUrl,
+  getPreferredGeneratedSources,
 };
 
 export default sourcesSlice.reducer;

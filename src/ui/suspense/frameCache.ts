@@ -73,9 +73,7 @@ export function getPauseFramesIfCached(pauseId: PauseId, sourcesState: SourcesSt
 
 function createPauseFrames(pauseId: PauseId, frames: Frame[], sourcesState: SourcesState) {
   return formatCallStackFrames(
-    frames.map((frame, index) =>
-      createFrame(sourcesState, ThreadFront.preferredGeneratedSources, frame, pauseId, index)
-    ),
+    frames.map((frame, index) => createFrame(sourcesState, frame, pauseId, index)),
     sourcesState.sourceDetails.entities
   )!;
 }

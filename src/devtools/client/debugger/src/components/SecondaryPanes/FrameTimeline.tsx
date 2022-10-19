@@ -103,9 +103,7 @@ class FrameTimelineRenderer extends Component<FrameTimelineProps, FrameTimelineS
     const frameStep = this.getPosition(progress);
 
     if (frameStep?.frame) {
-      setPreviewPausedLocation(
-        getPreferredLocation(sourcesState, frameStep.frame, ThreadFront.preferredGeneratedSources)
-      );
+      setPreviewPausedLocation(getPreferredLocation(sourcesState, frameStep.frame));
     }
   }
 

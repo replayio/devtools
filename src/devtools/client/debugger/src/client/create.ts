@@ -11,16 +11,11 @@ import { PauseFrame } from "../reducers/pause";
 
 export function createFrame(
   sources: SourcesState,
-  preferredGeneratedSources: Set<string>,
   frame: Frame,
   pauseId: PauseId,
   index = 0
 ): PauseFrame {
-  const { sourceId, line, column } = getPreferredLocation(
-    sources,
-    frame.location,
-    preferredGeneratedSources
-  );
+  const { sourceId, line, column } = getPreferredLocation(sources, frame.location);
   const location = {
     sourceId,
     line,
@@ -28,7 +23,7 @@ export function createFrame(
   };
 
   let alternateLocation;
-  const alternate = getAlternateLocation(sources, frame.location, preferredGeneratedSources);
+  const alternate = getAlternateLocation(sources, frame.location);
   if (alternate) {
     alternateLocation = {
       sourceId: alternate.sourceId,

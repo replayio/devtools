@@ -3,10 +3,11 @@ import { PauseId, Value } from "@replayio/protocol";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { getSelectedFrameId } from "../../selectors";
 import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
+import { getPreferredGeneratedSources } from "ui/reducers/sources";
 import { enterFocusMode as enterFocusModeAction } from "ui/actions/timeline";
 import { ConvertedScope, convertScopes } from "../../utils/pause/scopes/convertScopes";
 import { getFrameSuspense } from "ui/suspense/frameCache";
-import { getScopesSuspense } from "ui/suspense/scopeCache";
+import { getScopesSuspense, pickScopes } from "ui/suspense/scopeCache";
 import { Redacted } from "ui/components/Redacted";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
@@ -16,6 +17,7 @@ import ScopesInspector from "bvaughn-architecture-demo/components/inspector/Scop
 import styles from "./NewObjectInspector.module.css";
 
 function ScopesRenderer() {
+  const preferredGeneratedSources = useAppSelector(getPreferredGeneratedSources);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   if (!selectedFrameId) {
     return (
@@ -29,9 +31,9 @@ function ScopesRenderer() {
   if (!frame) {
     return null;
   }
-  const { scopes: protocolScopes, originalScopesUnavailable } = getScopesSuspense(
-    selectedFrameId.pauseId,
-    selectedFrameId.frameId
+  const { scopes: protocolScopes, originalScopesUnavailable } = pickScopes(
+    getScopesSuspense(selectedFrameId.pauseId, selectedFrameId.frameId),
+    preferredGeneratedSources
   );
   const scopes = convertScopes(protocolScopes, frame, selectedFrameId.pauseId);
 
