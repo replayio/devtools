@@ -86,30 +86,41 @@
   user-select: none;
 }
 
-.LineHitCounts {
+.LineHitCountBar {
+  flex: 0 0 1ch;
+}
+.LineHitCountBar0 {
+  background-color: var(--color-hit-counts-bar-0);
+}
+.LineHitCountBar1 {
+  background-color: var(--color-hit-counts-bar-1);
+}
+.LineHitCountBar2 {
+  background-color: var(--color-hit-counts-bar-2);
+}
+.LineHitCountBar3 {
+  background-color: var(--color-hit-counts-bar-3);
+}
+
+.LineHitCountLabel {
+  font-size: var(--font-size-tiny);
+  flex: 0 0 calc(var(--hit-count-size) + 2ch);
   display: flex;
-  /* Make sure there's enough room for the "+" button */
-  min-width: 1.5rem;
-  flex: 0 0 var(--hit-count-size);
   align-items: center;
   justify-content: center;
-  font-size: var(--font-size-tiny);
-  user-select: none;
+  border-right: 1px solid var(--border-color-light);
+  color: var(--color-hit-counts-label-color);
 }
-.LineHitCounts0 {
-  background-color: var(--color-hit-counts-0);
+.LineHitCountLabel0 {
 }
-.LineHitCounts1 {
-  background-color: var(--color-hit-counts-1);
-  color: var(--color-hit-counts-label-1);
+.LineHitCountLabel1 {
+  background-color: var(--color-hit-counts-label-background-1);
 }
-.LineHitCounts2 {
-  background-color: var(--color-hit-counts-2);
-  color: var(--color-hit-counts-label-2);
+.LineHitCountLabel2 {
+  background-color: var(--color-hit-counts-label-background-2);
 }
-.LineHitCounts3 {
-  background-color: var(--color-hit-counts-3);
-  color: var(--color-hit-counts-label-3);
+.LineHitCountLabel3 {
+  background-color: var(--color-hit-counts-label-background-3);
 }
 
 .PointPanel {

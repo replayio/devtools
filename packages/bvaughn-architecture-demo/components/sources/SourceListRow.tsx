@@ -89,7 +89,8 @@ const SourceListRow = memo(
     // This absolute hit count values are relative, per file.
     // Cubed root prevents high hit counts from lumping all other values together.
     const NUM_GRADIENT_COLORS = 3;
-    let hitCountLabelClassName = styles.LineHitCounts0;
+    let hitCountBarClassName = styles.LineHitCountBar0;
+    let hitCountLabelClassName = styles.LineHitCountLabel0;
     let hitCountIndex = NUM_GRADIENT_COLORS - 1;
     if (hitCount !== null && minHitCount !== null && maxHitCount !== null) {
       if (minHitCount !== maxHitCount) {
@@ -99,7 +100,8 @@ const SourceListRow = memo(
         );
       }
 
-      hitCountLabelClassName = styles[`LineHitCounts${hitCountIndex + 1}`];
+      hitCountBarClassName = styles[`LineHitCountBar${hitCountIndex + 1}`];
+      hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
     }
 
     const onMouseMove = ({ currentTarget, target }: MouseEvent) => {
@@ -223,13 +225,6 @@ const SourceListRow = memo(
           ].join(" ")}
         >
           <div
-            className={`${styles.LineHitCounts} ${hitCountLabelClassName}`}
-            style={{ height: `${lineHeight}px` }}
-          >
-            {hitCount !== null ? formatHitCount(hitCount) : ""}
-          </div>
-          {togglePointButton}
-          <div
             className={styles.LineNumber}
             data-test-id={`SourceLine-LineNumber-${lineNumber}`}
             style={{
@@ -238,6 +233,20 @@ const SourceListRow = memo(
           >
             {lineNumber}
           </div>
+
+          <div
+            className={`${styles.LineHitCountBar} ${hitCountBarClassName}`}
+            style={{ height: `${lineHeight}px` }}
+          />
+          <div
+            className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
+            style={{ height: `${lineHeight}px` }}
+          >
+            {hitCount !== null ? formatHitCount(hitCount) : ""}
+          </div>
+
+          {togglePointButton}
+
           {lineSegments}
         </div>
         {point && <PointPanel className={styles.PointPanel} point={point} />}
