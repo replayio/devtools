@@ -132,6 +132,22 @@ export function getDisconnectionError(): UnexpectedError {
   };
 }
 
+interface SourceContentsCommandRespone {
+  id: number;
+  result: {
+    contentType: string;
+    contents: string;
+  };
+  error?: undefined;
+}
+
+function isSourceContentsCommandResponse(
+  response: CommandResponse
+): response is SourceContentsCommandRespone {
+  // @ts-expect-error
+  return response.result && "contentType" in response.result && "contents" in response.result;
+}
+
 // Create a session to use while debugging.
 // NOTE: This thunk is dispatched _before_ the rest of the devtools logic
 // is initialized, so `extra.ThreadFront` isn't available yet.
@@ -223,7 +239,18 @@ export function createSocket(
         },
         onResponse: (response: CommandResponse) => {
           if (features.logProtocol) {
-            queueAction(responseReceived({ ...response, recordedAt: window.performance.now() }));
+            const clonedResponse = { ...response, recordedAt: window.performance.now() };
+
+            if (isSourceContentsCommandResponse(clonedResponse)) {
+              // Must be a source contents entry. Shrink the source text just to minimize store size.
+              // It's rare that we would want to look at the source text in the Protocol Viewer,
+              // and at most we might want to see if the initial lines match or something.
+              clonedResponse.result = {
+                ...clonedResponse.result,
+                contents: clonedResponse.result.contents.slice(0, 1000),
+              };
+            }
+            queueAction(responseReceived(clonedResponse));
           }
         },
         onResponseError: (error: CommandResponse) => {
