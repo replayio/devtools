@@ -83,27 +83,32 @@ function HitPoints({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
   const { duration } = useContext(SessionContext);
-  const { executionPoint, isPending, update } = useContext(TimelineContext);
+  const {
+    executionPoint: currentExecutionPoint,
+    isPending,
+    time: currentTime,
+    update,
+  } = useContext(TimelineContext);
 
   const [hitPoints] = getHitPointsForLocation(client, point.location, null, focusRange);
 
-  const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, executionPoint);
+  const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
   const firstHitPoint = hitPoints.length > 0 ? hitPoints[0] : null;
   const lastHitPoint = hitPoints.length > 0 ? hitPoints[hitPoints.length - 1] : null;
   const previousButtonEnabled =
-    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, executionPoint);
+    firstHitPoint != null && isExecutionPointsLessThan(firstHitPoint.point, currentExecutionPoint);
   const nextButtonEnabled =
-    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, executionPoint);
+    lastHitPoint != null && isExecutionPointsGreaterThan(lastHitPoint.point, currentExecutionPoint);
 
   const goToPrevious = () => {
-    const [prevHitPoint] = findHitPointBefore(hitPoints, executionPoint);
+    const [prevHitPoint] = findHitPointBefore(hitPoints, currentExecutionPoint);
     if (prevHitPoint !== null) {
       update(prevHitPoint.time, prevHitPoint.point);
     }
   };
   const goToNext = () => {
-    const [nextHitPoint] = findHitPointAfter(hitPoints, executionPoint);
+    const [nextHitPoint] = findHitPointAfter(hitPoints, currentExecutionPoint);
     if (nextHitPoint !== null) {
       update(nextHitPoint.time, nextHitPoint.point);
     }
@@ -144,6 +149,14 @@ function HitPoints({ point }: { point: Point }) {
             }}
           />
         ))}
+        {currentHitPoint === null ? (
+          <div
+            className={styles.CurrentTimeMarkerNoHitPoint}
+            style={{
+              left: `${(100 * currentTime) / duration}%`,
+            }}
+          />
+        ) : null}
       </div>
     </>
   );

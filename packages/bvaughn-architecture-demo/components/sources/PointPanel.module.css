@@ -131,8 +131,19 @@
 }
 .HitPointButton {
   background-color: var(--color-brand);
+  z-index: 2;
 }
 .HitPointButtonCurrent {
   background-color: var(--color-current);
-  z-index: 2;
+  z-index: 3;
+}
+
+.CurrentTimeMarkerNoHitPoint {
+  position: absolute;
+  top: 0.25rem;
+  margin-top: -0.5ch;
+  margin-left: -1px;
+  width: 2px;
+  height: 1ch;
+  background-color: var(--color-current);
 }
