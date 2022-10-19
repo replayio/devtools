@@ -81,6 +81,7 @@
   background-color: var(--background-color-tertiary-button);
   color: var(--color-tertiary-button);
   padding: 0;
+  transition: opacity 250ms;
 }
 
 .PreviousHitPointButton:disabled,
@@ -106,12 +107,17 @@
   border-radius: 1rem;
 }
 
-.HitPointTimeline {
+.HitPointTimeline,
+.HitPointTimelineDisabled {
   position: relative;
   background-color: var(--background-color-contrast-1);
   flex: 1 1 auto;
   border-radius: 0.5rem;
   height: 0.5rem;
+  transition: opacity 250ms;
+}
+.HitPointTimelineDisabled {
+  opacity: 0.5;
 }
 
 .HitPointButton,
@@ -119,31 +125,33 @@
   position: absolute;
   top: 0.25rem;
   margin: 0;
-  margin-top: -0.5ch;
-  margin-left: -0.5ch;
+  margin-top: -0.75ch;
+  margin-left: -0.75ch;
   padding: 0;
   border: 0;
-  width: 1ch;
-  height: 1ch;
-  border-radius: 1ch;
-  cursor: pointer;
+  width: 1.5ch;
+  height: 1.5ch;
+  border-radius: 1.5ch;
   outline: 0;
+}
+.HitPointButton:disabled,
+.HitPointButtonCurrent:disabled {
+  cursor: default;
 }
 .HitPointButton {
   background-color: var(--color-brand);
   z-index: 2;
+  cursor: pointer;
 }
 .HitPointButtonCurrent {
   background-color: var(--color-current);
   z-index: 3;
 }
 
-.CurrentTimeMarkerNoHitPoint {
+.CurrentTimeProgressBar {
   position: absolute;
-  top: 0.25rem;
-  margin-top: -0.5ch;
-  margin-left: -1px;
-  width: 2px;
-  height: 1ch;
-  background-color: var(--color-current);
+  top: 0;
+  left: 0;
+  height: 0.5rem;
+  background-color: var(--color-brand);
 }

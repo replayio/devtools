@@ -136,12 +136,19 @@ function HitPoints({ point }: { point: Point }) {
       >
         <Icon className={styles.NextHitPointButtonIcon} type="arrow-right" />
       </button>
-      <div className={styles.HitPointTimeline}>
+      <div className={isPending ? styles.HitPointTimelineDisabled : styles.HitPointTimeline}>
+        <div
+          className={styles.CurrentTimeProgressBar}
+          style={{
+            width: `${(100 * currentTime) / duration}%`,
+          }}
+        />
         {hitPoints.map(hitPoint => (
           <button
             className={
               currentHitPoint === hitPoint ? styles.HitPointButtonCurrent : styles.HitPointButton
             }
+            disabled={isPending}
             key={hitPoint.point}
             onClick={() => update(hitPoint.time, hitPoint.point)}
             style={{
@@ -149,14 +156,6 @@ function HitPoints({ point }: { point: Point }) {
             }}
           />
         ))}
-        {currentHitPoint === null ? (
-          <div
-            className={styles.CurrentTimeMarkerNoHitPoint}
-            style={{
-              left: `${(100 * currentTime) / duration}%`,
-            }}
-          />
-        ) : null}
       </div>
     </>
   );

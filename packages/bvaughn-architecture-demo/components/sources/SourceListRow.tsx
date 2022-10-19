@@ -124,7 +124,7 @@ const SourceListRow = memo(
           data-test-name="RemovePointButton"
           onClick={() => deletePoints(id)}
         >
-          <Icon className={styles.Icon} type="remove" />
+          <Icon className={styles.TogglePointButtonIcon} type="remove" />
         </button>
       );
 
@@ -203,7 +203,7 @@ const SourceListRow = memo(
             data-test-name="AddPointButton"
             onClick={() => onAddPointButtonClick(lineNumber)}
           >
-            <Icon className={styles.Icon} type="add" />
+            <Icon className={styles.TogglePointButtonIcon} type="add" />
           </button>
         </>
       );
@@ -247,12 +247,12 @@ const SourceListRow = memo(
             </div>
           )}
 
-          {togglePointButton}
-
           <div className={styles.LineSegmentsAndPointPanel}>
             {lineSegments}
 
             {point && <PointPanel className={styles.PointPanel} point={point} />}
+
+            {togglePointButton}
           </div>
         </div>
       </div>
