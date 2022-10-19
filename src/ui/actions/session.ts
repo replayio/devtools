@@ -183,7 +183,7 @@ export function createSocket(
         // Uncomment this to get a new session every time you refresh
         // controllerKey: String(Math.floor(Math.random() * 10e8)),
         listenForMetrics: !!prefs.listenForMetrics,
-        disableCache: !!prefs.disableCache || !!features.profileWorkerThreads,
+        disableCache: !!prefs.disableCache,
         disableQueryCache: !features.enableQueryCache,
         profileWorkerThreads: !!features.profileWorkerThreads,
       };
