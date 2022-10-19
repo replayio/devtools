@@ -252,6 +252,13 @@ export async function removeBreakpoint(
 
   const line = await getSourceLine(page, lineNumber);
   await line.locator(".CodeMirror-linenumber").click({ force: true });
+
+  // We want to add a slight delay after removing a breakpoint so that the
+  // breakpoint logic will have time to send protocol commands to the server,
+  // since that is not guaranteed to happen synchronously on click. This is
+  // important for cases where we remove a breakpoint and then immediately
+  // attempt to step across the breakpoint location.
+  await delay(500);
 }
 
 export async function toggleMappedSources(page: Page, targetState: "on" | "off"): Promise<void> {
