@@ -24,6 +24,8 @@ export type ItemData = {
   minHitCount: number | null;
   points: Point[];
   setHoveredState: (state: HoveredState | null) => void;
+  setShowHitCounts: (value: boolean) => void;
+  showHitCounts: boolean;
   source: ProtocolSource;
 };
 
@@ -43,6 +45,8 @@ const SourceListRow = memo(
       minHitCount,
       points,
       setHoveredState,
+      setShowHitCounts,
+      showHitCounts,
       source,
     } = data;
 
@@ -113,14 +117,14 @@ const SourceListRow = memo(
       setHoveredState(expression ? { expression, target: tokenElement } : null);
     };
 
-    let togglePointButton = null;
     let lineSegments = null;
+    let togglePointButton = null;
     if (point) {
       const { id, location, shouldBreak } = point;
 
       togglePointButton = (
         <button
-          className={styles.RemovePointButton}
+          className={styles.TogglePointButton}
           data-test-name="RemovePointButton"
           onClick={() => deletePoints(id)}
         >
@@ -199,7 +203,7 @@ const SourceListRow = memo(
       togglePointButton = (
         <>
           <button
-            className={styles.AddPointButton}
+            className={styles.TogglePointButton}
             data-test-name="AddPointButton"
             onClick={() => onAddPointButtonClick(lineNumber)}
           >
@@ -236,14 +240,18 @@ const SourceListRow = memo(
 
           <div
             className={`${styles.LineHitCountBar} ${hitCountBarClassName}`}
+            onClick={() => setShowHitCounts(!showHitCounts)}
             style={{ height: `${lineHeight}px` }}
           />
-          <div
-            className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
-            style={{ height: `${lineHeight}px` }}
-          >
-            {hitCount !== null ? formatHitCount(hitCount) : ""}
-          </div>
+          {showHitCounts && (
+            <div
+              className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
+              onClick={() => setShowHitCounts(!showHitCounts)}
+              style={{ height: `${lineHeight}px` }}
+            >
+              {hitCount !== null ? formatHitCount(hitCount) : ""}
+            </div>
+          )}
 
           {togglePointButton}
 

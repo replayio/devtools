@@ -14,6 +14,7 @@ import {
   useLayoutEffect,
   useMemo,
   useRef,
+  useState,
 } from "react";
 import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
@@ -25,6 +26,7 @@ import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
+import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
@@ -78,6 +80,9 @@ export default function SourceList({
   const client = useContext(ReplayClientContext);
   const { setVisibleLines, visibleLines } = useContext(SourcesContext);
 
+  const togglesLocalStorageKey = `Replay:ShowHitCounts`;
+  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
+
   const hitCounts = visibleLines
     ? getSourceHitCounts(client, sourceId, visibleLines, focusRange)
     : null;
@@ -126,6 +131,8 @@ export default function SourceList({
       minHitCount,
       points,
       setHoveredState,
+      setShowHitCounts,
+      showHitCounts,
       source,
     }),
     [
@@ -139,6 +146,8 @@ export default function SourceList({
       minHitCount,
       points,
       setHoveredState,
+      showHitCounts,
+      setShowHitCounts,
       source,
     ]
   );

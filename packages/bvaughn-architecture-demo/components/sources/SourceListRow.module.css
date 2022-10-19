@@ -23,8 +23,7 @@
   gap: 1ch;
 }
 
-.AddPointButton,
-.RemovePointButton {
+.TogglePointButton {
   position: absolute;
   top: 0;
   left: 0;
@@ -46,11 +45,10 @@
   cursor: pointer;
   user-select: false;
 }
-.AddPointButton {
+.TogglePointButton {
   display: none;
 }
-.AddPointButton:disabled,
-.RemovePointButton:disabled {
+.TogglePointButton:disabled {
   opacity: 0.5;
   cursor: default;
 }
@@ -70,7 +68,7 @@
   opacity: 0.5;
 }
 
-.LineWithHits:hover .AddPointButton {
+.LineWithHits:hover .TogglePointButton {
   display: flex;
 }
 
