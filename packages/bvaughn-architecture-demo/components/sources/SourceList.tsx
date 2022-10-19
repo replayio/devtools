@@ -187,6 +187,7 @@ export default function SourceList({
   return (
     <List
       className={styles.List}
+      estimatedItemSize={LINE_HEIGHT}
       height={height}
       innerRef={innerRef}
       itemCount={htmlLines.length}

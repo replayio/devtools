@@ -1,5 +1,5 @@
 import { getSourceContents } from "@bvaughn/src/suspense/SourcesCache";
-import { highlight } from "@bvaughn/src/suspense/TokenizerCache";
+import { parse } from "@bvaughn/src/suspense/SyntaxParsingCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
 import { newSource as ProtocolSource } from "@replayio/protocol";
 import { useContext, useRef, useState } from "react";
@@ -27,7 +27,7 @@ export default function Source({ source }: { source: ProtocolSource }) {
 
   // TODO Incrementally parse code using SourceContext -> visibleLines
   const code = sourceContents.contents;
-  const htmlLines = highlight(code, fileName);
+  const htmlLines = parse(code, fileName);
   if (htmlLines === null) {
     return null;
   }

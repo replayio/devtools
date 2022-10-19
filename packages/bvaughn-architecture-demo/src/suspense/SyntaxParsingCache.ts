@@ -8,12 +8,13 @@ import { jsonLanguage } from "@codemirror/lang-json";
 import { htmlLanguage } from "@codemirror/lang-html";
 import { LRLanguage, ensureSyntaxTree } from "@codemirror/language";
 import { EditorState } from "@codemirror/state";
-import { classHighlighter, highlightTree, tags } from "@lezer/highlight";
+import { classHighlighter, highlightTree } from "@lezer/highlight";
 
 import { createGenericCache } from "./createGenericCache";
 
 // TODO
-// Suspense can be async; we could move this to a Worker if it's slow.
+// Lower the initial threshold to only parse the first ~1k lines
+// then continue parsing off thread and stream the HTML in.
 async function highlighter(code: string, fileName: string): Promise<string[] | null> {
   const language = urlToLanguage(fileName);
   const state = EditorState.create({
@@ -21,7 +22,12 @@ async function highlighter(code: string, fileName: string): Promise<string[] | n
     extensions: [language.extension],
   });
 
-  const tree = ensureSyntaxTree(state, state.doc.length, 1e9);
+  // TODO
+  // Until we add support for incremental parsing,
+  // de-opt to showing plain text for files above a certain threshold.
+  const MAX_TOKEN_POSITION = 1_250_000;
+  const MAX_PARSE_TIME = 5_000;
+  const tree = ensureSyntaxTree(state, MAX_TOKEN_POSITION, MAX_PARSE_TIME);
   if (tree === null) {
     return null;
   }
@@ -92,14 +98,52 @@ async function highlighter(code: string, fileName: string): Promise<string[] | n
     position = to;
   });
 
-  if (position < tree.length - 1) {
+  const maxPosition = code.length - 1;
+  if (position < maxPosition) {
     // No style applied on the trailing text.
     // This typically indicates white space or newline characters.
-    processSection(code.slice(position, tree.length), "");
+    processSection(code.slice(position, maxPosition), "");
   }
 
   if (inProgressHTMLString !== "") {
     htmlLines.push(inProgressHTMLString);
+  }
+
+  let index = position + 1;
+
+  const div = document.createElement("div");
+  div.innerHTML = htmlLines.join("\n");
+
+  // Anything that's left should de-opt to plain text.
+  if (index < code.length) {
+    let nextIndex = code.indexOf("\n", index);
+
+    while (true) {
+      if (nextIndex === -1) {
+        const line = code.substring(index);
+
+        inProgressHTMLString += line;
+
+        break;
+      } else if (nextIndex !== index) {
+        const line = nextIndex >= 0 ? code.substring(index, nextIndex) : code.substring(index);
+
+        inProgressHTMLString += line;
+      }
+
+      if (nextIndex >= 0) {
+        htmlLines.push(inProgressHTMLString);
+
+        inProgressHTMLString = "";
+      }
+
+      index = nextIndex + 1;
+      nextIndex = code.indexOf("\n", index);
+    }
+
+    if (inProgressHTMLString !== "") {
+      htmlLines.push(inProgressHTMLString);
+    }
   }
 
   return htmlLines;
@@ -130,7 +174,7 @@ function urlToLanguage(fileName: string): LRLanguage {
   }
 }
 
-export const { getValueSuspense: highlight } = createGenericCache<
+export const { getValueSuspense: parse } = createGenericCache<
   [code: string, fileName: string],
   string[] | null
 >(highlighter, identity);

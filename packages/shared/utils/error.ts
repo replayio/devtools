@@ -4,8 +4,9 @@ export interface CommandError extends Error {
 }
 
 export enum ProtocolError {
-  TooManyPoints = 55,
   RecordingUnloaded = 38,
+  TooManyLocationsToPerformAnalysis = 67,
+  TooManyPoints = 55,
 }
 
 export const commandError = (message: string, code: number): CommandError => {
