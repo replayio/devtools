@@ -8,6 +8,7 @@ import {
   showSearchInput,
   toggleProtocolMessage,
   toggleProtocolMessages,
+  toggleSideMenu,
 } from "./utils/console";
 import { getCommandKey, getElementCount, getTestUrl, takeScreenshot } from "./utils/general";
 import testSetup from "./utils/testSetup";
@@ -330,23 +331,23 @@ test("should be able to toggle side filter menu open and closed", async ({ page 
   await page.fill("[data-test-id=EventTypeFilterInput]", "test");
 
   // Verify that we can close it.
-  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await toggleSideMenu(page, false);
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
 
   // Verify that we can re-open it and the same filter text will still be there.
-  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await toggleSideMenu(page, true);
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
   const text = await page.locator("[data-test-id=EventTypeFilterInput]").inputValue();
   expect(text).toBe("test");
 
   // Close again and verify that the setting is remembered between page reloads.
-  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await toggleSideMenu(page, false);
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
   await page.reload();
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeHidden();
 
   // Re-open and verify that the setting is remembered between page reloads.
-  await page.click("[data-test-id=ConsoleMenuToggleButton]");
+  await toggleSideMenu(page, true);
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
   await page.reload();
   await expect(page.locator("[data-test-id=ConsoleFilterToggles]")).toBeVisible();
