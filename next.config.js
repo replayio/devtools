@@ -36,6 +36,7 @@ const baseNextConfig = {
   },
 
   productionBrowserSourceMaps: true,
+  swcMinify: true,
 
   async redirects() {
     return [
