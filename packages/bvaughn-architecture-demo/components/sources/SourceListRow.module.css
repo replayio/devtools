@@ -143,6 +143,7 @@
   display: flex;
   align-items: center;
   width: 100%;
+  height: var(--line-height);
   border-left: 1px solid var(--border-color-light);
 }
 
@@ -150,4 +151,6 @@
   position: absolute;
   top: var(--line-height);
   width: 100%;
+  border-left: 1px solid var(--border-color-light);
+  left: -1px;
 }
