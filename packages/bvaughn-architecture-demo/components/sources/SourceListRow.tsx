@@ -10,6 +10,7 @@ import { formatHitCount } from "./formatHitCount";
 import PointPanel from "./PointPanel";
 import { HoveredState } from "./Source";
 import styles from "./SourceListRow.module.css";
+import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 
 export type ItemData = {
   addPoint: AddPoint;
@@ -101,9 +102,13 @@ const SourceListRow = memo(
       hitCountLabelClassName = styles[`LineHitCounts${hitCountIndex + 1}`];
     }
 
-    const onMouseMove = (event: MouseEvent) => {
-      const expression = getCurrentExpression(event);
-      setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
+    const onMouseMove = ({ currentTarget, target }: MouseEvent) => {
+      const rowElement = currentTarget as HTMLElement;
+      const tokenElement = target as HTMLElement;
+
+      const expression = getExpressionForTokenElement(rowElement, tokenElement);
+
+      setHoveredState(expression ? { expression, target: tokenElement } : null);
     };
 
     let togglePointButton = null;
@@ -245,42 +250,3 @@ const SourceListRow = memo(
 SourceListRow.displayName = "SourceListRow";
 
 export default SourceListRow;
-
-function getCurrentExpression({ currentTarget, target }: MouseEvent): string | null {
-  let currentNode = target as HTMLElement;
-  if (currentNode.tagName === "PRE") {
-    return null;
-  }
-
-  switch (currentNode.className) {
-    case "tok-operator":
-    case "tok-punctuation":
-      return null;
-  }
-
-  const parentNode = currentTarget as HTMLElement;
-  const children = Array.from(parentNode.childNodes);
-
-  let expression = currentNode.textContent!;
-  while (currentNode != null) {
-    const index = children.indexOf(currentNode);
-    if (index < 1) {
-      break;
-    }
-
-    currentNode = children[index - 1] as HTMLElement;
-    if (currentNode.nodeName === "#text") {
-      break;
-    }
-
-    if (currentNode.className !== "tok-punctuation") {
-      expression = currentNode.textContent + expression;
-    }
-
-    if (currentNode.textContent !== ".") {
-      break;
-    }
-  }
-
-  return expression.startsWith(".") ? expression.slice(1) : expression;
-}

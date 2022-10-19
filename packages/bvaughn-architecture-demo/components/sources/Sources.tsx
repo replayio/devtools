@@ -148,7 +148,7 @@ function Sources() {
                 key={sourceId}
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
-                <Suspense fallback={<Loader />}>
+                <Suspense fallback={<Loader className={styles.Loader} />}>
                   <Source source={source!} />
                 </Suspense>
               </LazyOffscreen>
