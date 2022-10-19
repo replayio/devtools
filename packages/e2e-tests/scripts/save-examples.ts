@@ -130,7 +130,11 @@ async function saveExamples(
 
 async function saveBrowserExamples() {
   await saveExamples("browser", config.browserExamplesPath, ".html", saveBrowserExample);
-  if (target === "all" || target === "browser") {
+  // This example is in a subdirectory so we can't look it up as easily, so we just do it manually.
+  if (
+    (target === "all" || target === "browser") &&
+    (exampleFilename === null || exampleFilename === "cra/dist/index.html")
+  ) {
     await saveBrowserExample({ exampleFilename: "cra/dist/index.html" });
   }
 }
