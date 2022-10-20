@@ -1,5 +1,6 @@
 import React, { Suspense, useContext, useDeferredValue, useEffect, useMemo, useState } from "react";
 import classnames from "classnames";
+import isEqual from "lodash/isEqual";
 import PanelEditor from "./PanelEditor";
 import BreakpointNavigation from "devtools/client/debugger/src/components/SecondaryPanes/Breakpoints/BreakpointNavigation";
 import Widget from "./Widget";
@@ -87,8 +88,10 @@ function Panel({
   // If we were fully using concurrent APIs, updates to something like focus range or breakpoint would be done in a transition,
   // which would expose an "is pending" flag that we could use to show e.g. "Loading..." while we're updating breakpoints.
   // In this case, since we're using the deferred API for this, we have to calculate the "is pending" flag ourselves.
-  const isPending =
-    unsafeFocusRegion !== unsafeFocusRegionForSuspense || breakpoint !== breakpointForSuspense;
+
+  // Do a deeper equality check - seems like we sometimes have breakpoints with equivalent contents
+  const breakpointsAreEqual = isEqual(breakpoint, breakpointForSuspense);
+  const isPending = unsafeFocusRegion !== unsafeFocusRegionForSuspense || !breakpointsAreEqual;
 
   // HACK
   // The TimeStampedPoints within the focus region are always at least as large as (often larger than) the user-defined time range.
