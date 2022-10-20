@@ -14,6 +14,8 @@ export default function getExpressionFromString(
     currentIndex--;
   }
 
+  // Do some basic validation to make sure the expression is valid
+
   // Don't try to auto-complete numbers.
   if (`${parseFloat(expression)}` === expression) {
     return null;
@@ -22,6 +24,13 @@ export default function getExpressionFromString(
   // Don't try to auto-complete booleans.
   if (expression === "true" || expression === "false") {
     return null;
+  }
+
+  // Don't try to auto-complete strings.
+  switch (expression.charAt(0)) {
+    case '"':
+    case "'":
+      return null;
   }
 
   return expression || null;

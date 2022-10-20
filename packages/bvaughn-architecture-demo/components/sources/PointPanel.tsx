@@ -1,24 +1,15 @@
 import Icon from "@bvaughn/components/Icon";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { validate } from "@bvaughn/src/utils/points";
-import {
-  ChangeEvent,
-  KeyboardEvent,
-  startTransition,
-  Suspense,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Suspense, useContext, useMemo, useState } from "react";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
+import AutoCompleteInput from "./AutoCompleteInput";
 
 import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
-import getExpressionFromString from "./utils/getExpressionFromString";
 
 export default function PointPanel({ className, point }: { className: string; point: Point }) {
   const { editPoint } = useContext(PointsContext);
@@ -36,46 +27,21 @@ export default function PointPanel({ className, point }: { className: string; po
   const hasChanged = editableCondition !== point.condition || editableContent !== point.content;
 
   if (isEditing) {
-    const save = () => {
+    const onCancel = () => {
+      setEditableContent(point.content);
+      setEditableCondition(point.condition);
+      setIsEditing(false);
+    };
+
+    const onChange = (newContent: string) => {
+      setEditableContent(newContent);
+    };
+
+    const onSubmit = () => {
       if (isConditionValid && isContentValid && hasChanged) {
         editPoint(point.id, { condition: editableCondition, content: editableContent });
       }
       setIsEditing(false);
-    };
-
-    const onChange = (event: ChangeEvent) => {
-      const input = event.currentTarget as HTMLInputElement;
-      const value = input.value;
-      if (value !== editableContent) {
-        setEditableContent(value);
-      }
-
-      const cursorIndex = input.selectionStart;
-      const shouldAutoComplete =
-        cursorIndex === value.length && value.length > 0 && value.charAt(value.length - 1) !== " ";
-      if (shouldAutoComplete) {
-        const expression = getExpressionFromString(value, cursorIndex - 1);
-        console.log("auto-complete:", expression);
-      }
-    };
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      switch (event.key) {
-        case "Enter": {
-          event.preventDefault();
-
-          save();
-          break;
-        }
-        case "Escape": {
-          event.preventDefault();
-
-          setEditableContent(point.content);
-          setEditableCondition(point.condition);
-          setIsEditing(false);
-          break;
-        }
-      }
     };
 
     return (
@@ -85,21 +51,24 @@ export default function PointPanel({ className, point }: { className: string; po
       >
         {/* TODO Conditional */}
         <div className={styles.Row}>
-          <div className={styles.ContentWrapper}>
+          <div
+            className={`${styles.ContentWrapper} ${isContentValid || styles.ContentWrapperInvalid}`}
+          >
             {/* TODO Badge picker */}
             <div className={styles.BadgePicker} />
             <div className={styles.Content}>
-              <input
+              <AutoCompleteInput
                 autoFocus
                 className={styles.ContentInput}
                 data-test-name="PointPanelContentInput"
+                onCancel={onCancel}
                 onChange={onChange}
-                onKeyDown={onKeyDown}
+                onSubmit={onSubmit}
                 value={editableContent}
               />
             </div>
           </div>
-          <button className={styles.SaveButton} onClick={save}>
+          <button className={styles.SaveButton} onClick={onSubmit}>
             Save
           </button>
         </div>

@@ -5,15 +5,15 @@ import styles from "./Popup.module.css";
 
 export default function Popup({
   children,
-  containerRef,
+  containerRef = null,
   onMouseLeave,
-  showTail,
+  showTail = false,
   target,
 }: {
   children: ReactNode;
-  containerRef: RefObject<HTMLElement>;
+  containerRef?: RefObject<HTMLElement> | null;
   onMouseLeave?: () => void;
-  showTail: boolean;
+  showTail?: boolean;
   target: HTMLElement;
 }) {
   const arrowRef = useRef<SVGElement>(null);
@@ -21,7 +21,7 @@ export default function Popup({
 
   useLayoutEffect(() => {
     const arrow = arrowRef.current!;
-    const container = containerRef.current!;
+    const container = containerRef?.current || document.body;
     const popover = popoverRef.current!;
 
     let ignoreMouseLeaveEventTimeout: NodeJS.Timeout | null = null;
@@ -132,7 +132,7 @@ export default function Popup({
         <polygon className={styles.ArrowBackground} points="8,0 16,8 0,8"></polygon>
         <polygon className={styles.ArrowForeground} points="8,1 15,8 1,8"></polygon>
       </svg>
-      <div className={styles.Children}>{children}</div>
+      {children}
     </div>,
     document.body
   );

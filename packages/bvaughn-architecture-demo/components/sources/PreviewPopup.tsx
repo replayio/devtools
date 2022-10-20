@@ -7,6 +7,8 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
 
+import styles from "./PreviewPopup.module.css";
+
 type Props = {
   containerRef: RefObject<HTMLElement>;
   dismiss: () => void;
@@ -31,7 +33,11 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
   if (pauseId !== null && value !== null) {
     return (
       <Popup containerRef={containerRef} onMouseLeave={dismiss} target={target} showTail={true}>
-        <SourcePreviewInspector pauseId={pause.pauseId} protocolValue={value} />
+        <SourcePreviewInspector
+          className={styles.Popup}
+          pauseId={pause.pauseId}
+          protocolValue={value}
+        />
       </Popup>
     );
   } else {
