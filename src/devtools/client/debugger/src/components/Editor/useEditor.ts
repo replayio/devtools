@@ -453,10 +453,11 @@ function scrollToLocationHelper(
   if (selectedLocation) {
     let shouldScrollToLocation = false;
     if (
-      selectedSource != null &&
-      selectedSourceContent != null &&
-      selectedLocation?.line != null &&
-      selectedSourceContent?.value != null
+      selectedSource &&
+      selectedSourceContent &&
+      // Intentionally bail out if line is 0
+      selectedLocation?.line &&
+      selectedSourceContent?.value
     ) {
       const isFirstLoad = prevSelectedSourceContent?.value == null;
       const locationChanged = prevSelectedLocation !== selectedLocation;
