@@ -9,8 +9,10 @@ import styles from "./SourceFileNameSearch.module.css";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
 
 export default function SourceFileNameSearch({
+  containerRef,
   inputRef,
 }: {
+  containerRef: RefObject<HTMLElement>;
   inputRef: RefObject<HTMLInputElement>;
 }) {
   const { openSource } = useContext(SourcesContext);
@@ -55,6 +57,11 @@ export default function SourceFileNameSearch({
       case "Escape": {
         event.preventDefault();
         searchActions.disable();
+
+        const container = containerRef.current;
+        if (container) {
+          container.focus();
+        }
         break;
       }
     }

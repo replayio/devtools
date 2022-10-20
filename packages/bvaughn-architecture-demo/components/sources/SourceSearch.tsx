@@ -5,7 +5,13 @@ import Icon from "../Icon";
 import styles from "./SourceSearch.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 
-export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInputElement> }) {
+export default function SourceSearch({
+  containerRef,
+  inputRef,
+}: {
+  containerRef: RefObject<HTMLElement>;
+  inputRef: RefObject<HTMLInputElement>;
+}) {
   const [searchState, searchActions] = useContext(SourceSearchContext);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -14,17 +20,22 @@ export default function SourceSearch({ inputRef }: { inputRef: RefObject<HTMLInp
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {
-      case "Escape": {
-        event.preventDefault();
-        searchActions.disable();
-        break;
-      }
       case "Enter": {
         event.preventDefault();
         if (event.shiftKey) {
           searchActions.goToPrevious();
         } else {
           searchActions.goToNext();
+        }
+        break;
+      }
+      case "Escape": {
+        event.preventDefault();
+        searchActions.disable();
+
+        const container = containerRef.current;
+        if (container) {
+          container.focus();
         }
         break;
       }
