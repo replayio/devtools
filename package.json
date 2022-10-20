@@ -182,6 +182,7 @@
     "graphqurl": "^1.0.1",
     "identity-obj-proxy": "^3.0.0",
     "import-sort": "^6.0.0",
+    "import-sort-style-replay": "workspace:*",
     "isomorphic-fetch": "^3.0.0",
     "istanbul-lib-coverage": "^3.2.0",
     "istanbul-lib-report": "^3.0.0",
@@ -239,5 +240,11 @@
     "react-is": "18.2.0",
     "ts-invariant": "0.10.3",
     "typescript": "4.6.3"
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "parser": "typescript",
+      "style": "replay"
+    }
   }
 }

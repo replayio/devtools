@@ -2,5 +2,6 @@
   "name": "import-sort-style-replay",
   "private": true,
   "version": "0.0.0",
+  "main": "./import-sort-style-replay.js",
   "sideEffects": false
 }
