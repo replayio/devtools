@@ -7,10 +7,6 @@ import {
 
 import { UIState } from "ui/state";
 import { NetworkAction } from "ui/actions/network";
-import { createSelector } from "reselect";
-import { getSourceDetailsEntities } from "ui/reducers/sources";
-import { PauseFrame } from "devtools/client/debugger/src/selectors";
-import { formatCallStackFrames } from "devtools/client/debugger/src/selectors/getCallStackFrames";
 import sortBy from "lodash/sortBy";
 import sortedUniqBy from "lodash/sortedUniqBy";
 import { getFocusRegion } from "./timeline";
@@ -23,7 +19,6 @@ import {
 
 export type NetworkState = {
   events: RequestEventInfo[];
-  frames: Record<string, PauseFrame[]>;
   loading: boolean;
   responseBodies: Record<string, ResponseBodyData[]>;
   requestBodies: Record<string, RequestBodyData[]>;
@@ -33,7 +28,6 @@ export type NetworkState = {
 
 const initialState = (): NetworkState => ({
   events: [],
-  frames: {},
   loading: true,
   requests: [],
   responseBodies: {},
@@ -82,14 +76,6 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
           ),
         },
       };
-    case "SET_FRAMES":
-      return {
-        ...state,
-        frames: {
-          ...state.frames,
-          [action.payload.point]: action.payload.frames,
-        },
-      };
     case "SHOW_REQUEST_DETAILS":
       return {
         ...state,
@@ -107,7 +93,6 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
 
 export const getEvents = (state: UIState) => state.network.events;
 export const getRequests = (state: UIState) => state.network.requests;
-const getFrames = (state: UIState) => state.network.frames;
 export const getFocusedEvents = (state: UIState) => {
   const events = getEvents(state);
   const focusRegion = getFocusRegion(state);
@@ -125,16 +110,6 @@ export const getFocusedRequests = (state: UIState) => {
 
   return filterToFocusRegion(requests, focusRegion);
 };
-
-export const getFormattedFrames = createSelector(
-  getFrames,
-  getSourceDetailsEntities,
-  (frames, sources) => {
-    return Object.keys(frames).reduce((acc: Record<string, PauseFrame[]>, frame) => {
-      return { ...acc, [frame]: formatCallStackFrames(frames[frame], sources)! };
-    }, {});
-  }
-);
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;
 export const getRequestBodies = (state: UIState) => state.network.requestBodies;

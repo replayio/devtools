@@ -14,8 +14,11 @@ import CommandBar from "./CommandBar";
 import FrameTimeline from "./FrameTimeline";
 import NewScopes from "./NewScopes";
 import { useDebuggerPrefs } from "../../utils/prefs";
+import { getPauseId } from "../../reducers/pause";
+import { useAppSelector } from "ui/setup/hooks";
 
 export default function SecondaryPanes() {
+  const pauseId = useAppSelector(getPauseId);
   const { value: scopesExpanded, update: updateScopesExpanded } =
     useDebuggerPrefs("scopes-visible");
   const { value: callstackVisible, update: updateCallstackVisible } =
@@ -52,7 +55,7 @@ export default function SecondaryPanes() {
           expanded={callstackVisible}
           onToggle={() => updateCallstackVisible(!callstackVisible)}
         >
-          <NewFrames panel="debugger" />
+          {pauseId && <NewFrames pauseId={pauseId} panel="debugger" />}
         </AccordionPane>
         <AccordionPane
           header="Scopes"

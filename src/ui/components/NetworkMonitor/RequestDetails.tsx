@@ -6,7 +6,6 @@ import React, { ReactNode, useEffect, useMemo, useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import { hideRequestDetails, selectAndFetchRequest } from "ui/actions/network";
 import { getLoadedRegions } from "ui/reducers/app";
-import { getFormattedFrames } from "ui/reducers/network";
 import { isPointInRegions } from "ui/utils/timeline";
 
 import AddNetworkRequestCommentButton from "./AddNetworkRequestCommentButton";
@@ -14,7 +13,7 @@ import RequestBody from "./RequestBody";
 import styles from "./RequestDetails.module.css";
 import ResponseBody from "./ResponseBody";
 import { findHeader, RequestSummary } from "./utils";
-import { StackTrace } from "./StackTrace";
+import StackTrace from "./StackTrace";
 
 interface Detail {
   name: string;
@@ -270,7 +269,6 @@ const RequestDetails = ({
   nextRequestId: string | null;
 }) => {
   const dispatch = useAppDispatch();
-  const frames = useAppSelector(getFormattedFrames)[request.point.point];
   const [activeTab, setActiveTab] = useState<NetworkTab>(DEFAULT_TAB);
   const loadedRegions = useAppSelector(getLoadedRegions)?.loaded;
 
@@ -340,7 +338,7 @@ const RequestDetails = ({
           {activeTab === "cookies" && <Cookies request={request} />}
           {activeTab === "response" && <ResponseBody request={request} />}
           {activeTab === "request" && <RequestBody request={request} />}
-          {activeTab === "stackTrace" && <StackTrace frames={frames} request={request} />}
+          {activeTab === "stackTrace" && <StackTrace request={request} />}
           {activeTab === "timings" && <Timing request={request} />}
         </div>
       </div>
