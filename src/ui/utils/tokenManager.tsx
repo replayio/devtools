@@ -1,10 +1,10 @@
-import { Auth0Context, Auth0ContextInterface, Auth0Provider } from "@auth0/auth0-react";
-import { AppState } from "@auth0/auth0-react/dist/auth0-provider";
+import { Auth0Context, Auth0ContextInterface, Auth0Provider, AppState } from "@auth0/auth0-react";
 import jwt_decode from "jwt-decode";
 import React, { ReactNode } from "react";
 import { assert, defer, Deferred } from "protocol/utils";
 import { listenForAccessToken } from "./browser";
 import { getAuthClientId, getAuthHost } from "./auth";
+import { pingTelemetry } from "./replay-telemetry";
 
 const domain = getAuthHost();
 const audience = "https://api.replay.io";
@@ -21,6 +21,22 @@ export interface TokenState {
 }
 
 type TokenListener = (state: TokenState) => void;
+
+// This rather messy fn finds and parses the access token from auth0's local
+// storage. This is necessary in the case of a redirect which happens before the
+// usual auth0 hooks will be called with the token value.
+function unstable_getAuth0Token() {
+  const key = Object.keys({ ...localStorage }).find(
+    s => s.includes("auth0spajs") && s.includes("https://api.replay.io")
+  );
+  const value = key && localStorage.getItem(key);
+
+  if (value) {
+    const accessToken: string | undefined = JSON.parse(value)?.body?.access_token;
+
+    return accessToken;
+  }
+}
 
 class TokenManager {
   auth0Client: Auth0ContextInterface | undefined;
@@ -48,6 +64,16 @@ class TokenManager {
 
   Auth0Provider = ({ children, apiKey }: { apiKey?: string; children: ReactNode }) => {
     const onRedirectCallback = (appState: AppState) => {
+      const accessToken = unstable_getAuth0Token();
+      if (accessToken) {
+        const decodedToken = jwt_decode<{ sub: string }>(accessToken);
+        const authId = decodedToken.sub;
+        pingTelemetry("devtools-auth", {
+          origin: "app",
+          authId,
+        });
+      }
+
       if (appState?.returnTo) {
         // TODO [ryanjduffy]: We'd normally use router.replace but when other
         // code (components/Account/index in this case) also does a replace,
