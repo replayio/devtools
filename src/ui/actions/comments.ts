@@ -155,20 +155,23 @@ export function createLabels(
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     await ThreadFront.ensureAllSources();
     const state = getState();
-    const sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
 
-    if (sourceId) {
-      sourceLocation = {
-        ...sourceLocation,
-        sourceId,
-      };
-    }
+    const { line, sourceUrl } = sourceLocation;
 
-    const { sourceUrl, line } = sourceLocation;
+    let sourceId: string | null = sourceLocation.sourceId || null;
 
     const filename = sourceUrl ? getFilenameFromURL(sourceUrl) : "unknown source";
+
     if (!sourceId) {
-      return { primary: `${filename}:${line}`, secondary: "" };
+      sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state) || null;
+      if (sourceId) {
+        sourceLocation = {
+          ...sourceLocation,
+          sourceId,
+        };
+      } else {
+        return { primary: `${filename}:${line}`, secondary: "" };
+      }
     }
 
     let symbols = getSymbols(state, { id: sourceId });
