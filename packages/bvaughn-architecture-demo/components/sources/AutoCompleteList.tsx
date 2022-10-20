@@ -1,6 +1,6 @@
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
-import { insertSortedString } from "@bvaughn/src/utils/array";
+import { findIndexString, insertString } from "@bvaughn/src/utils/array";
 import { Property, Scope } from "@replayio/protocol";
 import { CSSProperties, RefObject, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { FixedSizeList as List } from "react-window";
@@ -188,8 +188,9 @@ function findMatches(
     const matches: string[] = [];
     scopes.forEach(scope => {
       scope.bindings?.forEach(binding => {
-        if (binding.name.toLowerCase().startsWith(needle)) {
-          insertSortedString(matches, binding.name);
+        const name = binding.name.toLowerCase();
+        if (findIndexString(matches, name) < 0 && name.startsWith(needle)) {
+          insertString(matches, binding.name);
         }
       });
     });
@@ -197,15 +198,17 @@ function findMatches(
 
   if (globalProperties) {
     globalProperties.forEach(property => {
-      if (property.name.toLowerCase().startsWith(needle)) {
-        insertSortedString(matches, property.name);
+      const name = property.name.toLowerCase();
+      if (findIndexString(matches, name) < 0 && name.startsWith(needle)) {
+        insertString(matches, property.name);
       }
     });
   } else {
     [ARRAY_PROTOTYPE_PROPERTIES, OBJECT_PROTOTYPE_PROPERTIES].forEach(properties => {
       properties.forEach(property => {
-        if (property.toLowerCase().startsWith(needle)) {
-          insertSortedString(matches, property);
+        const name = property.toLowerCase();
+        if (findIndexString(matches, name) < 0 && name.startsWith(needle)) {
+          insertString(matches, property);
         }
       });
     });
