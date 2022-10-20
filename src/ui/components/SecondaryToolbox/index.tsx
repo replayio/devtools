@@ -94,7 +94,9 @@ function ConsolePanel() {
   return (
     <div className="toolbox-bottom-panels">
       <div className={classnames("toolbox-panel")} id="toolbox-content-console">
-        <NewConsoleRoot />
+        <Suspense fallback={<Loader />}>
+          <NewConsoleRoot />
+        </Suspense>
       </div>
     </div>
   );
