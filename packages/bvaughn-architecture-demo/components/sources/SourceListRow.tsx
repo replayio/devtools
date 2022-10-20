@@ -1,17 +1,15 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { CSSProperties, memo, MouseEvent } from "react";
+import { CSSProperties, memo } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 import { formatHitCount } from "./formatHitCount";
 
 import PointPanel from "./PointPanel";
-import { HoveredState } from "./Source";
 import styles from "./SourceListRow.module.css";
 import { findPointForLocation } from "./utils/points";
-import getExpressionForTokenElement from "./utils/getExpressionForTokenElement";
 
 export type ItemData = {
   addPoint: AddPoint;
@@ -24,7 +22,6 @@ export type ItemData = {
   maxHitCount: number | null;
   minHitCount: number | null;
   points: Point[];
-  setHoveredState: (state: HoveredState | null) => void;
   setShowHitCounts: (value: boolean) => void;
   showHitCounts: boolean;
   source: ProtocolSource;
@@ -45,7 +42,6 @@ const SourceListRow = memo(
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
       setShowHitCounts,
       showHitCounts,
       source,
@@ -104,17 +100,6 @@ const SourceListRow = memo(
       hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
     }
 
-    // TODO
-    // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
-    const onMouseMove = ({ currentTarget, target }: MouseEvent) => {
-      const rowElement = currentTarget as HTMLElement;
-      const tokenElement = target as HTMLElement;
-
-      const expression = getExpressionForTokenElement(rowElement, tokenElement);
-
-      setHoveredState(expression ? { expression, target: tokenElement } : null);
-    };
-
     let lineSegments = null;
     let togglePointButton = null;
     if (point) {
@@ -143,11 +128,7 @@ const SourceListRow = memo(
                 type="breakpoint"
               />
             </button>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: html }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
           </>
         );
       } else {
@@ -175,11 +156,7 @@ const SourceListRow = memo(
 
         lineSegments = (
           <>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: htmlBefore }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlBefore }} />
             <button
               className={styles.BreakpointButton}
               onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
@@ -189,11 +166,7 @@ const SourceListRow = memo(
                 type="breakpoint"
               />
             </button>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: htmlAfter }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
           </>
         );
       }
@@ -210,11 +183,7 @@ const SourceListRow = memo(
         </>
       );
       lineSegments = (
-        <pre
-          className={styles.LineSegment}
-          dangerouslySetInnerHTML={{ __html: html }}
-          onMouseMove={onMouseMove}
-        />
+        <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
       );
     }
 

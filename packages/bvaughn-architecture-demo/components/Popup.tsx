@@ -3,10 +3,13 @@ import { createPortal } from "react-dom";
 
 import styles from "./Popup.module.css";
 
+const MOUSE_LEAVE_DEBOUNCE_TIMER = 250;
+const RESIZE_DEBOUNCE_TIMER = 100;
+
 export default function Popup({
   children,
   containerRef = null,
-  onMouseLeave,
+  onMouseLeave: onMouseLeaveProp,
   showTail = false,
   target,
 }: {
@@ -24,13 +27,28 @@ export default function Popup({
     const container = containerRef?.current || document.body;
     const popover = popoverRef.current!;
 
+    let ignoreMouseLeaveEvents: boolean = false;
     let ignoreMouseLeaveEventTimeout: NodeJS.Timeout | null = null;
 
-    const onMouseLeaveWrapper = () => {
-      if (ignoreMouseLeaveEventTimeout === null) {
-        if (onMouseLeave != null) {
-          onMouseLeave();
-        }
+    const clearMouseLeaveTimeout = () => {
+      if (ignoreMouseLeaveEventTimeout) {
+        clearTimeout(ignoreMouseLeaveEventTimeout);
+      }
+      ignoreMouseLeaveEventTimeout = null;
+    };
+
+    const onMouseLeave = () => {
+      if (ignoreMouseLeaveEvents) {
+        return;
+      }
+
+      if (onMouseLeaveProp != null) {
+        clearMouseLeaveTimeout();
+
+        ignoreMouseLeaveEventTimeout = setTimeout(() => {
+          ignoreMouseLeaveEventTimeout = null;
+          onMouseLeaveProp();
+        }, MOUSE_LEAVE_DEBOUNCE_TIMER);
       }
     };
 
@@ -83,16 +101,21 @@ export default function Popup({
 
       // Ignore "mouseleave" events that occur right after resize.
       // They may be false positives, caused by the popover content moving.
-      if (ignoreMouseLeaveEventTimeout !== null) {
-        clearTimeout(ignoreMouseLeaveEventTimeout);
-      }
+      clearMouseLeaveTimeout();
+      ignoreMouseLeaveEvents = true;
       ignoreMouseLeaveEventTimeout = setTimeout(() => {
+        ignoreMouseLeaveEvents = false;
         ignoreMouseLeaveEventTimeout = null;
-      }, 100);
+      }, RESIZE_DEBOUNCE_TIMER);
+    };
+
+    const onMouseEnter = () => {
+      clearMouseLeaveTimeout();
     };
 
     container.addEventListener("scroll", reposition);
-    popover.addEventListener("mouseleave", onMouseLeaveWrapper);
+    popover.addEventListener("mouseenter", onMouseEnter);
+    popover.addEventListener("mouseleave", onMouseLeave);
 
     const observer = new ResizeObserver(reposition);
     observer.observe(container);
@@ -101,18 +124,17 @@ export default function Popup({
 
     return () => {
       container.removeEventListener("scroll", reposition);
-      popover.removeEventListener("mouseleave", onMouseLeaveWrapper);
+      popover.removeEventListener("mouseenter", onMouseEnter);
+      popover.removeEventListener("mouseleave", onMouseLeave);
 
       observer.unobserve(container);
       observer.unobserve(popover);
       observer.unobserve(target);
       observer.disconnect();
 
-      if (ignoreMouseLeaveEventTimeout !== null) {
-        clearTimeout(ignoreMouseLeaveEventTimeout);
-      }
+      clearMouseLeaveTimeout();
     };
-  }, [containerRef, onMouseLeave, showTail, target]);
+  }, [containerRef, onMouseLeaveProp, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();
@@ -120,14 +142,7 @@ export default function Popup({
   };
 
   return createPortal(
-    <div
-      className={styles.Popup}
-      data-test-name="Popup"
-      onClick={blockEvent}
-      onMouseDown={blockEvent}
-      onMouseUp={blockEvent}
-      ref={popoverRef}
-    >
+    <div className={styles.Popup} data-test-name="Popup" onClick={blockEvent} ref={popoverRef}>
       <svg ref={arrowRef as any} viewBox="0 0 16 8" preserveAspectRatio="none">
         <polygon className={styles.ArrowBackground} points="8,0 16,8 0,8"></polygon>
         <polygon className={styles.ArrowForeground} points="8,1 15,8 1,8"></polygon>

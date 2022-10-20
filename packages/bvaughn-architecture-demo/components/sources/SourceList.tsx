@@ -37,13 +37,11 @@ const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 77 + 40;
 export default function SourceList({
   height,
   htmlLines,
-  setHoveredState,
   source,
   width,
 }: {
   height: number;
   htmlLines: string[];
-  setHoveredState: (state: HoveredState | null) => void;
   source: ProtocolSource;
   width: number;
 }) {
@@ -131,7 +129,6 @@ export default function SourceList({
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
       setShowHitCounts,
       showHitCounts,
       source,
@@ -146,7 +143,6 @@ export default function SourceList({
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
       showHitCounts,
       setShowHitCounts,
       source,
