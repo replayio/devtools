@@ -21,7 +21,6 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import { formatHitCount } from "./formatHitCount";
-import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
@@ -31,8 +30,8 @@ import { findPointForLocation } from "./utils/points";
 // HACK
 // We could swap this out for something that lazily measures row height.
 const LINE_HEIGHT = 18;
-const LINE_HEIGHT_WITH_POINT = 18 + 77;
-const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 77 + 40;
+const LINE_HEIGHT_WITH_POINT = 18 + 81;
+const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 81 + 40;
 
 export default function SourceList({
   height,
