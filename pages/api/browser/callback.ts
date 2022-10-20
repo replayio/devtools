@@ -1,3 +1,4 @@
+import jwtDecode from "jwt-decode";
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getAuthClientId, getAuthHost } from "ui/utils/auth";
 import { pingTelemetry } from "ui/utils/replay-telemetry";
@@ -126,6 +127,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
     const token = await fetchToken(code, verifier);
     await fulfillAuthRequest(state, token.refresh_token);
+
+    const decodedToken = jwtDecode<{ sub: string }>(token.access_token);
+    const authId = decodedToken.sub;
+    pingTelemetry("devtools-auth", {
+      origin: "browser",
+      authId,
+    });
 
     res.redirect("/browser/auth");
   } catch (e: any) {
