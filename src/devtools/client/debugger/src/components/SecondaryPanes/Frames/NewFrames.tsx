@@ -2,13 +2,14 @@ import { Suspense, useMemo } from "react";
 import { PauseId } from "@replayio/protocol";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
 import {
+  Context,
   getFrameworkGroupingState,
   getPauseId,
   getSelectedFrameId,
   getThreadContext,
   PauseFrame,
 } from "devtools/client/debugger/src/selectors";
-import { isCurrentTimeInLoadedRegion } from "ui/reducers/app";
+import { getLoadedRegions } from "ui/reducers/app";
 import { getSourcesLoading } from "ui/reducers/sources";
 import { selectFrame as selectFrameAction } from "../../../actions/pause/selectFrame";
 import { toggleFrameworkGrouping as setFrameworkGroupingAction } from "../../../reducers/ui";
@@ -22,21 +23,57 @@ import Group from "./Group";
 import { CommonFrameComponentProps } from ".";
 import { getAllCachedPauseFrames } from "../../../utils/frames";
 import { getPauseFramesSuspense } from "ui/suspense/frameCache";
+import { isPointInRegions } from "ui/utils/timeline";
+import { Pause } from "protocol/thread/pause";
+import { assert } from "protocol/utils";
+import { ThreadFront } from "protocol/thread/thread";
 
 function FramesRenderer({
   panel,
   pauseId,
   asyncIndex = 0,
-  getAllFrames,
 }: {
   panel: CommonFrameComponentProps["panel"];
   pauseId: PauseId;
   asyncIndex?: number;
-  getAllFrames: () => PauseFrame[];
 }) {
   const sourcesState = useAppSelector(state => state.sources);
+  const loadedRegions = useAppSelector(getLoadedRegions);
+  const dispatch = useAppDispatch();
 
-  const asyncParentPauseId = getAsyncParentPauseIdSuspense(pauseId, asyncIndex);
+  if (!loadedRegions?.loaded) {
+    return null;
+  }
+
+  const asyncSeparator =
+    asyncIndex > 0 ? (
+      <div role="listitem">
+        <span className="location-async-cause">
+          <span className="async-label">async</span>
+        </span>
+      </div>
+    ) : null;
+
+  const asyncParentPauseId = getAsyncParentPauseIdSuspense(
+    pauseId,
+    asyncIndex,
+    loadedRegions?.loaded
+  );
+  if (asyncParentPauseId === null) {
+    return (
+      <>
+        {asyncSeparator}
+        <div className="pane-info empty">
+          This part of the call stack is unavailable because it is outside{" "}
+          <span className="cursor-pointer underline" onClick={() => dispatch(enterFocusModeAction)}>
+            your debugging window
+          </span>
+          .
+        </div>
+      </>
+    );
+  }
+
   let frames = asyncParentPauseId
     ? getPauseFramesSuspense(asyncParentPauseId, sourcesState)
     : undefined;
@@ -53,56 +90,52 @@ function FramesRenderer({
 
   return (
     <>
-      {asyncIndex > 0 ? (
-        <div role="listitem">
-          <span className="location-async-cause">
-            <span className="async-label">async</span>
-          </span>
-        </div>
-      ) : null}
-      <PauseFrames frames={frames} getAllFrames={getAllFrames} panel={panel} />
-      <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
-        <FramesRenderer
-          panel={panel}
-          pauseId={pauseId}
-          asyncIndex={asyncIndex + 1}
-          getAllFrames={getAllFrames}
-        />
-      </Suspense>
+      {asyncSeparator}
+      <PauseFrames pauseId={pauseId} frames={frames} panel={panel} />
+      <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
+        <Suspense fallback={<div className="pane-info empty">Loading async frames…</div>}>
+          <FramesRenderer panel={panel} pauseId={pauseId} asyncIndex={asyncIndex + 1} />
+        </Suspense>
+      </ErrorBoundary>
     </>
   );
 }
 
-export function PauseFrames({
+function PauseFrames({
+  pauseId,
   frames,
-  getAllFrames,
   panel,
-  selectFrame,
 }: {
+  pauseId: PauseId;
   frames: PauseFrame[];
-  getAllFrames?: () => PauseFrame[];
   panel: CommonFrameComponentProps["panel"];
-  selectFrame?: (...args: Parameters<typeof selectFrameAction>) => void;
 }) {
+  const sourcesState = useAppSelector(state => state.sources);
+  const currentPauseId = useAppSelector(getPauseId);
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const cx = useAppSelector(getThreadContext);
   const frameworkGroupingOn = useAppSelector(getFrameworkGroupingState);
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const dispatch = useAppDispatch();
 
-  if (!getAllFrames) {
-    getAllFrames = () => frames;
+  function selectFrame(cx: Context, frame: PauseFrame) {
+    if (pauseId !== currentPauseId) {
+      const pause = Pause.getById(pauseId);
+      if (!pause?.point || !loadedRegions || !isPointInRegions(loadedRegions.loaded, pause.point)) {
+        return;
+      }
+      ThreadFront.timeWarpToPause(pause);
+    }
+    dispatch(selectFrameAction(cx, frame));
   }
-  if (!selectFrame) {
-    selectFrame = (...args: Parameters<typeof selectFrameAction>) =>
-      dispatch(selectFrameAction(...args));
-  }
+
   function toggleFrameworkGrouping() {
     dispatch(setFrameworkGroupingAction(!frameworkGroupingOn));
   }
 
   function copyStackTrace() {
-    const framesToCopy = getAllFrames!()
-      .map(f => formatCopyName(f))
+    const framesToCopy = getAllCachedPauseFrames(pauseId, sourcesState)
+      ?.map(f => formatCopyName(f))
       .join("\n");
     copyToTheClipboard(framesToCopy);
   }
@@ -137,17 +170,23 @@ export function PauseFrames({
   );
 }
 
-export default function Frames({ panel }: { panel: CommonFrameComponentProps["panel"] }) {
-  const sourcesState = useAppSelector(state => state.sources);
+export default function Frames({
+  panel,
+  pauseId,
+}: {
+  panel: CommonFrameComponentProps["panel"];
+  pauseId: PauseId;
+}) {
   const sourcesLoading = useAppSelector(getSourcesLoading);
-  const pauseId = useAppSelector(getPauseId);
-  const showUnloadedRegionError = !useAppSelector(isCurrentTimeInLoadedRegion);
+  const loadedRegions = useAppSelector(getLoadedRegions);
   const dispatch = useAppDispatch();
+  const pause = Pause.getById(pauseId);
 
-  if (sourcesLoading || !pauseId) {
+  if (sourcesLoading || !loadedRegions || !pause?.point) {
     return null;
   }
-  if (showUnloadedRegionError) {
+
+  if (!isPointInRegions(loadedRegions.loaded, pause.point)) {
     return (
       <div className="pane frames">
         <div className="pane-info empty">
@@ -161,14 +200,12 @@ export default function Frames({ panel }: { panel: CommonFrameComponentProps["pa
     );
   }
 
-  const getAllFrames = () => getAllCachedPauseFrames(pauseId, sourcesState)!;
-
   return (
     <div className="pane frames" data-test-id="FramesPanel">
       <ErrorBoundary fallback={<div className="pane-info empty">Error loading frames</div>}>
         <Suspense fallback={<div className="pane-info empty">Loading…</div>}>
           <div role="list">
-            <FramesRenderer pauseId={pauseId} panel={panel} getAllFrames={getAllFrames} />
+            <FramesRenderer pauseId={pauseId} panel={panel} />
           </div>
         </Suspense>
       </ErrorBoundary>

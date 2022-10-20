@@ -1,6 +1,6 @@
-import { Frame, PauseId } from "@replayio/protocol";
+import { PauseId, TimeStampedPointRange } from "@replayio/protocol";
 import { ThreadFront } from "protocol/thread";
-import { isCommandError, ProtocolError } from "shared/utils/error";
+import { isPointInRegions } from "ui/utils/timeline";
 import { getFramesSuspense } from "./frameCache";
 import { getFrameStepsSuspense } from "./frameStepsCache";
 
@@ -13,10 +13,13 @@ export function getPauseIdForPointSuspense(point: string, time: number): PauseId
   }
 }
 
+// returns undefined if the async parent pause doesn't exist
+// or null if it is not in a loaded region
 export function getAsyncParentPauseIdSuspense(
   pauseId: PauseId,
-  asyncIndex: number
-): PauseId | undefined {
+  asyncIndex: number,
+  loadedRegions: TimeStampedPointRange[]
+): PauseId | null | undefined {
   while (asyncIndex > 0) {
     const frames = getFramesSuspense(pauseId)!;
     if (!frames?.length) {
@@ -26,6 +29,9 @@ export function getAsyncParentPauseIdSuspense(
     if (!steps?.length) {
       return;
     }
+    if (!isPointInRegions(loadedRegions, steps[0].point)) {
+      return null;
+    }
     const parentPauseId = getPauseIdForPointSuspense(steps[0].point, steps[0].time);
     if (parentPauseId === pauseId) {
       return;
@@ -34,31 +40,4 @@ export function getAsyncParentPauseIdSuspense(
     asyncIndex--;
   }
   return pauseId;
-}
-
-export function getAsyncParentFramesSuspense(
-  pauseId: PauseId,
-  asyncIndex: number
-): Frame[] | undefined {
-  try {
-    if (asyncIndex === 0) {
-      return getFramesSuspense(pauseId);
-    }
-    const asyncParentPauseId = getAsyncParentPauseIdSuspense(pauseId, asyncIndex);
-    if (!asyncParentPauseId) {
-      return;
-    }
-    const frames = getFramesSuspense(asyncParentPauseId);
-    if (!frames) {
-      return;
-    }
-    return frames.slice(1);
-  } catch (e: any) {
-    // TODO [FE-795]: Communicate this to the user
-    if (isCommandError(e, ProtocolError.TooManyPoints)) {
-      console.error(e);
-      return [];
-    }
-    throw e;
-  }
 }

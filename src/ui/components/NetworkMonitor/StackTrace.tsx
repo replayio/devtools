@@ -1,32 +1,24 @@
-import React from "react";
-import { useAppDispatch } from "ui/setup/hooks";
-import { seekToRequestFrame } from "ui/actions/network";
-import { PauseFrames } from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
+import React, { Suspense } from "react";
+import Frames from "devtools/client/debugger/src/components/SecondaryPanes/Frames/NewFrames";
 import { RequestSummary } from "./utils";
-import { PauseFrame } from "devtools/client/debugger/src/reducers/pause";
+import { getPauseIdForPointSuspense } from "ui/suspense/util";
 
-export const StackTrace = ({
-  frames,
-  request,
-}: {
-  frames: PauseFrame[];
-  request: RequestSummary;
-}) => {
-  const dispatch = useAppDispatch();
-  const selectFrame = async (cx: any, frame: any) => {
-    dispatch(seekToRequestFrame(request, frame, cx));
-  };
-
+function StackTrace({ request }: { request: RequestSummary }) {
+  const pauseId = getPauseIdForPointSuspense(request.point.point, request.point.time);
   return (
-    <div>
+    <div className="call-stack-pane">
       <h1 className="py-2 px-4 font-bold">Stack Trace</h1>
       <div className="px-2">
-        <div className="pane frames">
-          <div role="list">
-            <PauseFrames frames={frames} panel="networkmonitor" selectFrame={selectFrame} />
-          </div>
-        </div>
+        <Frames pauseId={pauseId} panel="networkmonitor" />
       </div>
     </div>
   );
-};
+}
+
+export default function StackTraceSuspenseWrapper({ request }: { request: RequestSummary }) {
+  return (
+    <Suspense>
+      <StackTrace request={request} />
+    </Suspense>
+  );
+}
