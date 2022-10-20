@@ -104,6 +104,8 @@ const SourceListRow = memo(
       hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
     }
 
+    // TODO
+    // Debounce hover event to avoid showing the popup (or requesting data) in response to normal mouse movements.
     const onMouseMove = ({ currentTarget, target }: MouseEvent) => {
       const rowElement = currentTarget as HTMLElement;
       const tokenElement = target as HTMLElement;

@@ -15,6 +15,7 @@
 }
 
 .ContentWrapper {
+  height: 3rem;
   flex: 1;
   background-color: var(--background-color-contrast-1);
   padding: 0.5rem;
@@ -33,15 +34,17 @@
   background-color: var(--background-color-light);
 }
 
-.ContentLabel {
+.Content {
   flex: 1 1 auto;
   white-space: pre;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
+.AddConditionalButton,
 .CommentButton,
-.EditButton {
+.EditButton,
+.SaveButton {
   flex-grow: 0;
   flex-shrink: 0;
   background: none;
@@ -56,11 +59,11 @@
 .EditButtonIcon {
   height: 1.5rem;
   width: 1.5rem;
+  fill: var(--color-default);
 }
 
 .CommentButton {
   background-color: var(--background-color-primary-button);
-  color: var(--color-primary-button);
   height: 2.5rem;
   width: 2.5rem;
   border-radius: 2.5rem;
@@ -69,4 +72,30 @@
 .CommentButtonIcon {
   height: 2rem;
   width: 2rem;
+  fill: var(--color-primary-button);
+}
+
+.SaveButton {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+  height: 2.5rem;
+  border-radius: 2.5rem;
+  padding: 0 2ch;
+}
+
+.AddConditionalButton {
+  text-decoration: underline;
+  font-size: var(--font-size-small);
+  color: var(--color-dim);
+}
+
+.ContentInput {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  padding: 0;
+
+  font-size: var(--font-size-regular);
+  font-family: var(--font-family-monospace);
 }
