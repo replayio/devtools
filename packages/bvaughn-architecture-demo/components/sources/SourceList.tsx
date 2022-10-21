@@ -1,6 +1,7 @@
 import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
+import useLocalStorage from "@bvaughn/src/hooks/useLocalStorage";
 import {
   getCachedMinMaxSourceHitCounts,
   getSourceHitCounts,
@@ -20,27 +21,26 @@ import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import { formatHitCount } from "./formatHitCount";
-import { HoveredState } from "./Source";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
 import { SourceFileNameSearchContext } from "./SourceFileNameSearchContext";
+import { findPointForLocation } from "./utils/points";
 
 // HACK
 // We could swap this out for something that lazily measures row height.
 const LINE_HEIGHT = 18;
-const LINE_HEIGHT_WITH_POINT = 18 + 88;
+const LINE_HEIGHT_WITH_POINT = 18 + 81;
+const LINE_HEIGHT_WITH_CONDITIONAL_POINT = 18 + 81 + 40;
 
 export default function SourceList({
   height,
   htmlLines,
-  setHoveredState,
   source,
   width,
 }: {
   height: number;
   htmlLines: string[];
-  setHoveredState: (state: HoveredState | null) => void;
   source: ProtocolSource;
   width: number;
 }) {
@@ -77,6 +77,9 @@ export default function SourceList({
   const { addPoint, deletePoints, editPoint, points } = useContext(PointsContext);
   const client = useContext(ReplayClientContext);
   const { setVisibleLines, visibleLines } = useContext(SourcesContext);
+
+  const togglesLocalStorageKey = `Replay:ShowHitCounts`;
+  const [showHitCounts, setShowHitCounts] = useLocalStorage<boolean>(togglesLocalStorageKey, true);
 
   const hitCounts = visibleLines
     ? getSourceHitCounts(client, sourceId, visibleLines, focusRange)
@@ -125,7 +128,8 @@ export default function SourceList({
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
+      setShowHitCounts,
+      showHitCounts,
       source,
     }),
     [
@@ -138,7 +142,8 @@ export default function SourceList({
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
+      showHitCounts,
+      setShowHitCounts,
       source,
     ]
   );
@@ -146,11 +151,14 @@ export default function SourceList({
   const getItemSize = useCallback(
     (index: number) => {
       const lineNumber = index + 1;
-      const point = points.find(
-        point => point.location.sourceId === sourceId && point.location.line === lineNumber
-      );
-
-      return point == null ? LINE_HEIGHT : LINE_HEIGHT_WITH_POINT;
+      const point = findPointForLocation(points, sourceId, lineNumber);
+      if (point === null || !point.shouldLog) {
+        return LINE_HEIGHT;
+      } else if (point.condition !== null) {
+        return LINE_HEIGHT_WITH_CONDITIONAL_POINT;
+      } else {
+        return LINE_HEIGHT_WITH_POINT;
+      }
     },
     [points, sourceId]
   );
@@ -177,11 +185,15 @@ export default function SourceList({
     [setVisibleLines]
   );
 
+  const numLines = htmlLines.length;
+  const maxLineNumberStringLength = `${numLines}`.length;
   const maxHitCountStringLength =
-    maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
+    showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
   const style: CSSProperties = {
     // @ts-ignore
     "--hit-count-size": `${maxHitCountStringLength}ch`,
+    // @ts-ignore
+    "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
   };
 
   return (
@@ -190,7 +202,7 @@ export default function SourceList({
       estimatedItemSize={LINE_HEIGHT}
       height={height}
       innerRef={innerRef}
-      itemCount={htmlLines.length}
+      itemCount={numLines}
       itemData={itemData}
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}

@@ -6,15 +6,6 @@
   padding: 0.125rem 0;
 }
 
-.Children {
-  max-width: 400px;
-  max-height: 400px;
-  height: auto;
-  overflow: auto;
-  background-color: var(--color-primary-background);
-  border: 1px solid var(--border-color);
-}
-
 .UpArrow,
 .DownArrow {
   height: 0.5rem;
@@ -32,8 +23,8 @@
 }
 
 .ArrowBackground {
-  fill: white;
+  fill: var(--border-color);
 }
 .ArrowForeground {
-  fill: black;
+  fill: var(--color-primary-background);
 }

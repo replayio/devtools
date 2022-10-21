@@ -8,6 +8,12 @@ function getMediaQueryList(): MediaQueryList | null {
   return null;
 }
 
+function getURLOverride(): string | null {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get("theme") || null;
+}
+
 export default function usePreferredColorScheme(): void {
   const colorScheme = useSyncExternalStore(
     function subscribe(onStoreChange: () => void) {
@@ -22,6 +28,11 @@ export default function usePreferredColorScheme(): void {
       }
     },
     function getSnapshot() {
+      const urlOverride = getURLOverride();
+      if (urlOverride !== null) {
+        return urlOverride;
+      }
+
       const mediaQueryList = getMediaQueryList();
       return mediaQueryList?.matches ? "dark" : "light";
     },
