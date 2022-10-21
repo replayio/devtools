@@ -160,18 +160,23 @@ export function createLabels(
 
     let sourceId: string | null = sourceLocation.sourceId || null;
 
+    // If there's a source URL, we should use it to find the source ID.
+    // Otherwise fall back to the source ID we already have.
+    if (sourceUrl) {
+      const alternateSourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
+      if (alternateSourceId) {
+        sourceId = alternateSourceId;
+        sourceLocation = {
+          ...sourceLocation,
+          sourceId: alternateSourceId,
+        };
+      }
+    }
+
     const filename = sourceUrl ? getFilenameFromURL(sourceUrl) : "unknown source";
 
     if (!sourceId) {
-      sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state) || null;
-      if (sourceId) {
-        sourceLocation = {
-          ...sourceLocation,
-          sourceId,
-        };
-      } else {
-        return { primary: `${filename}:${line}`, secondary: "" };
-      }
+      return { primary: `${filename}:${line}`, secondary: "" };
     }
 
     let symbols = getSymbols(state, { id: sourceId });
