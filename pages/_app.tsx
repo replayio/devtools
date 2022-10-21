@@ -239,6 +239,11 @@ App.getInitialProps = (appContext: AppContext) => {
   const authProps: AuthProps = { apiKey: undefined };
 
   if (authHeader) {
+    appContext.ctx.res?.setHeader(
+      "Cache-Control",
+      "no-cache, no-store, max-age=0, must-revalidate"
+    );
+
     const [scheme, token] = authHeader.split(" ", 2);
     if (!token || !/^Bearer$/i.test(scheme)) {
       console.error("Format is Authorization: Bearer [token]");
