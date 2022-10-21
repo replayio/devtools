@@ -231,6 +231,7 @@ function EditableRemark({
 
       {isEditing && (
         <textarea
+          autoFocus
           className={styles.Input}
           disabled={isPending}
           onBlur={onBlur}

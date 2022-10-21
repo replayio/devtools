@@ -11,6 +11,8 @@ type Dismiss = () => void;
 export default function Popup({
   children,
   containerRef = null,
+  dataTestId,
+  dataTestName = "Popup",
   dismiss,
   dismissOnMouseLeave = false,
   showTail = false,
@@ -18,6 +20,8 @@ export default function Popup({
 }: {
   children: ReactNode;
   containerRef?: RefObject<HTMLElement> | null;
+  dataTestId?: string;
+  dataTestName?: string;
   dismiss: Dismiss;
   dismissOnMouseLeave?: boolean;
   showTail?: boolean;
@@ -181,7 +185,13 @@ export default function Popup({
   };
 
   return createPortal(
-    <div className={styles.Popup} data-test-name="Popup" onClick={blockEvent} ref={popoverRef}>
+    <div
+      className={styles.Popup}
+      data-test-id={dataTestId}
+      data-test-name={dataTestName}
+      onClick={blockEvent}
+      ref={popoverRef}
+    >
       <svg ref={arrowRef as any} viewBox="0 0 16 8" preserveAspectRatio="none">
         <polygon className={styles.ArrowBackground} points="8,0 16,8 0,8"></polygon>
         <polygon className={styles.ArrowForeground} points="8,1 15,8 1,8"></polygon>

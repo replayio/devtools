@@ -5,6 +5,7 @@ import {
   Page,
   PageScreenshotOptions,
 } from "@playwright/test";
+import chalk from "chalk";
 
 const { HOST, RECORD_PROTOCOL_DATA, VISUAL_DEBUG } = process.env;
 
@@ -12,6 +13,20 @@ const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   animations: "disabled",
   scale: "css",
 };
+
+// Other test utils can use this to print formatted status messages that help visually monitor test progress.
+export async function debugPrint(page: Page | null, message: string, scope?: string) {
+  console.log(message, scope ? chalk.dim(`(${scope})`) : "");
+
+  if (page !== null) {
+    await page.evaluate(
+      ({ message, scope }) => {
+        console.log(`${message} %c${scope || ""}`, "color: #999;");
+      },
+      { message, scope }
+    );
+  }
+}
 
 export async function delay(duration: number) {
   await new Promise(resolve => setTimeout(resolve, duration));
@@ -135,4 +150,36 @@ export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
   }
 
   throw Error("Timed out waiting for loaders to finish");
+}
+
+export async function waitFor(
+  callback: () => Promise<void>,
+  options: {
+    retryInterval?: number;
+    timeout?: number;
+  } = {}
+): Promise<void> {
+  const { retryInterval = 250, timeout = 5_000 } = options;
+
+  const startTime = performance.now();
+
+  while (true) {
+    try {
+      await callback();
+
+      return;
+    } catch (error) {
+      if (typeof error === "string") {
+        console.log(error);
+      }
+
+      if (performance.now() - startTime > timeout) {
+        throw error;
+      }
+
+      await delay(retryInterval);
+
+      continue;
+    }
+  }
 }

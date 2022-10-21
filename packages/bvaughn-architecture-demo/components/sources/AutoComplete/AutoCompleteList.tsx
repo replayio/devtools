@@ -20,11 +20,15 @@ const MAX_LIST_HEIGHT = 200;
 const PREVIEW_CAN_OVERFLOW = false;
 
 export default function AutoCompleteListOuter({
+  dataTestId,
+  dataTestName,
   expression,
   inputRef,
   onCancel,
   onSubmit,
 }: {
+  dataTestId?: string;
+  dataTestName?: string;
   expression: string | null;
   inputRef: RefObject<HTMLInputElement>;
   onCancel: () => void;
@@ -40,6 +44,8 @@ export default function AutoCompleteListOuter({
 
   return (
     <AutoCompleteListInner
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
       expression={expression}
       inputRef={inputRef}
       onCancel={onCancel}
@@ -50,12 +56,16 @@ export default function AutoCompleteListOuter({
 }
 
 function AutoCompleteListInner({
+  dataTestId,
+  dataTestName,
   expression,
   inputRef,
   onCancel,
   onSubmit,
   pause,
 }: {
+  dataTestId?: string;
+  dataTestName?: string;
   expression: string;
   inputRef: RefObject<HTMLInputElement>;
   onCancel: () => void;
@@ -174,7 +184,12 @@ function AutoCompleteListInner({
   };
 
   return (
-    <Popup dismiss={onCancel} target={inputRef.current!}>
+    <Popup
+      dataTestId={dataTestId}
+      dataTestName={dataTestName}
+      dismiss={onCancel}
+      target={inputRef.current!}
+    >
       <List
         className={styles.List}
         height={Math.min(matches.length * LINE_HEIGHT, MAX_LIST_HEIGHT)}

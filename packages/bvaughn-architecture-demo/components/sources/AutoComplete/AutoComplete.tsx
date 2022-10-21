@@ -8,6 +8,8 @@ import AutoCompleteList from "./AutoCompleteList";
 export default function AutoComplete({
   autoFocus,
   className = "",
+  dataTestId,
+  dataTestName,
   onCancel: onCancelProp,
   onChange: onChangeProp,
   onSubmit: onSubmitProp,
@@ -15,6 +17,8 @@ export default function AutoComplete({
 }: {
   autoFocus: boolean;
   className: string;
+  dataTestId?: string;
+  dataTestName?: string;
   onCancel: () => void;
   onChange: (newValue: string) => void;
   onSubmit: () => void;
@@ -91,7 +95,8 @@ export default function AutoComplete({
       <input
         autoFocus={autoFocus}
         className={`${className} ${styles.Input}`}
-        data-test-name="AutoCompleteInput"
+        data-test-id={dataTestId}
+        data-test-name={dataTestName}
         onChange={onChange}
         onKeyDown={onKeyDown}
         ref={inputRef}
@@ -100,6 +105,8 @@ export default function AutoComplete({
       {expression && (
         <Suspense>
           <AutoCompleteList
+            dataTestId={dataTestId ? `${dataTestId}-List` : undefined}
+            dataTestName={dataTestName ? `${dataTestName}-List` : undefined}
             expression={expression}
             inputRef={inputRef}
             onCancel={onCancelProp}

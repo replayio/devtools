@@ -1,6 +1,5 @@
 .PublishedComment,
 .UnpublishedComment {
-  border-top: 2px solid var(--background-color-default);
   font-size: var(--font-size-regular);
 }
 .UnpublishedComment {
