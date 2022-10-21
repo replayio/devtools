@@ -51,7 +51,7 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
 
   if (pauseId !== null && value !== null) {
     return (
-      <Popup containerRef={containerRef} onMouseLeave={dismiss} target={target} showTail={true}>
+      <Popup containerRef={containerRef} dismiss={dismiss} target={target} showTail={true}>
         <SourcePreviewInspector
           className={styles.Popup}
           pauseId={pause.pauseId}

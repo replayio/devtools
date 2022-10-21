@@ -8,9 +8,3 @@
   font-family: var(--font-family-monospace);
   color: var(--color-default);
 }
-
-.AutoComplete {
-  background-color: var(--background-color-contrast-2);
-  border: 1px solid var(--border-color-light);
-  padding: 1rem;
-}

@@ -1,10 +1,11 @@
 import { ChangeEvent, KeyboardEvent, Suspense, useRef, useState } from "react";
 
-import styles from "./AutoCompleteInput.module.css";
-import AutoCompleteList from "./AutoCompleteList";
-import getExpressionFromString from "./utils/getExpressionFromString";
+import getExpressionFromString from "../utils/getExpressionFromString";
 
-export default function AutoCompleteInput({
+import styles from "./AutoComplete.module.css";
+import AutoCompleteList from "./AutoCompleteList";
+
+export default function AutoComplete({
   autoFocus,
   className = "",
   onCancel: onCancelProp,
@@ -90,7 +91,7 @@ export default function AutoCompleteInput({
       <input
         autoFocus={autoFocus}
         className={`${className} ${styles.Input}`}
-        data-test-name="PointPanelContentInput"
+        data-test-name="AutoCompleteInput"
         onChange={onChange}
         onKeyDown={onKeyDown}
         ref={inputRef}
@@ -98,7 +99,12 @@ export default function AutoCompleteInput({
       />
       {expression && (
         <Suspense>
-          <AutoCompleteList expression={expression} inputRef={inputRef} onSubmit={onSubmit} />
+          <AutoCompleteList
+            expression={expression}
+            inputRef={inputRef}
+            onCancel={onCancelProp}
+            onSubmit={onSubmit}
+          />
         </Suspense>
       )}
     </>

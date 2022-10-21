@@ -17,7 +17,7 @@ export default function SourceFileNameSearch({
 }) {
   const { openSource } = useContext(SourcesContext);
 
-  const ref = useRef<HTMLElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
 
   const [searchState, searchActions] = useContext(SourceFileNameSearchContext);
 

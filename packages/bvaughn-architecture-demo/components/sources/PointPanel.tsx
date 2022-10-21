@@ -5,8 +5,8 @@ import { Suspense, useContext, useMemo, useState } from "react";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
-import AutoCompleteInput from "./AutoCompleteInput";
 
+import AutoComplete from "./AutoComplete/AutoComplete";
 import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
@@ -57,7 +57,7 @@ export default function PointPanel({ className, point }: { className: string; po
             {/* TODO Badge picker */}
             <div className={styles.BadgePicker} />
             <div className={styles.Content}>
-              <AutoCompleteInput
+              <AutoComplete
                 autoFocus
                 className={styles.ContentInput}
                 data-test-name="PointPanelContentInput"

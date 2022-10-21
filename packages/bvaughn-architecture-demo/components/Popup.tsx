@@ -6,21 +6,39 @@ import styles from "./Popup.module.css";
 const MOUSE_LEAVE_DEBOUNCE_TIMER = 250;
 const RESIZE_DEBOUNCE_TIMER = 100;
 
+type Dismiss = () => void;
+
 export default function Popup({
   children,
   containerRef = null,
-  onMouseLeave: onMouseLeaveProp,
+  dismiss,
+  dismissOnMouseLeave = false,
   showTail = false,
   target,
 }: {
   children: ReactNode;
   containerRef?: RefObject<HTMLElement> | null;
-  onMouseLeave?: () => void;
+  dismiss: Dismiss;
+  dismissOnMouseLeave?: boolean;
   showTail?: boolean;
   target: HTMLElement;
 }) {
   const arrowRef = useRef<SVGElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
+
+  const dismissStateRef = useRef<{
+    dismiss: Dismiss;
+    dismissOnMouseLeave: boolean;
+  }>({
+    dismiss: dismiss || null,
+    dismissOnMouseLeave,
+  });
+
+  useLayoutEffect(() => {
+    const dismissState = dismissStateRef.current;
+    dismissState.dismiss = dismiss;
+    dismissState.dismissOnMouseLeave = dismissOnMouseLeave;
+  }, [dismiss, dismissOnMouseLeave]);
 
   useLayoutEffect(() => {
     const arrow = arrowRef.current!;
@@ -42,14 +60,20 @@ export default function Popup({
         return;
       }
 
-      if (onMouseLeaveProp != null) {
+      const { dismiss, dismissOnMouseLeave } = dismissStateRef.current;
+      if (dismissOnMouseLeave) {
         clearMouseLeaveTimeout();
 
         ignoreMouseLeaveEventTimeout = setTimeout(() => {
           ignoreMouseLeaveEventTimeout = null;
-          onMouseLeaveProp();
+          dismiss();
         }, MOUSE_LEAVE_DEBOUNCE_TIMER);
       }
+    };
+
+    const onScroll = () => {
+      const { dismiss } = dismissStateRef.current;
+      dismiss();
     };
 
     const reposition = () => {
@@ -82,6 +106,9 @@ export default function Popup({
         arrowUp = false;
       }
 
+      // TODO
+      // Handle horizontal positioning edge case if popup is outside of scroll area when rendered initially.
+
       // Horizontal alignment: Prefer horizontally centered around the target
       // But don't go outside of the bounds of the container.
       const popoverLeftMin = containerRect.left;
@@ -113,7 +140,8 @@ export default function Popup({
       clearMouseLeaveTimeout();
     };
 
-    container.addEventListener("scroll", reposition);
+    document.body.addEventListener("scroll", onScroll);
+    container.addEventListener("scroll", onScroll);
     popover.addEventListener("mouseenter", onMouseEnter);
     popover.addEventListener("mouseleave", onMouseLeave);
 
@@ -123,7 +151,8 @@ export default function Popup({
     observer.observe(target);
 
     return () => {
-      container.removeEventListener("scroll", reposition);
+      document.body.removeEventListener("scroll", onScroll);
+      container.removeEventListener("scroll", onScroll);
       popover.removeEventListener("mouseenter", onMouseEnter);
       popover.removeEventListener("mouseleave", onMouseLeave);
 
@@ -134,7 +163,7 @@ export default function Popup({
 
       clearMouseLeaveTimeout();
     };
-  }, [containerRef, onMouseLeaveProp, showTail, target]);
+  }, [containerRef, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();
