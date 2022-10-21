@@ -1,8 +1,0 @@
-.Popup {
-  max-width: 400px;
-  max-height: 400px;
-  height: auto;
-  overflow: auto;
-  background-color: var(--color-primary-background);
-  border: 1px solid var(--border-color);
-}

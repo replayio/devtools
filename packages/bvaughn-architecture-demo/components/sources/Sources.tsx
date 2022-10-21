@@ -2,7 +2,7 @@ import Loader from "@bvaughn/components/Loader";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { KeyboardEvent, Suspense, useContext, useRef } from "react";
+import { Suspense, useContext, useEffect, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
@@ -41,48 +41,84 @@ function Sources() {
   );
   const [sourceSearchState, sourceSearchActions] = useContext(SourceSearchContext);
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    switch (event.key) {
-      case "f":
-      case "F":
-        if (event.ctrlKey || event.metaKey) {
-          sourceSearchActions.enable();
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      const onBodyKeyDown = (event: KeyboardEvent) => {
+        switch (event.key) {
+          case "Escape":
+            sourceSearchActions.disable();
+            sourceFileNameSearchActions.disable();
 
-          const input = sourceSearchInputRef.current;
-          if (input) {
-            input.focus();
-          }
+            const container = containerRef.current;
+            if (container) {
+              container.focus();
+            }
 
-          event.preventDefault();
-          event.stopPropagation();
+            event.preventDefault();
+            event.stopPropagation();
+            break;
+          case "o":
+          case "O":
+            if (event.ctrlKey || event.metaKey) {
+              sourceFileNameSearchActions.enable();
+
+              const input = sourceFileNameSearchInputRef.current;
+              if (input) {
+                input.focus();
+              }
+
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            break;
         }
-        break;
-      case "o":
-      case "O":
-        if (event.ctrlKey || event.metaKey) {
-          sourceFileNameSearchActions.enable();
+      };
 
-          const input = sourceFileNameSearchInputRef.current;
-          if (input) {
-            input.focus();
-          }
+      const onContainerKeyDown = (event: KeyboardEvent) => {
+        switch (event.key) {
+          case "Escape":
+            sourceSearchActions.disable();
+            sourceFileNameSearchActions.disable();
 
-          event.preventDefault();
-          event.stopPropagation();
+            const container = containerRef.current;
+            if (container) {
+              container.focus();
+            }
+
+            event.preventDefault();
+            event.stopPropagation();
+            break;
+          case "f":
+          case "F":
+            if (event.ctrlKey || event.metaKey) {
+              sourceSearchActions.enable();
+
+              const input = sourceSearchInputRef.current;
+              if (input) {
+                input.focus();
+              }
+
+              event.preventDefault();
+              event.stopPropagation();
+            }
+            break;
         }
-        break;
+      };
+
+      container.addEventListener("keydown", onContainerKeyDown);
+      document.body.addEventListener("keydown", onBodyKeyDown);
+
+      return () => {
+        container.removeEventListener("keydown", onContainerKeyDown);
+        document.body.removeEventListener("keydown", onBodyKeyDown);
+      };
     }
-  };
+  }, [sourceFileNameSearchActions, sourceSearchActions]);
 
   return (
     <>
-      <div
-        className={styles.Sources}
-        data-test-id="SourcesRoot"
-        onKeyDown={onKeyDown}
-        ref={containerRef}
-        tabIndex={0}
-      >
+      <div className={styles.Sources} data-test-id="SourcesRoot" ref={containerRef} tabIndex={0}>
         <div className={styles.Tabs}>
           {openSourceIds.map(sourceId => {
             const source = getSource(client, sourceId);
@@ -112,7 +148,7 @@ function Sources() {
                 key={sourceId}
                 mode={sourceId === focusedSourceId ? "visible" : "hidden"}
               >
-                <Suspense fallback={<Loader className={styles.Loader} />}>
+                <Suspense fallback={<Loader />}>
                   <Source source={source!} />
                 </Suspense>
               </LazyOffscreen>
@@ -120,14 +156,9 @@ function Sources() {
           })}
         </div>
         {sourceFileNameSearchState.enabled && (
-          <SourceFileNameSearch
-            containerRef={containerRef}
-            inputRef={sourceFileNameSearchInputRef}
-          />
+          <SourceFileNameSearch inputRef={sourceFileNameSearchInputRef} />
         )}
-        {sourceSearchState.enabled && (
-          <SourceSearch containerRef={containerRef} inputRef={sourceSearchInputRef} />
-        )}
+        {sourceSearchState.enabled && <SourceSearch inputRef={sourceSearchInputRef} />}
       </div>
     </>
   );

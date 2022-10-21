@@ -11,9 +11,6 @@ import { UserInfo } from "../src/graphql/types";
 import { getCurrentUserInfo } from "../src/graphql/User";
 import { preCacheSources } from "../src/suspense/SourcesCache";
 
-import Loader from "./Loader";
-import styles from "./Initializer.module.css";
-
 // HACK Hack around the fact that the initSocket() function is side effectful
 // and writes to an "app" global on the window object.
 if (typeof window !== "undefined") {
@@ -103,7 +100,7 @@ export default function Initializer({
   }, [client]);
 
   if (context === null) {
-    return <Loader className={styles.Loader} />;
+    return null;
   }
 
   return <SessionContext.Provider value={context}>{children}</SessionContext.Provider>;

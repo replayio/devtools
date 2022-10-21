@@ -1,8 +1,0 @@
-.List {
-  border-radius: 0.25rem;
-  background-color: var(--background-color-default);
-  border: 1px solid var(--border-color);
-
-  font-family: var(--font-family-monospace);
-  font-size: var(--font-size-regular);
-}

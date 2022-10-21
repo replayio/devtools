@@ -1,13 +1,11 @@
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
-import { RefObject, Suspense, useContext, useEffect, useRef } from "react";
+import { RefObject, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import SourcePreviewInspector from "../inspector/SourcePreviewInspector";
 import Popup from "../Popup";
-
-import styles from "./PreviewPopup.module.css";
 
 type Props = {
   containerRef: RefObject<HTMLElement>;
@@ -20,8 +18,6 @@ type Props = {
 function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, target }: Props) {
   const client = useContext(ReplayClientContext);
 
-  const popupRef = useRef<HTMLDivElement>(null);
-
   const pauseId = pause.pauseId;
   const frameId = pause.data.frames?.[0]?.frameId ?? null;
 
@@ -32,32 +28,10 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
     value = result.returned || null;
   }
 
-  useEffect(() => {
-    const onClick = ({ target }: MouseEvent) => {
-      const popupElement = popupRef.current;
-      if (popupElement && target) {
-        if (popupElement !== target && !popupElement.contains(target as any)) {
-          dismiss();
-        }
-      }
-    };
-
-    document.body.addEventListener("click", onClick);
-
-    return () => {
-      document.body.removeEventListener("click", onClick);
-    };
-  });
-
   if (pauseId !== null && value !== null) {
     return (
-      <Popup containerRef={containerRef} dismiss={dismiss} target={target} showTail={true}>
-        <SourcePreviewInspector
-          className={styles.Popup}
-          pauseId={pause.pauseId}
-          protocolValue={value}
-          ref={popupRef}
-        />
+      <Popup containerRef={containerRef} onMouseLeave={dismiss} target={target} showTail={true}>
+        <SourcePreviewInspector pauseId={pause.pauseId} protocolValue={value} />
       </Popup>
     );
   } else {

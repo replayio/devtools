@@ -1,5 +1,5 @@
 .theme-dark {
-  --token-hover-background-color: #42381f;
+  --token-background-color: rgba(0, 0, 0, 0.5);
   --token-comment-color: #8f8f92;
   --token-definition-color: #fefefe;
   --token-local-color: #fefefe;
@@ -17,7 +17,7 @@
 }
 
 .theme-light {
-  --token-hover-background-color: #fffac8;
+  --token-background-color: rgba(255, 255, 255, 0.5);
   --token-comment-color: #737373;
   --token-definition-color: #3172e0;
   --token-local-color: #4e4e52;
@@ -32,6 +32,23 @@
   --token-typeName-color: #0074e8;
   --token-variableName-color: #8d1bdc;
   --token-variableName2-color: #8d1bdc;
+}
+
+.tok-comment:hover,
+.tok-definition:hover,
+.tok-local:hover,
+.tok-keyword:hover,
+.tok-meta:hover,
+.tok-number:hover,
+.tok-operator:hover,
+.tok-propertyName:hover,
+.tok-punctuation:hover,
+.tok-string:hover,
+.tok-string2:hover,
+.tok-typeName:hover,
+.tok-variableName:hover,
+.tok-variableName2:hover {
+  background-color: var(--token-background-color);
 }
 
 .tok-comment {
