@@ -1,15 +1,15 @@
 import Icon from "@bvaughn/components/Icon";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { memo, MouseEvent } from "react";
+import { CSSProperties, memo } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 import { formatHitCount } from "./formatHitCount";
 
 import PointPanel from "./PointPanel";
-import { HoveredState } from "./Source";
 import styles from "./SourceListRow.module.css";
+import { findPointForLocation } from "./utils/points";
 
 export type ItemData = {
   addPoint: AddPoint;
@@ -22,7 +22,8 @@ export type ItemData = {
   maxHitCount: number | null;
   minHitCount: number | null;
   points: Point[];
-  setHoveredState: (state: HoveredState | null) => void;
+  setShowHitCounts: (value: boolean) => void;
+  showHitCounts: boolean;
   source: ProtocolSource;
 };
 
@@ -41,7 +42,8 @@ const SourceListRow = memo(
       maxHitCount,
       minHitCount,
       points,
-      setHoveredState,
+      setShowHitCounts,
+      showHitCounts,
       source,
     } = data;
 
@@ -49,14 +51,9 @@ const SourceListRow = memo(
 
     const lineHitCounts = hitCounts?.get(lineNumber) || null;
 
-    const numLines = htmlLines.length;
-    const maxLineNumberStringLength = `${numLines}`.length;
-
     const html = htmlLines[index];
 
-    const point = points.find(
-      point => point.location.sourceId === sourceId && point.location.line === lineNumber
-    );
+    const point = findPointForLocation(points, sourceId, lineNumber);
 
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
@@ -88,7 +85,8 @@ const SourceListRow = memo(
     // This absolute hit count values are relative, per file.
     // Cubed root prevents high hit counts from lumping all other values together.
     const NUM_GRADIENT_COLORS = 3;
-    let hitCountLabelClassName = styles.LineHitCounts0;
+    let hitCountBarClassName = styles.LineHitCountBar0;
+    let hitCountLabelClassName = styles.LineHitCountLabel0;
     let hitCountIndex = NUM_GRADIENT_COLORS - 1;
     if (hitCount !== null && minHitCount !== null && maxHitCount !== null) {
       if (minHitCount !== maxHitCount) {
@@ -98,26 +96,22 @@ const SourceListRow = memo(
         );
       }
 
-      hitCountLabelClassName = styles[`LineHitCounts${hitCountIndex + 1}`];
+      hitCountBarClassName = styles[`LineHitCountBar${hitCountIndex + 1}`];
+      hitCountLabelClassName = styles[`LineHitCountLabel${hitCountIndex + 1}`];
     }
 
-    const onMouseMove = (event: MouseEvent) => {
-      const expression = getCurrentExpression(event);
-      setHoveredState(expression ? { expression, target: event.target as HTMLElement } : null);
-    };
-
-    let togglePointButton = null;
     let lineSegments = null;
+    let togglePointButton = null;
     if (point) {
       const { id, location, shouldBreak } = point;
 
       togglePointButton = (
         <button
-          className={styles.RemovePointButton}
+          className={styles.TogglePointButton}
           data-test-name="RemovePointButton"
           onClick={() => deletePoints(id)}
         >
-          <Icon className={styles.Icon} type="remove" />
+          <Icon className={styles.TogglePointButtonIcon} type="remove" />
         </button>
       );
 
@@ -134,11 +128,7 @@ const SourceListRow = memo(
                 type="breakpoint"
               />
             </button>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: html }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
           </>
         );
       } else {
@@ -166,11 +156,7 @@ const SourceListRow = memo(
 
         lineSegments = (
           <>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: htmlBefore }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlBefore }} />
             <button
               className={styles.BreakpointButton}
               onClick={() => editPoint(id, { shouldBreak: !shouldBreak })}
@@ -180,11 +166,7 @@ const SourceListRow = memo(
                 type="breakpoint"
               />
             </button>
-            <pre
-              className={styles.LineSegment}
-              dangerouslySetInnerHTML={{ __html: htmlAfter }}
-              onMouseMove={onMouseMove}
-            />
+            <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: htmlAfter }} />
           </>
         );
       }
@@ -192,50 +174,64 @@ const SourceListRow = memo(
       togglePointButton = (
         <>
           <button
-            className={styles.AddPointButton}
+            className={styles.TogglePointButton}
             data-test-name="AddPointButton"
             onClick={() => onAddPointButtonClick(lineNumber)}
           >
-            <Icon className={styles.Icon} type="add" />
+            <Icon className={styles.TogglePointButtonIcon} type="add" />
           </button>
         </>
       );
       lineSegments = (
-        <pre
-          className={styles.LineSegment}
-          dangerouslySetInnerHTML={{ __html: html }}
-          onMouseMove={onMouseMove}
-        />
+        <pre className={styles.LineSegment} dangerouslySetInnerHTML={{ __html: html }} />
       );
     }
 
+    const rowStyle: CSSProperties = {
+      ...style,
+      // @ts-ignore
+      "--line-height": `${lineHeight}px`,
+    };
+
+    // TODO [source viewer]
+    // Continue to hear button
+
+    // TODO [source viewer]
+    // Toggle breakpoint button
+
     return (
-      <div data-test-id={`SourceLine-${lineNumber}`} style={style}>
+      <div data-test-id={`SourceLine-${lineNumber}`} style={rowStyle}>
         <div
           className={[
             lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
             currentSearchResultLineIndex === index ? styles.CurrentSearchResultLine : undefined,
           ].join(" ")}
         >
-          <div
-            className={`${styles.LineHitCounts} ${hitCountLabelClassName}`}
-            style={{ height: `${lineHeight}px` }}
-          >
-            {hitCount !== null ? formatHitCount(hitCount) : ""}
-          </div>
-          {togglePointButton}
-          <div
-            className={styles.LineNumber}
-            data-test-id={`SourceLine-LineNumber-${lineNumber}`}
-            style={{
-              width: `${maxLineNumberStringLength}ch`,
-            }}
-          >
+          <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
           </div>
-          {lineSegments}
+
+          <div
+            className={`${styles.LineHitCountBar} ${hitCountBarClassName}`}
+            onClick={() => setShowHitCounts(!showHitCounts)}
+          />
+          {showHitCounts && (
+            <div
+              className={`${styles.LineHitCountLabel} ${hitCountLabelClassName}`}
+              onClick={() => setShowHitCounts(!showHitCounts)}
+            >
+              {hitCount !== null ? formatHitCount(hitCount) : ""}
+            </div>
+          )}
+
+          <div className={styles.LineSegmentsAndPointPanel}>
+            {lineSegments}
+
+            {point && <PointPanel className={styles.PointPanel} point={point} />}
+
+            {togglePointButton}
+          </div>
         </div>
-        {point && <PointPanel className={styles.PointPanel} point={point} />}
       </div>
     );
   },
@@ -245,42 +241,3 @@ const SourceListRow = memo(
 SourceListRow.displayName = "SourceListRow";
 
 export default SourceListRow;
-
-function getCurrentExpression({ currentTarget, target }: MouseEvent): string | null {
-  let currentNode = target as HTMLElement;
-  if (currentNode.tagName === "PRE") {
-    return null;
-  }
-
-  switch (currentNode.className) {
-    case "tok-operator":
-    case "tok-punctuation":
-      return null;
-  }
-
-  const parentNode = currentTarget as HTMLElement;
-  const children = Array.from(parentNode.childNodes);
-
-  let expression = currentNode.textContent!;
-  while (currentNode != null) {
-    const index = children.indexOf(currentNode);
-    if (index < 1) {
-      break;
-    }
-
-    currentNode = children[index - 1] as HTMLElement;
-    if (currentNode.nodeName === "#text") {
-      break;
-    }
-
-    if (currentNode.className !== "tok-punctuation") {
-      expression = currentNode.textContent + expression;
-    }
-
-    if (currentNode.textContent !== ".") {
-      break;
-    }
-  }
-
-  return expression.startsWith(".") ? expression.slice(1) : expression;
-}

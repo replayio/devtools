@@ -1,16 +1,33 @@
 import { expect, Locator, Page } from "@playwright/test";
-import { getCommandKey, getElementCount } from "./general";
+import chalk from "chalk";
 
-type MessageType =
-  | "console-error"
-  | "console-log"
-  | "console-warning"
-  | "event"
-  | "exception"
-  | "log-point"
-  | "terminal-expression";
+import { debugPrint, getCommandKey, getElementCount, waitFor } from "./general";
+import { Expected, MessageType } from "./types";
 
 type ToggleName = "errors" | "exceptions" | "logs" | "nodeModules" | "timestamps" | "warnings";
+
+export async function findConsoleMessage(
+  page: Page,
+  expected?: Expected,
+  messageType?: MessageType
+): Promise<Locator> {
+  await debugPrint(
+    page,
+    `Searching for console message${
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
+    }with text "${chalk.bold(expected)}"`,
+    "findConsoleMessage"
+  );
+
+  const attributeSelector = messageType
+    ? `[data-test-message-type="${messageType}"]`
+    : '[data-test-name="Message"]';
+
+  // Use single quotes because a couple messages have double quoted text displayed
+  return expected
+    ? page.locator(`${attributeSelector}:has-text('${expected}')`)
+    : page.locator(`${attributeSelector}`);
+}
 
 export async function focusOnConsole(page: Page) {
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
@@ -114,5 +131,43 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
 
   if ((isEnabled && !on) || (!isEnabled && on)) {
     await page.click(`[data-test-id="FilterToggle-${name}"]`);
+  }
+}
+
+export async function verifyConsoleMessage(
+  page: Page,
+  expected: Expected,
+  messageType?: MessageType,
+  expectedCount?: number
+) {
+  await debugPrint(
+    page,
+    `Verifying the presence of a console message${
+      messageType ? ` of type "${chalk.bold(messageType)}" ` : " "
+    }with text "${chalk.bold(expected)}"`,
+    "verifyConsoleMessage"
+  );
+
+  const messages = await findConsoleMessage(page, expected, messageType);
+
+  if (expectedCount != null) {
+    // Verify a specific number of messages
+    await waitFor(
+      async () => {
+        const count = await messages.count();
+        if (count !== expectedCount) {
+          throw `Expected ${expectedCount} messages, but found ${count}`;
+        }
+      },
+      {
+        // For console log points, it can take quite a while for the messages to finish
+        // eval-ing their expressions, so this needs to be much longer than in production.
+        timeout: process.env.BACKEND_CI ? 60_000 : undefined,
+      }
+    );
+  } else {
+    // Or just verify that there was at least one
+    const message = messages.first();
+    await message.waitFor();
   }
 }

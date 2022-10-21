@@ -1,5 +1,5 @@
 import {
-  createPauseResult,
+  createPauseResult as Pause,
   ExecutionPoint,
   FrameId,
   PauseData,
@@ -15,7 +15,7 @@ import { preCacheObjects } from "./ObjectPreviews";
 import { Record, STATUS_PENDING, STATUS_REJECTED, STATUS_RESOLVED, Wakeable } from "./types";
 
 const evaluationResultsMap: Map<ExecutionPoint, Record<Result>> = new Map();
-const executionPointToPauseMap: Map<ExecutionPoint, Record<createPauseResult>> = new Map();
+const executionPointToPauseMap: Map<ExecutionPoint, Record<Pause>> = new Map();
 const executionPointToPauseIdMap: Map<ExecutionPoint, PauseId> = new Map();
 const pauseIdToPauseDataMap: Map<PauseId, Record<PauseData>> = new Map();
 
@@ -72,12 +72,12 @@ export function getCachedPauseIdForExecutionPoint(executionPoint: ExecutionPoint
 export function getPauseForExecutionPoint(
   client: ReplayClientInterface,
   executionPoint: ExecutionPoint
-): createPauseResult {
+): Pause {
   let record = executionPointToPauseMap.get(executionPoint);
   if (record == null) {
     record = {
       status: STATUS_PENDING,
-      value: createWakeable<createPauseResult>(),
+      value: createWakeable<Pause>(),
     };
 
     executionPointToPauseMap.set(executionPoint, record);
@@ -154,9 +154,9 @@ async function fetchPauseData(
 async function fetchPauseId(
   client: ReplayClientInterface,
   executionPoint: ExecutionPoint,
-  record: Record<createPauseResult>
+  record: Record<Pause>
 ) {
-  const wakeable = record.value as Wakeable<createPauseResult>;
+  const wakeable = record.value as Wakeable<Pause>;
 
   try {
     const pause = await client.createPause(executionPoint);

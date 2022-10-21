@@ -1,40 +1,85 @@
 .Point {
   display: flex;
-  flex-direction: column;
-  gap: 0.5ch;
-  background-color: var(--color-hit-counts-0);
-  padding: 0.5rem;
-  border-radius: 0.25rem;
+  flex-direction: row;
+  background-color: var(--background-color-light);
+  padding: 0.75rem;
+  gap: 0.5rem;
 }
 
-.Label {
+.MainColumn {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.SecondaryColumn {
   flex: 0 0 auto;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.Row {
+  width: 100%;
+  flex: 0 0 2.5rem;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-}
-.LabelIcon {
-  height: 1.5rem;
-  width: 1.5rem;
+  gap: 1.5ch;
 }
 
-.Input {
+.ContentWrapper,
+.ContentWrapperInvalid,
+.ContentWrapperTooManyPoints {
+  height: 100%;
   flex: 1;
-  background-color: var(--background-color-contrast-2);
-  border: none;
+  background-color: var(--background-color-contrast-1);
+  border: 1px solid transparent;
+  padding: 0 0.5rem;
   border-radius: 0.25rem;
-  color: var(--color-default);
-  width: 4rem;
-  padding: 0.25rem;
-}
-.Input:disabled {
-  opacity: 0.5;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5ch;
 }
 
-.DeleteButton,
+.ContentWrapperInvalid {
+  background-color: var(--background-color-error);
+  border-color: var(--border-color-error);
+}
+
+.ContentWrapperTooManyPoints {
+  background-color: var(--background-color-error);
+  border: 1px solid var(--border-color-error);
+  color: var(--color-error);
+}
+
+/* TODO Badge picker */
+.BadgePicker {
+  flex: 0 0 1.5rem;
+  height: 1.5rem;
+  border-radius: 1.5rem;
+  background-color: var(--background-color-light);
+}
+
+.Content {
+  flex: 1 1 auto;
+  white-space: pre;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.AddConditionButton,
+.CancelButton,
+.CommentButton,
+.EditButton,
 .SaveButton {
+  flex-grow: 0;
+  flex-shrink: 0;
   background: none;
-  padding: 0.25rem;
-  border-radius: 0.25rem;
   border: none;
   margin: 0;
   cursor: pointer;
@@ -42,58 +87,53 @@
   align-items: center;
   justify-content: center;
 }
-.DeleteButton {
-  background-color: var(--background-color-secondary-button);
-  color: var(--color-secondary-button);
+
+.EditButtonIcon {
+  height: 1.5rem;
+  width: 1.5rem;
+  fill: var(--color-default);
 }
+
+.CommentButton {
+  background-color: var(--background-color-primary-button);
+  height: 2.5rem;
+  width: 2.5rem;
+  border-radius: 2.5rem;
+}
+
+.CommentButtonIcon {
+  height: 2rem;
+  width: 2rem;
+  fill: var(--color-primary-button);
+}
+
 .SaveButton {
   background-color: var(--background-color-primary-button);
   color: var(--color-primary-button);
+  height: 2.5rem;
+  border-radius: 2.5rem;
+  padding: 0 2ch;
 }
 
-.SaveButton:disabled {
-  opacity: 0.5;
+.AddConditionButton,
+.CancelButton {
+  text-decoration: underline;
+  font-size: var(--font-size-small);
+  color: var(--color-dim);
 }
 
-.DeleteButtonIcon,
-.SaveButtonIcon {
-  width: 1rem;
-  height: 1rem;
-  display: inline-block;
-}
-
-.Row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 1ch;
-}
-
-.HitPointsList {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 0.5ch;
-  overflow: auto;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.CancelButton {
   width: 100%;
 }
 
-.HitPointListItem {
-  list-style-type: none;
+.ContentInput {
+  width: 100%;
 }
 
-.HitPointsWarning {
+.ContentPrefixLabel {
+  width: 3ch;
   display: flex;
   align-items: center;
-  width: 100%;
-  color: var(--color-error);
-}
-.HitPointsWarningIcon {
-  width: 1rem;
-  height: 1rem;
-  flex: 0 0 1rem;
-  margin-right: 0.5ch;
-  display: inline-block;
+  justify-content: center;
+  font-size: var(--font-size-small);
 }
