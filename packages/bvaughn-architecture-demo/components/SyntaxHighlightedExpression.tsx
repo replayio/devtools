@@ -3,6 +3,8 @@ import { useMemo } from "react";
 
 import styles from "./SyntaxHighlightedExpression.module.css";
 
+// TODO
+// Replace this component with SyntaxHighlightedLine
 export default function SyntaxHighlightedExpression({ expression }: { expression: string }) {
   const tokens = useMemo<Token[]>(() => parseExpression(expression), [expression]);
   return (

@@ -7,8 +7,12 @@ export default function getExpressionForTokenElement(
   }
 
   switch (tokenElement.className) {
+    case "tok-comment":
+    case "tok-number":
     case "tok-operator":
     case "tok-punctuation":
+    case "tok-string":
+    case "tok-string2":
       return null;
   }
 
