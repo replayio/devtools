@@ -1,3 +1,4 @@
+import { SelectedFrameContext } from "@bvaughn/src/contexts/SelectedFrameContext";
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
 import { evaluate } from "@bvaughn/src/suspense/PauseCache";
 import { createPauseResult as Pause, Value as ProtocolValue } from "@replayio/protocol";
@@ -22,8 +23,9 @@ function SuspendingPreviewPopup({ containerRef, dismiss, expression, pause, targ
 
   const popupRef = useRef<HTMLDivElement>(null);
 
-  const pauseId = pause.pauseId;
-  const frameId = pause.data.frames?.[0]?.frameId ?? null;
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const frameId = selectedPauseAndFrameId?.frameId ?? null;
+  const pauseId = selectedPauseAndFrameId?.pauseId ?? null;
 
   let value: ProtocolValue | null = null;
   if (frameId !== null && pauseId !== null) {

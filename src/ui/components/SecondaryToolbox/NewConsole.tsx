@@ -2,13 +2,13 @@ import NewConsole from "bvaughn-architecture-demo/components/console";
 import { ConsoleSearchContext } from "bvaughn-architecture-demo/components/console/ConsoleSearchContext";
 import { TerminalContext } from "bvaughn-architecture-demo/src/contexts/TerminalContext";
 import React, { KeyboardEvent, useContext } from "react";
-import { getPauseId, getSelectedFrameId } from "devtools/client/debugger/src/selectors";
+import { getSelectedFrameId } from "devtools/client/debugger/src/selectors";
 import InspectorContextReduxAdapter from "devtools/client/debugger/src/components/shared/InspectorContextReduxAdapter";
 import JSTerm from "devtools/client/webconsole/components/Input/JSTerm";
 import { useGetRecordingId } from "ui/hooks/recordings";
 import { useFeature } from "ui/hooks/settings";
-import { getCurrentPoint } from "ui/reducers/app";
-import { getCurrentTime } from "ui/reducers/timeline";
+import { Pause } from "protocol/thread/pause";
+import { ThreadFront } from "protocol/thread/thread";
 
 import { ConsoleNag } from "../shared/Nags/Nags";
 
@@ -47,10 +47,7 @@ function JSTermWrapper() {
   // Note that the "frameId" the protocol expects is actually the "protocolId" and NOT the "frameId"
   const frame = useAppSelector(getSelectedFrameId);
   const frameId = frame?.frameId || null;
-
-  const pauseId = useAppSelector(getPauseId);
-  const point = useAppSelector(getCurrentPoint);
-  const time = useAppSelector(getCurrentTime);
+  const pauseId = frame?.pauseId;
 
   const onKeyDown = (event: KeyboardEvent) => {
     switch (event.key) {
@@ -73,7 +70,8 @@ function JSTermWrapper() {
   };
 
   const addTerminalExpression = (expression: string) => {
-    if (pauseId == null || point == null) {
+    const pause = pauseId ? Pause.getById(pauseId) : ThreadFront.currentPause;
+    if (!pause?.pauseId) {
       return;
     }
 
@@ -82,9 +80,9 @@ function JSTermWrapper() {
     addMessage({
       expression,
       frameId: frameId || null,
-      pauseId,
-      point,
-      time,
+      pauseId: pause.pauseId,
+      point: pause.point!,
+      time: pause.time!,
     });
   };
 

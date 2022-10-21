@@ -92,3 +92,8 @@ export async function setFocusRangeStartTime(page: Page, timeString: string): Pr
   await clearTimeInput(page, input);
   await input.fill(timeString);
 }
+
+export async function seekToPreviousScreenshot(page: Page) {
+  const timeline = page.locator(".progress-bar");
+  await timeline.press("ArrowLeft");
+}

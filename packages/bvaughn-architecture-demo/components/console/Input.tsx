@@ -1,7 +1,7 @@
+import { SelectedFrameContext } from "@bvaughn/src/contexts/SelectedFrameContext";
 import { TerminalContext } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import useCurrentPause from "@bvaughn/src/hooks/useCurrentPause";
-import { FrameId, PauseId } from "@replayio/protocol";
 import { useContext, useEffect, useRef } from "react";
 
 import Icon from "../Icon";
@@ -25,14 +25,10 @@ export default function Input() {
     searchStateVisibleRef.current = searchState.visible;
   }, [searchState.visible]);
 
-  const pause = useCurrentPause();
-
-  let frameId: FrameId | null = null;
-  let pauseId: PauseId | null = null;
-  if (pause) {
-    frameId = pause.data.frames?.[0]?.frameId ?? null;
-    pauseId = pause.pauseId;
-  }
+  const currentPause = useCurrentPause();
+  const { selectedPauseAndFrameId } = useContext(SelectedFrameContext);
+  const frameId = selectedPauseAndFrameId?.frameId ?? currentPause?.stack?.[0] ?? null;
+  const pauseId = selectedPauseAndFrameId?.pauseId ?? currentPause?.pauseId ?? null;
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     switch (event.key) {

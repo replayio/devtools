@@ -118,19 +118,17 @@ function useGetEvalMatches(expression: string) {
   const selectedFrameId = useAppSelector(getSelectedFrameId);
   const replayClient = useContext(ReplayClientContext);
 
-  const pauseId = useAppSelector(getPauseId);
-
   const getEvalMatchesForSelectedFrame = useCallback(
     async (expression: string) => {
-      if (!pauseId) {
+      if (!selectedFrameId) {
         return null;
       }
       const fetchObject = async (objectId: string) => {
-        return getObjectWithPreviewHelper(replayClient, pauseId, objectId);
+        return getObjectWithPreviewHelper(replayClient, selectedFrameId.pauseId, objectId);
       };
       return getEvalMatches(expression, selectedFrameId, fetchObject);
     },
-    [selectedFrameId, pauseId, replayClient]
+    [selectedFrameId, replayClient]
   );
   return useGetAsyncMatches(expression, getEvalMatchesForSelectedFrame);
 }

@@ -84,7 +84,7 @@ export async function executeAndVerifyTerminalExpression(
 ): Promise<void> {
   await openConsolePanel(page);
   await executeTerminalExpression(page, text);
-  await verifyConsoleMessage(page, expected, "terminal-expression");
+  await verifyEvaluationResult(page, expected);
   if (clearConsoleAfter) {
     await clearConsoleEvaluations(page);
   }
@@ -220,12 +220,32 @@ export async function verifyConsoleMessage(
   );
 
   const messages = await findConsoleMessage(page, expected, messageType);
+  await verifyExpectedCount(messages, expectedCount);
+}
 
+export async function verifyEvaluationResult(
+  page: Page,
+  expected: Expected,
+  expectedCount?: number
+) {
+  await debugPrint(
+    page,
+    `Verifying the presence of an evaluation result with text "${chalk.bold(expected)}"`,
+    "verifyConsoleMessage"
+  );
+
+  const messages = page.locator(
+    `[data-test-name="TerminalExpression-Result"]:has-text('${expected}')`
+  );
+  await verifyExpectedCount(messages, expectedCount);
+}
+
+export async function verifyExpectedCount(locator: Locator, expectedCount?: number) {
   if (expectedCount != null) {
     // Verify a specific number of messages
     await waitFor(
       async () => {
-        const count = await messages.count();
+        const count = await locator.count();
         if (count !== expectedCount) {
           throw `Expected ${expectedCount} messages, but found ${count}`;
         }
@@ -238,7 +258,7 @@ export async function verifyConsoleMessage(
     );
   } else {
     // Or just verify that there was at least one
-    const message = messages.first();
+    const message = locator.first();
     await message.waitFor();
   }
 }
