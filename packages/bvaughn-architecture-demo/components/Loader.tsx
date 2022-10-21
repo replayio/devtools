@@ -1,8 +1,8 @@
 import styles from "./Loader.module.css";
 
-export default function Loader({ className = "" }: { className?: string }) {
+export default function Loader() {
   return (
-    <div className={`${className} ${styles.Loader}`} data-test-name="Loader">
+    <div className={styles.Loader} data-test-name="Loader">
       Loading…
     </div>
   );

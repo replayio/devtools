@@ -2,7 +2,7 @@ import Inspector from "@bvaughn/components/inspector";
 import Loader from "@bvaughn/components/Loader";
 import { getObjectWithPreview } from "@bvaughn/src/suspense/ObjectPreviews";
 import { PauseId, Value as ProtocolValue } from "@replayio/protocol";
-import { ForwardedRef, forwardRef, Suspense, useContext } from "react";
+import { MouseEvent, Suspense, useContext } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import PropertiesRenderer from "./PropertiesRenderer";
@@ -10,16 +10,15 @@ import PropertiesRenderer from "./PropertiesRenderer";
 import styles from "./SourcePreviewInspector.module.css";
 import useClientValue from "./useClientValue";
 
-type Props = {
+export default function SourcePreviewInspector({
+  className = "",
+  pauseId,
+  protocolValue,
+}: {
   className?: string;
   pauseId: PauseId;
   protocolValue: ProtocolValue;
-};
-
-export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector(
-  { className = "", pauseId, protocolValue }: Props,
-  ref: ForwardedRef<HTMLDivElement>
-) {
+}) {
   const clientValue = useClientValue(protocolValue, pauseId);
   switch (clientValue.type) {
     case "array":
@@ -34,7 +33,6 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
         <div
           className={`${styles.SourcePreviewInspector} ${className}`}
           data-test-name="SourcePreviewInspector"
-          ref={ref}
         >
           <ObjectWrapper pauseId={pauseId} protocolValue={protocolValue} />
         </div>
@@ -45,7 +43,6 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
         <div
           className={`${styles.SourcePreviewInspector} ${className}`}
           data-test-name="SourcePreviewInspector"
-          ref={ref}
         >
           <div className={styles.InspectorWrapper}>
             <Suspense fallback={<Loader />}>
@@ -62,7 +59,7 @@ export default forwardRef<HTMLDivElement, Props>(function SourcePreviewInspector
       );
     }
   }
-});
+}
 
 function ObjectWrapper({
   pauseId,
