@@ -23,13 +23,9 @@ test("console_async: support global console evaluations in async frames", async 
 
   await executeAndVerifyTerminalExpression(page, '"eval " + n', "eval 2");
   await selectFrame(page, 2);
-  await executeAndVerifyTerminalExpression(page, '"eval " + n', "eval 3");
+  await executeAndVerifyTerminalExpression(page, '"eval " + n', "eval 4");
   await selectFrame(page, 4);
-  await executeAndVerifyTerminalExpression(
-    page,
-    '"eval " + n',
-    "The expression could not be evaluated."
-  );
+  await executeAndVerifyTerminalExpression(page, '"eval " + n', "ReferenceError: n is not defined");
 
   await verifyConsoleMessage(page, "foo", "console-log");
   await verifyConsoleMessage(page, "bar", "console-log");

@@ -13,6 +13,7 @@ import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
 import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
+import SelectedFrameContextWrapper from "@bvaughn/src/contexts/SelectedFrameContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
 import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
 import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
@@ -81,68 +82,72 @@ export default function HomePage() {
             <PointsContextRoot>
               <TimelineContextRoot>
                 <FocusContextRoot>
-                  <div className={styles.VerticalContainer}>
-                    <div className={styles.HorizontalContainer}>
-                      <div className={styles.ToolBar}>
-                        <button
-                          className={panel === "comments" ? styles.TabSelected : styles.Tab}
-                          disabled={isPending}
-                          onClick={() => setPanelTransition("comments")}
-                        >
-                          <Icon className={styles.TabIcon} type="comments" />
-                        </button>
-                        <button
-                          className={panel === "sources" ? styles.TabSelected : styles.Tab}
-                          disabled={isPending}
-                          onClick={() => setPanelTransition("sources")}
-                        >
-                          <Icon className={styles.TabIcon} type="source-explorer" />
-                        </button>
-                        <button
-                          className={panel === "protocol-viewer" ? styles.TabSelected : styles.Tab}
-                          disabled={isPending}
-                          onClick={() => setPanelTransition("protocol-viewer")}
-                        >
-                          <Icon className={styles.TabIcon} type="protocol-viewer" />
-                        </button>
-                      </div>
-                      <div className={styles.CommentsContainer}>
-                        <Suspense fallback={<Loader />}>
-                          <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
-                            <CommentList />
-                          </LazyOffscreen>
-                          <LazyOffscreen mode={panel == "protocol-viewer" ? "visible" : "hidden"}>
-                            <ProtocolViewer />
-                          </LazyOffscreen>
-                          <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
-                            <SourceExplorer />
-                          </LazyOffscreen>
-                        </Suspense>
-                      </div>
-                      <div className={styles.SourcesContainer}>
-                        <Suspense fallback={<Loader />}>
-                          <Sources />
-                        </Suspense>
-                      </div>
-                      <div className={styles.ConsoleContainer}>
-                        <TerminalContextRoot>
-                          <ConsoleRoot
-                            showSearchInputByDefault={false}
-                            terminalInput={
-                              <Suspense fallback={<Loader />}>
-                                <Input />
-                              </Suspense>
+                  <SelectedFrameContextWrapper>
+                    <div className={styles.VerticalContainer}>
+                      <div className={styles.HorizontalContainer}>
+                        <div className={styles.ToolBar}>
+                          <button
+                            className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("comments")}
+                          >
+                            <Icon className={styles.TabIcon} type="comments" />
+                          </button>
+                          <button
+                            className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("sources")}
+                          >
+                            <Icon className={styles.TabIcon} type="source-explorer" />
+                          </button>
+                          <button
+                            className={
+                              panel === "protocol-viewer" ? styles.TabSelected : styles.Tab
                             }
-                          />
-                        </TerminalContextRoot>
+                            disabled={isPending}
+                            onClick={() => setPanelTransition("protocol-viewer")}
+                          >
+                            <Icon className={styles.TabIcon} type="protocol-viewer" />
+                          </button>
+                        </div>
+                        <div className={styles.CommentsContainer}>
+                          <Suspense fallback={<Loader />}>
+                            <LazyOffscreen mode={panel == "comments" ? "visible" : "hidden"}>
+                              <CommentList />
+                            </LazyOffscreen>
+                            <LazyOffscreen mode={panel == "protocol-viewer" ? "visible" : "hidden"}>
+                              <ProtocolViewer />
+                            </LazyOffscreen>
+                            <LazyOffscreen mode={panel == "sources" ? "visible" : "hidden"}>
+                              <SourceExplorer />
+                            </LazyOffscreen>
+                          </Suspense>
+                        </div>
+                        <div className={styles.SourcesContainer}>
+                          <Suspense fallback={<Loader />}>
+                            <Sources />
+                          </Suspense>
+                        </div>
+                        <div className={styles.ConsoleContainer}>
+                          <TerminalContextRoot>
+                            <ConsoleRoot
+                              showSearchInputByDefault={false}
+                              terminalInput={
+                                <Suspense fallback={<Loader />}>
+                                  <Input />
+                                </Suspense>
+                              }
+                            />
+                          </TerminalContextRoot>
+                        </div>
+                      </div>
+                      <div className={styles.Row}>
+                        <Suspense fallback={<Loader />}>
+                          <Focuser />
+                        </Suspense>
                       </div>
                     </div>
-                    <div className={styles.Row}>
-                      <Suspense fallback={<Loader />}>
-                        <Focuser />
-                      </Suspense>
-                    </div>
-                  </div>
+                  </SelectedFrameContextWrapper>
                 </FocusContextRoot>
               </TimelineContextRoot>
             </PointsContextRoot>
