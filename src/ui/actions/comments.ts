@@ -155,18 +155,26 @@ export function createLabels(
   return async (dispatch, getState, { ThreadFront, replayClient }) => {
     await ThreadFront.ensureAllSources();
     const state = getState();
-    const sourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
 
-    if (sourceId) {
-      sourceLocation = {
-        ...sourceLocation,
-        sourceId,
-      };
+    const { line, sourceUrl } = sourceLocation;
+
+    let sourceId: string | null = sourceLocation.sourceId || null;
+
+    // If there's a source URL, we should use it to find the source ID.
+    // Otherwise fall back to the source ID we already have.
+    if (sourceUrl) {
+      const alternateSourceId = handleUnstableSourceIds(sourceLocation.sourceUrl, state);
+      if (alternateSourceId) {
+        sourceId = alternateSourceId;
+        sourceLocation = {
+          ...sourceLocation,
+          sourceId: alternateSourceId,
+        };
+      }
     }
 
-    const { sourceUrl, line } = sourceLocation;
-
     const filename = sourceUrl ? getFilenameFromURL(sourceUrl) : "unknown source";
+
     if (!sourceId) {
       return { primary: `${filename}:${line}`, secondary: "" };
     }
