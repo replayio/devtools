@@ -34,7 +34,8 @@
   width: 1.5rem;
 }
 
-.HitPointsLabel {
+.HitPointsLabel,
+.HitPointsLabelTooMany {
   background-color: var(--background-color-contrast-1);
   font-size: var(--font-size-tiny);
   display: flex;
@@ -43,6 +44,9 @@
   width: 10ch;
   height: 3ch;
   border-radius: 1rem;
+}
+.HitPointsLabelTooMany {
+  color: var(--color-dimmer);
 }
 
 .HitPointTimeline,

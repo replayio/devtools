@@ -1,10 +1,12 @@
 import Icon from "@bvaughn/components/Icon";
+import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { GraphQLClientContext } from "@bvaughn/src/contexts/GraphQLClientContext";
 import { InspectorContext } from "@bvaughn/src/contexts/InspectorContext";
 import { PointsContext } from "@bvaughn/src/contexts/PointsContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { addComment as addCommentGraphQL } from "@bvaughn/src/graphql/Comments";
+import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { validate } from "@bvaughn/src/utils/points";
 import {
   Suspense,
@@ -14,6 +16,7 @@ import {
   useState,
   useTransition,
 } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
 import Loader from "../Loader";
@@ -25,12 +28,35 @@ import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 
 // TODO [source viewer]
 // Fill 100% of Source list row (maybe float to the right)
-export default function PointPanel({ className, point }: { className: string; point: Point }) {
+export default function SourcePanelWrapper({
+  className,
+  point,
+}: {
+  className: string;
+  point: Point;
+}) {
+  return (
+    <Suspense fallback={<Loader />}>
+      <PointPanel className={className} point={point} />
+    </Suspense>
+  );
+}
+
+function PointPanel({ className, point }: { className: string; point: Point }) {
+  const { range: focusRange } = useContext(FocusContext);
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
   const { editPoint } = useContext(PointsContext);
+  const client = useContext(ReplayClientContext);
   const { accessToken, recordingId } = useContext(SessionContext);
   const { executionPoint: currentExecutionPoint, time: curentTime } = useContext(TimelineContext);
+
+  const [hitPoints, hitPointStatus] = getHitPointsForLocation(
+    client,
+    point.location,
+    null,
+    focusRange
+  );
 
   const invalidateCache = useCacheRefresh();
 
@@ -87,9 +113,7 @@ export default function PointPanel({ className, point }: { className: string; po
             <div className={styles.Row}>
               <div className={styles.ContentPrefixLabel}>if</div>
               <div
-                className={`${styles.ContentWrapper} ${
-                  isConditionValid || styles.ContentWrapperInvalid
-                }`}
+                className={isConditionValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}
               >
                 <div className={styles.Content}>
                   <AutoComplete
@@ -107,11 +131,7 @@ export default function PointPanel({ className, point }: { className: string; po
           )}
           <div className={styles.Row}>
             {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
-            <div
-              className={`${styles.ContentWrapper} ${
-                isContentValid || styles.ContentWrapperInvalid
-              }`}
-            >
+            <div className={isContentValid ? styles.ContentWrapper : styles.ContentWrapperInvalid}>
               <BadgePicker point={point} />
               <div className={styles.Content}>
                 <AutoComplete
@@ -168,6 +188,14 @@ export default function PointPanel({ className, point }: { className: string; po
   } else {
     const hasCondition = point.condition !== null;
 
+    let showTooManyPointsMessage = false;
+    switch (hitPointStatus) {
+      case "too-many-points-to-find":
+      case "too-many-points-to-run-analysis":
+        showTooManyPointsMessage = true;
+        break;
+    }
+
     const startEditing = () => {
       setEditableCondition(point.condition || null);
       setEditableContent(point.content);
@@ -204,32 +232,42 @@ export default function PointPanel({ className, point }: { className: string; po
           {hasCondition && (
             <div className={styles.Row}>
               <div className={styles.ContentPrefixLabel}>if</div>
-              <div className={styles.ContentWrapper}>
+              <div
+                className={styles.ContentWrapper}
+                onClick={showTooManyPointsMessage ? undefined : startEditing}
+              >
                 <SyntaxHighlightedLine code={point.condition!} />
               </div>
             </div>
           )}
           <div className={styles.Row}>
             {hasCondition && <div className={styles.ContentPrefixLabel}>log</div>}
-            <div className={styles.ContentWrapper}>
-              <BadgePicker point={point} />
-              <div className={styles.Content} onClick={startEditing}>
-                <SyntaxHighlightedLine code={point.content} />
+            {showTooManyPointsMessage ? (
+              <div className={styles.ContentWrapperTooManyPoints}>
+                Use Focus Mode to reduce the number of hits.
               </div>
-              <button
-                className={styles.EditButton}
-                disabled={isPending}
-                onClick={startEditing}
-                data-test-name="PointPanel-EditButton"
-              >
-                <Icon className={styles.EditButtonIcon} type="edit" />
-              </button>
-            </div>
+            ) : (
+              <div className={styles.ContentWrapper}>
+                <BadgePicker point={point} />
+                <div
+                  className={styles.Content}
+                  onClick={showTooManyPointsMessage ? undefined : startEditing}
+                >
+                  <SyntaxHighlightedLine code={point.content} />
+                </div>
+                <button
+                  className={styles.EditButton}
+                  disabled={isPending}
+                  onClick={showTooManyPointsMessage ? undefined : startEditing}
+                  data-test-name="PointPanel-EditButton"
+                >
+                  <Icon className={styles.EditButtonIcon} type="edit" />
+                </button>
+              </div>
+            )}
           </div>
           <div className={styles.Row}>
-            <Suspense fallback={<Loader />}>
-              <PointPanelTimeline point={point} />
-            </Suspense>
+            <PointPanelTimeline hitPoints={hitPoints} hitPointStatus={hitPointStatus} />
           </div>
         </div>
         {accessToken !== null && (

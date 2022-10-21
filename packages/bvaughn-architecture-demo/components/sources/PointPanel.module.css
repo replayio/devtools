@@ -31,7 +31,9 @@
   gap: 1.5ch;
 }
 
-.ContentWrapper {
+.ContentWrapper,
+.ContentWrapperInvalid,
+.ContentWrapperTooManyPoints {
   height: 100%;
   flex: 1;
   background-color: var(--background-color-contrast-1);
@@ -47,6 +49,12 @@
 .ContentWrapperInvalid {
   background-color: var(--background-color-error);
   border-color: var(--border-color-error);
+}
+
+.ContentWrapperTooManyPoints {
+  background-color: var(--background-color-error);
+  border: 1px solid var(--border-color-error);
+  color: var(--color-error);
 }
 
 /* TODO Badge picker */

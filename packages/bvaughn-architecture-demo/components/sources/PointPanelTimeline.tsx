@@ -1,22 +1,22 @@
 import Icon from "@bvaughn/components/Icon";
-import { FocusContext } from "@bvaughn/src/contexts/FocusContext";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
-import { getHitPointsForLocation } from "@bvaughn/src/suspense/PointsCache";
 import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
 import { useContext } from "react";
-import { ReplayClientContext } from "shared/client/ReplayClientContext";
-import { Point } from "shared/client/types";
 
 import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
 
 import styles from "./PointPanelTimeline.module.css";
+import { TimeStampedPoint } from "@replayio/protocol";
+import { HitPointStatus } from "shared/client/types";
 
-// TODO [source viewer]
-// Use focus mode to reduce the number of hits
-export default function PointPanelTimeline({ point }: { point: Point }) {
-  const client = useContext(ReplayClientContext);
-  const { range: focusRange } = useContext(FocusContext);
+export default function PointPanelTimeline({
+  hitPoints,
+  hitPointStatus,
+}: {
+  hitPoints: TimeStampedPoint[];
+  hitPointStatus: HitPointStatus;
+}) {
   const { duration } = useContext(SessionContext);
   const {
     executionPoint: currentExecutionPoint,
@@ -24,8 +24,6 @@ export default function PointPanelTimeline({ point }: { point: Point }) {
     time: currentTime,
     update,
   } = useContext(TimelineContext);
-
-  const [hitPoints] = getHitPointsForLocation(client, point.location, null, focusRange);
 
   const [currentHitPoint, currentHitPointIndex] = findHitPoint(hitPoints, currentExecutionPoint);
 
@@ -54,6 +52,8 @@ export default function PointPanelTimeline({ point }: { point: Point }) {
       ? `${currentHitPointIndex + 1} / ${hitPoints.length}`
       : hitPoints.length;
 
+  const tooManyPointsToFind = hitPointStatus === "too-many-points-to-find";
+
   return (
     <>
       <button
@@ -63,7 +63,11 @@ export default function PointPanelTimeline({ point }: { point: Point }) {
       >
         <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
       </button>
-      <div className={styles.HitPointsLabel}>{label}</div>
+      {tooManyPointsToFind ? (
+        <div className={styles.HitPointsLabelTooMany}>-</div>
+      ) : (
+        <div className={styles.HitPointsLabel}>{label}</div>
+      )}
       <button
         className={styles.NextHitPointButton}
         disabled={isPending || !nextButtonEnabled}

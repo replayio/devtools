@@ -84,7 +84,7 @@ export type HitPointStatus =
   | "too-many-points-to-run-analysis"
   | "unknown-error";
 
-export type HitPointsAndStatusTuple = [TimeStampedPoint[], HitPointStatus];
+export type HitPointsAndStatusTuple = [points: TimeStampedPoint[], status: HitPointStatus];
 export interface SourceLocationRange {
   start: SourceLocation;
   end: SourceLocation;
