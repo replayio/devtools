@@ -1,6 +1,6 @@
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { ChangeEvent, KeyboardEvent, RefObject, useContext } from "react";
+import { ChangeEvent, KeyboardEvent, RefObject, useContext, useEffect, useRef } from "react";
 
 import Icon from "../Icon";
 
@@ -17,7 +17,30 @@ export default function SourceFileNameSearch({
 }) {
   const { openSource } = useContext(SourcesContext);
 
+  const ref = useRef<HTMLElement>(null);
+
   const [searchState, searchActions] = useContext(SourceFileNameSearchContext);
+
+  useEffect(() => {
+    if (!searchState.enabled) {
+      return;
+    }
+
+    const onClick = (event: MouseEvent) => {
+      const self = ref.current;
+      if (self) {
+        if (!self.contains(event.target as Node)) {
+          searchActions.search("");
+          searchActions.disable();
+        }
+      }
+    };
+
+    document.body.addEventListener("click", onClick);
+    return () => {
+      document.body.removeEventListener("click", onClick);
+    };
+  }, [searchActions, searchState.enabled]);
 
   const onChange = (event: ChangeEvent<HTMLInputElement>) => {
     const text = event.currentTarget.value;
@@ -32,11 +55,13 @@ export default function SourceFileNameSearch({
     switch (event.key) {
       case "ArrowDown": {
         event.preventDefault();
+
         searchActions.goToNext();
         break;
       }
       case "ArrowUp": {
         event.preventDefault();
+
         searchActions.goToPrevious();
         break;
       }
@@ -56,6 +81,8 @@ export default function SourceFileNameSearch({
       }
       case "Escape": {
         event.preventDefault();
+
+        searchActions.search("");
         searchActions.disable();
 
         const container = containerRef.current;
@@ -92,7 +119,7 @@ export default function SourceFileNameSearch({
   }
 
   return (
-    <div className={styles.Popup} data-test-id="SourceFileNameSearch">
+    <div className={styles.Popup} data-test-id="SourceFileNameSearch" ref={ref}>
       <div className={styles.TopRow}>
         <Icon className={styles.Icon} type="search" />
         <input
