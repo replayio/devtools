@@ -27,6 +27,6 @@
     "yargs": "^17.6.0"
   },
   "dependencies": {
-    "chalk": "^4"
+    "chalk": "^5"
   }
 }
