@@ -193,6 +193,12 @@ const SourceListRow = memo(
       "--line-height": `${lineHeight}px`,
     };
 
+    // TODO [source viewer]
+    // Continue to hear button
+
+    // TODO [source viewer]
+    // Toggle breakpoint button
+
     return (
       <div data-test-id={`SourceLine-${lineNumber}`} style={rowStyle}>
         <div

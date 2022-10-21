@@ -12,6 +12,8 @@ import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/poi
 
 import styles from "./PointPanelTimeline.module.css";
 
+// TODO [source viewer]
+// Use focus mode to reduce the number of hits
 export default function PointPanelTimeline({ point }: { point: Point }) {
   const client = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);

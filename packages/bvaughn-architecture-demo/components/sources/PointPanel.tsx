@@ -23,6 +23,8 @@ import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 
+// TODO [source viewer]
+// Fill 100% of Source list row (maybe float to the right)
 export default function PointPanel({ className, point }: { className: string; point: Point }) {
   const graphQLClient = useContext(GraphQLClientContext);
   const { showCommentsPanel } = useContext(InspectorContext);
@@ -76,6 +78,8 @@ export default function PointPanel({ className, point }: { className: string; po
       setEditableCondition("");
     };
 
+    // TODO [source viewer]
+    // Current highlight (if paused at an execution point that corresponds to the current line)
     return (
       <div className={`${styles.Point} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
         <div className={styles.MainColumn}>
@@ -245,7 +249,8 @@ export default function PointPanel({ className, point }: { className: string; po
   }
 }
 
-// TODO Badge picker UI
+// TODO [source viewer]
+// Badge picker UI
 function BadgePicker({ point }: { point: Point }) {
   return <div className={styles.BadgePicker} />;
 }
