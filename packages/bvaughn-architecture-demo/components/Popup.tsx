@@ -3,35 +3,77 @@ import { createPortal } from "react-dom";
 
 import styles from "./Popup.module.css";
 
+const MOUSE_LEAVE_DEBOUNCE_TIMER = 250;
+const RESIZE_DEBOUNCE_TIMER = 100;
+
+type Dismiss = () => void;
+
 export default function Popup({
   children,
-  containerRef,
-  onMouseLeave,
-  showTail,
+  containerRef = null,
+  dismiss,
+  dismissOnMouseLeave = false,
+  showTail = false,
   target,
 }: {
   children: ReactNode;
-  containerRef: RefObject<HTMLElement>;
-  onMouseLeave?: () => void;
-  showTail: boolean;
+  containerRef?: RefObject<HTMLElement> | null;
+  dismiss: Dismiss;
+  dismissOnMouseLeave?: boolean;
+  showTail?: boolean;
   target: HTMLElement;
 }) {
   const arrowRef = useRef<SVGElement>(null);
   const popoverRef = useRef<HTMLDivElement>(null);
 
+  const dismissStateRef = useRef<{
+    dismiss: Dismiss;
+    dismissOnMouseLeave: boolean;
+  }>({
+    dismiss: dismiss || null,
+    dismissOnMouseLeave,
+  });
+
+  useLayoutEffect(() => {
+    const dismissState = dismissStateRef.current;
+    dismissState.dismiss = dismiss;
+    dismissState.dismissOnMouseLeave = dismissOnMouseLeave;
+  }, [dismiss, dismissOnMouseLeave]);
+
   useLayoutEffect(() => {
     const arrow = arrowRef.current!;
-    const container = containerRef.current!;
+    const container = containerRef?.current || document.body;
     const popover = popoverRef.current!;
 
+    let ignoreMouseLeaveEvents: boolean = false;
     let ignoreMouseLeaveEventTimeout: NodeJS.Timeout | null = null;
 
-    const onMouseLeaveWrapper = () => {
-      if (ignoreMouseLeaveEventTimeout === null) {
-        if (onMouseLeave != null) {
-          onMouseLeave();
-        }
+    const clearMouseLeaveTimeout = () => {
+      if (ignoreMouseLeaveEventTimeout) {
+        clearTimeout(ignoreMouseLeaveEventTimeout);
       }
+      ignoreMouseLeaveEventTimeout = null;
+    };
+
+    const onMouseLeave = () => {
+      if (ignoreMouseLeaveEvents) {
+        return;
+      }
+
+      const { dismiss, dismissOnMouseLeave } = dismissStateRef.current;
+      if (dismissOnMouseLeave) {
+        clearMouseLeaveTimeout();
+
+        ignoreMouseLeaveEventTimeout = setTimeout(() => {
+          ignoreMouseLeaveEventTimeout = null;
+          dismiss();
+        }, MOUSE_LEAVE_DEBOUNCE_TIMER);
+      }
+    };
+
+    const onScroll = () => {
+      const { dismiss } = dismissStateRef.current;
+      dismiss();
     };
 
     const reposition = () => {
@@ -64,6 +106,9 @@ export default function Popup({
         arrowUp = false;
       }
 
+      // TODO
+      // Handle horizontal positioning edge case if popup is outside of scroll area when rendered initially.
+
       // Horizontal alignment: Prefer horizontally centered around the target
       // But don't go outside of the bounds of the container.
       const popoverLeftMin = containerRect.left;
@@ -83,16 +128,30 @@ export default function Popup({
 
       // Ignore "mouseleave" events that occur right after resize.
       // They may be false positives, caused by the popover content moving.
-      if (ignoreMouseLeaveEventTimeout !== null) {
-        clearTimeout(ignoreMouseLeaveEventTimeout);
-      }
+      clearMouseLeaveTimeout();
+      ignoreMouseLeaveEvents = true;
       ignoreMouseLeaveEventTimeout = setTimeout(() => {
+        ignoreMouseLeaveEvents = false;
         ignoreMouseLeaveEventTimeout = null;
-      }, 100);
+      }, RESIZE_DEBOUNCE_TIMER);
     };
 
-    container.addEventListener("scroll", reposition);
-    popover.addEventListener("mouseleave", onMouseLeaveWrapper);
+    const onMouseEnter = () => {
+      clearMouseLeaveTimeout();
+    };
+
+    // Any scrolling should hide the popup.
+    // We could try to reposition but it's probably a better experience to just hide on scroll.
+    const scrollTargets: HTMLElement[] = [];
+    let currentTarget: HTMLElement | null = target;
+    while (currentTarget != null) {
+      scrollTargets.push(currentTarget);
+      currentTarget.addEventListener("scroll", onScroll);
+      currentTarget = currentTarget.parentElement || null;
+    }
+
+    popover.addEventListener("mouseenter", onMouseEnter);
+    popover.addEventListener("mouseleave", onMouseLeave);
 
     const observer = new ResizeObserver(reposition);
     observer.observe(container);
@@ -100,19 +159,21 @@ export default function Popup({
     observer.observe(target);
 
     return () => {
-      container.removeEventListener("scroll", reposition);
-      popover.removeEventListener("mouseleave", onMouseLeaveWrapper);
+      scrollTargets.forEach(target => {
+        target.removeEventListener("scroll", onScroll);
+      });
+
+      popover.removeEventListener("mouseenter", onMouseEnter);
+      popover.removeEventListener("mouseleave", onMouseLeave);
 
       observer.unobserve(container);
       observer.unobserve(popover);
       observer.unobserve(target);
       observer.disconnect();
 
-      if (ignoreMouseLeaveEventTimeout !== null) {
-        clearTimeout(ignoreMouseLeaveEventTimeout);
-      }
+      clearMouseLeaveTimeout();
     };
-  }, [containerRef, onMouseLeave, showTail, target]);
+  }, [containerRef, showTail, target]);
 
   const blockEvent = (event: MouseEvent) => {
     event.preventDefault();
@@ -120,19 +181,12 @@ export default function Popup({
   };
 
   return createPortal(
-    <div
-      className={styles.Popup}
-      data-test-name="Popup"
-      onClick={blockEvent}
-      onMouseDown={blockEvent}
-      onMouseUp={blockEvent}
-      ref={popoverRef}
-    >
+    <div className={styles.Popup} data-test-name="Popup" onClick={blockEvent} ref={popoverRef}>
       <svg ref={arrowRef as any} viewBox="0 0 16 8" preserveAspectRatio="none">
         <polygon className={styles.ArrowBackground} points="8,0 16,8 0,8"></polygon>
         <polygon className={styles.ArrowForeground} points="8,1 15,8 1,8"></polygon>
       </svg>
-      <div className={styles.Children}>{children}</div>
+      {children}
     </div>,
     document.body
   );
