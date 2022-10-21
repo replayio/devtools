@@ -140,8 +140,16 @@ export default function Popup({
       clearMouseLeaveTimeout();
     };
 
-    document.body.addEventListener("scroll", onScroll);
-    container.addEventListener("scroll", onScroll);
+    // Any scrolling should hide the popup.
+    // We could try to reposition but it's probably a better experience to just hide on scroll.
+    const scrollTargets: HTMLElement[] = [];
+    let currentTarget: HTMLElement | null = target;
+    while (currentTarget != null) {
+      scrollTargets.push(currentTarget);
+      currentTarget.addEventListener("scroll", onScroll);
+      currentTarget = currentTarget.parentElement || null;
+    }
+
     popover.addEventListener("mouseenter", onMouseEnter);
     popover.addEventListener("mouseleave", onMouseLeave);
 
@@ -151,8 +159,10 @@ export default function Popup({
     observer.observe(target);
 
     return () => {
-      document.body.removeEventListener("scroll", onScroll);
-      container.removeEventListener("scroll", onScroll);
+      scrollTargets.forEach(target => {
+        target.removeEventListener("scroll", onScroll);
+      });
+
       popover.removeEventListener("mouseenter", onMouseEnter);
       popover.removeEventListener("mouseleave", onMouseLeave);
 
