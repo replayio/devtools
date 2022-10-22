@@ -104,8 +104,6 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
       setEditableCondition("");
     };
 
-    // TODO [source viewer]
-    // Current highlight (if paused at an execution point that corresponds to the current line)
     return (
       <div className={`${styles.Point} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
         <div className={styles.MainColumn}>

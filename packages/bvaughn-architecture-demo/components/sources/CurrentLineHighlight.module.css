@@ -1,0 +1,9 @@
+.CurrentLine {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: var(--line-height);
+  width: var(--max-line-width);
+  background: var(--background-color-current-line);
+  z-index: -1;
+}

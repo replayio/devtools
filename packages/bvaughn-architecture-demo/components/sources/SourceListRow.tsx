@@ -8,6 +8,7 @@ import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
 
 import ContinueToButton from "./ContinueToButton";
+import CurrentLineHighlight from "./CurrentLineHighlight";
 import { formatHitCount } from "./formatHitCount";
 import PointPanel from "./PointPanel";
 import styles from "./SourceListRow.module.css";
@@ -302,6 +303,8 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
+            <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+
             {lineSegments}
 
             {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
