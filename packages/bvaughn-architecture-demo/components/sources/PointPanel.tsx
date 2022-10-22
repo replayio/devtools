@@ -67,7 +67,10 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
   const [editableCondition, setEditableCondition] = useState(point.condition);
   const [editableContent, setEditableContent] = useState(point.content);
 
-  const isContentValid = useMemo(() => validate(editableContent), [editableContent]);
+  const isContentValid = useMemo(
+    () => !!editableContent && validate(editableContent),
+    [editableContent]
+  );
   const isConditionValid = useMemo(
     () => editableCondition === null || validate(editableCondition),
     [editableCondition]
@@ -104,8 +107,6 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
       setEditableCondition("");
     };
 
-    // TODO [source viewer]
-    // Current highlight (if paused at an execution point that corresponds to the current line)
     return (
       <div className={`${styles.Point} ${className}`} data-test-id={`PointPanel-${lineNumber}`}>
         <div className={styles.MainColumn}>
@@ -164,7 +165,7 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
             <button
               className={styles.SaveButton}
               data-test-name="PointPanel-SaveButton"
-              disabled={isPending}
+              disabled={isPending || !isContentValid || !isConditionValid || !hasChanged}
               onClick={onSubmit}
             >
               Save

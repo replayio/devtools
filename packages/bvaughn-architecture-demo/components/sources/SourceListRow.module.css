@@ -23,40 +23,48 @@
   gap: 1ch;
 }
 
-.TogglePointButton {
+.HoverButton {
   position: absolute;
   top: 0;
   left: 0.5rem;
   z-index: 5;
-  border-radius: 0.5rem;
-  background-color: var(--background-color-primary-button);
-  color: var(--color-primary-button);
-  font: inherit;
-  font-size: var(--font-size-tiny);
+
+  width: 1.5rem;
   height: 1.5rem;
-  flex: 0 0 var(--hit-count-size);
-  width: var(--hit-count-size);
-  min-width: 1.5rem;
-  display: flex;
+  border-radius: 0.5rem;
+
+  display: none;
   align-items: center;
   justify-content: center;
+
+  outline: none;
   border: none;
   padding: 0;
-  margin: 0;
+
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+
   cursor: pointer;
-  user-select: false;
+  transition: all 100ms;
 }
-.TogglePointButton {
-  display: none;
-}
-.TogglePointButton:disabled {
+.HoverButton:disabled {
+  background-color: var(--background-color-tertiary-button);
+  color: var(--color-tertiary-button);
   opacity: 0.5;
   cursor: default;
 }
 
-.TogglePointButtonIcon {
+.HoverButton:hover:not(.HoverButton:disabled) {
+  top: -0.25rem;
+  left: 0.25rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.HoverButtonIcon {
   width: 1.5rem;
   height: 1.5rem;
+  fill: currentColor;
 }
 
 .Icon {
@@ -72,7 +80,7 @@
   opacity: 0.5;
 }
 
-.LineWithHits:hover .TogglePointButton {
+.LineWithHits:hover .HoverButton {
   display: flex;
 }
 

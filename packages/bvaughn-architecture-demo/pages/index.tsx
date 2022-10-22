@@ -8,10 +8,11 @@ import Loader from "@bvaughn/components/Loader";
 import SourceExplorer from "@bvaughn/components/sources/SourceExplorer";
 import Sources from "@bvaughn/components/sources/Sources";
 import { FocusContextRoot } from "@bvaughn/src/contexts/FocusContext";
-import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
-import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
+import { KeyboardModifiersContextRoot } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { PointsContextRoot } from "@bvaughn/src/contexts/PointsContext";
 import { SourcesContextRoot } from "@bvaughn/src/contexts/SourcesContext";
+import { TerminalContextRoot } from "@bvaughn/src/contexts/TerminalContext";
+import { TimelineContextRoot } from "@bvaughn/src/contexts/TimelineContext";
 import usePreferredColorScheme from "@bvaughn/src/hooks/usePreferredColorScheme";
 import React, {
   Suspense,
@@ -71,62 +72,64 @@ export default function HomePage() {
   const content = (
     <Initializer>
       <InspectorContext.Provider value={inspectorContext}>
-        <SourcesContextRoot>
-          <PointsContextRoot>
-            <TimelineContextRoot>
-              <FocusContextRoot>
-                <div className={styles.VerticalContainer}>
-                  <div className={styles.HorizontalContainer}>
-                    <div className={styles.ToolBar}>
-                      <button
-                        className={panel === "comments" ? styles.TabSelected : styles.Tab}
-                        disabled={isPending}
-                        onClick={() => setPanelTransition("comments")}
-                      >
-                        <Icon className={styles.TabIcon} type="comments" />
-                      </button>
-                      <button
-                        className={panel === "sources" ? styles.TabSelected : styles.Tab}
-                        disabled={isPending}
-                        onClick={() => setPanelTransition("sources")}
-                      >
-                        <Icon className={styles.TabIcon} type="source-explorer" />
-                      </button>
+        <KeyboardModifiersContextRoot>
+          <SourcesContextRoot>
+            <PointsContextRoot>
+              <TimelineContextRoot>
+                <FocusContextRoot>
+                  <div className={styles.VerticalContainer}>
+                    <div className={styles.HorizontalContainer}>
+                      <div className={styles.ToolBar}>
+                        <button
+                          className={panel === "comments" ? styles.TabSelected : styles.Tab}
+                          disabled={isPending}
+                          onClick={() => setPanelTransition("comments")}
+                        >
+                          <Icon className={styles.TabIcon} type="comments" />
+                        </button>
+                        <button
+                          className={panel === "sources" ? styles.TabSelected : styles.Tab}
+                          disabled={isPending}
+                          onClick={() => setPanelTransition("sources")}
+                        >
+                          <Icon className={styles.TabIcon} type="source-explorer" />
+                        </button>
+                      </div>
+                      <div className={styles.CommentsContainer}>
+                        <Suspense fallback={<Loader />}>
+                          {panel == "comments" && <CommentList />}
+                          {panel == "sources" && <SourceExplorer />}
+                        </Suspense>
+                      </div>
+                      <div className={styles.SourcesContainer}>
+                        <Suspense fallback={<Loader />}>
+                          <Sources />
+                        </Suspense>
+                      </div>
+                      <div className={styles.ConsoleContainer}>
+                        <TerminalContextRoot>
+                          <ConsoleRoot
+                            showSearchInputByDefault={false}
+                            terminalInput={
+                              <Suspense fallback={<Loader />}>
+                                <Input />
+                              </Suspense>
+                            }
+                          />
+                        </TerminalContextRoot>
+                      </div>
                     </div>
-                    <div className={styles.CommentsContainer}>
+                    <div className={styles.Row}>
                       <Suspense fallback={<Loader />}>
-                        {panel == "comments" && <CommentList />}
-                        {panel == "sources" && <SourceExplorer />}
+                        <Focuser />
                       </Suspense>
                     </div>
-                    <div className={styles.SourcesContainer}>
-                      <Suspense fallback={<Loader />}>
-                        <Sources />
-                      </Suspense>
-                    </div>
-                    <div className={styles.ConsoleContainer}>
-                      <TerminalContextRoot>
-                        <ConsoleRoot
-                          showSearchInputByDefault={false}
-                          terminalInput={
-                            <Suspense fallback={<Loader />}>
-                              <Input />
-                            </Suspense>
-                          }
-                        />
-                      </TerminalContextRoot>
-                    </div>
                   </div>
-                  <div className={styles.Row}>
-                    <Suspense fallback={<Loader />}>
-                      <Focuser />
-                    </Suspense>
-                  </div>
-                </div>
-              </FocusContextRoot>
-            </TimelineContextRoot>
-          </PointsContextRoot>
-        </SourcesContextRoot>
+                </FocusContextRoot>
+              </TimelineContextRoot>
+            </PointsContextRoot>
+          </SourcesContextRoot>
+        </KeyboardModifiersContextRoot>
       </InspectorContext.Provider>
     </Initializer>
   );

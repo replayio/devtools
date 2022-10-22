@@ -114,6 +114,11 @@
   border-radius: 2.5rem;
   padding: 0 2ch;
 }
+.SaveButton:disabled {
+  background-color: var(--background-color-tertiary-button);
+  color: var(--color-tertiary-button);
+  opacity: 0.5;
+}
 
 .AddConditionButton,
 .CancelButton {

@@ -2,7 +2,6 @@ import {
   ContentType,
   createPauseResult,
   ExecutionPoint,
-  EventHandlerType,
   FrameId,
   getPointsBoundingTimeResult as PointsBoundingTime,
   loadedRegions as LoadedRegions,
@@ -41,6 +40,7 @@ import { ThreadFront } from "protocol/thread";
 import { MAX_POINTS_FOR_FULL_ANALYSIS } from "protocol/thread/analysis";
 import { RecordingCapabilities } from "protocol/thread/thread";
 import { binarySearch, compareNumericStrings, defer } from "protocol/utils";
+import { TOO_MANY_POINTS_TO_FIND } from "shared/constants";
 import { isCommandError, ProtocolError } from "shared/utils/error";
 
 import {
@@ -571,7 +571,7 @@ export class ReplayClient implements ReplayClientInterface {
           {
             sourceId,
             locations: firstColumnLocations,
-            maxHits: 10_000,
+            maxHits: TOO_MANY_POINTS_TO_FIND,
             range: focusRange || undefined,
           },
           sessionId

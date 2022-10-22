@@ -3,6 +3,8 @@ import chalk from "chalk";
 
 import { clearTextArea, debugPrint, delay, getCommandKey, stopHovering } from "./general";
 
+type AsyncFunction = () => Promise<void>;
+
 export async function addBreakPoint(
   page: Page,
   options: {
@@ -22,9 +24,8 @@ export async function addBreakPoint(
   await goToLine(page, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
 
-  await numberLocator.hover({ force: true });
+  await hoverOverLine(page, { lineNumber });
 
   const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -56,10 +57,8 @@ export async function addLogPoint(
   await goToLine(page, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
 
-  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  await numberLocator.hover({ force: true });
+  await hoverOverLine(page, { lineNumber });
 
   const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -72,6 +71,48 @@ export async function addLogPoint(
   }
 
   await stopHovering(page);
+}
+
+export async function continueTo(
+  page: Page,
+  options: {
+    direction: "next" | "previous";
+    lineNumber: number;
+    sourceId?: string;
+  }
+) {
+  const { direction, lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    sourceId == null
+      ? `Continuing to ${chalk.bold(direction)} line ${chalk.bold(lineNumber)}`
+      : `Continuing to ${chalk.bold(direction)} line ${chalk.bold(
+          lineNumber
+        )} for source "${chalk.bold(sourceId)}"`,
+    "continueToNext"
+  );
+
+  if (sourceId != null) {
+    await openSourceFile(page, sourceId);
+  }
+  await goToLine(page, lineNumber);
+
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+
+  const stopHovering = await hoverOverLine(page, {
+    lineNumber,
+    withMetaKey: true,
+    withShiftKey: direction === "previous",
+  });
+
+  const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
+  const state = await button.getAttribute("data-test-state");
+  if (direction === state) {
+    await button.click();
+  }
+
+  await stopHovering();
 }
 
 export async function editLogPoint(
@@ -96,12 +137,7 @@ export async function editLogPoint(
 
   const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
   if (!(await pointPanelLocator.isVisible())) {
-    const locator = getSourceLineLocator(page, sourceId, lineNumber);
-
-    // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-    await locator
-      .locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`)
-      .hover({ force: true });
+    await hoverOverLine(page, { lineNumber });
   }
 
   const editButtonLocator = await pointPanelLocator.locator(
@@ -204,6 +240,103 @@ export async function goToLine(page: Page, lineNumber: number) {
   await delay(1000);
 }
 
+export async function hoverOverLine(
+  page: Page,
+  options: {
+    lineNumber: number;
+    withMetaKey?: boolean;
+    withShiftKey?: boolean;
+  }
+): Promise<AsyncFunction> {
+  const { lineNumber, withMetaKey, withShiftKey } = options;
+
+  let suffix = "";
+  if (withMetaKey || withShiftKey) {
+    const keys: string[] = [];
+    if (withMetaKey) {
+      keys.push("meta");
+    }
+    if (withShiftKey) {
+      keys.push("shift");
+    }
+    suffix = `with ${chalk.bold(keys.join(" and "))}`;
+  }
+  await debugPrint(page, `Hovering over line ${chalk.bold(lineNumber)} ${suffix}`, "hoverOverLine");
+
+  await goToLine(page, lineNumber);
+
+  if (withShiftKey) {
+    await page.keyboard.down("Shift");
+  } else {
+    await page.keyboard.up("Shift");
+  }
+  if (withMetaKey) {
+    await page.keyboard.down(getCommandKey());
+  } else {
+    await page.keyboard.up(getCommandKey());
+  }
+
+  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+  await numberLocator.hover({ force: true });
+
+  return async () => {
+    await stopHovering(page);
+    if (withMetaKey) {
+      await page.keyboard.up(getCommandKey());
+    }
+    if (withShiftKey) {
+      await page.keyboard.up("Shift");
+    }
+  };
+}
+
+export async function isContinueToButtonEnabled(
+  page: Page,
+  options: {
+    direction: "previous" | "next";
+    lineNumber: number;
+  }
+): Promise<boolean> {
+  const { direction, lineNumber } = options;
+
+  const stopHovering = await hoverOverLine(page, {
+    lineNumber,
+    withMetaKey: true,
+    withShiftKey: direction === "previous",
+  });
+
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const button = lineLocator.locator('[data-test-name="ContinueToButton"]');
+  const isEnabled = await button.isEnabled();
+
+  await stopHovering();
+
+  return isEnabled;
+}
+
+export async function isContinueToNextButtonEnabled(
+  page: Page,
+  lineNumber: number
+): Promise<boolean> {
+  return isContinueToButtonEnabled(page, { direction: "next", lineNumber });
+}
+
+export async function isContinueToPreviousButtonEnabled(
+  page: Page,
+  lineNumber: number
+): Promise<boolean> {
+  return isContinueToButtonEnabled(page, { direction: "previous", lineNumber });
+}
+
+export async function isLineCurrent(page: Page, lineNumber: number): Promise<boolean> {
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const currentHighlight = lineLocator.locator('[data-test-name="CurrentLineHighlight"]');
+  const isVisible = await currentHighlight.isVisible();
+  return isVisible;
+}
+
 export async function openSourceFile(page: Page, sourceId: string) {
   const sourceTabLocator = getSourceTabLocator(page, sourceId);
   const sourceTabIsVisible = await sourceTabLocator.isVisible();
@@ -235,9 +368,8 @@ export async function removeBreakPoint(
   await goToLine(page, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
 
-  await numberLocator.hover({ force: true });
+  await hoverOverLine(page, { lineNumber });
 
   const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
@@ -267,10 +399,8 @@ export async function removeLogPoint(
   await goToLine(page, lineNumber);
 
   const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
-  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
 
-  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  await numberLocator.hover({ force: true });
+  await hoverOverLine(page, { lineNumber });
 
   const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
   const state = await toggle.getAttribute("data-test-state");
