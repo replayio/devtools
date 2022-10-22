@@ -20,7 +20,7 @@ import { ListOnItemsRenderedProps, VariableSizeList as List } from "react-window
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 import { Point } from "shared/client/types";
 
-import { formatHitCount } from "./formatHitCount";
+import { formatHitCount } from "./utils/formatHitCount";
 import SourceListRow, { ItemData } from "./SourceListRow";
 import styles from "./SourceList.module.css";
 import { SourceSearchContext } from "./SourceSearchContext";
@@ -189,11 +189,11 @@ export default function SourceList({
   const maxLineNumberStringLength = `${numLines}`.length;
   const maxHitCountStringLength =
     showHitCounts && maxHitCount !== null ? `${formatHitCount(maxHitCount)}`.length : 0;
-  const style: CSSProperties = {
-    // @ts-ignore
+
+  const style = {
     "--hit-count-size": `${maxHitCountStringLength}ch`,
-    // @ts-ignore
     "--line-number-size": `${maxLineNumberStringLength + 1}ch`,
+    "--list-width": `${width}px`,
   };
 
   return (
@@ -207,7 +207,7 @@ export default function SourceList({
       itemSize={getItemSize}
       onItemsRendered={onItemsRendered}
       ref={listRef}
-      style={style}
+      style={style as CSSProperties}
       width={width}
     >
       {SourceListRow}

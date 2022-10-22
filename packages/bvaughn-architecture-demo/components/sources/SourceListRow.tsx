@@ -9,7 +9,7 @@ import { Point } from "shared/client/types";
 
 import ContinueToButton from "./ContinueToButton";
 import CurrentLineHighlight from "./CurrentLineHighlight";
-import { formatHitCount } from "./formatHitCount";
+import { formatHitCount } from "./utils/formatHitCount";
 import PointPanel from "./PointPanel";
 import styles from "./SourceListRow.module.css";
 import { findPointForLocation } from "./utils/points";
@@ -307,10 +307,10 @@ const SourceListRow = memo(
 
             {lineSegments}
 
-            {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
-
             {togglePointButton}
           </div>
+
+          {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
         </div>
       </div>
     );

@@ -26,8 +26,6 @@ import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
 
-// TODO [source viewer]
-// Fill 100% of Source list row (maybe float to the right)
 export default function SourcePanelWrapper({
   className,
   point,
