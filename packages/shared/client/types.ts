@@ -93,7 +93,7 @@ export interface SourceLocationRange {
 export interface ReplayClientInterface {
   get loadedRegions(): LoadedRegions | null;
   addEventListener(type: ReplayClientEvents, handler: Function): void;
-  breakpointAdded(point: Point): Promise<BreakpointId[]>;
+  breakpointAdded(location: Location, condition: string | null): Promise<BreakpointId[]>;
   breakpointRemoved(breakpointId: BreakpointId): Promise<void>;
   configure(sessionId: string): void;
   createPause(executionPoint: ExecutionPoint): Promise<createPauseResult>;
