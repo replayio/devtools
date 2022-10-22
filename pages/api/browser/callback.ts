@@ -16,7 +16,7 @@ interface Token {
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
 const getAppUrl = (path: string) =>
-  `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
+  `${process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}${path}`;
 
 async function fulfillAuthRequest(id: string, token: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;

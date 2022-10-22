@@ -10,14 +10,14 @@ export default function LoginPage() {
   const { user } = useAuth0();
   const dispatch = useAppDispatch();
 
-  if (user && typeof router.query.returnTo === "string") {
-    router.push(router.query.returnTo);
-  }
-
   const challenge = Array.isArray(router.query.challenge)
     ? router.query.challenge[0]
     : router.query.challenge;
   const state = Array.isArray(router.query.state) ? router.query.state[0] : router.query.state;
+
+  if (user && typeof router.query.returnTo === "string" && !challenge && !state) {
+    router.push(router.query.returnTo);
+  }
 
   useEffect(() => {
     dispatch(clearExpectedError());

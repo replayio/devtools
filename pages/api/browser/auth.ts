@@ -7,7 +7,7 @@ globalThis.fetch = globalThis.fetch || require("node-fetch");
 
 const getQueryValue = (query: string | string[]) => (Array.isArray(query) ? query[0] : query);
 const getAppUrl = (path: string) =>
-  `${process.env.NEXT_PUBLIC_APP_URL || process.env.NEXT_PUBLIC_VERCEL_URL}${path}`;
+  `${process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`}${path}`;
 
 async function initAuthRequest(key: string) {
   const api = process.env.NEXT_PUBLIC_API_URL;
@@ -70,6 +70,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         maxAge: 5 * 60 * 1000,
       })
     );
+
     res.redirect(url);
   } catch (e: any) {
     console.error(e);
