@@ -87,6 +87,58 @@
   margin: 0 1ch;
   color: var(--color-dim);
   user-select: none;
+  position: relative;
+  overflow: visible;
+}
+
+.BreakpointToggleOff,
+.BreakpointToggleOn {
+  cursor: pointer;
+  display: flex;
+  position: absolute;
+  top: 50%;
+  height: 2.5ch;
+  margin-top: -1.25ch;
+  left: -1ch;
+  right: -1ch;
+  text-align: right;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 1ch;
+}
+.BreakpointToggleOff:after,
+.BreakpointToggleOn:after {
+  left: 100%;
+  top: 50%;
+  border: solid transparent;
+  content: "";
+  height: 0;
+  width: 0;
+  position: absolute;
+  pointer-events: none;
+  border-width: 1.25ch;
+  margin-top: -1.25ch;
+}
+.BreakpointToggleOff {
+  display: none;
+  background-color: var(--color-dimmer);
+  color: var(--color-default);
+}
+.BreakpointToggleOff:after {
+  border-color: var(--color-transparent);
+  border-left-color: var(--color-dimmer);
+}
+.BreakpointToggleOn {
+  background-color: var(--background-color-primary-button);
+  color: var(--color-primary-button);
+}
+.BreakpointToggleOn:after {
+  border-color: var(--color-transparent);
+  border-left-color: var(--background-color-primary-button);
+}
+
+.LineWithHits .LineNumber:hover .BreakpointToggleOff {
+  display: flex;
 }
 
 .LineHitCountBar {

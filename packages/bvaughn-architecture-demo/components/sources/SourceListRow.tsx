@@ -58,29 +58,6 @@ const SourceListRow = memo(
     const hitCount = lineHitCounts?.count || null;
     const lineHasHits = hitCount !== null && hitCount > 0;
 
-    const onAddPointButtonClick = async (lineNumber: number) => {
-      if (lineHitCounts === null) {
-        return;
-      }
-
-      const closestColumnNumber = lineHitCounts.firstBreakableColumnIndex;
-      const fileName = source?.url?.split("/")?.pop();
-
-      // TODO The legacy app uses the closest function name for the content (if there is one).
-      // This app doesn't yet have logic for parsing source contents though.
-      addPoint(
-        {
-          content: `"${fileName}", ${lineNumber}`,
-          shouldLog: true,
-        },
-        {
-          column: closestColumnNumber,
-          line: lineNumber,
-          sourceId,
-        }
-      );
-    };
-
     // We use a gradient to indicate the "heat" (the number of hits).
     // This absolute hit count values are relative, per file.
     // Cubed root prevents high hit counts from lumping all other values together.
@@ -102,14 +79,23 @@ const SourceListRow = memo(
 
     let lineSegments = null;
     let togglePointButton = null;
-    if (point) {
+    if (point?.shouldLog) {
       const { id, location, shouldBreak } = point;
+
+      const togglePoint = () => {
+        if (!point.shouldLog || point.shouldBreak) {
+          editPoint(point.id, { shouldLog: !point.shouldLog });
+        } else {
+          deletePoints(point.id);
+        }
+      };
 
       togglePointButton = (
         <button
           className={styles.TogglePointButton}
-          data-test-name="RemovePointButton"
-          onClick={() => deletePoints(id)}
+          data-test-name="LogPointToggle"
+          data-test-state="on"
+          onClick={togglePoint}
         >
           <Icon className={styles.TogglePointButtonIcon} type="remove" />
         </button>
@@ -171,12 +157,40 @@ const SourceListRow = memo(
         );
       }
     } else {
+      const addLogPoint = () => {
+        if (lineHitCounts === null) {
+          return;
+        }
+
+        const fileName = source?.url?.split("/")?.pop();
+        const content = `"${fileName}", ${lineNumber}`;
+
+        if (point) {
+          editPoint(point.id, { content, shouldLog: true });
+        } else {
+          // TODO The legacy app uses the closest function name for the content (if there is one).
+          // This app doesn't yet have logic for parsing source contents though.
+          addPoint(
+            {
+              content,
+              shouldLog: true,
+            },
+            {
+              column: lineHitCounts.firstBreakableColumnIndex,
+              line: lineNumber,
+              sourceId,
+            }
+          );
+        }
+      };
+
       togglePointButton = (
         <>
           <button
             className={styles.TogglePointButton}
-            data-test-name="AddPointButton"
-            onClick={() => onAddPointButtonClick(lineNumber)}
+            data-test-name="LogPointToggle"
+            data-test-state="off"
+            onClick={addLogPoint}
           >
             <Icon className={styles.TogglePointButtonIcon} type="add" />
           </button>
@@ -196,8 +210,32 @@ const SourceListRow = memo(
     // TODO [source viewer]
     // Continue to hear button
 
-    // TODO [source viewer]
-    // Toggle breakpoint button
+    const toggleBreakpoint = () => {
+      if (lineHitCounts === null) {
+        return;
+      }
+
+      if (point) {
+        if (!point.shouldBreak || point.shouldLog) {
+          editPoint(point.id, { shouldBreak: !point.shouldBreak });
+        } else {
+          deletePoints(point.id);
+        }
+      } else {
+        // TODO The legacy app uses the closest function name for the content (if there is one).
+        // This app doesn't yet have logic for parsing source contents though.
+        addPoint(
+          {
+            shouldBreak: true,
+          },
+          {
+            column: lineHitCounts.firstBreakableColumnIndex,
+            line: lineNumber,
+            sourceId,
+          }
+        );
+      }
+    };
 
     return (
       <div data-test-id={`SourceLine-${lineNumber}`} style={rowStyle}>
@@ -209,6 +247,16 @@ const SourceListRow = memo(
         >
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
+            <div
+              className={
+                point?.shouldBreak ? styles.BreakpointToggleOn : styles.BreakpointToggleOff
+              }
+              data-test-name="BreakpointToggle"
+              data-test-state={point?.shouldBreak ? "on" : "off"}
+              onClick={toggleBreakpoint}
+            >
+              {lineNumber}
+            </div>
           </div>
 
           <div
@@ -227,7 +275,7 @@ const SourceListRow = memo(
           <div className={styles.LineSegmentsAndPointPanel}>
             {lineSegments}
 
-            {point && <PointPanel className={styles.PointPanel} point={point} />}
+            {point?.shouldLog && <PointPanel className={styles.PointPanel} point={point} />}
 
             {togglePointButton}
           </div>
