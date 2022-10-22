@@ -30,6 +30,8 @@ export async function findConsoleMessage(
 }
 
 export async function focusOnConsole(page: Page) {
+  await debugPrint(page, `Focusing on console`, "focusOnConsole");
+
   const consoleRoot = page.locator('[data-test-id="ConsoleRoot"]');
   await expect(consoleRoot).toBeVisible();
   await consoleRoot.focus();
@@ -38,7 +40,11 @@ export async function focusOnConsole(page: Page) {
 
 export async function hideSearchInput(page: Page) {
   const count = await getElementCount(page, '[data-test-id="ConsoleSearchInput"]');
-  if (count > 0) {
+  if (count === 0) {
+    await debugPrint(page, `No search inputs to hide`, "hideSearchInput");
+  } else {
+    await debugPrint(page, `Hiding search input`, "hideSearchInput");
+
     await page.focus('[data-test-id="ConsoleSearchInput"]');
     await page.keyboard.press("Escape");
   }
@@ -49,6 +55,16 @@ export async function locateMessage<T>(
   messageType: MessageType,
   partialText?: string
 ): Promise<Locator> {
+  await debugPrint(
+    page,
+    partialText
+      ? `Locating message of type "${chalk.bold(messageType)}" containing text "${chalk.bold(
+          partialText
+        )}"`
+      : `Locating message of type "${chalk.bold(messageType)}"`,
+    "locateMessage"
+  );
+
   const locator = messageLocator(page, messageType, partialText);
 
   let loop = 0;
@@ -81,11 +97,19 @@ export function messageLocator(
 }
 
 export async function seekToMessage(page: Page, messageListItem: Locator) {
+  await debugPrint(
+    page,
+    `Seeking to message "${chalk.bold(await messageListItem.textContent())}`,
+    "seekToMessage"
+  );
+
   await messageListItem.hover();
   await page.click('[data-test-id="ConsoleMessageHoverButton"]');
 }
 
 export async function showSearchInput(page: Page) {
+  await debugPrint(page, `Showing search input`, "showSearchInput");
+
   await focusOnConsole(page);
 
   await page.keyboard.down(getCommandKey());
@@ -105,6 +129,12 @@ export async function toggleSideMenu(page: Page, open: boolean) {
   }, []);
 
   if (isOpen !== open) {
+    await debugPrint(
+      page,
+      `${chalk.bold(open ? "Expanding" : "Collapsing")} Console side menu`,
+      "toggleSideMenu"
+    );
+
     await page.click(`[data-test-id="ConsoleMenuToggleButton"]`);
   }
 }
@@ -130,6 +160,12 @@ export async function toggleProtocolMessage(page: Page, name: ToggleName, on: bo
   );
 
   if ((isEnabled && !on) || (!isEnabled && on)) {
+    await debugPrint(
+      page,
+      `${chalk.bold(on ? "Enabling" : "Disabling")} Console filter "${chalk.bold(name)}"`,
+      "toggleProtocolMessage"
+    );
+
     await page.click(`[data-test-id="FilterToggle-${name}"]`);
   }
 }

@@ -1,11 +1,17 @@
 import { Locator, Page } from "@playwright/test";
+import { debugPrint } from "./general";
 
 export async function toggleExpandable<T>(
-  pageOrLocator: Page | Locator,
-  partialText?: string,
-  expanded: boolean = true
+  page: Page,
+  options: {
+    expanded?: boolean;
+    partialText?: string;
+    scope?: Locator;
+  }
 ): Promise<void> {
-  const expandable = pageOrLocator
+  const { expanded = true, scope = page, partialText } = options;
+
+  const expandable = scope
     .locator(`[data-test-name="Expandable"]`, { hasText: partialText })
     .last();
 
@@ -14,6 +20,8 @@ export async function toggleExpandable<T>(
   );
 
   if (isExpanded !== expanded) {
+    await debugPrint(page, expanded ? "Expanding toggle" : "Collapsing toggle", "toggleExpandable");
+
     const button = expandable.locator(`[role="button"]`);
     await button.click();
   }

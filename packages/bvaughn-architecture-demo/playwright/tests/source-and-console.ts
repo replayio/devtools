@@ -202,13 +202,13 @@ test("should support break points", async ({ page }) => {
 });
 
 test("should not erase log point content when breaking is toggled", async ({ page }) => {
-  const sourceLine = getSourceLineLocator(page, sourceId, 13);
-  await addLogPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-default-log-point-content");
+  const pointPanel = getPointPanelLocator(page, 13);
+  await addLogPoint(page, { sourceId, lineNumber: 13, content: '"This is custom"' });
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
   await addBreakPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-default-log-point-content");
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
   await removeBreakPoint(page, { sourceId, lineNumber: 13 });
-  await takeScreenshot(page, sourceLine, "source-line-with-default-log-point-content");
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
 });
 
 test("should not erase break point when logging is toggled", async ({ page }) => {

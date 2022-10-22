@@ -170,18 +170,16 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
               Save
             </button>
           </div>
-          {hasCondition && (
-            <div className={styles.Row}>
-              <button
-                className={styles.CancelButton}
-                data-test-name="PointPanel-CancelButton"
-                disabled={isPending}
-                onClick={onCancel}
-              >
-                Cancel
-              </button>
-            </div>
-          )}
+          <div className={styles.Row}>
+            <button
+              className={styles.CancelButton}
+              data-test-name="PointPanel-CancelButton"
+              disabled={isPending}
+              onClick={onCancel}
+            >
+              Cancel
+            </button>
+          </div>
         </div>
       </div>
     );
