@@ -16,6 +16,12 @@ import {
   getSourceLineLocator,
   removeBreakPoint,
   removeLogPoint,
+  hoverOverLine,
+  continueTo,
+  isContinueToButtonEnabled,
+  isContinueToNextButtonEnabled,
+  isContinueToPreviousButtonEnabled,
+  isLineCurrent,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -218,4 +224,26 @@ test("should not erase break point when logging is toggled", async ({ page }) =>
   await takeScreenshot(page, sourceLine, "source-line-with-break-point-and-log-point-content");
   await removeLogPoint(page, { sourceId, lineNumber: 13 });
   await takeScreenshot(page, sourceLine, "source-line-with-break-point-only-content");
+});
+
+test("should support continue to next and previous functionality", async ({ page }) => {
+  // Continue to next should be enabled initially;
+  // Continue to previous should not be.
+  await expect(await isContinueToNextButtonEnabled(page, 14)).toBe(true);
+  await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
+
+  // Go to line 14.
+  await expect(await isLineCurrent(page, 14)).toBe(false);
+  await continueTo(page, { lineNumber: 14, direction: "next" });
+  await expect(await isLineCurrent(page, 14)).toBe(true);
+
+  // Continue to next and previous buttons should both now be disabled for line 14.
+  // Continue to previous should be enabled for line 13
+  // And continue to next should be enabled for line 15.
+  await expect(await isContinueToNextButtonEnabled(page, 13)).toBe(false);
+  await expect(await isContinueToPreviousButtonEnabled(page, 13)).toBe(true);
+  await expect(await isContinueToNextButtonEnabled(page, 14)).toBe(false);
+  await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
+  await expect(await isContinueToNextButtonEnabled(page, 15)).toBe(true);
+  await expect(await isContinueToPreviousButtonEnabled(page, 15)).toBe(false);
 });
