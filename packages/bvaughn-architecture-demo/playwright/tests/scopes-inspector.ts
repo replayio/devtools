@@ -15,18 +15,18 @@ test.beforeEach(async ({ page }) => {
 test("should render sections correctly", async ({ page }) => {
   const block = page.locator("[data-test-name=ScopesInspector]");
   await takeScreenshot(page, block, "block-collapsed");
-  await toggleExpandable(block);
+  await toggleExpandable(page, { scope: block });
   await takeScreenshot(page, block, "block-expanded");
 
   const window = page.locator("[data-test-name=InspectorRoot]", { hasText: "Window:" });
   await takeScreenshot(page, window, "window-collapsed");
-  await toggleExpandable(window);
+  await toggleExpandable(page, { scope: window });
   await takeScreenshot(page, window, "window-expanded");
 });
 
 test("should show/hide object and array previews when toggled", async ({ page }) => {
   const block = page.locator("[data-test-name=ScopesInspector]");
-  await toggleExpandable(block);
+  await toggleExpandable(page, { scope: block });
 
   const array = block.locator("[data-test-name=InspectorRoot]", { hasText: "someArray" });
   const object = block.locator("[data-test-name=InspectorRoot]", { hasText: "someObject" });
@@ -34,8 +34,8 @@ test("should show/hide object and array previews when toggled", async ({ page })
   await takeScreenshot(page, array, "array-properties-collapsed");
   await takeScreenshot(page, object, "object-properties-collapsed");
 
-  await toggleExpandable(page, "someArray");
-  await toggleExpandable(page, "someObject");
+  await toggleExpandable(page, { partialText: "someArray" });
+  await toggleExpandable(page, { partialText: "someObject" });
 
   await takeScreenshot(page, array, "array-properties-expanded");
   await takeScreenshot(page, object, "object-properties-expanded");

@@ -19,7 +19,7 @@ export default function useBreakpointIdsFromServer(
     if (prevPoints !== points) {
       if (prevPoints === null) {
         points.forEach(point => {
-          client.breakpointAdded(point).then(serverIds => {
+          client.breakpointAdded(point.location, point.condition).then(serverIds => {
             pointIdToBreakpointIdMap.set(point.id, serverIds);
           });
         });
@@ -28,13 +28,13 @@ export default function useBreakpointIdsFromServer(
           const prevPoint = prevPoints.find(({ id }) => id === point.id);
           if (prevPoint == null) {
             if (point.shouldBreak) {
-              client.breakpointAdded(point).then(serverIds => {
+              client.breakpointAdded(point.location, point.condition).then(serverIds => {
                 pointIdToBreakpointIdMap.set(point.id, serverIds);
               });
             }
           } else if (prevPoint.shouldBreak !== point.shouldBreak) {
             if (point.shouldBreak) {
-              client.breakpointAdded(point).then(serverIds => {
+              client.breakpointAdded(point.location, point.condition).then(serverIds => {
                 pointIdToBreakpointIdMap.set(point.id, serverIds);
               });
             } else {

@@ -1,8 +1,9 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { toggleProtocolMessages, verifyConsoleMessage } from "./utils/console";
 import { getTestUrl, takeScreenshot } from "./utils/general";
 import {
+  addBreakPoint,
   addLogPoint,
   getSourceFileNameSearchResultsLocator,
   goToLine,
@@ -12,6 +13,9 @@ import {
   getSearchSourceLocator,
   getSourceLocator,
   getPointPanelLocator,
+  getSourceLineLocator,
+  removeBreakPoint,
+  removeLogPoint,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -40,7 +44,11 @@ test("should not allow saving log points with invalid conditional", async ({ pag
 
 test("should run local analysis for log points", async ({ page }) => {
   await toggleProtocolMessages(page, false);
-  await addLogPoint(page, { sourceId, lineNumber: 13, content: '"local", 123, true' });
+  await addLogPoint(page, {
+    sourceId,
+    lineNumber: 13,
+    content: '"local", 123, true',
+  });
   await verifyConsoleMessage(page, "local 123 true", "log-point", 1);
   const message = page.locator("[data-test-name=Message]").first();
   await takeScreenshot(page, message, "log-point-local-analysis");
@@ -182,4 +190,32 @@ test("should support text search in the active source file", async ({ page }) =>
   await takeScreenshot(page, sourceSearchLocator, "source-search-first-result-active");
   await page.keyboard.press("Escape");
   await expect(sourceSearchLocator).not.toBeVisible();
+});
+
+test("should support break points", async ({ page }) => {
+  const sourceLine = getSourceLineLocator(page, sourceId, 13);
+  await takeScreenshot(page, sourceLine, "source-line-no-breakpoint");
+  await addBreakPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, sourceLine, "source-line-with-breakpoint");
+  await removeBreakPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, sourceLine, "source-line-no-breakpoint");
+});
+
+test("should not erase log point content when breaking is toggled", async ({ page }) => {
+  const pointPanel = getPointPanelLocator(page, 13);
+  await addLogPoint(page, { sourceId, lineNumber: 13, content: '"This is custom"' });
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
+  await addBreakPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
+  await removeBreakPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, pointPanel, "point-panel-custom-content");
+});
+
+test("should not erase break point when logging is toggled", async ({ page }) => {
+  const sourceLine = getSourceLineLocator(page, sourceId, 13);
+  await addBreakPoint(page, { sourceId, lineNumber: 13 });
+  await addLogPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, sourceLine, "source-line-with-break-point-and-log-point-content");
+  await removeLogPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, sourceLine, "source-line-with-break-point-only-content");
 });

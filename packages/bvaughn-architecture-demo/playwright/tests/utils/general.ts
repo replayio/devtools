@@ -14,9 +14,29 @@ const SCREENSHOT_OPTIONS: LocatorScreenshotOptions & PageScreenshotOptions = {
   scale: "css",
 };
 
+export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
+  let attempts = 0;
+
+  while (attempts < 10) {
+    const locator = scope
+      ? scope.locator("[data-test-name=Loader]")
+      : page.locator("[data-test-name=Loader]");
+    const count = await locator.count();
+    if (count === 0) {
+      return;
+    }
+
+    attempts++;
+
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
+
+  throw Error("Timed out waiting for loaders to finish");
+}
+
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
 export async function debugPrint(page: Page | null, message: string, scope?: string) {
-  console.log(message, scope ? chalk.dim(`(${scope})`) : "");
+  console.log("      ", message, scope ? chalk.dim(`(${scope})`) : "");
 
   if (page !== null) {
     await page.evaluate(
@@ -132,24 +152,8 @@ async function takeScreenshotHelper(
   }
 }
 
-export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
-  let attempts = 0;
-
-  while (attempts < 10) {
-    const locator = scope
-      ? scope.locator("[data-test-name=Loader]")
-      : page.locator("[data-test-name=Loader]");
-    const count = await locator.count();
-    if (count === 0) {
-      return;
-    }
-
-    attempts++;
-
-    await new Promise(resolve => setTimeout(resolve, 100));
-  }
-
-  throw Error("Timed out waiting for loaders to finish");
+export async function stopHovering(page: Page): Promise<void> {
+  await page.mouse.move(0, 0);
 }
 
 export async function waitFor(
