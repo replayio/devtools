@@ -19,7 +19,7 @@ export async function clearTextArea(page: Page, textArea: Locator) {
 
 // Other test utils can use this to print formatted status messages that help visually monitor test progress.
 export async function debugPrint(page: Page | null, message: string, scope?: string) {
-  console.log(message, scope ? chalk.dim(`(${scope})`) : "");
+  console.log("      ", message, scope ? chalk.dim(`(${scope})`) : "");
 
   if (page !== null) {
     await page.evaluate(
