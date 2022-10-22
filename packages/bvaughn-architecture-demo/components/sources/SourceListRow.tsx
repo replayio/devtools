@@ -1,12 +1,14 @@
 import Icon from "@bvaughn/components/Icon";
+import { KeyboardModifiersContext } from "@bvaughn/src/contexts/KeyboardModifiersContext";
 import { AddPoint, DeletePoints, EditPoint } from "@bvaughn/src/contexts/PointsContext";
 import { newSource as ProtocolSource } from "@replayio/protocol";
-import { CSSProperties, memo } from "react";
+import { CSSProperties, memo, Suspense, useContext, useState } from "react";
 import { areEqual } from "react-window";
 import { LineNumberToHitCountMap } from "shared/client/types";
 import { Point } from "shared/client/types";
-import { formatHitCount } from "./formatHitCount";
 
+import ContinueToButton from "./ContinueToButton";
+import { formatHitCount } from "./formatHitCount";
 import PointPanel from "./PointPanel";
 import styles from "./SourceListRow.module.css";
 import { findPointForLocation } from "./utils/points";
@@ -29,6 +31,10 @@ export type ItemData = {
 
 const SourceListRow = memo(
   ({ data, index, style }: { data: ItemData; index: number; style: Object }) => {
+    const { isMetaKeyActive, isShiftKeyActive } = useContext(KeyboardModifiersContext);
+
+    const [isHovered, setIsHovered] = useState(false);
+
     const lineNumber = index + 1;
 
     const {
@@ -92,12 +98,12 @@ const SourceListRow = memo(
 
       togglePointButton = (
         <button
-          className={styles.TogglePointButton}
+          className={styles.HoverButton}
           data-test-name="LogPointToggle"
           data-test-state="on"
           onClick={togglePoint}
         >
-          <Icon className={styles.TogglePointButtonIcon} type="remove" />
+          <Icon className={styles.HoverButtonIcon} type="remove" />
         </button>
       );
 
@@ -187,12 +193,12 @@ const SourceListRow = memo(
       togglePointButton = (
         <>
           <button
-            className={styles.TogglePointButton}
+            className={styles.HoverButton}
             data-test-name="LogPointToggle"
             data-test-state="off"
             onClick={addLogPoint}
           >
-            <Icon className={styles.TogglePointButtonIcon} type="add" />
+            <Icon className={styles.HoverButtonIcon} type="add" />
           </button>
         </>
       );
@@ -207,8 +213,26 @@ const SourceListRow = memo(
       "--line-height": `${lineHeight}px`,
     };
 
-    // TODO [source viewer]
-    // Continue to hear button
+    if (isMetaKeyActive) {
+      if (!isHovered) {
+        togglePointButton = null;
+      } else {
+        if (lineHitCounts !== null) {
+          togglePointButton = (
+            <Suspense>
+              <ContinueToButton
+                buttonClassName={styles.HoverButton}
+                direction={isShiftKeyActive ? "previous" : "next"}
+                iconClassName={styles.HoverButtonIcon}
+                lineHitCounts={lineHitCounts}
+                lineNumber={lineNumber}
+                sourceId={sourceId}
+              />
+            </Suspense>
+          );
+        }
+      }
+    }
 
     const toggleBreakpoint = () => {
       if (lineHitCounts === null) {
@@ -238,7 +262,12 @@ const SourceListRow = memo(
     };
 
     return (
-      <div data-test-id={`SourceLine-${lineNumber}`} style={rowStyle}>
+      <div
+        data-test-id={`SourceLine-${lineNumber}`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={rowStyle}
+      >
         <div
           className={[
             lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
