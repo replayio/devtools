@@ -1,7 +1,39 @@
 import { expect, Locator, Page } from "@playwright/test";
 import chalk from "chalk";
 
-import { clearTextArea, debugPrint, delay, getCommandKey } from "./general";
+import { clearTextArea, debugPrint, delay, getCommandKey, stopHovering } from "./general";
+
+export async function addBreakPoint(
+  page: Page,
+  options: {
+    lineNumber: number;
+    sourceId: string;
+  }
+) {
+  const { lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Adding break point for source "${chalk.bold(sourceId)}" at line ${chalk.bold(lineNumber)}`,
+    "addBreakPoint"
+  );
+
+  await openSourceFile(page, sourceId);
+  await goToLine(page, lineNumber);
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+
+  await numberLocator.hover({ force: true });
+
+  const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
+  const state = await toggle.getAttribute("data-test-state");
+  if (state === "off") {
+    await toggle.click({ force: true });
+  }
+
+  await stopHovering(page);
+}
 
 export async function addLogPoint(
   page: Page,
@@ -23,22 +55,26 @@ export async function addLogPoint(
   await openSourceFile(page, sourceId);
   await goToLine(page, lineNumber);
 
-  const locator = getSourceLineLocator(page, sourceId, lineNumber);
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
 
   // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
-  await locator
-    .locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`)
-    .hover({ force: true });
+  await numberLocator.hover({ force: true });
 
-  const button = locator.locator('[data-test-name="AddPointButton"]');
-  await button.click({ force: true });
+  const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
+  const state = await toggle.getAttribute("data-test-state");
+  if (state === "off") {
+    await toggle.click({ force: true });
+  }
 
   if (content || condition) {
-    await editLogPointText(page, options);
+    await editLogPoint(page, options);
   }
+
+  await stopHovering(page);
 }
 
-export async function editLogPointText(
+export async function editLogPoint(
   page: Page,
   options: {
     content?: string;
@@ -52,7 +88,7 @@ export async function editLogPointText(
   await debugPrint(
     page,
     `Editing log point for source "${chalk.bold(sourceId)}" at line ${chalk.bold(lineNumber)}`,
-    "editLogPointText"
+    "editLogPoint"
   );
 
   await openSourceFile(page, sourceId);
@@ -73,18 +109,14 @@ export async function editLogPointText(
   );
   const editButtonIsVisible = await editButtonLocator.isVisible();
   if (editButtonIsVisible) {
-    await debugPrint(page, `Toggling point to be editable`, "editLogPointText");
+    await debugPrint(page, `Toggling point to be editable`, "editLogPoint");
 
     await editButtonLocator.click();
   }
 
   const contentLocator = pointPanelLocator.locator(`[data-test-name=PointPanel-ContentInput]`);
   if (content != null) {
-    await debugPrint(
-      page,
-      `Setting log point content to "${chalk.bold(content)}"`,
-      "editLogPointText"
-    );
+    await debugPrint(page, `Setting log point content to "${chalk.bold(content)}"`, "editLogPoint");
 
     await clearTextArea(page, contentLocator);
     await contentLocator.fill(content);
@@ -96,7 +128,7 @@ export async function editLogPointText(
     await debugPrint(
       page,
       `Setting log point condition to "${chalk.bold(condition)}"`,
-      "editLogPointText"
+      "editLogPoint"
     );
 
     if (!isConditionInputVisible) {
@@ -182,6 +214,71 @@ export async function openSourceFile(page: Page, sourceId: string) {
 
     await page.locator(`[data-test-id="SourceExplorerSource-${sourceId}"]`).click();
   }
+}
+
+export async function removeBreakPoint(
+  page: Page,
+  options: {
+    lineNumber: number;
+    sourceId: string;
+  }
+) {
+  const { lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Removing break point for source "${chalk.bold(sourceId)}" at line ${chalk.bold(lineNumber)}`,
+    "removeBreakPoint"
+  );
+
+  await openSourceFile(page, sourceId);
+  await goToLine(page, lineNumber);
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+
+  await numberLocator.hover({ force: true });
+
+  const toggle = lineLocator.locator('[data-test-name="BreakpointToggle"]');
+  const state = await toggle.getAttribute("data-test-state");
+  if (state === "on") {
+    await toggle.click({ force: true });
+  }
+
+  await stopHovering(page);
+}
+
+export async function removeLogPoint(
+  page: Page,
+  options: {
+    lineNumber: number;
+    sourceId: string;
+  }
+) {
+  const { lineNumber, sourceId } = options;
+
+  await debugPrint(
+    page,
+    `Removing log point for source "${chalk.bold(sourceId)}" at line ${chalk.bold(lineNumber)}`,
+    "removeLogPoint"
+  );
+
+  await openSourceFile(page, sourceId);
+  await goToLine(page, lineNumber);
+
+  const lineLocator = getSourceLineLocator(page, sourceId, lineNumber);
+  const numberLocator = lineLocator.locator(`[data-test-id="SourceLine-LineNumber-${lineNumber}"]`);
+
+  // Hover over the line number itself, not the line, to avoid triggering protocol preview requests.
+  await numberLocator.hover({ force: true });
+
+  const toggle = lineLocator.locator('[data-test-name="LogPointToggle"]');
+  const state = await toggle.getAttribute("data-test-state");
+  if (state === "on") {
+    await toggle.click({ force: true });
+  }
+
+  await stopHovering(page);
 }
 
 export async function searchSourceText(page: Page, text: string) {

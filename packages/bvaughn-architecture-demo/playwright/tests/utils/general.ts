@@ -152,6 +152,10 @@ export async function awaitNoLoaders(page: Page, scope: Locator | null = null) {
   throw Error("Timed out waiting for loaders to finish");
 }
 
+export async function stopHovering(page: Page): Promise<void> {
+  await page.mouse.move(0, 0);
+}
+
 export async function waitFor(
   callback: () => Promise<void>,
   options: {
