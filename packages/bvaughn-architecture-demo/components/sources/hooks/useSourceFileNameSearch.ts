@@ -70,6 +70,7 @@ export type Actions = SearchActions & {
 };
 
 export type State = SearchState<Result> & {
+  goToLineMode: boolean;
   goToLineNumber: number | null;
 };
 
@@ -86,13 +87,21 @@ export default function useSourceFileNameSearch(): [State, Actions] {
     [dispatch]
   );
 
-  const externalState = useMemo(
-    () => ({
+  const externalState = useMemo(() => {
+    const goToLineMode = state.query.startsWith(":");
+    let goToLineNumber: number | null = null;
+    if (goToLineMode) {
+      const parsed = parseInt(state.query.slice(1), 10);
+      if (!Number.isNaN(parsed)) {
+        goToLineNumber = parsed;
+      }
+    }
+    return {
       ...state,
-      goToLineNumber: state.query.startsWith(":") ? parseInt(state.query.slice(1), 10) : null,
-    }),
-    [state]
-  );
+      goToLineMode,
+      goToLineNumber,
+    };
+  }, [state]);
 
   return [externalState, externalActions];
 }

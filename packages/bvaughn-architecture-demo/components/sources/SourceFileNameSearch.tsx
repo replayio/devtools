@@ -95,12 +95,12 @@ export default function SourceFileNameSearch({
   };
 
   let results = null;
-  if (searchState.goToLineNumber !== null) {
+  if (searchState.goToLineMode) {
     results = (
       <div className={styles.Results} data-test-id="SourceFileNameSearchResults">
         <div className={styles.Result}>
           <span className={styles.GoToLinePrefix}>Go to line</span>
-          {searchState.goToLineNumber}
+          {searchState.goToLineNumber || ""}
         </div>
       </div>
     );
