@@ -22,6 +22,7 @@ import { Point } from "shared/client/types";
 import Loader from "../Loader";
 
 import AutoComplete from "./AutoComplete/AutoComplete";
+import BadgePicker from "./BadgePicker";
 import styles from "./PointPanel.module.css";
 import PointPanelTimeline from "./PointPanelTimeline";
 import SyntaxHighlightedLine from "./SyntaxHighlightedLine";
@@ -264,7 +265,11 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
             )}
           </div>
           <div className={styles.Row}>
-            <PointPanelTimeline hitPoints={hitPoints} hitPointStatus={hitPointStatus} />
+            <PointPanelTimeline
+              hitPoints={hitPoints}
+              hitPointStatus={hitPointStatus}
+              point={point}
+            />
           </div>
         </div>
         {accessToken !== null && (
@@ -282,10 +287,4 @@ function PointPanel({ className, point }: { className: string; point: Point }) {
       </div>
     );
   }
-}
-
-// TODO [source viewer]
-// Badge picker UI
-function BadgePicker({ point }: { point: Point }) {
-  return <div className={styles.BadgePicker} />;
 }

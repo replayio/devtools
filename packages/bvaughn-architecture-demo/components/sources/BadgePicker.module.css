@@ -1,0 +1,18 @@
+.BadgePickerButton {
+  width: 1.5rem;
+  height: 1.5rem;
+  background: none;
+  padding: 0;
+  border: 0;
+  margin: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.BadgePicker {
+  flex: 0 0 0.5rem;
+  height: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: var(--badge-background-color);
+}

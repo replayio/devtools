@@ -44,9 +44,13 @@
   width: 10ch;
   height: 3ch;
   border-radius: 1rem;
+
+  background-color: var(--badge-background-color);
+  color: var(--badge-color);
 }
 .HitPointsLabelTooMany {
   color: var(--color-dimmer);
+  color: var(--badge-color);
 }
 
 .HitPointTimeline,

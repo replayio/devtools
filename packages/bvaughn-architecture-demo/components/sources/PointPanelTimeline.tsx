@@ -2,20 +2,22 @@ import Icon from "@bvaughn/components/Icon";
 import { SessionContext } from "@bvaughn/src/contexts/SessionContext";
 import { TimelineContext } from "@bvaughn/src/contexts/TimelineContext";
 import { isExecutionPointsGreaterThan, isExecutionPointsLessThan } from "@bvaughn/src/utils/time";
-import { useContext } from "react";
-
-import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
+import { TimeStampedPoint } from "@replayio/protocol";
+import { CSSProperties, useContext } from "react";
+import { HitPointStatus, Point } from "shared/client/types";
 
 import styles from "./PointPanelTimeline.module.css";
-import { TimeStampedPoint } from "@replayio/protocol";
-import { HitPointStatus } from "shared/client/types";
+import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
+import { findHitPoint, findHitPointAfter, findHitPointBefore } from "./utils/points";
 
 export default function PointPanelTimeline({
   hitPoints,
   hitPointStatus,
+  point,
 }: {
   hitPoints: TimeStampedPoint[];
   hitPointStatus: HitPointStatus;
+  point: Point;
 }) {
   const { duration } = useContext(SessionContext);
   const {
@@ -54,6 +56,8 @@ export default function PointPanelTimeline({
 
   const tooManyPointsToFind = hitPointStatus === "too-many-points-to-find";
 
+  const badgeStyle = getBadgeStyleVars(point.badge);
+
   return (
     <>
       <button
@@ -64,9 +68,13 @@ export default function PointPanelTimeline({
         <Icon className={styles.PreviousHitPointButtonIcon} type="arrow-left" />
       </button>
       {tooManyPointsToFind ? (
-        <div className={styles.HitPointsLabelTooMany}>-</div>
+        <div className={styles.HitPointsLabelTooMany} style={badgeStyle as CSSProperties}>
+          -
+        </div>
       ) : (
-        <div className={styles.HitPointsLabel}>{label}</div>
+        <div className={styles.HitPointsLabel} style={badgeStyle as CSSProperties}>
+          {label}
+        </div>
       )}
       <button
         className={styles.NextHitPointButton}
