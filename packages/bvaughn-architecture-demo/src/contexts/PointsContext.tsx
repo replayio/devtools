@@ -36,29 +36,35 @@ export type PointsContextType = {
   pointsForAnalysis: Point[];
 };
 
-let idCounter: number = 0;
-
 export const PointsContext = createContext<PointsContextType>(null as any);
 
 export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
   const { recordingId } = useContext(SessionContext);
-  const [points, setPoints] = useLocalStorage<Point[]>(`${recordingId}::points`, []);
-  const [pointsForAnalysis, setPointsForAnalysis] = useState<Point[]>(points);
 
-  const [isPending, startTransition] = useTransition();
+  // Both high-pri state and transition state should be managed by useLocalStorage,
+  // Else values from other tabs will only be synced to the high-pri state.
+  const [points, setPoints] = useLocalStorage<Point[]>(`${recordingId}::points`, []);
+  const [pointsForAnalysis, setPointsForAnalysis, isPending] = useLocalStorage<Point[]>(
+    `${recordingId}::points::transition`,
+    [],
+    true
+  );
 
   const setPointsHelper = useCallback(
-    (updater: SetStateAction<Point[]>) => {
-      setPoints(updater);
-      startTransition(() => {
-        setPointsForAnalysis(updater);
-      });
+    (action: SetStateAction<Point[]>) => {
+      setPoints(action);
+      setPointsForAnalysis(action);
     },
-    [setPoints]
+    [setPoints, setPointsForAnalysis]
   );
 
   const addPoint = useCallback(
     (partialPoint: Partial<Point> | null, location: Location) => {
+      // Points (and their ids) are shared between tabs (via LocalStorage),
+      // so the id numbers should be deterministic;
+      // a single incrementing counter wouldn't work well unless it was also synced.
+      const id = `${location.sourceId}:${location.line}:${location.column}`;
+
       const point: Point = {
         badge: null,
         content: "",
@@ -67,7 +73,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
         shouldBreak: false,
         shouldLog: false,
         ...partialPoint,
-        id: idCounter++,
+        id,
         location,
       };
 
@@ -102,7 +108,7 @@ export function PointsContextRoot({ children }: PropsWithChildren<{}>) {
           return points;
         }
 
-        throw Error(`Could not find point with "${id}"`);
+        throw Error(`Could not find point with id "${id}"`);
       });
     },
     [setPointsHelper]
