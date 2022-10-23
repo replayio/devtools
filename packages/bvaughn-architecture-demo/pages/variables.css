@@ -92,6 +92,7 @@
   --value-type-html-text: #d7d7db;
 
   --badge-default-color: #898f95;
+  --badge-default-contrast-color: #000;
   --badge-green-color: #69e261;
   --badge-green-contrast-color: #050;
   --badge-orange-color: #ff9a19;
@@ -199,6 +200,7 @@
   --value-type-html-text: #0c0c0d;
 
   --badge-default-color: #dcdcdc;
+  --badge-default-contrast-color: #000;
   --badge-green-color: #73cc6d;
   --badge-green-contrast-color: #fff;
   --badge-orange-color: #da7c04;

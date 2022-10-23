@@ -229,7 +229,8 @@
 .PointPanel {
   position: absolute;
   top: var(--line-height);
-  width: 100%;
+  width: calc(var(--list-width) - var(--line-number-size) - 2ch);
+  left: calc(var(--line-number-size) + 2ch);
   border-left: 1px solid var(--border-color-light);
-  left: -1px;
+  font-size: var(--font-size-small);
 }

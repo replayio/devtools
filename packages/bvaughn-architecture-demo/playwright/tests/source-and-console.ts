@@ -247,3 +247,6 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToNextButtonEnabled(page, 15)).toBe(true);
   await expect(await isContinueToPreviousButtonEnabled(page, 15)).toBe(false);
 });
+
+// TODO [source viewer]
+// Test for badge picker colors
