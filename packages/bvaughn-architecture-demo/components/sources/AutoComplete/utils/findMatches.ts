@@ -14,10 +14,10 @@ export default function find(
     // We're searching the properties of an object.
     // Ignore scope values because they aren't part of that object.
     if (expressionTail) {
-      return findMatches(expressionTail.toLowerCase(), scopes, null);
+      return findMatches(expressionTail.toLowerCase(), null, properties);
     } else {
       // Show all properties until a user has started narrowing things down.
-      return flatten(scopes, properties);
+      return flatten(null, properties);
     }
   } else if (expressionTail) {
     // If there's no expression head, we might be searching values in scope,
