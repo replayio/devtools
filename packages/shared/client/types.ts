@@ -61,7 +61,7 @@ export type Events = {
   navigationEvents: NavigationEvent[];
 };
 
-export type PointId = number;
+export type PointId = string;
 export type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
 export type Point = {
   badge: Badge | null;
