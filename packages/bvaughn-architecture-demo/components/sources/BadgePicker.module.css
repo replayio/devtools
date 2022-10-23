@@ -1,18 +1,52 @@
 .BadgePickerButton {
   width: 1.5rem;
   height: 1.5rem;
+  flex-grow: 0;
+  flex-shrink: 0;
   background: none;
   padding: 0;
   border: 0;
-  margin: none;
+  margin: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 }
 
-.BadgePicker {
+.BadgePickerButtonIcon {
   flex: 0 0 0.5rem;
   height: 0.5rem;
   border-radius: 0.5rem;
   background-color: var(--badge-background-color);
+  fill: var(--badge-background-color);
+}
+
+.BadgePickerOpen {
+  position: relative;
+  display: flex;
+  height: 1.5rem;
+  width: 1.5rem;
+}
+
+.BadgePickerPopOut {
+  background-color: var(--badge-background);
+  border-radius: 1.5rem;
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color-contrast-2);
+}
+
+.UnicornBadge {
+  overflow: visible;
+  position: relative;
+  margin: 0;
+}
+.Unicorn {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.25rem;
+  margin-left: -0.25rem;
+  background-image: url(../../public/unicorn.svg) !important;
+  background-size: auto 100%;
 }
