@@ -16,12 +16,11 @@ import {
   getSourceLineLocator,
   removeBreakPoint,
   removeLogPoint,
-  hoverOverLine,
   continueTo,
-  isContinueToButtonEnabled,
   isContinueToNextButtonEnabled,
   isContinueToPreviousButtonEnabled,
   isLineCurrent,
+  toggleLogPointBadge,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
@@ -144,25 +143,15 @@ test("should support custom badge styles for log points", async ({ page }) => {
 test("should handle too many points to find", async ({ page }) => {
   await addLogPoint(page, { sourceId, lineNumber: 68 });
 
-  const popup = page.locator('[data-test-id="PointPanel-68"]');
+  const popup = getPointPanelLocator(page, 68);
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-find");
-
-  await toggleProtocolMessages(page, false);
-
-  const messagesList = page.locator('[data-test-name="Messages"]');
-  await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
 });
 
 test("should handle too many points to run analysis", async ({ page }) => {
   await addLogPoint(page, { sourceId, lineNumber: 70 });
 
-  const popup = page.locator('[data-test-id="PointPanel-70"]');
+  const popup = getPointPanelLocator(page, 70);
   await takeScreenshot(page, popup, "log-point-message-too-many-points-to-run-analysis");
-
-  await toggleProtocolMessages(page, false);
-
-  const messagesList = page.locator('[data-test-name="Messages"]');
-  await takeScreenshot(page, messagesList, "log-point-empty-messages-list");
 });
 
 test("should support fuzzy file search", async ({ page }) => {
@@ -248,5 +237,14 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToPreviousButtonEnabled(page, 15)).toBe(false);
 });
 
-// TODO [source viewer]
-// Test for badge picker colors
+test("should allow log point badge colors to be toggled", async ({ page }) => {
+  const pointPanelLocator = getPointPanelLocator(page, 13);
+  await addLogPoint(page, { sourceId, lineNumber: 13 });
+  await takeScreenshot(page, pointPanelLocator, "point-panel-default-badge");
+  await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: "green" });
+  await takeScreenshot(page, pointPanelLocator, "point-panel-green-badge");
+  await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: "unicorn" });
+  await takeScreenshot(page, pointPanelLocator, "point-panel-unicorn-badge");
+  await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: null });
+  await takeScreenshot(page, pointPanelLocator, "point-panel-default-badge");
+});

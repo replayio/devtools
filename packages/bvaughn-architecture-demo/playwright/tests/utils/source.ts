@@ -3,6 +3,8 @@ import chalk from "chalk";
 
 import { clearTextArea, debugPrint, delay, getCommandKey, stopHovering } from "./general";
 
+type Badge = "blue" | "green" | "orange" | "purple" | "unicorn" | "yellow";
+
 type AsyncFunction = () => Promise<void>;
 
 export async function addBreakPoint(
@@ -39,13 +41,14 @@ export async function addBreakPoint(
 export async function addLogPoint(
   page: Page,
   options: {
+    badge?: Badge | null;
     content?: string;
     condition?: string;
     lineNumber: number;
     sourceId: string;
   }
 ) {
-  const { content, condition, lineNumber, sourceId } = options;
+  const { badge, condition, content, lineNumber, sourceId } = options;
 
   await debugPrint(
     page,
@@ -66,9 +69,11 @@ export async function addLogPoint(
     await toggle.click({ force: true });
   }
 
-  if (content || condition) {
+  if (condition !== undefined || content !== undefined) {
     await editLogPoint(page, options);
   }
+
+  await toggleLogPointBadge(page, { badge, lineNumber, sourceId });
 
   await stopHovering(page);
 }
@@ -445,4 +450,45 @@ export async function searchSourcesByName(page: Page, text: string) {
 
   await clearTextArea(page, input);
   await page.keyboard.type(text);
+}
+
+export async function toggleLogPointBadge(
+  page: Page,
+  options: {
+    badge?: Badge | null;
+    lineNumber: number;
+    sourceId: string;
+  }
+) {
+  const { badge, lineNumber, sourceId } = options;
+
+  await openSourceFile(page, sourceId);
+  await goToLine(page, lineNumber);
+
+  const pointPanelLocator = getPointPanelLocator(page, options.lineNumber);
+
+  const targetBadgeState = badge || "default";
+  const badgeLocator = pointPanelLocator.locator(`[data-test-name=BadgePickerButton]`);
+
+  const isVisible = await badgeLocator.isVisible();
+  if (!isVisible) {
+    // Edge case for too-many-points
+    return;
+  }
+
+  const badgeState = await badgeLocator.getAttribute("data-test-state");
+  if (targetBadgeState !== badgeState) {
+    await debugPrint(
+      page,
+      `Setting badge to "${chalk.bold(targetBadgeState)}"`,
+      "toggleLogPointBadge"
+    );
+
+    await badgeLocator.click();
+
+    const targetButton = pointPanelLocator.locator(
+      `[data-test-name=BadgeButtonButton-${targetBadgeState}]`
+    );
+    await targetButton.click();
+  }
 }
