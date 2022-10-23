@@ -22,8 +22,9 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
+  --background-color-current-execution-point: #25364e;
+  --background-color-current-search-result: #42381f;
   --background-color-warning: #42381f;
-  --background-color-current-line: #25364e;
   --color-brand: #09a6e9;
   --color-contrast: #081121;
   --color-current: #f02d5e;
@@ -129,7 +130,8 @@
   --background-color-primary-button: #09a6e9;
   --background-color-secondary-button: #f02d5e;
   --background-color-tertiary-button: #929292;
-  --background-color-current-line: #eaf3ff;
+  --background-color-current-execution-point: #eaf3ff;
+  --background-color-current-search-result: #fffac8;
   --background-color-warning: #fffac8;
   --border-color: #081121;
   --border-color-light: #f9f9fa;

@@ -248,3 +248,12 @@ test("should allow log point badge colors to be toggled", async ({ page }) => {
   await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: null });
   await takeScreenshot(page, pointPanelLocator, "point-panel-default-badge");
 });
+
+// TODO [source viewer]
+// Test that scroll position and hit counts are restored per source
+
+// TODO [source viewer]
+// Test fuzzy search when switching sources
+
+// TODO [source viewer]
+// Test go-to-line when switching sources

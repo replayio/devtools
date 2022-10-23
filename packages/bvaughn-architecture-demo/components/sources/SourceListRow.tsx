@@ -185,12 +185,7 @@ const SourceListRow = memo(
           } as CSSProperties
         }
       >
-        <div
-          className={[
-            lineHasHits ? styles.LineWithHits : styles.LineWithoutHits,
-            currentSearchResultLineIndex === index ? styles.CurrentSearchResultLine : undefined,
-          ].join(" ")}
-        >
+        <div className={lineHasHits ? styles.LineWithHits : styles.LineWithoutHits}>
           <div className={styles.LineNumber} data-test-id={`SourceLine-LineNumber-${lineNumber}`}>
             {lineNumber}
             <div
@@ -219,7 +214,11 @@ const SourceListRow = memo(
           )}
 
           <div className={styles.LineSegmentsAndPointPanel}>
-            <CurrentLineHighlight lineNumber={lineNumber} sourceId={sourceId} />
+            <CurrentLineHighlight
+              currentSearchResultLineIndex={currentSearchResultLineIndex}
+              lineNumber={lineNumber}
+              sourceId={sourceId}
+            />
 
             {lineSegments}
 

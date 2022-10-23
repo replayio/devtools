@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import styles from "./CurrentLineHighlight.module.css";
 
 type Props = {
+  currentSearchResultLineIndex: number | null;
   lineNumber: number;
   sourceId: SourceId;
 };
@@ -16,7 +17,11 @@ export default function CurrentLineHighlight(props: Props) {
     </Suspense>
   );
 }
-function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
+function CurrentLineHighlightSuspends({
+  currentSearchResultLineIndex,
+  lineNumber,
+  sourceId,
+}: Props) {
   const pauseData = useCurrentPause();
   if (pauseData !== null && pauseData.data && pauseData.data.frames) {
     // TODO [source viewer]
@@ -29,9 +34,20 @@ function CurrentLineHighlightSuspends({ lineNumber, sourceId }: Props) {
           location => location.line === lineNumber && location.sourceId === sourceId
         )
       ) {
-        return <div className={styles.CurrentLine} data-test-name="CurrentLineHighlight" />;
+        return (
+          <div
+            className={styles.CurrentExecutionPoint}
+            data-test-name="CurrentExecutionPointLineHighlight"
+          />
+        );
       }
     }
+  }
+
+  if (currentSearchResultLineIndex !== null && currentSearchResultLineIndex + 1 === lineNumber) {
+    return (
+      <div className={styles.CurrentSearchResult} data-test-name="CurrentSearchResultHighlight" />
+    );
   }
 
   return null;
