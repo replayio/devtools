@@ -6,6 +6,8 @@ import Icon from "../Icon";
 import styles from "./BadgePicker.module.css";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
 
+// TODO [source viewer]
+// Animate open and close transition
 export default function BadgePicker({ point }: { point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
