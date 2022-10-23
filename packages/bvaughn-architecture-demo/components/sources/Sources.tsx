@@ -2,7 +2,7 @@ import Loader from "@bvaughn/components/Loader";
 import { SourcesContext } from "@bvaughn/src/contexts/SourcesContext";
 import { getSource } from "@bvaughn/src/suspense/SourcesCache";
 import { getSourceFileName } from "@bvaughn/src/utils/source";
-import { KeyboardEvent, Suspense, useContext, useRef } from "react";
+import { KeyboardEvent, MouseEvent, Suspense, useContext, useRef } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 import Icon from "../Icon";
@@ -87,16 +87,32 @@ function Sources() {
           {openSourceIds.map(sourceId => {
             const source = getSource(client, sourceId);
             const fileName = (source && getSourceFileName(source, true)) || "unknown";
+
+            const onOpenButtonClick = (event: MouseEvent) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              openSource(sourceId);
+            };
+
+            const onCloseButtonClick = (event: MouseEvent) => {
+              event.preventDefault();
+              event.stopPropagation();
+
+              closeSource(sourceId);
+            };
+
             return (
               <div
                 key={sourceId}
                 className={sourceId === focusedSourceId ? styles.SelectedTab : styles.Tab}
                 data-test-id={`SourceTab-${sourceId}`}
+                onClick={onOpenButtonClick}
               >
-                <button className={styles.OpenButton} onClick={() => openSource(sourceId)}>
+                <button className={styles.OpenButton} onClick={onOpenButtonClick}>
                   {fileName}
                 </button>
-                <button className={styles.CloseButton} onClick={() => closeSource(sourceId)}>
+                <button className={styles.CloseButton} onClick={onCloseButtonClick}>
                   <Icon className={styles.Icon} type="close" />
                 </button>
               </div>
