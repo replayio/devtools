@@ -64,38 +64,40 @@ function LineNumberTooltipSuspends({ keyModifiers }: Props) {
   const replayClient = useContext(ReplayClientContext);
   const { range: focusRange } = useContext(FocusContext);
 
-  const hitsCounts =
+  const hitCountsForAllLines =
     source && visibleLines
       ? getSourceHitCounts(replayClient, source.id, visibleLines, focusRange)
       : null;
 
-  let hitsCount: number | null = null;
-  if (hoveredLineIndex != null && hitsCounts != null) {
+  let hitsForHoveredLine: number | null = null;
+  if (hoveredLineIndex != null && hitCountsForAllLines != null) {
     const hoveredLineNumber = hoveredLineIndex + 1;
-    const lineHits = hitsCounts.get(hoveredLineNumber);
+    const lineHits = hitCountsForAllLines.get(hoveredLineNumber);
     if (lineHits) {
       // If there are multiple columns with hits for a line, show the first one.
-      hitsCount = lineHits.count;
+      hitsForHoveredLine = lineHits.count;
     }
   }
 
   useEffect(() => {
-    trackEvent(hitsCount ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits");
-    trackEvent("breakpoint.preview_hits", { hitsCount });
-  }, [hitsCount]);
+    trackEvent(hitsForHoveredLine ? "breakpoint.preview_has_hits" : "breakpoint.preview_no_hits");
+    trackEvent("breakpoint.preview_hits", { hitsCount: hitsForHoveredLine });
+  }, [hitsForHoveredLine]);
 
   if (isMetaActive) {
     return null;
   } else if (hoveredLineIndex === null || hoveredLineNode === null) {
     return null;
-  } else if (hitsCount == null) {
+  } else if (hitCountsForAllLines == null) {
     return <Loading hoveredLineNode={hoveredLineNode} />;
+  } else if (hitsForHoveredLine == null) {
+    return null;
   }
 
   return (
     <StaticTooltip targetNode={hoveredLineNode}>
-      <Wrapper showWarning={hitsCount! > 200}>
-        {hitsCount} hit{hitsCount == 1 ? "" : "s"}
+      <Wrapper showWarning={hitsForHoveredLine! > 200}>
+        {hitsForHoveredLine} hit{hitsForHoveredLine == 1 ? "" : "s"}
       </Wrapper>
     </StaticTooltip>
   );
