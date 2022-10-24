@@ -13,10 +13,6 @@
   color: var(--color-dimmer);
 }
 
-.CurrentSearchResultLine {
-  background-color: var(--background-color-contrast-1);
-}
-
 .Header {
   display: flex;
   align-items: center;

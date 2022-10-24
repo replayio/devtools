@@ -19,7 +19,7 @@ import {
   continueTo,
   isContinueToNextButtonEnabled,
   isContinueToPreviousButtonEnabled,
-  isLineCurrent,
+  isLineCurrentExecutionPoint,
   toggleLogPointBadge,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
@@ -222,9 +222,9 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
 
   // Go to line 14.
-  await expect(await isLineCurrent(page, 14)).toBe(false);
+  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(false);
   await continueTo(page, { lineNumber: 14, direction: "next" });
-  await expect(await isLineCurrent(page, 14)).toBe(true);
+  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(true);
 
   // Continue to next and previous buttons should both now be disabled for line 14.
   // Continue to previous should be enabled for line 13
@@ -248,3 +248,31 @@ test("should allow log point badge colors to be toggled", async ({ page }) => {
   await toggleLogPointBadge(page, { sourceId, lineNumber: 13, badge: null });
   await takeScreenshot(page, pointPanelLocator, "point-panel-default-badge");
 });
+
+test("scroll position should be restored when switching between sources", async ({ page }) => {
+  // Scroll to the bottom of "h1"
+  await openSourceFile(page, "h1");
+  await goToLine(page, 77);
+  const line77 = getSourceLineLocator(page, "h1", 77);
+  await expect(await line77.isVisible()).toBe(true);
+
+  // Open source "1" and scroll to the middle
+  await openSourceFile(page, "1");
+  await goToLine(page, 100);
+  const line100 = getSourceLineLocator(page, "1", 100);
+  await expect(await line100.isVisible()).toBe(true);
+
+  // Switch back and verify that we're still at the bottom of "h1"
+  await openSourceFile(page, "h1");
+  await expect(await line77.isVisible()).toBe(true);
+
+  // Switch back and verify that we're still in the middle of "1"
+  await openSourceFile(page, "1");
+  await expect(await line100.isVisible()).toBe(true);
+});
+
+// TODO [source viewer]
+// Test fuzzy search when switching sources
+
+// TODO [source viewer]
+// Test go-to-line when switching sources

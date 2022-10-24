@@ -1,3 +1,9 @@
+.BadgePicker {
+  width: 1.5rem;
+  height: 1.5rem;
+  position: relative;
+}
+
 .BadgePickerButton {
   width: 1.5rem;
   height: 1.5rem;
@@ -13,27 +19,70 @@
   cursor: pointer;
 }
 
+.BadgePickerButtonToggle {
+  position: relative;
+  z-index: 2;
+}
+
 .BadgePickerButtonIcon {
+  position: relative;
   flex: 0 0 0.5rem;
   height: 0.5rem;
   border-radius: 0.5rem;
   background-color: var(--badge-background-color);
   fill: var(--badge-background-color);
 }
+.BadgePickerButtonIcon:after {
+  content: "";
+  position: absolute;
+  top: -0.25rem;
+  left: -0.25rem;
+  height: 1rem;
+  width: 1rem;
+  border-radius: 1rem;
+  background-color: var(--badge-background-color);
+  opacity: 0;
+  transition: opacity 250ms;
+}
+.BadgePickerPopOut .BadgePickerButtonCurrent .BadgePickerButtonIcon:after,
+.BadgePickerPopOut .BadgePickerButton:hover .BadgePickerButtonIcon:after {
+  opacity: 0.25;
+}
 
-.BadgePickerOpen {
-  position: relative;
+.BadgePickerOpen,
+.BadgePickerClosed {
+  position: absolute;
+  top: 0;
+  left: 0;
   display: flex;
   height: 1.5rem;
   width: 1.5rem;
 }
+.BadgePickerOpen {
+  z-index: 1;
+}
+.BadgePickerClosed {
+  z-index: 0;
+}
 
 .BadgePickerPopOut {
-  background-color: var(--badge-background);
+  background-color: var(--background-color-contrast-2);
   border-radius: 1.5rem;
   display: flex;
   align-items: center;
-  background-color: var(--background-color-contrast-2);
+  padding-left: 1.5rem;
+}
+
+.BadgePickerOpen .BadgePickerPopOut {
+  animation: expand 250ms ease-out;
+  animation-fill-mode: forwards;
+  width: 1.5rem;
+}
+.BadgePickerClosed .BadgePickerPopOut {
+  animation: contract 250ms ease-out;
+  animation-fill-mode: forwards;
+  width: 9rem;
+  pointer-events: none;
 }
 
 .UnicornBadge {
@@ -49,4 +98,90 @@
   margin-left: -0.25rem;
   background-image: url(../../public/unicorn.svg) !important;
   background-size: auto 100%;
+}
+
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton {
+  animation: fadein 100ms linear;
+  animation-fill-mode: forwards;
+  opacity: 0;
+}
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(1) {
+  animation-delay: 50ms;
+}
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(2) {
+  animation-delay: 100ms;
+}
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(3) {
+  animation-delay: 150ms;
+}
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(4) {
+  animation-delay: 200ms;
+}
+.BadgePickerOpen .BadgePickerPopOut .BadgePickerButton:nth-of-type(5) {
+  animation-delay: 250ms;
+}
+
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton {
+  animation: fadeout 50ms linear;
+  animation-fill-mode: forwards;
+  opacity: 1;
+  pointer-events: none;
+}
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(1) {
+  animation-delay: 200ms;
+}
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(2) {
+  animation-delay: 150ms;
+}
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(3) {
+  animation-delay: 100ms;
+}
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(4) {
+  animation-delay: 50ms;
+}
+.BadgePickerClosed .BadgePickerPopOut .BadgePickerButton:nth-of-type(5) {
+  animation-delay: 0ms;
+}
+
+@keyframes expand {
+  0% {
+    opacity: 0;
+    width: 1.5rem;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    width: 9rem;
+  }
+}
+@keyframes contract {
+  0% {
+    width: 9rem;
+  }
+  75% {
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    opacity: 0;
+  }
+}
+
+@keyframes fadein {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
 }

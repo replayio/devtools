@@ -34,7 +34,7 @@ export type OpenSourcesState = {
   hoveredLineIndex: number | null;
   hoveredLineNode: HTMLElement | null;
   openSourceIds: SourceId[];
-  visibleLines: SourceLocationRange | null;
+  visibleLinesBySourceId: { [key: SourceId]: SourceLocationRange };
 };
 
 const INITIAL_STATE: OpenSourcesState = {
@@ -42,7 +42,7 @@ const INITIAL_STATE: OpenSourcesState = {
   hoveredLineIndex: null,
   hoveredLineNode: null,
   openSourceIds: [],
-  visibleLines: null,
+  visibleLinesBySourceId: {},
 };
 
 type CloseSourceAction = { type: "close_source"; sourceId: SourceId };
@@ -73,7 +73,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         hoveredLineIndex: prevHoveredLine,
         hoveredLineNode: prevHoveredLineNode,
         openSourceIds,
-        visibleLines: prevVisibleLines,
+        visibleLinesBySourceId: prevVisibleLinesBySourceId,
       } = state;
 
       const index = openSourceIds.indexOf(sourceId);
@@ -81,11 +81,9 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         let focusedSourceId = prevFocusedSourceId;
         let hoveredLineIndex = prevHoveredLine;
         let hoveredLineNode = prevHoveredLineNode;
-        let visibleLines = prevVisibleLines;
         if (prevFocusedSourceId === sourceId) {
           hoveredLineIndex = null;
           hoveredLineNode = null;
-          visibleLines = null;
 
           if (index > 0) {
             focusedSourceId = openSourceIds[index - 1];
@@ -96,12 +94,15 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
           }
         }
 
+        const visibleLinesBySourceId = { ...prevVisibleLinesBySourceId };
+        delete visibleLinesBySourceId[sourceId];
+
         return {
           focusedSourceId,
           hoveredLineIndex,
           hoveredLineNode,
           openSourceIds: [...openSourceIds.slice(0, index), ...openSourceIds.slice(index + 1)],
-          visibleLines,
+          visibleLinesBySourceId,
         };
       } else {
         return state;
@@ -109,7 +110,11 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     }
     case "open_source": {
       const { sourceId } = action;
-      const { focusedSourceId: prevFocusedSourceId, openSourceIds: prevOpenSourceIds } = state;
+      const {
+        focusedSourceId: prevFocusedSourceId,
+        openSourceIds: prevOpenSourceIds,
+        visibleLinesBySourceId: prevVisibleLinesBySourceId,
+      } = state;
 
       if (sourceId === prevFocusedSourceId) {
         return state;
@@ -125,7 +130,7 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
         hoveredLineIndex: null,
         hoveredLineNode: null,
         openSourceIds,
-        visibleLines: null,
+        visibleLinesBySourceId: prevVisibleLinesBySourceId,
       };
     }
     case "set_hovered_location": {
@@ -145,10 +150,19 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
     }
     case "set_visible_lines": {
       const { startIndex, stopIndex } = action;
-      const { visibleLines: prevVisibleLines } = state;
+      const { focusedSourceId, visibleLinesBySourceId: prevVisibleLinesBySourceId } = state;
 
-      const prevStartIndex = prevVisibleLines === null ? null : prevVisibleLines.start.line;
-      const prevStopIndex = prevVisibleLines === null ? null : prevVisibleLines.start.line;
+      if (focusedSourceId === null) {
+        return state;
+      }
+
+      let prevStartIndex = null;
+      let prevStopIndex = null;
+      const prevVisibleLines = prevVisibleLinesBySourceId[focusedSourceId];
+      if (prevVisibleLines != null) {
+        prevStartIndex = prevVisibleLines.start.line;
+        prevStopIndex = prevVisibleLines.start.line;
+      }
 
       // Automatically bucket lines to avoid triggering too many updates.
       let bucketedStartIndex = null;
@@ -164,22 +178,26 @@ function reducer(state: OpenSourcesState, action: OpenSourcesAction): OpenSource
       if (prevStartIndex === bucketedStartIndex && prevStopIndex === bucketedStopIndex) {
         return state;
       } else {
-        return {
-          ...state,
-          visibleLines:
-            bucketedStartIndex === null
-              ? null
-              : {
-                  start: {
-                    line: bucketedStartIndex,
-                    column: 0,
-                  },
-                  end: {
-                    line: bucketedStopIndex!,
-                    column: Number.MAX_SAFE_INTEGER,
-                  },
+        if (bucketedStartIndex === null || bucketedStopIndex === null) {
+          return state;
+        } else {
+          return {
+            ...state,
+            visibleLinesBySourceId: {
+              ...prevVisibleLinesBySourceId,
+              [focusedSourceId]: {
+                start: {
+                  line: bucketedStartIndex,
+                  column: 0,
                 },
-        };
+                end: {
+                  line: bucketedStopIndex,
+                  column: Number.MAX_SAFE_INTEGER,
+                },
+              },
+            },
+          };
+        }
       }
     }
     default: {
@@ -228,7 +246,14 @@ export function SourcesContextRoot({ children }: PropsWithChildren) {
 
   const context = useMemo<SourcesContextType>(
     () => ({
-      ...state,
+      focusedSourceId: state.focusedSourceId,
+      hoveredLineIndex: state.hoveredLineIndex,
+      hoveredLineNode: state.hoveredLineNode,
+      openSourceIds: state.openSourceIds,
+      visibleLines: state.focusedSourceId
+        ? state.visibleLinesBySourceId[state.focusedSourceId] || null
+        : null,
+
       closeSource,
       isPending,
       openSource,

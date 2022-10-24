@@ -1,9 +1,17 @@
-.CurrentLine {
+.CurrentExecutionPoint,
+.CurrentSearchResult {
   position: absolute;
   top: 0;
   left: 0;
   height: var(--line-height);
   width: var(--max-line-width);
-  background: var(--background-color-current-line);
   z-index: -1;
+}
+
+.CurrentExecutionPoint {
+  background: var(--background-color-current-execution-point);
+}
+
+.CurrentSearchResult {
+  background: var(--background-color-current-search-result);
 }

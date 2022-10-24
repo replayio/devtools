@@ -6,66 +6,74 @@ import Icon from "../Icon";
 import styles from "./BadgePicker.module.css";
 import { getBadgeStyleVars } from "./utils/getBadgeStyleVars";
 
-// TODO [source viewer]
-// Animate open and close transition
+// Three states prevents close animation from being shown on mount.
+type State = "initial" | "open" | "closed";
+
 export default function BadgePicker({ point }: { point: Point }) {
   const { editPoint } = useContext(PointsContext);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [state, setState] = useState<State>("initial");
 
   const toggle = (badge: Badge | null) => {
     editPoint(point.id, { badge });
-    setIsOpen(false);
+    setState("closed");
   };
 
-  return isOpen ? (
-    <div className={styles.BadgePickerOpen}>
-      <div className={styles.BadgePickerPopOut} data-test-name="BadgePickerPopout">
-        <button
-          className={styles.BadgePickerButton}
-          data-test-name="BadgeButtonButton-default"
-          onClick={() => toggle(null)}
-        >
+  const isInitial = state === "initial";
+  const isOpen = state === "open";
+
+  return (
+    <div className={styles.BadgePicker}>
+      <button
+        className={`${styles.BadgePickerButton} ${styles.BadgePickerButtonToggle}`}
+        data-test-name={isOpen ? "BadgeButtonButton-default" : "BadgePickerButton"}
+        data-test-state={point.badge || "default"}
+        onClick={() => (isOpen ? toggle(null) : setState("open"))}
+      >
+        {isOpen ? (
           <Icon className={styles.BadgePickerButtonIcon} type="remove" />
-        </button>
-        <BadgePickerButton badge="unicorn" toggle={toggle} />
-        <BadgePickerButton badge="green" toggle={toggle} />
-        <BadgePickerButton badge="yellow" toggle={toggle} />
-        <BadgePickerButton badge="orange" toggle={toggle} />
-        <BadgePickerButton badge="purple" toggle={toggle} />
-      </div>
+        ) : (
+          <BadgePickerButtonIcon badge={point.badge} />
+        )}
+      </button>
+      {isInitial || (
+        <div className={isOpen ? styles.BadgePickerOpen : styles.BadgePickerClosed} key={state}>
+          <div className={styles.BadgePickerPopOut} data-test-name="BadgePickerPopout">
+            <BadgePickerButton currentBadge={point.badge} targetBadge="unicorn" toggle={toggle} />
+            <BadgePickerButton currentBadge={point.badge} targetBadge="green" toggle={toggle} />
+            <BadgePickerButton currentBadge={point.badge} targetBadge="yellow" toggle={toggle} />
+            <BadgePickerButton currentBadge={point.badge} targetBadge="orange" toggle={toggle} />
+            <BadgePickerButton currentBadge={point.badge} targetBadge="purple" toggle={toggle} />
+          </div>
+        </div>
+      )}
     </div>
-  ) : (
-    <button
-      className={styles.BadgePickerButton}
-      data-test-name="BadgePickerButton"
-      data-test-state={point.badge || "default"}
-      onClick={() => setIsOpen(true)}
-    >
-      <BadgePickerButtonIcon badge={point.badge} />
-    </button>
   );
 }
 
 function BadgePickerButton({
-  badge,
+  currentBadge,
+  targetBadge,
   toggle,
 }: {
-  badge: Badge | null;
+  currentBadge: Badge | null;
+  targetBadge: Badge | null;
   toggle: (badge: Badge) => void;
 }) {
   let onClick;
-  if (badge && toggle) {
-    onClick = () => toggle(badge);
+  if (targetBadge && toggle) {
+    onClick = () => toggle(targetBadge);
   }
 
   return (
     <button
-      className={styles.BadgePickerButton}
-      data-test-name={`BadgeButtonButton-${badge || "default"}`}
+      className={`${styles.BadgePickerButton} ${
+        currentBadge === targetBadge ? styles.BadgePickerButtonCurrent : ""
+      }`}
+      data-test-name={`BadgeButtonButton-${targetBadge || "default"}`}
       onClick={onClick}
     >
-      <BadgePickerButtonIcon badge={badge} />
+      <BadgePickerButtonIcon badge={targetBadge} />
     </button>
   );
 }

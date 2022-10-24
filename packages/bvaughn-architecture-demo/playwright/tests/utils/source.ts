@@ -335,9 +335,21 @@ export async function isContinueToPreviousButtonEnabled(
   return isContinueToButtonEnabled(page, { direction: "previous", lineNumber });
 }
 
-export async function isLineCurrent(page: Page, lineNumber: number): Promise<boolean> {
+export async function isLineCurrentExecutionPoint(
+  page: Page,
+  lineNumber: number
+): Promise<boolean> {
   const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
-  const currentHighlight = lineLocator.locator('[data-test-name="CurrentLineHighlight"]');
+  const currentHighlight = lineLocator.locator(
+    '[data-test-name="CurrentExecutionPointLineHighlight"]'
+  );
+  const isVisible = await currentHighlight.isVisible();
+  return isVisible;
+}
+
+export async function isLineCurrentSearchResult(page: Page, lineNumber: number): Promise<boolean> {
+  const lineLocator = page.locator(`[data-test-id="SourceLine-${lineNumber}"]`);
+  const currentHighlight = lineLocator.locator('[data-test-name="CurrentSearchResultHighlight"]');
   const isVisible = await currentHighlight.isVisible();
   return isVisible;
 }

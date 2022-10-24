@@ -23,7 +23,6 @@ export function KeyboardModifiersContextRoot({ children }: PropsWithChildren<{}>
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      console.log("onKeyDown()", event.key);
       switch (event.key) {
         case "Meta":
         case "Cmd":
@@ -40,7 +39,6 @@ export function KeyboardModifiersContextRoot({ children }: PropsWithChildren<{}>
       }
     };
     const onKeyUp = (event: KeyboardEvent) => {
-      console.log("onKeyUp()", event.key);
       switch (event.key) {
         case "Meta":
         case "Cmd":
