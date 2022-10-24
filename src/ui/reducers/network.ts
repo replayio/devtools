@@ -108,14 +108,15 @@ export const getFocusedEvents = (state: UIState) => {
   return events.filter(e => e.time > beginTime && e.time <= endTime);
 };
 export const getFocusedRequests = (state: UIState) => {
+  const loadedRegions = getLoadedRegions(state);
+  if (loadedRegions?.loaded == null || loadedRegions.loaded.length === 0) {
+    return [];
+  }
+
   const requests = getRequests(state);
   const focusRegion = getFocusRegion(state);
-  const loadedRegions = getLoadedRegions(state);
 
-  let filteredRequests = requests;
-  if (loadedRegions?.loaded) {
-    filteredRequests = filterToLoadedRegions(filteredRequests, loadedRegions.loaded);
-  }
+  let filteredRequests = filterToLoadedRegions(requests, loadedRegions.loaded);
   if (focusRegion) {
     filteredRequests = filterToFocusRegion(filteredRequests, focusRegion);
   }
