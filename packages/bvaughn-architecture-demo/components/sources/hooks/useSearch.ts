@@ -78,7 +78,7 @@ function reducer<Result>(state: State<Result>, action: Action<Result>): State<Re
     case "goToPrevious": {
       const { currentScopeId, index, query, results } = state;
 
-      const newIndex = index < results.length - 1 ? index + 1 : 0;
+      const newIndex = index > 0 ? index - 1 : results.length - 1;
 
       let cachedScopes = state.cachedScopes;
       if (currentScopeId !== null) {
