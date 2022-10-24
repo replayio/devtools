@@ -636,6 +636,9 @@ export class ReplayClient implements ReplayClientInterface {
       })
     );
 
+    // Ensure breakpoint positions are sorted by line ascending
+    lineLocations!.sort((a, b) => a.line - b.line);
+
     return lineLocations!;
   }
 
