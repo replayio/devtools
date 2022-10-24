@@ -215,7 +215,7 @@ export const {
     const breakablePositions = await client.getBreakpointPositions(sourceId, null);
 
     const breakablePositionsByLine = new Map<number, ProtocolSameLineSourceLocations>();
-    // The positions are already sorted by line number on the backend
+    // The positions are already sorted by line number in `ReplayClient.getBreakpointPositions`
     for (let position of breakablePositions) {
       // TODO BAC-2329
       // The backend sometimes returns duplicate columns per line;
