@@ -158,9 +158,25 @@ export type TestMetadata = {
   result: TestResult;
   title: string;
   version: number;
+  tests?: TestItem[];
   run?: { id: string; title?: string };
   path?: string[];
   file?: string;
+};
+
+export type TestItem = {
+  id?: string;
+  title: string;
+  path?: string[];
+  relativePath?: string;
+  result: TestResult;
+  error?: TestItemError;
+};
+
+type TestItemError = {
+  message: string;
+  line?: number;
+  column?: number;
 };
 
 // https://github.com/Replayio/replay-cli/blob/main/packages/replay/metadata/source.ts
