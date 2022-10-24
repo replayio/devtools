@@ -1,12 +1,13 @@
+import { Value } from "@replayio/protocol";
 import Loader from "bvaughn-architecture-demo/components/Loader";
 import Inspector from "bvaughn-architecture-demo/components/inspector";
 import ErrorBoundary from "bvaughn-architecture-demo/components/ErrorBoundary";
-import { Value } from "@replayio/protocol";
+import { getRecordingCapabilities } from "bvaughn-architecture-demo/src/suspense/RecordingCache";
+import { useEagerEvaluateExpression } from "devtools/client/webconsole/utils/autocomplete-eager";
 import debounce from "lodash/debounce";
-import React, { FC, useEffect, useRef, useState, useMemo, Suspense } from "react";
 import { ThreadFront } from "protocol/thread";
-
-import { useEagerEvaluateExpression } from "../../utils/autocomplete-eager";
+import React, { FC, useEffect, useRef, useState, useMemo, Suspense, useContext } from "react";
+import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
 function useEagerEvalPreview(expression: string) {
   const [value, setValue] = useState<Value | null>(null);
@@ -61,10 +62,19 @@ const Preview: FC<{ expression: string }> = ({ expression }) => {
   );
 };
 
-const EagerEvalFooter: FC<{ expression: string; completedExpression: string | null }> = ({
-  expression,
-  completedExpression,
-}) => {
+type Props = {
+  expression: string;
+  completedExpression: string | null;
+};
+
+function EagerEvalFooterSuspends({ expression, completedExpression }: Props) {
+  const replayClient = useContext(ReplayClientContext);
+  const recordingCapabilities = getRecordingCapabilities(replayClient);
+
+  if (!recordingCapabilities.supportsEagerEvaluation) {
+    return null;
+  }
+
   return (
     <div
       className="message result flex items-center font-mono"
@@ -90,6 +100,12 @@ const EagerEvalFooter: FC<{ expression: string; completedExpression: string | nu
       ) : null}
     </div>
   );
-};
+}
 
-export default EagerEvalFooter;
+export default function EagerEvalFooter(props: Props) {
+  return (
+    <Suspense>
+      <EagerEvalFooterSuspends {...props} />
+    </Suspense>
+  );
+}

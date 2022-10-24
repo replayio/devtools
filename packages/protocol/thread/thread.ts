@@ -81,6 +81,7 @@ type FindTargetCommand = (
 ) => Promise<FindTargetResult>;
 
 export type RecordingCapabilities = {
+  supportsEagerEvaluation: boolean;
   supportsEventTypes: boolean;
   supportsNetworkRequests: boolean;
   supportsRepaintingGraphics: boolean;
@@ -230,6 +231,7 @@ class _ThreadFront {
     switch (recordingTarget) {
       case "chromium": {
         recordingCapabilities = {
+          supportsEagerEvaluation: false,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
@@ -240,6 +242,7 @@ class _ThreadFront {
       }
       case "gecko": {
         recordingCapabilities = {
+          supportsEagerEvaluation: true,
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: true,
@@ -249,6 +252,7 @@ class _ThreadFront {
       }
       case "node": {
         recordingCapabilities = {
+          supportsEagerEvaluation: true,
           supportsEventTypes: true,
           supportsNetworkRequests: true,
           supportsRepaintingGraphics: false,
@@ -259,6 +263,7 @@ class _ThreadFront {
       case "unknown":
       default: {
         recordingCapabilities = {
+          supportsEagerEvaluation: false,
           supportsEventTypes: false,
           supportsNetworkRequests: false,
           supportsRepaintingGraphics: false,
