@@ -1,7 +1,15 @@
+import { SourceId } from "@replayio/protocol";
 import { useMemo, useState } from "react";
 
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
+
+type Scope = {
+  code: string;
+  sourceId: SourceId | null;
+};
+
+export type SetScope = (sourceId: SourceId | null, code: string) => void;
 
 function search(query: string, lines: string[]): number[] {
   const results: number[] = [];
@@ -17,20 +25,25 @@ function search(query: string, lines: string[]): number[] {
 }
 
 export type Actions = SearchActions & {
-  setCode: (code: string) => void;
+  setScope: SetScope;
 };
 
 export type State = SearchState<number>;
 
 export default function useSourceSearch(): [State, Actions] {
-  const [code, setCode] = useState<string>("");
-  const lines = useMemo(() => code.split("\n"), [code]);
-  const [state, dispatch] = useSearch<string, number>(lines, search);
+  const [scope, setScope] = useState<Scope>({
+    code: "",
+    sourceId: null,
+  });
+
+  const lines = useMemo(() => scope.code.split("\n"), [scope.code]);
+
+  const [state, dispatch] = useSearch<string, number>(lines, search, scope.sourceId);
 
   const externalActions = useMemo(
     () => ({
       ...dispatch,
-      setCode: setCode,
+      setScope: (sourceId: SourceId | null, code: string) => setScope({ code, sourceId }),
     }),
     [dispatch]
   );

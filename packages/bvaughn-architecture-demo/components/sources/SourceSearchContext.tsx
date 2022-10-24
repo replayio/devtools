@@ -3,7 +3,7 @@ import { getSourceContentsHelper } from "@bvaughn/src/suspense/SourcesCache";
 import { createContext, ReactNode, useContext, useEffect, useMemo } from "react";
 import { ReplayClientContext } from "shared/client/ReplayClientContext";
 
-import useSourceSearch, { Actions, State } from "./hooks/useSourceSearch";
+import useSourceSearch, { Actions, SetScope, State } from "./hooks/useSourceSearch";
 
 export const SourceSearchContext = createContext<[State, Actions]>(null as any);
 
@@ -17,19 +17,16 @@ export function SourceSearchContextRoot({ children }: { children: ReactNode }) {
 
   // Keep source search state in sync with the focused source.
   useEffect(() => {
-    async function updateSourceContents(
-      focusedSourceId: string | null,
-      setCode: (code: string) => void
-    ) {
+    async function updateSourceContents(focusedSourceId: string | null, setScope: SetScope) {
       if (focusedSourceId) {
         const { contents: code } = await getSourceContentsHelper(client, focusedSourceId);
-        setCode(code);
+        setScope(focusedSourceId, code);
       } else {
-        setCode("");
+        setScope(null, "");
       }
     }
 
-    updateSourceContents(focusedSourceId, actions.setCode);
+    updateSourceContents(focusedSourceId, actions.setScope);
   }, [client, actions, focusedSourceId]);
 
   return <SourceSearchContext.Provider value={context}>{children}</SourceSearchContext.Provider>;
