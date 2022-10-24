@@ -15,7 +15,9 @@ import {
   displayedEndForFocusRegion,
   filterToFocusRegion,
   displayedBeginForFocusRegion,
+  filterToLoadedRegions,
 } from "ui/utils/timeline";
+import { getLoadedRegions } from "./app";
 
 export type NetworkState = {
   events: RequestEventInfo[];
@@ -108,8 +110,17 @@ export const getFocusedEvents = (state: UIState) => {
 export const getFocusedRequests = (state: UIState) => {
   const requests = getRequests(state);
   const focusRegion = getFocusRegion(state);
+  const loadedRegions = getLoadedRegions(state);
 
-  return filterToFocusRegion(requests, focusRegion);
+  let filteredRequests = requests;
+  if (loadedRegions?.loaded) {
+    filteredRequests = filterToLoadedRegions(filteredRequests, loadedRegions.loaded);
+  }
+  if (focusRegion) {
+    filteredRequests = filterToFocusRegion(filteredRequests, focusRegion);
+  }
+
+  return filteredRequests;
 };
 
 export const getResponseBodies = (state: UIState) => state.network.responseBodies;

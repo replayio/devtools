@@ -1,12 +1,11 @@
 import classNames from "classnames";
 import React, { useState } from "react";
 import { useAppDispatch, useAppSelector } from "ui/setup/hooks";
-import { Column, Row, TableInstance } from "react-table";
+import { Row, TableInstance } from "react-table";
 import { setFocusRegionEndTime, setFocusRegionBeginTime } from "ui/actions/timeline";
 import { getLoadedRegions } from "ui/reducers/app";
 import type { AppDispatch } from "ui/setup/store";
 import { trackEvent } from "ui/utils/telemetry";
-import { isTimeInRegions } from "ui/utils/timeline";
 
 import { ContextMenu } from "../ContextMenu";
 import { Dropdown, DropdownItem } from "../Library/LibraryDropdown";
@@ -96,17 +95,12 @@ const RequestTable = ({
               firstInFuture = true;
             }
 
-            const isInLoadedRegion = loadedRegions
-              ? isTimeInRegions(row.original.point.time, loadedRegions.loaded)
-              : false;
-
             prepareRow(row);
 
             return (
               <RequestRow
                 currentTime={currentTime}
                 isFirstInFuture={firstInFuture}
-                isInLoadedRegion={isInLoadedRegion}
                 isInPast={inPast}
                 isSelected={selectedRequest?.id === row.original.id}
                 key={row.getRowProps().key}

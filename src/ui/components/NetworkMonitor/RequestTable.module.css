@@ -25,10 +25,6 @@ table.requests {
   color: var(--theme-base-80);
 }
 
-.row.unloaded {
-  color: var(--theme-base-90);
-}
-
 .row.selected {
   background: var(--primary-accent-hover);
   border-color: var(--primary-accent-hover);

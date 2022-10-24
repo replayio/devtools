@@ -292,6 +292,13 @@ export function isFocusRegionSubset(
   }
 }
 
+export function filterToLoadedRegions<T extends TimeStampedPoint>(
+  sortedPoints: T[],
+  loadedRegions: TimeStampedPointRange[]
+): T[] {
+  return sortedPoints.filter(point => isPointInRegions(loadedRegions, point.point));
+}
+
 export function filterToFocusRegion<T extends TimeStampedPoint>(
   sortedPoints: T[],
   focusRegion: FocusRegion | null
