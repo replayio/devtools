@@ -21,18 +21,23 @@ import {
   isContinueToPreviousButtonEnabled,
   isLineCurrentExecutionPoint,
   toggleLogPointBadge,
+  getSourceSearchResultsLabelLocator,
+  goToNextSourceSearchResult,
+  goToPreviousSourceSearchResult,
+  clearSearchResult,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
 
 testSetup("dbd4da74-cf42-41fb-851d-69bed67debcf");
 
 const sourceId = "h1";
+const altSourceId = "1";
 
 test.beforeEach(async ({ page }) => {
   page.setDefaultTimeout(5000);
 
   await page.goto(getTestUrl("source-and-console"));
-  await openSourceFile(page, "h1");
+  await openSourceFile(page, sourceId);
 });
 
 test("should not allow saving log points with invalid content", async ({ page }) => {
@@ -187,6 +192,36 @@ test("should support text search in the active source file", async ({ page }) =>
   await expect(sourceSearchLocator).not.toBeVisible();
 });
 
+test("should remember search results and current index per source", async ({ page }) => {
+  await openSourceFile(page, sourceId);
+  const resultsLabel = getSourceSearchResultsLabelLocator(page);
+  await searchSourceText(page, "function");
+  await expect(await resultsLabel.textContent()).toBe("1 of 5 results");
+  await goToNextSourceSearchResult(page);
+  await goToNextSourceSearchResult(page);
+  await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
+
+  await openSourceFile(page, altSourceId);
+  await expect(await resultsLabel.textContent()).toBe("1 of 20 results");
+  await goToNextSourceSearchResult(page);
+  await goToNextSourceSearchResult(page);
+  await goToNextSourceSearchResult(page);
+  await expect(await resultsLabel.textContent()).toBe("4 of 20 results");
+
+  await openSourceFile(page, sourceId);
+  await expect(await resultsLabel.textContent()).toBe("3 of 5 results");
+  await goToPreviousSourceSearchResult(page);
+  await expect(await resultsLabel.textContent()).toBe("2 of 5 results");
+
+  await openSourceFile(page, altSourceId);
+  await expect(await resultsLabel.textContent()).toBe("4 of 20 results");
+
+  await clearSearchResult(page);
+  await expect(await resultsLabel.isVisible()).toBe(false);
+  await openSourceFile(page, sourceId);
+  await expect(await resultsLabel.isVisible()).toBe(false);
+});
+
 test("should support break points", async ({ page }) => {
   const sourceLine = getSourceLineLocator(page, sourceId, 13);
   await takeScreenshot(page, sourceLine, "source-line-no-breakpoint");
@@ -250,29 +285,23 @@ test("should allow log point badge colors to be toggled", async ({ page }) => {
 });
 
 test("scroll position should be restored when switching between sources", async ({ page }) => {
-  // Scroll to the bottom of "h1"
-  await openSourceFile(page, "h1");
+  // Scroll to the bottom of source 1
+  await openSourceFile(page, sourceId);
   await goToLine(page, 77);
-  const line77 = getSourceLineLocator(page, "h1", 77);
+  const line77 = getSourceLineLocator(page, sourceId, 77);
   await expect(await line77.isVisible()).toBe(true);
 
-  // Open source "1" and scroll to the middle
-  await openSourceFile(page, "1");
+  // Open source 2 and scroll to the middle
+  await openSourceFile(page, altSourceId);
   await goToLine(page, 100);
-  const line100 = getSourceLineLocator(page, "1", 100);
+  const line100 = getSourceLineLocator(page, altSourceId, 100);
   await expect(await line100.isVisible()).toBe(true);
 
-  // Switch back and verify that we're still at the bottom of "h1"
-  await openSourceFile(page, "h1");
+  // Switch back and verify that we're still at the bottom of source 1
+  await openSourceFile(page, sourceId);
   await expect(await line77.isVisible()).toBe(true);
 
-  // Switch back and verify that we're still in the middle of "1"
-  await openSourceFile(page, "1");
+  // Switch back and verify that we're still in the middle of source 2
+  await openSourceFile(page, altSourceId);
   await expect(await line100.isVisible()).toBe(true);
 });
-
-// TODO [source viewer]
-// Test fuzzy search when switching sources
-
-// TODO [source viewer]
-// Test go-to-line when switching sources
