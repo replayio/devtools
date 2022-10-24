@@ -19,7 +19,7 @@ import {
   continueTo,
   isContinueToNextButtonEnabled,
   isContinueToPreviousButtonEnabled,
-  isLineCurrent,
+  isLineCurrentExecutionPoint,
   toggleLogPointBadge,
 } from "./utils/source";
 import testSetup from "./utils/testSetup";
@@ -222,9 +222,9 @@ test("should support continue to next and previous functionality", async ({ page
   await expect(await isContinueToPreviousButtonEnabled(page, 14)).toBe(false);
 
   // Go to line 14.
-  await expect(await isLineCurrent(page, 14)).toBe(false);
+  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(false);
   await continueTo(page, { lineNumber: 14, direction: "next" });
-  await expect(await isLineCurrent(page, 14)).toBe(true);
+  await expect(await isLineCurrentExecutionPoint(page, 14)).toBe(true);
 
   // Continue to next and previous buttons should both now be disabled for line 14.
   // Continue to previous should be enabled for line 13
