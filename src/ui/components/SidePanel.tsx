@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Events from "ui/components/Events";
-import CypressInfo from "devtools/client/debugger/src/components/CypressInfo/CypressInfo";
 import ReplayInfo from "./Events/ReplayInfo";
 import PrimaryPanes from "devtools/client/debugger/src/components/PrimaryPanes";
 import StatusDropdown from "./shared/StatusDropdown";
@@ -9,7 +8,8 @@ import { getSelectedPrimaryPanel } from "ui/reducers/layout";
 import { useAppSelector } from "ui/setup/hooks";
 import ProtocolViewer from "./ProtocolViewer";
 import CommentCardsList from "./Comments/CommentCardsList";
-import { useFetchCypressSpec } from "../hooks/useFetchCypressSpec";
+import { useGetRecording, useGetRecordingId } from "ui/hooks/recordings";
+import TestInfo from "devtools/client/debugger/src/components/TestInfo/TestInfo";
 const FullTextSearch = require("devtools/client/debugger/src/components/FullTextSearch").default;
 const SecondaryPanes = require("devtools/client/debugger/src/components/SecondaryPanes").default;
 const Accordion = require("devtools/client/debugger/src/components/shared/Accordion").default;
@@ -21,7 +21,8 @@ export default function SidePanel() {
   const [replayInfoCollapsed, setReplayInfoCollapsed] = useState(false);
   const [eventsCollapsed, setEventsCollapsed] = useState(false);
   const [cypressCollapsed, setCypressCollapsed] = useState(false);
-  const cypressResults = useFetchCypressSpec();
+  const recordingId = useGetRecordingId();
+  const { recording } = useGetRecording(recordingId);
 
   const items = [
     {
@@ -34,12 +35,18 @@ export default function SidePanel() {
     },
   ];
 
-  if (cypressResults && cypressResults.length > 0) {
+  if (recording?.metadata?.test?.tests?.length) {
     items.push({
-      header: "Cypress",
+      header: `Test Info (${recording?.metadata?.test?.tests?.length})`,
       buttons: null,
       className: "cyress-info flex-1 border-t overflow-hidden border-themeBorder",
-      component: <CypressInfo results={cypressResults} />,
+      component: (
+        <TestInfo
+          result={recording?.metadata?.test.result}
+          spec={recording?.metadata?.test.file}
+          testCases={recording?.metadata?.test.tests}
+        />
+      ),
       opened: !cypressCollapsed,
       onToggle: () => setCypressCollapsed(!setCypressCollapsed),
     });
@@ -56,7 +63,7 @@ export default function SidePanel() {
 
   return (
     <div
-      className="w-full overflow-hidden rounded-lg bg-bodyBgcolor text-xs"
+      className="w-full overflow-hidden text-xs rounded-lg bg-bodyBgcolor"
       data-test-id="leftSidebar"
     >
       {selectedPrimaryPanel === "explorer" && <PrimaryPanes />}
