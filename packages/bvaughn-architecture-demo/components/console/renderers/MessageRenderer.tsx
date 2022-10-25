@@ -55,8 +55,12 @@ function MessageRenderer({
     }
   }, [isFocused]);
 
+  const stack = message.stack || [];
   const frames = message.data.frames || EMPTY_ARRAY;
-  const frame = frames.length > 0 ? frames[frames.length - 1] : null;
+  const frame =
+    stack.length > 0 && frames.length > 0
+      ? frames.find(frame => frame.frameId === stack[0]) || null
+      : null;
 
   let className = styles.Row;
   let icon = null;
