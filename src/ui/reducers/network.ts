@@ -41,6 +41,7 @@ const update = (state: NetworkState = initialState(), action: NetworkAction): Ne
       return {
         ...state,
         loading: false,
+        requests: sortBy(state.requests, request => BigInt(request.point)),
       };
     case "NEW_NETWORK_REQUESTS":
       return {

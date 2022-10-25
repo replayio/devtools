@@ -702,7 +702,7 @@ class _ThreadFront {
     client.Network.addRequestsListener(onRequestsReceived);
     client.Network.addResponseBodyDataListener(onResponseBodyData);
     client.Network.addRequestBodyDataListener(onRequestBodyData);
-    client.Network.findRequests({}, sessionId);
+    await client.Network.findRequests({}, sessionId);
   }
 
   getFrameSteps(pauseId: PauseId, frameId: FrameId) {
