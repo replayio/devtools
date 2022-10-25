@@ -52,9 +52,17 @@ function TestCase({ test, location }: { test: TestItem; location?: SourceLocatio
 
   return (
     <div className="flex flex-col gap-1">
-      <button className="flex flex-row items-center gap-1 group" onClick={onClick}>
+      <button
+        className="flex flex-row items-center gap-1 group"
+        onClick={onClick}
+        disabled={!location}
+      >
         <Status result={test.result} />
-        <div className="overflow-hidden whitespace-pre overflow-ellipsis group-hover:underline">
+        <div
+          className={`overflow-hidden whitespace-pre overflow-ellipsis ${
+            location ? "group-hover:underline" : ""
+          }`}
+        >
           {test.title}
         </div>
       </button>
@@ -77,11 +85,7 @@ function Status({ result }: { result: TestResult }) {
     <MaterialIcon
       iconSize="2xl"
       outlined
-      className={
-        result === "passed"
-          ? "text-green-500 group-hover:text-green-400"
-          : "text-red-500 group-hover:text-red-700"
-      }
+      className={result === "passed" ? "text-green-500" : "text-red-500"}
     >
       {result === "passed" ? "check_circle" : "highlight_off"}
     </MaterialIcon>
