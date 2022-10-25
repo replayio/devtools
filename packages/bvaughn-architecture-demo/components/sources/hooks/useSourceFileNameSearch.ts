@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import useSearch from "./useSearch";
 import type { Actions as SearchActions, State as SearchState } from "./useSearch";
 
+export type Item = ProtocolSource;
 export type Result = {
   characterIndices: number[];
   source: ProtocolSource;
@@ -69,7 +70,7 @@ export type Actions = SearchActions & {
   setSources: (sources: ProtocolSource[]) => void;
 };
 
-export type State = SearchState<Result> & {
+export type State = SearchState<Item, Result> & {
   goToLineMode: boolean;
   goToLineNumber: number | null;
 };

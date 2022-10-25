@@ -28,7 +28,7 @@ export type Actions = SearchActions & {
   setScope: SetScope;
 };
 
-export type State = SearchState<number>;
+export type State = SearchState<string, number>;
 
 export default function useSourceSearch(): [State, Actions] {
   const [scope, setScope] = useState<Scope>({
