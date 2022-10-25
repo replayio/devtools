@@ -29,8 +29,18 @@ export function bootstrap(_store: UIStore, ThreadFront: typeof TF) {
 
   ThreadFront.on(
     "paused",
-    ({ point, time, frame }: { point: string; hasFrames: boolean; time: number; frame: Frame }) => {
-      store.dispatch(paused({ executionPoint: point, time, frame }));
+    ({
+      point,
+      time,
+      frame,
+      hasFrames,
+    }: {
+      point: string;
+      hasFrames: boolean;
+      time: number;
+      frame: Frame;
+    }) => {
+      store.dispatch(paused({ executionPoint: point, time, frame, hasFrames }));
     }
   );
   ThreadFront.on("resumed", () => store.dispatch(resumed()));
