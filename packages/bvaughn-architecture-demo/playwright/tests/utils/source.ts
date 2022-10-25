@@ -78,6 +78,14 @@ export async function addLogPoint(
   await stopHovering(page);
 }
 
+export async function clearSearchResult(page: Page) {
+  await focusOnSource(page);
+
+  await debugPrint(page, `${chalk.bold("Clearing")} search result`, "clearSearchResult");
+
+  await page.click('[data-test-id="SourceSearchClearButton"]');
+}
+
 export async function continueTo(
   page: Page,
   options: {
@@ -196,6 +204,10 @@ export function getPointPanelLocator(page: Page, lineNumber: number): Locator {
   return page.locator(`[data-test-id=PointPanel-${lineNumber}]`);
 }
 
+export function getSourceSearchResultsLabelLocator(page: Page): Locator {
+  return page.locator(`[data-test-id="SearchResultsLabel"]`);
+}
+
 export function getSourceFileNameSearchResultsLocator(page: Page): Locator {
   return page.locator(`[data-test-id="SourceFileNameSearchResults"]`);
 }
@@ -243,6 +255,30 @@ export async function goToLine(page: Page, lineNumber: number) {
 
   // Give the list time to render and settle.
   await delay(1000);
+}
+
+export async function goToNextSourceSearchResult(page: Page) {
+  await focusOnSource(page);
+
+  await debugPrint(
+    page,
+    `Going to ${chalk.bold("next")} search result`,
+    "goToNextSourceSearchResult"
+  );
+
+  await page.click('[data-test-id="SourceSearchGoToNextButton"]');
+}
+
+export async function goToPreviousSourceSearchResult(page: Page) {
+  await focusOnSource(page);
+
+  await debugPrint(
+    page,
+    `Going to ${chalk.bold("previous")} search result`,
+    "goToNextSourceSearchResult"
+  );
+
+  await page.click('[data-test-id="SourceSearchGoToPreviousButton"]');
 }
 
 export async function hoverOverLine(
